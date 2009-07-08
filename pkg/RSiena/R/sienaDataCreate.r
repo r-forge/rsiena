@@ -23,6 +23,8 @@ sienaDataCreate<- function(..., nodeSets=NULL)
             TRUE
     }
     narg <- nargs()
+    ## find a set of names for the objects: either the names given in the
+    ## argument list or the names of the objects in the argument list
     dots <- as.list(substitute(list(...)))[-1] ##first entry is the word 'list'
     if (length(dots) == 0)
         stop('need some networks')
@@ -56,7 +58,7 @@ sienaDataCreate<- function(..., nodeSets=NULL)
                sienaNet = {
                    if (attr(dots[[i]],'sparse'))
                    {
-                       require(Matrix)
+                     ##  require(Matrix)
                        netdims <- c(dim(dots[[i]][[1]]), length(dots[[i]]))
                    }
                    else
@@ -461,7 +463,7 @@ sienaDataCreate<- function(..., nodeSets=NULL)
                     {
                         mymat <- myarray[, , j]
                     }
-                    if (!isSymmetric(mymat))
+                    if (suppressMessages(!isSymmetric(mymat)))
                     {
                         attr(depvars[[i]], 'symmetric') <- FALSE
                     }
@@ -491,12 +493,12 @@ sienaDataCreate<- function(..., nodeSets=NULL)
                 ### need to exclude the structurals here
                 if (sparse)
                 {
-                    vals <- lapply(depvars[[i]], function(x)
+                   vals <- lapply(depvars[[i]], function(x)
                                    c(x@x[!(is.na(x@x) |
                                            x@x %in% c(10, 11))] , 0))
                     attr(depvars[[i]], "range") <-
                         do.call(range, vals)
-                }
+               }
                 else
                 {
                     tmp <- depvars[[i]]
@@ -1212,14 +1214,14 @@ calcBalmeanGroup <- function(data)
                         tmp <- depvar[[k]]
                         diag(tmp)  <-  NA ## just in case
                         x1 <- tmp@x
-                        struct <- !is.na(x1) | x1 %in% c(10, 11)
+                        struct <- !is.na(x1) & x1 %in% c(10, 11)
                         x1[struct] <- x1[struct] - 10
                         tmp@x <- x1
+                        tmp1 <- colSums(is.na(tmp))
                         tempra <- tempra +
                             sum(2 * colSums(tmp, na.rm=TRUE) *
-                                colSums(1 - tmp, na.rm=TRUE),
+                                (dims[1] - tmp1 - colSums(tmp, na.rm=TRUE)),
                                 na.rm=TRUE)
-                        tmp1 <- colSums(is.na(tmp))
                         tmp2 <- colSums(!is.na(tmp))
                         temprb <- temprb + sum(tmp2 * (tmp2 - 1))
                     }
@@ -1259,10 +1261,10 @@ calcBalmean <- function(depvar)
             struct <- !is.na(x1) & x1 %in% c(10, 11)
             x1[struct] <- x1[struct] - 10
             tmp@x <- x1
-            tmp2 <- colSums(!is.na(tmp))
+            tmp1 <- colSums(is.na(tmp))
             tempra <- tempra +
                 sum(2 * colSums(tmp, na.rm=TRUE) *
-                    (dims[1] - tmp2 - colSums(tmp, na.rm=TRUE)),
+                    (dims[1] - tmp1 - colSums(tmp, na.rm=TRUE)),
                     na.rm=TRUE)
             tmp2 <- colSums(!is.na(tmp))
             temprb <- temprb + sum(tmp2 * (tmp2 - 1))

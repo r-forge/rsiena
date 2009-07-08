@@ -110,9 +110,25 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
                     {
                         if (!is.null(session))
                         {
-                            filename <-
-                                session$Filename[session$Name == netname
-                                                 &session$Period == k]
+                            namesession <-
+                                session[session$Name == netname, ]
+                            filename <- namesession$Filename
+                            if (length(filename) > 1)
+                            {
+                                if (namesession$Format[1] == "Siena net")
+                                {
+                                    period <-
+                                        strsplit(namesession$Period, " ")
+                                    sub <- sapply(period, function(x) k %in% x)
+                                }
+                                else
+                                {
+                                   period <-
+                                    unlist(strsplit(namesession$Period, " "))
+                                 sub <- match(k, period)
+                                }
+                                filename <- filename[sub]
+                            }
                             Report(c("Observation moment ", k + periodFromStart,
                                      " was read from file ", filename, '. \n'),
                                    sep='', outf)
@@ -124,7 +140,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
                         ## remove structurals ? NA or 0/1
                         if (attr(depvar, "sparse"))
                         {
-                            require(Matrix)
+                           # require(Matrix)
                             tmpdepvar <- depvar[[k]]
                             tmpx1 <- tmpdepvar@x
                             use <- tmpx1 %in% c(10, 11)
@@ -158,8 +174,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
                         {
                             if (attr(depvar, "sparse"))
                             {
-                                nstruct0 <- sum(depvar[[k]] %in% c(10))
-                                nstruct1 <- sum(depvar[[k]] %in% c(11))
+                                nstruct0 <- sum(depvar[[k]]@x %in% c(10))
+                                nstruct1 <- sum(depvar[[k]]@x %in% c(11))
                             }
                             else
                             {
@@ -173,8 +189,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
                                        sep="", outf );
                                 if (attr(depvar, "sparse"))
                                 {
-                                    nstruct0 <- sum(depvar[[k]] %in% c(10))
-                                    nstruct1 <- sum(depvar[[k]] %in% c(11))
+                                    nstruct0 <- sum(depvar[[k]]@x %in% c(10))
+                                    nstruct1 <- sum(depvar[[k]]@x %in% c(11))
                                 }
                                 else
                                 {
