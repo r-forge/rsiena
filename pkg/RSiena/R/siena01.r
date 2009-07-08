@@ -67,7 +67,7 @@ siena01Gui <- function()
         mytkarray[[noFiles, 5]] <<- noFiles ## period
         if (substring(filename[noFiles], nchar(filename[noFiles]) - 3,
                       nchar(filename[noFiles]))=='.net')
-            tkset(formatspins[[noFiles]], 2)
+            tkset(formatspins[[noFiles]], "pajek net")
         tcl(table1, "selection", "clear", "all") ## unselect everything
         tcl(table1, "selection", 'set', paste(noFiles,',3', sep=''))
         tcl(table1, "yview", noFiles)
@@ -141,7 +141,7 @@ siena01Gui <- function()
         noFiles <<- 0
         filename <<- NULL
         for (i in 1:tableRows)
-            for (j in 1:9)
+            for (j in 1:11)
                 mytkarray[[i,j]] <<- NULL
         lapply(typespins, function(x) tkset(x, 'network'))
         lapply(formatspins, function(x) tkset(x,'matrix' ))

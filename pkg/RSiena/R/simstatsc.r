@@ -392,7 +392,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
     sparse <- attr(depvar, 'sparse')
     if (sparse)
     {
-        require(Matrix)
+        ## require(Matrix)
         ## have a list of sparse matrices in triplet format
         ## with missings and structurals embedded and 0 based indices!
         netmiss <- vector("list", observations)

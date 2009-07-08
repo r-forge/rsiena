@@ -720,8 +720,8 @@ getEffects<- function(x, nintn = 10)
     n <- length(xx$depvars)
     types <- sapply(xx$depvars, function(x)attr(x, 'type'))
     sparses <- sapply(xx$depvars, function(x)attr(x, 'sparse'))
-    if (any(sparses))
-        require(Matrix)
+   ## if (any(sparses))
+   ##     require(Matrix)
     nOneModes <- sum(types == 'oneMode')
     nBehaviors <- sum(types == 'behavior')
     effects <- vector('list',n)
@@ -1006,6 +1006,8 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
                 mymat1@x[use] <- mymat1@x[use] - 10
                 use <- mymat2@x %in% c(10, 11)
                 mymat2@x[use] <- mymat2@x[use] - 10
+                mymat1 <- drop0(mymat1)
+                mymat2 <- drop0(mymat2)
             }
             else
             {
@@ -1016,8 +1018,8 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
             }
             diag(mymat1) <- NA
             diag(mymat2) <- NA
-            mydif <- mymat2-mymat1
-            matdiff[i] <-sum(abs(mydif), na.rm=TRUE)
+            mydif <- mymat2 - mymat1
+            matdiff[i] <- sum(abs(mydif), na.rm=TRUE)
             tmp <- table(mydif@x)
             tmp00 <- nactors * nactors - length(mydif@x)
             tmp <- c(tmp00, tmp[c(3, 1, 2)])

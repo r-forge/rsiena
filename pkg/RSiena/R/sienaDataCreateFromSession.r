@@ -37,21 +37,23 @@ sessionFromFile <- function(loadfilename, tk=FALSE)
        ## apply(session, 2, trim.blanks)
    ## }
    ## else
-    if (extension == 'csv')
+    if (extension == "csv")
     {
-        session <- read.csv(loadfilename, comment.char='',
-                             colClasses='character', strip.white=TRUE,
-                            na.strings='')
-        }
-    else if (extension =='txt')
-    {
-        session <- read.delim(loadfilename, comment.char='',
-                               colClasses='character', strip.white=TRUE )
+       ( session <- read.csv(loadfilename, comment.char="",
+                            colClasses="character", strip.white=TRUE,
+                            na.strings=NULL))
     }
-    else if (extension =='prn')
+    else if (extension =="txt")
     {
-        session <- read.table(loadfilename, comment.char='',
-                               colClasses='character', strip.white=TRUE)
+        session <- read.delim(loadfilename, comment.char="",
+                              colClasses="character", strip.white=TRUE,
+                              na.strings=NULL)
+    }
+    else if (extension =="prn")
+    {
+        session <- read.table(loadfilename, comment.char="",
+                              colClasses="character", strip.white=TRUE,
+                              na.strings=NULL)
     }
     else
     {
@@ -254,7 +256,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        }
                        else if (namesession$Format[1] == "Siena net")
                        {
-                           require(Matrix)
+                         ##  require(Matrix)
                            if (nrow(namesession) == 1)
                            {
                                miss <- miss1[[1]]
@@ -272,7 +274,6 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                    stop("Differing numbers of observations ",
                                         observations, " ", length(mylist))
                                nActors <- as.numeric(namesession$NbrOfActors[1])
-                               cat ("nactors", nActors,'\n')
                            }
                            else ## multiple siena nets
                            {
@@ -280,7 +281,6 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                    stop("observations and periods don't match")
                                mylist <- vector("list", observations)
                                nActors <- as.numeric(namesession$NbrOfActors[1])
-                               cat ("nactors", nactors,'\n')
                                for (x in 1:nrow(namesession))
                                {
                                    miss <- miss1[[x]]
@@ -309,7 +309,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        }
                        else ## pajek net
                        {
-                           require(Matrix)
+                           ##require(Matrix)
                            nActors <- network.size(namefiles[[1]])
                            mylist <- vector("list", observations)
                            for (x in 1:nrow(namesession))

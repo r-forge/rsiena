@@ -166,7 +166,7 @@ sienaNet<- function(netarray, type=c('oneMode','bipartite','behavior'),
     }
     else
     {
-        require(Matrix)
+      #  require(Matrix)
         if (!is.list(netarray))
             stop('netarray must be an array or a list of sparse matrices')
         if (!all(sapply(netarray, function(x) is(x,'dgTMatrix'))))
