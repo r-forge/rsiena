@@ -18,8 +18,7 @@ noClusters=2, initC=FALSE, tt=NULL, parallelTesting=FALSE, ...)
   \item{batch}{ Desired interface: 'batch' is a small amount of printout
 	to the  console}
   \item{verbose}{Produces various output to the console if TRUE}
-  \item{useCluster}{Boolean: whether to use a cluster of processes for
-    phase3}
+  \item{useCluster}{Boolean: whether to use a cluster of processes}
   \item{noClusters}{Number of processes to use if useCluster is TRUE}
   \item{initC}{Boolean: set to TRUE if the simulation will use C
 	routines. Only for use if using multiple processors, to ensure all

@@ -47,6 +47,8 @@ public:
 	virtual void clear();
 
 	CommonNeighborIterator reciprocatedTies(int i) const;
+	CommonNeighborIterator reciprocatedTies(int i,
+		int lowerBound) const;
 
 	int twoPathCount(int i, int j) const;
 	int truncatedTwoPathCount(int i, int j, int threshold = 2) const;

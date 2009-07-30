@@ -214,12 +214,25 @@ void OneModeNetwork::clear()
 // ----------------------------------------------------------------------------
 
 /**
- * Returns an iterator over reciprocated ties of the actor <i>i</i>
+ * Returns an iterator over reciprocated ties of the actor <i>i</i>.
  */
 CommonNeighborIterator OneModeNetwork::reciprocatedTies(int i) const
 {
 	this->checkSenderRange(i);
 	return CommonNeighborIterator(this->inTies(i), this->outTies(i));
+}
+
+
+/**
+ * Returns an iterator over reciprocated ties of the actor <i>i</i> with
+ * the alter not less than the given bound.
+ */
+CommonNeighborIterator OneModeNetwork::reciprocatedTies(int i,
+	int lowerBound) const
+{
+	this->checkSenderRange(i);
+	return CommonNeighborIterator(this->inTies(i, lowerBound),
+		this->outTies(i, lowerBound));
 }
 
 

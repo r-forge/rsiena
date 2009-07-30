@@ -81,6 +81,15 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                            sub("^(1/2)", "", effects$effectName[assort],
                                fixed=TRUE))
             }
+            ## and dense triads
+            dense <- effects$shortName == "denseTriads"
+            if (sum(dense) > 0)
+            {
+                parms <- effects[dense, "parm"]
+                effects$functionName[dense] <-
+                   sub("#", parms, effects$functionName[dense],
+                               fixed=TRUE)
+            }
             if (inherits(data, 'sienaGroup'))
             {
                 nGroup <- length(data)
@@ -146,32 +155,60 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             ## see if we can use the original dfra
             if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
             {
-                if (all(names(prevAns$dfra) == effects$shortNames)
+                if (all(rownames(prevAns$dfra) == effects$shortName)
                     && !is.null(prevAns$sf))
                 {
                     z$haveDfra <- TRUE
                     z$dfra <- prevAns$dfra
                     z$sf <- prevAns$sf
+                    ## use thetas too, unless use standard values
+                    if (!x$useStdInits)
+                    {
+                        effects$initialValue <- prevAns$theta
+                        if (!is.null(prevAns$condvar))
+                        {
+                            ## z$condvar has the subscripts of included
+                            ## parameters
+                            ## that correspond to the conditional variable
+                            ## need to scale the other rates again
+                            effects$initialValue[z$posj] <-
+                                effects$initialValue[z$posj] / prevAns$rate
+                        }
+                        z$theta <- effects$initialValue
+                    }
                 }
             }
             z$effects <- effects
         }
+        else
+        {
+            f <- FRANstore()
+            ## Would like f to be just the data objects plus the attributes
+            ## but need the effects later
+            ff <- f
+            f$pData <- NULL
+            f$pModel <-  NULL
+            f$myeffects <-  NULL
+            f$observations <-  NULL
+            f$randomseed2 <- NULL
+            f$seeds <- NULL
+        }
         pData <- .Call('setupData', PACKAGE="RSiena",
                        lapply(f, function(x)(as.integer(x$observations))),
                        lapply(f, function(x)(x$nodeSets)))
-        ans<- .Call('OneMode', PACKAGE="RSiena",
+        ans <- .Call('OneMode', PACKAGE="RSiena",
                     pData, lapply(f, function(x)x$nets))
         ans <- .Call('Behavior', PACKAGE="RSiena",
                      pData, lapply(f, function(x)x$behavs))
-        ans<-.Call('ConstantCovariates', PACKAGE="RSiena",
+        ans <-.Call('ConstantCovariates', PACKAGE="RSiena",
                    pData, lapply(f, function(x)x$cCovars))
-        ans<-.Call('ChangingCovariates', PACKAGE="RSiena",
-                   pData,lapply(f, function(x)x$vCovars))
-        ans<-.Call('DyadicCovariates', PACKAGE="RSiena",
-                   pData,lapply(f, function(x)x$dycCovars))
-        ans<-.Call('ChangingDyadicCovariates', PACKAGE="RSiena",
+        ans <-.Call('ChangingCovariates', PACKAGE="RSiena",
+                   pData, lapply(f, function(x)x$vCovars))
+        ans <-.Call('DyadicCovariates', PACKAGE="RSiena",
+                   pData, lapply(f, function(x)x$dycCovars))
+        ans <-.Call('ChangingDyadicCovariates', PACKAGE="RSiena",
                    pData, lapply(f, function(x)x$dyvCovars))
-        ans<-.Call('ExogEvent', PACKAGE="RSiena",
+        ans <-.Call('ExogEvent', PACKAGE="RSiena",
                    pData, lapply(f, function(x)x$exog))
         ##store the address
         f$pData <- pData
@@ -188,7 +225,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         }
         else
         {
-            myeffects <- f$myeffects
+            myeffects <- ff$myeffects
         }
         ans<- .Call('effects', PACKAGE="RSiena",
                     pData, myeffects)
@@ -221,6 +258,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         {
             CONDVAR <- z$condname
             CONDTARGET <- attr(f, "change")
+         ##   cat(CONDTARGET, '\n')
         }
         else
         {
@@ -231,13 +269,16 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                      pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
                      profileData)
         f$myeffects <- myeffects
-        z$effects <- effects
         if (!initC)
         {
             DataReport(z, x, f)
+            f$randomseed2 <- z$randomseed2
+        }
+        else
+        {
+            f$randomseed2 <- ff$randomseed2
         }
         f$observations <- attr(f, "observations") + 1
-        f$randomseed2 <- z$randomseed2
         FRANstore(f) ## store f in FRANstore
         return(z)
     }
@@ -268,7 +309,6 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     }
     ## iteration entry point
     f <- FRANstore()
-
     if (is.null(f$randomseed2))
     {
         randomseed2 <- NULL
@@ -281,7 +321,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                  z$Deriv, f$pData, f$seeds,
                  fromFiniteDiff, f$pModel, f$myeffects, z$theta,
                  randomseed2)
-    ## browser()
+    # browser()
     if (!fromFiniteDiff)
     {
         f$seeds <- ans[[3]]

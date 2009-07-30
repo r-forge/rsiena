@@ -47,8 +47,8 @@ TRUE, TRUE, TRUE, TRUE), ShortName = c("density", "recip", "transTrip",
 "nbrDist2", "nbrDist2twice", "denseTriads", "inPop", "inPopSqrt",
 "outPop", "outPopSqrt", "inAct", "inActSqrt", "outAct", "outActSqrt",
 "outInv", "outSqInv", "outOutAss", "outInAss", "inOutAss", "inInAss"
-), parm = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-0, 0, 0, 0, 2, 2, 2, 2)), .Names = c("EffectName", "FunctionName",
+), parm = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0,
+0, 0, 1, 1, 2, 2, 2, 2)), .Names = c("EffectName", "FunctionName",
 "Endowment.", "ShortName", "parm"), row.names = c(NA, -25L), class = "data.frame")
 symmetricObjEffects <-
 structure(list(EffectName = c("degree (density)", "transitive triads",
