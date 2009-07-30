@@ -783,7 +783,7 @@ void setupConstantCovariate(SEXP COCOVAR, ConstantCovariate *
 
 {
     int nActors = length(COCOVAR);
-//    Rprintf("nactors %d\n", nActors);
+  Rprintf("%x\n", pConstantCovariate);
     double * start = REAL(COCOVAR);
     for (int actor = 0; actor < nActors; actor++)
     {
@@ -1862,6 +1862,7 @@ one of values, one of missing values (boolean) */
 						}
 						else
 						{
+							Rprintf("here\n");
 							score = 0;
 						}
 					}

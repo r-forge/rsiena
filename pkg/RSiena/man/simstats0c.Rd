@@ -24,7 +24,10 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
 	with \command{sienaProfile.exe}}
   \item{prevAns}{An object of class "sienaFit", from which scaling
 	information (derivative matrix and standard deviation of the
-	deviations) will be extracted. Phase 1 will then be omitted.}
+	deviations) will be extracted along with the latest version of the
+	parameters which will be used as the initial values, unless the
+	model requests the use of standard initial values. Phase 1 will then
+	be omitted.}
 }
 \details{
   This should be used for the element FRAN of the model object.

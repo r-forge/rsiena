@@ -30,21 +30,28 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
     }
     on.exit(exitfn())
 
-    if (useCluster)
-    {
-        require(snow)
-    }
 
     time0 <-  proc.time()['elapsed']
     z <- NULL ## z is the object for all control information which may change.
     ## x is designed to be readonly. Only z is returned.
 
+    if (useCluster)
+    {
+        require(snow)
+        require(rlecuyer)
+        x$firstg <- x$firstg * noClusters
+        z$int <- noClusters
+    }
+    else
+    {
+        z$int <- 1
+    }
     if (parallelTesting)
     {
         set.seed(1, kind='Wich')
         ## randomseed2 is for second generator needed only for parallel testing
         randomseed2 <- .Random.seed
-        .Random.seed[2:4] <- as.integer(c(1,2,3))
+      #  .Random.seed[2:4] <- as.integer(c(1,2,3))
         randomseed2[2:4] <- as.integer(c(3,2,1))
         seed <- 1
         newseed <- 1
@@ -98,6 +105,9 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
     time1 <-  proc.time()['elapsed']
     Report(c("Total computation time", round(time1 - time0, digits=2),
              "seconds.\n"), outf)
+
+    if (useCluster)
+        stopCluster(z$cl)
 
     class(z) <- "sienaFit"
     z
@@ -255,7 +265,7 @@ AnnouncePhase <- function(z, x, subphase=NULL)
             z$pb<-createProgressBar(z$pb,max)
        }
     }
-z
+    z
 }
 
 roundfreq<- function(w)
@@ -269,7 +279,7 @@ roundfreq<- function(w)
     w
 }
 
-model.create<- function(fn=simstats0c,
+model.create<- function(fn=simstats0c, usesimstats0c=TRUE,
                         projname="Siena", MaxDegree=0, useStdInits=FALSE,
                         n3=1000, nsub=4, maxlike=FALSE, diag=TRUE,
                         condvarno=0, condname='',
@@ -294,6 +304,10 @@ model.create<- function(fn=simstats0c,
     model$ModelType <- 1
     model$MaxDegree <- MaxDegree
     model$randomSeed <- seed
+    if (deparse(substitute(fn)) == "simstats0c")
+        model$simstats0c <- TRUE
+    else
+        model$simstats0c <- usesimstats0c
     class(model) <- "sienaModel"
     model
 }

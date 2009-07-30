@@ -423,6 +423,9 @@ sienaDataCreate<- function(..., nodeSets=NULL)
                     x2[x2 %in% c(10, 11)] <- NA
                     mymat1@x <- x1
                     mymat2@x <- x2
+                    ## remove diagonals
+                    diag(mymat1) <- NA
+                    diag(mymat2) <- NA
                     mydiff <- mymat2 - mymat1
                     attr(depvars[[i]], 'distance')[j] <- sum(mydiff != 0,
                                                              na.rm = TRUE)
@@ -433,11 +436,14 @@ sienaDataCreate<- function(..., nodeSets=NULL)
                 }
                 else
                 {
-                    mymat1 <- myarray[,,j, drop=FALSE]
-                    mymat2 <- myarray[,,j + 1,drop=FALSE]
+                    mymat1 <- myarray[, , j]
+                    mymat2 <- myarray[, , j + 1]
                     ##remove structural values
                     mymat1[mymat1 %in% c(10,11)] <- NA
                     mymat2[mymat2 %in% c(10,11)] <- NA
+                    ## remove diagonals
+                    diag(mymat1) <- NA
+                    diag(mymat2) <- NA
                     mydiff <- mymat2 - mymat1
                     attr(depvars[[i]], 'distance')[j] <- sum(mydiff != 0,
                                                              na.rm = TRUE)
