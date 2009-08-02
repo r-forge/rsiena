@@ -123,8 +123,7 @@ phase1.1 <- function(z, x, ...)
             use <- !z$fixed & npos < 5
             z$epsilon[use] <- pmin(100.0 * z$scale[use], z$epsilon[use])
             z$epsilon[use] <- pmax(0.1 * z$scale[use], z$epsilon[use])
-            Report(c("New epsilon =", paste(" ", z$epsilon[use], collapse=""),
-                     "\n"), sep="", cf, fill=80)
+            Report(c("New epsilon =", paste(" ", z$epsilon[use], collapse=""),                     ".\n"), sep="", cf, fill=80)
             if (z$repeatsForEpsilon <= 4)
             {
                 Report("Change value of epsilon and restart Phase 1.\n", cf)
