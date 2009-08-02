@@ -8,6 +8,23 @@
 # * Description: This module contains the code for the gui for creation of a
 # * Siena data object.
 # *****************************************************************************/
+installGui <- function()
+{
+    if (.Platform$OS.type =="windows")
+    {
+        tmp <- list.files(pkgpath)
+        if (subs <- grep("sienaguisetup", tmp))
+        {
+            filename=paste(pkgpath, "/", tmp[subs], sep="", collapse="")
+            system(filename)
+        }
+    }
+    else
+    {
+        stop("Gui only needs installing on Windows: on Linux use sienascript")
+    }
+}
+
 siena01Gui <- function()
 {
    ## DONE (FALSE) ## this is so we can exit cleanly

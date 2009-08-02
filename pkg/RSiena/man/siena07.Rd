@@ -21,8 +21,8 @@ noClusters=2, initC=FALSE, tt=NULL, parallelTesting=FALSE, ...)
   \item{useCluster}{Boolean: whether to use a cluster of processes}
   \item{noClusters}{Number of processes to use if useCluster is TRUE}
   \item{initC}{Boolean: set to TRUE if the simulation will use C
-	routines. Only for use if using multiple processors, to ensure all
-	copies are initialised at the start of phase 3}
+	routines (currently always needed). Only for use if using
+	multiple processors, to ensure all copies are initialised correctly.}
   \item{tt}{A \code{tcltk} toplevel window. Used if called from the
 	model options screen.}
   \item{parallelTesting}{Boolean. If TRUE, sets up random numbers to
