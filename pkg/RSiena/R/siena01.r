@@ -48,6 +48,8 @@ siena01Gui <- function()
     ph2spinVar  <-  NULL
     rsspinVar <- NULL
     rsVar <- NULL
+    clustVar  <-  NULL
+    clustspinVar <- NULL
     derivVar <- NULL
     ph3spinVar <- NULL
     maxdfVar <- NULL
@@ -424,7 +426,15 @@ siena01Gui <- function()
         {
             model$randomSeed <- as.numeric(tclvalue(rsspinVar))
         }
-        model$FinDiff.method <- tclvalue(derivVar) == '0. crude Monte Carlo'
+         if (tclvalue(clustVar) == '0')
+        {
+            model$nbrClusters <- 1
+        }
+        else
+        {
+            model$nbrClusters <- as.numeric(tclvalue(clustspinVar))
+        }
+       model$FinDiff.method <- tclvalue(derivVar) == '0. crude Monte Carlo'
         model$n3 <- as.numeric(tclvalue(ph3spinVar))
         degs <- rep(0, nMaxDegree)
         for (i in 1:nMaxDegree)
@@ -484,9 +494,19 @@ siena01Gui <- function()
         {
             ##create mymodel
             mymodel <<- modelFromTcl()
-            if (inherits(resp <- try(siena07(mymodel, data=mydata,
-                                             effects=myeff),
-                                     silent=TRUE), "try-error"))
+            if (mymodel$nbrClusters > 1)
+            {
+                resp <- try(siena07(mymodel, data=mydata, effects=myeff,
+                                    useCluster=TRUE, initC=TRUE,
+                                    noClusters=mymodel$nbrClusters),
+                            silent=TRUE)
+            }
+            else
+            {
+                resp <- try(siena07(mymodel, data=mydata, effects=myeff),
+                            silent=TRUE)
+            }
+            if (inherits(resp, "try-error"))
             {
                 tkmessageBox(message=resp, icon="error")
             }
@@ -541,6 +561,19 @@ siena01Gui <- function()
             else
             {
                 tkgrid(rsspin, row=3, column=1)
+            }
+        }
+        clustersFn <- function()
+        {
+            val <- as.numeric(tclvalue(clustVar))
+            if (val == 0)
+            {
+                tkgrid.forget(clustspin)
+                tclvalue(clustspinVar) <<- 0
+            }
+            else
+            {
+                tkgrid(clustspin, row=4, column=1)
             }
         }
         returnFn <- function()
@@ -736,6 +769,17 @@ siena01Gui <- function()
                             textvariable=rsspinVar, cursor="arrow")
         tkgrid(rs, row=3, sticky='w')
 
+        ##create and display fields for number of processors entry
+        clustVar <<- tclVar()
+        tclvalue(clustVar) <<- '0'
+        clust <- tkcheckbutton(optf,
+                               text=' Number of processors: ',
+                               variable=clustVar,
+                               command=clustersFn)
+        clustspinVar <<- tclVar()
+        clustspin <-  tkwidget(optf, 'spinbox', from=2, to=1000, width=10,
+                            textvariable=clustspinVar, cursor="arrow")
+        tkgrid(clust, row=4, sticky='w')
         ##create and display field for derivative method
         derivlab <- tklabel(optf, text=' Derivative method ')
         derivlist <- c('0. crude Monte Carlo',
