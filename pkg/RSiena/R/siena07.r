@@ -16,7 +16,8 @@ bof <- NULL
 cf <- NULL
 
 siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
-                   noClusters = 2, initC=FALSE, tt=NULL,
+                   noClusters = 2, initC=FALSE,
+                   clusterString=rep("localhost", noClusters), tt=NULL,
                    parallelTesting=FALSE, ...)
 {
     exitfn <- function()
@@ -100,7 +101,7 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
         z$pb <- list(pb=NULL, pbval=0, pbmax=1)
     }
 
-    z <- robmon(z, x, useCluster, noClusters, initC, ...)
+    z <- robmon(z, x, useCluster, noClusters, initC, clusterString,...)
 
     time1 <-  proc.time()['elapsed']
     Report(c("Total computation time", round(time1 - time0, digits=2),
