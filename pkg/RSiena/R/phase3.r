@@ -20,10 +20,28 @@ phase3<- function(z, x, ...)
     int <- z$int
 
     if (x$checktime) z$ctime <- proc.time()[3]
-    z$sf <- matrix(0, nrow = x$n3, ncol = z$pp)
-    z$sf2 <- array(0, dim = c(x$n3, f$observations - 1, z$pp))
-    z$ssc <- array(0, dim = c(x$n3, f$observations - 1, z$pp))
-    z$sdf <- array(0, dim = c(x$n3, z$pp, z$pp))
+    ## fix up iteration numbers if using multiple processors
+    if (10 %% int == 0)
+    {
+        firstNit <- 10
+    }
+    else
+    {
+        firstNit <- 10 + int - 10 %% int
+    }
+    if ((x$n3 - firstNit) %% int == 0)
+    {
+        endNit <- x$n3
+    }
+    else
+    {
+        endNit <- x$n3  + int - (x$n3 - firstNit) %% int
+    }
+    z$n3 <- endNit
+    z$sf <- matrix(0, nrow = z$n3, ncol = z$pp)
+    z$sf2 <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
+    z$ssc <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
+    z$sdf <- array(0, dim = c(z$n3, z$pp, z$pp))
     ## revert to original requested method for phase 3
     z$Deriv <- !x$FinDiff.method
     if (x$FinDiff.method)
