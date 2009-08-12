@@ -428,11 +428,11 @@ siena01Gui <- function()
         }
          if (tclvalue(clustVar) == '0')
         {
-            model$nbrClusters <- 1
+            model$nbrNodes <- 1
         }
         else
         {
-            model$nbrClusters <- as.numeric(tclvalue(clustspinVar))
+            model$nbrNodes <- as.numeric(tclvalue(clustspinVar))
         }
        model$FinDiff.method <- tclvalue(derivVar) == '0. crude Monte Carlo'
         model$n3 <- as.numeric(tclvalue(ph3spinVar))
@@ -494,11 +494,11 @@ siena01Gui <- function()
         {
             ##create mymodel
             mymodel <<- modelFromTcl()
-            if (mymodel$nbrClusters > 1)
+            if (mymodel$nbrNodes > 1)
             {
                 resp <- try(siena07(mymodel, data=mydata, effects=myeff,
                                     useCluster=TRUE, initC=TRUE,
-                                    noClusters=mymodel$nbrClusters),
+                                    nbrNodes=mymodel$nbrnodes),
                             silent=TRUE)
             }
             else

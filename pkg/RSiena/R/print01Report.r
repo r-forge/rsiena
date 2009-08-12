@@ -656,8 +656,19 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
         modelname, ">>.\n\n"), sep="", outf)
     Report(c("Date and time:", format(Sys.time(), "%d/%m/%Y %X"), "\n\n"), outf)
     packageValues <- packageDescription("RSiena", fields=c("Version", "Date"))
+    rforgeRevision <-  packageDescription("RSiena",
+                                          fields="Repository/R-Forge/Revision")
+    if (is.na(rforgeRevision))
+    {
+        revision <- ""
+    }
+    else
+    {
+        revision <- paste(" R-forge revision: ", rforgeRevision, " ", sep="")
+    }
     Report(c("SIENA version ", packageValues[[1]], " (",
-        format(as.Date(packageValues[[2]]), "%d %m %Y"), ")\n\n"), sep="", outf)
+        format(as.Date(packageValues[[2]]), "%d %m %Y"), ")",
+             revision, "\n\n"), sep="", outf)
 
     if (!inherits(data, 'sienaGroup'))
     {

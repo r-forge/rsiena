@@ -19,34 +19,11 @@ storeinFRANstore <- function(...)
 {
     FRANstore(...)
 }
-phase2.1<- function(z, x, useCluster, noClusters, initC,...)
+phase2.1<- function(z, x, ...)
 {
     #initialise phase2
     int <- 1
-   # cl  <-  NULL
     f <- FRANstore()
-   # if (useCluster)
-   # {
-   #     if (!is.null(x$simstats0c) && !x$simstats0c)
-   #     {
-   #         stop("Multiple processors only for simstats0c at present")
-   #     }
-   #     cl <- makeCluster(rep("localhost", noClusters), type = "SOCK",
-   #                       outfile = 'cluster.out')
-   #     clusterSetupRNG(cl, seed = rep(1, 6))
-   #     clusterCall(cl, library, 'RSiena', character.only = TRUE)
-   #     clusterCall(cl, storeinFRANstore, f)
-   #     ans <- clusterCall(cl, storeinFRANstore)
-   #     int <- noClusters
-   #     if (initC)
-   #     {
-   #         ## ans <-  clusterCall(cl, x$FRAN, z, x, INIT=FALSE, initC = initC)
-   #         ans <-  clusterCall(cl, usesim, z, x,
-   #                             INIT=FALSE, initC = initC)
-   #     }
-   # }
-   # z$cl <- cl
-   # z$int <- int
     z$Phase <- 2
     z$writefreq <- 1
     if (!is.batch())
@@ -261,7 +238,7 @@ doIterations<- function(z, x, subphase,...)
         }
         if (z$int == 1)
         {
-            zz <- x$FRAN(zsmall, xsmall)
+            zz <- x$FRAN(zsmall, xsmall, ...)
             fra <- colSums(zz$fra) - z$targets
             if (!zz$OK)
             {
@@ -271,7 +248,7 @@ doIterations<- function(z, x, subphase,...)
         }
         else
         {
-            zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
+            zz <- clusterCall(z$cl, usesim, zsmall, xsmall, ...)
             fra <- rowMeans(sapply(zz, function(x) colSums(x$fra)- z$targets))
             zz$OK <- sapply(zz, function(x) x$OK)
             if (!all(zz$OK))

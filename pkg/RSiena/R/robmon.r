@@ -11,7 +11,7 @@
 ##args:x: model object - intended to be read only
 ##     z: model fitting object
 ## returns updated z
-robmon <- function(z, x, useCluster, noClusters, initC, clusterString, ...)
+robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
 {
     z$FinDiff.method<- x$FinDiff.method
     z$n <- 0
@@ -39,7 +39,7 @@ robmon <- function(z, x, useCluster, noClusters, initC, clusterString, ...)
             stop("Multiple processors only for simstats0c at present")
         }
         cl <- makeCluster(clusterString, type = "SOCK",
-                          outfile = 'cluster.out')
+                          outfile = 'cluster.out', homogeneous=FALSE)
         clusterSetupRNG(cl, seed = rep(1, 6))
         clusterCall(cl, library, "RSiena", character.only = TRUE)
         clusterCall(cl, storeinFRANstore,  FRANstore())
@@ -49,7 +49,7 @@ robmon <- function(z, x, useCluster, noClusters, initC, clusterString, ...)
                                 INIT=FALSE, initC = initC)
         }
         z$cl <- cl
-        z$int <- noClusters
+        z$int <- nbrNodes
     }
     else
     {

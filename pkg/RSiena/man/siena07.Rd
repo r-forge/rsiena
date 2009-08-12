@@ -11,7 +11,8 @@
 (See examples)}
 \usage{
 siena07(x, batch=FALSE, verbose=FALSE, useCluster=FALSE,
-noClusters=2, initC=FALSE, tt=NULL, parallelTesting=FALSE, ...)
+nbrNodes=2, initC=FALSE, clusterString=rep("localhost", nbrNodes),
+tt=NULL, parallelTesting=FALSE, ...)
 }
 \arguments{
   \item{x}{ A model object}
@@ -19,10 +20,13 @@ noClusters=2, initC=FALSE, tt=NULL, parallelTesting=FALSE, ...)
 	to the  console}
   \item{verbose}{Produces various output to the console if TRUE}
   \item{useCluster}{Boolean: whether to use a cluster of processes}
-  \item{noClusters}{Number of processes to use if useCluster is TRUE}
+  \item{nbrNodes}{Number of processes to use if useCluster is TRUE}
   \item{initC}{Boolean: set to TRUE if the simulation will use C
 	routines (currently always needed). Only for use if using
-	multiple processors, to ensure all copies are initialised correctly.}
+	multiple processors, to ensure all copies are initialised
+	correctly.}
+  \item{clusterString}{Definitions of clusters. Default set up to use
+	the localmachine only.}
   \item{tt}{A \code{tcltk} toplevel window. Used if called from the
 	model options screen.}
   \item{parallelTesting}{Boolean. If TRUE, sets up random numbers to
