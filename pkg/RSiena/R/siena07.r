@@ -16,8 +16,8 @@ bof <- NULL
 cf <- NULL
 
 siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
-                   noClusters = 2, initC=FALSE,
-                   clusterString=rep("localhost", noClusters), tt=NULL,
+                   nbrNodes = 2, initC=FALSE,
+                   clusterString=rep("localhost", nbrNodes), tt=NULL,
                    parallelTesting=FALSE, ...)
 {
     exitfn <- function()
@@ -40,8 +40,8 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
     {
         require(snow)
         require(rlecuyer)
-        x$firstg <- x$firstg * noClusters
-        z$int <- noClusters
+        x$firstg <- x$firstg * nbrNodes
+        z$int <- nbrNodes
     }
     else
     {
@@ -101,7 +101,7 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
         z$pb <- list(pb=NULL, pbval=0, pbmax=1)
     }
 
-    z <- robmon(z, x, useCluster, noClusters, initC, clusterString,...)
+    z <- robmon(z, x, useCluster, nbrNodes, initC, clusterString,...)
 
     time1 <-  proc.time()['elapsed']
     Report(c("Total computation time", round(time1 - time0, digits=2),
@@ -120,10 +120,21 @@ InitReports <- function(seed, newseed)
     Report(c("Date and time:", format(Sys.time(),"%d/%m/%Y %H:%M:%S")), outf)
     Report("\nNew results follow.\n", outf)
     Report("-----------------------------------\n", outf)
+    rforgeRevision <-  packageDescription("RSiena",
+                                          fields="Repository/R-Forge/Revision")
+    if (is.na(rforgeRevision))
+    {
+        revision <- ""
+    }
+    else
+    {
+        revision <- paste(" R-forge revision: ", rforgeRevision, " ", sep="")
+    }
     Report(c("\nSiena version ",
              packageDescription("RSiena", fields = "Version"), " (",
              format(as.Date(packageDescription("RSiena", fields = "Date")),
-                    "%d %b %y"), ")\n\n"), sep = '',  outf )
+                    "%d %b %y"), ")",
+             revision, "\n\n"), sep = '',  outf )
     Heading(1, outf, "Estimation by stochastic approximation algorithm.")
     if (is.null(seed))
     {

@@ -39,6 +39,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new TransitiveTripletsEffect(pEffectInfo);
 	}
+	else if (effectName == "transTriads")
+	{
+		pEffect = new TransitiveTriadsEffect(pEffectInfo);
+	}
 	else if (effectName == "transMedTrip")
 	{
 		pEffect = new TransitiveMediatedTripletsEffect(pEffectInfo);

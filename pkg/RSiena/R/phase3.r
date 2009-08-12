@@ -42,6 +42,7 @@ phase3<- function(z, x, ...)
     z$sf2 <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
     z$ssc <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
     z$sdf <- array(0, dim = c(z$n3, z$pp, z$pp))
+    z$sims <- vector("list", z$n3)
     ## revert to original requested method for phase 3
     z$Deriv <- !x$FinDiff.method
     if (x$FinDiff.method)
@@ -194,11 +195,11 @@ phase3<- function(z, x, ...)
     z
 }
 
-doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall,...)
+doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
 {
     if (int == 1)
     {
-        zz <- x$FRAN(zsmall, xsmall)
+        zz <- x$FRAN(zsmall, xsmall, ...)
         if (!zz$OK)
         {
             z$OK <- zz$OK
@@ -210,7 +211,7 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall,...)
     else
     {
   ##zz <- clusterCall(cl, simstats0c, zsmall, xsmall)
-        zz <- clusterCall(cl, usesim, zsmall, xsmall)
+        zz <- clusterCall(cl, usesim, zsmall, xsmall, ...)
         z$n <- z$n + z$int
       #  browser()
    }
@@ -220,6 +221,7 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall,...)
         fra <- fra - z$targets
         z$sf[nit, ] <- fra
         z$sf2[nit, , ] <- zz$fra
+        z$sims[[nit]] <- zz$nets
     }
     else
     {
@@ -229,7 +231,8 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall,...)
             fra <- fra - z$targets
             z$sf[nit + (i - 1), ] <- fra
             z$sf2[nit + (i - 1), , ] <- zz[[i]]$fra
-        }
+            z$sims[[nit + (i - 1)]] <- zz[[i]]$nets
+       }
     }
     if (x$cconditional)
     {

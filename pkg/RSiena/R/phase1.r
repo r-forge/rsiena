@@ -161,7 +161,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     DisplayIteration(z)
     if (int == 1)
     {
-        zz <- x$FRAN(zsmall, xsmall)
+        zz <- x$FRAN(zsmall, xsmall, ...)
         if (!zz$OK)
         {
             z$OK <- zz$OK
@@ -173,7 +173,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     }
     else
     {
-        zz <- clusterCall(cl, usesim, zsmall, xsmall)
+        zz <- clusterCall(cl, usesim, zsmall, xsmall, ...)
         z$n <- z$n + z$int
         z$phase1Its <- z$phase1Its + int
     }
@@ -482,7 +482,7 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
         if (int == 1)
         {
             zz <- x$FRAN(zdummy, xsmall, INIT=FALSE,
-                         fromFiniteDiff=TRUE)
+                         fromFiniteDiff=TRUE, ...)
             if (!zz$OK)
             {
                 z$OK <- zz$OK
@@ -492,7 +492,7 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
         else
         {
             zz <- clusterCall(cl, x$FRAN, zdummy, xsmall,
-                              INIT=FALSE, fromFiniteDiff=TRUE)
+                              INIT=FALSE, fromFiniteDiff=TRUE, ...)
         }
         if (int == 1)
         {

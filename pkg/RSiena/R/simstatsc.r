@@ -10,7 +10,7 @@
 # *****************************************************************************/
 simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                         effects=NULL, fromFiniteDiff=FALSE,
-                      profileData=FALSE, prevAns=NULL)
+                      profileData=FALSE, prevAns=NULL, returnDeps=FALSE)
 {
     if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
     {
@@ -81,6 +81,19 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                            sub("^(1/2)", "", effects$effectName[assort],
                                fixed=TRUE))
             }
+            ## and inverse out degree
+            outinv <- effects$shortName %in% c("outInv", "outSqInv")
+            if (sum(outinv) > 0)
+            {
+
+                effects$functionName[outinv] <-
+                    gsub("#", effects$parm[outinv],
+                           effects$functionName[outinv])
+
+                effects$effectName[outinv] <-
+                    gsub("#", effects$parm[outinv],
+                           effects$effectName[outinv])
+            }
             ## and dense triads
             dense <- effects$shortName == "denseTriads"
             if (sum(dense) > 0)
@@ -144,7 +157,13 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             attr(f, "observations") <- attr(data, "observations")
             attr(f, "compositionChange") <- attr(data, "compositionChange")
             attr(f, "exooptions") <- attr(data, "exooptions")
-            if (x$cconditional)
+           ## if any networks symmetric must use finite differences
+            syms <- attr(data,"symmetric")
+            if (any(!is.na(syms) & syms))
+            {
+                z$FinDiff.method <- TRUE
+            }
+        	if (x$cconditional)
             {
                 attr(f, "change") <-
                     sapply(f, function(xx)attr(xx$depvars[[z$condname]],
@@ -320,8 +339,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     ans <- .Call('model', PACKAGE="RSiena",
                  z$Deriv, f$pData, f$seeds,
                  fromFiniteDiff, f$pModel, f$myeffects, z$theta,
-                 randomseed2)
-    # browser()
+                 randomseed2, returnDeps)
     if (!fromFiniteDiff)
     {
         f$seeds <- ans[[3]]
@@ -338,7 +356,8 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     fra <- t(ans[[1]])
     f$randomseed2 <- ans[[5]]
     FRANstore(f)
-    list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE)
+    list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
+         nets=ans[[6]])
 }
 clearData <- function(pData)
 {

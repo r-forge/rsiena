@@ -520,6 +520,16 @@ void NetworkVariable::makeChange(int actor)
 		}
 
 		this->lpNetwork->setTieValue(this->lego, alter, 1 - currentValue);
+
+		const OneModeNetworkLongitudinalData * pData =
+			dynamic_cast<const OneModeNetworkLongitudinalData *>(this->pData());
+		if (pData)
+		{
+			if (pData->symmetric())
+			{
+			this->lpNetwork->setTieValue(alter, this->lego, 1 - currentValue);
+			}
+		}
 	}
 }
 

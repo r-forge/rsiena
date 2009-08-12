@@ -36,14 +36,13 @@ getEffects<- function(x, nintn = 10)
             rateEffects <- c(rateEffects,
                              paste(symmetricRateEffects[-(1:2), 1], varname))
             rateFunctions <- c(rateFunctions, symmetricRateEffects[-(1:2), 2])
-            rateShortNames <- symmetricRateEffects[, 3]
             ratePeriods <- c(ratePeriods, rep(NA, nrow(symmetricRateEffects)-2))
             rateTypes <- c(rateTypes, rep('structural',
                                           nrow(symmetricRateEffects)-2))
             objEffects <- symmetricObjEffects[, 1]
             objFunctions <- symmetricObjEffects[, 2]
             objEndowment <- symmetricObjEffects[, 3]
-            objShortnames <- symmetricObjEffects[, 4]
+            objShortNames <- symmetricObjEffects[, 4]
             objParms <- symmetricObjEffects[, 5]
             objEffects <- createObjEffectList(objEffects, objFunctions,
                                               objEndowment, objShortNames,
@@ -1032,7 +1031,7 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
     }
     distance <- attr(depvar, "distance" )
     if (attr(depvar,'symmetric'))
-        startRate<- nactors * (0.2 + distance)/(tmp['matcnt',]+1)
+        startRate<- nactors * (0.2 + distance)/(tmp['matcnt',] %/% 2 +1)
     else
         startRate<- nactors * (0.2 + 2 * distance)/(tmp['matcnt',]+1)
     startRate <- pmax(0.1, startRate)
@@ -1042,7 +1041,7 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
     if (attr(depvar,'symmetric'))
     {
         matchange <- matchange %/% 2
-        matcnt <- matcnt %/% 2
+       ## matcnt <- matcnt %/% 2
     }
     p01 <- ifelse (matchange[1,] + matchange[2,] >=1,
                    matchange[2,]/(matchange[1,]+matchange[2,]),0.5)

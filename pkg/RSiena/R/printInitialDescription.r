@@ -122,11 +122,20 @@ printInitialDescription <- function(data, effects, modelName="Siena")
                 if (gpatts$symmetric[net])
                 {
                     tmp$tmp <- tmp$tmp %/% 2
+                    matchange <- matchange %/% 2
                 }
                 for (per in 1:(atts$netdims[3] - 1))
                 {
                     ntot <- tmp$tmp["matcnt", per]
-                    misd <- atts$netdims[1] * (atts$netdims[1] - 1) - ntot
+                    if (gpatts$symmetric[net])
+                    {
+                        misd <- atts$netdims[1] * (atts$netdims[1] - 1) / 2 -
+                            ntot
+                    }
+                    else
+                    {
+                        misd <- atts$netdims[1] * (atts$netdims[1] - 1) - ntot
+                    }
                     if (valmin == 0 && valmax == 1)
                     {
                         jaccard <- format(round(matchange[4, per] /
