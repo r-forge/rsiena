@@ -101,9 +101,10 @@ PrintReport <- function(z, x)
                z$effects$effectName[z$effects$netType=='behavior'] <-
                    behEffects$effectName
            }
-           tmp <- paste(sprintf("%2d",1:length(z$effects$effectName)),
+           typesp <- ifelse (z$effects$type== "endow", ": ", ":  ")
+           tmp <- paste(sprintf("%2d", 1:length(z$effects$effectName)),
                         '. ',format(paste(z$effects$type,
-                        ':  ', z$effects$effectName, sep = ''), width=50),
+                        typesp, z$effects$effectName, sep = ''), width=50),
                          theta, ses, '\n', sep='', collapse = '')
            if (nBehavs > 0 && nOneModes > 0)
            {
