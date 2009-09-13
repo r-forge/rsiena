@@ -293,7 +293,9 @@ getEffects<- function(x, nintn = 10)
         objParms <- rep(0, length(objEffects))
         if (observations==1)
         {
-            rateEffects <- paste('rate', varname)
+            rateEffects <- paste('rate ',varname,' period ',
+                                 1, sep='')
+            ##rateEffects <- paste('rate', varname)
             rateFunctions <- "Amount of behavioral change"
             rateShortNames <- 'Rate'
             ratePeriods <- 1
@@ -405,7 +407,9 @@ getEffects<- function(x, nintn = 10)
             ## no starting value yet for quadratic effect
         }
         if (observations == 1)
-            effectname <- paste('rate', varname)
+     #       effectname <- paste('rate', varname)
+            effectname <- paste('rate ', varname,' period ',
+                                1:noPeriods, sep='')
         else
             effectname <- paste('rate ', varname,' (period ',
                                 1:noPeriods, ')', sep='')

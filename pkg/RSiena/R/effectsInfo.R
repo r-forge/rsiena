@@ -92,7 +92,7 @@ TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
 ), ShortName = c("linear", "quad", "avSim", "totSim", "indeg",
 "outdeg", "isolate", "avSimRecip", "totSimRecip", "avSimPopAlt",
 "totSimPopAlt", "avSimRecPop", "totSimRecPop", "avAlt", "avRecAlt",
-"denseTriads", "simDenseTriads", "recipDeg", "avSimPopEgo")), .Names = c("EffectName",
+"behDenseTriads", "simDenseTriads", "recipDeg", "avSimPopEgo")), .Names = c("EffectName",
 "Function.Name", "Endowment.", "ShortName"), class = "data.frame", row.names = c(NA,
 -19L))
 behaviorRateEffects <-

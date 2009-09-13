@@ -39,7 +39,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
             stop("Multiple processors only for simstats0c at present")
         }
         cl <- makeCluster(clusterString, type = "SOCK",
-                          outfile = 'cluster.out', homogeneous=FALSE)
+                          outfile = 'cluster.out')
         clusterSetupRNG(cl, seed = rep(1, 6))
         clusterCall(cl, library, "RSiena", character.only = TRUE)
         clusterCall(cl, storeinFRANstore,  FRANstore())

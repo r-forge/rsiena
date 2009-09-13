@@ -498,7 +498,7 @@ siena01Gui <- function()
             {
                 resp <- try(siena07(mymodel, data=mydata, effects=myeff,
                                     useCluster=TRUE, initC=TRUE,
-                                    nbrNodes=mymodel$nbrnodes),
+                                    nbrNodes=mymodel$nbrNodes),
                             silent=TRUE)
             }
             else

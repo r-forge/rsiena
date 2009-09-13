@@ -198,7 +198,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     if (z$FinDiff.method)
     {
         z <- FiniteDifferences(z, x, fra + z$targets, z$cl, z$int, ...)
-        z$sdf[z$nit, , ] <- z$sdf0
+        z$sdf[z$nit:(z$nit + (z$int - 1)), , ] <- z$sdf0
     }
     else if (x$maxlike)
     {
