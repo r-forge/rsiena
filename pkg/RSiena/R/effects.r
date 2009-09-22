@@ -8,8 +8,10 @@
 # * Description: This module contains the code for the creation of the
 # * effects object to go with a Siena data object or group object.
 # *****************************************************************************/
-getEffects<- function(x, nintn = 10)
+##@getEffects DataCreate
+getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
 {
+    ##@oneModeNet internal getEffects
     oneModeNet <- function(depvar, varname)
     {
         nodeSet <- attr(depvar, 'nodeSet')
@@ -281,6 +283,7 @@ getEffects<- function(x, nintn = 10)
              starts=starts)
     }
 
+    ##@behaviornet internal getEffects
     behaviorNet <- function(depvar, varname)
     {
         nodeSet <- attr(depvar,'nodeSet')
@@ -426,6 +429,7 @@ getEffects<- function(x, nintn = 10)
              objEffects = objEffects), starts=starts)
     }
 
+    ##@dyadNetObjEff internal getEffects
     dyadNetObjEff<- function(covarname, symmetric)
     {
         if (symmetric)
@@ -451,6 +455,7 @@ getEffects<- function(x, nintn = 10)
                                        varname, varname2=covarname)
         list(objEff=objEff)
     }
+    ##@covSymmNetEff internal getEffects
     covSymmNetEff<- function(covarname, poszvar, moreThan2)
     {
         covEffects <- paste(covarname,covarSymmetricObjEffects[, 1])
@@ -484,6 +489,7 @@ getEffects<- function(x, nintn = 10)
                                          rateTypes, varname, varname2=covarname)
         list(objEff=objEff, rateEff=rateEff)
     }
+    ##@covNonSymmNetEff internal getEffects
     covNonSymmNetEff<- function(covarname, poszvar, moreThan2)
     {
         covEffects<- paste(covarname, covarNonSymmetricObjEffects[, 1])
@@ -535,6 +541,7 @@ getEffects<- function(x, nintn = 10)
                                          rateTypes, varname, varname2=covarname)
         list(objEff=objEff, rateEff=rateEff)
     }
+    ##@covBehEff internal getEffects
     covBehEff<- function(varname, covarname, nodeSet, same=FALSE,
         ## same indicates that varname and covarname are the same:
         ## just one rate effect required
@@ -595,6 +602,7 @@ getEffects<- function(x, nintn = 10)
                                          rateTypes, varname, varname2=covarname)
         list(objEff=objEff, rateEff=rateEff)
     }
+    ##@netBehEff internal getEffects
     netBehEff<- function(varname, netname)
     {
         netObjEffects <- paste('behavior', varname,
@@ -619,6 +627,7 @@ getEffects<- function(x, nintn = 10)
                                           varname2=netname)
        list(objEff=objEff, rateEff=rateEff)
     }
+    ##@createObjEffectList internal getEffects
     createObjEffectList<- function(effectnames, functionnames, endowment,
                                    shortnames, parms, varname, varname2="",
                                    varname3=NULL)
@@ -659,6 +668,7 @@ getEffects<- function(x, nintn = 10)
         tmp$statisticFn <- statisticFn
         tmp
     }
+    ##@createRateEffectList internal getEffects
     createRateEffectList<- function(effectnames, functionnames, shortnames,
                                     ratePeriods, rateTypes,
                                     varname, varname2="")
@@ -689,7 +699,12 @@ getEffects<- function(x, nintn = 10)
         tmp$statisticFn <- statisticFn
         tmp
     }
-#### start of function createEffects
+    ## start of function getEffects
+    if (getDocumentation)
+    {
+        tt <- getInternals()
+        return(tt)
+    }
     if (!inherits(x, 'sienaGroup') && !inherits(x, 'siena'))
     {
         stop('Not a valid siena data object or group')
@@ -702,7 +717,7 @@ getEffects<- function(x, nintn = 10)
     {
         groupx <- FALSE
     }
-### validate the object?
+    ## validate the object?
     ## find the total number of periods to be processed = local var observations
     ## then process the first or only data object. Fill in starting values
     ## for other periods from the other objects, if any.
@@ -769,7 +784,7 @@ getEffects<- function(x, nintn = 10)
                effects[[i]]$effectName <- as.character(effects[[i]]$effectName)
                attr(effects[[i]], 'starts') <- tmp$starts
            },
-               bipartite = {},
+               bipartite = {stop("not yet implemented")},
                stop('error type'))
         effects[[i]]$groupName <- groupNames[1]
         effects[[i]]$group <- 1
@@ -904,12 +919,12 @@ getEffects<- function(x, nintn = 10)
     attr(effects, "starts") <- NULL
     cl <- class(effects)
     if (groupx)
-        class(effects) <- c('groupEffects','effects', cl)
+        class(effects) <- c('sienaGroupEffects','sienaEffects', cl)
     else
-        class(effects) <- c('effects', cl)
+        class(effects) <- c('sienaEffects', cl)
     effects
 }
-
+##@getBehaviorStartingVals DataCreate
 getBehaviorStartingVals <- function(depvar)
 {
     drange <- attr(depvar, 'range')
@@ -966,6 +981,7 @@ getBehaviorStartingVals <- function(depvar)
                        ifelse (tendency > 3, 3, tendency))
     list(startRate=startRate, tendency=tendency, untrimmed = untrimmed, dif=dif)
 }
+##@getNetworkStartingVals DataCreate
 getNetworkStartingVals <- function(depvar, structValid=TRUE)
 {
     noPeriods <- attr(depvar, "netdims")[3] - 1

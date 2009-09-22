@@ -1,5 +1,18 @@
-printInitialDescription <- function(data, effects, modelName="Siena")
+#/******************************************************************************
+# * SIENA: Simulation Investigation for Empirical Network Analysis
+# *
+# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# *
+# * File: printInitialDescription.r
+# *
+# * Description: This module contains the code to print details of the project.
+# *
+# *****************************************************************************/
+##@printInitialDescription Reporting
+printInitialDescription <- function(data, effects, modelName="Siena",
+                                    getDocumentation=FALSE)
 {
+    ##@initialNetworks internal printInitialDescription
     initialNetworks <- function()
     {
         Heading(2, outf,'Change in networks:')
@@ -327,6 +340,7 @@ printInitialDescription <- function(data, effects, modelName="Siena")
         Report("\n", outf)
     }
 
+    ##@initialBehaviors internal printInitialDescription
     initialBehaviors <- function()
     {
         Report("\n", outf)
@@ -452,7 +466,10 @@ printInitialDescription <- function(data, effects, modelName="Siena")
 
         Report("\n", outf)
     }
-
+    if (getDocumentation)
+    {
+        return(getInternals())
+    }
     if (!inherits(data, "sienaGroup"))
     {
         nData <- 1

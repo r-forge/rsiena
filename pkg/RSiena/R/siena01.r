@@ -8,6 +8,7 @@
 # * Description: This module contains the code for the gui for creation of a
 # * Siena data object.
 # *****************************************************************************/
+##@installGui Miscellaneous
 installGui <- function()
 {
     if (.Platform$OS.type =="windows")
@@ -25,7 +26,8 @@ installGui <- function()
     }
 }
 
-siena01Gui <- function()
+##@siena01Gui siena01
+siena01Gui <- function(getDocumentation=FALSE)
 {
    ## DONE (FALSE) ## this is so we can exit cleanly
     maxDegree <- NULL
@@ -59,7 +61,7 @@ siena01Gui <- function()
     mydata <- NULL
     myeff <- NULL
     mymodel <-  NULL
-
+    ##@addFile internal siena01Gui
     addFile<- function()
     {
         noFiles <<- noFiles+1
@@ -94,6 +96,7 @@ siena01Gui <- function()
         initialDir <<- dirname(filename[noFiles])
     }
 
+    ##@addTableRow internal siena01Gui
     addTableRow <- function(i)
     {
         tkinsert(table1,"rows","end","1")
@@ -114,7 +117,8 @@ siena01Gui <- function()
         tkconfigure(table1, height=i+1)
     }
 
-   applyFn <- function() ## prompt to save, then try to create data, then
+    ##@applyFn internal siena01Gui
+    applyFn <- function() ## prompt to save, then try to create data, then
         ## sienaModelOptions
     {
         if (noFiles == 0)
@@ -149,12 +153,13 @@ siena01Gui <- function()
         {
             mydata <<- resp$mydata
             myeff <<- resp$myeff
-            mymodel <<- model.create(fn=simstats0c)
+            mymodel <<- sienaModelCreate(fn=simstats0c)
             savedObjectName <- paste(modelName, ".RData", sep="")
             save(mydata, myeff, mymodel, file=savedObjectName)
             sienaModelOptions()
         }
     }
+    ##@clearFn internal siena01Gui
     clearFn <- function()
     {
         noFiles <<- 0
@@ -166,6 +171,7 @@ siena01Gui <- function()
         lapply(formatspins, function(x) tkset(x,'matrix' ))
 
     }
+    ##@deleteTableRow internal siena01Gui
     deleteTableRow <- function(i)
     {
         mypos <- paste(i,',4', sep='')
@@ -185,6 +191,7 @@ siena01Gui <- function()
         else
             files <<- NULL
     }
+    ##@editFile internal siena01Gui
     editFile<- function()
     {
         ##try: may be nothing selected or a box beneath spinbox
@@ -210,6 +217,7 @@ siena01Gui <- function()
         tcl('wm', 'attributes', tt, '-topmost', 0)
         invisible()
     }
+    ##@fromFileFn internal siena01Gui
     fromFileFn <- function()
     {
 
@@ -232,6 +240,7 @@ siena01Gui <- function()
         session <<- sessionFromFile(loadfilename, tk=TRUE)
         procSession()
     }
+    ##@fromFileContFn internal siena01Gui
     fromFileContFn <- function()
     {
         fromFileFn()
@@ -247,10 +256,12 @@ siena01Gui <- function()
             sienaModelOptions()
         }
     }
+    ##@helpFn internal siena01Gui
     helpFn <- function() ## display the manual
     {
         RShowDoc("s_man400", package="RSiena")
     }
+    ##@myStop internal siena01Gui
     myStop<- function()
     {
         if (!DONE() && exists("mydata") && exists("myeff") &&
@@ -266,6 +277,7 @@ siena01Gui <- function()
         tkdestroy(tt)
         DONE(TRUE)
     }
+    ##@procSession internal siena01Gui
     procSession <- function(replace=FALSE) ##
     {
         if (replace)
@@ -296,6 +308,7 @@ siena01Gui <- function()
         tcl(table1, "activate", "1, 3")
         tcl(table1, "selection", 'set', paste('1', ',3', sep=''))
     }
+    ##@removeFile internal siena01Gui
     removeFile <- function()
     {
         selcursor <- tclvalue(tcl(table1, 'curselection'))
@@ -310,6 +323,7 @@ siena01Gui <- function()
         tcl(table1, "selection", "clear", "all") ## unselect everything
         tcl(table1, "activate", '1, 4')
     }
+    ##@saveFn internal siena01Gui
     saveFn <- function() ## saves session file
     {
         if (noFiles == 0)
@@ -341,6 +355,7 @@ siena01Gui <- function()
             modelName <<- substring(modelName, 1, (ipos - 1))
         }
     }
+    ##@savefileFn internal siena01Gui
     savefileFn <- function() ## saves data and model
     {
         mymodel <<- modelFromTcl()
@@ -359,7 +374,7 @@ siena01Gui <- function()
         if (savefilename != "")
             save(mymodel, mydata, myeff, file=savefilename)
     }
-
+    ##@sessionFromTcl internal siena01Gui
     sessionFromTcl <- function()
     {
         rows <- as.numeric(strsplit(tclvalue(tkconfigure(table1,  '-rows')),
@@ -402,6 +417,7 @@ siena01Gui <- function()
         ##one day we will validate too!
     }
 
+    ##@modelFromTcl internal siena01Gui
     modelFromTcl <- function() ## used by stop function and modeloptions screen
     {
         model <- NULL
@@ -466,8 +482,10 @@ siena01Gui <- function()
         class(model) <- "sienaModel"
         model
     }
+    ##@sienaModelOptions internal siena01Gui
     sienaModelOptions <- function()
     {
+        ##@editFn internal siena01Gui
         editFn <- function()
         {
             editCols <- c("name", "effectName", "type", "include", "fix",
@@ -483,14 +501,15 @@ siena01Gui <- function()
                 effEdit[,i] <- as.logical(effEdit[,i])
             }
             myeff[, editCols] <<- effEdit
-          #  browser()
-        ## make sure this window is top with a global grab, bu only for a second
-        tcl('wm', 'attributes', tt, '-topmost', 1)
-        Sys.sleep(0.1)
-        tcl('wm', 'attributes', tt, '-topmost', 0)
-      #      tkfocus(tt)
+                                        ##  browser()
+            ## make sure this window is top with a global grab, bu only for a second
+            tcl('wm', 'attributes', tt, '-topmost', 1)
+            Sys.sleep(0.1)
+            tcl('wm', 'attributes', tt, '-topmost', 0)
+                                        #      tkfocus(tt)
         }
-         estimateFn <- function()
+        ##@estimateFn internal siena01Gui
+        estimateFn <- function()
         {
             ##create mymodel
             mymodel <<- modelFromTcl()
@@ -546,10 +565,12 @@ siena01Gui <- function()
                 tkfocus(resultsframe)
             }
         }
+        ##@modelhelpFn internal siena01Gui
         modelhelpFn <- function()
         {
             RShowDoc("s_man400", package="RSiena")
         }
+        ##@randomseedFn internal siena01Gui
         randomseedFn <- function()
         {
             val <- as.numeric(tclvalue(rsVar))
@@ -563,6 +584,7 @@ siena01Gui <- function()
                 tkgrid(rsspin, row=3, column=1)
             }
         }
+        ##@clustersFn internal siena01Gui
         clustersFn <- function()
         {
             val <- as.numeric(tclvalue(clustVar))
@@ -576,6 +598,7 @@ siena01Gui <- function()
                 tkgrid(clustspin, row=4, column=1)
             }
         }
+        ##@returnFn internal siena01Gui
         returnFn <- function()
         {
             ans <- tkmessageBox(message="Do you want to save the model?",
@@ -595,6 +618,7 @@ siena01Gui <- function()
             tkpack(frame1, side='top', padx=5)
             tkpack(f0, side="bottom")
         }
+        ##@showFn internal siena01Gui
         showFn <- function()
         {
             editCols <- c("name", "effectName", "type", "include", "fix",
@@ -605,12 +629,13 @@ siena01Gui <- function()
                 effEdit[,i] <- as.numeric(effEdit[,i])
             }
             edit(effEdit, edit.row.names=FALSE)
-          ##  tkfocus(tt)
-        ## make sure this window is top with a global grab, bu only for a second
-        tcl('wm', 'attributes', tt, '-topmost', 1)
-        Sys.sleep(0.1)
-        tcl('wm', 'attributes', tt, '-topmost', 0)
+            ##  tkfocus(tt)
+            ## make sure this window is top with a global grab, bu only for a second
+            tcl('wm', 'attributes', tt, '-topmost', 1)
+            Sys.sleep(0.1)
+            tcl('wm', 'attributes', tt, '-topmost', 0)
         }
+        ##@resultsFn internal siena01Gui
         resultsFn <- function()
         {
             if (resultsOpen)
@@ -636,6 +661,7 @@ siena01Gui <- function()
                 resultsOpen <<- TRUE
             }
         }
+        ##@saveresultsFn internal siena01Gui
         saveresultsFn <- function()
         {
             if (is.null(estimAns))
@@ -773,7 +799,7 @@ siena01Gui <- function()
         clustVar <<- tclVar()
         tclvalue(clustVar) <<- '0'
         clust <- tkcheckbutton(optf,
-                               text=' Number of processors: ',
+                               text=' Multiple processors: ',
                                variable=clustVar,
                                command=clustersFn)
         clustspinVar <<- tclVar()
@@ -872,13 +898,16 @@ siena01Gui <- function()
     ## ##############################################
     ## start of siena01Gui function proper
     ## ##############################################
+    if (getDocumentation)
+    {
+        return(getInternals())
+    }
 
     ## check we have the right libraries
     library(tcltk)
     if (!inherits(tclRequire("Tktable"), "tclObj"))
         stop("This function needs the package TkTable: install it, or use ",
              "an alternative data entry method: see RSiena help page")
-
     ## directory for startup
     initialDir <- getwd()
 
@@ -983,7 +1012,7 @@ siena01Gui <- function()
                   )
 
     ##create spinboxes for type
-    typelist <- c("network", "behavior", "constant covariate",
+    typelist <- c("network", "bipartite", "behavior", "constant covariate",
                   "changing covariate", "constant dyadic covariate",
                   "changing dyadic covariate", "exogenous event")
     typespins <- lapply(1:tableRows, function(x)

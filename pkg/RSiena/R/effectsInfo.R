@@ -1,3 +1,4 @@
+##@symmetricRateEffects Object/Effects Defined in effectsInfo.R
 symmetricRateEffects <-
 structure(list(EffectName = c("basic rate parameter", "constant rate (period ",
 "degree effect on rate", "indegree effect on rate", "reciprocity effect on rate",
@@ -8,6 +9,7 @@ structure(list(EffectName = c("basic rate parameter", "constant rate (period ",
 "degreeRate", "indegRate", "recipRate", "degRateInv")), .Names = c("EffectName",
 "FunctionName", "ShortName"), class = "data.frame", row.names = c(NA,
 -6L))
+##@nonsymmetricRateEffects Objects/Effects Defined in effectsInfo.R
 nonSymmetricRateEffects <-
 structure(list(EffectName = c("basic rate parameter", "constant rate (period ",
 "outdegree effect on rate", "indegree effect on rate", "reciprocity effect on rate",
@@ -18,6 +20,7 @@ structure(list(EffectName = c("basic rate parameter", "constant rate (period ",
 "outRate", "inRate", "recipRate", "outRateInv")), .Names = c("EffectName",
 "FunctionName", "ShortName"), class = "data.frame", row.names = c(NA,
 -6L))
+##@nonsymmetricObjEffects Objects/Effects Defined in effectsInfo.R
 nonSymmetricObjEffects <-
 structure(list(EffectName = c("outdegree (density)", "reciprocity",
 "transitive triplets", "transitive mediated triplets", "3-cycles",
@@ -50,6 +53,7 @@ TRUE, TRUE, TRUE, TRUE), ShortName = c("density", "recip", "transTrip",
 ), parm = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0,
 0, 0, 1, 1, 2, 2, 2, 2)), .Names = c("EffectName", "FunctionName",
 "Endowment.", "ShortName", "parm"), row.names = c(NA, -25L), class = "data.frame")
+##@symmetricObjEffects Objects/Effects Defined in effectsInfo.R
 symmetricObjEffects <-
 structure(list(EffectName = c("degree (density)", "transitive triads",
 "transitive ties", "betweenness", "balance", "number of actor pairs at distance 2",
@@ -69,6 +73,7 @@ FALSE, TRUE), ShortName = c("density", "transTriads", "transTies",
 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2)), .Names = c("EffectName",
 "FunctionName", "Endowment.", "ShortName", "parm"), row.names = c(NA,
 13L), class = "data.frame")
+##@behaviorObjEffects Objects/Effects Defined in effectsInfo.R
 behaviorObjEffects <-
 structure(list(EffectName = c("linear shape", "quadratic shape",
 "average similarity", "total similarity", "indegree", "outdegree",
@@ -95,6 +100,7 @@ TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE
 "behDenseTriads", "simDenseTriads", "recipDeg", "avSimPopEgo")), .Names = c("EffectName",
 "Function.Name", "Endowment.", "ShortName"), class = "data.frame", row.names = c(NA,
 -19L))
+##@behaviorRateEffects Objects/Effects Defined in effectsInfo.R
 behaviorRateEffects <-
 structure(list(EffectName = c("rate  (period ", "outdegree effect on rate",
 "indegree effect on rate", "reciprocated effect on rate"), FunctionName = c("Amount of behavioral change on",
@@ -102,20 +108,25 @@ structure(list(EffectName = c("rate  (period ", "outdegree effect on rate",
 "outRate", "inRate", "recipRate")), .Names = c("EffectName",
 "FunctionName", "ShortName"), class = "data.frame", row.names = c(NA,
 -4L))
+##@covarBehObjEffects Objects/Effects Defined in effectsInfo.R
 covarBehObjEffects <-
 structure(c("effect from", "influence interaction? x", "x", "influ. int. possible x",
 "effFrom", "inflIntX"), .Dim = 2:3)
+##@covarBehObjInteractions Objects/Effects Defined in effectsInfo.R
 covarBehObjInteractions <-
 structure(c("av.sim. x ", "tot. sim. x ", "av. alters x ", "avSimX",
 "totSimX", "avAltX"), .Dim = c(3L, 2L))
+##@dyadObjEffects Objects/Effects Defined in effectsInfo.R
 dyadObjEffects <-
 structure(c("WW=>X closure of", "WX=>X closure of", "XW=>X closure of",
 "WWX", "WXX", "XWX"), .Dim = c(3L, 2L))
+##@covarNonSymmetricObjEffects Objects/Effects Defined in effectsInfo.R
 covarNonSymmetricObjEffects <-
 structure(c("alter", "squared alter", "ego", "similarity", "similarity x reciprocity",
 "Sum of indegrees x", "Sum of indegrees x squared", "Sum of outdegrees x",
 "Similarity on", "Similarity x reciprocity on", "altX", "altSqX",
 "egoX", "simX", "simRecipX"), .Dim = c(5L, 3L))
+##@covarSymmetricObjEffects Objects/Effects Defined in effectsInfo.R
 covarSymmetricObjEffects <-
 structure(c("", "squared", "similarity", "X", "sqX", "simX"), .Dim = c(3L,
 2L))

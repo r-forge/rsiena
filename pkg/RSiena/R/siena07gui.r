@@ -3,24 +3,32 @@
 # *
 # * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 # *
-# * File: interrupt.r
+# * File: siena07Gui.r
 # *
 # * Description: This module contains the code controlling the gui for siena07.
 # *
 # *****************************************************************************/
-runtk<- function(tt)
+##@siena07Gui siena07 Create program screen for siena07
+siena07Gui <- function(tt, getDocumentation=FALSE)
 {
+    ##@myInterrupt internal siena07Gui
     myInterrupt<- function()
     {
         UserInterrupt(TRUE)
     }
+    ##@myEndPhase2 internal siena07Gui
     myEndPhase2<- function()
     {
         EarlyEndPhase2(TRUE)
     }
+    ##@myRestart internal siena07Gui
     myRestart<- function()
     {
         UserRestart(TRUE)
+    }
+    if (getDocumentation)
+    {
+        return(getInternals())
     }
     if (is.null(tt))
     {

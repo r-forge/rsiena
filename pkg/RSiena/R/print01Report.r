@@ -1,5 +1,17 @@
-print01Report <- function(data, myeff, modelname="Siena", session=NULL)
+#/******************************************************************************
+# * SIENA: Simulation Investigation for Empirical Network Analysis
+# *
+# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# *
+# * File:print01Report.r
+# *
+# * Description: This module contains the function to print the initial report
+# *****************************************************************************/
+##@print01Report Reporting
+print01Report <- function(data, myeff, modelname="Siena", session=NULL,
+                          getDocumentation=FALSE)
 {
+    ##@reportDataObject1 internal print01Report
     reportDataObject1 <- function(x)
     {
         Report(c(x$observations, "observations,\n"), outf)
@@ -20,8 +32,10 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
             Report(c(length(x$nodeSets[[1]]), "actors\n"), outf)
         }
     }
+    ##@reportDataObject internal print01Report
     reportDataObject <- function(x, periodFromStart=0, multi=FALSE)
     {
+        ##@reportStart internal print01Report
         reportStart <- function()
         {
             multipleNodeSets <- length(x$nodeSets) > 1
@@ -80,6 +94,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
          Report("\n", outf)
         }
 
+        ##@reportNetworks internal print01Report
         reportNetworks <- function()
         {
             Heading(2, outf, "Reading network variables.")
@@ -293,6 +308,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
             }
             Report("\n", outf)
         }
+        ##@reportBehaviors internal print01Report
         reportBehaviors <- function()
         {
             Heading(2, outf, "Reading dependent actor variables.")
@@ -399,6 +415,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
                 }
             }
         }
+        ##@reportConstantCovariates internal print01Report
         reportConstantCovariates <- function()
         {
             nCovars <- length(x$cCovars)
@@ -440,6 +457,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
                      " subtracted from the covariate",
                      ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
         }
+        ##@reportChangingCovariates internal print01Report
         reportChangingCovariates <- function()
         {
             nCovars <- length(x$vCovars)
@@ -504,6 +522,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
             Report(c(ifelse(nCovars  == 1, " is", "s are"),
                      "subtracted from the covariate.\n\n"),  outf)
         }
+        ##@reportConstantDyadicCovariates internal print01Report
         reportConstantDyadicCovariates <- function()
         {
             nCovars <- length(x$dycCovars)
@@ -548,6 +567,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
                      "subtracted from the dyadic covariate",
                      ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
         }
+        ##@reportChangingDyadicCovariates internal print01Report
         reportChangingDyadicCovariates <- function()
         {
             covars <- names(x$dyvCovars)
@@ -576,6 +596,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
                      "subtracted from the changing dyadic covariate",
                      ifelse(nCovars ==1, ".\n\n", "s.\n\n")), sep="", outf)
         }
+        ##@reportCompositionChange internal print01Report
         reportCompositionChange <- function()
         {
             comps <- x$compositionChange
@@ -646,6 +667,11 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL)
         Report("\n\n", outf) ## end of reportDataObject
     }
     ## create output file. ## start of print01Report proper
+    if (getDocumentation)
+    {
+        tt <- getInternals()
+        return(tt)
+    }
     Report(open=TRUE, type="w", projname=modelname)
     Report("                            ************************\n", outf)
     Report(c("                                   ", modelname, ".out\n"),

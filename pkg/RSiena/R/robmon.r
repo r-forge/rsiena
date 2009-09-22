@@ -11,6 +11,7 @@
 ##args:x: model object - intended to be read only
 ##     z: model fitting object
 ## returns updated z
+##@robmon siena07 Controls MOM process
 robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
 {
     z$FinDiff.method<- x$FinDiff.method

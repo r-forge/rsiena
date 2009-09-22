@@ -1,3 +1,15 @@
+#/******************************************************************************
+# * SIENA: Simulation Investigation for Empirical Network Analysis
+# *
+# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# *
+# * File: Sienatest.r
+# *
+# * Description: This module contains the function for instability analysis and
+# * score tests.
+# *
+# *****************************************************************************/
+##@InstabilityAnalysis siena07 Not currently used
 InstabilityAnalysis<- function(z)
 {
     ##I think this is not correct, because of scaling. cond number of var matrix of X
@@ -47,13 +59,14 @@ InstabilityAnalysis<- function(z)
     Report(c('\n\n',date(),'\n'),sep='',lf)
 }
 
+##@MatrixNorm siena07 Not currently used. May be incorrect.
 MatrixNorm<- function(mat)
 {
     tmp<-  apply(mat,2,function(x)x/sqrt(crossprod(x)))
     ##or  sweep(mat,2,apply(mat,2,function(x)x/sqrt(crossprod(x))
     tmp
 }
-
+##@TestOutput siena07 Print report
 TestOutput <- function(z,x)
 {
     testn<- sum(z$test)
@@ -127,6 +140,7 @@ TestOutput <- function(z,x)
         Report('\n',outf)
     }
 }
+##@ScoreTest siena07 Do score tests
 ScoreTest<- function(z,x)
 {
     z$testresult<- rep(NA,z$pp) ##for chisq per parameter
@@ -164,6 +178,7 @@ ScoreTest<- function(z,x)
     z$oneStep<- -dinv2%*%z$fra
    z
 }
+##@EvaluateTestStatistic siena07 Calculate score test statistics
 EvaluateTestStatistic<- function(x,test,dfra,msf,fra)
 {
     ##uses local arrays set up in the calling procedure

@@ -8,6 +8,7 @@
 # * Description: This module contains the code for simulating the process,
 # * communicating with C++.
 # *****************************************************************************/
+##@simstats0c siena07 Simulation Module
 simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                         effects=NULL, fromFiniteDiff=FALSE,
                       profileData=FALSE, prevAns=NULL, returnDeps=FALSE)
@@ -357,18 +358,21 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     f$randomseed2 <- ans[[5]]
     FRANstore(f)
     list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
-         nets=ans[[6]])
+         nets=list(ans[[6]]))
 }
+##@clearData siena07 Finalizer to clear Data object in C++
 clearData <- function(pData)
 {
     ans <- .Call('deleteData', PACKAGE="RSiena",
                  pData)
 }
+##@clearModel siena07 Finalizer to clear Model object in C++
 clearModel <- function(pModel)
 {
     ans <- .Call('deleteModel', PACKAGE="RSiena",
                  pModel)
 }
+##@createEdgeLists siena07 Reformat data for C++
 createEdgeLists<- function(mat, matorig)
 {
     ## mat1 is basic values, with missings and structurals replaced
@@ -409,6 +413,7 @@ createEdgeLists<- function(mat, matorig)
 
     list(mat1 = t(mat1), mat2 = t(mat2), mat3 = t(mat3))
 }
+##@createCovarEdgeLists siena07 Reformat data for C++
 createCovarEdgeList<- function(mat)
 {
     tmp <- lapply(1 : nrow(mat), function(x, y)
@@ -427,7 +432,7 @@ createCovarEdgeList<- function(mat)
     attr(mat1,'nActors2') <- ncol(mat)
     t(mat1)
 }
-
+##@unpackOneMode siena07 Reformat data for C++
 unpackOneMode <- function(depvar, observations, compositionChange)
 {
     edgeLists <- vector('list', observations)
@@ -798,7 +803,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
     attr(edgeLists, 'balmean') <- attr(depvar, 'balmean')
     return(edgeLists = edgeLists)
 }
-
+##@unpackBehavior siena07 Reformat data for C++
 unpackBehavior<- function(depvar, observations)
 {
     beh <- depvar[, 1, ]
@@ -832,9 +837,12 @@ unpackBehavior<- function(depvar, observations)
     storage.mode(beh) <- 'integer'
     list(beh=beh, behmiss=behmiss)
 }
+##@convertToStructuralZeros Miscellaneous To be implemented
 convertToStructuralZeros <- function()
 {
 }
+
+##@unpackCDyad siena07 Reformat data for C++
 unpackCDyad<- function(dycCovar)
 {
     sparse <- attr(dycCovar, 'sparse')
@@ -867,6 +875,7 @@ unpackCDyad<- function(dycCovar)
 }
 
 
+##@unpackVDyad siena07 Reformat data for C++
 unpackVDyad<- function(dyvCovar, observations)
 {
     edgeLists <- vector('list', observations)
@@ -908,6 +917,7 @@ unpackVDyad<- function(dyvCovar, observations)
     return(edgeLists = edgeLists)
 }
 
+##@unpackData siena07 Reformat data for C++
 unpackData <- function(data)
 {
     f <- NULL
@@ -950,6 +960,7 @@ unpackData <- function(data)
     f
 }
 
+##@unpackCompositionChange siena07 Reformat data for C++
 unpackCompositionChange <- function(compositionChange)
 {
     atts <- attributes(compositionChange)

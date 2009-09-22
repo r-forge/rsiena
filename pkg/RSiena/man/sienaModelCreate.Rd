@@ -1,12 +1,13 @@
-\name{model.create}
-\alias{model.create}
+\name{sienaModelCreate}
+\alias{sienaModelCreate}
 \alias{sienaModel}
+\alias{model.create}
 \title{Function to create a model object for parameters to Siena07}
 \description{
  Creates a basic object which can be used as an argument for Siena07
 }
 \usage{
-     model.create(fn = simstats0c, usesimstats0c=TRUE,
+     sienaModelCreate(fn = simstats0c, usesimstats0c=TRUE,
      projname = "Siena", MaxDegree = 0, useStdInits = FALSE,
      n3 = 1000, nsub = 4, maxlike = FALSE, diag = TRUE,
      condvarno = 0, condname = "", firstg = 0.2, cond = FALSE,
@@ -70,7 +71,7 @@
 \author{Ruth Ripley }
 \examples{
 
-mymodel <- model.create(findiff=TRUE, fn = simstats0c)
+mymodel <- sienaModelCreate(findiff=FALSE, fn = simstats0c)
 
 
 }

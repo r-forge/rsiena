@@ -49,12 +49,14 @@ tt=NULL, parallelTesting=FALSE, ...)
   \item{covtheta}{Estimated covariance matrix of theta}
   \item{dfra}{Matrix of estimated derivatives}
   \item{sf}{Matrix of deviations from target in phase 3}
+  \item{sims}{List of simulated networks, currently just one entry for
+  the first network. Each a list of edgelists, one for each period.}
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
-\seealso{\code{\link{model.create}}}
+\seealso{\code{\link{sienaModelCreate}}}
 \examples{
-mymodel <- model.create(findiff=TRUE, fn=simstats0c)
+mymodel <- sienaModelCreate(fn=simstats0c)
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)

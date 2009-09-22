@@ -8,8 +8,10 @@
 # * Description: This module contains the code to create
 # * Siena data object and group data objects.
 # *****************************************************************************/
-sienaDataCreate<- function(..., nodeSets=NULL)
+##@sienaDataCreate DataCreate
+sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 {
+    ##@validNodeSet internal sienaDataCreate
     validNodeSet <- function(nodeSetName, n)
     {
         if (!nodeSetName == 'Actors')
@@ -21,6 +23,10 @@ sienaDataCreate<- function(..., nodeSets=NULL)
         }
         else
             TRUE
+    }
+    if (getDocumentation)
+    {
+        return(getInternals())
     }
     narg <- nargs()
     ## find a set of names for the objects: either the names given in the
@@ -531,7 +537,7 @@ sienaDataCreate<- function(..., nodeSets=NULL)
     class(z) <- 'siena'
     z
 }
-
+##@rangeAndSimilarity DataCreate
 rangeAndSimilarity<- function(vals, rvals=NULL)
 {
     vals <- as.matrix(vals)
@@ -569,7 +575,7 @@ rangeAndSimilarity<- function(vals, rvals=NULL)
     simMean <- simTotal/simCnt
     list(simTotal=simTotal, simMean=simMean, range=rvals, simCnt=simCnt)
 }
-
+##@groupRangeAndSimilarityAndMean DataCreate
 groupRangeAndSimilarityAndMean <- function(group)
 {
     atts <- attributes(group)
@@ -829,8 +835,10 @@ groupRangeAndSimilarityAndMean <- function(group)
     attr(group, "dyvCovarMean") <- dyvCovarMean
     group
 }
-sienaGroupCreate <- function(objlist, singleOK=FALSE)
+##@sienaGroupCreate DataCreate
+sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 {
+    ##@copyAttributes internal sienaGroupCreate
     copyAttributes <- function(x, y)
     {
         atts <- attributes(y)
@@ -848,6 +856,10 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE)
         attr(x, 'name') <- atts$name
         ## storage.mode(attr(vCovars[[i]], 'range')) <- 'double'
        x
+    }
+    if (getDocumentation)
+    {
+        return(getInternals())
     }
     if (!is.list(objlist))
     {
@@ -1174,6 +1186,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE)
     copyGroupAttributes(group, "dyvCovars", "dyvCovarRange", "range", TRUE)
     group
 }
+##@copyGroupAttributes DataCreate
 copyGroupAttributes <- function(group, vartype, groupattrname, attrname,
                                 storage.mode=FALSE)
 {
@@ -1192,6 +1205,7 @@ copyGroupAttributes <- function(group, vartype, groupattrname, attrname,
     group
 }
 
+##@calcBalMeanGroup DataCreate
 calcBalmeanGroup <- function(data)
 {
     atts <- attributes(data)
@@ -1252,6 +1266,7 @@ calcBalmeanGroup <- function(data)
     }
     balmeans
 }
+##@calcBalmean DataCreate
 calcBalmean <- function(depvar)
 {
     tempra <- 0
@@ -1297,6 +1312,8 @@ calcBalmean <- function(depvar)
     #  cat(tempra, temprb,balmean,'\n')
     balmean
 }
+
+##@getGroupNetRanges DataCreate
 getGroupNetRanges <- function(data)
 {
     atts <- attributes(data)
