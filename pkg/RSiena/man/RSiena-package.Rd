@@ -22,7 +22,7 @@ Fits models to longitudinal sets of networks.
   using \code{\link{getEffects}}.
 
   Control of the fitting requires a \emph{model} object, which can be
-  created by \code{\link{model.create}}.
+  created by \code{\link{sienaModelCreate}}.
 
   More detailed help is available in the manual which you can display
   using \cr
@@ -48,6 +48,6 @@ Maintainer: Who to complain to <ruth@stats.ox.ac.uk>
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
-mymodel <- model.create(findiff=FALSE, fn=simstats0c)
+mymodel <- sienaModelCreate(findiff=FALSE, fn=simstats0c)
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 }

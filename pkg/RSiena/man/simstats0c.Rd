@@ -46,8 +46,9 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
   \item{ntim}{For conditional processing, time taken}
   \item{feasible}{currently set to TRUE}
   \item{OK}{could be set to FALSE if serious error has occurred}
-  \item{nets}{A list of simulated networks, as a list of edgelists for
-	each period. Only if \code{returnDeps} is TRUE.}
+  \item{sims}{A list of simulation results for each network, each a list
+	of edgelists for each period. Only if \code{returnDeps} is
+	TRUE. Only one entry currently}
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
@@ -59,7 +60,7 @@ mydata <- sienaDataCreate(mynet1)
 myeff<- getEffects(mydata)
 myeff[myeff$effectName=='transitive triplets'&
             myeff$type=='eval','include']<- TRUE
-mymodel<- model.create(findiff=TRUE, fn = simstats0c)
+mymodel<- sienaModelCreate(findiff=TRUE, fn = simstats0c)
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE)
 }
 \keyword{models}

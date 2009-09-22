@@ -8,12 +8,14 @@
 # * Description: This module contains the code for creation of a
 # * Siena data object from an interactive session or a session file.
 # *****************************************************************************/
+##@trim.blanks siena01
 trim.blanks <- function(x)
 {
     tmp <- gsub("^ *", "", x)
     gsub(" *$", "", tmp)
 }
 
+##@sessionFromFile siena01/DataCreate
 sessionFromFile <- function(loadfilename, tk=FALSE)
 {
     ## browser()
@@ -73,6 +75,7 @@ sessionFromFile <- function(loadfilename, tk=FALSE)
     session
 }
 
+##@readInFiles siena01/DataCreate
 readInFiles <- function(session, edited, files=NULL)
 {
     noFiles <- nrow(session)
@@ -126,20 +129,24 @@ readInFiles <- function(session, edited, files=NULL)
     }
     files
 }
+##@sienaDataCreateFromSession siena01/DataCreate
 sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                         modelName='Siena', edited=NULL,
-                                        files=NULL)
+                                        files=NULL, getDocumentation=FALSE)
 {
+    ##@turnoffwarn internal sienaDataCreateFromSession
     turnoffwarn <- function()
     {
         oldwarn <- getOption('warn')
         options(warn = -1)
         oldwarn
     }
+    ##@turnonwarn internal sienaDataCreateFromSession
     turnonwarn <- function(oldwarn)
     {
         options(warn = oldwarn)
     }
+    ##@validateNameSession internal sienaDataCreateFromSession
     validateNamesession <- function()
     {
         if (nrow(namesession) > 1)
@@ -192,6 +199,10 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
             }
 
         }
+    }
+    if (getDocumentation)
+    {
+        return(getInternals())
     }
     ActorSets <- NULL
     ActorSetsSize <- NULL
@@ -343,17 +354,13 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        nodesets <- strsplit(namesession[1, "ActorSet"], ' ')
                        myarray <- array(NA, dim=c(dim(namefiles[[1]]),
                                             observations))
-                       tmp <- sapply(1:observations, function(x) {
-                           ## miss <- gsub(" ", "|",
-                           ##  namesession$MissingValues[x],
-                           ##              fixed=TRUE)
-                           miss <- namesession$MissingValues
-                           if (miss != '')
+                       miss <- namesession$MissingValues
+                       for (x in 1:observations)
+                       {
+                           if (miss[x] != '')
                                namefiles[[x]][namefiles[[x]] %in% miss[x]] <- NA
-
-                           ##   namefiles[[x]][grep(miss, namefiles[[x]])] <- NA
                            myarray[ , , x] <- namefiles[[x]]
-                       })
+                       }
                        tmp <- sienaNet(myarray, type='bipartite',
                                        nodeSet=nodesets[[1]])
                        assign(objnames[j], tmp, .GlobalEnv)
@@ -423,19 +430,16 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        nodesets <- strsplit(namesession[1, "ActorSet"], ' ')
                        myarray <- array(NA, dim=c(dim(namefiles[[1]]),
                                              observations - 1))
-                       tmp <- sapply(1:nrow(namesession), function(x){
-                           ##      miss <- gsub(" ", "|",
-                           ##                   namesession$MissingValues[x],
-                           ##                    fixed=TRUE)
-                           miss <- namesession$MissingValues
-                           if (miss != '')
+                       miss <- namesession$MissingValues
+                       for (x in 1:nrow(namesession))
+                       {
+                           if (miss[x] != '')
                            {
-                               ##namefiles[[x]][grep(miss,namefiles[[x]])] <- NA
                                namefiles[[x]][namefiles[[x]] %in% miss[x]] <- NA
                            }
                            myarray[ , ,as.numeric(namesession$Period[x])] <-
                                namefiles[[x]]
-                       })
+                       }
                        tmp <- varDyadCovar(myarray, nodeSets=nodesets[[1]])
                        assign(objnames[j], tmp, .GlobalEnv)
                    },

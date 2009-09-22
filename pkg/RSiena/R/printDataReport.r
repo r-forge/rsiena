@@ -1,3 +1,14 @@
+# * SIENA: Simulation Investigation for Empirical Network Analysis
+# *
+# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# *
+# * File: printDatareport.r
+# *
+# * Description: This module contains the function to produce the data
+# * report from siena07
+# *
+# *****************************************************************************/
+##@DataReport siena07 Print report
 DataReport <- function(z, x, f)
 {
     ##f could be a group, but has attributes like a group even if not!

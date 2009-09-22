@@ -1,7 +1,7 @@
-##/******************************************************************************
+##/*****************************************************************************
 ## * SIENA: Simulation Investigation for Empirical Network Analysis
 ## *
-## * Web: http://stat.gamma.rug.nl/siena.html
+## * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 ## *
 ## * File: phase1.r
 ## *
@@ -11,9 +11,10 @@
 ## * restart. Phase 1.2 does the rest of the iterations and then calculates
 ## * the derivative estimate. doPhase1it does one iteration, is called by
 ## * phase1.1 and phase1.2.
-## *****************************************************************************/
+## ****************************************************************************/
 ##args: x model object (readonly), z control object
 ##
+##@phase1.1 siena07 Do first 10 iterations (before check if using finite differences)
 phase1.1 <- function(z, x, ...)
 {
     ## initialise phase 1
@@ -156,6 +157,7 @@ phase1.1 <- function(z, x, ...)
     z
 }
 
+##@doPhase1it siena07 does 1 iteration in Phase 1
 doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
 {
     DisplayIteration(z)
@@ -183,6 +185,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
         fra <- fra - z$targets
         z$sf[z$nit, ] <- fra
         z$sf2[z$nit, , ] <- zz$fra
+        z$sims[[z$nit]] <- zz$nets
     }
     else
     {
@@ -192,6 +195,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
             fra <- fra - z$targets
             z$sf[z$nit + (i - 1), ] <- fra
             z$sf2[z$nit + (i - 1), , ] <- zz[[i]]$fra
+            z$sims[[z$nit + (i - 1)]] <- zz[[i]]$nets
         }
 
     }
@@ -254,6 +258,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     #browser()
     z
 }
+##@phase1.2 siena07 Do rest of phase 1 iterations
 phase1.2 <- function(z, x, ...)
 {
     ##finish phase 1 iterations and do end-of-phase processing
@@ -381,6 +386,7 @@ phase1.2 <- function(z, x, ...)
     z
 }
 
+##@CalculateDerivative siena07 Calculates derivative in Phase 1
 CalculateDerivative <- function(z, x)
 {
     f <- FRANstore()
@@ -465,12 +471,13 @@ CalculateDerivative <- function(z, x)
     z
 }
 
+##@FiniteDifferences siena07 Does the extra iterations for finite differences
 FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
 {
     fras <- array(0, dim = c(int, z$pp, z$pp))
     xsmall<- NULL
     xsmall$cconditional <- x$cconditional
- # browser()
+ ##browser()
     for (i in 1 : z$pp)
     {
         zdummy <- z[c('theta', 'Deriv')]

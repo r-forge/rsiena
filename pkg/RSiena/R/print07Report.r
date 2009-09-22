@@ -8,6 +8,7 @@
 # * Description: This module contains the code to produce the report on a
 # * siena07 model fit.
 # *****************************************************************************/
+##@PrintReport siena07 Print report
 PrintReport <- function(z, x)
 {
     Report('\n\n', outf)
@@ -73,8 +74,8 @@ PrintReport <- function(z, x)
                    Report('\nOther parameters:\n', bof)
                }
            }
-           nBehavs <- length(z$f$behavs)
-           nOneModes <- length(z$f$nets)
+           nBehavs <- length(z$f[[1]]$behavs)
+           nOneModes <- length(z$f[[1]]$nets)
            if (nBehavs > 0 && nOneModes > 0)
            {
                Report("Network Dynamics\n", outf)
@@ -93,13 +94,16 @@ PrintReport <- function(z, x)
            {
                behEffects <- z$effects[z$effects$netType == 'behavior',]
                behNames <- unique(behEffects$name)
-               behEffects$effectName <- paste('<',
-                                              (1:nBehavs)[match(behEffects$name,
-                                                                behNames)],
-                                              '> ', behEffects$effectName,
-                                              sep='')
-               z$effects$effectName[z$effects$netType=='behavior'] <-
-                   behEffects$effectName
+               if (nBehavs > 1)
+               {
+                   behEffects$effectName <- paste('<',
+                                             (1:nBehavs)[match(behEffects$name,
+                                                                    behNames)],
+                                                  '> ', behEffects$effectName,
+                                                  sep='')
+                   z$effects$effectName[z$effects$netType=='behavior'] <-
+                       behEffects$effectName
+               }
            }
            typesp <- ifelse (z$effects$type== "endow", ": ", ":  ")
            tmp <- paste(sprintf("%2d", 1:length(z$effects$effectName)),
@@ -115,7 +119,7 @@ PrintReport <- function(z, x)
                tmp2 <- substring(tmp, tmpsub - 1, nchar(tmp))
                Report(tmp1, outf)
                Report(tmp1, bof)
-               Report('\n Behavior Dynamics\n', outf)
+               Report('\nBehavior Dynamics\n', outf)
                Report(tmp2, outf)
                Report(tmp2, bof)
            }

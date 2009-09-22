@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://stat.gamma.rug.nl/siena.html
+# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 # *
 # * File: phase3.r
 # *
@@ -11,7 +11,8 @@
 # * covariance matrix
 # *****************************************************************************/
 ##args: x model object, z control object
-phase3<- function(z, x, ...)
+##@phase3 siena07 Does phase 3
+phase3 <- function(z, x, ...)
 {
     ## initialize phase 3
     f <- FRANstore()
@@ -195,6 +196,7 @@ phase3<- function(z, x, ...)
     z
 }
 
+##@doPhase3it siena07 Does one iteration in phase 3
 doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
 {
     if (int == 1)
@@ -271,6 +273,8 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
         }
     z
 }
+
+##@phase3.2 siena07 Processing at end of phase 3
 phase3.2<- function(z,x,...)
 {
     z$timePhase3<-(proc.time()['elapsed']-z$ctime)/z$Phase3nits
@@ -417,7 +421,7 @@ phase3.2<- function(z,x,...)
    z
 }
 
-
+##@CalulateDerivative3 siena07 Calculates derivative at end of phase 3
 CalculateDerivative3<- function(z,x)
 {
     f <- FRANstore()
@@ -464,6 +468,7 @@ CalculateDerivative3<- function(z,x)
     z
 }
 
+##@PotentialNR siena07 Calculates change if NR step done now
 PotentialNR<-function(z,x,MakeStep=FALSE)
 {
     z$dfrac<- z$dfra
