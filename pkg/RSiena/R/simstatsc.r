@@ -335,7 +335,16 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     }
     else
     {
-        randomseed2 <- as.integer(f$randomseed2)
+        if (fromFiniteDiff)
+        {
+            randomseed2 <- as.integer(f$storedseed)
+        }
+        else
+        {
+            randomseed2 <- as.integer(f$randomseed2)
+            f$storedseed <- randomseed2
+        }
+       ## cat(randomseed2, '\n')
     }
     ans <- .Call('model', PACKAGE="RSiena",
                  z$Deriv, f$pData, f$seeds,
@@ -355,7 +364,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     }
     ntim <- ans[[4]]
     fra <- t(ans[[1]])
-    f$randomseed2 <- ans[[5]]
+    f$randomseed2 <- ans[[5]][c(1,4,3,2)]
     FRANstore(f)
     list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
          nets=list(ans[[6]]))
