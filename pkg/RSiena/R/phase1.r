@@ -59,11 +59,16 @@ phase1.1 <- function(z, x, ...)
     xsmall$cconditional <- x$cconditional
     zsmall$condvar <- z$condvar
     nits <- seq(1, firstNit, int)
-    nits6 <- min(nits[nits >= 6 ])
+    if (any(nits >= 6))
+    {
+        nits6 <- min(nits[nits >= 6 ])
+    }
+    else
+        nits6 <- -1
     for (nit in nits)
     {
          z$nit <- nit
-         if (nit == nits[2])
+         if (length(nits) > 1 && nit == nits[2])
          {
              time1 <- proc.time()['elapsed']
              if (x$checktime)
@@ -513,7 +518,12 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
     }
                                         # browser()
     if (z$Phase == 1 && z$nit <= 10)
-        z$npos <- z$npos + ifelse(abs(diag(fras[1, , ])) > 1e-6, 1, 0)
+    {
+        for (ii in 1: min(10 - z$nit + 1, int))
+        {
+            z$npos <- z$npos + ifelse(abs(diag(fras[ii, , ])) > 1e-6, 1, 0)
+        }
+    }
     sdf <- fras / rep(z$epsilon, z$pp)
     z$sdf0 <- sdf
                                         # browser()

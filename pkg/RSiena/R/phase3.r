@@ -112,7 +112,7 @@ phase3 <- function(z, x, ...)
                 writefreq <- z$writefreq
             }
         }
-        if (nit <= 5 || nit == 10 || nit %% z$writefreq == 0 ||
+        if (nit <= 5 || nit == 10 || (int==1 && nit %% z$writefreq == 0 ) ||
             (int > 1 && nit %in% nits[seq(z$writefreq + 1, x$n3 %/% int,
                                           z$writefreq)]))
         {
@@ -129,8 +129,8 @@ phase3 <- function(z, x, ...)
             if (nit %% z$writefreq == 0 || (int > 1 &&
                        nit %% z$writefreq == 1) )
             {
-                increment <- ifelse(nit <= 5, 1,
-                                    ifelse(nit <= 10, 5, z$writefreq))
+                increment <- ifelse(nit <= 5, int,
+                                    ifelse(nit <= 10, 5, z$writefreq * int))
                 val<- getProgressBar(z$pb)
                 if (x$FinDiff.method)
                     val <- val + increment * (z$pp + 1)
