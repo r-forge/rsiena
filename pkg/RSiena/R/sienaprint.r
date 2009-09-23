@@ -64,14 +64,17 @@ print.sienaFit <- function(x, ...)
            addtorow <- tmp$addtorow
            for (i in 1:length(tmp1))
            {
-               for (j in 1:length(addtorow$command))
+               if (length(addtorow$command) > 0)
                {
-                   ii <- grep(i-1, addtorow$pos[[j]])
-                   if (length(ii))
-                       if (i == 1 | addtorow$command[j] == 'Network Dynamics')
-                           cat( addtorow$command[j], '\n')
-                       else
-                           cat('\n', addtorow$command[j], '\n', sep='')
+                   for (j in 1:length(addtorow$command))
+                   {
+                       ii <- grep(i-1, addtorow$pos[[j]])
+                       if (length(ii))
+                           if (i == 1 | addtorow$command[j] == 'Network Dynamics')
+                               cat( addtorow$command[j], '\n')
+                           else
+                               cat('\n', addtorow$command[j], '\n', sep='')
+                   }
                }
                cat(tmp1[i], '\n')
            }

@@ -281,6 +281,14 @@ phase1.2 <- function(z, x, ...)
         nits <- seq((z$phase1Its+1), z$n1, int)
         for (nit in nits)
         {
+            if (is.null(z$ctime))
+            {
+                time1 <- proc.time()['elapsed']
+                if (x$checktime)
+                {
+                    z$ctime <- time1
+                }
+            }
             z$nit <- nit
             z <- doPhase1it(z, x, cl=z$cl, int=int, zsmall=zsmall,
                             xsmall=xsmall, ...)
@@ -291,7 +299,7 @@ phase1.2 <- function(z, x, ...)
         }
     }
     z$timePhase1 <- (proc.time()['elapsed'] - z$ctime) / (z$nit - 1)
-    if (x$checktime)
+    if (x$checktime  && !is.na(z$timePhase1))
     {
         Report(c('Time per iteration in phase 1  =',
                  format(z$timePhase1, digits = 4, nsmall = 4),'\n'), lf)
@@ -387,6 +395,9 @@ phase1.2 <- function(z, x, ...)
     WriteOutTheta(z)
     z$nitPhase1 <- z$phase1Its
     z$phase1devs <- z$sf
+    z$phase1dfra <- z$frda
+    z$phase1sdf <- z$sdf
+    z$phase1scores <- z$ssc
     ##browser()
     z
 }
@@ -524,7 +535,11 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
             z$npos <- z$npos + ifelse(abs(diag(fras[ii, , ])) > 1e-6, 1, 0)
         }
     }
-    sdf <- fras / rep(z$epsilon, z$pp)
+    sdf <- fras
+    for (i in 1:int)
+    {
+        sdf[i, , ] <- fras[i, , ] / rep(z$epsilon, z$pp)
+    }
     z$sdf0 <- sdf
                                         # browser()
     z
