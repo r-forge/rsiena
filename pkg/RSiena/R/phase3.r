@@ -44,23 +44,34 @@ phase3 <- function(z, x, ...)
     z$ssc <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
     z$sdf <- array(0, dim = c(z$n3, z$pp, z$pp))
     z$sims <- vector("list", z$n3)
-    ## revert to original requested method for phase 3
-    z$Deriv <- !x$FinDiff.method
-    if (x$FinDiff.method)
+    ## revert to original requested method for phase 3 unless symmetric
+    if (z$FinDiff.method && !x$FinDiff.method &&
+        (!is.null(z$FinDiffBecauseSymmetric)) && z$FinDiffBecauseSymmetric)
+    {
+        z$Deriv <- FALSE
+        z$FinDiff.method <- TRUE
+    }
+    else
+    {
+        z$Deriv <- !x$FinDiff.method
+        z$FinDiff.method <- x$FinDiff.method
+    }
+    if (z$FinDiff.method)
         Report('Estimation of derivatives by the finite difference method.\n\n',outf)
     else
         Report('Estimation of derivatives by the LR method (type 1).\n\n', outf)
     zsmall <- NULL
+    zsmall$Findiff.method <- z$Findiff.method
     zsmall$theta <- z$theta
     zsmall$Deriv <- z$Deriv
     zsmall$Phase <- z$Phase
     zsmall$nit <- z$nit
     xsmall<- NULL
-    xsmall$cconditional <- x$cconditional
+    zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
     if (!x$maxlike && !is.null(z$writefreq))
     {
-        if (x$FinDiff.method)
+        if (z$FinDiff.method)
             z$writefreq <- z$writefreq %/% z$pp
         else
             z$writefreq <- z$writefreq %/% 2
@@ -132,7 +143,7 @@ phase3 <- function(z, x, ...)
                 increment <- ifelse(nit <= 5, int,
                                     ifelse(nit <= 10, 5, z$writefreq * int))
                 val<- getProgressBar(z$pb)
-                if (x$FinDiff.method)
+                if (z$FinDiff.method)
                     val <- val + increment * (z$pp + 1)
                 else
                     val <- val + increment
@@ -201,7 +212,7 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
 {
     if (int == 1)
     {
-        zz <- x$FRAN(zsmall, xsmall, ...)
+        zz <- x$FRAN(zsmall, xsmall)
         if (!zz$OK)
         {
             z$OK <- zz$OK
@@ -213,7 +224,7 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
     else
     {
   ##zz <- clusterCall(cl, simstats0c, zsmall, xsmall)
-        zz <- clusterCall(cl, usesim, zsmall, xsmall, ...)
+        zz <- clusterCall(cl, usesim, zsmall, xsmall)
         z$n <- z$n + z$int
       #  browser()
    }
@@ -223,7 +234,7 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
         fra <- fra - z$targets
         z$sf[nit, ] <- fra
         z$sf2[nit, , ] <- zz$fra
-        z$sims[[nit]] <- zz$nets
+        z$sims[[nit]] <- zz$sims
     }
     else
     {
@@ -233,10 +244,10 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
             fra <- fra - z$targets
             z$sf[nit + (i - 1), ] <- fra
             z$sf2[nit + (i - 1), , ] <- zz[[i]]$fra
-            z$sims[[nit + (i - 1)]] <- zz[[i]]$nets
+            z$sims[[nit + (i - 1)]] <- zz[[i]]$sims
        }
     }
-    if (x$cconditional)
+    if (z$cconditional)
     {
         if (int==1)
             z$ntim[nit,]<- zz$ntim0
@@ -246,7 +257,7 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
                 z$ntim[nit+(i-1),]<- zz[[i]]$ntim0
         }
     }
-    if (x$FinDiff.method)
+    if (z$FinDiff.method)
     {
         z <- FiniteDifferences(z, x, fra + z$targets, cl, int, ...)
         z$sdf[nit:(nit + (int - 1)), , ] <- z$sdf0
@@ -298,7 +309,7 @@ phase3.2<- function(z,x,...)
     Report(c('Total of', z$n,'iterations.\n'),outf)
     Report(c('Parameter estimates based on', z$n-z$Phase3nits,
              'iterations,\n'), outf)
-    if (x$cconditional)
+    if (z$cconditional)
         Report(c('basic rate parameter',c('','s')[as.integer(z$observations>2)+1],
                  ' as well as \n'),outf)
     Report(c('convergence diagnostics, covariance and derivative matrices based on ',
@@ -307,7 +318,7 @@ phase3.2<- function(z,x,...)
     Report(c('Averages, standard deviations, ',
            'and t-ratios for deviations from targets:\n'),sep='',outf)
   #  Report(c(date(),'\n'),bof)
-    if (x$cconditional)
+    if (z$cconditional)
         Report('\nconditional moment estimation.',bof)
     else if (x$maxlike)
         Report('\nMaximum Likelihood estimation.',bof)
@@ -426,7 +437,7 @@ CalculateDerivative3<- function(z,x)
 {
     f <- FRANstore()
     z$mnfra<- colMeans(z$sf)
-    if (x$FinDiff.method||x$maxlike)
+    if (z$FinDiff.method||x$maxlike)
     {
         dfra<- t(apply(z$sdf,c(2,3),mean))
     }

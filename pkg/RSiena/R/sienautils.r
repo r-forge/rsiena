@@ -231,9 +231,10 @@ sienaNet<- function(netarray, type=c('oneMode','bipartite','behavior'),
     if (type != 'behavior')
         if (sparse)
         {
-             if (!all(sapply(netarray, function(x)
-                            {
-                                tmp <- x@x
+            netarray <- lapply(netarray, function(x)as(drop0(x), "dgTMatrix"))
+            if (!all(sapply(netarray, function(x)
+                        {
+                            tmp <- x@x
                                 all(is.na(tmp) | tmp == 1 | tmp == 10 |
                                     tmp == 11 )
                             }

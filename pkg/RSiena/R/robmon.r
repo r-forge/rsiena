@@ -46,7 +46,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
         clusterCall(cl, storeinFRANstore,  FRANstore())
         if (initC)
         {
-            ans <-  clusterCall(cl, usesim, NULL, x,
+            ans <-  clusterCall(cl, usesim, z, x,
                                 INIT=FALSE, initC = initC)
         }
         z$cl <- cl

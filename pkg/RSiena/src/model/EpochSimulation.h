@@ -31,6 +31,8 @@ class Model;
 class ActorSet;
 class EffectInfo;
 class SimulationActorSet;
+class State;
+class Cache;
 
 
 // ----------------------------------------------------------------------------
@@ -63,6 +65,8 @@ public:
 
     double score(const EffectInfo * pEffect) const;
     void score(const EffectInfo * pEffect, double value);
+
+    Cache * pCache() const;
 
 private:
     void runStep();
@@ -127,6 +131,9 @@ private:
     // including the rate effects, but excluding the basic rate effect.
 
     map<const EffectInfo *, double> lscores;
+
+    State * lpState;
+    Cache * lpCache;
 };
 
 }

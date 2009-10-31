@@ -38,7 +38,6 @@ BehaviorVariable::BehaviorVariable(BehaviorLongitudinalData * pData,
 {
 	this->lpData = pData;
 	this->lvalues = new int[this->n()];
-	this->lpredictorValues = new int[this->n()];
 	this->levaluationEffectContribution = new double * [3];
 	this->lendowmentEffectContribution = new double * [3];
 	this->lprobabilities = new double[3];
@@ -59,11 +58,9 @@ BehaviorVariable::BehaviorVariable(BehaviorLongitudinalData * pData,
 BehaviorVariable::~BehaviorVariable()
 {
 	delete[] this->lvalues;
-	delete[] this->lpredictorValues;
 
 	this->lpData = 0;
 	this->lvalues = 0;
-	this->lpredictorValues = 0;
 	delete[] this->lprobabilities;
 	// Delete arrays of contributions
 
@@ -144,25 +141,6 @@ double BehaviorVariable::similarity(int i, int j) const
 
 
 /**
- * Returns the predictor value on this behavior for the given actor.
- */
-int BehaviorVariable::predictorValue(int actor) const
-{
-	return this->lpredictorValues[actor];
-}
-
-
-/**
- * Returns the predictor value on this behavior for the given actor, which is
- * centered around the overall mean of the observed values.
- */
-double BehaviorVariable::centeredPredictorValue(int actor) const
-{
-	return this->lpredictorValues[actor] - this->lpData->overallMean();
-}
-
-
-/**
  * Returns the array of current values for this behavior variable.
  */
 const int * BehaviorVariable::values() const
@@ -216,15 +194,6 @@ void BehaviorVariable::initialize(int period)
 	this->lmean /= this->pActorSet()->activeActorCount();
 }
 
-/**
- * Set the value of the variable for use as a predictor rather than a
- * dependent variable .
- */
-
-void BehaviorVariable::predictorValue(int actor, int value)
-{
-	this->lpredictorValues[actor] = value;
-}
 
 // ----------------------------------------------------------------------------
 // Section: Composition change
@@ -318,16 +287,14 @@ void BehaviorVariable::makeChange(int actor)
 		!this->lpData->upOnly(this->period()))
 	{
 		probabilities[0] =
-			exp(this->totalEvaluationContribution(actor,
-					-1) +
-					 +
-				this->totalEndowmentContribution(actor,
-					-1));
+			exp(this->totalEvaluationContribution(actor, -1) +
+				this->totalEndowmentContribution(actor, -1));
 	}
 	else
 	{
 		probabilities[0] = 0;
 	}
+
 	// No change means zero contribution, but exp(0) = 1
 	probabilities[1] = 1;
 
@@ -337,8 +304,7 @@ void BehaviorVariable::makeChange(int actor)
 		!this->lpData->downOnly(this->period()))
 	{
 		probabilities[2] =
-			exp(this->totalEvaluationContribution(actor,
-				1));
+			exp(this->totalEvaluationContribution(actor, 1));
 	}
 	else
 	{
@@ -416,7 +382,7 @@ double BehaviorVariable::totalEvaluationContribution(int actor,
 			pEffect->calculateChangeContribution(actor, difference);
 		this->levaluationEffectContribution[difference+1][i] =
 			thisContribution;
-		contribution += pEffect->weight() * thisContribution;
+		contribution += pEffect->parameter() * thisContribution;
 	}
 	return contribution;
 }
@@ -435,7 +401,7 @@ double BehaviorVariable::totalEndowmentContribution(int actor,
 			pEffect->calculateChangeContribution(actor, difference);
 		this->lendowmentEffectContribution[difference+1][i] =
 			thisContribution;
-		contribution += pEffect->weight() * thisContribution;
+		contribution += pEffect->parameter() * thisContribution;
 	}
 
 	return contribution;

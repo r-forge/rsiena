@@ -160,6 +160,10 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
     }
     for (i in seq(along=vCovars)) ## note that behaviour variables are not here!
     {
+        if (observations < 3)
+        {
+            stop("Changing covariates are not possibLe with only two waves")
+        }
         if (!validNodeSet(attr(vCovars[[i]], 'nodeSet'), nrow(vCovars[[i]])))
             stop('changing covariate incorrect size: ', names(vCovars)[i])
         if (ncol(vCovars[[i]]) < (observations - 1))
@@ -377,7 +381,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
             for (j in 1:(observations - 1))
             {
                 myvector1 <- myarray[, , j]
-                myvector2 <- myarray[, , j+1]
+                myvector2 <- myarray[, , j + 1]
                 mydiff <- abs(myvector1 - myvector2)
                 attr(depvars[[i]], "distance")[j] <- sum(mydiff, na.rm=TRUE)
                 attr(depvars[[i]], "vals")[[j]] <- table(myvector1,
@@ -429,9 +433,12 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     x2[x2 %in% c(10, 11)] <- NA
                     mymat1@x <- x1
                     mymat2@x <- x2
-                    ## remove diagonals
-                    diag(mymat1) <- NA
-                    diag(mymat2) <- NA
+                    ## remove diagonals if not bipartite
+                    if (attr(depvars[[i]], "type") != "bipartite")
+                    {
+                        diag(mymat1) <- NA
+                        diag(mymat2) <- NA
+                    }
                     mydiff <- mymat2 - mymat1
                     attr(depvars[[i]], 'distance')[j] <- sum(mydiff != 0,
                                                              na.rm = TRUE)
@@ -447,9 +454,12 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     ##remove structural values
                     mymat1[mymat1 %in% c(10,11)] <- NA
                     mymat2[mymat2 %in% c(10,11)] <- NA
-                    ## remove diagonals
-                    diag(mymat1) <- NA
-                    diag(mymat2) <- NA
+                    ## remove diagonals if not bipartite
+                    if (attr(depvars[[i]], "type") != "bipartite")
+                    {
+                        diag(mymat1) <- NA
+                        diag(mymat2) <- NA
+                    }
                     mydiff <- mymat2 - mymat1
                     attr(depvars[[i]], 'distance')[j] <- sum(mydiff != 0,
                                                              na.rm = TRUE)
@@ -518,8 +528,60 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                         range(tmp[!(is.na(tmp) | tmp %in% c(10, 11))])
                 }
             }
-            else #type=='bipartite' not sure what we need here
+            else #type=='bipartite' not sure what we need here,
+                #### but include diagonal
             {
+                attr(depvars[[i]], 'symmetric') <- FALSE
+                attr(depvars[[i]], 'missing') <- FALSE
+                attr(depvars[[i]], 'structural') <- FALSE
+                for (j in 1:observations)
+                {
+                    if (sparse)
+                    {
+                        mymat <- myarray[[j]]
+                    }
+                    else
+                    {
+                        mymat <- myarray[, , j]
+                    }
+                    if (any(is.na(mymat)))
+                    {
+                        attr(depvars[[i]], 'missing') <- TRUE
+                    }
+                    if (any(!is.na(mymat) & (mymat == 10 | mymat == 11)))
+                    {
+                        attr(depvars[[i]], "structural") <- TRUE
+                    }
+                    if (sparse)
+                    {
+                        nonZeros <- table(mymat@x, useNA="always")
+                        Zeros <- nrow(mymat) * ncol(mymat) - sum(nonZeros)
+                        attr(depvars[[i]], "vals")[[j]] <-
+                            c(table(rep(0, Zeros)), nonZeros)
+                    }
+                    else
+                    {
+                        attr(depvars[[i]], "vals")[[j]] <- table(mymat,
+                                                                 useNA="always")
+                    }
+                    attr(depvars[[i]], "nval")[j] <-
+                        sum(!is.na(mymat))
+                }
+                ### need to exclude the structurals here
+                if (sparse)
+                {
+                   vals <- lapply(depvars[[i]], function(x)
+                                   c(x@x[!(is.na(x@x) |
+                                           x@x %in% c(10, 11))] , 0))
+                    attr(depvars[[i]], "range") <-
+                        do.call(range, vals)
+               }
+                else
+                {
+                    tmp <- depvars[[i]]
+                    attr(depvars[[i]], "range") <-
+                        range(tmp[!(is.na(tmp) | tmp %in% c(10, 11))])
+                }
             }
         }
         attr(depvars[[i]], 'name') <- names(depvars)[i]
@@ -561,7 +623,7 @@ rangeAndSimilarity<- function(vals, rvals=NULL)
     sapply(1: length(v), function(x, y, r){
         z <- y
         z[x] <- NA
-        ##browser()
+        #browser()
         tmp1 <- 1 - abs(y[x] - z) / r
         list(sum(tmp1, na.rm=TRUE), sum(!is.na(tmp1)))
          },
@@ -1112,6 +1174,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
         dyvCovars <- names(objlist[[1]]$dyvCovars)
     }
     symmetric[types=='behavior'] <- NA
+    symmetric[types=='bipartite'] <- FALSE
     names(symmetric) <- netnames
     group <-  objlist
     attr(group, 'netnames') <- netnames
@@ -1325,7 +1388,7 @@ getGroupNetRanges <- function(data)
     varmax <- NA
     for (net in seq(along=netnames))
     {
-        if (types[net] == "oneMode")
+        if (types[net] %in% c("oneMode", "bipartite"))
         {
             varmin <- NA
             varmax <- NA

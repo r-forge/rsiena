@@ -49,9 +49,11 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
         ## randomseed2 is for second generator needed only for parallel testing
         randomseed2 <- .Random.seed
       #  .Random.seed[2:4] <- as.integer(c(1,2,3))
-        randomseed2[2:4] <- as.integer(c(3,2,1))
+       # randomseed2[2:4] <- as.integer(c(3,2,1))
+        randomseed2[2:4] <- as.integer(c(1, 2, 3))
         seed <- 1
         newseed <- 1
+        z$parallelTesting <- TRUE
     }
     else
     {
@@ -61,7 +63,7 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, useCluster = FALSE,
         {
             set.seed(x$randomSeed)
             seed <- x$randomSeed
-       }
+        }
         else
         {
             if (exists(".Random.seed"))
@@ -239,36 +241,36 @@ AnnouncePhase <- function(z, x, subphase=NULL)
         z$n1pos<- n1pos
         if (!x$maxlike && z$FinDiff.method)
             pbmax <- pbmax + x$n3 * z$pp
-        z$pb$pbval<- 0
+        z$pb$pbval <- 0
         z$pb <- createProgressBar(z$pb, maxvalue=pbmax)
-        z$pb$pbmax<- pbmax
+        z$pb$pbmax <- pbmax
    }
     if (z$Phase==2)
     {
         propo <- z$n1pos + z$n2partsum[subphase]
         if (propo> getProgressBar(z$pb))
-            z$pb<-setProgressBar(z$pb,propo)
+            z$pb <-setProgressBar(z$pb,propo)
     }
     if (z$Phase ==3)
     {
         propo <- z$n1pos + z$n2partsum[x$nsub + 1]
         if (!z$AllUserFixed)
-            z$pb<- setProgressBar(z$pb,propo)
+            z$pb <- setProgressBar(z$pb,propo)
        else
         {
             max <- x$n3
-            z$pb<-createProgressBar(z$pb,max)
+            z$pb <-createProgressBar(z$pb,max)
        }
     }
     z
 }
 ##@roundfreq siena07 Prettify interval between progress reports
-roundfreq<- function(w)
+roundfreq <- function(w)
 {
     vec1 <- c(1, 2, 3, 4, 31, 66, 101, 300, 500)
     vec2 <- c(1, 2, 3, 20, 50, 100, 200, 500)
     if (is.batch())
-        w <- vec2[findInterval(w, vec1, all.inside=TRUE)]
+        w <- max(10,vec2[findInterval(w, vec1, all.inside=TRUE)])
     else
         w <- vec2[findInterval(w, vec1[1:7], all.inside=TRUE)]
     w

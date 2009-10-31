@@ -3,7 +3,7 @@
 # *
 # * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 # *
-# * File:print01Report.r
+# * File: print01Report.r
 # *
 # * Description: This module contains the function to print the initial report
 # *****************************************************************************/
@@ -41,19 +41,23 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             multipleNodeSets <- length(x$nodeSets) > 1
             if (multipleNodeSets)
             {
-                Report("Dependent variables   Type      NodeSet(s) (R, C)\n",
+                Report("Dependent variables   Type       NodeSet(s) (R, C)\n",
                        outf)
-                Report("-------------------   ----      -----------------\n",
+                Report("-------------------   ----       -----------------\n",
                        outf)
                 for (i in 1:length(x$depvars))
                 {
                     atts <- attributes(x$depvars[[i]])
                     Report(c(format(atts$name, width=20),
-                             format(atts$type, width=10)), outf)
-                    for (j in 1:length(atts$nodeSets))
+                             format(atts$type, width=12)), outf)
+                    for (j in 1:length(atts$nodeSet))
                     {
-                        Report(c(format(atts$nodeSets, width=10),
-                                 "(", atts$dim[j], ")"), sep="", outf)
+                        if (j > 1)
+                        {
+                            Report(', ', outf)
+                        }
+                        Report(c(format(atts$nodeSet[j]),
+                                 " (", atts$netdims[j], ")"), sep="", outf)
                     }
                     Report("\n", outf)
                 }
@@ -119,7 +123,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                     {
                         Report("This is a two-mode network.\n", outf)
                         Report(c("The number of units in the second mode is ",
-                                 atts$dim[2], ".\n"), sep="", outf)
+                                 atts$netdims[2], ".\n"), sep="", outf)
                     }
                     for (k in 1:x$observations)
                     {
@@ -178,12 +182,23 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                             missrow <- rowSums(is.na(tmpdepvar))
                             misscol <- colSums(is.na(tmpdepvar))
                         }
-                        tmp <- format(cbind(1:atts$netdims[1], outdeg, indeg))
+                        if (attr(depvar, "type") == "bipartite")
+                        {
+                             tmp <- format(cbind(1:atts$netdims[1], outdeg))
+                         }
+                        else
+                        {
+                            tmp <- format(cbind(1:atts$netdims[1], outdeg, indeg))
+                        }
+
                         Report(tmp[, 1], fill=60, outf)
                         Report("out-degrees\n", outf)
                         Report(tmp[, 2], fill=60, outf)
-                        Report("in-degrees\n", outf)
-                        Report(tmp[, 3], fill=60, outf)
+                        if (attr(depvar, "type") != "bipartite")
+                        {
+                            Report("in-degrees\n", outf)
+                            Report(tmp[, 3], fill=60, outf)
+                        }
                         ## report structural values
                         if (attr(depvar, "structural"))
                         {
@@ -421,11 +436,28 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             nCovars <- length(x$cCovars)
             covars <- names(x$cCovars)
             Heading(2, outf, "Reading constant actor covariates.")
-            Report(c(nCovars, "variable"),outf)
-            Report(ifelse(nCovars == 1, ", named:\n", "s, named:\n"), outf)
-            for (i in seq(along=covars))
+            if (!is.null(session))
             {
-                Report(c(format(covars[i], width=15), '\n'), outf)
+                covarssession <- session[session$Type == "constant covariate", ]
+                for (i in 1:nrow(covarssession))
+                {
+                    names <- strsplit(covarssession$Name[i],
+                                      " ", fixed=TRUE)[[1]]
+                    ncases <- length(x$cCovars[[match(names[1], covars)]])
+                    Report(c("Covariate data file", covarssession$Filename[i],
+                           "with", length(names), "variables,", ncases,
+                             "cases, named:\n"), outf)
+                    Report(paste(names, "\n"), outf, sep="")
+                }
+            }
+            else
+            {
+                Report(c(nCovars, "variable"),outf)
+                Report(ifelse(nCovars == 1, ", named:\n", "s, named:\n"), outf)
+                for (i in seq(along=covars))
+                {
+                    Report(c(format(covars[i], width=15), '\n'), outf)
+                }
             }
             Report(c("\nA total of", nCovars,
                      "non-changing individual covariate"), outf)
@@ -465,11 +497,28 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             use <- ! covars %in% names(x$cCovars)
             nCovars <- length(x$vCovars[use])
             Heading(2, outf, "Reading exogenous changing actor covariates.")
-            Report(c(nCovars, "variable"),outf)
-            Report(ifelse(nCovars == 1, ", named:\n", "s, named:\n"), outf)
-            for (i in seq(along=covars[use]))
+            if (!is.null(session))
             {
-                Report(c(format(covars[use][i], width=15), '\n'), outf)
+                covarssession <- session[session$Type == "changing covariate", ]
+                for (i in 1:nrow(covarssession))
+                {
+                    ncases <- nrow(x$vCovars[[match(covarssession$Name[i],
+                                                      covars)]])
+                    Report(c("Exogenous changing covariate ",
+                             covarssession$name[i], " read from file ",
+                             covarssession$Filename[i], ".\n"), sep="", outf)
+                    Report(c("Number of cases is ", ncases, ".\n"), sep="",
+                              outf)
+                }
+            }
+            else
+            {
+                Report(c(nCovars, "variable"),outf)
+                Report(ifelse(nCovars == 1, ", named:\n", "s, named:\n"), outf)
+                for (i in seq(along=covars[use]))
+                {
+                    Report(c(format(covars[use][i], width=15), '\n'), outf)
+                }
             }
             Report(c("\nA total of", nCovars,
                      "exogenous changing actor covariate"), outf)

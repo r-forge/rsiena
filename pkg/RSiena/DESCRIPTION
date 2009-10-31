@@ -1,12 +1,12 @@
 Package: RSiena
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.0.5
-Date: 2009-08-10
+Version: 1.0.6
+Date: 2009-10-31
 Author: Various
 Depends: R (>= 2.7.0)
-Imports: Matrix
-Suggests: tcltk, snow, rlecuyer, network, codetools, xtable
+Imports: Matrix, xtable
+Suggests: tcltk, snow, rlecuyer, network, codetools
 SystemRequirements: GNU make, tcl/tk 8.5, Tktable
 Maintainer: <ruth@stats.ox.ac.uk>
 Description: Fits models to longitudinal networks
@@ -14,4 +14,3 @@ License: GPL (>=2)
 LazyLoad: yes
 LazyData: yes
 URL: http://www.stats.ox.ac.uk/~snijders/siena
-Packaged: 2009-09-22 21:01:10 UTC; ruth
