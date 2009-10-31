@@ -55,8 +55,9 @@ phase1.1 <- function(z, x, ...)
     zsmall$Deriv <- z$Deriv
     zsmall$Phase <- z$Phase
     zsmall$nit <- z$nit
+    zsmall$Findiff.method <- z$Findiff.method
     xsmall<- NULL
-    xsmall$cconditional <- x$cconditional
+    zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
     nits <- seq(1, firstNit, int)
     if (any(nits >= 6))
@@ -168,7 +169,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     DisplayIteration(z)
     if (int == 1)
     {
-        zz <- x$FRAN(zsmall, xsmall, ...)
+        zz <- x$FRAN(zsmall, xsmall)
         if (!zz$OK)
         {
             z$OK <- zz$OK
@@ -180,7 +181,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     }
     else
     {
-        zz <- clusterCall(cl, usesim, zsmall, xsmall, ...)
+        zz <- clusterCall(cl, usesim, zsmall, xsmall)
         z$n <- z$n + z$int
         z$phase1Its <- z$phase1Its + int
     }
@@ -190,7 +191,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
         fra <- fra - z$targets
         z$sf[z$nit, ] <- fra
         z$sf2[z$nit, , ] <- zz$fra
-        z$sims[[z$nit]] <- zz$nets
+        z$sims[[z$nit]] <- zz$sims
     }
     else
     {
@@ -200,7 +201,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
             fra <- fra - z$targets
             z$sf[z$nit + (i - 1), ] <- fra
             z$sf2[z$nit + (i - 1), , ] <- zz[[i]]$fra
-            z$sims[[z$nit + (i - 1)]] <- zz[[i]]$nets
+            z$sims[[z$nit + (i - 1)]] <- zz[[i]]$sims
         }
 
     }
@@ -247,7 +248,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     z$pb <- setProgressBar(z$pb, val)
     progress <- val / z$pb$pbmax * 100
     if (z$nit <= 5 || z$nit %% z$writefreq == 0 || z$nit %%5 == 0 ||
-        x$maxlike || x$FinDiff.method ||
+        x$maxlike || z$FinDiff.method ||
         (int > 1 && z$nit %% z$writefreq < int))
     {
       #  Report(c('Phase', z$Phase, 'Iteration ', z$nit, '\n'))
@@ -273,8 +274,9 @@ phase1.2 <- function(z, x, ...)
     zsmall$Phase <- z$Phase
     zsmall$nit <- z$nit
     xsmall<- NULL
-    xsmall$cconditional <- x$cconditional
+    zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
+    zsmall$FinDiff.method <- z$Findiff.method
     int <- z$int
     if (z$n1 > z$phase1Its)
     {
@@ -492,11 +494,10 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
 {
     fras <- array(0, dim = c(int, z$pp, z$pp))
     xsmall<- NULL
-    xsmall$cconditional <- x$cconditional
  ##browser()
     for (i in 1 : z$pp)
     {
-        zdummy <- z[c('theta', 'Deriv')]
+        zdummy <- z[c('theta', 'Deriv', 'cconditional', 'FinDiff.method')]
         if (!z$fixed[i])
         {
             zdummy$theta[i] <- z$theta[i] + z$epsilon[i]
@@ -505,7 +506,7 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
         if (int == 1)
         {
             zz <- x$FRAN(zdummy, xsmall, INIT=FALSE,
-                         fromFiniteDiff=TRUE, ...)
+                         fromFiniteDiff=TRUE)
             if (!zz$OK)
             {
                 z$OK <- zz$OK
@@ -514,8 +515,8 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
         }
         else
         {
-            zz <- clusterCall(cl, x$FRAN, zdummy, xsmall,
-                              INIT=FALSE, fromFiniteDiff=TRUE, ...)
+            zz <- clusterCall(cl, usesim, zdummy, xsmall,
+                              INIT=FALSE, fromFiniteDiff=TRUE)
         }
         if (int == 1)
         {

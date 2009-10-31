@@ -29,7 +29,7 @@ installGui <- function()
 ##@siena01Gui siena01
 siena01Gui <- function(getDocumentation=FALSE)
 {
-   ## DONE (FALSE) ## this is so we can exit cleanly
+   ##DONE (FALSE) ## this is so we can exit cleanly, but seems redundant here
     maxDegree <- NULL
     nMaxDegree <- NULL
     resultsFileID <-  NULL
@@ -154,7 +154,7 @@ siena01Gui <- function(getDocumentation=FALSE)
             mydata <<- resp$mydata
             myeff <<- resp$myeff
             mymodel <<- sienaModelCreate(fn=simstats0c)
-            savedObjectName <- paste(modelName, ".RData", sep="")
+            savedObjectName <- paste(modelName, ".Rdata", sep="")
             save(mydata, myeff, mymodel, file=savedObjectName)
             sienaModelOptions()
         }
@@ -246,13 +246,17 @@ siena01Gui <- function(getDocumentation=FALSE)
         fromFileFn()
         ## try to read in the project object
         savedModelName <- paste(modelName, ".Rdata", sep='')
-        if (inherits(resp <- try(load(savedModelName, .GlobalEnv),
+        #browser()
+        if (inherits(resp <- try(load(savedModelName),
                                  silent=TRUE), "try-error"))
         {
             tkmessageBox(message="Unable to load saved model", icon="error")
         }
         else
         {
+            mydata <<- mydata
+            mymodel <<- mymodel
+            myeff <<- myeff
             sienaModelOptions()
         }
     }
@@ -369,7 +373,7 @@ siena01Gui <- function(getDocumentation=FALSE)
             init <- "Siena"
         }
         savefilename <- tclvalue(tkgetSaveFile(filetypes=modelFiletypes,
-                                               defaultextension='.RData',
+                                               defaultextension='.Rdata',
                                                initialfile=init))
         if (savefilename != "")
             save(mymodel, mydata, myeff, file=savefilename)
@@ -488,8 +492,16 @@ siena01Gui <- function(getDocumentation=FALSE)
         ##@editFn internal siena01Gui
         editFn <- function()
         {
+            if (is.null(myeff$effectNumber))
+            {
+                myeff <- cbind(effectNumber=1:nrow(myeff), myeff,
+                               effect1=rep(NA, nrow(myeff)),
+                               effect2=rep(NA, nrow(myeff)),
+                               effect3=rep(NA,nrow(myeff)))
+            }
             editCols <- c("name", "effectName", "type", "include", "fix",
-                          "test", "initialValue", "parm")
+                          "test", "initialValue", "parm", "effectNumber",
+                          "effect1", "effect2", "effect3")
             effEdit <- myeff[, editCols]
             for (i in c("include", "fix", "test"))
             {
@@ -501,8 +513,9 @@ siena01Gui <- function(getDocumentation=FALSE)
                 effEdit[,i] <- as.logical(effEdit[,i])
             }
             myeff[, editCols] <<- effEdit
-                                        ##  browser()
-            ## make sure this window is top with a global grab, bu only for a second
+            ##  browser()
+            ## make sure this window is top with a global grab,
+            ##but only for a second
             tcl('wm', 'attributes', tt, '-topmost', 1)
             Sys.sleep(0.1)
             tcl('wm', 'attributes', tt, '-topmost', 0)
@@ -532,7 +545,7 @@ siena01Gui <- function(getDocumentation=FALSE)
             else ## update the thetas to use next time
             {
                 estimAns <<- resp
-                if (mymodel$cconditional)
+                if (estimAns$cconditional)
                 {
                     ## z$condvar has the subscripts of included parameters that
                     ## correspond to the conditional variable
@@ -680,13 +693,13 @@ siena01Gui <- function(getDocumentation=FALSE)
                 init <- "sienaResults"
             }
             savefilename <- tclvalue(tkgetSaveFile(filetypes=modelFiletypes,
-                                                   defaultextension='.RData',
+                                                   defaultextension='.Rdata',
                                                    initialfile=init))
             if (savefilename != "")
                 save(estimAns, file=savefilename)
         }
         ########################################
-        ## start of ModelOptions function proper
+        ## start of sienaModelOptions function proper
         ########################################
         resultsOpen <- FALSE
         if (inherits(mydata, "sienaGroup"))
@@ -902,12 +915,11 @@ siena01Gui <- function(getDocumentation=FALSE)
     {
         return(getInternals())
     }
-
     ## check we have the right libraries
     library(tcltk)
     if (!inherits(tclRequire("Tktable"), "tclObj"))
-        stop("This function needs the package TkTable: install it, or use ",
-             "an alternative data entry method: see RSiena help page")
+        stop("This function needs the tcl/tk package TkTable: install it, ",
+             "or use an alternative data entry method: see RSiena help page")
     ## directory for startup
     initialDir <- getwd()
 

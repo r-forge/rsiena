@@ -29,7 +29,7 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
 	model requests the use of standard initial values. Phase 1 will then
 	be omitted.}
   \item{returnDeps}{Boolean. Whether to return the simulated networks in
-	Phase 3. Currently only returns the first network.}
+	Phase 3.}
 }
 \details{
   This should be used for the element FRAN of the model object.
@@ -46,9 +46,12 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
   \item{ntim}{For conditional processing, time taken}
   \item{feasible}{currently set to TRUE}
   \item{OK}{could be set to FALSE if serious error has occurred}
-  \item{sims}{A list of simulation results for each network, each a list
-	of edgelists for each period. Only if \code{returnDeps} is
-	TRUE. Only one entry currently}
+  \item{sims}{A list of simulation results, one for each iteration. Each
+	list consists of a list for each data object, each of which consists of
+	a list for each network, each of which consists of a list for each period,
+	each component of which is an edgelist in matrix form (the columns
+	are from, to, value) (or vector for behavior variables).
+	Only if \code{returnDeps} is TRUE.}
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }

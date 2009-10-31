@@ -44,7 +44,11 @@ print.sienaFit <- function(x, ...)
         stop("not a legitimate Siena model fit")
    if (!x$OK)
    {
-       cat("Error end of estimation algorithm")
+       cat("Error end of estimation algorithm\n")
+   }
+   else if (x$termination == "UserInterrupt")
+   {
+       cat("User interrupted run, object possibly incomplete\n")
    }
    else
        {
@@ -232,10 +236,13 @@ sienaFitThetaTable <- function(x)
     theta <- x$theta
     theta[diag(x$covtheta) < 0.0 | x$fixed] <- NA
 
-    if (nBehavs > 1)
+    if (nBehavs > 0)
     {
         behEffects <- x$effects[x$effects$netType == 'behavior',]
         behNames <- unique(behEffects$name)
+    }
+    if (nBehavs > 1)
+    {
         behEffects$effectName <- paste('<',
                                        (1:nBehavs)[match(behEffects$name,
                                                          behNames)],

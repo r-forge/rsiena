@@ -6,6 +6,7 @@ sienaGroupCreate,  sienaModelCreate, sienaNet, sienaNodeSet, simstats0c, varCova
        installGui)
 
 import(Matrix)
+import(xtable)
 
 S3method(print, siena)
 S3method(print, sienaGroup)
@@ -13,3 +14,4 @@ S3method(print, sienaFit)
 S3method(print, summary.sienaFit)
 S3method(print, sienaModel)
 S3method(summary, sienaFit)
+S3method(xtable, sienaFit)

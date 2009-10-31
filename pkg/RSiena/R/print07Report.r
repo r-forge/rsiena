@@ -24,7 +24,7 @@ PrintReport <- function(z, x)
            Report(c("Total of", z$n, "iteration steps.\n\n"), bof)
            Heading(3, outf, "Estimates and standard errors")
            Heading(3, bof, "Estimates and standard errors")
-           if (x$cconditional) ## deal with rate parameter
+           if (z$cconditional) ## deal with rate parameter
            {
                Report('Rate parameters:\n', outf)
                Report('Rate parameters:\n', bof)
@@ -130,7 +130,7 @@ PrintReport <- function(z, x)
            }
            Report('\n', outf)
            Report('\n', bof)
-           if (x$cconditional && length(attr(z$f, 'netnames')) > 1)
+           if (z$cconditional && length(attr(z$f, 'netnames')) > 1)
            {
                Report(c('For conditional estimation, ',
                         'the standard errors of rate parameters\n',

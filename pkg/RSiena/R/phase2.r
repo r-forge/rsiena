@@ -81,6 +81,7 @@ proc2subphase<- function(z, x, subphase, ...)
         z$ctime <- proc.time()[3]
         z$time1 <- proc.time()[3]
         z$thav <- z$theta
+       ## cat(z$thav, z$theta, '\n')
         z$prod0 <- rep(0, z$pp)
         z$prod1 <- rep(0, z$pp)
         ## ###############################################
@@ -148,7 +149,6 @@ proc2subphase<- function(z, x, subphase, ...)
                      ' = ', format(subphaseTime, nsmall=4, digits=4),
                      '\n', sep=''), lf)
     }
-    ## browser()
     z$theta <- z$thav / (z$nit + 1)
     DisplayThetaAutocor(z)
     ##    cat('it',z$nit,'\n')
@@ -188,8 +188,9 @@ doIterations<- function(z, x, subphase,...)
     zsmall$theta <- z$theta
     zsmall$Deriv <- z$Deriv
     zsmall$Phase<- z$Phase
+    zsmall$Findiff.method <- z$Findiff.method
     xsmall<- NULL
-    xsmall$cconditional <- x$cconditional
+    zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
     repeat
     {
@@ -244,7 +245,7 @@ doIterations<- function(z, x, subphase,...)
         }
         if (z$int == 1)
         {
-            zz <- x$FRAN(zsmall, xsmall, ...)
+            zz <- x$FRAN(zsmall, xsmall)
             fra <- colSums(zz$fra) - z$targets
             if (!zz$OK)
             {
@@ -254,7 +255,7 @@ doIterations<- function(z, x, subphase,...)
         }
         else
         {
-            zz <- clusterCall(z$cl, usesim, zsmall, xsmall, ...)
+            zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
             fra <- rowMeans(sapply(zz, function(x) colSums(x$fra)- z$targets))
             zz$OK <- sapply(zz, function(x) x$OK)
             if (!all(zz$OK))

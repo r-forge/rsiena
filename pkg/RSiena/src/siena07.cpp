@@ -12,6 +12,7 @@
  * @file
  * Sets up the Data object with data from R
  */
+#include <stdexcept>
 #include <iostream>
 #include <fstream>
 #include <valarray>
@@ -22,8 +23,8 @@
 #include <Rinternals.h>
 #include <Rmath.h>
 #include "data/Data.h"
-#include "data/OneModeNetwork.h"
-#include "data/TieIterator.h"
+#include "network/OneModeNetwork.h"
+#include "network/TieIterator.h"
 #include "data/LongitudinalData.h"
 #include "data/NetworkLongitudinalData.h"
 #include "data/OneModeNetworkLongitudinalData.h"
@@ -42,6 +43,7 @@
 #include "data/ActorSet.h"
 #include "model/EpochSimulation.h"
 #include "model/variables/DependentVariable.h"
+#include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"
 using namespace std;
 using namespace siena;
@@ -298,6 +300,20 @@ int sample(int n)
     int sel=(int) n*r ;
     return(sel);
 }
+SEXP getBehaviorValues(const BehaviorVariable & behavior)
+{
+    SEXP ans;
+    int n = behavior.n();
+    PROTECT(ans = allocVector(INTSXP, n));
+    int *ians = INTEGER(ans);
+	const int *pValues = behavior.values();
+    for (int i = 0; i < n; i++)
+	{
+		ians[i] = pValues[i];
+	}
+	UNPROTECT(1);
+    return(ans) ;
+}
 SEXP getAdjacency(const Network& net)
 {
     SEXP ans;
@@ -319,16 +335,17 @@ SEXP getEdgeList(const Network& net)
 {
     SEXP ans;
 	int nties = net.tieCount();
-    PROTECT(ans = allocMatrix(INTSXP, nties, 2));
+    PROTECT(ans = allocMatrix(INTSXP, nties, 3));
     int *ians = INTEGER(ans);
     /* initialise the memory: possibly only neccesary in case of error! */
-    for (int i = 0; i < nties * 2; i++)
+    for (int i = 0; i < nties * 3; i++)
 		ians[i] = 0;
 	int irow = 0;
     for (TieIterator iter=net.ties(); iter.valid(); iter.next())
     {
 		ians[irow ] = iter.ego() + 1;
-		ians[ nties + irow] = iter.alter() + 1;
+		ians[nties + irow] = iter.alter() + 1;
+		ians[2 * nties + irow] = iter.value();
 		irow ++;
     }
 
@@ -607,40 +624,71 @@ void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
 
 
 /**
- * Unpack one set of ties for a onemode network
- */
-void unpackOneModeNetwork(SEXP ONEMODEVALS, OneModeNetwork * pNetwork)
-{
-    int *start = INTEGER(ONEMODEVALS);
-    int listlen = ncols(ONEMODEVALS);
-    int pos = 0;
-    for (int row = 0; row < listlen; row++)
-    {
-	int i;
-	int j;
-	int val;
-	i = start[pos++];
-	j = start[pos++];
-	val = start[pos++];
-	pNetwork->setTieValue(i-1, j-1, val);
-    }
-//	Rprintf("end 1,14 %d\n",pNetwork->tieValue(0, 13));
-}
-/**
  * Create one observation for a one mode Network: ties, missing, structural
  *
  */
-void setupOneModeNetwork(SEXP ONEMODE, OneModeNetwork * pNetwork,
-			 OneModeNetwork * pMissingTieNetwork,
-			 OneModeNetwork * pStructuralTieNetwork)
-
+void setupOneModeNetwork(SEXP ONEMODE,
+	OneModeNetworkLongitudinalData * pNetworkData,
+	int observation)
 {
-/* one mode networks are passed in as list of edgelists with attributes
-   giving the size of the network - not checked yet*/
-    unpackOneModeNetwork(VECTOR_ELT(ONEMODE, 0), pNetwork);
-    unpackOneModeNetwork(VECTOR_ELT(ONEMODE, 1), pMissingTieNetwork);
-    unpackOneModeNetwork(VECTOR_ELT(ONEMODE, 2), pStructuralTieNetwork);
+	/* one mode networks are passed in as list of edgelists with attributes
+	 giving the size of the network - not checked yet*/
+
+	// Tie values
+
+	SEXP ONEMODEVALS = VECTOR_ELT(ONEMODE, 0);
+	int *start = INTEGER(ONEMODEVALS);
+	int listlen = ncols(ONEMODEVALS);
+	int pos = 0;
+
+	for (int row = 0; row < listlen; row++)
+	{
+		int i;
+		int j;
+		int val;
+		i = start[pos++];
+		j = start[pos++];
+		val = start[pos++];
+		pNetworkData->tieValue(i - 1, j - 1, observation, val);
+	}
+
+	// Missingness
+
+	ONEMODEVALS = VECTOR_ELT(ONEMODE, 1);
+	start = INTEGER(ONEMODEVALS);
+	listlen = ncols(ONEMODEVALS);
+	pos = 0;
+
+	for (int row = 0; row < listlen; row++)
+	{
+		int i;
+		int j;
+		int val;
+		i = start[pos++];
+		j = start[pos++];
+		val = start[pos++];
+		pNetworkData->missing(i - 1, j - 1, observation, val);
+	}
+
+	// Structural ties
+
+	ONEMODEVALS = VECTOR_ELT(ONEMODE, 2);
+	start = INTEGER(ONEMODEVALS);
+	listlen = ncols(ONEMODEVALS);
+	pos = 0;
+
+	for (int row = 0; row < listlen; row++)
+	{
+		int i;
+		int j;
+		int val;
+		i = start[pos++];
+		j = start[pos++];
+		val = start[pos++];
+		pNetworkData->structural(i - 1, j - 1, observation, val);
+	}
 }
+
 
 /**
  * Create all observations for a one mode Network
@@ -671,14 +719,9 @@ void setupOneModeObservations(SEXP ONEMODES,
     }
     for (int period = 0; period < observations; period++)
     {
-	OneModeNetwork * pNetwork = (OneModeNetwork *)
-            pOneModeNetworkLongitudinalData->pNetwork(period);
-	OneModeNetwork * pMissingTieNetwork = (OneModeNetwork *)
-	    pOneModeNetworkLongitudinalData->pMissingTieNetwork(period);
-	OneModeNetwork * pStructuralTieNetwork = (OneModeNetwork *)
-	    pOneModeNetworkLongitudinalData->pStructuralTieNetwork(period);
-	setupOneModeNetwork(VECTOR_ELT(ONEMODES, period), pNetwork,
-			    pMissingTieNetwork, pStructuralTieNetwork);
+    	setupOneModeNetwork(VECTOR_ELT(ONEMODES, period),
+			pOneModeNetworkLongitudinalData,
+			period);
     }
     UNPROTECT(2);
 }
@@ -713,10 +756,150 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
         pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
 		setupOneModeObservations(VECTOR_ELT(ONEMODEGROUP, oneMode),
 			pOneModeNetworkLongitudinalData);
+
+		// Once all network data has been stored, calculate some
+		// statistical properties of that data.
+
+		pOneModeNetworkLongitudinalData->calculateProperties();
         UNPROTECT(4);
     }
 }
 
+/**
+ * Create one observation for a bipartite Network: ties, missing, structural
+ *
+ */
+void setupBipartiteNetwork(SEXP BIPARTITE,
+	NetworkLongitudinalData * pNetworkData,
+	int observation)
+{
+	/* bipartite networks are passed in as list of edgelists with attributes
+	 giving the size of the network - not checked yet*/
+
+	// Tie values
+
+	SEXP BIPARTITEVALS = VECTOR_ELT(BIPARTITE, 0);
+	int *start = INTEGER(BIPARTITEVALS);
+	int listlen = ncols(BIPARTITEVALS);
+	int pos = 0;
+
+	for (int row = 0; row < listlen; row++)
+	{
+		int i;
+		int j;
+		int val;
+		i = start[pos++];
+		j = start[pos++];
+		val = start[pos++];
+		pNetworkData->tieValue(i - 1, j - 1, observation, val);
+	}
+
+	// Missingness
+
+	BIPARTITEVALS = VECTOR_ELT(BIPARTITE, 1);
+	start = INTEGER(BIPARTITEVALS);
+	listlen = ncols(BIPARTITEVALS);
+	pos = 0;
+
+	for (int row = 0; row < listlen; row++)
+	{
+		int i;
+		int j;
+		int val;
+		i = start[pos++];
+		j = start[pos++];
+		val = start[pos++];
+		pNetworkData->missing(i - 1, j - 1, observation, val);
+	}
+
+	// Structural ties
+
+	BIPARTITEVALS = VECTOR_ELT(BIPARTITE, 2);
+	start = INTEGER(BIPARTITEVALS);
+	listlen = ncols(BIPARTITEVALS);
+	pos = 0;
+
+	for (int row = 0; row < listlen; row++)
+	{
+		int i;
+		int j;
+		int val;
+		i = start[pos++];
+		j = start[pos++];
+		val = start[pos++];
+		pNetworkData->structural(i - 1, j - 1, observation, val);
+	}
+}
+
+
+/**
+ * Create all observations for a bipartite Network
+ *
+ */
+void setupBipartiteObservations(SEXP BIPARTITES,
+			      NetworkLongitudinalData *
+                              pNetworkLongitudinalData)
+
+{
+    int observations = length(BIPARTITES);
+    if (observations != pNetworkLongitudinalData->observationCount())
+    {
+		error ("wrong number of observations in bipartite");
+    }
+    SEXP uo;
+    PROTECT(uo = install("uponly"));
+    SEXP uponly = getAttrib(BIPARTITES, uo);
+    SEXP dow;
+    PROTECT(dow = install("downonly"));
+    SEXP downonly = getAttrib(BIPARTITES, dow);
+    for (int period = 0; period < (observations - 1); period++)
+    {
+        pNetworkLongitudinalData->upOnly(period,
+			LOGICAL(uponly)[period]);
+        pNetworkLongitudinalData->downOnly(period,
+			LOGICAL(downonly)[period]);
+    }
+    for (int period = 0; period < observations; period++)
+    {
+    	setupBipartiteNetwork(VECTOR_ELT(BIPARTITES, period),
+			pNetworkLongitudinalData,
+			period);
+    }
+    UNPROTECT(2);
+}
+/**
+ * Create one group of bipartite Networks
+ *
+ */
+void setupBipartiteGroup(SEXP BIPARTITEGROUP, Data * pData)
+{
+    int nBipartite = length(BIPARTITEGROUP);
+
+    for (int bipartite = 0; bipartite < nBipartite; bipartite++)
+    {
+        SEXP as;
+        PROTECT(as = install("nodeSet"));
+        SEXP actorSet = getAttrib(VECTOR_ELT(BIPARTITEGROUP, bipartite), as);
+        SEXP nm;
+        PROTECT(nm = install("name"));
+        SEXP name = getAttrib(VECTOR_ELT(BIPARTITEGROUP, bipartite), nm);
+        const ActorSet * pSenders = pData->pActorSet(CHAR(STRING_ELT(
+					actorSet, 0)));
+        const ActorSet * pReceivers = pData->pActorSet(CHAR(STRING_ELT(
+					actorSet, 1)));
+		NetworkLongitudinalData *  pNetworkLongitudinalData =
+			pData->createNetworkData(CHAR(STRING_ELT(name, 0)),
+				pSenders, pReceivers);
+		setupBipartiteObservations(VECTOR_ELT(BIPARTITEGROUP, bipartite),
+			pNetworkLongitudinalData);
+
+		// Once all network data has been stored, calculate some
+		// statistical properties of that data.
+
+		pNetworkLongitudinalData->calculateProperties();
+        UNPROTECT(2);
+    }
+}
 /**
  * Create all observations for a behavior Network
  *
@@ -764,7 +947,7 @@ void setupBehavior(SEXP BEHAVIOR, BehaviorLongitudinalData * pBehaviorData)
 	pBehaviorData->similarityMean(REAL(simMean)[0]);
 
     // Now that the values are set, calculate some important statistics
-	pBehaviorData->calculateStatistics();
+	pBehaviorData->calculateProperties();
 	UNPROTECT(3);
 }
 /**
@@ -804,7 +987,7 @@ void setupConstantCovariate(SEXP COCOVAR, ConstantCovariate *
 
 {
     int nActors = length(COCOVAR);
-  Rprintf("%x\n", pConstantCovariate);
+	// Rprintf("%x\n", pConstantCovariate);
     double * start = REAL(COCOVAR);
     for (int actor = 0; actor < nActors; actor++)
     {
@@ -1253,6 +1436,29 @@ extern "C"
 		return R_NilValue;
     }
 /**
+ *  Creates all the groups of bipartite networks in the data
+ *
+ */
+    SEXP Bipartite(SEXP RpData, SEXP BIPARTITELIST)
+    {
+/* retrieve the address of our data */
+		vector<Data *> * pGroupData = (vector<Data *> *)
+			R_ExternalPtrAddr(RpData);
+		int nGroups = pGroupData->size();
+/* bipartite networks are passed in as list of edgelists with attributes
+   giving the size of the network */
+		if (nGroups != length(BIPARTITELIST) )
+		{
+			error ("wrong number of groups");
+		}
+		for (int group = 0; group < nGroups; group++)
+		{
+			setupBipartiteGroup(VECTOR_ELT(BIPARTITELIST, group),
+							  (*pGroupData)[group]);
+		}
+		return R_NilValue;
+    }
+/**
  *  Creates all the groups of behavior networks in the data
  */
     SEXP Behavior(SEXP RpData, SEXP BEHLIST)
@@ -1598,7 +1804,7 @@ one of values, one of missing values (boolean) */
  *  sets up the model options of MAXDEGREE, CONDITIONAL
  */
     SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
-		SEXP CONDVAR, SEXP CONDTARGETS, SEXP PROFILEDATA)
+		SEXP CONDVAR, SEXP CONDTARGETS, SEXP PROFILEDATA, SEXP PARALLELRUN)
     {
         /* get hold of the data vector */
 		vector<Data *> * pGroupData = (vector<Data *> *)
@@ -1616,9 +1822,20 @@ one of values, one of missing values (boolean) */
 			int *change = INTEGER(CONDTARGETS);
             pModel->conditional(true);
 			pModel->conditionalDependentVariable(CHAR(STRING_ELT(CONDVAR,0)));
-			for (int i = 0; i < totObservations; i++)
+
+			int i = 0;
+
+			for (int group = 0; group < nGroups; group++)
 			{
-				pModel->addTargetChange(change[i]);
+				Data * pData = (*pGroupData)[group];
+
+				for (int period = 0;
+					period < pData->observationCount() - 1;
+					period++)
+				{
+					pModel->targetChange(pData, period, change[i]);
+					i++;
+				}
 			}
         }
         /* get names vector for max degree */
@@ -1637,6 +1854,12 @@ one of values, one of missing values (boolean) */
 				}
 			}
 		}
+		/* set the parallel run flag on the model */
+		if (!isNull(PARALLELRUN))
+		{
+			pModel->parallelRun(true);
+		}
+
 		// print out Data for profiling
 		if (asInteger(PROFILEDATA))
 		{
@@ -1708,6 +1931,7 @@ one of values, one of missing values (boolean) */
 					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, netTypeCol), i));
 				const char * rateType =
 					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, rateTypeCol), i));
+				//	Rprintf("%s %s \n", effectType, netType);
 				if (strcmp(effectType, "rate") == 0)
 				{
 					if (strcmp(effectName, "Rate") == 0)
@@ -1883,7 +2107,7 @@ one of values, one of missing values (boolean) */
 						}
 						else
 						{
-							Rprintf("here\n");
+							//	Rprintf("here\n");
 							score = 0;
 						}
 					}
@@ -1974,21 +2198,21 @@ one of values, one of missing values (boolean) */
 				 period++)
 			{
 				periodFromStart++;
-					EpochSimulation  Simulation(pData, pModel);
-					Simulation.initialize(period + 1);
-					//State State (pData, period + 1);
-				State State (&Simulation);
+				//	EpochSimulation  Simulation(pData, pModel);
+				//Simulation.initialize(period + 1);
+				State State (pData, period + 1);
+				//State State (&Simulation);
 				StatisticCalculator Calculator (pData, pModel, &State,
 					period);
  				vector<double> statistic(nEffects);
  				vector<double> score(nEffects); /* not used */
 
-// 				getStatistics(EFFECTSLIST, &Calculator, period,
-// 					group, pData, (EpochSimulation *) 0,
-// 					&statistic, &score);
-  				getStatistics(EFFECTSLIST, &Calculator, period,
-					group, pData, &Simulation,
+				getStatistics(EFFECTSLIST, &Calculator, period,
+					group, pData, (EpochSimulation *) 0,
 					&statistic, &score);
+  				//getStatistics(EFFECTSLIST, &Calculator, period,
+				//			group, pData, &Simulation,
+				//&statistic, &score);
 				//	Rprintf("%f %f \n",statistic[1], statistic[2]);
 				/* fill up matrices for  return value list */
 				int iii = (periodFromStart - 1) * nEffects;
@@ -2012,10 +2236,12 @@ one of values, one of missing values (boolean) */
 
     SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 			   SEXP FROMFINITEDIFF, SEXP MODELPTR, SEXP EFFECTSLIST,
-		SEXP THETA, SEXP RANDOMSEED2, SEXP RETURNDEPS)
+		SEXP THETA, SEXP RANDOMSEED2, SEXP RETURNDEPS, SEXP NEEDSEEDS)
     {
 		SEXP NEWRANDOMSEED; /* for parallel testing only */
 		PROTECT(NEWRANDOMSEED = duplicate(RANDOMSEED2));
+		//SEXP R2RANDOMSEED; /* for parallel testing only */
+		//PROTECT(R2RANDOMSEED = duplicate(RANDOMSEED2));
 
 		/* create a simulation and return the observed statistics and scores */
 
@@ -2027,10 +2253,7 @@ one of values, one of missing values (boolean) */
         Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
 
         int nGroups = pGroupData->size();
-        /* the group loop should be removed when the data structures are
-           changed to allow for the 'virtual' dependent variables */
-
-
+		/* find total number of periods to process */
 		int totObservations = 0;
         for (int group = 0; group < nGroups; group++)
             totObservations += (*pGroupData)[group]->observationCount() - 1;
@@ -2040,6 +2263,7 @@ one of values, one of missing values (boolean) */
 		int returnDependents = asInteger(RETURNDEPS);
 
 		int deriv = asInteger(DERIV);
+		int needSeeds = asInteger(NEEDSEEDS);
 
 		/* set the deriv flag on the model */
 		pModel->needScores(deriv);
@@ -2047,6 +2271,7 @@ one of values, one of missing values (boolean) */
 		/* update the parameters */
 		updateParameters(EFFECTSLIST, THETA, pGroupData, pModel);
 
+        /* count up the total number of parameters */
 		int dim = 0;
 		for (int i = 0; i < length(EFFECTSLIST); i++)
 		{
@@ -2057,7 +2282,7 @@ one of values, one of missing values (boolean) */
 		GetRNGstate();
 
         /* fra will contain the simulated statistics and must be initialised
-           to 0. Use ifra to reduce function evaluations. */
+           to 0. Use rfra to reduce function evaluations. */
         SEXP fra;
         double * rfra;
         PROTECT(fra = allocMatrix(REALSXP, dim, totObservations));
@@ -2078,9 +2303,24 @@ one of values, one of missing values (boolean) */
         SEXP ans;
         PROTECT(ans = allocVector(VECSXP, 6));
 
-		/* nets will be the returned simulated networks */
-		SEXP nets;
-        PROTECT(nets = allocVector(VECSXP, 2));
+		/* sims will be the returned simulated dependent variables */
+		SEXP sims;
+        PROTECT(sims = allocVector(VECSXP, nGroups));
+		if (returnDependents)
+		{
+			int nVariables = (*pGroupData)[0]->rDependentVariableData().size();
+			for (int group = 0; group < nGroups; group++)
+			{
+				SET_VECTOR_ELT(sims, group,
+					allocVector(VECSXP, nVariables));
+				for (int variable = 0; variable < nVariables; variable++)
+				{
+					SET_VECTOR_ELT(VECTOR_ELT(sims, group), variable,
+						allocVector(VECSXP, (*pGroupData)[group]->
+							observationCount() - 1));
+				}
+			}
+		}
 
 		/* seed store is a list to save the random states */
         SEXP seedstore;
@@ -2127,19 +2367,22 @@ one of values, one of missing values (boolean) */
 
 			for (int period = 0; period < observations - 1; period++)
             {
+
                 periodFromStart++;
 				if (!isNull(RANDOMSEED2))
 				{
-					defineVar(rs, NEWRANDOMSEED, R_GlobalEnv);
+					//defineVar(rs, R2RANDOMSEED, R_GlobalEnv);
+					defineVar(rs, RANDOMSEED2, R_GlobalEnv);
 					GetRNGstate();
 					//double dummy =
 					nextDouble();
 					PutRNGstate();
-					NEWRANDOMSEED = findVar(rs, R_GlobalEnv);
-//  					Rprintf("%d %d %d %d\n",INTEGER(NEWRANDOMSEED)[0],
-// 							INTEGER(NEWRANDOMSEED)[1],
-// 							INTEGER(NEWRANDOMSEED)[2],
-//  							INTEGER(NEWRANDOMSEED)[3]);
+					//R2RANDOMSEED = findVar(rs, R_GlobalEnv);
+					//Rprintf(" %d ORI %d %d %d %d\n", period,
+					//	INTEGER(RANDOMSEED2)[0],
+					//	INTEGER(RANDOMSEED2)[1],
+					//	INTEGER(RANDOMSEED2)[2],
+					//	INTEGER(RANDOMSEED2)[3]);
 				}
 				else
 				{
@@ -2150,9 +2393,12 @@ one of values, one of missing values (boolean) */
 					}
 					else /* save state */
 					{
-						PutRNGstate();
-						SET_VECTOR_ELT(VECTOR_ELT(seedstore, group),
-									   period, findVar(rs, R_GlobalEnv));
+						if (needSeeds)
+						{
+							PutRNGstate();
+							SET_VECTOR_ELT(VECTOR_ELT(seedstore, group),
+								period, findVar(rs, R_GlobalEnv));
+						}
 					}
 				}
 				/* run the epoch simulation for this period */
@@ -2175,13 +2421,6 @@ one of values, one of missing values (boolean) */
 
 					rscores[iii + effectNo] = score[effectNo];
 				}
-// 				if (deriv)
-// 				{
-//                     rscores[period + iii] = score;
-// 					rscores[totObservations + iii] = score[1];
-// 					rscores[totObservations + 1 + iii] = score[2];
-// 					rscores[totObservations + 2 + iii] = score[3];
-//                 }
 				if (pModel->conditional())
 				{
                     rntim[periodFromStart - 1] = pEpochSimulation->time();
@@ -2189,40 +2428,73 @@ one of values, one of missing values (boolean) */
 				// get simulated network
 				if (returnDependents)
 				{
-					const DependentVariable * thisnet =
-						pEpochSimulation->rVariables()[0];
-					const NetworkVariable * thisnetv =
-						(const NetworkVariable * ) thisnet;
-					const Network * thisn = thisnetv->pNetwork();
-					SEXP thisedge = getEdgeList(*thisn);
-					SET_VECTOR_ELT(nets, period, thisedge);
+					const vector<DependentVariable *> rVariables =
+						pEpochSimulation->rVariables();
+					for (unsigned i = 0; i < rVariables.size(); i++)
+					{
+						NetworkVariable * pNetworkVariable =
+							dynamic_cast<NetworkVariable *>(rVariables[i]);
+						BehaviorVariable * pBehaviorVariable =
+							dynamic_cast<BehaviorVariable *>(rVariables[i]);
+
+						if (pNetworkVariable)
+						{
+							const Network * pNetwork =
+								pNetworkVariable->pNetwork();
+							SEXP thisEdge = getEdgeList(*pNetwork);
+							SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(sims, group),
+									i), period, thisEdge);
+						}
+						else if (pBehaviorVariable)
+						{
+							SEXP theseValues =
+								getBehaviorValues(*pBehaviorVariable);
+							SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(sims,
+										group), i), period, theseValues);
+						}
+						else
+						{
+							throw domain_error("Unexpected class of dependent variable");
+						}
+					}
 				}
 			} /* end of period */
 			delete pEpochSimulation;
-   } /* end of group */
+  } /* end of group */
+
        /* send the .Random.seed back to R */
         PutRNGstate();
+		NEWRANDOMSEED = findVar(rs, R_GlobalEnv);
+// 		Rprintf("%d %d %d %d\n",INTEGER(NEWRANDOMSEED)[0],
+// 			INTEGER(NEWRANDOMSEED)[1],
+// 			INTEGER(NEWRANDOMSEED)[2],
+// 			INTEGER(NEWRANDOMSEED)[3]);
 
         /* set up the return object */
-
         if (!fromFiniteDiff)
         {
-            SET_VECTOR_ELT(ans, 2, seedstore);
+			if (needSeeds)
+			{
+				SET_VECTOR_ELT(ans, 2, seedstore);
+			}
         }
 		if (deriv)
         {
             SET_VECTOR_ELT(ans, 1, scores);
- 		SET_VECTOR_ELT(ans, 5, nets);
-       }
-      SET_VECTOR_ELT(ans, 0, fra);
+		}
+		if (deriv || (!fromFiniteDiff))
+		{
+			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 */
+		}
+		SET_VECTOR_ELT(ans, 0, fra);
 		SET_VECTOR_ELT(ans, 3, ntim);
-// 			Rprintf("r2 %d %d %d %d\n",INTEGER(NEWRANDOMSEED)[0],
-// 					INTEGER(NEWRANDOMSEED)[1],
-// 					INTEGER(NEWRANDOMSEED)[2],
-// 					INTEGER(NEWRANDOMSEED)[3]);
+// 		Rprintf("new %d %d %d %d\n",INTEGER(NEWRANDOMSEED)[0],
+// 			INTEGER(NEWRANDOMSEED)[1],
+// 			INTEGER(NEWRANDOMSEED)[2],
+// 			INTEGER(NEWRANDOMSEED)[3]);
 		if (!isNull(RANDOMSEED2))
 		{
-			SET_VECTOR_ELT(ans, 4, NEWRANDOMSEED);
+				SET_VECTOR_ELT(ans, 4, NEWRANDOMSEED);
 		}
         UNPROTECT(8);
         return(ans);
