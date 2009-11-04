@@ -187,9 +187,9 @@ doIterations<- function(z, x, subphase,...)
     zsmall <- NULL
     zsmall$theta <- z$theta
     zsmall$Deriv <- z$Deriv
-    zsmall$Phase<- z$Phase
-    zsmall$Findiff.method <- z$Findiff.method
-    xsmall<- NULL
+    zsmall$Phase <- z$Phase
+    zsmall$FinDiff.method <- z$FinDiff.method
+    xsmall <- NULL
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
     repeat
