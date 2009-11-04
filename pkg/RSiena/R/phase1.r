@@ -55,7 +55,7 @@ phase1.1 <- function(z, x, ...)
     zsmall$Deriv <- z$Deriv
     zsmall$Phase <- z$Phase
     zsmall$nit <- z$nit
-    zsmall$Findiff.method <- z$Findiff.method
+    zsmall$FinDiff.method <- z$FinDiff.method
     xsmall<- NULL
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
@@ -276,7 +276,7 @@ phase1.2 <- function(z, x, ...)
     xsmall<- NULL
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
-    zsmall$FinDiff.method <- z$Findiff.method
+    zsmall$FinDiff.method <- z$FinDiff.method
     int <- z$int
     if (z$n1 > z$phase1Its)
     {

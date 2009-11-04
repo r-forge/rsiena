@@ -224,21 +224,51 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             myeffects <- ff$myeffects
             returnDeps <- ff$returnDeps
         }
-        ans<- .Call('effects', PACKAGE="RSiena",
-                    pData, myeffects)
+        ## remove interaction effects and save till later
+        basicEffects <- lapply(myeffects, function(x)
+                        {
+                            x[!x$shortName %in% c("inspInt", "behUnspInt"), ]
+                        }
+                            )
+        interactionEffects <- lapply(myeffects, function(x)
+                        {
+                            x[x$shortName %in% c("inspInt", "behUnspInt"), ]
+                        }
+                            )
+        ans <- .Call('effects', PACKAGE="RSiena",
+                    pData, basicEffects)
         pModel <- ans[[1]][[1]]
+       ## browser()
         for (i in 1:length(ans[[2]])) ## ans[[2]] is a list of lists of
             ## pointers to effects. Each list corresponds to one
             ## dependent variable
         {
             effectPtr <- ans[[2]][[i]]
-            myeffects[[i]]$effectPtr <- effectPtr
+            basicEffects[[i]]$effectPtr <- effectPtr
+            interactionEffects[[i]]$effectPtr <-
+                basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect1,
+                                                  basicEffects[[i]]$effectNumber)]
+        }
+        ans <- .Call('interactionEffects', PACKAGE="RSiena",
+                    pData, pModel, interactionEffects)
+        ## copy these pointer to the interaction effects and then rejoin
+        for (i in 1:length(ans[[1]])) ## ans is a list of lists of
+            ## pointers to effects. Each list corresponds to one
+            ## dependent variable
+        {
+            if (nrow(interactionEffects[[i]]) > 0)
+            {
+                effectPtr <- ans[[1]][[i]]
+                interactionEffects[[i]]$effectPtr <- effectPtr
+            }
+            myeffects[[i]] <- rbind(basicEffects[[i]], interactionEffects[[i]])
         }
         if (!initC)
         {
             ans <- .Call('getTargets', PACKAGE="RSiena",
                          pData, pModel, myeffects)
             z$targets <- rowSums(ans)
+            z$targets2 <- ans
         }
         ##store address of model
         f$pModel <- pModel
@@ -343,7 +373,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     ans <- .Call('model', PACKAGE="RSiena",
                  z$Deriv, f$pData, f$seeds,
                  fromFiniteDiff, f$pModel, f$myeffects, z$theta,
-                 randomseed2, f$returnDeps, z$Findiff.method)
+                 randomseed2, f$returnDeps, z$FinDiff.method)
    #  browser()
    if (!fromFiniteDiff)
     {

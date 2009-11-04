@@ -61,7 +61,7 @@ phase3 <- function(z, x, ...)
     else
         Report('Estimation of derivatives by the LR method (type 1).\n\n', outf)
     zsmall <- NULL
-    zsmall$Findiff.method <- z$Findiff.method
+    zsmall$FinDiff.method <- z$FinDiff.method
     zsmall$theta <- z$theta
     zsmall$Deriv <- z$Deriv
     zsmall$Phase <- z$Phase
