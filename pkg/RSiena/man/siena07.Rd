@@ -49,6 +49,11 @@ tt=NULL, parallelTesting=FALSE, ...)
   \item{covtheta}{Estimated covariance matrix of theta}
   \item{dfra}{Matrix of estimated derivatives}
   \item{sf}{Matrix of deviations from target in phase 3}
+  \item{sf2}{Array of statistics from simulations in phase 3}
+  \item{targets}{Observed statistics}
+  \item{targets2}{Observed statistics for each wave}
+  \item{ssc}{Score function contributions for each wave for each
+	simulation in phase 3}
   \item{sims}{List of simulated networks, currently just one entry for
   the first network. Each a list of edgelists, one for each period.}
 }
