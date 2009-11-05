@@ -413,7 +413,7 @@ int calcChange(const Network* net0, const Network* net1, const Network* miss0,
 void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 			   int * parmCol, int * int1Col, int * int2Col, int * initValCol,
 			   int * typeCol, int * groupCol, int * periodCol, int * pointerCol,
-			   int * rateTypeCol)
+	int * rateTypeCol, int * intptr1Col, int * intptr2Col, int * intptr3Col)
 {
 	*netTypeCol = -1; /* net type */
 	*nameCol = -1; /* network name */
@@ -427,6 +427,10 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 	*periodCol = -1;
 	*pointerCol = -1;
 	*rateTypeCol = -1;
+	*intptr1Col = -1;
+	*intptr2Col = -1;
+	*intptr3Col = -1;
+
 	int n = length(Names);
 	for (int j = 0; j < n; j++)
 	{
@@ -479,6 +483,18 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 		{
 			*rateTypeCol = j;
 		}
+		if (strcmp(CHAR(STRING_ELT(Names, j)), "effect1") == 0)
+		{
+			*intptr1Col = j;
+		}
+		if (strcmp(CHAR(STRING_ELT(Names, j)), "effect2") == 0)
+		{
+			*intptr2Col = j;
+		}
+		if (strcmp(CHAR(STRING_ELT(Names, j)), "effect3") == 0)
+		{
+			*intptr3Col = j;
+		}
 	}
 	if (*netTypeCol < 0)
 	{
@@ -525,6 +541,18 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 	{
 		error("cannot find rate type");
 	}
+	if (*intptr1Col < 0)
+	{
+		error("cannot find effect1");
+	}
+	if (*intptr2Col < 0)
+	{
+		error("cannot find effect2");
+	}
+	if (*intptr3Col < 0)
+	{
+		error("cannot find effect3");
+	}
 //	Rprintf("%d parmcol\n", *parmCol);
 }
 
@@ -552,11 +580,15 @@ void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
 	int periodCol;
 	int pointerCol;
 	int rateTypeCol;
+	int intptr1Col;
+	int intptr2Col;
+	int intptr3Col;
 
 	getColNos(Names, &netTypeCol, &nameCol, &effectCol,
-			  &parmCol, &int1Col, &int2Col, &initValCol,
-			  &typeCol, &groupCol, &periodCol, &pointerCol,
-			  &rateTypeCol);
+		&parmCol, &int1Col, &int2Col, &initValCol,
+		&typeCol, &groupCol, &periodCol, &pointerCol,
+		&rateTypeCol, &intptr1Col, &intptr2Col, &intptr3Col);
+
 	int thetasub = -1;
 	/* find each effect and update its weight */
 	for (int net = 0; net < length(EFFECTSLIST); net++)
@@ -1600,7 +1632,7 @@ one of values, one of missing values (boolean) */
 
     }
 /**
- *  Creates all the effects for one network
+ *  Creates all the basic effects for one network
  */
 	SEXP createEffects(SEXP EFFECTS, Model *pModel, vector<Data *> * pGroupData,
 					   const char *networkName, int effectCol,
@@ -1683,7 +1715,7 @@ one of values, one of missing values (boolean) */
 
 
 /**
- *  creates the requested effects
+ *  creates the requested basic effects
  */
 
     SEXP effects(SEXP RpData, SEXP EFFECTSLIST)
@@ -1724,11 +1756,14 @@ one of values, one of missing values (boolean) */
 		int periodCol;
 		int pointerCol;
 		int rateTypeCol;
+		int intptr1Col;
+		int intptr2Col;
+		int intptr3Col;
 
 		getColNos(Names, &netTypeCol, &nameCol, &effectCol,
 				  &parmCol, &int1Col, &int2Col, &initValCol,
 				  &typeCol, &groupCol, &periodCol, &pointerCol,
-				  &rateTypeCol);
+			&rateTypeCol, &intptr1Col, &intptr2Col, &intptr3Col);
 
 		/* create a structure for the return values */
 		SEXP pointers;
@@ -1766,6 +1801,148 @@ one of values, one of missing values (boolean) */
 		SET_VECTOR_ELT(ans, 0, RpModel);
 
 		UNPROTECT(4);
+
+		return ans;
+	}
+/**
+ *  Creates all the interaction effects for one network
+ */
+	SEXP createInteractionEffects(SEXP EFFECTS, Model *pModel,
+		vector<Data *> * pGroupData, const char *networkName,
+		int effectCol, int parmCol, int int1Col, int int2Col, int initValCol,
+		int typeCol, int groupCol,	int periodCol, int pointerCol, int rateTypeCol,
+		int netTypeCol, int intptr1Col, int intptr2Col, int intptr3Col)
+    {
+        // find out how many effects there are
+        int nEffects = length(VECTOR_ELT(EFFECTS, 0));
+
+        // create the effects
+
+		/* set up a vector to return the pointers in */
+		SEXP effectPtrs;
+		PROTECT(effectPtrs = allocVector(VECSXP, nEffects));
+
+		for (int i = 0; i < nEffects; i++)
+		{
+			EffectInfo * pEffectInfo = 0;
+
+			const char * effectName =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, effectCol), i));
+			int parm1 = INTEGER(VECTOR_ELT(EFFECTS, parmCol))[i];
+			double parm = parm1;
+			const char * interaction1 =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, int1Col), i));
+			const char * interaction2 =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, int2Col), i));
+            double initialValue = REAL(VECTOR_ELT(EFFECTS, initValCol))[i];
+			const char * effectType =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), i));
+			const char * rateType =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, rateTypeCol), i));
+			const char * netType =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, netTypeCol), i));
+			EffectInfo * pEffect1 = (EffectInfo *) R_ExternalPtrAddr(
+ 				VECTOR_ELT(VECTOR_ELT(EFFECTS, intptr1Col), i));
+ 			EffectInfo * pEffect2 = (EffectInfo *) R_ExternalPtrAddr(
+ 				VECTOR_ELT(VECTOR_ELT(EFFECTS, intptr2Col), i));
+ 			EffectInfo * pEffect3 = (EffectInfo *) R_ExternalPtrAddr(
+ 				VECTOR_ELT(VECTOR_ELT(EFFECTS, intptr3Col), i));
+
+// 			pEffectInfo = pModel->addInteractionEffect(networkName,
+// 				effectName,
+// 				effectType,
+// 				initialValue,
+// 				parm,
+// 				interaction1,
+// 				interaction2,
+// 				rateType,
+// 				pEffect1,
+// 				pEffect2,
+// 				pEffect3);
+
+		SET_VECTOR_ELT(effectPtrs, i,
+			R_MakeExternalPtr((void *) pEffectInfo,
+				R_NilValue, R_NilValue));
+		}
+
+		UNPROTECT(1);
+		return effectPtrs;
+	}
+
+/**
+ *  creates the requested interaction effects
+ */
+
+    SEXP interactionEffects(SEXP RpData, SEXP RpModel, SEXP EFFECTSLIST)
+    {
+		vector<Data *> * pGroupData = (vector<Data *> *)
+			R_ExternalPtrAddr(RpData);
+        Model * pModel = (Model *) R_ExternalPtrAddr(RpModel);
+
+        // get the column names from the names attribute
+
+        SEXP cols;
+        PROTECT(cols = install("names"));
+        SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
+
+		int netTypeCol; /* net type */
+        int nameCol; /* network name */
+        int effectCol;  /* short name of effect */
+		int parmCol;
+		int int1Col;
+		int int2Col;
+		int initValCol;
+		int typeCol;
+		int groupCol;
+		int periodCol;
+		int pointerCol;
+		int rateTypeCol;
+		int intptr1Col;
+		int intptr2Col;
+		int intptr3Col;
+
+		getColNos(Names, &netTypeCol, &nameCol, &effectCol,
+			&parmCol, &int1Col, &int2Col, &initValCol,
+			&typeCol, &groupCol, &periodCol, &pointerCol,
+			&rateTypeCol, &intptr1Col, &intptr2Col, &intptr3Col);
+
+		/* create a structure for the return values */
+		SEXP pointers;
+		PROTECT(pointers = allocVector(VECSXP, length(EFFECTSLIST)));
+
+		/* loop over the different dependent variables */
+		for (int i = 0; i < length(EFFECTSLIST); i++)
+        {
+			//Rprintf("%d %d %d\n",i, length(EFFECTSLIST),
+			//	length(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, i) , 0)));
+			if (length(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, i), 0)) > 0)
+			{
+				const char * networkName =
+					CHAR(STRING_ELT(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, i),
+								nameCol), 0));
+
+				SEXP ptrs =
+					createInteractionEffects(VECTOR_ELT(EFFECTSLIST, i),
+						pModel, pGroupData,
+						networkName, effectCol, parmCol, int1Col,
+						int2Col, initValCol, typeCol, groupCol,
+						periodCol, pointerCol, rateTypeCol, netTypeCol,
+						intptr1Col, intptr2Col, intptr3Col);
+
+				SET_VECTOR_ELT(pointers, i, ptrs);
+			}
+			else
+			{
+				SET_VECTOR_ELT(pointers, i, NULL);
+			}
+		}
+        /* ans will be the return value */
+        SEXP ans;
+        PROTECT(ans = allocVector(VECSXP, 1));
+
+		SET_VECTOR_ELT(ans, 0, pointers);
+
+		UNPROTECT(3);
 
 		return ans;
 	}
@@ -1896,11 +2073,14 @@ one of values, one of missing values (boolean) */
 		int periodCol;
 		int pointerCol;
 		int rateTypeCol;
+		int intptr1Col;
+		int intptr2Col;
+		int intptr3Col;
 
 		getColNos(Names, &netTypeCol, &nameCol, &effectCol,
 				  &parmCol, &int1Col, &int2Col, &initValCol,
 				  &typeCol, &groupCol, &periodCol, &pointerCol,
-				  &rateTypeCol);
+			&rateTypeCol, &intptr1Col, &intptr2Col, &intptr3Col);
 
 
 		double statistic = 0;
