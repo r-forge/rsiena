@@ -44,6 +44,7 @@ siena01Gui <- function(getDocumentation=FALSE)
     ndepvars <- 0
     nettypes <- NULL
     estimVar <- NULL
+    effectsVar <-  NULL
     condVar <- NULL
     gainVar  <-  NULL
     stdstartVar <- NULL
@@ -492,9 +493,15 @@ siena01Gui <- function(getDocumentation=FALSE)
         ##@editFn internal siena01Gui
         editFn <- function()
         {
-            if (is.null(myeff$effectNumber))
+            ## split effects if a variable is selected
+            theseEffects <- tclvalue(effectsVar)
+            if (theseEffects != "")
             {
-                myeff <- cbind(effectNumber=1:nrow(myeff), myeff,
+                myeffcopy <- myeff[myeff$name == theseEffects, ]
+            }
+            if (is.null(myeffcopy$effectNumber))
+            {
+                myeffcopy <- cbind(effectNumber=1:nrow(myeff), myeff,
                                effect1=rep(NA, nrow(myeff)),
                                effect2=rep(NA, nrow(myeff)),
                                effect3=rep(NA,nrow(myeff)))
@@ -502,7 +509,7 @@ siena01Gui <- function(getDocumentation=FALSE)
             editCols <- c("name", "effectName", "type", "include", "fix",
                           "test", "initialValue", "parm", "effectNumber",
                           "effect1", "effect2", "effect3")
-            effEdit <- myeff[, editCols]
+            effEdit <- myeffcopy[, editCols]
             for (i in c("include", "fix", "test"))
             {
                 effEdit[,i] <- as.numeric(effEdit[,i])
@@ -512,7 +519,8 @@ siena01Gui <- function(getDocumentation=FALSE)
             {
                 effEdit[,i] <- as.logical(effEdit[,i])
             }
-            myeff[, editCols] <<- effEdit
+            myeffcopy[, editCols] <- effEdit
+            myeff[myeff$name == theseEffects, ] <<- myeffcopy
             ##  browser()
             ## make sure this window is top with a global grab,
             ##but only for a second
@@ -749,7 +757,9 @@ siena01Gui <- function(getDocumentation=FALSE)
 
         ## create and display top inner frame
         optf <- tkwidget(optiontt, 'frame', borderwidth=2, relief="groove")
-        tkgrid(optf, padx=5, pady=5, columnspan=2)
+        tkgrid.configure(optf, padx=5, pady=5)#), columnspan=2)
+        maxdf <- tkframe(optf, borderwidth=2, relief='groove')
+        tkgrid.configure(maxdf, padx=5, pady=5, rowspan=4, column=4, row=0)
 
         ## create and display estimation method option box and its label
         estimlist <- c('0. unconditional Method of Moments',
@@ -761,6 +771,9 @@ siena01Gui <- function(getDocumentation=FALSE)
         estimlab <- tklabel(optf, text='Estim. method')
         tkgrid(estimlab, estim)
 
+        tkgrid.configure(estimlab, column=0, row=0)
+        tkgrid.configure(estim, column=1, row=0)
+
         ## create options box to select a conditional variable
         if (ndepvars > 1)
         {
@@ -768,7 +781,9 @@ siena01Gui <- function(getDocumentation=FALSE)
             condvarl <- ttkcombobox(optf, values= depvarnames, state='readonly',
                                     textvariable=condVar, width=10)
             condlab <- tklabel(optf, text=' Conditioning Variable ')
-            tkgrid(condlab, condvarl)
+            tkgrid(condlab,  row=1, column=0)
+            tkgrid( condvarl, row=1, column=1)
+            tclvalue(condVar) <<- depvarnames[1]
         }
         ## create and display initial value of gain parameter box
         gainlab <- tklabel(optf, text=' Initial value of gain parameter ')
@@ -787,6 +802,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         tclvalue(stdstartVar) <<- '0'
         stdstart <- tkcheckbutton(optf, text=' Standard starting value ',
                                   variable=stdstartVar)
+        tkgrid(stdstart, row=2, sticky='w', columnspan=2)
 
         ## create and display box for number of phase 2 subphases
         ph2lab <- tklabel(optf, text=' Number of phase 2 subphases ')
@@ -794,7 +810,6 @@ siena01Gui <- function(getDocumentation=FALSE)
         tclvalue(ph2spinVar) <<- 4
         ph2spin <-  tkwidget(optf, 'spinbox', from=0, to=10, width=10,
                              textvariable=ph2spinVar, cursor="arrow")
-        tkgrid(stdstart, row=2, sticky='w')
         tkgrid(ph2lab, row=1, column=2, padx=5)
         tkgrid(ph2spin, row=1, column=3, sticky='w', padx=5)
 
@@ -806,7 +821,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         rsspinVar <<- tclVar()
         rsspin <-  tkwidget(optf, 'spinbox', from=0, to=1000000, width=10,
                             textvariable=rsspinVar, cursor="arrow")
-        tkgrid(rs, row=3, sticky='w')
+        tkgrid(rs, row=3, sticky='w', columnspan=2)
 
         ##create and display fields for number of processors entry
         clustVar <<- tclVar()
@@ -818,7 +833,8 @@ siena01Gui <- function(getDocumentation=FALSE)
         clustspinVar <<- tclVar()
         clustspin <-  tkwidget(optf, 'spinbox', from=2, to=1000, width=10,
                             textvariable=clustspinVar, cursor="arrow")
-        tkgrid(clust, row=4, sticky='w')
+        tkgrid(clust, row=4, sticky='w', columnspan=2)
+
         ##create and display field for derivative method
         derivlab <- tklabel(optf, text=' Derivative method ')
         derivlist <- c('0. crude Monte Carlo',
@@ -826,7 +842,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         derivVar <<- tclVar()
         tclvalue(derivVar) <<- '1. score function'
         derivw <- ttkcombobox(optf, values=derivlist, state="readonly",
-                              textvariable=derivVar, width=20)
+                              textvariable=derivVar, width=18)
         tkgrid(derivlab,  row=2, column=2, sticky='w', padx=5)
         tkgrid(derivw,  row=2, column=3, sticky='w', padx=5)
 
@@ -840,8 +856,6 @@ siena01Gui <- function(getDocumentation=FALSE)
         tkgrid(ph3spin, row=3, column=3, sticky='w', padx=5)
 
         ##create and display field for restricting degree of model
-        maxdf <- tkframe(optiontt, borderwidth=2, relief='groove')
-        tkgrid(maxdf)
         maxdfVar <<- tclArray()
         xscr2 <- tkscrollbar(maxdf, orient="horizontal",
                              command=function(...)tkxview(table2,...))
@@ -865,7 +879,7 @@ siena01Gui <- function(getDocumentation=FALSE)
             tcl(table2, 'tag','configure','title',fg='SystemHighlightText',
                 bg='SystemHighlight')
         }
-        maxdfVar[[0,1]] <<- as.tclObj('Dependent NetWork Variable', drop=TRUE)
+        maxdfVar[[0,1]] <<- as.tclObj("NetWork", drop=TRUE)
         maxdfVar[[0,2]] <<- as.tclObj('Max Degree', drop=TRUE)
         for (i in 1:nMaxDegree)
         {
@@ -875,18 +889,28 @@ siena01Gui <- function(getDocumentation=FALSE)
         tkpack(yscr2, fill="y", side="right")
         tkpack(xscr2, fill="x", side="bottom")
         tkpack(table2)
-        tcl(table2, 'width', 1, 20)
-        tcl(table2, 'width', 2, 15)
+        tcl(table2, 'width', 1, 15)
+        tcl(table2, 'width', 2, 10)
 
         ## create and display the frame for the buttons.
         comf <- tkframe(optiontt,  borderwidth=2, relief='groove')
-        tkgrid(comf, row=1, column=1)
+        tkgrid(comf, row=1, column=0)
 
         ## create the buttons
-        editbut <- tkbutton(comf, command=editFn, text=' Edit effects ',
-                            width=22)
+        ## create options box to select an effects list
+        ## if (ndepvars > 1)
+        ## {
+        effectsVar <<- tclVar()
+        effectsvarl <- ttkcombobox(comf,
+                                   values= depvarnames, state='readonly',
+                                   textvariable=effectsVar, width=10)
+        effectslab <- tklabel(comf, text=' Effects dependent variable ')
+        ##}
+        editbut <- tkbutton(comf, command=editFn,
+                            text=' Edit effects (selected variable) ',
+                            width=27)
         showbut <- tkbutton(comf, command=showFn,
-                            text=' Show included effects ', width=22)
+                            text=' Show included effects (all) ', width=22)
         applybut <- tkbutton(comf, command=estimateFn, text=' Estimate ',
                              width=22)
         saveresultsbut <- tkbutton(comf, command=saveresultsFn,
@@ -899,10 +923,18 @@ siena01Gui <- function(getDocumentation=FALSE)
                               text=' Exit Model Options ', width=22)
         helpbut <- tkbutton(comf, command=modelhelpFn, text=' Help ',
                             width=22)
-        tkgrid(editbut, showbut, applybut,  savefilebut, padx=5, pady=5)
-        tkgrid(savefilebut, resultsbut, saveresultsbut,
-               returnbut, helpbut, padx=5, pady=5)
-
+        ## if (ndepvars > 1)
+        ## {
+        tkgrid(effectslab, effectsvarl,
+               applybut,  savefilebut, returnbut, padx=5, pady=5)
+        ##}
+        ##else
+        ## {
+        ##   tkgrid(editbut, showbut, applybut,  savefilebut, padx=5, pady=5)
+        ## }
+        tkgrid(editbut, showbut,  resultsbut, saveresultsbut,
+                helpbut, padx=5, pady=5)
+        tkgrid(effectsvarl, sticky="w")
         ## make sure this window is top with a global grab, bu only for a second
         tcl('wm', 'attributes', tt, '-topmost', 1)
         Sys.sleep(0.1)
