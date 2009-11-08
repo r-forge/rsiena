@@ -280,6 +280,8 @@ void BehaviorVariable::makeChange(int actor)
 	// change, respectivelly
 
 	double probabilities[3];
+	bool upPossible = true;
+	bool downPossible = true;
 
 	// Calculate the probability for downward change
 
@@ -293,6 +295,7 @@ void BehaviorVariable::makeChange(int actor)
 	else
 	{
 		probabilities[0] = 0;
+		downPossible = false;
 	}
 
 	// No change means zero contribution, but exp(0) = 1
@@ -309,6 +312,7 @@ void BehaviorVariable::makeChange(int actor)
 	else
 	{
 		probabilities[2] = 0;
+		upPossible = false;
 	}
 
 	if (this->pSimulation()->pModel()->needScores())
@@ -330,7 +334,7 @@ void BehaviorVariable::makeChange(int actor)
 
 	if (this->pSimulation()->pModel()->needScores())
 	{
-		this->accumulateScores(difference + 1);
+		this->accumulateScores(difference + 1, upPossible, downPossible);
 	}
 
 	// Make the change
@@ -410,7 +414,8 @@ double BehaviorVariable::totalEndowmentContribution(int actor,
  * Updates the scores for evaluation and endowment function effects according
  * to the current step in the simulation.
  */
-void BehaviorVariable::accumulateScores(int difference) const
+void BehaviorVariable::accumulateScores(int difference,
+	bool upPossible, bool downPossible) const
 {
 	for (unsigned i = 0;
 		i < this->pEvaluationFunction()->rEffects().size();
@@ -423,11 +428,18 @@ void BehaviorVariable::accumulateScores(int difference) const
 		Effect * pEffect = this->pEvaluationFunction()->rEffects()[i];
 		double score = this->levaluationEffectContribution[difference][i];
 
-		for (int j = 0; j < 3; j+=2)
+		if (upPossible)
 		{
 			score -=
-				this->levaluationEffectContribution[j][i] *
-					this->lprobabilities[j];
+				this->levaluationEffectContribution[2][i] *
+				this->lprobabilities[2];
+		}
+
+		if (downPossible)
+		{
+			score -=
+				this->levaluationEffectContribution[0][i] *
+				this->lprobabilities[0];
 		}
 
 		this->pSimulation()->score(pEffect->pEffectInfo(),
@@ -449,11 +461,11 @@ void BehaviorVariable::accumulateScores(int difference) const
 		Effect * pEffect = this->pEndowmentFunction()->rEffects()[i];
 		double score = this->lendowmentEffectContribution[difference][i];
 
-		for (int j = 0; j < 2; j+=2)
+		if (downPossible)
 		{
 			score -=
-				this->lendowmentEffectContribution[j][i] *
-					this->lprobabilities[j];
+				this->lendowmentEffectContribution[0][i] *
+					this->lprobabilities[0];
 
 		}
 
