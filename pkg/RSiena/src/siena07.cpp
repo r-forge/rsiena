@@ -553,7 +553,7 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 	{
 		error("cannot find effect3");
 	}
-//	Rprintf("%d parmcol\n", *parmCol);
+//Rprintf("%d parmcol\n", *parmCol);
 }
 
 
@@ -754,7 +754,7 @@ void setupOneModeObservations(SEXP ONEMODES,
     	setupOneModeNetwork(VECTOR_ELT(ONEMODES, period),
 			pOneModeNetworkLongitudinalData,
 			period);
-    }
+   }
     UNPROTECT(2);
 }
 /**
@@ -1006,6 +1006,7 @@ void setupBehaviorGroup(SEXP BEHGROUP, Data *pData)
                                                                 actorSet, 0)));
 	BehaviorLongitudinalData * pBehaviorData =
 	    pData->createBehaviorData(CHAR(STRING_ELT(name, 0)), myActorSet);
+//	Rprintf("%x\n", pBehaviorData);
 	setupBehavior(VECTOR_ELT(BEHGROUP, behavior), pBehaviorData);
         UNPROTECT(2);
     }
@@ -2662,9 +2663,9 @@ one of values, one of missing values (boolean) */
         {
             SET_VECTOR_ELT(ans, 1, scores);
 		}
-		if (deriv || (!fromFiniteDiff))
+		if (returnDependents)
 		{
-			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 */
+			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 !!!!test properly*/
 		}
 		SET_VECTOR_ELT(ans, 0, fra);
 		SET_VECTOR_ELT(ans, 3, ntim);

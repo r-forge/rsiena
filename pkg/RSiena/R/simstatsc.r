@@ -343,7 +343,8 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         if (sum(z$test))
         {
             z$fra <- colMeans(z$sf, na.rm=TRUE)
-            z <- ScoreTest(z, x)
+            ans <- ScoreTest(z$pp, z$dfra, z$msf, z$fra, z$test, x$maxlike)
+            z <- c(z, ans)
             TestOutput(z, x)
         }
         dimnames(z$dfra)[[1]] <- as.list(z$effects$shortName)
@@ -353,6 +354,22 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     f <- FRANstore()
    # browser()
    # cat(f$randomseed2, f$storedseed, '\n')
+    if (fromFiniteDiff)
+    {
+        returnDeps <- FALSE
+    }
+    else
+    {
+        returnDeps <- f$returnDeps
+    }
+    if (is.null(f$seeds))
+    {
+        seeds <- NULL
+    }
+    else
+    {
+        seeds <- f$seeds
+    }
     if (is.null(f$randomseed2))
     {
         randomseed2 <- NULL
@@ -371,13 +388,14 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
        ## cat(randomseed2, '\n')
     }
     ans <- .Call('model', PACKAGE="RSiena",
-                 z$Deriv, f$pData, f$seeds,
+                 z$Deriv, f$pData, seeds,
                  fromFiniteDiff, f$pModel, f$myeffects, z$theta,
-                 randomseed2, f$returnDeps, z$FinDiff.method)
+                 randomseed2, returnDeps, z$FinDiff.method)
    #  browser()
    if (!fromFiniteDiff)
     {
-        f$seeds <- ans[[3]]
+        if (z$FinDiff.method)
+            f$seeds <- ans[[3]]
     }
     if (z$Deriv)
     {
@@ -391,8 +409,11 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     fra <- t(ans[[1]])
     f$randomseed2 <- ans[[5]]#[c(1,4,3,2)]
     FRANstore(f)
-    sims <- ans[[6]]
-    if (returnDeps)
+    if (f$returnDeps)
+        sims <- ans[[6]]
+    else
+        sims <- NULL
+    if (f$returnDeps)
     {
         ## attach the names
         names(sims) <- names(f)[1:length(sims)]

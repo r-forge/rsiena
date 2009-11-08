@@ -145,45 +145,7 @@ InitReports <- function(seed, newseed)
         Report(sprintf("Current random number seed is %d.\n", seed), outf)
     }
 }
-##@WriteOutTheta siena07 Progress reporting
-WriteOutTheta <- function(z)
-{
-    if (!is.batch())
-    {
-        tkdelete(z$tkvars$current, "1.0", "end")
-        tmp <- paste(c("", rep("\n", z$pp - 1)),
-                    format(round(z$theta,4), width=12, sep=""),
-                    collapse="")
-        tkinsert(z$tkvars$current, "1.0", tmp)
-    }
-    else
-    {
-        Report(c("theta:", format(z$theta, digits=3), "\n"))
-    }
-    Report("Current parameter values:\n", cf)
-    Report(format(z$theta), cf, fill=80)
-}
 
-##@DisplayTheta siena07 Progress reporting
-DisplayTheta<- function(z)
-{
-    if ((z$Phase == 2 || z$nit == 1 ) && (z$nit <= 30))
-    {
-        if (!is.batch())
-        {
-            tkdelete(z$tkvars$current, "1.0", "end")
-            tmp<- paste(c("", rep("\n", z$pp - 1)),
-                        format(z$theta, width=12, sep=""),
-                    collapse="")
-            tkinsert(z$tkvars$current, "1.0", tmp)
-        }
-        else
-        {
-          Report(c("theta:", format(z$theta, digits=3), "\n"))
-        }
-    }
-
-}
 ##@AnnouncePhase siena07 Progress reporting
 AnnouncePhase <- function(z, x, subphase=NULL)
 {
@@ -211,9 +173,9 @@ AnnouncePhase <- function(z, x, subphase=NULL)
     {
         if (!is.batch())
         {
-            tkconfigure(z$tkvars$current, height=z$pp)
-            tkconfigure(z$tkvars$deviation, height=z$pp)
-            tkconfigure(z$tkvars$quasi, height=z$pp)
+            tkconfigure(z$tkvars$current, height=min(z$pp, 30))
+            tkconfigure(z$tkvars$deviation, height=min(z$pp, 30))
+            tkconfigure(z$tkvars$quasi, height=min(z$pp, 30))
         }
         n1pos <- z$n1 * (z$pp + 1)
         z$n2min0 <- 7 + z$pp
@@ -276,21 +238,29 @@ roundfreq <- function(w)
     w
 }
 
+##@WriteOutTheta siena07 Progress reporting
+WriteOutTheta <- function(z)
+{
+    if (!is.batch())
+    {
+        DisplayTheta(z)
+    }
+    else
+    {
+        Report(c("theta:", format(z$theta, digits=3), "\n"))
+    }
+    Report("Current parameter values:\n", cf)
+    Report(format(z$theta), cf, fill=80)
+}
+
 ##@DisplayThetaAutocor siena07 Progress reporting
 DisplayThetaAutocor <- function(z)
 {
     if (!is.batch())
     {
-        tkdelete(z$tkvars$current, "1.0", "end")
-        tmp<- paste(c("", rep("\n", z$pp - 1)),
-                    format(round(z$theta, 4), width=12, sep=""),
-                    collapse="")
-        tkinsert(z$tkvars$current, "1.0", tmp)
+        DisplayTheta(z)
         tkdelete(z$tkvars$quasi, "1.0", "end")
-        tmp<- paste(c("", rep("\n", z$pp - 1)),
-                    format(round(z$ac, 4), width=12, sep=""),
-                    collapse="")
-        tkinsert(z$tkvars$quasi, "1.0", tmp)
+        tkinsert(z$tkvars$quasi, "1.0", FormatString(z$pp, z$ac))
     }
     else
     {
@@ -304,11 +274,7 @@ DisplayandWritetheta <- function(z)
 {
     if (!is.batch())
     {
-        tkdelete(z$tkvars$current, "1.0", "end")
-        tmp<- paste(c("", rep("\n", z$pp - 1)),
-                    format(round(z$theta, 4), width=12, nsmall=4, sep=""),
-                    collapse="")
-        tkinsert(z$tkvars$current, "1.0", tmp)
+        DisplayTheta(z)
     }
     else
     {
@@ -318,27 +284,31 @@ DisplayandWritetheta <- function(z)
 ##@DisplayTheta siena07 Progress reporting
 DisplayTheta <- function(z)
 {
-        if (!is.batch())
-        {
-            tkdelete(z$tkvars$current, "1.0", "end")
-            tmp<- paste(c("", rep("\n", z$pp - 1)),
-                        format(round(z$theta, 4), width=12, sep="", nsmall=4),
-                        collapse="")
-            tkinsert(z$tkvars$current, "1.0", tmp)
-        }
+    if (!is.batch())
+    {
+        tkdelete(z$tkvars$current, "1.0", "end")
+        tkinsert(z$tkvars$current, "1.0", FormatString(z$pp, z$theta))
+    }
 
+}
+##@FormatString siena07 Progress Reporting
+FormatString <- function(pp, value)
+{
+    ppuse <- min(30, pp)
+    nbrs <- format(1:ppuse)
+    nch <- nchar(nbrs[1])
+    formatstr <- paste("%", nch, "d.%", (13 - nch), ".4f\n", sep="",
+                       collapse="")
+    paste(sprintf(formatstr, 1:ppuse, value[1:ppuse]), collapse="")
 }
 ##@DisplayDeviations siena07 Progress reporting
 DisplayDeviations <- function(z, fra)
 {
-        if (!is.batch())
-        {
-            tkdelete(z$tkvars$deviations, "1.0", "end")
-            tmp<- paste(c("", rep("\n", z$pp - 1)),
-                        format(round(fra, 4), width=12, sep="", nsmall=4),
-                        collapse="")
-            tkinsert(z$tkvars$deviations, "1.0", tmp)
-        }
+    if (!is.batch())
+    {
+        tkdelete(z$tkvars$deviations, "1.0", "end")
+        tkinsert(z$tkvars$deviations, "1.0", FormatString(z$pp, fra))
+    }
 }
 ##@DisplayIteration siena07 Progress reporting
 DisplayIteration <- function(z)

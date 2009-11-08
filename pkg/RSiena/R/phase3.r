@@ -443,20 +443,7 @@ CalculateDerivative3<- function(z,x)
     }
    else
     {
-       dfra <-rowSums(sapply(1:(f$observations-1), function(i,y,s)
-                              sapply(1:z$Phase3nits, function(j,y,s)
-                                     outer(y[j,], s[j,]),
-                                     y=matrix(z$sf2[,i,], ncol=z$pp),
-                                     s=matrix(z$ssc[,i,], ncol=z$pp))))
-        dim(dfra)<- c(z$pp, z$pp, z$Phase3nits)
-        dfra<- apply(dfra,c(1,2),sum)
-        dfra<- dfra/z$Phase3nits
-        tmp <- matrix(sapply(1 : (f$observations - 1), function(i)
-                                   outer(colMeans(z$sf2)[i,],
-                  colMeans(z$ssc)[i,])), ncol=f$observations-1)
-
-        dfra<- dfra - matrix(rowSums(tmp), nrow=z$pp)
-
+        dfra <-  derivativeFromScoresAndDeviations(z$ssc, z$sf2)
         if (any(diag(dfra) < 0))
         {
             sub <- which(diag(dfra) < 0)

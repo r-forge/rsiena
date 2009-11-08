@@ -24,6 +24,7 @@ print.siena <- function(x, ...)
                      sapply(x$nodesets,length)))
       print(tmp)
   }
+  invisible(x)
 }
 ##@print.sienaGroup Methods
 print.sienaGroup <- function(x, ...)
@@ -35,6 +36,7 @@ print.sienaGroup <- function(x, ...)
   cat(paste(att$netnames, ":", att$types),'\n')
   cat('Total number of periods:', att$observations)
   cat("\nmore to be added!\n")
+  invisible(x)
 }
 
 ##@print.sienafit Methods
@@ -88,6 +90,7 @@ print.sienaFit <- function(x, ...)
                cat(" \n*** Warning ***",
                    "Estimation terminated early at user request.\n")
        }
+   invisible(x)
 }
 
 ##@summary.sienaFit Methods
@@ -120,6 +123,7 @@ print.summary.sienaFit <- function(x, ...)
        covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
        printMatrix(format(round(t(covcor),digits=3),width=12))
    }
+   invisible(x)
 }
 
 ##@printMatrix Miscellaneous
@@ -157,6 +161,7 @@ print.sienaModel <- function(x, ...)
             if (x$condvarno > 0)
                 cat('conditioned on First variable')
     }
+    invisible(x)
 
 }
 ##@sienaFitThetaTable Miscellaneous
