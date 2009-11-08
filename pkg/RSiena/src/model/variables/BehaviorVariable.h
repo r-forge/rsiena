@@ -63,7 +63,8 @@ private:
 		int difference) const;
 	double totalEndowmentContribution(int actor,
 		int difference) const;
-	void accumulateScores(int difference) const;
+	void accumulateScores(int difference, bool UpPossible,
+		bool downPossible) const;
 
 	// The observed data for this behavioral variable
 	BehaviorLongitudinalData * lpData;
