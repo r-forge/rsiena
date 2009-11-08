@@ -111,7 +111,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         }
         for (j in seq(along = xx$dycCovars))
         {
-            if (attr(x$dycCovars[[j]], 'nodeSet')[1] == nodeSet)
+            if (attr(xx$dycCovars[[j]], 'nodeSet')[1] == nodeSet)
             {
                 objEffects <- rbind(objEffects,
                                     createEffects("dyadObjective",
@@ -120,7 +120,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         }
         for (j in seq(along = xx$dyvCovars))
         {
-            if (attr(x$dvvCovars[[j]], 'nodeSet')[1] == nodeSet)
+            if (attr(xx$dvvCovars[[j]], 'nodeSet')[1] == nodeSet)
             {
                 objEffects <- rbind(objEffects,
                                     createEffects("dyadObjective",
@@ -129,7 +129,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         }
         for (j in seq(along = xx$cCovars))
         {
-            if (attr(x$cCovars[[j]], 'nodeSet') == nodeSet)
+            if (attr(xx$cCovars[[j]], 'nodeSet') == nodeSet)
             {
                 tmp <- covarOneModeEff(names(xx$cCovars)[j],
                                      attr(xx$cCovars[[j]], 'poszvar'),
@@ -152,9 +152,9 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
                 rateEffects <- rbind(rateEffects, tmp$rateEff)
             }
         }
-        for (j in seq(along=x$vCovars))
+        for (j in seq(along=xx$vCovars))
         {
-            if (attr(x$cCovars[[j]], 'nodeSet') == nodeSet)
+            if (attr(xx$vCovars[[j]], 'nodeSet') == nodeSet)
             {
                 tmp <- covarOneModeEff(names(xx$vCovars)[j],
                                      attr(xx$vCovars[[j]], 'poszvar'),
@@ -491,7 +491,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         }
         for (j in seq(along=xx$vCovars))
         {
-            covNodeset <- match(attr(xx$cCovars[[j]], "nodeSet"),
+            covNodeset <- match(attr(xx$vCovars[[j]], "nodeSet"),
                                 nodeSets)
             if (covNodeset > 0)
             {

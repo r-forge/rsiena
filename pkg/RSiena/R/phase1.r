@@ -417,22 +417,9 @@ CalculateDerivative <- function(z, x)
         ##note that warnings is never set as this piece of code is not executed
         ##if force_fin_diff_phase_1 is true so warning is zero on entry
         ##browser()
-        dfra<- matrix(0, nrow = z$pp, ncol = z$pp)
-       # browser()
-        for (i in 1 : (f$observations-1))
-        {
-            tmp <- sapply(1 : z$n1,function(j, y, s)
-                              outer(y[j, ], s[j, ]),
-                          y = matrix(z$sf2[, i, ], ncol=z$pp),
-                          s = matrix(z$ssc[, i, ], ncol=z$pp))
-            tmp <- array(tmp, dim = c(z$pp, z$pp, z$n1))
-            dfra <- dfra + apply(tmp, c(1, 2), sum)
-        }
-        dfra <- dfra / z$n1
-        tmp <- matrix(sapply(1 : (f$observations - 1), function(i)
-                                   outer(colMeans(z$sf2)[i,],
-                  colMeans(z$ssc)[i,])), ncol=f$observations-1)
-        dfra <- dfra - matrix(rowSums(tmp), nrow = z$pp)
+
+        dfra <-derivativeFromScoresAndDeviations(z$ssc, z$sf2)
+
         z$jacobianwarn1 <- rep(FALSE, z$pp)
         if (any(diag(dfra) <= 0))
         {
@@ -544,4 +531,24 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
     z$sdf0 <- sdf
                                         # browser()
     z
+}
+##@derivativeFromScoresAndDeviations siena07 create dfra from scores and deviations
+derivativeFromScoresAndDeviations <- function(scores, deviations)
+{
+    nIterations <- dim(scores)[1]
+    nWaves <- dim(scores)[2]
+    nParameters <- dim(scores)[3]
+    dfra <- rowSums(sapply(1:nWaves, function(i)
+                          sapply(1:nIterations, function(j, y, s)
+                                 outer(y[j, ], s[j, ]),
+                                 y=matrix(deviations[, i, ], ncol=nParameters),
+                                 s=matrix(scores[, i, ], ncol=nParameters))))
+    dim(dfra)<- c(nParameters, nParameters, nIterations)
+    dfra<- apply(dfra, c(1, 2), sum)
+    dfra<- dfra / nIterations
+    tmp <- matrix(sapply(1 : nWaves, function(i)
+                         outer(colMeans(deviations)[i,],
+                               colMeans(scores)[i,])), ncol=nWaves)
+
+    dfra - matrix(rowSums(tmp), nrow=nParameters)
 }
