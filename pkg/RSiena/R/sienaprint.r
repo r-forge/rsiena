@@ -40,7 +40,7 @@ print.sienaGroup <- function(x, ...)
 }
 
 ##@print.sienafit Methods
-print.sienaFit <- function(x, ...)
+print.sienaFit <- function(x, tstat=TRUE, ...)
 {
    if (!inherits(x, "sienaFit"))
         stop("not a legitimate Siena model fit")
@@ -54,18 +54,25 @@ print.sienaFit <- function(x, ...)
    }
    else
        {
-           cat("Estimates and standard errors\n\n")
-           tmp <- sienaFitThetaTable(x)
+           cat(c("Estimates, standard errors and t-statistics for",
+               "convergence\n\n"))
+           tmp <- sienaFitThetaTable(x, tstat=tstat)
            mydf <- tmp$mydf
            mymat <- as.matrix(mydf)
            mymat[, 'value'] <- format(round(mydf$value, digits=4))
            mymat[, 'se'] <- format(round(mydf$se, digits=4))
+           mymat[, 'tstat'] <- format(round(mydf$tstat, digits=4))
+           mymat[is.na(mydf$tstat), 'tstat'] <- ' '
            mymat[, 'type'] <- format(mymat[, 'type'])
            mymat[, 'text'] <- format(mymat[, 'text'])
            mymat[mydf$row < 1, 'row'] <-
                format(mydf[mydf$row < 1, 'row'])
            mymat[mydf[,'row'] >= 1, 'row'] <-
                paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
+           mymat <- rbind(c(rep("", 4), "Estimate", "", "Standard", "",
+                            "t statistic"),
+                          c(rep("", 6),  "  Error", "", ""), mymat)
+           mymat <- apply(mymat, 2, format)
            tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
            addtorow <- tmp$addtorow
            for (i in 1:length(tmp1))
@@ -165,7 +172,7 @@ print.sienaModel <- function(x, ...)
 
 }
 ##@sienaFitThetaTable Miscellaneous
-sienaFitThetaTable <- function(x)
+sienaFitThetaTable <- function(x, tstat=FALSE)
 {
     pp <- x$pp
     nrates <- length(x$rate)
@@ -179,6 +186,7 @@ sienaFitThetaTable <- function(x)
                        lParenthesis = rep("(", pp),
                        se = rep(0, pp),
                        rParenthesis = rep(")", pp),
+                       tstat=rep(NA, pp),
                        stringsAsFactors =FALSE)
     ## add to row is the extra lines to put in to table if you wish
     addtorow <- list()
@@ -188,7 +196,7 @@ sienaFitThetaTable <- function(x)
     {
         addtorow$command[addsub] <-
             'Rate parameters: '
-        addtorow$pos[[addsub]] <- 0
+        addtorow$pos[[addsub]] <- 2
         addsub <- addsub + 1
         if (length(x$rate) == 1)
         {
@@ -222,7 +230,7 @@ sienaFitThetaTable <- function(x)
             }
             addtorow$command[addsub] <-
                 'Other parameters: '
-            addtorow$pos[[addsub]] <- nn
+            addtorow$pos[[addsub]] <- nn + 2
             addsub <- addsub + 1
         }
     }
@@ -261,6 +269,11 @@ sienaFitThetaTable <- function(x)
     mydf[nrates + (1:x$pp), 'text' ] <- x$effects$effectName
     mydf[nrates + (1:x$pp), 'value' ] <- theta
     mydf[nrates + (1:x$pp), 'se' ] <- ses
+    if (!is.null(x$tstat))
+    {
+        mydf[1:nrates, "tstat"] <- NA
+        mydf[nrates + (1:x$pp), 'tstat' ] <- x$tstat
+    }
 
     if (nBehavs > 0 && nOneModes > 0)
     {
@@ -283,22 +296,46 @@ sienaFitCovarianceCorrelation <- function(x)
 
 }
 
-##@xtable.sienaFit Method
+##@xtable.sienaFit Methods
 xtable.sienaFit <- function(x, caption = NULL, label = NULL, align = NULL,
                             digits = NULL, display = NULL, ...)
 {
     tmp <- sienaFitThetaTable(x)
     mydf <- tmp$mydf
     addtorow <- tmp$addtorow
-    use <- addtorow$command != 'Network Dynamics'
-    addtorow$command <- paste('\\multicolumn{4}{l}{', addtorow$command,
-                              '} \\\\ \n')
-    use[1] <- FALSE
-    addtorow$command[use] <- paste('\\\\ ', addtorow$command[use])
+    if (!is.null(addtorow$command))
+    {
+        use <- addtorow$command != 'Network Dynamics'
+        addtorow$command <- paste('\\multicolumn{4}{l}{', addtorow$command,
+                                  '} \\\\ \n')
+        use[1] <- FALSE
+        addtorow$command[use] <- paste('\\\\ ', addtorow$command[use])
+    }
+    else
+    {
+        addtorow <- NULL
+    }
     mydf[mydf$row < 1, 'row'] <-
         format(mydf[mydf$row < 1, 'row'])
-    mydf[mydf[,'row'] >= 1, 'row'] <-
-        paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
-    return(list(xtable(mydf, caption=caption, label=label, align=align,
-                       digits=digits, display=display), addtorow))
+    mydf[mydf[,'row'] >= 1, 'row'] <- paste(format(mydf[mydf$row >= 1,
+             'row']), '.', sep='')
+    tmp <- list(xtable(mydf, caption=caption, label=label, align=align,
+                       digits=digits, display=display), addtorow=addtorow,
+                include.colnames=FALSE, include.rownames=FALSE, ...)
+    class(tmp) <- c("xtable.sienaFit", "xtable")
+    tmp
+}
+##@print.xtable.sienaFit Methods
+print.xtable.sienaFit <- function(x, ...)
+{
+    addtorow <- x[["addtorow"]]
+    if (!is.null(addtorow))
+    {
+        do.call("print", x)
+    }
+    else
+    {
+        do.call("print", x[-2])
+    }
+    invisible(x)
 }

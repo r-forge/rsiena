@@ -6,7 +6,8 @@ print('test1')
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
-mymodel<- model.create(findiff=TRUE, fn=simstats0c, projname='test1')
+mymodel<- model.create(findiff=TRUE, fn=simstats0c, projname='test1',
+                       cond=FALSE)
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 ##test2
 print('test2')
@@ -19,7 +20,8 @@ ans <- siena07(mymodel2, data=mydata, effects=myeff, batch=TRUE,parallelTesting=
 mynet1 <- sienaNet(array(c(tmp3,tmp4),dim=c(32,32,2)))
 mydata <- sienaDataCreate(mynet1)
 myeff<- getEffects(mydata)
-mymodel<- model.create(findiff=TRUE, fn = simstats0c, projname='test3')
+mymodel<- model.create(findiff=TRUE, fn = simstats0c, projname='test3',
+                       cond=FALSE)
 print('test3')
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 ##test4
@@ -32,7 +34,8 @@ ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
-mymodel<- model.create(fn=simstats0c, projname='test5')
+mymodel<- model.create(fn=simstats0c, projname='test5',
+                       cond=FALSE)
 print('test5')
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 ##test6
@@ -46,7 +49,8 @@ ans <- siena07(mymodel2, data=mydata, effects=myeff, batch=TRUE,parallelTesting=
 mynet1 <- sienaNet(array(c(tmp3,tmp4),dim=c(32,32,2)))
 mydata <- sienaDataCreate(mynet1)
 myeff<- getEffects(mydata)
-mymodel<- model.create(fn = simstats0c, projname='test7')
+mymodel<- model.create(fn = simstats0c, projname='test7',
+                       cond=FALSE)
 print('test7')
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 ##test8
@@ -56,13 +60,15 @@ mymodel$condvarno<- 1
 print('test8')
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 ##test9
+
 print('test9')
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mynet2 <- sienaNet(s50a,type='behavior')
 mydata <- sienaDataCreate(mynet1, mynet2)
 myeff <- getEffects(mydata)
 myeff$initialValue[96] <- 0.34699930338 ## siena3 starting values differ
-mymodel<- model.create(findiff=FALSE, fn=simstats0c, projname='test9')
+mymodel<- model.create(findiff=FALSE, fn=simstats0c, projname='test9',
+                       cond=FALSE)
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)
 ##test10
 print('test10')
@@ -76,9 +82,9 @@ data501 <- sienaDataCreateFromSession("s50.csv", modelName="s50")
 data501e <- sienaDataCreateFromSession("s50e.csv", modelName="s50e")
 data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj")
 
-model501 <- model.create( projname="s50")
-model501e <- model.create( projname="s50e")
-model501paj <- model.create(projname="s50paj")
+model501 <- model.create( projname="s50",  cond=FALSE)
+model501e <- model.create( projname="s50e", cond=FALSE )
+model501paj <- model.create(projname="s50paj", cond=FALSE )
 ans501 <- siena07(model501, data=data501$mydata, effects=data501$myeff,
                   parallelTesting=TRUE, batch=TRUE, verbose=TRUE)
 ans501e <- siena07(model501e, data=data501e$mydata, effects=data501e$myeff,

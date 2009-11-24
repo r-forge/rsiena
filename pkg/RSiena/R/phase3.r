@@ -328,15 +328,16 @@ phase3.2<- function(z,x,...)
     Report(c('Averages, standard deviations, ',
         'and t-ratios for deviations from targets:\n'),bof,sep='')
     ##calculate t-ratios
-    dmsf<- diag(z$msf)
-    sf<- colMeans(z$sf)
-    use<- dmsf< 1e-20*z$scale*z$scale
+    dmsf <- diag(z$msf)
+    sf <- colMeans(z$sf)
+    use <- dmsf < 1e-20*z$scale*z$scale
     use2 <- abs(sf)<1e-10*z$scale
-    dmsf[use]<- 1e-20*z$scale[use]*z$scale[use]
-    tstat<- rep(NA,z$pp)
+    dmsf[use] <- 1e-20*z$scale[use]*z$scale[use]
+    tstat <- rep(NA,z$pp)
     tstat[!use]<- sf[!use]/sqrt(dmsf[!use])
     tstat[use&use2]<- 0
     tstat[use&!use2]<- 999
+    z$tstat <- tstat
     mymess1<- paste(format(1:z$pp,width=3), '. ',
                     format(round(sf, 4), width=8, nsmall=4), ' ',
                     format(round(sqrt(dmsf), 4) ,width=8, nsmall=4), ' ',

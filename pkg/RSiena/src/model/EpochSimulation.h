@@ -114,18 +114,13 @@ private:
     const EventSet * lpEvents;
 
     // An iterator to the next event still to be processed.
-    EventSet::iterator lnextEvent;
+    EventSet::const_iterator lnextEvent;
 
     // Target amount of change for this period if we are using conditional simulation
     int ltargetChange;
 
     // The dependent variable the simulation is conditioned upon
     DependentVariable * lpConditioningVariable;
-
-    // Observed values of statistics in this simulation: one value for each
-    // selected effect, including the rate effects, except basic rate for
-    // conditioning variable, if any.
-    vector<double> lsimulatedStatistics;
 
     // Values of scores in this simulation: one for each selected effect,
     // including the rate effects, but excluding the basic rate effect.

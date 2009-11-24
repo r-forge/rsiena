@@ -138,11 +138,11 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                 depvar <- data[[group]]$depvars[[j]]
                 if (bipartite)
                 {
-                    tmp <- getBipartiteStartingVals(depvar, structValid=TRUE)
+                    tmp <- getBipartiteStartingVals(depvar)
                  }
                 else
                 {
-                    tmp <- getNetworkStartingVals(depvar, structValid=TRUE)
+                    tmp <- getNetworkStartingVals(depvar)
                 }
                 atts <- attributes(depvar)
                 matchange <- tmp$tmp[-c(1:2), , drop=FALSE]
@@ -343,21 +343,24 @@ printInitialDescription <- function(data, effects, modelName="Siena",
             }
             myobj <- myeff[myeff$shortName == "density" &
                            myeff$type == "eval",]
-            untrimmed <- myobj$untrimmedValue
-            Report(c(format(myobj$effectName, width=46),
-                     format(round(untrimmed, 4), nsmall=4, width=10),
-                     "\n"), outf)
-            if (untrimmed > 3)
+            if (nrow(myobj) > 0)
             {
-                Report(c("The initial parameter value is very low.",
-                         "It is truncated to -3. \n"), outf)
-            }
-            else
-                if (untrimmed < -3)
+                untrimmed <- myobj$untrimmedValue
+                Report(c(format(myobj$effectName, width=46),
+                         format(round(untrimmed, 4), nsmall=4, width=10),
+                         "\n"), outf)
+                if (untrimmed > 3)
                 {
-                    Report(c("The initial parameter value is very high.",
-                             "It is truncated to 3.\n"), outf)
+                    Report(c("The initial parameter value is very low.",
+                             "It is truncated to -3. \n"), outf)
                 }
+                else
+                    if (untrimmed < -3)
+                    {
+                        Report(c("The initial parameter value is very high.",
+                                 "It is truncated to 3.\n"), outf)
+                    }
+            }
         }
         Report("\n", outf)
     }

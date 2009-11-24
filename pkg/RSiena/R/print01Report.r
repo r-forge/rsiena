@@ -387,6 +387,16 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                                  format(atts$modes, width=4)), outf)
                         Report("\n", outf)
                     }
+                    depvar2 <- depvar
+                    depvar2[is.na(depvar2)] <- 0
+                    if (!isTRUE(all.equal(as.vector(depvar2) -
+                                          round(as.vector(depvar2)),
+                                          rep(0, length(depvar2)))))
+                    {
+                         Report(c("Non-integer values noted in this behavior",
+                                  "variable: they will be truncated.\n")
+                                 , outf)
+                    }
                     Report('\n', outf)
                 }
             }
@@ -426,7 +436,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                     Report(c(format(netname, width=14),
                              format(round(means, 3), nsmall=3,
                                     width=10), format(round(mean(means),
-                                    3), width=10), '\n\n'), sep="", outf)
+                                    3), width=10), '\n'), sep="", outf)
                 }
             }
         }
@@ -794,22 +804,181 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             periodFromStart <- periodFromStart + data[[i]]$observations
         }
         Report("\n", outf)
-   }
-    if (sum(nets) > 0)
-    {
-        if (any(atts$anyMissing[nets]))
-        {
-            netnames <- atts$netnames[nets]
-            missings <- atts$anyMissing[nets]
-            for (i in seq(along=netnames[missings]))
-            {
-                Report(c("There are missing data for network variable ",
-                         netnames[i], ".\n"), sep = "", outf)
-            }
-        }
-        Report("\n", outf)
     }
-  if (sum(atts$types == 'oneMode') > 0)
+    periodNos <- attr(data, "periodNos")
+    if (any(atts$anyUpOnly[nets]))
+    {
+        netnames <- atts$netnames[nets]
+        upOnly <- atts$anyUpOnly[nets]
+        for (i in seq(along=netnames[upOnly]))
+        {
+            if (sum(nets) > 1)
+            {
+                Report(c("Network ", netnames[i], ":\n"), sep = "", outf)
+            }
+            if (atts$observations == 1)
+            {
+                Report("All network changes are upward.\n", outf)
+                Report("This will be respected in the simulations.\n", outf)
+            }
+            else
+            {
+                Report(c("All network changes are upward for the following",
+                         "periods:\n"), outf)
+                periodsUp <-
+                    sapply(data, function(x)
+                       {
+                           attr(x$depvars[[match(netnames[i],
+                                                 names(x$depvars))]],
+                                "uponly")
+                       })
+                periods <- periodNos[c(1:length(periodsUp))[periodsUp]]
+                Report(paste(periods, " => ", periods + 1, ";",
+                             sep=""), fill=80, outf)
+                Report("This will be respected in the simulations.\n", outf)
+                if (atts$allUpOnly[i])
+                {
+                    Report(c("All changes are only up:",
+                             "no outdegree parameter.\n"), outf)
+                }
+            }
+            Report("\n", outf)
+        }
+    }
+    if (any(atts$anyDownOnly[nets]))
+    {
+        netnames <- atts$netnames[nets]
+        downOnly <- atts$anyDownOnly[nets]
+        for (i in seq(along=netnames[downOnly]))
+        {
+            if (sum(nets) > 1)
+            {
+                Report(c("Network ", netnames[i], "\n"), sep = "", outf)
+            }
+            if (atts$observations == 1)
+            {
+                Report("All network changes are downward.\n", outf)
+                Report("This will be respected in the simulations.\n\n", outf)
+            }
+            else
+            {
+                periodsDown <-
+                    sapply(data, function(x)
+                       {
+                           attr(x$depvars[[match(netnames[i],
+                                                 names(x$depvars))]],
+                                "downonly")
+                       })
+                Report(c("All network changes are downward for the",
+                         "following periods:\n"), outf)
+                periods <- periodNos[c(1:length(periodsDown))[periodsDown]]
+                Report(paste(periods, " => ", periods + 1, ";",
+                             sep=""), fill=80, outf)
+                Report("This will be respected in the simulations.\n", outf)
+                if (atts$allDownOnly[i])
+                {
+                    Report(c("All changes are only down:",
+                             "no outdegree parameter.\n"), outf)
+                }
+            }
+            Report("\n", outf)
+        }
+    }
+    if (any(atts$anyUpOnly[!nets]))
+    {
+        netnames <- atts$netnames[!nets]
+        upOnly <- atts$anyUpOnly[!nets]
+        for (i in seq(along=netnames[upOnly]))
+        {
+            Report(c("\nBehavior variable ", netnames[i], ":\n"), sep = "", outf)
+            if (atts$observations == 1)
+            {
+                Report("All behavior changes are upward.\n", outf)
+                Report("This will be respected in the simulations.\n", outf)
+            }
+            else
+            {
+                Report(c("All behavior changes are upward for the following",
+                         "periods:\n"), outf)
+                periodsUp <-
+                    sapply(data, function(x)
+                       {
+                           attr(x$depvars[[match(netnames[i],
+                                                 names(x$depvars))]],
+                                "uponly")
+                       })
+                periods <- periodNos[c(1:length(periodsUp))[periodsUp]]
+                Report(paste(periods, " => ", periods + 1, ";",
+                             sep=""), fill=80, outf)
+                Report("This will be respected in the simulations.\n", outf)
+                if (atts$allUpOnly[i])
+                {
+                    Report(c("All changes are only up:",
+                             "no linear shape parameter.\n\n"), outf)
+                }
+            }
+            Report("\n", outf)
+        }
+    }
+    if (any(atts$anyDownOnly[!nets]))
+    {
+        netnames <- atts$netnames[!nets]
+        downOnly <- atts$anyDownOnly[!nets]
+        for (i in seq(along=netnames[downOnly]))
+        {
+            Report(c("\nBehavior ", netnames[i], ":\n"), sep = "", outf)
+            if (atts$observations == 1)
+            {
+                Report("All behavior changes are downward.\n", outf)
+                Report("This will be respected in the simulations.\n", outf)
+            }
+            else
+            {
+                periodsDown <-
+                    sapply(data, function(x)
+                       {
+                           attr(x$depvars[[match(netnames[i],
+                                                 names(x$depvars))]],
+                                "downonly")
+                       })
+                Report(c("All behavior changes are downward for the",
+                         "following periods:\n"), outf)
+                periods <- periodNos[c(1:length(periodsDown))[periodsDown]]
+                Report(paste(periods, " => ", periods + 1, ";",
+                             sep=""), fill=80, outf)
+                Report("This will be respected in the simulations.\n", outf)
+                if (atts$allDownOnly[i])
+                {
+                    Report(c("All changes are only down:",
+                             "no linear shape parameter.\n"), outf)
+                }
+            }
+             Report("\n", outf)
+       }
+    }
+    if (any(atts$anyMissing[nets]))
+    {
+        netnames <- atts$netnames[nets]
+        missings <- atts$anyMissing[nets]
+        for (i in seq(along=netnames[missings]))
+        {
+            Report(c("There are missing data for network variable ",
+                     netnames[i], ".\n"), sep = "", outf)
+        }
+    }
+     if (any(atts$anyMissing[!nets]))
+    {
+        netnames <- atts$netnames[!nets]
+        missings <- atts$anyMissing[!nets]
+        for (i in seq(along=netnames[missings]))
+        {
+            Report(c("There are missing data for behavior variable ",
+                     netnames[i], ".\n"), sep = "", outf)
+        }
+    }
+   Report("\n", outf)
+
+    if (sum(atts$types == 'oneMode') > 0)
     {
         balmean <- atts$"balmean"
 

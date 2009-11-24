@@ -57,8 +57,6 @@ public:
 	virtual void setLeaverBack(const SimulationActorSet * pActorSet,
 		int actor);
 	Network * pNetwork() const;
-	Network * pPredictorNetwork() const;
-	void pPredictorNetwork(Network *);
 
 	int ego() const;
 

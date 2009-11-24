@@ -248,8 +248,7 @@ void BehaviorVariable::actOnLeaver(const SimulationActorSet * pActorSet,
 
 
 /**
- * Updates the current network and other variables when an actor becomes
- * inactive.
+ * Sets leavers values back to the value at the start of the simulation.
  */
 void BehaviorVariable::setLeaverBack(const SimulationActorSet * pActorSet,
 	int actor)

@@ -10,7 +10,7 @@
      sienaModelCreate(fn = simstats0c, usesimstats0c=TRUE,
      projname = "Siena", MaxDegree = 0, useStdInits = FALSE,
      n3 = 1000, nsub = 4, maxlike = FALSE, diag = TRUE,
-     condvarno = 0, condname = "", firstg = 0.2, cond = FALSE,
+     condvarno = 0, condname = "", firstg = 0.2, cond = NA,
      findiff = FALSE, seed = NULL)
 }
 \arguments{
@@ -37,7 +37,9 @@
   \code{condvarno} to specify the variable.}
   \item{firstg}{initial value of scaling parameter in the Robbins-Monro
   procedure.}
-  \item{cond}{Boolean. If TRUE, use conditional simulation}
+  \item{cond}{Boolean. If TRUE, use conditional simulation. If missing,
+	decision is deferred until \code{\link{siena07}}, when it is set to
+	TRUE if there is only one dependent variable, FALSE otherwise.}
   \item{findiff}{ Boolean: If TRUE, estimate derivatives using finite
   differences. If FALSE use scores.}
   \item{seed}{Integer. Starting value of random seed. Not used if

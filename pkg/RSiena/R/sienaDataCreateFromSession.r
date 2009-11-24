@@ -494,9 +494,9 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        ##   namefiles[[1]][grep(miss, namefiles[[1]])] <-  NA
                        miss <- namesession$MissingValues
                        namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
-                       varnames <- strsplit(objnames[j], ' ')
+                       varnames <- strsplit(objnames[j], ' ')[[1]]
                        tmp <- sapply(1: ncol(namefiles[[1]]), function(x){
-                           assign(varnames[[1]][x],
+                           assign(varnames[x],
                                   coCovar(namefiles[[1]][, x],
                                           nodeSet=namesession[1,
                                           "ActorSet"]),
