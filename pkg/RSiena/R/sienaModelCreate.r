@@ -14,7 +14,7 @@ sienaModelCreate<- function(fn=simstats0c, usesimstats0c=TRUE,
                         projname="Siena", MaxDegree=0, useStdInits=FALSE,
                         n3=1000, nsub=4, maxlike=FALSE, diag=TRUE,
                         condvarno=0, condname='',
-                        firstg=0.2, cond=FALSE, findiff=FALSE,  seed=NULL)
+                        firstg=0.2, cond=NA, findiff=FALSE,  seed=NULL)
 {
     model <- NULL
     model$projname <- projname

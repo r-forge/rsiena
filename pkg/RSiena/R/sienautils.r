@@ -228,7 +228,8 @@ sienaNet<- function(netarray, type=c('oneMode','bipartite','behavior'),
         if (!is.character(nodeSet))
             stop ('nodeset should be a character string')
     }
-    if (type != 'behavior')
+    if (type != "behavior")
+    {
         if (sparse)
         {
             netarray <- lapply(netarray, function(x)as(drop0(x), "dgTMatrix"))
@@ -246,7 +247,7 @@ sienaNet<- function(netarray, type=c('oneMode','bipartite','behavior'),
             if (!all(netarray %in% c(0, 1, 10, 11) | is.na(netarray)))
                 stop('entries in networks must be 0, 1, 10 or 11')
         }
-
+    }
     obj <- netarray
     class(obj) <- ('sienaNet')
     attr(obj, 'type') <- type

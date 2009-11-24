@@ -1,6 +1,5 @@
 \name{siena07}
 \alias{siena07}
-\alias{sienaFit}
 \title{Function to fit a model}
 \description{
  Fits a model using method of moments, based on straightforward
@@ -59,7 +58,9 @@ tt=NULL, parallelTesting=FALSE, ...)
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
-\seealso{\code{\link{sienaModelCreate}}}
+\seealso{There are print, summary and xtable methods for \code{\link{sienaFit}}
+  objects
+  \code{\link{sienaModelCreate}}, \code{\link{print.sienaFit}}}
 \examples{
 mymodel <- sienaModelCreate(fn=simstats0c)
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))

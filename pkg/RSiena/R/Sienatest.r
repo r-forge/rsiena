@@ -224,7 +224,7 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
             oneSided <- ov * sqrt(vav)
         else
             oneSided <- 0
-        if (maxlike) oneSided<- - oneSided
+        if (!maxlike) oneSided<- - oneSided
         ## change the sign for intuition for users
     }
     else

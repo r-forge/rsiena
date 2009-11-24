@@ -19,7 +19,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         {
             xx <- x
             xx[, c("effectName", "functionName", "period")] <-
-                sub("nnnnnn", i, xx[, c("effectName", "functionName",
+                sub("nnnnnn", periodNos[i], xx[, c("effectName", "functionName",
                                         "period")])
             tmp <-  rbind(tmp, xx)
         }
@@ -120,7 +120,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         }
         for (j in seq(along = xx$dyvCovars))
         {
-            if (attr(xx$dvvCovars[[j]], 'nodeSet')[1] == nodeSet)
+            if (attr(xx$dyvCovars[[j]], 'nodeSet')[1] == nodeSet)
             {
                 objEffects <- rbind(objEffects,
                                     createEffects("dyadObjective",
@@ -197,8 +197,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
                 }
             }
             if (types[j] == 'bipartite' &&
-                any(attr(xx$depvars[[j]], 'nodeSet') == nodeSet))
-                ## not sure what this test should be
+               (attr(xx$depvars[[j]], 'nodeSet')[1] == nodeSet))
             {
                 objEffects <-
                     rbind(objEffects,
@@ -244,9 +243,6 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         }
         if ((nOneModes + nBipartites) > 1) ## add the network name
         {
-       #     rateEffects$functionName <- paste(varname, ': ',
-       #                                       rateEffects$functionName,
-       #                                       sep = '')
             objEffects$functionName <- paste(varname, ': ',
                                              objEffects$functionName, sep = '')
             objEffects$effectName <- paste(varname, ': ',
@@ -281,19 +277,20 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         }
         else
         {
-            if (!(attr(depvar,'anyUpOnly') || attr(depvar, 'anyDownOnly')))
+            if (!(attr(depvar,'allUpOnly') || attr(depvar, 'allDownOnly')))
             {
                 objEffects[objEffects$effectName =='outdegree (density)'&
                            objEffects$type == 'eval',
                            c('include', "initialValue", "untrimmedValue")] <-
                                list(TRUE, starts$degree, starts$untrimmed)
             }
+            else
+            {
+                objEffects <-
+                    objEffects[!objEffects$shortName == "density", ]
+            }
             objEffects[objEffects$effectName == 'reciprocity'&
                        objEffects$type == 'eval','include'] <- TRUE
-            ##if (attr(xx$depvars[[i]],'uponly') ||attr(xx$depvars[[i]],
-            ##'downonly'))
-            ##effects[['outdegree (density)']]$eval$fix <- TRUE
-            ## maybe when you run it in siena07!
         }
         rateEffects$basicRate[1:observations] <- TRUE
         list(effects=rbind(rateEffects = rateEffects, objEffects = objEffects),
@@ -333,7 +330,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
                                                varname, names(xx$depvars)[j]))
             }
             if (types[j] == 'bipartite' &&
-                (attr(xx$depvars[[j]], 'nodeSet')[[1]] == nodeSet))
+                (attr(xx$depvars[[j]], 'nodeSet')[1] == nodeSet))
             {
                  objEffects <- rbind(objEffects,
                                     createEffects("behaviorBipartiteObjective",
@@ -385,7 +382,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
                                                varname, names(xx$depvars)[j]))
             }
             if (types[j] == 'bipartite' &&
-                any(attr(xx$depvars[[j]], 'nodeSet') == nodeSet))
+                attr(xx$depvars[[j]], 'nodeSet')[1] == nodeSet)
             {
                  objEffects <- rbind(objEffects,
                                     createEffects("behaviorBipartiteObjective2",
@@ -403,16 +400,24 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         ## get starting values
         starts <- getBehaviorStartingVals(depvar)
         ## set defaults
-        if (!(attr(depvar,'anyUpOnly') || attr(depvar, 'anyDownOnly')))
+        if (!(attr(depvar,'allUpOnly') || attr(depvar, 'allDownOnly')))
         {
             objEffects[grepl("linear shape", objEffects$effectName) &
                        objEffects$type == 'eval',
                        c('include', 'initialValue','untrimmedValue')]  <-
                            list(TRUE, starts$tendency, starts$untrimmed)
+        }
+        else
+        {
+            objEffects <- objEffects[objEffects$shortName != "linear", ]
+        }
+        if (attr(depvar, "range") > 2)
+        {
             objEffects[grepl("quadratic shape", objEffects$effectName) &
                        objEffects$type == 'eval','include']  <- TRUE
-            ## no starting value yet for quadratic effect
+            ## no starting value for quadratic effect
         }
+
 
         rateEffects[1:observations, 'include'] <- TRUE
         rateEffects[1:noPeriods, 'initialValue'] <-  starts$startRate
@@ -518,8 +523,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         {
             otherName <- names(xx$depvars)[j]
             if (types[j] == 'oneMode' &&
-                attr(xx$depvars[[j]], 'nodeSet') %in% nodeSets )
-                ## not sure what this test should be
+                attr(xx$depvars[[j]], 'nodeSet') ==  nodeSets[1] )
             {
                 if (attr(xx$depvars[[j]], "symmetric"))
                 {
@@ -537,8 +541,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
                 }
             }
             if (types[j] == 'bipartite' &&
-                all(attr(xx$depvars[[j]], 'nodeSet') %in% nodeSets) &&
-                ## or any?
+                (attr(xx$depvars[[j]], 'nodeSet')[1] == nodeSets[1]) &&
                 varname != otherName)
             {
                     objEffects <-
@@ -549,9 +552,6 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
        }
         if ((nOneModes + nBipartites) > 1) ## add the network name
         {
-           # rateEffects$functionName <- paste(varname, ': ',
-           #                                   rateEffects$functionName,
-           #                                   sep = '')
             objEffects$functionName <- paste(varname, ': ',
                                              objEffects$functionName, sep = '')
             objEffects$effectName <- paste(varname, ': ',
@@ -572,17 +572,24 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         rateEffects[1:noPeriods, 'initialValue'] <-  starts$startRate
         rateEffects$basicRate[1:observations] <- TRUE
 
-        if (!(attr(depvar,'anyUpOnly') || attr(depvar, 'anyDownOnly')))
+        if (!(attr(depvar,'allUpOnly') || attr(depvar, 'allDownOnly')))
         {
             objEffects[objEffects$effectName =='outdegree (density)' &
                        objEffects$type == 'eval',
                        c('include', 'initialValue', 'untrimmedValue')] <-
-                       list(TRUE, starts$degree, starts$untrimmed)
+                           list(TRUE, starts$degree, starts$untrimmed)
         }
-        ##if (attr(xx$depvars[[i]],'uponly') ||attr(xx$depvars[[i]],
-        ##'downonly'))
-        ##effects[['outdegree (density)']]$eval$fix <- TRUE
-        ## maybe when you run it in siena07!
+        else
+        {
+            objEffects <-
+                objEffects[!objEffects$shortName == "density", ]
+        }
+        if (attr(xx$depvars[[i]],'uponly') || attr(xx$depvars[[i]],
+                                                   'downonly'))
+        {
+            objEffects <-
+                objEffects[!objEffects$shortName == "density", ]
+        }
 
         rateEffects$basicRate[1:observations] <- TRUE
 
@@ -630,6 +637,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         {
             covObjEffects <-
                 createEffects("covarBipartiteObjective", covarname)[3, ]
+            covRateEffects <- createEffects("covarBipartiteRate", covarname)
         }
         else if (poszvar)
         {
@@ -645,7 +653,6 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
             covObjEffects <- NULL
         }
 
-        covRateEffects <- createEffects("covarBipartiteRate", covarname)
 
         list(objEff=covObjEffects, rateEff=covRateEffects)
     }
@@ -1057,7 +1064,7 @@ getBehaviorStartingVals <- function(depvar)
     list(startRate=startRate, tendency=tendency, untrimmed = untrimmed, dif=dif)
 }
 ##@getNetworkStartingVals DataCreate
-getNetworkStartingVals <- function(depvar, structValid=TRUE)
+getNetworkStartingVals <- function(depvar)
 {
     noPeriods <- attr(depvar, "netdims")[3] - 1
     ##rate
@@ -1065,15 +1072,8 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
     if (!attr(depvar,'sparse'))
     {
         nactors <- nrow(depvar)
-        if (structValid)
-        {
-            use <- !is.na(depvar) & (depvar == 10 | depvar == 11)
-            depvar[use] <- depvar[use] - 10  ## remove structural values
-        }
-        else
-        {
-            depvar[depvar==10 | depvar==11] <- NA ## remove structural values
-        }
+        use <- !is.na(depvar) & (depvar == 10 | depvar == 11)
+        depvar[use] <- depvar[use] - 10  ## remove structural values
         tmp <- sapply(1:noPeriods, function(x, z){
             diag(z[ , , x]) <- NA
             diag(z[, , x + 1]) <- NA
@@ -1081,7 +1081,11 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
             matchange <- table(z[, , x + 1], z[, , x])
             matcnt <- nactors * nactors -
                 sum(is.na(z[, , x + 1]) | is.na(z[, , x]))
-            c(matcnt=matcnt, matdiff=matdiff, matchange=matchange)
+            tmp <- c(matcnt=matcnt, matdiff=matdiff, matchange=matchange)
+            names(tmp) <- c("matcnt", "matdiff", "matchangeFrom0To0",
+                            "matchangeFrom0To1",
+                            "matchangeFrom1To0", "matchangeFrom1To1")
+            tmp
         }, z=depvar)
     }
     else
@@ -1094,22 +1098,12 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
         {
             mymat1 <- depvar[[i]]
             mymat2 <- depvar[[i+1]]
-            if (structValid)
-            {
-                use <- mymat1@x %in% c(10, 11)
-                mymat1@x[use] <- mymat1@x[use] - 10
-                use <- mymat2@x %in% c(10, 11)
-                mymat2@x[use] <- mymat2@x[use] - 10
-                mymat1 <- drop0(mymat1)
-                mymat2 <- drop0(mymat2)
-            }
-            else
-            {
-                mymat1@x[mymat1@x==10] <- NA
-                mymat1@x[mymat1@x==11] <- NA
-                mymat2@x[mymat2@x==10] <- NA
-                mymat2@x[mymat2@x==11] <- NA
-            }
+            use <- mymat1@x %in% c(10, 11)
+            mymat1@x[use] <- mymat1@x[use] - 10
+            use <- mymat2@x %in% c(10, 11)
+            mymat2@x[use] <- mymat2@x[use] - 10
+            mymat1 <- drop0(mymat1)
+            mymat2 <- drop0(mymat2)
             diag(mymat1) <- NA
             diag(mymat2) <- NA
             mydif <- mymat2 - mymat1
@@ -1117,18 +1111,21 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
             tmp <- table(mydif@x)
             tmp00 <- nactors * nactors - length(mydif@x)
             tmp <- c(tmp00, tmp[c(3, 1, 2)])
-            matchange[,i] <- tmp
+            matchange[, i] <- tmp
             matcnt[i] <- sum(tmp)
         }
         matchange <- data.frame(matchange)
-        tmp <-as.matrix(rbind(matcnt=matcnt, matdiff=matdiff,
+        tmp <- as.matrix(rbind(matcnt=matcnt, matdiff=matdiff,
                               matchange=matchange))
+        row.names(tmp) <- c("matcnt", "matdiff", "matchangeFrom0To0",
+                            "matchangeFrom0To1",
+                            "matchangeFrom1To0", "matchangeFrom1To1")
     }
     distance <- attr(depvar, "distance" )
     if (attr(depvar,'symmetric'))
-        startRate<- nactors * (0.2 + distance)/(tmp['matcnt',] %/% 2 +1)
+        startRate <- nactors * (0.2 + distance)/(tmp['matcnt',] %/% 2 +1)
     else
-        startRate<- nactors * (0.2 + 2 * distance)/(tmp['matcnt',]+1)
+        startRate <- nactors * (0.2 + 2 * distance)/(tmp['matcnt',] + 1)
     startRate <- pmax(0.1, startRate)
     startRate <- pmin(100, startRate)
     ##degree
@@ -1136,41 +1133,48 @@ getNetworkStartingVals <- function(depvar, structValid=TRUE)
     if (attr(depvar,'symmetric'))
     {
         matchange <- matchange %/% 2
-       ## matcnt <- matcnt %/% 2
     }
-    p01 <- ifelse (matchange[1,] + matchange[2,] >=1,
-                   matchange[2,]/(matchange[1,]+matchange[2,]),0.5)
-    p10 <- ifelse (matchange[3,] + matchange[4,] >=1,
-                   matchange[3,]/(matchange[3,]+matchange[4,]),0.5)
-    p01 <- pmax(0.02,p01)
-    p10 <- pmax(0.02,p10)
-    p01 <- pmin(0.98,p01)
-    p10 <- pmin(0.98,p10)
-    alpha <- 0.5 * log(p01/p10)
-    ##  if (observations == 2) ##more observations may come later!
-    ##       alphaf1 <- alpha
-    ##  else
-    ## {
-    p00 <- ifelse (matchange[1,] + matchange[2,] >=1,
-                   matchange[1,]/(matchange[1,]+matchange[2,]),0.0)
-    p11 <- ifelse (matchange[3,] + matchange[4,] >=1,
-                   matchange[4,]/(matchange[3,]+matchange[4,]),0.0)
-    p00 <- pmax(0.02,p00)
-    p11 <- pmax(0.02,p11)
-    p00 <- pmin(0.98,p00)
-    p11 <- pmin(0.98,p11)
-    prec <- ifelse(matchange[2,] * matchange[3,] >=1,
-                   4 /((p00/matchange[2,]) +
-                       (p11/matchange[3,])),1e-6)
-    alphaf1 <- sum(alpha*prec/sum(prec))
-    ## }
+    p01 <- ifelse (matchange["matchangeFrom0To0", ] +
+                   matchange["matchangeFrom0To1", ] >=1,
+                   matchange["matchangeFrom0To1", ] /
+                   (matchange["matchangeFrom0To0", ] +
+                    matchange["matchangeFrom0To1", ]), 0.5)
+    p10 <- ifelse (matchange["matchangeFrom1To0", ]
+                   + matchange["matchangeFrom1To1", ] >=1,
+                   matchange["matchangeFrom1To0", ] /
+                   (matchange["matchangeFrom1To0", ] +
+                    matchange["matchangeFrom1To1", ]), 0.5)
+    p01 <- pmax(0.02, p01)
+    p10 <- pmax(0.02, p10)
+    p01 <- pmin(0.98, p01)
+    p10 <- pmin(0.98, p10)
+    alpha <- 0.5 * log(p01 / p10)
+    p00 <- ifelse (matchange["matchangeFrom0To0", ] +
+                   matchange["matchangeFrom0To1", ] >=1,
+                   matchange["matchangeFrom0To0", ] /
+                   (matchange["matchangeFrom0To0", ] +
+                    matchange["matchangeFrom0To1", ]), 0.0)
+    p11 <- ifelse (matchange["matchangeFrom1To0", ]
+                   + matchange["matchangeFrom1To1", ] >=1,
+                   matchange["matchangeFrom1To1", ] /
+                   (matchange["matchangeFrom1To0", ] +
+                    matchange["matchangeFrom1To1", ]), 0.0)
+    p00 <- pmax(0.02, p00)
+    p11 <- pmax(0.02, p11)
+    p00 <- pmin(0.98, p00)
+    p11 <- pmin(0.98, p11)
+    prec <- ifelse(matchange["matchangeFrom0To1", ] *
+                   matchange["matchangeFrom1To0", ] >= 1,
+                   4 / ((p00 / matchange["matchangeFrom0To1", ]) +
+                       (p11 / matchange["matchangeFrom1To0", ])), 1e-6)
+    alphaf1 <- sum(alpha * prec / sum(prec))
     untrimmed <- alphaf1
     alphaf1 <- ifelse(alphaf1 < -3, -3, ifelse(alphaf1 > 3, 3, alphaf1))
     list(startRate=startRate, degree=alphaf1, alpha=alpha, prec=prec, tmp=tmp,
         untrimmed = untrimmed)
 }
 ##@getBipartiteStartingVals DataCreate
-getBipartiteStartingVals <- function(depvar, structValid=TRUE)
+getBipartiteStartingVals <- function(depvar)
 {
     noPeriods <- attr(depvar, "netdims")[3] - 1
     ##rate
@@ -1179,21 +1183,18 @@ getBipartiteStartingVals <- function(depvar, structValid=TRUE)
     {
         nsenders<- nrow(depvar)
         nreceivers <- ncol(depvar)
-        if (structValid)
-        {
             use <- !is.na(depvar) & (depvar == 10 | depvar == 11)
             depvar[use] <- depvar[use] - 10  ## remove structural values
-        }
-        else
-        {
-            depvar[depvar==10 | depvar==11] <- NA ## remove structural values
-        }
         tmp <- sapply(1:noPeriods, function(x, z){
             matdiff <- sum(z[, , x + 1] != z[, , x], na.rm=TRUE)
             matchange <- table(z[, , x + 1], z[, , x])
             matcnt <- nsenders * nreceivers -
                 sum(is.na(z[, , x + 1]) | is.na(z[, , x]))
-            c(matcnt=matcnt, matdiff=matdiff, matchange=matchange)
+            tmp <- c(matcnt=matcnt, matdiff=matdiff, matchange=matchange)
+            names(tmp) <- c("matcnt", "matdiff", "matchangeFrom0To0",
+                            "matchangeFrom0To1",
+                            "matchangeFrom1To0", "matchangeFrom1To1")
+            tmp
         }, z=depvar)
     }
     else
@@ -1207,22 +1208,12 @@ getBipartiteStartingVals <- function(depvar, structValid=TRUE)
         {
             mymat1 <- depvar[[i]]
             mymat2 <- depvar[[i+1]]
-            if (structValid)
-            {
-                use <- mymat1@x %in% c(10, 11)
-                mymat1@x[use] <- mymat1@x[use] - 10
-                use <- mymat2@x %in% c(10, 11)
-                mymat2@x[use] <- mymat2@x[use] - 10
-                mymat1 <- drop0(mymat1)
-                mymat2 <- drop0(mymat2)
-            }
-            else
-            {
-                mymat1@x[mymat1@x==10] <- NA
-                mymat1@x[mymat1@x==11] <- NA
-                mymat2@x[mymat2@x==10] <- NA
-                mymat2@x[mymat2@x==11] <- NA
-            }
+            use <- mymat1@x %in% c(10, 11)
+            mymat1@x[use] <- mymat1@x[use] - 10
+            use <- mymat2@x %in% c(10, 11)
+            mymat2@x[use] <- mymat2@x[use] - 10
+            mymat1 <- drop0(mymat1)
+            mymat2 <- drop0(mymat2)
             mydif <- mymat2 - mymat1
             matdiff[i] <- sum(abs(mydif), na.rm=TRUE)
             tmp <- table(mydif@x)
@@ -1234,42 +1225,49 @@ getBipartiteStartingVals <- function(depvar, structValid=TRUE)
         matchange <- data.frame(matchange)
         tmp <-as.matrix(rbind(matcnt=matcnt, matdiff=matdiff,
                               matchange=matchange))
+        row.names(tmp) <- c("matcnt", "matdiff", "matchangeFrom0To0",
+                            "matchangeFrom0To1",
+                            "matchangeFrom1To0", "matchangeFrom1To1")
     }
     distance <- attr(depvar, "distance" )
-    startRate<- nsenders * (0.2 + 2 * distance)/(tmp['matcnt',]+1)
+    startRate <- nsenders * (0.2 + 2 * distance)/(tmp['matcnt',] + 1)
     startRate <- pmax(0.1, startRate)
     startRate <- pmin(100, startRate)
     ##degree
     matchange<- as.matrix(tmp[grep("matchange", rownames(tmp)),,drop=FALSE])
-    if (attr(depvar,'symmetric'))
-    {
-        matchange <- matchange %/% 2
-       ## matcnt <- matcnt %/% 2
-    }
-    p01 <- ifelse (matchange[1,] + matchange[2,] >=1,
-                   matchange[2,]/(matchange[1,]+matchange[2,]),0.5)
-    p10 <- ifelse (matchange[3,] + matchange[4,] >=1,
-                   matchange[3,]/(matchange[3,]+matchange[4,]),0.5)
+    p01 <- ifelse (matchange["matchangeFrom0To0", ] +
+                   matchange["matchangeFrom0To1", ] >=1,
+                   matchange["matchangeFrom0To1", ] /
+                   (matchange["matchangeFrom0To0", ] +
+                    matchange["matchangeFrom0To1", ]), 0.5)
+    p10 <- ifelse (matchange["matchangeFrom1To0", ]
+                   + matchange["matchangeFrom1To1", ] >=1,
+                   matchange["matchangeFrom1To0", ] /
+                   (matchange["matchangeFrom1To0", ] +
+                    matchange["matchangeFrom1To1", ]), 0.5)
     p01 <- pmax(0.02,p01)
     p10 <- pmax(0.02,p10)
     p01 <- pmin(0.98,p01)
     p10 <- pmin(0.98,p10)
     alpha <- 0.5 * log(p01/p10)
-    ##  if (observations == 2) ##more observations may come later!
-    ##       alphaf1 <- alpha
-    ##  else
-    ## {
-    p00 <- ifelse (matchange[1,] + matchange[2,] >=1,
-                   matchange[1,]/(matchange[1,]+matchange[2,]),0.0)
-    p11 <- ifelse (matchange[3,] + matchange[4,] >=1,
-                   matchange[4,]/(matchange[3,]+matchange[4,]),0.0)
+    p00 <- ifelse (matchange["matchangeFrom0To0", ] +
+                   matchange["matchangeFrom0To1", ] >=1,
+                   matchange["matchangeFrom0To0", ] /
+                   (matchange["matchangeFrom0To0", ] +
+                    matchange["matchangeFrom0To1", ]), 0.0)
+    p11 <- ifelse (matchange["matchangeFrom1To0", ]
+                   + matchange["matchangeFrom1To1", ] >=1,
+                   matchange["matchangeFrom1To1", ] /
+                   (matchange["matchangeFrom1To0", ] +
+                    matchange["matchangeFrom1To1", ]), 0.0)
     p00 <- pmax(0.02,p00)
     p11 <- pmax(0.02,p11)
     p00 <- pmin(0.98,p00)
     p11 <- pmin(0.98,p11)
-    prec <- ifelse(matchange[2,] * matchange[3,] >=1,
-                   4 /((p00/matchange[2,]) +
-                       (p11/matchange[3,])),1e-6)
+    prec <- ifelse(matchange["matchangeFrom0To1", ] *
+                   matchange["matchangeFrom1To0", ] >= 1,
+                   4 / ((p00 / matchange["matchangeFrom0To1", ]) +
+                       (p11 / matchange["matchangeFrom1To0", ])), 1e-6)
     alphaf1 <- sum(alpha*prec/sum(prec))
     ## }
     untrimmed <- alphaf1

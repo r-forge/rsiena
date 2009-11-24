@@ -68,7 +68,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             z$posj[effects$basicRate] <- TRUE
             z$BasicRateFunction <- z$posj
             effects <- fixUpEffectNames(effects)
-           if (inherits(data, 'sienaGroup'))
+            if (inherits(data, 'sienaGroup'))
             {
                 nGroup <- length(data)
             }
@@ -76,6 +76,14 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             {
                 nGroup <- 1
                 data <- sienaGroupCreate(list(data), singleOK=TRUE)
+            }
+            if (is.na(x$cconditional))
+            {
+                x$cconditional <- length(depvarnames) == 1
+                if (x$cconditional)
+                {
+                    x$condvarno <- 1
+                }
             }
             z$cconditional <- FALSE
             if (x$cconditional)
@@ -186,7 +194,10 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             f$randomseed2 <- NULL
             f$seeds <- NULL
             f$returnDeps <- NULL
-        }
+            f$depNames <- NULL
+            f$groupNames <- NULL
+       }
+        ##browser()
         pData <- .Call('setupData', PACKAGE="RSiena",
                        lapply(f, function(x)(as.integer(x$observations))),
                        lapply(f, function(x)(x$nodeSets)))
@@ -227,12 +238,12 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ## remove interaction effects and save till later
         basicEffects <- lapply(myeffects, function(x)
                         {
-                            x[!x$shortName %in% c("inspInt", "behUnspInt"), ]
+                            x[!x$shortName %in% c("unspInt", "behUnspInt"), ]
                         }
                             )
         interactionEffects <- lapply(myeffects, function(x)
                         {
-                            x[x$shortName %in% c("inspInt", "behUnspInt"), ]
+                            x[x$shortName %in% c("unspInt", "behUnspInt"), ]
                         }
                             )
         ans <- .Call('effects', PACKAGE="RSiena",
@@ -245,12 +256,18 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         {
             effectPtr <- ans[[2]][[i]]
             basicEffects[[i]]$effectPtr <- effectPtr
-            interactionEffects[[i]]$effectPtr <-
+            interactionEffects[[i]]$effect1 <-
                 basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect1,
+                                                  basicEffects[[i]]$effectNumber)]
+            interactionEffects[[i]]$effect2 <-
+                basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect2,
+                                                  basicEffects[[i]]$effectNumber)]
+            interactionEffects[[i]]$effect3 <-
+                basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
                                                   basicEffects[[i]]$effectNumber)]
         }
         ans <- .Call('interactionEffects', PACKAGE="RSiena",
-                    pData, pModel, interactionEffects)
+                     pData, pModel, interactionEffects)
         ## copy these pointer to the interaction effects and then rejoin
         for (i in 1:length(ans[[1]])) ## ans is a list of lists of
             ## pointers to effects. Each list corresponds to one
@@ -307,13 +324,15 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         }
         f$observations <- attr(f, "observations") + 1
         f$returnDeps <- returnDeps
+        f$depNames <- names(f[[1]]$depvars)
+        f$groupNames <- names(f)[1:nGroup]
         if (!initC)
         {
             z$f <- f
         }
         if (initC || z$int == 1)
         {
-            f[[1]] <- NULL
+            f[1:nGroup] <- NULL
         }
         FRANstore(f) ## store f in FRANstore
         if (initC)
@@ -354,7 +373,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     f <- FRANstore()
    # browser()
    # cat(f$randomseed2, f$storedseed, '\n')
-    if (fromFiniteDiff)
+    if (fromFiniteDiff || z$Phase == 2)
     {
         returnDeps <- FALSE
     }
@@ -409,19 +428,18 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     fra <- t(ans[[1]])
     f$randomseed2 <- ans[[5]]#[c(1,4,3,2)]
     FRANstore(f)
-    if (f$returnDeps)
+    if (returnDeps)
         sims <- ans[[6]]
     else
         sims <- NULL
-    if (f$returnDeps)
+    if (returnDeps)
     {
         ## attach the names
-        names(sims) <- names(f)[1:length(sims)]
-        depnames <- names(f[[1]]$depvars) ## will be same for each set
+        names(sims) <- f$groupNames
         periodNo <- 1
         for (i in 1:length(sims))
         {
-            names(sims[[i]]) <- depnames
+            names(sims[[i]]) <- f$depNames
             for (j in 1:length(sims[[i]]))
             {
                 periodNos <- periodNo:(periodNo  + length(sims[[i]][[j]]) - 1)
@@ -471,13 +489,13 @@ createEdgeLists<- function(mat, matorig)
      },y = matorig)
     mat2 <- do.call(rbind, tmp)
     ## remove the diagonal
-    mat2 <- mat2[mat2[, 1] != mat2[, 2], ]
+    mat2 <- mat2[mat2[, 1] != mat2[, 2], , drop=FALSE]
     ## mat3 structurals
     struct <- mat1[,3] %in% c(10, 11)
     mat1[struct, 3] <- mat1[struct,3] - 10
     mat3 <- mat1[struct, , drop=FALSE]
     mat3[, 3] <- 1
-    mat1 <- mat1[!mat1[,3] == 0, ] ##remove any zeros just created
+    mat1 <- mat1[!mat1[,3] == 0, , drop=FALSE] ##remove any zeros just created
     ##fix up storage mode to be integer
     storage.mode(mat1) <- 'integer'
     storage.mode(mat2) <- 'integer'
@@ -1241,7 +1259,7 @@ fixUpEffectNames <- function(effects)
                             !is.na(effects$effect1), ]
     if (nrow(interactions) > 0)
     {
-        sapply(1:nrow(interactions), function(x, y, z)
+        unspIntNames <- sapply(1:nrow(interactions), function(x, y, z)
            {
                y <- y[x, ] ## get the interaction effect
                twoway <- is.na(y$effect3)
@@ -1287,8 +1305,10 @@ fixUpEffectNames <- function(effects)
                }
                ## check types
                inters <- rbind(inter1, inter2, inter3)
-               egoCount <- sum(inters$types == "ego", na.rm=TRUE)
-               dyadCount <- sum(inters$types == "dyad", na.rm=TRUE)
+               egos <- which(inters$interactionType == "ego")
+               egoCount <- length(egos)
+               dyads <- which(inters$interactionType == "dyad")
+               dyadCount <- length(dyads)
                if (twoway)
                {
                    if (egoCount < 1 && dyadCount != 2)
@@ -1305,7 +1325,23 @@ fixUpEffectNames <- function(effects)
                             "must be at least two ego or all dyadic effects")
                    }
                }
+               ## construct a name
+               ### make sure the egos are at the front of inters
+               inters <- rbind(inters[egos, ], inters[-egos, ])
+               tmpname <- paste(inters$effectName, collapse = " x ")
+               if (twoway && nchar(tmpname) < 38)
+               {
+                   tmpname <- paste("int. ", tmpname)
+               }
+               if (!twoway)
+               {
+                   tmpname <- paste("i3.", tmpname)
+               }
+               tmpname
            }, y=interactions, z=effects)
-     }
+        effects[effects$shortName == "unspInt" &
+                !is.na(effects$effect1), c("effectName", "functionName")] <-
+                    unspIntNames
+    }
     effects
 }

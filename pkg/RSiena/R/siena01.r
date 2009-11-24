@@ -175,12 +175,21 @@ siena01Gui <- function(getDocumentation=FALSE)
     ##@deleteTableRow internal siena01Gui
     deleteTableRow <- function(i)
     {
+        ## unmap the format window from the table
         mypos <- paste(i,',4', sep='')
         tkwindow.configure(table1, mypos, window="")
+        ## delete the window
         tcl(table1, 'window', 'delete', mypos)
+        ## remove the tcl variable behind it
+        formatspins <<- formatspins[-i]
+        ## unmap the type window from the table
         mypos <- paste(i,',7', sep='')
         tkwindow.configure(table1, mypos, window="")
+        ## delete the window
         tcl(table1, 'window', 'delete', mypos)
+        ## remove the tcl variable behind it
+        typespins <<- typespins[-i]
+        ## delete the row from the table
         tkdelete(table1, 'rows', i, '1')
         tableRows <<- tableRows - 1
         ##  sessionFromTcl()
@@ -495,6 +504,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         {
             ## split effects if a variable is selected
             theseEffects <- tclvalue(effectsVar)
+            myeffcopy <- myeff
             if (theseEffects != "")
             {
                 myeffcopy <- myeff[myeff$name == theseEffects, ]
@@ -651,7 +661,8 @@ siena01Gui <- function(getDocumentation=FALSE)
             }
             edit(effEdit, edit.row.names=FALSE)
             ##  tkfocus(tt)
-            ## make sure this window is top with a global grab, bu only for a second
+            ## make sure this window is top with a global grab,
+            ## but only for a second
             tcl('wm', 'attributes', tt, '-topmost', 1)
             Sys.sleep(0.1)
             tcl('wm', 'attributes', tt, '-topmost', 0)
@@ -765,7 +776,14 @@ siena01Gui <- function(getDocumentation=FALSE)
         estimlist <- c('0. unconditional Method of Moments',
                        '1. conditional Method of Moments')
         estimVar <<- tclVar()
-        tclvalue(estimVar) <<- '0. Unconditional Method of Moments'
+        if (ndepvars == 1)
+        {
+            tclvalue(estimVar) <<- '1. conditional Method of Moments'
+        }
+        else
+        {
+            tclvalue(estimVar) <<- '0. unconditional Method of Moments'
+        }
         estim <- ttkcombobox(optf, values=estimlist, state="readonly",
                              textvariable=estimVar, width=30)
         estimlab <- tklabel(optf, text='Estim. method')
