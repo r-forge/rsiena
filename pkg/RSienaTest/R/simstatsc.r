@@ -196,6 +196,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             f$returnDeps <- NULL
             f$depNames <- NULL
             f$groupNames <- NULL
+            f$nGroup <- NULL
        }
         ##browser()
         pData <- .Call('setupData', PACKAGE="RSienaTest",
@@ -234,6 +235,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         {
             myeffects <- ff$myeffects
             returnDeps <- ff$returnDeps
+            nGroup <- ff$nGroup
         }
         ## remove interaction effects and save till later
         basicEffects <- lapply(myeffects, function(x)
@@ -326,6 +328,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         f$returnDeps <- returnDeps
         f$depNames <- names(f[[1]]$depvars)
         f$groupNames <- names(f)[1:nGroup]
+        f$nGroup <- nGroup
         if (!initC)
         {
             z$f <- f
