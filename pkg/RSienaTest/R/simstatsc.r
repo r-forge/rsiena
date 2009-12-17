@@ -1310,7 +1310,7 @@ fixUpEffectNames <- function(effects)
                inters <- rbind(inter1, inter2, inter3)
                egos <- which(inters$interactionType == "ego")
                egoCount <- length(egos)
-               dyads <- which(inters$interactionType == "dyad")
+               dyads <- which(inters$interactionType == "dyadic")
                dyadCount <- length(dyads)
                if (twoway)
                {
