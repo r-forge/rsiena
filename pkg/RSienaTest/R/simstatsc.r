@@ -1300,7 +1300,7 @@ fixUpEffectNames <- function(effects)
                else
                {
                    if (inter1$name != inter2$name ||
-                       inter1$name != inter1$name3)
+                       inter1$name != inter3$name)
                    {
                        stop("invalid interaction specification:",
                             "must all be same network")
