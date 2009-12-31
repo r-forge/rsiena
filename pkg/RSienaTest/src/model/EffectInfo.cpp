@@ -146,6 +146,16 @@ string EffectInfo::interactionName1() const
 
 
 /**
+ * Returns the name of the other variable or covariate this effect interacts with,
+ * if the effect has two such interactions.
+ */
+string EffectInfo::interactionName2() const
+{
+	return this->linteractionName2;
+}
+
+
+/**
  * Returns the type of rate effect of this effect. Blank if not a rate effect,
  * values "structural" or "covariate".
  */

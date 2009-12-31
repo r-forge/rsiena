@@ -49,6 +49,7 @@ public:
 	double parameter() const;
 	double internalEffectParameter() const;
 	string interactionName1() const;
+	string interactionName2() const;
 	string rateType() const;
 	const EffectInfo * pEffectInfo1() const;
 	const EffectInfo * pEffectInfo2() const;
