@@ -58,14 +58,14 @@ PrintReport <- function(z, x)
                        tmp <- paste(' 0.', nnstr, ' Rate parameter period ',
                                     1:nn, '              ',
                                     format(round(z$rate,4),width=9),
-                                    '  (',format(round(z$vrate,4),width=9),
+                                    '  (',format(round(sqrt(z$vrate),4),width=9),
                                     ')\n', sep = '')
                    }                   else{
                        tmp <- paste(' 0.', nnstr,
                                     'Rate parameter cond. variable period ',
                                     1:nn, '              ',
                                     format(round(z$rate,4),width=9),
-                                    '  (',format(round(z$vrate,4),width=9),
+                                    '  (',format(round(sqrt(z$vrate),4),width=9),
                                     ')\n',   sep='')
                    }
                    Report(tmp, outf, sep='')

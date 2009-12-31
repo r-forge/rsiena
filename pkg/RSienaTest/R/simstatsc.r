@@ -3,7 +3,7 @@
 # *
 # * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 # *
-# * File: siena01.r
+# * File: simstatsc.r
 # *
 # * Description: This module contains the code for simulating the process,
 # * communicating with C++.

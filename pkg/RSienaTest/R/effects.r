@@ -686,12 +686,12 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
                 }
             }
         }
-        if (!is.null(covObjEffects))
-        {
-            usestr <- paste("effFrom", type, sep="")
-            covObjEffects$shortName <-
-                sub("effFrom", usestr, covObjEffects$shortName)
-        }
+     #   if (!is.null(covObjEffects))
+     #   {
+     #       usestr <- paste("effFrom", type, sep="")
+     #       covObjEffects$shortName <-
+     #           sub("effFrom", usestr, covObjEffects$shortName)
+     #   }
 
         list(objEff=covObjEffects, rateEff=covRateEffects)
     }
