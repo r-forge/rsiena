@@ -3,7 +3,7 @@
 # *
 # * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 # *
-# * File: siena01.r
+# * File: simstatsc.r
 # *
 # * Description: This module contains the code for simulating the process,
 # * communicating with C++.
@@ -1300,7 +1300,7 @@ fixUpEffectNames <- function(effects)
                else
                {
                    if (inter1$name != inter2$name ||
-                       inter1$name != inter1$name3)
+                       inter1$name != inter3$name)
                    {
                        stop("invalid interaction specification:",
                             "must all be same network")
@@ -1310,7 +1310,7 @@ fixUpEffectNames <- function(effects)
                inters <- rbind(inter1, inter2, inter3)
                egos <- which(inters$interactionType == "ego")
                egoCount <- length(egos)
-               dyads <- which(inters$interactionType == "dyad")
+               dyads <- which(inters$interactionType == "dyadic")
                dyadCount <- length(dyads)
                if (twoway)
                {
