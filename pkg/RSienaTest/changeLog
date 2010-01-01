@@ -1,4 +1,40 @@
-2009-11-20 R-forge revision new version 1.0.8
+2010-01-01 R-forge revision 33
+
+	* CHANGELOG: updated
+	
+2009-31-12 R-forge revision 31
+
+	* R/simstatsc.r: name in header
+
+	* R/effects.r: made covariate from effects all use the same short
+	name.
+
+	* R/print07report.r: standard errors for rate estimate for
+	conditional estimation needed square roots.
+	 
+	* src/*.cpp, src/*.h: many changes, additions and deletions for
+	(new) behavior 	effects.
+	
+2009-12-17 R-forge revision 30
+
+	* R/simstatsc.r: fixed typo in dyadic interactions
+	
+2009-12-17 R-forge revision 29
+
+	* R/simstatsc.r: fixed typo in 3-way interations
+	
+2009-12-14 R-forge revision 27
+
+	* R/simstatsc.r: fixed problem with multiple processors.
+	
+2009-12-01 R-forge revision 26 added RSienaTest version 1.0.9
+
+	* Added many files for user-specified interactions.
+
+	* DESCRIPTION, NAMESPACE, R/simstatsc.r, tests/parallel.r,
+	src/Makefile.win: changes necessary for the new package
+	
+2009-11-20 R-forge revision 25 new version 1.0.8
 
 	* R/simstatsc.r, R/siena01.r:  default method for estimation is
 	conditional if there is only one dependent variable.
