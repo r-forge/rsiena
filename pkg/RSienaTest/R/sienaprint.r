@@ -240,7 +240,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
     {
         addtorow$command[addsub] <-
             "Network Dynamics"
-        addtorow$pos[[addsub]] <- nrates
+        addtorow$pos[[addsub]] <- nrates + 2
         addsub <- addsub + 1
     }
 
@@ -280,7 +280,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
         nOneModeEff <- nrow(x$effects) - nrow(behEffects)
         addtorow$command[addsub] <-
             'Behavior Dynamics'
-        addtorow$pos[[addsub]] <- nrates + nOneModeEff
+        addtorow$pos[[addsub]] <- nrates + 2 + nOneModeEff
         addsub <- addsub + 1
     }
     return(list(mydf=mydf, addtorow=addtorow))

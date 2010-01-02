@@ -1,21 +1,26 @@
+2010-01-02 R-forge revision 34
+
+	* R/sienaprint.r: corrected layout of sienaFitThetaTable for
+	models with both behavior and network variables
+
 2010-01-01 R-forge revision 33
 
-	* inst/doc: updated changes in manual 
+	* inst/doc: updated changes in manual
 	* CHANGELOG: updated
-	
+
 2010-01-01 R-forge revision 32 (copy of relevant changes from revisions 29-31 to
 	RSienaTest)
 
 	* R/simstatsc.r: bug fixes to interactions (not yet functional)
 	and name in header block
-	
+
 	* R/print07report.r: took square root of standard errors of rate
 	estimates for conditional estimation.
-	
-2009-12-14 R-forge revision 28 
+
+2009-12-14 R-forge revision 28
 
 	* R/simstatsc.r: fixed problem with multiple processors.
-	
+
 2009-11-20 R-forge revision 25 new version 1.0.8
 
 	* R/simstatsc.r, R/siena01.r:  default method for estimation is
