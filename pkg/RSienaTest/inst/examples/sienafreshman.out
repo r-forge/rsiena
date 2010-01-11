@@ -1,0 +1,97 @@
+                            ************************
+                                   sienafreshman.out
+                            ************************
+
+Filename is sienafreshman.out.
+
+This file contains primary output for SIENA project <<sienafreshman>>.
+
+Date and time: 20/11/2009 02:13:38 
+
+SIENA version 1.0.7 (05 11 2009)
+
+@1
+Data input.
+===========
+
+2 observations,
+19 actors,
+1 dependent network variables,
+0 dependent bipartite variables,
+0 dependent behavior variables,
+0 constant actor covariates,
+0 exogenous changing actor covariates,
+0 constant dyadic covariates,
+0 exogenous changing dyadic covariates,
+no files with times of composition change.
+
+@2
+Reading network variables.
+--------------------------
+
+Name of network variable: friendship.
+oneMode network.
+Observation moment 1 was read from file tmp3a.dat. 
+For observation moment 1, degree distributions are as follows:
+Nodes
+ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
+out-degrees
+ 2  1  1  3  4  7  2 13  4  5  4  0  7  4  1  2  2  4  1
+in-degrees
+ 3  1  4  3  5  7  1  2  3  5  5  3  4  4  4  2  2  5  4
+
+No missing data for observation 1.
+
+Observation moment 2 was read from file tmp4a.dat. 
+For observation moment 2, degree distributions are as follows:
+Nodes
+ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
+out-degrees
+ 3  2  0  2  5 10  1 10  4  5  3  2  7  6  3  3  4  5  3
+in-degrees
+ 3  1  5  5  5  8  3  4  3  4  7  6  4  3  6  2  2  4  3
+
+No missing data for observation 2.
+
+
+
+
+
+The mean structural dissimilarity value subtracted in the
+balance calculations is         0.3189.
+
+
+@1
+Initial data description.
+=========================
+
+@2
+Change in networks:
+-------------------
+
+For the following statistics, missing values (if any) are not counted.
+
+Network density indicators:
+observation time              1      2
+density                    0.196  0.228
+average degree             3.526  4.105
+number of ties                67     78
+missing fraction           0.000  0.000
+
+
+Tie changes between subsequent observations:
+ periods        0 =>  0   0 =>  1   1 =>  0   1 =>  1   Distance Jaccard   Missing
+  1 ==>  2       254        21        10        57        31     0.648     0 (0%)
+
+Dyad Counts:
+ observation    total    mutual    asymm.     null
+     1.           171       22        23       126
+     2.           171       26        26       119
+
+Standard values for initial parameter values
+-------------------------------------------------
+
+basic rate parameter friendship         3.4455 
+outdegree (density)                               -0.3351 
+
+Initialisation of project <<sienafreshman>> executed succesfully.
