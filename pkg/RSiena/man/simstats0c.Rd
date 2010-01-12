@@ -58,12 +58,12 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
 \seealso{\code{\link{siena07}} }
 \examples{
 
-mynet1 <- sienaNet(array(c(tmp3,tmp4),dim=c(32,32,2)))
+mynet1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff<- getEffects(mydata)
 myeff[myeff$effectName=='transitive triplets'&
             myeff$type=='eval','include']<- TRUE
-mymodel<- sienaModelCreate(findiff=TRUE, fn = simstats0c)
+mymodel<- sienaModelCreate(fn = simstats0c, nsub=2, n3=100)
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE)
 }
 \keyword{models}

@@ -1,3 +1,9 @@
+2010-01-12 R-forge revision 35
+
+	* man/RSiena-package.Rd, man/siena07.Rd, man/sienaFit.Rd,
+	man/simstats0c.Rd: reduce time for examples
+	* tests/parallel.R, tests/patallel.Rout.save: reduce tests
+
 2010-01-02 R-forge revision 34
 
 	* R/sienaprint.r: corrected layout of sienaFitThetaTable for
