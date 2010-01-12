@@ -1,4 +1,4 @@
-2010-01-01 R-forge revision 34
+2010-01-02 R-forge revision 34
 
 	* R/sienaprint.r:  corrected layout of sienaFitThetaTable for
 	models with both behavior and network variables,
@@ -19,6 +19,9 @@
 
 	* src/*.cpp, src/*.h: many changes, additions and deletions for
 	(new) behavior 	effects.
+
+	* data/allEffects.csv: turned off endowment effects where not
+	implemented.
 
 2009-12-17 R-forge revision 30
 
