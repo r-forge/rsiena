@@ -1,4 +1,4 @@
-2010-01-12 R-forge revision 35
+2010-01-12 R-forge revision 38
 
 	* man/RSiena-package.Rd, man/siena07.Rd, man/sienaFit.Rd,
 	man/simstats0c.Rd: reduce time for examples
