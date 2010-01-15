@@ -15,9 +15,9 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> library(RSienaTest)
+> library(RSiena)
 Loading required package: xtable
-> print(packageDescription("RSienaTest",fields="Repository/R-Forge/Revision"))
+> print(packageDescription("RSiena",fields="Repository/R-Forge/Revision"))
 [1] NA
 > 
 > ##test3
@@ -28,7 +28,7 @@ Loading required package: xtable
 +                        cond=FALSE, nsub=2, n3=100)
 > print('test3')
 [1] "test3"
-> system.time(ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE))#,dll='../siena/src/RSiena.dll')
+> ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 
 Stochastic approximation algorithm.
 Initial value for gain parameter = 0.2.
@@ -58,7 +58,7 @@ Phase 1 Iteration 13 Progress: 5%
 Phase 1 Iteration 14 Progress: 6%
 Phase 1 Iteration 15 Progress: 6%
 Phase 1 Iteration 16 Progress: 7%
-Time per iteration in phase 1  = 0.0200 
+Time per iteration in phase 1  = 0.01933 
 Average deviations NR generated statistics and targets
 after phase 1:
       32.437500
@@ -117,7 +117,7 @@ Autocorrelations:
 0.1117977
 0.1982289
 
-Time per iteration in phase 2.1 = 0.004089
+Time per iteration in phase 2.1 = 0.004533
 theta  3.10 -1.09  1.67 
 ac 0.121 0.112 0.198 
 Phase 2.1 ended after 225 iterations.
@@ -137,7 +137,7 @@ Phase 2 Subphase 2 Iteration 7 Progress: 31%
 Phase 2 Subphase 2 Iteration 8 Progress: 31%
 Phase 2 Subphase 2 Iteration 9 Progress: 31%
 Phase 2 Subphase 2 Iteration 10 Progress: 31%
-Time per iteration in phase 2.2 = 0.004030
+Time per iteration in phase 2.2 = 0.003802
 theta  3.03 -1.13  1.79 
 ac  0.0471 -0.0488  0.0117 
 Phase 2.2 ended after 263 iterations.
@@ -147,7 +147,7 @@ Current parameter values:
 
 Start phase 3 
 Simulated values, phase 3.
-Time per iteration in phase 3   =  0.0152 
+Time per iteration in phase 3   =  0.0147 
 dfrac :
 12.246820 11.600000  5.800000
  3.555528 44.000000 10.800000
@@ -193,15 +193,13 @@ Covariance matrix of X (correlations below the diagonal):
      0.229      0.574     31.507
 
 
-   user  system elapsed 
-   3.96    0.02    4.00 
 > ##test4
 > mymodel$projname <- 'test4'
 > mymodel$cconditional <- TRUE
 > mymodel$condvarno<- 1
 > print('test4')
 [1] "test4"
-> system.time(ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE))#,dll='../siena/src/RSiena.dll')
+> ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 
 Stochastic approximation algorithm.
 Initial value for gain parameter = 0.2.
@@ -228,7 +226,7 @@ Phase 1 Iteration 10 Progress: 4%
 Phase 1 Iteration 11 Progress: 4%
 Phase 1 Iteration 12 Progress: 4%
 Phase 1 Iteration 13 Progress: 5%
-Time per iteration in phase 1  = 0.01167 
+Time per iteration in phase 1  = 0.01083 
 Average deviations NR generated statistics and targets
 after phase 1:
        2.461538
@@ -312,7 +310,7 @@ Current parameter values:
 
 Start phase 3 
 Simulated values, phase 3.
-Time per iteration in phase 3   =  0.0114 
+Time per iteration in phase 3   =  0.0109 
 dfrac :
 41.0 14.0
 22.2 22.8
@@ -339,7 +337,7 @@ Total of 390 iteration steps.
 Estimates and standard errors
                              
 Rate parameters:
- 0. Rate parameter                            3.0428  (   0.7235)
+ 0. Rate parameter                            3.0428  (   0.5235)
  1. eval:  outdegree (density)                          -1.0952  (   0.1923)
  2. eval:  reciprocity                                   1.7007  (   0.3089)
 
@@ -353,8 +351,6 @@ Covariance matrix of X (correlations below the diagonal):
      0.571     32.750
 
 
-   user  system elapsed 
-   2.53    0.00    2.55 
 > ##test7
 > mynet1 <- sienaNet(array(c(tmp3,tmp4),dim=c(32,32,2)))
 > mydata <- sienaDataCreate(mynet1)
@@ -363,7 +359,7 @@ Covariance matrix of X (correlations below the diagonal):
 +                        cond=FALSE)
 > print('test7')
 [1] "test7"
-> system.time(ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE))#,dll='../siena/src/RSiena.dll')
+> ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 
 Stochastic approximation algorithm.
 Initial value for gain parameter = 0.2.
@@ -384,7 +380,7 @@ Phase 1 Iteration 4 Progress: 1%
 Phase 1 Iteration 5 Progress: 1%
 Phase 1 Iteration 10 Progress: 2%
 Phase 1 Iteration 15 Progress: 2%
-Time per iteration in phase 1  = 0.005333 
+Time per iteration in phase 1  = 0.006667 
 Average deviations NR generated statistics and targets
 after phase 1:
       32.437500
@@ -443,7 +439,7 @@ Autocorrelations:
  0.03195180
 -0.00410509
 
-Time per iteration in phase 2.1 = 0.004044
+Time per iteration in phase 2.1 = 0.003867
 theta  3.12 -1.11  1.73 
 ac  0.14682  0.03195 -0.00411 
 Phase 2.1 ended after 225 iterations.
@@ -463,7 +459,7 @@ Phase 2 Subphase 2 Iteration 7 Progress: 45%
 Phase 2 Subphase 2 Iteration 8 Progress: 46%
 Phase 2 Subphase 2 Iteration 9 Progress: 46%
 Phase 2 Subphase 2 Iteration 10 Progress: 46%
-Time per iteration in phase 2.2 = 0.003968
+Time per iteration in phase 2.2 = 0.003651
 theta  3.11 -1.13  1.75 
 ac -0.112 -0.219 -0.157 
 Phase 2.2 ended after 63 iterations.
@@ -473,7 +469,7 @@ Current parameter values:
 
 Start phase 3 
 Simulated values, phase 3.
-Time per iteration in phase 3   =  0.0043 
+Time per iteration in phase 3   =  0.0041 
 dfrac :
 18.4056484  3.7142613 -0.3794248
  2.1526407 49.1035790 18.8351756
@@ -519,15 +515,13 @@ Covariance matrix of X (correlations below the diagonal):
      0.101      0.660     35.489
 
 
-   user  system elapsed 
-   1.81    0.01    1.83 
 > ##test8
 > mymodel$projname <- 'test8'
 > mymodel$cconditional <- TRUE
 > mymodel$condvarno<- 1
 > print('test8')
 [1] "test8"
-> system.time(ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE))#,dll='../siena/src/RSiena.dll')
+> ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 
 Stochastic approximation algorithm.
 Initial value for gain parameter = 0.2.
@@ -596,7 +590,7 @@ Phase 2 Subphase 1 Iteration 9 Progress: 8%
 Phase 2 Subphase 1 Iteration 10 Progress: 8%
 theta -0.922  1.368 
 ac 0.109 0.535 
-Time per iteration in phase 2.1 = 0.004043
+Time per iteration in phase 2.1 = 0.00383
 theta -1.11  1.66 
 ac -0.0414  0.0000 
 Phase 2.1 ended after 94 iterations.
@@ -625,7 +619,7 @@ Current parameter values:
 
 Start phase 3 
 Simulated values, phase 3.
-Time per iteration in phase 3   =  0.0040 
+Time per iteration in phase 3   =  0.0039 
 dfrac :
 33.189028  8.787036
 15.949957 19.294151
@@ -652,7 +646,7 @@ Total of 269 iteration steps.
 Estimates and standard errors
                              
 Rate parameters:
- 0. Rate parameter                            3.1368  (   0.6976)
+ 0. Rate parameter                            3.1368  (   0.4867)
  1. eval:  outdegree (density)                          -1.1224  (   0.2040)
  2. eval:  reciprocity                                   1.7395  (   0.2947)
 
@@ -666,21 +660,20 @@ Covariance matrix of X (correlations below the diagonal):
      0.586     30.010
 
 
-   user  system elapsed 
-   1.24    0.00    1.25 
+> ##test9
 > 
 > mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 > mynet2 <- sienaNet(s50a,type='behavior')
 > mydata <- sienaDataCreate(mynet1, mynet2)
 > myeff <- getEffects(mydata)
-> myeff$initialValue[94] <- 0.34699930338 ## siena3 starting values differ
+> myeff$initialValue[96] <- 0.34699930338 ## siena3 starting values differ
 > ##test10
 > print('test10')
 [1] "test10"
 > mymodel$projname <- 'test10'
 > mymodel$cconditional <- TRUE
 > mymodel$condvarno<- 1
-> system.time(ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE))
+> ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE, parallelTesting=TRUE, verbose=TRUE)
 
 Stochastic approximation algorithm.
 Initial value for gain parameter = 0.2.
@@ -704,7 +697,7 @@ Phase 1 Iteration 10 Progress: 1%
 Phase 1 Iteration 15 Progress: 2%
 Phase 1 Iteration 20 Progress: 3%
 Phase 1 Iteration 25 Progress: 3%
-Time per iteration in phase 1  = 0.01083 
+Time per iteration in phase 1  = 0.01125 
 Average deviations NR generated statistics and targets
 after phase 1:
       11.760000
@@ -769,7 +762,7 @@ Phase 2 Subphase 1 Iteration 9 Progress: 23%
 Phase 2 Subphase 1 Iteration 10 Progress: 24%
 theta -1.964  1.965  0.230  0.412  0.665 -0.217 
 ac  1.298  0.971  0.332  0.228 -0.775  0.825 
-Time per iteration in phase 2.1 = 0.01440
+Time per iteration in phase 2.1 = 0.01434
 theta -2.312  2.722  0.202  0.350  0.407 -0.212 
 ac -0.0102 -0.0819 -0.1969 -0.1784 -0.3442 -0.3264 
 Phase 2.1 ended after 166 iterations.
@@ -788,7 +781,7 @@ Phase 2 Subphase 2 Iteration 7 Progress: 53%
 Phase 2 Subphase 2 Iteration 8 Progress: 53%
 Phase 2 Subphase 2 Iteration 9 Progress: 53%
 Phase 2 Subphase 2 Iteration 10 Progress: 53%
-Time per iteration in phase 2.2 = 0.01475
+Time per iteration in phase 2.2 = 0.01488
 theta -2.355  2.815  0.200  0.367  0.356 -0.200 
 ac -0.1972 -0.3500 -0.0972 -0.3752 -0.3719 -0.1077 
 Phase 2.2 ended after 80 iterations.
@@ -799,7 +792,7 @@ Current parameter values:
 Start phase 3 
 Simulated values, phase 3.
 Phase 3 Iteration 100 Progress 100%
-Time per iteration in phase 3   =  0.0169 
+Time per iteration in phase 3   =  0.0157 
 dfrac :
 198.7730468  87.7900813 -28.0652717  -6.5802604  11.4180195  12.2382586
 145.6055398 103.8763360  -0.4775313  -6.5941940  13.6390143   8.8744044
@@ -842,8 +835,8 @@ Total of 371 iteration steps.
 Estimates and standard errors
                              
 Rate parameters:
- 0.1  Rate parameter period 1                 5.7677  (   0.9338)
- 0.2  Rate parameter period 2                 4.5201  (   0.7804)
+ 0.1  Rate parameter period 1                 5.7677  (   0.8719)
+ 0.2  Rate parameter period 2                 4.5201  (   0.6091)
 
 Other parameters:
  1. eval:  outdegree (density)                          -2.3554  (   0.1091)
@@ -871,21 +864,15 @@ Covariance matrix of X (correlations below the diagonal):
     -0.006      0.035     -0.145     -0.062      0.155    257.690
 
 
-   user  system elapsed 
-   5.95    0.00    5.97 
 > ##test11
 > print('test11')
 [1] "test11"
-> system.time(data501 <- sienaDataCreateFromSession("s50.csv", modelName="s50"))
-   user  system elapsed 
-   0.54    0.00    0.56 
-> system.time(data501e <- sienaDataCreateFromSession("s50e.csv", modelName="s50e"))
+> data501 <- sienaDataCreateFromSession("s50.csv", modelName="s50")
+> data501e <- sienaDataCreateFromSession("s50e.csv", modelName="s50e")
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
-   user  system elapsed 
-   0.81    0.02    0.83 
-> system.time(data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj"))
+> data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj")
 Loading required package: network
 Classes for Relational Data
 Version 1.4-1 created on July 26, 2008.
@@ -898,12 +885,10 @@ Type help("network-package") to get started.
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
-   user  system elapsed 
-   0.72    0.00    0.73 
 > 
 > model501e <- model.create( projname="s50e", cond=FALSE, nsub=2, n3=100 )
-> system.time(ans501e <- siena07(model501e, data=data501e$mydata, effects=data501e$myeff,
-+                    parallelTesting=TRUE, batch=TRUE, verbose=TRUE))
+> ans501e <- siena07(model501e, data=data501e$mydata, effects=data501e$myeff,
++                    parallelTesting=TRUE, batch=TRUE, verbose=TRUE)
 
 Stochastic approximation algorithm.
 Initial value for gain parameter = 0.2.
@@ -992,7 +977,7 @@ Autocorrelations:
 0.1923869
 0.2436313
 
-Time per iteration in phase 2.1 = 0.01326
+Time per iteration in phase 2.1 = 0.01282
 theta  5.55  4.35 -2.27  2.65 
 ac 0.0352 0.1297 0.1924 0.2436 
 Phase 2.1 ended after 227 iterations.
@@ -1015,7 +1000,7 @@ Phase 2 Subphase 2 Iteration 10 Progress: 48%
 Phase 2 Subphase 2 Iteration 200 Progress: 77%
 theta  5.54  4.51 -2.36  2.69 
 ac -0.1015  0.0533 -0.1115  0.0278 
-Time per iteration in phase 2.2 = 0.01366
+Time per iteration in phase 2.2 = 0.01299
 theta  5.77  4.53 -2.33  2.75 
 ac -0.0641  0.0195 -0.1176 -0.0246 
 Phase 2.2 ended after 268 iterations.
@@ -1026,7 +1011,7 @@ Current parameter values:
 Start phase 3 
 Simulated values, phase 3.
 Phase 3 Iteration 100 Progress 100%
-Time per iteration in phase 3   =  0.0142 
+Time per iteration in phase 3   =  0.0140 
 dfrac :
   8.1662885   0.0000000  38.2604466   5.4507366
   0.0000000   7.5602624  25.5047375   0.3465663
@@ -1079,7 +1064,5 @@ Covariance matrix of X (correlations below the diagonal):
      0.258      0.114      0.861    194.886
 
 
-   user  system elapsed 
-   8.64    0.05    8.71 
 > ## compare with outputs in parallelchecked/
 > 

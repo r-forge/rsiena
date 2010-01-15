@@ -1,8 +1,21 @@
+2010-01-15 R-forge revision 40
+
+	* R/print01report.r, R/sienaprint.r: remove extra sqrt roots in
+	standard error of rates for conditional estimation (see revision 32)
+	* src/Makefile.win, src/win32/Makefile: Changes to makefile for 64 bit
+	windows
+	* tests/parallel.R, tests/parallel.R.save: remove timers from
+	tests to reduce differences with output.
+
+2010-01-12 R-forge revision 39
+
+	* tests/parallel.r: fix bug: use library RSiena not RSienaTest
+
 2010-01-12 R-forge revision 38
 
 	* man/RSiena-package.Rd, man/siena07.Rd, man/sienaFit.Rd,
 	man/simstats0c.Rd: reduce time for examples
-	* tests/parallel.R, tests/patallel.Rout.save: reduce tests
+	* tests/parallel.R, tests/parallel.Rout.save: reduce tests
 
 2010-01-02 R-forge revision 34
 
