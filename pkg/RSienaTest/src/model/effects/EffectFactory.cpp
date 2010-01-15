@@ -282,6 +282,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new SimilarityEffect(pEffectInfo, false, true, false);
 	}
+	else if (effectName == "popAlt")
+	{
+		pEffect = new PopularityAlterEffect(pEffectInfo);
+	}
 	else if (effectName == "avSimRecPop")
 	{
 		pEffect = new ReciprocatedSimilarityEffect(pEffectInfo, true, true);

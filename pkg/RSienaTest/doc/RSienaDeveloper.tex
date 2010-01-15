@@ -1,0 +1,308 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[pdftex,dvipsnames]{color}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abso}[1]{\;\mid#1\mid\;}
+\renewcommand{\=}{\,=\,}
+\newcommand{\+}{\,+\,}
+% ----------------------------------------------------------------
+\newcommand{\remark}[1]{\par\noindent{\color[named]{ProcessBlue}#1}\par}
+\newcommand{\mcc}[2]{\multicolumn{#1}{c}{#2}}
+\newcommand{\mcp}[2]{\multicolumn{#1}{c|}{#2}}
+\newcommand{\nm}[1]{\textsf{\small #1}}
+\newcommand{\nnm}[1]{\textsf{\small\textit{#1}}}
+\newcommand{\nmm}[1]{\nnm{#1}}
+\newcommand{\sfn}[1]{\textbf{\texttt{#1}}}
+
+% no labels in list of references:
+\makeatletter
+\renewcommand\@biblabel{}
+\makeatother
+
+\hyphenation{Snij-ders Duijn DataSpecification dataspecification dependentvariable ModelSpecification}
+
+% centered section headings with a period after the number;
+% sans serif fonts for section and subsection headings
+\renewcommand{\thesection}{\arabic{section}.}
+\renewcommand{\thesubsection}{\thesection\arabic{subsection}}
+\makeatletter
+ \renewcommand{\section}{\@startsection{section}{1}
+                {0pt}{\baselineskip}{0.5\baselineskip}
+                {\centering\sffamily} }
+ \renewcommand{\subsection}{\@startsection{subsection}{2}
+                {0pt}{0.7\baselineskip}{0.3\baselineskip}
+                {\sffamily} }
+\makeatother
+
+
+\renewcommand{\baselinestretch}{1.0} %% For line spacing.
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus1ex}
+\raggedright
+\begin{document}
+
+\title{Notes for Developers of RSiena}
+\author{Ruth Ripley}
+\date{}
+\maketitle
+
+\centerline{\emph{\today}}
+\bigskip
+
+The introduction to the RSiena manual describes the basics of how to run the
+program, either `standalone' or within R. The help files in R describe how to
+use the R commands. Here I give some notes for developers.
+\section{Coding standards}
+I describe the main details of our current practice:
+\subsection{General}
+\begin{enumerate}
+\item Use lots of spaces: particularly around operators and after commas.
+\item Do not use underscores: use variable names made up of several (possibly
+  abbreviated) words with all but the first capitalised.
+\item Use braces even when not strictly necessary in \sfn{if} and \sfn{for}
+  statements and similar. (Not universal yet, but I am adding them...)
+\item Align braces under each other (so put the first one on a new line). (I
+  break this rule for \sfn{switch} statements in R as emacs does not do the
+  alignment sensibly!)
+\item Set tabs at intervals of 4 columns
+\item Indent by 4
+\item Align comments in the body of the code with the surrounding code.
+\item Do not use lines longer than 80 characters.
+\item New source files need their \sfn{eol-style} set to \sfn{native} when they
+  are added to the repository. On Windows, right-click and select
+  Tortoise-SVN/properties then add \sfn{eol-style:native}.  (One current
+  exception here: the file \sfn{sienascript} needs to have always unix line
+  endings. Otherwise a tarball built on Windows will not produce a usable
+  \sfn{sienascript} for Mac or Linux. There may be others in the future.)
+\item Copy a file header from an existing source file.
+\end{enumerate}
+\subsection{R}
+\begin{enumerate}
+\item Use \verb|<-| rather than \verb|=| for assignment.
+\item Avoid unnecessary \sfn{for} loops. They are acceptable where a complicated
+  \sfn{apply} statement would be necessary,  but not where a simple vectorised
+    command could be used.
+  \item \sfn{R} functions need a documentation comment preceding the function
+    declaration. If they have internal functions a call to \sfn{getInternals} is
+    required also.
+  \item \sfn{R} functions which are to be visible to the user need to be added
+    to the \sfn{NAMESPACE} file, and have a help page for them : see the Writing
+    R Extensions manual for the details of the format.
+  \item Check that {R CMD check} works with no warnings apart from line endings
+    (these are set to follow the platform, and will be OK when checked out on a
+    Linux box).
+  \item If writing methods, add them to the \sfn{NAMESPACE} file. Ensure that
+    you get no warnings from them.
+  \item \sfn{print} methods should invisibly return their argument.
+  \item \sfn{summary} methods for class \sfn{objclass} should return an object
+    of class \sfn{summary.objclass} which is printed by a
+    \sfn{print.summary.objclass} method.
+\item Avoid using the names of \sfn{R} functions as variable names. It is
+  permitted but may lead to confusion.
+\end{enumerate}
+\section{Recreating the package}
+\begin{enumerate}
+\item If using Windows, download and install the latest
+\textsf{Rtools.exe} from
+  \url{http://www.murdoch-sutherland.com/Rtools/}.  Beware: if you later install
+  other programs containing utilities such as tar (delphi is one offender), you
+  may need to uninstall and reinstall Rtools, as you need Rtools at the start of
+  your path. (Or edit the path!).
+\item If using a Mac, you will need the Xcode tools installed.
+\item Obtain the current source.
+\item In a command prompt window, navigate to the directory above the siena
+  tree. Here I assume it is called \sfn{siena}.
+\item Type\\
+\verb|R CMD BUILD siena|
+\item You will probably need to either add R to your path, or use
+  `path-to-R.exe' in the command above.
+\item When this one is OK, type\\
+\verb|R CMD INSTALL RSiena_1.0.n.tar.gz|\\
+(where \verb|n| is adjusted to match the file you have just created.)
+\item You now should have a new version of the package ready for use.
+\item Alternatively, instead of the BUILD and INSTALL, just type
+\verb|R CMD INSTALL siena|\\
+This will just compile the C that has changed and then do the rest.
+Quicker if you are debugging changes. Note that the \sfn{make} file is not very
+clever: if you are altering the C and your changes are not appearing, delete the
+.o's or .dll to force it, or do a BUILD
+to clear out all the .o's and the dll.
+\item On linux or Mac, the same commands should work, but you don't need the
+  Rtools. I have occasionally had problems with installing from a tarball or
+  from source, when I have no permission to write in the standard libraries, but
+  can't remember which one worked: one always did.
+\end{enumerate}
+\paragraph{Alternative methods for small changes}
+Now we have a \textsf{name space} for the package, small changes are not really
+possible.
+\begin{enumerate}
+\item If you make a change to an R source file, you can sometimes override the
+  package simply by sourcing the R file into the R session. If you have changed
+  the function \textsf{simstats0c}, you will need to recreate the model object
+  too. But if the functions you have changed call hidden functions in the
+  package, then this will fail, unless you source any others necessary\ldots it
+  may be easier to recreate the package.
+\item You can make a small change to a hidden file by using
+\verb|fixInNamespace('function name', 'RSiena')|.
+\item Useful to insert a call to \sfn{browser}, as you won't mind it
+  disappearing when you exit from R.
+\end{enumerate}
+\section{Parallel runs}
+\begin{enumerate}
+\item In Siena3324xx source file \textsf{rangen.pas}, edit the lines at the
+  bottom so that \textsf{version = 5} and \textsf{version2 = 6}.
+\item Build siena01, siena07
+\item Set the random seed to something non-zero (I use 1 but the value
+  should not matter) in the .MO file.
+\item It often helps to select the option to use standard starting values in the
+  .MO file. This is necessary for the automatic parallel tests.
+\item In R, use the argument \textsf{parallelTesting=TRUE} in the call to
+  \textsf{siena07}.
+\item Use the module \textsf{simstats0c} as the function when creating the
+  model.
+\end{enumerate}
+\paragraph{Automatic tests}
+\begin{enumerate}
+\item
+Select the correct versions of the random number generator as above.
+\item Build  siena03, siena01, siena07
+\item The automatic system needs some test files in the siena3324xx directory:
+\begin{description}
+\item[VRND32T3.DAT]
+\item[VRND32T4.DAT]
+\item[time23.dat]
+\item[tmp34.in]
+\item[effectsTest.bat]
+\end{description}
+There are more than one version of these data files around. The first two should
+be the same as the objects tmp3 and tmp4 in RSiena. Use the same time23.dat file
+in each case.
+\item Create a directory in the siena3 directory called effectsTest.
+\item  run \verb|siena01 tmp34|
+\item Set the random seed to something non-zero (I use 1 but the value
+  should not matter) in the .MO file.
+\item Select the option to use standard starting values in the
+  .MO file.
+\item Set the number of subphases in phase2 to 2, and the number of iterations
+  in phase3 to 100.
+\item At the command prompt type\\
+\verb|sh < effectsTest.bat|
+\item and wait... (not so long now!)
+\item when finished you should have 4 txt files to diff with the R ones:
+  comp.txt, compc.txt, compfd.txt, compfdc.txt. They will not be exactly the
+  same...
+\item The R part is run by the command (somewhere else with a subdirectory
+  called effectsTest, containing time23.dat):
+ \verb|R --vanilla < effectsTest.R|
+\item The R .txt files are in the effectsTest subdirectory, the siena3324 ones
+  are in the main directory.
+\item The subdirectories contain the .cck files and the equivalent from R, in
+  files called things like eval\%.tmp, endow\%.tmp.
+\item The .out files are stored in 4 parts: sienanonc.out, sienac.out,
+  sienafdnonc.out, sienafd.out.
+\item The detailed files can be used to find out more about runs that did not
+  match.
+\end{enumerate}
+\section{Profiling}
+If you are interested in knowing where RSiena spends its time, you can examine
+the R part by:
+\begin{verbatim}
+Rprof()
+siena07(...)
+Rprof(NULL)
+summaryRprof()
+\end{verbatim}
+For the C part it is a lot harder. An outline of the use of \verb|gprof|:
+\begin{enumerate}
+\item Our set-up works for networks, behavior variables and the various
+  covariates. 1 group only.
+\item You will need a standalone RMath library. You can find out how to create
+  this in the R-admin manual.
+\item Run siena07 with the extra argument \textsf{profileData=TRUE}.
+\item This creates a file called \textsf{data.txt}. Move this to the directory
+  \textsf{src}.
+\item In R, run the code, assuming the effects object is called \textsf{myeff}
+  and you have nothing valuable called \textsf{tmp}:
+\begin{verbatim}
+tmp <- myeff[myeff$include,c(1,4,7,13,14,5,6,17,21,23,16)]
+tmp[tmp==""] <- NA
+write.table(tmp, 'effects.txt', quote=FALSE, row.names=FALSE,
+col.names=FALSE, na="NA")
+\end{verbatim}
+\item This creates a file called \textsf{effects.txt}.  Move this to the
+  directory \textsf{src}.
+\item In the \textsf{src} directory,
+\begin{verbatim}
+make -f makefile.profile clean
+make -f makefile.profile
+SienaProfile.exe
+gprof SienaProfile.exe gmon.out > gprof.out
+more gprof.out
+\end{verbatim}
+\item You will need to adjust the \textsf{RHOME} line in
+  \textsf{makefile.profile} to reflect the location of R on your system.
+\item Google for ``gprof'' to find out how to understand the output!
+\end{enumerate}
+
+There are alternatives on linux (\textsf{oprofile}) or Mac OS (\textsf{shark}).
+A few notes about each:
+\begin{description}
+\item[oprofile]
+\begin{enumerate}
+\item You need root privileges to start or stop the daemon, and to reset it.
+\item It is a resource hog.
+\item The callgraph option only used to work on 32 bit machines.
+\item Failed to work on Fedora 10 as installed in the statistics department, but
+  possibly this has been updated.
+\item \verb|opcontrol --start| to start it
+\item \verb|opcontrol --callgragh=n| to get a callgraph.
+\item \verb|opcontrol --reset| to start the collection again
+\item Then run the R command
+\item \verb|opcontrol --dump| create a file you can get reports from
+\item \verb|opreport -l siena.so| to get a report. (Maybe Rsiena.so now)
+\item \verb|opannotate -d src srcdir| to get annotated output
+\item \verb|opcontrol --shutdown| to stop daemon
+\end{enumerate}
+\item[shark]
+\begin{enumerate}
+\item Make sure shark is installed
+\item Start it
+\item Run your R command
+\item During the run, click Start and then Stop  on the Shark window
+\item If you have the right settings a callgraph will appear in Shark.
+\item I found that saving the results usually failed to work.
+\item This route is the only one I found which would include C functions like
+  exp in the profiling, although it is possible you may find a profiled gcc
+  math library available for a Linux installation.
+\end{enumerate}
+\end{description}
+
+In any of these cases, you may find results vary due to garbage
+collection in R.
+\section{Debugging C++}
+You may find that R tends to crash when you change the C++. You can try to trap
+the error using \sfn{Rprintf} statements to print out details at intervals. The
+syntax for \sfn{Rprintf} is the same as the C function \sfn{printf}, but output
+from the R version appears in the R console where other output will not. You
+need the header file \sfn{"R.h"} which will probably already be included in any
+file I have debugged!
+
+If you have access to a Linux machine, you can use a program called
+\sfn{valgrind} to find places where you access memory which you should not, and
+similar things. The usage is described in the Writing R Extensions manual. I
+use, at the command line,\\
+\sfn{R -d "valgrind --tool=memcheck --leak-check=full " --vanilla < valgrind.r}\\
+where valgrind.r contains the commands I want to run, \emph{followed by
+  \sfn{gc()}} to do some R garbage collection. (Otherwise \sfn{valgrind} reports
+a lot of still reachable memory at the end.
+
+\sfn{valgrind} will also report memory leaks which may not cause an error, just
+an embarrassingly large memory usage, which will fail sooner or later.
+
+If \sfn{valgrind} reports use of uninitialised variables, use the option
+\sfn{=--track-origins=yes} to find out where the problem started. It can be
+surprisingly difficult to track these down!
+\end{document}

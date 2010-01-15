@@ -48,8 +48,8 @@ double PopularityAlterEffect::egoStatistic(int ego, double * currentValues)
 
 
 /**
- * Returns the average in-degree of the given actor in the current network
- * (0, if the actor has no outgoing ties).
+ * Returns the average in-degree of the neighbors of the given actor in
+ * the current network (0, if the actor has no outgoing ties).
  */
 double PopularityAlterEffect::averageInDegree(int i) const
 {

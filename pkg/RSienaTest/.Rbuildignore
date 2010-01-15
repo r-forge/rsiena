@@ -1,0 +1,7 @@
+^doc
+inst/*.txt
+src/SienaProfile.cpp
+src/SienaProfile.o
+src/SienaProfile.exe
+src/RMath.dll
+src/libpgSn.a

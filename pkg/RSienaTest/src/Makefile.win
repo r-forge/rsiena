@@ -1,6 +1,8 @@
 #-*- Makefile -*-
 #
 
+include $(R_HOME)/etc/Makeconf
+
 #RHOME = d:/R/R-2.9.0/
 #RHOME = c:/progra~1/R/R-2.9.0/
 #RHOME = c:/R/R-2.9.0/
@@ -39,12 +41,12 @@ CFLAGS = -O2 -Wall -pedantic
 CXXFLAGS = -O2 -Wall -pedantic
 DLLLIBS = $(PKG_LIBS) -L$(R_HOME)/bin -lR
 
-.cpp.o:
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+#.cpp.o:
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 ECHO = echo
-NM = nm
-DLL = g++
+#NM = nm
+DLL = $(CXX)
 SED = sed
 
 %.dll:

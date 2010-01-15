@@ -45,9 +45,9 @@ Maintainer: Who to complain to <ruth@stats.ox.ac.uk>
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \keyword{ package }
 \examples{
-mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mynet1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
-mymodel <- sienaModelCreate(findiff=FALSE, fn=simstats0c)
+mymodel <- sienaModelCreate(findiff=FALSE, fn=simstats0c, nsub=2, n3=100)
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 }

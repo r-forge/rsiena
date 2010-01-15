@@ -48,6 +48,7 @@
 #include "OutdegreePopularityEffect.h"
 #include "OutInDegreeAssortativityEffect.h"
 #include "OutOutDegreeAssortativityEffect.h"
+#include "PopularityAlterEffect.h"
 #include "QuadraticShapeEffect.h"
 #include "ReciprocalDegreeBehaviorEffect.h"
 #include "ReciprocatedSimilarityEffect.h"

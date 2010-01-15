@@ -51,7 +51,7 @@ digits = NULL, display = NULL, ...)
  derivative matrix of expected statistics \code{X} by parameters, and the
  covariance matrix of the expected statistics \code{X}.
 
- The function \code{xtable.sientFit} creates an object of class
+ The function \code{xtable.sienaFit} creates an object of class
  \code{xtable.sienaFit} which inherits from class \code{xtable} and
  passes an extra arguments to the \code{print.xtable}.
 }
@@ -62,8 +62,8 @@ digits = NULL, display = NULL, ...)
 \seealso{\code{\link{xtable}}, \code{\link{print.xtable}},
   \code{\link{siena07}}}
 \examples{
-mymodel <- sienaModelCreate(fn=simstats0c)
-mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
+mynet1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
