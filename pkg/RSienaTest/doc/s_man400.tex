@@ -6475,8 +6475,26 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
-\item 2010-01-02 R-forge revision 34
+\item 2010-01-15 R-forge revision 41 (RSienaTest only)
 
+\begin{itemize}
+\item
+   new effect: Popularity Alter, and altered effect1-3 to integers to correct
+  bug in fix(myeff) 
+  \item new utility functions to update effects object * no longer
+  necessary to include underlying effects for interactions.  
+  \item user parameter for number of unspecified behavior interactions 
+  \item  remove extra sqrt roots in standard error of rates for conditional
+  estimation (see revision 31)
+\end{itemize}
+\item 2010-01-15 R-forge revision 40: RSiena only
+	 
+  remove extra sqrt roots in standard error of rates for conditional
+  estimation (see revision 32)
+  
+	
+\item 2010-01-02 R-forge revision 34
+  
 Corrected layout of print and xtable for SienaFit objects with both behavior and
 network variables.
 
