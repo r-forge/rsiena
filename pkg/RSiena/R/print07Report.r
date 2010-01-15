@@ -44,9 +44,9 @@ PrintReport <- function(z, x)
                    }
                    Report(format(round(z$rate[1], digits = 4), width = 9), outf)
                    Report(format(round(z$rate[1], digits = 4), width = 9), bof)
-                   Report(c('  (', format(round(sqrt(z$vrate[1]), digits = 4),
+                   Report(c('  (', format(round(z$vrate[1], digits = 4),
                                         width = 9), ')\n'), sep = '', outf)
-                   Report(c('  (', format(round(sqrt(z$vrate[1]), digits = 4),
+                   Report(c('  (', format(round(z$vrate[1], digits = 4),
                                         width = 9), ')\n'), sep = '', bof)
                }
                else ## observations > 2
@@ -58,14 +58,14 @@ PrintReport <- function(z, x)
                        tmp <- paste(' 0.', nnstr, ' Rate parameter period ',
                                     1:nn, '              ',
                                     format(round(z$rate,4),width=9),
-                                    '  (',format(round(sqrt(z$vrate),4),width=9),
+                                    '  (',format(round(z$vrate,4),width=9),
                                     ')\n', sep = '')
                    }                   else{
                        tmp <- paste(' 0.', nnstr,
                                     'Rate parameter cond. variable period ',
                                     1:nn, '              ',
                                     format(round(z$rate,4),width=9),
-                                    '  (',format(round(sqrt(z$vrate),4),width=9),
+                                    '  (',format(round(z$vrate,4),width=9),
                                     ')\n',   sep='')
                    }
                    Report(tmp, outf, sep='')
