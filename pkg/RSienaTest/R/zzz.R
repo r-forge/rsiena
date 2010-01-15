@@ -34,7 +34,7 @@ pkgpath <- ''
 
 ##@.onUnload Miscellaneous Unload processing
 .onUnload <- function(libpath) {
-    library.dynam.unload("RSiena", libpath)
+    library.dynam.unload("RSienaTest", libpath)
 }
 
 #.Last.lib <- function(libpath)

@@ -62,15 +62,16 @@ tt=NULL, parallelTesting=FALSE, ...)
   objects
   \code{\link{sienaModelCreate}}, \code{\link{print.sienaFit}}}
 \examples{
-mymodel <- sienaModelCreate(fn=simstats0c)
-mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
+mynet1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 
 #or for conditional estimation
+\dontrun{
 mymodel$condname <- 'mynet1'
 mymodel$cconditional <- TRUE
-ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)}
 }
 \keyword{models}
