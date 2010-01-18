@@ -1,3 +1,17 @@
+2010-01-18 R-forge revision 43
+
+	* DESCRIPTION: new version 1.0.9
+	* NAMESPACE: new utility functions
+	* data/alleffects.csv : new behavior effects, user-specified
+	interactions.
+	* R/sienaeffects.r, man/includeEffects.Rd,
+	man/includeInteractions.Rd, man/setEffect.Rd: utilities to update
+	effects object.
+	* R/effects.r, man/getEffects.Rd: new parameter for number of
+	behavior interaction effects.
+	* src/model/effects/many: new behavior effects, user-specified
+	interactions.
+
 2010-01-15 R-forge revision 40
 
 	* R/print01report.r, R/sienaprint.r: remove extra sqrt roots in
