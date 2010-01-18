@@ -9,7 +9,7 @@
 # * effects object to go with a Siena data object or group object.
 # *****************************************************************************/
 ##@getEffects DataCreate
-getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
+getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 {
     ##@duplicateDataFrameRow internal getEffects Put period numbers in
     duplicateDataFrameRow <- function(x, n)
@@ -391,7 +391,7 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         }
         interaction <- createEffects("unspecifiedBehaviorInteraction",
                                      varname)
-        objEffects <- rbind(objEffects, interaction[rep(1, 4),])
+        objEffects <- rbind(objEffects, interaction[rep(1, behNintn),])
 
         ## now create the real effects, extra rows for endowment effects etc
         objEffects <- createObjEffectList(objEffects, varname)
@@ -686,12 +686,12 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
                 }
             }
         }
-        if (!is.null(covObjEffects))
-        {
-            usestr <- paste("effFrom", type, sep="")
-            covObjEffects$shortName <-
-                sub("effFrom", usestr, covObjEffects$shortName)
-        }
+     #   if (!is.null(covObjEffects))
+     #   {
+     #       usestr <- paste("effFrom", type, sep="")
+     #       covObjEffects$shortName <-
+     #           sub("effFrom", usestr, covObjEffects$shortName)
+     #   }
 
         list(objEff=covObjEffects, rateEff=covRateEffects)
     }
@@ -1004,6 +1004,14 @@ getEffects<- function(x, nintn = 10, getDocumentation=FALSE)
         class(effects) <- c('sienaGroupEffects','sienaEffects', cl)
     else
         class(effects) <- c('sienaEffects', cl)
+    myrownames <- paste(sapply(strsplit(row.names(effects), ".", fixed=TRUE),
+                               function(x)paste(x[1:2], collapse='.')),
+                        effects$type, sep='.')
+    myrownames <- paste(myrownames,
+                         as.vector(unlist(sapply(table(myrownames),
+                                                 function(x)1:x))), sep=".")
+    myrownames <- sub("Effects", "", myrownames)
+
     effects
 }
 ##@getBehaviorStartingVals DataCreate
