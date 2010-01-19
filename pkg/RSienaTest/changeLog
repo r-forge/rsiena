@@ -1,3 +1,12 @@
+2010-01-19 R-forge revision 46
+
+	* R/effectsDocumentation.r, man/effectsDocumentation.Rd,
+	inst/doc/effects.pdf: effects documentation system.
+
+2010-01-15 R-forge revision 42
+
+	* inst/doc/s_man400.pdf: new manual
+
 2010-01-15 R-forge revision 41
 
 	* doc/*, .Rbuildignore, src/sienaProfile.cpp: added developer
@@ -5,14 +14,14 @@
 	* data/allEffects.csv: new effect, altered effect1-3 to integers
 	to remove bug in fix(myeff)
 	* inst/*.out, *.Rdata: removed stray files from examples directory
-	* R/sienaeffects.r, NAMESPACE, man/includeEffects.Rd, 
-	man/includeInteraction.Rd, man/setEffect.Rd: utility functions to 
+	* R/sienaeffects.r, NAMESPACE, man/includeEffects.Rd,
+	man/includeInteraction.Rd, man/setEffect.Rd: utility functions to
 	update effects object
 	* R/siena01.r, R/simstatsc.r, R/printDataReport.r, R/print07Report.r,
 	R/Sienatest.r: no longer necessary to include underlying effects
 	for interactions.
-	* R/effects.r, man/getEffects.Rd: user parameter for number of 
-	unspecified behavior interactions 
+	* R/effects.r, man/getEffects.Rd: user parameter for number of
+	unspecified behavior interactions
 	* R/print07report.r, R/sienaprint.r: remove extra sqrt roots in
 	standard error of rates for conditional estimation (see revision
 	31)
@@ -23,27 +32,27 @@
 	src/model/effects/PopularityAlterEffect.cpp: New effect
 	* src/model/variables/BehaviorVariable.h,
 	src/model/effects/BehaviorVariable.cpp: new method
-	* tests/parallel.R, tests/parallel.R.save: reduce tests to 
+	* tests/parallel.R, tests/parallel.R.save: reduce tests to
 	save time in Check.
 	* man/RSiena-package.Rd, man/siena07.Rd, man/simstats0c.Rd,
 	man/sienaFit.Rd: made examples faster.
-	
+
 2010-01-15 R-forge revision 40: RSiena only
-	
+
 2010-01-12 R-forge revisions 38 and 39: RSiena only
 
 2010-01-12 R-forge revision 37
 
 	* inst/sienascript: reverted to LF eol-style
-	
+
 2010-01-12 R-forge revision 36
 
 	* all source files: eol-style: native
-	
+
 2010-01-11 R-forge revision 35
-	 
+
 	* inst: added manual and examples to RSienaTest
-	
+
 2010-01-02 R-forge revision 34
 
 	* R/sienaprint.r:  corrected layout of sienaFitThetaTable for
