@@ -1,3 +1,13 @@
+2010-01-19 R-forge revision 45
+
+	* NAMESPACE, R/effectsDocumentation.r,
+	man/effectsDocumentation.Rd: new documentation function
+	* inst/doc/effects.pdf: output from the documentation function/
+
+2010-01-18 R-forge revision 44
+
+	* src/model/effects/various.cpp, .h: removed superfluous files
+
 2010-01-18 R-forge revision 43
 
 	* DESCRIPTION: new version 1.0.9
