@@ -230,7 +230,7 @@ networks according to the dynamic actor-oriented model of Snijders
 and van Duijn (1997), Snijders (2001), and
 Snijders, Steglich, and Schweinberger (2007); also see
 Steglich, Snijders, and Pearson (2010).
-A tutorial for these models is in Snijders, van de Bunt, and Steglich (2009).
+A tutorial for these models is in Snijders, van de Bunt, and Steglich (2010).
 Some examples are
 presented, e.g., in van de Bunt (1999); van de Bunt, van Duijn, and
 Snijders (1999); and van Duijn, Zeggelink, Stokman, and Wasseur (2003);
@@ -930,43 +930,69 @@ which one may use to get started with \rs.
 
 # fix() may not be usable if you do not have tcl/tk available
 
-# Alternatively we can edit the dataframe directly using more data slicing
-# this command is another way to set "include" to TRUE or FALSE. TRUE or FALSE
-# will always be located at the 9th column, but not always at the 11th row as we
-# add or remove rate parameters depending on the model. In general the advantage
-# of this method is that we can save the last parameters and rerun the model
+# Alternatively we can edit the dataframe directly by using R functions.
+# Note that the columns of the dataframe of effects have names indicated
+# in the top of the dataframe:
+# name, effectName, type, include, fix, test, initialValue, parm,
+# effectnumber, effect1, effect2, effect3.
+# The commands below are used to set "include" to TRUE or FALSE,
+# as an alternative to using the data editor.
+# TRUE or FALSE will always be located at the 9th column,
+# transitive triplets will not always be at the 11th row as this depends
+# on the number of periods; further, the list of available effects
+# may change in future versions.
+# In general the advantage of this method is
+# that we can save the last parameters and rerun the model
 # later without opening the editor. (Saving can now be done in the GUI).
-# NB These row numbers may not be the current ones.
+# Note: These row numbers may not be the current ones, as they depend on the
+# list of effects implemented, which is changeable.
 
-        #myeff[11,9]=TRUE   #transitive triples
-        #myeff[15,9]=TRUE   #3 cycles
-        #myeff[17,9]=TRUE   #transitive ties
-        #myeff[27,9]=TRUE   #indegree popularity
-        #myeff[31,9]=TRUE   #outdegree popularity
-        #myeff[34,9]=TRUE   #indegree based activity
-        #myeff[36,9]=TRUE   #outdegree based activity
-        #myeff[46,9]=TRUE   #indegree-indegree assortivity
-        #myeff[48,9]=TRUE   #alcohol alter
-        #myeff[50,9]=TRUE   #alcohol alter (squared)
-        #myeff[52,9]=TRUE   #alcohol ego
-        #myeff[54,9]=TRUE   #alcohol similarity
-        #myeff[62,9]=TRUE   #alcohol alter by ego
+        #myeff[11,9] <- TRUE   #transitive triples
+        #myeff[15,9] <- TRUE   #3 cycles
+        #myeff[17,9] <- TRUE   #transitive ties
+        #myeff[27,9] <- TRUE   #indegree popularity
+        #myeff[31,9] <- TRUE   #outdegree popularity
+        #myeff[34,9] <- TRUE   #indegree based activity
+        #myeff[36,9] <- TRUE   #outdegree based activity
+        #myeff[46,9] <- TRUE   #indegree-indegree assortativity
+        #myeff[48,9] <- TRUE   #alcohol alter
+        #myeff[50,9] <- TRUE   #alcohol alter (squared)
+        #myeff[52,9] <- TRUE   #alcohol ego
+        #myeff[54,9] <- TRUE   #alcohol similarity
+        #myeff[62,9] <- TRUE   #alcohol ego x alcohol alter
 
-# (Alternatively, and more robustly against future changes in the structure,
-# use
+# Alternatively, and more robustly against future changes in the structure,
+# use the following for the last effect:
 
         #myeff[myeff$effectName=='alcohol ego x alcohol alter' &
         #myeff$type=='eval', 'include']=TRUE)
+
+# and similarly for the earlier ones.
 # To specify an interaction between say alcohol and reciprocity,
-# where 69 is the row number of an unspecified interaction effect:
+# where 69 is the row number of an unspecified interaction effect,
+# and 52 and 9 are now used as the numbers of the effects
+# that get the roles of effect1 and effect2,
+# meaning that they are to be interacted, the following can be used;
+# the name will be created by siena07.
 
         #myeff[69, c('effect1', 'effect2')] <- c(52, 9)
         #myeff[69, 'include'] <- TRUE
+
+
 # new, more robust, methods to amend an effects object:
+
         #myeff <- includeEffects(myeff, transTrip, cycle3, between)
         #myeff <- includeInteraction(myeff, egoX, recip,
         #   interaction1="alcohol")
         #myeff <- setParameter(myeff, outInv, 3)
+
+# There is a table of short names etc available as pdf via
+
+        #RShowDoc("effects", package="RSiena")
+
+# or as html by running the function
+
+        #effectsDocumentation()
 
 # siena07 actually fits the specified model to the data
 
@@ -1217,7 +1243,8 @@ net1 <- as.network(friend.data.w1)
 \label{S_multipleProcesses}
 \begin{enumerate}
 \item
-Multiple processes can be used to speed up the estimation in \sfn{siena07}.
+If multiple processors are available, then using
+multiple processes can speed up the estimation in \sfn{siena07}.
 
 \item In Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
   multiple simulations are done with the same parameters, and the resulting
@@ -1292,7 +1319,7 @@ reference to this manual is the following.  \smallskip
 
 \noindent
 Ripley, Ruth M., and Snijders, Tom A.B.
-2009.
+2010.
 Manual for SIENA version 4.0 (provisional version, \today).
 Oxford: University of Oxford, Department of Statistics; Nuffield College.
 \textsf{http://www.stats.ox.ac.uk/siena/}
@@ -1309,12 +1336,12 @@ More specific references are Schweinberger (2005) for the score-type goodness of
 fit tests and Schweinberger and Snijders (2007) for the calculation of standard
 errors of the Method of Moments estimators .
 
-A tutorial is Snijders, van de Bunt, and Steglich (2009).
+A tutorial is Snijders, van de Bunt, and Steglich (2010).
 
 
 \subsection{Getting help with problems}
 \label{sec:problems}
-If you have a problem running \RS, please read through the following hints to
+If you have a problem running \rs, please read through the following hints to
 see if any of them help. If not, please send an email to
 rsiena-help@lists.r-forge.r-project.org, or post in the help forum for \RS in
 R-forge. You need to be a registered member of R-forge (and possibly of \rs)
@@ -1322,8 +1349,8 @@ to post to a forum, but anyone can send emails (at present!). In your message,
 please tell us which operating system , which version of \Rn, and which version
 of \RS you are using.
 
-For queries about the modelling aspects of \SI, or interpretation, please
-continue to use the \SN mailing list.
+For queries about the modelling aspects of \si, or interpretation, please
+continue to use the \SN/ \RS mailing list.
 
 
 \begin{description}
@@ -1953,7 +1980,7 @@ the evolution of each dependent variable (network or behavior).
 
 For the longitudinal case, three types of
 effects are distinguished (see Snijders, 2001; Snijders,
-van de Bunt, and Steglich, 2009):
+van de Bunt, and Steglich, 2010):
 
 \begin{itemize}
 \item {\em rate function effects}\\
@@ -2802,14 +2829,30 @@ The numerical interpretation is different from that in Models 1-2.
 
 It is possible for the user to define additional interaction effects for the
 network. % and the behavior.
-The basis is provided by the initial definition, by \si, of ``unspecified
-interaction effects''.  Modifying two or three of the columns named ``effect1'',
-``effect2'', and ``effect3'' of these effects allows the definition of two-way
+The basis is provided by the initial definition, by \si, of `unspecified
+interaction effects'.  Modifying two or three of the columns named `effect1',
+`effect2', and `effect3' of the effects dataframe
+allows the definition of two-way
 or three-way interactions. The \emph{effectNumber} of the effects between which
-an interaction is required should be entered in the ``effect1'' and ``effect2'',
-and for three-way effects, the ``effect3'' columns. The interaction effect must
-also be ``included'', but the underlying effects need only be ``included'' if
+an interaction is required should be entered in the `effect1' and `effect2',
+and for three-way effects, the `effect3' columns. The interaction effect must
+also be `included', but the underlying effects need only be `included' if
 they are also required individually.
+
+\sfn{includeInteraction} is an \R function provided to facilitate the definition
+of interaction effects. Such effects can be specified simply by short names and
+the names of any variables required to identify the underlying effects: it is
+not necessary to know the effectNumbers of the effects. (The effectNumbers would
+change if new effects are introduced to \rs.) Information about short names of
+effects can be found in the file `effects.pdf' in the doc directory of the
+library, accessible from within \R using the command
+
+\verb|RShowDoc("effects", package="RSiena")|
+
+Alternatively a new version of this list can be displayed in a browser by using
+the function:
+
+\verb|effectsDocumentation()|
 
 \subsubsection{Interaction effects for network dynamics}
 
@@ -2828,7 +2871,8 @@ ego effect and another effect. A three-way interaction may be between three
 dyadic effects, two dyadic effects and an ego effect, or two ego effects and
 another effect.
 
-All effects used in interactions must be defined on the same network: that for
+All effects used in interactions must be defined on the same network
+(in the role of dependent variable): that for
 which the ``unspecified
 interaction effects'' is defined.  And either all must be evaluation effects or
 all must be endowment effects.
@@ -4021,12 +4065,28 @@ following the same steps produces the Rao (1947) efficient score test.
 
 Most goodness-of-fit tests will have the following form: some model
 is specified and one or more parameters are restricted to some
-constant, in most cases $0$.
-Parameters can be restricted by %opening the \textsf{{\em pname}.MO}
-%file, going to the parameters of interest and setting the values in
-%the fourth column equal to {\tt 1}.
+constant, in most cases $0$ -- these constant values
+define the null hypothesis being tested.
+This can be obtained in \RS by appropriate choices in the effects dataframe
+(called \sfn{myeff} in Section~ \ref{S_Rscript}).
+Parameters can be restricted by
 putting 1 in the \sfn{fix} and \sfn{test} columns when editing the effects, and
-the constant value in the \sfn{initialValue} column.  The goodness-of-fit test
+the tested value in the \sfn{initialValue} column.
+For example, when the effect for which the score test
+is desired has \sfn{effectNumber} equal to 46, the
+commands can be as follows.
+
+\begin{verbatim}
+myeff[46,9] <- TRUE
+myeff[46, 'fix'] <- TRUE
+myeff[46, 'test'] <- TRUE
+myeff[46, 'initialValue'] <- ((value to be used for test))
+\end{verbatim}
+
+
+
+
+The goodness-of-fit test
 proceeds by simply estimating the restricted model (not the unrestricted model,
 with unrestricted parameters) by the standard \SI estimation algorithm. No more
 information needs to be communicated.%  When the model is restricted, \SI by
@@ -5907,7 +5967,7 @@ are the sums of the changes in actor-dependent values
 for only those actors who decreased in behavior.
 More precisely, it is
 \begin{equation}
-\sum_{m=1}^{M-1} \sum_{i=1}^n I\{z_{ij}(t_{m+1}) < z_{ij}(t_m) \}\,
+\sum_{m=1}^{M-1} \sum_{i=1}^n I\{z_{i}(t_{m+1}) < z_{i}(t_m) \}\,
      \big( s^{\rm beh}_{ik}(x(t_{m+1})) -  s^{\rm beh}_{ik}(x(t_m))   \big) ,
 \end{equation}
 where $M$ is the number of observations, $x(t_m)$ is the observed situation
@@ -6475,26 +6535,35 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-01-19 R-forge revision 45
+ New documentation for the effects object.
+\item 2010-01-18 R-forge revision 43 (RSiena)
+\begin{itemize}
+\item new behavior effects
+\item user specified interactions
+\item new utilities to update the effects object
+\end{itemize}
 \item 2010-01-15 R-forge revision 41 (RSienaTest only)
 
 \begin{itemize}
 \item
    new effect: Popularity Alter, and altered effect1-3 to integers to correct
-  bug in fix(myeff) 
-  \item new utility functions to update effects object * no longer
-  necessary to include underlying effects for interactions.  
-  \item user parameter for number of unspecified behavior interactions 
+  bug in fix(myeff)
+  \item new utility functions to update effects object
+  \item no longer
+  necessary to include underlying effects for interactions.
+  \item user parameter for number of unspecified behavior interactions
   \item  remove extra sqrt roots in standard error of rates for conditional
   estimation (see revision 31)
 \end{itemize}
 \item 2010-01-15 R-forge revision 40: RSiena only
-	 
+
   remove extra sqrt roots in standard error of rates for conditional
   estimation (see revision 32)
-  
-	
+
+
 \item 2010-01-02 R-forge revision 34
-  
+
 Corrected layout of print and xtable for SienaFit objects with both behavior and
 network variables.
 
@@ -6829,6 +6898,12 @@ Modeling the co-evolution of networks and behavior.
 In \emph{Longitudinal models in the behavioral and related sciences},
 edited by Kees van Montfort, Han Oud and Albert Satorra, pp.\ 41--71.
 Mahwah, NJ: Lawrence Erlbaum.
+
+\bibitem{}
+Snijders, T.A.B., van de Bunt, G.G., and Steglich, C.E.G. (2010).
+Introduction to actor-based models for network dynamics.
+\textit{Social Networks}, 32, 44--60.
+
 
 \bibitem{} Snijders, T.A.B., and M.A.J.\ Van Duijn.  1997.
 Simulation for statistical inference in dynamic network models.
