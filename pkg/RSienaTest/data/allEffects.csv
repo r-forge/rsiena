@@ -166,7 +166,6 @@ bipartiteSymmetricObjective,degree^(1/#) xxxxxx activity,sum outd. x degre.^(1/#
 bipartiteSymmetricObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx",to,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
 nonSymmetricBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,2,objective,NA,NA,0,0,0,0
 nonSymmetricBipartiteObjective,from xxxxxx agreement ,"mixed triplets XWW, W = xxxxxx",from,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
-nonSymmetricBipartiteObjective,from xxxxxx mutual agr. ,"mixed triplets XWW, W=m.xxxxxx",fromMutual,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
 bipartiteBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,2,objective,NA,NA,0,0,0,0
 bipartiteBipartiteObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx",to,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
 covarNetNetObjective,from xxxxxx agr. x same yyyyyy,"m.tr. XWW, W = xxxxxx, same yyyyyy",covNetNet,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0

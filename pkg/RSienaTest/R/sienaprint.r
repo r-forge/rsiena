@@ -14,15 +14,49 @@ print.siena <- function(x, ...)
 {
   if (!inherits(x, "siena"))
         stop("not a legitimate Siena data object")
-  cat('Dependent variables: ', names(x$depvars),'\n')
-  cat('Number of waves:', x$observations)
+  cat('Dependent variables: ', paste(names(x$depvars), collapse=", "), "\n")
+  cat('Number of waves:', x$observations, "\n")
   if (!is.null(x$nodesets))
   {
       tmp <- cbind(c('Nodesets',
-                     names(x$nodesets)),
-                   c('Number of nodes',
-                     sapply(x$nodesets,length)))
+                     paste(names(x$nodesets), collapse=", ")),
+                   c('Number of nodes', sapply(x$nodesets, length)))
       print(tmp)
+  }
+  if (length(x$cCovars) > 0)
+  {
+      cat('Constant covariates: ', paste(names(x$cCovars), collapse=", "), "\n")
+  }
+  if (length(x$vCovars) > 0)
+  {
+      cat('Changing covariates: ',
+          paste(names(x$vCovars), collapse = ", "), "\n")
+  }
+  if (length(x$dycCovars) > 0)
+  {
+      cat('Constant dyadic covariates: ',
+          paste(names(x$dycCovars), collapse=", "), "\n")
+  }
+  if (length(x$dyvCovars) > 0)
+  {
+      cat('Changing dyadic covariates: ',
+          paste(names(x$dyvCovars), collapse=", "), "\n")
+  }
+  attrs <- attributes(x)
+  highers <- attrs[["higher"]]
+  disjoints <- attrs[["disjoint"]]
+  atleastones <- attrs[["atLeastOne"]]
+  if (any(highers))
+  {
+      cat("Higher: ", names(highers)[highers], "\n")
+  }
+  if (any(disjoints))
+  {
+      cat("Disjoint: ", names(disjoints)[disjoints], "\n")
+  }
+  if (any(atleastones))
+  {
+      cat("atLeatOne: ", names(atleastones)[atleastones], "\n")
   }
   invisible(x)
 }

@@ -8,7 +8,7 @@ include $(R_HOME)/etc/Makeconf
 #RHOME = c:/R/R-2.9.0/
 .PHONY: all libs execs
 
-SOURCES=$(wildcard data/*.cpp utils/*.cpp utils/random.h model/*.cpp model/effects/*.cpp model/tables/*.cpp model/variables/*.cpp network/*.cpp)
+SOURCES=$(wildcard data/*.cpp utils/*.cpp utils/random.h model/*.cpp model/effects/*.cpp model/tables/*.cpp model/variables/*.cpp network/*.cpp model/effects/generic/*.cpp model/ml/*.cpp model/filters/*.cpp)
 EXTRAS=$(foreach i,$(SOURCES),$(basename $i).o)
 
 PKG_LIBS=-L. -lSn
