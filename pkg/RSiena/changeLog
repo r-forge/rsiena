@@ -1,3 +1,7 @@
+2010-01-26 R-forge revision 46
+
+	* man/RSiena-package.Rd: new version number
+
 2010-01-19 R-forge revision 45
 
 	* NAMESPACE, R/effectsDocumentation.r,

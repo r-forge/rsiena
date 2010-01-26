@@ -1,0 +1,640 @@
+\documentclass[a4paper,fleqn,12pt]{article}
+% The parameter in [..] can be beamer or handout
+% Based on file
+% $Header: /cvsroot/latex-beamer/latex-beamer/solutions/generic-talks/generic-ornate-15min-45min.en.tex,v 1.4 2004/10/07 20:53:08 tantau Exp $
+% This file is a solution template for:
+% - Giving a talk on some subject.
+% - The talk is between 15min and 45min long.
+% - Style is ornate.
+% Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
+
+% When replacing figures, put a % at the end of the line
+% to prevent a linebreak being read!
+
+
+
+\usepackage{pgf}
+%\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{pgflibraryarrows}
+\usepackage{colortbl}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{enumitem}
+
+% For handouts; see pgfmanual
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{2 on 1}[border shrink=5mm]
+
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+
+\newcommand{\Reals}{\mbox{I}\hspace{-.07ex}\mbox{R}}
+\newcommand{\E}{\mbox{E}}
+\renewcommand{\P}{\mbox{P}}
+\newcommand{\se}{\mbox{s.e. }}
+\newcommand{\var}{\mbox{var}}
+\newcommand{\Cov}{\mbox{Cov}}
+\newcommand{\logit}{\mbox{logit}}
+\newcommand{\uh}{\underline{h}}
+\newcommand{\tuh}{\tilde{\uh}}
+\newcommand{\neqsum}[3]
+{\, \sum_{\stackrel{\scriptstyle #1 = 1}{\scriptstyle #2 \neq #3}}^g
+\,}
+
+\newcommand{\equat}[1]{$#1$}
+\newcounter{savenumi}
+\newcounter{savenumi2}
+\newcounter{savenumi3}
+\newcounter{savenumi4}
+
+
+
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command:
+
+%\beamerdefaultoverlayspecification{<+->}
+\renewcommand{\baselinestretch}{1.1}
+\newcommand{\cc}{\color[named]{SeaGreen}}
+\newcommand{\itc}{\color[rgb]{0.1,0.6,0.3}}  % itemcolor
+\newcommand{\siec}{\color[named]{Sienna}} % Siena color (RawSiena dvipsnames)
+\newcommand{\emec}{\color[rgb]{0.3,0.1,0.0}}  %  \color[named]{Emerald}}
+
+
+\newcommand{\cdiamond}{{\color[named]{MidnightBlue}\diamond}}
+\newcommand{\cbullet}{{\color[named]{MidnightBlue}$\bullet$}}
+\newcommand{\cques}{{\color[named]{MidnightBlue}?`}}
+\newcommand{\rast}{{\color[named]{Red}$\ast$}}
+\newcommand{\gast}{{\color[named]{Green}$\ast$}}
+
+\newcommand{\rtar}{{\itc $\Rightarrow$}}
+\newcommand{\qques}{\raisebox{1.2ex}{\rotatebox{180}
+                    {\color[named]{ForestGreen}\bf\large ?}}}
+\newcommand{\excl}{{\color[named]{ForestGreen}\bf\large !}}
+% or OliveGreen
+
+\hyphenation{mini-step mini-steps reci-pro-city}
+
+\setlength{\parskip}{1.5ex plus0.5ex minus0.5ex}
+\setlength{\parindent}{0ex}
+
+\title{Siena Chain Structures}
+
+\author{Tom A.B.\ Snijders }
+
+
+
+
+\newcommand{\sx}{{\scriptstyle X}}
+\newcommand{\sz}{{\scriptstyle Z}}
+\newcommand{\extraver}{{$\phantom{\Big(}$}}
+\newcommand{\extraverr}{{$\phantom{\big(}$}}
+
+\renewcommand{\th}[1]{$\theta_{#1}$}
+\newcommand{\ga}[1]{$\gamma_{#1}$}
+\newcommand{\be}[1]{$\beta_{#1}$}
+\newcommand{\maxr}{\textit{maxbeh}_r}
+
+\newcommand{\vit}{\theenumi}
+
+\newcommand{\mcc}[2]{\multicolumn{#1}{c}{#2}}
+\newcommand{\mcp}[2]{\multicolumn{#1}{c|}{#2}}
+
+\newcommand{\equa}[1]{\[#1\]}
+
+\newcommand{\separationb}{\\[0.5ex]\hline\rule{0pt}{2ex}}
+\newcommand{\separationg}{\\[0.5ex]\arrayrulecolor{grey}\hline\arrayrulecolor{black}
+                         \rule{0pt}{2ex}}
+
+\newcommand{\nm}[1]{\textsf{\small #1}}
+\newcommand{\nnm}[1]{\textsf{\small\textit{#1}}}
+\newcommand{\nmm}[1]{\nnm{#1}}
+\newcommand{\R}{{\sf R }}
+\newcommand{\Rn}{{\sf R}}
+\newcommand{\ms}{\textsl{\textsf{\small ms}}} % ministep
+
+\begin{document}
+
+\maketitle
+
+This paper gives a specification of the
+chain structures for likelihood-based calculations in RSiena.
+Much of this was implemented in Siena 3 in the unit \textsf{chains}.
+However, the procedures in this unit do much more than necessary,
+and in some cases do things slightly differently.
+
+\section{Notation}
+
+
+Symbols given \nnm{in italic sf font} refer to the names
+of variables used in the \R code.
+
+I changed the earlier used letters $X$ and $Z$ referring to networks and behavior
+to $N$ and $B$.
+
+Not all notation presented is used in this note;
+I just copied the notation from \emph{Siena Algorithms}
+and added what was needed additionally.
+
+\emph{Generic symbols for variables}
+
+There are $R_N$ networks and $R_B$ behavior variables.\\
+We require $R_N + R_B \geq 1$; if the current structure of RSiena
+requires this, then we require $R_N \geq 1$ (but if it is easy to
+work with $R_N = 0, R_B \geq 1$ then it would be nice to permit this.)
+
+\begin{tabbing}
+$i, j$ \hspace*{1em} \=  \hspace*{6em} \=  actors.\\[1ex]
+$m$ \> \> index for time period from $t_{m-1}$ to $t_m$ ($m = 2, \ldots, M$).  \\[1ex]
+$M$ \> \nnm{observations}   \> total number of observations\\[1ex]
+$x$ \> \> all $R_N$ networks jointly (one outcome).\\[1ex]
+$z$ \> \> all $R_B$ behaviors jointly (one outcome).\\[1ex]
+$y$ \> \> state: all networks and behaviors jointly (one outcome).\\[1ex]
+$W$ \> \> variable with values $N$ or $B$, indicating \\
+    \> \> whether something refers to network or behavior.\\[1ex]
+$r$ \> \> index number of networks or behaviors,\\
+    \> \> ranging from 1 to $R_W$ .\\[1ex]
+missing \> \> missingness indicators \\
+        \> \>  for ordered triples $(i,j,r)$ referring to networks $r$ \\
+        \> \> and for ordered pairs $(i,r)$ referring to behaviors;\\
+        \> \> values are F (false) and T (true);\\
+        \> \> if T, then further specifications are Start / End / Both,\\
+        \> \> referring to the observation period from $t_{m-1}$ to $t_m$ .\\[1ex]
+$\maxr$ \> \> maximum of the range of the $r'^{text{th}}$ behavior variable.\\[1ex]
+$^N$ \> \> as superscript: refers to network dynamics.\\[1ex]
+$^B$ \> \> as superscript: refers to behavior dynamics.\\[1ex]
+\end{tabbing}
+\medskip
+
+\emph{Changing variables (outcomes)}
+
+\begin{tabbing}
+$^{\rm{obs}}$ \hspace*{1em} \=  \hspace*{6em} \= as superscript: refers to observed values.\\[1ex]
+$\theta$ \> \nnm{theta} \> vector of all statistical parameters. \\[1ex]
+$p$  \>  \nnm{pp}  \> dimension of $\theta$.\\[1ex]
+$J$ \> \>  simulated data score function (vector of partial derivatives of log-likelihood) \\
+     \>  \>    ($p$-vector).\\[1ex]
+$t$ \hspace*{3em} \> \> time.\\[1ex]
+$N^{(r)}_{ij}$ \> \> dummy tie variable indicating $ i \stackrel{r}{\rightarrow} j $ for $r^{\text{th}}$ network.\\[1ex]
+$B^{(r)}_{i}$ \> \> behavior variable for $r^{\text{th}}$ behavior for actor $i$.
+\end{tabbing}
+\medskip
+
+Replacing an index by + denotes summation over this index.\\
+Toggling a number $a$ in $\{0, 1\}$ means replacing $a$ by $1-a$.
+\medskip
+
+\emph{Functions}
+
+\begin{tabbing}
+$\lambda^N(r,i,x,z)$ \hspace*{3em} \= rate function, network $r$.\\
+                                  \> (0 for inactive actors)\\[1ex]
+$\lambda^B(r,i,x,z)$ \hspace*{3em} \> rate function, behavior $r$.\\
+                                  \> (0 for inactive actors)\\[1ex]
+$f^N(r,i,x,z)$ \hspace*{3em} \> evaluation function function, network $r$.\\[1ex]
+$f^B(r,i,x,z)$ \hspace*{3em} \> evaluation function, behavior $r$.\\[1ex]
+$g^N(r,i,j,x,z)$ \hspace*{3em} \> endowment function function, network $r$.\\[1ex]
+$g^B(r,i,x,z)$ \hspace*{3em} \> endowment function, behavior $r$.\\[1ex]
+$\Delta f^N(r,i,j,x,z)$ \hspace*{3em} \> change in $f^N(r,i,x,z)$
+                                by toggling $N^{(r)}_{ij}$.\\[1ex]
+$\Delta f^B(r,i,v,x,z)$ \hspace*{3em} \> change in $f^B(r,i,x,z)$
+                                by changing $B^{(r)}_i$ to $B^{(r)}_i + v$.
+%$ \sim E(\lambda)$ \> generate random variable according to exponential distribution\\
+%                   \> with parameter $\lambda$ (note: expected value $1/\lambda$).\\[1em]
+\end{tabbing}
+%\medskip
+
+\section{Data structures}
+
+
+The basic data structure is called a \emph{chain}.
+This is a sequence of changes that can take one (`observed') value
+of $y$ to a next one.
+
+To allow later generalization to valued networks as easily as possible,
+we define a condition $D$ (for dichotomous) that is defined on the
+level of variables (networks or behavioral variables);
+in our current system $D$ is true for networks and false for
+behavioral variables, but this can be different in future uses.
+
+One change is called a \nnm{ministep}, denoted \ms, and is defined as:
+\begin{equation}
+    \ms \ = (w,i,j,r,d,\textit{pred},\textit{succ},
+                    \textit{lprob}, \textit{rrate})    \label{ministep}
+\end{equation}
+where
+\begin{tabbing}
+$w$ (`aspect') $\phantom{abcdefghij}$ \= = \= `network' or `behavior' (abbreviated to $N$ -- $B$ );\\
+$i$ (`actor') \> = \> actor if $w$ = B, sending actor if $w$ = N;\\
+$j$ (`actor') \> = \> meaningless 0 if $w$ = B, receiving actor if $w$ = N;\\
+$r$ (`variable number') \> = \> number of variable ($1 \leq r \leq R_w$ );\\
+$d$ (`difference') \> = \> meaningless 0 if $D$, amount of change if not $D$\\
+   \> \>   (where $D $ depends on $w, r$);\\
+   \> \>    currently we require $d \in \{-1, 0, 1\}$, but at some \\
+   \> \>    later moment exceptions to this rule may be allowed;\\
+\textit{pred} (`predecessor') \> = \> pointer to preceding ministep;\\
+\textit{succ} (`successor') \> = \> pointer to next (succeeding) ministep;\\
+\textit{lprob} (`log probability') \> = \> log probability of making this ministep;\\
+\textit{rrate} (`reciprocal rate') \> = \> reciprocal of aggregate (summed) )rate function \\
+   \> \>      immediately before this ministep.
+\end{tabbing}
+To indicate the components/fields of a ministep we use the notation
+$\ms.w, \ms.i$, etc.
+
+In Siena 3, $d$, \textit{pred} and \textit{succ} are called \textit{difh},
+\textit{predh} and \textit{such};
+and the program uses rates instead of reciprocal rates, but this was
+implemented only very incompletely anyway.
+
+The ministep is practically the same as what is called a microstep
+in the paper `Siena Algorithms', but used here in a more
+precise way. These words are not intentionally different.
+\\
+The log probability and reciprocal rate depend not only on the
+chain and the ministep, but also on the initial state $y$ or $y(t_{m-1})$
+valid before the start of the chain; and on the model specification and
+model parameters.
+Their computation is done by procedure \textit{StepProb} described in
+Section~\ref{S_prob}.
+
+The interpretation is that a ministep operates on (i.e., changes)
+outcome $y$ as implemented by the following function.
+\begin{enumerate}
+\item \textit{ChangeStep}$(y, \ms)$ transforms state $y$ as follows,\\
+      where $ \ms \ = (w,i,j,r,d, ...)$:
+      \begin{itemize}
+      \item if $w$ = N and $i \neq j$, change $N^{(r)}_{ij}$ to $1 - N^{(r)}_{ij}$;
+      \item if $w$ = B,  change $B^{(r)}_{i}$ to $B^{(r)}_{i} + d$.
+      \end{itemize}
+\end{enumerate}
+This means that only those values of $d$ are allowed that do not lead
+$B^{(r)}_{i}$ outside of the bounds of this variable.
+I think this should not always be checked except perhaps for in a test phase,
+but the creation and transformation of ministeps should contain
+checks that ensure this condition.
+
+\textit{ChangeStep} is called a lot, and it will be helpful
+that it is implemented in a very fast way.
+
+The \emph{kind} of a ministep is defined as
+(Network, $i,\, j,\, r$) for Network ministeps,
+and as (Behavior, $i, \, r$) for Behavior ministeps.
+This defines the variable changing by the ministep.
+
+The \emph{subkind} of a ministep is defined as
+$(w,i,r)$.
+This defines the choice situation / option set for the ministep.
+
+This definition also means that network ministeps with $i = j$ and behavior ministeps
+with $d = 0$ have no effect on the outcome. Such ministeps are permitted,
+and are called \emph{diagonal} ministeps.
+
+A \emph{chain} from observation $y(t_{m-1})$
+to observation $y(t_m)$ is a sequence of ministeps $\ms_1 , \ms_2 , ..., \ms_T$
+which, when applied sequentially, transform $y(t_{m-1})$ into $y(t_{m})$.
+We then say that the chain \emph{connects}  $y(t_{m-1})$ to $y(t_m)$.
+For $M$ observations, therefore, we require a sequence of $M-1$ chains.
+
+For a sequence of ministeps $\ms_1 , \ms_2 , ..., \ms_T$
+we define the following functions.
+For disregarded values of the ministep (depending on whether it is a N or B
+ministep) we use the wildcard symbol *.
+\begin{enumerate}[resume]
+\item \textit{NetworkNumber}$(i,j,r,t)  =  \,  \sharp\{ s \mid 1 \leq s \leq t, \textit{kind}(\ms_s) = (N,i,j,r)  \} $
+\item \textit{BehSum}$(i,B,r,t)  = \,   \Sigma_{s=1}^t \, \ms_s.d_s\,
+                      I\{ \textit{kind}(\ms_s) = (B,i,*,r) \} $\\
+      where $I$ is the indicator function defined as $I(A) = 1$ if $A$ is True
+      and 0 if $A$ is False.
+\end{enumerate}
+
+If the outcomes $y(t_{m-1})$ and $y(t_m)$ are completely defined
+(without any missing data) then the requirements on this sequence are as follows.
+
+\emph{Networks} : (since changes are defined as toggles)\\
+For all $i, j, r$ with $1 \leq r \leq R_N$, $i \neq j$,
+\[
+N^{(r)}_{ij}(t_{m-1}) = N^{(r)}_{ij}(t_m) \ \Leftrightarrow \
+       \text{\textit{NetworkNumber}}(i,j,N,r,T) \text{ is even }; \label{netrec}
+ \]
+\emph{Behavior} : (since changes are defined as increments)\\
+For all $i, r$ with $1 \leq r \leq R_B$,
+\begin{eqnarray}
+B^{(r)}_{i}(t_{m-1}) \! &+&  \! \text{ \textit{BehSum}}(i,B,r,T) = B^{(r)}_{i}(t_m)  \label{behrec1} \\
+\text{and} &&  \nonumber \\
+1 \leq B^{(r)}_{i}(t_{m-1}) \!  &+&  \! \text{ \textit{BehSum}}(i,B,r,t) \leq
+                             \maxr   \text{ for all } 1 \leq t < T.   \label{behrec2}
+\end{eqnarray}
+
+
+For missing network data $(i,j,r)$ and missing behavior data $(i,r)$,
+there is no such requirement; although for missing behavior data
+it must be ensured that the variable remains within range.
+
+It must be noted that missing data are not handled in the best possible way
+in the likelihood-based procedures in Siena 3, and this will be changed
+in RSiena. Therefore, results for likelihood-based procedures in Siena 3 and RSiena
+will be different.
+
+Classes of functions are required which do the following:
+\begin{enumerate}
+\item Create and transform chains.
+\item Calculate probabilities related to chains.
+\item Store chains: read from and write to file.
+\end{enumerate}
+
+\section{Create and transform chains}
+
+\subsection{Data types}
+\begin{enumerate}
+\item  Ministep. See (\ref{ministep}).\\
+       The \emph{kind} of a ministep is (Network, $i,\, j,\, r$) for Network ministeps,
+       and (Behavior, $i, \, r$) for Behavior ministeps.\\
+       Note that in Siena 3 this is called the \emph{rkind} (\emph{restricted kind}),
+       and the `kind' there also includes the value $d$.
+       A ministep \ms \ is \emph{diagonal} if it is of kind (Network, $i,\, j,\, r$)
+       with $i = j$, or of kind (Behavior, $i, \, r$) with $\ms.d$ = 0.
+\item Chain. This is a sequence of ministeps connected by the pointers
+      \textit{pred} and \textit{succ},
+      with a first and last element.
+      The first and last elements are dummies, i.e., they are of a special kind
+      $(\textit{Extreme}, 0, 0, 0)$ which implies no change:\\
+      $\textit{ChangeStep}(y,\text{first}) = \textit{ChangeStep}(y,\text{last}) = y$.\\
+      The section on structurally fixed values gives an exception to this rule,
+      however, for the last element.\\
+      The first and last elements are used just to have handles
+      for the start and end of the chain. Of course, first.\textit{pred} =last.\textit{succ} = nil.\\
+      The first and last ministeps are not diagonal.\\
+      \\
+      The connection implies that if $\ms_a$ and $\ms_b$ are two ministeps
+      with \\
+      $\ms_b.pred = \ms_a$, then $\ms_a.succ = \ms_b$.
+      The first element has a nil \textit{pred}, and the last element
+      has a nil \textit{succ}.
+\end{enumerate}
+
+\subsection{Functions}
+
+In Siena 3, I have defined the ministep type with various other pointers and attributes
+useful for navigating in the chain.
+These are functions of the chain, and including them in the ministep type
+is for the purpose of computational efficiency.
+These functions are the following. They are defined as functions of the ministep
+in a given chain.
+
+\begin{enumerate}
+\item \textit{nrkind}. The total number of ministeps in the chain of the same kind.
+\item \textit{predkind}. Pointer to the last earlier (`preceding') ministep of the same kind.\\
+                         Called \textit{predhrkind} in Siena 3.
+\item \textit{succkind}. Pointer to the first later (`succeeding') ministep of the same kind.\\
+                         Called \textit{suchrkind} in Siena 3.
+%\item \textit{multiple}. A boolean attribute, indicating that there is at least one more
+%      ministep of the same kind. The first and last ministeps are not multiple.
+\end{enumerate}
+
+The chain defines an order relation (binary function) of ministeps
+in an obvious way -- which of the ministeps comes earlier.
+When there may be the possibility of confusion,
+this is called the \emph{chain order}.
+
+\begin{enumerate}
+\item $\ms_a < \ms_b$ of there is a sequence $\ms_1, ..., \ms_K$ ($K \geq 0$) of ministeps
+      such that $\ms_a.succ = \ms_1, \ms_b.pred = \ms_k$, and $\ms_k.succ = \ms_{k+1}$
+      for all $k$, $1 \leq k \leq K-1$.
+\end{enumerate}
+
+An ordered pair of ministeps is called a CCP (\emph{consecutive canceling pair})
+if they are of the same kind, not diagonal, cancel each other's effect (see next sentence),
+have no other ministep of the same kind in between, are ordered
+according to the chain order, and there is at least one ministep of a
+different kind in between.
+Two ministeps $\ms_a$ and $\ms_b$ cancel each other's effect
+if the following hold: either they are both of the same kind
+(Network, $i,\, j,\, r$) (then they cancel because they toggle the same
+binary variable), or both are of the same kind (Behavior, $i, \, r$)
+and $\ms_a.d + \ms_b.d = 0$.
+
+For example, if the chain contains a total of three ministeps
+$\ms_a, \ms_b, \ms_c$
+of the kind (Network, 1, 2, 1), with $\ms_a < \ms_b < \ms_c$,
+and none of which are each others' immediate predecessors/successors,
+then $(\ms_a, \ms_b)$ and $(\ms_b, \ms_c)$ are CCP's.
+
+Basic functions of the chain are the following.
+\begin{enumerate}
+%\item \textit{Valid}, a boolean indicating whether the chain connects
+%      $y(t_{m-1})$ to $y(t_m)$, and the log probabilities and rates
+%      have been calculated.
+\item \textit{TotNumber}, the number of ministeps of the chain, excluding the first;\\
+      so an empty chain consisting only of the first and last ministeps
+      with \\
+      first.\textit{succ} = last has $TotNumber = 1$.
+\item \textit{DiagNumber}, the number of diagonal ministeps of the chain.
+\item\textit{CCPNumber}, the number of CCP's in the chain.
+\end{enumerate}
+
+The following functions are defined on the kinds of ministeps:
+\begin{enumerate}
+\item \textit{NumberKind}$(w,i,j,r)$, the number of ministeps of the chain
+      of kind $(w,i,j,r)$.\\
+      For the network ministeps this will be a sparse matrix, in the sense that for large networks
+      most of the values \textit{NumberKind}$(N,i,j,r)$ will be 0.\\
+      This is called \textit{Numberrkind} in Siena 3.
+\item \textit{Multiple}$(w,i,j,r)$ = True if \textit{NumberKind}$(w,i,j,r) \geq 2$
+      and False if \textit{NumberKind}$(w,i,j,r) \leq 1$.\\
+      We say that a kind can be multiple or non-multiple.
+\end{enumerate}
+
+\subsection{Operations}
+
+Basic operations on chains are the following.
+Of course they have to guarantee the consistency of all the
+derived variables and pointers.
+The consistency of the log probabilities and reciprocal rates
+is treated separately (when it is needed), see Section~\ref{S_prob}.
+\begin{enumerate}
+\item \emph{Create} an empty chain consisting only of the elements (first, last).
+%      with \textit{Valid} = False.
+%\item \emph{Validate}, check that the chain connects $y(t_{m-1})$ to $y(t_m)$
+%      and if so, calculate the log probabilities and rates
+%      and set \textit{Valid} to True.
+\item \emph{InsertBefore}$(\ms, (w,i,j,d,r))$ :\\
+      for a currently existing ministep $\ms \neq $  first, insert the ministep
+      with values $(w,i,j,d,r)$ between \ms.\textit{pred} and \ms.
+\item \emph{Delete}  a ministep, and link up its predecessor and successor.
+\item \emph{RandomElement}      :\\
+      draw a random ministep from the chain, excluding the first element;
+      note that the probabilities are 1/\textit{TotNumber}.
+\item \emph{Connect} : construct randomly a chain that connects
+      two outcomes $y(t_{m-1})$ and $y(t_m)$ .\\
+      This is done by repeatedly applying \emph{RandomElement} and \emph{InsertBefore}:
+      \begin{tabbing}
+      For all \= $R_N$ networks:\\
+         \> For all \= $(i,j), i \neq j$:\\
+          \> \> if $N^{(r)}_{ij}(t_{m-1}) \neq N^{(r)}_{ij}(t_m)$,\\
+            \> \> then InsertBefore(RandomElement, $N,i,j,0,r$);\\
+      For all \= $R_B$ behaviors: \\
+         \> For all \= $i$:\\
+          \> \> Define $D = B^{(r)}_{i}(t_{m}) - B^{(r)}_{i}(t_{m-1})$;\\
+            \> \> if $D > 0$, then $D$ times InsertBefore(RandomElement, $B,i,0,1,r$);\\
+            \> \> if $D < 0$, then $-D$ times InsertBefore(RandomElement, $B,i,0,-1,r$).\\
+      EXPLAIN LATER: mh DIAGONAL INSERTS UNTIL K'TH REJECTION.
+      \end{tabbing}
+\end{enumerate}
+The following random draws are not always possible, since the sets
+from which a random element is drawn, may be empty.
+(It may be noted, however, that usually the set will be non-empty.)
+\begin{enumerate}[resume]
+\item \emph{RandomDiag}      :\\
+      draw a random diagonal ministep from the chain;
+      note that the probabilities are 1/\textit{DiagNumber}.
+\item \emph{RandomMultipleKind}      :\\
+      draw a random multiple kind;
+      This is called \textit{RandomMultipleS} in Siena 3,
+      but there returns a ministep of this kind rather than
+      the kind itself.
+%      note that the probabilities are 1/\textit{MultipleNumber}.
+\item \emph{RandomCCPKind}$(w,i,j,r)$    :\\
+      draw a random element from the set of all ministeps in the chain
+      that are the first element of some CCP of kind $(w,i,j,r)$;
+      note that the probabilities are 1/\textit{DiagNumber}.\\
+      This is called RandomCCPrkind in Siena 3.\\
+      I SHALL WRITE MORE HERE ABOUT THE POINTERS USED IN SIENA 3
+      TO DO THIS.
+\end{enumerate}
+
+\section{Calculate probabilities related to chains}
+\label{S_prob}
+
+Ministeps are interpreted as changes in the chain (procedure \textit{ChangeStep}).
+These changes are made with certain probabilities, and the
+rate of change has a certain value when the ministep is going to be made.
+The probabilities and rates depend on the state immediately before the ministep;
+this depends in turn on the state at the start of the chain, and the
+sequence of ministeps before the current ministep.
+For a ministep \ms \ in the chain with a given initial state $y$
+(say, $y = y(t_{m-1})$), the state obtaining before \ms \
+can be defined recursively as follows (where \textit{ChangeStep} is treated
+as a function with states as outcomes).
+\begin{enumerate}
+\item $\textit{StateBefore}(\text{first}) = y$.
+\item $\textit{StateBefore}(\ms.succ) = \textit{ChangeStep}(\textit{StateBefore}(\ms),\ms)$.
+\end{enumerate}
+Thus, the state before \ms \ is obtained by repeatedly applying \textit{ChangeStep}.
+
+The probabilities and rates are defined by the following procedure.
+For the mathematical symbols $\pi_j, \pi_v, \lambda(...), J_m$, see
+the notation of Section 2 of `Siena Algorithms' where the microstep/ministep
+is treated for the purpose of simulation of the model,
+and where the same ingredients are used.
+\begin{enumerate}
+\item \textit{StepProb}$(\textsf{input}\ y, w,i,j,r,d; \textsf{output}\ lpr, rr, sc)$;\\
+      this calculates for the current state $y$, conditional on the
+      assumption that a ministep of kind $(w,i,*,r)$ is made,
+      the conditional probability that this will be the ministep
+      with value $(w,i,j,r,d)$;
+      this is $\pi_j$ (for networks) and $\pi_v$ (for behavior,
+      but now with $v$ replaced by $d$), denoted here by $\pi$;\\
+      it calculates the probability to make
+      a ministep of subkind $(w,i,r)$, which is
+      $\lambda^w(r,i,y) / \lambda^+(+,+,y)$;\\
+      the output value
+      $lpr = \ln(\pi) + \ln(\lambda^w(r,i,y)) - \ln(\lambda^+(+,+,y))$
+      is the log of the product of these probabilities;\\
+      it calculates the aggregate rate for current state $y$ ;
+      this is given by $\lambda^+(+,+,y)$; output value
+      $rr = 1/\lambda^+(+,+,y)$ is the reciprocal of this rate;\\
+      and it calculates the contribution of this ministep to the
+      score function, which in Section 2 of `Siena Algorithms'
+      is what is added to $J_m$, and stores this in $sc$.
+\end{enumerate}
+Function \textit{StepProb} in Siena 3 calculates $\ln(\pi)$ rather than what
+is defined here as $lpr$. I think that a more straightforward algorithm
+is obtained by calculating the definition of $lpr$ given here.
+
+The values of \textit{lprob} and \textit{rrate} that are part of the definition
+of the ministeps must be as calculated by \textit{StepProb} when applied to the
+state immediately before the ministep.
+Thus, in practice, these values can be obtained for the whole chain
+by repeated application of \textit{StepProb} and \textit{ChangeStep} jointly.
+
+While operating on the chain, it is important to keep the
+log probabilities and rates up to date. This requires the following procedure.
+It updates only part of the chain, and is applied when it is known
+that the earlier and later parts do not need to be updated.
+
+\begin{enumerate}[resume]
+\item \textit{Update}($\ms_a, \ms_b$) for ministeps $\ms_a < \ms_b$:\\
+       Use \textit{StepProb} to update the log probabilities and rates for all ministeps
+       from $\ms_a$ to $\ms_b$ (i.e., all ministeps between these two in the chain order,
+       including these two ministeps themselves).\\
+       This is called \textit{UpdateRateslprobs} in Siena 3.
+\end{enumerate}
+
+
+\section{Metropolis-Hastings steps}
+
+A basic required functionality is to simulate from the distribution
+of chains that connect $y(t_{m-1})$ to $y(t_m)$,
+given the model specification and model parameters.
+This is done by repeated application of Metropolis Hastings steps.
+These are of the following three types.
+
+\begin{enumerate}
+\item \textit{MH\_InsDelPermute}
+\item \textit{MH\_InsertDiag}\\
+      (called \textit{MH\_TryInsertDiag} in Siena 3).
+\item \textit{MH\_CancelDiag}\\
+      (called \textit{MH\_TryCancelDiag} in Siena 3).
+\end{enumerate}
+
+\subsection{Diagonal Insert}
+
+The function \textit{MH\_InsertDiag}$(\textsf{input}\ \ms, w,i,r; \textsf{output}\ \textit{accept})$
+is defined as follows.
+The interpretation is that,
+the proposal is made to insert a diagonal element of subkind
+$(w,i,r)$ immediately before ministep \ms;
+according to a random decision with a certain probability
+this proposal is put into effect (yielding \textit{accept} = True)
+or not (yielding \textit{accept} = False).
+
+FURTHER THIS TEXT IS INCOMPLETE, TO BE ADDED TO.
+
+\section{Store chains}
+
+For communication with users and with other programs,
+it is necessary to have a way of reading chains from files
+and writing them to files.
+Chains also have to be communicated to R.
+
+\section{Structurally fixed values}
+
+If $N^{r}(i,j)$ is structurally fixed and $N^{r}(i,j)(t_{m-1}) = N^{r}(i,j)(t_m)$,
+then the chain for period $m$ must not contain any ministeps of kind (Network, $i,j,r$).\\
+If $B^{r}(i)$ is structurally fixed and $B^{r}(i)(t_{m-1}) = B^{r}(i)(t_m)$,
+then the chain for period $m$ must not contain any ministeps of kind (Behavior, $i,*,r$).
+
+For the variables that are structurally fixed but
+have values at $t_m$ different from their
+values at $t_{m-1}$, the principle is that these changes are enforced
+either directly before the last ministep, or as part of the last ministep
+(whichever is the simpler or more elegant;
+I think the latter). These changes
+do not contribute anything to probabilities or rates; this can be implemented
+formally by omitting them from sums or by defining \textit{lprob} = 0
+and \textit{rrate} = 0.
+If there are several such variables, the order in which these changes are enforced
+does not matter (and is inconsequential).
+
+
+\end{document}
