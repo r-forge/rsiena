@@ -1,3 +1,7 @@
+2010-01-28 R-forge revision 48
+
+	* R/simstatsc.r: fixed bug in sort order of effects
+
 2010-01-26 R-forge revision 46
 
 	* man/RSiena-package.Rd: new version number
