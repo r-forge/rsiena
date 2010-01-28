@@ -67,11 +67,11 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                 depvarnames <- names(data[[1]]$depvars)
             else
                 depvarnames <- names(data$depvars)
-            effects1order <- match(names(effects1), depvarnames)
+            effects1order <- match(depvarnames, names(effects1))
             requestedEffects <- do.call(rbind, effects1[effects1order])
             row.names(requestedEffects) <- 1:nrow(requestedEffects)
             effects1 <- split(effects, effects$name)
-            effects1order <- match(names(effects1), depvarnames)
+            effects1order <- match(depvarnames, names(effects1))
             effects <- do.call(rbind, effects1[effects1order])
             row.names(effects) <- 1:nrow(effects)
             z$theta <- requestedEffects$initialValue

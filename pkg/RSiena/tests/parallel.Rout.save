@@ -666,7 +666,7 @@ Covariance matrix of X (correlations below the diagonal):
 > mynet2 <- sienaNet(s50a,type='behavior')
 > mydata <- sienaDataCreate(mynet1, mynet2)
 > myeff <- getEffects(mydata)
-> myeff$initialValue[96] <- 0.34699930338 ## siena3 starting values differ
+> myeff$initialValue[94] <- 0.34699930338 ## siena3 starting values differ
 > ##test10
 > print('test10')
 [1] "test10"
