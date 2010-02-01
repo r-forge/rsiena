@@ -82,7 +82,8 @@ void ConstantFunction::initialize(const Data * pData,
  */
 bool ConstantFunction::networkConstant() const
 {
-	return this->lconstantType == AVERAGE_IN_DEGREE;
+	return this->lconstantType == AVERAGE_IN_DEGREE ||
+		this->lconstantType == AVERAGE_OUT_DEGREE;
 }
 
 

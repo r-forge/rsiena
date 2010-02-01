@@ -156,7 +156,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             attr(f, "allDownOnly") <- attr(data, "allDownOnly")
             attr(f, "allHigher") <- attr(data, "allHigher")
             attr(f, "allDisjoint") <- attr(data, "allDisjoint")
-            attr(f, "allatLeastOne") <- attr(data, "allAtLeaseOne")
+            attr(f, "allAtLeastOne") <- attr(data, "allAtLeastOne")
             attr(f, "anyUpOnly") <- attr(data, "anyUpOnly")
             attr(f, "anyDownOnly") <- attr(data, "anyDownOnly")
             attr(f, "anyHigher") <- attr(data, "anyHigher")

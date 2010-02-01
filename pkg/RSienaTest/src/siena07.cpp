@@ -1739,7 +1739,7 @@ one of values, one of missing values (boolean) */
 						CHAR(STRING_ELT(TOHIGHERLIST, i)), HIGHER);
 			}
 			/* disjoint */
-			for (int i = 0; i < length(FROMHIGHERLIST); i++)
+			for (int i = 0; i < length(FROMDISJOINTLIST); i++)
 			{
 				pData->
 					addNetworkConstraint(CHAR(STRING_ELT(FROMDISJOINTLIST, i)),

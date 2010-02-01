@@ -51,11 +51,11 @@ void NetworkChange::makeChange(DependentVariable * pVariable)
 	if (this->ego() != this->lalter &&
 		this->difference() != 0)
 	{
-		NetworkVariable * pVariable =
+		NetworkVariable * pNetworkVariable =
 			dynamic_cast<NetworkVariable *>(pVariable);
-		int oldValue = pVariable->pNetwork()->tieValue(this->ego(),
+		int oldValue = pNetworkVariable->pNetwork()->tieValue(this->ego(),
 			this->lalter);
-		pVariable->pNetwork()->setTieValue(this->ego(),
+		pNetworkVariable->pNetwork()->setTieValue(this->ego(),
 			this->lalter,
 			oldValue + this->difference());
 	}

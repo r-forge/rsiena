@@ -359,7 +359,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		{
 			pAlterIndegreeFunction =
 				new IntSqrtFunction(pAlterIndegreeFunction);
+			pEgoIndegreeFunction =
+				new IntSqrtFunction(pEgoIndegreeFunction);
 			pFirstConstantFunction->pFunction(sqrt);
+			pSecondConstantFunction->pFunction(sqrt);
 		}
 
 		pEffect = new GenericNetworkEffect(pEffectInfo,
