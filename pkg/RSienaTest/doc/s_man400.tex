@@ -5644,6 +5644,270 @@ the following effects are available:
 \end{enumerate}
 
 
+
+\subsubsection{Multiple network effects}
+\label{S_MultiNet}
+
+If there are multiple dependent networks, the definition of
+cross-network effects is such that always, one network has the
+role of the dependent variable, while the other network, or
+networks, have the role of explanatory variable(s).
+In the following list the network in the role of dependent variable
+is denoted by the tie variables $x_{ij}$, while the
+tie variables $w_{ij}$ denote the network that is the
+explanatory variable.
+
+In the \SI output for projects with multiple networks,
+the dependent network in each given effect is indicated by
+the first part of the effect name.
+In the list below, a more or less normally formulated name is given first, then the
+name used in \SI between parentheses,
+using $X$ as the name for the dependent network and $W$
+as the name for the explanatory network.
+Since this is a co-evolution model, \SI will include also the effects
+where the roles of $X$ and $W$ are reversed.
+
+The first three effects are dyadic. The first can be regarded
+as a main effect; the reciprocity and mutuality effects
+will require rather big data sets to be empirically distinguished
+from each other.
+\begin{enumerate}
+ \item {\em Effect of W on X} ($X$: $W$),\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ij}  $ ;\\
+ $i \stackrel{W}{\rightarrow} j$ leads to  $i \stackrel{X}{\rightarrow} j$;
+
+ \item {\em Effect of incoming W on X} ($X$: reciprocity with $W$),\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ji}  $ ;\\
+ this can be regarded as generalized exchange:
+ $j \stackrel{W}{\rightarrow} i$ leads to  $i \stackrel{X}{\rightarrow} j$;
+
+ \item {\em Effect of mutual ties in W on X} ($X$: mutuality with $W$),\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ij} \, w_{ji}  $ ;\\
+ $j \stackrel{W}{\leftrightarrow} i$ leads to  $i \stackrel{X}{\rightarrow} j$;
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+\smallskip
+The following five are degree-related effects, where nodal degrees
+in the $W$ network have effects on popularity or activity in the
+$X$  network. They use an internal effect parameter $p$, which
+mostly will be 1 or 2.
+
+To decrease correlation with other effects, the
+$W$-degrees are centered by subtracting the value $\bar w$,
+which is the average degree of $W$ across all observations.\\
+THIS VALUE SHOULD BE GIVEN AS THE AVERAGE DEGREE IN THE INITIAL PART
+OF THE OUTPUT.
+
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+ \item {\em Effect of in-degree in W on X-popularity } ($X$: indegree$^{1/p}$ $W$ popularity)
+ defined by   the sum of  the $W$-in-degrees of the others to whom $i$ is tied,
+ for parameter $p = 2$ the square roots of the $W$-in-degrees:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{+j} - \bar w)^{1/p}  $;\\
+
+ \item {\em Effect of in-degree in W on X-activity } ($X$: indegree$^{1/p}$ $W$ activity)
+ defined by the $W$-in-degrees of $i$ (for $p = 2$ its square root)
+ times $i$'s $X$-out-degree:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{+i} - \bar w)^{1/p}
+                 =  x_{i+}\, (w_{+i} - \bar w_{+.}) ^{1/p} $;\\
+
+ \item {\em Effect of out-degree in W on X-popularity } ($X$: outdegree$^{1/p}$ $W$ popularity)
+ defined by   the sum of  the $W$-out-degrees of the others to whom $i$ is tied,
+ for parameter $p = 2$ the square roots of the $W$-out-degrees:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{j+} - \bar w)^{1/p}  $;\\
+
+ \item {\em Effect of out-degree  in W on X-activity } ($X$: outdegree$^{1/p}$ $W$ activity)
+ defined by the $W$-out-degrees of $i$ (for $p = 2$ its square root)
+ times $i$'s $X$-out-degree:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{i+} - \bar w)^{1/p} =
+                           x_{i+}\, (w_{i+} - \bar w)^{1/p} $;\\
+
+ \item {\em Effect of both in-degrees in W on X-popularity } ($X$: both indegrees$^{1/p}$ $W$ )
+ defined by   the sum of  the $W$-in-degrees of the others to whom $i$ is tied
+ multiplied by the centered $W$-in-degree of $i$,
+ for parameter $p = 2$ the square roots of the $W$-in-degrees:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{+i} - \bar w)^{1/p} \, (w_{+j} - \bar w)^{1/p}  $;\\
+ this can be regarded as an interaction between the effect of $W$-in-degree on $X$-popularity
+ and the effect of $W$-in-degree on $X$-activity.
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+\smallskip
+The betweenness effect is another positional effect:
+a positional characteristic in the $W$ network affects the
+ties in the $X$ network, but now the position is the betweenness count,
+defined as the number of pairs of nodes that are not directly connected:
+ $j \stackrel{W}{\nrightarrow} h$ ,
+but that are connected through $i$:
+ $j \stackrel{W}{\rightarrow} i  \stackrel{X}{\rightarrow} h$ .
+ Again there is an internal effect parameter $p$, usually
+1 or 2.
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+ \item {\em Effect of W-betweenness on X-popularity } ($X$: betweenness$^{1/p}$ $W$ popularity)
+ defined by   the sum of  the $W$-betweenness counts of the others to whom $i$ is tied:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \left(\sum_{h,k; h \neq k}w_{hj}\,w_{jk}\,(1-w_{hk})\right)^{1/p}  $;\\
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+\smallskip
+Finally there are four mixed triadic effects.
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em agreement about W leading to X}, ($X$: from $W$ agreement)\\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{jh}\,$;\\
+ this refers to agreement of actors with respect to their $W$-choices
+ (structural equivalence with respect to outgoing $W$-choices)
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of joint $W$ choices of others,
+ $i \stackrel{W}{\rightarrow} h \stackrel{W}{\leftarrow} j$.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from  3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em agreement in mutual W-ties leading to X}, ($X$: from $W$ mutual agreement)\\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\,  w_{hi}\, w_{jh}\, w_{hj}\,$;\\
+ this refers to agreement of actors with respect to their mutual $W$-choices
+ (structural equivalence with respect to mutual $W$-choices)
+ the contribution  of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of joint mutual $W$ choices of others,
+ $i \stackrel{W}{\leftrightarrow} h \stackrel{W}{\leftrightarrow} j$.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from  3.9 1.1732 to 3.1 2.559
+\arrow <2mm> [.2,.6]  from 2.9 2.559 to  2.1 1.1732
+\arrow <2mm> [.2,.6]  from  3.1 2.559 to  3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+ \item
+\begin{minipage}[t]{.7\textwidth}
+ {\em  W leading to agreement in X}, ($X$: $W$ to agreement)\\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, x_{hj}\,$;\\
+ this refers to the closure of mixed $W-X$ two-paths;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of mixed $W-x$ two-paths
+ $i \stackrel{W}{\rightarrow} h \stackrel{X}{\rightarrow} j$.\\
+ Note that since this is the evaluation function for actor $i$ with
+ respect to network $X$, only the $x_{ij}$ tie indicator in the formula,
+ corresponding to  the tie $i \stackrel{X}{\rightarrow} j$,
+ is the dependent variable here.\\
+ The interpretation is that actors have the tendency to make the same
+ outgoing $X$-choices as those to whom they have a $W$-tie.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $X$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+ \item
+\begin{minipage}[t]{.7\textwidth}
+ {\em mixed $WW=>X$ closure}, ($X$: closure of $W$)\\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{hj}\,$;\\
+ this refers to the closure of $W-W$ two-paths;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of $W-W$ two-paths
+ $i \stackrel{W}{\rightarrow} h \stackrel{W}{\rightarrow} j$.\\
+ The interpretation is that actors have the tendency to make
+ and maintain $X$-ties to those to whom they have an indirect
+ (distance 2) $W$-tie: `$W$-ties of $W$-ties tend to become $X$-ties'.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+
+
+
 \subsubsection{Network endowment function} \label{S_g}
 
 The \hypertarget{T_gratification}{network endowment function}
