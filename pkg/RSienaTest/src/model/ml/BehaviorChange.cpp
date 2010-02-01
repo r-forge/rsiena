@@ -46,10 +46,10 @@ void BehaviorChange::makeChange(DependentVariable * pVariable)
 
 	if (this->difference() != 0)
 	{
-		BehaviorVariable * pVariable =
+		BehaviorVariable * pBehaviorVariable =
 			dynamic_cast<BehaviorVariable *>(pVariable);
-		int oldValue = pVariable->value(this->ego());
-		pVariable->value(this->ego(), oldValue + this->difference());
+		int oldValue = pBehaviorVariable->value(this->ego());
+		pBehaviorVariable->value(this->ego(), oldValue + this->difference());
 	}
 }
 
