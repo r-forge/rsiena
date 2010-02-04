@@ -85,7 +85,7 @@ covarNonSymmetricObjective,xxxxxx of indirect ties,Sum xxxxxx of indirect ties,I
 covarBehaviorInteractions,av.sim. x ,av.sim. x ,avSimX,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
 covarBehaviorInteractions,tot. sim. x ,tot. sim. x ,totSimX,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
 covarBehaviorInteractions,av. alters x ,av. alters x ,avAltX,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
-covarBehaviorRate,effect yyyyyy on rate xxxxxx,Amount of change on xxxxxx x yyyyyy,RateX,NA,yyyyyy,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,rate,NA,NA,0,0,0,0,
+covarBehaviorRate,effect yyyyyy on rate xxxxxx,Amount of change on xxxxxx x yyyyyy,RateX,NA,yyyyyy,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,rate,NA,covariate,0,0,0,0,
 bipartiteObjective,outdegree (density),Number of ties,density,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,dyadic
 bipartiteObjective,4-cycles,(Number 4-cycles)^1/#),4-cycles,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,1,objective,NA,NA,0,0,0,0,
 bipartiteObjective,indegree - popularity,Sum of squared indegrees,inPop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
@@ -166,7 +166,6 @@ bipartiteSymmetricObjective,degree^(1/#) xxxxxx activity,sum outd. x degre.^(1/#
 bipartiteSymmetricObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx",to,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
 nonSymmetricBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,2,objective,NA,NA,0,0,0,0
 nonSymmetricBipartiteObjective,from xxxxxx agreement ,"mixed triplets XWW, W = xxxxxx",from,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
-nonSymmetricBipartiteObjective,from xxxxxx mutual agr. ,"mixed triplets XWW, W=m.xxxxxx",fromMutual,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
 bipartiteBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,2,objective,NA,NA,0,0,0,0
 bipartiteBipartiteObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx",to,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
 covarNetNetObjective,from xxxxxx agr. x same yyyyyy,"m.tr. XWW, W = xxxxxx, same yyyyyy",covNetNet,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0
