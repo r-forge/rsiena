@@ -1,3 +1,10 @@
+2010-02-07 R-forge revision 52
+
+	* R/globals.r, R/siena07.r, man/siena07.Rd: 
+	new silent option with no output.
+	* tests/parallel.R, tests/parallel.Rout.save: suppress progress
+	message output and include prints of results.
+	
 2010-02-04 R-forge revision 51
 
 	* data/allEffects/csv: Bug in covariate behavior effects
