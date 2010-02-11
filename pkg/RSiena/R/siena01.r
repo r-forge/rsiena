@@ -530,7 +530,14 @@ siena01Gui <- function(getDocumentation=FALSE)
                 effEdit[,i] <- as.logical(effEdit[,i])
             }
             myeffcopy[, editCols] <- effEdit
+            if (theseEffects != "")
+            {
             myeff[myeff$name == theseEffects, ] <<- myeffcopy
+            }
+            else
+            {
+                myeff <<- myeffcopy
+            }
             ##  browser()
             ## make sure this window is top with a global grab,
             ##but only for a second
