@@ -1,4 +1,5 @@
-include $(R_HOME)/etc/Makeconf
+## This should work on Win64 but it not currently built.
+include $(R_HOME)/etc$(R_ARCH)/Makeconf
 
 %.o: %.rc
 	$(RESCOMP) -i $< -o $@
