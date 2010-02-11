@@ -577,7 +577,7 @@ siena01Gui <- function(getDocumentation=FALSE)
                     use <- which(myeff$include)
                     initValues <- rep(0, length(use))
                     initValues[estimAns$condvar] <- estimAns$rate
-                    initValues[!estimAns$condvar] <- estimAns$theta
+                    initValues[-estimAns$condvar] <- estimAns$theta
                     myeff$initialValue[myeff$include] <<- initValues
                 }
                 else
