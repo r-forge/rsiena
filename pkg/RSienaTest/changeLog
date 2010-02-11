@@ -1,3 +1,10 @@
+2010-02-11 R-forge revision 55 (cf revision 52)
+
+	* R/globals.r, R/siena07.r, man/siena07.Rd: 
+	new silent option with no output.
+	* tests/parallel.R, tests/parallel.Rout.save: suppress progress
+	message output and include prints of results.
+	
 2010-02-11 R-forge revision 54
 
 	* R/print07Report.r: source formatting
