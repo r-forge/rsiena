@@ -1,4 +1,8 @@
-2010-02-07 R-forge revision 52
+2010-02-11 R-forge revision 53
+
+	* R/siena01.r: fixed bug in editing all effects
+	
+2010-02-07 R-forge revision 52 
 
 	* R/globals.r, R/siena07.r, man/siena07.Rd: 
 	new silent option with no output.
