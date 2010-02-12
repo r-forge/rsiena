@@ -247,7 +247,7 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
             z$sims[[nit + (i - 1)]] <- zz[[i]]$sims
        }
     }
-    if (z$cconditional)
+    if ((!x$maxlike) && z$cconditional)
     {
         if (int==1)
             z$ntim[nit,]<- zz$ntim0
@@ -308,7 +308,7 @@ phase3.2 <- function(z, x, ...)
     Report(c('Total of', z$n,'iterations.\n'), outf)
     Report(c('Parameter estimates based on', z$n - z$Phase3nits,
              'iterations,\n'), outf)
-    if (z$cconditional)
+    if (!x$maxlike && z$cconditional)
         Report(c('basic rate parameter',
                  c('', 's')[as.integer(z$observations > 2) + 1],
                  ' as well as \n'), outf)
@@ -318,10 +318,10 @@ phase3.2 <- function(z, x, ...)
     Report(c('Averages, standard deviations, ',
            'and t-ratios for deviations from targets:\n'), sep='', outf)
   #  Report(c(date(),'\n'),bof)
-    if (z$cconditional)
-        Report('\nconditional moment estimation.', bof)
-    else if (x$maxlike)
+    if (x$maxlike)
         Report('\nMaximum Likelihood estimation.', bof)
+    else if (z$cconditional)
+        Report('\nconditional moment estimation.', bof)
     else
         Report('\nunconditional moment estimation.', bof)
     Report('\nInformation for convergence diagnosis.\n', bof)

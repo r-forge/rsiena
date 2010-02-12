@@ -234,24 +234,24 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             f$nGroup <- NULL
        }
         ##browser()
-        pData <- .Call('setupData', PACKAGE="RSienaTest",
+        pData <- .Call('setupData', PACKAGE=pkgname,
                        lapply(f, function(x)(as.integer(x$observations))),
                        lapply(f, function(x)(x$nodeSets)))
-        ans <- .Call('OneMode', PACKAGE="RSienaTest",
+        ans <- .Call('OneMode', PACKAGE=pkgname,
                     pData, lapply(f, function(x)x$nets))
-        ans <- .Call('Bipartite', PACKAGE="RSienaTest",
+        ans <- .Call('Bipartite', PACKAGE=pkgname,
                     pData, lapply(f, function(x)x$bipartites))
-        ans <- .Call('Behavior', PACKAGE="RSienaTest",
+        ans <- .Call('Behavior', PACKAGE=pkgname,
                      pData, lapply(f, function(x)x$behavs))
-        ans <-.Call('ConstantCovariates', PACKAGE="RSienaTest",
+        ans <-.Call('ConstantCovariates', PACKAGE=pkgname,
                    pData, lapply(f, function(x)x$cCovars))
-        ans <-.Call('ChangingCovariates', PACKAGE="RSienaTest",
+        ans <-.Call('ChangingCovariates', PACKAGE=pkgname,
                    pData, lapply(f, function(x)x$vCovars))
-        ans <-.Call('DyadicCovariates', PACKAGE="RSienaTest",
+        ans <-.Call('DyadicCovariates', PACKAGE=pkgname,
                    pData, lapply(f, function(x)x$dycCovars))
-        ans <-.Call('ChangingDyadicCovariates', PACKAGE="RSienaTest",
+        ans <-.Call('ChangingDyadicCovariates', PACKAGE=pkgname,
                    pData, lapply(f, function(x)x$dyvCovars))
-        ans <-.Call('ExogEvent', PACKAGE="RSienaTest",
+        ans <-.Call('ExogEvent', PACKAGE=pkgname,
                    pData, lapply(f, function(x)x$exog))
         ## split the names of the constraints
         higher <- attr(f, "allHigher")
@@ -259,7 +259,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         atLeastOne <- attr(f, "allAtLeastOne")
         froms <- sapply(strsplit(names(higher), ","), function(x)x[1])
         tos <- sapply(strsplit(names(higher), ","), function(x)x[2])
-        ans <- .Call("Constraints", PACKAGE="RSienaTest",
+        ans <- .Call("Constraints", PACKAGE=pkgname,
                      pData, froms[higher], tos[higher],
                      froms[disjoint], tos[disjoint],
                      froms[atLeastOne], tos[atLeastOne])
@@ -293,7 +293,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                             x[x$shortName %in% c("unspInt", "behUnspInt"), ]
                         }
                             )
-        ans <- .Call('effects', PACKAGE="RSienaTest",
+        ans <- .Call('effects', PACKAGE=pkgname,
                     pData, basicEffects)
         pModel <- ans[[1]][[1]]
        ## browser()
@@ -313,7 +313,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                 basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
                                                   basicEffects[[i]]$effectNumber)]
         }
-        ans <- .Call('interactionEffects', PACKAGE="RSienaTest",
+        ans <- .Call('interactionEffects', PACKAGE=pkgname,
                      pData, pModel, interactionEffects)
         ## copy these pointers to the interaction effects and then rejoin
         for (i in 1:length(ans[[1]])) ## ans is a list of lists of
@@ -336,7 +336,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                             )
         if (!initC)
         {
-            ans <- .Call('getTargets', PACKAGE="RSienaTest",
+            ans <- .Call('getTargets', PACKAGE=pkgname,
                          pData, pModel, myeffects)
             z$targets <- rowSums(ans)
             z$targets2 <- ans
@@ -363,7 +363,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             CONDVAR <- NULL
             CONDTARGET <- NULL
         }
-        ans <- .Call("setupModelOptions", PACKAGE="RSienaTest",
+        ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                      pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
                      profileData, z$parallelTesting)
         f$myeffects <- myeffects
@@ -461,7 +461,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         }
        ## cat(randomseed2, '\n')
     }
-    ans <- .Call('model', PACKAGE="RSienaTest",
+    ans <- .Call('model', PACKAGE=pkgname,
                  z$Deriv, f$pData, seeds,
                  fromFiniteDiff, f$pModel, f$myeffects, z$theta,
                  randomseed2, returnDeps, z$FinDiff.method)
@@ -511,13 +511,13 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 ##@clearData siena07 Finalizer to clear Data object in C++
 clearData <- function(pData)
 {
-    ans <- .Call('deleteData', PACKAGE="RSienaTest",
+    ans <- .Call('deleteData', PACKAGE=pkgname,
                  pData)
 }
 ##@clearModel siena07 Finalizer to clear Model object in C++
 clearModel <- function(pModel)
 {
-    ans <- .Call('deleteModel', PACKAGE="RSienaTest",
+    ans <- .Call('deleteModel', PACKAGE=pkgname,
                  pModel)
 }
 ##@createEdgeLists siena07 Reformat data for C++

@@ -756,8 +756,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
     Report(c("This file contains primary output for SIENA project <<",
         modelname, ">>.\n\n"), sep="", outf)
     Report(c("Date and time:", format(Sys.time(), "%d/%m/%Y %X"), "\n\n"), outf)
-    packageValues <- packageDescription("RSiena", fields=c("Version", "Date"))
-    rforgeRevision <-  packageDescription("RSiena",
+    packageValues <- packageDescription(pkgname, fields=c("Version", "Date"))
+    rforgeRevision <-  packageDescription(pkgname,
                                           fields="Repository/R-Forge/Revision")
     if (is.na(rforgeRevision))
     {
