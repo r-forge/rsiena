@@ -119,7 +119,7 @@ InitReports <- function(seed, newseed)
     Report(c("Date and time:", format(Sys.time(),"%d/%m/%Y %H:%M:%S")), outf)
     Report("\nNew results follow.\n", outf)
     Report("-----------------------------------\n", outf)
-    rforgeRevision <-  packageDescription("RSiena",
+    rforgeRevision <-  packageDescription(pkgname,
                                           fields="Repository/R-Forge/Revision")
     if (is.na(rforgeRevision))
     {
@@ -130,8 +130,8 @@ InitReports <- function(seed, newseed)
         revision <- paste(" R-forge revision: ", rforgeRevision, " ", sep="")
     }
     Report(c("\nSiena version ",
-             packageDescription("RSiena", fields = "Version"), " (",
-             format(as.Date(packageDescription("RSiena", fields = "Date")),
+             packageDescription(pkgname, fields = "Version"), " (",
+             format(as.Date(packageDescription(pkgname, fields = "Date")),
                     "%d %b %y"), ")",
              revision, "\n\n"), sep = '',  outf )
     Heading(1, outf, "Estimation by stochastic approximation algorithm.")

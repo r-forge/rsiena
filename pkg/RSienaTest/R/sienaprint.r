@@ -189,7 +189,7 @@ print.sienaModel <- function(x, ...)
         '\n')
     cat(' Number of subphases in phase 2:', x$nsub, '\n')
     cat(' Number of iterations in phase 3:', x$n3, '\n')
-    if (!x$cconditional)
+    if (is.na(x$cconditional) || !x$cconditional)
     {
         cat('Unconditional simulation\n')
     }

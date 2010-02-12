@@ -42,7 +42,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
         cl <- makeCluster(clusterString, type = "SOCK",
                           outfile = 'cluster.out')
         clusterSetupRNG(cl, seed = rep(1, 6))
-        clusterCall(cl, library, "RSiena", character.only = TRUE)
+        clusterCall(cl, library, pkgname, character.only = TRUE)
         clusterCall(cl, storeinFRANstore,  FRANstore())
         if (initC)
         {

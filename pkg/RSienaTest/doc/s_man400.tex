@@ -506,6 +506,8 @@ There are two ways to enter the data.
       and it is created in .csv (comma separated) format
       by the \sfn{ siena01Gui()} when you request
       \sfn{Save to file}.
+\item If you wish to remove files, use the \sfn{Remove} option rather than
+  blanking out the entries. 
 \end{enumerate}
 Once you have done this, check that the \sfn{Format},
 \sfn{Period}, \sfn{Type}, etc., are correct, and enter any
@@ -605,8 +607,9 @@ The details of this screen are explained in Section~\ref{S_de_screen}.
 \item[\sfn{changing dyadic covariate}]
 \item[\sfn{exogenous event}] (for changing composition of the actor set)
 \end{description}
-\item[\sfn{Selected}] Yes or No. Only files with \sfn{Yes} will be included in
-  the model.
+\item[\sfn{Selected}] Yes or No. Files with \sfn{Yes} \emph{or blank} will be 
+included in the model. Use this field to remove any networks or behavior
+variables that are not required in the model. 
 \item[\sfn{Missing Values}] Enter any values which indicate missingness, with
   spaces between different entries.
 \item[\sfn{Nonzero Codes}] Enter any values which indicate ties, with spaces
@@ -984,7 +987,7 @@ which one may use to get started with \rs.
         #myeff <- includeEffects(myeff, transTrip, cycle3, between)
         #myeff <- includeInteraction(myeff, egoX, recip,
         #   interaction1="alcohol")
-        #myeff <- setParameter(myeff, outInv, 3)
+        #myeff <- setEffect(myeff, outInv, 3) ##sets parameter
 
 # There is a table of short names etc available as pdf via
 
@@ -4072,15 +4075,18 @@ This can be obtained in \RS by appropriate choices in the effects dataframe
 Parameters can be restricted by
 putting 1 in the \sfn{fix} and \sfn{test} columns when editing the effects, and
 the tested value in the \sfn{initialValue} column.
-For example, when the effect for which the score test
-is desired has \sfn{effectNumber} equal to 46, the
+For example, to request a score test for the reciprocity evaluation effect for
+the first network: Suppose this effect has \sfn{effectNumber} equal to 10, the
 commands can be as follows.
 
 \begin{verbatim}
-myeff[46,9] <- TRUE
-myeff[46, 'fix'] <- TRUE
-myeff[46, 'test'] <- TRUE
-myeff[46, 'initialValue'] <- ((value to be used for test))
+myeff[10, 9] <- TRUE
+myeff[10, 'fix'] <- TRUE
+myeff[10, 'test'] <- TRUE
+myeff[10, 'initialValue'] <- ((value to be used for test))
+## or, more easily
+myeff <- setEffect(myeff, recip, fix=TRUE, test=TRUE, 
+initialValue=(value to be used for test))
 \end{verbatim}
 
 
@@ -6799,6 +6805,14 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-02-12 R-forge revision 58 (RSienaTest only) Fix to bugs in printing
+  version numbers and in using multiple processors (would revert to RSiena
+  package.) Added a skeleton MCMC routine.
+\item 2010-02-11 R-forge revision 57 Fix to bug in siena01Gui where in
+  conditional estimation, the
+  estimated values were not remembered for the next run.
+\item 2010-02-11 R-forge revision 56 (RSiena only)
+Multiple network effects, constraints between networks.
 \item 2010-02-11 R-forge revision 55 (RSienaTest only)
 New silent option for siena07.
 \item 2010-02-11 R-forge revision 54 (RSienaTest only)
