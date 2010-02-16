@@ -614,12 +614,12 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     }
                     else
                     {
-                        attr(depvars[[i]], "vals")[[j]] <- table(mymat,
-                                                                 useNA="always")
+                        attr(depvars[[i]], "vals")[[j]] <-
+                            table(mymat, useNA="always")
                     }
                     attr(depvars[[i]], "nval")[j] <-
                         sum(!is.na(mymat[row(mymat) != col(mymat)]))
-                }
+           }
                 ### need to exclude the structurals here
                 if (sparse)
                 {
@@ -635,9 +635,31 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     attr(depvars[[i]], "range") <-
                         range(tmp[!(is.na(tmp) | tmp %in% c(10, 11))])
                 }
+                ## average degree
+                atts <- attributes(depvars[[i]])
+                ones <- sapply(atts$vals, function(x){
+                               if (is.na(x["11"]))
+                           {
+                               ones <- x["1"]
+                           }
+                               else
+                           {
+                               ones <- x["1"] + x["11"]
+                           }
+                              } )
+                density <- ones / atts$nval
+                degree <- (atts$netdims[1] - 1) * ones / atts$nval
+                missings <- 1 - atts$nval/ atts$netdims[1] /
+                    (atts$netdims[1] - 1)
+                attr(depvars[[i]], "ones") <- ones
+                attr(depvars[[i]], "density") <- density
+                attr(depvars[[i]], "degree") <- degree
+                attr(depvars[[i]], "averageOutDegree") <- mean(degree)
+                attr(depvars[[i]], "averageInDegree") <- mean(degree)
+                attr(depvars[[i]], "missings") <- missings
             }
             else #type=='bipartite' not sure what we need here,
-                #### but include diagonal
+                ## but include diagonal
             {
                 attr(depvars[[i]], 'balmean') <- NA
                 attr(depvars[[i]], 'simMean') <- NA
@@ -692,7 +714,28 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     attr(depvars[[i]], "range") <-
                         range(tmp[!(is.na(tmp) | tmp %in% c(10, 11))])
                 }
-            }
+                 ## average degree
+                atts <- attributes(depvars[[i]])
+                ones <- sapply(atts$vals, function(x){
+                               if (is.na(x["11"]))
+                           {
+                               ones <- x["1"]
+                           }
+                               else
+                           {
+                               ones <- x["1"] + x["11"]
+                           }
+                              } )
+                density <- ones / atts$nval
+                degree <- (atts$netdims[2]) * ones / atts$nval
+                missings <- 1 - atts$nval/ atts$netdims[1] /
+                    (atts$netdims[2])
+                attr(depvars[[i]], "ones") <- ones
+                attr(depvars[[i]], "density") <- density
+                attr(depvars[[i]], "degree") <- degree
+                attr(depvars[[i]], "averageOutDegree") <- mean(degree)
+                attr(depvars[[i]], "missings") <- missings
+           }
         }
         attr(depvars[[i]], 'name') <- names(depvars)[i]
     }
@@ -789,6 +832,7 @@ checkConstraints <- function(z)
                     var1[var1 %in% c(10, 11)] <- var1[var1 %in% c(10, 11)] - 10
                     var2[var2 %in% c(10, 11)] <- var2[var2 %in% c(10, 11)] - 10
                     ## higher
+                    browser()
                     if (any(var1 - var2 < 0, na.rm=TRUE))
                     {
                         higher[i] <- FALSE
@@ -1230,7 +1274,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
             }
             if (is.null(nodeSets[[netnamesub]]))
             {
-                nodeSets[[netnamesub]] <- attribs[['nodeSet']]
+                  nodeSets[[netnamesub]] <- attribs[['nodeSet']]
             }
             else if (any(nodeSets[[netnamesub]] != attribs[['nodeSet']]))
             {
@@ -1467,6 +1511,33 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     balmeans <- calcBalmeanGroup (group)
     names(balmeans) <- netnames
     attr(group, "balmean") <- balmeans
+    ## calculate overall degree averages
+    atts <- attributes(group)
+    netnames <- atts$netnames
+    types <- atts$types
+    ## cat(types,'\n')
+    degrees <- namedVector(NA, netnames)
+    for (net in seq(along=netnames))
+    {
+        if (types[net] != "behavior")
+        {
+            degree <- 0
+            nDegree <- 0
+            for (i in 1: length(group))
+            {
+                j <- match(netnames[net], names(group[[i]]$depvars))
+                if (is.na(j))
+                    stop("network names not consistent")
+                depvar <- group[[i]]$depvars[[j]]
+                degs <- attr(depvar, "degree")
+                degree <- degree + sum(degs)
+                nDegree <- nDegree + length(degs)
+            }
+            degrees[net] <- degree / nDegree
+        }
+    }
+    attr(group, "averageOutDegree") <- degrees
+    attr(group, "averageInDegree") <- degrees
     group <- groupRangeAndSimilarityAndMean(group)
     bAnyMissing <- attr(group, "bAnyMissing")
     attr(group, "anyMissing") <- anyMissing | bAnyMissing
@@ -1477,6 +1548,10 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     ## copy the global attributes down to individual level where appropriate
     ##group <- copyGroupAttributes(group, "depvars", "balmean", "balmean")
     group <- copyGroupAttributes(group, "depvars", "symmetric", "symmetric")
+    ##group <- copyGroupAttributes(group, "depvars", "averageInDegree",
+    ##                             "averageInDegree")
+    ##group <- copyGroupAttributes(group, "depvars", "averageOutDegree",
+    ##                             "averageOutDegree")
     ##group <- copyGroupAttributes(group, "depvars", "bSim", "simMean")
     group <- copyGroupAttributes(group, "depvars", "bposzvar", "poszvar")
     group <- copyGroupAttributes(group, "depvars", "bRange", "range")

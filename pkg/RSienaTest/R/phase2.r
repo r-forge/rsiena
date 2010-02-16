@@ -27,7 +27,7 @@ phase2.1<- function(z, x, ...)
 {
     #initialise phase2
     z$phase2fras <- array(0, dim=c(4, z$pp, 1000))
-    z$rejectprops <- matrix(0, nrow=4, ncol=1000)
+    z$rejectprops <- array(0, dim=c(4, 4, 1000))
     int <- 1
     f <- FRANstore()
     z$Phase <- 2
@@ -272,7 +272,7 @@ doIterations<- function(z, x, subphase,...)
         z$phase2fras[subphase, ,z$nit] <- fra
         if (x$maxlike)
         {
-            z$rejectprops[subphase, z$nit] <- zz$rejectprop
+            z$rejectprops[subphase, , z$nit] <- zz$rejectprop
         }
         if (z$nit %% 2 == 1)
         {
@@ -321,7 +321,7 @@ doIterations<- function(z, x, subphase,...)
         z$theta <- zsmall$theta
         z$thav <- z$thav + zsmall$theta
         z$thavn <- z$thavn + 1
-        if (x$maxlike && x$moreUpdates > 0)
+        if (x$maxlike && !is.null(x$moreUpdates) && x$moreUpdates > 0)
         {
             z <- doMoreUpdates(z, x, x$moreUpdates * subphase)
             zsmall$theta <- z$theta

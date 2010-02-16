@@ -261,9 +261,9 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                                 }
                                 else if (sum(nnonactive) > 1)
                                 {
-                                    Report(c("Actors ", which(nnonactive),
-                                             " are inactive at this ",
-                                             "observation.\n"), sep='', outf)
+                                    Report(c("Actors", which(nnonactive),
+                                             "are inactive at this",
+                                             "observation.\n"), fill=80, outf)
                                 }
                             }
                         }
@@ -1154,6 +1154,48 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                              '\n'), outf)
                 }
             }
+        }
+    }
+    ## report on constraints
+  if (any(atts$anyHigher) || any(atts$anyDisjoint) || any(atts$anyAtLeastOne))
+    {
+        Report("\n", outf)
+        highers <- atts[["anyHigher"]]
+        disjoints <- atts[["anyDisjoint"]]
+        atleastones <- atts[["anyAtLeastOne"]]
+        if (any(highers))
+        {
+            higherSplit <- strsplit(names(highers)[highers], ",")
+            lapply(higherSplit, function(x)
+               {
+                   Report(c("Network ", x[1], " is higher than network ", x[2],
+                            ".\n"), sep="", outf)
+                   Report("This will be respected in the simulations.\n\n",
+                          outf)
+              })
+        }
+        if (any(disjoints))
+        {
+            disjointSplit <- strsplit(names(disjoints)[disjoints],',')
+            lapply(disjointSplit, function(x)
+               {
+                   Report(c("Network ", x[1], " is disjoint from network ",
+                            x[2], ".\n"), sep="", outf)
+                   Report("This will be respected in the simulations.\n\n",
+                          outf)
+              })
+        }
+        if (any(atleastones))
+        {
+            atLeastOneSplit <- strsplit(names(atleastones)[atleastones],',')
+            lapply(atLeastOneSplit, function(x)
+               {
+                   Report(c("A link in at least one of networks ",
+                            x[1], " and", x[2],
+                           " always exists.\n"), sep="", outf)
+                   Report("This will be respected in the simulations.\n\n",
+                          outf)
+              })
         }
     }
     printInitialDescription(data, myeff, modelname)

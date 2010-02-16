@@ -284,6 +284,22 @@ int NetworkLongitudinalData::maxDegree() const
 {
 	return this->lmaxDegree;
 }
+/**
+ * Stores the average in-degree over all receivers and observations.
+ */
+void NetworkLongitudinalData::averageInDegree(double val)
+{
+	this->laverageInDegree = val;
+}
+
+
+/**
+ * Store the average out-degree over all senders and observations.
+ */
+void NetworkLongitudinalData::averageOutDegree(double val)
+{
+	this->laverageOutDegree = val;
+}
 
 
 /**

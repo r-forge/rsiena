@@ -951,6 +951,8 @@ unpackOneMode <- function(depvar, observations, compositionChange)
     attr(edgeLists, 'symmetric') <- attr(depvar, 'symmetric')
     ## attr balmean
     attr(edgeLists, 'balmean') <- attr(depvar, 'balmean')
+    attr(edgeLists, 'averageInDegree') <- attr(depvar, 'averageInDegree')
+    attr(edgeLists, 'averageOutDegree') <- attr(depvar, 'averageOutDegree')
     return(edgeLists = edgeLists)
 }
 ##@unpackBipartite siena07 Reformat data for C++
@@ -1098,6 +1100,7 @@ unpackBipartite <- function(depvar, observations, compositionChange)
     attr(edgeLists, 'symmetric') <- attr(depvar, 'symmetric')
     ## attr balmean
     attr(edgeLists, 'balmean') <- attr(depvar, 'balmean')
+    attr(edgeLists, 'averageOutDegree') <- attr(depvar, 'averageOutDegree')
     return(edgeLists = edgeLists)
 }
 ##@unpackBehavior siena07 Reformat data for C++
