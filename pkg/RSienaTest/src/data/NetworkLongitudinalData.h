@@ -60,6 +60,8 @@ public:
 	int maxDegree() const;
 	double averageInDegree() const;
 	double averageOutDegree() const;
+	void averageInDegree(double val);
+	void averageOutDegree(double val);
 
 private:
 	// The set of actors receiving the ties of the network

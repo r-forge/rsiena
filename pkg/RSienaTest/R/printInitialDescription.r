@@ -60,40 +60,21 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                 depvar <- data[[group]]$depvars[[j]]
                 atts <- attributes(depvar)
                 subs <- 1:data[[group]]$observations + periodFromStart
-                ones <- sapply(atts$vals, function(x){
-                    if (is.na(x["11"]))
-                    {
-                        x["1"]
-                    }
-                    else
-                    {
-                        x["1"] + x["11"]
-                    }
-                })
-                density[subs] <- ones / atts$nval
-                if (any(ones >= atts$nval))
+                density[subs] <- atts$density
+                if (any(atts$ones >= atts$nval))
                 {
                     difficult <- TRUE
                 }
-                if (bipartite)
-                {
-                    degree[subs] <- atts$netdims[2] * ones / atts$nval
-                    missings[subs] <- 1 - atts$nval/ atts$netdims[1] /
-                        atts$netdims[2]
-                }
-                else
-                {
-                    degree[subs] <- (atts$netdims[1] - 1) * ones / atts$nval
-                    missings[subs] <- 1 - atts$nval/ atts$netdims[1] /
-                        (atts$netdims[1] - 1)
-               }
-                nties[subs] <- ones
+                degree[subs] <- atts$degree
+                missings[subs] <-atts$missings
+                nties[subs] <- atts$ones
                 if (gpatts$symmetric[net])
                 {
                     nties <- nties / 2
                 }
                 periodFromStart <- data[[group]]$observations
             }
+            averageDegree <- mean(degree)
             ## now do the format
             tmp <- rbind(format(round(density, 3), nsmall=3, width=7),
                          format(round(degree, 3), nsmall=3, width=7),
@@ -116,9 +97,38 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                 if (startCol > nobs)
                     break
             }
+            if (sum(gpatts$types == "oneMode") > 0)
+            {
+                netnames <- gpatts$netnames[net]
+                if (nData > 1)
+                {
+                    averageOutDegree <-
+                        sapply(data, function(x)
+                               sapply(x$depvars, function(y)
+                                      attr(y, "averageOutDegree")))
+                }
+                else
+                {
+                    averageOutDegree <- gpatts$"averageOutDegree"
+                }
+                Report("\n", outf)
+                if (nData > 1 || sum(atts$types == "oneMode") > 1)
+                {
+                    Report("The average degrees are: ", outf)
+                    Report(paste(names(data), round(averageOutDegree, 3),
+                                 sep=': '), outf)
+                    Report("\n", outf)
+
+                }
+                else
+                {
+                    Report(c("The average degree is",
+                             round(averageOutDegree, 3), "\n"), outf)
+                }
+            }
             Report("\n\n", outf)
             Report(c(ifelse(gpatts$symmetric[net], "Edge", "Tie"),
-                   "changes between subsequent observations:\n"), outf)
+                     "changes between subsequent observations:\n"), outf)
             valmin <- gpatts$netRanges[1, net]
             valmax <- gpatts$netRanges[2, net]
             tmp <- expand.grid(valmin:valmax, valmin:valmax)

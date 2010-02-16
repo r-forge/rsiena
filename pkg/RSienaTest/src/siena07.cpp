@@ -773,9 +773,17 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
         SEXP symm;
         PROTECT(symm = install("symmetric"));
         SEXP symmetric = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode), symm);
-         SEXP balm;
+		SEXP balm;
         PROTECT(balm = install("balmean"));
         SEXP balmean = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode), balm);
+		SEXP avin;
+        PROTECT(avin = install("averageInDegree"));
+        SEXP averageInDegree = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode),
+			avin);
+		SEXP avout;
+        PROTECT(avout = install("averageOutDegree"));
+        SEXP averageOutDegree = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode),
+			avout);
 		SEXP nm;
         PROTECT(nm = install("name"));
         SEXP name = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode), nm);
@@ -786,14 +794,23 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
                                      myActorSet);
         pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
         pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
+        pOneModeNetworkLongitudinalData->
+			averageInDegree(*(REAL(averageInDegree)));
+        pOneModeNetworkLongitudinalData->
+			averageOutDegree(*(REAL(averageOutDegree)));
 		setupOneModeObservations(VECTOR_ELT(ONEMODEGROUP, oneMode),
 			pOneModeNetworkLongitudinalData);
+		//	Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
+		//	averageInDegree(),  pOneModeNetworkLongitudinalData->
+		//	averageOutDegree());
 
 		// Once all network data has been stored, calculate some
 		// statistical properties of that data.
-
-		pOneModeNetworkLongitudinalData->calculateProperties();
-        UNPROTECT(4);
+		//pOneModeNetworkLongitudinalData->calculateProperties();
+		//Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
+		//	averageInDegree(), pOneModeNetworkLongitudinalData->
+		//	averageOutDegree());
+        UNPROTECT(6);
     }
 }
 
@@ -915,6 +932,10 @@ void setupBipartiteGroup(SEXP BIPARTITEGROUP, Data * pData)
         SEXP nm;
         PROTECT(nm = install("name"));
         SEXP name = getAttrib(VECTOR_ELT(BIPARTITEGROUP, bipartite), nm);
+		SEXP avout;
+        PROTECT(avout = install("averageOutDegree"));
+        SEXP averageOutDegree = getAttrib(VECTOR_ELT(BIPARTITEGROUP,
+				bipartite), avout);
         const ActorSet * pSenders = pData->pActorSet(CHAR(STRING_ELT(
 					actorSet, 0)));
         const ActorSet * pReceivers = pData->pActorSet(CHAR(STRING_ELT(
@@ -922,14 +943,15 @@ void setupBipartiteGroup(SEXP BIPARTITEGROUP, Data * pData)
 		NetworkLongitudinalData *  pNetworkLongitudinalData =
 			pData->createNetworkData(CHAR(STRING_ELT(name, 0)),
 				pSenders, pReceivers);
+        pNetworkLongitudinalData->averageOutDegree(*(REAL(averageOutDegree)));
 		setupBipartiteObservations(VECTOR_ELT(BIPARTITEGROUP, bipartite),
 			pNetworkLongitudinalData);
 
 		// Once all network data has been stored, calculate some
 		// statistical properties of that data.
 
-		pNetworkLongitudinalData->calculateProperties();
-        UNPROTECT(2);
+		//pNetworkLongitudinalData->calculateProperties();
+        UNPROTECT(3);
     }
 }
 /**
