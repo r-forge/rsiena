@@ -1,3 +1,20 @@
+2010-02-27 R-forge revision 61
+
+	* R/robmon.r: change to random number seed for lecuyer random
+	numbers. previously every sequence started with same seed. Now
+	random based on the R seed.
+	* man/siena07.Rd: brought example in line with current choice between
+	conditional and unconditional estimation
+
+2010-02-12 R-forge revision 59
+	* inst/doc/s_man400.pdf: updated manual
+
+2010-02-11 R-forge revision 58
+
+	* src/data/NetworkConstraint.cpp, src/data/NetworkConstraint.h,
+	src/model/efefcts/generic/many, src/model/filters, src/model/ml:
+	forgotten additions in revision 56
+
 2010-02-11 R-forge revision 57
 
 	* R/siena01.r: fix bug which stopped Siena update of effects
@@ -8,14 +25,12 @@
 	* DESCRIPTION, man/RSiena-package.Rd: new version number 1.0.10
 	* src/model/effects/generic/*, src/model/effects/effectfactory.cpp:
 	multiple networks
-	* src/model/filters, src/model/EpochSimulation.cpp,
-	src/model/variables/*,
+	* src/model/EpochSimulation.cpp, src/model/variables/*,
 	src/data/Data.cpp, R/sienaDataCreate.r, R/sienautils.r,
 	R/simstatsc.r, NAMESPACE: constraints between pairs of networks.
 	* src/Makefile, Makefile.win: add new directories
 	* R/sienaDataCreate.r, R/print01Report.r: separate balance means
 	etc. for groups
-	* src/model/ml/*: functions for ML, work in progress.
 
 2010-02-11 R-forge revision 53
 
