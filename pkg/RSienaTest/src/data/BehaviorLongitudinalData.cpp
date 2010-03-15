@@ -34,16 +34,19 @@ BehaviorLongitudinalData::BehaviorLongitudinalData(std::string name,
 {
 	this->lvalues = new int * [observationCount];
 	this->lmissing = new bool * [observationCount];
+	this->lstructural = new bool * [observationCount];
 
 	for (int i = 0; i < observationCount; i++)
 	{
 		this->lvalues[i] = new int[pActorSet->n()];
 		this->lmissing[i] = new bool[pActorSet->n()];
+		this->lstructural[i] = new bool[pActorSet->n()];
 
 		for (int actor = 0; actor < pActorSet->n(); actor++)
 		{
 			this->lvalues[i][actor] = 0;
 			this->lmissing[i][actor] = false;
+			this->lstructural[i][actor] = false;
 		}
 	}
 }
@@ -58,12 +61,15 @@ BehaviorLongitudinalData::~BehaviorLongitudinalData()
 	{
 		delete[] this->lvalues[i];
 		delete[] this->lmissing[i];
+		delete[] this->lstructural[i];
 	}
 
 	delete[] this->lvalues;
 	delete[] this->lmissing;
+	delete[] this->lstructural;
 	this->lvalues = 0;
 	this->lmissing = 0;
+	this->lstructural = 0;
 }
 
 
@@ -117,6 +123,28 @@ void BehaviorLongitudinalData::missing(int observation,
 	bool missing)
 {
 	this->lmissing[observation][actor] = missing;
+}
+
+
+/**
+ * Returns if the value of the behavioral variable is structurally
+ * determined for the given actor at the specified observation.
+ */
+bool BehaviorLongitudinalData::structural(int observation, int actor) const
+{
+	return this->lstructural[observation][actor];
+}
+
+
+/**
+ * Stores if the value of the behavioral variable is structurally
+ * determined for the given actor at the specified observation.
+ */
+void BehaviorLongitudinalData::structural(int observation,
+	int actor,
+	bool structural)
+{
+	this->lstructural[observation][actor] = structural;
 }
 
 

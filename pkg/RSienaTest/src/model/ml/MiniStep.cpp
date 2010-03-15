@@ -10,6 +10,7 @@
 
 #include "MiniStep.h"
 #include "model/variables/DependentVariable.h"
+#include "model/ml/Chain.h"
 
 namespace siena
 {
@@ -26,10 +27,14 @@ MiniStep::MiniStep(int ego, string variableName, int difference)
 	this->lego = ego;
 	this->lvariableName = variableName;
 	this->ldifference = difference;
-	this->llogProbability = 0;
+	this->lpChain = 0;
+	this->llogOptionSetProbability = 0;
+	this->llogChoiceProbability = 0;
 	this->lreciprocalRate = 0;
 	this->lpPrevious = 0;
 	this->lpNext = 0;
+	this->lindex = -1;
+	this->ldiagonalIndex = -1;
 }
 
 
@@ -51,11 +56,40 @@ string MiniStep::variableName() const
 
 
 /**
- * Stores the log probability of making this ministep.
+ * Stores the owner chain of this ministep.
  */
-void MiniStep::logProbability(double probability)
+void MiniStep::pChain(Chain * pChain)
 {
-	this->llogProbability = probability;
+	this->lpChain = pChain;
+}
+
+
+/**
+ * Returns the owner chain of this ministep.
+ */
+Chain * MiniStep::pChain() const
+{
+	return this->lpChain;
+}
+
+
+/**
+ * Stores the log probability of choosing the option set of this ministep,
+ * given the state just before this ministep.
+ */
+void MiniStep::logOptionSetProbability(double probability)
+{
+	this->llogOptionSetProbability = probability;
+}
+
+
+/**
+ * Stores the log probability of making this ministep,
+ * given that a ministep of the same option set will be made.
+ */
+void MiniStep::logChoiceProbability(double probability)
+{
+	this->llogChoiceProbability = probability;
 }
 
 
@@ -65,6 +99,11 @@ void MiniStep::logProbability(double probability)
  */
 void MiniStep::reciprocalRate(double value)
 {
+	if (this->lpChain)
+	{
+		this->lpChain->onReciprocalRateChange(this, value);
+	}
+
 	this->lreciprocalRate = value;
 }
 
@@ -93,6 +132,16 @@ void MiniStep::pNext(MiniStep * pMiniStep)
 void MiniStep::makeChange(DependentVariable * pVariable)
 {
 	// Nothing in the base class.
+}
+
+
+/**
+ * Returns if this ministep is diagonal, namely, it does not change
+ * the dependent variables. Dummy ministeps are not considered diagonal.
+ */
+bool MiniStep::diagonal() const
+{
+	return false;
 }
 
 }

@@ -109,15 +109,19 @@ public:
 	 */
 	virtual double probability(MiniStep * pMiniStep) = 0;
 
+	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
+
 protected:
 	inline EpochSimulation * pSimulation() const;
 	void simulatedDistance(int distance);
+	void invalidateRates();
 
 private:
 	void initializeFunction(Function * pFunction,
 		const vector<EffectInfo *> & rEffects) const;
 
-	virtual double calculateRate(int i);
+	bool constantRates() const;
+	double calculateRate(int i);
 	double structuralRate(int i) const;
 	void updateCovariateRates();
 	inline double basicRate() const;
@@ -192,6 +196,11 @@ private:
 
 	// Scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeScores;
+
+	// Indicates if the rates are valid and shouldn't be recalculated
+	// provided that the rates are constant during the period.
+
+	int lvalidRates;
 };
 
 

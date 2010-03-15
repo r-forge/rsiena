@@ -128,9 +128,9 @@
 \newcommand{\addc}[1]{{\textcolor[named]{Black}{#1}}}  % clarifications
 \newcommand{\addaa}[1]{{\textcolor[named]{Black}{#1}}}  % additions
 \newcommand{\addca}[1]{{\textcolor[named]{Black}{#1}}}  % clarifications
-\newcommand{\addab}[1]{{\textcolor[named]{Red}{#1}}}  % additions
-\newcommand{\addcb}[1]{{\textcolor[named]{MidnightBlue}{#1}}}  % clarifications
-
+\newcommand{\addab}[1]{{\textcolor[named]{Black}{#1}}}  % additions
+\newcommand{\addcb}[1]{{\textcolor[named]{Black}{#1}}}  % clarifications
+\newcommand{\addcc}[1]{{\textcolor[named]{Red}{#1  10/03/2010.}}}
 
 \hyphenation{mini-step mini-steps reci-pro-city}
 \setlength{\parskip}{1.5ex plus0.5ex minus0.5ex}
@@ -1752,6 +1752,8 @@ The input parameter $c_0$ is a relatively small integer --
 in Siena 3 it is determined adaptively with a maximum value of 40.
 
 First a rough description is given.
+\medskip
+
 First a vector of coordinates $(w_0,i_0,j_0,r_0,d_0)$ is selected.
 The output variable \textit{misdat} indicates whether option
 $(w_0,i_0,j_0,r_0)$ is missing (see function \textit{mis} defined above).
@@ -1765,10 +1767,12 @@ such that the two inserted ministeps will be a CCP.
 This requires the following:\\
 $\blacktriangleright \Big((w_0 = N) \Rightarrow i_0 \neq j_0\Big)$ and
      $\Big((w_0 = B) \Rightarrow d_0 \neq 0\Big)$;\\
-$\blacktriangleright $ there is at least one ministep between $\ms_a$ and $\ms_b$
-(i.e., $\textit{length}(\ms_a,\ms_b) \geq 3$);\\
-$\blacktriangleright $ there are no ministeps of  the type  $(w,i,j,r)$ in the
+%$\blacktriangleright $ there is at least one ministep between $\ms_a$ and $\ms_b$
+%(i.e., $\textit{length}(\ms_a,\ms_b) \geq 3$);\\ omitted 10-03-10
+     \addcc{Condition omitted }\\
+$\blacktriangleright $ there are no ministeps of  the type  $(w_0,i_0,j_0,r_0)$ in the
 interval  $[\ms_a, \ms_b.\nnm{pred}]$.
+\     \addcc{ changed }
 
 The number $c$ is $\min\{c_0, \textit{length}(\ms_a,\ms_b)-1\}$.
 If $c \geq 2$,
@@ -1791,7 +1795,8 @@ The steps taken in the function are as follows.
 Part \emph{A}:
 \begin{enumerate}
 \item Repeat $\ms_a \leftarrow $ \textit{RandomElement} \ until
-       $\ms_a.\nnm{succ} < \nnm{last}$.
+%       $\ms_a.\nnm{succ} < \nnm{last}$.  changed 10-03-10
+       $\ms_a < \nnm{last}$. \ \addcc{Changed }
 \item $y \leftarrow  \textit{StateBefore}(\ms_a) $
 \item \textit{StepProb1}$(y, *;  rr, lospr*)$ \\
        With probabilities defined by $\exp(lospr*)$ choose \textit{OptionSet} $(w_0,i_0,r_0)$.\\
@@ -1818,15 +1823,19 @@ Part \emph{A}:
                 or the \nnm{last} ministep
                 if there is no ministep after $\ms_a$ of this \textit{Option}.\\
                 This can be determined using the pointer \nnm{succOption}.
-             \item    $\textit{ChoiceLength} \leftarrow \textit{length}(\ms_a, \ms_d ) - 2$
-             \item             If $\textit{ChoiceLength} \leq 0$ then exit.
+             \item    $\textit{ChoiceLength} \leftarrow \textit{length}(\ms_a, \ms_d ) - 1$
+                \   \addcc{Changed }
+                \\ \addcc{Condition (iii) omitted }
+  %           \item             If $\textit{ChoiceLength} \leq 0$ then exit.
              \end{enumerate}
       \item If \textit{misdat}:\\
             $\textit{ChoiceLength} \leftarrow 1 $
       \end{enumerate}
 \item \begin{enumerate}
        \item  If (not \textit{misdat}):\\
-              Let $\ms_b$ a random ministep in the interval $[\ms_a.\nnm{succ}^2, \ms_d ]$.\\
+%              Let $\ms_b$ a random ministep in the interval $[\ms_a.\nnm{succ}^2, \ms_d ]$.\\
+               Let $\ms_b$ a random ministep in the interval $[\ms_a.\nnm{succ}, \ms_d ]$.
+               \  \addcc{Changed } \\
               Note that the number of choices here is \textit{ChoiceLength}.
        \item  If \textit{misdat}:\\
               $\ms_b \leftarrow \nnm{last}$
@@ -1849,8 +1858,10 @@ Part \emph{A}:
 \end{enumerate}
 The proposal probability is
 \[
-  \frac{\exp{(lospr + lcpr)}}{(\textit{TotNumber}-2)\ttimes \textit{ChoiceLength} \ttimes (c!)}
+%  \frac{\exp{(lospr + lcpr)}}{(\textit{TotNumber}-2)\ttimes \textit{ChoiceLength} \ttimes (c!)}
+  \frac{\exp{(lospr + lcpr)}}{(\textit{TotNumber}-1)\ttimes \textit{ChoiceLength} \ttimes (c!)}
 \]
+ \addcc{Changed } \\
 This is used in \textit{pra} below.
 We also need the probability of the inverse proposal
 (except for the factor $c! $ which cancels),
@@ -1956,9 +1967,11 @@ Part \emph{B}:
      \textit{pra}  \leftarrow &
         \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \nonumber \\
   \nonumber
-     & \ttimes  \frac{prdpr \ttimes pr_1 \ttimes (\textit{TotNumber}-2)\ttimes \textit{ChoiceLength} }
+%     & \ttimes  \frac{prdpr \ttimes pr_1 \ttimes (\textit{TotNumber}-2)\ttimes \textit{ChoiceLength} }
+      & \ttimes  \frac{prdpr \ttimes pr_1 \ttimes (\textit{TotNumber}-1)\ttimes \textit{ChoiceLength} }
                      {pripr \ttimes \exp{(lospr + lcpr)}}
     \end{align}
+ \addcc{Changed } \\
     if (\textit{pra} $ > 1$), then  \textit{pra} $ \leftarrow 1 $.
 \end{enumerate}
 Part \emph{C}:
@@ -2177,9 +2190,12 @@ Part \emph{B}:
 \item \begin{align}
      \textit{pra}  \leftarrow \ &
         \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \nonumber \\
-          & \ \ttimes  \frac{pripr \ttimes \exp(lpr_0)}{prdpr \ttimes pr_1 \ttimes \textit{TotNumber}
+%          & \ \ttimes  \frac{pripr \ttimes \exp(lpr_0)}{prdpr \ttimes pr_1 \ttimes \textit{TotNumber}
+           & \ \ttimes  \frac{pripr \ttimes \exp(lpr_0)}{prdpr \ttimes pr_1 \ttimes
+                                                  \textit{(TotNumber+1)}
                                            \ttimes \textit{ChoiceLength} }
     \end{align}
+ \addcc{Changed } \\
     if (\textit{pra} $ > 1$), then  \textit{pra} $ \leftarrow 1 $.
 \end{enumerate}
 Part \emph{C}:
@@ -2196,8 +2212,7 @@ Part \emph{C}:
 \end{enumerate}
 
 \subsection{Randomize Missings}
-
-\addab{This section is new in the version of February 8, 2010.}
+%\addab{This section is new in the version of February 8, 2010.}
 
 The function
 \textit{MH\_RandomMis}

@@ -64,6 +64,7 @@ public:
 	int ego() const;
 
 	virtual double probability(MiniStep * pMiniStep);
+	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
 
 private:
 	void preprocessEgo();

@@ -31,6 +31,7 @@ public:
 	inline int alter() const;
 
 	virtual void makeChange(DependentVariable * pVariable);
+	virtual bool diagonal() const;
 
 private:
 	// The alter whose incoming tie is changed

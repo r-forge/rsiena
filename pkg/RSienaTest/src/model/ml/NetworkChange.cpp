@@ -61,4 +61,14 @@ void NetworkChange::makeChange(DependentVariable * pVariable)
 	}
 }
 
+
+/**
+ * Returns if this ministep is diagonal, namely, it does not change
+ * the dependent variables.
+ */
+bool NetworkChange::diagonal() const
+{
+	return this->ego() == this->lalter || this->difference() == 0;
+}
+
 }
