@@ -292,8 +292,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                             Report(c("Total number of missing data: ",
                                      sum(missrow),
                                      ", corresponding to a fraction of ",
-                                     round(sum(missrow)/atts$netdims[1] /
-                                           (atts$netdims[1] - 1), 3),
+                                     format(round(sum(missrow)/atts$netdims[1] /
+                                           (atts$netdims[1] - 1), 3), nsmall=3),
                                      ".\n"), sep="", outf)
                             if (k > 1)
                                 Report(c("In reported in- and outdegrees,",
@@ -649,12 +649,30 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             use <- ! covars %in% names(x$dycCovars) ## need an attributes to say
             nCovars <- length(x$dyvCovars[use])
             Heading(2, outf, "Reading exogenous dyadic covariates.")
-            Report(c("Note that no missing values are considered yet for",
-                     "changing dyadic covariates.\n"), outf)
+            ## Report(c("Note that no missing values are considered yet for",
+            ##          "changing dyadic covariates.\n"), outf)
             for (i in seq(along=covars))
             {
                 Report(c("Exogenous dyadic covariate named ", covars[i], '.\n'),
                        sep="", outf)
+            }
+            Report("Number of tie variables with missing data per period:\n", outf)
+            Report(c(" period   ", format(1:(x$observations - 1) +
+                                          periodFromStart, width=9),
+                     "       overall\n"), sep="", outf)
+            for (i in seq(along=covars))
+              {
+                if (use[i])
+                  {
+                    thiscovar <- x$dyvCovars[[i]] ## array
+                    missvals <- colSums(is.na(thiscovar), dims=2)
+                    Report(c(format(covars[i], width=10),
+                             format(missvals, width=8),
+                             format(sum(missvals), width=9), "     (",
+                             format(round(sum(missvals)/nrow(thiscovar)/
+                                          ncol(thiscovar), 1), nsmall=1,
+                                    width=3), '%)\n'), outf)
+                }
             }
             Report("\nMeans of  covariates:\n", outf)
             for (i in seq(along=covars))
@@ -747,7 +765,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
         tt <- getInternals()
         return(tt)
     }
-    Report(open=TRUE, type="w", projname=modelname)
+    Report(openfiles=TRUE, type="w", projname=modelname)
     Report("                            ************************\n", outf)
     Report(c("                                   ", modelname, ".out\n"),
            sep='', outf)

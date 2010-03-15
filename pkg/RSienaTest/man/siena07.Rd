@@ -11,7 +11,7 @@
 \usage{
 siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE, useCluster=FALSE,
 nbrNodes=2, initC=FALSE, clusterString=rep("localhost", nbrNodes),
-tt=NULL, parallelTesting=FALSE, ...)
+tt=NULL, parallelTesting=FALSE, clusterIter=TRUE, ...)
 }
 \arguments{
   \item{x}{ A model object}
@@ -32,6 +32,10 @@ tt=NULL, parallelTesting=FALSE, ...)
 	model options screen.}
   \item{parallelTesting}{Boolean. If TRUE, sets up random numbers to
 	parallel those in Siena 3.}
+  \item{clusterIter}{Boolean. If TRUE, multiple processes execute
+	complete iterations at each call.
+	If FALSE, multiple processes execute a single
+	wave at each call.}
   \item{\dots}{Arguments for the simulation function}
 }
 \details{

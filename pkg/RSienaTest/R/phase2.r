@@ -26,8 +26,11 @@ storeinFRANstore <- function(...)
 phase2.1<- function(z, x, ...)
 {
     #initialise phase2
-    z$phase2fras <- array(0, dim=c(4, z$pp, 1000))
-    z$rejectprops <- array(0, dim=c(4, 4, 1000))
+    if (x$maxlike)
+    {
+        z$phase2fras <- array(0, dim=c(4, z$pp, 1000))
+        z$rejectprops <- array(0, dim=c(4, 4, 1000))
+    }
     int <- 1
     f <- FRANstore()
     z$Phase <- 2
@@ -191,7 +194,9 @@ doIterations<- function(z, x, subphase,...)
     zsmall$theta <- z$theta
     zsmall$Deriv <- z$Deriv
     zsmall$Phase <- z$Phase
+    zsmall$int2 <- z$int2
     zsmall$FinDiff.method <- z$FinDiff.method
+    zsmall$cl <- z$cl
     xsmall <- NULL
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
@@ -269,9 +274,9 @@ doIterations<- function(z, x, subphase,...)
                 break
             }
         }
-        z$phase2fras[subphase, ,z$nit] <- fra
         if (x$maxlike)
         {
+            z$phase2fras[subphase, ,z$nit] <- fra
             z$rejectprops[subphase, , z$nit] <- zz$rejectprop
         }
         if (z$nit %% 2 == 1)

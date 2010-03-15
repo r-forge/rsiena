@@ -42,12 +42,12 @@ addAttributes.coCovar <- function(x, name, ...)
 addAttributes.varCovar <- function(x, name, ...)
 {
     tmpmat <- x
-    varmean <- mean(tmpmat, na.rm=TRUE)
+    varmean <- mean(x, na.rm=TRUE)
     vartotal <- sum(x, na.rm=TRUE)
     nonMissingCount <- sum(!is.na(x))
-    attr(x, "rangep") <- apply(tmpmat, 2, range, na.rm=TRUE)
-    attr(x, "meanp") <- colMeans(tmpmat, na.rm=TRUE)
-    cr <- range(tmpmat, na.rm=TRUE)
+    attr(x, "rangep") <- apply(x, 2, range, na.rm=TRUE)
+    attr(x, "meanp") <- colMeans(x, na.rm=TRUE)
+    cr <- range(x, na.rm=TRUE)
     attr(x, 'range') <- cr[2] - cr[1]
     storage.mode(attr(x, 'range')) <- 'double'
     attr(x, 'mean') <- varmean
@@ -73,11 +73,13 @@ addAttributes.coDyadCovar <- function(x, name, bipartite, ...)
     }
     varmean <- mean(x, na.rm=TRUE)
     attr(x,'mean') <- varmean
-    rr<-  range(x, na.rm=TRUE)
+    rr <-  range(x, na.rm=TRUE)
     attr(x,'range') <- rr[2] - rr[1]
     storage.mode(attr(x, 'range')) <- 'double'
     attr(x,'range2') <- rr
     attr(x, 'name') <- name
+    nonMissingCount <- sum(!is.na(x))
+    attr(x, "nonMissingCount") <- nonMissingCount
     if (!bipartite) #zero the diagonal
     {
         diag(x) <- 0
@@ -96,10 +98,13 @@ addAttributes.varDyadCovar <- function(x, name, bipartite, ...)
     }
     varmean <- mean(x, na.rm=TRUE)
     attr(x,'mean') <- mean(x, na.rm=TRUE)
+    attr(x, "meanp") <- colMeans(x, dims=2, na.rm=TRUE)
     rr <-  range(x, na.rm=TRUE)
     attr(x,'range') <- rr[2] - rr[1]
     storage.mode(attr(x, 'range')) <- 'double'
     attr(x, 'name') <- name
+    nonMissingCounts <- colSums(!is.na(x), dims=2)
+    attr(x, "nonMissingCount") <- nonMissingCounts
     if (!bipartite) ## put diagonal to zero
     {
         for (obs in 1:dim(x)[3])
@@ -1253,6 +1258,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     dyvnodeSets <- namedVector(NA, dyvCovars, listType=TRUE)
     observations <- 0
     periodNos <- rep(NA, 2)
+    groupPeriods <- namedVector(NA, names(objlist))
     for (i in 1:length(objlist))
     {
         for (j in 1:length(objlist[[i]]$depvars))
@@ -1396,7 +1402,8 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
         newobs <- objlist[[i]]$observations
         periodNos[observations + (1 : (newobs - 1))] <-
                   observations + i - 1 + (1 : (newobs - 1))
-        observations <- observations + objlist[[i]]$observations -1
+        observations <- observations + objlist[[i]]$observations - 1
+        groupPeriods[i] <- newobs
     }
     ## if more than one object, now create the group proper
     if (length(objlist) > 1)
@@ -1479,6 +1486,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     attr(group, 'types') <- types
     attr(group, 'observations') <- observations
     attr(group, 'periodNos') <- periodNos
+    attr(group, 'groupPeriods') <- groupPeriods
     attr(group, 'netnodeSets') <- nodeSets
     attr(group, 'cCovars') <- cCovars
     attr(group, 'vCovars') <- vCovars
