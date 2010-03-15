@@ -10,11 +10,13 @@
 # *****************************************************************************/
 
 ##@sienaModelCreate DataCreate
-sienaModelCreate<- function(fn=simstats0c, usesimstats0c=TRUE,
-                        projname="Siena", MaxDegree=0, useStdInits=FALSE,
-                        n3=1000, nsub=4, maxlike=FALSE, diag=!maxlike,
-                        condvarno=0, condname='',
-                        firstg=0.2, cond=NA, findiff=FALSE,  seed=NULL)
+sienaModelCreate <-
+    function(fn=simstats0c,
+             usesimstats0c=deparse(substitute(fn)) == "simstats0c",
+             projname="Siena", MaxDegree=0, useStdInits=FALSE,
+             n3=1000, nsub=4, maxlike=FALSE, diag=!maxlike,
+             condvarno=0, condname='',
+             firstg=0.2, cond=NA, findiff=FALSE,  seed=NULL)
 {
     model <- NULL
     model$projname <- projname
@@ -24,7 +26,8 @@ sienaModelCreate<- function(fn=simstats0c, usesimstats0c=TRUE,
     model$firstg <- firstg
     model$maxrat <- 1.0
     model$maxmaxrat <- 10.0
-    model$FRAN <- fn
+   # model$FRAN <- fn
+    model$FRANname <- deparse(substitute(fn))
     model$maxlike <-  maxlike
     model$cconditional <- cond
     model$condvarno <-  condvarno
@@ -35,10 +38,7 @@ sienaModelCreate<- function(fn=simstats0c, usesimstats0c=TRUE,
     model$ModelType <- 1
     model$MaxDegree <- MaxDegree
     model$randomSeed <- seed
-    if (deparse(substitute(fn)) == "simstats0c")
-        model$simstats0c <- TRUE
-    else
-        model$simstats0c <- usesimstats0c
+    model$simstats0c <- usesimstats0c
     class(model) <- "sienaModel"
     model
 }

@@ -36,7 +36,8 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                 if (!all(userlist %in% deflist))
                 {
                     bad <- which(!(userlist %in% deflist))
-                    stop("invalid effect requested: ", userlist[bad])
+                    print(userlist[bad])
+                    stop("invalid effect requested: see above ")
                 }
             }
             if (!inherits(effects, 'data.frame'))
@@ -166,6 +167,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             attr(f, "observations") <- attr(data, "observations")
             attr(f, "compositionChange") <- attr(data, "compositionChange")
             attr(f, "exooptions") <- attr(data, "exooptions")
+            attr(f, "groupPeriods") <- attr(data, "groupPeriods")
            ## if any networks symmetric must use finite differences
             syms <- attr(data,"symmetric")
             z$FinDiffBecauseSymmetric <- FALSE
@@ -234,6 +236,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             f$nGroup <- NULL
        }
         ##browser()
+        #browser()
         pData <- .Call('setupData', PACKAGE=pkgname,
                        lapply(f, function(x)(as.integer(x$observations))),
                        lapply(f, function(x)(x$nodeSets)))
@@ -243,6 +246,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                     pData, lapply(f, function(x)x$bipartites))
         ans <- .Call('Behavior', PACKAGE=pkgname,
                      pData, lapply(f, function(x)x$behavs))
+       # browser()
         ans <-.Call('ConstantCovariates', PACKAGE=pkgname,
                    pData, lapply(f, function(x)x$cCovars))
         ans <-.Call('ChangingCovariates', PACKAGE=pkgname,
@@ -385,7 +389,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         {
             z$f <- f
         }
-        if (initC || z$int == 1)
+        if (initC || (z$int == 1 && z$int2 == 1))
         {
             f[1:nGroup] <- NULL
         }
@@ -424,10 +428,15 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         dimnames(z$dfra)[[1]] <- as.list(z$requestedEffects$shortName)
         return(z)
     }
-    ## iteration entry point
+    ## iteration entry points
     f <- FRANstore()
    # browser()
    # cat(f$randomseed2, f$storedseed, '\n')
+   # if (fromFiniteDiff)
+   # {
+      #  cat('before\n')
+      #  print(f$seeds)
+   # }
     if (fromFiniteDiff || z$Phase == 2)
     {
         returnDeps <- FALSE
@@ -461,15 +470,48 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         }
        ## cat(randomseed2, '\n')
     }
-    ans <- .Call('model', PACKAGE=pkgname,
-                 z$Deriv, f$pData, seeds,
-                 fromFiniteDiff, f$pModel, f$myeffects, z$theta,
-                 randomseed2, returnDeps, z$FinDiff.method)
-   #  browser()
-   if (!fromFiniteDiff)
+    groupPeriods <- attr(f, "groupPeriods")
+    callGrid <- cbind(rep(1:f$nGroup, groupPeriods - 1),
+                      as.vector(unlist(sapply(groupPeriods - 1,
+                                              function(x) 1:x))))
+    if (z$int2==1 || nrow(callGrid) == 1)
+    {
+      #   cat("theta", z$theta, "\n")
+       ans <- .Call('model', PACKAGE=pkgname,
+                     z$Deriv, f$pData, seeds,
+                     fromFiniteDiff, f$pModel, f$myeffects, z$theta,
+                     randomseed2, returnDeps, z$FinDiff.method, !is.null(z$cl))
+    }
+    else
+    {
+        use <- 1:(min(nrow(callGrid), z$int2))
+        anss <- parRapply(z$cl[use], callGrid, doModel,
+                          z$Deriv, seeds, fromFiniteDiff, z$theta,
+                          randomseed2, returnDeps, z$FinDiff.method, TRUE)
+        ##anss <- apply(callGrid, 1, doModel,
+        ##            z$Deriv, fromFiniteDiff, z$theta,
+        ##           returnDeps, z$FinDiff.method)
+        ## reorganize the anss so it looks like the normal one
+    # browser()
+        ans <- NULL
+        ans[[1]] <- sapply(anss, "[[", 1) ## statistics
+        ans[[2]] <- sapply(anss, "[[", 2) ## scores
+        ans[[3]] <- split(lapply(anss, "[[", 3), callGrid[, 1]) ## seeds
+        ans[[4]] <- sapply(anss, "[[", 4) # ntim
+        ans[[5]] <- NULL # randomseed not sensible here
+        fff <- lapply(anss, "[[", 6)
+        fff <- split(fff, callGrid[, 1])
+        ans[[6]] <- lapply(fff, function(x){
+            lapply(1:length(f$depNames), function(x, z) lapply(z, "[[", x), z=x)
+        })
+    }
+    # browser()
+    if (!fromFiniteDiff)
     {
         if (z$FinDiff.method)
             f$seeds <- ans[[3]]
+      # cat('after\n')
+      # print(f$seeds)
     }
     if (z$Deriv)
     {
@@ -506,8 +548,23 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
  #   cat('fra', fra, '\n')
  #    cat(f$randomseed2, f$storedseed, '\n')
    list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
-         sims=sims)
+         sims=sims, f$seeds)
 }
+doModel <- function(x, Deriv, seeds, fromFiniteDiff, theta, randomseed2,
+                    returnDeps, FinDiff.method, useStreams)
+{
+   # cat('gothere\n')
+   #     cat("theta", theta, "\n")
+    f <- FRANstore()
+   # cat('stream', .lec.GetStreams(),'\n')
+   # print(.lec.GetState(.lec.GetStreams()))
+    seeds <- seeds[[x[1]]][[x[2]]]
+    .Call("modelPeriod", PACKAGE=pkgname, Deriv, f$pData, seeds,
+                         fromFiniteDiff, f$pModel, f$myeffects, theta,
+                         randomseed2, returnDeps, FinDiff.method, useStreams,
+          as.integer(x[1]), as.integer(x[2]))
+}
+
 ##@clearData siena07 Finalizer to clear Data object in C++
 clearData <- function(pData)
 {
@@ -525,23 +582,23 @@ createEdgeLists<- function(mat, matorig)
 {
     ## mat1 is basic values, with missings and structurals replaced
     tmp <- lapply(1 : nrow(mat), function(x, y)
-     {
-         mymat <- matrix(0, nrow = sum(y[x, ] > 0), ncol = 3)
-         mymat[, 1] <- x
-         mymat[, 2] <- which(y[x, ] != 0)
-         mymat[, 3] <- y[x, mymat[, 2]]
-         mymat
-     }, y = mat)
+              {
+                  mymat <- matrix(0, nrow = sum(y[x, ] > 0), ncol = 3)
+                  mymat[, 1] <- x
+                  mymat[, 2] <- which(y[x, ] != 0)
+                  mymat[, 3] <- y[x, mymat[, 2]]
+                  mymat
+              }, y = mat)
     mat1 <- do.call(rbind, tmp)
     ## mat2 reverts to matorig to get the missing values
     tmp <- lapply(1 : nrow(matorig), function(x, y)
-     {
-         mymat <- matrix(0, nrow = sum(is.na(y[x, ])), ncol = 3)
-         mymat[, 1] <- x
-         mymat[, 2] <- which(is.na(y[x, ]))
-         mymat[, 3] <- 1
-         mymat
-     },y = matorig)
+              {
+                  mymat <- matrix(0, nrow = sum(is.na(y[x, ])), ncol = 3)
+                  mymat[, 1] <- x
+                  mymat[, 2] <- which(is.na(y[x, ]))
+                  mymat[, 3] <- 1
+                  mymat
+              }, y = matorig)
     mat2 <- do.call(rbind, tmp)
     ## remove the diagonal
     mat2 <- mat2[mat2[, 1] != mat2[, 2], , drop=FALSE]
@@ -563,7 +620,7 @@ createEdgeLists<- function(mat, matorig)
     list(mat1 = t(mat1), mat2 = t(mat2), mat3 = t(mat3))
 }
 ##@createCovarEdgeLists siena07 Reformat data for C++
-createCovarEdgeList<- function(mat)
+createCovarEdgeList<- function(mat, matorig)
 {
     tmp <- lapply(1 : nrow(mat), function(x, y)
               {
@@ -574,12 +631,21 @@ createCovarEdgeList<- function(mat)
                   mymat
               }, y = mat)
     mat1 <- do.call(rbind, tmp)
-    ##drop the diagonal : no, in case bipartite
-   ## mat1 <- mat1[mat1[,1] != mat1[, 2],]
+    ##mat2 reverts to matorig to get the missing values
+    tmp <- lapply(1 : nrow(matorig), function(x, y)
+              {
+                  mymat <- matrix(0, nrow = sum(is.na(y[x, ])), ncol = 3)
+                  mymat[, 1] <- x
+                  mymat[, 2] <- which(is.na(y[x, ]))
+                  mymat[, 3] <- 1
+                  mymat
+              }, y = matorig)
+    mat2 <- do.call(rbind, tmp)   ##drop the diagonal : no, in case bipartite
+    ## mat1 <- mat1[mat1[,1] != mat1[, 2],]
     ## add attribute of size
     attr(mat1,'nActors1') <- nrow(mat)
     attr(mat1,'nActors2') <- ncol(mat)
-    t(mat1)
+    list(mat1=t(mat1), mat2=t(mat2))
 }
 ##@unpackOneMode siena07 Reformat data for C++
 unpackOneMode <- function(depvar, observations, compositionChange)
@@ -1149,21 +1215,29 @@ unpackCDyad<- function(dycCovar)
     if (sparse)
     {
         ## have a sparse matrix in triplet format
-        ## with missings embedded - not allowed!
+        ## with missings embedded
         ## with 0 based indices!
-            varmat <- cbind(dycCovar@i+1, dycCovar@j+1, dycCovar@x)
-            ##drop the diagonal, if present - not for bipartite
-           ## varmat <- varmat[varmat[,1] != varmat[, 2],]
-            mat1 <- varmat[!is.na(varmat[, 3]), ]
-            mat1 <- mat1[!mat1[, 3] == 0, ]
-            ## add attribute of dim
-            attr(mat1,'nActors1') <- nrow(dycCovar)
-            attr(mat1,'nActors2') <- ncol(dycCovar)
-            edgeLists <-  t(mat1)
+        varmat <- cbind(dycCovar@i+1, dycCovar@j+1, dycCovar@x)
+        ##drop the diagonal, if present - not for bipartite
+        ## varmat <- varmat[varmat[,1] != varmat[, 2],]
+        mat1 <- varmat
+        ##mat1[is.na(varmat[, 3]), 3] <- attr(dycCovar, "mean")
+        mat1 <- mat1[!mat1[, 3] == 0, ]
+        ## add attribute of dim
+        attr(mat1,'nActors1') <- nrow(dycCovar)
+        attr(mat1,'nActors2') <- ncol(dycCovar)
+        mat2 <- varmat[is.na(varmat[, 3]), ]
+        mat2[, 3] <- 1
+        ## add attribute of dim
+        attr(mat2,'nActors1') <- nrow(dycCovar)
+        attr(mat2,'nActors2') <- ncol(dycCovar)
+        edgeLists <-  list(t(mat1), t(mat2))
     }
     else
     {
-        edgeLists <- createCovarEdgeList(dycCovar)
+        dycCovar1 <- dycCovar
+        ##dycCovar1[is.na(dycCovar1)] <- attr(dycCovar, "mean")
+        edgeLists <- createCovarEdgeList(dycCovar1, dycCovar)
     }
     ## add attribute of nodesets
     attr(edgeLists, 'nodeSet') <- attr(dycCovar, 'nodeSet')
@@ -1181,6 +1255,7 @@ unpackVDyad<- function(dyvCovar, observations)
     edgeLists <- vector('list', observations)
     varmats <- vector('list', observations)
     sparse <- attr(dyvCovar, 'sparse')
+    means <- attr(dyvCovar, "meanp")
     if (sparse)
     {
         ## have a list of sparse matrices in triplet format
@@ -1189,14 +1264,19 @@ unpackVDyad<- function(dyvCovar, observations)
         {
             thisvar <- dyvCovar[[i]]
             varmat <- cbind(var@i+1, var@j+1, var@x)
-            ##drop the diagonal, if present no - bipartite?
-           ## varmat <- varmat[varmat[,1] != varmat[, 2],]
-            mat1 <- varmat[!is.na(varmat[, 3]), ]
+            ## drop the diagonal, if present no - bipartite?
+            ## varmat <- varmat[varmat[,1] != varmat[, 2],]
+            mat1 <- varmat
+            mat1[is.na(varmat[, 3]), 3] <- means[i]
             mat1 <- mat1[!mat1[, 3] == 0, ]
+            mat2 <- varmat[is.na(varmat[, 3]), ]
+            mat2[, 3] <- 1
             ## add attribute of size
             attr(mat1, 'nActors1') <- nrow(dyvCovar[[i]])
             attr(mat1, 'nActors2') <- ncol(dyvCovar[[i]])
-            edgeLists[[i]] <- t(mat1)
+            attr(mat2, 'nActors1') <- nrow(dyvCovar[[i]])
+            attr(mat2, 'nActors2') <- ncol(dyvCovar[[i]])
+            edgeLists[[i]] <- list(t(mat1), t(mat2))
         }
     }
     else
@@ -1204,15 +1284,15 @@ unpackVDyad<- function(dyvCovar, observations)
         for (i in 1:(observations - 1))
         {
             thisvar <- dyvCovar[, , i]
-            thisvar[is.na(thisvar) ]<- 0
-            edgeLists[[i]] <- createCovarEdgeList(thisvar)
+            thisvar[is.na(thisvar) ] <- means[i]
+            edgeLists[[i]] <- createCovarEdgeList(thisvar, dyvCovar[, , i])
         }
     }
     ## add attribute of nodeset
     attr(edgeLists, 'nodeSet') <- attr(dyvCovar, 'nodeSet')
     ## add attribute of name
     attr(edgeLists, 'name') <- attr(dyvCovar, 'name')
-     ## add attribute of mean
+    ## add attribute of mean
     attr(edgeLists, 'mean') <- attr(dyvCovar, 'mean')
     return(edgeLists = edgeLists)
 }
@@ -1414,3 +1494,4 @@ fixUpEffectNames <- function(effects)
     }
     effects
 }
+

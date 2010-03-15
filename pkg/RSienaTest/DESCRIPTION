@@ -6,7 +6,7 @@ Date: 2010-02-11
 Author: Various
 Depends: R (>= 2.9.0), xtable
 Imports: Matrix
-Suggests: tcltk, rlecuyer, snow, network, codetools
+Suggests: tcltk, snow, rlecuyer, network, codetools, lattice
 SystemRequirements: GNU make, tcl/tk 8.5, Tktable
 Maintainer: Ruth Ripley <ruth@stats.ox.ac.uk>
 Description: Fits models to longitudinal networks

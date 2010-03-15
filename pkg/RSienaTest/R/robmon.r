@@ -12,7 +12,8 @@
 ##     z: model fitting object
 ## returns updated z
 ##@robmon siena07 Controls MOM process
-robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
+robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
+                   clusterIter, ...)
 {
     z$FinDiff.method<- x$FinDiff.method
     z$n <- 0
@@ -29,6 +30,10 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
     #######################################################
     ##do initial setup call of FRAN
     #######################################################
+    if (!is.function(x$FRAN))
+    {
+        x$FRAN <- getFromNamespace(x$FRANname, pos=grep("RSiena", search())[1])
+    }
     z <- x$FRAN(z, x, INIT=TRUE, ...)
     ##
     ##if conditional, FRAN changes z$theta etc
@@ -39,10 +44,14 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
         {
             stop("Multiple processors only for simstats0c at present")
         }
+        if (!clusterIter && nbrNodes >= z$f$observations)
+        {
+            stop("Not enough observations to use the nodes")
+        }
         cl <- makeCluster(clusterString, type = "SOCK",
-                          outfile = 'cluster.out')
-        clusterSetupRNG(cl, seed = rep(1, 6))
+                          outfile = "cluster.out")
         clusterCall(cl, library, pkgname, character.only = TRUE)
+        clusterSetupRNG(cl, seed = as.integer(runif(6, max=.Machine$integer.max)))
         clusterCall(cl, storeinFRANstore,  FRANstore())
         if (initC)
         {
@@ -50,11 +59,10 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString, ...)
                                 INIT=FALSE, initC = initC)
         }
         z$cl <- cl
-        z$int <- nbrNodes
     }
     else
     {
-        z$int <-  1
+        z$cl  <-  NULL
     }
     z$newFixed <- rep(FALSE, z$pp)
     z$AllNowFixed <- FALSE
