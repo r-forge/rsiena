@@ -53,4 +53,14 @@ void BehaviorChange::makeChange(DependentVariable * pVariable)
 	}
 }
 
+
+/**
+ * Returns if this ministep is diagonal, namely, it does not change
+ * the dependent variables.
+ */
+bool BehaviorChange::diagonal() const
+{
+	return this->difference() == 0;
+}
+
 }

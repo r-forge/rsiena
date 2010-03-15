@@ -142,6 +142,16 @@ double BehaviorVariable::centeredValue(int actor) const
 
 
 /**
+ * Returns if the behavior is structurally determined for the given actor
+ * at the current period.
+ */
+bool BehaviorVariable::structural(int actor) const
+{
+	return this->lpData->structural(this->period(), actor);
+}
+
+
+/**
  * Returns the centered similarity of the given actors.
  */
 double BehaviorVariable::similarity(int i, int j) const
@@ -437,6 +447,42 @@ double BehaviorVariable::probability(MiniStep * pMiniStep)
 
 	this->calculateProbabilities(pMiniStep->ego());
 	return this->lprobabilities[pMiniStep->difference() + 1];
+}
+
+
+/**
+ * Returns whether applying the given ministep on the current state of this
+ * variable would be valid with respect to all constraints.
+ */
+bool BehaviorVariable::validMiniStep(const MiniStep * pMiniStep) const
+{
+	bool valid = DependentVariable::validMiniStep(pMiniStep);
+
+	if (valid && !pMiniStep->diagonal())
+	{
+		int i = pMiniStep->ego();
+		int d = pMiniStep->difference();
+		int newValue = this->lvalues[i] + d;
+
+		if (newValue < this->lpData->min() || newValue > this->lpData->max())
+		{
+			valid = false;
+		}
+		else if (d > 0 && this->lpData->downOnly(this->period()))
+		{
+			valid = false;
+		}
+		else if (d < 0 && this->lpData->upOnly(this->period()))
+		{
+			valid = false;
+		}
+		else
+		{
+			valid = this->lpData->structural(this->period(), i);
+		}
+	}
+
+	return valid;
 }
 
 }

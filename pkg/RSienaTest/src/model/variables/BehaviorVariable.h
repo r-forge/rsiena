@@ -52,12 +52,14 @@ public:
 	int value(int actor) const;
 	void value(int actor, int newValue);
 	double centeredValue(int actor) const;
+	bool structural(int actor) const;
 	double similarity(int i, int j) const;
 	const int * values() const;
 	int range() const;
 	double similarityMean() const;
 
 	virtual double probability(MiniStep * pMiniStep);
+	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
 
 private:
 	double totalEvaluationContribution(int actor,

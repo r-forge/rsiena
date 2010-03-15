@@ -1,15 +1,29 @@
-2010-02-12 R-forge revision 58
+2010-02-16 R-forge revision 60
+
+	* R/printInitialDescription.r, R/sienaDataCreate.r,
+	src/data/NetworkLongitudinalData.h,
+	src/data/NetworkLongitudinalData.cpp, src/siena07.cpp: average
+	indegrees and outdegrees added to data objects, reports and passed
+	into to C++
+
+	* R/print01Report.r: report on constraints, reformat list of
+	inactive actors.
+
+	* R/simstatsc.r, R/phase2.r, R/maxlike.r: fixes for maxlike
+	routine.
+
+2010-02-12 R-forge revision 59
 
 	* DESCRIPTION, man/RSiena-package.Rd: new version: 1.0.11
 	* R/siena07.r, R/zzz.R, R/siena01.r, R/sienaRDocumentation.r,
-	R/robmon.r, R/print01Report.r, R/getTargets.r, R/simstatsc.r: 
-	replace string "RSiena" or "RSienaTest" by variable containing 
+	R/robmon.r, R/print01Report.r, R/getTargets.r, R/simstatsc.r:
+	bug fix: replace string "RSiena" or "RSienaTest" by variable containing
 	package name
-	* R/makelike.r, R/maxlikecalc.r, man/maxlikefn.Rd, 
+	* R/makelike.r, R/maxlikecalc.r, man/maxlikefn.Rd,
 	man/sienaModelCreate.rd, R/phase2.r, R/phase3.r,
 	R/sienaModelCreate.r, R/sienaprint.r, NAMESPACE: simple MCMC
 	routine intended for algorithm testing only.
-		
+
 2010-02-11 R-forge revision 57
 
 	* R/siena01.r: fix bug which stopped Siena update of effects

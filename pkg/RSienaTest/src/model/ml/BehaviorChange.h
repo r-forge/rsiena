@@ -29,6 +29,7 @@ public:
 	virtual ~BehaviorChange();
 
 	virtual void makeChange(DependentVariable * pVariable);
+	virtual bool diagonal() const;
 };
 
 }

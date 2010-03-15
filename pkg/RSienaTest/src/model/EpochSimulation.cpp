@@ -28,8 +28,6 @@
 #include "model/State.h"
 #include "model/effects/Effect.h"
 #include "model/tables/Cache.h"
-#include "model/ml/Chain.h"
-#include "model/ml/MiniStep.h"
 #include "model/filters/AtLeastOneFilter.h"
 #include "model/filters/DisjointFilter.h"
 #include "model/filters/HigherFilter.h"
@@ -717,59 +715,12 @@ Cache * EpochSimulation::pCache() const
 }
 
 
-// ----------------------------------------------------------------------------
-// Section: Maximum likelihood related methods
-// ----------------------------------------------------------------------------
-
 /**
- * Updates the probabilities for a range of ministeps of the given chain
- * (including the end-points of the range).
+ * Returns the total rate over all dependent variables.
  */
-void EpochSimulation::updateProbabilities(Chain * pChain,
-	MiniStep * pFirstMiniStep,
-	MiniStep * pLastMiniStep)
+double EpochSimulation::totalRate() const
 {
-	// Initialize the variables as of the beginning of the period
-    this->initialize(pChain->period());
-
-    // Apply the ministeps before the first ministep of the required range
-    // to derive the correct state before that ministep.
-
-    MiniStep * pMiniStep = pChain->pFirst()->pNext();
-
-    while (pMiniStep != pFirstMiniStep)
-    {
-    	DependentVariable * pVariable =
-    		this->lvariableMap[pMiniStep->variableName()];
-    	pMiniStep->makeChange(pVariable);
-
-    	pMiniStep = pMiniStep->pNext();
-    }
-
-    bool done = false;
-
-    while (!done)
-    {
-    	DependentVariable * pVariable =
-    		this->lvariableMap[pMiniStep->variableName()];
-    	this->calculateRates();
-    	double rate = pVariable->rate(pMiniStep->ego());
-    	double probability = pVariable->probability(pMiniStep);
-    	double reciprocalTotalRate = 1 / this->ltotalRate;
-
-    	pMiniStep->reciprocalRate(reciprocalTotalRate);
-    	pMiniStep->logProbability(log(probability * rate * reciprocalTotalRate));
-    	pMiniStep->makeChange(pVariable);
-
-    	if (pMiniStep == pLastMiniStep)
-    	{
-    		done = true;
-    	}
-    	else
-    	{
-    		pMiniStep = pMiniStep->pNext();
-    	}
-    }
+	return this->ltotalRate;
 }
 
 }
