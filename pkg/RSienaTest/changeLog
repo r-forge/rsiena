@@ -1,4 +1,46 @@
-2010-02-16 R-forge revision 60
+2010-03-16 R-forge revision 64
+
+	* data/allEffects.csv: covarBipartite egoX should have been an ego
+	effect not dyadic.
+
+2010-03-15 R-forge revision 63 (RSienaTest only)
+
+	* R/siena08.r, R/iwlsm.r, man/siena08.Rd, man/print.sienameta.Rd,
+	man/iwlsm.Rd, summary.iwlsm.Rd: siena08 Meta analysis
+	* R/robmon.r, R/sienaModelCreate.r, man/sienaModelCreate.Rd:
+	remove the function from the model object. Use name instead so no
+	need to load package on R startup with model object in .RData.
+	* R/siena01.r: now uses sienaModelCreate rather than creating object
+	itself.
+	* R/siena07.r, R/phase1.r, R/phase2.r, R/phase3.r, R/robmon.r,
+	R/simstatsc.r, R.sienaDataCreate.r, src/siena07.cpp,
+	man/siena07.Rd:
+	fixed rlecuyer random numbers and added facility to use multiple
+	processors by wave.
+	* R/globals.r, R/print01Report.r, R/siena07.r: Report function can
+	now be used with optional
+	output file
+	* R/print01Report.r, R/sienaDataCerate.r, src/siena07.cpp: missing
+	values in dyadic covariates (incomplete!)
+
+2010-03-15 R-forge revision 62 (RSienaTest only)
+
+	* doc/RSienaDeveloper.tex, doc/Siena_algorithms2.tex
+	* inst/examples/baerveldt3.csv, inst/examples/baerveldt4.csv:
+	altered changing covariate text to constant covariate as only 2
+	waves.
+	* src/data/BehaviorLongitudinalData.cpp, .h: C++ support for
+	structural variables. (Not yet in R)
+	* src/model/many: more code for ML routine.
+	* src/utils/Random.cpp: changes to commments
+
+2010-02-27 R-forge revision 61 (Riena only)
+
+	* R/robmon.r: generate rlecuyer random numbers from the siena01
+	seed.
+	* R/phase3.r: bug in displaying information with few iterations.
+
+2010-02-16 R-forge revision 60 (RSienaTest only)
 
 	* R/printInitialDescription.r, R/sienaDataCreate.r,
 	src/data/NetworkLongitudinalData.h,
@@ -12,7 +54,7 @@
 	* R/simstatsc.r, R/phase2.r, R/maxlike.r: fixes for maxlike
 	routine.
 
-2010-02-12 R-forge revision 59
+2010-02-12 R-forge revision 59 (RSienaTest only except for manual)
 
 	* DESCRIPTION, man/RSiena-package.Rd: new version: 1.0.11
 	* R/siena07.r, R/zzz.R, R/siena01.r, R/sienaRDocumentation.r,
@@ -24,19 +66,37 @@
 	R/sienaModelCreate.r, R/sienaprint.r, NAMESPACE: simple MCMC
 	routine intended for algorithm testing only.
 
+2010-02-11 R-forge revision 58 (RSiena only)
+
+	* man/, src/: some files from revision 56 which got missed.
+
 2010-02-11 R-forge revision 57
 
 	* R/siena01.r: fix bug which stopped Siena update of effects
 	initial values after conditional estimation.
 
-2010-02-11 R-forge revision 55 (cf revision 52)
+2010-02-11 R-forge revision 56 (RSiena only, cf revision 47)
+
+	* DESCRIPTION, man/RSiena-package.Rd: new version number 1.0.10
+	* src/model/effects/generic/*, src/model/effects/effectfactory.cpp:
+	multiple networks
+	* src/model/filters, src/model/EpochSimulation.cpp,
+	src/model/variables/*,
+	src/data/Data.cpp, R/sienaDataCreate.r, R/sienautils.r,
+	R/simstatsc.r, NAMESPACE: constraints between pairs of networks.
+	* src/Makefile, Makefile.win: add new directories
+	* R/sienaDataCreate.r, R/print01Report.r: separate balance means
+	etc. for groups
+	* src/model/ml/*: functions for ML, work in progress.
+
+2010-02-11 R-forge revision 55 (RSienaTest only, (cf revision 52)
 
 	* R/globals.r, R/siena07.r, man/siena07.Rd:
 	new silent option with no output.
 	* tests/parallel.R, tests/parallel.Rout.save: suppress progress
 	message output and include prints of results.
 
-2010-02-11 R-forge revision 54
+2010-02-11 R-forge revision 54 (RSienaTest only)
 
 	* R/print07Report.r: source formatting
 	* data/allEffects.csv: bug in covariate behavior effects
@@ -47,12 +107,26 @@
 
 	* R/siena01.r: fixed bug in editing all effects
 
+2010-02-07 R-forge revision 52 RSiena
+
+	* R/globals.r, R/siena07.r, man/siena07.Rd:
+	new silent option with no output.
+	* tests/parallel.R, tests/parallel.Rout.save: suppress progress
+	message output and include prints of results.
+
+2010-02-04 R-forge revision 51 RSiena
+
+	* data/allEffects/csv: Bug in covariate behavior effects
+	* configure.win, src/Makefile.win, src/Makevars, src/win32/Makefile:
+	changes for Win64
+	* r/effects.r: minor fixes to getEffects function (default effects
+	for multiple dependent networks.)
 
 2010-02-01 R-forge Revision 50
 
 	* doc/s_man400.tex
 
-2010-02-01 R-forge Revision 49
+2010-02-01 R-forge Revision 49 RSienatest
 
 	* R/simstatsc.r, src/siena07.cpp: fixes to constraint
 	* src/model/effects/EffectFactory.cpp,
@@ -63,7 +137,7 @@
 
 	* R/simstatsc.r: fixed bug in sort order of effects
 
-2010-01-26 R-forge revision 47
+2010-01-26 R-forge revision 47 RSienaTest
 
 	* DESCRIPTION, man/RSiena-package.Rd: new version number 1.0.10
 	* src/model/effects/generic/*, src/model/effects/effectfactory.cpp:
@@ -78,16 +152,40 @@
 	* src/model/ml/*: functions for ML, work in progress.
 	* doc/Siena_algorithms.tex, doc/Siena_ChainStructures.tex: added
 
-2010-01-19 R-forge revision 46
+2010-01-19 R-forge revision 46 RSienaTest
 
 	* R/effectsDocumentation.r, man/effectsDocumentation.Rd,
 	inst/doc/effects.pdf: effects documentation system.
 
-2010-01-15 R-forge revision 42
+2010-01-19 R-forge revision 45 RSiena
+
+	* NAMESPACE, R/effectsDocumentation.r,
+	man/effectsDocumentation.Rd: new documentation function
+	* inst/doc/effects.pdf: output from the documentation function/
+
+2010-01-18 R-forge revision 44 RSiena
+
+	* src/model/effects/various.cpp, .h: removed superfluous files
+
+2010-01-18 R-forge revision 43 Siena
+
+	* DESCRIPTION: new version 1.0.9
+	* NAMESPACE: new utility functions
+	* data/alleffects.csv : new behavior effects, user-specified
+	interactions.
+	* R/sienaeffects.r, man/includeEffects.Rd,
+	man/includeInteractions.Rd, man/setEffect.Rd: utilities to update
+	effects object.
+	* R/effects.r, man/getEffects.Rd: new parameter for number of
+	behavior interaction effects.
+	* src/model/effects/many: new behavior effects, user-specified
+	interactions.
+
+2010-01-15 R-forge revision 42 RSienaTest
 
 	* inst/doc/s_man400.pdf: new manual
 
-2010-01-15 R-forge revision 41
+2010-01-15 R-forge revision 41 RSienaTest
 
 	* doc/*, .Rbuildignore, src/sienaProfile.cpp: added developer
 	documentation
@@ -117,30 +215,55 @@
 	* man/RSiena-package.Rd, man/siena07.Rd, man/simstats0c.Rd,
 	man/sienaFit.Rd: made examples faster.
 
-2010-01-15 R-forge revision 40: RSiena only
+2010-01-15 R-forge revision 40 RSiena
 
-2010-01-12 R-forge revisions 38 and 39: RSiena only
+	* R/print01report.r, R/sienaprint.r: remove extra sqrt roots in
+	standard error of rates for conditional estimation (see revision 32)
+	* src/Makefile.win, src/win32/Makefile: Changes to makefile for 64 bit
+	windows
+	* tests/parallel.R, tests/parallel.R.save: remove timers from
+	tests to reduce differences with output.
 
-2010-01-12 R-forge revision 37
+2010-01-12 R-forge revision 39 RSiena
+
+	* tests/parallel.r: fix bug: use library RSiena not RSienaTest
+
+2010-01-12 R-forge revision 38 RSiena
+
+	* man/RSiena-package.Rd, man/siena07.Rd, man/sienaFit.Rd,
+	man/simstats0c.Rd: reduce time for examples
+	* tests/parallel.r, tests/parallel.Rout.save: reduce time for tests
+
+2010-01-12 R-forge revision 37: RSienaTest
 
 	* inst/sienascript: reverted to LF eol-style
 
-2010-01-12 R-forge revision 36
+2010-01-12 R-forge revision 36: RSienaTest
 
 	* all source files: eol-style: native
 
-2010-01-11 R-forge revision 35
+2010-01-11 R-forge revision 35 RSienaTest
 
 	* inst: added manual and examples to RSienaTest
 
-2010-01-02 R-forge revision 34
+2010-01-02 R-forge revision 34 RSiena and RSienaTest
 
 	* R/sienaprint.r:  corrected layout of sienaFitThetaTable for
-	models with both behavior and network variables,
+	models with both behavior and network variables
 
-2010-01-01 R-forge revision 33
+2010-01-01 R-forge revision 33 RSiena and RSienaTest
 
+	* inst/doc: updated changes in manual
 	* CHANGELOG: updated
+
+2010-01-01 R-forge revision 32 (RSiena: copy of relevant changes from revisions 29-31 to
+	RSienaTest)
+
+	* R/simstatsc.r: bug fixes to interactions (not yet functional)
+	and name in header block
+
+	* R/print07report.r: took square root of standard errors of rate
+	estimates for conditional estimation.
 
 2009-31-12 R-forge revision 31
 

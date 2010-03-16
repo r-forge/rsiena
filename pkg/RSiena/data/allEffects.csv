@@ -70,7 +70,7 @@ covarSymmetricObjective,xxxxxx ego x xxxxxx alter,xxxxxx ego x xxxxxx alter,egoX
 covarSymmetricObjective,xxxxxx of indirect ties,xxxxxx of indirect ties,IndTies,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
 covarBipartiteObjective,xxxxxx alter,Sum of indegrees x xxxxxx,altX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
 covarBipartiteObjective,xxxxxx squared alter,Sum of indegrees x squared xxxxxx,altSqX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
-covarBipartiteObjective,xxxxxx ego,Sum of outdegrees x xxxxxx,egoX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,dyadic
+covarBipartiteObjective,xxxxxx ego,Sum of outdegrees x xxxxxx,egoX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,ego
 covarNonSymmetricObjective,xxxxxx alter,Sum of indegrees x xxxxxx,altX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
 covarNonSymmetricObjective,xxxxxx squared alter,Sum of indegrees x squared xxxxxx,altSqX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,
 covarNonSymmetricObjective,xxxxxx ego,Sum of outdegrees x xxxxxx,egoX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,objective,NA,NA,0,0,0,0,ego
