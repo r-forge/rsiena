@@ -234,6 +234,8 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             f$depNames <- NULL
             f$groupNames <- NULL
             f$nGroup <- NULL
+            f$basicEffects <- NULL
+            f$interactionEffects <- NULL
        }
         ##browser()
         #browser()
@@ -279,43 +281,49 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             effects$effectPtr <- NA
             splitFactor <- factor(effects$name, levels=attr(f, "netnames"))
             myeffects <- split(effects, splitFactor)
+            ## remove interaction effects and save till later
+            basicEffects <- lapply(myeffects, function(x)
+                               {
+                                   x[!x$shortName %in% c("unspInt", "behUnspInt"), ]
+                               }
+                                   )
+            interactionEffects <- lapply(myeffects, function(x)
+                                     {
+                                         x[x$shortName %in% c("unspInt", "behUnspInt"), ]
+                                     }
+                                         )
+            ## store effects objects as we may need to recreate them
+            f$interactionEffects <- interactionEffects
+            f$basicEffects <- basicEffects
         }
         else
         {
             myeffects <- ff$myeffects
+            basicEffects <- ff$basicEffects
+            interactionEffects <- ff$interactionEffects
             returnDeps <- ff$returnDeps
             nGroup <- ff$nGroup
         }
-        ## remove interaction effects and save till later
-        basicEffects <- lapply(myeffects, function(x)
-                        {
-                            x[!x$shortName %in% c("unspInt", "behUnspInt"), ]
-                        }
-                            )
-        interactionEffects <- lapply(myeffects, function(x)
-                        {
-                            x[x$shortName %in% c("unspInt", "behUnspInt"), ]
-                        }
-                            )
         ans <- .Call('effects', PACKAGE=pkgname,
-                    pData, basicEffects)
+                     pData, basicEffects)
         pModel <- ans[[1]][[1]]
-       ## browser()
+        ## browser()
         for (i in 1:length(ans[[2]])) ## ans[[2]] is a list of lists of
             ## pointers to effects. Each list corresponds to one
             ## dependent variable
         {
             effectPtr <- ans[[2]][[i]]
             basicEffects[[i]]$effectPtr <- effectPtr
-            interactionEffects[[i]]$effect1 <-
-                basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect1,
-                                                  basicEffects[[i]]$effectNumber)]
-            interactionEffects[[i]]$effect2 <-
-                basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect2,
-                                                  basicEffects[[i]]$effectNumber)]
-            interactionEffects[[i]]$effect3 <-
-                basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
-                                                  basicEffects[[i]]$effectNumber)]
+
+                interactionEffects[[i]]$effect1 <-
+                    basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect1,
+                                                      basicEffects[[i]]$effectNumber)]
+                interactionEffects[[i]]$effect2 <-
+                    basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect2,
+                                                      basicEffects[[i]]$effectNumber)]
+                interactionEffects[[i]]$effect3 <-
+                    basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
+                                                      basicEffects[[i]]$effectNumber)]
         }
         ans <- .Call('interactionEffects', PACKAGE=pkgname,
                      pData, pModel, interactionEffects)
@@ -393,6 +401,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         {
             f[1:nGroup] <- NULL
         }
+
         FRANstore(f) ## store f in FRANstore
         if (initC)
         {
@@ -476,12 +485,11 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                                               function(x) 1:x))))
     if (z$int2==1 || nrow(callGrid) == 1)
     {
-      #   cat("theta", z$theta, "\n")
-       ans <- .Call('model', PACKAGE=pkgname,
+     ans <- .Call('model', PACKAGE=pkgname,
                      z$Deriv, f$pData, seeds,
                      fromFiniteDiff, f$pModel, f$myeffects, z$theta,
                      randomseed2, returnDeps, z$FinDiff.method, !is.null(z$cl))
-    }
+   }
     else
     {
         use <- 1:(min(nrow(callGrid), z$int2))
