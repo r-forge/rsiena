@@ -302,6 +302,29 @@ for all dependent variables if there is composition change), $\delta_{bc}$ is 1
 if the simulation is unconditional and 0 otherwise, and $R$ is the number of
 simulations performed (considering each period as a separate simulation).
 
+Addendum: for maximum likelihood we need derivatives of scores too. Using
+similar notation, with $v_{rk_1k_2}$ the derivative of the score corresponding
+to$(\theta_{k_1}, \theta_{k_2})$  in the $r$-th chain,  this is
+
+\begin{align*}
+\intertext{for a basic rate parameter, $(\lambda)$, for a
+dependent variable, not the total here, just the per actor rate}
+v_{rkk} &= \sum_{m=1}^M  \textrm{nbr of non-structurally determined links in the
+  chain}/ \lambda_m^2\\
+\intertext{for other parameters}
+v_{rk_1k_2}&= \sum_{m=1}^M \left [  \left( \sum_{a, \nnm{delta}_a}
+  s_{i,a\delta k_a} p_{i,a\delta} \right) \left (
+\sum_{ b, \nnm{delta}_b} s_{i,b\delta k_b} p_{i,a\delta} \right) -
+\sum_{a, \nnm{delta}}
+  s_{i,a\delta k_1}p_{i,a\delta}  s_{i,a\delta k_2}
+\right ]\\
+\intertext{with derivative matrix}
+ D_{jk}&=\frac{1}{R}\sum_{r=1}^R v_{rjk}
+\end{align*}
+
+Note that non-basic rate effects are not allowed in the maximum likelihood
+case and basic rate effects are uncorrelated with all other effects.
+
 \subsection{Calculate statistics}
 \label{sec:stats}
 \begin{itemize}
