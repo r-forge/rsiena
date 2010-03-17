@@ -97,9 +97,8 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                 if (startCol > nobs)
                     break
             }
-            if (sum(gpatts$types == "oneMode") > 0)
+            if (sum(gpatts$types != "bipartite") > 0)
             {
-                netnames <- gpatts$netnames[net]
                 if (nData > 1)
                 {
                     averageOutDegree <-
@@ -112,7 +111,7 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                     averageOutDegree <- gpatts$"averageOutDegree"
                 }
                 Report("\n", outf)
-                if (nData > 1 || sum(atts$types == "oneMode") > 1)
+                if (nData > 1 || sum(atts$types != "behavior") > 1)
                 {
                     Report("The average degrees are: ", outf)
                     Report(paste(names(data), round(averageOutDegree, 3),
