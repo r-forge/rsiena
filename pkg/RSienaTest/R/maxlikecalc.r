@@ -82,7 +82,8 @@ calcgrad<- function(pars,Z,startmat,varmat=FALSE)
                 ps<- exp(fs)
             ##    ps[is.na(mat1[i,])|is.na(mat2[i,])]<- 0
                 ps<- ps/sum(ps)
-                ss<- sweep(ss,2,ss[i,])
+               ## ss<- sweep(ss,2,ss[i,])
+               ## browser()
                 wmean<- apply(ss*ps,2,sum)
                 if (varmat)
                 {

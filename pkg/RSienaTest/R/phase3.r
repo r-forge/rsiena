@@ -126,7 +126,7 @@ phase3 <- function(z, x, ...)
             }
         }
         if (nit <= 5 || nit == 10 || (int==1 && nit %% z$writefreq == 0 ) ||
-            (int > 1 && (z$writefreq - 1) < z$n3%/%int &&
+            (int > 1 && (z$writefreq + 1) < z$n3%/%int &&
              nit %in% nits[seq(z$writefreq + 1, x$n3 %/% int,
                                           z$writefreq)]))
         {

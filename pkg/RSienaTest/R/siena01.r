@@ -465,6 +465,8 @@ siena01Gui <- function(getDocumentation=FALSE)
             degs[i] <- as.integer(tclvalue(maxdfVar[[i, 2]]))
         }
         names(degs) <- depvarnames[maxDegree]
+        condvarno <- 0
+        condname <- ""
         if (cond)
         {
             if (ndepvars == 1)
