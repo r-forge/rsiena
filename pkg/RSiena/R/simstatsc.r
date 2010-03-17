@@ -232,6 +232,8 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             f$depNames <- NULL
             f$groupNames <- NULL
             f$nGroup <- NULL
+            f$basicEffects <- NULL
+            f$interactionEffects <- NULL
        }
         ##browser()
         pData <- .Call('setupData', PACKAGE="RSiena",
@@ -275,13 +277,6 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             effects$effectPtr <- NA
             splitFactor <- factor(effects$name, levels=attr(f, "netnames"))
             myeffects <- split(effects, splitFactor)
-        }
-        else
-        {
-            myeffects <- ff$myeffects
-            returnDeps <- ff$returnDeps
-            nGroup <- ff$nGroup
-        }
         ## remove interaction effects and save till later
         basicEffects <- lapply(myeffects, function(x)
                         {
@@ -293,6 +288,18 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                             x[x$shortName %in% c("unspInt", "behUnspInt"), ]
                         }
                             )
+            ## store effects objects as we may need to recreate them
+            f$interactionEffects <- interactionEffects
+            f$basicEffects <- basicEffects
+        }
+        else
+        {
+            myeffects <- ff$myeffects
+            basicEffects <- ff$basicEffects
+            interactionEffects <- ff$interactionEffects
+            returnDeps <- ff$returnDeps
+            nGroup <- ff$nGroup
+        }
         ans <- .Call('effects', PACKAGE="RSiena",
                     pData, basicEffects)
         pModel <- ans[[1]][[1]]

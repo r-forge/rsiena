@@ -1,8 +1,18 @@
+2010-03-17 R-forge revision 66
+
+	* R/simstatsc.r: bug fix: user interaction effects did not work
+	with multiple processors.
+
+2010-03-17 R-forge revision 65 (RSienaTest only)
+
+	* src/model/ml/MLsimulation.cpp, src/model/ml/MLsimulation.ch:
+	forgotten files
+
 2010-03-16 R-forge revision 64
 
 	* data/allEffects.csv: covarBipartite egoX should have been an ego
 	effect not dyadic.
-	
+
 2010-03-15 R-forge revision 63 (RSienaTest only)
 
 	* R/siena08.r, R/iwlsm.r, man/siena08.Rd, man/print.sienameta.Rd,
