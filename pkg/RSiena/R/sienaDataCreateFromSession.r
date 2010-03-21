@@ -254,7 +254,8 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
         gpsession <- session[session$Group == gps[i], ]
         ops <- turnoffwarn()
         gpsessionperiods <- unlist(strsplit(gpsession$Period, " "))
-        observations <- max(as.numeric(gpsessionperiods), na.rm=TRUE)
+      ##  observations <- max(as.numeric(gpsessionperiods), na.rm=TRUE)
+        observations <- length(unique(gpsessionperiods))
         turnonwarn(ops)
         gpfiles <- files[session$Group == gps[i]]
         objnames <- unique(gpsession$Name)
