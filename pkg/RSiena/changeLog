@@ -1,3 +1,15 @@
+2010-03-21 R-forge revision 68 new version number 1.0.11 for RSiena
+
+	* R/sienaDataCreateFromSession.r: allow periods to be numbered
+	other than from 1 in siena net input.
+
+2010-03-17 R-forge revision 67 (RSienaTest only)
+
+	* R/siena01.r: fix to creation of model for unconditional estimation
+	* R/phase3.r: fix to timing of progress reports for multiple processors
+	* R/printInitialDescription.r: fix, was crashing with one mode and
+	bipartite networks together
+
 2010-03-17 R-forge revision 66
 
 	* R/simstatsc.r: bug fix: user interaction effects did not work
