@@ -5,7 +5,7 @@
  *
  * File: Random.h
  *
- * Description: This module defines the class Random for random number
+ * Description: This module defines utilities for random number
  * generation.
  *****************************************************************************/
 
@@ -14,6 +14,8 @@
 
 #include <R.h>
 #include <vector>
+
+using namespace std;
 
 namespace siena
 {
@@ -45,7 +47,7 @@ int nextIntWithCumulativeProbabilities(int n, const T * p)
 	double value = nextDouble() * p[n - 1];
 	int i = 0;
 	int high = n - 1;
-	
+
 	while (p[i] < value)
 	{
 		int middle = (i + high) / 2;
@@ -61,6 +63,22 @@ int nextIntWithCumulativeProbabilities(int n, const T * p)
 	}
 
 	return i;
+}
+
+
+/**
+ * Permutes the elements in the given vector.
+ */
+template<class T>
+void permuteVector(vector<T> & rVector)
+{
+	for (unsigned i = 1; i < rVector.size(); i++)
+	{
+		T element = rVector[i];
+		int newIndex = nextInt(i + 1);
+		rVector[i] = rVector[newIndex];
+		rVector[newIndex] = element;
+	}
 }
 
 }

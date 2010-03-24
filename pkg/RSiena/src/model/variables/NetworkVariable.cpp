@@ -278,6 +278,9 @@ void NetworkVariable::actOnJoiner(const SimulationActorSet * pActorSet,
 					iter.value());
 			}
 		}
+
+		// The rates need to be recalculated.
+		this->invalidateRates();
 	}
 
 	if (pActorSet == this->pReceivers())
@@ -308,6 +311,9 @@ void NetworkVariable::actOnJoiner(const SimulationActorSet * pActorSet,
 		{
 			this->lactiveStructuralTieCount[iter.actor()]++;
 		}
+
+		// The rates need to be recalculated.
+		this->invalidateRates();
 	}
 }
 
@@ -325,6 +331,9 @@ void NetworkVariable::actOnLeaver(const SimulationActorSet * pActorSet,
 	{
 		// Remove the ties from the given actor.
 		this->lpNetwork->clearOutTies(actor);
+
+		// The rates need to be recalculated.
+		this->invalidateRates();
 	}
 
 	if (pActorSet == this->pReceivers())
@@ -343,6 +352,9 @@ void NetworkVariable::actOnLeaver(const SimulationActorSet * pActorSet,
 		{
 			this->lactiveStructuralTieCount[iter.actor()]--;
 		}
+
+		// The rates need to be recalculated.
+		this->invalidateRates();
 	}
 }
 
@@ -395,17 +407,24 @@ void NetworkVariable::setLeaverBack(const SimulationActorSet * pActorSet,
  */
 bool NetworkVariable::canMakeChange(int actor) const
 {
-	int activeAlterCount =
-		this->lpReceivers->activeActorCount();
+	bool rc = DependentVariable::canMakeChange(actor);
 
-	if (this->oneModeNetwork())
+	if (rc)
 	{
-		// No loops are possible in one mode networks
-		activeAlterCount--;
+		int activeAlterCount =
+			this->lpReceivers->activeActorCount();
+
+		if (this->oneModeNetwork())
+		{
+			// No loops are possible in one mode networks
+			activeAlterCount--;
+		}
+
+		rc &= this->lpSenders->active(actor) &&
+			this->lactiveStructuralTieCount[actor] < activeAlterCount;
 	}
 
-	return this->lpSenders->active(actor) &&
-		this->lactiveStructuralTieCount[actor] < activeAlterCount;
+	return rc;
 }
 
 
@@ -757,6 +776,105 @@ double NetworkVariable::probability(MiniStep * pMiniStep)
 	this->lego = pNetworkChange->ego();
 	this->calculateTieFlipProbabilities();
 	return this->lprobabilities[pNetworkChange->alter()];
+}
+
+
+/**
+ * Returns whether applying the given ministep on the current state of this
+ * variable would be valid with respect to all constraints.
+ */
+bool NetworkVariable::validMiniStep(const MiniStep * pMiniStep) const
+{
+	bool valid = DependentVariable::validMiniStep(pMiniStep);
+
+	if (valid && !pMiniStep->diagonal())
+	{
+		NetworkLongitudinalData * pData =
+			(NetworkLongitudinalData *) this->pData();
+		const NetworkChange * pNetworkChange =
+			dynamic_cast<const NetworkChange *>(pMiniStep);
+		int i = pNetworkChange->ego();
+		int j = pNetworkChange->alter();
+
+		if (this->lpNetwork->tieValue(i, j))
+		{
+			valid = !pData->upOnly(this->period());
+		}
+		else
+		{
+			valid = !pData->downOnly(this->period()) &&
+				this->lpNetwork->outDegree(i) < pData->maxDegree() &&
+				this->pReceivers()->active(j);
+		}
+
+		if (valid)
+		{
+			valid = pData->structural(i, j, this->period());
+		}
+
+		// The filters may add some more conditions.
+
+		for (unsigned i = 0;
+			i < this->lpermittedChangeFilters.size() && valid;
+			i++)
+		{
+			PermittedChangeFilter * pFilter = this->lpermittedChangeFilters[i];
+			valid = pFilter->validMiniStep(pNetworkChange);
+		}
+	}
+
+	return valid;
+}
+
+
+/**
+ * Generates a random ministep for the given ego.
+ */
+MiniStep * NetworkVariable::randomMiniStep(int ego)
+{
+	this->lego = ego;
+	this->calculateTieFlipProbabilities();
+	int alter = nextIntWithProbabilities(this->m(), this->lprobabilities);
+
+	int difference = 0;
+
+	if (alter != ego)
+	{
+		// The following statement makes sure that a tie is withdrawn
+		// correctly.
+
+		difference = -this->lpNetwork->tieValue(ego, alter);
+
+		// Here we make sure that non-existing ties are properly introduced
+
+		if (difference == 0)
+		{
+			difference = 1;
+		}
+	}
+
+	MiniStep * pMiniStep =
+		new NetworkChange(this->id(), ego, alter, difference);
+	pMiniStep->logChoiceProbability(log(this->lprobabilities[alter]));
+
+	return pMiniStep;
+}
+
+
+/**
+ * Returns if the observed value for the option of the given ministep
+ * is missing at either end of the period.
+ */
+bool NetworkVariable::missing(const MiniStep * pMiniStep) const
+{
+	const NetworkChange * pNetworkChange =
+		dynamic_cast<const NetworkChange *>(pMiniStep);
+	return this->lpData->missing(pNetworkChange->ego(),
+			pNetworkChange->alter(),
+			this->period()) ||
+		this->lpData->missing(pNetworkChange->ego(),
+			pNetworkChange->alter(),
+			this->period() + 1);
 }
 
 }

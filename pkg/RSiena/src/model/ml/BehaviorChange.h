@@ -23,12 +23,13 @@ namespace siena
 class BehaviorChange: public MiniStep
 {
 public:
-	BehaviorChange(int ego,
-		string variableName,
+	BehaviorChange(int variableIndex,
+		int ego,
 		int difference);
 	virtual ~BehaviorChange();
 
 	virtual void makeChange(DependentVariable * pVariable);
+	virtual bool diagonal() const;
 };
 
 }

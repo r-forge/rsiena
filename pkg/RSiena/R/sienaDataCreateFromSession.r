@@ -480,6 +480,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        ##             namesession$MissingValues[1],
                        ##              fixed=TRUE)
                        miss <- namesession$MissingValues
+                       miss <- strsplit(miss, " ")[[1]]
                        if (!is.na(miss) && miss != '')
                            namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
                        ##  namefiles[[1]][grep(miss, namefiles[[1]])] <-  NA
@@ -494,6 +495,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        ##              fixed=TRUE)
                        ##   namefiles[[1]][grep(miss, namefiles[[1]])] <-  NA
                        miss <- namesession$MissingValues
+                       miss <- strsplit(miss, " ")[[1]]
                        namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
                        varnames <- strsplit(objnames[j], ' ')[[1]]
                        tmp <- sapply(1: ncol(namefiles[[1]]), function(x){
@@ -509,6 +511,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                      ##               fixed=TRUE)
                      ##  namefiles[[1]][grep(miss, namefiles[[1]])] <-  NA
                        miss <- namesession$MissingValues
+                       miss <- strsplit(miss, " ")[[1]]
                        namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
                        assign(objnames[j],
                               varCovar (namefiles[[1]],
@@ -521,6 +524,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                      ##               fixed=TRUE)
                      ##  namefiles[[1]][grep(miss, namefiles[[1]])] <-  NA
                        miss <- namesession$MissingValues
+                        miss <- strsplit(miss, " ")[[1]]
                        namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
                        if (namesession[1, "ActorSet"] == "Actors")
                        {
@@ -541,9 +545,10 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        myarray <- array(NA, dim=c(dim(namefiles[[1]]),
                                              observations - 1))
                        miss <- namesession$MissingValues
+                       miss <- strsplit(miss, " ")
                        for (x in 1:nrow(namesession))
                        {
-                           if (miss[x] != '')
+                           if (miss[[x]] != '')
                            {
                                namefiles[[x]][namefiles[[x]] %in% miss[x]] <- NA
                            }

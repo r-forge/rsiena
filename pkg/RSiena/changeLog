@@ -1,3 +1,36 @@
+2010-03-24 R-forge revision 69 (RSiena only) (cf revision 63, 67 for RSienaTest)
+
+	* src/many: mostly incomplete, changes for ML.
+	* R/simstatsc.r: sped up carry forward for NA arcs in sparse input.
+	* R/print01Report.r: some percentages had not been multiplied by 100.
+	* R/sienaDataCreateFromSession.r: fix to allow more than one
+	value indicating missing for covariates etc.
+	* data/allEffects.csv, src/model/effects/EffectFactory.cpp:
+	renamed 4-cycle shortname to cycle4. Needs to be a permissible R
+	name.
+	* inst/examples/baerveldt3.csv, baerveldt4.csv: changed the
+	changing covariates to constant as only 2 periods.
+	* R/siena08.r, R/iwlsm.r, man/siena08.Rd, man/print.sienameta.Rd,
+	man/iwlsm.Rd, summary.iwlsm.Rd: siena08 Meta analysis
+	* R/robmon.r, R/sienaModelCreate.r, man/sienaModelCreate.Rd:
+	remove the function from the model object. Use name instead so no
+	need to load package on R startup with model object in .RData.
+	* R/siena01.r: now uses sienaModelCreate rather than creating object
+	itself.
+	* R/siena07.r, R/phase1.r, R/phase2.r, R/phase3.r, R/robmon.r,
+	R/simstatsc.r, R.sienaDataCreate.r, src/siena07.cpp,
+	man/siena07.Rd:
+	fixed rlecuyer random numbers and added facility to use multiple
+	processors by wave.
+	* R/globals.r, R/print01Report.r, R/siena07.r: Report function can
+	now be used with optional output file
+	* R/print01Report.r, R/sienaDataCreate.r, src/siena07.cpp: missing
+	values in dyadic covariates (incomplete!)
+	* R/siena01.r: fix to creation of model for unconditional estimation
+	* R/phase3.r: fix to timing of progress reports for multiple processors
+	* R/printInitialDescription.r: fix, was crashing with one mode and
+	bipartite networks together.
+
 2010-03-21 R-forge revision 68 new version number 1.0.11 for RSiena
 
 	* R/sienaDataCreateFromSession.r: allow periods to be numbered
@@ -40,9 +73,8 @@
 	fixed rlecuyer random numbers and added facility to use multiple
 	processors by wave.
 	* R/globals.r, R/print01Report.r, R/siena07.r: Report function can
-	now be used with optional
-	output file
-	* R/print01Report.r, R/sienaDataCerate.r, src/siena07.cpp: missing
+	now be used with optional output file
+	* R/print01Report.r, R/sienaDataCreate.r, src/siena07.cpp: missing
 	values in dyadic covariates (incomplete!)
 
 2010-03-15 R-forge revision 62 (RSienaTest only)

@@ -26,6 +26,11 @@ storeinFRANstore <- function(...)
 phase2.1<- function(z, x, ...)
 {
     #initialise phase2
+    if (x$maxlike)
+    {
+        z$phase2fras <- array(0, dim=c(4, z$pp, 1000))
+        z$rejectprops <- array(0, dim=c(4, 4, 1000))
+    }
     int <- 1
     f <- FRANstore()
     z$Phase <- 2
@@ -81,6 +86,7 @@ proc2subphase<- function(z, x, subphase, ...)
         z$ctime <- proc.time()[3]
         z$time1 <- proc.time()[3]
         z$thav <- z$theta
+        z$thavn <- 1
        ## cat(z$thav, z$theta, '\n')
         z$prod0 <- rep(0, z$pp)
         z$prod1 <- rep(0, z$pp)
@@ -149,7 +155,7 @@ proc2subphase<- function(z, x, subphase, ...)
                      ' = ', format(subphaseTime, nsmall=4, digits=4),
                      '\n', sep=''), lf)
     }
-    z$theta <- z$thav / (z$nit + 1)
+    z$theta <- z$thav / z$thavn #(z$nit + 1)
     DisplayThetaAutocor(z)
     ##    cat('it',z$nit,'\n')
     ##recalculate autocor using -1 instead of -2 as error
@@ -188,7 +194,9 @@ doIterations<- function(z, x, subphase,...)
     zsmall$theta <- z$theta
     zsmall$Deriv <- z$Deriv
     zsmall$Phase <- z$Phase
+    zsmall$int2 <- z$int2
     zsmall$FinDiff.method <- z$FinDiff.method
+    zsmall$cl <- z$cl
     xsmall <- NULL
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
@@ -243,9 +251,11 @@ doIterations<- function(z, x, subphase,...)
                 }
             }
         }
+        zsmall$nit <- z$nit
         if (z$int == 1)
         {
             zz <- x$FRAN(zsmall, xsmall)
+          ##  browser()
             fra <- colSums(zz$fra) - z$targets
             if (!zz$OK)
             {
@@ -264,6 +274,11 @@ doIterations<- function(z, x, subphase,...)
                 break
             }
         }
+        if (x$maxlike)
+        {
+            z$phase2fras[subphase, ,z$nit] <- fra
+            z$rejectprops[subphase, , z$nit] <- zz$rejectprop
+        }
         if (z$nit %% 2 == 1)
         {
             prev.fra <- fra
@@ -281,9 +296,7 @@ doIterations<- function(z, x, subphase,...)
                 DisplayThetaAutocor(z)
             }
         }
-        ## limit change. not sure what to do here sd is not set up
-        ## unless finite differences are used or ML and
-        ## ML is specifically excluded here. Reporting is delayed to
+        ## limit change.  Reporting is delayed to
         ## end of phase.
      ##   browser()
         if (x$diag)## !maxlike at present
@@ -300,7 +313,6 @@ doIterations<- function(z, x, subphase,...)
         }
         else
         {
-            browser()
             fchange <- as.vector(z$gain * fra %*% z$dinv)
         }
         ##   browser()
@@ -311,6 +323,12 @@ doIterations<- function(z, x, subphase,...)
         zsmall$theta <- zsmall$theta - fchange
         z$theta <- zsmall$theta
         z$thav <- z$thav + zsmall$theta
+        z$thavn <- z$thavn + 1
+        ## if (x$maxlike && !is.null(x$moreUpdates) && x$moreUpdates > 0)
+        ## {
+        ##    z <- doMoreUpdates(z, x, x$moreUpdates * subphase)
+        ##    zsmall$theta <- z$theta
+        ## }
         ##check for user interrupt
        ##   browser()
         CheckBreaks()

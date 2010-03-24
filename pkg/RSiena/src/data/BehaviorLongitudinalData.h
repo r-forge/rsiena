@@ -23,7 +23,8 @@ namespace siena
 class BehaviorLongitudinalData : public LongitudinalData
 {
 public:
-	BehaviorLongitudinalData(std::string name,
+	BehaviorLongitudinalData(int id,
+		std::string name,
 		const ActorSet * pActorSet,
 		int observationCount);
 	virtual ~BehaviorLongitudinalData();
@@ -32,6 +33,8 @@ public:
 	void value(int observation, int actor, int value);
 	bool missing(int observation, int actor) const;
 	void missing(int observation, int actor, bool missing);
+	bool structural(int observation, int actor) const;
+	void structural(int observation, int actor, bool flag);
 	const int * values(int observation) const;
 
 	int min() const;
@@ -49,6 +52,9 @@ private:
 
 	// Missingness indicators
 	bool ** lmissing;
+
+	// Structural value indicators
+	bool ** lstructural;
 
 	// The smallest non-missing value
 	int lmin;

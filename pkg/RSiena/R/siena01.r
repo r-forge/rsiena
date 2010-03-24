@@ -154,7 +154,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         {
             mydata <<- resp$mydata
             myeff <<- resp$myeff
-            mymodel <<- sienaModelCreate(fn=simstats0c)
+            mymodel <<- sienaModelCreate()
             savedObjectName <- paste(modelName, ".Rdata", sep="")
             save(mydata, myeff, mymodel, file=savedObjectName)
             sienaModelOptions()
@@ -273,13 +273,14 @@ siena01Gui <- function(getDocumentation=FALSE)
     ##@helpFn internal siena01Gui
     helpFn <- function() ## display the manual
     {
-        RShowDoc("s_man400", package="RSiena")
+        RShowDoc("s_man400", package=pkgname)
     }
     ##@myStop internal siena01Gui
     myStop<- function()
     {
         if (!DONE() && exists("mydata") && exists("myeff") &&
-            exists("mymodel") && !is.null(mydata) && !is.null(myeff) && !is.null(mymodel))
+            exists("mymodel") && !is.null(mydata) && !is.null(myeff) &&
+            !is.null(mymodel))
         {
             ans <- tkmessageBox(message='Do you want to save the model?',
                                 type='yesno', icon='question')
@@ -432,69 +433,56 @@ siena01Gui <- function(getDocumentation=FALSE)
     }
 
     ##@modelFromTcl internal siena01Gui
-    modelFromTcl <- function() ## used by stop function and modeloptions screen
+    modelFromTcl <- function()
     {
-        model <- NULL
+       # model <- NULL
         if (!is.null(modelName))
         {
-            model$projname <- modelName
+            projname <- modelName
         }
         else
         {
-            model$projname <- "Siena"
+            projname <- "Siena"
         }
-        model$cconditional <- tclvalue(estimVar) ==
+        cond <- tclvalue(estimVar) ==
             '1. conditional Method of Moments'
-        model$firstg <- as.numeric(tclvalue(gainVar))
-        model$useStdInits <- tclvalue(stdstartVar) == '1'
-        model$nsub <- as.numeric(tclvalue(ph2spinVar))
+        firstg <- as.numeric(tclvalue(gainVar))
+        useStdInits <- tclvalue(stdstartVar) == '1'
+        nsub <- as.numeric(tclvalue(ph2spinVar))
         if (tclvalue(rsVar) == '0')
         {
-            model$randomSeed <- NULL
+            seed <- NULL
         }
         else
         {
-            model$randomSeed <- as.numeric(tclvalue(rsspinVar))
+            seed <- as.numeric(tclvalue(rsspinVar))
         }
-         if (tclvalue(clustVar) == '0')
-        {
-            model$nbrNodes <- 1
-        }
-        else
-        {
-            model$nbrNodes <- as.numeric(tclvalue(clustspinVar))
-        }
-       model$FinDiff.method <- tclvalue(derivVar) == '0. crude Monte Carlo'
-        model$n3 <- as.numeric(tclvalue(ph3spinVar))
+        FinDiff.method <- tclvalue(derivVar) == '0. crude Monte Carlo'
+        n3 <- as.numeric(tclvalue(ph3spinVar))
         degs <- rep(0, nMaxDegree)
         for (i in 1:nMaxDegree)
         {
             degs[i] <- as.integer(tclvalue(maxdfVar[[i, 2]]))
         }
         names(degs) <- depvarnames[maxDegree]
-        model$MaxDegree <- degs
-        model$checktime <- TRUE
-        model$maxrat <- 1
-        model$maxmaxrat <- 10
-        model$FRAN <- simstats0c
-        model$diag <-  TRUE
-        model$maxlike <-  FALSE
-        model$ModelType <- 1
-        model$exogenous <- FALSE
-        if (model$cconditional)
+        condvarno <- 0
+        condname <- ""
+        if (cond)
         {
             if (ndepvars == 1)
             {
-                model$condvarno <- 1
-                model$condname <- ""
+               condvarno <- 1
+               condname <- ""
             }
             else
             {
-                model$condname <- tclvalue(condVar)
+                condname <- tclvalue(condVar)
             }
         }
-        class(model) <- "sienaModel"
-        model
+        sienaModelCreate(projname=projname, useStdInits=useStdInits,
+                         cond=cond, firstg=firstg, seed=seed,
+                         nsub=nsub, n3=n3, findiff=FinDiff.method,
+                         MaxDegree=degs, condvarno=condvarno, condname=condname)
     }
     ##@sienaModelOptions internal siena01Gui
     sienaModelOptions <- function()
@@ -551,11 +539,20 @@ siena01Gui <- function(getDocumentation=FALSE)
         {
             ##create mymodel
             mymodel <<- modelFromTcl()
-            if (mymodel$nbrNodes > 1)
+
+            if (tclvalue(clustVar) == '0')
+            {
+                nbrNodes <- 1
+            }
+            else
+            {
+                nbrNodes <- as.numeric(tclvalue(clustspinVar))
+            }
+            if (nbrNodes > 1)
             {
                 resp <- try(siena07(mymodel, data=mydata, effects=myeff,
                                     useCluster=TRUE, initC=TRUE,
-                                    nbrNodes=mymodel$nbrNodes),
+                                    nbrNodes=nbrNodes),
                             silent=TRUE)
             }
             else
@@ -567,22 +564,28 @@ siena01Gui <- function(getDocumentation=FALSE)
             {
                 tkmessageBox(message=resp, icon="error")
             }
-            else ## update the thetas to use next time
+            else ## update the thetas to use next time, if run not interrupted
             {
                 estimAns <<- resp
                 if (estimAns$cconditional)
                 {
                     ## z$condvar has the subscripts of included parameters that
                     ## correspond to the conditional variable
-                    use <- which(myeff$include)
-                    initValues <- rep(0, length(use))
-                    initValues[estimAns$condvar] <- estimAns$rate
-                    initValues[-estimAns$condvar] <- estimAns$theta
-                    myeff$initialValue[myeff$include] <<- initValues
+                    if (!is.null(estimAns$rate))
+                    {
+                        use <- which(myeff$include)
+                        initValues <- rep(0, length(use))
+                        initValues[estimAns$condvar] <- estimAns$rate
+                        initValues[-estimAns$condvar] <- estimAns$theta
+                        myeff$initialValue[myeff$include] <<- initValues
+                    }
                 }
                 else
                 {
-                    myeff$initialValue[myeff$include] <<- estimAns$theta
+                    if (!estimAns$termination == "UserInterrupt")
+                    {
+                        myeff$initialValue[myeff$include] <<- estimAns$theta
+                    }
                 }
                 wasopen <- FALSE
                 if (resultsOpen)
@@ -606,7 +609,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         ##@modelhelpFn internal siena01Gui
         modelhelpFn <- function()
         {
-            RShowDoc("s_man400", package="RSiena")
+            RShowDoc("s_man400", package=pkgname)
         }
         ##@randomseedFn internal siena01Gui
         randomseedFn <- function()

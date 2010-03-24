@@ -22,15 +22,16 @@ namespace siena
 class NetworkChange: public MiniStep
 {
 public:
-	NetworkChange(int ego,
+	NetworkChange(int variableId,
+		int ego,
 		int alter,
-		string variableName,
 		int difference);
 	virtual ~NetworkChange();
 
 	inline int alter() const;
 
 	virtual void makeChange(DependentVariable * pVariable);
+	virtual bool diagonal() const;
 
 private:
 	// The alter whose incoming tie is changed

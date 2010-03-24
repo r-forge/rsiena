@@ -305,6 +305,16 @@ int DependentVariable::n() const
 
 
 /**
+ * Returns the ID of this dependent variable, which is the same as the ID
+ * of the underlying observed data object.
+ */
+int DependentVariable::id() const
+{
+	return this->pData()->id();
+}
+
+
+/**
  * Stores the distance of this variable to the observed data at the
  * beginning of the current period.
  */
@@ -352,6 +362,11 @@ void DependentVariable::initialize(int period)
 
 		this->updateCovariateRates();
 	}
+
+	// Make sure the rates will be calculated whenever calculateRates()
+	// is called next time.
+
+	this->lvalidRates = false;
 }
 
 
@@ -364,25 +379,40 @@ void DependentVariable::initialize(int period)
  */
 void DependentVariable::calculateRates()
 {
-	this->ltotalRate = 0;
-	int n = this->n();
-
-	for (int i = 0; i < n; i++)
+	if (!this->constantRates() || !this->lvalidRates)
 	{
-		// If an actor cannot make a change with respect to this variable,
-		// then its rate is 0.
+		this->ltotalRate = 0;
+		int n = this->n();
 
-		if (this->canMakeChange(i))
+		for (int i = 0; i < n; i++)
 		{
-			this->lrate[i] = this->calculateRate(i);
-		}
-		else
-		{
-			this->lrate[i] = 0;
+			// If an actor cannot make a change with respect to this variable,
+			// then its rate is 0.
+
+			if (this->canMakeChange(i))
+			{
+				this->lrate[i] = this->calculateRate(i);
+			}
+			else
+			{
+				this->lrate[i] = 0;
+			}
+
+			this->ltotalRate += this->lrate[i];
 		}
 
-		this->ltotalRate += this->lrate[i];
+		this->lvalidRates = true;
 	}
+}
+
+
+/**
+ * Ensures that the rates will be recalculated when the method
+ * calculateRates() is called next time.
+ */
+void DependentVariable::invalidateRates()
+{
+	this->lvalidRates = false;
 }
 
 
@@ -392,6 +422,17 @@ void DependentVariable::calculateRates()
 bool DependentVariable::canMakeChange(int actor) const
 {
 	return this->lpActorSet->active(actor);
+}
+
+
+/**
+ * Returns if the rates are constant over the current period, and can be
+ * thus calculated just once.
+ */
+bool DependentVariable::constantRates() const
+{
+	return this->lstructuralRateEffects.empty() &&
+		this->lbehaviorVariableParameters.empty();
 }
 
 
@@ -531,6 +572,10 @@ double DependentVariable::structuralRate(int i) const
 	return rate;
 }
 
+
+// ----------------------------------------------------------------------------
+// Section: Scores
+// ----------------------------------------------------------------------------
 
 /**
  * Updates the rate score functions for this event for this variable.
@@ -830,6 +875,10 @@ double DependentVariable::inverseOutDegreeScore(
 void DependentVariable::actOnJoiner(const SimulationActorSet * pActorSet,
 	int actor)
 {
+	if (pActorSet == this->lpActorSet)
+	{
+		this->invalidateRates();
+	}
 }
 
 
@@ -839,6 +888,24 @@ void DependentVariable::actOnJoiner(const SimulationActorSet * pActorSet,
 void DependentVariable::actOnLeaver(const SimulationActorSet * pActorSet,
 	int actor)
 {
+	if (pActorSet == this->lpActorSet)
+	{
+		this->invalidateRates();
+	}
+}
+
+
+// ----------------------------------------------------------------------------
+// Section: Maximum likelihood related methods
+// ----------------------------------------------------------------------------
+
+/**
+ * Returns whether applying the given ministep on the current state of this
+ * variable would be valid with respect to all constraints.
+ */
+bool DependentVariable::validMiniStep(const MiniStep * pMiniStep) const
+{
+	return true;
 }
 
 }

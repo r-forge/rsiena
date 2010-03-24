@@ -33,8 +33,6 @@ class EffectInfo;
 class SimulationActorSet;
 class State;
 class Cache;
-class Chain;
-class MiniStep;
 
 
 // ----------------------------------------------------------------------------
@@ -56,12 +54,6 @@ public:
     // Method of moments related
     void runEpoch(int period);
 
-    // Maximum likelihood related
-
-    void updateProbabilities(Chain * pChain,
-    	MiniStep * pFirstMiniStep,
-    	MiniStep * pLastMiniStep);
-
     // Accessors
 
     const Data * pData() const;
@@ -79,15 +71,21 @@ public:
     double score(const EffectInfo * pEffect) const;
     void score(const EffectInfo * pEffect, double value);
 
+protected:
+    void calculateRates();
+    double totalRate() const;
+    DependentVariable * chooseVariable() const;
+    int chooseActor(const DependentVariable * pVariable) const;
+
+    // A vector of dependent variables with their current values
+    vector<DependentVariable *> lvariables;
+
 private:
     void runStep();
-    void calculateRates();
     void drawTimeIncrement();
     bool reachedCompositionChange() const;
     void makeNextCompositionChange();
 	void setLeaversBack();
-    DependentVariable * chooseVariable() const;
-    int chooseActor(const DependentVariable * pVariable) const;
     void accumulateRateScores(double tau,
     	const DependentVariable * pSelectedVariable = 0,
     	int selectedActor = 0);
@@ -104,10 +102,7 @@ private:
     // Stores the wrappers of each original actor set
     map<const ActorSet *, SimulationActorSet *> lactorSetMap;
 
-    // A vector of dependent variables with their current values
-    vector<DependentVariable *> lvariables;
-
-    // The dependent variable for look-ups by name
+    // The dependent variable for look-ups by variable names
     map<string, DependentVariable *> lvariableMap;
 
     // The current period to be simulated

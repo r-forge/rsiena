@@ -1,3 +1,14 @@
+/******************************************************************************
+ * SIENA: Simulation Investigation for Empirical Network Analysis
+ *
+ * Web: http://www.stats.ox.ac.uk/~snijders/siena/
+ *
+ * File: Random.cpp
+ *
+ * Description: This file contains the implementation of random number
+ * generation utilities.
+ *****************************************************************************/
+
 #include "Random.h"
 #include <sys/time.h>
 #include <R.h>

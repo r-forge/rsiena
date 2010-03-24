@@ -56,6 +56,8 @@ phase1.1 <- function(z, x, ...)
     zsmall$Phase <- z$Phase
     zsmall$nit <- z$nit
     zsmall$FinDiff.method <- z$FinDiff.method
+    zsmall$int2 <- z$int2
+    zsmall$cl <- z$cl
     xsmall<- NULL
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
@@ -97,8 +99,7 @@ phase1.1 <- function(z, x, ...)
          ## #######################################
          ## # do iteration
          ## #######################################
-         z <- doPhase1it(z, x, cl=z$cl, int=z$int, zsmall=zsmall,
-                         xsmall=xsmall, ...)
+         z <- doPhase1it(z, x, zsmall=zsmall, xsmall=xsmall, ...)
          ## #######################################
          ## #
          ## #######################################
@@ -164,8 +165,9 @@ phase1.1 <- function(z, x, ...)
 }
 
 ##@doPhase1it siena07 does 1 iteration in Phase 1
-doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
+doPhase1it<- function(z, x, zsmall, xsmall, ...)
 {
+    int <- z$int
     DisplayIteration(z)
     if (int == 1)
     {
@@ -181,9 +183,10 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     }
     else
     {
-        zz <- clusterCall(cl, usesim, zsmall, xsmall)
+        zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
         z$n <- z$n + z$int
         z$phase1Its <- z$phase1Its + int
+      #  browser()
     }
     if (int == 1)
     {
@@ -207,7 +210,7 @@ doPhase1it<- function(z, x, cl, int, zsmall, xsmall, ...)
     }
     if (z$FinDiff.method)
     {
-        z <- FiniteDifferences(z, x, fra + z$targets, z$cl, z$int, ...)
+        z <- FiniteDifferences(z, x, fra + z$targets, ...)
         z$sdf[z$nit:(z$nit + (z$int - 1)), , ] <- z$sdf0
     }
     else if (x$maxlike)
@@ -273,6 +276,8 @@ phase1.2 <- function(z, x, ...)
     zsmall$Deriv <- z$Deriv
     zsmall$Phase <- z$Phase
     zsmall$nit <- z$nit
+    zsmall$int2 <- z$int2
+    zsmall$cl <- z$cl
     xsmall<- NULL
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
@@ -292,8 +297,7 @@ phase1.2 <- function(z, x, ...)
                 }
             }
             z$nit <- nit
-            z <- doPhase1it(z, x, cl=z$cl, int=int, zsmall=zsmall,
-                            xsmall=xsmall, ...)
+            z <- doPhase1it(z, x, zsmall=zsmall, xsmall=xsmall, ...)
             if (!z$OK || UserInterruptFlag() || UserRestartFlag())
             {
                 return(z)
@@ -477,14 +481,16 @@ CalculateDerivative <- function(z, x)
 }
 
 ##@FiniteDifferences siena07 Does the extra iterations for finite differences
-FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
+FiniteDifferences <- function(z, x, fra, ...)
 {
+    int <- z$int
     fras <- array(0, dim = c(int, z$pp, z$pp))
     xsmall<- NULL
  ##browser()
     for (i in 1 : z$pp)
     {
-        zdummy <- z[c('theta', 'Deriv', 'cconditional', 'FinDiff.method')]
+        zdummy <- z[c('theta', 'Deriv', 'cconditional', 'FinDiff.method',
+                      'int2', 'cl')]
         if (!z$fixed[i])
         {
             zdummy$theta[i] <- z$theta[i] + z$epsilon[i]
@@ -502,8 +508,9 @@ FiniteDifferences <- function(z, x, fra, cl, int=1, ...)
         }
         else
         {
-            zz <- clusterCall(cl, usesim, zdummy, xsmall,
+            zz <- clusterCall(z$cl, usesim, zdummy, xsmall,
                               INIT=FALSE, fromFiniteDiff=TRUE)
+            #browser()
         }
         if (int == 1)
         {
