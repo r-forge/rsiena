@@ -23,6 +23,7 @@
 #include "model/EffectInfo.h"
 #include "model/SimulationActorSet.h"
 #include "model/ml/MiniStep.h"
+#include "model/ml/BehaviorChange.h"
 
 namespace siena
 {
@@ -138,6 +139,16 @@ void BehaviorVariable::value(int actor, int newValue)
 double BehaviorVariable::centeredValue(int actor) const
 {
 	return this->lvalues[actor] - this->lpData->overallMean();
+}
+
+
+/**
+ * Returns if the behavior is structurally determined for the given actor
+ * at the current period.
+ */
+bool BehaviorVariable::structural(int actor) const
+{
+	return this->lpData->structural(this->period(), actor);
 }
 
 
@@ -437,6 +448,67 @@ double BehaviorVariable::probability(MiniStep * pMiniStep)
 
 	this->calculateProbabilities(pMiniStep->ego());
 	return this->lprobabilities[pMiniStep->difference() + 1];
+}
+
+
+/**
+ * Returns whether applying the given ministep on the current state of this
+ * variable would be valid with respect to all constraints.
+ */
+bool BehaviorVariable::validMiniStep(const MiniStep * pMiniStep) const
+{
+	bool valid = DependentVariable::validMiniStep(pMiniStep);
+
+	if (valid && !pMiniStep->diagonal())
+	{
+		int i = pMiniStep->ego();
+		int d = pMiniStep->difference();
+		int newValue = this->lvalues[i] + d;
+
+		if (newValue < this->lpData->min() || newValue > this->lpData->max())
+		{
+			valid = false;
+		}
+		else if (d > 0 && this->lpData->downOnly(this->period()))
+		{
+			valid = false;
+		}
+		else if (d < 0 && this->lpData->upOnly(this->period()))
+		{
+			valid = false;
+		}
+		else
+		{
+			valid = this->lpData->structural(this->period(), i);
+		}
+	}
+
+	return valid;
+}
+
+
+/**
+ * Generates a random ministep for the given ego.
+ */
+MiniStep * BehaviorVariable::randomMiniStep(int ego)
+{
+	this->calculateProbabilities(ego);
+	int difference = nextIntWithProbabilities(3, this->lprobabilities) - 1;
+	BehaviorChange * pMiniStep =
+		new BehaviorChange(this->lpData->id(), ego, difference);
+	pMiniStep->logChoiceProbability(log(this->lprobabilities[difference + 1]));
+	return pMiniStep;
+}
+
+
+/**
+ * Returns if the observed value for the option of the given ministep
+ * is missing at either end of the period.
+ */
+bool BehaviorVariable::missing(const MiniStep * pMiniStep) const
+{
+	return this->lpData->missing(this->period(), pMiniStep->ego()) ||
+		this->lpData->missing(this->period() + 1, pMiniStep->ego());
 }
 
 }

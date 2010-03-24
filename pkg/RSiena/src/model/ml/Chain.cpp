@@ -14,6 +14,7 @@
 #include "model/ml/MiniStep.h"
 #include "model/ml/BehaviorChange.h"
 #include "model/ml/NetworkChange.h"
+#include "model/ml/MLSimulation.h"
 #include "network/Network.h"
 #include "network/IncidentTieIterator.h"
 #include "data/Data.h"
@@ -23,10 +24,14 @@
 namespace siena
 {
 
+// ----------------------------------------------------------------------------
+// Section: Constructors, destructors, initializers
+// ----------------------------------------------------------------------------
+
 /**
  * Creates an empty chain.
  */
-Chain::Chain()
+Chain::Chain(Data * pData)
 {
 	this->lpFirst = new MiniStep(0, 0, 0);
 	this->lpLast = new MiniStep(0, 0, 0);
@@ -34,7 +39,16 @@ Chain::Chain()
 	this->lpFirst->pNext(this->lpLast);
 	this->lpLast->pPrevious(this->lpFirst);
 
+	this->resetOrderingKeys();
+
+	this->lpData = pData;
 	this->lperiod = -1;
+
+	this->lminiSteps.push_back(this->lpLast);
+	this->lpLast->index(0);
+
+	this->lmu = 0;
+	this->lsigma2 = 0;
 }
 
 
@@ -43,20 +57,27 @@ Chain::Chain()
  */
 Chain::~Chain()
 {
-	this->emptyChain();
+	this->clear();
 
 	delete this->lpFirst;
 	delete this->lpLast;
 	this->lpFirst = 0;
 	this->lpLast = 0;
+	this->lpData = 0;
+
+	this->lminiSteps.clear();
 }
 
+
+// ----------------------------------------------------------------------------
+// Section: Chain modifications
+// ----------------------------------------------------------------------------
 
 /**
  * Removes all ministeps from this chain except for the dummy ministeps
  * at the ends of the chain.
  */
-void Chain::emptyChain()
+void Chain::clear()
 {
 	MiniStep * pMiniStep = this->lpFirst->pNext();
 
@@ -69,6 +90,16 @@ void Chain::emptyChain()
 
 	this->lpFirst->pNext(this->lpLast);
 	this->lpLast->pPrevious(this->lpFirst);
+
+	this->lminiSteps.clear();
+	this->lminiSteps.push_back(this->lpLast);
+	this->lpLast->index(0);
+
+	this->ldiagonalMiniSteps.clear();
+	this->lfirstMiniStepPerOption.clear();
+
+	this->lmu = 0;
+	this->lsigma2 = 0;
 }
 
 
@@ -79,11 +110,52 @@ void Chain::insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep)
 {
 	MiniStep * pPreviousMiniStep = pExistingMiniStep->pPrevious();
 
+	pNewMiniStep->pChain(this);
+
+	// Update the pointers to next and previous ministeps.
+
 	pNewMiniStep->pPrevious(pPreviousMiniStep);
 	pPreviousMiniStep->pNext(pNewMiniStep);
 
 	pNewMiniStep->pNext(pExistingMiniStep);
 	pExistingMiniStep->pPrevious(pNewMiniStep);
+
+	// Set the ordering key.
+
+	double leftKey = pPreviousMiniStep->orderingKey();
+	double rightKey = pExistingMiniStep->orderingKey();
+	double newKey = (leftKey + rightKey) / 2;
+
+	if (leftKey < newKey && newKey < rightKey)
+	{
+		pNewMiniStep->orderingKey(newKey);
+	}
+	else
+	{
+		// Bad. We have exhausted the double precision.
+		// However, using a linear time effort, we can restore a correct order.
+
+		this->resetOrderingKeys();
+	}
+
+	// Update the array of diagonal ministeps
+
+	if (pNewMiniStep->diagonal())
+	{
+		this->ldiagonalMiniSteps.push_back(pNewMiniStep);
+		pNewMiniStep->diagonalIndex(this->ldiagonalMiniSteps.size() - 1);
+	}
+
+	// Update the array of all ministeps
+
+	this->lminiSteps.push_back(pNewMiniStep);
+	pNewMiniStep->index(this->lminiSteps.size() - 1);
+
+	// Update some variables that are constantly maintained
+
+	double rr = pNewMiniStep->reciprocalRate();
+	this->lmu += rr;
+	this->lsigma2 += rr * rr;
 }
 
 
@@ -96,6 +168,28 @@ void Chain::remove(MiniStep * pMiniStep)
 	pMiniStep->pNext()->pPrevious(pMiniStep->pPrevious());
 	pMiniStep->pNext(0);
 	pMiniStep->pPrevious(0);
+
+	if (pMiniStep->diagonal())
+	{
+		MiniStep * pLastMiniStep =
+			this->ldiagonalMiniSteps[this->ldiagonalMiniSteps.size() - 1];
+		this->ldiagonalMiniSteps[pMiniStep->diagonalIndex()] = pLastMiniStep;
+		pLastMiniStep->diagonalIndex(pMiniStep->diagonalIndex());
+		this->ldiagonalMiniSteps.pop_back();
+		pMiniStep->diagonalIndex(-1);
+	}
+
+	MiniStep * pLastMiniStep = this->lminiSteps[this->lminiSteps.size() - 1];
+	this->lminiSteps[pMiniStep->index()] = pLastMiniStep;
+	pLastMiniStep->index(pMiniStep->index());
+	this->lminiSteps.pop_back();
+	pMiniStep->index(-1);
+
+	double rr = pMiniStep->reciprocalRate();
+	this->lmu -= rr;
+	this->lsigma2 -= rr * rr;
+
+	pMiniStep->pChain(0);
 }
 
 
@@ -104,17 +198,20 @@ void Chain::remove(MiniStep * pMiniStep)
  * given data object for the given period. The chain is simple in the sense
  * that no two ministeps cancel each other out.
  */
-void Chain::connect(Data * pData, int period)
+void Chain::connect(int period)
 {
-	this->emptyChain();
+	this->clear();
 	this->lperiod = period;
 	vector<MiniStep *> miniSteps;
 
 	// Create the required ministeps
 
-	for (unsigned i = 0; i < pData->rDependentVariableData().size(); i++)
+	for (unsigned variableIndex = 0;
+		variableIndex < this->lpData->rDependentVariableData().size();
+		variableIndex++)
 	{
-		LongitudinalData * pVariableData = pData->rDependentVariableData()[i];
+		LongitudinalData * pVariableData =
+			this->lpData->rDependentVariableData()[variableIndex];
 		NetworkLongitudinalData * pNetworkData =
 			dynamic_cast<NetworkLongitudinalData *>(pVariableData);
 		BehaviorLongitudinalData * pBehaviorData =
@@ -136,9 +233,9 @@ void Chain::connect(Data * pData, int period)
 						(!iter2.valid() || iter1.actor() < iter2.actor()))
 					{
 						miniSteps.push_back(
-							new NetworkChange(i,
+							new NetworkChange(pNetworkData->id(),
+								i,
 								iter1.actor(),
-								pNetworkData->name(),
 								-1));
 						iter1.next();
 					}
@@ -146,9 +243,9 @@ void Chain::connect(Data * pData, int period)
 						(!iter1.valid() || iter2.actor() < iter1.actor()))
 					{
 						miniSteps.push_back(
-							new NetworkChange(i,
+							new NetworkChange(pNetworkData->id(),
+								i,
 								iter2.actor(),
-								pNetworkData->name(),
 								1));
 						iter2.next();
 					}
@@ -177,8 +274,8 @@ void Chain::connect(Data * pData, int period)
 				for (int j = 0; j < delta; j++)
 				{
 					miniSteps.push_back(
-						new BehaviorChange(i,
-							pBehaviorData->name(),
+						new BehaviorChange(pBehaviorData->id(),
+							i,
 							singleChange));
 				}
 			}
@@ -204,6 +301,48 @@ void Chain::connect(Data * pData, int period)
 }
 
 
+// ----------------------------------------------------------------------------
+// Section: Various updates
+// ----------------------------------------------------------------------------
+
+/**
+ * Performs the necessary updates when the reciprocal rate of the
+ * given ministep changes to the given value.
+ */
+void Chain::onReciprocalRateChange(const MiniStep * pMiniStep, double newValue)
+{
+	double oldValue = pMiniStep->reciprocalRate();
+
+	this->lmu -= oldValue;
+	this->lsigma2 -= oldValue * oldValue;
+
+	this->lmu += newValue;
+	this->lsigma2 += newValue * newValue;
+}
+
+
+/**
+ * Assigns new ordering keys for the ministeps of this chain. The new
+ * ordering key of a ministep is its index in the list.
+ */
+void Chain::resetOrderingKeys()
+{
+	int key = 0;
+	MiniStep * pMiniStep = this->lpFirst;
+
+	while (pMiniStep)
+	{
+		pMiniStep->orderingKey(key);
+		pMiniStep = pMiniStep->pNext();
+		key++;
+	}
+}
+
+
+// ----------------------------------------------------------------------------
+// Section: Accessors
+// ----------------------------------------------------------------------------
+
 /**
  * Returns the period whose end observations are connected by this chain.
  */
@@ -228,6 +367,138 @@ MiniStep * Chain::pFirst() const
 MiniStep * Chain::pLast() const
 {
 	return this->lpLast;
+}
+
+
+/**
+ * Returns the number of ministeps of this chain excluding the first,
+ * but including the last dummy ministep.
+ */
+int Chain::ministepCount() const
+{
+	return this->lminiSteps.size();
+}
+
+
+/**
+ * Returns the number of diagonal ministeps in this chain.
+ */
+int Chain::diagonalMinistepCount() const
+{
+	return this->ldiagonalMiniSteps.size();
+}
+
+
+/**
+ * Returns the sum of reciprocal rates over all non-dummy ministeps.
+ */
+double Chain::mu() const
+{
+	return this->lmu;
+}
+
+
+/**
+ * Returns the sum of squared reciprocal rates over all non-dummy ministeps.
+ */
+double Chain::sigma2() const
+{
+	return this->lsigma2;
+}
+
+
+// ----------------------------------------------------------------------------
+// Section: Random draws
+// ----------------------------------------------------------------------------
+
+/**
+ * Returns a random ministep excluding the first dummy ministep.
+ */
+MiniStep * Chain::randomMiniStep() const
+{
+	return this->lminiSteps[nextInt(this->lminiSteps.size())];
+}
+
+
+/**
+ * Returns a random diagonal ministep.
+ */
+MiniStep * Chain::randomDiagonalMiniStep() const
+{
+	return this->ldiagonalMiniSteps[nextInt(this->ldiagonalMiniSteps.size())];
+}
+
+
+/**
+ * Returns a random ministep form the given interval.
+ */
+MiniStep * Chain::randomMiniStep(MiniStep * pFirstMiniStep,
+	MiniStep * pLastMiniStep) const
+{
+	int length = this->intervalLength(pFirstMiniStep, pLastMiniStep);
+	int index = nextInt(length);
+	MiniStep * pMiniStep = pFirstMiniStep;
+
+	while (index > 0)
+	{
+		pMiniStep = pMiniStep->pNext();
+		index--;
+	}
+
+	return pMiniStep;
+}
+
+
+// ----------------------------------------------------------------------------
+// Section: Intervals
+// ----------------------------------------------------------------------------
+
+/**
+ * Returns the length of the given interval of ministeps.
+ */
+int Chain::intervalLength(const MiniStep * pFirstMiniStep,
+	const MiniStep * pLastMiniStep) const
+{
+	int length = 1;
+	const MiniStep * pMiniStep = pFirstMiniStep;
+
+	while (pMiniStep != pLastMiniStep)
+	{
+		pMiniStep = pMiniStep->pNext();
+		length++;
+	}
+
+	return length;
+}
+
+
+// ----------------------------------------------------------------------------
+// Section: Same option related
+// ----------------------------------------------------------------------------
+
+/**
+ * Returns the first ministep of the given option in the subchain starting
+ * with the given ministep, or 0, if there is no such a ministep.
+ */
+MiniStep * Chain::nextMiniStepForOption(Option & rOption,
+	const MiniStep * pFirstMiniStep) const
+{
+	MiniStep * pMiniStep = 0;
+	map<Option, MiniStep *>::const_iterator iter =
+		this->lfirstMiniStepPerOption.find(rOption);
+
+	if (iter != this->lfirstMiniStepPerOption.end())
+	{
+		pMiniStep = iter->second;
+
+		while (pMiniStep &&
+			pMiniStep->orderingKey() < pFirstMiniStep->orderingKey())
+		{
+			pMiniStep = pMiniStep->pNextWithSameOption();
+		}
+	}
+
+	return pMiniStep;
 }
 
 }

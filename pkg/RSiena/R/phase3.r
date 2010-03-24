@@ -66,6 +66,8 @@ phase3 <- function(z, x, ...)
     zsmall$Deriv <- z$Deriv
     zsmall$Phase <- z$Phase
     zsmall$nit <- z$nit
+    zsmall$int2 <- z$int2
+    zsmall$cl <- z$cl
     xsmall<- NULL
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
@@ -124,7 +126,7 @@ phase3 <- function(z, x, ...)
             }
         }
         if (nit <= 5 || nit == 10 || (int==1 && nit %% z$writefreq == 0 ) ||
-            (int > 1 && (z$writefreq - 1) < z$n3%/%int &&
+            (int > 1 && (z$writefreq + 1) < z$n3%/%int &&
              nit %in% nits[seq(z$writefreq + 1, x$n3 %/% int,
                                           z$writefreq)]))
         {
@@ -157,8 +159,7 @@ phase3 <- function(z, x, ...)
             }
         }
 ###############################
-        z <- doPhase3it(z, x, nit, cl=z$cl, int=int, zsmall=zsmall,
-                      xsmall=xsmall, ...)
+        z <- doPhase3it(z, x, nit, zsmall=zsmall, xsmall=xsmall, ...)
 ##############################
         ##  browser()
         if (!is.batch())
@@ -209,8 +210,9 @@ phase3 <- function(z, x, ...)
 }
 
 ##@doPhase3it siena07 Does one iteration in phase 3
-doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
+doPhase3it<- function(z, x, nit, zsmall, xsmall, ...)
 {
+    int <- z$int
     if (int == 1)
     {
         zz <- x$FRAN(zsmall, xsmall)
@@ -225,7 +227,7 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
     else
     {
   ##zz <- clusterCall(cl, simstats0c, zsmall, xsmall)
-        zz <- clusterCall(cl, usesim, zsmall, xsmall)
+        zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
         z$n <- z$n + z$int
       #  browser()
    }
@@ -248,19 +250,19 @@ doPhase3it<- function(z, x, nit, cl, int, zsmall, xsmall, ...)
             z$sims[[nit + (i - 1)]] <- zz[[i]]$sims
        }
     }
-    if (z$cconditional)
+    if ((!x$maxlike) && z$cconditional)
     {
         if (int==1)
-            z$ntim[nit,]<- zz$ntim0
+            z$ntim[nit,] <- zz$ntim0
         else
         {
             for (i in 1:int)
-                z$ntim[nit+(i-1),]<- zz[[i]]$ntim0
+                z$ntim[nit+(i-1),] <- zz[[i]]$ntim0
         }
     }
     if (z$FinDiff.method)
     {
-        z <- FiniteDifferences(z, x, fra + z$targets, cl, int, ...)
+        z <- FiniteDifferences(z, x, fra + z$targets, ...)
         z$sdf[nit:(nit + (int - 1)), , ] <- z$sdf0
     }
     else if (x$maxlike) ## as far as I can see
@@ -309,7 +311,7 @@ phase3.2 <- function(z, x, ...)
     Report(c('Total of', z$n,'iterations.\n'), outf)
     Report(c('Parameter estimates based on', z$n - z$Phase3nits,
              'iterations,\n'), outf)
-    if (z$cconditional)
+    if (!x$maxlike && z$cconditional)
         Report(c('basic rate parameter',
                  c('', 's')[as.integer(z$observations > 2) + 1],
                  ' as well as \n'), outf)
@@ -319,10 +321,10 @@ phase3.2 <- function(z, x, ...)
     Report(c('Averages, standard deviations, ',
            'and t-ratios for deviations from targets:\n'), sep='', outf)
   #  Report(c(date(),'\n'),bof)
-    if (z$cconditional)
-        Report('\nconditional moment estimation.', bof)
-    else if (x$maxlike)
+    if (x$maxlike)
         Report('\nMaximum Likelihood estimation.', bof)
+    else if (z$cconditional)
+        Report('\nconditional moment estimation.', bof)
     else
         Report('\nunconditional moment estimation.', bof)
     Report('\nInformation for convergence diagnosis.\n', bof)

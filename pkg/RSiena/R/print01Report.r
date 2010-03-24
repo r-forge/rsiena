@@ -261,9 +261,9 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                                 }
                                 else if (sum(nnonactive) > 1)
                                 {
-                                    Report(c("Actors ", which(nnonactive),
-                                             " are inactive at this ",
-                                             "observation.\n"), sep='', outf)
+                                    Report(c("Actors", which(nnonactive),
+                                             "are inactive at this",
+                                             "observation.\n"), fill=80, outf)
                                 }
                             }
                         }
@@ -292,8 +292,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                             Report(c("Total number of missing data: ",
                                      sum(missrow),
                                      ", corresponding to a fraction of ",
-                                     round(sum(missrow)/atts$netdims[1] /
-                                           (atts$netdims[1] - 1), 3),
+                                     format(round(sum(missrow)/atts$netdims[1] /
+                                           (atts$netdims[1] - 1), 3), nsmall=3),
                                      ".\n"), sep="", outf)
                             if (k > 1)
                                 Report(c("In reported in- and outdegrees,",
@@ -417,7 +417,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                     Report(c(format(netname, width=12),
                              format(c(missings, sum(missings)),
                                     width=10), "      (",
-                             format(round(sum(missings)/
+                             format(round(100 * sum(missings)/
                                           nrow(depvar)/ncol(depvar), 1),
                                     nsmall=1, width=4), ' %)\n'), sep="", outf)
                 }
@@ -477,7 +477,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             {
                 Report(c(format(covars[i], width=15),
                          sum(is.na(x$cCovars[[i]])), "  (",
-                         format(round(sum(is.na(x$cCovars[[i]]))/
+                         format(round(100 * sum(is.na(x$cCovars[[i]]))/
                                       length(x$cCovars[[i]]), 1),
                                 width=3, nsmall=1), '%)\n'), outf)
             }
@@ -562,7 +562,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                     Report(c(format(covars[i], width=10),
                              format(misscols, width=8),
                              format(sum(misscols), width=9), "     (",
-                             format(round(sum(misscols)/nrow(thiscovar)/
+                             format(round(100 * sum(misscols)/nrow(thiscovar)/
                                           ncol(thiscovar), 1), nsmall=1,
                                     width=3), '%)\n'), outf)
                 }
@@ -618,7 +618,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                 diag(myvar) <- 0
                 Report(c(format(covars[i], width=15),
                          sum(is.na(myvar)), "  (",
-                         format(round(sum(is.na(myvar))/
+                         format(round(100 * sum(is.na(myvar))/
                                       (length(myvar) - nrow(myvar)), 1),
                                 width=3, nsmall=1), '%)\n'), outf)
             }
@@ -649,12 +649,30 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             use <- ! covars %in% names(x$dycCovars) ## need an attributes to say
             nCovars <- length(x$dyvCovars[use])
             Heading(2, outf, "Reading exogenous dyadic covariates.")
-            Report(c("Note that no missing values are considered yet for",
-                     "changing dyadic covariates.\n"), outf)
+            ## Report(c("Note that no missing values are considered yet for",
+            ##          "changing dyadic covariates.\n"), outf)
             for (i in seq(along=covars))
             {
                 Report(c("Exogenous dyadic covariate named ", covars[i], '.\n'),
                        sep="", outf)
+            }
+            Report("Number of tie variables with missing data per period:\n", outf)
+            Report(c(" period   ", format(1:(x$observations - 1) +
+                                          periodFromStart, width=9),
+                     "       overall\n"), sep="", outf)
+            for (i in seq(along=covars))
+              {
+                if (use[i])
+                  {
+                    thiscovar <- x$dyvCovars[[i]] ## array
+                    missvals <- colSums(is.na(thiscovar), dims=2)
+                    Report(c(format(covars[i], width=10),
+                             format(missvals, width=8),
+                             format(sum(missvals), width=9), "     (",
+                             format(round(100 * sum(missvals)/nrow(thiscovar)/
+                                          ncol(thiscovar), 1), nsmall=1,
+                                    width=3), '%)\n'), outf)
+                }
             }
             Report("\nMeans of  covariates:\n", outf)
             for (i in seq(along=covars))
@@ -747,7 +765,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
         tt <- getInternals()
         return(tt)
     }
-    Report(open=TRUE, type="w", projname=modelname)
+    Report(openfiles=TRUE, type="w", projname=modelname)
     Report("                            ************************\n", outf)
     Report(c("                                   ", modelname, ".out\n"),
            sep='', outf)
@@ -756,8 +774,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
     Report(c("This file contains primary output for SIENA project <<",
         modelname, ">>.\n\n"), sep="", outf)
     Report(c("Date and time:", format(Sys.time(), "%d/%m/%Y %X"), "\n\n"), outf)
-    packageValues <- packageDescription("RSiena", fields=c("Version", "Date"))
-    rforgeRevision <-  packageDescription("RSiena",
+    packageValues <- packageDescription(pkgname, fields=c("Version", "Date"))
+    rforgeRevision <-  packageDescription(pkgname,
                                           fields="Repository/R-Forge/Revision")
     if (is.na(rforgeRevision))
     {
@@ -1154,6 +1172,48 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                              '\n'), outf)
                 }
             }
+        }
+    }
+    ## report on constraints
+  if (any(atts$anyHigher) || any(atts$anyDisjoint) || any(atts$anyAtLeastOne))
+    {
+        Report("\n", outf)
+        highers <- atts[["anyHigher"]]
+        disjoints <- atts[["anyDisjoint"]]
+        atleastones <- atts[["anyAtLeastOne"]]
+        if (any(highers))
+        {
+            higherSplit <- strsplit(names(highers)[highers], ",")
+            lapply(higherSplit, function(x)
+               {
+                   Report(c("Network ", x[1], " is higher than network ", x[2],
+                            ".\n"), sep="", outf)
+                   Report("This will be respected in the simulations.\n\n",
+                          outf)
+              })
+        }
+        if (any(disjoints))
+        {
+            disjointSplit <- strsplit(names(disjoints)[disjoints],',')
+            lapply(disjointSplit, function(x)
+               {
+                   Report(c("Network ", x[1], " is disjoint from network ",
+                            x[2], ".\n"), sep="", outf)
+                   Report("This will be respected in the simulations.\n\n",
+                          outf)
+              })
+        }
+        if (any(atleastones))
+        {
+            atLeastOneSplit <- strsplit(names(atleastones)[atleastones],',')
+            lapply(atLeastOneSplit, function(x)
+               {
+                   Report(c("A link in at least one of networks ",
+                            x[1], " and", x[2],
+                           " always exists.\n"), sep="", outf)
+                   Report("This will be respected in the simulations.\n\n",
+                          outf)
+              })
         }
     }
     printInitialDescription(data, myeff, modelname)

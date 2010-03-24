@@ -69,6 +69,7 @@ public:
 	int n() const;
 	virtual int m() const = 0;
 	virtual LongitudinalData * pData() const = 0;
+	int id() const;
 
 	inline const Function * pEvaluationFunction() const;
 	inline const Function * pEndowmentFunction() const;
@@ -103,21 +104,38 @@ public:
 	double reciprocalDegreeScore(const NetworkVariable * pNetwork) const;
 	double inverseOutDegreeScore(const NetworkVariable * pNetwork) const;
 
+	// Maximum likelihood related
+
 	/**
 	 * Calculates the probability of the given ministep assuming that the
 	 * ego of the ministep will change this variable.
 	 */
 	virtual double probability(MiniStep * pMiniStep) = 0;
 
+	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
+
+	/**
+	 * Returns if the observed value for the option of the given ministep
+	 * is missing at either end of the period.
+	 */
+	virtual bool missing(const MiniStep * pMiniStep) const = 0;
+
+	/**
+	 * Generates a random ministep for the given ego.
+	 */
+	virtual MiniStep * randomMiniStep(int ego) = 0;
+
 protected:
 	inline EpochSimulation * pSimulation() const;
 	void simulatedDistance(int distance);
+	void invalidateRates();
 
 private:
 	void initializeFunction(Function * pFunction,
 		const vector<EffectInfo *> & rEffects) const;
 
-	virtual double calculateRate(int i);
+	bool constantRates() const;
+	double calculateRate(int i);
 	double structuralRate(int i) const;
 	void updateCovariateRates();
 	inline double basicRate() const;
@@ -192,6 +210,11 @@ private:
 
 	// Scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeScores;
+
+	// Indicates if the rates are valid and shouldn't be recalculated
+	// provided that the rates are constant during the period.
+
+	int lvalidRates;
 };
 
 

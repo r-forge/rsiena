@@ -17,14 +17,14 @@ namespace siena
 
 /**
  * Constructs a new behavior ministep.
+ * @param[in] variableId the ID of the dependent variable to be changed
  * @param[in] ego the actor making the change
- * @param[in] variableName the name of the dependent variable to be changed
  * @param[in] difference the amount of change
  * (-1,0,+1 for dichotomous variables)
  */
-BehaviorChange::BehaviorChange(int ego,
-	string variableName,
-	int difference) : MiniStep(ego, variableName, difference)
+BehaviorChange::BehaviorChange(int variableId,
+	int ego,
+	int difference) : MiniStep(variableId, ego, difference)
 {
 }
 
@@ -51,6 +51,16 @@ void BehaviorChange::makeChange(DependentVariable * pVariable)
 		int oldValue = pBehaviorVariable->value(this->ego());
 		pBehaviorVariable->value(this->ego(), oldValue + this->difference());
 	}
+}
+
+
+/**
+ * Returns if this ministep is diagonal, namely, it does not change
+ * the dependent variables.
+ */
+bool BehaviorChange::diagonal() const
+{
+	return this->difference() == 0;
 }
 
 }

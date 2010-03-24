@@ -45,6 +45,9 @@
 #include "model/variables/DependentVariable.h"
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"
+#include "model/ml/MLSimulation.h"
+#include "model/ml/Chain.h"
+#include "model/ml/MiniStep.h"
 using namespace std;
 using namespace siena;
 
@@ -292,7 +295,7 @@ int mysample(const int n, const valarray<double>& p)
 	    }
 	}
     }
-    return(hi);
+    return hi;
 }
 int sample(int n)
 {
@@ -312,7 +315,7 @@ SEXP getBehaviorValues(const BehaviorVariable & behavior)
 		ians[i] = pValues[i];
 	}
 	UNPROTECT(1);
-    return(ans) ;
+    return ans  ;
 }
 SEXP getAdjacency(const Network& net)
 {
@@ -329,7 +332,7 @@ SEXP getAdjacency(const Network& net)
     }
 
     UNPROTECT(1);
-    return(ans) ;
+    return ans;
 }
 SEXP getEdgeList(const Network& net)
 {
@@ -350,10 +353,24 @@ SEXP getEdgeList(const Network& net)
     }
 
     UNPROTECT(1);
-    return(ans) ;
+    return ans;
 }
 
-
+SEXP getChain(const Chain& chain)
+{
+	SEXP ans, sego;
+	int ministepCount = chain.ministepCount();
+	PROTECT(sego = allocVector(INTSXP, 1));
+	int * ego = INTEGER(sego);
+	PROTECT(ans = allocVector(VECSXP, ministepCount));
+	MiniStep *pMiniStep = chain.pFirst();
+	for (int i = 0; i < ministepCount; i++)
+	{
+		ego[0] = pMiniStep->ego();
+		SET_VECTOR_ELT(ans, i, sego);
+	}
+	return ans;
+}
 /**
  * Calculates change between two networks. Ignores any values missing in
  *  either network. Does not use structural values as yet.
@@ -773,9 +790,17 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
         SEXP symm;
         PROTECT(symm = install("symmetric"));
         SEXP symmetric = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode), symm);
-         SEXP balm;
+		SEXP balm;
         PROTECT(balm = install("balmean"));
         SEXP balmean = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode), balm);
+		SEXP avin;
+        PROTECT(avin = install("averageInDegree"));
+        SEXP averageInDegree = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode),
+			avin);
+		SEXP avout;
+        PROTECT(avout = install("averageOutDegree"));
+        SEXP averageOutDegree = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode),
+			avout);
 		SEXP nm;
         PROTECT(nm = install("name"));
         SEXP name = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode), nm);
@@ -786,14 +811,23 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
                                      myActorSet);
         pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
         pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
+        pOneModeNetworkLongitudinalData->
+			averageInDegree(*(REAL(averageInDegree)));
+        pOneModeNetworkLongitudinalData->
+			averageOutDegree(*(REAL(averageOutDegree)));
 		setupOneModeObservations(VECTOR_ELT(ONEMODEGROUP, oneMode),
 			pOneModeNetworkLongitudinalData);
+		//	Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
+		//	averageInDegree(),  pOneModeNetworkLongitudinalData->
+		//	averageOutDegree());
 
 		// Once all network data has been stored, calculate some
 		// statistical properties of that data.
-
-		pOneModeNetworkLongitudinalData->calculateProperties();
-        UNPROTECT(4);
+		//pOneModeNetworkLongitudinalData->calculateProperties();
+		//Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
+		//	averageInDegree(), pOneModeNetworkLongitudinalData->
+		//	averageOutDegree());
+        UNPROTECT(6);
     }
 }
 
@@ -915,6 +949,10 @@ void setupBipartiteGroup(SEXP BIPARTITEGROUP, Data * pData)
         SEXP nm;
         PROTECT(nm = install("name"));
         SEXP name = getAttrib(VECTOR_ELT(BIPARTITEGROUP, bipartite), nm);
+		SEXP avout;
+        PROTECT(avout = install("averageOutDegree"));
+        SEXP averageOutDegree = getAttrib(VECTOR_ELT(BIPARTITEGROUP,
+				bipartite), avout);
         const ActorSet * pSenders = pData->pActorSet(CHAR(STRING_ELT(
 					actorSet, 0)));
         const ActorSet * pReceivers = pData->pActorSet(CHAR(STRING_ELT(
@@ -922,14 +960,15 @@ void setupBipartiteGroup(SEXP BIPARTITEGROUP, Data * pData)
 		NetworkLongitudinalData *  pNetworkLongitudinalData =
 			pData->createNetworkData(CHAR(STRING_ELT(name, 0)),
 				pSenders, pReceivers);
+        pNetworkLongitudinalData->averageOutDegree(*(REAL(averageOutDegree)));
 		setupBipartiteObservations(VECTOR_ELT(BIPARTITEGROUP, bipartite),
 			pNetworkLongitudinalData);
 
 		// Once all network data has been stored, calculate some
 		// statistical properties of that data.
 
-		pNetworkLongitudinalData->calculateProperties();
-        UNPROTECT(2);
+		//pNetworkLongitudinalData->calculateProperties();
+        UNPROTECT(3);
     }
 }
 /**
@@ -1175,21 +1214,33 @@ void setupChangingCovariateGroup(SEXP VARCOVARGROUP, Data *pData)
 void setupDyadicCovariate(SEXP DYADVAR,
                           ConstantDyadicCovariate * pConstantDyadicCovariate)
 {
-    double *start = REAL(DYADVAR);
-    int listlen = ncols(DYADVAR);
+    double *start = REAL(VECTOR_ELT(DYADVAR, 0));
+    double *missingstart = REAL(VECTOR_ELT(DYADVAR, 1));
+    int listlen = ncols(VECTOR_ELT(DYADVAR, 0));
 //	Rprintf("listlen =  %d\n", listlen);
     int pos = 0;
     for (int row = 0; row < listlen; row++)
     {
-	int i;
-	int j;
-	double val;
-	i = start[pos++];
-	j = start[pos++];
-	val = start[pos++];
-	pConstantDyadicCovariate->value(i-1, j-1, val);
- 	pConstantDyadicCovariate->missing(i-1, j-1, 0);
-   }
+		int i;
+		int j;
+		double val;
+		i = start[pos++];
+		j = start[pos++];
+		val = start[pos++];
+		pConstantDyadicCovariate->value(i-1, j-1, val);
+	}
+    listlen = ncols(VECTOR_ELT(DYADVAR, 1));
+    pos = 0;
+    for (int row = 0; row < listlen; row++)
+    {
+		int i;
+		int j;
+		double val;
+		i = missingstart[pos++];
+		j = missingstart[pos++];
+		val = missingstart[pos++];
+		pConstantDyadicCovariate->missing(i-1, j-1, val);
+	}
 }
 
 /**
@@ -1236,19 +1287,33 @@ void setupDyadicCovariateGroup(SEXP DYADVARGROUP, Data *pData)
 void unpackChangingDyadicPeriod(SEXP VARDYADVALS, ChangingDyadicCovariate *
                                 pChangingDyadicCovariate, int period)
 {
-    double *start = REAL(VARDYADVALS);
-    int listlen = ncols(VARDYADVALS);
+    double *start = REAL(VECTOR_ELT(VARDYADVALS, 0));
+	int listlen = ncols(VECTOR_ELT(VARDYADVALS, 0));
 //	Rprintf("listlen =  %d\n", listlen);
     int pos = 0;
     for (int row = 0; row < listlen; row++)
     {
-	int i;
-	int j;
-	double val;
-	i = start[pos++];
-	j = start[pos++];
-	val = start[pos++];
-	pChangingDyadicCovariate->value(i - 1, j - 1, period, val);
+		int i;
+		int j;
+		double val;
+		i = start[pos++];
+		j = start[pos++];
+		val = start[pos++];
+		pChangingDyadicCovariate->value(i - 1, j - 1, period, val);
+    }
+    double *missingstart = REAL(VECTOR_ELT(VARDYADVALS, 1));
+    listlen = ncols(VECTOR_ELT(VARDYADVALS, 1));
+//	Rprintf("listlen =  %d\n", listlen);
+	pos = 0;
+    for (int row = 0; row < listlen; row++)
+    {
+		int i;
+		int j;
+		double val;
+		i = missingstart[pos++];
+		j = missingstart[pos++];
+		val = missingstart[pos++];
+		pChangingDyadicCovariate->missing(i - 1, j - 1, period, val);
     }
 }
 /**
@@ -1267,8 +1332,8 @@ void setupChangingDyadicObservations(SEXP VARDYAD,
     //  }
     for (int period = 0; period < (observations - 1); period++)
     {
-	unpackChangingDyadicPeriod(VECTOR_ELT(VARDYAD, period),
-                                  pChangingDyadicCovariate, period);
+		unpackChangingDyadicPeriod(VECTOR_ELT(VARDYAD, period),
+			pChangingDyadicCovariate, period);
     }
 }
 /**
@@ -1292,18 +1357,18 @@ void setupChangingDyadicCovariateGroup(SEXP VARDYADGROUP, Data * pData)
                                                                 actorSet, 0)));
         const ActorSet * myActorSet2 = pData->pActorSet(CHAR(STRING_ELT(
                                                                 actorSet, 1)));
-	ChangingDyadicCovariate *  pChangingDyadicCovariate =
-	    pData->createChangingDyadicCovariate(CHAR(STRING_ELT(name, 0)),
-                                     myActorSet1, myActorSet2);
-	setupChangingDyadicObservations(VECTOR_ELT(VARDYADGROUP,
-                                                   changingDyadic),
-				 pChangingDyadicCovariate);
+		ChangingDyadicCovariate *  pChangingDyadicCovariate =
+			pData->createChangingDyadicCovariate(CHAR(STRING_ELT(name, 0)),
+				myActorSet1, myActorSet2);
+		setupChangingDyadicObservations(VECTOR_ELT(VARDYADGROUP,
+				changingDyadic),
+			pChangingDyadicCovariate);
  		SEXP mean;
 		PROTECT(mean = install("mean"));
 		SEXP Mean = getAttrib(VECTOR_ELT(VARDYADGROUP, changingDyadic),
 			mean);
 		pChangingDyadicCovariate->mean(REAL(Mean)[0]);
-       UNPROTECT(3);
+		UNPROTECT(3);
     }
 }
 /**
@@ -2362,6 +2427,138 @@ one of values, one of missing values (boolean) */
 	}
 
 /**
+ *  retrieves the values of the scores for each of the effects,
+ *  for one period. The call will relate to one group only, although all effects
+ *  are the same apart from the basic rates.
+ */
+	void getScores(SEXP EFFECTSLIST, int period, int group, Data *pData,
+		MLSimulation * pMLSimulation,
+		vector<double> * rderivs, vector<double> *rscore)
+    {
+
+        // get the column names from the names attribute
+        SEXP cols;
+        PROTECT(cols = install("names"));
+        SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
+
+		int netTypeCol; /* net type */
+        int nameCol; /* network name */
+        int effectCol;  /* short name of effect */
+		int parmCol;
+		int int1Col;
+		int int2Col;
+		int initValCol;
+		int typeCol;
+		int groupCol;
+		int periodCol;
+		int pointerCol;
+		int rateTypeCol;
+		int intptr1Col;
+		int intptr2Col;
+		int intptr3Col;
+
+		getColNos(Names, &netTypeCol, &nameCol, &effectCol,
+				  &parmCol, &int1Col, &int2Col, &initValCol,
+				  &typeCol, &groupCol, &periodCol, &pointerCol,
+			&rateTypeCol, &intptr1Col, &intptr2Col, &intptr3Col);
+
+
+		double deriv = 0;
+		double score = 0;
+		int istore = 0;
+
+		for (int ii = 0; ii < length(EFFECTSLIST); ii++)
+		{
+			const char * networkName =
+				CHAR(STRING_ELT(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, ii),
+										   nameCol), 0));
+			SEXP EFFECTS = VECTOR_ELT(EFFECTSLIST, ii);
+
+			for (int i = 0; i < length(VECTOR_ELT(EFFECTS,0)); i++)
+			{
+				const char * effectName =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, effectCol),  i));
+				//	int parm = INTEGER(VECTOR_ELT(EFFECTS, parmCol))[i];
+				const char * interaction1 =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, int1Col),i));
+				//	const char * interaction2 =
+				//CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, int2Col), i));
+				//double initialValue =
+				//REAL(VECTOR_ELT(EFFECTS, initValCol))[i];
+				const char * effectType =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), i));
+				const char * netType =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, netTypeCol), i));
+				const char * rateType =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, rateTypeCol), i));
+				//	Rprintf("%s %s \n", effectType, netType);
+				if (strcmp(effectType, "rate") == 0)
+				{
+					if (strcmp(effectName, "Rate") == 0)
+					{
+						int groupno =
+							INTEGER(VECTOR_ELT(EFFECTS, groupCol))[i];
+						int periodno =
+							INTEGER(VECTOR_ELT(EFFECTS, periodCol))[i];
+						if ((periodno - 1) == period && (groupno - 1) == group)
+						{
+
+							if (strcmp(netType, "behavior") == 0)
+							{
+								const DependentVariable * pVariable =
+									pMLSimulation->pVariable(networkName);
+								score = pVariable->basicRateScore();
+							}
+							else
+							{
+								/* find the dependent variable for the score */
+								const DependentVariable * pVariable =
+									pMLSimulation->pVariable(networkName);
+								score = pVariable->basicRateScore();
+							}
+						}
+						else
+						{
+							score = 0;
+						}
+					}
+					else
+					{
+						error("Non constant rate effects are not %s",
+							"implemented for maximum likelihood.");
+					}
+				}
+				else
+				{
+					if (strcmp(effectType, "eval") == 0)
+					{
+						EffectInfo * pEffectInfo = (EffectInfo *)
+							R_ExternalPtrAddr(
+								VECTOR_ELT(VECTOR_ELT(EFFECTS,
+													  pointerCol), i));
+							score = pMLSimulation->score(pEffectInfo);
+					}
+					else if (strcmp(effectType, "endow") == 0)
+					{
+						EffectInfo * pEffectInfo = (EffectInfo *)
+							R_ExternalPtrAddr(
+								VECTOR_ELT(VECTOR_ELT(EFFECTS,
+													  pointerCol), i));
+							score = pMLSimulation->score(pEffectInfo);
+					}
+					else
+					{
+						error("invalid effect type %s\n", effectType);
+					}
+				}
+				//		Rprintf("%f %d \n", score, istore);
+				(*rscore)[istore] = score;
+				istore++; /* keep forgetting to move the ++ */
+			}
+		}
+		UNPROTECT(1);
+	}
+/**
  *  Gets target values relative to the input data
  */
 
@@ -2448,13 +2645,12 @@ one of values, one of missing values (boolean) */
  */
 
     SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
-			   SEXP FROMFINITEDIFF, SEXP MODELPTR, SEXP EFFECTSLIST,
-		SEXP THETA, SEXP RANDOMSEED2, SEXP RETURNDEPS, SEXP NEEDSEEDS)
+		SEXP FROMFINITEDIFF, SEXP MODELPTR, SEXP EFFECTSLIST,
+		SEXP THETA, SEXP RANDOMSEED2, SEXP RETURNDEPS, SEXP NEEDSEEDS,
+		SEXP USESTREAMS)
     {
 		SEXP NEWRANDOMSEED; /* for parallel testing only */
 		PROTECT(NEWRANDOMSEED = duplicate(RANDOMSEED2));
-		//SEXP R2RANDOMSEED; /* for parallel testing only */
-		//PROTECT(R2RANDOMSEED = duplicate(RANDOMSEED2));
 
 		/* create a simulation and return the observed statistics and scores */
 
@@ -2472,6 +2668,7 @@ one of values, one of missing values (boolean) */
             totObservations += (*pGroupData)[group]->observationCount() - 1;
 
 		int fromFiniteDiff = asInteger(FROMFINITEDIFF);
+		int useStreams = asInteger(USESTREAMS);
 
 		int returnDependents = asInteger(RETURNDEPS);
 
@@ -2540,14 +2737,14 @@ one of values, one of missing values (boolean) */
         PROTECT(seedstore = allocVector(VECSXP, nGroups));
         for (int group = 0; group < nGroups; group++)
         {
-            SET_VECTOR_ELT(seedstore, group,
-                           allocVector(VECSXP, (*pGroupData)[group]->
-                                       observationCount() - 1));
+			  SET_VECTOR_ELT(seedstore, group,
+				 	allocVector(VECSXP, (*pGroupData)[group]->
+				                    observationCount() - 1));
         }
 
 		/* rs will allow us to access or set the .Random.seed in R */
         SEXP rs;
-        PROTECT(rs = install(".Random.seed"));
+		PROTECT(rs = install(".Random.seed"));
 
         /* scores will hold the return values of the scores */
         SEXP scores;
@@ -2558,14 +2755,30 @@ one of values, one of missing values (boolean) */
             rscores[i] = 0.0;
 
         int periodFromStart = 0;
-        /* group loop here */
+
+		SEXP Cgstr = R_NilValue;
+		SEXP STREAMS = R_NilValue;
+		SEXP ans2, ans3, ans4, R_fcall1, R_fcall2, R_fcall3, R_fcall4;
+		SEXP seedvector;
+
+		if (useStreams)
+		{
+			// create an R character string
+			PROTECT(Cgstr = allocVector(STRSXP,1));
+			SET_STRING_ELT(Cgstr, 0, mkChar("Cg"));
+
+			// find out which stream we are using
+			PROTECT(R_fcall1 = lang1(install(".lec.GetStreams")));
+			PROTECT(STREAMS = eval(R_fcall1, R_GlobalEnv));
+		}
+		/* group loop here */
         for (int group = 0; group < nGroups; group++)
         {
 			/* random states need store (not fromFiniteDiff)
 			   and restore (fromFiniteDiff) for each period
 			   within each  group */
-            SEXP seeds = 0;
-            if (fromFiniteDiff)
+            SEXP seeds = R_NilValue;
+			if (fromFiniteDiff)
             {
                 seeds = VECTOR_ELT(SEEDS, group);
             }
@@ -2582,35 +2795,78 @@ one of values, one of missing values (boolean) */
             {
 
                 periodFromStart++;
-				if (!isNull(RANDOMSEED2))
+
+				if (!isNull(RANDOMSEED2)) /* parallel testing versus Siena3 */
 				{
-					//defineVar(rs, R2RANDOMSEED, R_GlobalEnv);
+					// overwrite R's random number seed
 					defineVar(rs, RANDOMSEED2, R_GlobalEnv);
+					// get it into memory
 					GetRNGstate();
-					//double dummy =
+					// move on one
 					nextDouble();
+					// write it back to R
 					PutRNGstate();
-					//R2RANDOMSEED = findVar(rs, R_GlobalEnv);
-					//Rprintf(" %d ORI %d %d %d %d\n", period,
-					//	INTEGER(RANDOMSEED2)[0],
-					//	INTEGER(RANDOMSEED2)[1],
-					//	INTEGER(RANDOMSEED2)[2],
-					//	INTEGER(RANDOMSEED2)[3]);
 				}
-				else
+				else /* normal run */
 				{
 					if (fromFiniteDiff) /* restore state */
 					{
-						defineVar(rs, VECTOR_ELT(seeds, period), R_GlobalEnv);
-						GetRNGstate();
+						if (useStreams) /* using lecuyer random numbers */
+						{
+							// overwrite the current state in R
+							PROTECT(R_fcall2 = lang4(install("[[<-"),
+									install(".lec.Random.seed.table"), Cgstr,
+									VECTOR_ELT(seeds, period)));
+							PROTECT(ans2 = eval(R_fcall2, R_GlobalEnv));
+							// get the overwritten state into C table
+							PROTECT(R_fcall3 =
+								lang2(install(".lec.CurrentStream"),
+									STREAMS));
+							PROTECT(ans3 = eval(R_fcall3, R_GlobalEnv));
+							UNPROTECT(4);
+						}
+						else /* using normal random numbers */
+						{
+							// overwrite R's current state
+							defineVar(rs, VECTOR_ELT(seeds, period),
+								R_GlobalEnv);
+							// get the value from .Random.seed into memory
+							GetRNGstate();
+						}
 					}
 					else /* save state */
 					{
 						if (needSeeds)
 						{
-							PutRNGstate();
-							SET_VECTOR_ELT(VECTOR_ELT(seedstore, group),
-								period, findVar(rs, R_GlobalEnv));
+							if (useStreams)
+							{
+								PROTECT(R_fcall2 =
+									lang2(install(".lec.ResetNextSubstream"),
+										STREAMS));
+								PROTECT(ans2 = eval(R_fcall2, R_GlobalEnv));
+
+								PROTECT(R_fcall3 =
+									lang2(install(".lec.CurrentStream"),
+										STREAMS));
+								PROTECT(ans3 = eval(R_fcall3, R_GlobalEnv));
+								// get the relevant current state from R
+								PROTECT(R_fcall4 = lang3(install("[["),
+										install(".lec.Random.seed.table"),
+										Cgstr));
+								ans4 = eval(R_fcall4, R_GlobalEnv);
+								// value is not kept unless we duplicate it
+								PROTECT(seedvector = duplicate(ans4));
+								// store the Cg values
+								SET_VECTOR_ELT(VECTOR_ELT(seedstore, group),
+									period, seedvector);
+								UNPROTECT(6);
+							}
+							else
+							{
+								PutRNGstate();
+								SET_VECTOR_ELT(VECTOR_ELT(seedstore, group),
+									period, findVar(rs, R_GlobalEnv));
+							}
 						}
 					}
 				}
@@ -2673,15 +2929,11 @@ one of values, one of missing values (boolean) */
 				}
 			} /* end of period */
 			delete pEpochSimulation;
-  } /* end of group */
+		} /* end of group */
 
-       /* send the .Random.seed back to R */
+		/* send the .Random.seed back to R */
         PutRNGstate();
 		NEWRANDOMSEED = findVar(rs, R_GlobalEnv);
-// 		Rprintf("%d %d %d %d\n",INTEGER(NEWRANDOMSEED)[0],
-// 			INTEGER(NEWRANDOMSEED)[1],
-// 			INTEGER(NEWRANDOMSEED)[2],
-// 			INTEGER(NEWRANDOMSEED)[3]);
 
         /* set up the return object */
         if (!fromFiniteDiff)
@@ -2697,23 +2949,404 @@ one of values, one of missing values (boolean) */
 		}
 		if (returnDependents)
 		{
-			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 !!!!test properly*/
+			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 !!test this */
 		}
 		SET_VECTOR_ELT(ans, 0, fra);
 		SET_VECTOR_ELT(ans, 3, ntim);
-// 		Rprintf("new %d %d %d %d\n",INTEGER(NEWRANDOMSEED)[0],
-// 			INTEGER(NEWRANDOMSEED)[1],
-// 			INTEGER(NEWRANDOMSEED)[2],
-// 			INTEGER(NEWRANDOMSEED)[3]);
+
 		if (!isNull(RANDOMSEED2))
 		{
 				SET_VECTOR_ELT(ans, 4, NEWRANDOMSEED);
+		}
+		if (useStreams)
+		{
+			UNPROTECT(3);
 		}
         UNPROTECT(8);
         return(ans);
     }
 
+    SEXP modelPeriod(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
+		SEXP FROMFINITEDIFF, SEXP MODELPTR, SEXP EFFECTSLIST,
+		SEXP THETA, SEXP RANDOMSEED2, SEXP RETURNDEPS, SEXP NEEDSEEDS,
+		SEXP USESTREAMS, SEXP GROUP, SEXP PERIOD)
+    {
+		/* create a simulation and return the observed statistics and scores */
 
+        /* get hold of the data vector */
+		vector<Data *> * pGroupData = (vector<Data *> *)
+			R_ExternalPtrAddr(DATAPTR);
+		int group = asInteger(GROUP) - 1;
+
+		int period = asInteger(PERIOD) - 1;
+
+		Data * pData = (*pGroupData)[group];
+
+		/* get hold of the model object */
+        Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+		int fromFiniteDiff = asInteger(FROMFINITEDIFF);
+		int useStreams = asInteger(USESTREAMS); /* always true */
+		if (!useStreams)
+		{
+			error("function modelPeriod called with useStreams FALSE");
+		}
+
+		int returnDependents = asInteger(RETURNDEPS);
+
+		int deriv = asInteger(DERIV);
+		int needSeeds = asInteger(NEEDSEEDS);
+
+		/* set the deriv flag on the model */
+		pModel->needScores(deriv);
+
+		/* update the parameters */
+		updateParameters(EFFECTSLIST, THETA, pGroupData, pModel);
+
+        /* count up the total number of parameters */
+		int dim = 0;
+		for (int i = 0; i < length(EFFECTSLIST); i++)
+		{
+			dim += length(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, i), 0));
+		}
+
+        /* fra will contain the simulated statistics and must be initialised
+           to 0. Use rfra to reduce function evaluations. */
+        SEXP fra;
+        double * rfra;
+        PROTECT(fra = allocVector(REALSXP, dim));
+		rfra = REAL(fra);
+		for (int i = 0; i < length(fra); i++)
+		{
+			rfra[i] = 0;
+		}
+
+        /* ntim is the total time taken in this period */
+        SEXP ntim;
+        double * rntim;
+        PROTECT(ntim = allocVector(REALSXP, 1));
+		rntim = REAL(ntim);
+		rntim[0] = 0.0;
+
+        /* ans will be the return value */
+        SEXP ans;
+        PROTECT(ans = allocVector(VECSXP, 6));
+
+		/* sims will be the returned simulated dependent variables */
+		SEXP sims;
+		int nVariables = (*pGroupData)[0]->rDependentVariableData().size();
+		PROTECT(sims = allocVector(VECSXP, nVariables));
+
+		/* seed store is a list to save the random state */
+        SEXP seedstore;
+        PROTECT(seedstore = allocVector(VECSXP, 1));
+
+        /* scores will hold the return values of the scores */
+        SEXP scores;
+        double *rscores;
+        PROTECT(scores = allocVector(REALSXP, dim));
+        rscores = REAL(scores);
+		for (int i = 0; i < length(scores); i++)
+            rscores[i] = 0.0;
+
+		/* random states need store (not fromFiniteDiff)
+		   and restore (fromFiniteDiff) for each period
+		   within each  group */
+
+		/* create my epochsimulation object */
+		EpochSimulation * pEpochSimulation  = new
+			EpochSimulation(pData, pModel);
+
+		SEXP Cgstr, ans2, ans3, ans4, STREAMS, R_fcall1, R_fcall2,
+			R_fcall3, R_fcall4;
+
+		// create an R character string
+		PROTECT(Cgstr = allocVector(STRSXP,1));
+		SET_STRING_ELT(Cgstr, 0, mkChar("Cg"));
+
+		// find out which stream we are using
+		PROTECT(R_fcall1 = lang1(install(".lec.GetStreams")));
+		PROTECT(STREAMS = eval(R_fcall1, R_GlobalEnv));
+
+		if (!isNull(RANDOMSEED2))
+		{
+			error("non null randomseed2");
+		}
+		else
+		{
+			if (fromFiniteDiff) /* restore state */
+			{
+				// overwrite the current state in R
+				PROTECT(R_fcall2 = lang4(install("[[<-"),
+						install(".lec.Random.seed.table"), Cgstr,
+						VECTOR_ELT(SEEDS, 0)));
+				PROTECT(ans2 = eval(R_fcall2, R_GlobalEnv));
+				// get the overwritten state into C table
+				PROTECT(R_fcall3 = lang2(install(".lec.CurrentStream"),
+						STREAMS));
+				PROTECT(ans3 = eval(R_fcall3, R_GlobalEnv));
+				UNPROTECT(4);
+			}
+			else /* save state */
+			{
+				if (needSeeds)
+				{
+					// move on to next substream in R copy of our stream
+					PROTECT(R_fcall2 =
+						lang2(install(".lec.ResetNextSubstream"),
+							STREAMS));
+					PROTECT(ans2 = eval(R_fcall2, R_GlobalEnv));
+					// now make this stream the current one so C table
+					// contains these values
+					PROTECT(R_fcall3 = lang2(install(".lec.CurrentStream"),
+							STREAMS));
+					PROTECT(ans3 = eval(R_fcall3, R_GlobalEnv));
+					// get the relevant current state from R
+					PROTECT(R_fcall4 = lang3(install("[["),
+							install(".lec.Random.seed.table"), Cgstr));
+					PROTECT(ans4 = eval(R_fcall4, R_GlobalEnv));
+					// store the Cg values
+					SET_VECTOR_ELT(seedstore, 0, ans4);
+					UNPROTECT(6);
+				}
+			}
+		}
+
+		/* run the epoch simulation for this period */
+		pEpochSimulation->runEpoch(period);
+
+		State State(pEpochSimulation);
+		StatisticCalculator Calculator(pData, pModel, &State,
+			period);
+		vector<double> statistic(dim);
+		vector<double> score(dim);
+		getStatistics(EFFECTSLIST, &Calculator,
+			period, group, pData, pEpochSimulation,
+			&statistic, &score);
+		/* fill up vector for  return value list */
+		for (unsigned effectNo = 0; effectNo < statistic.size();
+			 effectNo++)
+		{
+			rfra[effectNo] = statistic[effectNo];
+
+			rscores[effectNo] = score[effectNo];
+		}
+		if (pModel->conditional())
+		{
+			rntim[0] = pEpochSimulation->time();
+		}
+		// get simulated network
+		if (returnDependents)
+		{
+			const vector<DependentVariable *> rVariables =
+				pEpochSimulation->rVariables();
+			for (unsigned i = 0; i < rVariables.size(); i++)
+			{
+				NetworkVariable * pNetworkVariable =
+					dynamic_cast<NetworkVariable *>(rVariables[i]);
+				BehaviorVariable * pBehaviorVariable =
+					dynamic_cast<BehaviorVariable *>(rVariables[i]);
+
+				if (pNetworkVariable)
+				{
+					const Network * pNetwork =
+						pNetworkVariable->pNetwork();
+					SEXP thisEdge = getEdgeList(*pNetwork);
+					SET_VECTOR_ELT(sims, i, thisEdge);
+				}
+				else if (pBehaviorVariable)
+				{
+					SEXP theseValues =
+						getBehaviorValues(*pBehaviorVariable);
+					SET_VECTOR_ELT(sims, i, theseValues);
+				}
+				else
+				{
+					throw domain_error("Unexpected class of dependent variable");
+				}
+			}
+		}
+		delete pEpochSimulation;
+
+        /* set up the return object */
+        if (!fromFiniteDiff)
+        {
+			if (needSeeds)
+			{
+				SET_VECTOR_ELT(ans, 2, seedstore);
+			}
+        }
+		if (deriv)
+        {
+            SET_VECTOR_ELT(ans, 1, scores);
+		}
+		if (returnDependents)
+		{
+			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 !!!!test this*/
+		}
+		SET_VECTOR_ELT(ans, 0, fra);
+		SET_VECTOR_ELT(ans, 3, ntim);
+
+        UNPROTECT(9);
+        return(ans);
+    }
+
+    SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
+		SEXP MODELPTR, SEXP EFFECTSLIST, SEXP MLSIMPTR,
+		SEXP THETA, SEXP RETURNDEPS, SEXP GROUP, SEXP PERIOD)
+    {
+		/* do some MH steps and return the scores and derivs of the chain
+		   at the end */
+
+        /* get hold of the data vector */
+		vector<Data *> * pGroupData = (vector<Data *> *)
+			R_ExternalPtrAddr(DATAPTR);
+		int group = asInteger(GROUP) - 1;
+
+		int period = asInteger(PERIOD) - 1;
+
+		Data * pData = (*pGroupData)[group];
+
+		/* get hold of the model object */
+        Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+		/* get hold of the simulation object */
+        MLSimulation * pMLSimulation =
+			(MLSimulation *) R_ExternalPtrAddr(MLSIMPTR);
+
+		int returnDependents = asInteger(RETURNDEPS);
+
+		int deriv = asInteger(DERIV);
+
+		/* set the deriv flag on the model */
+		pModel->needScores(deriv);
+
+		/* update the parameters */
+		updateParameters(EFFECTSLIST, THETA, pGroupData, pModel);
+
+        /* count up the total number of parameters */
+		int dim = 0;
+		for (int i = 0; i < length(EFFECTSLIST); i++)
+		{
+			dim += length(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, i), 0));
+		}
+
+        /* ans will be the return value */
+        SEXP ans;
+        PROTECT(ans = allocVector(VECSXP, 7));
+
+		/* sims will be the returned chain */
+		SEXP sims;
+		PROTECT(sims = allocVector(VECSXP, 1));
+
+        /* scores will hold the return values of the scores */
+        SEXP scores;
+        double *rscores;
+        PROTECT(scores = allocVector(REALSXP, dim));
+        rscores = REAL(scores);
+		for (int i = 0; i < length(scores); i++)
+		{
+            rscores[i] = 0.0;
+		}
+
+        /* dff will hold the return values of the derivatives */
+        SEXP dff;
+        double *rdff;
+        PROTECT(dff = allocMatrix(REALSXP, dim, dim));
+        rdff = REAL(dff);
+		for (int i = 0; i < length(dff); i++)
+		{
+            rdff[i] = 0.0;
+		}
+
+		/* run the epoch simulation for this period */
+		pMLSimulation->runEpoch(period);
+
+		State State(pMLSimulation);
+		vector<double> derivs(dim * dim);
+		vector<double> score(dim);
+		getScores(EFFECTSLIST, 	period, group, pData, pMLSimulation,
+			&derivs, &score);
+		/* fill up vectors for  return value list */
+		for (unsigned effectNo = 0; effectNo < score.size();
+			 effectNo++)
+		{
+			rscores[effectNo] = score[effectNo];
+		}
+		for (unsigned ii = 0; ii < derivs.size(); ii++)
+		{
+			rdff[ii] = derivs[ii];
+		}
+		// get chain
+		if (returnDependents)
+		{
+			//	SEXP theseValues =
+			//	getChain(*pMLSimulation);
+
+			//SET_VECTOR_ELT(sims, 0, theseValues);
+		}
+
+        /* set up the return object */
+		if (deriv)
+        {
+            SET_VECTOR_ELT(ans, 6, dff);
+		}
+		if (returnDependents)
+		{
+			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 !!!!test this*/
+		}
+		SET_VECTOR_ELT(ans, 1, scores);
+
+        UNPROTECT(9);
+        return(ans);
+    }
+
+    SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES)
+    {
+		/* set up chains and do the first few MH iters on each */
+
+        /* get hold of the data vector */
+		vector<Data *> * pGroupData = (vector<Data *> *)
+			R_ExternalPtrAddr(DATAPTR);
+
+        int nGroups = pGroupData->size();
+		/* find total number of periods to process */
+		int totObservations = 0;
+        for (int group = 0; group < nGroups; group++)
+            totObservations += (*pGroupData)[group]->observationCount() - 1;
+
+		/* get hold of the model object */
+        Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+		SEXP RpChains;
+		PROTECT(RpChains = allocVector(VECSXP, totObservations));
+
+		Data * pData = (*pGroupData)[0];
+		/* create the simulation object or maybe an array: one period for now*/
+        MLSimulation * pMLSimulation = new MLSimulation(pData, pModel);
+
+		/* set simple rates flag */
+		pMLSimulation->simpleRates(asInteger(SIMPLERATES));
+
+		/* set probability flags */
+		pMLSimulation->insertDiagonalProbability(1.0);
+
+		pMLSimulation->cancelDiagonalProbability(1.0);
+
+		/* initialize the chain: this also initializes the data */
+		pMLSimulation->connect(0);
+
+		/* get the chain up to a reasonable length */
+		pMLSimulation->burnin();
+
+		/* return the pointers */
+		for (int i = 0; i < totObservations; i++)
+		{
+			SET_VECTOR_ELT(RpChains, i,
+				R_MakeExternalPtr((void *) pMLSimulation, R_NilValue,
+					R_NilValue));
+		}
+		UNPROTECT(1);
+		return RpChains;
+	}
 }
-
-

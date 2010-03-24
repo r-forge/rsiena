@@ -23,11 +23,11 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
     x <- x
     beverbose <- verbose
     besilent <- silent
-    function(txt, dest, fill=FALSE, sep=" ", hdest,
-             open=FALSE, close=FALSE,
-             type=c("a", "w"),  projname="Siena" , verbose=FALSE, silent=FALSE)
+    function(txt, dest, fill=FALSE, sep=" ", hdest, openfiles=FALSE,
+             closefiles=FALSE, type=c("a", "w", "n"),  projname="Siena" ,
+             verbose=FALSE, silent=FALSE)
     {
-        if (open)
+        if (openfiles)
         {
             type <- match.arg(type)
             beverbose <<- verbose
@@ -36,15 +36,16 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
             {
                 x$outf <<- file(paste(projname, ".out", sep=""), open="w")
             }
-            else
+            else if (type =="a")
             {
                 x$outf <<- file(paste(projname, ".out", sep=""), open="a")
             }
 
         }
-        else if (close)
+        else if (closefiles)
         {
             close(x[["outf"]])
+            x$outf <<- NULL
         }
         else
         {
@@ -82,14 +83,22 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
                     }
                     else
                     {
-                        cat(txt, file=x[[deparse(substitute(dest))]],
-                            fill=fill, sep=sep)
+                        if (is.null(x[[deparse(substitute(dest))]]))
+                        {
+                            cat(txt, fill=fill, sep=sep)
+                        }
+                        else
+                        {
+                            cat(txt, file=x[[deparse(substitute(dest))]],
+                                fill=fill, sep=sep)
+                        }
                     }
                 }
             }
-       }
+        }
     }
 }
+
 
 ##@Report Globals
 Report <- local({verbose <-  NULL; silent <- NULL;
