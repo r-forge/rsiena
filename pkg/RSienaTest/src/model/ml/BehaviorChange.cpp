@@ -17,14 +17,14 @@ namespace siena
 
 /**
  * Constructs a new behavior ministep.
+ * @param[in] variableId the ID of the dependent variable to be changed
  * @param[in] ego the actor making the change
- * @param[in] variableName the name of the dependent variable to be changed
  * @param[in] difference the amount of change
  * (-1,0,+1 for dichotomous variables)
  */
-BehaviorChange::BehaviorChange(int ego,
-	string variableName,
-	int difference) : MiniStep(ego, variableName, difference)
+BehaviorChange::BehaviorChange(int variableId,
+	int ego,
+	int difference) : MiniStep(variableId, ego, difference)
 {
 }
 

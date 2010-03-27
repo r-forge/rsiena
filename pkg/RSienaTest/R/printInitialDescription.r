@@ -97,34 +97,29 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                 if (startCol > nobs)
                     break
             }
-            if (sum(gpatts$types != "bipartite") > 0)
-            {
-                if (nData > 1)
+            averageOutDegree <- rep(NA, nData)
+            for (group in 1:nData)
                 {
-                    averageOutDegree <-
-                        sapply(data, function(x)
-                               sapply(x$depvars, function(y)
-                                      attr(y, "averageOutDegree")))
-                }
-                else
-                {
-                    averageOutDegree <- gpatts$"averageOutDegree"
+                j <- match(netnames[net], names(data[[group]]$depvars))
+                if (is.na(j))
+                    stop("network names not consistent")
+                depvar <- data[[group]]$depvars[[j]]
+                atts <- attributes(depvar)
+                averageOutDegree[group] <- atts$"averageOutDegree"
                 }
                 Report("\n", outf)
-                if (nData > 1 || sum(atts$types != "behavior") > 1)
+            if (nData > 1)
                 {
                     Report("The average degrees are: ", outf)
                     Report(paste(names(data), round(averageOutDegree, 3),
                                  sep=': '), outf)
                     Report("\n", outf)
-
                 }
                 else
                 {
                     Report(c("The average degree is",
                              round(averageOutDegree, 3), "\n"), outf)
                 }
-            }
             Report("\n\n", outf)
             Report(c(ifelse(gpatts$symmetric[net], "Edge", "Tie"),
                      "changes between subsequent observations:\n"), outf)
@@ -269,6 +264,7 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                         {
                             ##  require(Matrix)
                             mymat <- depvar[[per]]
+                            diag(mymat) <- 0
                             mymat1 <- mymat@i
                             mymat2 <- mymat@j
                             mymat3 <- mymat@x
@@ -293,9 +289,11 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                                 missji <- paste(mymat2[is.na(mymat3)],
                                                 mymat1[is.na(mymat3)])
                                 mutual <- sum(ij %in% ji) / 2
+                                ## nondyads are ones where we have a link and
+                                ## its partner is missing
                                 nondyads <- sum(ji %in% missij)
                                 asymm <- length(ij) - nondyads - mutual * 2
-                                missdyads <- sum(!missij %in% missji) +
+                                missdyads <- sum(!(missij %in% missji)) +
                                     sum(missij %in% missji) / 2
                                 nulls <- atts$netdims[1] *
                                     (atts$netdims[2] - 1) / 2 -

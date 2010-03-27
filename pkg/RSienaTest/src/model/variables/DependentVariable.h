@@ -69,6 +69,7 @@ public:
 	int n() const;
 	virtual int m() const = 0;
 	virtual LongitudinalData * pData() const = 0;
+	int id() const;
 
 	inline const Function * pEvaluationFunction() const;
 	inline const Function * pEndowmentFunction() const;
@@ -103,6 +104,8 @@ public:
 	double reciprocalDegreeScore(const NetworkVariable * pNetwork) const;
 	double inverseOutDegreeScore(const NetworkVariable * pNetwork) const;
 
+	// Maximum likelihood related
+
 	/**
 	 * Calculates the probability of the given ministep assuming that the
 	 * ego of the ministep will change this variable.
@@ -110,6 +113,17 @@ public:
 	virtual double probability(MiniStep * pMiniStep) = 0;
 
 	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
+
+	/**
+	 * Returns if the observed value for the option of the given ministep
+	 * is missing at either end of the period.
+	 */
+	virtual bool missing(const MiniStep * pMiniStep) const = 0;
+
+	/**
+	 * Generates a random ministep for the given ego.
+	 */
+	virtual MiniStep * randomMiniStep(int ego) = 0;
 
 protected:
 	inline EpochSimulation * pSimulation() const;

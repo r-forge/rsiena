@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * SIENA: Simulation Investigation for Empirical Network Analysis
  *
@@ -46,6 +45,9 @@
 #include "model/variables/DependentVariable.h"
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"
+#include "model/ml/MLSimulation.h"
+#include "model/ml/Chain.h"
+#include "model/ml/MiniStep.h"
 using namespace std;
 using namespace siena;
 
@@ -293,7 +295,7 @@ int mysample(const int n, const valarray<double>& p)
 	    }
 	}
     }
-    return(hi);
+    return hi;
 }
 int sample(int n)
 {
@@ -313,7 +315,7 @@ SEXP getBehaviorValues(const BehaviorVariable & behavior)
 		ians[i] = pValues[i];
 	}
 	UNPROTECT(1);
-    return(ans) ;
+    return ans  ;
 }
 SEXP getAdjacency(const Network& net)
 {
@@ -330,7 +332,7 @@ SEXP getAdjacency(const Network& net)
     }
 
     UNPROTECT(1);
-    return(ans) ;
+    return ans;
 }
 SEXP getEdgeList(const Network& net)
 {
@@ -351,10 +353,24 @@ SEXP getEdgeList(const Network& net)
     }
 
     UNPROTECT(1);
-    return(ans) ;
+    return ans;
 }
 
-
+SEXP getChain(const Chain& chain)
+{
+	SEXP ans, sego;
+	int ministepCount = chain.ministepCount();
+	PROTECT(sego = allocVector(INTSXP, 1));
+	int * ego = INTEGER(sego);
+	PROTECT(ans = allocVector(VECSXP, ministepCount));
+	MiniStep *pMiniStep = chain.pFirst();
+	for (int i = 0; i < ministepCount; i++)
+	{
+		ego[0] = pMiniStep->ego();
+		SET_VECTOR_ELT(ans, i, sego);
+	}
+	return ans;
+}
 /**
  * Calculates change between two networks. Ignores any values missing in
  *  either network. Does not use structural values as yet.
@@ -2411,6 +2427,138 @@ one of values, one of missing values (boolean) */
 	}
 
 /**
+ *  retrieves the values of the scores for each of the effects,
+ *  for one period. The call will relate to one group only, although all effects
+ *  are the same apart from the basic rates.
+ */
+	void getScores(SEXP EFFECTSLIST, int period, int group, Data *pData,
+		MLSimulation * pMLSimulation,
+		vector<double> * rderivs, vector<double> *rscore)
+    {
+
+        // get the column names from the names attribute
+        SEXP cols;
+        PROTECT(cols = install("names"));
+        SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
+
+		int netTypeCol; /* net type */
+        int nameCol; /* network name */
+        int effectCol;  /* short name of effect */
+		int parmCol;
+		int int1Col;
+		int int2Col;
+		int initValCol;
+		int typeCol;
+		int groupCol;
+		int periodCol;
+		int pointerCol;
+		int rateTypeCol;
+		int intptr1Col;
+		int intptr2Col;
+		int intptr3Col;
+
+		getColNos(Names, &netTypeCol, &nameCol, &effectCol,
+				  &parmCol, &int1Col, &int2Col, &initValCol,
+				  &typeCol, &groupCol, &periodCol, &pointerCol,
+			&rateTypeCol, &intptr1Col, &intptr2Col, &intptr3Col);
+
+
+		double deriv = 0;
+		double score = 0;
+		int istore = 0;
+
+		for (int ii = 0; ii < length(EFFECTSLIST); ii++)
+		{
+			const char * networkName =
+				CHAR(STRING_ELT(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, ii),
+										   nameCol), 0));
+			SEXP EFFECTS = VECTOR_ELT(EFFECTSLIST, ii);
+
+			for (int i = 0; i < length(VECTOR_ELT(EFFECTS,0)); i++)
+			{
+				const char * effectName =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, effectCol),  i));
+				//	int parm = INTEGER(VECTOR_ELT(EFFECTS, parmCol))[i];
+				const char * interaction1 =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, int1Col),i));
+				//	const char * interaction2 =
+				//CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, int2Col), i));
+				//double initialValue =
+				//REAL(VECTOR_ELT(EFFECTS, initValCol))[i];
+				const char * effectType =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), i));
+				const char * netType =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, netTypeCol), i));
+				const char * rateType =
+					CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, rateTypeCol), i));
+				//	Rprintf("%s %s \n", effectType, netType);
+				if (strcmp(effectType, "rate") == 0)
+				{
+					if (strcmp(effectName, "Rate") == 0)
+					{
+						int groupno =
+							INTEGER(VECTOR_ELT(EFFECTS, groupCol))[i];
+						int periodno =
+							INTEGER(VECTOR_ELT(EFFECTS, periodCol))[i];
+						if ((periodno - 1) == period && (groupno - 1) == group)
+						{
+
+							if (strcmp(netType, "behavior") == 0)
+							{
+								const DependentVariable * pVariable =
+									pMLSimulation->pVariable(networkName);
+								score = pVariable->basicRateScore();
+							}
+							else
+							{
+								/* find the dependent variable for the score */
+								const DependentVariable * pVariable =
+									pMLSimulation->pVariable(networkName);
+								score = pVariable->basicRateScore();
+							}
+						}
+						else
+						{
+							score = 0;
+						}
+					}
+					else
+					{
+						error("Non constant rate effects are not %s",
+							"implemented for maximum likelihood.");
+					}
+				}
+				else
+				{
+					if (strcmp(effectType, "eval") == 0)
+					{
+						EffectInfo * pEffectInfo = (EffectInfo *)
+							R_ExternalPtrAddr(
+								VECTOR_ELT(VECTOR_ELT(EFFECTS,
+													  pointerCol), i));
+							score = pMLSimulation->score(pEffectInfo);
+					}
+					else if (strcmp(effectType, "endow") == 0)
+					{
+						EffectInfo * pEffectInfo = (EffectInfo *)
+							R_ExternalPtrAddr(
+								VECTOR_ELT(VECTOR_ELT(EFFECTS,
+													  pointerCol), i));
+							score = pMLSimulation->score(pEffectInfo);
+					}
+					else
+					{
+						error("invalid effect type %s\n", effectType);
+					}
+				}
+				//		Rprintf("%f %d \n", score, istore);
+				(*rscore)[istore] = score;
+				istore++; /* keep forgetting to move the ++ */
+			}
+		}
+		UNPROTECT(1);
+	}
+/**
  *  Gets target values relative to the input data
  */
 
@@ -3043,4 +3191,162 @@ one of values, one of missing values (boolean) */
         return(ans);
     }
 
+    SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
+		SEXP MODELPTR, SEXP EFFECTSLIST, SEXP MLSIMPTR,
+		SEXP THETA, SEXP RETURNDEPS, SEXP GROUP, SEXP PERIOD)
+    {
+		/* do some MH steps and return the scores and derivs of the chain
+		   at the end */
+
+        /* get hold of the data vector */
+		vector<Data *> * pGroupData = (vector<Data *> *)
+			R_ExternalPtrAddr(DATAPTR);
+		int group = asInteger(GROUP) - 1;
+
+		int period = asInteger(PERIOD) - 1;
+
+		Data * pData = (*pGroupData)[group];
+
+		/* get hold of the model object */
+        Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+		/* get hold of the simulation object */
+        MLSimulation * pMLSimulation =
+			(MLSimulation *) R_ExternalPtrAddr(MLSIMPTR);
+
+		int returnDependents = asInteger(RETURNDEPS);
+
+		int deriv = asInteger(DERIV);
+
+		/* set the deriv flag on the model */
+		pModel->needScores(deriv);
+
+		/* update the parameters */
+		updateParameters(EFFECTSLIST, THETA, pGroupData, pModel);
+
+        /* count up the total number of parameters */
+		int dim = 0;
+		for (int i = 0; i < length(EFFECTSLIST); i++)
+		{
+			dim += length(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, i), 0));
+		}
+
+        /* ans will be the return value */
+        SEXP ans;
+        PROTECT(ans = allocVector(VECSXP, 7));
+
+		/* sims will be the returned chain */
+		SEXP sims;
+		PROTECT(sims = allocVector(VECSXP, 1));
+
+        /* scores will hold the return values of the scores */
+        SEXP scores;
+        double *rscores;
+        PROTECT(scores = allocVector(REALSXP, dim));
+        rscores = REAL(scores);
+		for (int i = 0; i < length(scores); i++)
+		{
+            rscores[i] = 0.0;
+		}
+
+        /* dff will hold the return values of the derivatives */
+        SEXP dff;
+        double *rdff;
+        PROTECT(dff = allocMatrix(REALSXP, dim, dim));
+        rdff = REAL(dff);
+		for (int i = 0; i < length(dff); i++)
+		{
+            rdff[i] = 0.0;
+		}
+
+		/* run the epoch simulation for this period */
+		pMLSimulation->runEpoch(period);
+
+		State State(pMLSimulation);
+		vector<double> derivs(dim * dim);
+		vector<double> score(dim);
+		getScores(EFFECTSLIST, 	period, group, pData, pMLSimulation,
+			&derivs, &score);
+		/* fill up vectors for  return value list */
+		for (unsigned effectNo = 0; effectNo < score.size();
+			 effectNo++)
+		{
+			rscores[effectNo] = score[effectNo];
+		}
+		for (unsigned ii = 0; ii < derivs.size(); ii++)
+		{
+			rdff[ii] = derivs[ii];
+		}
+		// get chain
+		if (returnDependents)
+		{
+			//	SEXP theseValues =
+			//	getChain(*pMLSimulation);
+
+			//SET_VECTOR_ELT(sims, 0, theseValues);
+		}
+
+        /* set up the return object */
+		if (deriv)
+        {
+            SET_VECTOR_ELT(ans, 6, dff);
+		}
+		if (returnDependents)
+		{
+			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 !!!!test this*/
+		}
+		SET_VECTOR_ELT(ans, 1, scores);
+
+        UNPROTECT(9);
+        return(ans);
+    }
+
+    SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES)
+    {
+		/* set up chains and do the first few MH iters on each */
+
+        /* get hold of the data vector */
+		vector<Data *> * pGroupData = (vector<Data *> *)
+			R_ExternalPtrAddr(DATAPTR);
+
+        int nGroups = pGroupData->size();
+		/* find total number of periods to process */
+		int totObservations = 0;
+        for (int group = 0; group < nGroups; group++)
+            totObservations += (*pGroupData)[group]->observationCount() - 1;
+
+		/* get hold of the model object */
+        Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+		SEXP RpChains;
+		PROTECT(RpChains = allocVector(VECSXP, totObservations));
+
+		Data * pData = (*pGroupData)[0];
+		/* create the simulation object or maybe an array: one period for now*/
+        MLSimulation * pMLSimulation = new MLSimulation(pData, pModel);
+
+		/* set simple rates flag */
+		pMLSimulation->simpleRates(asInteger(SIMPLERATES));
+
+		/* set probability flags */
+		pMLSimulation->insertDiagonalProbability(1.0);
+
+		pMLSimulation->cancelDiagonalProbability(1.0);
+
+		/* initialize the chain: this also initializes the data */
+		pMLSimulation->connect(0);
+
+		/* get the chain up to a reasonable length */
+		pMLSimulation->burnin();
+
+		/* return the pointers */
+		for (int i = 0; i < totObservations; i++)
+		{
+			SET_VECTOR_ELT(RpChains, i,
+				R_MakeExternalPtr((void *) pMLSimulation, R_NilValue,
+					R_NilValue));
+		}
+		UNPROTECT(1);
+		return RpChains;
+	}
 }

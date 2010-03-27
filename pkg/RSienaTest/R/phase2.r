@@ -296,9 +296,7 @@ doIterations<- function(z, x, subphase,...)
                 DisplayThetaAutocor(z)
             }
         }
-        ## limit change. not sure what to do here sd is not set up
-        ## unless finite differences are used or ML and
-        ## ML is specifically excluded here. Reporting is delayed to
+        ## limit change.  Reporting is delayed to
         ## end of phase.
      ##   browser()
         if (x$diag)## !maxlike at present

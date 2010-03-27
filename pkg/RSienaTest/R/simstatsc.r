@@ -15,394 +15,9 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 {
     if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
     {
-        if (!initC)
-        {
-            if (!inherits(data,'siena'))
-                stop('not valid siena data object')
-            defaultEffects <- getEffects(data)
-            if (is.null(effects))
-                effects <- defaultEffects
-            else
-            {
-            ## todo check that the effects match the data dependent variables
-                userlist <- apply(effects[effects$include,], 1, function(x)
-                                  paste(x[c("name", "effectName",
-                                            "type", "groupName")],
-                                        collapse="|"))
-                deflist <- apply(defaultEffects, 1, function(x)
-                                  paste(x[c("name", "effectName",
-                                            "type", "groupName")],
-                                        collapse="|"))
-                if (!all(userlist %in% deflist))
-                {
-                    bad <- which(!(userlist %in% deflist))
-                    print(userlist[bad])
-                    stop("invalid effect requested: see above ")
-                }
-            }
-            if (!inherits(effects, 'data.frame'))
-                stop('effects is not a data.frame')
-            if (x$useStdInits)
-            {
-                if (any(effects$effectName != defaultEffects$effectName))
-                {
-                    stop('Cannot use standard initialisation with a ',
-                          'different effect list')
-                }
-                effects$initialValue <- defaultEffects$initialValue
-            }
-            ## find any effects not included which are needed for interactions
-            interactionNos <- unique(c(effects$effect1, effects$effect2,
-                                       effects$effect3))
-            interactionNos <- interactionNos[interactionNos > 0]
-            interactionMainEffects <- effects[interactionNos, ]
-            effects$requested <- effects$include
-            requestedEffects <- effects[effects$include, ]
+        z <- initializeFRAN(z, x, data, effects, prevAns, initC,
+                            profileData=profileData, returnDeps=returnDeps)
 
-            effects$include[interactionNos] <- TRUE
-            effects <- effects[effects$include,]
-
-            ## split and rejoin both versions before continuing
-            effects1 <- split(requestedEffects, requestedEffects$name)
-            if (inherits(data, "sienaGroup"))
-                depvarnames <- names(data[[1]]$depvars)
-            else
-                depvarnames <- names(data$depvars)
-            effects1order <- match(depvarnames, names(effects1))
-            requestedEffects <- do.call(rbind, effects1[effects1order])
-            row.names(requestedEffects) <- 1:nrow(requestedEffects)
-            effects1 <- split(effects, effects$name)
-            effects1order <- match(depvarnames, names(effects1))
-            effects <- do.call(rbind, effects1[effects1order])
-            row.names(effects) <- 1:nrow(effects)
-            z$theta <- requestedEffects$initialValue
-            z$fixed <- requestedEffects$fix
-            z$test <- requestedEffects$test
-            z$pp <- length(z$test)
-            z$posj <- rep(FALSE,z$pp)
-            z$posj[requestedEffects$basicRate] <- TRUE
-            z$BasicRateFunction <- z$posj
-            effects <- fixUpEffectNames(effects)
-
-            ## copy interaction names to the requested effects
-            requestedEffects$effectName <- effects[effects$requested,
-                                                   "effectName"]
-            requestedEffects$functionName <- effects[effects$requested,
-                                                   "functionName"]
-
-            if (inherits(data, 'sienaGroup'))
-            {
-                nGroup <- length(data)
-            }
-            else
-            {
-                nGroup <- 1
-                data <- sienaGroupCreate(list(data), singleOK=TRUE)
-            }
-            if (is.na(x$cconditional))
-            {
-                x$cconditional <- length(depvarnames) == 1
-                if (x$cconditional)
-                {
-                    x$condvarno <- 1
-                }
-            }
-            z$cconditional <- FALSE
-            if (x$cconditional)
-            {
-                types <- sapply(data[[1]]$depvars, function(x) attr(x, 'type'))
-                nets <- sum(types != "behavior")
-                if (nets == 1)
-                {
-                    z$cconditional <- TRUE
-                    ## find the conditioning variable
-                    observations <- attr(data, 'observations')
-                    if (x$condname != '')
-                    {
-                        z$condvarno <- match(x$condname, attr(data, "netnames"))
-                        z$condname <- x$condname
-                    }
-                    else
-                    {
-                        z$condvarno <- x$condvarno
-                        z$condname <- attr(data, 'netnames')[x$condvarno]
-                    }
-                    z$condtype <- attr(data, "types")[z$condvarno]
-                    if (z$condtype == 'oneMode')
-                        z$symmetric  <-  attr(data, "symmetric")[[z$condvarno]]
-                    else
-                        z$symmetric <- FALSE
-                    ## find the positions of basic rate effects for this network
-                    z$condvar <-
-                        (1:nrow(requestedEffects))[requestedEffects$name==
-                                                   z$condname][1:observations]
-                    z$theta<- z$theta[-z$condvar]
-                    z$fixed<- z$fixed[-z$condvar]
-                    z$test<- z$test[-z$condvar]
-                    z$pp<- z$pp-length(z$condvar)
-                    z$scale<- z$scale[-z$condvar]
-                    z$BasicRateFunction <- z$posj[-z$condvar]
-                    z$posj <- z$posj[-z$condvar]
-                    z$theta[z$posj] <-
-                        z$theta[z$posj] /
-                            requestedEffects$initialValue[z$condvar]
-                    z$ntim<- matrix(NA, nrow=x$n3, ncol=observations)
-                }
-            }
-            ## unpack data and put onto f anything we may need next time round.
-            f <- lapply(data, function(x) unpackData(x))
-            attr(f, "netnames") <- attr(data, "netnames")
-            attr(f, "symmetric") <- attr(data, "symmetric")
-            attr(f, "allUpOnly") <- attr(data, "allUpOnly")
-            attr(f, "allDownOnly") <- attr(data, "allDownOnly")
-            attr(f, "allHigher") <- attr(data, "allHigher")
-            attr(f, "allDisjoint") <- attr(data, "allDisjoint")
-            attr(f, "allAtLeastOne") <- attr(data, "allAtLeastOne")
-            attr(f, "anyUpOnly") <- attr(data, "anyUpOnly")
-            attr(f, "anyDownOnly") <- attr(data, "anyDownOnly")
-            attr(f, "anyHigher") <- attr(data, "anyHigher")
-            attr(f, "anyDisjoint") <- attr(data, "anyDisjoint")
-            attr(f, "anyAtLeastOne") <- attr(data, "anyAtLeastOne")
-            attr(f, "types") <- attr(data, "types")
-            attr(f, "observations") <- attr(data, "observations")
-            attr(f, "compositionChange") <- attr(data, "compositionChange")
-            attr(f, "exooptions") <- attr(data, "exooptions")
-            attr(f, "groupPeriods") <- attr(data, "groupPeriods")
-           ## if any networks symmetric must use finite differences
-            syms <- attr(data,"symmetric")
-            z$FinDiffBecauseSymmetric <- FALSE
-            if (any(!is.na(syms) & syms))
-            {
-                z$FinDiff.method <- TRUE
-                z$FinDiffBecauseSymmetric <- TRUE
-            }
-        	if (z$cconditional)
-            {
-                attr(f, "change") <-
-                    sapply(f, function(xx)attr(xx$depvars[[z$condname]],
-                                               'distance'))
-                attr(f,"condEffects") <- requestedEffects[z$condvar,]
-                effcondvar <-
-                    (1:nrow(effects))[effects$name==
-                                      z$condname][1:observations]
-                effects <- effects[-effcondvar, ]
-                requestedEffects <- requestedEffects[-z$condvar,]
-            }
-            ## see if we can use the original dfra
-            if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
-            {
-                if (all(rownames(prevAns$dfra) == requestedEffects$shortName)
-                    && !is.null(prevAns$sf))
-                {
-                    z$haveDfra <- TRUE
-                    z$dfra <- prevAns$dfra
-                    z$sf <- prevAns$sf
-                    ## use thetas too, unless use standard values
-                    if (!x$useStdInits)
-                    {
-                        requestedEffects$initialValue <- prevAns$theta
-                        if (!is.null(prevAns$condvar))
-                        {
-                            ## z$condvar has the subscripts of included
-                            ## parameters
-                            ## that correspond to the conditional variable
-                            ## need to scale the other rates again
-                            requestedEffects$initialValue[z$posj] <-
-                                requestedEffects$initialValue[z$posj] /
-                                    prevAns$rate
-                        }
-                        z$theta <- requestedEffects$initialValue
-                    }
-                }
-            }
-            z$effects <- effects
-            z$requestedEffects <- requestedEffects
-        }
-        else
-        {
-            f <- FRANstore()
-            ## Would like f to be just the data objects plus the attributes
-            ## but need the effects later. Also returnDeps flag
-            ff <- f
-            f$pData <- NULL
-            f$pModel <-  NULL
-            f$myeffects <-  NULL
-            f$observations <-  NULL
-            f$randomseed2 <- NULL
-            f$seeds <- NULL
-            f$returnDeps <- NULL
-            f$depNames <- NULL
-            f$groupNames <- NULL
-            f$nGroup <- NULL
-            f$basicEffects <- NULL
-            f$interactionEffects <- NULL
-       }
-        ##browser()
-        #browser()
-        pData <- .Call('setupData', PACKAGE=pkgname,
-                       lapply(f, function(x)(as.integer(x$observations))),
-                       lapply(f, function(x)(x$nodeSets)))
-        ans <- .Call('OneMode', PACKAGE=pkgname,
-                    pData, lapply(f, function(x)x$nets))
-        ans <- .Call('Bipartite', PACKAGE=pkgname,
-                    pData, lapply(f, function(x)x$bipartites))
-        ans <- .Call('Behavior', PACKAGE=pkgname,
-                     pData, lapply(f, function(x)x$behavs))
-       # browser()
-        ans <-.Call('ConstantCovariates', PACKAGE=pkgname,
-                   pData, lapply(f, function(x)x$cCovars))
-        ans <-.Call('ChangingCovariates', PACKAGE=pkgname,
-                   pData, lapply(f, function(x)x$vCovars))
-        ans <-.Call('DyadicCovariates', PACKAGE=pkgname,
-                   pData, lapply(f, function(x)x$dycCovars))
-        ans <-.Call('ChangingDyadicCovariates', PACKAGE=pkgname,
-                   pData, lapply(f, function(x)x$dyvCovars))
-        ans <-.Call('ExogEvent', PACKAGE=pkgname,
-                   pData, lapply(f, function(x)x$exog))
-        ## split the names of the constraints
-        higher <- attr(f, "allHigher")
-        disjoint <- attr(f, "allDisjoint")
-        atLeastOne <- attr(f, "allAtLeastOne")
-        froms <- sapply(strsplit(names(higher), ","), function(x)x[1])
-        tos <- sapply(strsplit(names(higher), ","), function(x)x[2])
-        ans <- .Call("Constraints", PACKAGE=pkgname,
-                     pData, froms[higher], tos[higher],
-                     froms[disjoint], tos[disjoint],
-                     froms[atLeastOne], tos[atLeastOne])
-        ##store the address
-        f$pData <- pData
-        ## register a finalizer
-        ans <- reg.finalizer(f$pData, clearData, onexit = FALSE)
-        if (!initC)
-        {
-            storage.mode(effects$parm) <- 'integer'
-            storage.mode(effects$group) <- 'integer'
-            storage.mode(effects$period) <- 'integer'
-            effects$effectPtr <- NA
-            splitFactor <- factor(effects$name, levels=attr(f, "netnames"))
-            myeffects <- split(effects, splitFactor)
-            ## remove interaction effects and save till later
-            basicEffects <- lapply(myeffects, function(x)
-                               {
-                                   x[!x$shortName %in% c("unspInt", "behUnspInt"), ]
-                               }
-                                   )
-            interactionEffects <- lapply(myeffects, function(x)
-                                     {
-                                         x[x$shortName %in% c("unspInt", "behUnspInt"), ]
-                                     }
-                                         )
-            ## store effects objects as we may need to recreate them
-            f$interactionEffects <- interactionEffects
-            f$basicEffects <- basicEffects
-        }
-        else
-        {
-            myeffects <- ff$myeffects
-            basicEffects <- ff$basicEffects
-            interactionEffects <- ff$interactionEffects
-            returnDeps <- ff$returnDeps
-            nGroup <- ff$nGroup
-        }
-        ans <- .Call('effects', PACKAGE=pkgname,
-                     pData, basicEffects)
-        pModel <- ans[[1]][[1]]
-        ## browser()
-        for (i in 1:length(ans[[2]])) ## ans[[2]] is a list of lists of
-            ## pointers to effects. Each list corresponds to one
-            ## dependent variable
-        {
-            effectPtr <- ans[[2]][[i]]
-            basicEffects[[i]]$effectPtr <- effectPtr
-
-                interactionEffects[[i]]$effect1 <-
-                    basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect1,
-                                                      basicEffects[[i]]$effectNumber)]
-                interactionEffects[[i]]$effect2 <-
-                    basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect2,
-                                                      basicEffects[[i]]$effectNumber)]
-                interactionEffects[[i]]$effect3 <-
-                    basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
-                                                      basicEffects[[i]]$effectNumber)]
-        }
-        ans <- .Call('interactionEffects', PACKAGE=pkgname,
-                     pData, pModel, interactionEffects)
-        ## copy these pointers to the interaction effects and then rejoin
-        for (i in 1:length(ans[[1]])) ## ans is a list of lists of
-            ## pointers to effects. Each list corresponds to one
-            ## dependent variable
-        {
-            if (nrow(interactionEffects[[i]]) > 0)
-            {
-                effectPtr <- ans[[1]][[i]]
-                interactionEffects[[i]]$effectPtr <- effectPtr
-            }
-            myeffects[[i]] <- rbind(basicEffects[[i]], interactionEffects[[i]])
-        }
-        ## remove the effects only created as underlying effects
-        ## for interaction effects
-        myeffects <- lapply(myeffects, function(x)
-                        {
-                            x[x$requested, ]
-                        }
-                            )
-        if (!initC)
-        {
-            ans <- .Call('getTargets', PACKAGE=pkgname,
-                         pData, pModel, myeffects)
-            z$targets <- rowSums(ans)
-            z$targets2 <- ans
-        }
-        ##store address of model
-        f$pModel <- pModel
-        ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
-        if (x$MaxDegree == 0 || is.null(x$MaxDegree))
-        {
-            MAXDEGREE <-  NULL
-        }
-        else
-        {
-            MAXDEGREE <- x$MaxDegree
-        }
-        if (z$cconditional)
-        {
-            CONDVAR <- z$condname
-            CONDTARGET <- attr(f, "change")
-         ##   cat(CONDTARGET, '\n')
-        }
-        else
-        {
-            CONDVAR <- NULL
-            CONDTARGET <- NULL
-        }
-        ans <- .Call("setupModelOptions", PACKAGE=pkgname,
-                     pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
-                     profileData, z$parallelTesting)
-        f$myeffects <- myeffects
-        if (!initC)
-        {
-            DataReport(z, x, f)
-            f$randomseed2 <- z$randomseed2
-        }
-        else
-        {
-            f$randomseed2 <- ff$randomseed2
-        }
-        f$observations <- attr(f, "observations") + 1
-        f$returnDeps <- returnDeps
-        f$depNames <- names(f[[1]]$depvars)
-        f$groupNames <- names(f)[1:nGroup]
-        f$nGroup <- nGroup
-        if (!initC)
-        {
-            z$f <- f
-        }
-        if (initC || (z$int == 1 && z$int2 == 1))
-        {
-            f[1:nGroup] <- NULL
-        }
-
-        FRANstore(f) ## store f in FRANstore
         if (initC)
         {
             return(NULL)
@@ -439,13 +54,13 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     }
     ## iteration entry points
     f <- FRANstore()
-   # browser()
-   # cat(f$randomseed2, f$storedseed, '\n')
-   # if (fromFiniteDiff)
-   # {
-      #  cat('before\n')
-      #  print(f$seeds)
-   # }
+    ## browser()
+    ## cat(f$randomseed2, f$storedseed, '\n')
+    ## if (fromFiniteDiff)
+    ## {
+    ##  cat('before\n')
+    ##  print(f$seeds)
+    ## }
     if (fromFiniteDiff || z$Phase == 2)
     {
         returnDeps <- FALSE
@@ -485,11 +100,12 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                                               function(x) 1:x))))
     if (z$int2==1 || nrow(callGrid) == 1)
     {
-     ans <- .Call('model', PACKAGE=pkgname,
+      #   cat("theta", z$theta, "\n")
+       ans <- .Call('model', PACKAGE=pkgname,
                      z$Deriv, f$pData, seeds,
                      fromFiniteDiff, f$pModel, f$myeffects, z$theta,
                      randomseed2, returnDeps, z$FinDiff.method, !is.null(z$cl))
-   }
+    }
     else
     {
         use <- 1:(min(nrow(callGrid), z$int2))
@@ -500,7 +116,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ##            z$Deriv, fromFiniteDiff, z$theta,
         ##           returnDeps, z$FinDiff.method)
         ## reorganize the anss so it looks like the normal one
-    # browser()
+        ## browser()
         ans <- NULL
         ans[[1]] <- sapply(anss, "[[", 1) ## statistics
         ans[[2]] <- sapply(anss, "[[", 2) ## scores
@@ -513,13 +129,13 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             lapply(1:length(f$depNames), function(x, z) lapply(z, "[[", x), z=x)
         })
     }
-    # browser()
+    ## browser()
     if (!fromFiniteDiff)
     {
         if (z$FinDiff.method)
             f$seeds <- ans[[3]]
-      # cat('after\n')
-      # print(f$seeds)
+        ## cat('after\n')
+        ## print(f$seeds)
     }
     if (z$Deriv)
     {
@@ -553,19 +169,19 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             periodNo <- periodNos[length(periodNos)] + 2
        }
     }
- #   cat('fra', fra, '\n')
- #    cat(f$randomseed2, f$storedseed, '\n')
+    ##   cat('fra', fra, '\n')
+    ##    cat(f$randomseed2, f$storedseed, '\n')
    list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
          sims=sims, f$seeds)
 }
 doModel <- function(x, Deriv, seeds, fromFiniteDiff, theta, randomseed2,
                     returnDeps, FinDiff.method, useStreams)
 {
-   # cat('gothere\n')
-   #     cat("theta", theta, "\n")
+    ## cat('gothere\n')
+    ##     cat("theta", theta, "\n")
     f <- FRANstore()
-   # cat('stream', .lec.GetStreams(),'\n')
-   # print(.lec.GetState(.lec.GetStreams()))
+    ## cat('stream', .lec.GetStreams(),'\n')
+    ## print(.lec.GetState(.lec.GetStreams()))
     seeds <- seeds[[x[1]]][[x[2]]]
     .Call("modelPeriod", PACKAGE=pkgname, Deriv, f$pData, seeds,
                          fromFiniteDiff, f$pModel, f$myeffects, theta,
@@ -584,6 +200,12 @@ clearModel <- function(pModel)
 {
     ans <- .Call('deleteModel', PACKAGE=pkgname,
                  pModel)
+}
+##@clearModel siena07 Finalizer to clear MLSimulation object in C++
+clearMLSimulation <- function(pMLSimulation)
+{
+    ans <- .Call('deleteMLSimulation', PACKAGE=pkgname,
+                 pMLSimulation)
 }
 ##@createEdgeLists siena07 Reformat data for C++
 createEdgeLists<- function(mat, matorig)
@@ -701,18 +323,18 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                 netmiss[[i]][netmiss[[i]][, 1] != netmiss[[i]][, 2], ,
                              drop=FALSE]
             ## carry forward missing values if any
-            for (j in seq(along=netmiss[[i]][,1]))
-            {
-                if (i == 1) # set missings to zero
+            if (i == 1)
                 {
-                    networks[[i]][netmiss[[i]][j, 1],
-                                  netmiss[[i]][j, 2]] <- 0
+                netmat <- netmat[!is.na(netmat[,3]), ]
+                networks[[i]] <- spMatrix(nActors, nActors, netmat[, 1],
+                                          netmat[, 2], netmat[,3])
                 }
                 else
                 {
-                    networks[[i]][netmiss[[i]][j, 1], netmiss[[i]][j, 2]] <-
-                        networks[[i-1]][netmiss[[i]][j, 1], netmiss[[i]][j, 2]]
-                }
+                netmiss1 <- netmiss[[i]][, 1:2]
+                storage.mode(netmiss1) <- 'integer'
+                networks[[i]][netmiss1[, 1:2]] <-
+                    networks[[i-1]][netmiss1[, 1:2]]
             }
         }
         for (i in 1:observations)
@@ -1182,15 +804,31 @@ unpackBehavior<- function(depvar, observations)
 {
     beh <- depvar[, 1, ]
     behmiss <- is.na(beh)
+    origbeh <- beh
+    allna <- apply(beh, 1, function(x)all(is.na(x)))
+    modes <- attr(depvar, "modes")
     ## carry forward missings ### nb otherwise use the mode
-    for (i in 1:observations)
+    ## allNAs: use modes
+    beh[allna, ] <- rep(modes, each=sum(allna))
+    for (i in 2:observations)
     {
-        if (i == 1)
-            beh[is.na(beh[, i]), i] <- 0
-        else ##carry missing forward!
-            beh[is.na(beh[, i]), i] <-
-                beh[is.na(beh[, i]), i - 1]
+            beh[is.na(beh[, i]), i] <-  beh[is.na(beh[, i]), i - 1]
     }
+    for (i in (observations-1):1)
+    {
+            beh[is.na(beh[, i]), i] <-  beh[is.na(beh[, i]), i +1]
+    }
+   #browser()
+   # for (i in seq(2:observations)
+   # {
+   #     if (i == 1)
+   #     {
+   #         beh[is.na(beh[, i]), i] <- modes[1]
+   #     else ##carry missing forward if there
+   #     {
+   #         beh[is.na(beh[, i]), i] <- ifelse(beh[is.na(beh[, i] , i - 1]
+   #             beh[is.na(beh[, i]), i - 1]
+   # }
     struct <- beh[beh %in% c(10,11)]
     beh[struct] <- beh[struct] - 10
     behstruct <- beh
@@ -1503,3 +1141,437 @@ fixUpEffectNames <- function(effects)
     effects
 }
 
+##@initializeFRAN siena07 reformat data and send to C. get targets.
+initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
+                           returnDeps)
+{
+    if (!initC) ## ie first time round
+    {
+        if (!inherits(data,'siena'))
+            stop('not valid siena data object')
+
+        ## check the effects object
+        defaultEffects <- getEffects(data)
+        if (is.null(effects))
+            effects <- defaultEffects
+        else
+        {
+            ## todo check that the effects match the data dependent variables
+            userlist <- apply(effects[effects$include,], 1, function(x)
+                              paste(x[c("name", "effectName",
+                                        "type", "groupName")],
+                                    collapse="|"))
+            deflist <- apply(defaultEffects, 1, function(x)
+                             paste(x[c("name", "effectName",
+                                       "type", "groupName")],
+                                   collapse="|"))
+            if (!all(userlist %in% deflist))
+            {
+                bad <- which(!(userlist %in% deflist))
+                print(userlist[bad])
+                stop("invalid effect requested: see above ")
+            }
+        }
+        if (!inherits(effects, 'data.frame'))
+            stop('effects is not a data.frame')
+        if (x$useStdInits)
+        {
+            if (any(effects$effectName != defaultEffects$effectName))
+            {
+                stop('Cannot use standard initialisation with a ',
+                     'different effect list')
+            }
+            effects$initialValue <- defaultEffects$initialValue
+        }
+        ## find any effects not included which are needed for interactions
+        interactionNos <- unique(c(effects$effect1, effects$effect2,
+                                   effects$effect3))
+        interactionNos <- interactionNos[interactionNos > 0]
+        interactionMainEffects <- effects[interactionNos, ]
+        effects$requested <- effects$include
+        requestedEffects <- effects[effects$include, ]
+
+        effects$include[interactionNos] <- TRUE
+        effects <- effects[effects$include ,]
+
+        ## split and rejoin both versions before continuing
+        if (inherits(data, "sienaGroup"))
+            depvarnames <- names(data[[1]]$depvars)
+        else
+            depvarnames <- names(data$depvars)
+
+        effects1 <- split(requestedEffects, requestedEffects$name)
+        effects1order <- match(depvarnames, names(effects1))
+        requestedEffects <- do.call(rbind, effects1[effects1order])
+        row.names(requestedEffects) <- 1:nrow(requestedEffects)
+
+        effects1 <- split(effects, effects$name)
+        effects1order <- match(depvarnames, names(effects1))
+        effects <- do.call(rbind, effects1[effects1order])
+        row.names(effects) <- 1:nrow(effects)
+
+        ## now set up z provisionally
+        z$theta <- requestedEffects$initialValue
+        z$fixed <- requestedEffects$fix
+        z$test <- requestedEffects$test
+        z$pp <- length(z$test)
+        z$posj <- rep(FALSE,z$pp)
+        z$posj[requestedEffects$basicRate] <- TRUE
+        z$BasicRateFunction <- z$posj
+
+        ## sort out names of user specified interaction effects
+        effects <- fixUpEffectNames(effects)
+        ## copy interaction names to the requested effects
+        requestedEffects$effectName <- effects[effects$requested,
+                                               "effectName"]
+        requestedEffects$functionName <- effects[effects$requested,
+                                                 "functionName"]
+
+        ## get data object into group format to save coping with two
+        ## different formats
+        if (inherits(data, 'sienaGroup'))
+        {
+            nGroup <- length(data)
+        }
+        else
+        {
+            nGroup <- 1
+            data <- sienaGroupCreate(list(data), singleOK=TRUE)
+        }
+        ## if not specified whether conditional or nor, set to conditional
+        ## iff there is only one dependent variable (therefore number 1)
+        ## and not maxlike
+        if (is.na(x$cconditional))
+        {
+            x$cconditional <- !x$maxlike && (length(depvarnames) == 1)
+            if (x$cconditional)
+            {
+                x$condvarno <- 1
+            }
+        }
+        ## not check if conditional estimation is OK and copy to z if so
+        z$cconditional <- FALSE
+        if (x$cconditional)
+        {
+            if (x$maxlike)
+            {
+                stop("Conditional estimation is not possible with",
+                     "maximum likelihood method")
+            }
+            types <- sapply(data[[1]]$depvars, function(x) attr(x, 'type'))
+            nets <- sum(types != "behavior")
+            ##  if (nets == 1) not sure if this is necessary
+            ##  {
+            z$cconditional <- TRUE
+            ## find the conditioning variable
+            observations <- attr(data, 'observations')
+            if (x$condname != '')
+            {
+                z$condvarno <- match(x$condname, attr(data, "netnames"))
+                z$condname <- x$condname
+            }
+            else
+            {
+                z$condvarno <- x$condvarno
+                z$condname <- attr(data, 'netnames')[x$condvarno]
+            }
+            z$condtype <- attr(data, "types")[z$condvarno]
+            if (z$condtype == 'oneMode')
+                z$symmetric  <-  attr(data, "symmetric")[[z$condvarno]]
+            else
+                z$symmetric <- FALSE
+            ## find the positions of basic rate effects for this network
+            z$condvar <-
+                (1:nrow(requestedEffects))[requestedEffects$name==
+                                           z$condname][1:observations]
+            z$theta<- z$theta[-z$condvar]
+            z$fixed<- z$fixed[-z$condvar]
+            z$test<- z$test[-z$condvar]
+            z$pp<- z$pp-length(z$condvar)
+            z$scale<- z$scale[-z$condvar]
+            z$BasicRateFunction <- z$posj[-z$condvar]
+            z$posj <- z$posj[-z$condvar]
+            z$theta[z$posj] <-
+                z$theta[z$posj] / requestedEffects$initialValue[z$condvar]
+        }
+
+        ## unpack data and put onto f anything we may need next time round.
+        f <- lapply(data, function(x) unpackData(x))
+
+        attr(f, "netnames") <- attr(data, "netnames")
+        attr(f, "symmetric") <- attr(data, "symmetric")
+        attr(f, "allUpOnly") <- attr(data, "allUpOnly")
+        attr(f, "allDownOnly") <- attr(data, "allDownOnly")
+        attr(f, "allHigher") <- attr(data, "allHigher")
+        attr(f, "allDisjoint") <- attr(data, "allDisjoint")
+        attr(f, "allAtLeastOne") <- attr(data, "allAtLeastOne")
+        attr(f, "anyUpOnly") <- attr(data, "anyUpOnly")
+        attr(f, "anyDownOnly") <- attr(data, "anyDownOnly")
+        attr(f, "anyHigher") <- attr(data, "anyHigher")
+        attr(f, "anyDisjoint") <- attr(data, "anyDisjoint")
+        attr(f, "anyAtLeastOne") <- attr(data, "anyAtLeastOne")
+        attr(f, "types") <- attr(data, "types")
+        attr(f, "observations") <- attr(data, "observations")
+        attr(f, "compositionChange") <- attr(data, "compositionChange")
+        attr(f, "exooptions") <- attr(data, "exooptions")
+        attr(f, "groupPeriods") <- attr(data, "groupPeriods")
+
+        if (x$maxlike && x$FinDiff.method)
+        {
+            stop("Finite difference method for deriviatives not available",
+                 "with Maximum likelihood method")
+        }
+        ## if any networks symmetric must use finite differences and not maxlike
+        syms <- attr(data,"symmetric")
+        z$FinDiffBecauseSymmetric <- FALSE
+        if (any(!is.na(syms) & syms))
+        {
+            z$FinDiff.method <- TRUE
+            z$FinDiffBecauseSymmetric <- TRUE
+            if (x$maxlike)
+            {
+                stop("Maximum likelihood method not implemented",
+                     "for symmetric networks")
+            }
+        }
+        if (z$cconditional)
+        {
+            attr(f, "change") <-
+                sapply(f, function(xx)attr(xx$depvars[[z$condname]],
+                                           'distance'))
+            attr(f,"condEffects") <- requestedEffects[z$condvar,]
+            effcondvar <-
+                (1:nrow(effects))[effects$name==
+                                  z$condname][1:observations]
+            effects <- effects[-effcondvar, ]
+            requestedEffects <- requestedEffects[-z$condvar,]
+        }
+        ## see if we can use the original dfra
+        if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
+        {
+            if (all(rownames(prevAns$dfra) == requestedEffects$shortName)
+                && !is.null(prevAns$sf))
+            {
+                z$haveDfra <- TRUE
+                z$dfra <- prevAns$dfra
+                z$sf <- prevAns$sf
+                ## use thetas too, unless use standard values
+                if (!x$useStdInits)
+                {
+                    requestedEffects$initialValue <- prevAns$theta
+                    if (!is.null(prevAns$condvar))
+                    {
+                        ## z$condvar has the subscripts of included
+                        ## parameters
+                        ## that correspond to the conditional variable
+                        ## need to scale the other rates again
+                        requestedEffects$initialValue[z$posj] <-
+                            requestedEffects$initialValue[z$posj] /
+                                prevAns$rate
+                    }
+                    z$theta <- requestedEffects$initialValue
+                }
+            }
+        }
+        z$effects <- effects
+        z$requestedEffects <- requestedEffects
+    }
+    else ## initC, i.e just send already set up data into new processes
+    {
+        f <- FRANstore()
+        ## Would like f to be just the data objects plus the attributes
+        ## but need the effects later. Also a few other things,
+        ## which probably could be attributes but are not!
+        ff <- f
+        f$pData <- NULL
+        f$pModel <-  NULL
+        f$myeffects <-  NULL
+        f$observations <-  NULL
+        f$randomseed2 <- NULL
+        f$seeds <- NULL
+        f$returnDeps <- NULL
+        f$depNames <- NULL
+        f$groupNames <- NULL
+        f$nGroup <- NULL
+            f$basicEffects <- NULL
+            f$interactionEffects <- NULL
+    }
+    ##browser()
+    pData <- .Call('setupData', PACKAGE=pkgname,
+                   lapply(f, function(x)(as.integer(x$observations))),
+                   lapply(f, function(x)(x$nodeSets)))
+    ans <- .Call('OneMode', PACKAGE=pkgname,
+                 pData, lapply(f, function(x)x$nets))
+    ans <- .Call('Bipartite', PACKAGE=pkgname,
+                 pData, lapply(f, function(x)x$bipartites))
+    ans <- .Call('Behavior', PACKAGE=pkgname,
+                 pData, lapply(f, function(x)x$behavs))
+    ans <-.Call('ConstantCovariates', PACKAGE=pkgname,
+                pData, lapply(f, function(x)x$cCovars))
+    ans <-.Call('ChangingCovariates', PACKAGE=pkgname,
+                pData, lapply(f, function(x)x$vCovars))
+    ans <-.Call('DyadicCovariates', PACKAGE=pkgname,
+                pData, lapply(f, function(x)x$dycCovars))
+    ans <-.Call('ChangingDyadicCovariates', PACKAGE=pkgname,
+                pData, lapply(f, function(x)x$dyvCovars))
+    ans <-.Call('ExogEvent', PACKAGE=pkgname,
+                pData, lapply(f, function(x)x$exog))
+
+    ## split the names of the constraints
+    higher <- attr(f, "allHigher")
+    disjoint <- attr(f, "allDisjoint")
+    atLeastOne <- attr(f, "allAtLeastOne")
+    froms <- sapply(strsplit(names(higher), ","), function(x)x[1])
+    tos <- sapply(strsplit(names(higher), ","), function(x)x[2])
+    ans <- .Call("Constraints", PACKAGE=pkgname,
+                 pData, froms[higher], tos[higher],
+                 froms[disjoint], tos[disjoint],
+                 froms[atLeastOne], tos[atLeastOne])
+
+    ##store the address
+    f$pData <- pData
+    ## register a finalizer
+    ans <- reg.finalizer(f$pData, clearData, onexit = FALSE)
+
+    if (!initC)
+    {
+        storage.mode(effects$parm) <- 'integer'
+        storage.mode(effects$group) <- 'integer'
+        storage.mode(effects$period) <- 'integer'
+        effects$effectPtr <- NA
+        splitFactor <- factor(effects$name, levels=attr(f, "netnames"))
+        myeffects <- split(effects, splitFactor)
+    ## remove interaction effects and save till later
+            basicEffects <- lapply(myeffects, function(x)
+           {
+               x[!x$shortName %in% c("unspInt", "behUnspInt"), ]
+           }
+               )
+            interactionEffects <- lapply(myeffects, function(x)
+           {
+               x[x$shortName %in% c("unspInt", "behUnspInt"), ]
+           }
+                                 )
+            ## store effects objects as we may need to recreate them
+            f$interactionEffects <- interactionEffects
+            f$basicEffects <- basicEffects
+        }
+        else
+        {
+            myeffects <- ff$myeffects
+            basicEffects <- ff$basicEffects
+            interactionEffects <- ff$interactionEffects
+            returnDeps <- ff$returnDeps
+            nGroup <- ff$nGroup
+        }
+        ans <- .Call('effects', PACKAGE=pkgname,
+                     pData, basicEffects)
+    pModel <- ans[[1]][[1]]
+    ## browser()
+    for (i in 1:length(ans[[2]])) ## ans[[2]] is a list of lists of
+        ## pointers to effects. Each list corresponds to one
+        ## dependent variable
+    {
+        effectPtr <- ans[[2]][[i]]
+        basicEffects[[i]]$effectPtr <- effectPtr
+        interactionEffects[[i]]$effect1 <-
+            basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect1,
+                                              basicEffects[[i]]$effectNumber)]
+        interactionEffects[[i]]$effect2 <-
+            basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect2,
+                                              basicEffects[[i]]$effectNumber)]
+        interactionEffects[[i]]$effect3 <-
+            basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
+                                              basicEffects[[i]]$effectNumber)]
+    }
+    ans <- .Call('interactionEffects', PACKAGE=pkgname,
+                 pData, pModel, interactionEffects)
+    ## copy these pointers to the interaction effects and then rejoin
+    for (i in 1:length(ans[[1]])) ## ans is a list of lists of
+        ## pointers to effects. Each list corresponds to one
+        ## dependent variable
+    {
+        if (nrow(interactionEffects[[i]]) > 0)
+        {
+            effectPtr <- ans[[1]][[i]]
+            interactionEffects[[i]]$effectPtr <- effectPtr
+        }
+        myeffects[[i]] <- rbind(basicEffects[[i]], interactionEffects[[i]])
+    }
+    ## remove the effects only created as underlying effects
+    ## for interaction effects
+    myeffects <- lapply(myeffects, function(x)
+                    {
+                        x[x$requested, ]
+                    }
+                        )
+    if (x$maxlike)
+    {
+        z$targets <- rep(0, z$pp)
+        z$targets2 <- 0
+    }
+    else if (!initC)
+    {
+        ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects)
+        z$targets <- rowSums(ans)
+        z$targets2 <- ans
+    }
+    ##store address of model
+    f$pModel <- pModel
+    ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
+    if (x$MaxDegree == 0 || is.null(x$MaxDegree))
+    {
+        MAXDEGREE <-  NULL
+    }
+    else
+    {
+        MAXDEGREE <- x$MaxDegree
+    }
+    if (z$cconditional)
+    {
+        CONDVAR <- z$condname
+        CONDTARGET <- attr(f, "change")
+        ##   cat(CONDTARGET, '\n')
+    }
+    else
+    {
+        CONDVAR <- NULL
+        CONDTARGET <- NULL
+    }
+    ans <- .Call("setupModelOptions", PACKAGE=pkgname,
+                 pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
+                 profileData, z$parallelTesting)
+    if (x$maxlike)
+    {
+        ## set up chains and do initial steps
+        ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel, TRUE)
+        ##store address of simulation object
+        f$pMLSimulation <- ans[[1]]
+        ans <- reg.finalizer(f$pMLSimulation, clearMLSimulation, onexit = FALSE)
+    }
+    f$myeffects <- myeffects
+    if (!initC)
+    {
+        DataReport(z, x, f)
+        f$randomseed2 <- z$randomseed2
+    }
+    else
+    {
+        f$randomseed2 <- ff$randomseed2
+    }
+    f$observations <- attr(f, "observations") + 1
+    f$returnDeps <- returnDeps
+    f$depNames <- names(f[[1]]$depvars)
+    f$groupNames <- names(f)[1:nGroup]
+    f$nGroup <- nGroup
+    if (!initC)
+    {
+        z$f <- f
+    }
+    if (initC || (z$int == 1 && z$int2 == 1))
+    {
+        f[1:nGroup] <- NULL
+    }
+    FRANstore(f) ## store f in FRANstore
+    z
+}

@@ -34,7 +34,8 @@ class Network;
 class NetworkLongitudinalData : public LongitudinalData
 {
 public:
-	NetworkLongitudinalData(std::string name,
+	NetworkLongitudinalData(int id,
+		std::string name,
 		const ActorSet * pSenders,
 		const ActorSet * pReceivers,
 		int observationCount);

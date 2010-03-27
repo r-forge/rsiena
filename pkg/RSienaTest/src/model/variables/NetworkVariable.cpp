@@ -826,4 +826,55 @@ bool NetworkVariable::validMiniStep(const MiniStep * pMiniStep) const
 	return valid;
 }
 
+
+/**
+ * Generates a random ministep for the given ego.
+ */
+MiniStep * NetworkVariable::randomMiniStep(int ego)
+{
+	this->lego = ego;
+	this->calculateTieFlipProbabilities();
+	int alter = nextIntWithProbabilities(this->m(), this->lprobabilities);
+
+	int difference = 0;
+
+	if (alter != ego)
+	{
+		// The following statement makes sure that a tie is withdrawn
+		// correctly.
+
+		difference = -this->lpNetwork->tieValue(ego, alter);
+
+		// Here we make sure that non-existing ties are properly introduced
+
+		if (difference == 0)
+		{
+			difference = 1;
+		}
+	}
+
+	MiniStep * pMiniStep =
+		new NetworkChange(this->id(), ego, alter, difference);
+	pMiniStep->logChoiceProbability(log(this->lprobabilities[alter]));
+
+	return pMiniStep;
+}
+
+
+/**
+ * Returns if the observed value for the option of the given ministep
+ * is missing at either end of the period.
+ */
+bool NetworkVariable::missing(const MiniStep * pMiniStep) const
+{
+	const NetworkChange * pNetworkChange =
+		dynamic_cast<const NetworkChange *>(pMiniStep);
+	return this->lpData->missing(pNetworkChange->ego(),
+			pNetworkChange->alter(),
+			this->period()) ||
+		this->lpData->missing(pNetworkChange->ego(),
+			pNetworkChange->alter(),
+			this->period() + 1);
+}
+
 }

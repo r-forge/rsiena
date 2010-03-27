@@ -417,7 +417,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                     Report(c(format(netname, width=12),
                              format(c(missings, sum(missings)),
                                     width=10), "      (",
-                             format(round(sum(missings)/
+                             format(round(100 * sum(missings)/
                                           nrow(depvar)/ncol(depvar), 1),
                                     nsmall=1, width=4), ' %)\n'), sep="", outf)
                 }
@@ -477,7 +477,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             {
                 Report(c(format(covars[i], width=15),
                          sum(is.na(x$cCovars[[i]])), "  (",
-                         format(round(sum(is.na(x$cCovars[[i]]))/
+                         format(round(100 * sum(is.na(x$cCovars[[i]]))/
                                       length(x$cCovars[[i]]), 1),
                                 width=3, nsmall=1), '%)\n'), outf)
             }
@@ -562,7 +562,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                     Report(c(format(covars[i], width=10),
                              format(misscols, width=8),
                              format(sum(misscols), width=9), "     (",
-                             format(round(sum(misscols)/nrow(thiscovar)/
+                             format(round(100 * sum(misscols)/nrow(thiscovar)/
                                           ncol(thiscovar), 1), nsmall=1,
                                     width=3), '%)\n'), outf)
                 }
@@ -618,7 +618,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                 diag(myvar) <- 0
                 Report(c(format(covars[i], width=15),
                          sum(is.na(myvar)), "  (",
-                         format(round(sum(is.na(myvar))/
+                         format(round(100 * sum(is.na(myvar))/
                                       (length(myvar) - nrow(myvar)), 1),
                                 width=3, nsmall=1), '%)\n'), outf)
             }
@@ -669,7 +669,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                     Report(c(format(covars[i], width=10),
                              format(missvals, width=8),
                              format(sum(missvals), width=9), "     (",
-                             format(round(sum(missvals)/nrow(thiscovar)/
+                             format(round(100 * sum(missvals)/nrow(thiscovar)/
                                           ncol(thiscovar), 1), nsmall=1,
                                     width=3), '%)\n'), outf)
                 }

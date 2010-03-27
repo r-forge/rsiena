@@ -25,12 +25,15 @@ namespace siena
  * Constructs a data object for storing the observed values of a behavioral
  * variable for the given set of actors at the given number of observations.
  * Initially, all values are set to 0.
+ * @param[in] id the ID that is unique among all longitudinal data object
+ * of the parent Data instance
  * @param[in] name the name of the corresponding behavior variable
  */
-BehaviorLongitudinalData::BehaviorLongitudinalData(std::string name,
+BehaviorLongitudinalData::BehaviorLongitudinalData(int id,
+	std::string name,
 	const ActorSet * pActorSet,
 	int observationCount) :
-		LongitudinalData(name, pActorSet, observationCount)
+		LongitudinalData(id, name, pActorSet, observationCount)
 {
 	this->lvalues = new int * [observationCount];
 	this->lmissing = new bool * [observationCount];

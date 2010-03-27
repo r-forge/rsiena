@@ -125,6 +125,8 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
         stopCluster(z$cl)
 
     class(z) <- "sienaFit"
+    z$tkvars <- NULL
+    z$pb <- NULL
     z
 }
 ##@InitReports siena07 Print report
