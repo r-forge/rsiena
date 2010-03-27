@@ -527,7 +527,8 @@ FiniteDifferences <- function(z, x, fra, ...)
     {
         for (ii in 1: min(10 - z$nit + 1, int))
         {
-            z$npos <- z$npos + ifelse(abs(diag(fras[ii, , ])) > 1e-6, 1, 0)
+            z$npos <- z$npos +
+                ifelse(abs(diag(matrix(fras[ii, , ], nrow=z$pp))) > 1e-6, 1, 0)
         }
     }
     sdf <- fras
