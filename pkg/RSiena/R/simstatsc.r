@@ -804,15 +804,31 @@ unpackBehavior<- function(depvar, observations)
 {
     beh <- depvar[, 1, ]
     behmiss <- is.na(beh)
+    origbeh <- beh
+    allna <- apply(beh, 1, function(x)all(is.na(x)))
+    modes <- attr(depvar, "modes")
     ## carry forward missings ### nb otherwise use the mode
-    for (i in 1:observations)
+    ## allNAs: use modes
+    beh[allna, ] <- rep(modes, each=sum(allna))
+    for (i in 2:observations)
     {
-        if (i == 1)
-            beh[is.na(beh[, i]), i] <- 0
-        else ##carry missing forward!
-            beh[is.na(beh[, i]), i] <-
-                beh[is.na(beh[, i]), i - 1]
+            beh[is.na(beh[, i]), i] <-  beh[is.na(beh[, i]), i - 1]
     }
+    for (i in (observations-1):1)
+    {
+            beh[is.na(beh[, i]), i] <-  beh[is.na(beh[, i]), i +1]
+    }
+   #browser()
+   # for (i in seq(2:observations)
+   # {
+   #     if (i == 1)
+   #     {
+   #         beh[is.na(beh[, i]), i] <- modes[1]
+   #     else ##carry missing forward if there
+   #     {
+   #         beh[is.na(beh[, i]), i] <- ifelse(beh[is.na(beh[, i] , i - 1]
+   #             beh[is.na(beh[, i]), i - 1]
+   # }
     struct <- beh[beh %in% c(10,11)]
     beh[struct] <- beh[struct] - 10
     behstruct <- beh
@@ -1277,7 +1293,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             z$posj <- z$posj[-z$condvar]
             z$theta[z$posj] <-
                 z$theta[z$posj] / requestedEffects$initialValue[z$condvar]
-            z$ntim <- matrix(NA, nrow=x$n3, ncol=observations)
         }
 
         ## unpack data and put onto f anything we may need next time round.

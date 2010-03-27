@@ -1,3 +1,12 @@
+2010-03-27 R-forge revision 70 (RSiena only)
+
+	* R/simstatsc.r, R/phase3.r: move definition of ntim to phase3
+	* R/simstatsc.r (unpackBehavior) carry forward and back or use
+	mode for missings
+	* R/siena07.r: remove tk variables from return object
+	* R/phase1.r (FiniteDifferences) ensure z$npos update is always a
+	vector (a dimension could be lost).
+
 2010-03-24 R-forge revision 69 (RSiena only) (cf revision 63, 67 for RSienaTest)
 
 	* src/many: mostly incomplete, changes for ML.
