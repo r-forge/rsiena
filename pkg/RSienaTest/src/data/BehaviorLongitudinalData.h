@@ -23,7 +23,8 @@ namespace siena
 class BehaviorLongitudinalData : public LongitudinalData
 {
 public:
-	BehaviorLongitudinalData(std::string name,
+	BehaviorLongitudinalData(int id,
+		std::string name,
 		const ActorSet * pActorSet,
 		int observationCount);
 	virtual ~BehaviorLongitudinalData();

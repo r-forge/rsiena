@@ -253,7 +253,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new CovariateIndirectTiesEffect(pEffectInfo);
 	}
-	else if (effectName == "4-cycles")
+	else if (effectName == "cycle4")
 	{
 		pEffect = new FourCyclesEffect(pEffectInfo);
 	}

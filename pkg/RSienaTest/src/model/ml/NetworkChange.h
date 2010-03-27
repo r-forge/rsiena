@@ -22,9 +22,9 @@ namespace siena
 class NetworkChange: public MiniStep
 {
 public:
-	NetworkChange(int ego,
+	NetworkChange(int variableId,
+		int ego,
 		int alter,
-		string variableName,
 		int difference);
 	virtual ~NetworkChange();
 

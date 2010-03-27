@@ -77,8 +77,8 @@ protected:
     DependentVariable * chooseVariable() const;
     int chooseActor(const DependentVariable * pVariable) const;
 
-    // The dependent variable for look-ups by name
-    map<string, DependentVariable *> lvariableMap;
+    // A vector of dependent variables with their current values
+    vector<DependentVariable *> lvariables;
 
 private:
     void runStep();
@@ -102,8 +102,8 @@ private:
     // Stores the wrappers of each original actor set
     map<const ActorSet *, SimulationActorSet *> lactorSetMap;
 
-    // A vector of dependent variables with their current values
-    vector<DependentVariable *> lvariables;
+    // The dependent variable for look-ups by variable names
+    map<string, DependentVariable *> lvariableMap;
 
     // The current period to be simulated
     int lperiod;

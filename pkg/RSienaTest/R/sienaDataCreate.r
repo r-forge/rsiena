@@ -837,7 +837,6 @@ checkConstraints <- function(z)
                     var1[var1 %in% c(10, 11)] <- var1[var1 %in% c(10, 11)] - 10
                     var2[var2 %in% c(10, 11)] <- var2[var2 %in% c(10, 11)] - 10
                     ## higher
-                    browser()
                     if (any(var1 - var2 < 0, na.rm=TRUE))
                     {
                         higher[i] <- FALSE

@@ -12,6 +12,8 @@
 #define CHAIN_H_
 
 #include <vector>
+#include <map>
+#include "model/ml/Option.h"
 
 using namespace std;
 
@@ -41,12 +43,16 @@ public:
 	Chain(Data * pData);
 	virtual ~Chain();
 
+	// Chain modifications
+
 	void clear();
 	void insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep);
 	void remove(MiniStep * pMiniStep);
 	void connect(int period);
 
 	void onReciprocalRateChange(const MiniStep * pMiniStep, double newValue);
+
+	// Accessors
 
 	int period() const;
 	MiniStep * pFirst() const;
@@ -56,12 +62,26 @@ public:
 	double mu() const;
 	double sigma2() const;
 
+	// Intervals
+
+	int intervalLength(const MiniStep * pFirstMiniStep,
+		const MiniStep * pLastMiniStep) const;
+
+	// Same option related
+
+	MiniStep * nextMiniStepForOption(Option & rOption,
+		const MiniStep * pFirstMiniStep) const;
+
 	// Random draws
 
 	MiniStep * randomMiniStep() const;
 	MiniStep * randomDiagonalMiniStep() const;
+	MiniStep * randomMiniStep(MiniStep * pFirstMiniStep,
+		MiniStep * pLastMiniStep) const;
 
 private:
+	void resetOrderingKeys();
+
 	// A dummy first ministep in the chain
 	MiniStep * lpFirst;
 
@@ -87,6 +107,9 @@ private:
 
 	// Sum of squared reciprocal rates over all non-dummy ministeps.
 	double lsigma2;
+
+	// Maps each option to its first ministep in the chain (if any)
+	map<Option, MiniStep *> lfirstMiniStepPerOption;
 };
 
 }

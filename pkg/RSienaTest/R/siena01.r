@@ -564,22 +564,28 @@ siena01Gui <- function(getDocumentation=FALSE)
             {
                 tkmessageBox(message=resp, icon="error")
             }
-            else ## update the thetas to use next time
+            else ## update the thetas to use next time, if run not interrupted
             {
                 estimAns <<- resp
                 if (estimAns$cconditional)
                 {
                     ## z$condvar has the subscripts of included parameters that
                     ## correspond to the conditional variable
-                    use <- which(myeff$include)
-                    initValues <- rep(0, length(use))
-                    initValues[estimAns$condvar] <- estimAns$rate
-                    initValues[-estimAns$condvar] <- estimAns$theta
-                    myeff$initialValue[myeff$include] <<- initValues
+                    if (!is.null(estimAns$rate))
+                    {
+                        use <- which(myeff$include)
+                        initValues <- rep(0, length(use))
+                        initValues[estimAns$condvar] <- estimAns$rate
+                        initValues[-estimAns$condvar] <- estimAns$theta
+                        myeff$initialValue[myeff$include] <<- initValues
+                    }
                 }
                 else
                 {
-                    myeff$initialValue[myeff$include] <<- estimAns$theta
+                    if (!estimAns$termination == "UserInterrupt")
+                    {
+                        myeff$initialValue[myeff$include] <<- estimAns$theta
+                    }
                 }
                 wasopen <- FALSE
                 if (resultsOpen)

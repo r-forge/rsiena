@@ -678,7 +678,9 @@ mhstep <- function(theta, f, promul, prelins)
         #browser()
         list(chain=chain,accept=accept,numm=numm)
     }##end of procedure
-    ## browser() ##start of mhstep
+    #########################################################################
+    ##start of mhstep
+    #########################################################################
     #cat('start', f$numm,'\n')
    ## print(table(f$chain))
     startmat<- f$startmat

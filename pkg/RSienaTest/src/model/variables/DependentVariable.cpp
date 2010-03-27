@@ -305,6 +305,16 @@ int DependentVariable::n() const
 
 
 /**
+ * Returns the ID of this dependent variable, which is the same as the ID
+ * of the underlying observed data object.
+ */
+int DependentVariable::id() const
+{
+	return this->pData()->id();
+}
+
+
+/**
  * Stores the distance of this variable to the observed data at the
  * beginning of the current period.
  */

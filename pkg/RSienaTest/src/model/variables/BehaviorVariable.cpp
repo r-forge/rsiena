@@ -23,6 +23,7 @@
 #include "model/EffectInfo.h"
 #include "model/SimulationActorSet.h"
 #include "model/ml/MiniStep.h"
+#include "model/ml/BehaviorChange.h"
 
 namespace siena
 {
@@ -483,6 +484,31 @@ bool BehaviorVariable::validMiniStep(const MiniStep * pMiniStep) const
 	}
 
 	return valid;
+}
+
+
+/**
+ * Generates a random ministep for the given ego.
+ */
+MiniStep * BehaviorVariable::randomMiniStep(int ego)
+{
+	this->calculateProbabilities(ego);
+	int difference = nextIntWithProbabilities(3, this->lprobabilities) - 1;
+	BehaviorChange * pMiniStep =
+		new BehaviorChange(this->lpData->id(), ego, difference);
+	pMiniStep->logChoiceProbability(log(this->lprobabilities[difference + 1]));
+	return pMiniStep;
+}
+
+
+/**
+ * Returns if the observed value for the option of the given ministep
+ * is missing at either end of the period.
+ */
+bool BehaviorVariable::missing(const MiniStep * pMiniStep) const
+{
+	return this->lpData->missing(this->period(), pMiniStep->ego()) ||
+		this->lpData->missing(this->period() + 1, pMiniStep->ego());
 }
 
 }

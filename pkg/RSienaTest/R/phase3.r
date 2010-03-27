@@ -43,6 +43,10 @@ phase3 <- function(z, x, ...)
     z$sf2 <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
     z$ssc <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
     z$sdf <- array(0, dim = c(z$n3, z$pp, z$pp))
+    if (z$cconditional)
+    {
+        z$ntim <- matrix(NA, nrow=z$n3, ncol=f$observations - 1)
+    }
     z$sims <- vector("list", z$n3)
     ## revert to original requested method for phase 3 unless symmetric
     if (z$FinDiff.method && !x$FinDiff.method &&

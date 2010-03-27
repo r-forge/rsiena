@@ -29,12 +29,14 @@ public:
     	MiniStep * pFirstMiniStep,
     	MiniStep * pLastMiniStep);
     void executeMiniSteps(MiniStep * pFirstMiniStep, MiniStep * pLastMiniStep);
+	void burnin();
 
     // Metropolis-Hastings steps
 
 	bool insertDiagonalMiniStep();
 	bool cancelDiagonalMiniStep();
 	bool permute(int c0);
+	bool insertPermute(int c0);
 	double proposalProbability() const;
 
 	void simpleRates(bool flag);

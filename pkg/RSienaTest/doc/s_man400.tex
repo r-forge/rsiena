@@ -853,6 +853,14 @@ which one may use to get started with \rs.
 
         friend.data.w1[friend.data.w1 %in% c(6,9)] <- NA
 
+# to select a subset of the data based on an actor variable, say,
+# (the possibilities are endless, but hopefully this will serve as a pattern)
+#
+        use <- drink[, 1] %in% c(2, 3)
+        friend1.data.w1 <- friend.data.w1[use, use]
+        friend1.data.w2 <- friend.data.w2[use, use]
+        drink1 <- drink[use, ]
+
 ####################FROM VECTORS AND MATRICES TO SIENA OBJECTS##################
 
 # A number of objects need to be created in R, as preparations to letting Siena07
@@ -6805,7 +6813,21 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
-\item 2010-02-12 R-forge revision 58 (RSienaTest only) Fix to bugs in printing
+\item 2010-03-16 R-forge revision 63 (RSienaTest only)
+\begin{itemize}
+\item new functions \sfn{siena08} and \sfn{iwlsm}, for meta analysis
+\item can now use different processors for each wave. Not recommended: usually
+  slower than by iteration, but will be useful with ML routines when they are
+  completed.
+\item No longer crashes with missing dyadic covariates.
+\end{itemize}
+\item 2010-02-27 R-forge revision 61 (RSiena only) bug fix: random numbers used
+  with multiple processes were the same in each run. Now seed is generated
+  from the usual \R random number seed. Also fixed a display bug if running
+  phase 3 with few iterations.
+\item 2010-02-16 R-forge revision 60 (RSienaTest only) added average indegrees
+  to reports. Also constraints.
+\item 2010-02-12 R-forge revision 59 (RSienaTest only) Fix to bugs in printing
   version numbers and in using multiple processors (would revert to RSiena
   package.) Added a skeleton MCMC routine.
 \item 2010-02-11 R-forge revision 57 Fix to bug in siena01Gui where in
@@ -6867,8 +6889,8 @@ Fix to bug in sorting effects for multiple dependent variables.
 
 \item 2010-01-02 R-forge revision 34
 
-Corrected layout of print and xtable for SienaFit objects with both behavior and
-network variables.
+  Corrected layout of \sfn{print} and \sfn{xtable} for \sfn{SienaFit} objects
+  with both behavior and network variables.
 
 \item 2010-01-01 R-forge revision 33
 
