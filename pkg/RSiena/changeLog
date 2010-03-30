@@ -1,3 +1,29 @@
+2010-03-27 R-forge revision 71 (RSienaTest only) (cf revision 68, 69, 70 for RSiena)
+
+	* data/allEffects.csv, src/model/effects/EffectFactory.cpp:
+	renamed 4-cycle shortname to cycle4. Needs to be a permissible R
+	name.
+	* DESCRIPTION, man/RSiena-package.Rd: new version number 1.0.12
+	* NAMESPACE: removed addAttributes.default as does not exist
+	* R/maxlike.r, phase2.r: altered comments
+	* R/phase1.r (FiniteDifferences) ensure z$npos update is always a
+	vector (a dimension could be lost).
+	* R/simstatsc.r, R/phase3.r: move definition of ntim to phase3
+	* R/print01Report.r: some percentages had not been multiplied by 100.
+	* R/printInitialDescription.r: another fix re crashing with one mode and
+	bipartite networks together.
+	* R/siena01.r: fix to carrying forward theta if abnormal termination
+	* R/siena07.r: remove tk variables from return object
+	* R/sienaDataCreateFromSession.r: fix to allow more than one
+	value indicating missing for covariates etc.
+	* R/sienaDataCreateFromSession.r: allow periods to be numbered
+	other than from 1 in siena net input.
+	* R/simstatsc.r: sped up carry forward for NA arcs in sparse
+	input. Also new function to initialise. Some changes relevant for ML.
+	* R/simstatsc.r (unpackBehavior) carry forward and back or use
+	mode for missings
+	* src/many changes for ML
+
 2010-03-27 R-forge revision 70 (RSiena only)
 
 	* R/simstatsc.r, R/phase3.r: move definition of ntim to phase3
