@@ -5,7 +5,11 @@
 %Required files: pdfscreen.sty, pdfscreen.cfg, ilcampo_bg.jpg, ilcampo.jpg
 %\usepackage{times}
 \usepackage{natbib}
+\usepackage{rotating}
+\usepackage{longtable, lscape}
+\usepackage{threeparttablex}
 \usepackage{amsmath}
+ \usepackage[top=2.5cm, bottom=2.5cm, left=2cm , right=1.8cm]{geometry}
 %\usepackage[bookmarksopen=false]{hyperref}
 % in the newer version of pdfscreen, hyperref can be loaded first with its own parameters
 \usepackage[pdftex,dvipsnames]{color}
@@ -20,12 +24,12 @@
 
 
 \usepackage{pictexwd}
-\usepackage{supertabular}
-\usepackage{tabls}
+%\usepackage{supertabular}
+%\usepackage{tabls}
 \usepackage{enumitem}
 
 
-
+\setlength{\bibsep}{0.01in}
 \begin{screen}
  \margins{.65in}{.65in}{.65in}{.65in}
  \screensize{6.25in}{8in}
@@ -50,6 +54,8 @@
 %\renewcommand\textfraction{0}
 %\def\pdfscreen{\texttt{\small\color{section1}pdfscreen}\xspace}
 
+%\def\bibsection{\section{\refname}}
+\renewcommand\bibsection{\section{\refname}}
 
 \newcommand{\opmerking}[1]{\par \fbox{\Large #1} \par}
 %\newcommand{\opmerking}[1]{}
@@ -94,7 +100,7 @@
 \newcommand{\ga}[1]{$\gamma_{#1}$}
 \newcommand{\beq}{\begin{equation}}
 \newcommand{\eeq}{\end{equation}}
-\renewcommand{\bibitem}[1]{\bigskip \par \noindent \hspace{-4pt}}
+%\renewcommand{\bibitem}[1]{\bigskip \par \noindent \hspace{-4pt}}
 \makeatletter
 \newenvironment{indentation}[2]
 {\par \setlength{\leftmargin}{#1}       \setlength{\rightmargin}{#2}
@@ -102,7 +108,7 @@
   \advance\@totalleftmargin\leftmargin  \@setpar{{\@@par}}%
   \parshape 1 \@totalleftmargin         \linewidth \ignorespaces}{\par}
 \makeatother
-\renewcommand{\bibitem}[1]{\par \noindent \hskip-\parindent}
+%\renewcommand{\bibitem}[1]{\par \noindent \hskip-\parindent}
 
 \newcommand{\separationb}{\\[0.5ex]\hline\rule{0pt}{2ex}}
 
@@ -172,8 +178,8 @@
 \noindent \SI (for {\sf Simulation Investigation for Empirical
 Network Analysis}) is a computer program that carries out the
 statistical estimation of models for the evolution of social
-networks according to the dynamic actor-oriented model of Snijders
-(2001, 2005) and Snijders, Steglich, and Schweinberger (2007).
+networks according to the dynamic actor-oriented model of \citet{Snijders01,
+Snijders05} and \citet{SnijdersEA07}.
 This is the manual for \SI version 4, which is a contributed package to
 the statistical system \Rn.
 The manual is based on the earlier manual for \SI version 3,
@@ -213,28 +219,26 @@ Mark Huisman, Michael Schweinberger, and Christian Steglich.
 \footnote{This program was first presented at the
 International Conference for Computer Simulation and the Social
 Sciences, Cortona (Italy), September 1997, which originally was
-scheduled to be held in Siena. See Snijders \& van Duijn (1997).}
+scheduled to be held in Siena. See \citet{SnijdersDuijn97}.}
 \end{print}
 \begin{screen}
 \footnote{This program was first presented
 at the International Conference for Computer Simulation and the
 Social Sciences, Cortona (Italy), September 1997, which originally
-was scheduled to be held in Siena. See Snijders \& van Duijn (1997).
+was scheduled to be held in Siena. See \citet{SnijdersDuijn97} .
 The background picture in this manual is the Palazzo Pubblico with
 the Torre del Mangia in Siena.}
 \end{screen}
 $\!\!\!$, shorthand for {\sf Simulation Investigation for Empirical
 Network Analysis}, is a computer program that carries out the
 statistical estimation of models for repeated measures of social
-networks according to the dynamic actor-oriented model of Snijders
-and van Duijn (1997), Snijders (2001), and
-Snijders, Steglich, and Schweinberger (2007); also see
-Steglich, Snijders, and Pearson (2010).
-A tutorial for these models is in Snijders, van de Bunt, and Steglich (2010).
+networks according to the dynamic actor-oriented model of \citet{SnijdersDuijn97}, \citet{Snijders01}, and
+\citet*{SnijdersEA07}; also see
+\citet*{SteglichEA10}.
+A tutorial for these models is in \citet*{SnijdersEA10b}.
 Some examples are
-presented, e.g., in van de Bunt (1999); van de Bunt, van Duijn, and
-Snijders (1999); and van Duijn, Zeggelink, Stokman, and Wasseur (2003);
-and Steglich, Snijders, and West (2006).
+presented, e.g., in \citet*{vanBunt99, vanBuntEA99} and \citet*{vanDuijnEA03};
+and \citet*{SteglichEA06}.
 
 A website for \SI is maintained at \url{http://www.stats.ox.ac.uk/~snijders/siena/}~.
 At this website
@@ -492,7 +496,7 @@ When you are done, quit \R in the polite way:\\
 window.)
 
 \subsection{Entering Data.}
-
+\label{thegui}
 There are two ways to enter the data.
 \begin{enumerate}
 \item Enter each of your data files using \sfn{Add}.\\
@@ -507,7 +511,7 @@ There are two ways to enter the data.
       by the \sfn{ siena01Gui()} when you request
       \sfn{Save to file}.
 \item If you wish to remove files, use the \sfn{Remove} option rather than
-  blanking out the entries. 
+  blanking out the entries.
 \end{enumerate}
 Once you have done this, check that the \sfn{Format},
 \sfn{Period}, \sfn{Type}, etc., are correct, and enter any
@@ -526,6 +530,7 @@ The details of this screen are explained in Section~\ref{S_de_screen}.
 
 
 \subsection{Running the Estimation Program}
+\label{estgui}
 \begin{enumerate}
 \item Click \sfn{Apply}: you will be prompted to save your work. Then you should
   see the \sfn{Model Options} screen shown in \hyperlink{options}{Figure
@@ -607,9 +612,9 @@ The details of this screen are explained in Section~\ref{S_de_screen}.
 \item[\sfn{changing dyadic covariate}]
 \item[\sfn{exogenous event}] (for changing composition of the actor set)
 \end{description}
-\item[\sfn{Selected}] Yes or No. Files with \sfn{Yes} \emph{or blank} will be 
+\item[\sfn{Selected}] Yes or No. Files with \sfn{Yes} \emph{or blank} will be
 included in the model. Use this field to remove any networks or behavior
-variables that are not required in the model. 
+variables that are not required in the model.
 \item[\sfn{Missing Values}] Enter any values which indicate missingness, with
   spaces between different entries.
 \item[\sfn{Nonzero Codes}] Enter any values which indicate ties, with spaces
@@ -649,7 +654,7 @@ An exogenous events file can be given, indicating change of composition of the
 network in the sense that some actors are not part of the network during
 all the observations.
 This will trigger treatment of such change of composition
-according to Huisman and Snijders (2003).
+according to \citet{HuismanSnijders03}.
 This file must have one row for each node.
 Each row should be
 consist of a set of pairs of numbers which indicate the periods
@@ -1337,17 +1342,16 @@ Oxford: University of Oxford, Department of Statistics; Nuffield College.
 
 \smallskip
 
-A basic reference for the network dynamics model is Snijders (2001)
-or Snijders (2005).
+A basic reference for the network dynamics model is \citet{Snijders01}
+or \citet{Snijders05}.
 Basic references for the model of network-behavior co-evolution
-are Snijders, Steglich, and Schweinberger (2007)
-and Steglich, Snijders, and Pearson (2010).
+are \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
 
-More specific references are Schweinberger (2005) for the score-type goodness of
-fit tests and Schweinberger and Snijders (2007) for the calculation of standard
-errors of the Method of Moments estimators .
+More specific references are \citet{Schweinberger10} for the score-type goodness
+of fit tests and \citet{SchweinbergerSnijders07a} for the calculation of
+standard errors of the Method of Moments estimators .
 
-A tutorial is Snijders, van de Bunt, and Steglich (2010).
+A tutorial is \citet*{SnijdersEA10b}.
 
 
 \subsection{Getting help with problems}
@@ -1784,8 +1788,7 @@ interactions between covariates; see Section~\ref{S_int_eff}.
 \SI also allows dependent action variables,
 also called dependent behavior variables. This can be used in studies
 of the co-evolution of networks and behavior, as described
-in Snijders, Steglich, and Schweinberger (2007) and Steglich, Snijders,
-and Pearson (2010).
+in \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
 These action variables represent the actors' behavior, attitudes, beliefs, etc.
 The difference between dependent action variables and changing actor
 covariates is that the latter change exogenously, i.e., according
@@ -1832,7 +1835,7 @@ one may expect problems in getting good estimates.
 In the current implementation of \si, missing data are treated in
 a simple way, trying to minimize their influence on the estimation
 results.
-This method is further explained in Huisman and Steglich (2008),
+This method is further explained in \citet{HuismanSteglich08},
 where comparisons are also made with other ways of dealings with the missing
 information.
 
@@ -1856,7 +1859,7 @@ In the further observations, for any variable,
 if there is an earlier observed value of this variable then
 the last observed value is used to impute the current
 value (the `last observation carry forward' option,
-cf.\ Lepkowski, 1989); if there is no earlier observed
+cf.\ \citet{Lepkowski89}; if there is no earlier observed
 value, the value 0 is imputed.
 For the dependent behavior variables the same principle
 is used: if there is a previous observation of the same variable
@@ -1889,8 +1892,8 @@ period for being counted in the respective target statistics.
 \SI can also be used to analyze networks of which the composition
 changes over time, because actors join or leave the network
 between the observations.
-This can be done in two ways: using the method of Huisman and Snijders
-(2003), or using structural zeros.
+This can be done in two ways: using the method of \citet{HuismanSnijders03},
+or using structural zeros.
 (For the maximum likelihood estimation option, the Huisman-Snijders method
 is not implemented, and only the structural zeros method can be used.)
 Structural zeros can specified for all elements of the tie variables
@@ -1990,8 +1993,7 @@ the evolution of each dependent variable (network or behavior).
 % the file \textsf{{\em pname}.eff}.
 
 For the longitudinal case, three types of
-effects are distinguished (see Snijders, 2001; Snijders,
-van de Bunt, and Steglich, 2010):
+effects are distinguished \citep*[see][]{Snijders01, SnijdersEA10b}:
 
 \begin{itemize}
 \item {\em rate function effects}\\
@@ -2012,8 +2014,7 @@ or on the out-degree.)
 %See XXXXXXX.
 \item {\em evaluation function effects}\\
 The evaluation function\footnote{The evaluation function was called
-\emph{objective function} in Snijders,
-2001.} models the network actors' satisfaction with their local
+\emph{objective function} in \citet{Snijders01}} models the network actors' satisfaction with their local
 network neighborhood configuration. It is assumed that actors
 change their scores on the dependent variable such that they
 improve their total satisfaction -- with a random element
@@ -2036,7 +2037,7 @@ prevalence of the behavior, and
 to account more precisely for the distribution of the behavior.
 \item {\em endowment function effects}\\
 The endowment function\footnote{The endowment function is similar to the {\it gratification
-function} in Snijders, 2001.} is an extension of the evaluation
+function} in \citet{Snijders01}} is an extension of the evaluation
 function that allows to distinguish between new and old network
 ties (when evaluating possible network changes) and between
 increasing or decreasing behavioral scores (when evaluating
@@ -2273,7 +2274,7 @@ in Section~\ref{S_math}. Here we give a more qualitative description.
 
 \item \begin{minipage}[t]{.6\textwidth}
       Transitivity in two-mode networks is expressed in the first
-      place by the number of \emph{four-cycles} (Robins and Alexander, 2005).
+      place by the number of \emph{four-cycles} \citep{RobinsAlexander04}.
       This reflects the extent to which actors who make one choice in common
       also make other choices in common.
       \vfill
@@ -2575,7 +2576,7 @@ If $X$ and $W$ both are one-mode networks, the \emph{closure of W} effect
 For models with one or more dependent behavior variables, i.e.,
 models for the co-evolution of networks and behavior,
 the most important effects for the behavior dynamics are the following;
-see Steglich, Snijders, and Pearson (2010).
+see \citet*{SteglichEA10}.
 In these descriptions, with the `alters' of an actor
 we refer to the other actors to whom
 the focal actor has an outgoing tie.
@@ -2680,9 +2681,9 @@ These are currently not implemented in \SI 4.
 
 \iffalse
 For directed networks, the Model Type distinguishes between
-the model of Snijders (2001) (Model Type 1), that of Snijders
-(2003) (Model Type 2),
-and the tie-based model described in Snijders (2006) (Model Type 3).
+the model of \citet{Snijders01} (Model Type 1), 
+that of \citet{Snijders03} (Model Type 2),
+and the tie-based model described in \citet{Snijders06} (Model Type 3).
 Model Type 1 is the default model and is
 described in the basic publications on Stochastic Actor-Oriented
 Models for network dynamics.
@@ -2710,8 +2711,7 @@ outdegree distribution is governed by parameters that are not
 connected to the parameters for the structural dynamics. The use of
 such an approach in statistical modeling minimizes the influence of
 the observed degrees on the conclusions about the structural aspects
-of the network dynamics. This is further explained in Snijders
-(2003).
+of the network dynamics. This is further explained in \citet{Snijders03}.
 
 For Model Type 2, in the rate function, effects connected to these
 functions $\xi$ and $\nu$ are included. On the other hand, effects
@@ -2725,7 +2725,7 @@ simulated out-degrees). For Model Type 2 this comparison is always
 given. For Model Type 1, this comparison is given by adding 10 to the
 Model Code in the advanced options. (For \LaTeX\ users: the log
 file contains code that can be used to make a graph of the type
-given in Snijders, 2003).
+given in \citet{Snijders03}.
 
 For using Model Type 2, it is advised to first estimate some model
 according to Model Type 1 (this may be a simple model containing a
@@ -2749,7 +2749,7 @@ included:
 \item the factorial out-degree effect
 \item the logarithmic out-degree effect.
 \end{enumerate}
-These are the effects defined in formula (18) of Snijders (2003b)
+These are the effects defined in formula (18) of \citet{Snijders03}
 and indicated with the parameters $\alpha_1$, $\alpha_2$,
 and $\alpha_3$, respectively.
 The user has to see from the estimation results which, or which two,
@@ -2761,8 +2761,8 @@ should be included to yield a good fit for the out-degrees.
 
 \iffalse
 In addition these types, there is
-Model Type 6 which implements the reciprocity model of Wasserman (1979)
-and Leenders (1995) (also see Snijders, 1999, 2005) ---
+Model Type 6 which implements the reciprocity model of \citet{Wasserman79}
+and \citet{Leenders95}  \citep[also see][]{Snijders99, Snijders05} ---
 provided that no other effects are chosen than
 the outdegree effect, the reciprocity effect and perhaps
 the reciprocity endowment effect,
@@ -2785,13 +2785,13 @@ coefficients are zero (see Section~\ref{S_gof}).
 \label{S_modeltype_nd}
 
 Non-directed networks are an undocumented option (there currently
-only is the presentation Snijders 2007), and therefore
+only is the presentation \citet{Snijders07}, and therefore
 mentioned here reluctantly for those users who want to use
 this option anyway.
 
 \SI detects automatically when the networks all are non-directed, and then employs a model for this
 special case. For non-directed networks, the Model Type has seven possible values,
-as described in Snijders (2007).
+as described in \citet{Snijders07}.
 
 \begin{enumerate}
 \item Forcing model: \\
@@ -3280,7 +3280,7 @@ If all relevant actor heterogeneity is observed in the form of actor covariates,
 then actor heterogeneity can be taken into account by including covariates in the model.
 If not all relevant actor heterogeneity is observed,
 then more complex models are required, such as random effects models.
-Random effects models (see Schweinberger and Snijders, 2007a) allow to take
+Random effects models \citep[see][]{SchweinbergerSnijders07b} allow to take
 unobserved actor heterogeneity into account
 by assuming that the network (and behavior) evolution is affected by unobserved
 outcomes of actor-dependent random variables (random effects),
@@ -3331,11 +3331,10 @@ during the model specification part, using a stochastic
 approximation algorithm.
 %Three estimation procedures are implemented:
 Only one estimation procedure is currently implemented:
-the Method of Moments (MoM) (Snijders, 2001; Snijders, Steglich,
-and Schweinberger, 2007);
-% the Method of Maximum Likelihood (ML) (Snijders, Koskinen and Schweinberger, 2007);
-% and a Bayesian method (Koskinen, 2005; Koskinen and Snijders, 2007;
-% Schweinberger and Snijders, 2007).
+the Method of Moments (MoM) \citep*{Snijders01, SnijdersEA07};
+% the Method of Maximum Likelihood (ML) \citep{SnijdersEA10};
+% and a Bayesian method \citep{Koskinen04, KoskinenSnijders07,
+% SchweinbergerSnijders07c).
 % For non-constant rate functions, currently only
 % MoM estimation is available.
 % The Method of Moments is the default;
@@ -3396,8 +3395,9 @@ current initial values.
 \subsection{\label{algorithm}Algorithm} %MS
 
 The estimation algorithm
-is an implementation of the Robbins-Monro (1951) algorithm,
-described in Snijders (2001, 2002), and
+is an implementation of the Robbins-Monro \citeyearpar{RobbinsMonro51}
+ algorithm,
+described in \citet{Snijders01, Snijders02}, and
 has %for both the MoM and ML method
 three phases:
 \begin{enumerate}
@@ -3485,8 +3485,8 @@ is convenient to have a look at the {\tt @1} marks first.
 
 The primary information in the output of the estimation process
 consists of the following three parts. Results are presented here
-which correspond to Table 2, column ``$t_1$, $t_3$" of Snijders
-(2001). The results were obtained in an independent repetition of
+which correspond to Table 2, column ``$t_1$, $t_3$" of \citet{Snijders01}. 
+The results were obtained in an independent repetition of
 the estimation for this data set and this model specification;
 since the repetition was independent, the results are slightly
 different, illustrating the stochastic nature of the estimation
@@ -3723,13 +3723,12 @@ are as strong as .9.
 \label{S_Bayes}
 
 \SI can estimate models by three estimation methods: the (unconditional or conditional)
-Method of Moments (`MoM', the default; Snijders, 2001; Snijders, Steglich, and Schweinberger 2007),
-the Maximum Likelihood method (`ML', see Snijders, Koskinen, and Schweinberger, 2010),
-and Bayesian methods (see
-Koskinen, 2005; Koskinen and Snijders, 2007; Schweinberger and Snijders, 2007b).
+Method of Moments \citep*[`MoM', the default;][]{Snijders01; SnijdersEA07},
+the Maximum Likelihood method \citep[`ML', see][]{SnijdersEA10},
+and Bayesian methods 
+\citep[see][]{Koskinen04, KoskinenSnijders07, SchweinbergerSnijders07c}.
 The maximum likelihood and Bayesian procedures are not yet
 implemented in RSiena.
-
 In nice situations (relatively small and large network data sets,
 and large network and behavior data sets),
 the three methods tend to agree
@@ -3791,7 +3790,7 @@ which were programmed by Michael Schweinberger.
 The {\tt R} functions input files generated by {\tt Siena} and output,
 among other things,
 trace plots and MCMC lag $1, \dots, 100$ autocorrelations of sampled entities
-(see Schweinberger and Snijders, 2007a,b),
+\citep[see][]{SchweinbergerSnijders07b, SchweinbergerSnijders07c},
 and,
 in the Bayesian case,
 in addition $95\%$ posterior intervals, histograms, and Gaussian kernel density
@@ -3866,8 +3865,8 @@ derivative which is close to 0, and sometimes also by
 \hyperlink{T_convergence}{lack of convergence of the algorithm}.
 (This type of problem also occurs in maximum likelihood estimation
 for logistic regression and certain other generalized linear
-models; \label{LargeFix} see Geyer and Thompson (1992, Section
-1.6), Albert and Anderson (1984), Hauck and Donner (1978).)
+models; \label{LargeFix} see \citet[section 1.6]{GeyerThompson92},
+\citet{AlbertAnderson84, HauckDonner77}.)
 In such cases this effect
 should be fixed to some large value and not left free to be
 estimated. This can be specified in the model specification
@@ -4004,20 +4003,19 @@ The derivatives can be estimated by three methods:
 \item[(1)] score function method 1 (default),
 \item[(2)] score function method 2 (not currently implemented).
 \end{itemize}
-Schweinberger and Snijders (2006) point out that the finite differences method is associated with a bias-variance dilemma,
-and proposed the unbiased and consistent score function methods.
-These methods demand less computation time than method (0).
-\iffalse
-Method 1 estimates the derivatives per observation period separately
-by the simulated sample covariance of the complete data score
-function and the generated statistics; this is then added over
-the observation periods.
-Especially for more than 2 observations, method 1 has a much
-smaller standard error of the estimated standard errors than the other methods.
-\fi
-It is recommended to use at least 1000 iterations (default) in phase 3.
-For published results, it is recommended to have 2000 or 4000 iterations
-in phase 3.
+\citet{SchweinbergerSnijders07a} point out that the finite differences method is
+associated with a bias-variance dilemma, and proposed the unbiased and
+consistent score function methods.  These methods demand less computation time
+than method (0).  
+\iffalse 
+
+Method 1 estimates the derivatives per observation
+period separately by the simulated sample covariance of the complete data score
+function and the generated statistics; this is then added over the observation
+periods.  Especially for more than 2 observations, method 1 has a much smaller
+standard error of the estimated standard errors than the other methods.  \fi It
+is recommended to use at least 1000 iterations (default) in phase 3.  For
+published results, it is recommended to have 2000 or 4000 iterations in phase 3.
 
 \begin{print}
 \newpage
@@ -4041,8 +4039,7 @@ these tests have approximately a standard normal distribution.
 In the maximum  likelihood estimation method
 it is possible to request likelihood ratio tests.
 The log likelihood ratio is computed
-by bridge sampling (Gelman and Meng, 1998;
-Handcock and Hunter, 2006).
+by bridge sampling \citep{GelmanMeng98, HandcockHunter06}.
 This can be requested (a bit deviously) by the number of runs in phase 3
 (defined in the  \hyperlink{T_S_options}{specification options}):
 \begin{enumerate}
@@ -4071,7 +4068,7 @@ is implemented for the MoM estimation method
 in \SI (see Schweinberger, 2005).
 \iffalse
 For the ML estimation method,
-following the same steps produces the Rao (1947) efficient score test.
+following the same steps produces the \citet{Rao47} efficient score test.
 \fi
 
 Most goodness-of-fit tests will have the following form: some model
@@ -4093,7 +4090,7 @@ myeff[10, 'fix'] <- TRUE
 myeff[10, 'test'] <- TRUE
 myeff[10, 'initialValue'] <- ((value to be used for test))
 ## or, more easily
-myeff <- setEffect(myeff, recip, fix=TRUE, test=TRUE, 
+myeff <- setEffect(myeff, recip, fix=TRUE, test=TRUE,
 initialValue=(value to be used for test))
 \end{verbatim}
 
@@ -4330,7 +4327,7 @@ specification with the current parameter values is correct.
 
 For simulating networks and behavior, the output includes
 the autocorrelation statistics known as Moran's $I$ and Geary's $c$.
-For formulae and interpretation see, e.g., Ripley (1981, 98--99).
+For formulae and interpretation see, e.g., \citet[98--99]{Ripley81}.
 These measure the extent to which the value of the variable
 in question is similar between tied actors.
 This similarity is expressed by relatively high values for Moran's $I$
@@ -4411,7 +4408,7 @@ on the distances observed for the dependent action variables.\\
 %   In the longitudinal case, the meaning of this code is as follows.\\
 %   Model Codes 10 or more give extra output for evaluating the fit of
 %   the out-degree distribution and for the explained variation
-%   (Snijders, 2004);\\
+%   \citet{Snijders04};\\
 %   the integer Model Code in the unit position (i.e.,
 %   Model Code itself if it is less than 10, and Model Code - 10 if the code is more than 10)
 %   defines the Model Type defined in Section~\ref{S_modeltype}.\\[0.5ex]
@@ -4439,7 +4436,7 @@ on the distances observed for the dependent action variables.\\
 %      MCMC algorithm.
 \item The initial gain value, which is the step size in the starting
       steps of the Robbins-Monro procedure, indicated in
-      Snijders (2001) by $a_1\,$.
+      \citet{Snijders01} by $a_1\,$.
 \item The choice between standard initial values (suitable
 estimates for the density and reciprocity parameters and zero
 values for all other parameters) or
@@ -4461,7 +4458,7 @@ parameter values.
       %(this is the method used in
       %\SI versions 1 and 2, which has a bias);
       1 is the more efficient and unbiased
-      method proposed by Schweinberger and Snijders (2007);
+      method proposed by \citet{SchweinbergerSnijders07a};
       this is the preferred method. See Section~\ref{S_se}.
 \end{enumerate}
 
@@ -4486,8 +4483,8 @@ conditionally or unconditionally.\medskip
 
 For getting a first acquaintance with the model, one may use the
 data set collected by Gerhard van de Bunt, discussed extensively in
-van de Bunt (1999), van de Bunt, van Duijn, and Snijders (1999),
-and used as example also in Snijders (2001) and Snijders (2005).
+\citet*{vanBunt99, vanBuntEA99},
+and used as example also in \citet{Snijders01} and \citet{Snijders05}.
 The data files are provided with the program
 and at the \SI website. The digraph data files
 used are the two networks {\sf vrnd32t2.dat}, {\sf vrnd32t4.dat}.
@@ -4961,10 +4958,11 @@ multilevel extension to \si.
    estimated for several data sets.
    \textsf{Siena08} combines
    the estimates in a meta-analysis or multilevel analysis
-   according to the methods of Snijders and Baerveldt (2003),
+   according to the methods of \citet{SnijdersBaerveldt03},
    and according to a Fisher-type combination of one-sided $p$-values.
-   This combination method of Fisher (1932) is described in Hedges and Olkin (1985)
-   and (briefly) in Snijders and Bosker (1999, Chapter 3).
+   This combination method of \citet{Fisher32} is described in
+\citet{HedgesOlkin85}
+   and (briefly) in \citet[Chapter 3]{SnijdersBosker99}).
    Some more information is at the \SI website.
 
    For \SI version 4 the program \textsf{Siena08.exe} still must be
@@ -5047,7 +5045,7 @@ New in this version:<br>
     this is important for two reasons:<br>
     1. it allows to see easily how many positive and negative individually significant
      parameter values are contained in the combined data set;<br>
-    2. an assumption of the Snijders-Baerveldt (2003)
+    2. an assumption of the Snijders-Baerveldt \citeyearpar{SnijdersBaerveldt03}
     method for meta-analysis is that standard errors and true parameter values
     are uncorrelated; this can be visually checked from this plot.
 <li>An extra method for combining the various classes, which does not make this assumption.<br>
@@ -5148,8 +5146,8 @@ Versies voor Liesbeth
 
 
 Here, the mathematical formulae for the definition of the effects
-are given. In Snijders (2001, 2005) and Steglich, Snijders and Pearson,
-(2010), further background to these formulae can be found.
+are given. In \citet{Snijders01,Snijders05} and \citet*{SteglichEA10}, 
+further background to these formulae can be found.
 The effects are grouped into effects for modelling network
 evolution and effects for modelling behavioral evolution (i.e.,
 the dynamics of dependent actor variables). Within each group of
@@ -5197,7 +5195,8 @@ but only by the Maximum Likelihood or Bayesian method;
 this is indicated below by ``endowment effect only likelihood-based''.
 
 (It may be noted that the network evaluation function was called objective function,
-and the endowment function was called gratification function, in Snijders, 2001.)
+and the endowment function was called gratification function, in 
+\citet{Snijders01}.)
 
 \subsubsection{Network evaluation function}
 \label{S_f}
@@ -5938,10 +5937,9 @@ In this formula, the $\gamma_k$ are the parameters for the endowment function.
 The potential effects $s^{\rm net}_{ik}(x) $ in this function, and their
 formulae, are the same as in the evaluation function;
 except that not all are available, as indicated in the preceding subsection.
-For further explication, consult Snijders (2001, 2005;
-here, the `gratification function' is used rather than the endowment function),
-Snijders, Steglich, and Schweinberger (2007), and Steglich, Snijders
-and Pearson (2010).
+For further explication, consult \citet{Snijders01, Snijders05};
+(here, the `gratification function' is used rather than the endowment function),
+\citet*{SnijdersEA07}, and \citet*{SteglichEA10}.
 
 \begin{screen}
 \newpage
@@ -5953,7 +5951,7 @@ The \hypertarget{T_rate}{network rate function} $\lambda^{\rm net}$
 Type) as a product \[ \lambda^{\rm net}_i(\rho, \alpha, x, m) =
 \lambda^{\rm net}_{i1} \lambda^{\rm net}_{i2} \lambda^{\rm net}_{i3}
 \] of factors depending, respectively, on period $m$, actor
-covariates, and actor position (see Snijders, 2001, p.\ 383). The
+covariates, and actor position \citep[see][p.\ 383]{Snijders01}. The
 corresponding factors in the rate function are the following:
 \begin{enumerate}
  \item The dependence on the period can be represented by a simple factor
@@ -5977,7 +5975,7 @@ corresponding factors in the rate function are the following:
  on the out-degree is represented by
  \[ \lambda^{\rm net}_{i3} = \frac{x_{i+}}{n-1} \exp(\alpha_1) \+
  \left(1 - \frac{x_{i+}}{n-1}\right) \exp(- \alpha_1). \]
- This formula is motivated in Snijders and Van Duijn (1997).
+ This formula is motivated in \citet{SnijdersDuijn97}.
  This defines a linear function of the out-degree,
  parametrized in such a way that it is necessarily positive.\\
  For a general dependence on the out-degree, in-degree, and number
@@ -6011,7 +6009,7 @@ reciprocated degrees.
 \subsubsection{Network rate function for Model Type 2}
 
 For Model Type 2 (see Section~\ref{S_modeltype}), the network rate
-function is defined according to Snijders (2003) by
+function is defined according to \citet{Snijders03} by
 \begin{eqnarray*}
   \rho_m\, \lambda_{i+}(s) & = &  \rho_m\,\frac{\nu(s)\, \xi(s)}{1 \,+\, \xi(s)}\, , \\
   \rho_m\, \lambda_{i-}(s) & = &  \rho_m\, \frac{\nu(s-1)}{1 \,+\, \xi(s-1)} \ ,
@@ -6023,8 +6021,7 @@ parameter $\rho_m$ is a multiplicative effect of the observation
 period.
 
 Function $\xi$ (\emph{xi}) is called the distributional tendency
-function and is represented according to Snijders (2003, formula
-(17)) by
+function and is represented according to \citet[formula (17)]{Snijders03} by
 \[ \xi(s) \,=\, \exp\left(\alpha_1 \,-\, \alpha_2 \log(s+1) - \frac{\alpha_3}{s+1}\right)  \ . \]
 where the names given in \SI are
 \begin{itemize}
@@ -6033,7 +6030,7 @@ where the names given in \SI are
  \item $\alpha_3$ : factorial out-degree effect.
 \end{itemize}
 The reasons for these names and interpretation of the effects
-can be found in Snijders (2003).
+can be found in \citet{Snijders03}.
 To the exponent also effects of actor covariates can be added.
 
 The so-called volatility function $\nu$ (\emph{nu}) is defined as
@@ -6237,8 +6234,8 @@ calculation of the endowment function only when the actor considers
 decreasing his behavioral score by one unit (downward steps), not
 when upward steps (or no change) are considered. For more details,
 consult
-Snijders, Steglich, and Schweinberger (2007) and
-Steglich, Snijders and Pearson (2010).
+\citet*{SnijdersEA07} and
+\citet*{SteglichEA10}.
 
 The statistics reported as \emph{dec.\ beh.} (decrease in behavior)
 are the sums of the changes in actor-dependent values
@@ -6270,8 +6267,9 @@ This section still is in development.
 
 The main `driving force' of the actor-oriented model
 is the evaluation function
-(in earlier publications called objective function,
-see Snijders, 2001, 2005) given in formula (\ref{f_net}) (for the network) as
+\citep[in earlier publications called objective function,
+see][]{Snijders01, Snijders05} given in formula (\ref{f_net}) 
+(for the network) as
 \[
 f^{\rm net}(x) \, = \, \sum_k \beta^{\rm net}_k \, s^{\rm net}_{ik}(x)   \ .
 \]
@@ -6284,7 +6282,7 @@ and for this purpose random disturbances are added
 to the values of the objective function with standard deviations
 equal\footnote{More exactly, the value is $\sqrt{\pi^2/6}$,
 the standard deviation of the Gumbel
-distribution; see Snijders (2001).} to 1.28.
+distribution; see \citet{Snijders01}.} to 1.28.
 
 An alternative interpretation is that when actor $i$ is making
 a `ministep', i.e., a single change in his outgoing ties
@@ -6392,8 +6390,8 @@ outcome of (\ref{eq_sel}) for some values of $v_i$ and $v_j$.
 
 This can be concretely carried using the data set {\sf s50}
 which is an excerpt of 50 girls in the data set used in
-Pearson and Michell (2000), Pearson and West (2003),
-Steglich et al.\ (2006) and Steglich et al.\ (2007).
+\citet{PearsonMichell00, PearsonWest03,
+SteglichEA06} and \citet{SteglichEA07}.
 We refer to any of these papers for a further description of the data.
 The friendship network data over 3 waves are in
 the files {\sf s50-network1.dat}, {\sf s50-network2.dat},
@@ -6807,12 +6805,488 @@ This function is maximal for
 %\end{print}
 %\fi
 
+%% \documentclass[a4paper,11pt,titlepage]{article}
+% \usepackage{rotating}
+% \usepackage{longtable, lscape}
+% \usepackage[top=2.5cm, bottom=2.5cm, left=2cm , right=1.8cm]{geometry}
+% \author{Paulina Preciado}
+% \title{List of Functions for RSiena}
+
+% \begin{document}
+% \maketitle
+% \tableofcontents
+% \listoftables
+\appendix
+\newpage
+\section{List of Functions in Order of Execution}
+
+    This appendix provides a description of the functions that constitute the
+    RSiena package. This is intended as a quick reference or catalogue for the
+    user to employ Stochastic Actor Oriented Models (SAOM) to analyse network
+    dynamics in R.
+
+    The functions are presented in execution order (in the approximate order in
+    which they would be used in real model estimation) A list of useful R
+    functions to read and prepare the data set is also included at the
+    beginning. In all cases examples on how to use these functions are provided.
+
+    The descriptions provided are suitable for beginner and intermediate R and
+    Siena users. For the advanced specifications of the functions the user
+    should refer to the help by typing ``?funName'' in the R console, where
+    ``funName'' is the name of the function.
+
+    We consider that the model estimation is composed by 6 stages:
+\begin{enumerate}
+	\item Getting started
+	\item Get the data the right format or check that it is in the correct
+      format
+	\item Data specification
+	\item Model specification
+	\item	Model estimation
+	\item	Working with the results
+\end{enumerate}
+
+Tables \ref{tab:FuncExR} and \ref{tab:ListSienaExec} present the list of useful
+R functions and the list of RSiena functions in execution order, respectively.
+\begin{footnotesize}
+\begin{sidewaystable}
+\begin{threeparttable}
+\centering
+		\begin{tabular}{c | l | p{4.5cm} | p{5cm} | p{8cm} }
+		\multicolumn{1}{c}{\textbf{Stage}} & \multicolumn{1}{c}{\textbf{Name}}
+ & 							\multicolumn{1}{c}{\textbf{Syntax}} &
+ \multicolumn{1}{c}{\textbf{Examples}} &
+\multicolumn{1}{c}{\textbf{Description}} \\
+		\cline{1-5}
+		1 &help\tnote{*} &	help(funame) &	help(siena01Gui) &
+	Opens the help on the function named ``funame'', this can also be done by
+    typing ``?'' followed by ``funame'' in  the console\\
+		\hline
+		1	&getwd	&getwd()		& &
+Returns the name of the current working directory.
+				Does not require arguments\\
+				\hline
+		1 &	list.files &	list.files(dir)	&
+list.files (``C:/User/ MyDocuments/ MySiena'') &	Returns a character vector
+with the names of the files in the directory ``dir''.
+If no argument is provided, ``dir'' is the current working directory.
+Type ?list.files for more options\\
+\hline
+1	&setwd\tnote{*}	&setwd(dir)	&setwd(``C:/MyDocuments/ MySiena'') &
+	Sets the working directory to ``dir''. In this context the working
+ directory should be where the data is saved\\
+\hline
+1	&install.packages\tnote{*} &	install.packages() &
+&It is used to install packages. If no arguments are provided it opens a GUI
+ to select a mirror site and the packages that we want to download and
+ install. This is not necessary if the package has already been installed.
+ See ?install.packages for more options\\
+\hline
+1	&library\tnote{*} &	library(package) &	library(RSiena) &
+Loads the library named ``package''. See ?library for more options.\\
+\hline
+1	&read.table &	read.table(file, header = FALSE, sep = ``'',
+quote = ``\'''',...) & 	net1$<$--read.table(`network1. dat' , header = F)
+&	Reads a file in table format and creates a data	frame from it.
+The argument ``file'' is the file containing the data. In the case of
+adjacency matrices, the	file should have the same number of columns and	rows.
+``header'' is a logical argument indicating whether the first row of the data
+contains the column names. ``sep'' is the field separator character
+ (such as space, comma, etc.). See the help on the function to specify
+other arguments\\
+\hline
+2 &  as.matrix   &as.matrix(x,...)   &net1 $<$-- as.matrix(net1) &
+Transforms an object ``x'' into a matrix. Siena works with matrices and
+not with data frames\\
+\hline
+2&	class &   class(x)  & class(net1)  & Returns the type of object that
+``x'' is\\
+\hline
+2&   dim  & dim(x)  & dim(net1) &  Returns the dimension of object ``x''\\
+\hline
+4 &   fix\tnote{*}  & fix(x) &  fix(effects) &  Allows editing the object ``x''
+ by opening a window and it replaces the old object by the edited ``x''\\
+\hline
+\end{tabular}
+\caption[Functions from R in order of execution]
+{Useful functions from R in execution order}
+\label{tab:FuncExR}
+\begin{tablenotes}
+\item [*] Also available via a menu option
+\end{tablenotes}
+\end{threeparttable}
+\end{sidewaystable}
+\end{footnotesize}
+
+
+\begin{landscape}
+\begin{footnotesize}
+\begin{longtable}{c | p{3cm} | p{5.2cm} | p{4.2cm} | p{8.5cm} }
+\caption[List of RSiena Functions: Execution]
+{List of RSiena Functions in order of Execution}
+\label{tab:ListSienaExec} \\
+\hline
+
+\multicolumn{1}{c}{\textbf{Stage}} &
+\multicolumn{1}{c}{\textbf{Name}} &
+\multicolumn{1}{c}{\textbf{Syntax}} &
+\multicolumn{1}{c}{\textbf{Examples}} &
+\multicolumn{1}{c}{\textbf{Description}} \\
+\hline
+\endfirsthead
+
+\multicolumn{5}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\multicolumn{1}{c}{\textbf{Stage}} &
+\multicolumn{1}{c}{\textbf{Name}} &
+\multicolumn{1}{c}{\textbf{Syntax}} &
+\multicolumn{1}{c}{\textbf{Examples}} &
+\multicolumn{1}{c}{\textbf{Description}} \\
+\hline
+\endhead
+
+\hline \multicolumn{5}{|r|}{{\tiny{Continued...}}} \\
+\hline
+\endfoot
+
+\hline
+\hline
+\endlastfoot
+
+1 &	installGui &	installGui()	&
+	&Starts the installer for the standalone version of RSiena.
+Only for Windows. Does not require arguments\\
+\hline
+
+3 to 5&	siena01Gui&	siena01Gui()&	&	Does not require arguments.
+ Opens a GUI to be used to run the model estimation or to create a session
+ from which to work within R. Details on how to run the estimation under
+ the GUI can be found in section \ref{thegui} and \ref{estgui}.\\
+\hline
+
+3	&sienaNodeSet	&sienaNodeSet (n, nodeSetName = ``Actors'',
+names = NULL)	& &	Creates a Siena node set which can be used as the nodes
+ in a siena network. ``n'' is the number of actors or nodes; ``nodeSetName''
+ is a character string to name the node set (defaults to ``Actors'') and
+```names'' is a string vector with length n with the names of each node
+(optional)\\
+\hline
+
+3 & sienaNet & sienaNet (netarray, type = c(``oneMode'', ``bipartite'',
+``behavior''), nodeSet = ``Actors'', sparse = is.list (netarray)) &
+sienaNet(array(c(net1,net2, net3), dim = c(dim(net1),3))) & Creates a Siena
+network object by forming an array of network observations represented as
+matrices, arrays or sparse matrices. ``netarray'' is a matrix (type=``behavior''
+only) or array of values or list of sparse matrices of type
+``dgTMatrix'';``type'' is either ``one mode'' (default), ``bipartite'' or
+``behaviour''; ``nodeSet'' is the name of the node set.  It is a vector with two
+strings for a bipartite network; ``sparse'' is logical and it is set to TRUE if
+the data is in sparse matrix
+format,  FALSE otherwise\\
+\hline
+
+3 &coCovar & coCovar(val, nodeSet =`Actors') & cons $<$-- as.matrix( read.table
+('cons.DAT')) \newline cons1 $<$-- coCovar (cons[,1]) & Creates a constant
+covariate object, where val is the vector of covariate values and nodeSet is the
+name of the actors' set.  The dimension of val should be (1, \#
+Actors)\\
+\hline
+
+3 & varCovar & varCovar(val, nodeSet =`Actors') & chan $<$-- as.matrix
+(read.table ('chan.DAT')) \newline chan $<$-- varCovar (chan[,1]) & Creates a
+changing covariate object where ``val'' is a matrix with the covariate values
+with one row for each actor and one column for each period; ``nodeSet'' is the
+name of the set of actors \\
+\hline
+
+3& coDyadCovar &coDyadCovar(val, nodeSets = c(``Actors'', ``Actors'')) & &
+Creates a constant dyadic covariate object where ``val'' is a matrix of the same
+dimension as the network observations and nodeSets are the sets of actors with
+which the constant covariate is associated\\
+\hline
+
+3 &varDyadCovar & varDyadCovar(val, nodeSets = c(``Actors'', ``Actors'')) &
+&Creates a changing dyadic covariate object where ``val'' is an array of
+matrices. Each matrix has the same dimension of the actor set and ``val'' has
+one less matrices than observations of the network; ``nodeSets'' are the sets
+of actors to which the varying covariate object is associated\\
+\hline
+
+3 & sienaComposition Change & sienaCompositionChange(changelist, nodeSet =
+"Actors", option = 1) & & Creates a list of events describing the moments in
+which each actor is present in the network: ``changelist'' is a list with an
+entry for each actor in the node set. Each entry is a vector indicating
+intervals in which an actor is present in the network. ``nodeSet'' is the name
+of the set of actors corresponding to these composition changes and ``option''
+(defaults to 1) is an integer controlling the processing of the network entries
+for the actors not currently present. See help(sienaCompositionChange) for
+details on this\\
+\hline
+
+3 & sienaComposition ChangeFromFile & sienaCompositionChangeFromFile (filename,
+nodeSet = "Actors", fileobj = NULL, option = 1) & & Creates a list of events
+describing the changes over time in the actor set from a file. ``filename'' is
+the name of the file containing change information (one line per actor) each
+line is a series of space delimited numbers indicating intervals. ``fileobj'' is
+the result of readLines on ``filename''. ``nodeSet'' is the name of the set of
+actors. ``option'' (defaults to 1) has the same
+description that in  sienaCompositionChange\\
+\hline
+
+3 & sienaDataCreate & sienaDataCreate(...,nodeSets=NULL, getDocumentation =
+FALSE) & MyData $<$-- sienaDataCreate (net, cons1, cons2, cons3, chan, dyad) &
+Creates a siena object from networks, covariates, composition and behaviour
+objects: .``...''  represents the objects of class ``sienaNet'', ``coCovar'',
+``varCovar'', ``coDyadCovar'', ``varDyadCovar'',
+``compositionChange''. ``nodeSets'' is a list of Siena node sets. Default is a
+single set named ``Actors'' with length equal to the number of rows in the first
+object of class ``SienaNet'', it has to match the nodeSet supplied when the
+arguments are created; ``getDocumentation'' is a flag to allow
+documentation for internal functions,  not for use by users\\
+\hline
+
+3 & sienaDataCreateFrom Session & sienaDataCreateFromSession(file name = NULL,
+session = NULL, modelName = ``Siena'', ...) & myobj $<$-- sienaDataCreate
+FromSession(`Session.csv') & Reads a SIENA session from a file and creates a
+Siena Data object or group. ``file'' is the session file; ``session'' is the
+input session if the function is called from siena01Gui(); ``modelName'' is the
+project's name; ``...'' refers to other
+arguments used by siena01Gui()\\
+\hline
+
+3 & sienaGroupCreate & sienaGroupCreate (objlist, single OK = FALSE,
+getDocumentation=FALSE) & sienaGroupCreate (list( MyData1, MyData2)) & Creates
+an object of class ``sienaGroup'' from a list of Siena data objects: ``objlist''
+is a list of objects of class ``siena''; ``singleOK'' is a boolean variable to
+indicate if it is OK to have just one object; ``getDocumentation''
+is a flag to  allow documentation of internal functions, not for use by users\\
+\hline
+
+4 & effectsDocumentation & effectsDocumentation() & & Prints a html or
+\LaTeX\ table with the  effects details\\
+\hline
+
+4 & getEffects& getEffects(x, nintn = 10, behNintn = 4, getDocumentation =
+FALSE) & MyEff$<$--getEffects (MyData, nint = 2, behNint = 1) & Creates a siena
+effects objects (a data frame) that contains a list of the effects that can be
+included in the model.  Type fix(MyEff) to edit the effects through a GUI
+(e.g. Including them or excluding them, changing their names, initial values,
+fixing them, etc.) The arguments are a siena or a siena group object ``x'', the
+number of lines for user defined network interactions ``nint'' and the number of
+lines for user defined behaviour interactions ``behNintn''. ``getDocumentation''
+is a flag to allow documentation for
+internal functions, not to  be used by users\\
+\hline
+
+4 & includeEffects & includeEffects(myeff, ..., include = TRUE, name =
+myeff\$dollar name[1], type = ``eval'', interaction1 = ``'', interaction2 =
+``'') & {MyEff$<$--includeEffects(MyEff, transTrip, balance) \flushleft
+MyEff$<$--includeEffects(MyEff, sameX, sameXRecip, interaction1="gender")}
+ &The function is a
+way to select the effects to be included. ``myeff'' is an effects object, as
+created by getEffects. It is necessary to indicate the short names to identify
+the effects to be included (argument ...). Use myeff\$shortName to get a list of
+the short names of possible effects to include and myeff\$effectName to get the
+full name of the effects. This information can also be found in the
+documentation
+created by effectsDocumentation(). The ``include = TRUE'' indicates that we want
+to
+include the ``...'' effects in the model, it can be set to FALSE to exclude
+effects from the model. ``name'' is the name of the network for which effects
+are being included. ``type'' is to include ``eval'' (objective function effects)
+or ``endow'' (endowment function effects). ``interaction1'' and ``interaction2''
+are names of siena objects (where needed) to completely identify the effects
+e.g. covariate name or behavior variable name. Use
+myeff\$effectName[myeff\$include]
+to get the names of the included effects. It returns a
+new effects object, so it is important to assign it to a
+name\\
+\hline
+
+4	& includeInteraction & 	includeInteraction(myeff, ..., include = TRUE, name
+= myeff\$name[1], type  = ``eval'', interaction1 = rep(``'', 3), interaction2 =
+rep(``'', 3)) &  MyEff$<$--includeInteraction( MyEff, transTrip, egoX,
+interaction1 = c(``'',``beh'')) 	&This function provides an interface to
+allow easy update of  an unspecified interaction row in a Siena effects
+object. ``myeff'' is  a Siena  effects object as created by getEffects. To
+specify the effects to interact,  list their short names instead of ``...'';
+``include'' is a boolean variable,  default TRUE to include the interaction, it
+can be switched to FALSE to turn off  an interaction. ``name'' is the name of
+network for which interactions are being  defined. Defaults to the first in the
+effects object. ``type'' is the type of  effects to be interacted: currently
+only ``eval'' or ``endow''. ``interaction1''  is a vector of siena objects where
+needed to completely identify the effect e.g.  covariate name or behavior
+variable name. Trailing blanks may be omitted.  ``interaction2''  is a vector of
+siena objects where needed to completely  identify the effect e.g. covariate
+name or behavior variable name.  Trailing blanks may be omitted\\
+\hline
+
+4 & setEffect &setEffect(myeff, shortName, parameter = 0, fix = FALSE, test =
+FALSE, initialValue = 0, include = TRUE, name = myeff\$name[1], type = ``eval'',
+interaction1 = ``'', interaction2 = ``'') & MyEff $<$-- setEffect(MyEff,
+transTrip, initialValue = 3, include = T) & Interface to change the attributes
+of a particular effect. The required arguments are an effect object (``myeff''),
+the short name of the effect to modify (``shortName'') and a required integer
+value that defaults to zero (``parameter''). Depending on what it is desired to
+be modified we can supply: ``fix = TRUE'', if we wish to fix that parameter;
+``test = TRUE'' if we wish to test that parameter; ``initialValue = 2'' (or any
+desired number) to modify the effect's initial value (Defaults to zero);
+``include = TRUE or FALSE'' depending on whether we want to include/exclude the
+effect (defaults to TRUE). The arguments ``name'', ``type'' and ``interaction1''
+and
+``interaction2'' are defined as in includeInteraction  and includeEffects\\
+\hline
+
+5 & print01Report & print01Report(data, myeff, modelname = ``Siena'', session =
+NULL, getDocumentation = FALSE) & print01Report(MyData, MyEff) & Prints a report
+of a Siena data object and its default effects. We need to supply a Siena data
+object (``data'') a siena effects object (``myeff'') and a model name
+(``modelname'') that defaults to ``Siena''. It creates and saves a file named
+``modelname.out'' (Siena.out) that contains preliminary information
+on the data\\
+\hline
+
+5 & sienaModelCreate & sienaModelCreate(fn = simstats0c,
+usesimstats0c = deparse(substitute(fn)) == "simstats0c",
+projname = ``Siena'', MaxDegree = 0, useStdInits = FALSE, n3 = 1000, nsub = 4,
+maxlike = FALSE, diag = !maxlike,
+condvarno = 0, condname = ``'', firstg = 0.2, cond
+= NA, findiff = FALSE, seed = NULL) & MyModel $<$-- model.create (projname =
+``MyProject'') & Creates a siena model object that can be used to call
+siena07. ``fn'' is function to do one simulation in the Robbins-Monro
+algorithm. ``usesimstats0c'' is boolean, if true the standard algorithm is being
+used which can be used with multiple processors. Just used for
+validation. ``projname'' is character string name of project. No embedded
+spaces. ``MaxDegree'' is a named vector of maximum degree values for
+corresponding networks. ``useStdInits'' is a boolean variable, if TRUE, the
+initial values in the effects object will be ignored and default values used
+instead. ``n3'' is the number of iterations in phase 3 (defaults to
+1000). ``nsub'' is the number of subphases in phase 2 (defaults to
+4). ``maxlike'', boolean to indicate whether to use maximum likelihood method or
+straightforward simulation (defaults to false). ``diag'' is boolean to indicate
+if the complete estimated derivative matrix should be used; ``condvarno'', if
+conditional estimation is used the parameter is the sequential number of the
+network or behaviour variable on which to condition. ``condname'' is the name of
+the dependent variable on which to condition (only use condname or condvar, not
+both). ``firstg'' initial value of scaling parameter in the Robbins-Monro
+procedure. ``cond'' is boolean, If TRUE, use conditional simulation. If missing,
+decision is deferred until siena07 is called, when it is set to TRUE if there is
+only one dependent variable, FALSE otherwise. ``findiff'' is boolean, if TRUE,
+estimate derivatives using finite differences and if FALSE, use scores. ``seed''
+is an integer referring to the starting value of random seed. Not used if
+parallel
+testing\\
+\hline
+
+5	& model.create	& & &		See sienaModelCreate\\
+\hline
+
+5 & siena07 & siena07(x, batch = FALSE, verbose = FALSE, silent = FALSE,
+useCluster = FALSE, nbrNodes = 2, initC = FALSE, clusterString =
+rep(``localhost'', nbrNodes), tt = NULL, parallelTesting = FALSE, ...) & ans
+$<$-- siena07(MyModel, data = MyData, effects = MyEff, batch = FALSE,
+verbose = TRUE,
+useCluster = TRUE, nbrNodes = 2, initC = TRUE) & Fits a model using the method
+of
+moments based on straightforward simulation, conditional or otherwise, or on an
+MCMC simulation. Estimation is done using Robbins-Monro algorithm. Note that the
+particular model to be used is passed on as the model object, and data for the
+model must be passed by using named arguments. ``x'' is a model object;
+``batch'' is a boolean variable to indicate if it is desired to open the GUI of
+Siena simulation; ``verbose'' is a boolean variable to produce output on the
+console; ``silent'' is also a boolean variable, if true, no output is printed to
+the console; ``useCluster'' is a boolean variable to indicate if it is desired
+to use a cluster of processors; ``nbrNodes'' is the number of processors to use
+if useCluster is TRUE; ``initC'' is boolean: set to TRUE if the simulation will
+use C routines (currently always needed). Only relevant if using multiple
+processors, to ensure all copies are initialised correctly. ``clusterString'' is
+the definition of clusters, default set up to use the local machine only; ``tt''
+is a tcltk toplevel window used if called from the model options screen;
+``parallelTesting'' is boolean, if TRUE, sets up random numbers to parallel
+those in Siena 3. ``...''  Arguments for the simulation function, such as the
+data, effects, etc. It returns an object of class sienaFit (lets say ans). The
+main attributes are theta, which are the estimated coefficients (view with
+ans\$theta); covtheta is the estimated covariance matrix of theta; dfra is the
+matrix of estimated derivatives; ans\$targets and ans\$ targets2 are the
+observed statistics and the observed statistic for each wave respectively;
+ans\$ssc are the score function contributions for each wave for each simulation
+in phase 3: ans\$sims is the simulated networks as edgelists. Use names(ans) to
+obtain more characteristics; only recommended if you are
+proficient in RSiena\\
+\hline
+
+6 & print.sienaFit & print(x, tstat=TRUE, ...) & print(ans) & The function
+prints a table containing the estimated parameter values, standard errors and
+(optionally) t-statistics for convergence. If ``x '' is a summary(sienaFit) it
+prints on the console all the summary elements. ``tstat'' is a boolean argument,
+set to TRUE if it is desired for the t-statistics for convergence to
+be added to the report\\
+\hline
+
+6 & summary.sienaFit & summary(x,...) & summary(ans) & Prints a table containing
+the estimated parameter values, standard errors and t-statistics for convergence
+together with the covariance matrix of the estimates, the derivative matrix of
+expected statistics D by parameters, and the covariance matrix of the expected
+statistics D.  The only required argument is a
+``sienaFit'' object ``x'', as produced by  siena07\\
+\hline
+
+6 & xtable.sienaFit & xtable(x, caption = NULL, label = NULL, align = NULL,
+digits = NULL, display = NULL, ...) & sienaxtab $<$-- xtable(ans, caption = ``My
+Table'', digits = 2).  &Creates an object of class xtable.sienaFit which inherits
+from class xtable and passes an extra arguments to the print.xtable.
+The argument is a sienaFit object ``x''. See ?xtable for more options\\
+\hline
+
+
+\end{longtable}
+\end{footnotesize}
+\end{landscape}
+
+%% Document ends here
+%\end{document}
+
+%\section{List of Functions in Alphabetical Order}
+
+%\input{ListFunctionsCleanrr}
+
 \section{Changes compared to earlier versions}
 
 This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-03-27 R-forge revision 71 (RSienaTest only)
+\begin{itemize}
+\item Fixes as for RSiena in revision 68/69/70 for RSiena
+\item New version number 1.0.12
+\end{itemize}
+\item 2010-03-27 R-forge revision 70 (RSiena only)
+\begin{itemize}
+\item Fix to crash at end of phase 3 with multiple processors and 
+conditional estimation
+\item Correct carry forward/backward/use mode for behavior variables
+\item Fix bug causing crash in Finite Differences with only one effect 
+\end{itemize}
+\item 2010-03-24 R-forge revision 69 (RSiena only)
+\begin{itemize}
+\item New features and bug fixes as for revision 63 in RSienaTest.
+\item 4-cycles effect has new shortName: cycle4.
+\item some percentages on reports were proportions not percentages
+\item Sped up treatment of missing values in sparse format networks.
+\item Fix: now allows more than one value to indicate missing in covariates.
+\end{itemize}
+\item 2010-03-12 R-forge revision 68 new version number for RSiena.\\
+In \sfn{siena01Gui}, allow waves for SienaNet inputs to be numbered
+arbitrarily, rather than insisting on 1-n. Change simply allows this, the actual
+wave numbers are not yet used on reports etc.
+\item 2010-03-17 R-forge revision 66
+Corrected processing of user-specified interaction effects with multiple
+processors. This had originally worked but failed when one no longer had to
+include the underlying effects.
+\item 2010-03-16 R-forge revision 64
+covarBipartite ego effect had been given type dyadic rather than ego.
 \item 2010-03-16 R-forge revision 63 (RSienaTest only)
 \begin{itemize}
 \item new functions \sfn{siena08} and \sfn{iwlsm}, for meta analysis
@@ -6838,7 +7312,7 @@ Multiple network effects, constraints between networks.
 \item 2010-02-11 R-forge revision 55 (RSienaTest only)
 New silent option for siena07.
 \item 2010-02-11 R-forge revision 54 (RSienaTest only)
-Fix to covariate behavior effect bug. 
+Fix to covariate behavior effect bug.
 \item 2010-02-11 R-forge revision 53
 Fixed bug in siena01 gui which ignored changes to all effeccts
 \item 2010-02-07 R-forge revision 52 (RSiena only)
@@ -6846,8 +7320,8 @@ New silent option for siena07.
 \item 2010-02-04 R-forge revision 51 (RSiena only)
 \begin{itemize}
 \item
-Fix to covariate behavior effect bug. 
-\item 
+Fix to covariate behavior effect bug.
+\item
 Fix to default effects with multiple networks.
 \end{itemize}
 \item 2010-02-01 R-forge revision 49 (RSienaTest) only
@@ -6987,300 +7461,13 @@ Created RSienaTest which includes user
      testing with siena3.
    \end{itemize}
  \end{itemize}
-
-\section{References}
-
-\bibitem{} Albert, A., and  J.A.\ Anderson. 1984.
-On the existence of the maximum likelihood estimates
-in logistic regression models.
-{\em Biometrika}, {\bf 71}, 1 -- 10.
-
-\bibitem{} de Federico de la R\'ua, A. 2004.
-L'Analyse Longitudinal de R\'eseaux sociaux totaux avec SIENA - M\'ethode, discussion et application.
-{\em BMS, Bulletin de M\'ethodologie Sociologique}, {\bf 84}, October 2004, 5--39.
-
-\bibitem{} de Federico de la R\'ua, A. 2005.
-El an\'alisis din\'amico de redes sociales con SIENA.
-M\'etodo, Discusi\'on y Aplicaci\'on.
-{\em Empiria}, {\bf 10}, 151--181.
-
-\bibitem{}
-Fisher, R.A. 1932.
-{\em Statistical Methods for Research Workers, 4th edn.}
-Edinburgh: Oliver \& Boyd.
-
-
-\bibitem{} Frank, O. 1991.
-Statistical analysis of change in networks.
-{\em Statistica Neerlandica}, {\bf 45}, 283--293.
-
-\bibitem{} Frank, O., and D.\ Strauss. 1986.
-Markov graphs.
-{\em Journal of the American Statistical Association}, {\bf 81}, 832 -- 842.
-
-%\bibitem{} Freeman, L.C., and S.C.\ Freeman. 1980.
-%A semi-visible college: Structural effects of seven months
-%of EIES participation by a social networks community.
-%Pp.\ 77 -- 85 in Henderson, M.M., and M.J.\ McNaughton (eds.),
-%{\em Electronic Communication: Technology and Impacts}.
-%Washington, DC: American Association for the Advancement of Science.
-
-\bibitem{} Gelman, A., and X.-L. Meng (1998)
-Simulating Normalizing Constants:
-From Importance Sampling to Bridge Sampling to Path Sampling.
-\emph{Statistical Science}, {\bf 13}, 163--185.
-
-
-\bibitem{}
-Geyer, C.J., and E.A.\ Thompson. 1992.
-Constrained Monte Carlo maximum likelihood for dependent data.
-{\em Journal of the Royal Statistical Society}, ser.\ B, {\bf 54}, 657 -- 699.
-
-\bibitem{} Handcock, Mark S. 2002.
-``Statistical Models for Social Networks: Inference and Degeneracy."
-Pp.\ 229 -- 240 in {\em Dynamic Social Network
-Modeling and Analysis: Workshop Summary and Papers}, edited by Ronald
-Breiger, Kathleen Carley, and Philippa E.\ Pattison.
-National Research Council of the
-National Academies. Washington, DC: The National Academies Press.
-
-\bibitem{} Handcock, Mark S., and Hunter, David R. 2006.
-Inference in curved exponential family models for networks.
-\emph{Journal of Computational and Graphical Statistics}, {\bf 15}, 565--583.
-
-\bibitem{}
-Hauck Jr. W.W., and Donner, A. 1977.
-Wald's test as applied to hypotheses in logit analysis.
-\emph{Journal of the American Statistical Association}, 72, 851-853.
-
-\bibitem{}
-Hedges, L.V., and Olkin, I. 1985.
-{\em Statistical Methods for Meta-analysis}.
-New York: Academic Press.
-
-\bibitem{} Huisman, M.E., and T.A.B.\ Snijders. 2003.
-Statistical analysis of longitudinal network data
-with changing composition.
-{\em Sociological Methods \& Research}, {\bf 32}, 253 -- 287.
-
-\bibitem{}
-Huisman, M., and C.\ Steglich (2008).
-Treatment of non-response in longitudinal network data.
-\textit{Social Networks}, 30, 297--308.
-
-\bibitem{} Jariego, I.M., and  de Federico de la R\'ua, A. 2006.
-El an\'alisis din\'amico de redes con Siena.
-Pp.~77-93 in J.L. Molina, A. Quiroga, J. Mart\'i, I.M. Jariego,
-and A. de Federico (eds.),
-{\em Talleres de autoformaci\'on con programas inform\'aticos
-de an\'alisis de redes sociales}.
-Bellaterra: Universit\'at Autonoma de Barcelona.
-
-\bibitem{}
-Koskinen, J. 2004.
-\emph{Essays on Bayesian Inference for Social Networks}.
-PhD Dissertation. Department of Statistics, Stockholm University.
-
-\bibitem{}
-Koskinen, J.H., and T.A.B.\ Snijders. 2007.
-Bayesian inference for dynamic network data.
-Journal of Statistical Planning and Inference.
-\textit{Journal of Statistical Planning and Inference} 13: 3930--3938.
-
-\bibitem{} Leenders, R.Th.A.J. 1995. Models for network dynamics:
-a Markovian framework.
-{\em Journal of Mathematical Sociology} 20: 1 -- 21.
-
-
-\bibitem{}
-Lepkowski, J.M. 1989. Treatment of wave nonresponse in panel surveys.
-In: Kasprzyk, D., Duncan, G.,
-Kalton, G., Singh, M.P. (Eds.), \emph{Panel Surveys}.
-Wiley, New York, pp.\ 348--374.
-
-\bibitem{}
-Pearson, M.A., and L.\ Michell. 2000.
-Smoke Rings: Social network analysis of friendship groups, smoking and
-drug-taking. \emph{Drugs: education, prevention and policy}, 7, 21--37.
-
-\bibitem{}
-Pearson, Michael, Steglich, Christian, and Snijders, Tom. 2006.
-\newblock Homophily and assimilation among sport-active adolescent substance users.
-\newblock \textit{Connections} 27(1), 47--63.
-
-\bibitem{}
-Pearson, M., and P.\ West. 2003.
-Drifting Smoke Rings: Social Network Analysis and Markov Processes in a
-Longitudinal Study of Friendship Groups and Risk-Taking.
-\emph{Connections}, 25(2), 59--76.
-
-\bibitem{}
-Press, W. H., Teukolsky, S. A., Vetterling, W. T., and Flannery, B. P. 1992.
-\textit{Numerical Recipes: The Art of Scientific Computing} (Second Edition).
-Cambridge University Press.
-
-\bibitem{}
-Rao, C.R. 1947.
-Large sample tests of statistical hypothesis concerning several parameters with applications to problems
-of estimation.
-\emph{Proceedings of the Cambridge Philosophical Society}, 44, 50-–57.
-
-\bibitem{}
-Ripley, B. 1981.
-\emph{Spatial Statistics}, New York: Wiley.
-
-\bibitem{}
-{Robbins}, H., and {Monro}, S. 1951.
-A stochastic approximation method.
-\textit{Annals of Mathematical Statistics}, 22, 400--407.
-
-\bibitem{}
-Robins, G., Alexander, M., 2004. Small worlds among interlocking directors:
-network structure and distance in bipartite graphs.
-\textit{Computational \& Mathematical Organization Theory} 10, 69--94.
-
-
-\bibitem{} Schweinberger, M. 2005.
-\emph{Statistical Modeling of Network Dynamics Given Panel Data:
-Goodness-of-fit Tests.} Submitted for publication.
-
-\bibitem{} Schweinberger, M., and Snijders, T.A.B. 2006.
-Markov models for digraph panel data: Monte Carlo-based derivative estimation.
-\emph{Computational Statistics and Data Analysis} 51: 4465 -- 4483.
-
-\bibitem{} {Schweinberger}, M. and T.~A.~B. {Snijders} (2007a).
-\newblock {\em Random effects models for digraph panel data.}
-\newblock Working paper.
-
-\bibitem{} {Schweinberger}, M. and T.~A.~B. {Snijders} (2007b).
-\newblock {\em Bayesian inference for longitudinal data on social networks and other outcome variables.}
-\newblock Working paper.
-
-\bibitem{} Snijders, T.A.B. 1999.
-The transition probabilities of the reciprocity model.
-{\em Journal of Mathematical Sociology} 23: 241 -- 253.
-
-\bibitem{} Snijders, T.A.B. 2001.
-The statistical evaluation of social network dynamics.
-Pp.\  361-395 in {\em Sociological Methodology -- 2001},  edited by
-M.E.\ Sobel and M.P.\ Becker. Boston and London: Basil Blackwell.
-
-\bibitem{} Snijders, T.A.B. 2002.
-Markov Chain Monte Carlo Estimation of Exponential Random Graph Models.
-{\em Journal of Social Structure}, Vol. 3 (2002), No. 2.  \\
-Available from \textsf{http://www2.heinz.cmu.edu/project/INSNA/joss/index1.html}.
-
-\bibitem{} Snijders, T.A.B. 2003.
-Accounting for degree distributions in empirical
-analysis of network dynamics.
-Pp.\ 146-161 in: R. Breiger, K. Carley, and P. Pattison (eds.),
-\emph{Dynamic Social Network Modeling and Analysis: Workshop Summary and Papers.}
-National Research Council, National Academy of Sciences USA.
-Washington, DC: The National Academies Press.
-
-\bibitem{} Snijders, T.A.B. 2004.
-Explained Variation in Dynamic Network Models.
-\emph{Math\'{e}matiques, Informatique et Sciences Humaines /
-Mathematics and Social Sciences}, 168(4).
-
-\bibitem{} Snijders, T.A.B. 2005.
-Models for Longitudinal Network Data.
-Chapter 11 in P.\ Carrington, J.\ Scott, and S.\ Wasserman (Eds.),
-\emph{Models and methods in social network analysis}.
-New York: Cambridge University Press.
-
-\bibitem{}
-Snijders, T.A.B., 2006.
-Statistical Methods for Network Dynamics.
-In: S.R.\ Luchini et al.\ (eds.), \emph{Proceedings of the XLIII Scientific Meeting,
-Italian Statistical Society}, pp.\ 281--296.
-Padova: CLEUP.
-
-
-\bibitem{} Snijders, T.A.B. 2007.
-Analysing dynamics of non-directed social networks.
-\emph{In preparation. Transparencies available at internet.}
-
-\bibitem{}
-Snijders, Tom A.B, and Baerveldt, Chris, 2003.
-A Multilevel Network Study of the Effects
-of Delinquent Behavior on Friendship Evolution.
-\textit{Journal of Mathematical Sociology} 27: 123--151.
-
-
-\bibitem{} Snijders, T.A.B. and Bosker, R.J. 1999.
-{\it Multilevel Analysis: An introduction to basic and advanced
-multilevel modeling}. London: Sage.
-
-\bibitem{}
-Snijders, T.A.B., J.H.\ Koskinen, and M.\ Schweinberger. 2010.
-Maximum Likelihood Estimation for Social Network Dynamics.
-\textit{Annals of Applied Statistics}, to be published.
-
-\bibitem{}
-Snijders, Tom A.B., Steglich, Christian E.G., and Schweinberger, Michael. 2007.
-Modeling the co-evolution of networks and behavior.
-In \emph{Longitudinal models in the behavioral and related sciences},
-edited by Kees van Montfort, Han Oud and Albert Satorra, pp.\ 41--71.
-Mahwah, NJ: Lawrence Erlbaum.
-
-\bibitem{}
-Snijders, T.A.B., van de Bunt, G.G., and Steglich, C.E.G. (2010).
-Introduction to actor-based models for network dynamics.
-\textit{Social Networks}, 32, 44--60.
-
-
-\bibitem{} Snijders, T.A.B., and M.A.J.\ Van Duijn.  1997.
-Simulation for statistical inference in dynamic network models.
-Pp.\ 493 -- 512 in {\em Simulating Social Phenomena}, edited by
-R.\ Conte, R.\ Hegselmann, and P.\ Terna. Berlin: Springer.
-
-\bibitem{} Snijders, T.A.B., and van Duijn, M.A.J. 2002.
-Conditional maximum likelihood estimation under various specifications of
-exponential random graph models. \\
-Pp.\ 117--134 in Jan Hagberg (ed.), {\it Contributions to Social
-Network Analysis, Information Theory, and Other Topics in
-Statistics; A Festschrift in honour of Ove Frank}. University of
-Stockholm: Department of Statistics.
-
-\bibitem{} Steglich, Ch., Snijders, T.A.B., and Pearson, M. 2010.
-{\em Dynamic Networks and Behavior: Separating Selection from
-Influence.} (To be published, \emph{Sociological Methodology}.)
-
-\bibitem{} Steglich, Ch.E.G., Snijders, T.A.B., and West, P. 2006.
-Applying SIENA: An Illustrative Analysis of the Coevolution of
-Adolescents' Friendship Networks, Taste in Music, and Alcohol
-Consumption. \emph{Methodology}, 2: 48--56.
-
-
-\bibitem{} Van de Bunt, G.G. 1999. {\em Friends by choice.
-An actor-oriented statistical network model for friendship
-networks through time.}
-Amsterdam: Thesis Publishers.
-
-\bibitem{}
-Van de Bunt, G.G., M.A.J.\ van Duijn, and T.A.B.\ Snijders. 1999.
-Friendship networks through time:
-An actor-oriented statistical network model.
-{\em  Computational and Mathematical Organization Theory}, {\bf 5}, 167 -- 192.
-
-\bibitem{}
-van Duijn, M.A.J., E.P.H.\ Zeggelink, M.\ Huisman, F.N.\ Stokman, and F.W.\ Wasseur. 2003.
-Evolution of Sociology Freshmen into a Friendship Network.
-\emph{Journal of Mathematical Sociology} 27, 153--191.
-
-\bibitem{} Wasserman, S. 1979. A stochastic model for directed graphs
-with transition rates determined by reciprocity.
-Pp.\ 392 -- 412 in {\em Sociological Methodology 1980},
-edited by K.F.\ Schuessler. San Francisco: Jossey-Bass.
-
-\bibitem{} Wasserman, S., and P.\ Pattison. 1996. Logit models and
-logistic regression for social networks: I. An introduction to
-Markov graphs and $p^*$.
-{\em Psychometrika}, {\bf 61}, 401 -- 425.
-
-%\bibitem{} Wasserman, S., and K.\ Faust. 1994.
-%{\em Social Network Analysis: Methods and Applications}.
-%New York and Cambridge: Cambridge University Press.
-
+\nocite{Federico04}
+\nocite{Federico05}
+\nocite{Frank91}
+\nocite{FrankStrauss86}
+\nocite{Handcock02}
+\nocite{JariegoFederico06}
+
+\bibliographystyle{JRSS}
+\bibliography{RSiena}
 \end{document}
