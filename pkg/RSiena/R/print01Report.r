@@ -377,8 +377,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                         Report(c("Missing values in this actor variable are",
                                  "imputed",
                                  "by the mode per observation.\n"), outf)
-                        Report(c("But if there is a previous nonmissing",
-                                 "value,",
+                        Report(c("But if there is a previous (or later)",
+                                 "nonmissing value,",
                                  "this is used as the imputed value.\n"), outf)
                         Report("Modal values:\nObservation  ", outf)
                         Report(c(format(1:x$observations+periodFromStart,
