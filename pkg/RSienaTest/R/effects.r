@@ -452,7 +452,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         }
         for (j in seq(along = xx$dyvCovars))
         {
-            if (all(nodeSets == attr(xx$dycCovars[[j]], 'nodeSet')))
+            if (all(nodeSets == attr(xx$dyvCovars[[j]], 'nodeSet')))
             {
                 objEffects <- rbind(objEffects,
                                     createEffects("dyadObjective",

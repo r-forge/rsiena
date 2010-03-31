@@ -1,3 +1,24 @@
+2010-03-31 R-forge revision 75
+
+	* R/getEffects.r: fix bug causing crash with Dyadic covariates and
+	bipartite networks
+
+2010-03-30 R-forge revision 74 (RSiena only)
+
+	* R/print01Report.r: change to text about missing values
+	* inst/doc/s_man400.pdf: updated manual
+
+2010-03-30 R-forge revision 73 (RSienaTest only)
+
+	* R/print01Report.r: change to text about missing values
+	* doc/s_man400.tex: updated manual source
+	* doc/RSienaDeveloper.tex: updated documentation
+	* inst/doc/s_man400.pdf: updated manual
+
+2010-03-30 R-forge revision 72 (RSienaTest only)
+
+	* doc/RSiena.bib: added bibliography file
+
 2010-03-27 R-forge revision 71 (RSienaTest only) (cf revision 68, 69, 70 for RSiena)
 
 	* data/allEffects.csv, src/model/effects/EffectFactory.cpp:
