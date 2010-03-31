@@ -1,3 +1,24 @@
+2010-03-31 R-forge revision 75
+
+	* R/getEffects.r: fix bug causing crash with Dyadic covariates and
+	bipartite networks
+
+2010-03-30 R-forge revision 74 (RSiena only)
+
+	* R/print01Report.r: change to text about missing values
+	* inst/doc/s_man400.pdf: updated manual
+
+2010-03-30 R-forge revision 73 (RSienaTest only)
+
+	* R/print01Report.r: change to text about missing values
+	* doc/s_man400.tex: updated manual source
+	* doc/RSienaDeveloper.tex: updated documentation
+	* inst/doc/s_man400.pdf: updated manual
+
+2010-03-30 R-forge revision 72 (RSienaTest only)
+
+	* doc/RSiena.bib: added bibliography file
+
 2010-03-27 R-forge revision 71 (RSienaTest only) (cf revision 68, 69, 70 for RSiena)
 
 	* data/allEffects.csv, src/model/effects/EffectFactory.cpp:
@@ -36,7 +57,8 @@
 2010-03-24 R-forge revision 69 (RSiena only) (cf revision 63, 67 for RSienaTest)
 
 	* src/many: mostly incomplete, changes for ML.
-	* R/simstatsc.r: sped up carry forward for NA arcs in sparse input.
+	* R/simstatsc.r: sped up carry forward for NA arcs in sparse
+	input. Also new function to initialise. Some changes relevant for ML.
 	* R/print01Report.r: some percentages had not been multiplied by 100.
 	* R/sienaDataCreateFromSession.r: fix to allow more than one
 	value indicating missing for covariates etc.
@@ -61,12 +83,13 @@
 	now be used with optional output file
 	* R/print01Report.r, R/sienaDataCreate.r, src/siena07.cpp: missing
 	values in dyadic covariates (incomplete!)
-	* R/siena01.r: fix to creation of model for unconditional estimation
+	* R/siena01.r: fix to creation of model for unconditional
+	estimation, fix to carrying forward theta if abnormal termination
 	* R/phase3.r: fix to timing of progress reports for multiple processors
 	* R/printInitialDescription.r: fix, was crashing with one mode and
 	bipartite networks together.
 
-2010-03-21 R-forge revision 68 new version number 1.0.11 for RSiena
+2010-03-21 R-forge revision 68 (RSiena only) new version number 1.0.11 for RSiena
 
 	* R/sienaDataCreateFromSession.r: allow periods to be numbered
 	other than from 1 in siena net input.
