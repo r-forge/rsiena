@@ -666,7 +666,8 @@ siena01Gui <- function(getDocumentation=FALSE)
         showFn <- function()
         {
             editCols <- c("name", "effectName", "type", "include", "fix",
-                          "test", "initialValue", "parm")
+                          "test", "initialValue", "parm", "effectNumber",
+                          "effect1", "effect2", "effect3")
             effEdit <- myeff[myeff$include, editCols]
             for (i in c("include", "fix", "test"))
             {

@@ -10,14 +10,30 @@
 
 ##@includeEffect DataCreate
 includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
-                        type="eval", interaction1="", interaction2="")
+                           type="eval", interaction1="", interaction2="",
+                           character=FALSE)
 {
-    dots <- substitute(list(...))[-1] ##first entry is the word 'list'
+   
+    if (character)
+    {
+        dots <- sapply(list(...), function(x)x)
+    }
+    else
+    {
+        dots <- substitute(list(...))[-1] ##first entry is the word 'list'
+    }
     if (length(dots) == 0)
     {
         stop("need some effect short names")
     }
-    effectNames <- sapply(dots, function(x)deparse(x))
+    if (!character)
+    {
+        effectNames <- sapply(dots, function(x)deparse(x))
+    }
+    else
+    {
+        effectNames <- dots
+    }
     use <- myeff$shortName %in% effectNames &
     myeff$type==type &
     myeff$name==name &
@@ -25,17 +41,24 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
     myeff$interaction2 == interaction2
     myeff[use, "include"] <- include
     print(myeff[use, c("name", "shortName", "type", "interaction1",
-                     "interaction2", "include")])
+                       "interaction2", "include")])
     myeff
 }
 ##@includeInteraction DataCreate
 includeInteraction <- function(myeff, ...,
                                include=TRUE, name=myeff$name[1],
                         type="eval", interaction1=rep("", 3),
-                               interaction2=rep("", 3))
+                               interaction2=rep("", 3), character=FALSE)
 {
-    ## check we have 2 or 3 short names
-    dots <- substitute(list(...))[-1] ##first entry is the word 'list'
+    if (character)
+    {
+        dots <- sapply(list(...), function(x)x)
+    }
+    else
+    {
+        ## check we have 2 or 3 short names
+        dots <- substitute(list(...))[-1] ##first entry is the word 'list'
+    }
     if (length(dots) == 0)
     {
         stop("need some effect short names")
@@ -44,7 +67,14 @@ includeInteraction <- function(myeff, ...,
     {
          stop("need exactly two or three effect short names")
     }
-    shortNames <- sapply(dots, function(x)deparse(x))
+    if (!character)
+    {
+        shortNames <- sapply(dots, function(x)deparse(x))
+    }
+    else
+    {
+        shortNames <- dots
+    }
     ## check that we have a spare row
     ints <- myeff[myeff$name == name & myeff$shortName  %in%
                   c("unspInt", "behUnspInt") &
@@ -132,10 +162,14 @@ includeInteraction <- function(myeff, ...,
 ##@setEffect DataCreate
 setEffect <- function(myeff, shortName, parameter=0,
                       fix=FALSE, test=FALSE, initialValue=0,
-                        include=TRUE, name=myeff$name[1],
-                        type="eval", interaction1="", interaction2="")
+                      include=TRUE, name=myeff$name[1],
+                      type="eval", interaction1="", interaction2="",
+                      character=FALSE)
 {
-    shortName <- deparse(substitute(shortName))
+    if (!character)
+    {
+        shortName <- deparse(substitute(shortName))
+    }
     use <- myeff$shortName == shortName &
     myeff$name == name &
     myeff$type == type &

@@ -184,11 +184,12 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                         }
                         if (attr(depvar, "type") == "bipartite")
                         {
-                             tmp <- format(cbind(1:atts$netdims[1], outdeg))
-                         }
+                            tmp <- format(cbind(1:atts$netdims[1], outdeg))
+                        }
                         else
                         {
-                            tmp <- format(cbind(1:atts$netdims[1], outdeg, indeg))
+                            tmp <- format(cbind(1:atts$netdims[1], outdeg,
+                                                indeg))
                         }
 
                         Report(tmp[, 1], fill=60, outf)
@@ -251,7 +252,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                                     nnonactive <-
                                         rowSums(depvar[, , k] == 10 |
                                                 depvar[, , k] == 11, na.rm=TRUE)
-                                    nnonactive <- nnonactive >= nrow(depvar[, , k])
+                                    nnonactive <- nnonactive >=
+                                        nrow(depvar[, , k])
                                 }
                                 if (sum(nnonactive)  == 1)
                                 {
@@ -269,11 +271,15 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                         }
                         if (attr(depvar, "sparse"))
                         {
-                            anymissings <- any(is.na(depvar[[k]]))
+                            depvark <- depvar[[k]]
+                            diag(depvark) <- 0
+                            anymissings <- any(is.na(depvark))
                         }
                         else
                         {
-                            anymissings <- any(is.na(depvar[, , k]))
+                            depvark <- depvar[, , k]
+                            diag(depvark) <- 0
+                            anymissings <- any(is.na(depvark))
                         }
                         if (anymissings)
                         {
@@ -656,7 +662,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                 Report(c("Exogenous dyadic covariate named ", covars[i], '.\n'),
                        sep="", outf)
             }
-            Report("Number of tie variables with missing data per period:\n", outf)
+            Report("Number of tie variables with missing data per period:\n",
+                   outf)
             Report(c(" period   ", format(1:(x$observations - 1) +
                                           periodFromStart, width=9),
                      "       overall\n"), sep="", outf)
@@ -924,7 +931,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
         upOnly <- atts$anyUpOnly[!nets]
         for (i in seq(along=netnames[upOnly]))
         {
-            Report(c("\nBehavior variable ", netnames[i], ":\n"), sep = "", outf)
+            Report(c("\nBehavior variable ", netnames[i], ":\n"), sep = "",
+                   outf)
             if (atts$observations == 1)
             {
                 Report("All behavior changes are upward.\n", outf)
@@ -1067,15 +1075,13 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                     {
                         Report(c("for network ", format(netnames[i], width=12),
                                  format(round(balmean[i], 4),
-                                        nsmall=4, width=14),
-                                 '.\n'),
+                                        nsmall=4, width=14), '.\n'),
                                sep="", outf)
                     }
                     else
                     {
-                        Report(c(format(round(balmean[i], 4), nsmall=4, width=14),
-                                 '.\n'),
-                               sep="", outf)
+                        Report(c(format(round(balmean[i], 4), nsmall=4,
+                                        width=14), '.\n'), sep="", outf)
                     }
                 }
             }
@@ -1111,8 +1117,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                 {
                     Report(c("Similarity", format(atts$cCovars[i], width=12),
                              ':', format(round(atts$cCovarSim[i], 4), width=12,
-                                         nsmall=4),
-                             '\n'), outf)
+                                         nsmall=4), '\n'), outf)
                 }
             }
         }
@@ -1139,8 +1144,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                 {
                     Report(c("Similarity", format(atts$netnames[i], width=12),
                              ':', format(round(atts$bSim[i], 4), nsmall=4,
-                                         width=12),
-                             '\n'), outf)
+                                         width=12), '\n'), outf)
                 }
             }
         }
@@ -1168,8 +1172,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                 {
                     Report(c("Similarity", format(atts$vCovars[i], width=12),
                              ':', format(round(atts$vCovarSim[i], 4), width=12,
-                                         nsmall=4),
-                             '\n'), outf)
+                                         nsmall=4), '\n'), outf)
                 }
             }
         }
