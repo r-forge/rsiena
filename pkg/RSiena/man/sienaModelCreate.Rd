@@ -7,19 +7,16 @@
  Creates a basic object which can be used as an argument for Siena07
 }
 \usage{
-     sienaModelCreate(fn = simstats0c,
-     usesimstats0c=deparse(substitute(fn))=="simstats0c",
+     sienaModelCreate(fn,
      projname = "Siena", MaxDegree = 0, useStdInits = FALSE,
      n3 = 1000, nsub = 4, maxlike = FALSE, diag = !maxlike,
      condvarno = 0, condname = "", firstg = 0.2, cond = NA,
-     findiff = FALSE, seed = NULL)
+     findiff = FALSE, seed = NULL, pridg=0.05, prcdg=0.05,
+     prper=0.3, pripr=0.25, prdpr=0.25, prrms=0.1 )
 }
 \arguments{
   \item{fn}{function to do one simulation in the Robbins-Monro
     algorithm}
-  \item{usesimstats0c}{Boolean. If true the standard algorithm is being
-	used which can be used with multiple processors. Just used for
-	validation.}
   \item{projname}{character string name of project. No embedded spaces}
   \item{MaxDegree}{Named vector of maximum degree values for
 	corresponding networks}
@@ -45,7 +42,13 @@
   \item{findiff}{ Boolean: If TRUE, estimate derivatives using finite
   differences. If FALSE use scores.}
   \item{seed}{Integer. Starting value of random seed. Not used if
-  parallel testing.}
+	parallel testing.}
+  \item{pridg}{Real number. Probability used in Metropolis-Hastings routine}
+  \item{prcdg}{Real number. Probability used in Metropolis-Hastings routine}
+  \item{prper}{Real number. Probability used in Metropolis-Hastings routine}
+  \item{pripr}{Real number. Probability used in Metropolis-Hastings routine}
+  \item{prdpr}{Real number. Probability used in Metropolis-Hastings routine}
+  \item{prrms}{Real number. Probability used in Metropolis-Hastings routine}
 }
 \details{Model specification is done via this object for Siena7. This
   function creates an object with the correct elements. Those not
@@ -59,7 +62,7 @@
   \item{firstg}{Initial value of the scale in the Robbins-Munro algorithm}
   \item{maxrat}{value used to control the maximum size of the jumps}
   \item{maxmaxrat}{value used to control the maximum size of the jumps}
-  \item{FRAN}{Simulation fn}
+  \item{FRANname}{Name of simulation fn}
   \item{maxlike}{is FRAN using maximum likelihood?}
   \item{cconditional}{is FRAN using conditional estimation?}
   \item{condvarno}{number of dependent variable on which to condition}

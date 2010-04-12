@@ -473,7 +473,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
         attr(depvars[[i]], 'distance') <- rep(FALSE, observations - 1)
         attr(depvars[[i]], 'vals') <- vector("list", observations)
         attr(depvars[[i]], 'nval') <- rep(NA, observations)
-        attr(depvars[[i]], 'noMissing') <- rep(NA, observations)
+        attr(depvars[[i]], 'noMissing') <- rep(0, observations)
         if (type == 'behavior')
         {
             attr(depvars[[i]], 'noMissing') <- FALSE
@@ -624,7 +624,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     }
                     attr(depvars[[i]], "nval")[j] <-
                         sum(!is.na(mymat[row(mymat) != col(mymat)]))
-           }
+                }
                 ### need to exclude the structurals here
                 if (sparse)
                 {
@@ -656,12 +656,15 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                 degree <- (atts$netdims[1] - 1) * ones / atts$nval
                 missings <- 1 - atts$nval/ atts$netdims[1] /
                     (atts$netdims[1] - 1)
+                noMissing <- atts$netdims[1] * (atts$netdims[1] - 1) -
+                    atts$nval
                 attr(depvars[[i]], "ones") <- ones
                 attr(depvars[[i]], "density") <- density
                 attr(depvars[[i]], "degree") <- degree
                 attr(depvars[[i]], "averageOutDegree") <- mean(degree)
                 attr(depvars[[i]], "averageInDegree") <- mean(degree)
                 attr(depvars[[i]], "missings") <- missings
+                attr(depvars[[i]], "noMissing") <- noMissing
             }
             else #type=='bipartite' not sure what we need here,
                 ## but include diagonal
@@ -734,12 +737,14 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                 density <- ones / atts$nval
                 degree <- (atts$netdims[2]) * ones / atts$nval
                 missings <- 1 - atts$nval/ atts$netdims[1] /
-                    (atts$netdims[2])
+                    atts$netdims[2]
+                noMissing <- atts$netdims[1] * atts$netdims[2] - atts$nval
                 attr(depvars[[i]], "ones") <- ones
                 attr(depvars[[i]], "density") <- density
                 attr(depvars[[i]], "degree") <- degree
                 attr(depvars[[i]], "averageOutDegree") <- mean(degree)
                 attr(depvars[[i]], "missings") <- missings
+                attr(depvars[[i]], "noMissing") <- noMissing
            }
         }
         attr(depvars[[i]], 'name') <- names(depvars)[i]
@@ -754,11 +759,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
     z$dycCovars <- dycCovars
     z$dyvCovars <- dyvCovars
     z$compositionChange <- compositionChange
- #   types <- sapply(z$depvars, function(x)attr(x, "type"))
- #   if (sum(types != "behavior" ) > 1)
- #   {
-        z <- checkConstraints(z)
- #   }
+    z <- checkConstraints(z)
     class(z) <- 'siena'
     z
 }
@@ -767,35 +768,41 @@ checkConstraints <- function(z)
 {
     types <- sapply(z$depvars, function(x)attr(x, "type"))
     sparse <- sapply(z$depvars, function(x)attr(x, "sparse"))
-    nodeSets <- sapply(z$depvars, function(x)attr(x, "nodeSet"))
+    nodeSets <- lapply(z$depvars, function(x)attr(x, "nodeSet"))
     nNets <- length(z$depvars)
+
     pairsOfNets <- as.matrix(expand.grid(names(z$depvars), names(z$depvars)))
-    ## maybe remove some as don't want pairs with self, but may want all there
-    ##pairsOfNets <- pairsOfNets[pairsOfNets[, 1] != pairsOfNets[, 2], ]
-    pairsNames <- paste(pairsOfNets[, 1], pairsOfNets[,2], sep=",")
+    pairsNames <- paste(pairsOfNets[, 1], pairsOfNets[, 2], sep=",")
 
     higher <- namedVector(FALSE, pairsNames )
     atLeastOne <- namedVector(FALSE, pairsNames )
     disjoint <- namedVector(FALSE, pairsNames )
 
-    ## identify any nets which may relate
+    ## identify any nets which may relate. These are those that
+    ## share a node set and type.
     relates <- data.frame(name=names(z$depvars), type=types,
                           nodeSets=sapply(nodeSets, paste, collapse=","),
                           tn=paste(types, sapply(nodeSets, paste,
                           collapse=",")) , stringsAsFactors=FALSE)
+
+    ## just check we have only one row per network
+    if (nrow(relates) != nNets)
+    {
+        stop("Error in checkConstraints")
+    }
+    ## find the ones that do occur more than once
     use <- relates$tn %in% relates$tn[duplicated(relates$tn)]
+
+    ## create a working list to be compared, with names for ease of access
     nets <- namedVector(NA, names(z$depvars), listType=TRUE)
+
     for (net in names(z$depvars)[use])
     {
         if (types[[net]] != "behavior")
         {
             nets[[net]] <- z$depvars[[net]]
-        ##    nets[[net]] <- replaceMissingsAndStructurals(z$depvars[[net]])
         }
     }
-
-   ## relSplits <- split(relates, relates$tn)
-   ## relSplits <- relSplits[sapply(relSplits, nrow) > 1]
 
     for (i in 1:nrow(pairsOfNets))
     {
@@ -809,7 +816,7 @@ checkConstraints <- function(z)
             nodes1 <- relates[net1, "nodeSets"]
             nodes2 <- relates[net2, "nodeSets"]
 
-            if (type1 == type2 && type1 != "behavior" & nodes1 == nodes2)
+            if (type1 == type2 && type1 != "behavior" && nodes1 == nodes2)
             {
                 higher[i] <- TRUE
                 disjoint[i] <- TRUE
@@ -856,7 +863,6 @@ checkConstraints <- function(z)
             }
         }
     }
-
     attr(z, "higher") <- higher
     attr(z, "disjoint") <- disjoint
     attr(z, "atLeastOne") <- atLeastOne
@@ -875,14 +881,6 @@ rangeAndSimilarity<- function(vals, rvals=NULL)
         rvals <- range(vals,na.rm=TRUE)
     }
     rvals1 <- rvals[2] - rvals[1]
-    ## use of outer creates a potentially huge matrix unnecessarily
-    ## tmp3 <- apply(vals,2,function(x)
-    ##          {
-    ##              y <- 1 - abs(outer(x, x, "-")) / rvals1
-    ##              diag(y) <- NA
-    ##              y
-    ##          })
-    ## tmp3 <- array(tmp3, dim=c(n, n, observations))
     tmp <- apply(vals, 2, function(v){
     sapply(1: length(v), function(x, y, r){
         z <- y
@@ -1157,7 +1155,7 @@ groupRangeAndSimilarityAndMean <- function(group)
     attr(group, "dyvCovarMean") <- dyvCovarMean
     group
 }
-##@namedVector DataCreate
+##@namedVector DataCreate Utility to create a vector with appropriate names
 namedVector <- function(vectorValue, vectorNames, listType=FALSE)
 {
     if (listType)
@@ -1255,6 +1253,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     cvnodeSets <- namedVector(NA, vCovars)
     dycnodeSets <- namedVector(NA, dycCovars, listType=TRUE)
     dyvnodeSets <- namedVector(NA, dyvCovars, listType=TRUE)
+    totalMissings <- namedVector(0, netnames)
     observations <- 0
     periodNos <- rep(NA, 2)
     groupPeriods <- namedVector(NA, names(objlist))
@@ -1314,6 +1313,8 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
             {
                 structural[netnamesub] <- TRUE
             }
+            totalMissings[netnamesub] <- totalMissings[netnamesub] +
+                sum(attribs[["noMissing"]])
         }
         thisHigher <- attr(objlist[[i]], "higher")
         thisDisjoint <- attr(objlist[[i]], "disjoint")
@@ -1472,6 +1473,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     attr(group, 'netnames') <- netnames
     attr(group, 'symmetric') <- symmetric
     attr(group, 'structural') <- structural
+    attr(group, "totalMissings") <- totalMissings
     attr(group, 'allUpOnly') <- allUpOnly
     attr(group, 'allDownOnly') <- allDownOnly
     attr(group, 'anyUpOnly') <- anyUpOnly

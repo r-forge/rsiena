@@ -253,7 +253,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
             mydf[1:nn, 'row'] <- nnstr
             mydf[1:nn, 'value'] <- x$rate
             mydf[1:nn, 'se'] <- x$vrate
-            if (x$f$nDepvars == 1 || is.null(x$f$nDepvars))
+            if (is.null(x$f[[1]]$nDepvars) || x$f[[1]]$nDepvars == 1)
             {
                 mydf[1:nn, 'text'] <- paste('Rate parameter period', 1:nn)
             }

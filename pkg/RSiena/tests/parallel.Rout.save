@@ -129,8 +129,8 @@ Estimates, standard errors and t-statistics for convergence
                                                         Error                
 
 Rate parameters: 
-  0.1      Rate parameter period 1          5.7677  ( 0.8719   )             
-  0.2      Rate parameter period 2          4.5201  ( 0.6091   )             
+  0.1      Rate parameter cond. variable period 1  5.7677  ( 0.8719   )             
+  0.2      Rate parameter cond. variable period 2  4.5201  ( 0.6091   )             
 
 Other parameters: 
 Network Dynamics 

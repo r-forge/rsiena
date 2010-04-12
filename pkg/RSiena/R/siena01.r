@@ -239,7 +239,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         ## browser()
         if (loadfilename == "")
         {
-            return()
+            return(FALSE)
         }
         modelName <<- basename(loadfilename)
         ipos <- max(c(0, gregexpr('.', modelName, fixed=TRUE)[[1]]))
@@ -249,25 +249,29 @@ siena01Gui <- function(getDocumentation=FALSE)
         }
         session <<- sessionFromFile(loadfilename, tk=TRUE)
         procSession()
+        TRUE
     }
     ##@fromFileContFn internal siena01Gui
     fromFileContFn <- function()
     {
-        fromFileFn()
-        ## try to read in the project object
-        savedModelName <- paste(modelName, ".Rdata", sep='')
-        #browser()
-        if (inherits(resp <- try(load(savedModelName),
-                                 silent=TRUE), "try-error"))
+        OK <- fromFileFn()
+        if (OK)
         {
-            tkmessageBox(message="Unable to load saved model", icon="error")
-        }
-        else
-        {
-            mydata <<- mydata
-            mymodel <<- mymodel
-            myeff <<- myeff
-            sienaModelOptions()
+            ## try to read in the project object
+            savedModelName <- paste(modelName, ".Rdata", sep='')
+                                        #browser()
+            if (inherits(resp <- try(load(savedModelName),
+                                     silent=TRUE), "try-error"))
+            {
+                tkmessageBox(message="Unable to load saved model", icon="error")
+            }
+            else
+            {
+                mydata <<- mydata
+                mymodel <<- mymodel
+                myeff <<- myeff
+                sienaModelOptions()
+            }
         }
     }
     ##@helpFn internal siena01Gui
@@ -539,7 +543,6 @@ siena01Gui <- function(getDocumentation=FALSE)
         {
             ##create mymodel
             mymodel <<- modelFromTcl()
-
             if (tclvalue(clustVar) == '0')
             {
                 nbrNodes <- 1
@@ -727,9 +730,54 @@ siena01Gui <- function(getDocumentation=FALSE)
             if (savefilename != "")
                 save(estimAns, file=savefilename)
         }
-        ########################################
+        ##@screenFromModel internal siena01Gui update screen from saved model
+        screenFromModel <- function()
+        {
+            if (exists("mymodel"))
+            {
+                if (!is.na(mymodel$cconditional))
+                {
+                    if (mymodel$cconditional)
+                    {
+                        tclvalue(estimVar) <<-
+                            '1. conditional Method of Moments'
+                        if (ndepvars > 1)
+                        {
+                            tclvalue(condVar) <<- mymodel$condvarno
+                        }
+                    }
+                    else
+                    {
+                        tclvalue(estimVar) <<-
+                            '0. unconditional Method of Moments'
+                    }
+                }
+                tclvalue(gainVar) <<- mymodel$firstg
+                tclvalue(stdstartVar) <<- as.numeric(mymodel$useStdInits)
+                tclvalue(ph2spinVar) <<- mymodel$nsub
+                if (!is.null(mymodel$randomSeed) && mymodel$randomSeed != 0)
+                {
+                    tclvalue(rsVar) <<- '1'
+                    tclvalue(rsspinVar) <<- mymodel$randomSeed
+                    randomseedFn()
+                }
+                if (mymodel$FinDiff.method)
+                {
+                    tclvalue(derivVar) <<- '0. crude Monte Carlo'
+               }
+                tclvalue(ph3spinVar) <<- mymodel$n3
+                if (mymodel$MaxDegree != 0)
+                {
+                    for (i in 1:nMaxDegree)
+                    {
+                        maxdfVar[[i, 2]] <<- mymodel$MaxDegree[depvarnames[i]]
+                    }
+               }
+            }
+        }
+        ##*######################################
         ## start of sienaModelOptions function proper
-        ########################################
+        ##*#####################################
         resultsOpen <- FALSE
         if (inherits(mydata, "sienaGroup"))
         {
@@ -963,7 +1011,8 @@ siena01Gui <- function(getDocumentation=FALSE)
         tkgrid(editbut, showbut,  resultsbut, saveresultsbut,
                 helpbut, padx=5, pady=5)
         tkgrid(effectsvarl, sticky="w")
-        ## make sure this window is top with a global grab, bu only for a second
+        screenFromModel()
+       ## make sure this window is top with a global grab, bu only for a second
         tcl('wm', 'attributes', tt, '-topmost', 1)
         Sys.sleep(0.1)
         tcl('wm', 'attributes', tt, '-topmost', 0)

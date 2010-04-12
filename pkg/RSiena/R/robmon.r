@@ -27,6 +27,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     z$maxrepeatsubphase <- 4
     z$gain <- x$firstg
     z$haveDfra <- FALSE
+    z$maxlike <- x$maxlike
     #######################################################
     ##do initial setup call of FRAN
     #######################################################
@@ -40,7 +41,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     #######################################################
     if (useCluster)
     {
-        if (!is.null(x$simstats0c) && !x$simstats0c)
+        if (!is.null(x$FRANname) && x$FRANname != "simstats0c")
         {
             stop("Multiple processors only for simstats0c at present")
         }

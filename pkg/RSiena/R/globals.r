@@ -139,9 +139,13 @@ Heading<- function(level=1, dest, text, fill=FALSE)
         Report(c("@", level, "\n", text, "\n"), hdest=dest, sep="", fill=fill)
         Report(rep(ch, sum(nchar(text))), hdest=dest, sep="", fill=fill)
         if (level < 3)
+        {
             Report("\n\n", hdest = dest)
+        }
         else
+        {
             Report("\n", hdest = dest)
+        }
     }
 }
 
@@ -149,10 +153,14 @@ Heading<- function(level=1, dest, text, fill=FALSE)
 PrtOutMat<- function(mat, dest)
 {
     if (missing(dest))
-        Report(format(t(mat)), sep=c(rep.int(" ", ncol(mat) - 1), "\n"))
+    {
+        Report(format(t(mat), scientific=FALSE),
+               sep=c(rep.int(" ", ncol(mat) - 1), "\n"))
+    }
     else
     {
-        Report(format(t(mat)), sep=c(rep.int(" ", ncol(mat) - 1), "\n"),
+        Report(format(t(mat), scientific=FALSE),
+               sep=c(rep.int(" ", ncol(mat) - 1), "\n"),
                hdest=deparse(substitute(dest)))
         Report("\n", hdest=deparse(substitute(dest)))
     }
