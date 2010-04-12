@@ -42,6 +42,7 @@ public:
 
 	virtual int m() const;
 	virtual LongitudinalData * pData() const;
+	virtual bool behaviorVariable() const;
 	virtual void initialize(int period);
 	virtual void setLeaverBack(const SimulationActorSet * pActorSet,
 		int actor);
@@ -62,6 +63,7 @@ public:
 	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
 	virtual MiniStep * randomMiniStep(int ego);
 	virtual bool missing(const MiniStep * pMiniStep) const;
+	virtual bool structural(const MiniStep * pMiniStep) const;
 
 private:
 	double totalEvaluationContribution(int actor,
@@ -71,6 +73,7 @@ private:
 	void accumulateScores(int difference, bool UpPossible,
 		bool downPossible) const;
 	void calculateProbabilities(int actor);
+	void accumulateDerivatives() const;
 
 	// The observed data for this behavioral variable
 	BehaviorLongitudinalData * lpData;

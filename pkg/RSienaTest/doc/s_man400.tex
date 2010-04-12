@@ -981,7 +981,7 @@ which one may use to get started with \rs.
 # use the following for the last effect:
 
         #myeff[myeff$effectName=='alcohol ego x alcohol alter' &
-        #myeff$type=='eval', 'include']=TRUE)
+        #myeff$type=='eval', 'include']=TRUE
 
 # and similarly for the earlier ones.
 # To specify an interaction between say alcohol and reciprocity,
@@ -2266,6 +2266,7 @@ The basic list of these and other effects is as follows.
 
 For the structural part of the model for network dynamics,
 for two-mode (or bipartite) networks,
+treated in \citet{KoskinenEdling2010},
 the most important effects are as follows.
 The mathematical formulae for these and other effects are given
 in Section~\ref{S_math}. Here we give a more qualitative description.
@@ -2430,7 +2431,6 @@ The main evaluation effect is usually the most important. In the
 current version of \si, there are no effects of dyadic covariates
 on behavioral evolution.
 
-\iffalse
 \subsection{Cross-network effects for dynamics of multiple networks}
 
 If the are multiple dependent network variables,
@@ -2559,6 +2559,7 @@ If $X$ and $W$ both are one-mode networks, the \emph{closure of W} effect
 \put{$h$} at 3 3.4
 \put{{\small $W$}} at 2.1 1.9
 \put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3.0 0.6
 \arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
 \arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
 \arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
@@ -2568,7 +2569,7 @@ If $X$ and $W$ both are one-mode networks, the \emph{closure of W} effect
 \end{minipage}
 
 \end{enumerate}
-\fi
+
 
 \subsection{Effects on behavior evolution}
 \label{S_eff_beh}
@@ -2681,7 +2682,7 @@ These are currently not implemented in \SI 4.
 
 \iffalse
 For directed networks, the Model Type distinguishes between
-the model of \citet{Snijders01} (Model Type 1), 
+the model of \citet{Snijders01} (Model Type 1),
 that of \citet{Snijders03} (Model Type 2),
 and the tie-based model described in \citet{Snijders06} (Model Type 3).
 Model Type 1 is the default model and is
@@ -3485,7 +3486,7 @@ is convenient to have a look at the {\tt @1} marks first.
 
 The primary information in the output of the estimation process
 consists of the following three parts. Results are presented here
-which correspond to Table 2, column ``$t_1$, $t_3$" of \citet{Snijders01}. 
+which correspond to Table 2, column ``$t_1$, $t_3$" of \citet{Snijders01}.
 The results were obtained in an independent repetition of
 the estimation for this data set and this model specification;
 since the repetition was independent, the results are slightly
@@ -3725,7 +3726,7 @@ are as strong as .9.
 \SI can estimate models by three estimation methods: the (unconditional or conditional)
 Method of Moments \citep*[`MoM', the default;][]{Snijders01; SnijdersEA07},
 the Maximum Likelihood method \citep[`ML', see][]{SnijdersEA10},
-and Bayesian methods 
+and Bayesian methods
 \citep[see][]{Koskinen04, KoskinenSnijders07, SchweinbergerSnijders07c}.
 The maximum likelihood and Bayesian procedures are not yet
 implemented in RSiena.
@@ -4006,8 +4007,8 @@ The derivatives can be estimated by three methods:
 \citet{SchweinbergerSnijders07a} point out that the finite differences method is
 associated with a bias-variance dilemma, and proposed the unbiased and
 consistent score function methods.  These methods demand less computation time
-than method (0).  
-\iffalse 
+than method (0).
+\iffalse
 
 Method 1 estimates the derivatives per observation
 period separately by the simulated sample covariance of the complete data score
@@ -5146,7 +5147,7 @@ Versies voor Liesbeth
 
 
 Here, the mathematical formulae for the definition of the effects
-are given. In \citet{Snijders01,Snijders05} and \citet*{SteglichEA10}, 
+are given. In \citet{Snijders01,Snijders05} and \citet*{SteglichEA10},
 further background to these formulae can be found.
 The effects are grouped into effects for modelling network
 evolution and effects for modelling behavioral evolution (i.e.,
@@ -5195,7 +5196,7 @@ but only by the Maximum Likelihood or Bayesian method;
 this is indicated below by ``endowment effect only likelihood-based''.
 
 (It may be noted that the network evaluation function was called objective function,
-and the endowment function was called gratification function, in 
+and the endowment function was called gratification function, in
 \citet{Snijders01}.)
 
 \subsubsection{Network evaluation function}
@@ -6268,7 +6269,7 @@ This section still is in development.
 The main `driving force' of the actor-oriented model
 is the evaluation function
 \citep[in earlier publications called objective function,
-see][]{Snijders01, Snijders05} given in formula (\ref{f_net}) 
+see][]{Snijders01, Snijders05} given in formula (\ref{f_net})
 (for the network) as
 \[
 f^{\rm net}(x) \, = \, \sum_k \beta^{\rm net}_k \, s^{\rm net}_{ik}(x)   \ .
@@ -6391,7 +6392,7 @@ outcome of (\ref{eq_sel}) for some values of $v_i$ and $v_j$.
 This can be concretely carried using the data set {\sf s50}
 which is an excerpt of 50 girls in the data set used in
 \citet{PearsonMichell00, PearsonWest03,
-SteglichEA06} and \citet{SteglichEA07}.
+SteglichEA06} and \citet{SteglichEA10}.
 We refer to any of these papers for a further description of the data.
 The friendship network data over 3 waves are in
 the files {\sf s50-network1.dat}, {\sf s50-network2.dat},
@@ -6820,7 +6821,8 @@ This function is maximal for
 \newpage
 \section{List of Functions in Order of Execution}
 
-    This appendix provides a description of the functions that constitute the
+    This appendix, for which we are indebted to Paulina Preciado Lopez,
+    provides a description of the functions that constitute the
     RSiena package. This is intended as a quick reference or catalogue for the
     user to employ Stochastic Actor Oriented Models (SAOM) to analyse network
     dynamics in R.
@@ -6837,13 +6839,13 @@ This function is maximal for
 
     We consider that the model estimation is composed by 6 stages:
 \begin{enumerate}
-	\item Getting started
-	\item Get the data the right format or check that it is in the correct
+    \item Getting started
+    \item Get the data the right format or check that it is in the correct
       format
-	\item Data specification
-	\item Model specification
-	\item	Model estimation
-	\item	Working with the results
+    \item Data specification
+    \item Model specification
+    \item   Model estimation
+    \item   Working with the results
 \end{enumerate}
 
 Tables \ref{tab:FuncExR} and \ref{tab:ListSienaExec} present the list of useful
@@ -6852,44 +6854,44 @@ R functions and the list of RSiena functions in execution order, respectively.
 \begin{sidewaystable}
 \begin{threeparttable}
 \centering
-		\begin{tabular}{c | l | p{4.5cm} | p{5cm} | p{8cm} }
-		\multicolumn{1}{c}{\textbf{Stage}} & \multicolumn{1}{c}{\textbf{Name}}
- & 							\multicolumn{1}{c}{\textbf{Syntax}} &
+        \begin{tabular}{c | l | p{4.5cm} | p{5cm} | p{8cm} }
+        \multicolumn{1}{c}{\textbf{Stage}} & \multicolumn{1}{c}{\textbf{Name}}
+ &                          \multicolumn{1}{c}{\textbf{Syntax}} &
  \multicolumn{1}{c}{\textbf{Examples}} &
 \multicolumn{1}{c}{\textbf{Description}} \\
-		\cline{1-5}
-		1 &help\tnote{*} &	help(funame) &	help(siena01Gui) &
-	Opens the help on the function named ``funame'', this can also be done by
+        \cline{1-5}
+        1 &help\tnote{*} &  help(funame) &  help(siena01Gui) &
+    Opens the help on the function named ``funame'', this can also be done by
     typing ``?'' followed by ``funame'' in  the console\\
-		\hline
-		1	&getwd	&getwd()		& &
+        \hline
+        1   &getwd  &getwd()        & &
 Returns the name of the current working directory.
-				Does not require arguments\\
-				\hline
-		1 &	list.files &	list.files(dir)	&
-list.files (``C:/User/ MyDocuments/ MySiena'') &	Returns a character vector
+                Does not require arguments\\
+                \hline
+        1 & list.files &    list.files(dir) &
+list.files (``C:/User/ MyDocuments/ MySiena'') &    Returns a character vector
 with the names of the files in the directory ``dir''.
 If no argument is provided, ``dir'' is the current working directory.
 Type ?list.files for more options\\
 \hline
-1	&setwd\tnote{*}	&setwd(dir)	&setwd(``C:/MyDocuments/ MySiena'') &
-	Sets the working directory to ``dir''. In this context the working
+1   &setwd\tnote{*} &setwd(dir) &setwd(``C:/MyDocuments/ MySiena'') &
+    Sets the working directory to ``dir''. In this context the working
  directory should be where the data is saved\\
 \hline
-1	&install.packages\tnote{*} &	install.packages() &
+1   &install.packages\tnote{*} &    install.packages() &
 &It is used to install packages. If no arguments are provided it opens a GUI
  to select a mirror site and the packages that we want to download and
  install. This is not necessary if the package has already been installed.
  See ?install.packages for more options\\
 \hline
-1	&library\tnote{*} &	library(package) &	library(RSiena) &
+1   &library\tnote{*} & library(package) &  library(RSiena) &
 Loads the library named ``package''. See ?library for more options.\\
 \hline
-1	&read.table &	read.table(file, header = FALSE, sep = ``'',
-quote = ``\'''',...) & 	net1$<$--read.table(`network1. dat' , header = F)
-&	Reads a file in table format and creates a data	frame from it.
+1   &read.table &   read.table(file, header = FALSE, sep = ``'',
+quote = ``\'''',...) &  net1$<$--read.table(`network1. dat' , header = F)
+&   Reads a file in table format and creates a data frame from it.
 The argument ``file'' is the file containing the data. In the case of
-adjacency matrices, the	file should have the same number of columns and	rows.
+adjacency matrices, the file should have the same number of columns and rows.
 ``header'' is a logical argument indicating whether the first row of the data
 contains the column names. ``sep'' is the field separator character
  (such as space, comma, etc.). See the help on the function to specify
@@ -6899,7 +6901,7 @@ other arguments\\
 Transforms an object ``x'' into a matrix. Siena works with matrices and
 not with data frames\\
 \hline
-2&	class &   class(x)  & class(net1)  & Returns the type of object that
+2&  class &   class(x)  & class(net1)  & Returns the type of object that
 ``x'' is\\
 \hline
 2&   dim  & dim(x)  & dim(net1) &  Returns the dimension of object ``x''\\
@@ -6954,19 +6956,19 @@ not with data frames\\
 \hline
 \endlastfoot
 
-1 &	installGui &	installGui()	&
-	&Starts the installer for the standalone version of RSiena.
+1 & installGui &    installGui()    &
+    &Starts the installer for the standalone version of RSiena.
 Only for Windows. Does not require arguments\\
 \hline
 
-3 to 5&	siena01Gui&	siena01Gui()&	&	Does not require arguments.
+3 to 5& siena01Gui& siena01Gui()&   &   Does not require arguments.
  Opens a GUI to be used to run the model estimation or to create a session
  from which to work within R. Details on how to run the estimation under
  the GUI can be found in section \ref{thegui} and \ref{estgui}.\\
 \hline
 
-3	&sienaNodeSet	&sienaNodeSet (n, nodeSetName = ``Actors'',
-names = NULL)	& &	Creates a Siena node set which can be used as the nodes
+3   &sienaNodeSet   &sienaNodeSet (n, nodeSetName = ``Actors'',
+names = NULL)   & & Creates a Siena node set which can be used as the nodes
  in a siena network. ``n'' is the number of actors or nodes; ``nodeSetName''
  is a character string to name the node set (defaults to ``Actors'') and
 ```names'' is a string vector with length n with the names of each node
@@ -7104,10 +7106,10 @@ new effects object, so it is important to assign it to a
 name\\
 \hline
 
-4	& includeInteraction & 	includeInteraction(myeff, ..., include = TRUE, name
+4   & includeInteraction &  includeInteraction(myeff, ..., include = TRUE, name
 = myeff\$name[1], type  = ``eval'', interaction1 = rep(``'', 3), interaction2 =
 rep(``'', 3)) &  MyEff$<$--includeInteraction( MyEff, transTrip, egoX,
-interaction1 = c(``'',``beh'')) 	&This function provides an interface to
+interaction1 = c(``'',``beh''))     &This function provides an interface to
 allow easy update of  an unspecified interaction row in a Siena effects
 object. ``myeff'' is  a Siena  effects object as created by getEffects. To
 specify the effects to interact,  list their short names instead of ``...'';
@@ -7179,7 +7181,7 @@ parallel
 testing\\
 \hline
 
-5	& model.create	& & &		See sienaModelCreate\\
+5   & model.create  & & &       See sienaModelCreate\\
 \hline
 
 5 & siena07 & siena07(x, batch = FALSE, verbose = FALSE, silent = FALSE,
@@ -7257,6 +7259,15 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-04-11 R-forge revision 76 (RSienaTest only) Various bug fixes
+\begin{itemize}
+\item Memory problems when calculating derivatives with many iterations and
+  parameters.
+\item Occasional effects not being included correctly due to trailing blanks
+\item Some minor details of reports corrected.
+\end{itemize}
+\item 2010-03-31 R-forge revision 75 fixed bug with dyadic covariates and
+  bipartite networks.
 \item 2010-03-27 R-forge revision 71 (RSienaTest only)
 \begin{itemize}
 \item Fixes as for RSiena in revision 68/69/70 for RSiena
@@ -7264,10 +7275,10 @@ repository.)
 \end{itemize}
 \item 2010-03-27 R-forge revision 70 (RSiena only)
 \begin{itemize}
-\item Fix to crash at end of phase 3 with multiple processors and 
+\item Fix to crash at end of phase 3 with multiple processors and
 conditional estimation
 \item Correct carry forward/backward/use mode for behavior variables
-\item Fix bug causing crash in Finite Differences with only one effect 
+\item Fix bug causing crash in Finite Differences with only one effect
 \end{itemize}
 \item 2010-03-24 R-forge revision 69 (RSiena only)
 \begin{itemize}
@@ -7371,16 +7382,16 @@ Fix to bug in sorting effects for multiple dependent variables.
 Updated change log and manual in RSiena and changelog in RSienaTest.
 
 \item 2010-01-01 R-forge revision 32
-	print07report.r: corrected standard errors for rate estimate for
-	conditional estimation: needed square roots. RSiena
+    print07report.r: corrected standard errors for rate estimate for
+    conditional estimation: needed square roots. RSiena
 
 \item 2009-12-31 R-forge revision 31
 \begin{itemize}
 \item
-	print07report.r: corrected standard errors for rate estimate for
-	conditional estimation: needed square roots. RSienaTest only
+    print07report.r: corrected standard errors for rate estimate for
+    conditional estimation: needed square roots. RSienaTest only
 
-\item more behavior	effects in RSienaTest.
+\item more behavior effects in RSienaTest.
 \end{itemize}
 
 \item 2009-12-17 R-forge revision 30
@@ -7468,6 +7479,7 @@ Created RSienaTest which includes user
 \nocite{Handcock02}
 \nocite{JariegoFederico06}
 
-\bibliographystyle{JRSS}
+%\bibliographystyle{JRSS} % TS: I did not find this style so I changed it:
+\bibliographystyle{Chicago}
 \bibliography{RSiena}
 \end{document}

@@ -27,7 +27,7 @@ tt=NULL, parallelTesting=FALSE, clusterIter=TRUE, ...)
 	multiple processors, to ensure all copies are initialised
 	correctly.}
   \item{clusterString}{Definitions of clusters. Default set up to use
-	the localmachine only.}
+	the local machine only.}
   \item{tt}{A \code{tcltk} toplevel window. Used if called from the
 	model options screen.}
   \item{parallelTesting}{Boolean. If TRUE, sets up random numbers to

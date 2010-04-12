@@ -70,6 +70,8 @@ public:
 	virtual int m() const = 0;
 	virtual LongitudinalData * pData() const = 0;
 	int id() const;
+	virtual bool networkVariable() const;
+	virtual bool behaviorVariable() const;
 
 	inline const Function * pEvaluationFunction() const;
 	inline const Function * pEndowmentFunction() const;
@@ -114,6 +116,8 @@ public:
 
 	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
 
+	void updateEffectParameters();
+
 	/**
 	 * Returns if the observed value for the option of the given ministep
 	 * is missing at either end of the period.
@@ -121,9 +125,18 @@ public:
 	virtual bool missing(const MiniStep * pMiniStep) const = 0;
 
 	/**
+	 * Returns if the given ministep is structurally determined for the period
+	 */
+	virtual bool structural(const MiniStep * pMiniStep) const = 0;
+
+	/**
 	 * Generates a random ministep for the given ego.
 	 */
 	virtual MiniStep * randomMiniStep(int ego) = 0;
+
+	void calculateMaximumLikelihoodRateScores(int activeMiniStepCount);
+	void calculateMaximumLikelihoodRateDerivatives(int activeMiniStepCount);
+	double basicRateDerivative() const;
 
 protected:
 	inline EpochSimulation * pSimulation() const;
@@ -189,6 +202,10 @@ private:
 
 	// The score for the basic rate parameter for this variable for this period
 	double lbasicRateScore;
+
+	// The derivative for the basic rate parameter for this variable for
+	// this period
+	double lbasicRateDerivative;
 
 	// Scores for rate effects depending on constant covariates
 	map<const ConstantCovariate *, double> lconstantCovariateScores;

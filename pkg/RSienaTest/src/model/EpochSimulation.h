@@ -70,6 +70,10 @@ public:
 
     double score(const EffectInfo * pEffect) const;
     void score(const EffectInfo * pEffect, double value);
+	map<const EffectInfo *, double> derivative(const EffectInfo * pEffect1) const;
+	double derivative(const EffectInfo * pEffect1, const EffectInfo * pEffect2) const;
+	void derivative(const EffectInfo * pEffect1, const EffectInfo * pEffect2,
+		double value);
 
 protected:
     void calculateRates();
@@ -138,6 +142,7 @@ private:
     // including the rate effects, but excluding the basic rate effect.
 
     map<const EffectInfo *, double> lscores;
+    map<const EffectInfo *, map <const EffectInfo *, double> > lderivatives;
 
     State * lpState;
     Cache * lpCache;

@@ -346,6 +346,7 @@ void DependentVariable::initialize(int period)
 	this->lperiod = period;
 	this->lsimulatedDistance = 0;
 	this->lbasicRateScore = 0;
+	this->lbasicRateDerivative = 0;
 	this->lbasicRate =
 		this->lpSimulation->pModel()->basicRateParameter(this->pData(),
 			period);
@@ -736,12 +737,43 @@ void DependentVariable::accumulateRateScores(double tau,
 	}
 }
 
+/**
+ * Calculates the rate score functions for this chain for this variable.
+ * @param[in] activeMiniStepCount the number of non-structurally determined
+ * links in the current chain for this variable.
+ */
+
+void DependentVariable::calculateMaximumLikelihoodRateScores(int
+	activeMiniStepCount)
+{
+//	Rprintf("%d %d %f\n", this->n(), activeMiniStepCount, this->basicRate());
+	this->lbasicRateScore =
+		- this->n() + activeMiniStepCount / this->basicRate();
+}
+
+/**
+ * Calculates the rate derivative functions for this chain for this variable.
+ * @param[in] activeMiniStepCount the number of non-structurally determined
+ * links in the current chain for this variable.
+ */
+
+void DependentVariable::calculateMaximumLikelihoodRateDerivatives(int
+	activeMiniStepCount)
+{
+//	Rprintf("%d %d %f\n", this->n(), activeMiniStepCount, this->basicRate());
+	this->lbasicRateDerivative =
+		- activeMiniStepCount / this->basicRate()/ this->basicRate();
+}
 
 double DependentVariable::basicRateScore() const
 {
 	return this->lbasicRateScore;
 }
 
+double DependentVariable::basicRateDerivative() const
+{
+	return this->lbasicRateDerivative;
+}
 
 double DependentVariable::constantCovariateScore(
 	const ConstantCovariate * pCovariate) const
@@ -906,6 +938,64 @@ void DependentVariable::actOnLeaver(const SimulationActorSet * pActorSet,
 bool DependentVariable::validMiniStep(const MiniStep * pMiniStep) const
 {
 	return true;
+}
+
+
+/**
+ * Updates effect parameters
+ */
+
+void DependentVariable::updateEffectParameters()
+{
+	// find the Evaluation effectInfos
+	const vector<EffectInfo *>  rEffects=
+		this->lpSimulation->pModel()->rEvaluationEffects(this->name());
+
+	const Function * pFunction = this->pEvaluationFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		NetworkEffect * pEffect =
+			(NetworkEffect *) pFunction->rEffects()[i];
+		pEffect->parameter(rEffects[i]->parameter());
+	}
+	// find the Endowment effectInfos
+	const vector<EffectInfo *>  rEffects2=
+	 this->lpSimulation->pModel()->rEndowmentEffects(this->name());
+
+	pFunction = this->pEndowmentFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		NetworkEffect * pEffect =
+			(NetworkEffect *) pFunction->rEffects()[i];
+		pEffect->parameter(rEffects2[i]->parameter());
+	}
+
+
+}
+
+// ----------------------------------------------------------------------------
+// Section: Properties
+// ----------------------------------------------------------------------------
+
+/**
+ * Returns if this is a network variable.
+ */
+bool DependentVariable::networkVariable() const
+{
+	// This method is overriden in NetworkVariable. Here we return false.
+	return false;
+}
+
+
+/**
+ * Returns if this is a behavior variable.
+ */
+bool DependentVariable::behaviorVariable() const
+{
+	// This method is overriden in BehaviorVariable. Here we return false.
+	return false;
 }
 
 }
