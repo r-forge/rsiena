@@ -11,7 +11,7 @@
 setEffect(myeff, shortName, parameter = 0, fix = FALSE,
 test = FALSE, initialValue = 0, include = TRUE,
 name = myeff$name[1], type = "eval", interaction1 = "",
-interaction2 = "")
+interaction2 = "", character=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -44,6 +44,7 @@ interaction2 = "")
   Name of siena object where needed to completely identify the
   effect e.g. covariate name or behavior variable name.
 }
+\item{character}{Boolean: is the short name a character string or not}
 }
 \details{
 The arguments should identify the effects completely. The parm column
