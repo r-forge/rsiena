@@ -525,7 +525,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                      ##  namefiles[[1]][grep(miss, namefiles[[1]])] <-  NA
                        miss <- namesession$MissingValues
                         miss <- strsplit(miss, " ")[[1]]
-                       namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
+                      namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
                        if (namesession[1, "ActorSet"] == "Actors")
                        {
                            namesession[1, "ActorSet"]<- "Actors Actors"

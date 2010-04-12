@@ -1,3 +1,69 @@
+2010-04-12 R-forge revision 77 (RSiena only)
+
+	* inst/examples/many, man/coDyadCovar.Rd: added new line to end.
+	* data/allEffects.csv: remove trailing blanks
+	* man/includeEffects.Rd, man/siena07.Rd, R/siena07.r,
+	R/sienaDataCreateFromSession.r: minor formatting
+	* R/sienaModelCreate.R, man/sienaModelCreate.Rd: changes to storage of
+	function to be used, additions of ML parameters.
+	* R/globals.r: changed matrix print to stop using scientific
+	notation
+	* R/phase1.r: changed dfra to use for loops rather than apply's to
+	save memory
+	* R/maxlike.r, phase1.r, phase2.r, phase3.r, robmon.r: new function
+	makeZsmall, minor changes for maxlike.
+	* R/print01Report.r: fix bug which did not find whether symmetric
+	correctly.
+	* R/printInitialDescription.r: fix bug to printout of average
+	degrees.
+	* R/siena01.r: fix bug: the save function did not keep the model options
+	* R/sienaDataCreate.r: changes to attributes concerning missing
+	values. Remove warning in checkConstraints with bipartite networks.
+	* R/sienaPrint.r: fix to text re rates for conditional simulation
+	* R/simstatsc.r: changes for maxlike
+	* tests/parallel.Rout.save: updated test output.
+
+2010-04-12 R-forge revision 76 (RSienaTest only)
+
+	* src/data/ActorSet.cpp,
+	src/model/effects/AverageReciprocatedAlterEffect.cpp,
+	src/model/effects/ReciprocalDegreeBehaviorEffect.cpp,
+	src/model/variables/BehaviorVariable.cpp,
+	src/model/variables/EffectValueTable.cpp,
+	src/network/OneModeNetwork.cpp,src/utils/SqrtTable.cpp:
+	changes for Solaris compiling.
+	* inst/examples/many, man/coDyadCovar.Rd: added new line to end.
+	* data/allEffects.csv: remove trailing blanks
+	* doc/RSiena.bib, doc/s_man400.tex: changes to manual
+	* man/includeEffects.Rd, man/siena07.Rd, R/siena07.r,
+	R/sienaDataCreateFromSession.r: minor formatting
+	* R/sienaModelCreate.R, man/sienaModelCreate.Rd: changes to storage of
+	function to be used, additions of ML parameters.
+	* R/globals.r: changed matrix print to stop using scientific
+	notation
+	* R/phase1.r: changed dfra to use for loops rather than apply's to
+	save memory
+	* R/maxlike.r, phase1.r, phase2.r, phase3.r, robmon.r: new function
+	makeZsmall, minor changes for maxlike.
+	* R/iwlsm.r, maxlikecalc.r, siena08.r: added eolstyle native
+	* R/print01Report.r: fix bug which did not find whether symmetric
+	correctly.
+	* R/printInitialDescription.r: fix bug to printout of average
+	degrees.
+	* R/siena01.r: fix bug: the save function did not keep the model options
+	* R/sienaDataCreate.r: changes to attributes concerning missing
+	values. Remove warning in checkConstraints with bipartite networks.
+	* R/sienaPrint.r: fix to text re rates for conditional simulation
+	* R/simstatsc.r: changes for maxlike
+	* R/maxlikec.r: new function for maximum likelihood, corresponding
+	to simstatsc.r
+	* src/model/Model.cpp, Model.h, ml/MLSimulation.cpp,
+	ml/MLSimulation.h, ml/NetworkChange.cpp, ml/NetworkChange.h,
+	variables/DependentVariable.cpp, variables/DependentVariable.h,
+	variables/NetworkVariable.cpp, variables/NetworkVariable.h,
+	siena07.cpp: changes for max like.
+	* tests/parallel.Rout.save: updated test output.
+
 2010-03-31 R-forge revision 75
 
 	* R/getEffects.r: fix bug causing crash with Dyadic covariates and
