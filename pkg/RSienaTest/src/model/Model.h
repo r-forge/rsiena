@@ -90,6 +90,9 @@ public:
 	void needScores(bool flag);
 	bool needScores() const;
 
+	void needDerivatives(bool flag);
+	bool needDerivatives() const;
+
 	void parallelRun(bool flag);
 	bool parallelRun() const;
 
@@ -129,6 +132,10 @@ private:
 
 	// indicates whether we need to accumulate scores in this iteration
 	bool lneedScores;
+
+	// indicates whether we need to accumulate derivatives for ML in 
+	// this iteration
+	bool lneedDerivatives;
 
 	// indicates whether we need to match Siena3 in use of random variables
 	// and score calculations

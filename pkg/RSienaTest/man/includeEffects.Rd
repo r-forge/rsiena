@@ -9,7 +9,7 @@
 }
 \usage{
 includeEffects(myeff, ..., include = TRUE, name = myeff$name[1],
-type = "eval", interaction1 = "", interaction2 = "")
+ type = "eval", interaction1 = "", interaction2 = "")
 }
 \arguments{
   \item{myeff}{a Siena effects object as created by \code{\link{getEffects}}

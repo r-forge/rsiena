@@ -105,8 +105,8 @@ maxlikefn<- function(z,x,INIT=FALSE,TERM=FALSE, data, effects=NULL,nstart=1000,
         f$startmat <- startmat
         f$endmat <- endmat
         f$chain <- chain
-        f$accepts <-  rep(0,4)
-        f$rejects <- rep(0,4)
+        f$accepts <-  rep(0,6)
+        f$rejects <- rep(0,6)
         f$probs <- c(pinsdel, 0, pdiaginsdel)#
         f$madechain <- FALSE
         f$numm <- 20
@@ -151,8 +151,8 @@ maxlikefn<- function(z,x,INIT=FALSE,TERM=FALSE, data, effects=NULL,nstart=1000,
       #  int <- x$int
         if (z$Phase==2)
         {
-            f$accepts <-  rep(0, 4)
-            f$rejects <- rep(0, 4)
+            f$accepts <-  rep(0, 6)
+            f$rejects <- rep(0, 6)
             varmat <- FALSE
            ## browser()
             if (z$nit == 1)## beginning of a subphase
@@ -210,8 +210,8 @@ maxlikefn<- function(z,x,INIT=FALSE,TERM=FALSE, data, effects=NULL,nstart=1000,
         FRANstore(f)
       #  cat(scores,'\n')
         ##browser()
-        list(fra=matrix(scores, nrow=1), sc=NULL, dff=dff, OK=TRUE,
-             rejectprop=f$rejects / (f$accepts + f$rejects))
+        list(fra=matrix(scores, nrow=1), ntim0 = NULL, feasible = TRUE, OK = TRUE, dff=dff, accepts=f$accepts, rejects= f$rejects)
+
     }
 }
 mhIntStep <- function(theta, f, promul, prelins, int)

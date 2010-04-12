@@ -1,7 +1,7 @@
 ##/*****************************************************************************
 ## * SIENA: Simulation Investigation for Empirical Network Analysis
 ## *
-## * Web: http://stat.gamma.rug.nl/siena.html
+## * Web: http://www.stats.ox.ac.uk/~snijders/siena
 ## *
 ## * File: siena07.r
 ## *

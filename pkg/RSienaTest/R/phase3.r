@@ -64,17 +64,9 @@ phase3 <- function(z, x, ...)
         Report('Estimation of derivatives by the finite difference method.\n\n',outf)
     else
         Report('Estimation of derivatives by the LR method (type 1).\n\n', outf)
-    zsmall <- NULL
-    zsmall$FinDiff.method <- z$FinDiff.method
-    zsmall$theta <- z$theta
-    zsmall$Deriv <- z$Deriv
-    zsmall$Phase <- z$Phase
-    zsmall$nit <- z$nit
-    zsmall$int2 <- z$int2
-    zsmall$cl <- z$cl
+
     xsmall<- NULL
-    zsmall$cconditional <- z$cconditional
-    zsmall$condvar <- z$condvar
+    zsmall <- makeZsmall(z)
     if (!x$maxlike && !is.null(z$writefreq))
     {
         if (z$FinDiff.method)
@@ -195,6 +187,7 @@ phase3 <- function(z, x, ...)
                                  'phase-3 iterations.\n'), outf)
                     }
                     z$sf <- z$sf[1:nit,,drop=FALSE]
+                    z$sf2 <- z$sf2[1:nit,,,drop=FALSE]
                     z$ssc <- z$ssc[1:nit,,,drop=FALSE]
                     z$sdf <-z$sdf[1:nit,,,drop=FALSE]
                     break
@@ -209,6 +202,7 @@ phase3 <- function(z, x, ...)
         return(z)
     }
     z$Phase3nits <- nit
+    z$n3 <- nit
     z<- phase3.2(z,x)
     z
 }

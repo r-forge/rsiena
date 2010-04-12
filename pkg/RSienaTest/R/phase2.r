@@ -190,16 +190,8 @@ doIterations<- function(z, x, subphase,...)
 {
     z$nit <- 0
     ac <- 0
-    zsmall <- NULL
-    zsmall$theta <- z$theta
-    zsmall$Deriv <- z$Deriv
-    zsmall$Phase <- z$Phase
-    zsmall$int2 <- z$int2
-    zsmall$FinDiff.method <- z$FinDiff.method
-    zsmall$cl <- z$cl
     xsmall <- NULL
-    zsmall$cconditional <- z$cconditional
-    zsmall$condvar <- z$condvar
+    zsmall <- makeZsmall(z)
     repeat
     {
         z$n <- z$n+1
@@ -266,7 +258,9 @@ doIterations<- function(z, x, subphase,...)
         else
         {
             zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
-            fra <- rowMeans(sapply(zz, function(x) colSums(x$fra)- z$targets))
+            fra <- sapply(zz, function(x) colSums(x$fra)- z$targets)
+            dim(fra) <- c(z$pp, z$int)
+            fra <- rowMeans(fra)
             zz$OK <- sapply(zz, function(x) x$OK)
             if (!all(zz$OK))
             {
@@ -277,7 +271,7 @@ doIterations<- function(z, x, subphase,...)
         if (x$maxlike)
         {
             z$phase2fras[subphase, ,z$nit] <- fra
-            z$rejectprops[subphase, , z$nit] <- zz$rejectprop
+         #   z$rejectprops[subphase, , z$nit] <- zz$rejectprop
         }
         if (z$nit %% 2 == 1)
         {

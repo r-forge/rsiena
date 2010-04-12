@@ -10,22 +10,27 @@
  *****************************************************************************/
 
 #include "BehaviorChange.h"
+#include "data/BehaviorLongitudinalData.h"
 #include "model/variables/BehaviorVariable.h"
+#include "model/ml/Option.h"
 
 namespace siena
 {
 
 /**
  * Constructs a new behavior ministep.
- * @param[in] variableId the ID of the dependent variable to be changed
+ * @param[in] pData the longitudinal data object for the
  * @param[in] ego the actor making the change
  * @param[in] difference the amount of change
  * (-1,0,+1 for dichotomous variables)
  */
-BehaviorChange::BehaviorChange(int variableId,
+BehaviorChange::BehaviorChange(BehaviorLongitudinalData * pData,
 	int ego,
-	int difference) : MiniStep(variableId, ego, difference)
+	int difference) : MiniStep(pData, ego)
 {
+	this->lpData = pData;
+	this->ldifference = difference;
+	this->pOption(new Option(pData->id(), ego));
 }
 
 
@@ -34,6 +39,15 @@ BehaviorChange::BehaviorChange(int variableId,
  */
 BehaviorChange::~BehaviorChange()
 {
+}
+
+
+/**
+ * Returns if this ministep is changing a behavior variable.
+ */
+bool BehaviorChange::behaviorMiniStep() const
+{
+	return true;
 }
 
 
@@ -61,6 +75,47 @@ void BehaviorChange::makeChange(DependentVariable * pVariable)
 bool BehaviorChange::diagonal() const
 {
 	return this->difference() == 0;
+}
+
+
+/**
+ * Returns if the observed data for this ministep is missing at
+ * either end of the given period.
+ */
+bool BehaviorChange::missing(int period) const
+{
+	return this->lpData->missing(period, this->ego()) ||
+		this->lpData->missing(period + 1, this->ego());
+}
+
+
+/**
+ * Returns a new ministep that reverses the effect of this ministep.
+ */
+MiniStep * BehaviorChange::createReverseMiniStep() const
+{
+	return new BehaviorChange(this->lpData,
+		this->ego(),
+		-this->difference());
+}
+
+
+/**
+ * Returns if this mini step is the first mini step of a CCP.
+ */
+bool BehaviorChange::firstOfConsecutiveCancelingPair() const
+{
+	bool rc = MiniStep::firstOfConsecutiveCancelingPair();
+
+	if (rc)
+	{
+		BehaviorChange * pNextForOption =
+			dynamic_cast<BehaviorChange *>(this->pNextWithSameOption());
+
+		rc = this->ldifference == -pNextForOption->ldifference;
+	}
+
+	return rc;
 }
 
 }

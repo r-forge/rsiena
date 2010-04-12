@@ -99,27 +99,27 @@ printInitialDescription <- function(data, effects, modelName="Siena",
             }
             averageOutDegree <- rep(NA, nData)
             for (group in 1:nData)
-                {
+            {
                 j <- match(netnames[net], names(data[[group]]$depvars))
                 if (is.na(j))
                     stop("network names not consistent")
                 depvar <- data[[group]]$depvars[[j]]
                 atts <- attributes(depvar)
                 averageOutDegree[group] <- atts$"averageOutDegree"
-                }
-                Report("\n", outf)
+            }
+            Report("\n", outf)
             if (nData > 1)
-                {
-                    Report("The average degrees are: ", outf)
-                    Report(paste(names(data), round(averageOutDegree, 3),
-                                 sep=': '), outf)
-                    Report("\n", outf)
-                }
-                else
-                {
-                    Report(c("The average degree is",
-                             round(averageOutDegree, 3), "\n"), outf)
-                }
+            {
+                Report("The average degrees are: ", outf)
+                Report(paste(names(data), round(averageOutDegree, 3),
+                             sep=': '), outf)
+                Report("\n", outf)
+            }
+            else
+            {
+                Report(c("The average degree is",
+                         round(averageOutDegree, 3), "\n"), outf)
+            }
             Report("\n\n", outf)
             Report(c(ifelse(gpatts$symmetric[net], "Edge", "Tie"),
                      "changes between subsequent observations:\n"), outf)

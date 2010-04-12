@@ -724,21 +724,21 @@ void NetworkVariable::accumulateScores(int alter) const
 	{
 		Effect * pEffect = this->pEvaluationFunction()->rEffects()[i];
 		double score = this->levaluationEffectContribution[alter][i];
-		//Rprintf("score 1 %f\n", score);
+		//	Rprintf("score 1 %f\n", score);
 
 		for (int j = 0; j < this->m(); j++)
 		{
 			score -=
 				this->levaluationEffectContribution[j][i] *
 					this->lprobabilities[j];
-			//		Rprintf("score 2 %d %f %f %f\n", j, score,
-			//			this->levaluationEffectContribution[j][i],
-			//		this->lprobabilities[j]);
+			//Rprintf("score 2 %d %f %f %f\n", j, score,
+			//		this->levaluationEffectContribution[j][i],
+			//	this->lprobabilities[j]);
 		}
 
 		this->pSimulation()->score(pEffect->pEffectInfo(),
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
-//	Rprintf("score %f\n", score);
+		//Rprintf("score %f\n", score);
 	}
 	for (unsigned i = 0;
 		i < this->pEndowmentFunction()->rEffects().size();
@@ -771,12 +771,149 @@ void NetworkVariable::accumulateScores(int alter) const
  */
 double NetworkVariable::probability(MiniStep * pMiniStep)
 {
+	// Initialize the cache object for the current ego
+	this->pSimulation()->pCache()->initialize(pMiniStep->ego());
+
 	NetworkChange * pNetworkChange =
 		dynamic_cast<NetworkChange *>(pMiniStep);
 	this->lego = pNetworkChange->ego();
 	this->calculateTieFlipProbabilities();
+	if (this->pSimulation()->pModel()->needScores())
+	{
+		this->accumulateScores(pNetworkChange->alter());
+	}
+	if (this->pSimulation()->pModel()->needDerivatives())
+	{
+		this->accumulateDerivatives();
+	}
 	return this->lprobabilities[pNetworkChange->alter()];
 }
+
+/**
+ * Updates the derivatives for evaluation and endowment function effects
+ * according to the current miniStep in the chain.
+ */
+void NetworkVariable::accumulateDerivatives() const
+{
+	int totalEvaluationEffects = this->pEvaluationFunction()->rEffects().size();
+	int totalEndowmentEffects = this->pEndowmentFunction()->rEffects().size();
+	int totalEffects = totalEvaluationEffects + totalEndowmentEffects;
+	Effect * pEffect1;
+	Effect * pEffect2;
+	double derivative;
+	double product[totalEffects];
+	double contribution1 = 0.0;
+	double contribution2 = 0.0;
+
+	for (int effect1 = 0; effect1 < totalEffects; effect1++)
+	{
+		product[effect1] = 0.0;
+
+		if (effect1 < totalEvaluationEffects)
+		{
+			pEffect1 = this->pEvaluationFunction()->rEffects()[effect1];
+		}
+		else
+		{
+			pEffect1 = this->pEndowmentFunction()->rEffects()[effect1];
+		}
+		for (int alter = 0; alter < this->m(); alter++)
+		{
+			if (effect1 < totalEvaluationEffects)
+			{
+				product[effect1] +=
+					this->levaluationEffectContribution[alter][effect1] *
+					this->lprobabilities[alter];
+			}
+			else
+			{
+				product[effect1] +=
+					this->lendowmentEffectContribution[alter][effect1] *
+					this->lprobabilities[alter];
+			}
+			//	Rprintf("%d %d %f\n", alter, effect1, product[effect1]);
+		}
+		for (int effect2 = effect1; effect2 < totalEffects; effect2++)
+		{
+			derivative = 0.0;
+			if (effect2 <= totalEvaluationEffects)
+			{
+				pEffect2 = this->pEvaluationFunction()->rEffects()[effect2];
+			}
+			else
+			{
+				pEffect2 = this->pEndowmentFunction()->rEffects()[effect2];
+			}
+
+			for (int alter = 0; alter < this->m(); alter++)
+			{
+				if (effect1 < totalEvaluationEffects)
+				{
+					contribution1 =
+						this->levaluationEffectContribution[alter][effect1];
+				}
+				else
+				{
+					contribution1 =
+						this->lendowmentEffectContribution[alter][effect1];
+				}
+				if (effect2 < totalEvaluationEffects)
+				{
+					contribution2 =
+						this->levaluationEffectContribution[alter][effect2];
+				}
+				else
+				{
+					contribution2 =
+						this->lendowmentEffectContribution[alter][effect2];
+				}
+
+				derivative -=
+					contribution1 * contribution2 *	this->lprobabilities[alter];
+				//	Rprintf("deriv 2 %d %d %d %f %f %f %f\n", alter, effect1, effect2,
+				//		derivative,
+						//		this->levaluationEffectContribution[alter][effect1],
+				//		this->levaluationEffectContribution[alter][effect2],
+				//		this->lprobabilities[alter]);
+			}
+
+			this->pSimulation()->derivative(pEffect1->pEffectInfo(),
+				pEffect2->pEffectInfo(),
+				this->pSimulation()->derivative(pEffect1->pEffectInfo(),
+					pEffect2->pEffectInfo()) +	derivative);
+		}
+	}
+
+	for (int effect1 = 0; effect1 < totalEffects; effect1++)
+	{
+		for (int effect2 = effect1; effect2 < totalEffects; effect2++)
+		{
+			if (effect1 < totalEvaluationEffects)
+			{
+				pEffect1 = this->pEvaluationFunction()->rEffects()[effect1];
+			}
+			else
+			{
+				pEffect1 = this->pEndowmentFunction()->rEffects()[effect1];
+			}
+			if (effect2 <= totalEvaluationEffects)
+			{
+				pEffect2 = this->pEvaluationFunction()->rEffects()[effect2];
+			}
+			else
+			{
+				pEffect2 = this->pEndowmentFunction()->rEffects()[effect2];
+			}
+			this->pSimulation()->derivative(pEffect1->pEffectInfo(),
+				pEffect2->pEffectInfo(),
+				this->pSimulation()->derivative(pEffect1->pEffectInfo(),
+					pEffect2->pEffectInfo()) + product[effect1] * product[effect2]);
+		}
+	}
+}
+
+//	Rprintf("deriv %f\n", derivative;
+
 
 
 /**
@@ -809,7 +946,7 @@ bool NetworkVariable::validMiniStep(const MiniStep * pMiniStep) const
 
 		if (valid)
 		{
-			valid = pData->structural(i, j, this->period());
+			valid = !pData->structural(i, j, this->period());
 		}
 
 		// The filters may add some more conditions.
@@ -832,29 +969,13 @@ bool NetworkVariable::validMiniStep(const MiniStep * pMiniStep) const
  */
 MiniStep * NetworkVariable::randomMiniStep(int ego)
 {
+	this->pSimulation()->pCache()->initialize(ego);
 	this->lego = ego;
 	this->calculateTieFlipProbabilities();
 	int alter = nextIntWithProbabilities(this->m(), this->lprobabilities);
 
-	int difference = 0;
-
-	if (alter != ego)
-	{
-		// The following statement makes sure that a tie is withdrawn
-		// correctly.
-
-		difference = -this->lpNetwork->tieValue(ego, alter);
-
-		// Here we make sure that non-existing ties are properly introduced
-
-		if (difference == 0)
-		{
-			difference = 1;
-		}
-	}
-
 	MiniStep * pMiniStep =
-		new NetworkChange(this->id(), ego, alter, difference);
+		new NetworkChange(this->lpData, ego, alter);
 	pMiniStep->logChoiceProbability(log(this->lprobabilities[alter]));
 
 	return pMiniStep;
@@ -875,6 +996,30 @@ bool NetworkVariable::missing(const MiniStep * pMiniStep) const
 		this->lpData->missing(pNetworkChange->ego(),
 			pNetworkChange->alter(),
 			this->period() + 1);
+}
+
+/**
+ * Returns if the given ministep is structurally determined in the period.
+ */
+bool NetworkVariable::structural(const MiniStep * pMiniStep) const
+{
+	const NetworkChange * pNetworkChange =
+		dynamic_cast<const NetworkChange *>(pMiniStep);
+	return this->lpData->structural(pNetworkChange->ego(),
+			pNetworkChange->alter(),
+			this->period());
+}
+
+// ----------------------------------------------------------------------------
+// Section: Properties
+// ----------------------------------------------------------------------------
+
+/**
+ * Returns if this is a network variable.
+ */
+bool NetworkVariable::networkVariable() const
+{
+	return true;
 }
 
 }

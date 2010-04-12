@@ -30,6 +30,7 @@ Model::Model()
 {
 	this->lconditional = false;
 	this->lneedScores = false;
+	this->lneedDerivatives = false;
 	this->lparallelRun = false;
 }
 
@@ -115,6 +116,22 @@ void Model::needScores(bool flag)
 bool Model::needScores() const
 {
 	return this->lneedScores;
+}
+/**
+ * Stores if derivatives are to accumulated in the current simulation
+ */
+void Model::needDerivatives(bool flag)
+{
+	this->lneedDerivatives = flag;
+}
+
+
+/**
+ * Returns if derivatives are to accumulated in the current simulation
+ */
+bool Model::needDerivatives() const
+{
+	return this->lneedDerivatives;
 }
 
 /**
