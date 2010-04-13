@@ -508,9 +508,13 @@ siena01Gui <- function(getDocumentation=FALSE)
                                effect2=rep(0, nrow(myeff)),
                                effect3=rep(0,nrow(myeff)))
             }
+             if (is.null(myeffcopy$timeDummy))
+            {
+                myeffcopy$timeDummy <- rep(",", nrow(myeff))
+            }
             editCols <- c("name", "effectName", "type", "include", "fix",
                           "test", "initialValue", "parm", "effectNumber",
-                          "effect1", "effect2", "effect3")
+                          "effect1", "effect2", "effect3", "timeDummy")
             effEdit <- myeffcopy[, editCols]
             for (i in c("include", "fix", "test"))
             {
@@ -576,10 +580,27 @@ siena01Gui <- function(getDocumentation=FALSE)
                     ## correspond to the conditional variable
                     if (!is.null(estimAns$rate))
                     {
+                        efflist <- apply(myeff[myeff$include, ], 1, function(x)
+                                         paste(x[c("name", "shortName",
+                                                   "type", "groupName",
+                                                   "interaction1",
+                                                   "interaction2", "period")],
+                                               collapse="|"))
+                        condeff <- attr(estimAns$f, "condEffects")
+                        condeff$initialValue <- estimAns$rate
+                        estimAns$effects$initialValue <- estimAns$theta
+                        neweff <- rbind(estimAns$effects, condeff)
+
+                        newlist <- apply(neweff, 1, function(x)
+                                         paste(x[c("name", "shortName",
+                                                   "type", "groupName",
+                                                   "interaction1",
+                                                   "interaction2", "period")],
+                                               collapse="|"))
                         use <- which(myeff$include)
                         initValues <- rep(0, length(use))
-                        initValues[estimAns$condvar] <- estimAns$rate
-                        initValues[-estimAns$condvar] <- estimAns$theta
+                        initValues <- neweff$initialValue[match(efflist,
+                                                                newlist)]
                         myeff$initialValue[myeff$include] <<- initValues
                     }
                 }
@@ -587,7 +608,21 @@ siena01Gui <- function(getDocumentation=FALSE)
                 {
                     if (!estimAns$termination == "UserInterrupt")
                     {
-                        myeff$initialValue[myeff$include] <<- estimAns$theta
+                        efflist <- apply(myeff[myeff$include, ], 1, function(x)
+                                         paste(x[c("name", "shortName",
+                                                   "type", "groupName",
+                                                   "interaction1",
+                                                   "interaction2", "period")],
+                                               collapse="|"))
+                        newlist <- apply(estimAns$effects, 1, function(x)
+                                         paste(x[c("name", "shortName",
+                                                   "type", "groupName",
+                                                   "interaction1",
+                                                   "interaction2", "period")],
+                                               collapse="|"))
+                        subs <- match(efflist, newlist)
+                        myeff$initialValue[myeff$include] <<-
+                            estimAns$theta[subs]
                     }
                 }
                 wasopen <- FALSE
@@ -665,9 +700,20 @@ siena01Gui <- function(getDocumentation=FALSE)
         ##@showFn internal siena01Gui
         showFn <- function()
         {
+            if (is.null(myeff$effectNumber))
+            {
+                myeff <- cbind(effectNumber=1:nrow(myeff), myeff,
+                                   effect1=rep(0, nrow(myeff)),
+                                   effect2=rep(0, nrow(myeff)),
+                                   effect3=rep(0,nrow(myeff)))
+            }
+            if (is.null(myeff$timeDummy))
+            {
+                myeff$timeDummy <- rep(",", nrow(myeff))
+            }
             editCols <- c("name", "effectName", "type", "include", "fix",
                           "test", "initialValue", "parm", "effectNumber",
-                          "effect1", "effect2", "effect3")
+                          "effect1", "effect2", "effect3", "timeDummy")
             effEdit <- myeff[myeff$include, editCols]
             for (i in c("include", "fix", "test"))
             {

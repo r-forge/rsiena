@@ -5,7 +5,7 @@ sienaCompositionChangeFromFile, sienaDataCreate, sienaDataCreateFromSession,
 sienaGroupCreate,  sienaModelCreate, sienaNet, sienaNodeSet, #simstats0c,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, #maxlikefn,
-       installGui, siena08, iwlsm)#, sienaTimeTest)
+       installGui, siena08, iwlsm, sienaTimeTest)
 
 import(Matrix)
 import(xtable)
@@ -34,7 +34,7 @@ S3method(addAttributes, coCovar)
 S3method(addAttributes, varCovar)
 S3method(addAttributes, coDyadCovar)
 S3method(addAttributes, varDyadCovar)
-#S3method(print, sienaTimeTest)
-#S3method(summary, sienaTimeTest)
-#S3method(print, summary.sienaTimeTest)
-#S3method(plot, sienaTimeTest)
+S3method(print, sienaTimeTest)
+S3method(summary, sienaTimeTest)
+S3method(print, summary.sienaTimeTest)
+S3method(plot, sienaTimeTest)
