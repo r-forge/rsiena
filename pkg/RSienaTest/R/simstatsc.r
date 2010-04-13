@@ -1212,18 +1212,24 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                 oldlist <- apply(prevEffects, 1, function(x)
                                  paste(x[c("name", "shortName",
                                            "type", "groupName",
-                                           "interaction1", "interaction2")],
+                                           "interaction1", "interaction2",
+                                           "period")],
                                        collapse="|"))
                 efflist <- apply(effects, 1, function(x)
                                  paste(x[c("name", "shortName",
                                            "type", "groupName",
-                                           "interaction1", "interaction2")],
+                                           "interaction1", "interaction2",
+                                           "period")],
                                      collapse="|"))
                 use <- efflist %in% oldlist
                 effects$initialValue[use] <-
                     prevEffects$initialValue[match(efflist, oldlist)][use]
             }
         }
+        ## add any effects needed for time dummies
+        tmp <- sienaTimeFix(effects, data)
+        data <- tmp$data
+        effects <- tmp$effects
         ## find any effects not included which are needed for interactions
         interactionNos <- unique(c(effects$effect1, effects$effect2,
                                    effects$effect3))

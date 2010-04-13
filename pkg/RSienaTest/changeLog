@@ -1,4 +1,44 @@
-2010-04-11 R-forge revision 76 (RSienaTest only)
+2010-04-13 R-forge revision 79
+
+	* R/sienaTimeTest.r, man/sienaTimeTest.Rd, data/allEffects.csv,
+	R/simstatsc.r, man/allEffects.Rd, man/getEffects.Rd:
+	new function sienaTimeTest.
+
+2010-04-12 R-forge revision 78
+
+	* R/sienaeffects.r, man/includeEffects.Rd,
+	man/includeInteraction.Rd, man/setEffects.Rd: allow character or
+	non character input of effect names.
+	* R/siena01.r: include effectNumber, effect1, effect2, effect3 in
+	display of included effects.
+	* R/print01Report.r: ignore diagonal missing values in total count
+
+2010-04-12 R-forge revision 77 (RSiena only)
+
+	* inst/examples/many, man/coDyadCovar.Rd: added new line to end.
+	* data/allEffects.csv: remove trailing blanks
+	* man/includeEffects.Rd, man/siena07.Rd, R/siena07.r,
+	R/sienaDataCreateFromSession.r: minor formatting
+	* R/sienaModelCreate.R, man/sienaModelCreate.Rd: changes to storage of
+	function to be used, additions of ML parameters.
+	* R/globals.r: changed matrix print to stop using scientific
+	notation
+	* R/phase1.r: changed dfra to use for loops rather than apply's to
+	save memory
+	* R/maxlike.r, phase1.r, phase2.r, phase3.r, robmon.r: new function
+	makeZsmall, minor changes for maxlike.
+	* R/print01Report.r: fix bug which did not find whether symmetric
+	correctly.
+	* R/printInitialDescription.r: fix bug to printout of average
+	degrees.
+	* R/siena01.r: fix bug: the save function did not keep the model options
+	* R/sienaDataCreate.r: changes to attributes concerning missing
+	values. Remove warning in checkConstraints with bipartite networks.
+	* R/sienaPrint.r: fix to text re rates for conditional simulation
+	* R/simstatsc.r: changes for maxlike
+	* tests/parallel.Rout.save: updated test output.
+
+2010-04-12 R-forge revision 76 (RSienaTest only)
 
 	* src/data/ActorSet.cpp,
 	src/model/effects/AverageReciprocatedAlterEffect.cpp,
@@ -39,7 +79,7 @@
 	variables/NetworkVariable.cpp, variables/NetworkVariable.h,
 	siena07.cpp: changes for max like.
 	* tests/parallel.Rout.save: updated test output.
-	* R/phase2.r: fixed bug, could not use multipl processors with
+	* R/phase2.r: fixed bug, could not use multiple processors with
 	only one effect
 
 2010-03-31 R-forge revision 75

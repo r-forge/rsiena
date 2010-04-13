@@ -1,3 +1,18 @@
+2010-04-13 R-forge revision 79
+
+	* R/sienaTimeTest.r, man/sienaTimeTest.Rd, data/allEffects.csv,
+	R/simstatsc.r, man/allEffects.Rd, man/getEffects.Rd:
+	new function sienaTimeTest.
+
+2010-04-12 R-forge revision 78
+
+	* R/sienaeffects.r, man/includeEffects.Rd,
+	man/includeInteraction.Rd, man/setEffects.Rd: allow character or
+	non character input of effect names.
+	* R/siena01.r: include effectNumber, effect1, effect2, effect3 in
+	display of included effects.
+	* R/print01Report.r: ignore diagonal missing values in total count
+
 2010-04-12 R-forge revision 77 (RSiena only)
 
 	* inst/examples/many, man/coDyadCovar.Rd: added new line to end.
@@ -54,7 +69,8 @@
 	* R/sienaDataCreate.r: changes to attributes concerning missing
 	values. Remove warning in checkConstraints with bipartite networks.
 	* R/sienaPrint.r: fix to text re rates for conditional simulation
-	* R/simstatsc.r: changes for maxlike
+	* R/simstatsc.r: changes for maxlike, also changes to use of
+	previous values
 	* R/maxlikec.r: new function for maximum likelihood, corresponding
 	to simstatsc.r
 	* src/model/Model.cpp, Model.h, ml/MLSimulation.cpp,
@@ -63,6 +79,8 @@
 	variables/NetworkVariable.cpp, variables/NetworkVariable.h,
 	siena07.cpp: changes for max like.
 	* tests/parallel.Rout.save: updated test output.
+	* R/phase2.r: fixed bug, could not use multiple processors with
+	only one effect
 
 2010-03-31 R-forge revision 75
 
