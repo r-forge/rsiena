@@ -1,4 +1,4 @@
-useDynLib(RSiena)
+useDynLib(RSienaTest)
 export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
 siena01Gui, siena07, sienaCompositionChange,
 sienaCompositionChangeFromFile, sienaDataCreate, sienaDataCreateFromSession,
