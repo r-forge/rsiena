@@ -27,7 +27,7 @@
 \usage{
 timetest <- sienaTimeTest(sienaFit)
 \method{plot}{sienaTimeTest}(x, pairwise=FALSE, effects=1:2,
-	dims=c(2, 1), scale=.2, plevels=c(.1, .5, .025), multiplot=FALSE, ...)
+	dims=c(2, 1), scale=.2, plevels=c(.1, .05, .025), multiplot=FALSE, ...)
 sienaEffects$timeDummy <- "2,4,6" #Include time dummies for periods
                                   # 2, 4, and 6
 sienaEffects$timeDummy <- "all"	  #Include all time dummies

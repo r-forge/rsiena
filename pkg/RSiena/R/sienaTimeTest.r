@@ -240,7 +240,7 @@ print.sienaTimeTest <- function(x, ...)
 	invisible(x)
 }
 plot.sienaTimeTest <- function(x, pairwise=FALSE, effects=1:2,
-	dims=c(2, 1), scale=.2, plevels=c(.1, .5, .025),
+	dims=c(2, 1), scale=.2, plevels=c(.1, .05, .025),
 	multiplot=FALSE, ...)
 {
 	require(lattice)

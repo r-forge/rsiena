@@ -1,3 +1,9 @@
+2010-04-14 R-forge revision 80
+
+	* R/sienaTimeTest.r, man/sienaTimeTest.Rd. corrected default
+	plevels for plot
+	* RSienaTest only NAMESPACE: corrected package name
+
 2010-04-13 R-forge revision 79
 
 	* R/sienaTimeTest.r, man/sienaTimeTest.Rd, data/allEffects.csv,
