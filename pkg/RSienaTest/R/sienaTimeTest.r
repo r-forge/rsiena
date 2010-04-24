@@ -352,59 +352,59 @@ plot.sienaTimeTest <- function(x, pairwise=FALSE, effects=1:2,
 		{
 			ymin=min(yaxis[i, ] - scale * abs(yaxis[i, ]))
 			ymax=max(yaxis[i, ] + scale * abs(yaxis[i, ]))
-			xyplot(yaxis[i, ]~xaxis,
+			xyplot(yaxis[i, ] ~ xaxis,
 				   type = "p", main = rownames(timetest$IndividualTest)
 				   [timetest$NonRateIndices[effects[i]]],
 				   sub=paste("p=", timetest$EffectTest[effects[i]]), bty="n",
 				   xlab="Wave", ylab="Parameter Value", auto.key=TRUE,
 				   ylim=c(ymin, ymax), xlim=c(0, length(xaxis) + 1),
 				   panel=function(x, y){
-				   for (j in 1:length(x))
-				   {
-				   if ( c(FALSE, timetest$ToTest[effects[i], ])[j] )
-				   {
-				   tmp="red"
+                       for (j in 1:length(x))
+                       {
+                           if ( c(FALSE, timetest$ToTest[effects[i], ])[j] )
+                           {
+                               tmp="red"
 
-				   }
-				   else
-				   {
-				   tmp="gray"
-				   }
+                           }
+                           else
+                           {
+                               tmp="gray"
+                           }
                            l <- yaxis[i, j] - abs(qnorm(plevels[1]  /  2,
                                                         sd=dummysd[i, j]))
                            u <- yaxis[i, j] + abs(qnorm(plevels[1] / 2,
                                                         sd=dummysd[i, j]))
                            panel.xyplot(c(x[j], x[j]), c(l, u), reference=TRUE,
                                         col=tmp, alpha=.50,
-								type="l", lend=1, lwd=10)
+                                        type="l", lend=1, lwd=10)
                            panel.xyplot(c(x[j], x[j]), c(l, u), reference=TRUE,
                                         col=tmp, alpha=.75,
-								type="p", pch=45, cex=3)
+                                        type="p", pch=45, cex=3)
                            l <- yaxis[i, j] - abs(qnorm(plevels[2] / 2,
                                                         sd=dummysd[i, j]))
                            u <- yaxis[i, j] + abs(qnorm(plevels[2] / 2,
                                                         sd=dummysd[i, j]))
                            panel.xyplot(c(x[j], x[j]), c(l, u), reference=TRUE,
                                         col=tmp, alpha=.50,
-								type="l", lend=1, lwd=10)
+                                        type="l", lend=1, lwd=10)
                            panel.xyplot(c(x[j], x[j]), c(l, u), reference=TRUE,
                                         col=tmp, alpha=.75,
-								type="p", pch=45, cex=3)
+                                        type="p", pch=45, cex=3)
                            l <- yaxis[i, j] - abs(qnorm(plevels[3] / 2,
                                                         sd=dummysd[i, j]))
                            u <- yaxis[i, j] + abs(qnorm(plevels[3] / 2,
                                                         sd=dummysd[i, j]))
                            panel.xyplot(c(x[j], x[j]), c(l, u), reference=TRUE,
                                         col=tmp, alpha=.25,
-								type="l", lend=1, lwd=10)
-				   }
+                                        type="l", lend=1, lwd=10)
+                       }
                        panel.xyplot(x, y, type="s", reference=TRUE,
                                     col="black", alpha=.75, pch=2)
                        panel.xyplot(x, y, type="p", reference=TRUE, pch=20,
                                     col=1)
                        panel.abline(a=timetest$IndividualTest[effects[i], 1],
                                     reference=TRUE,
-								col="black", lwd=2, alpha=.75)
+                                    col="black", lwd=2, alpha=.75)
 
 				   }, ...)
 		}

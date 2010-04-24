@@ -49,6 +49,7 @@ public:
 	void insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep);
 	void remove(MiniStep * pMiniStep);
 	void connect(int period);
+	void period(int period);
 
 	void onReciprocalRateChange(const MiniStep * pMiniStep, double newValue);
 
@@ -59,8 +60,12 @@ public:
 	MiniStep * pLast() const;
 	int ministepCount() const;
 	int diagonalMinistepCount() const;
+	int consecutiveCancelingPairCount() const;
+	int missingNetworkMiniStepCount() const;
+	int missingBehaviorMiniStepCount() const;
 	double mu() const;
 	double sigma2() const;
+	void printConsecutiveCancelingPairs() const;
 
 	// Intervals
 
@@ -69,7 +74,7 @@ public:
 
 	// Same option related
 
-	MiniStep * nextMiniStepForOption(Option & rOption,
+	MiniStep * nextMiniStepForOption(const Option & rOption,
 		const MiniStep * pFirstMiniStep) const;
 
 	// Random draws
@@ -78,9 +83,14 @@ public:
 	MiniStep * randomDiagonalMiniStep() const;
 	MiniStep * randomMiniStep(MiniStep * pFirstMiniStep,
 		MiniStep * pLastMiniStep) const;
+	MiniStep * randomConsecutiveCancelingPair() const;
+	MiniStep * randomMissingNetworkMiniStep() const;
+	MiniStep * randomMissingBehaviorMiniStep() const;
 
 private:
 	void resetOrderingKeys();
+	void updateSameOptionPointersOnInsert(MiniStep * pMiniStep);
+	void updateCCPs(MiniStep * pMiniStep);
 
 	// A dummy first ministep in the chain
 	MiniStep * lpFirst;
@@ -102,6 +112,15 @@ private:
 	// Stores the diagonal ministeps in no particular order.
 	vector<MiniStep *> ldiagonalMiniSteps;
 
+	// Stores the first ministep of each CCP in no particular order.
+	vector<MiniStep *> lccpMiniSteps;
+
+	// Stores the networks ministeps of missing options
+	vector<MiniStep *> lmissingNetworkMiniSteps;
+
+	// Storesthe behavior ministeps of missing options
+	vector<MiniStep *> lmissingBehaviorMiniSteps;
+
 	// Sum of reciprocal rates over all non-dummy ministeps.
 	double lmu;
 
@@ -109,7 +128,7 @@ private:
 	double lsigma2;
 
 	// Maps each option to its first ministep in the chain (if any)
-	map<Option, MiniStep *> lfirstMiniStepPerOption;
+	map<const Option, MiniStep *> lfirstMiniStepPerOption;
 };
 
 }

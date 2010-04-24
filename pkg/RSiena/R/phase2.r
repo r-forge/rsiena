@@ -318,11 +318,11 @@ doIterations<- function(z, x, subphase,...)
         z$theta <- zsmall$theta
         z$thav <- z$thav + zsmall$theta
         z$thavn <- z$thavn + 1
-       # if (x$maxlike && !is.null(x$moreUpdates) && x$moreUpdates > 0)
-       # {
-       #     z <- doMoreUpdates(z, x, x$moreUpdates * subphase)
-       #     zsmall$theta <- z$theta
-       # }
+        if (x$maxlike && !is.null(x$moreUpdates) && x$moreUpdates > 0)
+        {
+            z <- doMoreUpdates(z, x, x$moreUpdates * subphase)
+            zsmall$theta <- z$theta
+        }
         ##check for user interrupt
        ##   browser()
         CheckBreaks()

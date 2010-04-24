@@ -7,6 +7,8 @@
  *
  * Description: This file contains the implementation of the class Chain.
  *****************************************************************************/
+#include <R.h>
+#include <Rinternals.h>
 
 #include <vector>
 #include "Chain.h"
@@ -23,6 +25,7 @@
 
 namespace siena
 {
+SEXP getMiniStepDF(const MiniStep& miniStep);
 
 // ----------------------------------------------------------------------------
 // Section: Constructors, destructors, initializers
@@ -385,6 +388,14 @@ void Chain::connect(int period)
 // ----------------------------------------------------------------------------
 
 /**
+ * Sets the value of the period of the chain.
+ */
+void Chain::period(int value)
+{
+	this->lperiod = value;
+}
+
+/**
  * Performs the necessary updates when the reciprocal rate of the
  * given ministep changes to the given value.
  */
@@ -664,6 +675,19 @@ MiniStep * Chain::randomMissingBehaviorMiniStep() const
 		nextInt(this->lmissingBehaviorMiniSteps.size())];
 }
 
+/**
+ * Prints the list of ccps.
+ */
+void  Chain::printConsecutiveCancelingPairs() const
+{
+	// rr debug code for ccps
+		Rprintf("\nStart\n ");
+	for (unsigned i = 0; i < this->lccpMiniSteps.size(); i++)
+	{
+		PrintValue(getMiniStepDF(*this->lccpMiniSteps[i]));
+	}
+		Rprintf("\nend\n ");
+}
 
 // ----------------------------------------------------------------------------
 // Section: Intervals

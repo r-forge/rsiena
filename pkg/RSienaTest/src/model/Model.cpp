@@ -29,6 +29,7 @@ namespace siena
 Model::Model()
 {
 	this->lconditional = false;
+	this->lneedChain = false;
 	this->lneedScores = false;
 	this->lneedDerivatives = false;
 	this->lparallelRun = false;
@@ -100,6 +101,22 @@ string Model::conditionalDependentVariable() const
 {
 	return this->lconditionalDependentVariable;
 }
+/**
+ * Stores if a chain is to be built in the current simulation
+ */
+void Model::needChain(bool flag)
+{
+	this->lneedChain = flag;
+}
+
+
+/**
+ * Returns if a chain is to be built in the current simulation
+ */
+bool Model::needChain() const
+{
+	return this->lneedChain;
+}
 
 /**
  * Stores if scores are to accumulated in the current simulation
@@ -151,6 +168,55 @@ bool Model::parallelRun() const
 	return this->lparallelRun;
 }
 
+/**
+ * Stores the number of ML steps
+ */
+void Model::numberMLSteps(int value)
+{
+	this->lnumberMLSteps = value;
+}
+
+
+/**
+ * Returns the number of ML steps
+ */
+int Model::numberMLSteps() const
+{
+	return this->lnumberMLSteps;
+}
+
+/**
+ * Stores the number of MH batches
+ */
+void Model::numberMHBatches(int value)
+{
+	this->lnumberMHBatches = value;
+}
+
+
+/**
+ * Returns the number of MH batches
+ */
+int Model::numberMHBatches() const
+{
+	return this->lnumberMHBatches;
+}
+/**
+ * Stores the Bayesian scale factor
+ */
+void Model::BayesianScaleFactor(double value)
+{
+	this->lBayesianScaleFactor = value;
+}
+
+
+/**
+ * Returns the Bayesian scale factor
+ */
+double Model::BayesianScaleFactor() const
+{
+	return this->lBayesianScaleFactor;
+}
 // ----------------------------------------------------------------------------
 // Section: Effect management
 // ----------------------------------------------------------------------------

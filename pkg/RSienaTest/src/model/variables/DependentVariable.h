@@ -91,6 +91,7 @@ public:
 	void calculateRates();
 	double totalRate() const;
 	double rate(int actor) const;
+	inline double basicRate() const;
 
 	int simulatedDistance() const;
 
@@ -117,6 +118,7 @@ public:
 	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
 
 	void updateEffectParameters();
+	void updateEffectInfoParameters();
 
 	/**
 	 * Returns if the observed value for the option of the given ministep
@@ -138,6 +140,10 @@ public:
 	void calculateMaximumLikelihoodRateDerivatives(int activeMiniStepCount);
 	double basicRateDerivative() const;
 
+	// Bayesian related
+	void sampleBasicRate(int miniStepCount);
+	double sampleParameters(double scaleFactor);
+
 protected:
 	inline EpochSimulation * pSimulation() const;
 	void simulatedDistance(int distance);
@@ -151,7 +157,6 @@ private:
 	double calculateRate(int i);
 	double structuralRate(int i) const;
 	void updateCovariateRates();
-	inline double basicRate() const;
 
 	// A simulation of the actor-based model, which owns this variable
 	EpochSimulation * lpSimulation;
@@ -232,6 +237,13 @@ private:
 	// provided that the rates are constant during the period.
 
 	int lvalidRates;
+
+	// store for number of acceptances and rejections for non basic rate 
+	// parameters in Bayesian modelling
+
+	int lacceptances;
+	int lrejections;
+
 };
 
 

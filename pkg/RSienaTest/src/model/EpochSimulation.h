@@ -33,6 +33,7 @@ class EffectInfo;
 class SimulationActorSet;
 class State;
 class Cache;
+class Chain;
 
 
 // ----------------------------------------------------------------------------
@@ -74,7 +75,8 @@ public:
 	double derivative(const EffectInfo * pEffect1, const EffectInfo * pEffect2) const;
 	void derivative(const EffectInfo * pEffect1, const EffectInfo * pEffect2,
 		double value);
-
+	Chain * pChain();
+	
 protected:
     void calculateRates();
     double totalRate() const;
@@ -146,6 +148,8 @@ private:
 
     State * lpState;
     Cache * lpCache;
+
+	Chain * lpChain;
 };
 
 }

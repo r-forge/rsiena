@@ -83,6 +83,16 @@ int MiniStep::variableId() const
 	return this->lpData->id();
 }
 
+/**
+ * Returns the name of the dependent variable that this ministep is changing.
+ */
+string MiniStep::variableName() const
+{
+	return this->lpData->name();
+}
+
+
+
 
 /**
  * Stores the owner chain of this ministep.

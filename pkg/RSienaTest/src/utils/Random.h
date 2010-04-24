@@ -25,8 +25,14 @@ namespace siena
 double nextDouble();
 double nextExponential(double lambda);
 double nextExponentialQAD(double lambda);
+double nextGamma(double shape, double scale);
+double nextNormal(double mean, double standardDeviation);
 int nextInt(int n);
 int nextIntWithProbabilities(int n, const double * p);
+
+// Density function for normal variables
+double normalDensity(double value, double mean, double standardDeviation,
+	int log);
 
 //void storeState();
 //void restoreState();

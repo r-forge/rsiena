@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "MiniStep.h"
+#include "data/LongitudinalData.h"
 #include "model/variables/DependentVariable.h"
 #include "model/ml/Chain.h"
 
@@ -17,16 +18,15 @@ namespace siena
 
 /**
  * Constructs a new ministep.
- * @param[in] variableId the ID of the dependent variable to be changed
+ * @param[in] pData the longitudinal data object for the
+ * corresponding dependent variable
  * @param[in] ego the actor making the change
- * @param[in] difference the amount of change
- * (-1,0,+1 for dichotomous variables)
  */
-MiniStep::MiniStep(int variableId, int ego, int difference)
+MiniStep::MiniStep(LongitudinalData * pData, int ego)
 {
 	this->lego = ego;
-	this->lvariableId = variableId;
-	this->ldifference = difference;
+	this->lpData = pData;
+	this->lpOption = 0;
 	this->lpChain = 0;
 	this->llogOptionSetProbability = 0;
 	this->llogChoiceProbability = 0;
@@ -37,6 +37,8 @@ MiniStep::MiniStep(int variableId, int ego, int difference)
 	this->lpNextWithSameOption = 0;
 	this->lindex = -1;
 	this->ldiagonalIndex = -1;
+	this->lconsecutiveCancelingPairIndex = -1;
+	this->lmissingIndex = -1;
 	this->lorderingKey = 0;
 }
 
@@ -46,7 +48,50 @@ MiniStep::MiniStep(int variableId, int ego, int difference)
  */
 MiniStep::~MiniStep()
 {
+	if (this->lpOption)
+	{
+		delete this->lpOption;
+	}
+
+	this->lpOption = 0;
 }
+
+
+/**
+ * Returns if this ministep is changing a network variable.
+ */
+bool MiniStep::networkMiniStep() const
+{
+	return false;
+}
+
+
+/**
+ * Returns if this ministep is changing a behavior variable.
+ */
+bool MiniStep::behaviorMiniStep() const
+{
+	return false;
+}
+
+
+/**
+ * Returns the ID of the dependent variable that this ministep is changing.
+ */
+int MiniStep::variableId() const
+{
+	return this->lpData->id();
+}
+
+/**
+ * Returns the name of the dependent variable that this ministep is changing.
+ */
+string MiniStep::variableName() const
+{
+	return this->lpData->name();
+}
+
+
 
 
 /**
@@ -64,6 +109,15 @@ void MiniStep::pChain(Chain * pChain)
 Chain * MiniStep::pChain() const
 {
 	return this->lpChain;
+}
+
+
+/**
+ * Stores the option of this ministep.
+ */
+void MiniStep::pOption(const Option * pOption)
+{
+	this->lpOption = pOption;
 }
 
 
@@ -156,6 +210,36 @@ void MiniStep::makeChange(DependentVariable * pVariable)
 bool MiniStep::diagonal() const
 {
 	return false;
+}
+
+
+/**
+ * Returns if the observed data for this ministep is missing at
+ * either end of the given period.
+ */
+bool MiniStep::missing(int period) const
+{
+	return false;
+}
+
+
+/**
+ * Returns a new ministep that reverses the effect of this ministep.
+ */
+MiniStep * MiniStep::createReverseMiniStep() const
+{
+	return 0;
+}
+
+
+/**
+ * Returns if this mini step is the first mini step of a CCP.
+ */
+bool MiniStep::firstOfConsecutiveCancelingPair() const
+{
+	return !this->diagonal() &&
+		this->lpNextWithSameOption &&
+		this->lpNextWithSameOption != this->lpNext;
 }
 
 }
