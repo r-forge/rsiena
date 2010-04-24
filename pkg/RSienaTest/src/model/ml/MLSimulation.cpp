@@ -8,11 +8,13 @@
  * Description: This file contains the implementation of the class
  * MLSimulation.
  *****************************************************************************/
-
+#include <stdexcept>
+#include <string>
 #include <R.h>
 #include <Rinternals.h>
 #include "MLSimulation.h"
 #include "utils/Random.h"
+#include "utils/Utils.h"
 #include "data/NetworkLongitudinalData.h"
 #include "data/BehaviorLongitudinalData.h"
 #include "model/Model.h"
@@ -28,7 +30,9 @@
 
 namespace siena
 {
-SEXP getMiniStep(const MiniStep& miniStep);
+SEXP getMiniStepDF(const MiniStep& miniStep);
+SEXP getChainDF(const Chain& chain);
+
 
 MLSimulation::MLSimulation(Data * pData, Model * pModel) :
 	EpochSimulation(pData, pModel)
@@ -91,7 +95,7 @@ void MLSimulation::updateProbabilities(const Chain * pChain,
     MiniStep * pMiniStep = pFirstMiniStep;
 
 	// set up array to store counts of structurally active ministeps by variable
-	int counts[this->lvariables.size()];
+	int *counts = new int[this->lvariables.size()];
 	for (unsigned i = 0; i < this->lvariables.size(); i++)
 	{
 		counts[i] = 0;
@@ -140,6 +144,7 @@ void MLSimulation::updateProbabilities(const Chain * pChain,
 		}
 
 	}
+	delete [] counts;
 }
 
 /**
@@ -180,15 +185,15 @@ void MLSimulation::preburnin()
 void MLSimulation::runEpoch(int period)
 {
     // Initialize the rate functions of all variables and parameters for effects
-   for (unsigned i = 0; i < this->lvariables.size(); i++)
-     {
+	for (unsigned i = 0; i < this->lvariables.size(); i++)
+	{
      	this->lvariables[i]->initializeRateFunction();
 		this->lvariables[i]->updateEffectParameters();
-     }
+	}
 	this->setUpProbabilityArray();
-	this->initialize(0);
-//	PrintValue(getMiniStep(*this->lpChain->pFirst()->pNext()));
-	int numSteps=300;
+	this->initialize(period);
+	//	PrintValue(getMiniStepDF(*this->lpChain->pFirst()->pNext()));
+	int numSteps = this->pModel()->numberMLSteps() ;
 
 	for (int i = 0; i < numSteps; i++)
 	{
@@ -199,6 +204,120 @@ void MLSimulation::runEpoch(int period)
 const Chain * MLSimulation::pChain() const
 {
 	return this->lpChain;
+}
+
+void MLSimulation::pChain(Chain * pChain)
+{
+	this->lpChain = pChain;
+}
+
+/*
+ * Set the chain to one uploaded from R and calculate the chain probabilities.
+ *
+ */
+
+void MLSimulation::pChainProbabilities(Chain * pChain, int period)
+{
+	// pretty inefficient way to do this. probably need at least
+	// option to store the change contributions on the ministep.
+	delete this->lpChain;
+	this->lpChain = pChain;
+	this->runEpoch(period);
+
+	this->updateProbabilities(this->lpChain, this->lpChain->pFirst()->pNext(),
+			this->lpChain->pLast()->pPrevious());
+}
+
+/*
+ * Clears the stores for MCMC.
+ *
+ */
+void MLSimulation::initializeMCMCcycle()
+{
+
+	// clear storage for the sampled parameters.
+	this->lBayesAcceptances.clear();
+	this->lsampledBasicRates.clear();
+	this->lcandidates.clear();
+
+}
+
+/*
+ * Sample from the priors for the parameters.
+ *
+ */
+void MLSimulation::MHPstep()
+{
+	double scaleFactor = this->pModel()->BayesianScaleFactor();
+	double probabilityRatio;
+
+	// first count how many steps for each variable and accumulate the log probs
+	int * stepCount = new int[this->lvariables.size()];
+	for (unsigned i = 0; i < this->lvariables.size(); i++)
+	{
+		stepCount[i] = 0;
+	}
+	double oldLogLikelihood = 0;
+	double newLogLikelihood = 0;
+	MiniStep * pMiniStep = this->pChain()->pFirst()->pNext();
+	MiniStep * pLastMiniStep = this->pChain()->pLast();
+	while (pMiniStep!= pLastMiniStep)
+	{
+		stepCount[pMiniStep->variableId()] ++;
+		oldLogLikelihood += pMiniStep->logOptionSetProbability() +
+			pMiniStep->logChoiceProbability();
+		pMiniStep = pMiniStep->pNext();
+	}
+	double priorRatio = 0;
+
+	for (unsigned i = 0; i < this->lvariables.size(); i++)
+	{
+		// generate gamma random variate for each basic rate
+		this->lvariables[i]->sampleBasicRate(stepCount[i]);
+
+		// generate normal random variate for each other effect
+		priorRatio  += this->lvariables[i]->sampleParameters(scaleFactor);
+	}
+
+	//  calculate the acceptance probability for the non basic rate effects
+	this->updateProbabilities(this->lpChain, this->lpChain->pFirst()->pNext(),
+			this->lpChain->pLast()->pPrevious());
+	pMiniStep = this->lpChain->pFirst()->pNext();
+	while (pMiniStep!= pLastMiniStep)
+	{
+		newLogLikelihood += pMiniStep->logOptionSetProbability() +
+			pMiniStep->logChoiceProbability();
+		pMiniStep = pMiniStep->pNext();
+	}
+
+	probabilityRatio = exp(-oldLogLikelihood  + newLogLikelihood + priorRatio);
+
+	if (nextDouble() < probabilityRatio)
+	{
+		this->lBayesAcceptances.push_back(true);
+		// copy these parameters to the effectInfo's so they are the
+		// default next time we reject
+		for (unsigned i = 0; i < this->lvariables.size(); i++)
+		{
+			this->lvariables[i]->updateEffectInfoParameters();
+		}
+	}
+	else
+	{
+		this->lBayesAcceptances.push_back(false);
+		// re-initialize the rate functions of all variables and parameters
+		// for effects from those in the effectinfo's
+		for (unsigned i = 0; i < this->lvariables.size(); i++)
+		{
+			this->lvariables[i]->initializeRateFunction();
+			this->lvariables[i]->updateEffectParameters();
+		}
+		// reset the chain probabilities
+		this->updateProbabilities(this->lpChain,
+			this->lpChain->pFirst()->pNext(),
+			this->lpChain->pLast()->pPrevious());
+	}
+	delete[] stepCount;
 }
 
 /**
@@ -298,7 +417,114 @@ void MLSimulation::resetVariables()
 		this->rVariables()[i]->initialize(this->period());
 	}
 }
+/**
+ * Returns the Bayes Acceptance for the given iteration.
+ */
 
+int MLSimulation::BayesAcceptances(unsigned iteration) const
+{
+	if (iteration < this->lBayesAcceptances.size())
+	{
+		return this->lBayesAcceptances[iteration];
+	}
+	else
+	{
+		throw std::out_of_range("The number" + toString(iteration) +
+			" is not in the range [0," +
+			toString(this->lBayesAcceptances.size()) + "].");
+	}
+
+}
+/**
+ * Returns the sampled basic rate parameter for the given iteration.
+ */
+
+double MLSimulation::sampledBasicRates(unsigned iteration) const
+{
+	if (iteration < this->lsampledBasicRates.size())
+	{
+		return this->lsampledBasicRates[iteration];
+	}
+	else
+	{
+		throw std::out_of_range("The number" + toString(iteration) +
+			" is not in the range [0," +
+			toString(this->lsampledBasicRates.size()) + "].");
+	}
+
+}
+/**
+ * Stores the sampled basic rate parameter for the next iteration.
+ */
+
+void MLSimulation::sampledBasicRates(double value)
+{
+	this->lsampledBasicRates.push_back(value);
+}
+/**
+ * Returns the shape parameter used in the sampled basic rate parameter for
+ * the given iteration.
+ */
+
+int MLSimulation::sampledBasicRatesDistributions(unsigned iteration) const
+{
+	if (iteration < this->lsampledBasicRatesDistributions.size())
+	{
+		return this->lsampledBasicRatesDistributions[iteration];
+	}
+	else
+	{
+		throw std::out_of_range("The number" + toString(iteration) +
+			" is not in the range [0," +
+			toString(this->lsampledBasicRatesDistributions.size()) + "].");
+	}
+
+}
+/**
+ * Stores the shape parameter used in the sampled basic rate parameter for the
+ * next iteration.
+ */
+
+void MLSimulation::sampledBasicRatesDistributions(int value)
+{
+	this->lsampledBasicRatesDistributions.push_back(value);
+}
+
+/**
+ * Returns the candidate value for the given iteration for the given effect.
+ * The candidate values are updated in the MHPstep of a Bayesian simulation.
+ */
+double MLSimulation::candidates(const EffectInfo * pEffect,
+	unsigned iteration) const
+{
+	map<const EffectInfo *, vector<double> >::const_iterator iter =
+		this->lcandidates.find(pEffect);
+	double candidate = 0;
+
+	if (iter != this->lcandidates.end())
+	{
+		if (iteration < iter->second.size())
+		{
+			candidate = iter->second[iteration];
+		}
+		else
+		{
+			throw std::out_of_range("The number" + toString(iteration) +
+				" is not in the range [0," +
+				toString(iter->second.size()) + "].");
+		}
+	}
+
+	return candidate;
+}
+/**
+ * Stores the candidate value for the next iteration for the given effect.
+ * The candidate values are updated in the MHPstep of a Bayesian simulation.
+ */
+void MLSimulation::candidates(const EffectInfo * pEffect, double value)
+{
+	this->lcandidates[pEffect].push_back(value);
+}
 
 // ----------------------------------------------------------------------------
 // Section: Metropolis-Hastings steps
@@ -314,7 +540,6 @@ bool MLSimulation::insertDiagonalMiniStep()
 	int i = this->chooseActor(pVariable);
 	BehaviorVariable * pBehaviorVariable =
 		dynamic_cast<BehaviorVariable *>(pVariable);
-
 	if (!pVariable->pActorSet()->active(i) ||
 		(pBehaviorVariable && pBehaviorVariable->structural(i)))
 	{

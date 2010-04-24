@@ -1,7 +1,35 @@
+2010-04-24 R-forge revision 81
+
+	* src/model/effects/structuralRateEffect.cpp: fix crash caused by
+	size of effect table for bipartite networks.
+	* R/bayes.r, src/siena07.cpp, src/model/ml/MLSimulation.cpp,
+	src/model/ml/MLsimulation.h, src/model/model.cpp,
+	src/model/model.h, src/model/variables/DependentVariable.cpp,
+	src/model/variables/DependentVariable.h, src/utils/Random.cpp,
+	src/utils/Random.h: New function bayes and supporting methods.
+	* R/phase3.r, R/simstatsc.r: changes for ML
+	* R/simstatscr, src/siena07.cpp, src/model/EpochSimulation.cpp,
+	src/model/variables/BehaviorVariable.cpp,
+	src/model/variables/NetworkVariable.cpp
+	src/model/EpochSimulation.h:
+	create and return chain after MOM simulation
+	* src/model/EpochSimulation.cpp: added trap to stop conditional
+	estimation after 1000000 steps.
+	* src/model/ml/chains.cpp, src/model/ml/chains.h,
+	src/model/ml/MiniStep.cpp, src/model/ml/MiniStep.h,
+	src/siena07.cpp: print utilities for
+	chains. create an R dataframe from a ministep. Print list of CCP's
+	* src/model/ml/MLSimulation.cpp, src/model/model/cpp,
+	src/model/model.h: changes for ML
+	* src/model/variables/BehaviorVariable.cpp: fixed ambiguous call
+	to abs: need cstdlib as well as cmath. Possibly to do with
+	NO_C_HEADERS.
+
 2010-04-14 R-forge revision 80
 
 	* R/sienaTimeTest.r, man/sienaTimeTest.Rd. corrected default
 	plevels for plot
+	* RSienaTest only NAMESPACE: corrected package name
 
 2010-04-13 R-forge revision 79
 

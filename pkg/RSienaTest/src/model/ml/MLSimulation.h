@@ -40,9 +40,12 @@ public:
 	void runEpoch(int period);
 	void MLStep();
 	void setUpProbabilityArray();
+
 	int acceptances(int stepType) const;
 	int rejections(int stepType) const;
 	const Chain * pChain() const;
+	void pChain(Chain * pChain);
+	void pChainProbabilities(Chain * pChain, int period);
 
     // Metropolis-Hastings steps
 
@@ -82,6 +85,17 @@ public:
 	void missingBehaviorProbability(double probability);
 	double missingBehaviorProbability() const;
 
+	// Bayesian routines
+	void initializeMCMCcycle();
+	void MHPstep();
+	int BayesAcceptances(unsigned iteration) const;
+	double sampledBasicRates(unsigned iteration) const;
+	void sampledBasicRates(double value);
+	int sampledBasicRatesDistributions(unsigned iteration) const;
+	void sampledBasicRatesDistributions(int value);
+	double candidates(const EffectInfo * pEffect, unsigned iteration) const;
+	void candidates(const EffectInfo * pEffect, double value);
+
 private:
 	void setStateBefore(MiniStep * pMiniStep);
 	void resetVariables();
@@ -102,6 +116,11 @@ private:
 	double lprobabilityArray[6];
 	int lacceptances[6];
 	int lrejections[6];
+	vector<int> lBayesAcceptances;
+	vector<double> lsampledBasicRates;
+	vector<int> lsampledBasicRatesDistributions;
+	map<const EffectInfo *, vector<double> > lcandidates;
+
 };
 
 }

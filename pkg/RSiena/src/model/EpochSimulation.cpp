@@ -32,6 +32,8 @@
 #include "model/filters/DisjointFilter.h"
 #include "model/filters/HigherFilter.h"
 #include "model/filters/LowerFilter.h"
+#include "model/ml/Chain.h"
+#include "model/ml/MiniStep.h"
 
 namespace siena
 {
@@ -184,6 +186,7 @@ EpochSimulation::EpochSimulation(Data * pData, Model * pModel)
     // dependent variables during the simulation.
 
     this->lpState = new State(this);
+	this->lpChain = new Chain(pData);
 }
 
 
@@ -195,6 +198,7 @@ EpochSimulation::~EpochSimulation()
     delete[] this->lcummulativeRates;
 	delete this->lpState;
 	delete this->lpCache;
+	delete this->lpChain;
 
     this->lcummulativeRates = 0;
     this->lpState = 0;
@@ -287,6 +291,11 @@ void EpochSimulation::initialize(int period)
 
     // Reset scores
     this->lscores.clear();
+    // Reset derivatives
+    this->lderivatives.clear();
+	// reset chain
+	this->lpChain->clear();
+	this->lpChain->period(period);
 }
 
 
@@ -296,10 +305,9 @@ void EpochSimulation::initialize(int period)
 void EpochSimulation::runEpoch(int period)
 {
     this->initialize(period);
-
     for(int nIter = 0; ; nIter++)
     {
-        this->runStep();
+       this->runStep();
 
         if (this->lpModel->conditional())
         {
@@ -308,7 +316,17 @@ void EpochSimulation::runEpoch(int period)
             {
                 break;
             }
-        }
+             else if (nIter > 1000000)
+            {
+#ifdef STANDALONE
+				exit(1);
+#endif
+#ifndef STANDALONE
+				error("Unlikely to terminate this epoch:",
+					" more than 1000000 steps");
+#endif
+            }
+       }
         else
         {
             if (this->ltime >= 1)
@@ -340,8 +358,8 @@ void EpochSimulation::runEpoch(int period)
 void EpochSimulation::runStep()
 {
     this->calculateRates();
-    this->drawTimeIncrement();
-    double nextTime = this->ltime + this->ltau;
+	this->drawTimeIncrement();
+	double nextTime = this->ltime + this->ltau;
 
     DependentVariable * pSelectedVariable = 0;
     int selectedActor = 0;
@@ -376,6 +394,17 @@ void EpochSimulation::runStep()
 
 			this->lpCache->initialize(selectedActor);
 			pSelectedVariable->makeChange(selectedActor);
+
+			if (this->pModel()->needChain())
+			{
+				// update rate probabilities on the final ministep
+				this->lpChain->pLast()->pPrevious()->
+					logOptionSetProbability(log(pSelectedVariable->
+							rate(selectedActor)
+							/ this->totalRate()));
+				this->lpChain->pLast()->pPrevious()->
+					reciprocalRate(1.0 / this->totalRate());
+			}
 		}
 	}
 	else
@@ -611,6 +640,13 @@ const Model * EpochSimulation::pModel() const
     return this->lpModel;
 }
 
+/**
+ * Returns the chain repesenting the events simulated by this simulation object.
+ */
+Chain * EpochSimulation::pChain()
+{
+    return this->lpChain;
+}
 
 /**
  * Returns the dependent variable with the given name if it exists;
@@ -703,6 +739,60 @@ double EpochSimulation::score(const EffectInfo * pEffect) const
 void EpochSimulation::score(const EffectInfo * pEffect, double value)
 {
 	this->lscores[pEffect] = value;
+}
+
+/**
+ * Returns the current derivatives for the given pair of effects.
+ * The derivatives are updated for each ministep of a chain.
+ */
+double EpochSimulation::derivative(const EffectInfo * pEffect1,
+	const EffectInfo * pEffect2) const
+{
+	map<const EffectInfo *, map<const EffectInfo *, double> >::const_iterator
+		iter = this->lderivatives.find(pEffect1);
+	double derivative = 0;
+
+	if (iter != this->lderivatives.end())
+	{
+		const map<const EffectInfo *, double> effect1Map = iter->second;
+		map<const EffectInfo *, double> ::const_iterator iter2 =
+			effect1Map.find(pEffect2);
+		if (iter2 != effect1Map.end())
+		{
+			derivative = iter2->second;
+		}
+	}
+
+	return derivative;
+}
+
+/**
+ * Returns the current map of derivatives for the given effect.
+ * The derivatives are updated for each ministep of a chain.
+ */
+map<const EffectInfo*, double> EpochSimulation::derivative(const
+	EffectInfo * pEffect) const
+{
+	map<const EffectInfo *, map<const EffectInfo *, double> >::const_iterator
+		iter = this->lderivatives.find(pEffect);
+
+	map<const EffectInfo *, double>	effectMap;
+	if (iter != this->lderivatives.end())
+	{
+		const map<const EffectInfo *, double> effectMap = iter->second;
+	}
+
+	return effectMap;
+}
+
+/**
+ * Sets the derivative for the given effects to the given value.
+ */
+void EpochSimulation::derivative(const EffectInfo * pEffect1,
+	const EffectInfo * pEffect2,
+	double value)
+{
+	this->lderivatives[pEffect1][pEffect2] = value;
 }
 
 

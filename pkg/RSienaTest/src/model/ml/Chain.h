@@ -49,6 +49,7 @@ public:
 	void insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep);
 	void remove(MiniStep * pMiniStep);
 	void connect(int period);
+	void period(int period);
 
 	void onReciprocalRateChange(const MiniStep * pMiniStep, double newValue);
 
@@ -64,6 +65,7 @@ public:
 	int missingBehaviorMiniStepCount() const;
 	double mu() const;
 	double sigma2() const;
+	void printConsecutiveCancelingPairs() const;
 
 	// Intervals
 

@@ -9,6 +9,7 @@
  * BehaviorVariable class.
  *****************************************************************************/
 #define NO_C_HEADERS
+#include <cstdlib>
 #include <cmath>
 #include <string>
 #include <stdexcept>
@@ -23,6 +24,7 @@
 #include "model/effects/BehaviorEffect.h"
 #include "model/EffectInfo.h"
 #include "model/SimulationActorSet.h"
+#include "model/ml/Chain.h"
 #include "model/ml/MiniStep.h"
 #include "model/ml/BehaviorChange.h"
 
@@ -251,6 +253,16 @@ void BehaviorVariable::makeChange(int actor)
 			this->ldownPossible);
 	}
 
+	if (this->pSimulation()->pModel()->needChain())
+	{
+		// insert ministep in chain
+		BehaviorChange * pMiniStep =
+			new BehaviorChange(this->lpData, actor, difference);
+		this->pSimulation()->pChain()->insertBefore(pMiniStep,
+			this->pSimulation()->pChain()->pLast());
+		pMiniStep->logChoiceProbability(log(this->lprobabilities[difference
+					+ 1]));
+	}
 	// Make the change
 
 	if (difference != 0)
@@ -269,8 +281,8 @@ void BehaviorVariable::makeChange(int actor)
 		{
 			int observedValue = this->lpData->value(this->period(), actor);
 			this->simulatedDistance(this->simulatedDistance() +
-				abs(this->lvalues[actor] - observedValue) -
-				abs(oldValue - observedValue));
+				std::abs(this->lvalues[actor] - observedValue) -
+				std::abs(oldValue - observedValue));
 		}
 	}
 }
@@ -480,7 +492,7 @@ void BehaviorVariable::accumulateDerivatives() const
 	Effect * pEffect1;
 	Effect * pEffect2;
 	double derivative;
-	double product[totalEffects];
+	double * product = new double[totalEffects];
 	double contribution1 = 0.0;
 	double contribution2 = 0.0;
 
@@ -626,6 +638,8 @@ void BehaviorVariable::accumulateDerivatives() const
 				product[effect1] * product[effect2]);
 		}
 	}
+	delete[] product;
+
 }
 
 //	Rprintf("deriv %f\n", derivative;

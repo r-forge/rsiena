@@ -43,7 +43,7 @@ phase3 <- function(z, x, ...)
     z$sf2 <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
     z$ssc <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
     z$sdf <- array(0, dim = c(z$n3, z$pp, z$pp))
-    if (z$cconditional)
+    if (!is.null(z$cconditional) && z$cconditional)
     {
         z$ntim <- matrix(NA, nrow=z$n3, ncol=f$observations - 1)
     }

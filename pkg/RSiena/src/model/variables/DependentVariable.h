@@ -70,6 +70,8 @@ public:
 	virtual int m() const = 0;
 	virtual LongitudinalData * pData() const = 0;
 	int id() const;
+	virtual bool networkVariable() const;
+	virtual bool behaviorVariable() const;
 
 	inline const Function * pEvaluationFunction() const;
 	inline const Function * pEndowmentFunction() const;
@@ -89,6 +91,7 @@ public:
 	void calculateRates();
 	double totalRate() const;
 	double rate(int actor) const;
+	inline double basicRate() const;
 
 	int simulatedDistance() const;
 
@@ -114,6 +117,9 @@ public:
 
 	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
 
+	void updateEffectParameters();
+	void updateEffectInfoParameters();
+
 	/**
 	 * Returns if the observed value for the option of the given ministep
 	 * is missing at either end of the period.
@@ -121,9 +127,22 @@ public:
 	virtual bool missing(const MiniStep * pMiniStep) const = 0;
 
 	/**
+	 * Returns if the given ministep is structurally determined for the period
+	 */
+	virtual bool structural(const MiniStep * pMiniStep) const = 0;
+
+	/**
 	 * Generates a random ministep for the given ego.
 	 */
 	virtual MiniStep * randomMiniStep(int ego) = 0;
+
+	void calculateMaximumLikelihoodRateScores(int activeMiniStepCount);
+	void calculateMaximumLikelihoodRateDerivatives(int activeMiniStepCount);
+	double basicRateDerivative() const;
+
+	// Bayesian related
+	void sampleBasicRate(int miniStepCount);
+	double sampleParameters(double scaleFactor);
 
 protected:
 	inline EpochSimulation * pSimulation() const;
@@ -138,7 +157,6 @@ private:
 	double calculateRate(int i);
 	double structuralRate(int i) const;
 	void updateCovariateRates();
-	inline double basicRate() const;
 
 	// A simulation of the actor-based model, which owns this variable
 	EpochSimulation * lpSimulation;
@@ -190,6 +208,10 @@ private:
 	// The score for the basic rate parameter for this variable for this period
 	double lbasicRateScore;
 
+	// The derivative for the basic rate parameter for this variable for
+	// this period
+	double lbasicRateDerivative;
+
 	// Scores for rate effects depending on constant covariates
 	map<const ConstantCovariate *, double> lconstantCovariateScores;
 
@@ -215,6 +237,13 @@ private:
 	// provided that the rates are constant during the period.
 
 	int lvalidRates;
+
+	// store for number of acceptances and rejections for non basic rate 
+	// parameters in Bayesian modelling
+
+	int lacceptances;
+	int lrejections;
+
 };
 
 

@@ -17,20 +17,58 @@
 namespace siena
 {
 
+// ----------------------------------------------------------------------------
+// Section: Forward declarations
+// ----------------------------------------------------------------------------
+
+class BehaviorLongitudinalData;
+
+
+// ----------------------------------------------------------------------------
+// Section: Class definition
+// ----------------------------------------------------------------------------
+
 /**
  * Defines a ministep changing a behavior variable.
  */
 class BehaviorChange: public MiniStep
 {
 public:
-	BehaviorChange(int variableIndex,
+	BehaviorChange(BehaviorLongitudinalData * pData,
 		int ego,
 		int difference);
 	virtual ~BehaviorChange();
 
+	inline int difference() const;
+
+	virtual bool behaviorMiniStep() const;
 	virtual void makeChange(DependentVariable * pVariable);
 	virtual bool diagonal() const;
+	virtual bool missing(int period) const;
+	virtual MiniStep * createReverseMiniStep() const;
+	virtual bool firstOfConsecutiveCancelingPair() const;
+
+private:
+	// The longitudinal data object for the corresponding behavior variable
+	BehaviorLongitudinalData * lpData;
+
+	// The amount of change
+	int ldifference;
 };
+
+
+// ----------------------------------------------------------------------------
+// Section: Inline methods
+// ----------------------------------------------------------------------------
+
+/**
+ * Returns the amount of change in this ministep.
+ */
+int BehaviorChange::difference() const
+{
+	return this->ldifference;
+}
+
 
 }
 

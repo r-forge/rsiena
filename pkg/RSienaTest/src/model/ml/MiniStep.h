@@ -47,7 +47,8 @@ public:
 
 	inline int ego() const;
 	int variableId() const;
-
+	string variableName() const;
+	
 	virtual bool networkMiniStep() const;
 	virtual bool behaviorMiniStep() const;
 

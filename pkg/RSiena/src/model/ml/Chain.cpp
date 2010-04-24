@@ -7,6 +7,8 @@
  *
  * Description: This file contains the implementation of the class Chain.
  *****************************************************************************/
+#include <R.h>
+#include <Rinternals.h>
 
 #include <vector>
 #include "Chain.h"
@@ -23,6 +25,7 @@
 
 namespace siena
 {
+SEXP getMiniStepDF(const MiniStep& miniStep);
 
 // ----------------------------------------------------------------------------
 // Section: Constructors, destructors, initializers
@@ -33,8 +36,8 @@ namespace siena
  */
 Chain::Chain(Data * pData)
 {
-	this->lpFirst = new MiniStep(0, 0, 0);
-	this->lpLast = new MiniStep(0, 0, 0);
+	this->lpFirst = new MiniStep(0, 0);
+	this->lpLast = new MiniStep(0, 0);
 
 	this->lpFirst->pNext(this->lpLast);
 	this->lpLast->pPrevious(this->lpFirst);
@@ -96,6 +99,9 @@ void Chain::clear()
 	this->lpLast->index(0);
 
 	this->ldiagonalMiniSteps.clear();
+	this->lccpMiniSteps.clear();
+	this->lmissingNetworkMiniSteps.clear();
+	this->lmissingBehaviorMiniSteps.clear();
 	this->lfirstMiniStepPerOption.clear();
 
 	this->lmu = 0;
@@ -126,7 +132,7 @@ void Chain::insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep)
 	double rightKey = pExistingMiniStep->orderingKey();
 	double newKey = (leftKey + rightKey) / 2;
 
-	if (leftKey < newKey && newKey < rightKey)
+	if ((-leftKey + newKey) > 1e-10 && (- newKey +rightKey) > 1e-10)
 	{
 		pNewMiniStep->orderingKey(newKey);
 	}
@@ -146,10 +152,33 @@ void Chain::insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep)
 		pNewMiniStep->diagonalIndex(this->ldiagonalMiniSteps.size() - 1);
 	}
 
+	if (pNewMiniStep->missing(this->lperiod))
+	{
+		if (pNewMiniStep->networkMiniStep())
+		{
+			pNewMiniStep->missingIndex(this->lmissingNetworkMiniSteps.size());
+			this->lmissingNetworkMiniSteps.push_back(pNewMiniStep);
+		}
+		else
+		{
+			pNewMiniStep->missingIndex(this->lmissingBehaviorMiniSteps.size());
+			this->lmissingBehaviorMiniSteps.push_back(pNewMiniStep);
+		}
+	}
+
 	// Update the array of all ministeps
 
 	this->lminiSteps.push_back(pNewMiniStep);
 	pNewMiniStep->index(this->lminiSteps.size() - 1);
+
+	this->updateSameOptionPointersOnInsert(pNewMiniStep);
+
+	// Update the vector of CCPs for each ministep whose CCP status
+	// might have changed.
+
+	this->updateCCPs(pNewMiniStep->pPrevious());
+	this->updateCCPs(pNewMiniStep->pPreviousWithSameOption());
+	this->updateCCPs(pNewMiniStep);
 
 	// Update some variables that are constantly maintained
 
@@ -164,10 +193,47 @@ void Chain::insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep)
  */
 void Chain::remove(MiniStep * pMiniStep)
 {
-	pMiniStep->pPrevious()->pNext(pMiniStep->pNext());
-	pMiniStep->pNext()->pPrevious(pMiniStep->pPrevious());
+	MiniStep * pPrevious = pMiniStep->pPrevious();
+	MiniStep * pPreviousWithSameOption = pMiniStep->pPreviousWithSameOption();
+
+	// Updates pointers to the next and previous ministep.
+
+	pPrevious->pNext(pMiniStep->pNext());
+	pMiniStep->pNext()->pPrevious(pPrevious);
 	pMiniStep->pNext(0);
 	pMiniStep->pPrevious(0);
+
+	// Next and previous pointers to ministeps of the same option
+
+	if (this->lfirstMiniStepPerOption[*pMiniStep->pOption()] ==
+		pMiniStep)
+	{
+		this->lfirstMiniStepPerOption[*pMiniStep->pOption()] =
+			pMiniStep->pNextWithSameOption();
+	}
+
+	if (pMiniStep->pNextWithSameOption())
+	{
+		pMiniStep->pNextWithSameOption()->pPreviousWithSameOption(
+			pPreviousWithSameOption);
+	}
+
+	if (pPreviousWithSameOption)
+	{
+		pPreviousWithSameOption->pNextWithSameOption(
+			pMiniStep->pNextWithSameOption());
+	}
+
+	pMiniStep->pPreviousWithSameOption(0);
+	pMiniStep->pNextWithSameOption(0);
+
+	// Update the vector of CCPs
+
+	this->updateCCPs(pPrevious);
+	this->updateCCPs(pPreviousWithSameOption);
+	this->updateCCPs(pMiniStep);
+
+	// Update the vector of diagonal ministeps
 
 	if (pMiniStep->diagonal())
 	{
@@ -177,6 +243,24 @@ void Chain::remove(MiniStep * pMiniStep)
 		pLastMiniStep->diagonalIndex(pMiniStep->diagonalIndex());
 		this->ldiagonalMiniSteps.pop_back();
 		pMiniStep->diagonalIndex(-1);
+	}
+
+	// Update the vectors of ministeps for missing options
+
+	if (pMiniStep->missing(this->lperiod))
+	{
+		vector<MiniStep *> * pVector = &this->lmissingNetworkMiniSteps;
+
+		if (pMiniStep->behaviorMiniStep())
+		{
+			pVector = &this->lmissingBehaviorMiniSteps;
+		}
+
+		MiniStep * pLast = (*pVector)[pVector->size() - 1];
+		(*pVector)[pMiniStep->missingIndex()] = pLast;
+		pLast->missingIndex(pMiniStep->missingIndex());
+		pVector->pop_back();
+		pMiniStep->missingIndex(-1);
 	}
 
 	MiniStep * pLastMiniStep = this->lminiSteps[this->lminiSteps.size() - 1];
@@ -233,20 +317,18 @@ void Chain::connect(int period)
 						(!iter2.valid() || iter1.actor() < iter2.actor()))
 					{
 						miniSteps.push_back(
-							new NetworkChange(pNetworkData->id(),
+							new NetworkChange(pNetworkData,
 								i,
-								iter1.actor(),
-								-1));
+								iter1.actor()));
 						iter1.next();
 					}
 					else if (iter2.valid() &&
 						(!iter1.valid() || iter2.actor() < iter1.actor()))
 					{
 						miniSteps.push_back(
-							new NetworkChange(pNetworkData->id(),
+							new NetworkChange(pNetworkData,
 								i,
-								iter2.actor(),
-								1));
+								iter2.actor()));
 						iter2.next();
 					}
 					else
@@ -274,7 +356,7 @@ void Chain::connect(int period)
 				for (int j = 0; j < delta; j++)
 				{
 					miniSteps.push_back(
-						new BehaviorChange(pBehaviorData->id(),
+						new BehaviorChange(pBehaviorData,
 							i,
 							singleChange));
 				}
@@ -306,6 +388,14 @@ void Chain::connect(int period)
 // ----------------------------------------------------------------------------
 
 /**
+ * Sets the value of the period of the chain.
+ */
+void Chain::period(int value)
+{
+	this->lperiod = value;
+}
+
+/**
  * Performs the necessary updates when the reciprocal rate of the
  * given ministep changes to the given value.
  */
@@ -335,6 +425,85 @@ void Chain::resetOrderingKeys()
 		pMiniStep->orderingKey(key);
 		pMiniStep = pMiniStep->pNext();
 		key++;
+	}
+}
+
+
+/**
+ * Updates the "same option" related structures after the insertion of
+ * the given ministep.
+ */
+void Chain::updateSameOptionPointersOnInsert(MiniStep * pNewMiniStep)
+{
+	MiniStep * pFirstMiniStep =
+		this->lfirstMiniStepPerOption[*pNewMiniStep->pOption()];
+
+	if (!pFirstMiniStep ||
+		pFirstMiniStep->orderingKey() > pNewMiniStep->orderingKey())
+	{
+		// The new ministep is the earliest for its option
+
+		pNewMiniStep->pNextWithSameOption(pFirstMiniStep);
+
+		if (pFirstMiniStep)
+		{
+			pFirstMiniStep->pPreviousWithSameOption(pNewMiniStep);
+		}
+
+		this->lfirstMiniStepPerOption[*pNewMiniStep->pOption()] =
+			pNewMiniStep;
+	}
+	else
+	{
+		MiniStep * pLeftMiniStep = pFirstMiniStep;
+
+		while (pLeftMiniStep->pNextWithSameOption() &&
+			pLeftMiniStep->pNextWithSameOption()->orderingKey() <
+				pNewMiniStep->orderingKey())
+		{
+			pLeftMiniStep = pLeftMiniStep->pNextWithSameOption();
+		}
+
+		MiniStep * pRightMiniStep = pLeftMiniStep->pNextWithSameOption();
+
+		pLeftMiniStep->pNextWithSameOption(pNewMiniStep);
+		pNewMiniStep->pPreviousWithSameOption(pLeftMiniStep);
+
+		if (pRightMiniStep)
+		{
+			pNewMiniStep->pNextWithSameOption(pRightMiniStep);
+			pRightMiniStep->pPreviousWithSameOption(pNewMiniStep);
+		}
+	}
+}
+
+
+/**
+ * Updates the vector of consecutive canceling pairs (CCPs) if the
+ * CCP status of the given ministep has changed.
+ */
+void Chain::updateCCPs(MiniStep * pMiniStep)
+{
+	if (pMiniStep)
+	{
+		if (pMiniStep->firstOfConsecutiveCancelingPair() &&
+			pMiniStep->consecutiveCancelingPairIndex() == -1)
+		{
+			pMiniStep->consecutiveCancelingPairIndex(
+				this->lccpMiniSteps.size());
+			this->lccpMiniSteps.push_back(pMiniStep);
+		}
+		else if (!pMiniStep->firstOfConsecutiveCancelingPair() &&
+			pMiniStep->consecutiveCancelingPairIndex() != -1)
+		{
+			MiniStep * pLastCCPMiniStep =
+				this->lccpMiniSteps[this->lccpMiniSteps.size() - 1];
+			int index = pMiniStep->consecutiveCancelingPairIndex();
+			this->lccpMiniSteps[index] = pLastCCPMiniStep;
+			pLastCCPMiniStep->consecutiveCancelingPairIndex(index);
+			this->lccpMiniSteps.pop_back();
+			pMiniStep->consecutiveCancelingPairIndex(-1);
+		}
 	}
 }
 
@@ -407,6 +576,35 @@ double Chain::sigma2() const
 }
 
 
+/**
+ * Returns the number of CCPs in this chain.
+ */
+int Chain::consecutiveCancelingPairCount() const
+{
+	return this->lccpMiniSteps.size();
+}
+
+
+/**
+ * Returns the number of network ministeps with missing observed data
+ * at either end of the current period.
+ */
+int Chain::missingNetworkMiniStepCount() const
+{
+	return this->lmissingNetworkMiniSteps.size();
+}
+
+
+/**
+ * Returns the number of behavior ministeps with missing observed data
+ * at either end of the current period.
+ */
+int Chain::missingBehaviorMiniStepCount() const
+{
+	return this->lmissingBehaviorMiniSteps.size();
+}
+
+
 // ----------------------------------------------------------------------------
 // Section: Random draws
 // ----------------------------------------------------------------------------
@@ -449,6 +647,48 @@ MiniStep * Chain::randomMiniStep(MiniStep * pFirstMiniStep,
 }
 
 
+/**
+ * Returns the first mini step of a random consecutive canceling pair.
+ */
+MiniStep * Chain::randomConsecutiveCancelingPair() const
+{
+	return this->lccpMiniSteps[nextInt(this->lccpMiniSteps.size())];
+}
+
+
+/**
+ * Returns a random network change with missing observed data.
+ */
+MiniStep * Chain::randomMissingNetworkMiniStep() const
+{
+	return this->lmissingNetworkMiniSteps[
+		nextInt(this->lmissingNetworkMiniSteps.size())];
+}
+
+
+/**
+ * Returns a random behavior change with missing observed data.
+ */
+MiniStep * Chain::randomMissingBehaviorMiniStep() const
+{
+	return this->lmissingBehaviorMiniSteps[
+		nextInt(this->lmissingBehaviorMiniSteps.size())];
+}
+
+/**
+ * Prints the list of ccps.
+ */
+void  Chain::printConsecutiveCancelingPairs() const
+{
+	// rr debug code for ccps
+		Rprintf("\nStart\n ");
+	for (unsigned i = 0; i < this->lccpMiniSteps.size(); i++)
+	{
+		PrintValue(getMiniStepDF(*this->lccpMiniSteps[i]));
+	}
+		Rprintf("\nend\n ");
+}
+
 // ----------------------------------------------------------------------------
 // Section: Intervals
 // ----------------------------------------------------------------------------
@@ -480,11 +720,11 @@ int Chain::intervalLength(const MiniStep * pFirstMiniStep,
  * Returns the first ministep of the given option in the subchain starting
  * with the given ministep, or 0, if there is no such a ministep.
  */
-MiniStep * Chain::nextMiniStepForOption(Option & rOption,
+MiniStep * Chain::nextMiniStepForOption(const Option & rOption,
 	const MiniStep * pFirstMiniStep) const
 {
 	MiniStep * pMiniStep = 0;
-	map<Option, MiniStep *>::const_iterator iter =
+	map<const Option, MiniStep *>::const_iterator iter =
 		this->lfirstMiniStepPerOption.find(rOption);
 
 	if (iter != this->lfirstMiniStepPerOption.end())

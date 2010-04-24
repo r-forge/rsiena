@@ -153,9 +153,21 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     f$randomseed2 <- ans[[5]]#[c(1,4,3,2)]
     FRANstore(f)
     if (returnDeps)
+    {
         sims <- ans[[6]]
+    }
     else
+    {
         sims <- NULL
+    }
+    if (returnDeps)
+    {
+        chain <- ans[[7]]
+    }
+    else
+    {
+        chain <- NULL
+    }
     if (returnDeps)
     {
         ## attach the names
@@ -174,7 +186,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     }
    # browser()
    list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
-         sims=sims, f$seeds)
+         sims=sims, f$seeds, chain=chain)
 }
 doModel <- function(x, Deriv, seeds, fromFiniteDiff, theta, randomseed2,
                     returnDeps, FinDiff.method, useStreams, maxlike)
@@ -1538,17 +1550,22 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                         x[x$requested, ]
                     }
                         )
-    if (x$maxlike)
-    {
-        z$targets <- rep(0, z$pp)
-        z$targets2 <- 0
-    }
-    else if (!initC)
+    if (!initC)
     {
         ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects)
-        z$targets <- rowSums(ans)
-        z$targets2 <- ans
-    }
+        if (!x$maxlike)
+        {
+            z$targets <- rowSums(ans)
+            z$targets2 <- ans
+        }
+        else
+        {
+            z$targets <- rep(0, z$pp)
+            z$targets2 <- 0
+            z$maxlikeTargets <- rowSums(ans)
+            z$maxlikeTargets2 <- ans
+       }
+   }
     ##store address of model
     f$pModel <- pModel
     ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
@@ -1609,9 +1626,11 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                      prmin, prmib)
         ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
                      simpleRates, z$probs)
+        f$chain <- ans[[2]]
         ##store address of simulation object
         f$pMLSimulation <- ans[[1]][[1]]
-        ans <- reg.finalizer(f$pMLSimulation, clearMLSimulation, onexit = FALSE)
+        ans1 <- reg.finalizer(f$pMLSimulation, clearMLSimulation,
+                              onexit = FALSE)
     }
     f$myeffects <- myeffects
     if (!initC)

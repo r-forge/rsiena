@@ -23,8 +23,10 @@ namespace siena
 // Section: Forward declarations
 // ----------------------------------------------------------------------------
 
+class LongitudinalData;
 class DependentVariable;
 class Chain;
+class Option;
 
 
 // ----------------------------------------------------------------------------
@@ -40,12 +42,17 @@ class MiniStep
 	friend class Chain;
 
 public:
-	MiniStep(int variableIndex, int ego, int difference);
+	MiniStep(LongitudinalData * pData, int ego);
 	virtual ~MiniStep();
 
 	inline int ego() const;
-	inline int variableId() const;
-	inline int difference() const;
+	int variableId() const;
+	string variableName() const;
+	
+	virtual bool networkMiniStep() const;
+	virtual bool behaviorMiniStep() const;
+
+	inline const Option * pOption() const;
 
 	Chain * pChain() const;
 
@@ -74,11 +81,24 @@ public:
 	inline int diagonalIndex() const;
 	inline void diagonalIndex(int index);
 
+	inline int consecutiveCancelingPairIndex() const;
+	inline void consecutiveCancelingPairIndex(int index);
+
+	inline int missingIndex() const;
+	inline void missingIndex(int index);
+
 	inline double orderingKey() const;
 	inline void orderingKey(double key);
 
 	virtual void makeChange(DependentVariable * pVariable);
 	virtual bool diagonal() const;
+	virtual bool missing(int period) const;
+	virtual MiniStep * createReverseMiniStep() const;
+
+	virtual bool firstOfConsecutiveCancelingPair() const;
+
+protected:
+	void pOption(const Option * pOption);
 
 private:
 	void pChain(Chain * pChain);
@@ -86,11 +106,11 @@ private:
 	// The actor making the change
 	int lego;
 
-	// The ID of the dependent variable to be changed
-	int lvariableId;
+	// The longitudinal data object for the corresponding dependent variable
+	LongitudinalData * lpData;
 
-	// The amount of change (+1,0,-1 for dichotomous variables)
-	int ldifference;
+	// The option of this ministep
+	const Option * lpOption;
 
 	// The owner chain (0, if the ministep is not part of a chain)
 	Chain * lpChain;
@@ -128,6 +148,14 @@ private:
 	// The index in the vector of diagonal ministeps of the owner chain.
 	int ldiagonalIndex;
 
+	// The index in the vector of CCPs of the owner chain.
+	int lconsecutiveCancelingPairIndex;
+
+	// The index in the vector of network of behavior ministeps with
+	// missing observed data at either end of the period
+
+	int lmissingIndex;
+
 	// An arbitrary double value that corresponds with the chain order,
 	// i.e. x.lorderingKey < y.lorderingKey whenever x and y is part
 	// of the same chain and x precedes y in the chain.
@@ -141,30 +169,11 @@ private:
 // ----------------------------------------------------------------------------
 
 /**
- * Returns the ID of the dependent variable that this ministep is changing.
- */
-int MiniStep::variableId() const
-{
-	return this->lvariableId;
-}
-
-
-/**
  * Returns the ego of this ministep.
  */
 int MiniStep::ego() const
 {
 	return this->lego;
-}
-
-
-/**
- * Returns the amount of change in this ministep
- * (+1,0,-1 for dichotomous variables).
- */
-int MiniStep::difference() const
-{
-	return this->ldifference;
 }
 
 
@@ -175,6 +184,15 @@ int MiniStep::difference() const
 double MiniStep::logOptionSetProbability() const
 {
 	return this->llogOptionSetProbability;
+}
+
+
+/**
+ * Returns the option of this ministep.
+ */
+const Option * MiniStep::pOption() const
+{
+	return this->lpOption;
 }
 
 
@@ -273,6 +291,52 @@ int MiniStep::diagonalIndex() const
 void MiniStep::diagonalIndex(int index)
 {
 	this->ldiagonalIndex = index;
+}
+
+
+/**
+ * Returns the index of this ministep in the vector of ministeps
+ * of the owner chain that are the first ministeps of CCPs
+ * (-1, if the ministep is not part of a chain or is not the first
+ * ministep of a CCP).
+ */
+int MiniStep::consecutiveCancelingPairIndex() const
+{
+	return this->lconsecutiveCancelingPairIndex;
+}
+
+
+/**
+ * Stores the index of this ministep in the vector of ministeps
+ * of the owner chain that are the first ministeps of CCPs
+ * (-1, if the ministep is not part of a chain or is not the first
+ * ministep of a CCP).
+ */
+void MiniStep::consecutiveCancelingPairIndex(int index)
+{
+	this->lconsecutiveCancelingPairIndex = index;
+}
+
+
+/**
+ * Returns the index of this ministep in the corresponding vector of
+ * ministeps with missing observed data.
+ * (-1, if the observed data is not missing).
+ */
+int MiniStep::missingIndex() const
+{
+	return this->lmissingIndex;
+}
+
+
+/**
+ * Stores the index of this ministep in the corresponding vector of
+ * ministeps with missing observed data.
+ * (-1, if the observed data is not missing).
+ */
+void MiniStep::missingIndex(int index)
+{
+	this->lmissingIndex = index;
 }
 
 

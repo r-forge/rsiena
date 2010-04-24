@@ -16,6 +16,7 @@
 #include "BehaviorVariable.h"
 #include "DependentVariable.h"
 #include "utils/Utils.h"
+#include "utils/Random.h"
 #include "data/ActorSet.h"
 #include "data/ConstantCovariate.h"
 #include "data/ChangingCovariate.h"
@@ -26,6 +27,7 @@
 #include "model/Model.h"
 #include "model/EffectInfo.h"
 #include "model/EpochSimulation.h"
+#include "model/ml/MLSimulation.h"
 #include "model/SimulationActorSet.h"
 #include "model/effects/AllEffects.h"
 #include "model/effects/EffectFactory.h"
@@ -288,6 +290,7 @@ DependentVariable::~DependentVariable()
 	this->lcovariateRates = 0;
 	this->lpEvaluationFunction = 0;
 	this->lpEndowmentFunction = 0;
+	
 }
 
 
@@ -955,8 +958,7 @@ void DependentVariable::updateEffectParameters()
 
 	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
 	{
-		NetworkEffect * pEffect =
-			(NetworkEffect *) pFunction->rEffects()[i];
+		Effect * pEffect = pFunction->rEffects()[i];
 		pEffect->parameter(rEffects[i]->parameter());
 	}
 	// find the Endowment effectInfos
@@ -967,12 +969,95 @@ void DependentVariable::updateEffectParameters()
 
 	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
 	{
-		NetworkEffect * pEffect =
-			(NetworkEffect *) pFunction->rEffects()[i];
+		Effect * pEffect = pFunction->rEffects()[i];
 		pEffect->parameter(rEffects2[i]->parameter());
 	}
+}
+/**
+ * Updates effect info parameters from the effects (used if accepted)
+ */
 
+void DependentVariable::updateEffectInfoParameters()
+{
+	// find the Evaluation effectInfos
+	const vector<EffectInfo *>  rEffects=
+		this->lpSimulation->pModel()->rEvaluationEffects(this->name());
 
+	const Function * pFunction = this->pEvaluationFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		Effect * pEffect = pFunction->rEffects()[i];
+		rEffects[i]->parameter(pEffect->parameter());
+	}
+	// find the Endowment effectInfos
+	const vector<EffectInfo *>  rEffects2=
+	 this->lpSimulation->pModel()->rEndowmentEffects(this->name());
+
+	pFunction = this->pEndowmentFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		Effect * pEffect =	pFunction->rEffects()[i];
+		rEffects2[i]->parameter(pEffect->parameter());
+	}
+}
+
+/**
+ * Samples from distribution for basic rate parameters 
+ *
+ */
+void DependentVariable::sampleBasicRate(int miniStepCount)
+{
+	this->lbasicRate = nextGamma(miniStepCount + 1, 1.0 / this->n());
+	MLSimulation * pMLSimulation = 
+		dynamic_cast<MLSimulation * >(this->pSimulation()); 
+	pMLSimulation->sampledBasicRates(this->lbasicRate);
+	pMLSimulation->sampledBasicRatesDistributions(miniStepCount + 1);
+	this->lvalidRates = false;
+}
+/**
+ * Samples from distribution for non basic rate parameters 
+ *
+ */
+double DependentVariable::sampleParameters(double scaleFactor)
+{
+	double priorSD = 10000;
+	double priornew = 0;
+	double priorold = 0;
+
+	// need to access this later
+	MLSimulation * pMLSimulation = 
+		dynamic_cast<MLSimulation * >(this->pSimulation()); 
+
+	// create candidate set of parameters and copy them to the effects
+	
+	const Function * pFunction = this->pEvaluationFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		Effect * pEffect = pFunction->rEffects()[i];
+		double candidate = pEffect->parameter() + nextNormal(0, scaleFactor);
+		priornew += normalDensity(candidate, 0, priorSD, true);
+		
+		pMLSimulation->candidates(pEffect->pEffectInfo(), candidate);
+		priorold += normalDensity(pEffect->parameter(), 0, priorSD, true);
+		pEffect->parameter(candidate);
+
+	}
+
+	pFunction = this->pEndowmentFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		Effect * pEffect = pFunction->rEffects()[i];
+		double candidate = pEffect->parameter() + nextNormal(0, scaleFactor);
+		priornew += normalDensity(candidate, 0, priorSD, true);
+		pMLSimulation->candidates(pEffect->pEffectInfo(), candidate);
+		priorold += normalDensity(pEffect->parameter(), 0, priorSD,	true);
+		pEffect->parameter(candidate);
+	}
+	return priornew - priorold;
 }
 
 // ----------------------------------------------------------------------------

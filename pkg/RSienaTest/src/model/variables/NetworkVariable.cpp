@@ -30,6 +30,7 @@
 #include "model/tables/NetworkCache.h"
 #include "model/ml/NetworkChange.h"
 #include "model/filters/PermittedChangeFilter.h"
+#include "model/ml/Chain.h"
 
 namespace siena
 {
@@ -444,6 +445,15 @@ void NetworkVariable::makeChange(int actor)
 		this->accumulateScores(alter);
 	}
 
+	if (this->pSimulation()->pModel()->needChain())
+	{
+		// add ministep to chain
+		MiniStep * pMiniStep =
+			new NetworkChange(this->lpData, actor, alter);
+		this->pSimulation()->pChain()->insertBefore(pMiniStep,
+			this->pSimulation()->pChain()->pLast());
+		pMiniStep->logChoiceProbability(log(this->lprobabilities[alter]));
+	}
 	// Make a change if we have a real alter (other than the ego)
 
 	if (!this->oneModeNetwork() || this->lego != alter)
@@ -801,7 +811,7 @@ void NetworkVariable::accumulateDerivatives() const
 	Effect * pEffect1;
 	Effect * pEffect2;
 	double derivative;
-	double product[totalEffects];
+	double * product = new double[totalEffects];
 	double contribution1 = 0.0;
 	double contribution2 = 0.0;
 
@@ -870,9 +880,10 @@ void NetworkVariable::accumulateDerivatives() const
 
 				derivative -=
 					contribution1 * contribution2 *	this->lprobabilities[alter];
-				//	Rprintf("deriv 2 %d %d %d %f %f %f %f\n", alter, effect1, effect2,
+				//	Rprintf("deriv 2 %d %d %d %f %f %f %f\n", alter, effect1,
+				//    effect2,
 				//		derivative,
-						//		this->levaluationEffectContribution[alter][effect1],
+				//		this->levaluationEffectContribution[alter][effect1],
 				//		this->levaluationEffectContribution[alter][effect2],
 				//		this->lprobabilities[alter]);
 			}
@@ -907,9 +918,11 @@ void NetworkVariable::accumulateDerivatives() const
 			this->pSimulation()->derivative(pEffect1->pEffectInfo(),
 				pEffect2->pEffectInfo(),
 				this->pSimulation()->derivative(pEffect1->pEffectInfo(),
-					pEffect2->pEffectInfo()) + product[effect1] * product[effect2]);
+					pEffect2->pEffectInfo()) + product[effect1] *
+				product[effect2]);
 		}
 	}
+	delete [] product;
 }
 
 //	Rprintf("deriv %f\n", derivative;
