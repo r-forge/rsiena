@@ -13,7 +13,7 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
                            type="eval", interaction1="", interaction2="",
                            character=FALSE)
 {
-   
+
     if (character)
     {
         dots <- sapply(list(...), function(x)x)
@@ -40,7 +40,7 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
     myeff$interaction1 == interaction1 &
     myeff$interaction2 == interaction2
     myeff[use, "include"] <- include
-    print(myeff[use, c("name", "shortName", "type", "interaction1",
+    print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
                        "interaction2", "include")])
     myeff
 }
@@ -153,7 +153,7 @@ includeInteraction <- function(myeff, ...,
     myeff[intn, c("effect1", "effect2", "effect3")] <-
         c(effect1, effect2, effect3)
 
-    print(myeff[intn, c("name", "shortName", "type", "interaction1",
+    print.data.frame(myeff[intn, c("name", "shortName", "type", "interaction1",
                      "interaction2", "include", "effect1", "effect2",
                         "effect3")])
     myeff
@@ -188,7 +188,7 @@ setEffect <- function(myeff, shortName, parameter=0,
     myeff[use, "fix"] <- fix
     myeff[use, "test"] <- test
     myeff[use, "initialValue"] <- initialValue
-    print(myeff[use, c("name", "shortName", "type", "interaction1",
+    print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
                        "interaction2", "include", "parm", "fix", "test",
                        "initialValue")])
     myeff

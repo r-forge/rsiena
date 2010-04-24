@@ -1,3 +1,9 @@
+2010-04-24 R-forge revision 82
+
+	* R/effectsMethods.r, man/print.sienaEffects.Rd,
+	man/edit.sienaEffects.Rd, NAMESPACE: print, summary and edit
+	methods for sienaEffects objects.
+
 2010-04-24 R-forge revision 81
 
 	* src/model/effects/structuralRateEffect.cpp: fix crash caused by
