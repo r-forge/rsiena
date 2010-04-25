@@ -110,8 +110,8 @@ edit.sienaEffects <- function(name, ...)
     priorityColumns <- c("name", "effectName", "type", "include", "fix",
                          "test", "initialValue", "parm", "shortName")
     priorityX <- name[, priorityColumns]
-    notPriorityX <- name[, -c(match(priorityColumns, names(x)))]
-    x <- cbind(priorityX, notPriorityX)
+    notPriorityX <- name[, -c(match(priorityColumns, names(name)))]
+    name <- cbind(priorityX, notPriorityX)
 
     ## get edit.data.frame to do the actual edit
     tmp <- NextMethod(, , edit.row.names=FALSE)
