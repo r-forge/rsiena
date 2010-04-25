@@ -1,3 +1,7 @@
+2010-04-25 R-forge revision 83
+
+	* R/effectsMethods.r: fix bug introduced trying to pass checks
+
 2010-04-24 R-forge revision 82
 
 	* R/effectsMethods.r, man/print.sienaEffects.Rd,
@@ -483,7 +487,7 @@
 
 2010-01-02 R-forge revision 34 RSiena and RSienaTest
 
-	* R/sienaprint.r:  corrected layout of sienaFitThetaTable for
+	* R/sienaprint.r: corrected layout of sienaFitThetaTable for
 	models with both behavior and network variables
 
 2010-01-01 R-forge revision 33 RSiena and RSienaTest
