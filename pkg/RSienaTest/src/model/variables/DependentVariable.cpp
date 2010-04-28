@@ -11,7 +11,6 @@
 
 #include <cmath>
 #include <stdexcept>
-#include <R.h>
 
 #include "BehaviorVariable.h"
 #include "DependentVariable.h"
@@ -290,7 +289,7 @@ DependentVariable::~DependentVariable()
 	this->lcovariateRates = 0;
 	this->lpEvaluationFunction = 0;
 	this->lpEndowmentFunction = 0;
-	
+
 }
 
 
@@ -1004,20 +1003,20 @@ void DependentVariable::updateEffectInfoParameters()
 }
 
 /**
- * Samples from distribution for basic rate parameters 
+ * Samples from distribution for basic rate parameters
  *
  */
 void DependentVariable::sampleBasicRate(int miniStepCount)
 {
 	this->lbasicRate = nextGamma(miniStepCount + 1, 1.0 / this->n());
-	MLSimulation * pMLSimulation = 
-		dynamic_cast<MLSimulation * >(this->pSimulation()); 
+	MLSimulation * pMLSimulation =
+		dynamic_cast<MLSimulation * >(this->pSimulation());
 	pMLSimulation->sampledBasicRates(this->lbasicRate);
 	pMLSimulation->sampledBasicRatesDistributions(miniStepCount + 1);
 	this->lvalidRates = false;
 }
 /**
- * Samples from distribution for non basic rate parameters 
+ * Samples from distribution for non basic rate parameters
  *
  */
 double DependentVariable::sampleParameters(double scaleFactor)
@@ -1027,11 +1026,11 @@ double DependentVariable::sampleParameters(double scaleFactor)
 	double priorold = 0;
 
 	// need to access this later
-	MLSimulation * pMLSimulation = 
-		dynamic_cast<MLSimulation * >(this->pSimulation()); 
+	MLSimulation * pMLSimulation =
+		dynamic_cast<MLSimulation * >(this->pSimulation());
 
 	// create candidate set of parameters and copy them to the effects
-	
+
 	const Function * pFunction = this->pEvaluationFunction();
 
 	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
@@ -1039,7 +1038,7 @@ double DependentVariable::sampleParameters(double scaleFactor)
 		Effect * pEffect = pFunction->rEffects()[i];
 		double candidate = pEffect->parameter() + nextNormal(0, scaleFactor);
 		priornew += normalDensity(candidate, 0, priorSD, true);
-		
+
 		pMLSimulation->candidates(pEffect->pEffectInfo(), candidate);
 		priorold += normalDensity(pEffect->parameter(), 0, priorSD, true);
 		pEffect->parameter(candidate);

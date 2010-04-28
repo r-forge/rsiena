@@ -134,7 +134,8 @@ to clear out all the .o's and the dll.
 \item On linux or Mac, the same commands should work, but you don't need the
   Rtools. I have occasionally had problems with installing from a tarball or
   from source, when I have no permission to write in the standard libraries, but
-  can't remember which one worked: one always did.
+  can't remember which one worked: one always did. The most likely to work is to
+  use, within R, \sfn{install.packages("tarball name", repos=NULL).
 \end{enumerate}
 \paragraph{Alternative methods for small changes}
 Now we have a \textsf{name space} for the package, small changes are not really
@@ -288,14 +289,17 @@ You may find that R tends to crash when you change the C++. You can try to trap
 the error using \sfn{Rprintf} statements to print out details at intervals. The
 syntax for \sfn{Rprintf} is the same as the C function \sfn{printf}, but output
 from the R version appears in the R console where other output will not. You
-need the header file \sfn{"R.h"} which will probably already be included in any
-file I have debugged!
+need the header file \sfn{"R\_ext/Print.h"} which may already be
+included in any file I have debugged! To print out R objects (arguments or
+objects you have created in the C++), use
+\sfn{PrintValue(SEXP xx)}: this requires the header file \sfn{Rinternals.h}.
 
 If you have access to a Linux machine, you can use a program called
 \sfn{valgrind} to find places where you access memory which you should not, and
 similar things. The usage is described in the Writing R Extensions manual. I
 use, at the command line,\\
-\sfn{R -d "valgrind --tool=memcheck --leak-check=full " --vanilla < valgrind.r}\\
+\sfn{R -d "valgrind --tool=memcheck --leak-check=full " --vanilla < valgrind.r}
+\\
 where valgrind.r contains the commands I want to run, \emph{followed by
   \sfn{gc()}} to do some R garbage collection. (Otherwise \sfn{valgrind} reports
 a lot of still reachable memory at the end.
@@ -306,4 +310,47 @@ an embarrassingly large memory usage, which will fail sooner or later.
 If \sfn{valgrind} reports use of uninitialised variables, use the option
 \sfn{--track-origins=yes} to find out where the problem started. It can be
 surprisingly difficult to track these down!
+\section{The R C++ interface}
+This is not easy to understand from the documentation, but there should be
+examples of most functions in the code already. Some notes:
+\begin{description}
+\item[random numbers]
+We use the R random number functions such as \sfn{rexp}. These work slightly
+differently from the R versions, you need to check the syntax of the call in
+the manual if adding new ones. The header required is \sfn{Rmath.h}. 
+\item[Random number seeds] The functions\sfn{GetRNGstate} and 
+\sfn{PutRNGstate}  are used to get the R random number seed into the C++
+process and then replace it in the R. The header for these is 
+\sfn{R\_ext/Random.h}.
+\item[rlecuyer]
+With multiple processes we use the random numbers from the \sfn{rlecuyer}
+package. The seed is set in eg \sfn{robmon} (in the R code). There is code in
+\sfn{siena07.cpp} which shows how to set and reset these if you must. The
+different streams are intended to be kept apart, so for finite differencing
+where we need common random number streams I have advanced to a new substream at
+the beginning of each real iteration and reset to this point at the beginning of
+each finite difference one. The jump to the new substream ignores the current
+state so it does not matter if the streams get muddled up during the finite
+differencing stage.
+\item[errors]
+Error messages can use the function \sfn{error} which is similar to
+\sfn{Rprintf} in syntax, and needs the header file \sfn{R\_ext/error.h}.
+\end{description}
+\section{C++ platform independence}
+A few notes of problems we have had:
+\begin{itemize}
+\item With some compilers you need to add \sfn{<string>} if you use
+  \sfn{<stdexcept>}. Often this will be included somewhere else in the path, but
+  if you add \sfn{<stdexcept>} it would be good to add \sfn{<string>} also.
+  \item If you work on a Mac, currently you will find it easier to remove the
+    word \sfn{clean} from the make file \sfn{Makevars}. I suggest you do this in
+    a personal copy in a directory \sfn{.R} in your home directory, though, so
+    that when you build and check the package it will get the right one. Also
+    use the INSTALL flag: \sfn{R CMD INSTALL --no-multiarch dirname} to retain
+    unchanged object files between installs. Hopefully this will cease to be a
+    problem at some stage.
+\item Also remove the word \sfn{clean} from the makefile on Linux.  
+  \item Be careful with \sfn{abs}. The integer version is in \sfn{<cstdlib>} not
+    \sfn{<cmath>}. Compilation may fail with message about ambiguity.
+\end{itemize}
 \end{document}

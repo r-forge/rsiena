@@ -7,7 +7,6 @@
  *
  * Description: This file contains the implementation of the class Chain.
  *****************************************************************************/
-#include <R.h>
 #include <Rinternals.h>
 
 #include <vector>

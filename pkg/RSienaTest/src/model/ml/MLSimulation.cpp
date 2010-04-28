@@ -10,7 +10,7 @@
  *****************************************************************************/
 #include <stdexcept>
 #include <string>
-#include <R.h>
+#include <cmath>
 #include <Rinternals.h>
 #include "MLSimulation.h"
 #include "utils/Random.h"

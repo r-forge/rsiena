@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include <stdexcept>
-#include <R.h>
 
 #include "BehaviorEffect.h"
 #include "data/Data.h"

@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include <stdexcept>
-#include <R.h>
 
 #include "CovariateDependentNetworkEffect.h"
 #include "data/ConstantCovariate.h"

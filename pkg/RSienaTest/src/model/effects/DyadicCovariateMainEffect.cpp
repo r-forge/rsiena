@@ -8,7 +8,6 @@
  * Description: This file contains the implementation of the
  * DyadicCovariateMainEffect class.
  *****************************************************************************/
-#include <R.h>
 #include "DyadicCovariateMainEffect.h"
 #include "network/Network.h"
 #include "network/TieIterator.h"

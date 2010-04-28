@@ -8,7 +8,6 @@
  * Description: This file contains the implementation of the
  * BehaviorVariable class.
  *****************************************************************************/
-#define NO_C_HEADERS
 #include <cstdlib>
 #include <cmath>
 #include <string>

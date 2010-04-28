@@ -1,3 +1,10 @@
+2020-04-28 R-forge revision 84
+
+	* src/many: removed <R.h> and adjusted other header files
+	* man/iwlms.Rd: (RSienaTest only) eol-style property set.
+	* doc/RSienaDeveloper.tex: notes about headers and R/C
+	interface. (RSienatest only)
+	
 2010-04-25 R-forge revision 83
 
 	* R/effectsMethods.r: fix bug introduced trying to pass checks
