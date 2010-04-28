@@ -8,7 +8,6 @@
  * Description: This file contains the implementation of the class
  * NetworkChange.
  *****************************************************************************/
-#include <R.h>
 
 #include "NetworkChange.h"
 #include "network/Network.h"

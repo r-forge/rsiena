@@ -18,8 +18,9 @@
 #include <valarray>
 #include <vector>
 #include <set>
-#include <string>
-#include <R.h>
+#include <cstring>
+#include <R_ext/Print.h>
+#include <R_ext/Random.h>
 #include <Rinternals.h>
 #include <Rmath.h>
 #include "data/Data.h"

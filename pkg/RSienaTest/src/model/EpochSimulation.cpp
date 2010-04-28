@@ -10,7 +10,8 @@
  *****************************************************************************/
 
 #include <algorithm>
-#include <R.h>
+#include <cmath>
+#include <R_ext/Error.h>
 
 #include "EpochSimulation.h"
 #include "utils/Random.h"

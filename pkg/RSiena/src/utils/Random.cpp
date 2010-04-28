@@ -11,8 +11,6 @@
 
 #include "Random.h"
 #include <sys/time.h>
-#include <R.h>
-#include <Rinternals.h>
 #include <Rmath.h>
 #include <vector>
 

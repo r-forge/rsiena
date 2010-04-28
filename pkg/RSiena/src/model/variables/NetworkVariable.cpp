@@ -11,7 +11,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <R.h>
 #include "NetworkVariable.h"
 #include "utils/Utils.h"
 #include "utils/Random.h"
