@@ -28,9 +28,7 @@
 timetest <- sienaTimeTest(sienaFit)
 \method{plot}{sienaTimeTest}(x, pairwise=FALSE, effects=1:2,
 	dims=c(2, 1), scale=.2, plevels=c(.1, .05, .025), multiplot=FALSE, ...)
-sienaEffects$timeDummy <- "2,4,6" #Include time dummies for periods
-                                  # 2, 4, and 6
-sienaEffects$timeDummy <- "all"	  #Include all time dummies
+myeffects <- includeTimeDummy(sienaEffects, outdegree, timeDummy="all")
 }
 \arguments{
   \item{sienaFit}{ A sienaFit object returned by \code{siena07}. }
@@ -97,7 +95,8 @@ sienaEffects$timeDummy <- "all"	  #Include all time dummies
  If it is determined that a time heterogeneity occurs for any number of
  time periods or effects (or any combination therein), the
  \code{timeDummy} column provides facilities within a sienaFit object to
- quickly adjust the model and re-estimate in the usual way.
+ quickly adjust the model and re-estimate in the usual way. Alternately,
+ the includeTimeDummy function can be used to add the desired dummies.
 
 }
 \value{
@@ -133,8 +132,7 @@ mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
-myeff$include[myeff$shortName=='transTrip' & myeff$type=='eval'] <- TRUE
-myeff$include[myeff$shortName=='balance' & myeff$type=='eval'] <- TRUE
+myeff <- includeEffects(myeff, transTrip, balance)
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 
 ## Conduct the score type test to assess whether heterogeneity is present.
@@ -142,8 +140,7 @@ tt <- sienaTimeTest(ans)
 
 ## Suppose that we wish to include two time dummies.
 ## Add them in the following way:
-myeff$timeDummy[myeff$shortName=='recip' & myeff$type=='eval'] = "2"
-myeff$timeDummy[myeff$shortName=='balance' & myeff$type=='eval'] = "2"
+myeff <- includeTimeDummy(myeff, recip, balance, timeDummy="2")
 ans2 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 
 ## Re-assess the time heterogeneity
@@ -157,12 +154,10 @@ mymodel <- sienaModelCreate(fn=simstats0c, nsub=4, n3=500)
 mynet1 <- sienaNet(array(c(s501, s502, s503, s501, s503, s502), dim=c(50, 50, 6)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
-myeff$include[myeff$shortName=='transTrip' & myeff$type=='eval'] <- TRUE
-myeff$include[myeff$shortName=='balance' & myeff$type=='eval'] <- TRUE
-myeff$timeDummy[myeff$shortName=='recip' & myeff$type=='eval'] = "2,3,5"
-myeff$timeDummy[myeff$shortName=='balance' & myeff$type=='eval'] = "2,5"
-myeff$timeDummy[myeff$shortName=='recip' & myeff$type=='eval'] = "4"
-myeff$timeDummy[myeff$shortName=='density' & myeff$type=='eval'] = "all"
+myeff <- includeEffects(myeff, transTrip, balance)
+myeff <- includeTimeDummy(myeff, recip, timeDummy="2,3,5")
+myeff <- includeTimeDummy(myeff, balance, timeDummy="4")
+myeff <- includeTimeDummy(myeff, density, timeDummy="all")
 ansp <- siena07(mymodel, data=mydata, effects=myeff, batch=FALSE)
 ttp <- sienaTimeTest(ansp)
 

@@ -397,8 +397,7 @@ plot.sienaTimeTest <- function(x, pairwise=FALSE, effects=1:2,
 			ymin=min(yaxis[i, ] - scale * abs(yaxis[i, ]))
 			ymax=max(yaxis[i, ] + scale * abs(yaxis[i, ]))
 			xyplot(yaxis[i, ] ~ xaxis,
-				   type = "p", main = rownames(timetest$IndividualTest)
-				   [timetest$NonRateIndices[effects[i]]],
+				   type = "p", main = rownames(timetest$EffectTest)[effects[i]] ,
 				   sub=paste("p=", timetest$EffectTest[effects[i]]), bty="n",
 				   xlab="Wave", ylab="Parameter Value", auto.key=TRUE,
 				   ylim=c(ymin, ymax), xlim=c(0, length(xaxis) + 1),
@@ -670,4 +669,37 @@ sienaTimeFix <- function(effects, data)
 		list(effects=effects, data=data)
 	}
 }
-
+##@includeTimeDummy DataCreate
+includeTimeDummy <- function(myeff, ..., timeDummy="all", name=myeff$name[1],
+		type="eval", interaction1="", interaction2="",
+		character=FALSE)
+{
+	
+	if (character)
+	{
+		dots <- sapply(list(...), function(x)x)
+	}
+	else
+	{
+		dots <- substitute(list(...))[-1] ##first entry is the word 'list'
+	}
+	if (length(dots) == 0)
+	{
+		stop("need some effect short names")
+	}
+	if (!character)
+	{
+		effectNames <- sapply(dots, function(x)deparse(x))
+	}
+	else
+	{
+		effectNames <- dots
+	}
+	use <- myeff$shortName %in% effectNames &
+			myeff$type==type &
+			myeff$name==name &
+			myeff$interaction1 == interaction1 &
+			myeff$interaction2 == interaction2
+	myeff[use, "timeDummy"] <- timeDummy
+	myeff
+}
