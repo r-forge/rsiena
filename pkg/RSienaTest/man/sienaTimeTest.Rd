@@ -28,7 +28,8 @@
 timetest <- sienaTimeTest(sienaFit)
 \method{plot}{sienaTimeTest}(x, pairwise=FALSE, effects=1:2,
 	dims=c(2, 1), scale=.2, plevels=c(.1, .05, .025), multiplot=FALSE, ...)
-myeffects <- includeTimeDummy(sienaEffects, outdegree, timeDummy="all")
+myeffects <- includeTimeDummy(sienaEffects, outdegree,
+	timeDummy="all", type="eval")
 }
 \arguments{
   \item{sienaFit}{ A sienaFit object returned by \code{siena07}. }
@@ -167,5 +168,20 @@ plot(ttp, pairwise=TRUE)
 ## Time test plots show
 plot(ttp, effects=1:4, dims=c(2,2))
 }
+## A demonstration of RateX heterogeneity. Note that rate
+## interactions are not implemented in general, just for
+## Rate x cCovar.
+\dontrun{
+mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
+mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+myccov <- coCovar(s50a[,1])
+mydata <- sienaDataCreate(mynet1, myccov)
+myeff <- getEffects(mydata)
+myeff <- includeEffects(myeff, transTrip, balance)
+myeff <- includeEffects(myeff, RateX, type="rate",
+			interaction1="myccov")
+myeff <- includeTimeDummy(myeff, RateX, type="rate",
+			interaction1="myccov")
+ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 }
 \keyword{models}

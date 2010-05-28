@@ -131,9 +131,10 @@ sienaTimeTest <- function (sienaFit, effects=NULL)
 	SF <- array(0, dim=c(nSims, observations - 1, nEffects + nDummies))
 	if (sum(dim(G[, , 1:nEffects]) != dim(moment))+
 		sum(dim(SF[, , 1:nEffects]) != dim(scores))>0) {
-		stop("The moments and scores in your sienaFit have unexpected dimensions.
-			It is possible that your model specifications are not yet implemented
-			in sienaTimeTest. Please contact the developers")
+		stop("The moments and scores in your sienaFit have unexpected dimensions.\n
+			It is possible that your model specifications are not yet implemented\n
+			in sienaTimeTest. Please contact the developers.\n\nDid you include
+			the base effect?\n")
 	}
 	## Will be used to construct the dummy names for output
 	dummyNames <- rep("", nDummies)
@@ -559,12 +560,12 @@ sienaTimeFix <- function(effects, data)
  #       warning("Time dummy not implemented for covariate effects")
  #       effects$timeDummy[covar] <- ","
  #   }
-    eval <- effects$type =="eval"
-	if (any(effects$timeDummy[!eval] !=','))
+    implemented <- (effects$type == "eval" | effects$shortName == "RateX")
+	if (any(effects$timeDummy[!implemented] !=','))
 	{
 		warning("Time dummy effects are only implemented",
-                " for one mode network effects of type eval.")
-        effects$timeDummy[!eval] <- ","
+                " for one mode network effects of type eval or for RateX.")
+        effects$timeDummy[!implemented] <- ","
 	}
 	if (all(effects$timeDummy==',') )
 	{
@@ -573,6 +574,7 @@ sienaTimeFix <- function(effects, data)
 	}
 	else
 	{
+## 	One mode, eval effects, or RateX effects:
 		alreadyDummied <- grep("isDummy", effects$timeDummy)
 		effects$timeDummy[effects$timeDummy=="all"]  <-
             paste(2:(data$observations-1), collapse = ",")
@@ -583,8 +585,9 @@ sienaTimeFix <- function(effects, data)
 ## all of the previous dummied effects within the column.
 			effects <- effects[-alreadyDummied, ]
 		}
-		dummiedEffects <- effects$effectNumber[effects$timeDummy != ',']
+		dummiedEffects <- effects$effectNumber[effects$timeDummy != ',' & (effects$type=='eval' | effects$shortName=='RateX')]
 		covToAdd <- NULL
+		rateCovToAdd <- NULL
 		dummyCombos <- list()
 		ctr=1
 ## This might need to be changed for sienaGroup:
@@ -611,9 +614,49 @@ sienaTimeFix <- function(effects, data)
 			}
 			if (length(tmp) > 0)
 			{
-				dummyCombos[[ctr]]=list(effectNumber=i, periods=tmp)
-				ctr=ctr + 1
-				covToAdd <- unique(c(covToAdd, tmp))
+				if (effects$type[effects$effectNumber==i]=='eval') {
+					dummyCombos[[ctr]]=list(effectNumber=i, periods=tmp)
+					ctr=ctr + 1
+					covToAdd <- unique(c(covToAdd, tmp))
+				} else if (effects$shortName[effects$effectNumber==i]=='RateX') {
+					## RateX effect, has to be dealt with differently. Just add them now:
+					for (p in tmp) {
+						dname <- paste(effects$interaction1[effects$effectNumber==i],
+								"Dummy",p,sep="")
+						base <- matrix(0,nact,nper-1)
+						## Figure out the base values:
+						dvind <- which(names(data$cCovars) == 
+							effects$interaction1[effects$effectNumber==i])
+						## Stick them into the right time spot
+						base[,p] <- data$cCovars[[dvind]]
+						## make a new varCovar:
+						base <- varCovar(base)
+						base <- addAttributes.varCovar(base, name=dname)
+						data$vCovars[[length(data$vCovars)+1]] <- base
+						names(data$vCovars)[length(data$vCovars)] <- dname
+						## Now add the rate term:
+						tmprow <- allEffects[allEffects$functionName==
+										'Amount of change x xxxxxx' & allEffects$type=='rate'
+										& allEffects$effectGroup=='covarNonSymmetricRate', ]
+						tmprow$name <- effects$name[effects$shortName=='RateX' &
+										effects$type=='rate'][1]
+						tmprow$effectFn <- 'NULL'
+						tmprow$statisticFn <- 'NULL'
+						tmprow$netType <- 'oneMode'
+						tmprow$groupName <- 'Group1'
+						tmprow$group <- 1
+						tmprow$fix <- FALSE
+						tmprow$include <- TRUE
+						tmprow$effectNumber <- max(effects$effectNumber) + 1
+						tmprow <- tmprow[, colnames(effects)]
+						tmprow$effectName <- gsub('xxxxxx', dname, tmprow$effectName)
+						tmprow$functionName <- gsub('xxxxxx', dname, tmprow$functionName)
+						tmprow$interaction1 <- dname
+						tmprow$timeDummy <- paste('isDummy', p, i, sep=',')
+						rownames(tmprow) <- dname
+						effects <- rbind(effects, tmprow)
+					}
+				}
 			}
 		}
 ## Add the required covariate effects to the effect objects
@@ -651,10 +694,10 @@ sienaTimeFix <- function(effects, data)
 			rownames(tmprow) <- dname
 			effects <- rbind(effects, tmprow)
 		}
-		for (i in 1:length(dummyCombos))
+		for (i in seq(along=dummyCombos))
 		{
 			baseNum=dummyCombos[[i]]$effectNumber
-			for (j in 1:length(dummyCombos[[i]]$periods))
+			for (j in seq(along=dummyCombos[[i]]$periods))
 			{
 				dname <- paste("Dummy", dummyCombos[[i]]$periods[j], sep="")
 				dummyNum <- effects$effectNumber[rownames(effects)==dname]

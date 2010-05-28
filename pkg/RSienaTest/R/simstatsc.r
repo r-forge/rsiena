@@ -1100,8 +1100,12 @@ fixUpEffectNames <- function(effects)
                    }
                    if (inter1$type != inter2$type)
                    {
-                       stop("invalid interaction specification: ",
-                            "must be same type: evaluation or endowment")
+					   warning("Interaction specification gives effects ",
+							   "with different specifications eval/endow/rate ",
+							   "trying with experimental code. Remove these ",
+							   "Interactions if this does not work.")
+##                       stop("invalid interaction specification: ",
+##                            "must be same type: evaluation or endowment")
                    }
                }
                else
