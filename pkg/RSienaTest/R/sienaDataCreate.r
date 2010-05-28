@@ -158,8 +158,39 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
     {
         nm[fixup] <- dep
     }
-    dots <- list(...)
-    names(dots) <- nm
+	## Josh inserting this code: #####################################
+	## Adding this list flattening routine so that sienaDataCreate can
+	## accept a list of lists. Useful for expanding time dummies, etc.
+	## Also attaches meaningful names to the flattened items.
+	listContainsList <- function (x) {
+		which(sapply(seq(along=x), function(i) class(x[[i]])=='list'))
+	}
+	args <- list(...)
+	toFlatten <- listContainsList(args)
+	if (length(toFlatten)>0) {
+		numberOfOldArgs <- length(args[-toFlatten])
+		numberOfNewArgs <- sum(sapply(toFlatten, function(i) length(args[[i]])))
+		flattened <- vector("list", numberOfNewArgs + numberOfOldArgs)
+		newNames <- rep("", numberOfNewArgs + numberOfOldArgs)
+		newNames[1:numberOfOldArgs] <- nm[-toFlatten]
+		flattened[seq(numberOfOldArgs)] <- args[-toFlatten]
+		count <- numberOfOldArgs
+		for (i in toFlatten) {
+			for (j in seq(along=args[[i]])) {
+				count = count + 1
+				flattened[[count]] <- args[[i]][[j]]
+				newNames[count] <- names(args[[i]][j])
+			}
+		}
+		names(flattened) <- newNames
+		narg <- length(flattened)
+		nm <- newNames
+		dots <- flattened
+	} else {
+		dots <- list(...)
+	}
+	################################################################
+
     if (any(duplicated(nm)))
     {
         stop('names must be unique')
