@@ -241,31 +241,31 @@ presented, e.g., in \citet*{vanBunt99, vanBuntEA99} and \citet*{vanDuijnEA03};
 and \citet*{SteglichEA06}.
 
 A website for \SI is maintained at \url{http://www.stats.ox.ac.uk/~snijders/siena/}~.
-At this website
-(`publications' tab) you shall also find references to introductions in various other languages.
+At this website (`publications' tab)
+you shall also find references to introductions in various other languages.
 
-
-This is a provisional manual for \SI version 4.0,
-which is also called \rs.
-This is a contributed package for the \R statistical system
+This is a manual for \SI version 4.0,
+which is also called \rs; the manual is provisional in the sense
+that it still is continually being updated.
+\RS is a contributed package for the \R statistical system
 which can be downloaded from\\
 \url{http://cran.r-project.org}. For the operation of \Rn,
 the reader is referred
 to the corresponding manual. If desired, \SI can be operated \emph{apparently}
 independently of \Rn, as is explained in Section~\ref{Gui}.
 
-Sometimes latest versions are available at
+\RS was programmed by Ruth Ripley and Krists Boitmanis, in collaboration with Tom Snijders.
+
+In addition to the `official' \R distribution of \rs, there is
+an additional distribution at R-Forge, which is
+a central platform for the development of \R packages
+offering facilities for source code management.
+Sometimes latest versions of \RS are available at
 \url{http://r-forge.r-project.org/R/?group_id=461}
 before being incorporated into the R package that can be downloaded from CRAN.
+In addition, at R-Forge there is a package RSienaTest which may include
+additional options that are still in the testing stage.
 
-\RS was programmed by
-Ruth Ripley and Krists Boitmanis, in collaboration with Tom Snijders.
-
-This manual is updated rather frequently, and it may be worthwhile
-to check now and then for updates.
-It is possible that the current version still bears some traces
-from the conversion of \SI version 3 to 4, and has (mistakenly)
-some remarks that apply to version 3 and not to 4.
 
 \iffalse
 The manual focuses on the use of \SI for analysing the dynamics
@@ -762,6 +762,8 @@ the \sfn{verbose=TRUE} option of \sfn{siena07}.
 
 The following is an example \R script,
 which one may use to get started with \rs.
+The appendix contains a list of \RS functions which may be consulted
+in addition to this script.
 
 \begin{verbatim}
 #####################################GENERAL###################################
@@ -869,9 +871,9 @@ which one may use to get started with \rs.
 
 ####################FROM VECTORS AND MATRICES TO SIENA OBJECTS##################
 
-# A number of objects need to be created in R, as preparations to letting Siena07
+# A number of objects need to be created in R, as preparations to letting siena07
 # execute the estimation.
-# sienaModelCreate creates a control object which can be used as an argument for Siena07
+# sienaModelCreate creates a control object which can be used as an argument for siena07
 # You can look in the RSiena help files, requested by typing ?RSiena,
 # to find out about options that you may use here;
 # for beginning users, only the two options mentioned below are relevant.
@@ -1303,8 +1305,8 @@ multiple processes can speed up the estimation in \sfn{siena07}.
 
 \item In Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
   multiple simulations are done with the same parameters, and the resulting
-  statistics are averaged. The gain parameter is increased and the minimum numb
-  er of iterations in phase 2 reduced to take advantage of
+  statistics are averaged. The gain parameter is increased and the
+  number of iterations in phase 2 reduced to take advantage of
   the increased accuracy.
 
 \item The parameters required to run all processes on one computer are fairly
@@ -1323,13 +1325,14 @@ multiple processes can speed up the estimation in \sfn{siena07}.
   see the documentation for the package \sfn{snow}.
 
 \item Currently \RS uses sockets for inter-process communication.
-\item Each process needs a copy of the data in memory. If there is insuffient
+\item Each process needs a copy of the data in memory. If there is insufficient
   memory available there will be no speed gain as too much time will be spent
   paging.
 \item In each iteration the main process waits until all the other processes
   have finished. The overall speed is therefore that of the slowest process, and
   there should be enough processors to allow them all to run at speed.
 \end{enumerate}
+
 \subsection{Steps for looking at results: Executing \si .}
 \label{S_exec}
 
@@ -1344,13 +1347,14 @@ multiple processes can speed up the estimation in \sfn{siena07}.
       in absolute value, and that it has nearly converged if they are all
       smaller than 0.2.\\
       These bounds are indications only, and may be taken with a grain of
-      salt.\\
-
-      \smallskip
-
-\item The \textsf{Initial value of gain parameter} determines the
+      salt.
+\item In rare circumstances, when the data set leads to instability
+      of the algorithm, the following may be of use.\\
+      The \textsf{Initial value of the gain parameter} determines the
       step sizes in the parameter updates in the iterative
       algorithm.
+      This is the parameter called \textsf{firstg}
+      in function \textsf{sienaModelCreate}.
       A too low value implies that it takes very long to attain a
       reasonable parameter estimate when starting from an initial
       parameter value that is far from the `true' parameter estimate.
@@ -1876,11 +1880,16 @@ one may expect problems in getting good estimates.
 In the current implementation of \si, missing data are treated in
 a simple way, trying to minimize their influence on the estimation
 results.
-This method is further explained in \citet{HuismanSteglich08},
-where comparisons are also made with other ways of dealings with the missing
-information.
+%This method is further explained in \citet{HuismanSteglich08},
+%where comparisons are also made with other ways of dealings with the missing
+%information.
 
 The basic idea is the following.
+\medskip
+
+NOTE: This may not be a correct representation. To be modified.
+\medskip
+
 A brief sketch of the procedure is that
 missing values are imputed to allow meaningful simulations;
 for the calculation of the target statistics in the Method of Moments,
@@ -1900,7 +1909,7 @@ In the further observations, for any variable,
 if there is an earlier observed value of this variable then
 the last observed value is used to impute the current
 value (the `last observation carry forward' option,
-cf.\ \citet{Lepkowski89}; if there is no earlier observed
+cf.\ \citet{Lepkowski89}); if there is no earlier observed
 value, the value 0 is imputed.
 For the dependent behavior variables the same principle
 is used: if there is a previous observation of the same variable
@@ -4339,14 +4348,14 @@ not problematic.
 \newpage
 \subsection{Testing differences between independent groups}
 
-Sometimes it is interesting to test differences between parameters
-estimated for independent groups. For example, for work-related support networks
-analyzed in two different firms, one might wish to test whether the
-tendency to reciprocation of work-related support, as reflected by the reciprocity parameter,
-is equally strong in both firms.
-Such a comparison is meaningful especially if the total model is the same in
-both groups, as control for different other effects would compromise
-the basis of comparison of the parameters.
+Sometimes it is interesting to test differences between parameters estimated for
+independent groups. For example, for work-related support networks analyzed in
+two different firms, one might wish to test whether the tendency to
+reciprocation of work-related support, as reflected by the reciprocity
+parameter, is equally strong in both firms.  Such a comparison is meaningful
+especially if the total model is the same in both groups, as control for
+different other effects would compromise the basis of comparison of the
+parameters.
 
 If the parameter estimates in the two networks are $\hat\beta_a$ and $\hat\beta_b$,
 with standard errors \textit{s.e}$_a$ and  \textit{s.e}$_b$, respectively,
@@ -4359,7 +4368,11 @@ standard normal distribution.
 
 \newpage
 \subsection{Testing time heterogeneity in parameters}
-We initially assume that $\beta$ does not vary over time, yielding a \emph{restricted model}. Our data contains $|\mathcal{M}|$ observations, and we estimate the restricted model the method of moments. We wish to test whether the \emph{restricted model} is misspecified with respect to time heterogeneity. Formally, define a vector of time dummy terms $\mathbf{h}$:
+We initially assume that $\beta$ does not vary over time, yielding a
+\emph{restricted model}. Our data contains $|\mathcal{M}|$ observations, and we
+estimate the restricted model the method of moments. We wish to test whether the
+\emph{restricted model} is misspecified with respect to time
+heterogeneity. Formally, define a vector of time dummy terms $\mathbf{h}$:
 \begin{align}
 h_k^{(m)}=\left\{
 \begin{array}{ll}
@@ -4368,22 +4381,29 @@ h_k^{(m)}=\left\{
 \end{array}
 \right . ,
 \end{align}
-where $k$ corresponds to an effect included in the model.\footnote{The dummy $\delta_k^{(1)}$ is always zero so that period $w_1$ is (arbitrarily) considered the reference period.} An \emph{unrestricted model} which allows for time heterogeneity in all of the effects is considered as a modification of \eqref{eq:fij}:
+where $k$ corresponds to an effect included in the model.\footnote{The dummy
+  $\delta_k^{(1)}$ is always zero so that period $w_1$ is (arbitrarily)
+  considered the reference period.} An \emph{unrestricted model} which allows
+for time heterogeneity in all of the effects is considered as a modification of
+\eqref{eq:fij}:
 
 \begin{align}
-f^{(m)}_{ij}(\mathbf{x})= \sum_k (\beta_k + \delta_k^{(m)} h_k^{(m)}) s_{ik}(\mathbf{x}(i \leadsto j))
+f^{(m)}_{ij}(\mathbf{x})= \sum_k (\beta_k + \delta_k^{(m)} h_k^{(m)})
+s_{ik}(\mathbf{x}(i \leadsto j))
 \label{eq:fmij}
 \end{align}
-where $\delta_k^{(m)}$ are the time dummy interacted effect parameters. One way to formulate the testing problem of assessing time hetergeneity is the following:
+where $\delta_k^{(m)}$ are the time dummy interacted effect parameters. One way
+to formulate the testing problem of assessing time hetergeneity is the
+following:
 \begin{align}
 H_0:\delta_k^{(m)} = 0 & \mbox{~for all~} k,m \notag\\
 H_1:\delta_k^{(m)} \neq 0 & \mbox{ for some } k,m .
 \label{hyptest}
 \end{align}
 
-An application of the score test is given for the special case of parameter heterogeneity
-by \citet{Lospinoso2010a} and implemented in RSiena.
-To apply the test to your dataset, run an estimation in the usual way, e.g.:
+An application of the score test is given for the special case of parameter
+heterogeneity by \citet{Lospinoso2010a} and implemented in RSiena.  To apply the
+test to your dataset, run an estimation in the usual way, e.g.:
 \begin{verbatim}
 mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
@@ -6937,24 +6957,28 @@ This function is maximal for
 % \maketitle
 % \tableofcontents
 % \listoftables
+
 \appendix
 \newpage
 \section{List of Functions in Order of Execution}
 
     This appendix, for which we are indebted to Paulina Preciado Lopez,
     provides a description of the functions that constitute the
-    RSiena package. This is intended as a quick reference or catalogue for the
-    user to employ Stochastic Actor Oriented Models (SAOM) to analyse network
-    dynamics in R.
+    \RS package. This is intended as a quick reference or catalogue for the
+    user to employ Stochastic Actor Oriented Models (SAOM) to analyze network
+    dynamics in \Rn.
 
-    The functions are presented in execution order (in the approximate order in
-    which they would be used in real model estimation) A list of useful R
+    The functions are presented in execution order (more or less as
+    they would be used in practice). A list of useful \R
     functions to read and prepare the data set is also included at the
     beginning. In all cases examples on how to use these functions are provided.
+    In the `syntax' column,
+    when arguments of functions are followed by = and a single option,
+    this is the default option.
 
-    The descriptions provided are suitable for beginner and intermediate R and
+    The descriptions provided are suitable for beginner and intermediate \R and
     Siena users. For the advanced specifications of the functions the user
-    should refer to the help by typing ``?funName'' in the R console, where
+    should refer to the help by typing ``?funName'' in the \R console, where
     ``funName'' is the name of the function.
 
     We consider that the model estimation is composed by 6 stages:
@@ -6969,101 +6993,94 @@ This function is maximal for
 \end{enumerate}
 
 Tables \ref{tab:FuncExR} and \ref{tab:ListSienaExec} present the list of useful
-R functions and the list of RSiena functions in execution order, respectively.
-\begin{footnotesize}
+\R functions and the list of \RS functions in execution order, respectively.
+%\begin{footnotesize}
 \begin{sidewaystable}
 \begin{threeparttable}
 \centering
-        \begin{tabular}{c | l | p{4.5cm} | p{5cm} | p{8cm} }
+        \begin{tabular}{c | l | p{4cm} | p{4cm} | p{12cm} }
         \multicolumn{1}{c}{\textbf{Stage}} & \multicolumn{1}{c}{\textbf{Name}}
  &                          \multicolumn{1}{c}{\textbf{Syntax}} &
  \multicolumn{1}{c}{\textbf{Examples}} &
 \multicolumn{1}{c}{\textbf{Description}} \\
         \cline{1-5}
         1 &help\tnote{*} &  help(funame) &  help(siena01Gui) &
-    Opens the help on the function named ``funame'', this can also be done by
-    typing ``?'' followed by ``funame'' in  the console\\
+    Opens the help on the function named ``funame''; this can also be done by
+    typing ``?'' followed by ``funame'' in  the console.
+    This is the general way to get information about further options
+    of this function.    \\
         \hline
         1   &getwd  &getwd()        & &
 Returns the name of the current working directory.
                 Does not require arguments\\
                 \hline
         1 & list.files &    list.files(dir) &
-list.files (``C:/User/ MyDocuments/ MySiena'') &    Returns a character vector
-with the names of the files in the directory ``dir''.
-If no argument is provided, ``dir'' is the current working directory.
-Type ?list.files for more options\\
-\hline
-1   &setwd\tnote{*} &setwd(dir) &setwd(``C:/MyDocuments/ MySiena'') &
+list.files (``C:/User/ MyDocuments/
+\newline
+MySiena'') &    Returns a character vector
+with the names of the files in the directory ``dir''. If no argument is
+provided, ``dir'' is the current working directory.\\
+\hline 1   &setwd\tnote{*} &setwd(dir) &setwd( ``C:/MyDocuments/ MySiena'') &
     Sets the working directory to ``dir''. In this context the working
  directory should be where the data is saved\\
-\hline
-1   &install.packages\tnote{*} &    install.packages() &
-&It is used to install packages. If no arguments are provided it opens a GUI
+\hline 1   &install.packages\tnote{*} &    install.packages() & &It is used to
+install packages. If no arguments are provided it opens a GUI
  to select a mirror site and the packages that we want to download and
- install. This is not necessary if the package has already been installed.
- See ?install.packages for more options\\
-\hline
-1   &library\tnote{*} & library(package) &  library(RSiena) &
-Loads the library named ``package''. See ?library for more options.\\
-\hline
-1   &read.table &   read.table(file, header = FALSE, sep = ``'',
-quote = ``\'''',...) &  net1$<$--read.table(`network1. dat' , header = F)
-&   Reads a file in table format and creates a data frame from it.
-The argument ``file'' is the file containing the data. In the case of
-adjacency matrices, the file should have the same number of columns and rows.
-``header'' is a logical argument indicating whether the first row of the data
-contains the column names. ``sep'' is the field separator character
+ install. This is not necessary if the package has already been installed.\\
+\hline 1   &library\tnote{*} & library(package) &  library(RSiena) &
+Loads the library named ``package''. \\
+\hline 1   &read.table &   read.table(file, header=FALSE,  sep=``'',
+\newline
+quote=``{\''}'',...) &  net1 $<$-- read.table(
+\newline
+`network1.dat', header=F) & Reads
+a file in table format and creates a data frame from it. The argument ``file''
+is the file containing the data. In the case of adjacency matrices, the file
+should have the same number of columns and rows. ``header'' is a logical
+argument indicating whether the first row of the data contains the column
+names. ``sep'' is the field separator character
  (such as space, comma, etc.). See the help on the function to specify
 other arguments\\
-\hline
-2 &  as.matrix   &as.matrix(x,...)   &net1 $<$-- as.matrix(net1) &
+\hline 2 &  as.matrix   &as.matrix(x,...)   &net1 $<$-- \newline as.matrix(net1) &
 Transforms an object ``x'' into a matrix. Siena works with matrices and
 not with data frames\\
-\hline
-2&  class &   class(x)  & class(net1)  & Returns the type of object that
+\hline 2&  class &   class(x)  & class(net1)  & Returns the type of object that
 ``x'' is\\
 \hline
 2&   dim  & dim(x)  & dim(net1) &  Returns the dimension of object ``x''\\
-\hline
-4 &   fix\tnote{*}  & fix(x) &  fix(effects) &  Allows editing the object ``x''
+\hline 4 &   fix\tnote{*}  & fix(x) &  fix(effects) &  Allows editing the
+object ``x''
  by opening a window and it replaces the old object by the edited ``x''\\
 \hline
 \end{tabular}
-\caption[Functions from R in order of execution]
-{Useful functions from R in execution order}
-\label{tab:FuncExR}
+\caption[Functions from \R in order of execution] {Useful functions from \R in
+execution order} \label{tab:FuncExR}
 \begin{tablenotes}
 \item [*] Also available via a menu option
 \end{tablenotes}
 \end{threeparttable}
 \end{sidewaystable}
-\end{footnotesize}
+%\end{footnotesize}
 
 
 \begin{landscape}
-\begin{footnotesize}
+%\begin{footnotesize}
 \begin{longtable}{c | p{3cm} | p{5.2cm} | p{4.2cm} | p{8.5cm} }
-\caption[List of RSiena Functions: Execution]
-{List of RSiena Functions in order of Execution}
+\caption[List of \RS Functions: Execution] {List of \RS Functions in order of
+Execution}
 \label{tab:ListSienaExec} \\
 \hline
 
-\multicolumn{1}{c}{\textbf{Stage}} &
-\multicolumn{1}{c}{\textbf{Name}} &
-\multicolumn{1}{c}{\textbf{Syntax}} &
-\multicolumn{1}{c}{\textbf{Examples}} &
+\multicolumn{1}{c}{\textbf{Stage}} & \multicolumn{1}{c}{\textbf{Name}} &
+\multicolumn{1}{c}{\textbf{Syntax}} & \multicolumn{1}{c}{\textbf{Examples}} &
 \multicolumn{1}{c}{\textbf{Description}} \\
 \hline
 \endfirsthead
 
 \multicolumn{5}{c}%
 {{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
-\hline
-\multicolumn{1}{c}{\textbf{Stage}} &
-\multicolumn{1}{c}{\textbf{Name}} &
-\multicolumn{1}{c}{\textbf{Syntax}} &
-\multicolumn{1}{c}{\textbf{Examples}} &
+\hline \multicolumn{1}{c}{\textbf{Stage}} & \multicolumn{1}{c}{\textbf{Name}} &
+\multicolumn{1}{c}{\textbf{Syntax}} & \multicolumn{1}{c}{\textbf{Examples}} &
 \multicolumn{1}{c}{\textbf{Description}} \\
 \hline
 \endhead
@@ -7072,72 +7089,87 @@ not with data frames\\
 \hline
 \endfoot
 
-\hline
-\hline
+\hline \hline
 \endlastfoot
 
 1 & installGui &    installGui()    &
-    &Starts the installer for the standalone version of RSiena.
+    &Starts the installer for the standalone version of \rs.
 Only for Windows. Does not require arguments\\
 \hline
 
-3 to 5& siena01Gui& siena01Gui()&   &   Does not require arguments.
+3 -- 5& siena01Gui& siena01Gui()&   &   Does not require arguments.
  Opens a GUI to be used to run the model estimation or to create a session
- from which to work within R. Details on how to run the estimation under
+ from which to work within \Rn. Details on how to run the estimation under
  the GUI can be found in section \ref{thegui} and \ref{estgui}.\\
 \hline
 
-3   &sienaNodeSet   &sienaNodeSet (n, nodeSetName = ``Actors'',
-names = NULL)   & & Creates a Siena node set which can be used as the nodes
+3   &sienaNodeSet   &sienaNodeSet (n, \newline
+nodeSetName= ``Actors'', \newline
+names=NULL) & &
+Creates a Siena node set which can be used as the nodes
  in a siena network. ``n'' is the number of actors or nodes; ``nodeSetName''
  is a character string to name the node set (defaults to ``Actors'') and
 ```names'' is a string vector with length n with the names of each node
 (optional)\\
 \hline
 
-3 & sienaNet & sienaNet (netarray, type = c(``oneMode'', ``bipartite'',
-``behavior''), nodeSet = ``Actors'', sparse = is.list (netarray)) &
-sienaNet(array(c(net1,net2, net3), dim = c(dim(net1),3))) & Creates a Siena
-network object by forming an array of network observations represented as
-matrices, arrays or sparse matrices. ``netarray'' is a matrix (type=``behavior''
-only) or array of values or list of sparse matrices of type
-``dgTMatrix'';``type'' is either ``one mode'' (default), ``bipartite'' or
-``behaviour''; ``nodeSet'' is the name of the node set.  It is a vector with two
-strings for a bipartite network; ``sparse'' is logical and it is set to TRUE if
-the data is in sparse matrix
+3 & sienaNet & sienaNet (netarray, type= \newline
+c(``oneMode'', ``bipartite'',\newline
+``behavior''), \newline
+nodeSet=``Actors'', \newline
+sparse=is.list (netarray)) & sienaNet(array(
+c(net1,net2,net3), dim=c(dim(net1),3))) & Creates a Siena network object by
+forming an array of network observations represented as matrices, arrays or
+sparse matrices. ``netarray'' is a matrix (type=``behavior'' only) or array of
+values or list of sparse matrices of type ``dgTMatrix'';``type'' is either
+``one mode'' (default), ``bipartite'' or ``behaviour''; ``nodeSet'' is the name
+of the node set.  It is a vector with two strings for a bipartite network;
+``sparse'' is logical and it is set to TRUE if the data is in sparse matrix
 format,  FALSE otherwise\\
 \hline
 
-3 &coCovar & coCovar(val, nodeSet =`Actors') & cons $<$-- as.matrix( read.table
-('cons.DAT')) \newline cons1 $<$-- coCovar (cons[,1]) & Creates a constant
-covariate object, where val is the vector of covariate values and nodeSet is the
-name of the actors' set.  The dimension of val should be (1, \#
+3 &coCovar & coCovar(val, \newline
+nodeSet =`Actors') & cons $<$-- \newline
+as.matrix( read.table \newline
+('cons.DAT')) \newline cons1 $<$--\newline
+ coCovar (cons[,1]) & Creates a constant
+covariate object, where val is the vector of covariate values and nodeSet is
+the name of the actors' set.  The dimension of val should be (1, \#
 Actors)\\
 \hline
 
-3 & varCovar & varCovar(val, nodeSet =`Actors') & chan $<$-- as.matrix
-(read.table ('chan.DAT')) \newline chan $<$-- varCovar (chan[,1]) & Creates a
+3 & varCovar & varCovar(val, \newline
+nodeSet =`Actors') & chan $<$-- as.matrix \newline
+(read.table ('chan.DAT')) \newline chan $<$-- \newline
+varCovar (chan[,1]) & Creates a
 changing covariate object where ``val'' is a matrix with the covariate values
 with one row for each actor and one column for each period; ``nodeSet'' is the
 name of the set of actors \\
 \hline
 
-3& coDyadCovar &coDyadCovar(val, nodeSets = c(``Actors'', ``Actors'')) & &
-Creates a constant dyadic covariate object where ``val'' is a matrix of the same
-dimension as the network observations and nodeSets are the sets of actors with
+3& coDyadCovar &coDyadCovar(val, \newline
+nodeSets= \newline
+c(``Actors'', ``Actors'')) & &
+Creates a constant dyadic covariate object where ``val'' is a matrix of the
+same dimension as the network observations and nodeSets are the sets of actors
+with
 which the constant covariate is associated\\
 \hline
 
-3 &varDyadCovar & varDyadCovar(val, nodeSets = c(``Actors'', ``Actors'')) &
+3 &varDyadCovar & varDyadCovar(val, \newline
+nodeSets= \newline
+c(``Actors'', ``Actors'')) &
 &Creates a changing dyadic covariate object where ``val'' is an array of
 matrices. Each matrix has the same dimension of the actor set and ``val'' has
 one less matrices than observations of the network; ``nodeSets'' are the sets
 of actors to which the varying covariate object is associated\\
 \hline
 
-3 & sienaComposition Change & sienaCompositionChange(changelist, nodeSet =
-"Actors", option = 1) & & Creates a list of events describing the moments in
-which each actor is present in the network: ``changelist'' is a list with an
+3 & sienaCompositionChange & \newline
+sienaCompositionChange( changelist,\newline
+nodeSet="Actors", \newline
+option=1) & & Creates a list of events describing the moments
+in which each actor is present in the network: ``changelist'' is a list with an
 entry for each actor in the node set. Each entry is a vector indicating
 intervals in which an actor is present in the network. ``nodeSet'' is the name
 of the set of actors corresponding to these composition changes and ``option''
@@ -7146,232 +7178,288 @@ for the actors not currently present. See help(sienaCompositionChange) for
 details on this\\
 \hline
 
-3 & sienaComposition ChangeFromFile & sienaCompositionChangeFromFile (filename,
-nodeSet = "Actors", fileobj = NULL, option = 1) & & Creates a list of events
+3 & sienaCompositionChangeFromFile & \newline
+sienaCompositionChangeFromFile ( filename, \newline
+nodeSet="Actors", \newline
+fileobj=NULL, option=1) & & Creates a list of events
 describing the changes over time in the actor set from a file. ``filename'' is
 the name of the file containing change information (one line per actor) each
-line is a series of space delimited numbers indicating intervals. ``fileobj'' is
-the result of readLines on ``filename''. ``nodeSet'' is the name of the set of
-actors. ``option'' (defaults to 1) has the same
+line is a series of space delimited numbers indicating intervals. ``fileobj''
+is the result of readLines on ``filename''. ``nodeSet'' is the name of the set
+of actors. ``option'' (defaults to 1) has the same
 description that in  sienaCompositionChange\\
 \hline
 
-3 & sienaDataCreate & sienaDataCreate(...,nodeSets=NULL, getDocumentation =
-FALSE) & MyData $<$-- sienaDataCreate (net, cons1, cons2, cons3, chan, dyad) &
-Creates a siena object from networks, covariates, composition and behaviour
-objects: .``...''  represents the objects of class ``sienaNet'', ``coCovar'',
-``varCovar'', ``coDyadCovar'', ``varDyadCovar'',
+3 & sienaDataCreate & sienaDataCreate(...,\newline nodeSets=NULL, \newline
+getDocumentation=FALSE) &
+MyData $<$-- \newline
+sienaDataCreate (net, cons1, cons2, cons3, \newline
+chan, dyad) & Creates a siena object from networks, covariates,
+composition and behaviour objects: .``...''  represents the objects of class
+``sienaNet'', ``coCovar'', ``varCovar'', ``coDyadCovar'', ``varDyadCovar'',
 ``compositionChange''. ``nodeSets'' is a list of Siena node sets. Default is a
-single set named ``Actors'' with length equal to the number of rows in the first
-object of class ``SienaNet'', it has to match the nodeSet supplied when the
-arguments are created; ``getDocumentation'' is a flag to allow
+single set named ``Actors'' with length equal to the number of rows in the
+first object of class ``SienaNet'', it has to match the nodeSet supplied when
+the arguments are created; ``getDocumentation'' is a flag to allow
 documentation for internal functions,  not for use by users\\
 \hline
 
-3 & sienaDataCreateFrom Session & sienaDataCreateFromSession(file name = NULL,
-session = NULL, modelName = ``Siena'', ...) & myobj $<$-- sienaDataCreate
-FromSession(`Session.csv') & Reads a SIENA session from a file and creates a
+3 & sienaDataCreateFromSession & \newline
+sienaDataCreateFromSession( \newline
+filename=NULL, \newline
+session=NULL, \newline
+modelName=``Siena'', ...) & myobj $<$-- \newline
+sienaDataCreateFromSession  \newline
+(`Session.csv') & Reads a SIENA session from a file and creates a
 Siena Data object or group. ``file'' is the session file; ``session'' is the
 input session if the function is called from siena01Gui(); ``modelName'' is the
 project's name; ``...'' refers to other
 arguments used by siena01Gui()\\
 \hline
 
-3 & sienaGroupCreate & sienaGroupCreate (objlist, single OK = FALSE,
-getDocumentation=FALSE) & sienaGroupCreate (list( MyData1, MyData2)) & Creates
-an object of class ``sienaGroup'' from a list of Siena data objects: ``objlist''
-is a list of objects of class ``siena''; ``singleOK'' is a boolean variable to
-indicate if it is OK to have just one object; ``getDocumentation''
+3 & sienaGroupCreate & sienaGroupCreate (objlist, \newline
+singleOK=FALSE, \newline
+getDocumentation=FALSE) & sienaGroupCreate (list( \newline
+MyData1, MyData2)) & Creates
+an object of class ``sienaGroup'' from a list of Siena data objects:
+``objlist'' is a list of objects of class ``siena''; ``singleOK'' is a boolean
+variable to indicate if it is OK to have just one object; ``getDocumentation''
 is a flag to  allow documentation of internal functions, not for use by users\\
 \hline
 
-4 & effectsDocumentation & effectsDocumentation() & & Prints a html or
+4 & effectsDocumentation & \newline
+effectsDocumentation() & & Prints a html or
 \LaTeX\ table with the  effects details\\
 \hline
 
-4 & getEffects& getEffects(x, nintn = 10, behNintn = 4, getDocumentation =
-FALSE) & MyEff$<$--getEffects (MyData, nint = 2, behNint = 1) & Creates a siena
-effects objects (a data frame) that contains a list of the effects that can be
-included in the model.  Type fix(MyEff) to edit the effects through a GUI
-(e.g. Including them or excluding them, changing their names, initial values,
-fixing them, etc.) The arguments are a siena or a siena group object ``x'', the
-number of lines for user defined network interactions ``nint'' and the number of
-lines for user defined behaviour interactions ``behNintn''. ``getDocumentation''
-is a flag to allow documentation for
+4 & getEffects& getEffects(x, nintn=10, \newline
+behNintn=4, \newline
+getDocumentation=FALSE) &
+MyEff $<$-- getEffects (\newline
+MyData, nint=2, \newline
+behNint=1) & Creates a siena effects
+objects (a data frame) that contains a list of the effects that can be included
+in the model.  Type fix(MyEff) to edit the effects through a GUI (e.g.
+Including them or excluding them, changing their names, initial values, fixing
+them, etc.) The arguments are a siena or a siena group object ``x'', the number
+of lines for user defined network interactions ``nint'' and the number of lines
+for user defined behaviour interactions ``behNintn''. ``getDocumentation'' is a
+flag to allow documentation for
 internal functions, not to  be used by users\\
 \hline
 
-4 & includeEffects & includeEffects(myeff, ..., include = TRUE, name =
-myeff\$dollar name[1], type = ``eval'', interaction1 = ``'', interaction2 =
-``'') & {MyEff$<$--includeEffects(MyEff, transTrip, balance) \flushleft
-MyEff$<$--includeEffects(MyEff, sameX, sameXRecip, interaction1="gender")}
+4 & includeEffects & includeEffects(myeff, ..., include=TRUE, \newline
+name=myeff{\,\$}name[1], type=``eval'', \newline
+interaction1=``'',\newline
+interaction2=``'') & {MyEff$<$--includeEffects(MyEff, transTrip, balance)
+\flushleft MyEff$<$--includeEffects(MyEff, sameX, \newline
+sameXRecip, \newline
+interaction1="gender")}
  &The function is a
 way to select the effects to be included. ``myeff'' is an effects object, as
 created by getEffects. It is necessary to indicate the short names to identify
-the effects to be included (argument ...). Use myeff\$shortName to get a list of
-the short names of possible effects to include and myeff\$effectName to get the
-full name of the effects. This information can also be found in the
-documentation
-created by effectsDocumentation(). The ``include = TRUE'' indicates that we want
-to
-include the ``...'' effects in the model, it can be set to FALSE to exclude
-effects from the model. ``name'' is the name of the network for which effects
-are being included. ``type'' is to include ``eval'' (objective function effects)
-or ``endow'' (endowment function effects). ``interaction1'' and ``interaction2''
-are names of siena objects (where needed) to completely identify the effects
-e.g. covariate name or behavior variable name. Use
-myeff\$effectName[myeff\$include]
-to get the names of the included effects. It returns a
-new effects object, so it is important to assign it to a
+the effects to be included (argument ...). Use myeff{\,\$\,}shortName to get a list
+of the short names of possible effects to include and myeff{\,\$}effectName to get
+the full name of the effects. This information can also be found in the
+documentation created by effectsDocumentation(). The ``include=TRUE'' indicates
+that we want to include the ``...'' effects in the model, it can be set to
+FALSE to exclude effects from the model. ``name'' is the name of the network
+for which effects are being included. ``type'' is to include ``eval''
+(objective function effects) or ``endow'' (endowment function effects).
+``interaction1'' and ``interaction2'' are names of siena objects (where needed)
+to completely identify the effects e.g. covariate name or behavior variable
+name. Use myeff{\,\$}effectName[myeff{\,\$}include] to get the names of the included
+effects. It returns a new effects object, so it is important to assign it to a
 name\\
 \hline
 
-4   & includeInteraction &  includeInteraction(myeff, ..., include = TRUE, name
-= myeff\$name[1], type  = ``eval'', interaction1 = rep(``'', 3), interaction2 =
-rep(``'', 3)) &  MyEff$<$--includeInteraction( MyEff, transTrip, egoX,
-interaction1 = c(``'',``beh''))     &This function provides an interface to
-allow easy update of  an unspecified interaction row in a Siena effects
-object. ``myeff'' is  a Siena  effects object as created by getEffects. To
-specify the effects to interact,  list their short names instead of ``...'';
-``include'' is a boolean variable,  default TRUE to include the interaction, it
-can be switched to FALSE to turn off  an interaction. ``name'' is the name of
-network for which interactions are being  defined. Defaults to the first in the
-effects object. ``type'' is the type of  effects to be interacted: currently
-only ``eval'' or ``endow''. ``interaction1''  is a vector of siena objects where
+4   & includeInteraction &  includeInteraction(myeff, ..., include=TRUE,
+\newline
+name=myeff{\,\$}name[1], \newline
+type =``eval'', \newline
+interaction1=rep(``'', 3),\newline
+interaction2=rep(``'', 3)) &  MyEff$<$--includeInteraction( MyEff, \newline
+transTrip, egoX, \newline
+interaction1= c(``'',``beh''))     &This function provides an interface to
+allow easy update of  an unspecified interaction row in a Siena effects object.
+``myeff'' is  a Siena  effects object as created by getEffects. To specify the
+effects to interact,  list their short names instead of ``...''; ``include'' is
+a boolean variable,  default TRUE to include the interaction, it can be
+switched to FALSE to turn off  an interaction. ``name'' is the name of network
+for which interactions are being  defined. Defaults to the first in the effects
+object. ``type'' is the type of  effects to be interacted: currently only
+``eval'' or ``endow''. ``interaction1''  is a vector of siena objects where
 needed to completely identify the effect e.g.  covariate name or behavior
-variable name. Trailing blanks may be omitted.  ``interaction2''  is a vector of
-siena objects where needed to completely  identify the effect e.g. covariate
-name or behavior variable name.  Trailing blanks may be omitted\\
+variable name. Trailing blanks may be omitted.  ``interaction2''  is a vector
+of siena objects where needed to completely  identify the effect e.g. covariate
+name or behavior variable name.  Trailing blanks may be omitted. \\
 \hline
 
-4 & setEffect &setEffect(myeff, shortName, parameter = 0, fix = FALSE, test =
-FALSE, initialValue = 0, include = TRUE, name = myeff\$name[1], type = ``eval'',
-interaction1 = ``'', interaction2 = ``'') & MyEff $<$-- setEffect(MyEff,
-transTrip, initialValue = 3, include = T) & Interface to change the attributes
-of a particular effect. The required arguments are an effect object (``myeff''),
-the short name of the effect to modify (``shortName'') and a required integer
-value that defaults to zero (``parameter''). Depending on what it is desired to
-be modified we can supply: ``fix = TRUE'', if we wish to fix that parameter;
-``test = TRUE'' if we wish to test that parameter; ``initialValue = 2'' (or any
-desired number) to modify the effect's initial value (Defaults to zero);
-``include = TRUE or FALSE'' depending on whether we want to include/exclude the
-effect (defaults to TRUE). The arguments ``name'', ``type'' and ``interaction1''
-and
-``interaction2'' are defined as in includeInteraction  and includeEffects\\
+4 & setEffect &setEffect(myeff, shortName, \newline
+parameter=0, fix=FALSE, \newline
+test=FALSE, \newline
+initialValue=0, \newline
+include=TRUE, name=myeff{\,\$}name[1], \newline
+type=``eval'', \newline
+interaction1 = ``'', \newline
+interaction2 = ``'') & MyEff $<$-- \newline
+setEffect(MyEff, transTrip,
+initialValue=3, \newline
+include=T) & Interface to change the attributes of a particular
+effect. The required arguments are an effect object (``myeff''), the short name
+of the effect to modify (``shortName'') and a required integer value that
+defaults to zero (``parameter''). Depending on what it is desired to be
+modified we can supply: ``fix=TRUE'', if we wish to fix that parameter; ``test
+= TRUE'' if we wish to test that parameter; ``initialValue=2'' (or any desired
+number) to modify the effect's initial value (Defaults to zero); ``include=TRUE
+or FALSE'' depending on whether we want to include/exclude the effect (defaults
+to TRUE). The arguments ``name'', ``type'' and ``interaction1'' and
+``interaction2'' are defined as in includeInteraction  and includeEffects.\\
 \hline
 
-5 & print01Report & print01Report(data, myeff, modelname = ``Siena'', session =
-NULL, getDocumentation = FALSE) & print01Report(MyData, MyEff) & Prints a report
-of a Siena data object and its default effects. We need to supply a Siena data
-object (``data'') a siena effects object (``myeff'') and a model name
-(``modelname'') that defaults to ``Siena''. It creates and saves a file named
-``modelname.out'' (Siena.out) that contains preliminary information
-on the data\\
+5 & print01Report & print01Report(data, myeff, \newline
+modelname=``Siena'',\newline
+session=NULL, \newline
+getDocumentation=FALSE) & print01Report(MyData, MyEff) & Prints a
+report of a Siena data object and its default effects. We need to supply a
+Siena data object (``data'') a siena effects object (``myeff'') and a model
+name (``modelname'') that defaults to ``Siena''. It creates and saves a file
+named ``modelname.out'' (Siena.out) that contains preliminary information
+on the data.\\
 \hline
 
-5 & sienaModelCreate & sienaModelCreate(fn = simstats0c,
-usesimstats0c = deparse(substitute(fn)) == "simstats0c",
-projname = ``Siena'', MaxDegree = 0, useStdInits = FALSE, n3 = 1000, nsub = 4,
-maxlike = FALSE, diag = !maxlike,
-condvarno = 0, condname = ``'', firstg = 0.2, cond
-= NA, findiff = FALSE, seed = NULL) & MyModel $<$-- model.create (projname =
-``MyProject'') & Creates a siena model object that can be used to call
-siena07. ``fn'' is function to do one simulation in the Robbins-Monro
-algorithm. ``usesimstats0c'' is boolean, if true the standard algorithm is being
-used which can be used with multiple processors. Just used for
-validation. ``projname'' is character string name of project. No embedded
-spaces. ``MaxDegree'' is a named vector of maximum degree values for
-corresponding networks. ``useStdInits'' is a boolean variable, if TRUE, the
-initial values in the effects object will be ignored and default values used
-instead. ``n3'' is the number of iterations in phase 3 (defaults to
-1000). ``nsub'' is the number of subphases in phase 2 (defaults to
-4). ``maxlike'', boolean to indicate whether to use maximum likelihood method or
+5 & sienaModelCreate & sienaModelCreate(\newline
+fn=simstats0c,\newline
+%usesimstats0c = \newline deparse(substitute(fn)) == \newline "simstats0c", \newline
+projname=``Siena'', \newline
+MaxDegree=0, \newline
+useStdInits=FALSE, n3=1000, \newline
+nsub=4, maxlike=FALSE, \newline
+diag=!maxlike, \newline
+condvarno=0, \newline
+condname=``'', firstg=0.2, \newline
+cond=NA, findiff=FALSE, \newline
+seed=NULL) &
+\newline
+MyModel $<$-- model.create \newline
+(projname = \newline
+``MyProject'') & Creates a siena model
+object that can be used to call siena07. ``fn'' is function to do one
+simulation in the Robbins-Monro algorithm.
+%``usesimstats0c'' is boolean, if true the standard algorithm
+% is being used which can be used with multiple processors.
+% Just used for validation.
+``projname'' is character string name of
+project. No embedded spaces. ``MaxDegree'' is a named vector of maximum degree
+values for corresponding networks. ``useStdInits'' is a boolean variable, if
+TRUE, the initial values in the effects object will be ignored and default
+values used instead. ``n3'' is the number of iterations in phase 3 (defaults to
+1000). ``nsub'' is the number of subphases in phase 2 (defaults to 4).
+``maxlike'', boolean to indicate whether to use maximum likelihood method or
 straightforward simulation (defaults to false). ``diag'' is boolean to indicate
 if the complete estimated derivative matrix should be used; ``condvarno'', if
 conditional estimation is used the parameter is the sequential number of the
-network or behaviour variable on which to condition. ``condname'' is the name of
-the dependent variable on which to condition (only use condname or condvar, not
-both). ``firstg'' initial value of scaling parameter in the Robbins-Monro
-procedure. ``cond'' is boolean, If TRUE, use conditional simulation. If missing,
-decision is deferred until siena07 is called, when it is set to TRUE if there is
-only one dependent variable, FALSE otherwise. ``findiff'' is boolean, if TRUE,
-estimate derivatives using finite differences and if FALSE, use scores. ``seed''
-is an integer referring to the starting value of random seed. Not used if
-parallel
-testing\\
+network or behaviour variable on which to condition. ``condname'' is the name
+of the dependent variable on which to condition (only use condname or condvar,
+not both). ``firstg'' initial value of gain parameter in the Robbins-Monro
+procedure. ``cond'' is boolean, If TRUE, use conditional simulation. If
+missing, decision is deferred until siena07 is called, when it is set to TRUE
+if there is only one dependent variable, FALSE otherwise. ``findiff'' is
+boolean, if TRUE, estimate derivatives using finite differences and if FALSE,
+use scores. ``seed'' is an integer referring to the starting value of random
+seed. Not used if parallel
+testing.\\
 \hline
 
 5   & model.create  & & &       See sienaModelCreate\\
 \hline
 
-5 & siena07 & siena07(x, batch = FALSE, verbose = FALSE, silent = FALSE,
-useCluster = FALSE, nbrNodes = 2, initC = FALSE, clusterString =
-rep(``localhost'', nbrNodes), tt = NULL, parallelTesting = FALSE, ...) & ans
-$<$-- siena07(MyModel, data = MyData, effects = MyEff, batch = FALSE,
-verbose = TRUE,
-useCluster = TRUE, nbrNodes = 2, initC = TRUE) & Fits a model using the method
-of
-moments based on straightforward simulation, conditional or otherwise, or on an
-MCMC simulation. Estimation is done using Robbins-Monro algorithm. Note that the
-particular model to be used is passed on as the model object, and data for the
-model must be passed by using named arguments. ``x'' is a model object;
-``batch'' is a boolean variable to indicate if it is desired to open the GUI of
-Siena simulation; ``verbose'' is a boolean variable to produce output on the
-console; ``silent'' is also a boolean variable, if true, no output is printed to
-the console; ``useCluster'' is a boolean variable to indicate if it is desired
-to use a cluster of processors; ``nbrNodes'' is the number of processors to use
-if useCluster is TRUE; ``initC'' is boolean: set to TRUE if the simulation will
-use C routines (currently always needed). Only relevant if using multiple
-processors, to ensure all copies are initialised correctly. ``clusterString'' is
-the definition of clusters, default set up to use the local machine only; ``tt''
-is a tcltk toplevel window used if called from the model options screen;
-``parallelTesting'' is boolean, if TRUE, sets up random numbers to parallel
-those in Siena 3. ``...''  Arguments for the simulation function, such as the
-data, effects, etc. It returns an object of class sienaFit (lets say ans). The
-main attributes are theta, which are the estimated coefficients (view with
-ans\$theta); covtheta is the estimated covariance matrix of theta; dfra is the
-matrix of estimated derivatives; ans\$targets and ans\$ targets2 are the
-observed statistics and the observed statistic for each wave respectively;
-ans\$ssc are the score function contributions for each wave for each simulation
-in phase 3: ans\$sims is the simulated networks as edgelists. Use names(ans) to
+5 & siena07 & siena07(x, batch=FALSE, \newline
+verbose=FALSE, silent=FALSE,\newline
+useCluster=FALSE, \newline
+nbrNodes=2, \newline
+initC=FALSE, \newline
+clusterString= \newline
+rep(``localhost'', nbrNodes), \newline
+tt=NULL, \newline
+parallelTesting=FALSE, ...) & ans $<$-- \newline
+siena07(MyModel,
+data=MyData, effects=MyEff, batch=FALSE, \newline
+verbose=TRUE, \newline
+useCluster=TRUE,\newline
+nbrNodes=2
+% , \newline initC=TRUE
+)
+& Estimates parameters using Robbins-Monro algorithm.
+ Note that the particular
+model to be used is passed on as the model object, and data for the model must
+be passed by using named arguments. ``x'' is a model object; ``batch'' is a
+boolean variable to indicate if it is desired to open the GUI of Siena
+simulation; ``verbose'' is a boolean variable to produce output on the console;
+``silent'' is also a boolean variable, if true, no output is printed to the
+console; ``useCluster'' is a boolean variable to indicate if it is desired to
+use a cluster of processors; ``nbrNodes'' is the number of processors to use if
+useCluster is TRUE; `
+%`initC'' is boolean: set to TRUE if the simulation will
+%use C routines (currently always needed). Only relevant if using multiple
+%processors, to ensure all copies are initialised correctly.
+``clusterString''
+is the definition of clusters, default set up to use the local machine only;
+%``tt'' is a tcltk toplevel window used if called from the model options screen;
+%``parallelTesting'' is boolean, if TRUE, sets up random numbers to parallel
+%those in Siena 3. ``...''  Arguments for the simulation function, such as the
+%data, effects, etc.
+\newline
+siena07 returns an object of class sienaFit (let's say ans). The
+main attributes are ans{\,\$}theta, which are the estimated coefficients;
+ans{\,\$}covtheta is the estimated covariance matrix of theta;
+ans{\,\$}dfra is the
+matrix of estimated derivatives; ans{\,\$}targets and ans{\,\$} targets2 are the
+observed statistics and the observed statistic by wave, respectively;
+ans{\,\$}ssc are the score function contributions for each wave for each simulation
+in phase 3: ans{\,\$}sims is the simulated networks as edgelists. Use names(ans) to
 obtain more characteristics; only recommended if you are
-proficient in RSiena\\
+proficient in \rs.\\
 \hline
 
 6 & print.sienaFit & print(x, tstat=TRUE, ...) & print(ans) & The function
 prints a table containing the estimated parameter values, standard errors and
 (optionally) t-statistics for convergence. If ``x '' is a summary(sienaFit) it
-prints on the console all the summary elements. ``tstat'' is a boolean argument,
-set to TRUE if it is desired for the t-statistics for convergence to
+prints on the console all the summary elements. ``tstat'' is a boolean
+argument, set to TRUE if it is desired for the t-statistics for convergence to
 be added to the report\\
 \hline
 
-6 & summary.sienaFit & summary(x,...) & summary(ans) & Prints a table containing
-the estimated parameter values, standard errors and t-statistics for convergence
-together with the covariance matrix of the estimates, the derivative matrix of
-expected statistics D by parameters, and the covariance matrix of the expected
-statistics D.  The only required argument is a
-``sienaFit'' object ``x'', as produced by  siena07\\
+6 & summary.sienaFit & summary(x,...) & summary(ans) & Prints a table
+containing the estimated parameter values, standard errors and t-statistics for
+convergence together with the covariance matrix of the estimates, the
+derivative matrix of expected statistics D by parameters, and the covariance
+matrix of the expected statistics D.  The only required argument is a
+``sienaFit'' object ``x'', as produced by  siena07.\\
 \hline
 
-6 & xtable.sienaFit & xtable(x, caption = NULL, label = NULL, align = NULL,
-digits = NULL, display = NULL, ...) & sienaxtab $<$-- xtable(ans, caption = ``My
-Table'', digits = 2).  &Creates an object of class xtable.sienaFit which inherits
+6 & xtable.sienaFit & xtable(x, caption=NULL, \newline
+label=NULL, align=NULL, \newline
+digits=NULL,\newline
+ display=NULL, ...) & sienaxtab $<$-- \newline
+ xtable(ans, \newline
+caption=``My
+Table'', \newline
+digits=2).  &Creates an object of class xtable.sienaFit which inherits
 from class xtable and passes an extra arguments to the print.xtable.
-The argument is a sienaFit object ``x''. See ?xtable for more options\\
+The argument is a sienaFit object ``x''. \\
 \hline
 
 
 \end{longtable}
-\end{footnotesize}
+%\end{footnotesize}
 \end{landscape}
-
-%% Document ends here
-%\end{document}
 
 %\section{List of Functions in Alphabetical Order}
 
 %\input{ListFunctionsCleanrr}
+
+
 
 \section{Changes compared to earlier versions}
 
@@ -7382,8 +7470,6 @@ repository.)
 \item 2010-04-24 R-forge revision 82-88
 New functionality for sienaTimeTest, new function includeTimeDummy, added funcitonality
 to includeEffects, sienaDataCreate.
-\item 2010-04-24 R-forge revision 81
-New print, summary and edit methods for Siena effects objects
 \item 2010-04-24 R-forge revision 81
 New print, summary and edit methods for Siena effects objects
 \item 2010-04-24 R-forge revision 80
