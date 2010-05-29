@@ -11,7 +11,8 @@
 ##@includeEffect DataCreate
 includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
                            type="eval", interaction1="", interaction2="",
-                           character=FALSE)
+                           character=FALSE, initialValue=0, fix=FALSE,
+						   timeDummy=",")
 {
 
     if (character)
@@ -40,6 +41,9 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
     myeff$interaction1 == interaction1 &
     myeff$interaction2 == interaction2
     myeff[use, "include"] <- include
+	myeff[use, "fix"] <- fix
+	myeff[use, "initialValue"] <- initialValue
+	myeff[use, "timeDummy"] <- timeDummy
     print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
                        "interaction2", "include")])
     myeff

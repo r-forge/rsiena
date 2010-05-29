@@ -767,7 +767,8 @@ which one may use to get started with \rs.
 #####################################GENERAL###################################
 
 # This is an R script for getting started with RSiena, written by
-# Robin Gauthier, Tom Snijders, and Ruth Ripley.
+# Robin Gauthier, Tom Snijders, and Ruth Ripley, with contributions
+# from Josh Lospinoso.
 # Lines starting with # are not processed by R but treated as comments.
 
 # R is case sensitive.
@@ -1122,6 +1123,44 @@ which one may use to get started with \rs.
 # previous run from which to extract the theta estimates and the
 derivatives. Phase 1 will be omitted in this case.
 
+# Suppose also that you have a network with more than two time periods.
+# There are facilities available for dealing with such situations, where
+# effects may differ over time.
+#
+# Load a dataset with three time periods:
+
+	mynet2 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+
+# Set up your data objects and effects objects as before:
+
+	mydata2 <- sienaDataCreate(mynet2)
+	myeff2 <- getEffects(mydata2)
+
+# Try out the new includeEffects functionality for adding effects:
+
+	myeff2 <- includeEffects(myeff2, transTrip, balance)
+
+# Run an estimation with your old model parameters:
+
+	mymodel2 <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
+	ans <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
+
+# Conduct the score type test to assess whether heterogeneity is present.
+
+	tt <- sienaTimeTest(ans)
+
+# Try a plot to see a visual representation of the time test:
+
+	plot(tt, effects=1:4, dims=c(2,2))
+
+# Add a few time dummy terms:
+
+	myeff3<- includeTimeDummy(myeff2, recip, balance, timeDummy="2")
+
+# And estimate the new model:
+
+ans3 <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
+
 #######################VIEWING THE NETWORK IN R#######################
 
 # We can make connections with other R packages, e.g., Carter Butts's
@@ -1349,7 +1388,9 @@ are \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
 
 More specific references are \citet{Schweinberger10} for the score-type goodness
 of fit tests and \citet{SchweinbergerSnijders07a} for the calculation of
-standard errors of the Method of Moments estimators .
+standard errors of the Method of Moments estimators. For assessing and
+correcting time heterogeneity, and associated model selection considerations,
+refer to \citet*{Lospinoso2010a, Lospinoso2010b}.
 
 A tutorial is \citet*{SnijdersEA10b}.
 
@@ -3321,6 +3362,32 @@ or Bayesian estimation (see Section~\ref{S_Bayes}).
 %of the unobserved actor heterogeneity.
 \fi
 
+\subsection{Time heterogeneity in model parameters}
+Currently for the case of a one mode network, you can include
+time heterogeneous parameters in your model. Consider the reformulation of
+the evaluation function into
+\begin{align}
+f^{(m)}_{ij}(\mathbf{x})= \sum_k (\beta_k + \delta_k^{(m)} h_k^{(m)}) s_{ik}(\mathbf{x}(i \leadsto j))
+\label{eq:fmij}
+\end{align}
+where $\delta_k^{(m)}$ are the time dummy interacted effect parameters. You
+can include these in your model simply via the function
+\begin{verbatim}
+myeffects <- includeTimeDummy(myeffects, density, reciprocity, timeDummy="2,3,6")
+\end{verbatim}
+which would add three time dummy terms to each effect listed in the function.
+
+We recommend that you start with simple models, and use the score type test for
+assessing heterogeneity, i.e.
+\begin{verbatim}
+tt <- sienaTimeTest(ans)
+\end{verbatim}
+to decide which dummy terms to include.
+
+See \citet{Lospinoso2010a} for a technical presentation of how the test works,
+and \citet{Lospinoso2010b} for a walkthrough on model selection.
+
+
 \begin{print}
 \newpage
 \end{print}
@@ -4290,7 +4357,60 @@ then the difference can be tested with the test statistic
 which under the null hypothesis of equal parameters has an approximating
 standard normal distribution.
 
+\newpage
+\subsection{Testing time heterogeneity in parameters}
+We initially assume that $\beta$ does not vary over time, yielding a \emph{restricted model}. Our data contains $|\mathcal{M}|$ observations, and we estimate the restricted model the method of moments. We wish to test whether the \emph{restricted model} is misspecified with respect to time heterogeneity. Formally, define a vector of time dummy terms $\mathbf{h}$:
+\begin{align}
+h_k^{(m)}=\left\{
+\begin{array}{ll}
+1& \{m : w_m \in \mathcal{W}, m \neq 1\}\\
+0& \mbox{~elsewhere~}
+\end{array}
+\right . ,
+\end{align}
+where $k$ corresponds to an effect included in the model.\footnote{The dummy $\delta_k^{(1)}$ is always zero so that period $w_1$ is (arbitrarily) considered the reference period.} An \emph{unrestricted model} which allows for time heterogeneity in all of the effects is considered as a modification of \eqref{eq:fij}:
 
+\begin{align}
+f^{(m)}_{ij}(\mathbf{x})= \sum_k (\beta_k + \delta_k^{(m)} h_k^{(m)}) s_{ik}(\mathbf{x}(i \leadsto j))
+\label{eq:fmij}
+\end{align}
+where $\delta_k^{(m)}$ are the time dummy interacted effect parameters. One way to formulate the testing problem of assessing time hetergeneity is the following:
+\begin{align}
+H_0:\delta_k^{(m)} = 0 & \mbox{~for all~} k,m \notag\\
+H_1:\delta_k^{(m)} \neq 0 & \mbox{ for some } k,m .
+\label{hyptest}
+\end{align}
+
+An application of the score test is given for the special case of parameter heterogeneity
+by \citet{Lospinoso2010a} and implemented in RSiena.
+To apply the test to your dataset, run an estimation in the usual way, e.g.:
+\begin{verbatim}
+mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
+mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mydata <- sienaDataCreate(mynet1)
+myeff <- getEffects(mydata)
+myeff <- includeEffects(myeff, transTrip, balance)
+ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+\end{verbatim}
+and conduct the timetest through
+\begin{verbatim}
+## Conduct the score type test to assess whether heterogeneity is present.
+tt <- sienaTimeTest(ans)
+plot(tt, effects=1:2, dim=c(1,2))
+\end{verbatim}
+If it is decided that you wish to add time dummy terms, you may do so via
+\begin{verbatim}
+myeff <- includeTimeDummy(myeff, recip, balance, timeDummy="2")
+ans2 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+\end{verbatim}
+and test again,
+\begin{verbatim}
+tt2 <- sienaTimeTest(ans2)
+\end{verbatim}
+and so on.
+
+See \citet{Lospinoso2010b} for a walkthrough of the model selection process
+for time dummy terms.
 
 \begin{print}
 \newpage
@@ -7259,6 +7379,11 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-04-24 R-forge revision 82-88
+New functionality for sienaTimeTest, new function includeTimeDummy, added funcitonality
+to includeEffects, sienaDataCreate.
+\item 2010-04-24 R-forge revision 81
+New print, summary and edit methods for Siena effects objects
 \item 2010-04-24 R-forge revision 81
 New print, summary and edit methods for Siena effects objects
 \item 2010-04-24 R-forge revision 80

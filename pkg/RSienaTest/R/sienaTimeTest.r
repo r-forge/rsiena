@@ -10,7 +10,7 @@
 ## * sienaTimeFix, which is called to set up time dummy interacted effects.
 ## ****************************************************************************/
 ##@sienaTimeTest siena07 Does test for time homogeneity of effects
-sienaTimeTest <- function (sienaFit, effects=NULL)
+sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 {
 	observations <- sienaFit$f$observations
 	# There must be more than 2 observations to do a time test!
@@ -178,6 +178,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL)
 				## these operations dont relate directly to the scores
 				dummyByEffect[i, j]=inc
 				dummyProps$shortName[inc] <- sienaFit$effects[-escreen,]$shortName[i]
+				dummyProps$interaction1[inc] <- sienaFit$effects[-escreen,]$interaction1[i]
 				dummyProps$type[inc] <- sienaFit$effects[-escreen,]$type[i]
 				dummyProps$period[inc] <- j + 1
 			}
@@ -192,17 +193,28 @@ sienaTimeTest <- function (sienaFit, effects=NULL)
 	doTests <- c(rep(FALSE, nEffects), rep(TRUE, nDummies))
 	jointTest <- ScoreTest(nTotalEffects, D, sigma, fra, doTests, maxlike=FALSE)
 	jointTestP <- 1 - pchisq(jointTest$testresOverall, nDummies)
-	individualTest <- jointTest$testresulto[1:nDummies]
+	if (! condition) {
+		individualTest <- jointTest$testresulto[1:nDummies]
+	} else {
+		individualTest <- sapply(1:nDummies, function (i)
+			{ doTests <- rep(FALSE, nEffects + nDummies)
+				doTests[nDummies+i] <- TRUE
+				test <- ScoreTest(nTotalEffects, D, sigma, fra, doTests, FALSE)
+				test$testresulto[1]
+			})
+	}
 	individualTestP <- 2 * (1-pnorm(abs(individualTest))[1:nDummies])
 	rownames(jointTestP) <- c("Joint Significant Test")
 	colnames(jointTestP) <- c("p-Val")
 	thetaOneStep <- c(sienaFit$theta[-c(dscreen,rscreen,escreen)], rep(0, nDummies)) +
-	jointTest$oneStep
+			jointTest$oneStep
 	effectTest <- sapply(1:length(indBaseEffects), function (i)
 					{
 						 doTests <- rep(FALSE, nEffects + nDummies)
 						 tmp <- which(dummyProps$shortName ==
-									  sienaFit$effects[-escreen,]$shortName[i])
+									  sienaFit$effects[-escreen,]$shortName[i] &
+									  dummyProps$interaction1 ==
+									  sienaFit$effects[-escreen,]$interaction1[i])
 						 if (length(tmp) > 0)
 						 {
 							doTests[tmp] <- TRUE
@@ -215,6 +227,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL)
 							NA
 						 }
 					})
+
 	dim(effectTest) <- c(length(indBaseEffects), 1)
 	effectTestP <- round(1 - pchisq(effectTest, apply(toTest, 1, sum)), 5)
 	rownames(effectTestP) <- baseNames
