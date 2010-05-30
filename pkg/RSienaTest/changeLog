@@ -1,4 +1,13 @@
-2020-04-28 R-forge revision 84
+2010-05-30 R-forge revision 91
+	* Updated changelog!
+	
+2010-05-30 R-forge revisions 84-89
+	* Added includeTimeDummy function
+	* Added sienaTimeTest functionality
+	* Support for RateX timedummy effects
+	* Added documentation to manual on sienaTimeTest
+	
+2010-04-28 R-forge revision 84
 
 	* src/many: removed <R.h> and adjusted other header files
 	* man/iwlms.Rd: (RSienaTest only) eol-style property set.
