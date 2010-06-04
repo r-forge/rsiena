@@ -1,6 +1,9 @@
 \documentclass[12pt, a4paper]{article}
 \usepackage[pdftex,dvipsnames]{color}
 \usepackage{graphicx}
+\usepackage{times}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage{url}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -115,7 +118,8 @@ I describe the main details of our current practice:
 \item If using a Mac, you will need the Xcode tools installed.
 \item Obtain the current source.
 \item In a command prompt window, navigate to the directory above the siena
-  tree. Here I assume it is called \sfn{siena}.
+  tree. Here I assume it is called \sfn{RSiena}. (You may have minor
+  difficulties if it is not!)
 \item Type\\
 \verb|R CMD build RSiena|
 \item You will probably need to either add R to your path, or use
@@ -147,7 +151,7 @@ to clear out all the .o's and the dll.
   with presence of object files with the other version. Once the warnings have
   gone away, do a final check on the pdf version of the help pages which will be
   in the directory RSiena.RCheck. Check any pages you have changed for lines
-  that are too long: the usage section, I think, does not wrap automatically. 
+  that are too long: the usage section, I think, does not wrap automatically.
 \end{enumerate}
 \paragraph{Alternative methods for small changes}
 Now we have a \textsf{name space} for the package, small changes are not really
@@ -272,7 +276,7 @@ A few notes about each:
 \item Failed to work on Fedora 10 as installed in the statistics department, but
   possibly this has been updated.
 \item \verb|opcontrol --start| to start it
-\item \verb|opcontrol --callgragh=n| to get a callgraph.
+\item \verb|opcontrol --callgraph=n| to get a callgraph.
 \item \verb|opcontrol --reset| to start the collection again
 \item Then run the R command
 \item \verb|opcontrol --dump| create a file you can get reports from
@@ -329,10 +333,10 @@ examples of most functions in the code already. Some notes:
 \item[random numbers]
 We use the R random number functions such as \sfn{rexp}. These work slightly
 differently from the R versions, you need to check the syntax of the call in
-the manual if adding new ones. The header required is \sfn{Rmath.h}. 
-\item[Random number seeds] The functions\sfn{GetRNGstate} and 
+the manual if adding new ones. The header required is \sfn{Rmath.h}.
+\item[Random number seeds] The functions\sfn{GetRNGstate} and
 \sfn{PutRNGstate}  are used to get the R random number seed into the C++
-process and then replace it in the R. The header for these is 
+process and then replace it in the R. The header for these is
 \sfn{R\_ext/Random.h}.
 \item[rlecuyer]
 With multiple processes we use the random numbers from the \sfn{rlecuyer}
@@ -361,8 +365,226 @@ A few notes of problems we have had:
     use the INSTALL flag: \sfn{R CMD INSTALL --no-multiarch dirname} to retain
     unchanged object files between installs. Hopefully this will cease to be a
     problem at some stage.
-\item Also remove the word \sfn{clean} from the makefile on Linux.  
+\item Also remove the word \sfn{clean} from the makefile on Linux.
   \item Be careful with \sfn{abs}. The integer version is in \sfn{<cstdlib>} not
     \sfn{<cmath>}. Compilation may fail with message about ambiguity.
 \end{itemize}
+\section{Algorithms}
+This section outlines the different options available to the (expert!) user.
+\subsection{Within siena07}
+\begin{itemize}
+\item I have created a copy of \sfn{DoIterations}, called
+  \sfn{DoIterationsCopy}. Moving a `\#' from one call to the other in
+  \sfn{proc2subphase} will switch usage. Make your changes to the copy version,
+  so you can reinstate the working version by reverting the comment placing.
+\item Most of the possible changes are in \sfn{DoIterations}, but I have added
+  the facility to use regression rather than a simple average at the end of the
+  subphases. This is controlled by a parameter \sfn{useAerage} in
+  \sfn{proc2Subphase}, set to \sfn{TRUE} by default. Change it by editing the
+  file! You also need to use \sfn{doIterationsCopy} to force the retention of
+  all the parameter values and deviations.
+\item Within \sfn{doIterationsCopy}, the update step has been removed to a
+  function, \sfn{doChangeStep}, and a loop to do importance sampling steps
+  inserted. The step continue until the variance of the weights is greater than
+  one tenth the value with all mass concentrated at one point., or to 25
+  (hard-coded!). A parameter \sfn{numberIterations} controls the number of
+  samples used. Default to 10, change it by editing!
+\item Flags are available in \sfn{doIterationsCopy} to store the chains and
+  change contributions in C. Predicted statistics or scores are obtained from
+  the function \sfn{predictOutcomes}, which uses the robust method of
+  recalculation of likelihood in C.
+\item If you have sourced the file \sfn{algorithms.r}, then other options for
+  this calculation could be tried using the functions in that file.
+\item There is also a preexisting system for maximum likelihood which just
+  recalculates the scores and does another iteration. Based on
+  \sfn{doMoreUpdates}.
+\item \sfn{doIterationsCopy} will not function with conditional estimation,
+and will not do anything sensible with missing data (yet!). So avoid missing
+data.
+\item You need to set \sfn{returnDeps=TRUE} on the call to \sfn{siena07}.
+\item You might want to alter the number of iterations per subphase. This is set
+  in the function \sfn{AnnouncePhase} (code in \sfn{siena07.r}).
+\item More than two waves, or multigroups, would be very experimental!
+\end{itemize}
+\subsection{Standalone}
+Use the file \sfn{algorithms.r}. This is in the \sfn{inst/examples} directory in
+the source to keep it out of the way of build procedures. (In the examples
+directory in the installed package.) Source it to use it. There is no need to
+rebuild the package after changing this file. (If it needs functions from the
+package it accesses them using \sfn{RSiena:::}. 
+
+The basic outline is described here. The parameters are passed to the initialize
+routine and then stored on \sfn{z}. I think their use will be fairly clear if
+you read what follows (and the code!) 
+
+No promises about robustness, and the routine is designed to be hacked rather
+than run unchanged. But examples of use are in file \sfn{runalg.r}.
+
+Bayesian routine is not documented here, as it is part of the package and has
+a help page.
+
+The graphs are semi-automatic, driven by a dataframe with a column for each
+panel. Consult the code to see how it works: construct a formula from the column
+names. It is a nice trick. There is no parameter to turn them off: comments them
+out.  
+
+None of this has been tested with more than two waves or with multiple groups. 
+I suspect none of it would work!
+
+\sfn{}
+
+\begin{algorithmic}
+\STATE Call AlgorithmsInitialize \ref{sec:init}
+\REPEAT
+\STATE
+\REPEAT
+\IF{using optim}
+\IF{not finalLoop}
+\STATE set number of samples for this iteration from optim schedule
+\ENDIF
+\STATE set the importance sampling weights to 1
+\ENDIF
+\STATE get the next set of samples: \ref{sec:samples}
+\REPEAT
+\IF{using optim}
+\STATE store the old theta
+\STATE do an optim update step: \ref{sec:optim}
+\STATE get importance sampling weights at new theta
+\IF {variance of weights high or more than maxiiter repeats or no change in
+theta}
+\STATE break
+\ENDIF
+\ELSIF {response surface}
+\STATE do a reponse surface change step \ref{sec:resp}
+\STATE break
+\ELSE
+\STATE do an algorithm change step: \ref{sec:algchange}
+\IF{final loop and theta has not changed much}
+\STATE break
+\ENDIF
+\STATE get predicted values (\ref{sec:pred}) and importance sampling weights at
+new theta 
+\IF{variance of importance sampling weights is large or more than
+  \sfn{maxiiter} repeats} 
+\STATE break
+\ENDIF
+\ENDIF
+\UNTIL{for ever}
+\STATE update the plots
+\IF {using C storage}
+\STATE clear the stores
+\ENDIF
+\IF {using history for optim}
+\STATE store the samples
+\ENDIF
+\UNTIL{completed \sfn{numiter} iterations or more than \sfn{maxiiter} importance
+sampling steps and still low variance or final loop}
+\IF {not finalLoop}
+\STATE set finalLoop to TRUE
+\STATE set up things for final iteration: \ref{sec:final}
+\ELSE
+\STATE break
+\ENDIF
+\UNTIL{for ever}
+\STATE Do termination call to C
+\STATE Close any open processes
+\end{algorithmic}
+\subsubsection{Initialize}
+\label{sec:init}
+\begin{algorithmic}
+\STATE call initializeFRAN to set data up in C
+\STATE Store all the options on \sfn{z}
+\STATE create useful variables (Some of this is done automatically now in
+  \sfn{initialiseFRAN} but I have not pruned thus function.)
+\STATE set finalLoop to FALSE
+\end{algorithmic}
+\subsubsection{Get next set of samples}
+\label{sec:samples}
+\begin{algorithmic}
+\STATE get the samples
+\STATE calculate derivative matrix
+\STATE calculate likelihoods
+\end{algorithmic}
+\subsubsection{Optim change step}
+\label{sec:optim}
+\begin{algorithmic}
+\STATE 2 functions provided: mean log likelihood (EM) or log mean
+probability ratios (GT) 
+\STATE Derivative calculation routines to match (hope these are correct!)
+\STATE Default method is BFGS 
+\STATE Default is just 1 iteration until final loop
+\STATE Rates need logging unless you use L-BFGS-B. The functions take exp() at
+the start.
+\STATE Step length is limited to distance of the scale.
+\STATE With EM you can reuse the historical samples downweighted by factor of
+optimWeight each time. 
+\STATE EM uses importance sampling weights 
+\end{algorithmic}
+\subsubsection{Response surface step}
+\label{sec:resp}
+\begin{algorithmic}
+\STATE Use importance sampling to estimate the statistics at points around the
+current parameter. 
+\STATE Create a data frame with these and (down-weighted) previous results.
+\STATE Fit a linear regression and solve for targets 0
+\STATE Move is restricted to distance the scale factor.
+\STATE There is a routine to fit a quadratic instead, and minimise the distance
+from targets 0, but it does not work well. Usually not positive definite. Maybe
+I coded it wrong. It uses raw orthogonal polynomials.
+\end{algorithmic}
+\subsubsection{Non optim change step}
+\label{sec:algchange}
+\begin{algorithmic}
+\STATE Uses the phase 2 update step from siena07, with diagonal or full
+derivative matrix as requested.
+\end{algorithmic}
+\subsubsection{Predictions}
+\label{sec:pred}
+\begin{algorithmic}
+\STATE Get the log likelihoods
+\STATE Subtract the values for the smaple
+\STATE Exponentiate
+\STATE Normalise to sum to 1
+\IF {variance greater than maxVar}
+\STATE make predictions NA
+\ELSE
+\STATE multiply by statistics or scores
+\ENDIF 
+\end{algorithmic}
+\subsubsection{Calculating likelihoods and probabilities}
+Various functions provided: the differences are the use of C or not and stored
+change contributions or not, and which format is most convenient for the final
+calculations.
+\begin{description}
+\item[useC] Uses getProbabilitiesFromCSTore to get hold of the log choices for
+  each ministep using change contributions stored in C, and then uses
+  getLikelihood3 to do the calculations. Memory intensive but fast. May not be
+  robust. Rate values are not stored and rate part of calculation is done in
+  R. Only currently works for forward simulation, where it is least useful! 
+\item[NOT useC AND useSLowC] Uses getProbabilities to pass chain back into C and
+  recalculate the chnage contributions to update the ministeps. Fairly quick,
+  low memory demand, robust as reuses code that must be maintained. Recommended.
+\item[NOT useC and NOT useSlowC] Uses getProbabilitiesR to calculate the choice
+  probs using change contributions matrices stored in R. Not recommended unless
+  you prefer changing R to C. Slow, memory intensive, and clumsy. Then uses 
+getLikelihood2 to combine the values.  Only currently works for forward
+simulation.
+\end{description}
+\subsubsection{Set up final iteration}
+\label{sec:final}
+\begin{algorithmic}
+\STATE set \sfn{diag} flag off so use whole derivative matrix
+\STATE reduce the gain to stop erratic behavior
+\STATE set number of samples to finalIter
+\STATE restart iteration count
+\IF {using optim}
+\STATE set maxit to 100
+\STATE set maxiiter to 0
+\STATE set optimFn to optimFinal
+\STATE set useOptim to useOptimFinal: could do Newton-Raphson type updates
+instead. 
+\ELSE 
+\STATE set maxiiter to 20
+\ENDIF
+\end{algorithmic}
 \end{document}

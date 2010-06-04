@@ -1,3 +1,9 @@
+2010-06-04 R-forge revision 95
+
+	* .Rbuildignore: added Makefile.profile to suppress warning
+	* R/phase2.r: removed stray RSiena:::
+	* doc/s_man400.tex: updated changelog
+	
 2010-06-04 R-forge revision 94 
 
 	* src/Makefile.win replaced by src/Makevars.win. Amended
@@ -20,10 +26,10 @@
 	man/setEffect.Rd: reverted revision 88, added timedummy to
 	setEffect, allow includeInteraction to set include to FALSE as
 	well as TRUE.
-	* R/sienaprint.r: fixed bug if used time dummies: use requested
-	effects not effects object. Also fix for added lines in
-	print.sienaFit, which were wrong if there were a large number of
-	effects. 
+	* R/sienaprint.r: fixed bug if interactions or time dummies
+	present: use requested effects not effects object. 
+	Also fix for added lines in print.sienaFit, which were wrong if
+	there were a large number of effects. 
 	* R/sienaTimeTest.r: added include parameter to includeTimeDummy,
 	and print out changed lines. Changed header comment.
 	* R/simstatsc.r: error message if use composition change with
@@ -81,7 +87,7 @@
 	control orthogonalization in sienaTimeTest, 
 	add parameters to includeEffects, documentation update.
 	
-2010-02-28 R-forge revision 88 (RSienaTest only)
+2010-05-28 R-forge revision 88 (RSienaTest only)
 
 	* R/sienaTimeTest.r, sienaDataCreate.r, simstatsc.r, 
 	man/sienaTimeTest.Rd: TimeDummies for RateX effects (constant
