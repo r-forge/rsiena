@@ -9,7 +9,7 @@
 }
 \usage{
 setEffect(myeff, shortName, parameter = 0, fix = FALSE,
-test = FALSE, initialValue = 0, include = TRUE,
+test = FALSE, initialValue = 0, timeDummy = ",", include = TRUE,
 name = myeff$name[1], type = "eval", interaction1 = "",
 interaction2 = "", character=FALSE)
 }
@@ -17,7 +17,8 @@ interaction2 = "", character=FALSE)
 \arguments{
   \item{myeff}{a Siena effects object as created by \code{\link{getEffects}}
 }
-  \item{shortName}{A short name (no quotes) to identify the effect which should be changed.
+\item{shortName}{A short name (all with or all without quotes)
+  to identify the effect which should be changed.
 }
   \item{parameter}{Integer value required. Default 0.
 }
@@ -25,7 +26,10 @@ interaction2 = "", character=FALSE)
 }
   \item{test}{Boolean required. Default FALSE.
 }
-  \item{initialValue}{Integer value required. Default 0.
+  \item{initialValue}{Initial value required. Default 0.
+}
+\item{timeDummy}{string: Comma delimited string of which periods to
+dummy. Alternately, use \code{\link{includeTimeDummy}}.
 }
   \item{include}{Boolean. default TRUE, but can be switched to FALSE to
 	turn off an effect.}

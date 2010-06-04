@@ -231,6 +231,13 @@ MiniStep * MiniStep::createReverseMiniStep() const
 	return 0;
 }
 
+/**
+ * Returns a new ministep that is a copy of this ministep.
+ */
+MiniStep * MiniStep::createCopyMiniStep() const
+{
+	return 0;
+}
 
 /**
  * Returns if this mini step is the first mini step of a CCP.

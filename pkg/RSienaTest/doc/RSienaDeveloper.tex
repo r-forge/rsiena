@@ -92,9 +92,9 @@ I describe the main details of our current practice:
   \item \sfn{R} functions which are to be visible to the user need to be added
     to the \sfn{NAMESPACE} file, and have a help page for them : see the Writing
     R Extensions manual for the details of the format.
-  \item Check that {R CMD check} works with no warnings apart from line endings
-    (these are set to follow the platform, and will be OK when checked out on a
-    Linux box).
+  \item Check that \sfn{R CMD check} works with no warnings apart from line
+    endings (these are set to follow the platform, and will be OK when checked
+    out on a Linux box).
   \item If writing methods, add them to the \sfn{NAMESPACE} file. Ensure that
     you get no warnings from them.
   \item \sfn{print} methods should invisibly return their argument.
@@ -117,25 +117,37 @@ I describe the main details of our current practice:
 \item In a command prompt window, navigate to the directory above the siena
   tree. Here I assume it is called \sfn{siena}.
 \item Type\\
-\verb|R CMD BUILD siena|
+\verb|R CMD build RSiena|
 \item You will probably need to either add R to your path, or use
   `path-to-R.exe' in the command above.
 \item When this one is OK, type\\
 \verb|R CMD INSTALL RSiena_1.0.n.tar.gz|\\
 (where \verb|n| is adjusted to match the file you have just created.)
 \item You now should have a new version of the package ready for use.
-\item Alternatively, instead of the BUILD and INSTALL, just type
-\verb|R CMD INSTALL siena|\\
+\item Alternatively, instead of the build and INSTALL, just type
+\verb|R CMD INSTALL RSiena|\\
 This will just compile the C that has changed and then do the rest.
 Quicker if you are debugging changes. Note that the \sfn{make} file is not very
 clever: if you are altering the C and your changes are not appearing, delete the
-.o's or .dll to force it, or do a BUILD
+.o's or .dll to force it, or do a build
 to clear out all the .o's and the dll.
 \item On linux or Mac, the same commands should work, but you don't need the
   Rtools. I have occasionally had problems with installing from a tarball or
   from source, when I have no permission to write in the standard libraries, but
   can't remember which one worked: one always did. The most likely to work is to
-  use, within R, \sfn{install.packages("tarball name", repos=NULL).
+  use, within R, \sfn{install.packages("tarball name", repos=NULL)}.
+\item If you find a Mac keeps recompiling all the C, even when you have not
+  changed anything, remove the word ``clean'' from the line beginning with the
+  word ``all'' in the file \verb|RSiena/src/Makevars|. But try to remember not
+  to commit this version!
+\item Checking the package. Either run \verb|R CMD check RSiena|, or do a build
+  and run\verb|R CMD check RSiena_1.0.n.tar.gz|. This will create a directory
+  called \verb|RSiena.Rcheck|, and produce some diagnostics to the screen. You
+  should have no warnings at all from the tar ball version, maybe some to do
+  with presence of object files with the other version. Once the warnings have
+  gone away, do a final check on the pdf version of the help pages which will be
+  in the directory RSiena.RCheck. Check any pages you have changed for lines
+  that are too long: the usage section, I think, does not wrap automatically. 
 \end{enumerate}
 \paragraph{Alternative methods for small changes}
 Now we have a \textsf{name space} for the package, small changes are not really
@@ -302,7 +314,7 @@ use, at the command line,\\
 \\
 where valgrind.r contains the commands I want to run, \emph{followed by
   \sfn{gc()}} to do some R garbage collection. (Otherwise \sfn{valgrind} reports
-a lot of still reachable memory at the end.
+a lot of still reachable memory at the end.)
 
 \sfn{valgrind} will also report memory leaks which may not cause an error, just
 an embarrassingly large memory usage, which will fail sooner or later.

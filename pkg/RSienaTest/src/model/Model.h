@@ -30,6 +30,7 @@ class Effect;
 class StructuralRateEffect;
 class Function;
 class EffectInfo;
+class Chain;
 
 
 // ----------------------------------------------------------------------------
@@ -76,6 +77,9 @@ public:
 	const vector<EffectInfo *> & rEvaluationEffects(string variableName) const;
 	const vector<EffectInfo *> & rEndowmentEffects(string variableName) const;
 
+	void chainStore(Chain& chain);
+	vector<Chain *> *chainStore();
+	
 	// Various flags
 
 	void conditional(bool flag);
@@ -95,6 +99,9 @@ public:
 
 	void needDerivatives(bool flag);
 	bool needDerivatives() const;
+
+	void needChangeContributions(bool flag);
+	bool needChangeContributions() const;
 
 	void parallelRun(bool flag);
 	bool parallelRun() const;
@@ -152,6 +159,10 @@ private:
 	// this iteration
 	bool lneedDerivatives;
 
+	// indicates whether we need to store the change contributions on 
+	// the ministeps
+	bool lneedChangeContributions;
+
 	// indicates whether we need to match Siena3 in use of random variables
 	// and score calculations
 	bool lparallelRun;
@@ -164,6 +175,9 @@ private:
 
 	// Bayesian scale factor for normal random variates
 	double lBayesianScaleFactor;
+
+	// chain storage
+	vector <Chain *> lchainStore;
 
 };
 

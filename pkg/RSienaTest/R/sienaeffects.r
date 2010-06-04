@@ -11,8 +11,7 @@
 ##@includeEffect DataCreate
 includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
                            type="eval", interaction1="", interaction2="",
-                           character=FALSE, initialValue=0, fix=FALSE,
-						   timeDummy=",")
+                           character=FALSE)
 {
 
     if (character)
@@ -41,9 +40,6 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
     myeff$interaction1 == interaction1 &
     myeff$interaction2 == interaction2
     myeff[use, "include"] <- include
-	myeff[use, "fix"] <- fix
-	myeff[use, "initialValue"] <- initialValue
-	myeff[use, "timeDummy"] <- timeDummy
     print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
                        "interaction2", "include")])
     myeff
@@ -79,17 +75,20 @@ includeInteraction <- function(myeff, ...,
     {
         shortNames <- dots
     }
-    ## check that we have a spare row
-    ints <- myeff[myeff$name == name & myeff$shortName  %in%
-                  c("unspInt", "behUnspInt") &
-                  (is.na(myeff$effect1) | myeff$effect1 == 0)&
-                  myeff$type == type, ]
-    if (nrow(ints) == 0)
+    ## if want to include, check that we have a spare row
+    if (include)
     {
-        stop("No more interactions available:",
-             "recreate the effects object requesting more interactions")
+        ints <- myeff[myeff$name == name & myeff$shortName  %in%
+                      c("unspInt", "behUnspInt") &
+                      (is.na(myeff$effect1) | myeff$effect1 == 0)&
+                      myeff$type == type, ]
+        if (nrow(ints) == 0)
+        {
+            stop("No more interactions available:",
+                 "recreate the effects object requesting more interactions")
+        }
+        ints <- ints[1, ]
     }
-    ints <- ints[1, ]
     ## find the first underlying effect
     shortName <- shortNames[1]
     interact1 <- interaction1[1]
@@ -126,7 +125,7 @@ includeInteraction <- function(myeff, ...,
         stop("Second effect not unique")
     }
     effect2 <- myeff[use, "effectNumber"]
-     ## find the third underlying effect, if any
+    ## find the third underlying effect, if any
 
     if (length(shortNames) > 2)
     {
@@ -152,11 +151,22 @@ includeInteraction <- function(myeff, ...,
     {
         effect3 <- 0
     }
-    intn <- myeff$effectNumber == ints$effectNumber
-    myeff[intn, "include"] <- include
-    myeff[intn, c("effect1", "effect2", "effect3")] <-
-        c(effect1, effect2, effect3)
-
+    if (include)
+    {
+        intn <- myeff$effectNumber == ints$effectNumber
+        myeff[intn, "include"] <- include
+        myeff[intn, c("effect1", "effect2", "effect3")] <-
+            c(effect1, effect2, effect3)
+    }
+    else
+    {
+        intn <- (myeff$effect1 == effect1) & (myeff$effect2 == effect2)
+        if (effect3 > 0)
+        {
+            intn <- intn & (myeff$effect3 == effect3)
+        }
+        myeff[intn, "include"] <- FALSE
+    }
     print.data.frame(myeff[intn, c("name", "shortName", "type", "interaction1",
                      "interaction2", "include", "effect1", "effect2",
                         "effect3")])
@@ -166,6 +176,7 @@ includeInteraction <- function(myeff, ...,
 ##@setEffect DataCreate
 setEffect <- function(myeff, shortName, parameter=0,
                       fix=FALSE, test=FALSE, initialValue=0,
+                      timeDummy=",",
                       include=TRUE, name=myeff$name[1],
                       type="eval", interaction1="", interaction2="",
                       character=FALSE)
@@ -192,8 +203,9 @@ setEffect <- function(myeff, shortName, parameter=0,
     myeff[use, "fix"] <- fix
     myeff[use, "test"] <- test
     myeff[use, "initialValue"] <- initialValue
+    myeff[use, "timeDummy"] <- timeDummy
     print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
                        "interaction2", "include", "parm", "fix", "test",
-                       "initialValue")])
+                       "initialValue", "timeDummy")])
     myeff
 }

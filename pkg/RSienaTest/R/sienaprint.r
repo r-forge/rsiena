@@ -115,9 +115,9 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
                {
                    for (j in 1:length(addtorow$command))
                    {
-                       ii <- grep(i-1, addtorow$pos[[j]])
-                       if (length(ii))
-                           if (i == 1 | addtorow$command[j] == 'Network Dynamics')
+                       ii <- match(i-1, addtorow$pos[[j]])
+                       if (!is.na(ii))
+                           if (i == 2 | addtorow$command[j] == 'Network Dynamics')
                                cat( addtorow$command[j], '\n')
                            else
                                cat('\n', addtorow$command[j], '\n', sep='')
@@ -208,8 +208,16 @@ print.sienaModel <- function(x, ...)
 ##@sienaFitThetaTable Miscellaneous
 sienaFitThetaTable <- function(x, tstat=FALSE)
 {
+    effects <- x$requestedEffects
     pp <- x$pp
-    nrates <- length(x$rate)
+    if (x$cconditional)
+    {
+        nrates <- length(x$rate)
+    }
+    else
+    {
+        nrates <- 0
+    }
     pp <- pp + nrates
     ## mydf stores the data before formatting
     mydf <- data.frame(dummy=rep(" ", pp),
@@ -285,7 +293,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
 
     if (nBehavs > 0)
     {
-        behEffects <- x$effects[x$effects$netType == 'behavior',]
+        behEffects <- effects[effects$netType == 'behavior',]
         behNames <- unique(behEffects$name)
     }
     if (nBehavs > 1)
@@ -295,12 +303,12 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
                                                          behNames)],
                                        '> ', behEffects$effectName,
                                        sep='')
-        x$effects$effectName[x$effects$netType=='behavior'] <-
+        effects$effectName[effects$netType=='behavior'] <-
             behEffects$effectName
     }
     mydf[nrates + (1:x$pp), 'row'] <-  1:x$pp
-    mydf[nrates + (1:x$pp), 'type' ] <- x$effects$type
-    mydf[nrates + (1:x$pp), 'text' ] <- x$effects$effectName
+    mydf[nrates + (1:x$pp), 'type' ] <- effects$type
+    mydf[nrates + (1:x$pp), 'text' ] <- effects$effectName
     mydf[nrates + (1:x$pp), 'value' ] <- theta
     mydf[nrates + (1:x$pp), 'se' ] <- ses
     if (!is.null(x$tstat))
@@ -311,7 +319,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
 
     if (nBehavs > 0 && nOneModes > 0)
     {
-        nOneModeEff <- nrow(x$effects) - nrow(behEffects)
+        nOneModeEff <- nrow(effects) - nrow(behEffects)
         addtorow$command[addsub] <-
             'Behavior Dynamics'
         addtorow$pos[[addsub]] <- nrates + 2 + nOneModeEff

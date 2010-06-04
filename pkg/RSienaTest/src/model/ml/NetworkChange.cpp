@@ -102,5 +102,67 @@ MiniStep * NetworkChange::createReverseMiniStep() const
 		this->ego(),
 		this->lalter);
 }
+/**
+ * Returns a new ministep that is a copy of this ministep.
+ */
+MiniStep * NetworkChange::createCopyMiniStep() const
+{
+	NetworkChange * pNetworkChange =  new NetworkChange(this->lpData,
+		this->ego(), this->lalter);
+	// copy the contribution changes
+	pNetworkChange->levaluationEffectContribution =
+		this->levaluationEffectContribution;
+	return pNetworkChange;
+}
+
+/**
+ * Returns the evaluationEffectContribution for this effect and alter for
+ * this ministep.
+ */
+double NetworkChange::evaluationEffectContribution(int alter, int effect) const
+{
+	return this->levaluationEffectContribution[alter][effect];
+}
+
+/**
+ * Returns the endowmentEffectContribution for this effect and alter for
+ * this ministep.
+ */
+double NetworkChange::endowmentEffectContribution(int alter, int effect) const
+{
+	return this->lendowmentEffectContribution[alter][effect];
+}
+
+/**
+ * Stores the evaluationEffectContribution in the next spot for this alter for
+ * this ministep.
+ */
+void NetworkChange::evaluationEffectContribution(double value, int alter, 
+	int effect) 
+{
+	this->levaluationEffectContribution[alter][effect] = value;
+}
+
+/**
+ * Stores the endowmentEffectContribution for this effect and alter for
+ * this ministep.
+ */
+void NetworkChange::endowmentEffectContribution(double value, int alter, 
+	int effect) 
+{
+	this->lendowmentEffectContribution[alter][effect] = value;
+}
+/**
+ * Creates arrays for the evaluation and endowment Effect Contributions for
+ * this ministep.
+ */
+void NetworkChange::allocateEffectContributionArrays(int nEvaluationEffects, 
+	int nEndowmentEffects, int m) 
+{
+	this->levaluationEffectContribution.resize(m, 
+		vector <double> (nEvaluationEffects));
+	this->lendowmentEffectContribution.resize(m, 
+		vector <double> (nEvaluationEffects));
+}
 
 }

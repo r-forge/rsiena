@@ -1,7 +1,7 @@
 ##*****************************************************************************
 ## * SIENA: Simulation Investigation for Empirical Network Analysis
 ## *
-## * Web: http://stat.gamma.rug.nl/siena.html
+## * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 ## *
 ## * File: sienaTimeTest.r
 ## *
@@ -51,7 +51,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 	# which egoX dummies are fixed, so that we do not consider them as included
 	dscreen <- which(sienaFit$effects[-escreen,]$shortName=='egoX' &
 					sienaFit$effects[-escreen,]$fix
-					 & length(grep("Dummy", 
+					 & length(grep("Dummy",
 					sienaFit$effects[-escreen,]$effectName)) > 0)
 	if (length(dscreen)==0)
 	{
@@ -90,7 +90,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 				## this information in dummyByEffect -- this is used
 				## extensively in plot.sienaTimeTest
 				dummyByEffect[rownames(toTest)==as.numeric(tmp[3]),
-					colnames(toTest)==as.numeric(tmp[2])]  <- 
+					colnames(toTest)==as.numeric(tmp[2])]  <-
 					which(sienaFit$effects[-escreen,]$
 					effectNumber[-c(rscreen,dscreen)]==i)
 			}
@@ -638,7 +638,7 @@ sienaTimeFix <- function(effects, data)
 								"Dummy",p,sep="")
 						base <- matrix(0,nact,nper-1)
 						## Figure out the base values:
-						dvind <- which(names(data$cCovars) == 
+						dvind <- which(names(data$cCovars) ==
 							effects$interaction1[effects$effectNumber==i])
 						## Stick them into the right time spot
 						base[,p] <- data$cCovars[[dvind]]
@@ -752,10 +752,10 @@ sienaTimeFix <- function(effects, data)
 }
 ##@includeTimeDummy DataCreate
 includeTimeDummy <- function(myeff, ..., timeDummy="all", name=myeff$name[1],
-		type="eval", interaction1="", interaction2="",
+		type="eval", interaction1="", interaction2="", include=TRUE,
 		character=FALSE)
 {
-	
+
 	if (character)
 	{
 		dots <- sapply(list(...), function(x)x)
@@ -782,5 +782,7 @@ includeTimeDummy <- function(myeff, ..., timeDummy="all", name=myeff$name[1],
 			myeff$interaction1 == interaction1 &
 			myeff$interaction2 == interaction2
 	myeff[use, "timeDummy"] <- timeDummy
+    myeff[use, "include"] <- include
+    print.data.frame(myeff[use,])
 	myeff
 }

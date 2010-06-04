@@ -15,6 +15,7 @@
 #include "model/EffectInfo.h"
 #include "model/variables/DependentVariable.h"
 #include "model/effects/AllEffects.h"
+#include "model/ml/Chain.h"
 
 namespace siena
 {
@@ -32,6 +33,7 @@ Model::Model()
 	this->lneedChain = false;
 	this->lneedScores = false;
 	this->lneedDerivatives = false;
+	this->lneedChangeContributions = false;
 	this->lparallelRun = false;
 }
 
@@ -60,6 +62,8 @@ Model::~Model()
 		this->ltargetChanges.erase(this->ltargetChanges.begin());
 		delete[] array;
 	}
+
+	deallocateVector(this->lchainStore);
 }
 
 
@@ -149,6 +153,22 @@ void Model::needDerivatives(bool flag)
 bool Model::needDerivatives() const
 {
 	return this->lneedDerivatives;
+}
+/**
+ * Stores if change contributions are to be stored on ministeps
+ */
+void Model::needChangeContributions(bool flag)
+{
+	this->lneedChangeContributions = flag;
+}
+
+
+/**
+ * Returns if change contributions are to be stroed on ministeps
+ */
+bool Model::needChangeContributions() const
+{
+	return this->lneedChangeContributions;
 }
 
 /**
@@ -485,4 +505,18 @@ int Model::targetChange(const Data * pData, int period) const
 	return value;
 }
 
+// ----------------------------------------------------------------------------
+// Section: Chain storage
+// ----------------------------------------------------------------------------
+
+void Model::chainStore(Chain& chain)
+{
+	// make a copy of the chain
+    this->lchainStore.push_back(chain.copyChain());
+}
+
+vector<Chain *> * Model::chainStore()
+{
+	return &(this->lchainStore);
+}
 }
