@@ -3,15 +3,16 @@
  *
  * Web: http://www.stats.ox.ac.uk/~snijders/siena/
  *
- * File: CovariateDependentNetworkEffect.h
+ * File: CovariateDistance2NetworkEffect.h
  *
  * Description: This file contains the definition of the
- * CovariateDependentNetworkEffect class.
+ * CovariateDistance2NetworkEffect class.
  *****************************************************************************/
 
-#ifndef COVARIATEDEPENDENTNETWORKEFFECT_H_
-#define COVARIATEDEPENDENTNETWORKEFFECT_H_
-
+#ifndef COVARIATEDISTANCE2NETWORKEFFECT_H_
+#define COVARIATEDISTANCE2NETWORKEFFECT_H_
+#include <string>
+#include "CovariateDependentNetworkEffect.h"
 #include "NetworkEffect.h"
 
 namespace siena
@@ -33,37 +34,32 @@ class BehaviorLongitudinalData;
 
 /**
  * The base class for network effects depending on an individual
- * covariate (constant, changing, or dependent behavior variable).
+ * covariate (constant, changing, or dependent behavior variable) at distance 2.
  */
-class CovariateDependentNetworkEffect : public NetworkEffect
+class CovariateDistance2NetworkEffect : public CovariateDependentNetworkEffect
 {
 public:
-	CovariateDependentNetworkEffect(const EffectInfo * pEffectInfo);
+	CovariateDistance2NetworkEffect(const EffectInfo * pEffectInfo);
+	virtual ~CovariateDistance2NetworkEffect();
 
 	virtual void initialize(const Data * pData,
 		State * pState,
 		int period,
 		Cache * pCache);
 
+	virtual void preprocessEgo(int ego);
+
+
 protected:
-	double value(int i) const;
-	bool missing(int i) const;
-	double similarity(int i, int j) const;
-	ConstantCovariate * pConstantCovariate() const;
-	ChangingCovariate * pChangingCovariate() const;
-	BehaviorLongitudinalData * pBehaviorData() const;
+	bool missingDummy(int i) const;
+	double averageAlterValue(int i) const;
+	double similarityNetwork(int i, int j, std::string networkName) const;
 
 private:
-	ConstantCovariate * lpConstantCovariate;
-	ChangingCovariate * lpChangingCovariate;
-	BehaviorLongitudinalData * lpBehaviorData;
-
-	// The current value of a behavior variable per each actor.
-	// This array is 0 for covariate-based effects.
-
-	const int * lvalues;
+	double * laverageAlterValues;
+	bool * laverageAlterMissing;
 };
 
 }
 
-#endif /*COVARIATEDEPENDENTNETWORKEFFECT_H_*/
+#endif /*COVARIATEDISTANCE2NETWORKEFFECT_H_*/

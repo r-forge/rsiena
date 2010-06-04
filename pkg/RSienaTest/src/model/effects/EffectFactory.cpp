@@ -503,6 +503,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new InteractionCovariateEffect(pEffectInfo);
 	}
+	else if (effectName == "AltsAvAlt")
+	{
+		pEffect = new AltersCovariateAverageEffect(pEffectInfo);
+	}
+	else if (effectName == "altDist2")
+	{
+		pEffect = new CovariateDistance2AlterEffect(pEffectInfo);
+	}
+	else if (effectName == "simDist2")
+	{
+		pEffect = new CovariateDistance2SimilarityEffect(pEffectInfo);
+	}
 	else
 	{
 		throw domain_error("Unexpected effect name: " + effectName);
