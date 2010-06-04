@@ -669,7 +669,7 @@ clearStoredChains <- function()
 getProbabilitiesPhase2 <- function(chain, theta, nactors, rateParameterPosition,
                               cl=NULL)
 {
-    f <-  RSiena:::FRANstore()#
+    f <-  FRANstore()#
     getScores <- FALSE
     ##print(theta)
     for (i in 1:length(chain)) # group
@@ -681,7 +681,7 @@ getProbabilitiesPhase2 <- function(chain, theta, nactors, rateParameterPosition,
                 tmp <- parLapply(cl, chain[[i]][[j]],
                                  function(x, i, j, theta, getScores, k, n)
                              {
-                                 f <- RSiena:::FRANstore()
+                                 f <- FRANstore()
                                  resp <- .Call("getChainProbabilitiesList",
                                                PACKAGE = pkgname, x,
                                                f$pData, f$pModel, as.integer(i),
