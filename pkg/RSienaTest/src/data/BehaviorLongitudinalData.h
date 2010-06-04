@@ -11,6 +11,8 @@
 #ifndef BEHAVIORLONGITUDINALDATA_H_
 #define BEHAVIORLONGITUDINALDATA_H_
 
+#include <map>
+
 #include "data/LongitudinalData.h"
 
 namespace siena
@@ -42,8 +44,10 @@ public:
 	double overallMean() const;
 	int range() const;
 	double similarity(double a, double b) const;
+	double similarityNetwork(double a, double b, std::string networkName) const;
 	double similarityMean() const;
 	void similarityMean(double similarityMean);
+	void similarityMeans(double similarityMean, std::string networkName);
 	void calculateProperties();
 
 private:
@@ -70,6 +74,9 @@ private:
 
 	// The similarity mean
 	double lsimilarityMean;
+
+	// The alter similarity means for each network (to be passed from outside)
+	std::map<std::string, double> lsimilarityMeans;
 };
 
 }

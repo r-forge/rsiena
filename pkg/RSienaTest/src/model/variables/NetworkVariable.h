@@ -69,6 +69,7 @@ public:
 	virtual MiniStep * randomMiniStep(int ego);
 	virtual bool missing(const MiniStep * pMiniStep) const;
 	virtual bool structural(const MiniStep * pMiniStep) const;
+	virtual double calculateChoiceProbability(const MiniStep * pMiniStep) const;
 
 private:
 	void preprocessEgo();
@@ -77,6 +78,7 @@ private:
 	void calculateTieFlipProbabilities();
 	void accumulateScores(int alter) const;
 	void accumulateDerivatives() const;
+	void copyChangeContributions(MiniStep * pMiniStep) const;
 
 	// The current state of the network
 	Network * lpNetwork;

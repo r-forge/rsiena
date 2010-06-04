@@ -64,8 +64,10 @@ public:
 	virtual MiniStep * randomMiniStep(int ego);
 	virtual bool missing(const MiniStep * pMiniStep) const;
 	virtual bool structural(const MiniStep * pMiniStep) const;
+	virtual double calculateChoiceProbability(const MiniStep* pMiniStep) const;
 
 private:
+	void preprocessEgo();
 	double totalEvaluationContribution(int actor,
 		int difference) const;
 	double totalEndowmentContribution(int actor,
@@ -74,6 +76,7 @@ private:
 		bool downPossible) const;
 	void calculateProbabilities(int actor);
 	void accumulateDerivatives() const;
+	void copyChangeContributions(MiniStep * pMiniStep) const;
 
 	// The observed data for this behavioral variable
 	BehaviorLongitudinalData * lpData;
@@ -105,6 +108,9 @@ private:
 
 	// Indicates if downward change is possible in the current situation
 	bool ldownPossible;
+
+	// the actor under consideration
+	int lego;
 };
 
 }
