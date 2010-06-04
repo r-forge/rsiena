@@ -94,6 +94,7 @@ public:
 	virtual bool diagonal() const;
 	virtual bool missing(int period) const;
 	virtual MiniStep * createReverseMiniStep() const;
+	virtual MiniStep * createCopyMiniStep() const;
 
 	virtual bool firstOfConsecutiveCancelingPair() const;
 

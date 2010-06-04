@@ -916,7 +916,8 @@ bool MLSimulation::insertPermute(int c0)
 	for (unsigned i = 0; i < interval.size() && valid; i++)
 	{
 		pMiniStep = interval[i];
-		pVariable = this->lvariables[pMiniStep->variableId()];
+		DependentVariable * pVariable =
+			this->lvariables[pMiniStep->variableId()];
 
 		if (!pVariable->validMiniStep(pMiniStep))
 		{
@@ -967,8 +968,8 @@ bool MLSimulation::insertPermute(int c0)
 		this->calculateRates();
 		double rr = 1 / this->totalRate();
 		double lospr =
-			log(pVariable->rate(pMiniStep->ego()) * rr);
-		double lcpr = log(pVariable->probability(pMiniStep));
+			log(pVariable->rate(pRightMiniStep->ego()) * rr);
+		double lcpr = log(pVariable->probability(pRightMiniStep));
 
 		sumlprob_new += lospr + lcpr;
 

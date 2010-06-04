@@ -19,6 +19,7 @@ phase3 <- function(z, x, ...)
     DisplayTheta(z)
     z$Phase <-  3
     int <- z$int
+    z$returnDeps <- z$returnDepsStored
 
     if (x$checktime) z$ctime <- proc.time()[3]
     ## fix up iteration numbers if using multiple processors

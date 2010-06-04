@@ -1,5 +1,5 @@
 
-R version 2.10.1 Patched (2010-03-23 r51392)
+R version 2.11.0 Patched (2010-04-23 r51810)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -87,7 +87,7 @@ Total of 404 iteration steps.
 > ##test8
 > mymodel$projname <- 'test8'
 > mymodel$cconditional <- TRUE
-> mymodel$condvarno<- 1
+> mymodel$condvarno <- 1
 > print('test8')
 [1] "test8"
 > ans <- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -112,7 +112,7 @@ Total of 269 iteration steps.
 > mynet2 <- sienaNet(s50a,type='behavior')
 > mydata <- sienaDataCreate(mynet1, mynet2)
 > myeff <- getEffects(mydata)
-> myeff$initialValue[94] <- 0.34699930338 ## siena3 starting values differ
+> myeff$initialValue[98] <- 0.34699930338 ## siena3 starting values differ
 > ##test10
 > print('test10')
 [1] "test10"

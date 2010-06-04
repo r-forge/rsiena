@@ -9,9 +9,9 @@
 # * communicating with C++. Only subsidiary routines used for maximum likelihood
 # *****************************************************************************/
 ##@simstats0c siena07 Simulation Module
-simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
-                        effects=NULL, fromFiniteDiff=FALSE,
-                      profileData=FALSE, prevAns=NULL, returnDeps=FALSE)
+simstats0c <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
+                       effects=NULL, fromFiniteDiff=FALSE,
+                       profileData=FALSE, prevAns=NULL, returnDeps=FALSE)
 {
     if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
     {
@@ -41,30 +41,43 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         f$pModel <- NULL
         f$pData <- NULL
         FRANstore(NULL) ## clear the stored object
-        PrintReport(z, x)
-        if (sum(z$test))
+        if (is.null(z$print))
         {
-            z$fra <- colMeans(z$sf, na.rm=TRUE)
-            ans <- ScoreTest(z$pp, z$dfra, z$msf, z$fra, z$test, x$maxlike)
-            z <- c(z, ans)
-            TestOutput(z, x)
+            PrintReport(z, x)
+
+            if (sum(z$test))
+            {
+                z$fra <- colMeans(z$sf, na.rm=TRUE)
+                ans <- ScoreTest(z$pp, z$dfra, z$msf, z$fra, z$test, x$maxlike)
+                z <- c(z, ans)
+                TestOutput(z, x)
+            }
+            dimnames(z$dfra)[[1]] <- as.list(z$requestedEffects$shortName)
         }
-        dimnames(z$dfra)[[1]] <- as.list(z$requestedEffects$shortName)
         return(z)
     }
-    ######################################################################
+    ## ####################################################################
     ## iteration entry point: not for ML
-    ######################################################################
+    ## ####################################################################
     ## retrieve stored information
     f <- FRANstore()
     ## browser()
-    if (fromFiniteDiff || z$Phase == 2)
+    ## fix up the interface so can call from outside robmon framework
+    if (is.null(z$Deriv))
+    {
+        z$Deriv <- FALSE
+    }
+    if (is.null(z$Phase))
+    {
+        z$Phase <- 1 ### nb be aware
+    }
+    if (fromFiniteDiff)
     {
         returnDeps <- FALSE
     }
     else
     {
-        returnDeps <- f$returnDeps
+        returnDeps <- z$returnDeps
     }
     if (is.null(f$seeds))
     {
@@ -89,7 +102,7 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             randomseed2 <- as.integer(f$randomseed2)
             f$storedseed <- randomseed2
         }
-       ## cat(randomseed2, '\n')
+        ## cat(randomseed2, '\n')
     }
     ## create a grid of periods with group names in case want to parallelize
     ## using this
@@ -101,11 +114,12 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     ## we are not
     if (z$int2==1 || nrow(callGrid) == 1)
     {
-      #   cat("theta", z$theta, "\n")
-            ans <- .Call('model', PACKAGE=pkgname, z$Deriv, f$pData, seeds,
-                         fromFiniteDiff, f$pModel, f$myeffects, z$theta,
-                         randomseed2, returnDeps, z$FinDiff.method,
-                         !is.null(z$cl))
+        ##   cat("theta", z$theta, "\n")
+        ans <- .Call('model', PACKAGE=pkgname, z$Deriv, f$pData, seeds,
+                     fromFiniteDiff, f$pModel, f$myeffects, z$theta,
+                     randomseed2, returnDeps, z$FinDiff.method,
+                     !is.null(z$cl), z$addChainToStore,
+                     z$needChangeContributions)
     }
     else
     {
@@ -182,10 +196,10 @@ simstats0c <-function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                 names(sims[[i]][[j]]) <- periodNos
             }
             periodNo <- periodNos[length(periodNos)] + 2
-       }
+        }
     }
-   # browser()
-   list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
+                                        # browser()
+    list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
          sims=sims, f$seeds, chain=chain)
 }
 doModel <- function(x, Deriv, seeds, fromFiniteDiff, theta, randomseed2,
@@ -202,11 +216,12 @@ doModel <- function(x, Deriv, seeds, fromFiniteDiff, theta, randomseed2,
     }
     else
     {
+        nrunMH <- 200
         .Call("mlPeriod", PACKAGE=pkgname, Deriv, f$pData, seeds,
-              #fromFiniteDiff,
+                                        #fromFiniteDiff,
               f$pModel, f$myeffects, f$pMLSimulation, theta,
               returnDeps, #FinDiff.method, useStreams,
-              as.integer(x[1]), as.integer(x[2]))
+              as.integer(x[1]), as.integer(x[2]), nrunMH)
     }
 }
 
@@ -415,7 +430,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                         ## set to missing in raw data for distances later
                         depvar[[i]][j, ] <- NA
                         depvar[[i]][, j] <- NA
-                   }
+                    }
                 }
                 for (j in threes) ## False data is preceded and followed by real
                 {
@@ -597,7 +612,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                         networks[[i]][j, use] <- networks[[i-1]][j, use]
                         networks[[i]][use, j] <- networks[[i-1]][use, j]
                     }
-               }
+                }
                 else if (ccOption == 3)
                 {
                     depvar[j, , i] <- NA ## missing
@@ -613,7 +628,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                     depvar[use, j, i] <- 0
                     depvar[j, j, i] <- NA
                     ## carry forward already done
-                     if (i == 1)
+                    if (i == 1)
                     {
                         networks[[i]][j, use] <- 0
                         networks[[i]][use, j] <- 0
@@ -624,13 +639,16 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                         networks[[i]][use, j] <- networks[[i-1]][use, j]
 
                     }
-               }
+                }
                 else if (ccOption %in% c(2, 3))
                 {
                     depvar[j, , i] <- NA ## missing
                     depvar[, j, i] <- NA
                 }
             }
+        }
+        for (i in 1:observations)
+        {
             if (i < observations)
             {
                 ## recreate distances, as we have none in c++. (no longer true)
@@ -644,13 +662,12 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                 diag(mymat2[,,1]) <- 0
                 mydiff <- mymat2 - mymat1
                 attr(depvar, 'distance')[i] <- sum(mydiff != 0,
-                                                         na.rm = TRUE)
+                                                   na.rm = TRUE)
                 if (all(mydiff >= 0, na.rm=TRUE))
                     attr(depvar, 'uponly')[i] <- TRUE
                 if (all(mydiff <= 0, na.rm=TRUE))
                     attr(depvar, 'downonly')[i] <- TRUE
             }
-
             diag(networks[[i]]) <- 0
             edgeLists[[i]] <- createEdgeLists(networks[[i]], depvar[, , i])
         }
@@ -679,6 +696,20 @@ unpackBipartite <- function(depvar, observations, compositionChange)
     networks <- vector('list', observations)
     actorSet <- attr(depvar, "nodeSet")
     compActorSets <- sapply(compositionChange, function(x)attr(x, "nodeSet"))
+    thisComp <- match(actorSet, compActorSets)
+    compChange <- any(!is.na(thisComp))
+    if (compChange)
+    {
+        stop("Composition change is not yet implemented for bipartite",
+             "networks")
+        action <- attr(compositionChange[[thisComp]], "action")
+        ccOption <- attr(compositionChange[[thisComp]], "ccOption")
+    }
+    else
+    {
+        ccOption <- 0
+        action <- matrix(0, nrow=attr(depvar, "netdims")[1], ncol=observations)
+    }
     sparse <- attr(depvar, 'sparse')
     if (sparse)
     {
@@ -700,22 +731,19 @@ unpackBipartite <- function(depvar, observations, compositionChange)
             }
             ## extract missing entries
             netmiss[[i]] <- netmat[is.na(netmat[,3]), , drop = FALSE]
-            netmiss[[i]] <-
-                netmiss[[i]][netmiss[[i]][, 1] != netmiss[[i]][, 2], ,
-                             drop=FALSE]
             ## carry forward missing values if any
-            for (j in seq(along=netmiss[[i]][,1]))
+            if (i == 1) # set missings to zero
             {
-                if (i == 1) # set missings to zero
-                {
-                    networks[[i]][netmiss[[i]][j, 1],
-                                  netmiss[[i]][j, 2]] <- 0
-                }
-                else
-                {
-                    networks[[i]][netmiss[[i]][j, 1], netmiss[[i]][j, 2]] <-
-                        networks[[i-1]][netmiss[[i]][j, 1], netmiss[[i]][j, 2]]
-                }
+                netmat <- netmat[!is.na(netmat[,3]), ]
+                networks[[i]] <- spMatrix(nActors, nActors, netmat[, 1],
+                                          netmat[, 2], netmat[,3])
+            }
+            else
+            {
+                netmiss1 <- netmiss[[i]][, 1:2]
+                storage.mode(netmiss1) <- 'integer'
+                networks[[i]][netmiss1[, 1:2]] <-
+                    networks[[i-1]][netmiss1[, 1:2]]
             }
         }
         for (i in 1:observations)
@@ -753,8 +781,6 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                 x2[x2 %in% c(10, 11)] <- NA
                 mymat1@x <- x1
                 mymat2@x <- x2
-                diag(mymat1) <- 0
-                diag(mymat2) <- 0
                 mydiff <- mymat2 - mymat1
                 attr(depvar, 'distance')[i] <- sum(mydiff != 0,
                                                    na.rm = TRUE)
@@ -788,9 +814,6 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                 ##remove structural values
                 mymat1[mymat1 %in% c(10,11)] <- NA
                 mymat2[mymat2 %in% c(10,11)] <- NA
-                ## and the diagonal
-                diag(mymat1[,,1]) <- 0
-                diag(mymat2[,,1]) <- 0
                 mydiff <- mymat2 - mymat1
                 attr(depvar, 'distance')[i] <- sum(mydiff != 0,
                                                          na.rm = TRUE)
@@ -867,6 +890,8 @@ unpackBehavior<- function(depvar, observations)
     attr(beh, 'distance') <- attr(depvar, 'distance')
     ## attr simMean
     attr(beh, 'simMean') <- attr(depvar, 'simMean')
+    ## attr simMeans
+    attr(beh, 'simMeans') <- attr(depvar, 'simMeans')
     storage.mode(beh) <- 'integer'
     list(beh=beh, behmiss=behmiss)
 }
@@ -1100,12 +1125,12 @@ fixUpEffectNames <- function(effects)
                    }
                    if (inter1$type != inter2$type)
                    {
-					   warning("Interaction specification gives effects ",
-							   "with different specifications eval/endow/rate ",
-							   "trying with experimental code. Remove these ",
-							   "Interactions if this does not work.")
-##                       stop("invalid interaction specification: ",
-##                            "must be same type: evaluation or endowment")
+					#   warning("Interaction specification gives effects ",
+					#		   "with different specifications eval/endow/rate ",
+					#		   "trying with experimental code. Remove these ",
+					#		   "Interactions if this does not work.")
+                       stop("invalid interaction specification: ",
+                            "must be same type: evaluation or endowment")
                    }
                }
                else
@@ -1170,6 +1195,20 @@ fixUpEffectNames <- function(effects)
 initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                            returnDeps)
 {
+    ## fix up the interface so can call from outside robmon framework
+    if (is.null(z$FinDiff.method))
+    {
+        z$FinDiff.method <- FALSE
+    }
+    if (is.null(z$int))
+    {
+        z$int <- 1
+    }
+    if (is.null(z$int2))
+    {
+        z$int2 <- 1
+    }
+
     if (!initC) ## ie first time round
     {
         if (!inherits(data,'siena'))
@@ -1236,7 +1275,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                                            "type", "groupName",
                                            "interaction1", "interaction2",
                                            "period")],
-                                     collapse="|"))
+                                       collapse="|"))
                 use <- efflist %in% oldlist
                 effects$initialValue[use] <-
                     prevEffects$initialValue[match(efflist, oldlist)][use]
@@ -1379,6 +1418,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         attr(f, "compositionChange") <- attr(data, "compositionChange")
         attr(f, "exooptions") <- attr(data, "exooptions")
         attr(f, "groupPeriods") <- attr(data, "groupPeriods")
+        attr(f, "totalMissings") <- attr(data, "totalMissings")
 
         if (x$maxlike && x$FinDiff.method)
         {
@@ -1419,6 +1459,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             {
                 z$haveDfra <- TRUE
                 z$dfra <- prevAns$dfra
+                z$dinv <- prevAns$dinv
                 z$sf <- prevAns$sf
             }
         }
@@ -1427,7 +1468,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     }
     else ## initC, i.e just send already set up data into new processes
     {
-        f <- FRANstore()
+       f <- FRANstore()
         ## Would like f to be just the data objects plus the attributes
         ## but need the effects later. Also a few other things,
         ## which probably could be attributes but are not!
@@ -1438,12 +1479,13 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         f$observations <-  NULL
         f$randomseed2 <- NULL
         f$seeds <- NULL
-        f$returnDeps <- NULL
         f$depNames <- NULL
         f$groupNames <- NULL
         f$nGroup <- NULL
         f$basicEffects <- NULL
         f$interactionEffects <- NULL
+        f$chain <- NULL
+        f$pMLSimulation <- NULL
     }
     ##browser()
     pData <- .Call('setupData', PACKAGE=pkgname,
@@ -1490,7 +1532,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         effects$effectPtr <- rep(NA, nrow(effects))
         splitFactor <- factor(effects$name, levels=attr(f, "netnames"))
         myeffects <- split(effects, splitFactor)
-    ## remove interaction effects and save till later
+        ## remove interaction effects and save till later
         basicEffects <-
             lapply(myeffects, function(x)
                {
@@ -1512,7 +1554,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         myeffects <- ff$myeffects
         basicEffects <- ff$basicEffects
         interactionEffects <- ff$interactionEffects
-        returnDeps <- ff$returnDeps
         nGroup <- ff$nGroup
     }
     ans <- .Call('effects', PACKAGE=pkgname, pData, basicEffects)
@@ -1568,8 +1609,10 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             z$targets2 <- 0
             z$maxlikeTargets <- rowSums(ans)
             z$maxlikeTargets2 <- ans
-       }
-   }
+            z$nrunMH <- 4 * sum(z$maxlikeTargets[z$effects$basicRate])
+        }
+    }
+
     ##store address of model
     f$pModel <- pModel
     ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
@@ -1602,11 +1645,11 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         simpleRates <- TRUE
 
         ## sum the missings to calculate the relevant probabilities
-        totalMissings <- attr(data, "totalMissings")
-        types <- attr(data, "types")
+        totalMissings <- attr(f, "totalMissings")
+        types <- attr(f, "types")
         use <- types != "behavior"
         ## use arbitrary n for now
-        n <- length(data[[1]]$nodeSets[[1]])
+        n <- length(f[[1]]$nodeSets[[1]])
         if (sum(use) > 0)
         {
             netMissings <- sum(totalMissings[use])
@@ -1639,7 +1682,10 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     f$myeffects <- myeffects
     if (!initC)
     {
-        DataReport(z, x, f)
+        if (is.null(z$print) || z$print)
+        {
+            DataReport(z, x, f)
+        }
         f$randomseed2 <- z$randomseed2
     }
     else
@@ -1647,7 +1693,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         f$randomseed2 <- ff$randomseed2
     }
     f$observations <- attr(f, "observations") + 1
-    f$returnDeps <- returnDeps
     f$depNames <- names(f[[1]]$depvars)
     f$groupNames <- names(f)[1:nGroup]
     f$nGroup <- nGroup
@@ -1655,10 +1700,15 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     {
         z$f <- f
     }
-    if (initC || (z$int == 1 && z$int2 == 1))
+    if (initC || (z$int == 1 && z$int2 == 1 &&
+                  (!is.null(z$nbrNodes) && z$nbrNodes == 1)))
     {
+
         f[1:nGroup] <- NULL
     }
     FRANstore(f) ## store f in FRANstore
+    z <- initForAlgorithms(z)
+    z$returnDeps <- returnDeps
+    z$returnDepsStored <- returnDeps
     z
 }
