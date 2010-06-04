@@ -837,7 +837,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
     ## add starting values for the other objects
     if (groupx && length(x) > 1)
     {
-        period <- xx$observations   ### periods used so far
+        period <-  xx$observations ##periods used so far
+
         for (group in 2:length(x))
         {
             xx <- x[[group]]
@@ -992,6 +993,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                    },
                        stop('error type'))
             }
+            period <-  period + xx$observations ##periods used so far
         }
     }
     effects <- do.call(rbind, effects)
@@ -1035,7 +1037,7 @@ getBehaviorStartingVals <- function(depvar)
         }, z = depvar, y = dif)
         startRate <- tmp[1, ]
         ##tendency
-        tmp <- rowSums(tmp[-1, ]) + 2
+        tmp <- rowSums(tmp[-1, , drop=FALSE]) + 2
         tendency <- log((tmp[2] * (tmp[3] + tmp[4])) /
                         (tmp[4] * (tmp[1] + tmp[2])))
         untrimmed <- tendency

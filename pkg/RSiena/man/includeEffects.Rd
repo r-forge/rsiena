@@ -24,7 +24,7 @@ short names to identify the effects which should be included or excluded.
 	included. Defaults to the first in the effects object.
 }
   \item{type}{
-  Type of effects to be included: currently only "eval" or "endow".
+  Type of effects to be included.
 }
   \item{interaction1}{
   Name of siena object where needed to completely identify the

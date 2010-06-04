@@ -679,6 +679,20 @@ unpackBipartite <- function(depvar, observations, compositionChange)
     networks <- vector('list', observations)
     actorSet <- attr(depvar, "nodeSet")
     compActorSets <- sapply(compositionChange, function(x)attr(x, "nodeSet"))
+    thisComp <- match(actorSet, compActorSets)
+    compChange <- any(!is.na(thisComp))
+    if (compChange)
+    {
+        stop("Composition change is not yet implemented for bipartite",
+             "networks")
+        action <- attr(compositionChange[[thisComp]], "action")
+        ccOption <- attr(compositionChange[[thisComp]], "ccOption")
+    }
+    else
+    {
+        ccOption <- 0
+        action <- matrix(0, nrow=attr(depvar, "netdims")[1], ncol=observations)
+    }
     sparse <- attr(depvar, 'sparse')
     if (sparse)
     {
@@ -700,22 +714,19 @@ unpackBipartite <- function(depvar, observations, compositionChange)
             }
             ## extract missing entries
             netmiss[[i]] <- netmat[is.na(netmat[,3]), , drop = FALSE]
-            netmiss[[i]] <-
-                netmiss[[i]][netmiss[[i]][, 1] != netmiss[[i]][, 2], ,
-                             drop=FALSE]
             ## carry forward missing values if any
-            for (j in seq(along=netmiss[[i]][,1]))
+            if (i == 1) # set missings to zero
             {
-                if (i == 1) # set missings to zero
-                {
-                    networks[[i]][netmiss[[i]][j, 1],
-                                  netmiss[[i]][j, 2]] <- 0
-                }
-                else
-                {
-                    networks[[i]][netmiss[[i]][j, 1], netmiss[[i]][j, 2]] <-
-                        networks[[i-1]][netmiss[[i]][j, 1], netmiss[[i]][j, 2]]
-                }
+                netmat <- netmat[!is.na(netmat[,3]), ]
+                networks[[i]] <- spMatrix(nActors, nActors, netmat[, 1],
+                                          netmat[, 2], netmat[,3])
+            }
+            else
+            {
+                netmiss1 <- netmiss[[i]][, 1:2]
+                storage.mode(netmiss1) <- 'integer'
+                networks[[i]][netmiss1[, 1:2]] <-
+                    networks[[i-1]][netmiss1[, 1:2]]
             }
         }
         for (i in 1:observations)
@@ -753,8 +764,6 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                 x2[x2 %in% c(10, 11)] <- NA
                 mymat1@x <- x1
                 mymat2@x <- x2
-                diag(mymat1) <- 0
-                diag(mymat2) <- 0
                 mydiff <- mymat2 - mymat1
                 attr(depvar, 'distance')[i] <- sum(mydiff != 0,
                                                    na.rm = TRUE)
@@ -788,9 +797,6 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                 ##remove structural values
                 mymat1[mymat1 %in% c(10,11)] <- NA
                 mymat2[mymat2 %in% c(10,11)] <- NA
-                ## and the diagonal
-                diag(mymat1[,,1]) <- 0
-                diag(mymat2[,,1]) <- 0
                 mydiff <- mymat2 - mymat1
                 attr(depvar, 'distance')[i] <- sum(mydiff != 0,
                                                          na.rm = TRUE)
@@ -1100,6 +1106,10 @@ fixUpEffectNames <- function(effects)
                    }
                    if (inter1$type != inter2$type)
                    {
+					#   warning("Interaction specification gives effects ",
+					#		   "with different specifications eval/endow/rate ",
+					#		   "trying with experimental code. Remove these ",
+					#		   "Interactions if this does not work.")
                        stop("invalid interaction specification: ",
                             "must be same type: evaluation or endowment")
                    }
@@ -1415,6 +1425,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             {
                 z$haveDfra <- TRUE
                 z$dfra <- prevAns$dfra
+                z$dinv <- prevAns$dinv
                 z$sf <- prevAns$sf
             }
         }
