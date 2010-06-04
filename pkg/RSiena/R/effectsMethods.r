@@ -15,43 +15,51 @@ print.sienaEffects <- function(x, fileName=NULL, ...)
     if (!inherits(x, "sienaEffects"))
         stop("not a legitimate Siena effects object")
 
-    nDependents <- length(unique(x$name))
-    userSpecifieds <- x$shortName[x$include] %in% c("unspInt", "behUnspInt")
-    endowments <- !x$type[x$include] %in% c("rate", "eval")
-
-    specs <- x[x$include, c("name", "effectName", "include", "fix", "test",
-                            "initialValue", "parm")]
-    if (nDependents == 1)
-    {
-        specs <- specs[, -1]
-    }
-    if (any(endowments))
-    {
-        specs <- cbind(specs, type=x[x$include, "type"])
-    }
-    if (any(userSpecifieds))
-    {
-        specs <- cbind(specs, x[x$include, c("effect1", "effect2")])
-        if (any (x$effect3[x$include] > 0))
-        {
-            specs <- cbind(specs, effect3=x[x$include, "effect3"])
-        }
-    }
-    specs[, "initialValue"] <- format(round(specs$initialValue,digits=5),
-                                      width=10)
-    row.names(specs) <- 1:nrow(specs)
-
     if (typeof(fileName)=="character")
     {
         sink(fileName, split=TRUE)
     }
 
-    print(as.matrix(specs), quote=FALSE)
+    if (nrow(x) > 0)
+    {
+        nDependents <- length(unique(x$name))
+        userSpecifieds <- x$shortName[x$include] %in% c("unspInt", "behUnspInt")
+        endowments <- !x$type[x$include] %in% c("rate", "eval")
 
+        specs <- x[x$include, c("name", "effectName", "include", "fix", "test",
+                                "initialValue", "parm")]
+        if (nDependents == 1)
+        {
+            specs <- specs[, -1]
+        }
+        if (any(endowments))
+        {
+            specs <- cbind(specs, type=x[x$include, "type"])
+        }
+        if (any(userSpecifieds))
+        {
+            specs <- cbind(specs, x[x$include, c("effect1", "effect2")])
+            if (any (x$effect3[x$include] > 0))
+            {
+                specs <- cbind(specs, effect3=x[x$include, "effect3"])
+            }
+        }
+        specs[, "initialValue"] <- format(round(specs$initialValue,digits=5),
+                                          width=10)
+        row.names(specs) <- 1:nrow(specs)
+
+        print(as.matrix(specs), quote=FALSE)
+
+    }
+    else
+    {
+        print.data.frame(x)
+    }
     if (typeof(fileName)=="character")
     {
         sink()
     }
+
     invisible(x)
 }
 

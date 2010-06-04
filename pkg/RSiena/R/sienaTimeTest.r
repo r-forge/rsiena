@@ -1,7 +1,7 @@
 ##*****************************************************************************
 ## * SIENA: Simulation Investigation for Empirical Network Analysis
 ## *
-## * Web: http://stat.gamma.rug.nl/siena.html
+## * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 ## *
 ## * File: sienaTimeTest.r
 ## *
@@ -10,90 +10,161 @@
 ## * sienaTimeFix, which is called to set up time dummy interacted effects.
 ## ****************************************************************************/
 ##@sienaTimeTest siena07 Does test for time homogeneity of effects
-sienaTimeTest <- function (sienaFit)
+sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 {
 	observations <- sienaFit$f$observations
+	# There must be more than 2 observations to do a time test!
 	if (observations <=2)
 	{
 		stop("You must have at least three time periods to test
 			 for non-heterogeneity across time.")
 	}
-## Find out which dummies have already been included in the model:
-	indRateEffects <- which(sienaFit$effects$shortName=="Rate")
-	indDummiedEffects <- grep("Dummy", sienaFit$effects$effectName)
-	indBaseEffects <- setdiff(1:nrow(sienaFit$effects), c(indRateEffects,
+	## Screen out the undesired effects
+	if (!is.null(effects)) {
+		escreen = setdiff(1:nrow(sienaFit$effects), effects)
+	} else {
+		escreen = 99999
+	}
+	# Identify which effects are rate parameters
+	indRateEffects <- which(sienaFit$effects$shortName[-escreen]=="Rate")
+	# Identify which effects are estimated dummy terms
+	indDummiedEffects <- grep("Dummy", sienaFit$effects$effectName[-escreen])
+	# The effects which will be tested are stored here. Take all of the
+	# effects, and take out the rate and dummy effects. These indices
+	# will have to be changed for the moments, scores, etc. after we
+	# screen the sienaFit ingredients.
+	indBaseEffects <- setdiff(1:nrow(sienaFit$effects[-escreen,]), c(indRateEffects,
 														  indDummiedEffects))
+	baseNames=sienaFit$effects[-escreen,]$effectName[indBaseEffects]
+	# toTest will hold booleans for which of the time dummies have not
+	# been estimated and thus are candidates for time tests.
 	toTest <- array(TRUE, dim=c(length(indBaseEffects),
 								sienaFit$f$observations - 2))
+	rownames(toTest) <- sienaFit$effects[-escreen,]$effectNumber[indBaseEffects]
+	colnames(toTest) <- 2:(sienaFit$f$observations - 1)
+	# dummyByEffect gets passed from sienaTimeTest so that other functions
+	# know which dummies belong to which base effects.
 	dummyByEffect <- array(0, dim=c(length(indBaseEffects),
 									sienaFit$f$observations - 2))
-	rownames(toTest) <- sienaFit$effects$effectNumber[indBaseEffects]
-	colnames(toTest) <- 2:(sienaFit$f$observations - 1)
 	dimnames(dummyByEffect) <- dimnames(toTest)
-## Must be able to screen out DummyX ego effects that are fixed:
-	dscreen <- which(sienaFit$effects$shortName=='egoX' & sienaFit$effects$fix
-					 & length(grep("Dummy", sienaFit$effects$effectName)) > 0)
+	# dscreen is the first important screening vector, which will determine
+	# which egoX dummies are fixed, so that we do not consider them as included
+	dscreen <- which(sienaFit$effects[-escreen,]$shortName=='egoX' &
+					sienaFit$effects[-escreen,]$fix
+					 & length(grep("Dummy",
+					sienaFit$effects[-escreen,]$effectName)) > 0)
 	if (length(dscreen)==0)
 	{
 		dscreen <- 99999
 	}
-	for (i in sienaFit$effects$effectNumber[sienaFit$effects$timeDummy != ',']){
-		tmp <- toString(sienaFit$effects$timeDummy[
-					   sienaFit$effects$effectNumber == i])
+	## If the estimation was unconditional, the rate parameters will have scores
+	## and moments which must also be screened out. Ruth, is there a simple way to
+	## check conditioning? I tried $conditional and it doesn't seem to do what I
+	## intuitively expected. For now, I just check the dimensionality of the scores,
+	## as it will match the number of included "effects" on dimension 3 if uncond.
+	## estimation was used.
+	if (dim(sienaFit$sf2[,,-escreen])[3] == dim(sienaFit$effects[,,-escreen])[1]) {
+		rscreen <- indRateEffects
+	} else {
+		rscreen <- 99999
+	}
+	## Go through each effect which had a time dummy included, and incorporate this
+	## information into the toTest vector. i.e. if a time dummy was estimated, set
+	## its element in toTest equal to FALSE so that we do not time test it
+	for (i in sienaFit$effects[-escreen,]$effectNumber
+		[sienaFit$effects[-escreen,]$timeDummy != ',']){
+		tmp <- toString(sienaFit$effects[-escreen,]$timeDummy[
+					   sienaFit$effects[-escreen,]$effectNumber == i])
 		tmp <- strsplit(tmp, split=",", fixed=TRUE)[[1]]
 		if (length(which(!tmp == '')) > 0)
 		{
-			if (tmp[1]=='isDummy' & !(i %in% sienaFit$effects$
+			## The effect we are looking at is a time dummy.
+			if (tmp[1]=='isDummy' & !(i %in% sienaFit$effects[-escreen,]$
 									  effectNumber[dscreen]))
 			{
+				## Dont test this dummy...
 				toTest[rownames(toTest)==as.numeric(tmp[3]),
-				colnames(toTest)==as.numeric(tmp[2])] <- FALSE
+					colnames(toTest)==as.numeric(tmp[2])] <- FALSE
+				## We want to be able to reference this effect given an
+				## index for the base effect and a time period, so store
+				## this information in dummyByEffect -- this is used
+				## extensively in plot.sienaTimeTest
 				dummyByEffect[rownames(toTest)==as.numeric(tmp[3]),
-				colnames(toTest)==as.numeric(tmp[2])]  <-
-				which(sienaFit$effects$effectNumber[-dscreen]==i)
+					colnames(toTest)==as.numeric(tmp[2])]  <-
+					which(sienaFit$effects[-escreen,]$
+					effectNumber[-c(rscreen,dscreen)]==i)
 			}
 
 		}
 		else
 		{
+			## The effect we are looking at had a time dummy,
+			## nothing required for now.
 			next
 		}
 	}
+	##  nEffects, nSims, nameslist, nDummies convert commonly used ingredients
+	##  from sienaFit into an easily accessed form based on the screens
+	##  set up above
 	nEffects <- length(indBaseEffects) + sum(!toTest)
-	nSims <- sienaFit$n3
+	## With the use of multiple nodes, sometimes the sienaFit object comes back
+	## with the wrong number of iterations!! Fixing it by looking elsewhere:
+	## Used to be: nSims <- sienaFit$n3
+	nSims <- dim(sienaFit$sf2[,,-escreen])[1]
 	nameslist <- list(
 					Iteration=paste("it", 1:nSims, sep=""),
 					Wave=paste("Wave", 1:(observations - 1), sep=""),
-					Effect=sienaFit$effects$effectName
+					Effect=sienaFit$effects[-escreen,]$effectName[-c(dscreen,rscreen)]
 					)
 	nDummies <- sum(toTest)
 	nTotalEffects <- nDummies + nEffects
-	obsStats <- t(sienaFit$targets2[-dscreen, ])
-	moment <- sienaFit$sf2[, , -dscreen] - rep(obsStats, each=nSims)
-	dummyNames <- rep("", nDummies)
+	## obsStats, moment, scores are the crucial ingredients from sienaFit which
+	## screen for the base effects and make the rest of the code clean
+	obsStats <- t(sienaFit$targets2[-c(dscreen,rscreen,escreen), ])
+	moment <- sienaFit$sf2[, , -c(dscreen,rscreen,escreen)] - rep(obsStats, each=nSims)
+	scores <- sienaFit$ssc[ , , -c(dscreen,rscreen,escreen)]
+	## Because the sienaFit object does not have a strict class definition,
+	## the $sf2 and $targets2 arrays cannot be expected to always have the
+	## proper format. The best we can do is therefore to die gracefully if
+	## the arrays do not line up:
 	G <- array(0, dim=c(nSims, observations - 1, nEffects + nDummies))
+	SF <- array(0, dim=c(nSims, observations - 1, nEffects + nDummies))
+	if (sum(dim(G[, , 1:nEffects]) != dim(moment))+
+		sum(dim(SF[, , 1:nEffects]) != dim(scores))>0) {
+		stop("The moments and scores in your sienaFit have unexpected dimensions.\n
+			It is possible that your model specifications are not yet implemented\n
+			in sienaTimeTest. Please contact the developers.\n\nDid you include
+			the base effect?\n")
+	}
+	## Will be used to construct the dummy names for output
+	dummyNames <- rep("", nDummies)
+	## Set the base effects G equal to the moments from sienaFit
 	G[, , 1:nEffects] <- moment
+	## inc used for incrementing through the dummies
 	inc <- nEffects
 	for (i in 1:nrow(toTest))
 	{
 		for (j in 1:ncol(toTest))
 		{
+			## Go through each dummy to be tested
 			if (toTest[i, j])
 			{
 				inc <- inc + 1
+				## And add scores and moments for the specific time period j+1
 				G[, j + 1, inc] <- moment[, j + 1, i]
 				dummyNames[inc-nEffects] <- paste("(*)Dummy", j + 1, ":",
 												  nameslist$Effect[i], sep="")
 			}
 		}
 	}
+	## Put names onto G for easy reference
 	dimnames(G) <- list(nameslist$Iteration, nameslist$Wave,
-						c(nameslist$Effect[-dscreen], dummyNames))
+						c(nameslist$Effect, dummyNames))
+	## Make the covariance matrix for the new moments
 	sigma <- cov(apply(G, c(1, 3), sum))
-	SF <- array(0, dim=c(nSims, observations - 1, nEffects + nDummies))
-	SF[, , 1:nEffects] <- sienaFit$ssc[ , , -dscreen]
+	## Basically repeat this process for the scores:
+	SF[, , 1:nEffects] <- scores
 	inc <- nEffects
-## Add any dummies that have been previously estimated:
 	dummyProps <- list()
 	for (i in 1:nrow(toTest))
 	{
@@ -102,34 +173,48 @@ sienaTimeTest <- function (sienaFit)
 			if (toTest[i, j])
 			{
 				inc <- inc + 1
-				SF[, j + 1, inc] <- sienaFit$ssc[, j + 1, i]
-				dummyNames[inc-nEffects] <- paste("(*)Dummy", j + 1, ":",
-												  nameslist$Effect[i], sep="")
+				SF[, j + 1, inc] <- scores[, j + 1, i]
+				## Save some information on these dummies for later;
+				## these operations dont relate directly to the scores
 				dummyByEffect[i, j]=inc
-				dummyProps$shortName[inc] <- sienaFit$effects$shortName[i]
-				dummyProps$type[inc] <- sienaFit$effects$type[i]
+				dummyProps$shortName[inc] <- sienaFit$effects[-escreen,]$shortName[i]
+				dummyProps$interaction1[inc] <- sienaFit$effects[-escreen,]$interaction1[i]
+				dummyProps$type[inc] <- sienaFit$effects[-escreen,]$type[i]
 				dummyProps$period[inc] <- j + 1
 			}
 		}
 	}
-	dimnames(SF) <- list(nameslist$Iteration, nameslist$Wave,
-						 c(nameslist$Effect[-dscreen], dummyNames))
+	## Copy the dimnames for G
+	dimnames(SF) <- dimnames(G)
+	## We have now set up all of the ingredients properly, so we may proceed with
+	## the score type test of Schweinberger (2007)
 	D <- derivativeFromScoresAndDeviations(SF, G)
 	fra <- apply(G, 3, sum) / nSims
 	doTests <- c(rep(FALSE, nEffects), rep(TRUE, nDummies))
 	jointTest <- ScoreTest(nTotalEffects, D, sigma, fra, doTests, maxlike=FALSE)
 	jointTestP <- 1 - pchisq(jointTest$testresOverall, nDummies)
-	individualTest <- jointTest$testresulto[1:nDummies]
+	if (! condition) {
+		individualTest <- jointTest$testresulto[1:nDummies]
+	} else {
+		individualTest <- sapply(1:nDummies, function (i)
+			{ doTests <- rep(FALSE, nEffects + nDummies)
+				doTests[nDummies+i] <- TRUE
+				test <- ScoreTest(nTotalEffects, D, sigma, fra, doTests, FALSE)
+				test$testresulto[1]
+			})
+	}
 	individualTestP <- 2 * (1-pnorm(abs(individualTest))[1:nDummies])
 	rownames(jointTestP) <- c("Joint Significant Test")
 	colnames(jointTestP) <- c("p-Val")
-	thetaOneStep <- c(sienaFit$theta[-dscreen], rep(0, nDummies)) +
-	jointTest$oneStep
+	thetaOneStep <- c(sienaFit$theta[-c(dscreen,rscreen,escreen)], rep(0, nDummies)) +
+			jointTest$oneStep
 	effectTest <- sapply(1:length(indBaseEffects), function (i)
 					{
 						 doTests <- rep(FALSE, nEffects + nDummies)
 						 tmp <- which(dummyProps$shortName ==
-									  sienaFit$effects$shortName[i])
+									  sienaFit$effects[-escreen,]$shortName[i] &
+									  dummyProps$interaction1 ==
+									  sienaFit$effects[-escreen,]$interaction1[i])
 						 if (length(tmp) > 0)
 						 {
 							doTests[tmp] <- TRUE
@@ -142,17 +227,19 @@ sienaTimeTest <- function (sienaFit)
 							NA
 						 }
 					})
+
 	dim(effectTest) <- c(length(indBaseEffects), 1)
 	effectTestP <- round(1 - pchisq(effectTest, apply(toTest, 1, sum)), 5)
-	rownames(effectTestP) <- nameslist$Effect[indBaseEffects]
+	rownames(effectTestP) <- baseNames
 	colnames(effectTestP) <- c("p-Val")
-	thetaStar <- cbind(c(sienaFit$theta[-dscreen], rep(0, nDummies)),
+	thetaStar <- cbind(c(sienaFit$theta[-c(dscreen,rscreen,escreen)], rep(0, nDummies)),
 					   thetaOneStep,
-					   round(c(2-2 * pnorm(abs(sienaFit$theta[-dscreen]/
-											 sqrt(diag(sienaFit$covtheta)[-dscreen]))),
+					   round(c(2-2 * pnorm(abs(sienaFit$theta[-c(dscreen,rscreen,escreen)]/
+											 sqrt(diag(sienaFit$covtheta)[-c(dscreen,
+											rscreen,escreen)]))),
 							   individualTestP), 5))
 	colnames(thetaStar) <- c("Initial Est.", "One Step Est.", "p-Value")
-	rownames(thetaStar) <- dimnames(SF)[[3]]
+	rownames(thetaStar) <- dimnames(G)[[3]]
 	returnObj <- list(
 					  JointTest=jointTestP,
 					  EffectTest=effectTestP,
@@ -169,10 +256,12 @@ sienaTimeTest <- function (sienaFit)
 					  DummyIndexByEffect=dummyByEffect,
 					  DummyStdErr=sqrt(diag(jointTest$covMatrix)),
 					  OriginalEffects=nEffects,
-					  OriginalThetaStderr=sqrt(diag(sienaFit$covtheta))[-dscreen],
+					  OriginalThetaStderr=sqrt(diag(sienaFit$covtheta))[-c(dscreen,
+									  		rscreen,escreen)],
 					  SienaFit=sienaFit,
 					  DummyProps=dummyProps,
-					  ToTest=toTest
+					  ToTest=toTest,
+					  ScreenedEffects=setdiff(c(rscreen,escreen),99999)
 					  )
 	class(returnObj) <- "sienaTimeTest"
 	returnObj
@@ -207,18 +296,11 @@ print.summary.sienaTimeTest <- function(x, ...)
 	}
 	tmp <- paste(" (", 1:length(rownames(x$IndividualTest)), ") ",
 				 rownames(x$IndividualTest), "\n", sep="")
-	cat("\nUse the following indices for plotting the pairwise moment
-		correlations:\n", tmp)
+	cat("\nUse the following indices for plotting:\n", tmp)
 	tmp <- paste(" (", 1:length(x$NonRateIndices), ") ",
 				 rownames(x$IndividualTest)[x$NonRateIndices], "\n", sep="")
-	cat("\nUse the following indices for plotting the effect-wise
-		fitted parameters:\n", tmp)
-	effectNames <- rownames(x$IndividualTest)
-	dummies <- grepl("Dummy", effectNames)
-	dummyIndex <- paste(" (", 1:sum(dummies), ") ", effectNames[dummies],
-						"\n", sep="")
 	cat("\nIf you would like to fit time dummies to your model, use the
-		following indices:\n", dummyIndex)
+		timeDummy column in your effects object.")
 	cat("\nType \"?sienaTimeTest\" for more information on this output.\n")
 	invisible(x)
 }
@@ -321,14 +403,14 @@ plot.sienaTimeTest <- function(x, pairwise=FALSE, effects=1:2,
 		if (length(effects)==1)
 		{
 			yaxis <- timetest$IndividualTest[as.vector(c(effects,
-														 timetest$DummyIndexByEffect[effects, ])), 2]
+									timetest$DummyIndexByEffect[effects, ])), 2]
 			dim(yaxis) <- c(1, timetest$Waves)
 
 		}
 		else
 		{
 			yaxis <- timetest$IndividualTest[as.vector(t(cbind(effects,
-															   timetest$DummyIndexByEffect[effects, ]))), 2]
+									timetest$DummyIndexByEffect[effects, ]))), 2]
 			yaxis <- matrix(yaxis, nrow=length(effects), ncol=timetest$Waves,
 							byrow=TRUE)
 		}
@@ -339,7 +421,7 @@ plot.sienaTimeTest <- function(x, pairwise=FALSE, effects=1:2,
 		basevals[, 1] <- 0
 		yaxis <- yaxis + basevals
 		pvals <- timetest$IndividualTest[c(effects, as.vector(
-															  t(timetest$DummyIndexByEffect[effects, ]))), 3]
+									t(timetest$DummyIndexByEffect[effects, ]))), 3]
 		dummysd <- abs(c(vals / qnorm(1 - pvals / 2)))
 		dummysd[effects] <- timetest$OriginalThetaStderr[effects]
 		dim(dummysd) <- c(length(effects), timetest$Waves)
@@ -353,8 +435,7 @@ plot.sienaTimeTest <- function(x, pairwise=FALSE, effects=1:2,
 			ymin=min(yaxis[i, ] - scale * abs(yaxis[i, ]))
 			ymax=max(yaxis[i, ] + scale * abs(yaxis[i, ]))
 			xyplot(yaxis[i, ] ~ xaxis,
-				   type = "p", main = rownames(timetest$IndividualTest)
-				   [timetest$NonRateIndices[effects[i]]],
+				   type = "p", main = rownames(timetest$EffectTest)[effects[i]] ,
 				   sub=paste("p=", timetest$EffectTest[effects[i]]), bty="n",
 				   xlab="Wave", ylab="Parameter Value", auto.key=TRUE,
 				   ylim=c(ymin, ymax), xlim=c(0, length(xaxis) + 1),
@@ -485,18 +566,19 @@ sienaTimeFix <- function(effects, data)
         warning("Time dummy not implemented for multi-group projects")
         effects$timeDummy <- ","
     }
-    covar <- effects$interaction1 != ""
-    if (any(effects$timeDummy[covar] != ","))
-    {
-        warning("Time dummy not implemented for covariate effects")
-        effects$timeDummy[covar] <- ","
-    }
-    eval <- effects$type =="eval"
-	if (any(effects$timeDummy[!eval] !=','))
+ # Josh tested these covariate effects, they work as-is for sienaTimeFix.
+ #   covar <- effects$interaction1 != ""
+ #   if (any(effects$timeDummy[covar] != ","))
+ #   {
+ #       warning("Time dummy not implemented for covariate effects")
+ #       effects$timeDummy[covar] <- ","
+ #   }
+    implemented <- (effects$type == "eval" | effects$shortName == "RateX")
+	if (any(effects$timeDummy[!implemented] !=','))
 	{
 		warning("Time dummy effects are only implemented",
-                " for one mode network effects of type eval.")
-        effects$timeDummy[!eval] <- ","
+                " for one mode network effects of type eval or for RateX.")
+        effects$timeDummy[!implemented] <- ","
 	}
 	if (all(effects$timeDummy==',') )
 	{
@@ -505,6 +587,7 @@ sienaTimeFix <- function(effects, data)
 	}
 	else
 	{
+## 	One mode, eval effects, or RateX effects:
 		alreadyDummied <- grep("isDummy", effects$timeDummy)
 		effects$timeDummy[effects$timeDummy=="all"]  <-
             paste(2:(data$observations-1), collapse = ",")
@@ -515,8 +598,9 @@ sienaTimeFix <- function(effects, data)
 ## all of the previous dummied effects within the column.
 			effects <- effects[-alreadyDummied, ]
 		}
-		dummiedEffects <- effects$effectNumber[effects$timeDummy != ',']
+		dummiedEffects <- effects$effectNumber[effects$timeDummy != ',' & (effects$type=='eval' | effects$shortName=='RateX')]
 		covToAdd <- NULL
+		rateCovToAdd <- NULL
 		dummyCombos <- list()
 		ctr=1
 ## This might need to be changed for sienaGroup:
@@ -543,9 +627,49 @@ sienaTimeFix <- function(effects, data)
 			}
 			if (length(tmp) > 0)
 			{
-				dummyCombos[[ctr]]=list(effectNumber=i, periods=tmp)
-				ctr=ctr + 1
-				covToAdd <- unique(c(covToAdd, tmp))
+				if (effects$type[effects$effectNumber==i]=='eval') {
+					dummyCombos[[ctr]]=list(effectNumber=i, periods=tmp)
+					ctr=ctr + 1
+					covToAdd <- unique(c(covToAdd, tmp))
+				} else if (effects$shortName[effects$effectNumber==i]=='RateX') {
+					## RateX effect, has to be dealt with differently. Just add them now:
+					for (p in tmp) {
+						dname <- paste(effects$interaction1[effects$effectNumber==i],
+								"Dummy",p,sep="")
+						base <- matrix(0,nact,nper-1)
+						## Figure out the base values:
+						dvind <- which(names(data$cCovars) ==
+							effects$interaction1[effects$effectNumber==i])
+						## Stick them into the right time spot
+						base[,p] <- data$cCovars[[dvind]]
+						## make a new varCovar:
+						base <- varCovar(base)
+						base <- addAttributes.varCovar(base, name=dname)
+						data$vCovars[[length(data$vCovars)+1]] <- base
+						names(data$vCovars)[length(data$vCovars)] <- dname
+						## Now add the rate term:
+						tmprow <- allEffects[allEffects$functionName==
+										'Amount of change x xxxxxx' & allEffects$type=='rate'
+										& allEffects$effectGroup=='covarNonSymmetricRate', ]
+						tmprow$name <- effects$name[effects$shortName=='RateX' &
+										effects$type=='rate'][1]
+						tmprow$effectFn <- 'NULL'
+						tmprow$statisticFn <- 'NULL'
+						tmprow$netType <- 'oneMode'
+						tmprow$groupName <- 'Group1'
+						tmprow$group <- 1
+						tmprow$fix <- FALSE
+						tmprow$include <- TRUE
+						tmprow$effectNumber <- max(effects$effectNumber) + 1
+						tmprow <- tmprow[, colnames(effects)]
+						tmprow$effectName <- gsub('xxxxxx', dname, tmprow$effectName)
+						tmprow$functionName <- gsub('xxxxxx', dname, tmprow$functionName)
+						tmprow$interaction1 <- dname
+						tmprow$timeDummy <- paste('isDummy', p, i, sep=',')
+						rownames(tmprow) <- dname
+						effects <- rbind(effects, tmprow)
+					}
+				}
 			}
 		}
 ## Add the required covariate effects to the effect objects
@@ -583,10 +707,10 @@ sienaTimeFix <- function(effects, data)
 			rownames(tmprow) <- dname
 			effects <- rbind(effects, tmprow)
 		}
-		for (i in 1:length(dummyCombos))
+		for (i in seq(along=dummyCombos))
 		{
 			baseNum=dummyCombos[[i]]$effectNumber
-			for (j in 1:length(dummyCombos[[i]]$periods))
+			for (j in seq(along=dummyCombos[[i]]$periods))
 			{
 				dname <- paste("Dummy", dummyCombos[[i]]$periods[j], sep="")
 				dummyNum <- effects$effectNumber[rownames(effects)==dname]
@@ -626,4 +750,39 @@ sienaTimeFix <- function(effects, data)
 		list(effects=effects, data=data)
 	}
 }
+##@includeTimeDummy DataCreate
+includeTimeDummy <- function(myeff, ..., timeDummy="all", name=myeff$name[1],
+		type="eval", interaction1="", interaction2="", include=TRUE,
+		character=FALSE)
+{
 
+	if (character)
+	{
+		dots <- sapply(list(...), function(x)x)
+	}
+	else
+	{
+		dots <- substitute(list(...))[-1] ##first entry is the word 'list'
+	}
+	if (length(dots) == 0)
+	{
+		stop("need some effect short names")
+	}
+	if (!character)
+	{
+		effectNames <- sapply(dots, function(x)deparse(x))
+	}
+	else
+	{
+		effectNames <- dots
+	}
+	use <- myeff$shortName %in% effectNames &
+			myeff$type==type &
+			myeff$name==name &
+			myeff$interaction1 == interaction1 &
+			myeff$interaction2 == interaction2
+	myeff[use, "timeDummy"] <- timeDummy
+    myeff[use, "include"] <- include
+    print.data.frame(myeff[use,])
+	myeff
+}

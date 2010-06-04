@@ -24,7 +24,7 @@ character=FALSE)
 	defined. Defaults to the first in the effects object.
 }
 \item{type}{
-  Type of effects to be interacted: currently only "eval" or "endow".
+  Type of effects to be interacted.
 }
 \item{interaction1}{
   Vector of siena objects where needed to completely identify the

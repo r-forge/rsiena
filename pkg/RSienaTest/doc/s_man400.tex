@@ -7467,6 +7467,12 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-06-04 R-forge revision 96 RSiena
+\begin{itemize}
+\item bug fixes as in revisions 92, 93. 
+\item Changes and bug fixes to sienaTimeTest etc.\ as in revisions 85--89, 
+\item \sfn{includeInteractions} now will unInclude too.
+\end{itemize}
 \item 2010-06-04 R-forge revision 93 (RSienaTest only)
 \begin{itemize}\item New algorithms function
   (not in package: in the examples directory).
@@ -7487,7 +7493,7 @@ repository.)
 \item Change to error message if an epoch is unlikely to terminate.
 \end{itemize}
 \item 2010-06-04 R-forge revision 92 (RSienaTest only) New average alter
-  effects.
+  effects. Bug fix to effects object for more than two groups.
 \item 2010-05-29 R-forge revision 89 (RSienaTest only)
 New option to control orthogonalization in sienaTimeTest, changes to
 includeEffects and sienaDataCreate (NB changes reverted in revision 93).
