@@ -769,11 +769,18 @@ in addition to this script.
 #####################################GENERAL###################################
 
 # This is an R script for getting started with RSiena, written by
-# Robin Gauthier, Tom Snijders, and Ruth Ripley, with contributions
-# from Josh Lospinoso.
+# Robin Gauthier, Tom Snijders, Ruth Ripley, and Josh Lospinoso.
 # Lines starting with # are not processed by R but treated as comments.
+# The script has a lot of explanation of R possibilities that will be
+# familiar for readers well acquainted with R, and can be skipped by them.
+# We have attempted to make the script understable also for R newbies.
+# The script can be downloaded from the 'Data sets' tab of the Siena website
+# together with the s50 data set.
 
 # R is case sensitive.
+# The left-arrow "<-" is very frequently used: it denotes an assignment,
+# "a <- b" meaning that object a gets the value b.
+# Often b is a complicated expression that has to be evaluated by R.
 
 # Help within R can be called by typing a question mark and the name of the
 # function you need help with. For example ?library loading will bring up a
@@ -786,12 +793,31 @@ in addition to this script.
 # in general the command syntax for calling R's functions is function(x) where
 # function is a saved function and x the name of the object to be operated on.
 
-####################CALLING THE DATA AND PRELIMINARY MANIPULATIONS#############
+# To execute this script
+# (this description is for Windows, and will be slightly different for
+#  Mac or Unix):
+# (1) start an R session;
+# (2) move to the desired directory by selecting "File - Change Dir" in the
+#     drop down menu, or by typing
+#     setwd("directory name")
+#     (without the initial # sign),
+#     filling in the directory name with forward slashes
+#     where you migh expect backslashes and hitting "Return";
+# (3) open this script in the R session;
+# (4) when the cursor is in the script and you hit Ctrl-R,
+#     the line where the cursor is will be executed;
+#     when you select a few lines by moving the cursor
+#     while continuously pressing the Shift key ,
+#     then hitting Ctrl-R will execute the highlighted part.
+# The best is to read this script and execute it line by line
+# (or command by command) as you go.
+
+#################### CALLING THE DATA AND PRELIMINARY MANIPULATIONS ###########
 
 # The library command loads the packages needed during the session.
 
         library(RSiena)
-        library(snow) # (these three additional libraries will be loaded
+        library(snow) # (these four additional libraries will be loaded
         library(network)# automatically if required)
         library(rlecuyer)
         library(xtable)
@@ -812,6 +838,10 @@ in addition to this script.
 
          ?RSiena
 
+# Or, for a listing of all accessible functions in RSiena:
+
+         library(help=RSiena)
+
 # Where is the manual?
 
          RShowDoc("s_man400", package="RSiena")
@@ -831,50 +861,451 @@ in addition to this script.
 # if single backslashes are used, one of the error messages will be:
 #   1: '\R' is an unrecognized escape in a character string
 
-
         friend.data.w1 <- as.matrix(read.table("s50-network1.dat"))
         friend.data.w2 <- as.matrix(read.table("s50-network2.dat"))
+        friend.data.w3 <- as.matrix(read.table("s50-network3.dat"))
         drink <- as.matrix(read.table("s50-alcohol.dat"))
+        smoke <- as.matrix(read.table("s50-smoke.dat"))
 
 # Before we work with the data, we want to be sure it is correct. A simple way
 # to check that our data is a matrix is the command class()
 
         class(friend.data.w1)
 
-# To check that all the data has been read in, we can use the dim() command. The
-# matrix should have the same dimensions as the original data (here, 50 by 50).
+# To check that all the data has been read in, we can use the dim() command.
+# The adjacency matrix should have the same dimensions as the original data
+# (here, 50 by 50).
 
         dim(friend.data.w1)
-
-# To check the values are correct, including missing values, we can use
-
-        table(friend.data.w1, useNA='always')
-
-# We do the same for the changing covariate that I have labelled "drink". Unlike
-# the two matrices it should be 50 by 3 because there are three time points in
-# the data, although we will only work with two (we are only working with
-# two adjacency matrices.
-
         dim(drink)
 
-# to create NA's, use eg:
+# To check the values are correct, including missing values, we can use
+# the following commands to tabulate the variables.
+
+        table(friend.data.w1, useNA='always')
+        table(friend.data.w2, useNA='always')
+        table(friend.data.w3, useNA='always')
+        table(drink, useNA='always')
+        table(smoke, useNA='always')
+
+# NA is the R code for missing data (Not Available).
+# This data set happens to have no missings (see the data description).
+# If there are any missings,
+# it is necessary to tell R about the missing data codes.
+# Let us do as if the missing codes for the friendship network were 6 and 9.
+# This leads to the following commands.
+# (For new R users: the c() function used here as "c(6,9)" constructs
+#  a vector [c for column] consisting of the numbers 6 and 9.
+#  This function is used a lot in basic R.)
 
         friend.data.w1[friend.data.w1 %in% c(6,9)] <- NA
+        friend.data.w1[friend.data.w2 %in% c(6,9)] <- NA
+        friend.data.w1[friend.data.w3 %in% c(6,9)] <- NA
 
-# to select a subset of the data based on an actor variable, say,
+# A visual inspection of the adjacency matrices can sometimes be useful.
+# This will, for example, help in highlighting outliers with respect to
+# outdegrees or indegrees, if there are any of such outliers.
+# This requires package sna:
+
+        library(network)
+        library(sna)
+        net1 <- as.network(friend.data.w1)
+        net2 <- as.network(friend.data.w2)
+        net3 <- as.network(friend.data.w3)
+        plot.sociomatrix(net1,drawlab=F,diaglab=F,xlab='friendship t1')
+        plot.sociomatrix(net2,drawlab=F,diaglab=F,xlab='friendship t2')
+        plot.sociomatrix(net3,drawlab=F,diaglab=F,xlab='friendship t3')
+
+# To select a subset of the data based on an actor variable, say,
+# those who have the value 2 or 3 on drinking at time 1
 # (the possibilities are endless, but hopefully this will serve as a pattern)
-#
+
         use <- drink[, 1] %in% c(2, 3)
+
+# This creates a logical vector which is TRUE for the cases where the condition
+# is satisfied. To view or check, display the vectors:
+
+        drink[,1]
+        use
+
+# and the number of selected cases is displayed by
+
+        sum(use)
+
+# To have this arrayed more neatly side by side, you can create and display
+# a matrix with the desired information:
+
+        aa <- matrix(nrow=5, ncol=2)
+        aa[,1] <- drink[,1]
+        aa[,2] <- use
+        aa
+
+# Given this selection, submatrices can be formed in case the analyses
+# are to be done for this subset only:
+
         friend1.data.w1 <- friend.data.w1[use, use]
         friend1.data.w2 <- friend.data.w2[use, use]
         drink1 <- drink[use, ]
 
-####################FROM VECTORS AND MATRICES TO SIENA OBJECTS##################
+############ GIVING THE DATA THEIR ROLES AS VARIABLES IN A SIENA MODEL #########
 
 # A number of objects need to be created in R, as preparations to letting siena07
-# execute the estimation.
-# sienaModelCreate creates a control object which can be used as an argument for siena07
-# You can look in the RSiena help files, requested by typing ?RSiena,
+# execute the estimation. This will be indicated by
+# A: dependent variables;
+# B: explanatory variables;
+# C: combination of dependent and explanatory variables;
+# D: model specification.
+
+# A.
+# First we have to create objects for the dependent variables.
+
+# sienaNet creates a Siena network object from a matrix or array
+# or list of sparse matrix of triples.
+# This object will have the role of a dependent variable in the analysis.
+# The name of this network object (here: friendship) will be used
+# in the output file.
+
+        friendship <- sienaNet(array(c(friend.data.w1, friend.data.w2, friend.data.w3),
+                               dim=c(50, 50, 3)))
+
+# The integers in the dim() here refer to the number of nodes (senders,
+# receivers) and the number of waves.
+# This object is an array of dimension 50x50x3, representing three adjacency matrices,
+# with a number of attributes. You can get the detailed information by requesting
+
+        dim(friendship)
+        attributes(friendship)
+
+# If you only are interested in the value of one particular attribute,
+# you can request this by, e.g.,
+
+        attributes(friendship)$type
+
+# The entire contents of the object are listed by typing
+
+#       friendship
+
+# but this gives a lot of output which you may not want,
+# hence the # sign in front.
+
+# sienaNet can also be used to create a behavior variable object
+# with the extra argument type="behavior".
+# (Non-mentioned attributes get the default value, and in this case oneMode is the default.)
+# E.g. the 'drink' data is made available as a dependent behavior variable by the function
+
+        drinkingbeh <- sienaNet(drink, type="behavior")
+
+# (but only use the variable in one role: behavior variable or changing covariate!)
+
+# The options available for a sienaNet object are displayed when requesting
+
+        ?sienaNet
+
+# This shows that next to one-mode (unipartite) and behavior dependent variables,
+# also two-mode (bipartite) dependent variables are possible.
+# You can infer that oneMode is the default type from the fact
+# that it is mentioned first.
+
+# To create bipartite network objects you need two nodesets and must create
+# the node sets too eg:
+
+        friendship <- sienaNet(array(c(friend.data.w1, friend.data.w2),
+                               dim=c(50, 50, 2)), nodeSet=c("senders", "receivers"))
+        senders <- sienaNodeSet(50, nodeSetName="senders")
+        receivers <- sienaNodeSet(50, nodeSetName="receivers")
+        mydata <- sienaDataCreate(friendship, alcohol,
+        nodeSets=list(senders, receivers))
+
+
+# B.
+# Second we construct objects for the explanatory (independent) variables.
+# From the help request
+#       ?sienaDataCreate
+# we see that these can be of five kinds:
+# coCovar            Constant actor covariates
+# varCovar           Time-varying actor covariates
+# coDyadCovar        Constant dyadic covariates
+# varDyadCovar       Time-varying dyadic covariates
+# compositionChange  Composition change indicators.
+# You can get help about this by the following requests:
+#       ?coCovar
+#       ?varCovar
+#       ?coDyadCovar
+#       ?varDyadCovar
+#       ?sienaCompositionChange
+
+# The variables available for this data set all are changing actor covariates.
+# For illustrative purposes, we use smoking as observed at the first wave
+# as a constant covariate:
+
+        smoke1 <- coCovar(smoke[,1])
+
+# This selects the first column of smoke, which contains the first wave observations,
+# and makes it available as a constant covariate.
+# We use the drinking data as a changing covariate.
+# The function varCovar creates a changing covariate object from a matrix;
+# the name comes from 'varying covariate'.
+
+        alcohol <- varCovar(drink)
+
+# The information request
+
+        attributes(alcohol)
+
+# will tell you the information that R now has added to the drink data.
+
+# C.
+# We now combine the dependent and independent variables.
+# The function sienaDataCreate creates a Siena data object from input networks,
+# covariates and composition change objects;
+# the objects that earlier were created by sienaNet will have the role
+# of dependent variables, and similarly the other roles are predetermined
+# by creation by the functions coCovar, varCovar,
+# coDyadCovar, varDyadCovar, and sienaCompositionChange.
+
+        mydata <- sienaDataCreate(friendship,smoke1,alcohol)
+
+# You should now understand how the result of this differs from the
+# result of
+#       mybehdata <- sienaDataCreate(friendship,smoke1,drinkingbeh)
+
+# If you would like to use different names, you could request this as follows:
+#        mydata <- sienaDataCreate(nominations = friendship, smoke1, drinking = alcohol)
+
+# This finishes the data specification. Now we have to specify the model.
+
+# D.
+# The data set as combined in mydata implies a certain set of effects
+# that can be included in the specification of the model.
+# To have access to these, the effects are combined in a data frame.
+# In R, an object of class "data.frame" is a matrix with named columns,
+# each column having its own type (numerical, integer, string, logical, etc.)
+# The function getEffects creates a dataframe of effects with a number of extra
+# properties for use in RSiena:
+
+        myeff <- getEffects(mydata)
+
+# Before we explain the object myeff and how we shall be going to use it,
+# we first produce a data description which is available now:
+
+        print01Report(mydata,myeff, modelname = 's50_3_init')
+
+# This writes a basic report of the data to the file
+# s50_3_init.out in the current working directory.
+# Inspecting this is important because it serves as a check and also contains
+# a number of descriptives.
+# In this description you can see that the third wave data for alcohol are not used.
+# This is because changing covariates are assumed to be constant from one wave until
+# immediately before the next wave, so that the values for the last wave are ignored.
+
+# Let us now consider the myeff object, which is used to specify the model.
+# It is of the class "sienaEffects", and contains the model specification.
+# You can inspect the current model specification by simply requesting
+
+       myeff
+
+# For starting, the model specification is just a very limited default;
+# to make a meaningful analysis, you will need to add to it.
+
+# The rows of the myeff object correspond to the effects.
+# By requesting
+
+        names(myeff)
+
+# you see the information that is stored about the effects.
+# Among these is the effectName.
+# The set of available effects can be inspected by requesting their names:
+
+        myeff$effectName
+
+# The "include" column defines whether effects are included in the model.
+
+        myeff$include
+
+# Here the TRUE values correspond to the default model specification which,
+# however, is not meant as a serious model, being too limited.
+# There are various ways to operate on myeff.
+# fix calls a data editor internal to R, so we can manually edit the effects.
+# This operates the same as in the Gui.
+
+        fix(myeff)
+
+# fix() may not be usable if you do not have tcl/tk available!
+# Note that the top of the dataframe shows the names of the columns:
+# name, effectName, etc.
+# You can edit the "include" column by changing the TRUE and FALSE values
+# as required; when the editor is closed, the new values are stored.
+
+# Alternatively we can edit the dataframe directly by using R functions.
+# The commands below are used to set "include" to TRUE or FALSE,
+# as an alternative to using the data editor.
+# The "include" column with values TRUE or FALSE will always be located
+# at the 9th column,
+# but transitive triplets will not always be at the 13th row as this depends
+# on the number of periods and variables;
+# further, the list of available effects may change in future versions.
+# In general the advantage of this method is that we can save
+# the last parameters and rerun the model later without opening the editor.
+# (Saving can now be done in the GUI).
+# Note: These row numbers may not be the current ones, as they depend on the
+# list of effects implemented, which is changeable.
+# Some examples are the following (preceded by # because not proposed to be applied).
+
+        #myeff[13,9] <- TRUE   #transitive triples
+        #myeff[17,9] <- TRUE   #3 cycles
+        #myeff[19,9] <- TRUE   #transitive ties
+        #myeff[29,9] <- TRUE   #indegree popularity (sqrt)
+        #myeff[33,9] <- TRUE   #outdegree popularity (sqrt)
+        #myeff[35,9] <- TRUE   #indegree based activity (sqrt)
+        #myeff[37,9] <- TRUE   #outdegree based activity (sqrt)
+        #myeff[46,9] <- TRUE   #indegree-indegree assortativity
+        #myeff[69,9] <- TRUE   #alcohol alter
+        #myeff[73,9] <- TRUE   #alcohol ego
+        #myeff[75,9] <- TRUE   #alcohol similarity
+        #myeff[83,9] <- TRUE   #alcohol ego x alcohol alter
+
+# This way of model specification is convenient especially for use
+# in later analyses.
+# But in other choices of data, the effect numbers will change.
+# The following methods require more typing the first time,
+# but can be re-used much more robustly.
+# Several variants are given, so that you can use what suits you best.
+# We give a small and meaningful model.
+# To understand the R commands, recall that myeff is a matrix,
+# i.e., a two-dimensional array,
+# and myeff[i,j] refers to row/effect i and its characteristic j.
+# A file with the effect names, for easy access to their exact wordings,
+# is obtained by the following commands.
+# The function sink diverts output to a file;
+# the last command sink() directs it to the console again.
+
+     sink("effectlist.txt")
+     myeff$effectName
+     sink()
+
+# Now look in the file "effectlist.txt" (in the current directory)
+# for the spelling of the various effects you might wish to use.
+# The following commands can be used to select the
+# five mentioned effects.
+# Note that == is the logical "equals", & is the logical "and",
+# and what is between the square brackets [...] makes a selection.
+
+        myeff[myeff$effectName=='transitive triplets' &
+              myeff$type=='eval', 'include'] <- TRUE
+        myeff[myeff$effectName=='3-cycles' &
+              myeff$type=='eval', 'include'] <- TRUE
+        myeff[myeff$effectName=='smoke1 similarity' &
+              myeff$type=='eval', 'include'] <- TRUE
+        myeff[myeff$effectName=='alcohol alter' &
+              myeff$type=='eval', 'include'] <- TRUE
+        myeff[myeff$effectName=='alcohol ego' &
+              myeff$type=='eval', 'include'] <- TRUE
+        myeff[myeff$effectName=='alcohol ego x alcohol alter' &
+              myeff$type=='eval', 'include'] <- TRUE
+
+# You can similarly add other ones.
+# If you make a typing error in the effect name, there will be no warning,
+# but also no consequence of your command.
+# Therefore it is good to check the results,
+# by requesting the list of effects now included in the model.
+# This can be done, e.g., by
+
+        myeff[myeff$include==TRUE,]$effectName
+
+# but more informatively by
+
+        myeff
+
+# A third way of specifying the model is by the includeEffects function.
+# This function uses short names instead of full names.
+# A list of these is obtained by
+
+        sink("effectshortlist.txt")
+        myeff$shortName
+        sink()
+
+# A table of effect information including short names is also available as a pdf
+# in the R directory, and can be opened by
+
+        #RShowDoc("effects", package="RSiena")
+
+# or created and opened as a html file in the current directory by the function
+
+        #effectsDocumentation()
+
+# For illustration, let us start from scratch with a new sienaEffects object,
+# and add the transitive triples and 3-cycles effects
+
+        myeff <- getEffects(mydata)
+        myeff <- includeEffects(myeff,transTrip,cycle3)
+
+# The short names do not differentiate between the covariates:
+# e.g., the effects 'alcohol ego' and 'smoke1 ego' both have short name 'egoX',
+# and the command
+
+        myeff <- includeEffects(myeff,egoX)
+
+# results in a message that does not (like the earlier one)
+# confirm the newly included effect.
+# The covariates are indicated by the variable "interaction1" in the sienaEffects object,
+# and this has to be mentioned to include these effects:
+
+        myeff <- includeEffects(myeff,egoX,altX,egoXaltX,interaction1="alcohol")
+        myeff <- includeEffects(myeff,simX,interaction1="smoke1")
+
+# We check the results again:
+
+        myeff
+
+# By looking at the help offered by
+
+        ?includeEffects
+
+# you can see how to include endowment effects and how to exclude effects.
+
+# As a special topic, let us show how interaction effects are created.
+# First we give a method using effect numbers, with the disadvantages
+# that the commands are not portable to other data sets.
+# The first "unspecified interaction effect" has number 90.
+# To specify an interaction between say smoke1 ego and reciprocity,
+# note that the numbers of these effects are 11 and 52.
+# The name of the interaction effect will later be created by siena07.
+
+       # myeff[90, c('effect1', 'effect2')] <- c(11,52)
+       # myeff[90, 'include'] <- TRUE
+
+# A more robust method to include an interaction is offered by the
+# includeInteraction function. The above interaction can also be
+# defined by the command
+
+#        myeff <- includeInteraction(myeff, egoX, recip,include=FALSE,
+#                                    interaction1="smoke1")
+
+# and, e.g., an interaction between smoke1 ego and alcohol ego is defined by
+
+#        myeff <- includeInteraction(myeff, egoX, egoX,include=FALSE,
+#                                    interaction1=c("smoke1","alcohol"))
+
+# where we now specified "include=FALSE" because we wish to make this effect
+# available without using it in in the model to be estimated below.
+
+# A second special topic is how to access other characteristics of effects
+# without referring to the effect numbers.
+# This can be done by the setEffect function.
+# E.g., the dense triads effects counts the number of triplets with at least xx ties,
+# where xx is the parameter of the effect, which can be 5 or 6
+# (note that 6 is the maximum number of ties in a triplet).
+# The default is 5. This is changed to 6 by the command
+
+        myeff <- setEffect(myeff, denseTriads, include=FALSE, 6)
+
+########################### ESTIMATION OF PARAMETERS ###########################
+
+# Parameters of the model are estimated by the function siena07.
+# This requires the data specification; the effects specification;
+# and a number of parameters, or settings, for the estimation algorithm.
+# The latter are contained in an object created by the function sienaModelCreate.
+# You can look at the help provided by ?sienaModelCreate
 # to find out about options that you may use here;
 # for beginning users, only the two options mentioned below are relevant.
 #
@@ -884,140 +1315,15 @@ in addition to this script.
 # New estimation runs will append to it.
 # A new call to print01Report will overwrite it!
 
-        mymodel <- sienaModelCreate(useStdInits = TRUE, projname = 's50_2')
-
-# sienaNet creates a Siena network object from a matrix or array or list of sparse
-# matrix of triples.
-# The name of this network object (here: friendship) will be used
-# in the output file.
-        friendship <- sienaNet(array(c(friend.data.w1, friend.data.w2), dim=c(50, 50, 2)))
-# the integers in the dim() here refer to the number of nodes (senders,
-# receivers) and the number of waves.
-#
-# sienaNet is also used to create a behavior variable object
-# with the extra argument type="behavior"
-# e.g  using the drinking behavior matrix
-        alcohol <- sienaNet(drink, type="behavior")
-# (but only use the variable once: behavior variable or changing covariate!)
-
-# To create bipartite network objects you need two nodesets and must create
-# the node sets too eg:
-
-        friendship <- sienaNet(array(c(friend.data.w1, friend.data.w2),
-                               dim=c(50, 50, 2)), nodeSet=c("senders", "receivers"))
-
-        senders <- sienaNodeSet(50, nodeSetName="senders")
-        receivers <- sienaNodeSet(50, nodeSetName="receivers")
-        mydata <- sienaDataCreate(friendship, alcohol,
-        nodeSets=list(senders, receivers))
-
-# varCovar creates a changing covariate object from a matrix;
-# the name comes from 'varying covariate'. We are only using
-# two waves of data, so we only want drinking behavior at time 1 and 2, the
-# first two columns of the data. The brackets slice the data into the first two
-# columns while the comma indicates that R should read all of the rows.
-# Omitting the [,1:2] will lead to the same result, as
-# RSiena drops an unnecessary final column automatically.
-# The name (alcohol) again will be used in the output file.
-
-
-        alcohol <- varCovar(val = drink[,1:2])
-
-# sienaDataCreate creates a Siena data object from input networks,
-# covariates and composition change objects.
-
-        mydata <- sienaDataCreate(friendship,alcohol)
-
-# If you would like to use different names, you could request this as follows:
-        mydata <- sienaDataCreate(nominations = friendship, drinking = alcohol)
-
-# This finishes the data specification. Now we have to specify the model.
-
-# getEffects creates a dataframe of effects
-
-        myeff <- getEffects(mydata)
-
-# A basic report of data input, which serves as a check and also contains
-# a number of descriptives, can be obtained as follows.
-# It produces a file named 'modelname.out' in the current working directory.
-
-        print01Report(mydata,myeff, modelname = 's50_2_init')
-
-# fix calls a data editor, so we can manually edit the effects as in the Gui
-
-        fix(myeff)
-
-# fix() may not be usable if you do not have tcl/tk available
-
-# Alternatively we can edit the dataframe directly by using R functions.
-# Note that the columns of the dataframe of effects have names indicated
-# in the top of the dataframe:
-# name, effectName, type, include, fix, test, initialValue, parm,
-# effectnumber, effect1, effect2, effect3.
-# The commands below are used to set "include" to TRUE or FALSE,
-# as an alternative to using the data editor.
-# TRUE or FALSE will always be located at the 9th column,
-# transitive triplets will not always be at the 11th row as this depends
-# on the number of periods; further, the list of available effects
-# may change in future versions.
-# In general the advantage of this method is
-# that we can save the last parameters and rerun the model
-# later without opening the editor. (Saving can now be done in the GUI).
-# Note: These row numbers may not be the current ones, as they depend on the
-# list of effects implemented, which is changeable.
-
-        #myeff[11,9] <- TRUE   #transitive triples
-        #myeff[15,9] <- TRUE   #3 cycles
-        #myeff[17,9] <- TRUE   #transitive ties
-        #myeff[27,9] <- TRUE   #indegree popularity
-        #myeff[31,9] <- TRUE   #outdegree popularity
-        #myeff[34,9] <- TRUE   #indegree based activity
-        #myeff[36,9] <- TRUE   #outdegree based activity
-        #myeff[46,9] <- TRUE   #indegree-indegree assortativity
-        #myeff[48,9] <- TRUE   #alcohol alter
-        #myeff[50,9] <- TRUE   #alcohol alter (squared)
-        #myeff[52,9] <- TRUE   #alcohol ego
-        #myeff[54,9] <- TRUE   #alcohol similarity
-        #myeff[62,9] <- TRUE   #alcohol ego x alcohol alter
-
-# Alternatively, and more robustly against future changes in the structure,
-# use the following for the last effect:
-
-        #myeff[myeff$effectName=='alcohol ego x alcohol alter' &
-        #myeff$type=='eval', 'include']=TRUE
-
-# and similarly for the earlier ones.
-# To specify an interaction between say alcohol and reciprocity,
-# where 69 is the row number of an unspecified interaction effect,
-# and 52 and 9 are now used as the numbers of the effects
-# that get the roles of effect1 and effect2,
-# meaning that they are to be interacted, the following can be used;
-# the name will be created by siena07.
-
-        #myeff[69, c('effect1', 'effect2')] <- c(52, 9)
-        #myeff[69, 'include'] <- TRUE
-
-
-# new, more robust, methods to amend an effects object:
-
-        #myeff <- includeEffects(myeff, transTrip, cycle3, between)
-        #myeff <- includeInteraction(myeff, egoX, recip,
-        #   interaction1="alcohol")
-        #myeff <- setEffect(myeff, outInv, 3) ##sets parameter
-
-# There is a table of short names etc available as pdf via
-
-        #RShowDoc("effects", package="RSiena")
-
-# or as html by running the function
-
-        #effectsDocumentation()
+        mymodel <- sienaModelCreate(useStdInits = TRUE, projname = 's50_3')
 
 # siena07 actually fits the specified model to the data
 
-        ans <- siena07(mymodel, data=mydata, effects=myeff, batch=FALSE, verbose=TRUE)
+        ans1 <- siena07(mymodel, data=mydata, effects=myeff, batch=FALSE, verbose=FALSE)
 
-# By using various different effects objects, you can switch between specifications.
+# (ans for "answer").
+# By using various different effects objects, i.e., with different names,
+# you can switch between specifications.
 # The batch=FALSE parameters will give a graphical user interface being opened;
 # verbose=TRUE leads to diagnostic information being sent to the console
 # during the estimation, and results after the estimation
@@ -1027,14 +1333,20 @@ in addition to this script.
 # or more immediately if the Buffered Output is deselected in the Misc menu)
 # which helps monitor the progress of the estimation.
 
+# The call of siena07 leads to output in the file s50_3.out
+# (or more generally projname.out, where projname is the name given in sienaModelCreate).
+
 # To use multiple processors, in the simplest case where your computer has 2
 # processors, use
-         ans <- siena07(mymodel, data=mydata, effects=myeff, batch=FALSE,
-                        verbose=TRUE, nbrNodes=2, useCluster=TRUE, initC=TRUE)
 
-# Adjust the nbrNodes to the number available. If you wish to use other machines
-# as well, see the more detailed instructions below. You will need to use the
-# clusterString argument as well.
+#         ans1 <- siena07(mymodel, data=mydata, effects=myeff, batch=FALSE,
+#                        verbose=TRUE, nbrNodes=2, useCluster=TRUE, initC=TRUE)
+
+# Adjust the nbrNodes to the number available.
+# If you wish to work on with other programs while running siena07,
+# it is advisable to use one node less than the number of available processors.
+# If you wish to use other machines as well, see the more detailed instructions below.
+# You will then need to use the clusterString argument as well.
 #
 # If you wish the fitted object to include the simulated networks, use the
 # parameter returnDeps=TRUE. The fitted object will then have a component named
@@ -1042,12 +1354,14 @@ in addition to this script.
 # of lists (each dependent network or behavior variable) of edgelists for
 # networks or vectors for behavior variables.
 #
-# This option would require rather a lot of communication between multiple
-# processes so it might be better to avoid using the two options together.
-#
-#################################################################################
+# This option when used with multiple processors would require
+# rather a lot of communication between multiple processes
+# so it might be better to avoid using the two options together.
 
-# Depending on the random seed, the results could be something like the following.
+################### LOOKING AT THE RESULTS ################################
+
+# Depending on the random seed and the model specification,
+# the results could be something like the following.
 
 #Rates and standard errors
 
@@ -1066,39 +1380,49 @@ in addition to this script.
 #13 eval alcohol ego                         0.03142  (   0.10044 )
 #14 eval alcohol similarity                  1.10065  (   0.72948 )
 
-# With function siena07 we made ans as the object containing
+# The results can be viewed in the output file s50_3.out.
+# They can also be accessed in various ways within R.
+
+# With function siena07 we made ans1 as the object containing
 # all the results of the estimation. For example,
 
-        ans$theta
+        ans1$theta
 
 # contains the vector of parameter estimates while
 
-        ans$covtheta
+        ans1$covtheta
 
 # contains the covariance matrix of the estimates.
 # There are several `methods' available for the object containing the results of
 # the estimation.
 
-        ans
+        ans1
 
 # will produce a short table.
+# Note that the "t statistic" is the t-statistic for convergence checking,
+# not the t statistic for testing the significance of this effect!
+# (See Section 6.2.1 of the manual.)
 
-        summary(ans)
+        summary(ans1)
 
 # will produce a longer report, and
 
-        xtable(ans)
+        xtable(ans1)
 
 # will produce a table formatted for inclusion in a LaTeX document
 # or formatted in html. Use e.g.
 
-        xtable(ans, type='html')
+        xtable(ans1, type='html')
 
 # to get html, and e.g.
 
-        xtable(ans, file='ff.tex')
+        xtable(ans1, file='ff.tex')
 
 # to write the results to a file.
+
+# These results currently contain a column with t ratios for convergence,
+# which are not to be confused for the t ratios to test the significance of the effects.
+# This will be changed in future versions.
 
 # The option useStdInits = TRUE, used above in sienaModelCreate, will make
 # each estimation run start with standard initial values.
@@ -1108,60 +1432,106 @@ in addition to this script.
         mymodel$useStdInits <- FALSE
 
 # and then initialise the next estimation by the current results.
-# If you used unconditional estimation (as here was the default), then request:
+# If you used conditional estimation (as here was the default), then request:
+        myeff$initialValue[myeff$include] <- c(ans1$rate, ans1$theta)
 
-        myeff$initialValue[myeff$include] <- ans$theta
+# and if you used unconditional estimation:
+#        myeff$initialValue[myeff$include] <- ans1$theta
 
-# and if you used conditional estimation, conditional on the first network:
-        myeff$initialValue[myeff$include] <- c(ans$rate, ans$theta)
-
-# By using a different vector instead of ans$theta you can
+# By using a different vector instead of ans1$theta you can
 # initialise differently.
 # Note that this initial vector will be used until you change it again,
 # e.g., to the results of a new run,
 # or until you change the useStdInits option.
+# Also note that you should do this before changing the model,
+# because else the vectors will have incompatible lengths.
+# When unsatisfactory convergence was obtained, the first thing to do is
+# to run siena07 repeatedly with useStdInits=FALSE,
+# updating the initial values with the results of the last estimation
+# as indicated here, and continuing until convergence is satisfactory,
+# as indicated by the t-ratios for convergence all being less than
+# a value such as 0.10.
 
 # You can use the prevAns= option in siena07 to supply the result of a
-# previous run from which to extract the theta estimates and the
-derivatives. Phase 1 will be omitted in this case.
+# previous run from which to extract the theta estimates
+# and the derivatives. Phase 1 will be omitted in this case.
 
-# Suppose also that you have a network with more than two time periods.
-# There are facilities available for dealing with such situations, where
-# effects may differ over time.
-#
+################# TESTING FOR TIME HETEROGENEITY #####################
+
+# Now suppose also that you have a network with more than two time periods.
+# There are facilities available for dealing with the possibility that
+# parameters of effects may differ over time. This is demonstrated here.
+# This is further documented in Sections 5.7 and 8.5 of the manual.
+
 # Load a dataset with three time periods:
 
-	mynet2 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+    mynet2 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 
 # Set up your data objects and effects objects as before:
 
-	mydata2 <- sienaDataCreate(mynet2)
-	myeff2 <- getEffects(mydata2)
+    mydata2 <- sienaDataCreate(mynet2)
+    myeff2 <- getEffects(mydata2)
 
-# Try out the new includeEffects functionality for adding effects:
+# Try out the includeEffects function for adding effects:
 
-	myeff2 <- includeEffects(myeff2, transTrip, balance)
+    myeff2 <- includeEffects(myeff2, transTrip, balance)
 
 # Run an estimation with your old model parameters:
 
-	mymodel2 <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
-	ans <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
+    mymodel2 <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
+    ans2 <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
 
 # Conduct the score type test to assess whether heterogeneity is present.
 
-	tt <- sienaTimeTest(ans)
+    tt2 <- sienaTimeTest(ans2)
 
 # Try a plot to see a visual representation of the time test:
 
-	plot(tt, effects=1:4, dims=c(2,2))
+    plot(tt2, effects=1:4, dims=c(2,2))
 
 # Add a few time dummy terms:
 
-	myeff3<- includeTimeDummy(myeff2, recip, balance, timeDummy="2")
+    myeff3<- includeTimeDummy(myeff2, recip, balance, timeDummy="2")
 
 # And estimate the new model:
 
 ans3 <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
+
+
+######################### QUITTING          ##########################
+
+# If you save the history and the workspace before quitting,
+# you will later be able to go on and utilize what you did earlier.
+# Another way of storing things is by the functions dput() and dget()
+# which save objects in the form of files which you then
+# can call back later; use
+#       ?dput
+# to get more information about this.
+# It will often be useful to emply different objects for different
+# specifications, e.g., using myeff1, myeff2, ..., ans1, ans2, ...
+# (or using more informative names).
+# You quit by the function
+#       q()
+
+######################### USING FEWER WAVES ##########################
+
+# For this data set (s50) we have a changing actor covariate, so that is what we elaborate.
+# The function varCovar creates a changing covariate object from a matrix;
+# the name comes from 'varying covariate'. We are only using
+# two waves of data, so we only want drinking behavior at time 1 and 2, the
+# first two columns of the data.
+# Recall that drink is a 50x3 matrix.
+# The selection is made below by what is between the brackets [....]:
+# Nothing being mentioned before the comma indicates that R should use all of the rows,
+# while 1:2 being mentioned after the comma keeps only first two columns.
+# Omitting the [,1:2] will lead to the same result, as
+# RSiena drops an unnecessary final column automatically.
+# The name (alcohol) again will be used in the output file.
+
+        alcohol <- varCovar(val = drink[,1:2])
+
+# TO BE CONTINUED
+# FOR EXAMPLE plot.sociomatrix FROM SNA
 
 #######################VIEWING THE NETWORK IN R#######################
 
@@ -1183,7 +1553,7 @@ ans3 <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
 # The function as.network will convert a matrix to a network object.
 
 # NB this command needs the network package loaded (library(network))
-net1 <- as.network(friend.data.w1)
+        net1 <- as.network(friend.data.w1)
 
 # The command plot will visualize the network for you according to the defaults
 
@@ -3372,6 +3742,8 @@ or Bayesian estimation (see Section~\ref{S_Bayes}).
 \fi
 
 \subsection{Time heterogeneity in model parameters}
+\label{S_timetest1}
+
 Currently for the case of a one mode network, you can include
 time heterogeneous parameters in your model. Consider the reformulation of
 the evaluation function into
@@ -3379,7 +3751,9 @@ the evaluation function into
 f^{(m)}_{ij}(\mathbf{x})= \sum_k (\beta_k + \delta_k^{(m)} h_k^{(m)}) s_{ik}(\mathbf{x}(i \leadsto j))
 \label{eq:fmij}
 \end{align}
-where $\delta_k^{(m)}$ are the time dummy interacted effect parameters. You
+where $m$ denotes the period (from wave $m$ to wave $m+1$ in the panel data set)
+and $\delta_k^{(m)}$ are parameters for the effects interacted
+with time dummies. You
 can include these in your model simply via the function
 \begin{verbatim}
 myeffects <- includeTimeDummy(myeffects, density, reciprocity, timeDummy="2,3,6")
@@ -3387,7 +3761,8 @@ myeffects <- includeTimeDummy(myeffects, density, reciprocity, timeDummy="2,3,6"
 which would add three time dummy terms to each effect listed in the function.
 
 We recommend that you start with simple models, and use the score type test for
-assessing heterogeneity, i.e.
+assessing heterogeneity, i.e., if \texttt{ans} is the object of results produced
+by \texttt{siena07},
 \begin{verbatim}
 tt <- sienaTimeTest(ans)
 \end{verbatim}
@@ -3400,6 +3775,7 @@ and \citet{Lospinoso2010b} for a walkthrough on model selection.
 \begin{print}
 \newpage
 \end{print}
+
 \section{Estimation}
 \label{S_Est}
 
@@ -4345,7 +4721,6 @@ restricting and estimating models, as small values of the test
 statistic indicate that the imposed restriction on the parameters is
 not problematic.
 
-\newpage
 \subsection{Testing differences between independent groups}
 
 Sometimes it is interesting to test differences between parameters estimated for
@@ -4368,6 +4743,8 @@ standard normal distribution.
 
 \newpage
 \subsection{Testing time heterogeneity in parameters}
+\label{S_timetest2}
+
 We initially assume that $\beta$ does not vary over time, yielding a
 \emph{restricted model}. Our data contains $|\mathcal{M}|$ observations, and we
 estimate the restricted model the method of moments. We wish to test whether the
@@ -4383,17 +4760,21 @@ h_k^{(m)}=\left\{
 \end{align}
 where $k$ corresponds to an effect included in the model.\footnote{The dummy
   $\delta_k^{(1)}$ is always zero so that period $w_1$ is (arbitrarily)
-  considered the reference period.} An \emph{unrestricted model} which allows
+  considered the reference period.} The explanation here
+is formulated for the network evaluation function,
+but the principle can be applied more generally.
+An \emph{unrestricted model} which allows
 for time heterogeneity in all of the effects is considered as a modification of
-\eqref{eq:fij}:
+\eqref{f_net}:
 
 \begin{align}
 f^{(m)}_{ij}(\mathbf{x})= \sum_k (\beta_k + \delta_k^{(m)} h_k^{(m)})
 s_{ik}(\mathbf{x}(i \leadsto j))
 \label{eq:fmij}
 \end{align}
-where $\delta_k^{(m)}$ are the time dummy interacted effect parameters. One way
-to formulate the testing problem of assessing time hetergeneity is the
+where $\delta_k^{(m)}$ are parameters for interactions of the effects
+with time dummies. One way
+to formulate the testing problem of assessing time heterogeneity is the
 following:
 \begin{align}
 H_0:\delta_k^{(m)} = 0 & \mbox{~for all~} k,m \notag\\
@@ -4403,29 +4784,32 @@ H_1:\delta_k^{(m)} \neq 0 & \mbox{ for some } k,m .
 
 An application of the score test is given for the special case of parameter
 heterogeneity by \citet{Lospinoso2010a} and implemented in RSiena.  To apply the
-test to your dataset, run an estimation in the usual way, e.g.:
+test to your dataset, run an estimation in the usual way, e.g. as follows
+(we specify \texttt{nsub=2, n3=100} just to have an example that runs
+very quickly):
 \begin{verbatim}
 mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip, balance)
-ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+ans2 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 \end{verbatim}
 and conduct the timetest through
 \begin{verbatim}
 ## Conduct the score type test to assess whether heterogeneity is present.
-tt <- sienaTimeTest(ans)
-plot(tt, effects=1:2, dim=c(1,2))
+tt2 <- sienaTimeTest(ans2)
+plot(tt2, effects=1:2, dim=c(1,2))
 \end{verbatim}
-If it is decided that you wish to add time dummy terms, you may do so via
+If as a consequence of this analysis you wish to add time dummy terms,
+this may be done via
 \begin{verbatim}
 myeff <- includeTimeDummy(myeff, recip, balance, timeDummy="2")
-ans2 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+ans3 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 \end{verbatim}
-and test again,
+and testing again,
 \begin{verbatim}
-tt2 <- sienaTimeTest(ans2)
+tt3 <- sienaTimeTest(ans3)
 \end{verbatim}
 and so on.
 
@@ -7467,10 +7851,20 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-06-08 R-forge revision 97
+\begin{itemize}
+\item Fix to bug in constant dyadic
+  covariates with missing values.
+\item Changes to treament of bipartite networks. The processing of these is
+  still under development: we need to add the possibility of 'no change' to the
+  ministeps. Code to deal with composition change has been added, and the
+  treatment of missing values in sparse matrix format networks has been
+  corrected further (the change in revision 96 was not quite correct).
+\end{itemize}
 \item 2010-06-04 R-forge revision 96 RSiena
 \begin{itemize}
-\item bug fixes as in revisions 92, 93. 
-\item Changes and bug fixes to sienaTimeTest etc.\ as in revisions 85--89, 
+\item bug fixes as in revisions 92, 93.
+\item Changes and bug fixes to sienaTimeTest etc.\ as in revisions 85--89,
 \item \sfn{includeInteractions} now will unInclude too.
 \end{itemize}
 \item 2010-06-04 R-forge revision 93 (RSienaTest only)

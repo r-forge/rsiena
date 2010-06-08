@@ -1,3 +1,16 @@
+2010-06-08 R-forge revision 97
+
+	* R/simstatsc.r: constant dyadic covariates with missing values
+	should now work correctly, varying ones do not fail, but the
+	centering and filling in of missing values for these is still to
+	be sorted out. Also treatment of bipartite nets with composition
+	change has been corrected. (Previously missings were not processed
+	correctly if a sparse-matrix format network (even after the
+	previous change!) and composition change was ignored for all
+	bipartite networks.)
+
+	* doc/RSiena.bib: additions.
+
 2010-06-04 R-forge revision 96 (RSiena mainly)
 
 	* R/sienaTimeTest.r, R/sienaeffects.r, man/sienaTimeTest.rd,
