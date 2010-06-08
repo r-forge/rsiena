@@ -1,8 +1,8 @@
-2010-06-08 R-forge revision 98
+2010-06-08 R-forge revision 99
 
 	* R/simstatsc.r: fixed bug that bipartite networks not allowed 'loops'
 
-2010-06-08 R-forge revision 97
+2010-06-08 R-forge revision 98
 
 	* R/simstatsc.r: constant dyadic covariates with missing values
 	should now work correctly, varying ones do not fail, but the
@@ -14,6 +14,10 @@
 	bipartite networks.)
 
 	* doc/RSiena.bib: additions.
+
+2010-06-04 R-forge revision 97
+
+	* NAMESPACE: added forgotten includeTimeDummy
 
 2010-06-04 R-forge revision 96 (RSiena mainly)
 
