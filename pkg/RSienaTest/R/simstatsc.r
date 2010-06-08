@@ -279,9 +279,19 @@ createEdgeLists<- function(mat, matorig)
     storage.mode(mat2) <- 'integer'
     storage.mode(mat3) <- 'integer'
     ## add attribute of size
-    attr(mat1,'nActors') <- nrow(mat)
-    attr(mat2,'nActors') <- nrow(mat)
-    attr(mat3,'nActors') <- nrow(mat)
+    nodeSets <- attr(matorig, "nodeSet")
+    if (length(nodeSets) > 1) ## bipartite
+    {
+        attr(mat1,'nActors') <- c(nrow(mat), ncol(mat))
+        attr(mat2,'nActors') <- c(nrow(mat), ncol(mat))
+        attr(mat3,'nActors') <- c(nrow(mat), ncol(mat))
+    }
+    else
+    {
+        attr(mat1,'nActors') <- nrow(mat)
+        attr(mat2,'nActors') <- nrow(mat)
+        attr(mat3,'nActors') <- nrow(mat)
+    }
 
     list(mat1 = t(mat1), mat2 = t(mat2), mat3 = t(mat3))
 }
@@ -866,21 +876,15 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                 {
                     stop("duplicate values in sparse matrices")
                 }
-                if (any (mat1[, 1] == mat1[, 2]) ||
-                    any (mat2[, 1] == mat2[, 2]) ||
-                    any (mat3[, 1] == mat3[, 2]))
-                {
-                    stop("loop values in sparse matrices")
-                }
             }
             ##fix up storage mode to be integer
             storage.mode(mat1) <- 'integer'
             storage.mode(mat2) <- 'integer'
             storage.mode(mat3) <- 'integer'
             ## add attribute of size
-            attr(mat1,'nActors') <- nActors
-            attr(mat2,'nActors') <- nActors
-            attr(mat3,'nActors') <- nActors
+            attr(mat1,'nActors') <- c(nActors, nReceivers)
+            attr(mat2,'nActors') <- c(nActors, nReceivers)
+            attr(mat3,'nActors') <- c(nActors, nReceivers)
             if (i < observations)
             {
                 ## recreate the distance etc
