@@ -306,8 +306,7 @@ createCovarEdgeList<- function(mat, matorig)
                   mymat[, 3] <- 1
                   mymat
               }, y = matorig)
-    mat2 <- do.call(rbind, tmp)   ##drop the diagonal : no, in case bipartite
-    ## mat1 <- mat1[mat1[,1] != mat1[, 2],]
+    mat2 <- do.call(rbind, tmp)
     ## add attribute of size
     attr(mat1,'nActors1') <- nrow(mat)
     attr(mat1,'nActors2') <- ncol(mat)
@@ -700,8 +699,8 @@ unpackBipartite <- function(depvar, observations, compositionChange)
     compChange <- any(!is.na(thisComp))
     if (compChange)
     {
-        stop("Composition change is not yet implemented for bipartite",
-             "networks")
+      #  stop("Composition change is not yet implemented for bipartite",
+      #       "networks")
         action <- attr(compositionChange[[thisComp]], "action")
         ccOption <- attr(compositionChange[[thisComp]], "ccOption")
     }
@@ -722,6 +721,7 @@ unpackBipartite <- function(depvar, observations, compositionChange)
             ## extract this matrix
             networks[[i]] <- depvar[[i]]
             nActors <- nrow(depvar[[i]])
+            nReceivers <- ncol(depvar[[i]])
             ## stop if any duplicates
             netmat <- cbind(networks[[i]]@i+1, networks[[i]]@j+1,
                             networks[[i]]@x)
@@ -730,12 +730,12 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                 stop("duplicate entries in sparse matrix")
             }
             ## extract missing entries
-            netmiss[[i]] <- netmat[is.na(netmat[,3]), , drop = FALSE]
+            netmiss[[i]] <- netmat[is.na(netmat[, 3]), , drop = FALSE]
             ## carry forward missing values if any
             if (i == 1) # set missings to zero
             {
                 netmat <- netmat[!is.na(netmat[,3]), ]
-                networks[[i]] <- spMatrix(nActors, nActors, netmat[, 1],
+                networks[[i]] <- spMatrix(nActors, nReceivers, netmat[, 1],
                                           netmat[, 2], netmat[,3])
             }
             else
@@ -761,6 +761,118 @@ unpackBipartite <- function(depvar, observations, compositionChange)
             mat3 <- mat1[struct, , drop = FALSE]
             ## now remove the zeros from reset data
             mat1 <- mat1[!mat1[, 3] == 0, ]
+            ## do comp change
+            if (compChange)
+            {
+                ## revert to sparse matrices temporarily
+                mat1 <- spMatrix(nrow=nActors, ncol=nReceivers, i = mat1[, 1],
+                                 j=mat1[, 2], x=mat1[, 3])
+                mat2 <- spMatrix(nrow=nActors, ncol=nReceivers, i = mat2[, 1],
+                                 j=mat2[, 2], x=mat2[, 3])
+                mat3 <- spMatrix(nrow=nActors, ncol=nReceivers, i = mat3[, 1],
+                                 j=mat3[, 2], x=mat3[, 3])
+                ones <- which(action[, i] == 1)
+                twos <- which(action[, i] == 2)
+                threes <- which(action[, i] == 3)
+                for (j in ones) ## False data is not preceded by anything real
+                {
+                    if (ccOption %in% c(1, 2))
+                    {
+                        ## find missing values for this actor
+                        use <- mat2[j, ] > 0
+                        ## remove from real data (i.e. zero)
+                        mat1[j, use] <- 0
+                        ## remove from missing data
+                        mat2[j, use] <- 0
+                        ## remove from raw data for distances later
+                        depvar[[i]][j, use] <- 0 ## zero
+                    }
+                    else if (ccOption == 3)
+                    {
+                        ## add the row  to the missing data
+                        mat2[j, ] <- 1
+                        ## set to missing in raw data for distances later
+                        depvar[[i]][j, ] <- NA
+                    }
+                }
+                for (j in threes) ## False data is preceded and followed by real
+                {
+                    if (ccOption %in% c(1, 2))
+                    {
+                        ## find missing values for this actor
+                        use <- mat2[j, ] > 0
+                        ## remove these from mat2, the missing data
+                        mat2[j, use] <- 0
+                        ## carry forward
+                        if (i == 1)
+                        {
+                            ## 0 any matches from mat1, the real data
+                            mat1[j, use] <- 0
+                        }
+                        else
+                        {
+                            mat1[j, use] <- networks[[i-1]][j, use]
+                        }
+                        depvar[[i]][j, use] <- 0 ##  not missing
+                    }
+                    else if (ccOption == 3)
+                    {
+                        ## add the row to the missing data
+                        mat2[j, ] <- 1
+                        depvar[[i]][j, ] <- NA
+                    }
+                }
+                for (j in twos) ## False data is not followed by anything real
+                {
+                    if (ccOption == 1)
+                    {
+                        ## find missing values for this actor
+                        use <- mat2[j, ] > 0
+                        ## remove these from mat2, the missing data
+                        mat2[j, use] <- 0
+                        depvar[[i]][j, use] <- 0 ##  not missing
+                        ## carry forward
+                        if (i == 1)
+                        {
+                            ## 0 any matches from mat1, the real data
+                            mat1[j, use] <- 0
+                        }
+                        else
+                        {
+                            mat1[j, use] <- networks[[i-1]][j , use]
+                        }
+                    }
+                    else if (ccOption %in% c(2, 3))
+                    {
+                        ## add the row  to the missing data
+                        mat2[j, ] <- 1
+                        depvar[[i]][j, ] <- NA
+                    }
+                }
+
+                ## now revert to triplet matrices, after updating networks
+                networks[[i]] <- mat1
+                mat1 <- cbind(mat1@i + 1, mat1@j + 1, mat1@x)
+                mat2 <- cbind(mat2@i + 1, mat2@j + 1, mat2@x)
+                mat3 <- cbind(mat3@i + 1, mat3@j + 1, mat3@x)
+                if (any (mat1[, 3] == 0) || any (mat2[, 3] == 0) ||
+                    any (mat3[, 3] == 0))
+                {
+                    stop("zero values in sparse matrices")
+                }
+                if (any (duplicated(mat1[, -3])) ||
+                    any (duplicated(mat2[, -3])) ||
+                    any (duplicated(mat3[, -3])))
+                {
+                    stop("duplicate values in sparse matrices")
+                }
+                if (any (mat1[, 1] == mat1[, 2]) ||
+                    any (mat2[, 1] == mat2[, 2]) ||
+                    any (mat3[, 1] == mat3[, 2]))
+                {
+                    stop("loop values in sparse matrices")
+                }
+            }
             ##fix up storage mode to be integer
             storage.mode(mat1) <- 'integer'
             storage.mode(mat2) <- 'integer'
@@ -803,6 +915,69 @@ unpackBipartite <- function(depvar, observations, compositionChange)
             else ##carry missing forward!
                 networks[[i]][is.na(depvar[, , i])] <-
                     networks[[i-1]][is.na(depvar[, , i])]
+        }
+        for (i in 1:observations)
+        {
+            ones <- which(action[, i] == 1)
+            twos <- which(action[, i] == 2)
+            threes <- which(action[, i] == 3)
+            for (j in ones) ## False data is not preceded by anything real
+            {
+                if (ccOption %in% c(1, 2))
+                {
+                    use <- is.na(depvar[j, , i])
+                    depvar[j, use, i] <- 0 ## not missing
+                    networks[[i]][j, use] <- 0 ## zero
+                }
+                else if (ccOption == 3)
+                {
+                    depvar[j, , i] <- NA ## missing
+                }
+            }
+            for (j in threes) ## False data is preceded and followed by real
+            {
+
+                if (ccOption %in% c(1, 2))
+                {
+                    use <- is.na(depvar[j, , i])
+                    depvar[j, use, i] <- 0 ##  not missing
+                    ## carry forward already done
+                    if (i == 1)
+                    {
+                        networks[[i]][j, use] <- 0
+                    }
+                    else
+                    {
+                        networks[[i]][j, use] <- networks[[i-1]][j, use]
+                    }
+                }
+                else if (ccOption == 3)
+                {
+                    depvar[j, , i] <- NA ## missing
+                }
+            }
+            for (j in twos) ## False data is not followed by anything real
+            {
+                if (ccOption == 1)
+                {
+                    use <- is.na(depvar[j, , i])
+                    depvar[j, use, i] <- 0 ##  not missing
+                    ## carry forward already done
+                    if (i == 1)
+                    {
+                        networks[[i]][j, use] <- 0
+                    }
+                    else
+                    {
+                        networks[[i]][j, use] <- networks[[i-1]][j, use]
+
+                    }
+                }
+                else if (ccOption %in% c(2, 3))
+                {
+                    depvar[j, , i] <- NA ## missing
+                }
+            }
         }
         for (i in 1:observations)
         {
@@ -904,6 +1079,7 @@ convertToStructuralZeros <- function()
 unpackCDyad<- function(dycCovar)
 {
     sparse <- attr(dycCovar, 'sparse')
+    nodeSets <- attr(dycCovar, "nodeSet")
     if (sparse)
     {
         ## have a sparse matrix in triplet format
@@ -911,9 +1087,12 @@ unpackCDyad<- function(dycCovar)
         ## with 0 based indices!
         varmat <- cbind(dycCovar@i+1, dycCovar@j+1, dycCovar@x)
         ##drop the diagonal, if present - not for bipartite
-        ## varmat <- varmat[varmat[,1] != varmat[, 2],]
+        if (nodeSets[1] == nodeSets[2])
+        {
+            varmat <- varmat[varmat[,1] != varmat[, 2],]
+        }
         mat1 <- varmat
-        ##mat1[is.na(varmat[, 3]), 3] <- attr(dycCovar, "mean")
+        mat1[is.na(varmat[, 3]), 3] <- attr(dycCovar, "mean")
         mat1 <- mat1[!mat1[, 3] == 0, ]
         ## add attribute of dim
         attr(mat1,'nActors1') <- nrow(dycCovar)
@@ -927,8 +1106,12 @@ unpackCDyad<- function(dycCovar)
     }
     else
     {
+        if (nodeSets[1] == nodeSets[2])
+        {
+            diag(dycCovar) <- 0
+        }
         dycCovar1 <- dycCovar
-        ##dycCovar1[is.na(dycCovar1)] <- attr(dycCovar, "mean")
+        dycCovar1[is.na(dycCovar1)] <- attr(dycCovar, "mean")
         edgeLists <- createCovarEdgeList(dycCovar1, dycCovar)
     }
     ## add attribute of nodesets
@@ -948,6 +1131,7 @@ unpackVDyad<- function(dyvCovar, observations)
     varmats <- vector('list', observations)
     sparse <- attr(dyvCovar, 'sparse')
     means <- attr(dyvCovar, "meanp")
+    nodeSets <- attr(dyvCovar, "nodeSet")
     if (sparse)
     {
         ## have a list of sparse matrices in triplet format
@@ -957,7 +1141,10 @@ unpackVDyad<- function(dyvCovar, observations)
             thisvar <- dyvCovar[[i]]
             varmat <- cbind(var@i+1, var@j+1, var@x)
             ## drop the diagonal, if present no - bipartite?
-            ## varmat <- varmat[varmat[,1] != varmat[, 2],]
+            if (nodeSets[1] == nodeSets[2])
+            {
+                varmat <- varmat[varmat[,1] != varmat[, 2],]
+            }
             mat1 <- varmat
             mat1[is.na(varmat[, 3]), 3] <- means[i]
             mat1 <- mat1[!mat1[, 3] == 0, ]
@@ -975,6 +1162,10 @@ unpackVDyad<- function(dyvCovar, observations)
     {
         for (i in 1:(observations - 1))
         {
+            if (nodeSets[1] == nodeSets[2])
+            {
+                diag(dyvCovar[, , i]) <- 0
+            }
             thisvar <- dyvCovar[, , i]
             thisvar[is.na(thisvar) ] <- means[i]
             edgeLists[[i]] <- createCovarEdgeList(thisvar, dyvCovar[, , i])
