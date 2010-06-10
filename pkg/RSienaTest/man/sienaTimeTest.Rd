@@ -91,7 +91,8 @@ tt <- sienaTimeTest(ans)
 
 ## Suppose that we wish to include two time dummies.
 ## Add them in the following way:
-myeff <- setEffect(myeff, recip, balance, timeDummy="2")
+myeff <- setEffect(myeff, recip, timeDummy="2")
+myeff <- setEffect(myeff, balance, timeDummy="2")
 ans2 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 
 ## Re-assess the time heterogeneity

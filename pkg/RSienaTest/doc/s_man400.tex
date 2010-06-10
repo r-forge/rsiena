@@ -1491,7 +1491,9 @@ in addition to this script.
 
 # Add a few time dummy terms:
 
-    myeff3<- setEffect(myeff2, recip, balance, timeDummy="2")
+    myeff3<- setEffect(myeff2, recip, timeDummy="2")
+    myeff3<- setEffect(myeff3,  balance, timeDummy="2")
+
 
 # And estimate the new model:
 
@@ -3756,9 +3758,9 @@ and $\delta_k^{(m)}$ are parameters for the effects interacted
 with time dummies. You
 can include these in your model simply via the function
 \begin{verbatim}
-myeffects <- setEffect(myeffects, density, reciprocity, timeDummy="2,3,6")
+myeffects <- setEffect(myeffects, density, timeDummy="2,3,6")
 \end{verbatim}
-which would add three time dummy terms to each effect listed in the function.
+which would add three time dummied density effects.
 
 We recommend that you start with simple models, and use the score type test for
 assessing heterogeneity, i.e., if \texttt{ans} is the object of results produced
@@ -4804,7 +4806,7 @@ plot(tt2, effects=1:2, dim=c(1,2))
 If as a consequence of this analysis you wish to add time dummy terms,
 this may be done via
 \begin{verbatim}
-myeff <- setEffect(myeff, recip, balance, timeDummy="2")
+myeff <- setEffect(myeff, recip, timeDummy="2")
 ans3 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 \end{verbatim}
 and testing again,
@@ -7851,7 +7853,8 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
-\item 2010-06-10 R-forge revision 100/101: Removed includeTimeDummy, as it duplicates functionality for setEffects. Fixed RateX so that it works with changing actor covariates as well.
+\item 2010-06-10 R-forge revision 100-102: Removed includeTimeDummy, as it duplicates functionality for setEffects. Fixed RateX so that it works with changing actor covariates as well. Made some modifications so that setEffects is only ever called with oneEffect, as includeTime
+Dummy had accepted more than one effect.
 \item 2010-06-08 R-forge revision 99
 Fix to bug introduced in revision 98: bipartite networks could not have 'loops'
 \item 2010-06-08 R-forge revision 98
