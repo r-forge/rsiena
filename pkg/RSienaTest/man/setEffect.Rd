@@ -29,7 +29,7 @@ interaction2 = "", character=FALSE)
   \item{initialValue}{Initial value required. Default 0.
 }
 \item{timeDummy}{string: Comma delimited string of which periods to
-dummy. Alternately, use \code{\link{includeTimeDummy}}.
+dummy. Alternately, use the corresponding column on your effect object}.
 }
   \item{include}{Boolean. default TRUE, but can be switched to FALSE to
 	turn off an effect.}
