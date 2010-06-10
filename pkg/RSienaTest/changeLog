@@ -1,3 +1,8 @@
+2010-06-08 R-forge revision 104
+
+	* doc/s_man400.tex: Updated RSiena manual script as per
+	Tom's request.
+
 2010-06-08 R-forge revision 100-103
 
 	* R/sienaTimeTest.r: added changing covariate functionality to

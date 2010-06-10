@@ -1457,47 +1457,83 @@ in addition to this script.
 # and the derivatives. Phase 1 will be omitted in this case.
 
 ################# TESTING FOR TIME HETEROGENEITY #####################
-
+ 
 # Now suppose also that you have a network with more than two time periods.
 # There are facilities available for dealing with the possibility that
 # parameters of effects may differ over time. This is demonstrated here.
-# This is further documented in Sections 5.7 and 8.5 of the manual.
-
-# Load a dataset with three time periods:
+# This is further documented in Section 5.7 of the manual.
+ 
+# Load a dataset with three time periods. Here, we use the s50 dataset
+# which is included with RSiena
 
     mynet2 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-
+ 
 # Set up your data objects and effects objects as before:
-
+ 
     mydata2 <- sienaDataCreate(mynet2)
     myeff2 <- getEffects(mydata2)
 
-# Try out the includeEffects function for adding effects:
-
+# Try out the includeEffects function for adding effects.
+ 
     myeff2 <- includeEffects(myeff2, transTrip, balance)
 
-# Run an estimation with your old model parameters:
+# This function provides a clean interface to include effects which is
+# identical to the following two commands (in this example):
+#
+# myeff2$include[myeff2$shortname==transTrip] <- TRUE
+# myeff2$include[myeff2$shortname==balance] <- TRUE
 
+# Run an estimation as usual:
+ 
     mymodel2 <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
     ans2 <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
-
+ 
 # Conduct the score type test to assess whether heterogeneity is present.
-
+ 
     tt2 <- sienaTimeTest(ans2)
 
-# Try a plot to see a visual representation of the time test:
+# There are a number of score type tests conducted with this command.
+# See the Time Heterogeneity section for instructions on interpreting:
 
+    summary(tt2)
+ 
+# Briefly, there are three kinds of score tests here. The joint test
+# indicates whether there is evidence over all excluded time dummy
+# interaction effects for time heterogeneity. The effect-wise tests
+# indicate whether there is evidence across each effect (e.g.
+# for outdegree over ALL periods) for time heterogeneity.
+# A table is given with the original estimates, and "quick and dirty"
+# one-step estimates, to give a rough guess of what the values will
+# be if you include all time dummy interacted effects. Individual
+# tests are also given to indicate whether there is evidence for
+# time heterogeneity for the individual time dummy interactions.
+
+
+# Try a plot to see a visual representation of the time test:
+ 
     plot(tt2, effects=1:4, dims=c(2,2))
 
-# Add a few time dummy terms:
-
-    myeff3<- setEffect(myeff2, recip, timeDummy="2")
-    myeff3<- setEffect(myeff3,  balance, timeDummy="2")
-
-
+# This plot illustrates the base period (=1) estimate for each effect
+# as a horizontal line. The dots represent one step estimates for each
+# effect, and the bands around these points represent confidence
+# intervals. Time dummy effects which have not yet been estimated are
+# indicated by red intervals.
+ 
+# Let's say that we would like to add a few time dummy terms to a
+# new effects object to prepare another estimation
+ 
+    myeff3 <- myeff2
+    myeff3<- setEffect(myeff3, recip, timeDummy="2")
+    myeff3<- setEffect(myeff3, balance, timeDummy="2")
+ 
 # And estimate the new model:
+ 
+    ans3 <- siena07(mymodel2, data=mydata2, effects=myeff3, batch=TRUE)
 
-ans3 <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
+# And so on:
+    tt3 <- sienaTimeTest(ans3)
+    summary(tt3)
+    plot(tt3, effects=1:4, dims=c(2,2))
 
 
 ######################### QUITTING          ##########################
@@ -7853,7 +7889,8 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
-\item 2010-06-10 R-forge revision 100-102: Removed includeTimeDummy, as it duplicates functionality for setEffects. Fixed RateX so that it works with changing actor covariates as well. Made some modifications so that setEffects is only ever called with oneEffect, as includeTime
+\item 2010-06-11 Updated time heterogeneity script for Tom
+\item 2010-06-10 R-forge revision 100-103: Removed includeTimeDummy, as it duplicates functionality for setEffects. Fixed RateX so that it works with changing actor covariates as well. Made some modifications so that setEffects is only ever called with oneEffect, as includeTime
 Dummy had accepted more than one effect.
 \item 2010-06-08 R-forge revision 99
 Fix to bug introduced in revision 98: bipartite networks could not have 'loops'
