@@ -28,8 +28,8 @@ interaction2 = "", character=FALSE)
 }
   \item{initialValue}{Initial value required. Default 0.
 }
-\item{timeDummy}{string: Comma delimited string of which periods to
-dummy. Alternately, use the corresponding column on your effect object}.
+	\item{timeDummy}{string: Comma delimited string of which periods to
+	dummy. Alternately, use the corresponding column on your effect object.
 }
   \item{include}{Boolean. default TRUE, but can be switched to FALSE to
 	turn off an effect.}
@@ -70,7 +70,7 @@ mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mynet2 <- sienaNet(s50a, type="behavior")
 mydata <- sienaDataCreate(mynet1, mynet2)
 myeff <- getEffects(mydata)
-myeff <- setEffect(myeff, outInv, 3) ##parameter
+myeff <- setEffect(myeff, outInv, 3, timeDummy="2") ##parameter
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

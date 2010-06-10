@@ -1,11 +1,11 @@
-2010-06-08 R-forge revision 100/101
+2010-06-08 R-forge revision 100-103
 
 	* R/sienaTimeTest.r: added changing covariate functionality to
 	sienaTimeFix for RateX effects. Deleted includeTimeDummy.
 	* man/includeTimeDummy.r: deleted.
 	* man/sienaTimeTest.r: changed includeTimeDummy to setEffects
 	* man/plot.sienaTimeTest.r: changed includeTimeDummy to setEffects
-	* doc/s_man400.tex: changed includeTimeDummy to setEffects
+	* doc/s_man400.tex: changed includeTimeDummy to setEffects.
 
 2010-06-08 R-forge revision 99
 
