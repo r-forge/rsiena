@@ -1,3 +1,7 @@
+2010-06-18 R-forge revision 106
+
+	* DESCRIPTION: new version numbers: added 105 to end.
+
 2010-06-18 R-forge revision 105
 
 	* R/siena01.r: bug fix: call edit.data.frame directly to avoid the edit
