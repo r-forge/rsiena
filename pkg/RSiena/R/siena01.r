@@ -520,7 +520,7 @@ siena01Gui <- function(getDocumentation=FALSE)
             {
                 effEdit[,i] <- as.numeric(effEdit[,i])
             }
-            effEdit <- edit(effEdit, edit.row.names=FALSE)
+            effEdit <- utils:::edit.data.frame(effEdit, edit.row.names=FALSE)
             for (i in c("include", "fix", "test"))
             {
                 effEdit[,i] <- as.logical(effEdit[,i])
@@ -719,7 +719,7 @@ siena01Gui <- function(getDocumentation=FALSE)
             {
                 effEdit[,i] <- as.numeric(effEdit[,i])
             }
-            edit(effEdit, edit.row.names=FALSE)
+            utils:::edit.data.frame(effEdit, edit.row.names=FALSE)
             ##  tkfocus(tt)
             ## make sure this window is top with a global grab,
             ## but only for a second

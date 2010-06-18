@@ -1,3 +1,33 @@
+2010-06-18 R-forge revision 105
+
+	* R/siena01.r: bug fix: call edit.data.frame directly to avoid the edit
+	method of sienaEffects objects.
+
+2010-06-10 R-forge revision 104 RSiena
+
+	* doc/s_man400.tex: Updated RSiena manual script as per
+	Tom's request.
+
+2010-06-08 R-forge revision 103 RSienaTest only
+
+	* man/sienaTimeTest.Rd, man/setEffect.Rd,
+	CHANGELOG, doc/s_man400.tex: get through checks
+
+2010-06-08 R-forge revision 102 RSienaTest only
+
+	* NAMESPACE, R/sienaTimeTest.r, man/includeTimeDummy.Rd,
+	man/sienaTimeTest.Rd, man/plot.sienaTimeTest.Rd, man/setEffect.Rd,
+	CHANGELOG, doc/s_man400.tex: Deleted includeTimeDummy.
+
+2010-06-08 R-forge revision 101 RSienaTest only
+
+	* R/sienaTimeTest.r: added changing covariate functionality to
+	sienaTimeFix for RateX effects.
+
+2010-06-08 R-forge revision 100
+
+	* Changelog, doc/s_man400.tex: fixed incorrect revision numbers.
+
 2010-06-08 R-forge revision 99
 
 	* R/simstatsc.r: fixed bug that bipartite networks not allowed 'loops'
