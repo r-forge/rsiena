@@ -191,6 +191,22 @@ double BehaviorLongitudinalData::similarity(double a, double b) const
 	return 1.0 - fabs(a - b) / this->lrange - this->lsimilarityMean;
 }
 
+/**
+ * Returns the centered alter similarity for the given values with respect to the
+ * given network defined as 1 - |a - b| / range - similarityMean[network].
+ */
+double BehaviorLongitudinalData::similarityNetwork(double a, double b,
+	std::string networkName) const
+{
+	double similarityMean = 0;
+	map<std::string, double>::const_iterator iter =
+		this->lsimilarityMeans.find(networkName);
+	if (iter != this->lsimilarityMeans.end())
+	{
+		similarityMean = iter->second;
+	}
+	return 1.0 - fabs(a - b) / this->lrange - similarityMean;
+}
 
 /**
  * Returns the similarity mean value over all observations.
@@ -209,6 +225,15 @@ void BehaviorLongitudinalData::similarityMean(double similarityMean)
 	this->lsimilarityMean = similarityMean;
 }
 
+/**
+ * Stores the alter similarity mean value over all observations wrt to the
+ * given network.
+ */
+void BehaviorLongitudinalData::similarityMeans(double similarityMean,
+	std::string networkName)
+{
+	this->lsimilarityMeans[networkName] = similarityMean;
+}
 
 /**
  * Returns the range of observed values.

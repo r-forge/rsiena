@@ -1367,7 +1367,10 @@ fixUpEffectNames <- function(effects)
                }
                ## construct a name
                ### make sure the egos are at the front of inters
-               inters <- rbind(inters[egos, ], inters[-egos, ])
+               if (egoCount > 0)
+               {
+                   inters <- rbind(inters[egos, ], inters[-egos, ])
+               }
                tmpname <- paste(inters$effectName, collapse = " x ")
                if (twoway && nchar(tmpname) < 38)
                {

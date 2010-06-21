@@ -684,6 +684,16 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                               substituteNames(covarBehObjEffects[2, ],
                                               zName=names(xx$depvars)[j]))
                 }
+                if ((types[j] =="oneMode" &&
+                    attr(xx$depvars[[j]], 'nodeSet') == nodeSet)
+                || (types[j] == "bipartite" &&
+                    attr(xx$depvars[[j]], 'nodeSet')[2] == nodeSet))
+                {
+                    covObjEffects <-
+                        rbind(covObjEffects,
+                              substituteNames(covarBehObjEffects[3, ],
+                                              zName=names(xx$depvars)[j]))
+                }
             }
         }
      #   if (!is.null(covObjEffects))

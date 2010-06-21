@@ -5,7 +5,7 @@
   This function creates a constant dyadic covariate object from a matrix.
 }
 \usage{
-coDyadCovar(val, nodeSets=c("Actors","Actors"))
+coDyadCovar(val, nodeSets=c("Actors", "Actors"))
 }
 \arguments{
   \item{val}{Matrix of covariate values. }

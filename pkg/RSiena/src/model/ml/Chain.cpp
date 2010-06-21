@@ -739,5 +739,26 @@ MiniStep * Chain::nextMiniStepForOption(const Option & rOption,
 
 	return pMiniStep;
 }
+// ----------------------------------------------------------------------------
+// Section: copy a chain (too difficult (for Ruth!) to do a copy constructor!
+// ----------------------------------------------------------------------------
 
+Chain * Chain::copyChain()
+{
+	Chain * pChain = new Chain(this->lpData);
+
+	pChain->lperiod = this->lperiod;
+
+	for (unsigned i = 1; i < this->lminiSteps.size(); i++)
+	{
+		MiniStep *pMiniStep = this->lminiSteps[i]->createCopyMiniStep();
+
+		pChain->insertBefore(pMiniStep, pChain->lpLast);
+	}
+
+	pChain->lmu = this->lmu;
+	pChain->lsigma2 = this->lsigma2;
+//	Rprintf("%x\n", pChain);
+	return pChain;
+}
 }

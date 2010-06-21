@@ -1,3 +1,66 @@
+2010-06-21 R-forge revision 108
+
+	* doc/RSienaDeveloper.tex: added note about Rd2dvi.
+	* data/allEffects.csv, R/effects.r, R/sienaDataCreate.r,
+	src/data/BehaviorLongitudinalData.cpp, BehaviorLongitudinalData.h,
+	src/data/Covariate.cpp, src/data/Covariate.h,
+	src/model/effects/AllEffects.h, src/model/effects/BehaviorEffect.cpp,
+	src/model/effects/BehaviorEffect.h,
+	src/model/effects/CovariateAndNetworkBehaviorEffect.cpp,
+	src/model/effects/CovariateAndNetworkBehaviorEffect.h,
+	src/model/effects/CovariateDependentNetworkEffect.cpp,
+	src/model/effects/CovariateDependentNetworkEffect.h,
+	src/model/effects/CovariateDistance2AlterEffect.cpp,
+	src/model/effects/CovariateDistance2AlterEffect.h,
+	src/model/effects/CovariateDistance2NetworkEffect.cpp,
+	src/model/effects/CovariateDistance2NetworkEffect.h,
+	src/model/effects/CovariateDistance2SimilarityEffect.cpp,
+	src/model/effects/CovariateDistance2SimilarityEffect.h,
+	src/model/effects/EffectFactory.cpp,
+	src/model/variables/BehaviorVariable.cpp,
+	src/model/variables/BehaviorVariable.h,
+	src/model/variables/NetworkVariable.cpp,
+	src/model/variables/NetworkVariable.h, src/siena07.cpp,
+	tests/parallel.R, tests/parallel.Rout.save
+	: (RSiena only) covariate-at-distance-2 effects
+	* man/coDyadCovar.Rd, man/siena01Gui.Rd, man/sienaDataCreate.Rd,
+	man/sienaDataCreateFromSession.Rd, man/sienaNet.Rd,
+	man/sienaNodeSet.Rd, man/sienaTimeTest.Rd, man/simstats0c.Rd,
+	man/varDyadCovar.Rd: minor edits
+	* R/effectsDocumentation.r: bug caused by insertion of timeDummy
+	column
+	* R/effectsMethods.r, man/print.sienaEffects.Rd: more fixes for
+	empty cases, new argument to allow printing of all lines.
+	* man/siena07.Rd, sienaModelCreate.Rd: major edits.
+	* R/bayes.r: defer the plots till later
+	* R/globals.r (RSiena only): allow use of Report with no file,
+	suppress everything with silent.
+	* R/maxlikec.r, R/phase1.r, phase2.r, phase3.r,
+	src/model/EpochSimulation.cpp,
+	src/model/EpochSimulation.h, src/model/ml/BehaviorChange.cpp,
+	src/model/ml/BehaviorChange.h, src/model/ml/Chain.cpp,
+	src/model/ml/Chain.h, src/model/ml/MiniStep.cpp,
+	src/model/ml/MiniStep.h, src/model/MLSimulation.cpp,
+	src/model/ml/NetworkChange.cpp, src/model/ml/NetworkChange.h,
+	src/model/Model.cpp, src/model/Model.h,
+	src/model/variables/BehaviorVariable.cpp,
+	src/model/variables/BehaviorVariable.h,
+	src/model/variables/DependentVariable.h,
+	src/model/variables/NetworkVariable.cpp,
+	src/model/variables/NetworkVariable.h, src/siena07.cpp:
+	(RSiena only): 	minor changes for ML or algorithms
+	* src/model/EpochSimulation.cpp: (RSiena only)
+	corrected error message if unlikely to terminate epoch.
+	* inst/doc/effects.pdf: updated list, after correcting bug
+	* R/print01Report.r: fix bug with more than 2 groups
+	* R/printInitialDescription.r: fix bug with 8 waves
+	* R/sienaDataCreate.r: make covariate-at-dist-2 effects work for
+	groups and for bipartites, multiple networks, behavior variables
+	with missing values...
+	* R/simstatsc.r: fix bug in naming user defined dyadic interactions.
+	* R/sienaTimeTest.r: (RSiena only) make RateX effects work with varying
+	covariates too.
+	
 2010-06-21 R-forge revision 107 RSienaTest only
 
 	* NAMESPACE, R/sienaTimeTest.r, man/includeTimeDummy.Rd,

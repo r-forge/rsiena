@@ -5,7 +5,7 @@
   This function creates a changing dyadic covariate object from an array.
 }
 \usage{
-varDyadCovar(val, nodeSets=c('Actors','Actors'))
+varDyadCovar(val, nodeSets=c("Actors", "Actors"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -27,7 +27,8 @@ varDyadCovar(val, nodeSets=c('Actors','Actors'))
 \seealso{\code{\link{sienaDataCreate}}}
 \examples{
 
-mydyadvar <- varDyadCovar(array(c(s501,s502),dim=c(50,50,2)))
+mydyadvar <- varDyadCovar(array(c(
+s501, s502), dim=c(50, 50, 2)))
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

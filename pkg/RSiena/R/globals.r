@@ -23,6 +23,7 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
     x <- x
     beverbose <- verbose
     besilent <- silent
+    noReportFile <- FALSE
     function(txt, dest, fill=FALSE, sep=" ", hdest, openfiles=FALSE,
              closefiles=FALSE, type=c("a", "w", "n"),  projname="Siena" ,
              verbose=FALSE, silent=FALSE)
@@ -39,6 +40,10 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
             else if (type =="a")
             {
                 x$outf <<- file(paste(projname, ".out", sep=""), open="a")
+            }
+            else if (type == "n")
+            {
+                noReportFile <<- TRUE
             }
 
         }
@@ -69,7 +74,10 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
                     }
                     else
                     {
-                        cat(txt, file = x[[hdest]], fill = fill, sep = sep)
+                        if (!noReportFile)
+                        {
+                            cat(txt, file = x[[hdest]], fill = fill, sep = sep)
+                        }
                     }
                 }
                 else
@@ -85,12 +93,18 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
                     {
                         if (is.null(x[[deparse(substitute(dest))]]))
                         {
-                            cat(txt, fill=fill, sep=sep)
+                            if (!besilent)
+                            {
+                                cat(txt, fill=fill, sep=sep)
+                            }
                         }
                         else
                         {
-                            cat(txt, file=x[[deparse(substitute(dest))]],
-                                fill=fill, sep=sep)
+                            if (!noReportFile)
+                            {
+                                cat(txt, file=x[[deparse(substitute(dest))]],
+                                    fill=fill, sep=sep)
+                            }
                         }
                     }
                 }

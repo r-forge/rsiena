@@ -760,6 +760,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
     z$dyvCovars <- dyvCovars
     z$compositionChange <- compositionChange
     z <- checkConstraints(z)
+    z <- covarDist2(z)
     class(z) <- 'siena'
     z
 }
@@ -1182,6 +1183,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
         attr(x, 'mean') <- atts$mean
         attr(x, 'vartotal') <- atts$vartotal
         attr(x, 'nonMissingCount') <- atts$nonMissingCount
+        attr(x, 'simMeans') <- atts$simMeans
         rr <- rangeAndSimilarity(x, atts$range2)
         attr(x, 'poszvar') <- atts$poszvar
         attr(x, 'similarity') <- rr$simValues
@@ -1771,4 +1773,125 @@ getGroupNetRanges <- function(data)
         }
     }
     ranges
+}
+
+##@covarDist2 DataCreate calculate average alter values for covariate wrt each net
+covarDist2 <- function(z)
+{
+    netNames <- names(z$depvars)
+    netTypes <- sapply(z$depvars, function(x)attr(x, "type"))
+    netActorSet <- sapply(z$depvars, function(x)
+                          if (attr(x, "type") == "bipartite")
+                      {
+                          attr(x, "nodeSet")[2]
+                      }
+                          else
+                      {
+                          attr(x, "nodeSet")
+                      }
+                          )
+    ## find the constant covariates
+    for (i in seq(along=z$cCovars))
+    {
+        nodeSet <- attr(z$cCovars[[i]], "nodeSet")
+        use <- (netTypes != "behavior" & netActorSet == nodeSet)
+        simMeans <- namedVector(NA, netNames[use])
+        for (j in which(use))
+        {
+            simMeans[netNames[j]] <-
+                calcCovarDist2(matrix(z$cCovars[[i]], ncol=1),
+                               z$depvars[[j]])
+        }
+        attr(z$cCovars[[i]], "simMeans") <- simMeans
+    }
+    for (i in seq(along=z$vCovars))
+    {
+        nodeSet <- attr(z$vCovars[[i]], "nodeSet")
+        use <- (netTypes != "behavior" & netActorSet == nodeSet)
+        simMeans <- namedVector(NA, netNames[use])
+        for (j in which(use))
+        {
+            simMeans[netNames[j]] <-
+                calcCovarDist2(z$vCovars[[i]], z$depvars[[j]])
+        }
+        attr(z$vCovars[[i]], "simMeans") <- simMeans
+
+    }
+    for (i in seq(along=z$depvars))
+    {
+        if (netTypes[i] == "behavior")
+        {
+            beh <- z$depvars[[i]][, 1, ]
+            ## take off the mean NB no structurals yet!
+            beh <- beh - mean(beh, na.rm=TRUE)
+            nodeSet <- netActorSet[i]
+            use <- (netTypes != "behavior" & netActorSet == nodeSet)
+            simMeans <- namedVector(NA, netNames[use])
+            for (j in which(use))
+            {
+                simMeans[netNames[j]] <-
+                    calcCovarDist2(beh[, -ncol(beh), drop=FALSE],
+                                   z$depvars[[j]], rval=range(beh, na.rm=TRUE))
+            }
+            attr(z$depvars[[i]], "simMeans") <- simMeans
+        }
+    }
+    z
+}
+##@ calcCovarDist2 DataCreate similarity mean for alter of this depvar
+calcCovarDist2 <- function(covar, depvar, rval=NULL)
+{
+    ## remove final obs from depvars
+    observations <- attr(depvar, "netdims")[3] - 1
+
+    simTotal <- rep(NA, observations)
+    simCnt <- rep(NA, observations)
+
+    for (i in 1:observations)
+    {
+        if (ncol(covar) == 1) # maybe constant covariate used for each obs
+        {
+            xx <- covar[, 1]
+        }
+        else
+        {
+            xx <- covar[, i]
+        }
+        if (attr(depvar, "sparse"))
+        {
+            dep <- depvar[[i]]
+            dep@x[dep@x %in% c(10, 11)] <- dep@x[dep@x %in% c(10, 11)] - 10
+        }
+        else
+        {
+            dep <- depvar[, , i]
+            dep[dep %in% c(10, 11)] <- dep[dep %in% c(10, 11)] - 10
+        }
+        vi <- apply(dep, 1, function(x)
+                {
+                    if (sum(x, na.rm=TRUE) > 0)
+                    {
+                        nonMissing <- sum(!is.na(xx[!is.na(x) & x > 0]))
+                        if (nonMissing > 0)
+                        {
+                            sum(x * xx, na.rm=TRUE)/ sum(x, na.rm=TRUE)
+                        }
+                        else
+                        {
+                            NA
+                        }
+                    }
+                    else
+                    {
+                        0
+                    }
+
+                }
+                    )
+
+        tmp <- rangeAndSimilarity(vi, rval)
+        simTotal[i] <- tmp$simTotal
+        simCnt[i] <- tmp$simCnt
+    }
+    sum(simTotal)/sum(simCnt)
 }

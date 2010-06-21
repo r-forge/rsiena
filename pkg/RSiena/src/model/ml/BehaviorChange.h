@@ -12,6 +12,8 @@
 #ifndef BEHAVIORCHANGE_H_
 #define BEHAVIORCHANGE_H_
 
+#include <vector>
+
 #include "MiniStep.h"
 
 namespace siena
@@ -46,7 +48,14 @@ public:
 	virtual bool diagonal() const;
 	virtual bool missing(int period) const;
 	virtual MiniStep * createReverseMiniStep() const;
+	virtual MiniStep * createCopyMiniStep() const;
 	virtual bool firstOfConsecutiveCancelingPair() const;
+	double evaluationEffectContribution(int difference, int effect) const;
+	double endowmentEffectContribution(int difference, int effect) const;
+	void allocateEffectContributionArrays(int nEvaluationEffects,
+		int nEndowmentEffects);
+	void evaluationEffectContribution(double value, int difference, int effect);
+	void endowmentEffectContribution(double value, int difference, int effect);
 
 private:
 	// The longitudinal data object for the corresponding behavior variable
@@ -54,6 +63,18 @@ private:
 
 	// The amount of change
 	int ldifference;
+
+	// A vector of change contributions to effects, where one element, 
+	// of length the number of effects in the evaluation function, 
+	// corresponds to each possible difference.
+
+	vector<vector <double> > levaluationEffectContribution;
+
+	// A vector of change contributions to effects, where one element, 
+	// of length the number of effects in the endowment function, 
+	// corresponds to each possible difference.
+
+	vector<vector <double> > lendowmentEffectContribution;
 };
 
 

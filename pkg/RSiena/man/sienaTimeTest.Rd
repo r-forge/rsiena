@@ -20,7 +20,8 @@
  and Snijders (2007a).
  }
 
-\usage{sienaTimeTest(sienaFit, effects=NULL, condition=FALSE)
+ \usage{
+sienaTimeTest(sienaFit, effects=NULL, condition=FALSE)
 }
 \arguments{
   \item{sienaFit}{ A sienaFit object returned by \code{siena07}. }

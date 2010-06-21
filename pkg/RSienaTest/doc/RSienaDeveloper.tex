@@ -145,13 +145,17 @@ to clear out all the .o's and the dll.
   word ``all'' in the file \verb|RSiena/src/Makevars|. But try to remember not
   to commit this version!
 \item Checking the package. Either run \verb|R CMD check RSiena|, or do a build
-  and run\verb|R CMD check RSiena_1.0.n.tar.gz|. This will create a directory
+  and run \verb|R CMD check RSiena_1.0.n.tar.gz|. This will create a directory
   called \verb|RSiena.Rcheck|, and produce some diagnostics to the screen. You
   should have no warnings at all from the tar ball version, maybe some to do
   with presence of object files with the other version. Once the warnings have
   gone away, do a final check on the pdf version of the help pages which will be
   in the directory RSiena.RCheck. Check any pages you have changed for lines
   that are too long: the usage section, I think, does not wrap automatically.
+\item If you just want to check the format of the help pages in  the pdf, you
+  can use
+\verb|R CMD Rd2dvi --pdf man| or e.g.\ \verb|R CMD --pdf man/siena7.Rd|, which
+will create a file called Rd2.pdf.
 \end{enumerate}
 \paragraph{Alternative methods for small changes}
 Now we have a \textsf{name space} for the package, small changes are not really

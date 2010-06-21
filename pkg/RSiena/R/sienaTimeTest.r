@@ -59,7 +59,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 	}
 	## If the estimation was unconditional, the rate parameters will have scores
 	## and moments which must also be screened out. Ruth, is there a simple way to
-	## check conditioning? I tried $conditional and it doesn't seem to do what I
+	## check conditioning? I tried $conditional and it doesnt seem to do what I
 	## intuitively expected. For now, I just check the dimensionality of the scores,
 	## as it will match the number of included "effects" on dimension 3 if uncond.
 	## estimation was used.
@@ -640,9 +640,20 @@ sienaTimeFix <- function(effects, data)
 						## Figure out the base values:
 						dvind <- which(names(data$cCovars) ==
 							effects$interaction1[effects$effectNumber==i])
-						## Stick them into the right time spot
-						base[,p] <- data$cCovars[[dvind]]
-						## make a new varCovar:
+						if ( length(dvind) == 0) {
+						## It is a varCovar, not a coCovar 
+							dvind <- which(names(data$vCovars) ==
+											effects$interaction1[effects$effectNumber==i])
+							if (length(dvind)==0) {
+								stop("Having trouble finding the covariate for your rate effect. Please
+									 contact the developers.")
+							}
+							base[,p] <- data$vCovars[[dvind]][,p]
+						} else {
+							## Stick them into the right time spot
+							base[,p] <- data$cCovars[[dvind]]
+							## make a new varCovar:
+						}
 						base <- varCovar(base)
 						base <- addAttributes.varCovar(base, name=dname)
 						data$vCovars[[length(data$vCovars)+1]] <- base
