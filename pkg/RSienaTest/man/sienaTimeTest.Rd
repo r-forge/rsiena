@@ -20,7 +20,8 @@
  and Snijders (2007a).
  }
 
-\usage{sienaTimeTest(sienaFit, effects=NULL, condition=FALSE)
+ \usage{
+sienaTimeTest(sienaFit, effects=NULL, condition=FALSE)
 }
 \arguments{
   \item{sienaFit}{ A sienaFit object returned by \code{siena07}. }
@@ -45,7 +46,7 @@
  time periods or effects (or any combination therein), the
  \code{timeDummy} column provides facilities within a sienaFit object to
  quickly adjust the model and re-estimate in the usual way. Alternately,
- the setEffect function can be used to add the desired dummies.
+ the includeTimeDummy function can be used to add the desired dummies.
 }
 \value{
   \code{sienaTimeTest} Returns a list containing many items,
@@ -76,7 +77,7 @@ Goodness of Fit. PhD thesis, University of Groningen, 2007.
 }
 \author{Josh Lospinoso}
 \seealso{\code{\link{siena07}}, \code{\link{plot.sienaTimeTest}},
-  \code{\link{setEffect}}}
+  \code{\link{includeTimeDummy}}}
 \examples{
 ## Estimate a restricted model
 mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
@@ -91,8 +92,7 @@ tt <- sienaTimeTest(ans)
 
 ## Suppose that we wish to include two time dummies.
 ## Add them in the following way:
-myeff <- setEffect(myeff, recip, timeDummy="2")
-myeff <- setEffect(myeff, balance, timeDummy="2")
+myeff <- includeTimeDummy(myeff, recip, balance, timeDummy="2")
 ans2 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 
 ## Re-assess the time heterogeneity
@@ -107,9 +107,9 @@ mynet1 <- sienaNet(array(c(s501, s502, s503, s501, s503, s502), dim=c(50, 50, 6)
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip, balance)
-myeff <- setEffect(myeff, recip, timeDummy="2,3,5")
-myeff <- setEffect(myeff, balance, timeDummy="4")
-myeff <- setEffect(myeff, density, timeDummy="all")
+myeff <- includeTimeDummy(myeff, recip, timeDummy="2,3,5")
+myeff <- includeTimeDummy(myeff, balance, timeDummy="4")
+myeff <- includeTimeDummy(myeff, density, timeDummy="all")
 ansp <- siena07(mymodel, data=mydata, effects=myeff, batch=FALSE)
 ttp <- sienaTimeTest(ansp)
 
@@ -129,8 +129,8 @@ myccov <- coCovar(s50a[,1])
 mydata <- sienaDataCreate(mynet1, myccov)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip, balance)
-myeff <- setEffect(myeff, RateX, type="rate",
-			interaction1="myccov", timeDummy="all")
+myeff <- includeTimeDummy(myeff, RateX, type="rate",
+			interaction1="myccov")
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 }
 }

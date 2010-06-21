@@ -761,3 +761,39 @@ sienaTimeFix <- function(effects, data)
 		list(effects=effects, data=data)
 	}
 }
+##@includeTimeDummy DataCreate
+includeTimeDummy <- function(myeff, ..., timeDummy="all", name=myeff$name[1],
+		type="eval", interaction1="", interaction2="", include=TRUE,
+		character=FALSE)
+{
+
+	if (character)
+	{
+		dots <- sapply(list(...), function(x)x)
+	}
+	else
+	{
+		dots <- substitute(list(...))[-1] ##first entry is the word 'list'
+	}
+	if (length(dots) == 0)
+	{
+		stop("need some effect short names")
+	}
+	if (!character)
+	{
+		effectNames <- sapply(dots, function(x)deparse(x))
+	}
+	else
+	{
+		effectNames <- dots
+	}
+	use <- myeff$shortName %in% effectNames &
+			myeff$type==type &
+			myeff$name==name &
+			myeff$interaction1 == interaction1 &
+			myeff$interaction2 == interaction2
+	myeff[use, "timeDummy"] <- timeDummy
+    myeff[use, "include"] <- include
+    print.data.frame(myeff[use,])
+	myeff
+}

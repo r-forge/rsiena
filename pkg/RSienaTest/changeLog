@@ -1,3 +1,9 @@
+2010-06-21 R-forge revision 107 RSienaTest only
+
+	* NAMESPACE, R/sienaTimeTest.r, man/includeTimeDummy.Rd,
+	man/sienaTimeTest.Rd, man/plot.sienaTimeTest.Rd, man/setEffect.Rd,
+	CHANGELOG, doc/s_man400.tex : Reinstated includeTimeDummy.
+
 2010-06-18 R-forge revision 106
 
 	* DESCRIPTION: new version numbers: added 105 to end.
