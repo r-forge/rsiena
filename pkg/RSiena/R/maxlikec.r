@@ -33,7 +33,10 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         f$pModel <- NULL
         f$pData <- NULL
         FRANstore(NULL) ## clear the stored object
-        PrintReport(z, x)
+        if (is.null(z$print) || z$print)
+        {
+            PrintReport(z, x)
+        }
         if (sum(z$test))
         {
             z$fra <- colMeans(z$sf, na.rm=TRUE)
@@ -41,7 +44,10 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             z <- c(z, ans)
             TestOutput(z, x)
         }
-        dimnames(z$dfra)[[1]] <- as.list(z$requestedEffects$shortName)
+        if (!is.null(z$dfra))
+        {
+            dimnames(z$dfra)[[1]] <- as.list(z$requestedEffects$shortName)
+        }
         return(z)
     }
     ######################################################################
@@ -50,14 +56,14 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     ## retrieve stored information
     f <- FRANstore()
     ## browser()
-    if (z$Phase == 2)
-    {
-        returnDeps <- FALSE
-    }
-    else
-    {
-        returnDeps <- f$returnDeps
-    }
+    ##if (z$Phase == 2)
+    ##{
+    ##    returnDeps <- FALSE
+    ##}
+    ##else
+    ##{
+    returnDeps <- z$returnDeps
+    ##}
     ## create a grid of periods with group names in case want to parallelize
     ## using this
     groupPeriods <- attr(f, "groupPeriods")
@@ -68,10 +74,10 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     ## we are not
     if (z$int2==1 || nrow(callGrid) == 1)
     {
-            ## for now!
-             ans <- .Call('mlPeriod', PACKAGE=pkgname, z$Deriv, f$pData,
-                          f$pModel, f$myeffects, f$pMLSimulation, z$theta,
-                          returnDeps, 1, 1)
+        ## for now!
+        ans <- .Call('mlPeriod', PACKAGE=pkgname, z$Deriv, f$pData,
+                     f$pModel, f$myeffects, f$pMLSimulation, z$theta,
+                     returnDeps, 1, 1, z$nrunMH)
     }
     else
     {
@@ -131,9 +137,9 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         dffraw <- ans[[7]]
         dff <- matrix(0, nrow=z$pp, ncol=z$pp)
         start <- 1
+        rawsub <- 1
         for (i in 1:length(f$myeffects))
         {
-            rawsub <- 1
             rows <- nrow(f$myeffects[[i]])
             nRates <- sum(f$myeffects[[i]]$type == 'rate')
             nonRates <- rows - nRates
@@ -145,8 +151,10 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                            start : (start + nonRates - 1)] <-
                 dffraw[rawsub:(rawsub + nonRates * nonRates - 1)]
             start <- start + nonRates
+            rawsub <- rawsub + nonRates * nonRates
         }
-        dff[upper.tri(dff)] <- dff[lower.tri(dff)]
+        dff <- dff + t(dff)
+        diag(dff) <- diag(dff) / 2
         dff <- -dff
     }
     else
@@ -156,7 +164,18 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
    # browser()
 
    list(fra = fra, ntim0 = NULL, feasible = TRUE, OK = TRUE,
-         sims=sims, dff = dff, chain = ans[[6]], accepts=ans[[8]],
+         sims=sims, dff = dff, chain = list(ans[[6]]), accepts=ans[[8]],
         rejects= ans[[9]])
 }
 
+dist2full<-function(dis) {
+
+      n<-attr(dis,"Size")
+
+      full<-matrix(0,n,n)
+
+      full[lower.tri(full)]<-dis
+
+      full+t(full)
+
+}

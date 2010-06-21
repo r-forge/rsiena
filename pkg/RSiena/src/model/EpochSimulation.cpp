@@ -12,7 +12,8 @@
 #include <algorithm>
 #include <cmath>
 #include <R_ext/Error.h>
-
+#include <R_ext/Print.h>
+#include <Rinternals.h>
 #include "EpochSimulation.h"
 #include "utils/Random.h"
 #include "utils/Utils.h"
@@ -38,6 +39,8 @@
 
 namespace siena
 {
+SEXP getMiniStepList(const MiniStep& miniStep, int period,
+	const EpochSimulation& epochSimulation);
 
 // ----------------------------------------------------------------------------
 // Section: Constructors and destructors
@@ -317,13 +320,13 @@ void EpochSimulation::runEpoch(int period)
             {
                 break;
             }
-             else if (nIter > 1000000)
+			else if (nIter > 1000000)
             {
 #ifdef STANDALONE
 				exit(1);
 #endif
 #ifndef STANDALONE
-				error("Unlikely to terminate this epoch:",
+				error("%s %s","Unlikely to terminate this epoch:",
 					" more than 1000000 steps");
 #endif
             }
@@ -340,7 +343,7 @@ void EpochSimulation::runEpoch(int period)
 				exit(1);
 #endif
 #ifndef STANDALONE
-				error("Unlikely to terminate this epoch:",
+				error("%s %s", "Unlikely to terminate this epoch:",
 					" more than 1000000 steps");
 #endif
             }
@@ -766,7 +769,43 @@ double EpochSimulation::derivative(const EffectInfo * pEffect1,
 
 	return derivative;
 }
+/**
+ * Returns the sum of the logChoiceProb for the chain.
+ */
+double EpochSimulation::calculateChainProbabilities(Chain * pChain)
+{
+//	Rprintf("  %x\n", pChain);
+	MiniStep *pMiniStep = pChain->pFirst()->pNext();
+	double logprob=0;
 
+//	Rprintf("%d %x %x\n", pChain->ministepCount(), pMiniStep, pChain->pLast());
+	int i = 0;
+	while(pMiniStep != pChain->pLast())
+	{
+		i ++;
+		DependentVariable * pVariable =
+    		this->lvariables[pMiniStep->variableId()];
+
+		logprob +=
+			pVariable->calculateChoiceProbability(pMiniStep);
+		//	Rprintf(" i epoch %d %f %x\n", i, logprob, pMiniStep);
+		//const EpochSimulation *xx = this;
+		//	PrintValue(getMiniStepList(*pMiniStep,this->lperiod, *xx ));
+		//	if (i > 1) error("what now");
+		pMiniStep = pMiniStep->pNext();
+	}
+//	Rprintf("%f\n", logprob);
+	return logprob;
+}
+void EpochSimulation::updateParameters()
+{
+	for (unsigned i = 0; i < this->lvariables.size(); i++)
+	{
+     	this->lvariables[i]->initializeRateFunction();
+		this->lvariables[i]->updateEffectParameters();
+	}
+
+}
 /**
  * Returns the current map of derivatives for the given effect.
  * The derivatives are updated for each ministep of a chain.

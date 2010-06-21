@@ -568,5 +568,7 @@ makeZsmall <- function(z)
     zsmall$cconditional <- z$cconditional
     zsmall$condvar <- z$condvar
     zsmall$pp <- z$pp
+    zsmall$nrunMH <- z$nrunMH
+    zsmall$returnDeps <- z$returnDeps
     zsmall
 }

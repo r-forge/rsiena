@@ -1566,7 +1566,7 @@ in addition to this script.
 # myeff2$include[myeff2$shortname==balance] <- TRUE
 
 # Run an estimation as usual:
- 
+
     mymodel2 <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
     ans2 <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
 
@@ -1578,7 +1578,7 @@ in addition to this script.
 # See the Time Heterogeneity section for instructions on interpreting:
 
     summary(tt2)
- 
+
 # Briefly, there are three kinds of score tests here. The joint test
 # indicates whether there is evidence over all excluded time dummy
 # interaction effects for time heterogeneity. The effect-wise tests
@@ -1592,7 +1592,7 @@ in addition to this script.
 
 
 # Try a plot to see a visual representation of the time test:
- 
+
     plot(tt2, effects=1:4, dims=c(2,2))
 
 # This plot illustrates the base period (=1) estimate for each effect
@@ -1600,10 +1600,10 @@ in addition to this script.
 # effect, and the bands around these points represent confidence
 # intervals. Time dummy effects which have not yet been estimated are
 # indicated by red intervals.
- 
+
 # Let's say that we would like to add a few time dummy terms to a
 # new effects object to prepare another estimation
- 
+
     myeff3 <- myeff2
     myeff3<- includeTimeDummy(myeff3, recip, timeDummy="2")
     myeff3<- includeTimeDummy(myeff3, balance, timeDummy="2")
@@ -8102,13 +8102,27 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-06-21 R-forge revision 108:
+\begin{itemize}
+\item effects print method with no lines selected no longer gives error, new
+  argument includeOnly so you can print lines which are not currently included.
+\item effectsDocumentation was failing due to timeDummy column
+\item New average alter effects
+\item Corrected format of error message if unlikely to finish epoch/
+\item Corrected print report for multiple groups via the gui, and for 8 waves.
+\item Fixed names for used defined dyadic interactions.
+\item Fixed bug where SienaTimeTest dummies with RateX would not work with
+  changing covariates.
+\end{itemize}
+\item 2010-06-21 R-forge revision 107: RsienaTest only: reinstated
+includeTimeDummy.
 \item 2010-06-18 R-forge revision 106: new version numbers:
-  1.0.11.105 and 1.0.12.105 for RSiena and RSienaTest respectively. 
+  1.0.11.105 and 1.0.12.105 for RSiena and RSienaTest respectively.
 \item 2010-06-18 R-forge revision 105: Fixed siena01Gui bug when trying to edit
-  the effects. Problem was introduced in revision 81. 
+  the effects. Problem was introduced in revision 81.
 \item 2010-06-10 Updated time heterogeneity script for Tom
-\item 2010-06-08 R-forge revision 102: RSienaTest only. Removed 
-includeTimeDummy. 
+\item 2010-06-08 R-forge revision 102: RSienaTest only. Removed
+includeTimeDummy.
 \item 2010-06-08 R-forge revision 101: RSienaTest only. Fixed RateX so that it
   works with changing actor covariates as well.
 \item 2010-06-08 R-forge revision 100: corrected revision numbers in changelog.
@@ -8116,8 +8130,7 @@ includeTimeDummy.
 Fix to bug introduced in revision 98: bipartite networks could not have 'loops'
 \item 2010-06-08 R-forge revision 98
 \begin{itemize}
-\item Fix to bug in constant dyadic
-  covariates with missing values.
+\item Fix to bug in constant dyadic covariates with missing values.
 \item Changes to treament of bipartite networks. The processing of these is
   still under development: we need to add the possibility of 'no change' to the
   ministeps. Code to deal with composition change has been added, and the

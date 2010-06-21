@@ -10,7 +10,7 @@
   atomic columns listed separately.
 }
 \usage{
-\method{print}{sienaEffects}(x, fileName = NULL, ...)
+\method{print}{sienaEffects}(x, fileName = NULL, includeOnly=TRUE, ...)
 \method{summary}{sienaEffects}(object, fileName = NULL, includeOnly=TRUE, ...)
 \method{print}{summary.sienaEffects}(x, fileName = NULL, ...)
 }

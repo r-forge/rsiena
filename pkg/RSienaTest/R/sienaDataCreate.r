@@ -1183,6 +1183,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
         attr(x, 'mean') <- atts$mean
         attr(x, 'vartotal') <- atts$vartotal
         attr(x, 'nonMissingCount') <- atts$nonMissingCount
+        attr(x, 'simMeans') <- atts$simMeans
         rr <- rangeAndSimilarity(x, atts$range2)
         attr(x, 'poszvar') <- atts$poszvar
         attr(x, 'similarity') <- rr$simValues
@@ -1782,7 +1783,7 @@ covarDist2 <- function(z)
     netActorSet <- sapply(z$depvars, function(x)
                           if (attr(x, "type") == "bipartite")
                       {
-                          attr(x, "nodeSet")[1]
+                          attr(x, "nodeSet")[2]
                       }
                           else
                       {
@@ -1795,9 +1796,9 @@ covarDist2 <- function(z)
         nodeSet <- attr(z$cCovars[[i]], "nodeSet")
         use <- (netTypes != "behavior" & netActorSet == nodeSet)
         simMeans <- namedVector(NA, netNames[use])
-        for (j in seq(along=z$depvars[use]))
+        for (j in which(use))
         {
-            simMeans[netNames[use][j]] <-
+            simMeans[netNames[j]] <-
                 calcCovarDist2(matrix(z$cCovars[[i]], ncol=1),
                                z$depvars[[j]])
         }
@@ -1808,9 +1809,9 @@ covarDist2 <- function(z)
         nodeSet <- attr(z$vCovars[[i]], "nodeSet")
         use <- (netTypes != "behavior" & netActorSet == nodeSet)
         simMeans <- namedVector(NA, netNames[use])
-        for (j in seq(along=z$depvars[use]))
+        for (j in which(use))
         {
-            simMeans[netNames[use][j]] <-
+            simMeans[netNames[j]] <-
                 calcCovarDist2(z$vCovars[[i]], z$depvars[[j]])
         }
         attr(z$vCovars[[i]], "simMeans") <- simMeans
@@ -1826,11 +1827,11 @@ covarDist2 <- function(z)
             nodeSet <- netActorSet[i]
             use <- (netTypes != "behavior" & netActorSet == nodeSet)
             simMeans <- namedVector(NA, netNames[use])
-            for (j in seq(along=z$depvars[use]))
+            for (j in which(use))
             {
-                simMeans[netNames[use][j]] <-
+                simMeans[netNames[j]] <-
                     calcCovarDist2(beh[, -ncol(beh), drop=FALSE],
-                                   z$depvars[[j]], rval=range(beh))
+                                   z$depvars[[j]], rval=range(beh, na.rm=TRUE))
             }
             attr(z$depvars[[i]], "simMeans") <- simMeans
         }
@@ -1841,7 +1842,7 @@ covarDist2 <- function(z)
 calcCovarDist2 <- function(covar, depvar, rval=NULL)
 {
     ## remove final obs from depvars
-    observations <- dim(depvar)[3] - 1
+    observations <- attr(depvar, "netdims")[3] - 1
 
     simTotal <- rep(NA, observations)
     simCnt <- rep(NA, observations)
@@ -1859,12 +1860,13 @@ calcCovarDist2 <- function(covar, depvar, rval=NULL)
         if (attr(depvar, "sparse"))
         {
             dep <- depvar[[i]]
+            dep@x[dep@x %in% c(10, 11)] <- dep@x[dep@x %in% c(10, 11)] - 10
         }
         else
         {
             dep <- depvar[, , i]
+            dep[dep %in% c(10, 11)] <- dep[dep %in% c(10, 11)] - 10
         }
-        dep[dep %in% c(10, 11)] <- dep[dep %in% c(10, 11)] - 10
         vi <- apply(dep, 1, function(x)
                 {
                     if (sum(x, na.rm=TRUE) > 0)

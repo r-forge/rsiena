@@ -10,7 +10,7 @@
 ## *
 ## ****************************************************************************/
 ##@print.sienaEffects Methods
-print.sienaEffects <- function(x, fileName=NULL, ...)
+print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,...)
 {
     if (!inherits(x, "sienaEffects"))
         stop("not a legitimate Siena effects object")
@@ -25,9 +25,12 @@ print.sienaEffects <- function(x, fileName=NULL, ...)
         nDependents <- length(unique(x$name))
         userSpecifieds <- x$shortName[x$include] %in% c("unspInt", "behUnspInt")
         endowments <- !x$type[x$include] %in% c("rate", "eval")
-
-        specs <- x[x$include, c("name", "effectName", "include", "fix", "test",
+        specs <- x[, c("name", "effectName", "include", "fix", "test",
                                 "initialValue", "parm")]
+        if (includeOnly)
+        {
+            specs <- specs[x$include, ]
+        }
         if (nDependents == 1)
         {
             specs <- specs[, -1]
@@ -46,10 +49,15 @@ print.sienaEffects <- function(x, fileName=NULL, ...)
         }
         specs[, "initialValue"] <- format(round(specs$initialValue,digits=5),
                                           width=10)
-        row.names(specs) <- 1:nrow(specs)
-
-        print(as.matrix(specs), quote=FALSE)
-
+        if (nrow(specs) > 0)
+        {
+            row.names(specs) <- 1:nrow(specs)
+            print(as.matrix(specs), quote=FALSE)
+        }
+        else
+        {
+            print.data.frame(specs)
+        }
     }
     else
     {

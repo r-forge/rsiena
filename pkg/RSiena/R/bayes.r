@@ -10,7 +10,7 @@
 ## ****************************************************************************/
 ##@bayes algorithm  fit a Bayesian model
 bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
-                 nrunMH=100)
+                 nrunMH=100, save=TRUE)
 {
     createStores <- function()
     {
@@ -138,14 +138,14 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 
     ## initialise
     Report(openfiles=TRUE, type="n") #initialise with no file
-    require(lattice)
-    ##   require(MASS)
-    ##  dev.new()
-    ## histPlot = dev.cur()
-    dev.new()
-    thetaplot = dev.cur()
-    dev.new()
-    acceptsplot = dev.cur()
+    if (!save)
+    {
+        require(lattice)
+        dev.new()
+        thetaplot = dev.cur()
+        dev.new()
+        acceptsplot = dev.cur()
+    }
     z  <-  NULL
     z$FinDiff.method <- FALSE
     z$maxlike <- TRUE
@@ -190,16 +190,9 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         z <- storeData()
 
         numm <- z$numm
-        if (ii %% 10 == 0) ## do some plots
+        if (ii %% 10 == 0 && !save) ## do some plots
         {
             cat('main after ii',ii,numm, '\n')
-            ## dev.set(histPlot)
-            ## par(mfrow=c(2,3))
-            ## truehist(z$lambdas)
-            ## truehist(z$betas[, 1])
-            ## truehist(z$candidates[, 1])
-            ## truehist(z$betas[, 2])
-            ## truehist(z$candidates[, 2])
             dev.set(thetaplot)
             thetadf <- data.frame(z$lambdas, z$betas)
             acceptsdf <- data.frame(z$MHproportions, z$acceptances)

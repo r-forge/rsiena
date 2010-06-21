@@ -90,7 +90,7 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                 endCol <- startCol + 6
                 endCol <- min(endCol, nobs)
                 tmp3 <- rbind(format(startCol:endCol, width=7),
-                              tmp[, startCol:endCol])
+                              tmp[, startCol:endCol, drop=FALSE])
                 tmp2 <- cbind(text, tmp3, eols)
                 Report(t(tmp2), sep="", outf)
                 startCol <- startCol + 7

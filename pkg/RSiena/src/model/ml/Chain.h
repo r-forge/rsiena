@@ -87,6 +87,9 @@ public:
 	MiniStep * randomMissingNetworkMiniStep() const;
 	MiniStep * randomMissingBehaviorMiniStep() const;
 
+	// copy
+	Chain * copyChain();
+
 private:
 	void resetOrderingKeys();
 	void updateSameOptionPointersOnInsert(MiniStep * pMiniStep);
