@@ -1,3 +1,8 @@
+2010-06-25 R-forge revision 110
+
+	* man/coDyadCovar.Rd, man/varDyadCovar.Rd: added sparse parameter
+	to documentation.
+
 2010-06-25 R-forge revision 109
 
 	* data/allEffects.csv, R/effects.r: removed inappropriate dyadic
