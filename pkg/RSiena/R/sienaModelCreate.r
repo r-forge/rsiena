@@ -58,8 +58,16 @@ sienaModelCreate <-
         }
     }
     model$cconditional <- cond
-    model$condvarno <-  condvarno
-    model$condname <- condname
+    if (!is.na(cond) && cond && condvarno == 0 && condname == "")
+    {
+        model$condvarno <-  1
+        model$condname <- ""
+    }
+    else
+    {
+        model$condvarno <-  condvarno
+        model$condname <- condname
+    }
     model$FinDiff.method <-  findiff
     model$nsub <- nsub
     model$diag <- diag

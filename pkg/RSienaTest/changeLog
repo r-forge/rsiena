@@ -1,3 +1,26 @@
+2010-06-25 R-forge revision 109
+
+	* data/allEffects.csv, R/effects.r: removed inappropriate dyadic
+	covariate effects for bipartite networks.
+	* src/model/variables/NetworkVariable.cpp: correct distance
+	accumulation for symmetric networks with conditional estimation
+	* R/sienaModelCreate.r: add default variable for cond=TRUE
+	* R/sienaprint.r: add Score test results to summary.sienaFit
+	* R/simstatsc.r: remove data object from stored f again (still on z)
+	* src/data/ChangingDyadicCovariate.cpp,
+	src/data/ChangingDyadicCovariate.h,
+	src/model/effects/DyadicCovariateDependentNetworkEffect.cpp,
+	src/model/effects/DyadicCovariateDependentNetworkEffect.h
+	src/model/effects/DyadicCovariateMainEffect.cpp,
+	src/model/effects/DyadicCovariateReciprocityEffect.cpp,
+	src/model/effects/EffectFactory.cpp,
+	src/model/effects/NetworkEffect.cpp,
+	R/sienaDataCreate.r, R/sienaDataCreateFromSession,
+	R/print01Report.r, R/sienautils.r,
+	R/simstatsc.r, man/coDyadCovar.Rd, man/varDyadCovar.Rd:
+	dyadic covariates now deal correctly with missing values and can
+	be sparse matrices.
+
 2010-06-21 R-forge revision 108
 
 	* doc/RSienaDeveloper.tex: added note about Rd2dvi.
@@ -60,7 +83,7 @@
 	* R/simstatsc.r: fix bug in naming user defined dyadic interactions.
 	* R/sienaTimeTest.r: (RSiena only) make RateX effects work with varying
 	covariates too.
-	
+
 2010-06-21 R-forge revision 107 RSienaTest only
 
 	* NAMESPACE, R/sienaTimeTest.r, man/includeTimeDummy.Rd,

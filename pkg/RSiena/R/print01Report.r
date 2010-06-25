@@ -620,7 +620,14 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
             Report("Number of tie variables with missing data:\n", outf)
             for (i in seq(along=covars))
             {
-                myvar <- x$dycCovars[[i]]
+                if (attr(x$dycCovars[[i]], "sparse"))
+                {
+                    myvar <- x$dycCovars[[i]][[1]]
+                }
+                else
+                {
+                    myvar <- x$dycCovars[[i]]
+                }
                 diag(myvar) <- 0
                 Report(c(format(covars[i], width=15),
                          sum(is.na(myvar)), "  (",
@@ -668,17 +675,26 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
                                           periodFromStart, width=9),
                      "       overall\n"), sep="", outf)
             for (i in seq(along=covars))
-              {
+            {
                 if (use[i])
-                  {
-                    thiscovar <- x$dyvCovars[[i]] ## array
-                    missvals <- colSums(is.na(thiscovar), dims=2)
+                {
+                    sparse <- attr(x$dyvCovars[[i]], "sparse")
+                    vardims <- attr(x$dyvCovars[[i]], "vardims")
+                    thiscovar <- x$dyvCovars[[i]] ## array/list of sparse mats
+                    if (!sparse)
+                    {
+                        missvals <- colSums(is.na(thiscovar), dims=2)
+                    }
+                    else
+                    {
+                        missvals <- sapply(thiscovar, function(x)sum(is.na(x)))
+                    }
                     Report(c(format(covars[i], width=10),
                              format(missvals, width=8),
                              format(sum(missvals), width=9), "     (",
-                             format(round(100 * sum(missvals)/nrow(thiscovar)/
-                                          ncol(thiscovar), 1), nsmall=1,
-                                    width=3), '%)\n'), outf)
+                             format(round(100 * sum(missvals)/vardims[1]/
+                                          vardims[2]), nsmall=1,
+                                          width=3), '%)\n'), outf)
                 }
             }
             Report("\nMeans of  covariates:\n", outf)
