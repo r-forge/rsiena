@@ -148,6 +148,79 @@ print.summary.sienaFit <- function(x, ...)
    if (!inherits(x, "summary.sienaFit"))
         stop("not a legitimate summary of a Siena model fit")
    print.sienaFit(x)
+   if (sum(x$test) > 0) ## we have some score tests
+   {
+       testn <- sum(x$test)
+       if (x$maxlike)
+       {
+           cat("Score test <c>\n\n")
+       }
+       else
+       {
+           cat("Generalised score test <c>\n\n")
+       }
+       cat("Testing the goodness-of-fit of the model restricted by\n")
+       j <- 0
+       for (k in 1:x$pp)
+           if (x$test[k])
+           {
+               j <- j+1
+               cat(c(" (",j,")   ",
+                     format(paste(x$requestedEffects$type[k], ":  ",
+                                  x$requestedEffects$effectName[k],
+                                  sep=""),
+                            width=50), " = ",
+                     sprintf("%8.4f", x$theta[k]),"\n"),
+                   sep = "")
+           }
+       cat("_________________________________________________\n")
+       cat("                ")
+       cat("   \n")
+       if (testn > 1)
+           cat('Joint test:\n-----------\n')
+       cat(c('   c = ',sprintf("%8.4f", x$testresOverall),
+                '   d.f. = ',j,'   p-value '), sep='')
+       pvalue <- 1 - pchisq(x$testresOverall, j)
+        if (pvalue < 0.0001)
+            cat('< 0.0001\n')
+        else
+            cat(c('= ', sprintf("%8.4f\n", pvalue)), sep = '')
+        if (testn==1)
+            cat(c('\n   one-sided (normal variate): ',
+                     sprintf("%8.4f",x$testresulto[1])), sep = '')
+        if (testn> 1)
+        {
+            cat('\n\n')
+            for (k in 1:j)
+            {
+                cat(c('(',k,') tested separately:\n'),sep='')
+                cat('-----------------------\n')
+                cat(' - two-sided:\n')
+                cat(c('  c = ', sprintf("%8.4f", x$testresult[k]),
+                         '   d.f. = 1  p-value '), sep = '')
+                pvalue<- 1-pchisq(x$testresult[k],1)
+                if (pvalue < 0.0001)
+                    cat('< 0.0001\n')
+                else
+                    cat(c('= ', sprintf("%8.4f", pvalue), '\n'), sep = '')
+                cat(c(' - one-sided (normal variate): ',
+                         sprintf("%8.4f", x$testresulto[k])), sep = '')
+                if (k<j)
+                    cat('\n\n')
+            }
+        }
+        cat('    \n_________________________________________________\n\n')
+        cat('One-step estimates: \n\n')
+        for (i in 1 : x$pp)
+        {
+            onestepest<- x$oneStep[i]+x$theta[i]
+            cat(c(format(paste(x$requestedEffects$type[i],':  ',
+                                  x$requestedEffects$effectName[i], sep = ''),
+                            width=50),
+                     sprintf("%8.4f", onestepest), '\n'), sep = "")
+        }
+        cat('\n')
+   }
    if (x$OK)
    {
        cat("Covariance matrix of estimates (correlations below diagonal)\n\n")

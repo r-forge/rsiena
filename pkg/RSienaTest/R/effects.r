@@ -446,7 +446,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
             if (all(nodeSets == attr(xx$dycCovars[[j]], 'nodeSet')))
             {
                 objEffects <- rbind(objEffects,
-                                    createEffects("dyadObjective",
+                                    createEffects("dyadBipartiteObjective",
                                                   names(xx$dycCovars)[j] ))
             }
         }
@@ -455,7 +455,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
             if (all(nodeSets == attr(xx$dyvCovars[[j]], 'nodeSet')))
             {
                 objEffects <- rbind(objEffects,
-                                    createEffects("dyadObjective",
+                                    createEffects("dyadBipartiteObjective",
                                                   names(xx$dyvCovars)[j]))
             }
         }

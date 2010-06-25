@@ -193,7 +193,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new DyadicCovariateMainEffect(pEffectInfo);
 	}
-	else if (effectName == "Xrecip")
+	else if (effectName == "XRecip")
 	{
 		pEffect = new DyadicCovariateReciprocityEffect(pEffectInfo);
 	}

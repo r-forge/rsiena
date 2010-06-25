@@ -67,48 +67,112 @@ addAttributes.varCovar <- function(x, name, ...)
 ##@addAttributes.coDyadCovar DataCreate
 addAttributes.coDyadCovar <- function(x, name, bipartite, ...)
 {
+    sparse <- attr(x, "sparse")
     if (!bipartite) ## remove diagonal for calculation of mean
     {
-        diag(x) <- NA
+        if (!sparse)
+        {
+            diag(x) <- NA
+        }
+        else
+        {
+            diag(x[[1]])  <-  NA
+        }
     }
-    varmean <- mean(x, na.rm=TRUE)
+    if (sparse)
+    {
+        nonMissingCount <- sum(!is.na(x[[1]]))
+        varmean <- sum(x[[1]], na.rm=TRUE) / nonMissingCount
+        ## sparse mean is incorrect
+        rr <-  range(x[[1]], na.rm=TRUE)
+    }
+    else
+    {
+        varmean <- mean(x, na.rm=TRUE)
+        rr <-  range(x, na.rm=TRUE)
+        nonMissingCount <- sum(!is.na(x))
+    }
     attr(x,'mean') <- varmean
-    rr <-  range(x, na.rm=TRUE)
     attr(x,'range') <- rr[2] - rr[1]
     storage.mode(attr(x, 'range')) <- 'double'
     attr(x,'range2') <- rr
     attr(x, 'name') <- name
-    nonMissingCount <- sum(!is.na(x))
     attr(x, "nonMissingCount") <- nonMissingCount
     if (!bipartite) #zero the diagonal
     {
-        diag(x) <- 0
+        if (sparse)
+        {
+            diag(x[[1]]) <- 0
+        }
+        else
+        {
+            diag(x) <- 0
+        }
     }
     x
 }
 ##@addAttributes.varDyadCovar DataCreate
 addAttributes.varDyadCovar <- function(x, name, bipartite, ...)
 {
+    sparse <- attr(x, "sparse")
+    vardims <- attr(x, "vardims")
     if (!bipartite) ## remove the diagonal before calculating the mean
     {
-        for (obs in 1:dim(x)[3])
+        for (obs in 1:vardims[3])
         {
-            diag(x[, , obs]) <- NA
+            if (sparse)
+            {
+                diag(x[[obs]]) <- NA
+            }
+            else
+            {
+                diag(x[, , obs]) <- NA
+            }
         }
     }
-    varmean <- mean(x, na.rm=TRUE)
-    attr(x,'mean') <- mean(x, na.rm=TRUE)
-    attr(x, "meanp") <- colMeans(x, dims=2, na.rm=TRUE)
-    rr <-  range(x, na.rm=TRUE)
-    attr(x,'range') <- rr[2] - rr[1]
-    storage.mode(attr(x, 'range')) <- 'double'
-    attr(x, 'name') <- name
-    nonMissingCounts <- colSums(!is.na(x), dims=2)
+    if (sparse)
+    {
+        totalValue <- 0
+        totalCount <- 0
+        meanp <- rep(NA, vardims[3])
+        nonMissingCounts <- rep(NA, vardims[3])
+        for (obs in 1:vardims[3])
+        {
+            totalValue <- totalValue + sum(x[[obs]], na.rm=TRUE)
+            nonMissingCounts[obs] <- sum(!is.na(x[[obs]]))
+            totalCount <- totalCount +  nonMissingCounts[obs]
+            meanp[obs] <- sum(x[[obs]], na.rm=TRUE) /
+                nonMissingCounts[obs]
+      }
+        varmean <- totalValue / totalCount
+        rr <- range(sapply(x, range, na.rm=TRUE), na.rm=TRUE)
+        attr(x, "meanp") <- meanp
+    }
+    else
+    {
+        varmean <- mean(x, na.rm=TRUE)
+        rr <-  range(x, na.rm=TRUE)
+        attr(x, "meanp") <- colMeans(x, dims=2, na.rm=TRUE)
+        nonMissingCounts <- colSums(!is.na(x), dims=2)
+    }
+    attr(x, "mean") <- varmean
+    attr(x, "range") <- rr[2] - rr[1]
+    storage.mode(attr(x, "range")) <- "double"
+    attr(x, "name") <- name
     attr(x, "nonMissingCount") <- nonMissingCounts
     if (!bipartite) ## put diagonal to zero
     {
-        for (obs in 1:dim(x)[3])
-            diag(x[, , obs]) <- 0
+        for (obs in 1:vardims[3])
+        {
+            if (!sparse)
+            {
+                diag(x[, , obs]) <- 0
+            }
+            else
+            {
+                diag(x[[obs]]) <- 0
+            }
+        }
     }
     x
 }
@@ -315,9 +379,17 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
     {
         nattr <- attr(dycCovars[[i]], 'nodeSet')
         bipartite <- nattr[1] != nattr[2]
-        if (!validNodeSet(nattr[1], nrow(dycCovars[[i]])))
+        if (attr(dycCovars[[i]], "sparse"))
+        {
+            thisdycCovar <- dycCovars[[i]][[1]]
+        }
+        else
+        {
+            thisdycCovar <- dycCovars[[i]]
+        }
+        if (!validNodeSet(nattr[1], nrow(thisdycCovar)))
             stop('dyadic covariate incorrect nbr rows', names(dycCovars)[i])
-        if (!validNodeSet(nattr[2], ncol(dycCovars[[i]])))
+        if (!validNodeSet(nattr[2], ncol(thisdycCovar)))
              stop('dyadic covariate incorrect nbr columns',
                   names(dycCovars)[i])
         dycCovars[[i]] <- addAttributes(dycCovars[[i]], names(dycCovars)[i],
@@ -327,22 +399,37 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
     {
         if (observations < 3)
         {
-            stop("Changing covariates are not possibLe with only two waves")
+            stop("Changing covariates are not possible with only two waves")
         }
         nattr <- attr(dyvCovars[[i]],'nodeSet')
+        sparse <- attr(dyvCovars[[i]], "sparse")
         bipartite <- nattr[1] != nattr[2]
-        if (!validNodeSet(nattr[1], dim(dyvCovars[[i]])[1]))
+        vardims <- attr(dyvCovars[[i]], "vardims")
+        if (!validNodeSet(nattr[1], vardims[1]))
+        {
             stop('dyadic changing covariate incorrect nbr rows',
                  names(dyvCovars)[i])
-        if (!validNodeSet(nattr[2], dim(dyvCovars[[i]])[2]))
+        }
+        if (!validNodeSet(nattr[2], vardims[2]))
+        {
             stop('dyadic changing covariate incorrect nbr columns',
                  names(dyvCovars)[i])
-        if (dim(dyvCovars[[i]])[3] < (observations - 1))
+        }
+        if (vardims[3] < (observations - 1))
+        {
             stop('Dyadic changing covariate not enough observations')
-         if (dim(dyvCovars[[i]])[3] != (observations - 1))
+        }
+        if (vardims[3] != (observations - 1))
         {
             tmpatt <- attributes(dyvCovars[[i]])
-            dyvCovars[[i]] <- dyvCovars[[i]][, 1:(observations - 1)]
+            if (sparse)
+            {
+                dyvCovars[[i]] <- dyvCovars[[i]][1:(observations - 1)]
+            }
+            else
+            {
+                dyvCovars[[i]] <- dyvCovars[[i]][, 1:(observations - 1)]
+            }
             attnames <- names(tmpatt)
             for (att in seq(along=attnames))
             {
@@ -351,7 +438,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     attr(dyvCovars[[i]], attnames[att]) <- tmpatt[[att]]
                 }
             }
-          }
+        }
         dyvCovars[[i]] <- addAttributes(dyvCovars[[i]], names(dyvCovars)[i],
                                         bipartite)
     }
@@ -1122,11 +1209,27 @@ groupRangeAndSimilarityAndMean <- function(group)
             {
                 stop("inconsistent covariate names")
             }
-            vartotal <- vartotal + sum(group[[i]]$dyvCovars[[j]], na.rm=TRUE)
-            nonMissingCount <- nonMissingCount +
-                sum(!is.na(group[[i]]$dyvCovars[[j]]))
-            thisrange[, i] <- range(group[[i]]$dyvCovars[[j]],
-                                    na.rm=TRUE)
+            sparse <- attr(group[[i]]$dyvCovars[[j]], "sparse")
+            vardims <- attr(group[[i]]$dyvCovars[[j]], "vardims")
+            if (attr(group[[i]]$dyvCovars[[j]], "sparse"))
+            {
+                for (obs in 1:vardims[3])
+                {
+                    vartotal <- vartotal + sum(group[[i]]$dyvCovars[[j]][[obs]], na.rm=TRUE)
+                    nonMissingCount <- nonMissingCount +
+                        sum(!is.na(group[[i]]$dyvCovars[[j]][[obs]]))
+                }
+                thisrange[, i] <- range(sapply(group[[i]]$dyvCovars[[j]], range, na.rm=TRUE),
+                                            na.rm=TRUE)
+            }
+            else
+            {
+                vartotal <- vartotal + sum(group[[i]]$dyvCovars[[j]], na.rm=TRUE)
+                nonMissingCount <- nonMissingCount +
+                    sum(!is.na(group[[i]]$dyvCovars[[j]]))
+                thisrange[, i] <- range(group[[i]]$dyvCovars[[j]],
+                                        na.rm=TRUE)
+            }
         }
         dyvCovarMean[covar] <- vartotal / nonMissingCount
         rr <- range(thisrange, na.rm=TRUE)

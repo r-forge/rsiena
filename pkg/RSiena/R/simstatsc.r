@@ -1086,10 +1086,14 @@ unpackCDyad<- function(dycCovar)
     nodeSets <- attr(dycCovar, "nodeSet")
     if (sparse)
     {
-        ## have a sparse matrix in triplet format
+        ## have a list containing 1 sparse matrix in triplet format
         ## with missings embedded
         ## with 0 based indices!
-        varmat <- cbind(dycCovar@i+1, dycCovar@j+1, dycCovar@x)
+        varmat <- cbind(dycCovar[[1]]@i+1, dycCovar[[1]]@j+1, dycCovar[[1]]@x)
+        if (any(duplicated(varmat[, 1:2])))
+        {
+            stop("duplicate entries in sparse matrix dyadic covariate")
+        }
         ##drop the diagonal, if present - not for bipartite
         if (nodeSets[1] == nodeSets[2])
         {
@@ -1099,13 +1103,13 @@ unpackCDyad<- function(dycCovar)
         mat1[is.na(varmat[, 3]), 3] <- attr(dycCovar, "mean")
         mat1 <- mat1[!mat1[, 3] == 0, ]
         ## add attribute of dim
-        attr(mat1,'nActors1') <- nrow(dycCovar)
-        attr(mat1,'nActors2') <- ncol(dycCovar)
-        mat2 <- varmat[is.na(varmat[, 3]), ]
+        attr(mat1, 'nActors1') <- nrow(dycCovar[[1]])
+        attr(mat1, 'nActors2') <- ncol(dycCovar[[1]])
+        mat2 <- varmat[is.na(varmat[, 3]), , drop=FALSE]
         mat2[, 3] <- 1
         ## add attribute of dim
-        attr(mat2,'nActors1') <- nrow(dycCovar)
-        attr(mat2,'nActors2') <- ncol(dycCovar)
+        attr(mat2,'nActors1') <- nrow(dycCovar[[1]])
+        attr(mat2,'nActors2') <- ncol(dycCovar[[1]])
         edgeLists <-  list(t(mat1), t(mat2))
     }
     else
@@ -1140,10 +1144,10 @@ unpackVDyad<- function(dyvCovar, observations)
     {
         ## have a list of sparse matrices in triplet format
         ## with 0 based indices!
-        for (i in 1:observations)
+        for (i in 1:(observations - 1))
         {
             thisvar <- dyvCovar[[i]]
-            varmat <- cbind(var@i+1, var@j+1, var@x)
+            varmat <- cbind(thisvar@i+1, thisvar@j+1, thisvar@x)
             ## drop the diagonal, if present no - bipartite?
             if (nodeSets[1] == nodeSets[2])
             {
@@ -1152,7 +1156,7 @@ unpackVDyad<- function(dyvCovar, observations)
             mat1 <- varmat
             mat1[is.na(varmat[, 3]), 3] <- means[i]
             mat1 <- mat1[!mat1[, 3] == 0, ]
-            mat2 <- varmat[is.na(varmat[, 3]), ]
+            mat2 <- varmat[is.na(varmat[, 3]),, drop=FALSE ]
             mat2[, 3] <- 1
             ## add attribute of size
             attr(mat1, 'nActors1') <- nrow(dyvCovar[[i]])
@@ -1899,7 +1903,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         z$f <- f
     }
     if (initC || (z$int == 1 && z$int2 == 1 &&
-                  (!is.null(z$nbrNodes) && z$nbrNodes == 1)))
+                  (is.null(z$nbrNodes) || z$nbrNodes == 1)))
     {
 
         f[1:nGroup] <- NULL

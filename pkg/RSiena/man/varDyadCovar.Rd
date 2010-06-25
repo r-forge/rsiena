@@ -9,7 +9,8 @@ varDyadCovar(val, nodeSets=c("Actors", "Actors"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{val}{Array of covariate values, Third dimension is the time }
+  \item{val}{Array of covariate values, Third dimension is the
+	time. Alternatively, a list of sparse matrices of type "dgTMatrix"}
   \item{nodeSets}{Names (character string) of the associated node sets}
 }
 \details{

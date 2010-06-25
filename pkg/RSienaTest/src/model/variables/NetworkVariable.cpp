@@ -8,9 +8,9 @@
  * Description: This file contains the implementation of the
  * NetworkVariable class.
  *****************************************************************************/
-#include <R_ext/Print.h> 
-#include <R_ext/Arith.h> 
-#include <Rinternals.h> 
+#include <R_ext/Print.h>
+#include <R_ext/Arith.h>
+#include <Rinternals.h>
 #include <algorithm>
 #include <cmath>
 #include "NetworkVariable.h"
@@ -470,17 +470,27 @@ void NetworkVariable::makeChange(int actor)
 		// period. Ties missing at any of the endpoints of the period
 		// don't contribute to the distance
 
+		// If network is symmetric, changes are in steps of two, otherwise 1
+		int change = 1;
+		if (this->oneModeNetwork())
+		{
+			if ((dynamic_cast<const OneModeNetworkLongitudinalData *>
+					(this->lpData))->symmetric())
+			{
+				change = 2;
+			}
+		}
 		if (!this->lpData->missing(this->lego, alter, this->period()) &&
 			!this->lpData->missing(this->lego, alter, this->period() + 1))
 		{
 			if (this->lpData->tieValue(this->lego, alter, this->period()) ==
 				currentValue)
 			{
-				this->simulatedDistance(this->simulatedDistance() + 1);
+				this->simulatedDistance(this->simulatedDistance() + change);
 			}
 			else
 			{
-				this->simulatedDistance(this->simulatedDistance() - 1);
+				this->simulatedDistance(this->simulatedDistance() - change);
 			}
 		}
 
@@ -1047,7 +1057,7 @@ bool NetworkVariable::structural(const MiniStep * pMiniStep) const
 			this->period());
 }
 /**
- * Copies the change contributions for evaluation and endowment function 
+ * Copies the change contributions for evaluation and endowment function
  * effects according to the current miniStep.
  */
 void NetworkVariable::copyChangeContributions(MiniStep * pMiniStep) const
@@ -1061,27 +1071,27 @@ void NetworkVariable::copyChangeContributions(MiniStep * pMiniStep) const
 		 nEndowmentEffects, this->m());
 
 	 for (int alter = 0; alter < this->m(); alter++)
-	 {		
+	 {
 		for (unsigned i = 0;
 			 i < this->pEvaluationFunction()->rEffects().size(); i++)
 		{
 			pNetworkChange->evaluationEffectContribution(
 				this->levaluationEffectContribution[alter][i], alter, i);
 		}
-			
+
 		for (unsigned i = 0;
 			 i < this->pEndowmentFunction()->rEffects().size(); i++)
 		{
 			pNetworkChange->endowmentEffectContribution(
 				this->lendowmentEffectContribution[alter][i], alter, i);
 		}
-		
+
 	}
 }
 /**
- * Calculates the log probability of the choice of this ministep, 
+ * Calculates the log probability of the choice of this ministep,
  * using stored change contributions.
- * 
+ *
  */
 double NetworkVariable::calculateChoiceProbability(const MiniStep * pMiniStep)
 const
@@ -1105,7 +1115,7 @@ const
 			contribution += pEffect->parameter() *
 				pNetworkChange->evaluationEffectContribution(alter, i);
 			//	Rprintf("%d %d %d %f %f \n",alter, i, pNetworkChange->ego(),
-			//	pEffect->parameter(), 
+			//	pEffect->parameter(),
 			//	pNetworkChange->evaluationEffectContribution(alter, i));
 		}
 
@@ -1118,16 +1128,16 @@ const
 
 		// The selection probability is the exponential of the total
 		// contribution.
-		
+
 		probabilities[alter] = exp(contribution);
 		if (R_IsNaN(probabilities[alter]))
 		{
 			PrintValue(getMiniStepDF(*pNetworkChange));
 		}
 		total += probabilities[alter];
-	
+
 	}
-	
+
 	// Normalize
 
 	if (total != 0)

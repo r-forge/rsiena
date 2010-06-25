@@ -8102,6 +8102,16 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-06-25 R-forge revision 109:
+\begin{itemize}
+\item Dyadic covariates may have missing values and sparse input format.
+\item Removed some inappropriate dyadic covariate effects for bipartite
+  networks.
+\item Score test output now available via summary() on a fit.
+\item Corrected conditional estimation for symmetric networks.
+\item Now do not need to specify the variable to condition on if it is the first
+  in \sfn{sienaModelCreate()}
+\end{itemize}
 \item 2010-06-21 R-forge revision 108:
 \begin{itemize}
 \item effects print method with no lines selected no longer gives error, new

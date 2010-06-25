@@ -8,7 +8,7 @@
 coDyadCovar(val, nodeSets=c("Actors", "Actors"))
 }
 \arguments{
-  \item{val}{Matrix of covariate values. }
+  \item{val}{Matrix of covariate values. May be sparse, of type "dgTMatrix" }
   \item{nodeSets}{The name of the node sets with which this
     covariate is associated.}
 }
