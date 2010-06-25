@@ -5,13 +5,15 @@
   This function creates a changing dyadic covariate object from an array.
 }
 \usage{
-varDyadCovar(val, nodeSets=c("Actors", "Actors"))
+varDyadCovar(val, nodeSets=c("Actors", "Actors"),
+    sparse=is.list(val))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{val}{Array of covariate values, Third dimension is the
 	time. Alternatively, a list of sparse matrices of type "dgTMatrix"}
   \item{nodeSets}{Names (character string) of the associated node sets}
+  \item{sparse}{Boolean: whether sparse matrices or not.}
 }
 \details{
   When part of a Siena data object, the covariate is assumed to be
