@@ -1,3 +1,16 @@
+2010-07-03 R-forge revision 111
+
+	* src/siena07.cpp, src/model/ml/Chain.cpp,
+	src/model/ml/MLSimulation.cpp, src/model/ml/Option.cpp, 
+	src/model/ml/MLSimulation.h, src/model/ml/Option.h, 
+	R/phase1.r, R/sienaModelCreate.r, R/simstatsc.r, R/maxlike.r, 
+	man/sienaModelCreate.Rd: ML changes
+	* src/model/variables/NetworkVariable.cpp,
+        doc/simstats0c.tex (RSienaTest only): added option of
+	no change for bipartite networks.
+	* doc/RSienaDeveloper.tex (RSienaTest only): added some details 
+	about C++ and Doxygen.
+
 2010-06-25 R-forge revision 110
 
 	* man/coDyadCovar.Rd, man/varDyadCovar.Rd: added sparse parameter

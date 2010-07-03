@@ -775,13 +775,14 @@ The appendix of this manual contains a list of \RS functions which may be consul
 in addition to this script.
 
 \begin{verbatim}
-###################################### GENERAL #################################
+##################################### GENERAL #################################
 
 # This is an R script for getting started with RSiena, written by
-# Robin Gauthier, Tom Snijders, Ruth Ripley, and Josh Lospinoso.
-# Version 09-06-2010.
+# Tom Snijders (maintainer), Ruth Ripley, Robin Gauthier (who started it!),
+# with contributions by Josh Lospinoso.
+# Version 22-06-2010.
 
-# Lines starting with # are not processed by R but treated as comments.
+# Anything in a line after the symbol # is not processed by R but treated as comments.
 # The script has a lot of explanation of R possibilities that will be
 # familiar for readers well acquainted with R, and can be skipped by them.
 # We have attempted to make the script understable also for R newbies.
@@ -796,14 +797,18 @@ in addition to this script.
 # Help within R can be called by typing a question mark and the name of the
 # function you need help with. For example ?library loading will bring up a
 # file titled "loading and listing of packages".
-# Comments are made at the end of commands, or in lines staring with # telling
-# R to ignore everything beyond it.
-# This session will be using s50 data which are supposed to be
-# present in the working directory.
 # Note that any command in R is called a function;
 # in general the command syntax for calling R's functions is function(x) where
 # function is a saved function and x the name of the object to be operated on.
 
+# For new R users:
+# note that there is a lot of documentation available at
+# http://cran.xl-mirror.nl/other-docs.html
+# including some short introductions, handy reference cards,
+# and introductions in a lot of languages besides English.
+
+# This session will be using s50 data which are supposed to be
+# present in the working directory.
 # To execute this script
 # (this description is for Windows, and will be slightly different for
 #  Mac or Unix):
@@ -947,7 +952,7 @@ in addition to this script.
 # To have this arrayed more neatly side by side, you can create and display
 # a matrix with the desired information:
 
-        aa <- matrix(nrow=5, ncol=2)
+        aa <- matrix(nrow=50, ncol=2)
         aa[,1] <- drink[,1]
         aa[,2] <- use
         aa
@@ -1135,6 +1140,9 @@ in addition to this script.
 
         myeff$effectName
 
+# If desired, more information about this can be obtained from the help files,
+#      ?getEffects
+
 # The "include" column defines whether effects are included in the model.
 
         myeff$include
@@ -1195,10 +1203,16 @@ in addition to this script.
 # is obtained by the following commands.
 # The function sink diverts output to a file;
 # the last command sink() directs it to the console again.
+# The function cbind combines two columns into a matrix,
+# and is used here to get the effect names and the short names next to each other.
 
      sink("effectlist.txt")
-     myeff$effectName
+     cbind( myeff$effectName,myeff$shortName)
      sink()
+
+# Another way to get this information is by the command
+
+#      write.table(format(cbind( myeff$effectName,myeff$shortName)),"effectlist.txt")
 
 # Now look in the file "effectlist.txt" (in the current directory)
 # for the spelling of the various effects you might wish to use.
@@ -1305,6 +1319,8 @@ in addition to this script.
 
 # where we now specified "include=FALSE" because we wish to make this effect
 # available without using it in in the model to be estimated below.
+# Running a model with an interaction effect may lead to errors
+# if the main effects are not included (even if with fixed parameters).
 
 # A second special topic is how to access other characteristics of effects
 # without referring to the effect numbers.
@@ -1545,8 +1561,8 @@ in addition to this script.
 # parameters of effects may differ over time. This is demonstrated here.
 # This is further documented in Section 5.7 of the manual.
 
-# Load a dataset with three time periods. Here, we use the s50 dataset
-# which is included with RSiena
+# Load a dataset with three time periods.
+# Here, we use the s50 dataset which is included with RSiena
 
     mynet2 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 
@@ -1562,41 +1578,60 @@ in addition to this script.
 # This function provides a clean interface to include effects which is
 # identical to the following two commands (in this example):
 #
-# myeff2$include[myeff2$shortname==transTrip] <- TRUE
-# myeff2$include[myeff2$shortname==balance] <- TRUE
+#   myeff2$include[myeff2$shortname=='transTrip'] <- TRUE
+#   myeff2$include[myeff2$shortname=='balance'] <- TRUE
 
 # Run an estimation as usual:
 
     mymodel2 <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
     ans2 <- siena07(mymodel2, data=mydata2, effects=myeff2, batch=TRUE)
 
-# Conduct the score type test to assess whether heterogeneity is present.
+# With the batch=TRUE parameter there is no graphical interface
+# monitoring the progress of the estimation algorithm;
+# rather, reports of the progress are made visible
+# every time you click on the R console.
+
+# The function sienaTimeTest conducts score type tests for
+# time homogeneity. This does not require extra computation time.
 
     tt2 <- sienaTimeTest(ans2)
 
-# There are a number of score type tests conducted with this command.
-# See the Time Heterogeneity section for instructions on interpreting:
+# The request
+
+    tt2
+
+# gives the result of an overall test for time homogeneity
+# for all the parameters included - in this case, 4.
+# In this case the test is not significant.
+
+# Parameterwise tests and so-called one-step estimates are reported
+# by the request
 
     summary(tt2)
 
+# See the Time Heterogeneity section for the interpretation.
 # Briefly, there are three kinds of score tests here. The joint test
 # indicates whether there is evidence over all excluded time dummy
-# interaction effects for time heterogeneity. The effect-wise tests
-# indicate whether there is evidence across each effect (e.g.
-# for outdegree over ALL periods) for time heterogeneity.
-# A table is given with the original estimates, and "quick and dirty"
-# one-step estimates, to give a rough guess of what the values will
-# be if you include all time dummy interacted effects. Individual
-# tests are also given to indicate whether there is evidence for
-# time heterogeneity for the individual time dummy interactions.
-
+# interaction effects for time heterogeneity. The parameterwise tests
+# indicate the evidence for time heterogeneity for each effect
+# separately (e.g., for outdegree over ALL periods).
+# The one-step estimates are approximations
+# (one might say "quick and dirty", but usually quite reasonable)
+# for the estimates that would be obtained if all interactions
+# of parameters with time dummies would be freely estimated.
+# A table is given with the original estimates and the
+# one-step estimates.
+# For three or more waves, tests are also given to indicate the evidence
+# for time heterogeneity for the individual time dummy interactions.
 
 # Try a plot to see a visual representation of the time test:
 
     plot(tt2, effects=1:4, dims=c(2,2))
 
+# The <<effects>> parameter indicates the effects for which plots
+# are produced, and the <<dims>> the layout on the graphics device.
 # This plot illustrates the base period (=1) estimate for each effect
-# as a horizontal line. The dots represent one step estimates for each
+# as a horizontal line. The dots represent one-step estimates for each
 # effect, and the bands around these points represent confidence
 # intervals. Time dummy effects which have not yet been estimated are
 # indicated by red intervals.
@@ -1605,18 +1640,29 @@ in addition to this script.
 # new effects object to prepare another estimation
 
     myeff3 <- myeff2
-    myeff3<- includeTimeDummy(myeff3, recip, timeDummy="2")
-    myeff3<- includeTimeDummy(myeff3, balance, timeDummy="2")
 
-# And estimate the new model:
+# A new version of RSiena will include functions as follows:
+
+#    myeff3<- setEffect(myeff3, outdegree, timeDummy="2")
+#    myeff3<- setEffect(myeff3, balance, timeDummy="2")
+
+# As long as these have not been implemented yet, we can use
+# the following commands to add the main effect of the time dummy
+# (the same as interaction with the outdegree, or density, effect)
+# and the interaction of the time dummy with, e.g., balance:
+
+     myeff3$timeDummy[myeff3$shortName=='density'] <- "2"
+     myeff3$timeDummy[myeff3$shortName=='balance'] <- "2"
+
+# Then we can estimate the new model
 
     ans3 <- siena07(mymodel2, data=mydata2, effects=myeff3, batch=TRUE)
 
 # And so on:
+
     tt3 <- sienaTimeTest(ans3)
     summary(tt3)
     plot(tt3, effects=1:4, dims=c(2,2))
-
 
 
 ######################### USING FEWER WAVES ##########################
@@ -1674,6 +1720,7 @@ in addition to this script.
 # is the function saveSienaFit contained in the utilities file
 # on the "RSiena scripts" page of the Siena website,
 # http://www.stats.ox.ac.uk/~snijders/siena/
+# Of course this gives some safety against unexpected crashes etc.
 
 # Another way of storing things is by the functions dput() and dget()
 # which save objects in the form of files which you then
@@ -2918,12 +2965,17 @@ actor;
 \end{enumerate}
 \item {\em network evaluation and endowment functions}
 \begin{enumerate}
-\item the covariate-similarity effect;
+\item the covariate-similarity effect, which is suitable for variables
+      measured on an interval scale (or at least an ordinal scale
+      where it is meaningful to use the absolute difference
+      between the numerical values to express dissimilarity);
       a positive parameter implies that actors prefer
       ties to others with similar values on this variable --
       thus contributing to the
       network-autocorrelation of this variable not by changing
-      the variable but by changing the network;
+      the variable but by changing the network;\\
+      for categorical variables, see the `same covariate'
+      effect below;
 \item the effect on the actor's activity (covariate-ego);
       a positive parameter will imply the tendency that
       actors with higher values on this covariate
@@ -2969,7 +3021,9 @@ actor;
 The usual order of importance of these covariate effects on
 network evolution is: evaluation effects are most important, followed
 by endowment and rate effects. Inside the group of evaluation
-effects, it is the covariate-similarity effect that is most
+effects, for variables measured on an interval scale
+(or ordinal scale with reasonable numerical values),
+it is the covariate-similarity effect that is most
 important, followed by the effects of covariate-ego and
 covariate-alter.
 
@@ -8102,6 +8156,8 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-07-03 R-forge revision 111: bipartite networks now have a no-change
+  option at each ministep of simulation.
 \item 2010-06-25 R-forge revision 110: updated manual pages for dyadic
   covariates.
 \item 2010-06-25 R-forge revision 109:

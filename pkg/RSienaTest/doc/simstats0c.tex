@@ -215,7 +215,11 @@ selected rate effects multiplied by relevant theta value
 \subsection{Choose Change}
 \label{sec:change}
 \begin{algorithmic}
-\FOR[calculate deltas and effects]{$j \in \{1\ldots \nnm{dim2} \}$ }
+\STATE Define alters =$\{1\ldots \nnm{dim2} \}$
+\IF{bipartite}
+\STATE add \{0\} to  alters
+\ENDIF
+\FOR[calculate deltas and effects]{$j \in \text{alters}$ }
 \IF{out-degree of actor = \nm{maxdegree}}
 \STATE change is only permissible if there is a link to this alter, to
 change its value
@@ -241,8 +245,12 @@ change its value
 \STATE$\nnm{delta} = \{+1\}$
 \ENDIF
 \ELSE[not behaviour variable]
+\IF{j = 0 or j = actor}
+\STATE $\nnm{delta} = 0$
+\ELSE
 \STATE $\nnm{delta} = \{1-2\nm{y}\}$
 \COMMENT{for valued networks, this would alter}
+\ENDIF
 \ENDIF
 \ENDIF
 \STATE calculate \nnm{p(j, delta)} effect of each

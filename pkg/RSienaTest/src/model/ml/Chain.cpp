@@ -627,7 +627,7 @@ MiniStep * Chain::randomDiagonalMiniStep() const
 
 
 /**
- * Returns a random ministep form the given interval.
+ * Returns a random ministep from the given interval.
  */
 MiniStep * Chain::randomMiniStep(MiniStep * pFirstMiniStep,
 	MiniStep * pLastMiniStep) const
@@ -743,6 +743,9 @@ MiniStep * Chain::nextMiniStepForOption(const Option & rOption,
 // Section: copy a chain (too difficult (for Ruth!) to do a copy constructor!
 // ----------------------------------------------------------------------------
 
+/**
+ * Returns a copy of the given chain
+ */
 Chain * Chain::copyChain()
 {
 	Chain * pChain = new Chain(this->lpData);

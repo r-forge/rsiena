@@ -64,7 +64,7 @@ I describe the main details of our current practice:
 \begin{enumerate}
 \item Use lots of spaces: particularly around operators and after commas.
 \item Do not use underscores: use variable names made up of several (possibly
-  abbreviated) words with all but the first capitalised.
+  abbreviated, but ideally not) words with all but the first capitalised.
 \item Use braces even when not strictly necessary in \sfn{if} and \sfn{for}
   statements and similar. (Not universal yet, but I am adding them...)
 \item Align braces under each other (so put the first one on a new line). (I
@@ -73,21 +73,23 @@ I describe the main details of our current practice:
 \item Set tabs at intervals of 4 columns
 \item Indent by 4
 \item Align comments in the body of the code with the surrounding code.
-\item Do not use lines longer than 80 characters.
+\item Do not use lines longer than 80 characters in any file, even
+  documentation. 
 \item New source files need their \sfn{eol-style} set to \sfn{native} when they
   are added to the repository. On Windows, right-click and select
   Tortoise-SVN/properties then add \sfn{eol-style:native}.  (One current
   exception here: the file \sfn{sienascript} needs to have always unix line
   endings. Otherwise a tarball built on Windows will not produce a usable
   \sfn{sienascript} for Mac or Linux. There may be others in the future.)
-\item Copy a file header from an existing source file.
+\item Copy a file header from an existing source file, and adapt it.
+\item Ensure your editor removes all trailing spaces.
 \end{enumerate}
 \subsection{R}
 \begin{enumerate}
 \item Use \verb|<-| rather than \verb|=| for assignment.
 \item Use \sfn{TRUE} and \sfn{FALSE} not \sfn{T} and \sfn{F}.
 \item Avoid unnecessary \sfn{for} loops. They are acceptable where a complicated
-  \sfn{apply} statement would be necessary,  but not where a simple vectorised
+  \sfn{apply} statement would be necessary, but not where a simple vectorised
     command could be used.
   \item \sfn{R} functions need a documentation comment preceding the function
     declaration. If they have internal functions a call to \sfn{getInternals} is
@@ -106,6 +108,16 @@ I describe the main details of our current practice:
     \sfn{print.summary.objclass} method.
 \item Avoid using the names of \sfn{R} functions as variable names. It is
   permitted but may lead to confusion.
+\end{enumerate}
+\subsection{C++}
+\begin{enumerate}
+\item Use \texttt{this-\textgreater} even when not strictly necessary.
+\item Documentation is provided via Doxygen: install this and Graphviz. Use the
+  doxygen wizard with the file \texttt{config.dox} in \texttt{RSienaTest/doc}.
+\item If you add new files or functions, ensure they are
+  Doxygen-documented by copying the comment structure at the start of file or
+  function from a similar one.
+\item More details of the design are in the document \emph{classdesign.tex}.
 \end{enumerate}
 \section{Recreating the package}
 \begin{enumerate}
