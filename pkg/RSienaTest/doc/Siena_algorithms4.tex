@@ -160,7 +160,7 @@
 \newcommand{\addcc}[1]{{\textcolor[named]{Black}{#1}}}
 \newcommand{\addcd}[1]{{\textcolor[named]{Black}{#1}}}
 \newcommand{\addce}[1]{{\textcolor[named]{Black}{#1}}}
-\newcommand{\addcf}[1]{{\textcolor[named]{Red}{#1  (changed 30/05/2010)}}}
+\newcommand{\addcf}[1]{{\textcolor[named]{Black}{#1}}}
 
 \hyphenation{mini-step mini-steps reci-pro-city}
 \setlength{\parskip}{1.5ex plus0.5ex minus0.5ex}
@@ -1515,14 +1515,19 @@ by the very experienced user.
 \addaa{
 Function \textit{MH\_DelPermute} also uses internal probabilities \textit{prmin}
 and \textit{prmib}.
-These could have the default values
+If the number of actors always is $n$, and all networks are one-mode,
+these could have the default values
 \begin{align}
   \textit{prmin} & \, = \frac{\textit{NumMisNet}}{\textit{NumMisNet} + R_N\, n(n-1)} \\[0.5em]
   \textit{prmib} & \, = \frac{\textit{NumMisBeh}}{\textit{NumMisBeh} + R_B\, n}\
 \end{align}
+In the general case, $R_N\, n(n-1)$ would be replaced by the total number of
+dyadic tie variables, and $R_B\, n$ by the total number of individual
+behaviour variables.
 (The reasoning is as follows.
 In procedure \textit{MH\_DelPermute} this probability serves to balance
-changes in missings with changes in CCPs, and the total available number of variables/options
+changes in missings with changes in CCPs, and the
+total available number of variables/options
 for which there could be CCPs is $R_N\, n(n-1)$ and $R_B \,n$, respectively).}
 
 \newpage
@@ -2016,13 +2021,22 @@ and therefore calculate the following.
         \textit{NewCCPNumber} \leftarrow \textit{CCPNumber} + 1 \ ;
       \]
       if $\textit{NumberOption}(w_0,i_0,j_0,r_0) \geq 1 $ and $w_0 = N$ :
-      \[
-        \textit{NewCCPNumber} \leftarrow \textit{CCPNumber} + 2 \ ;
-       \]
+      \begin{enumerate}
+      \item if $\ms_a.\nnm{pred}$ in the original chain
+         (before the insertion) is of \textit{Option} $(w_0,i_0,j_0,r_0)$
+         then
+          \[
+            \textit{NewCCPNumber} \leftarrow \textit{CCPNumber} + 1 \ ,
+           \]
+      \item else
+          \[
+            \textit{NewCCPNumber} \leftarrow \textit{CCPNumber} + 2 \ ;
+           \]
+      \end{enumerate}
       if $\textit{NumberOption}(w_0,i_0,j_0,r_0) \geq 1$  and $w_0 = B$ :
       \begin{frindentation}{2em}{1em}
-      if there is a ministep of option $(w_0,i_0,j_0,r_0)$
-      before $\ms_a$, \\
+      if \{ there is a ministep of option $(w_0,i_0,j_0,r_0)$
+      before $\ms_a$, and the last such ministep is not $\ms_a.\nnm{pred}$ \}, \\
       define $d_-$ as the $d$-coordinate of the last such ministep,
       and $d_- \leftarrow 0$  otherwise;\\
       if there is a ministep of option $(w_0,i_0,j_0,r_0)$
@@ -2052,7 +2066,6 @@ and therefore calculate the following.
 Part \emph{B}:
 \begin{enumerate}[resume]
 \item
-\vspace{-1.5em}
 \[ \textit{sumlprob} \leftarrow \sum_{s=1}^{\textit{ThisLength}}
              (\ms_a.\nnm{succ}^{s-1}).(\nnm{lChoiceProb} + \nnm{lOptionSetProb}) \ ;
       \]
@@ -3086,7 +3099,6 @@ Below we shall use a different expression, however, which is the linear
 approximation to this function.
 \fi
 
-\addce{
 The score function for the parameters of the rate function
 here is different from what is specified in \\
 \textsf{simstats0c}.
@@ -3118,24 +3130,14 @@ The rate function then is expressed by
  \lambda^w(\theta, r,i, y) = \rho^w_r \, \exp(\alpha^w_{r} s^w_{ri} )
                \label{tkappa5}
 \end{equation}
-(where $\alpha^w_{r}$ is a row vector and $ s^w_{ri}$ a column vector).
+(where $\alpha^w_{r} s^w_{ri}$ is the inner product of these two vectors).
 Thus, there is a basic rate parameter $\rho^w_r$ for each  dependent
 variable labeled $(w,r)$; in addition there may be actor-dependent variables $s^w_{ri}$ that
 affect the rate for dependent variable $(w,r)$, but the parameters $\alpha^w_{r}$
 are distinct for distinct dependent variables.
-\vspace{\parskip} \\
-\hspace{\parindent}   % Just a \par does not agree with addce.
-If there is composition change, denote the time duration
-for which actor $i$ is present in a given period between two waves
-by $(td)_i$.
-Note that total time duration between two waves
-always is 1.
-Thus, $0 \leq (td)_i \leq 1$, and $(td)_i = 0$ for actors
-who are absent throughout this period, $(td)_i = 1$ for actors who
-always are present, and $0 < (td)_i < 1$ for actors who join
-or leave during the period.
-\vspace{\parskip} \\
-\hspace{\parindent}  % Just a \par does not agree with addce.
+
+All sums over actors $i$ in the following are over the active actors.
+
 Denote the number of ministeps of \textit{OptionSet} $(w,i,r)$
 by $T^w_{ri}$ and $T^w_r = \sum_i T^w_{ri}$.
 Note that $\sum_{w,r} T^w_r = \textit{TotNumber}-1$.
@@ -3143,7 +3145,7 @@ The score functions are given
 for the basic rate parameters by
 \begin{equation}
 \frac{\partial\, \text{complete data log-likelihood}}{\partial \rho^w_r} =
-    \frac{T^w_r}{\rho^w_r} - \sum_i (td)_i \, \exp(\alpha^w_{r} s^w_{ri}) \  , \label{tscore2}
+    \frac{T^w_r}{\rho^w_r} - \sum_{\text{active } i}  \exp(\alpha^w_{r} s^w_{ri}) \  , \label{tscore2}
 \end{equation}
 which for cases with \emph{only} a basic rate parameter
 $ \lambda^w(\theta, r,i, y) = \rho^w_r $,
@@ -3158,9 +3160,9 @@ by $h$, the score functions for the other rate parameters are
 \begin{eqnarray}
   \frac{\partial \, \text{complete data log-likelihood}}{\partial \alpha^w_{rh}}
   &=&                                                         \label{tscore4}
-   \sum_i  s^w_{rih} \big(T^w_{ri} - (td)_i \, \rho^w_r \,
+   \sum_{\text{active } i} s^w_{rih} \big(T^w_{ri} -  \rho^w_r \,
                    \exp(\alpha^w_{r} s^w_{ri} )  \big) \\
-   &=& \sum_i  s^w_{rih} \big(T^w_{ri} - (td)_i \,  \lambda^w(\theta, r,i, y)   \big)
+   &=& \sum_{\text{active } i}  s^w_{rih} \big(T^w_{ri} -  \lambda^w(\theta, r,i, y)   \big)
                \ . \nonumber
 \end{eqnarray}
 More background is given in Appendix~\ref{S_A1}.
@@ -3227,7 +3229,7 @@ and for the other rate parameters they are
 This reduces to the equations above in case that the functions
 $s^w_{ri}(y)$ are independent of $y$, so there is nothing against
 using these last two equations in all cases.
-}
+
 
 \iffalse
 In the ``other case", the formula is more complicated.
@@ -3270,7 +3272,7 @@ through the \textit{KappaFactor}.
 Note that \textit{StepProb3} calculates $rr$ as the reciprocal of
 \[
    \lambda^+(\theta, +,+, y) = \sum_{r=1}^{R_N} \sum_i \lambda^N(\theta,r,i,y)
-           +  \sum_{r=1}^{R_B} \sum_i \lambda^B(\theta,r,i,y)
+           +  \sum_{r=1}^{R_B} \sum{\text{active } i} \lambda^B(\theta,r,i,y)
 \]
 and $sc$ as the score function for all parameters except $\rho$.
 
@@ -3358,12 +3360,13 @@ It will be worthwhile to think about a better way of
 estimating $\Cov(\hat\theta)$.
 
 \addce{
-In the Robbins-Monro algorithm we might use an adaptation,
-and solve right away for $\rho$ using
+In the Robbins-Monro algorithm we might later experiment with an adaptation,
+in which after the Robbins-Monro update step we
+solve for $\rho$ using
 the score function for $\rho$  --
-consider (\ref{tscore2}), (\ref{tscore3}), and (\ref{tscore5}) --
-given that the parameters $\alpha$ have been updated earlier.
-(I hope this agrees with the stochasticity of the Robbins-Monro algorithm.)
+consider (\ref{tscore2}), (\ref{tscore3}), and (\ref{tscore5}).
+(I am not sure that this works well, as this
+might conflict with the stochasticity of the Robbins-Monro algorithm.)
 }
 
 \section{Likelihood-based calculations:
@@ -3667,7 +3670,7 @@ are arbitrary and the rate function is given by
  \lambda^w(\theta, r,i, y) = \rho^w_r \, \exp(\alpha^w_{r} s_{ri} )
                \label{kappa5}
 \end{equation}
-(where $\alpha^w_{r}$ is a row vector and $ s_{ri}$ a column vector).
+(where $\alpha^w_{r} s_{ri}$  is the inner product of these two vectors).
 Thus, there is a basic rate parameter $\rho^w_r$ for each given dependent
 variable labeled $(w,r)$; in addition there may be actor-dependent variables $s_{ri}$ that
 affect the rate for dependent variable $(w,r)$, but the parameters $\alpha^w_{r}$

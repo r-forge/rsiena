@@ -76,8 +76,11 @@ public:
 	void deletePermuteProbability(double probability);
 	double deletePermuteProbability() const;
 
-	void randomMissingProbability(double probability);
-	double randomMissingProbability() const;
+	void insertRandomMissingProbability(double probability);
+	double insertRandomMissingProbability() const;
+
+	void deleteRandomMissingProbability(double probability);
+	double deleteRandomMissingProbability() const;
 
 	void missingNetworkProbability(double probability);
 	double missingNetworkProbability() const;
@@ -107,15 +110,16 @@ private:
 	double lpermuteProbability;
 	double linsertPermuteProbability;
 	double ldeletePermuteProbability;
-	double lrandomMissingProbability;
+	double linsertRandomMissingProbability;
+	double ldeleteRandomMissingProbability;
 	double lmissingNetworkProbability;
 	double lmissingBehaviorProbability;
 	double lproposalProbability;
 	bool lmissingData;
 	Aspect laspect;
-	double lprobabilityArray[6];
-	int lacceptances[6];
-	int lrejections[6];
+	double lprobabilityArray[7];
+	int lacceptances[7];
+	int lrejections[7];
 	vector<int> lBayesAcceptances;
 	vector<double> lsampledBasicRates;
 	vector<int> lsampledBasicRatesDistributions;

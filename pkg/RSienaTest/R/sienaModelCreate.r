@@ -16,8 +16,8 @@ sienaModelCreate <-
              n3=1000, nsub=4, maxlike=FALSE, diag=!maxlike,
              condvarno=0, condname='',
              firstg=0.2, cond=NA, findiff=FALSE,  seed=NULL,
-             pridg=0.05, prcdg=0.05, prper=0.3, pripr=0.25, prdpr=0.25,
-             prrms=0.1)
+             pridg=0.1, prcdg=0.1, prper=0.3, pripr=0.25, prdpr=0.25,
+             prirms=0.0, prdrms=0.0)
 {
     model <- NULL
     model$projname <- projname
@@ -79,7 +79,8 @@ sienaModelCreate <-
     model$prper <- prper
     model$pripr <- pripr
     model$prdpr <- prdpr
-    model$prrms <- prrms
+    model$prirms <- prirms
+    model$prdrms <- prdrms
     class(model) <- "sienaModel"
     model
 }

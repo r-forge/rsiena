@@ -1871,8 +1871,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         {
             prmib <- 0.0
         }
-        z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prrms,
-                     prmin, prmib)
+        z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms,
+                     x$prdrms, prmin, prmib)
         ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
                      simpleRates, z$probs)
         f$chain <- ans[[2]]

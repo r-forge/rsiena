@@ -3717,13 +3717,13 @@ one of values, one of missing values (boolean) */
 
 		/* get hold of the statistics for accept and reject */
 		SEXP accepts;
-		PROTECT(accepts = allocVector(INTSXP, 6));
+		PROTECT(accepts = allocVector(INTSXP, 7));
 		SEXP rejects;
-		PROTECT(rejects = allocVector(INTSXP, 6));
+		PROTECT(rejects = allocVector(INTSXP, 7));
 		int * iaccepts = INTEGER(accepts);
 		int * irejects = INTEGER(rejects);
 
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 7; i++)
 		{
 			iaccepts[i] = pMLSimulation->acceptances(i);
 			irejects[i] = pMLSimulation->rejections(i);
@@ -3800,9 +3800,10 @@ one of values, one of missing values (boolean) */
 		pMLSimulation->permuteProbability(REAL(PROBS)[2]);
 		pMLSimulation->insertPermuteProbability(REAL(PROBS)[3]);
 		pMLSimulation->deletePermuteProbability(REAL(PROBS)[4]);
-		pMLSimulation->randomMissingProbability(REAL(PROBS)[5]);
-		pMLSimulation->missingNetworkProbability(REAL(PROBS)[6]);
-		pMLSimulation->missingBehaviorProbability(REAL(PROBS)[7]);
+		pMLSimulation->insertRandomMissingProbability(REAL(PROBS)[5]);
+		pMLSimulation->deleteRandomMissingProbability(REAL(PROBS)[6]);
+		pMLSimulation->missingNetworkProbability(REAL(PROBS)[7]);
+		pMLSimulation->missingBehaviorProbability(REAL(PROBS)[8]);
 
 		/* initialize the chain: this also initializes the data */
 		pMLSimulation->connect(0);
@@ -3816,7 +3817,7 @@ one of values, one of missing values (boolean) */
 		/* do some more steps */
 
 		pMLSimulation->setUpProbabilityArray();
-		int numSteps=1000;
+		int numSteps = 500;
 		for (int i = 0; i < numSteps; i++)
 		{
 			pMLSimulation->MLStep();
