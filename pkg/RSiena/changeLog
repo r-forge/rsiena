@@ -1,3 +1,8 @@
+2010-07-04 R-forge revision 112
+
+	* R/sienautils.r: fix bug with groups and constant dyadic
+	covariates with only 2 periods. (Introduced in revision 109!)
+
 2010-07-03 R-forge revision 111
 
 	* src/siena07.cpp, src/model/ml/Chain.cpp,
