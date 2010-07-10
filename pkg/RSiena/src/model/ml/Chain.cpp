@@ -315,20 +315,42 @@ void Chain::connect(int period)
 					if (iter1.valid() &&
 						(!iter2.valid() || iter1.actor() < iter2.actor()))
 					{
+						if (!pNetworkData->structural(i, iter1.actor(),
+								period)
+							//	|| !pNetworkData->structural(i, iter1.actor(),
+							//	period + 1)
+							)
+						{
 						miniSteps.push_back(
 							new NetworkChange(pNetworkData,
 								i,
 								iter1.actor()));
 						iter1.next();
 					}
+						else
+						{
+							// create step in structural subchain?
+						}
+					}
 					else if (iter2.valid() &&
 						(!iter1.valid() || iter2.actor() < iter1.actor()))
 					{
+						if (!pNetworkData->structural(i, iter2.actor(),
+								period)
+							//	|| !pNetworkData->structural(i, iter2.actor(),
+							// period + 1)
+							)
+						{
 						miniSteps.push_back(
 							new NetworkChange(pNetworkData,
 								i,
 								iter2.actor()));
 						iter2.next();
+					}
+					else
+					{
+							// create step in structural subchain?
+						}
 					}
 					else
 					{
@@ -354,10 +376,20 @@ void Chain::connect(int period)
 
 				for (int j = 0; j < delta; j++)
 				{
+					if (!pBehaviorData->structural(period, j)
+						//|| !pBehaviorData->structural(period, j + 1)
+						)
+
+					{
 					miniSteps.push_back(
 						new BehaviorChange(pBehaviorData,
 							i,
 							singleChange));
+					}
+					else
+					{
+						// create step in structural subchain?
+					}
 				}
 			}
 		}

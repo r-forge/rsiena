@@ -15,7 +15,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
      diag = !maxlike, condvarno = 0, condname = "", firstg = 0.2,
      cond = NA, findiff = FALSE, seed = NULL, pridg=0.1,
      prcdg=0.1, prper=0.3, pripr=0.25, prdpr=0.25, prirms=0,
-     prdrms=0)
+     prdrms=0, maximumPermutationLength=40,
+     minimumPermutationLength=2, initialPermutationLength=20)
 }
 \arguments{
   \item{fn}{Function to do one simulation in the Robbins-Monro
@@ -64,6 +65,12 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
 	routine in ML estimation.}
   \item{prdrms}{Real number. Probability used in Metropolis-Hastings
 	routine in ML estimation.}
+  \item{maximumPermutationLength}{Maximum length of permutation in steps in ML
+	estimation}
+  \item{minimumPermutationLength}{Minimum length of permutation in steps in ML
+	estimation}
+  \item{initialPermutationLength}{Initial length of permutation in steps in ML
+	estimation}
 }
 \details{Model specification is done via this object for
   \code{\link{siena07}}.

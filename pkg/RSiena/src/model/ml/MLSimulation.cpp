@@ -48,11 +48,12 @@ MLSimulation::MLSimulation(Data * pData, Model * pModel) :
 	this->lmissingNetworkProbability = 0;
 	this->lmissingBehaviorProbability = 0;
 	this->laspect = NETWORK;
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 7; i++)
 	{
 		this->lrejections[i] = 0;
 		this->lacceptances[i] = 0;
 	}
+	this->lcurrentPermutationLength = pModel->initialPermutationLength();
 }
 
 
@@ -350,8 +351,8 @@ void MLSimulation::setUpProbabilityArray()
 void MLSimulation::MLStep()
 {
 
-	int stepType = nextIntWithProbabilities(6, this->lprobabilityArray);
-	int c0 = 40;
+	int stepType = nextIntWithProbabilities(7, this->lprobabilityArray);
+	int c0 = this->lcurrentPermutationLength;
 	bool accept = false;
 	switch (stepType)
 	{
@@ -363,15 +364,21 @@ void MLSimulation::MLStep()
 		break;
 	case 2:
 		accept = this->permute(c0);
+		this->updateCurrentPermutationLength(accept);
 		break;
 	case 3:
 		accept = this->insertPermute(c0);
+		this->updateCurrentPermutationLength(accept);
 		break;
 	case 4:
 		accept = this->deletePermute(c0);
+		this->updateCurrentPermutationLength(accept);
 		break;
 	case 5:
-		//accept = this->randomMissing();
+		//accept = this->insertRandomMissing();
+		break;
+	case 6:
+		//accept = this->deleteRandomMissing();
 		break;
 	}
 	if (accept)
@@ -691,6 +698,9 @@ bool MLSimulation::permute(int c0)
 	MiniStep * pNextMiniStep = pMiniStep;
 
 	permuteVector(interval);
+
+	this->lthisPermutationLength = interval.size();
+
 	this->setStateBefore(pMiniStepA);
 	bool valid = true;
 	double sumlprob = 0;
@@ -909,6 +919,8 @@ bool MLSimulation::insertPermute(int c0)
 	}
 
 	permuteVector(interval);
+
+	this->lthisPermutationLength = interval.size();
 
 	// Add the ministeps up to the pMiniStepB to the interval,
 	// as the calculations with these ministeps are the same as with
@@ -1307,6 +1319,8 @@ bool MLSimulation::deletePermute(int c0)
 	}
 
 	permuteVector(interval);
+
+	this->lthisPermutationLength = interval.size();
 
 	// Add the ministeps up to pMiniStepB to the interval,
 	// as the calculations with these ministeps are the same as with
@@ -1858,5 +1872,35 @@ int MLSimulation::acceptances(int stepType) const
 int MLSimulation::rejections(int stepType) const
 {
 	return this->lrejections[stepType];
+}
+
+/**
+ * Updates the permutation length for this period.
+ */
+
+void MLSimulation::updateCurrentPermutationLength(bool accept)
+{
+	int permutationLength = this->lcurrentPermutationLength;
+	if (this->lthisPermutationLength == permutationLength)
+	{
+		double minvalue = this->pModel()->minimumPermutationLength();
+		double maxvalue = this->pModel()->maximumPermutationLength();
+		if (accept)
+		{
+			this->lcurrentPermutationLength += 0.5;
+			if (this->lcurrentPermutationLength > maxvalue)
+			{
+				this->lcurrentPermutationLength = maxvalue;
+			}
+		}
+		else
+		{
+			this->lcurrentPermutationLength -= 0.5;
+			if (this->lcurrentPermutationLength < minvalue)
+			{
+				this->lcurrentPermutationLength = minvalue;
+			}
+		}
+	}
 }
 }

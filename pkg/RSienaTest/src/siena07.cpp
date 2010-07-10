@@ -3766,7 +3766,8 @@ one of values, one of missing values (boolean) */
         return(ans);
     }
 
-    SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES, SEXP PROBS)
+    SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES,
+		SEXP PROBS, SEXP MINIMUMPERM, SEXP MAXIMUMPERM, SEXP INITIALPERM)
     {
 		/* set up chains and do the first few MH iters on each */
 
@@ -3779,10 +3780,18 @@ one of values, one of missing values (boolean) */
 
 		int totObservations = 0;
         for (int group = 0; group < nGroups; group++)
+		{
             totObservations += (*pGroupData)[group]->observationCount() - 1;
+		}
 
 		/* get hold of the model object */
         Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+		/* copy permutation lengths to the model */
+
+		pModel->maximumPermutationLength(REAL(MAXIMUMPERM)[0]);
+		pModel->minimumPermutationLength(REAL(MINIMUMPERM)[0]);
+		pModel->initialPermutationLength(REAL(INITIALPERM)[0]);
 
 		SEXP RpChains;
 		PROTECT(RpChains = allocVector(VECSXP, totObservations));

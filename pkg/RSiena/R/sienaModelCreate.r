@@ -17,7 +17,8 @@ sienaModelCreate <-
              condvarno=0, condname='',
              firstg=0.2, cond=NA, findiff=FALSE,  seed=NULL,
              pridg=0.1, prcdg=0.1, prper=0.3, pripr=0.25, prdpr=0.25,
-             prirms=0.0, prdrms=0.0)
+             prirms=0.0, prdrms=0.0, maximumPermutationLength=40,
+             minimumPermutationLength=2, initialPermutationLength=20)
 {
     model <- NULL
     model$projname <- projname
@@ -81,6 +82,9 @@ sienaModelCreate <-
     model$prdpr <- prdpr
     model$prirms <- prirms
     model$prdrms <- prdrms
+    model$maximumPermutationLength <- maximumPermutationLength
+    model$minimumPermutationLength <- minimumPermutationLength
+    model$initialPermutationLength <- initialPermutationLength
     class(model) <- "sienaModel"
     model
 }
