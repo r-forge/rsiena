@@ -1620,7 +1620,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         attr(f, "compositionChange") <- attr(data, "compositionChange")
         attr(f, "exooptions") <- attr(data, "exooptions")
         attr(f, "groupPeriods") <- attr(data, "groupPeriods")
-        attr(f, "totalMissings") <- attr(data, "totalMissings")
+      #  attr(f, "totalMissings") <- attr(data, "totalMissings")
 
         if (x$maxlike && x$FinDiff.method)
         {
@@ -1846,35 +1846,21 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         ## set up chains and do initial steps
         simpleRates <- TRUE
 
-        ## sum the missings to calculate the relevant probabilities
-        totalMissings <- attr(f, "totalMissings")
         types <- attr(f, "types")
-        use <- types != "behavior"
-        ## use arbitrary n for now
-        n <- length(f[[1]]$nodeSets[[1]])
-        if (sum(use) > 0)
-        {
-            netMissings <- sum(totalMissings[use])
-            prmin <- netMissings / (netMissings + sum(use) * n * (n - 1))
-        }
-        else
-        {
-            prmin <- 0.0
-        }
-        use <- types == "behavior"
-        if (sum(use) > 0)
-        {
-            behMissings <- sum(totalMissings[types == "behavior"])
-            prmib <- behMissings / (behMissings + sum(use) * n)
-        }
-        else
-        {
-            prmib <- 0.0
-        }
+        nbrNonMissNet <- attr(f, "numberMissingNetwork")
+        nbrMissNet <- attr(f, "numberMissingNetwork")
+        nbrNonMissBeh <- attr(f, "numberMissingBehavior")
+        nbrMissBeh <- attr(f, "numberMissingBehavior")
+
+        prmin <-   nbrMissNet/ (nbrMissNet + nbrNonMissNet)
+        prmib <-   nbrMissBeh/ (nbrMissBeh + nbrNonMissBeh)
+        cat (prmin, prmib, '\n')
         z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms,
                      x$prdrms, prmin, prmib)
         ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
-                     simpleRates, z$probs)
+                     simpleRates, z$probs, x$minimumPermutationLength,
+                     x$maximumPermutationLength,
+                     x$initialPermutationLength)
         f$chain <- ans[[2]]
         ##store address of simulation object
         f$pMLSimulation <- ans[[1]][[1]]

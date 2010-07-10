@@ -832,7 +832,12 @@ void NetworkVariable::accumulateScores(int alter) const
 		 i++)
 	{
 		Effect * pEffect = this->pEndowmentFunction()->rEffects()[i];
-		double score = this->lendowmentEffectContribution[alter][i];
+
+		double score = 0;
+		if (this->lpNetworkCache->outTieExists(alter))
+		{
+			score += this->lendowmentEffectContribution[alter][i];
+		}
 
 		for (int j = 0; j < m; j++)
 		{
@@ -847,7 +852,6 @@ void NetworkVariable::accumulateScores(int alter) const
 
 		this->pSimulation()->score(pEffect->pEffectInfo(),
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
-//	Rprintf(" endow score %f\n", score);
 	}
 }
 
@@ -1088,6 +1092,7 @@ bool NetworkVariable::missing(const MiniStep * pMiniStep) const
 {
 	const NetworkChange * pNetworkChange =
 		dynamic_cast<const NetworkChange *>(pMiniStep);
+
 	return this->lpData->missing(pNetworkChange->ego(),
 			pNetworkChange->alter(),
 			this->period()) ||

@@ -88,6 +88,11 @@ public:
 	void missingBehaviorProbability(double probability);
 	double missingBehaviorProbability() const;
 
+	void currentPermutationLength(int period, double value);
+	double currentPermutationLength(int period) const;
+
+	void updateCurrentPermutationLength(bool accept);
+
 	// Bayesian routines
 	void initializeMCMCcycle();
 	void MHPstep();
@@ -124,6 +129,9 @@ private:
 	vector<double> lsampledBasicRates;
 	vector<int> lsampledBasicRatesDistributions;
 	map<const EffectInfo *, vector<double> > lcandidates;
+	// current length of permuted interval
+	double lcurrentPermutationLength;
+	int lthisPermutationLength;
 
 };
 
