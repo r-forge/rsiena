@@ -147,6 +147,9 @@ Quicker if you are debugging changes. Note that the \sfn{make} file is not very
 clever: if you are altering the C and your changes are not appearing, delete the
 .o's or .dll to force it, or do a build
 to clear out all the .o's and the dll.
+\item On Windows the install procedure downloads the gui installer. If you want
+  to bypass this, rename the file \verb|configure.win| in the package
+  directory. 
 \item On linux or Mac, the same commands should work, but you don't need the
   Rtools. I have occasionally had problems with installing from a tarball or
   from source, when I have no permission to write in the standard libraries, but

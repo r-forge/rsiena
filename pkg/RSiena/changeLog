@@ -1,3 +1,10 @@
+2010-07-19 R-forge revision 114
+
+	* R/print01Report.r: fix bug in names of multiple behavior
+	variables on siena01 report.
+	* R/print07Report.r, R/sienaprint.r: remove references to data in
+	printing, as object gets too large.
+	
 2010-07-10 R-forge revision 113
 
 	* src/model/variables/NetworkVariable.cpp: bug fix for endowment
