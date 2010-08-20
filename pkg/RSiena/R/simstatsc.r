@@ -1555,6 +1555,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         }
         ## now check if conditional estimation is OK and copy to z if so
         z$cconditional <- FALSE
+        types <- sapply(data[[1]]$depvars, function(x) attr(x, 'type'))
+        nets <- sum(types != "behavior")
         if (x$cconditional)
         {
             if (x$maxlike)
@@ -1562,7 +1564,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                 stop("Conditional estimation is not possible with",
                      "maximum likelihood method")
             }
-            types <- sapply(data[[1]]$depvars, function(x) attr(x, 'type'))
+          #  types <- sapply(data[[1]]$depvars, function(x) attr(x, 'type'))
             nets <- sum(types != "behavior")
             ##  if (nets == 1) not sure if this is necessary
             ##  {
@@ -1670,7 +1672,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     }
     else ## initC, i.e just send already set up data into new processes
     {
-       f <- FRANstore()
+        f <- FRANstore()
         ## Would like f to be just the data objects plus the attributes
         ## but need the effects later. Also a few other things,
         ## which probably could be attributes but are not!
@@ -1688,6 +1690,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         f$interactionEffects <- NULL
         f$chain <- NULL
         f$pMLSimulation <- NULL
+        f$types <- NULL
     }
     ##browser()
     pData <- .Call('setupData', PACKAGE=pkgname,
@@ -1884,6 +1887,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     f$depNames <- names(f[[1]]$depvars)
     f$groupNames <- names(f)[1:nGroup]
     f$nGroup <- nGroup
+    f$types <- types
     if (!initC)
     {
         z$f <- f
