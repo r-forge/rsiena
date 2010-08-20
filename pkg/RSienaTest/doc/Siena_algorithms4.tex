@@ -176,7 +176,7 @@ RSiena. It is intended to be included later on as part of the
 programmer's manual of RSiena.
 
 
-\remark{The additions in the version of May 30, 2010, pertain
+The additions in the version of May 30, 2010, pertain
 to the following.
 \begin{enumerate}
 \item The earlier, incomplete and incorrect, procedure \textit{MH\_RandomMis}
@@ -188,8 +188,6 @@ to the following.
 \item Small changes to correct errors in procedures  \textit{MH\_InsPermute}
      and  \textit{MH\_DelPermute}.
 \end{enumerate}
-Again, all changes are indicated in red.
-}
 
 The additions in the version of May 11, 2010, pertain to the
 following issues.
@@ -314,7 +312,8 @@ $\lambda^B(r,i,x,z)$ \hspace*{3em} \> rate function, behavior $r$.\\
                                   \> (0 for inactive actors)\\[1ex]
 $f^N(r,i,x,z)$ \hspace*{3em} \> evaluation function function, network $r$.\\[1ex]
 $f^B(r,i,x,z)$ \hspace*{3em} \> evaluation function, behavior $r$.\\[1ex]
-$g^N(r,i,j,x,z)$ \hspace*{3em} \> endowment function function, network $r$.\\[1ex]
+$g^N(r,i,j,x,z)$ \hspace*{3em} \> endowment function function, network $r$\\
+                     \> (used also as creation function!) \\[1ex]
 $g^B(r,i,x,z)$ \hspace*{3em} \> endowment function, behavior $r$.\\[1ex]
 $\Delta f^N(r,i,j,x,z)$ \hspace*{3em} \> change in $f^N(r,i,x,z)$
                                 by toggling $N^{(r)}_{ij}$.\\[1ex]
@@ -446,6 +445,7 @@ we define the following logical (boolean) variables:
 
       For all $j \in C$, calculate $h_j = \Delta f^N(r,i,j,x,z)$, and $h_i = 0$.\\
       For all $j \in C$ with $N^{r}_{ij} = 1$, calculate $h_j = h_j - g^N(r,i,j,x,z)$.\\
+      For all $j \in C$ with $N^{r}_{ij} = 0$, calculate $h_j = h_j + g^N(r,i,j,x,z)$.\\
       Choose $j \in C \cup {i}$ with probabilities
       \begin{equation}
          \pi_j = \frac{\exp(h_j) }{ \sum_k \exp(h_k) }               \label{pij}
@@ -869,6 +869,147 @@ algorithm. See
 \citet{Snijders01} and
 \citet{SnijdersEA07}.
 I hope later on to have time for elaborating this here.
+
+\subsection{Interaction effects for behavior}
+
+Interaction effects can be defined for those behavior effects
+where the effect is defined as a product of the behavior itself ($z_i$)
+and something independent of $z_i$ itself, although it may depend
+on the other dependent variables and even on $z_j$ for $j \neq i$. In mathematical
+terms, for effects defined as
+\begin{equation}
+  s_{ik}^Z(x,z) = z_i\, s_{ik}^{Z0}(x,z)   \label{beh_eff_standard}
+\end{equation}
+where $s_{ik}^{Z0}(x,z)$ is a function not depending on $z_i$.
+Most effects are of this kind;
+if I am right, all except for the quadratic tendency effect
+and effects involving similarity with respect to $Z$.
+
+Note that this concerns effect for the same behavior variable $Z$.
+(I drop the index $r$ here.)
+
+For such effects, the change contribution is $s_{ik}^{Z0}(x,z)$ and
+the evaluation statistic is (\ref{beh_eff_standard}).
+
+The interaction of two such effects, with indices $k_1$ and $k_2$
+(where it is allowed that $k_1 = k_2$) is defined by the
+evaluation statistic
+\begin{equation}
+  s_{i(k_1 \circ k_2)}^Z(x,z) = z_i\, s_{ik_1}^{Z0}(x,z) \, s_{ik_2}^{Z0}(x,z)  \label{beh_eff_int}
+\end{equation}
+(I just used a circle $\circ$ to denote the interaction)
+and the change contribution
+\[
+   s_{ik_1}^{Z0}(x,z) \, s_{ik_2}^{Z0}(x,z)  \ .
+\]
+
+For interactions between three effects it is just the same.
+The same effects qualify, the evaluation statistic is
+\[
+  s_{i(k_1 \circ k_2 \circ k_3)}^Z(x,z) = z_i\, s_{ik_1}^{Z0}(x,z) \, s_{ik_2}^{Z0}(x,z)\, s_{ik_3}^{Z0}(x,z)
+\]
+and the change contribution
+\[
+   s_{ik_1}^{Z0}(x,z) \, s_{ik_2}^{Z0}(x,z\, s_{ik_3}^{Z0}(x,z)  \ .
+\]
+
+
+\subsection{Weighted effects for behavior}
+
+Another concept, which is similar to interaction, is
+weighted effects. This is defined for effects
+involving a network $X$. Again I drop the index $r$.
+
+The effect can be weighted by an actor variable;
+which can be an actor covariate as well as a dependent actor behavior
+(the same behavior as the one under consideration or a different one).
+Denote this variable by $V$.
+The weighting is carried out by multiplying each $x_{ij}$
+(but not other tie variables; only ties with $i$
+as a sender)
+by $v_j$; thus, in the interactions of the preceding subsection
+we are working with $v_i$ but now with $v_j$.
+(The weighted indegree effect below is an exception to this general description.)
+This multiplication is done in the change contribution
+as well as the evaluation statistic.
+
+Let me give the following examples (going through the list
+in the manual).
+
+\begin{enumerate}
+\addtocounter{enumi}{2}
+ \item {\em weighted average similarity effect}, defined by the
+ weighted average of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
+ and the other actors $j$ to whom he is tied,\\
+ \[
+ s^{\rm beh}_{i\vit \circ V}(x) =
+   \frac{\sum_j v_j\, x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z})}{\sum_j v_j \,x_{ij}} \ ;
+   \]
+ (and 0 if $\sum_j v_j\ x_{ij} = 0$)  ;
+
+ \item {\em weighted total similarity effect}, defined by the
+ weighted sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
+ and the other actors $j$ to whom he is tied,\\
+ $s^{\rm beh}_{i\vit \circ V}(x) = \sum_j v_j\, x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $ ;
+
+ \item {\em weighted indegree effect}, \\
+ by an exception to the rule this could be defined as
+ $s^{\rm beh}_{i\vit \circ V}(x) = z_i \sum_j v_j\,x_{ji} $ ;
+
+ \item {\em weighted outdegree effect}, \\
+ $s^{\rm beh}_{i\vit \circ V}(x) = z_i \sum_j v_j \,x_{ij} $ ;
+
+\addtocounter{enumi}{1}
+
+ \item
+ {\em weighted average similarity $\times$ reciprocity effect}, defined by the
+ sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
+ and the other actors $j$ to whom he is reciprocally tied,
+ \[
+ s^{\rm beh}_{i\vit \circ V}(x) =
+ \frac{ \sum_j v_j \, x_{ij} x_{ji} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z})}
+     {\sum_j v_j \, x_{ij} x_{ji}} \ ;
+\]
+
+ (and 0 if $\sum_j v_j \, x_{ij} x_{ji} = 0$) ;
+
+ \item {\em weighted total similarity $\times$ reciprocity effect}, defined by the
+ sum of weighted centered similarity scores ${\rm sim}^z_{ij}$ between $i$
+ and the other actors $j$ to whom he is reciprocally tied,\\
+ $s^{\rm beh}_{i\vit \circ V}(x) =  \sum_j v_j\, x_{ij} x_{ji} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $.
+
+\medskip
+
+\hspace{-2em}
+Let us omit the popularity-interaction effects,
+   which already contain a weight.
+
+ \addtocounter{enumi}{4}
+
+
+ \item {\em weighted average alter effect}, defined by the product of $i$'s
+ behavior multiplied by the average behavior of his alters (a kind
+ of ego-alter behavior covariance),
+ \[
+ s^{\rm beh}_{i\vit \circ V}(x) =  z_i \, \frac{  \sum_j v_j\,x_{ij}\, z_j }
+                                { \sum_j v_j \,x_{ij} }
+  \]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
+
+ \item {\em weighted average reciprocated alter effect}, defined by the product of $i$'s
+ behavior multiplied by the average behavior of his reciprocated alters,
+ \[
+ s^{\rm beh}_{i\vit \circ V}(x) =  z_i \, \frac{\sum_j v_j \, x_{ij}\, x_{ji}\, z_j }
+                                {\sum_j v_j\, x_{ij}\, x_{ji} }
+\]
+ (and 0 if the ratio is 0/0) ;
+
+\addtocounter{enumi}{3}
+
+ \item {\em weighted reciprocated degree effect}, \\
+ $s^{\rm beh}_{i\vit \circ V}(x) = z_i \sum_j v_j \, x_{ij}\,x_{ji} $ .
+
+\end{enumerate}
 
 
 \section{Likelihood-based calculations:
@@ -3874,7 +4015,7 @@ of $\breve v_i$ would be the same as the alter effect of $v_i$.
       defined as the sum of alters' covariate-average over all actors
       to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \breve v_j
+ s^{\rm net}_{i\vit }(x) = \sum_j x_{ij} \breve v_j
 \]
 
 \item \emph{covariate - similarity at distance 2},
@@ -3882,7 +4023,7 @@ of $\breve v_i$ would be the same as the alter effect of $v_i$.
       values for alters' covariate-average between $i$ and all actors
       $j$ to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\breve v)_{ij}
+ s^{\rm net}_{i\vit }(x) = \sum_j x_{ij} ({\rm sim}(\breve v)_{ij}
   - \widehat{{\rm sim}(\breve v)}) \ ,
 \]
  where the similarity scores ${\rm sim}(\breve v)_{ij}$ are defined as

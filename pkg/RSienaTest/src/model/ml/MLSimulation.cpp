@@ -15,11 +15,15 @@
 #include "MLSimulation.h"
 #include "utils/Random.h"
 #include "utils/Utils.h"
+#include "network/Network.h"
+#include "network/TieIterator.h"
 #include "data/NetworkLongitudinalData.h"
 #include "data/BehaviorLongitudinalData.h"
 #include "model/Model.h"
+#include "model/State.h"
 #include "model/SimulationActorSet.h"
 #include "model/variables/DependentVariable.h"
+#include "model/variables/NetworkVariable.h"
 #include "model/variables/BehaviorVariable.h"
 #include "model/ml/Chain.h"
 #include "model/ml/MiniStep.h"
@@ -38,15 +42,6 @@ MLSimulation::MLSimulation(Data * pData, Model * pModel) :
 	EpochSimulation(pData, pModel)
 {
 	this->lpChain = new Chain(pData);
-	this->linsertDiagonalProbability = 0;
-	this->lcancelDiagonalProbability = 0;
-	this->lpermuteProbability = 0;
-	this->linsertPermuteProbability = 0;
-	this->ldeletePermuteProbability = 0;
-	this->linsertRandomMissingProbability = 0;
-	this->ldeleteRandomMissingProbability = 0;
-	this->lmissingNetworkProbability = 0;
-	this->lmissingBehaviorProbability = 0;
 	this->laspect = NETWORK;
 	for (int i = 0; i < 7; i++)
 	{
@@ -54,12 +49,69 @@ MLSimulation::MLSimulation(Data * pData, Model * pModel) :
 		this->lacceptances[i] = 0;
 	}
 	this->lcurrentPermutationLength = pModel->initialPermutationLength();
+	this->lthisPermutationLength = 0;
+	this->lphase1 = false;
 }
 
 
 MLSimulation::~MLSimulation()
 {
 	delete this->lpChain;
+	deallocateVector(this->linitialMissingOptions);
+}
+
+
+/**
+ * Initializes the simulation as of the beginning of the specified
+ * period.
+ */
+void MLSimulation::initialize(int period)
+{
+	EpochSimulation::initialize(period);
+
+	deallocateVector(this->linitialMissingOptions);
+
+	for (unsigned k = 0;
+		k < this->pData()->rDependentVariableData().size();
+		k++)
+	{
+		const NetworkLongitudinalData * pNetworkData =
+			dynamic_cast<const NetworkLongitudinalData *>(
+				this->pData()->rDependentVariableData()[k]);
+		const BehaviorLongitudinalData * pBehaviorData =
+			dynamic_cast<const BehaviorLongitudinalData *>(
+				this->pData()->rDependentVariableData()[k]);
+
+		if (pNetworkData)
+		{
+			for (TieIterator iter =
+					pNetworkData->pMissingTieNetwork(period)->ties();
+				iter.valid();
+				iter.next())
+			{
+				this->linitialMissingOptions.push_back(
+					new Option(pNetworkData->id(), iter.ego(), iter.alter()));
+			}
+		}
+		else if (pBehaviorData)
+		{
+			for (int i = 0; i < pBehaviorData->n(); i++)
+			{
+				if (pBehaviorData->missing(period, i))
+				{
+					this->linitialMissingOptions.push_back(
+						new Option(pBehaviorData->id(), i));
+				}
+			}
+		}
+	}
+
+	// Create the initial state. The observed values in the Data object
+	// should be copied if there are any missings.
+
+	this->lpChain->period(period);
+	bool copyValues = !this->linitialMissingOptions.empty();
+	this->lpChain->setupInitialState(copyValues);
 }
 
 
@@ -187,14 +239,21 @@ void MLSimulation::preburnin()
 void MLSimulation::runEpoch(int period)
 {
     // Initialize the rate functions of all variables and parameters for effects
+	this->lphase1 = true;
 	for (unsigned i = 0; i < this->lvariables.size(); i++)
 	{
      	this->lvariables[i]->initializeRateFunction();
 		this->lvariables[i]->updateEffectParameters();
 	}
 	this->setUpProbabilityArray();
-	this->initialize(period);
-	//	PrintValue(getMiniStepDF(*this->lpChain->pFirst()->pNext()));
+	//this->initialize(period);
+//	PrintValue(getMiniStepDF(*this->lpChain->pFirst()->pNext()));
+	this->updateProbabilities(this->pChain(),
+			this->pChain()->pFirst()->pNext(),
+			this->pChain()->pLast()->pPrevious());
+//	PrintValue(getChainDF(*this->lpChain));
+//	Rprintf(" %d\n", this->pChain()->ministepCount());
+
 	int numSteps = this->pModel()->numberMLSteps() ;
 
 	for (int i = 0; i < numSteps; i++)
@@ -203,16 +262,18 @@ void MLSimulation::runEpoch(int period)
 	}
 }
 
-const Chain * MLSimulation::pChain() const
+/**
+ * Returns the chain representing the events simulated by this simulation object.
+ */
+Chain * MLSimulation::pChain() const
 {
-	return this->lpChain;
+    return this->lpChain;
 }
 
 void MLSimulation::pChain(Chain * pChain)
 {
 	this->lpChain = pChain;
 }
-
 /*
  * Set the chain to one uploaded from R and calculate the chain probabilities.
  *
@@ -329,13 +390,16 @@ void MLSimulation::MHPstep()
 
 void MLSimulation::setUpProbabilityArray()
 {
-	this->lprobabilityArray[0] = this->linsertDiagonalProbability;
-	this->lprobabilityArray[1] = this->lcancelDiagonalProbability;
-	this->lprobabilityArray[2] = this->lpermuteProbability;
-	this->lprobabilityArray[3] = this->linsertPermuteProbability;
-	this->lprobabilityArray[4] = this->ldeletePermuteProbability;
-	this->lprobabilityArray[5] = this->linsertRandomMissingProbability;
-	this->lprobabilityArray[6] = this->ldeleteRandomMissingProbability;
+	this->lprobabilityArray[0] = this->pModel()->insertDiagonalProbability();
+	this->lprobabilityArray[1] = this->pModel()->cancelDiagonalProbability();
+	this->lprobabilityArray[2] = this->pModel()->permuteProbability();
+	this->lprobabilityArray[3] = this->pModel()->insertPermuteProbability();
+	this->lprobabilityArray[4] = this->pModel()->deletePermuteProbability();
+	this->lprobabilityArray[5] =
+		this->pModel()->insertRandomMissingProbability();
+	this->lprobabilityArray[6] =
+		this->pModel()->deleteRandomMissingProbability();
+
 	for (int i = 0; i < 7; i++)
 	{
 		this->lrejections[i] = 0;
@@ -352,7 +416,10 @@ void MLSimulation::MLStep()
 {
 
 	int stepType = nextIntWithProbabilities(7, this->lprobabilityArray);
-	int c0 = this->lcurrentPermutationLength;
+//	int c0 = this->lcurrentPermutationLength;
+	int c0 = 40;
+//	PrintValue(getChainDF(*this->pChain()));
+	//Rprintf("stepType %d\n", stepType);
 	bool accept = false;
 	switch (stepType)
 	{
@@ -423,13 +490,64 @@ void MLSimulation::resetVariables()
 
 	for (unsigned i = 0; i < this->rVariables().size(); i++)
 	{
-		this->rVariables()[i]->initialize(this->period());
+		DependentVariable * pVariable = this->rVariables()[i];
+		pVariable->initialize(this->period());
+
+		// The values of missings have to be read from the current
+		// initial state (y_init in the specification).
+
+		if (!this->linitialMissingOptions.empty())
+		{
+			if (pVariable->networkVariable())
+			{
+				const Network * pInitialNetwork =
+					this->lpChain->pInitialState()->pNetwork(
+						pVariable->name());
+				NetworkVariable * pNetworkVariable =
+					dynamic_cast<NetworkVariable *>(pVariable);
+				NetworkLongitudinalData * pNetworkData =
+					dynamic_cast<NetworkLongitudinalData *>(
+						pNetworkVariable->pData());
+				const Network * pMissings =
+					pNetworkData->pMissingTieNetwork(this->period());
+
+				for (TieIterator iter = pMissings->ties();
+					iter.valid();
+					iter.next())
+				{
+					pNetworkVariable->pNetwork()->setTieValue(iter.ego(),
+						iter.alter(),
+						pInitialNetwork->tieValue(iter.ego(),
+							iter.alter()));
+				}
+			}
+			else if (pVariable->behaviorVariable())
+			{
+				const int * initialValues =
+					this->lpChain->pInitialState()->behaviorValues(
+						pVariable->name());
+				BehaviorVariable * pBehaviorVariable =
+					dynamic_cast<BehaviorVariable *>(pVariable);
+				BehaviorLongitudinalData * pBehaviorData =
+					dynamic_cast<BehaviorLongitudinalData *>(
+						pBehaviorVariable->pData());
+
+				for (int actor = 0; actor < pBehaviorData->n(); actor++)
+				{
+					if (pBehaviorData->missing(this->period(), actor))
+					{
+						pBehaviorVariable->value(actor, initialValues[actor]);
+					}
+				}
+			}
+		}
 	}
 }
+
+
 /**
  * Returns the Bayes Acceptance for the given iteration.
  */
-
 int MLSimulation::BayesAcceptances(unsigned iteration) const
 {
 	if (iteration < this->lBayesAcceptances.size())
@@ -601,9 +719,9 @@ bool MLSimulation::insertDiagonalMiniStep()
 		kappaFactor *
 		explcpr *
 		this->lpChain->ministepCount() *
-		this->lcancelDiagonalProbability /
+		this->pModel()->cancelDiagonalProbability() /
 		((this->lpChain->diagonalMinistepCount() + 1) *
-			this->linsertDiagonalProbability);
+			this->pModel()->insertDiagonalProbability());
 
 	if (this->lproposalProbability > 1)
 	{
@@ -623,6 +741,11 @@ bool MLSimulation::insertDiagonalMiniStep()
 bool MLSimulation::cancelDiagonalMiniStep()
 {
 	bool accept = false;
+
+	if (this->lpChain->diagonalMinistepCount() == 0)
+	{
+		return accept;
+	}
 
 	MiniStep * pMiniStep = this->lpChain->randomDiagonalMiniStep();
 	double rr = pMiniStep->reciprocalRate();
@@ -646,9 +769,9 @@ bool MLSimulation::cancelDiagonalMiniStep()
 	this->lproposalProbability =
 		kappaFactor * exp(-pMiniStep->logChoiceProbability()) *
 			this->lpChain->diagonalMinistepCount() *
-			this->linsertDiagonalProbability /
+		this->pModel()->insertDiagonalProbability() /
 		((this->lpChain->ministepCount() - 1) *
-			this->lcancelDiagonalProbability);
+			this->pModel()->cancelDiagonalProbability());
 
 	if (this->lproposalProbability > 1)
 	{
@@ -819,6 +942,16 @@ bool MLSimulation::insertPermute(int c0)
 
 	MiniStep * pMiniStepA = this->lpChain->randomMiniStep();
 
+// 	if (this->lphase1)
+// 	{
+// 		Option * pOption= new Option(0, 17, 45);
+
+// 		pMiniStepA = this->lpChain->nextMiniStepForOption(*pOption, this->lpChain->pFirst());
+// 		PrintValue(getMiniStepDF(*pMiniStepA));
+// 		pMiniStepA = this->lpChain->nextMiniStepForOption(*pOption, pMiniStepA->pNext());
+// 		PrintValue(getMiniStepDF(*pMiniStepA));
+// 	}
+
 	while (pMiniStepA == this->lpChain->pLast())
 	{
 		pMiniStepA = this->lpChain->randomMiniStep();
@@ -891,7 +1024,19 @@ bool MLSimulation::insertPermute(int c0)
 			this->lpChain->intervalLength(pMiniStepA, pMiniStepD) - 1;
 		pMiniStepB =
 			this->lpChain->randomMiniStep(pMiniStepA->pNext(), pMiniStepD);
+// 	if (this->lphase1)
+// 	{
+// 		Option * pOption= new Option(0, 0, 7);
+
+// 		pMiniStepB = this->lpChain->nextMiniStepForOption(*pOption, this->lpChain->pFirst());
+// 		PrintValue(getMiniStepDF(*pMiniStepB));
+// 		pMiniStepB = this->lpChain->nextMiniStepForOption(*pOption, pMiniStepB->pNext());
+// 	}
 	}
+// 	PrintValue(getMiniStepDF(*pMiniStepA));
+//	PrintValue(getMiniStepDF(pMiniStepD));
+//	PrintValue(getMiniStepDF(pMiniStepB));
+	//Rprintf("choic %d\n", choiceLength);
 
 	vector<MiniStep *> interval;
 	MiniStep * pMiniStep = pMiniStepA;
@@ -928,6 +1073,7 @@ bool MLSimulation::insertPermute(int c0)
 
 	while (pMiniStep != pMiniStepB)
 	{
+//		PrintValue(getMiniStepDF(*pMiniStep));
 		interval.push_back(pMiniStep);
 		pMiniStep = pMiniStep->pNext();
 	}
@@ -1124,7 +1270,6 @@ bool MLSimulation::insertPermute(int c0)
 //  				error("time to stop");
 //  			}
 
-
 			pr1 =
 				(1 -
 					this->lmissingNetworkProbability -
@@ -1178,12 +1323,17 @@ bool MLSimulation::insertPermute(int c0)
 		this->lproposalProbability =
 			kappaFactor *
 				exp(sumlprob_new - sumlprob) *
-				this->ldeletePermuteProbability *
+			this->pModel()->deletePermuteProbability() *
 				pr1 * pr2 *
 				(this->lpChain->ministepCount() - 2) *
 				choiceLength /
-			(this->linsertPermuteProbability * exp(lospr0 + lcpr0));
+			(this->pModel()->insertPermuteProbability() * exp(lospr0 + lcpr0));
 
+// 		Rprintf(" %f %f %f %f %f %f %d %f %f %f %f\n", kappaFactor, sumlprob_new, sumlprob,
+// 			this->pModel()->deletePermuteProbability(), pr1, pr2,
+// 			this->lpChain->ministepCount() - 2, choiceLength,
+// 			this->pModel()->insertPermuteProbability(), lospr0, lcpr0);
+// 		Rprintf("proposal %f **** \n", this->lproposalProbability);
 		if (this->lproposalProbability > 1)
 		{
 			this->lproposalProbability = 1;
@@ -1192,6 +1342,7 @@ bool MLSimulation::insertPermute(int c0)
 		{
 			// Change the chain permanently
 
+			//	Rprintf("proposal accepted\n");
 			accept = true;
 
 			for (unsigned i = 0; i < interval.size(); i++)
@@ -1244,7 +1395,6 @@ bool MLSimulation::deletePermute(int c0)
 				this->lmissingBehaviorProbability;
 	MiniStep * pMiniStepA = 0;
 	MiniStep * pMiniStepB = 0;
-
 	if (!this->lmissingData)
 	{
 		if (this->lpChain->consecutiveCancelingPairCount() == 0)
@@ -1584,13 +1734,17 @@ bool MLSimulation::deletePermute(int c0)
 		this->lproposalProbability =
 			kappaFactor *
 				exp(sumlprob_new - sumlprob) *
-				this->linsertPermuteProbability *
+			this->pModel()->insertPermuteProbability() *
 				exp(lpr0) /
-			(this->ldeletePermuteProbability *
+			(this->pModel()->deletePermuteProbability() *
 				pr1 * pr2 *
 				(this->lpChain->ministepCount() + 1) *
 				choiceLength);
 
+// 		Rprintf(" %f %f %f %f %f %f %d %f %f %f \n", kappaFactor, sumlprob_new, sumlprob,
+// 			this->pModel()->deletePermuteProbability(), pr1, pr2,
+// 			this->lpChain->ministepCount() - 2, choiceLength,
+// 			this->pModel()->insertPermuteProbability(),  lpr0);
 		if (this->lproposalProbability > 1)
 		{
 			this->lproposalProbability = 1;
@@ -1632,6 +1786,238 @@ bool MLSimulation::deletePermute(int c0)
 	delete[] newChoiceProbability;
 
 	return accept;
+}
+
+
+bool MLSimulation::insertMissing()
+{
+	// The numbers in the comments are referencing the specification in
+	// Siena_algorithms4.pdf.
+
+	// Part A
+
+	// 1.
+
+	if (this->linitialMissingOptions.size() == 0)
+	{
+		return false;
+	}
+
+	// 2.
+
+	const Option * pOption =
+		this->linitialMissingOptions[
+			nextInt(this->linitialMissingOptions.size())];
+
+	DependentVariable * pVariable =
+		this->lvariables[pOption->variableIndex()];
+	NetworkLongitudinalData * pNetworkData =
+		dynamic_cast<NetworkLongitudinalData *>(pVariable->pData());
+	BehaviorLongitudinalData * pBehaviorData =
+		dynamic_cast<BehaviorLongitudinalData *>(pVariable->pData());
+
+	double pr1 = 1;
+	double d0 = 0;
+
+	if (pVariable->behaviorVariable())
+	{
+		pr1 = 0.5;
+		d0 = nextInt(2) * 2 - 1;
+	}
+
+	// 3.
+
+	bool reversed = false;
+
+	if (pVariable->behaviorVariable())
+	{
+		int initialValue =
+			this->lpChain->pInitialState()->behaviorValues(pVariable->name())[
+				pOption->ego()];
+		double newValue = initialValue + d0;
+
+		if (newValue < pBehaviorData->min() || newValue > pBehaviorData->max())
+		{
+			pr1 = 1;
+			d0 = -d0;
+			reversed = true;
+		}
+	}
+
+	// 4.
+
+	MiniStep * pMiniStepB =
+		this->pChain()->firstMiniStepForOption(*pOption);
+
+	if (!pMiniStepB)
+	{
+		pMiniStepB = this->pChain()->pLast();
+	}
+
+	// 5.
+
+	double choiceLength =
+		this->pChain()->intervalLength(this->pChain()->pFirst(), pMiniStepB) -
+			1;
+
+	// 6.
+
+	const MiniStep * pMiniStepA =
+		this->pChain()->randomMiniStep(this->pChain()->pFirst()->pNext(),
+			pMiniStepB);
+
+	// 7.
+
+	if (pVariable->constrained())
+	{
+		if (!this->validInsertMissingStep(pOption, d0, pMiniStepA))
+		{
+			if (pVariable->networkVariable() || reversed)
+			{
+				return false;
+			}
+			else
+			{
+				d0 = -d0;
+				pr1 = 1;
+
+				if (!this->validInsertMissingStep(pOption, d0, pMiniStepA))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	// Part B
+
+	// 8.
+
+	double sumlprob = 0;
+	double sumlprob_new = 0;
+	double mu_new = this->lpChain->mu();
+	double sigma2_new = this->lpChain->sigma2();
+
+	for (MiniStep * pMiniStep = this->lpChain->pFirst()->pNext();
+		pMiniStep != pMiniStepA;
+		pMiniStep = pMiniStep->pNext())
+	{
+		sumlprob += pMiniStep->logChoiceProbability() +
+			pMiniStep->logOptionSetProbability();
+		mu_new -= pMiniStep->reciprocalRate();
+		sigma2_new -= pMiniStep->reciprocalRate() *
+			pMiniStep->reciprocalRate();
+	}
+
+	// 9.
+
+	this->setStateBefore(this->lpChain->pFirst()->pNext());
+
+	return true;
+}
+
+
+/**
+ * Returns if inserting the (w0, i0, j0, r0, d0) right before the given
+ * mini step pMiniStepA and changing the initial state by (w0, i0, j0, r0, -d0)
+ * is valid with respect to various constraints. The option (w0, i0, j0, r0)
+ * is given by the parameter pOption.
+ */
+bool MLSimulation::validInsertMissingStep(const Option  * pOption,
+	int d0,
+	const MiniStep * pMiniStepA)
+{
+	bool rc = true;
+
+	// Initialize the variables
+	this->resetVariables();
+
+	DependentVariable * pVariable = this->lvariables[pOption->variableIndex()];
+
+	// The ministep to be inserted before pMiniStepA
+	MiniStep * pNewMiniStep = this->createMiniStep(pOption, d0);
+
+	// The dummy ministeps that would change the initial state
+	MiniStep * pDummyMiniStep = pNewMiniStep->createReverseMiniStep();
+
+	// Check if changing the initial state according to the dummy ministep
+	// is valid. Note that the up-only and down-only conditions should not
+	// be tested, as this is not an actual change, but rather just a
+	// convenient way of changing the initial state.
+
+	if (pVariable->validMiniStep(pDummyMiniStep, false))
+	{
+		pDummyMiniStep->makeChange(pVariable);
+	}
+	else
+	{
+		rc = false;
+	}
+
+	// Test the validity of existing ministeps up to pMiniStepA and
+	// execute them.
+
+	for (MiniStep * pMiniStep = this->lpChain->pFirst()->pNext();
+		pMiniStep != pMiniStepA && rc;
+		pMiniStep = pMiniStep->pNext())
+	{
+		pVariable = this->lvariables[pMiniStep->variableId()];
+
+		if (pVariable->validMiniStep(pMiniStep))
+		{
+			pMiniStep->makeChange(pVariable);
+		}
+		else
+		{
+			rc = false;
+		}
+	}
+
+	// Finally, test the new ministep to be inserted before pMiniStepA
+
+	if (rc)
+	{
+		pVariable = this->lvariables[pNewMiniStep->variableId()];
+		rc = pVariable->validMiniStep(pNewMiniStep);
+	}
+
+	// Free the memory
+
+	delete pDummyMiniStep;
+	delete pNewMiniStep;
+
+	return rc;
+}
+
+
+/**
+ * Creates and returns a new mini step for the given option and difference
+ * parameter (the later for behavior changes only).
+ */
+MiniStep * MLSimulation::createMiniStep(const Option * pOption,
+	int difference) const
+{
+	MiniStep * pMiniStep = 0;
+	DependentVariable * pVariable = this->lvariables[pOption->variableIndex()];
+
+	if (pVariable->networkVariable())
+	{
+		pMiniStep =
+			new NetworkChange(
+				dynamic_cast<NetworkLongitudinalData *>(pVariable->pData()),
+				pOption->ego(),
+				pOption->alter());
+	}
+	else
+	{
+		pMiniStep =
+			new BehaviorChange(
+				dynamic_cast<BehaviorLongitudinalData *>(pVariable->pData()),
+				pOption->ego(),
+				difference);
+	}
+
+	return pMiniStep;
 }
 
 
@@ -1685,142 +2071,6 @@ bool MLSimulation::simpleRates() const
 	return this->lsimpleRates;
 }
 
-
-/**
- * Stores the probability associated with the insertDiagonalMiniStep
- * operation.
- */
-void MLSimulation::insertDiagonalProbability(double probability)
-{
-	this->linsertDiagonalProbability = probability;
-}
-
-
-/**
- * Returns the probability associated with the insertDiagonalMiniStep
- * operation.
- */
-double MLSimulation::insertDiagonalProbability() const
-{
-	return this->linsertDiagonalProbability;
-}
-
-
-/**
- * Stores the probability associated with the cancelDiagonalMiniStep
- * operation.
- */
-void MLSimulation::cancelDiagonalProbability(double probability)
-{
-	this->lcancelDiagonalProbability = probability;
-}
-
-
-/**
- * Returns the probability associated with the cancelDiagonalMiniStep
- * operation.
- */
-double MLSimulation::cancelDiagonalProbability() const
-{
-	return this->lcancelDiagonalProbability;
-}
-
-
-/**
- * Stores the probability associated with the permute
- * operation.
- */
-void MLSimulation::permuteProbability(double probability)
-{
-	this->lpermuteProbability = probability;
-}
-
-
-/**
- * Returns the probability associated with the permute
- * operation.
- */
-double MLSimulation::permuteProbability() const
-{
-	return this->lpermuteProbability;
-}
-
-/**
- * Stores the probability associated with the insertPermute
- * operation.
- */
-void MLSimulation::insertPermuteProbability(double probability)
-{
-	this->linsertPermuteProbability = probability;
-}
-
-
-/**
- * Returns the probability associated with the insertPermute
- * operation.
- */
-double MLSimulation::insertPermuteProbability() const
-{
-	return this->linsertPermuteProbability;
-}
-
-
-/**
- * Stores the probability associated with the deletePermute
- * operation.
- */
-void MLSimulation::deletePermuteProbability(double probability)
-{
-	this->ldeletePermuteProbability = probability;
-}
-
-
-/**
- * Returns the probability associated with the deletePermute
- * operation.
- */
-double MLSimulation::deletePermuteProbability() const
-{
-	return this->ldeletePermuteProbability;
-}
-
-/**
- * Stores the probability associated with the insertRandomMissing
- * operation.
- */
-void MLSimulation::insertRandomMissingProbability(double probability)
-{
-	this->linsertRandomMissingProbability = probability;
-}
-
-
-/**
- * Returns the probability associated with the insertRandomMissing
- * operation.
- */
-double MLSimulation::insertRandomMissingProbability() const
-{
-	return this->linsertRandomMissingProbability;
-}
-
-/**
- * Stores the probability associated with the deleteRandomMissing
- * operation.
- */
-void MLSimulation::deleteRandomMissingProbability(double probability)
-{
-	this->ldeleteRandomMissingProbability = probability;
-}
-
-
-/**
- * Returns the probability associated with the deleteRandomMissing
- * operation.
- */
-double MLSimulation::deleteRandomMissingProbability() const
-{
-	return this->ldeleteRandomMissingProbability;
-}
 
 /**
  * Stores the missing network probability (prmin in Tom's specification).

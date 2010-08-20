@@ -72,6 +72,7 @@ public:
 	int id() const;
 	virtual bool networkVariable() const;
 	virtual bool behaviorVariable() const;
+	virtual bool constrained() const;
 
 	inline const Function * pEvaluationFunction() const;
 	inline const Function * pEndowmentFunction() const;
@@ -115,7 +116,8 @@ public:
 	 */
 	virtual double probability(MiniStep * pMiniStep) = 0;
 
-	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
+	virtual bool validMiniStep(const MiniStep * pMiniStep,
+		bool checkUpOnlyDownOnlyConditions = true) const;
 
 	void updateEffectParameters();
 	void updateEffectInfoParameters();
@@ -239,7 +241,7 @@ private:
 
 	int lvalidRates;
 
-	// store for number of acceptances and rejections for non basic rate 
+	// store for number of acceptances and rejections for non basic rate
 	// parameters in Bayesian modelling
 
 	int lacceptances;

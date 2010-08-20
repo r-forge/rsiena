@@ -1,3 +1,24 @@
+2010-08-20 R-forge revision 117 RSienaTest only
+
+	* doc/config.dox: added doxygen configuration file
+	* doc/RSiena.bib, s_man400.tex, Siena_algorithms4.tex,
+	simstats0c.tex: documentation updates
+	* inst/examples/algorithms.r: improvements!
+	* R/initialiseFRAN.r, R/simstatsc.r: removed initialise function
+	to separate source file
+	* src/siena07.cpp deleted
+	* src/siena07internals.cpp, src/siena07models.cpp,
+	src/siena07setup.cpp, src/siena07utilities.cpp,
+	src/siena07internals.h, src/siena07models.h,
+	src/siena07setup.h, src/siena07utilities.h: replacements for
+	siena07.cpp
+	* R/bayes.r, R/maxlikec.r, R/phase1.r, R/robmon.r, R/siena07.r,
+	src/many, man/siena07.Rd : ML changes (in progress)
+	* src/model/variables/DependentVariable.cpp,
+	src/model/variables/NetworkVariable.cpp,
+	src/model/variables/DependentVariable.h,
+	src/model/variables/NetworkVariable.h: symmetric networks (in progress)
+
 2010-08-20 R-forge revision 116 RSiena only
 
 	* R/simstatsc.r: forgotten part of previous change to print.

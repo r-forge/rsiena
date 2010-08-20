@@ -8,7 +8,7 @@
  * Description: This file contains the implementation of the
  * DependentVariable class.
  *****************************************************************************/
-
+#include <R_ext/Print.h>
 #include <cmath>
 #include <stdexcept>
 
@@ -382,6 +382,7 @@ void DependentVariable::initialize(int period)
  */
 void DependentVariable::calculateRates()
 {
+	double sumRatesSquared = 0;
 	if (!this->constantRates() || !this->lvalidRates)
 	{
 		this->ltotalRate = 0;
@@ -402,8 +403,17 @@ void DependentVariable::calculateRates()
 			}
 
 			this->ltotalRate += this->lrate[i];
-		}
+			sumRatesSquared += this->lrate[i] * this->lrate[i];
 
+		}
+		if (networkVariable())
+		{
+			if(this->pSimulation()->pModel()->modelTypeB())
+			{
+				this->ltotalRate = this->totalRate() * this->totalRate() -
+					sumRatesSquared;
+			}
+		}
 		this->lvalidRates = true;
 	}
 }
@@ -598,9 +608,17 @@ void DependentVariable::accumulateRateScores(double tau,
 	if (this == pSelectedVariable)
 	{
 		this->lbasicRateScore += 1.0 / this->basicRate();
+		if (this->pSimulation()->pModel()->modelTypeB())
+		{
+			this->lbasicRateScore += 1.0 / this->basicRate();
+		}
 	}
-
 	this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
+
+	if (this->pSimulation()->pModel()->modelTypeB())
+	{
+		this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
+	}
 
 	// Update scores for covariate dependent rate parameters
 
@@ -935,9 +953,11 @@ void DependentVariable::actOnLeaver(const SimulationActorSet * pActorSet,
 
 /**
  * Returns whether applying the given ministep on the current state of this
- * variable would be valid with respect to all constraints.
+ * variable would be valid with respect to all constraints. One can disable
+ * the checking of up-only and down-only conditions.
  */
-bool DependentVariable::validMiniStep(const MiniStep * pMiniStep) const
+bool DependentVariable::validMiniStep(const MiniStep * pMiniStep,
+	bool checkUpOnlyDownOnlyConditions) const
 {
 	return true;
 }
@@ -1080,6 +1100,17 @@ bool DependentVariable::behaviorVariable() const
 {
 	// This method is overriden in BehaviorVariable. Here we return false.
 	return false;
+}
+
+
+/**
+ * Returns if there are any constraints on the permitted changes of this
+ * variable.
+ */
+bool DependentVariable::constrained() const
+{
+	return this->pData()->upOnly(this->period()) ||
+		this->pData()->downOnly(this->period());
 }
 
 }

@@ -190,6 +190,7 @@ doPhase1it<- function(z, x, zsmall, xsmall, ...)
         z$sf[z$nit, ] <- fra
         z$sf2[z$nit, , ] <- zz$fra
         z$sims[[z$nit]] <- zz$sims
+        z$chain[[z$nit]] <- zz$chain
     }
     else
     {
@@ -570,5 +571,7 @@ makeZsmall <- function(z)
     zsmall$pp <- z$pp
     zsmall$nrunMH <- z$nrunMH
     zsmall$returnDeps <- z$returnDeps
+    zsmall$addChainToStore <- z$addChainToStore
+    zsmall$needChangeContributions <- z$needChangeContributions
     zsmall
 }
