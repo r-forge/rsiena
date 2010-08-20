@@ -1,3 +1,9 @@
+2010-08-20 R-forge revision 115
+
+	* R/siena08.r: correct p-values on report.
+	* R/sienaprint.r: correct print layout in special cases
+	* R/sienaDataCreate.r: changes for ML (in progress)
+
 2010-07-19 R-forge revision 114
 
 	* R/print01Report.r: fix bug in names of multiple behavior
