@@ -77,7 +77,7 @@ public:
 		const EffectInfo * pEffect2) const;
 	void derivative(const EffectInfo * pEffect1, const EffectInfo * pEffect2,
 		double value);
-	Chain * pChain();
+	Chain * pChain() const;
 	double calculateChainProbabilities(Chain * chain);
 	void updateParameters();
 	

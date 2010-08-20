@@ -13,7 +13,7 @@
 siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
         useCluster=FALSE, nbrNodes=2, initC=FALSE,
         clusterString=rep("localhost", nbrNodes), tt=NULL,
-        parallelTesting=FALSE, clusterIter=TRUE, ...)
+        parallelTesting=FALSE, clusterIter=!x$maxlike, ...)
       }
 \arguments{
   \item{x}{A control object, of class \code{\link{sienaModel} }}

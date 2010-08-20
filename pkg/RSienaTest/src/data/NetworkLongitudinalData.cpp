@@ -44,6 +44,7 @@ NetworkLongitudinalData::NetworkLongitudinalData(int id,
 	this->lstructuralTieNetworks = new Network * [observationCount];
 	this->lmissingTieNetworks = new Network * [observationCount];
 	this->lmaxDegree = std::numeric_limits<int>::max();
+	this->ldensity = new double[observationCount];
 
 	for (int i = 0; i < observationCount; i++)
 	{
@@ -82,10 +83,12 @@ NetworkLongitudinalData::~NetworkLongitudinalData()
 	delete[] this->lnetworks;
 	delete[] this->lstructuralTieNetworks;
 	delete[] this->lmissingTieNetworks;
+	delete[] this->ldensity;
 
 	this->lnetworks = 0;
 	this->lstructuralTieNetworks = 0;
 	this->lmissingTieNetworks = 0;
+	this->ldensity = 0;
 }
 
 

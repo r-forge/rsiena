@@ -151,7 +151,7 @@ algorithms <- function(data, effects, x, ...)
             if (z$useC)
             {
                 f <- RSiena:::FRANstore()
-                .Call("clearStoredChains", PACKAGE=pkgname, f$pModel)
+                .Call("clearStoredChains", PACKAGE=pkgname, f$pModel, x$maxlike)
             }
             if (z$useHistory)
             {
@@ -408,7 +408,7 @@ getLikelihood3 <- function(sumLogChoiceProb, sumlogOptionSetProb, nactors,
 {
     loglik <- 0
     loglik <- sumLogChoiceProb  #+ sumlogOptionSetProb
-    nc <- nc[, match(names(lambda), colnames(nc))]
+    nc <- nc[, match(names(lambda), colnames(nc)), drop=FALSE]
     loglik <- loglik - sum(nactors * lambda) +
         rowSums(nc * rep(log(lambda), each=length(sumLogChoiceProb))) -
         rowSums(lfactorial(nc))

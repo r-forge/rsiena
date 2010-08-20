@@ -1,3 +1,28 @@
+2010-08-20 R-forge revision 117 RSienaTest only
+
+	* doc/config.dox: added doxygen configuration file
+	* doc/RSiena.bib, s_man400.tex, Siena_algorithms4.tex,
+	simstats0c.tex: documentation updates
+	* inst/examples/algorithms.r: improvements!
+	* R/initialiseFRAN.r, R/simstatsc.r: removed initialise function
+	to separate source file
+	* src/siena07.cpp deleted
+	* src/siena07internals.cpp, src/siena07models.cpp,
+	src/siena07setup.cpp, src/siena07utilities.cpp,
+	src/siena07internals.h, src/siena07models.h,
+	src/siena07setup.h, src/siena07utilities.h: replacements for
+	siena07.cpp
+	* R/bayes.r, R/maxlikec.r, R/phase1.r, R/robmon.r, R/siena07.r,
+	src/many, man/siena07.Rd : ML changes (in progress)
+	* src/model/variables/DependentVariable.cpp,
+	src/model/variables/NetworkVariable.cpp,
+	src/model/variables/DependentVariable.h,
+	src/model/variables/NetworkVariable.h: symmetric networks (in progress)
+
+2010-08-20 R-forge revision 116 RSiena only
+
+	* R/simstatsc.r: forgotten part of previous change to print.
+
 2010-08-20 R-forge revision 115
 
 	* R/siena08.r: correct p-values on report.
@@ -10,17 +35,17 @@
 	variables on siena01 report.
 	* R/print07Report.r, R/sienaprint.r: remove references to data in
 	printing, as object gets too large.
-	
+
 2010-07-10 R-forge revision 113
 
 	* src/model/variables/NetworkVariable.cpp: bug fix for endowment
 	effects, since a recent change
 	* src/model/ml/NetworkChange: bug fix, could not return bipartite
-	simulations. 
+	simulations.
 	* src/siena07.cpp, src/model/Model.h, src/model/Model.cpp,
 	src/model/ml/MLSimulation.cpp, src/model/ml/MLSimulation.h,
 	R/simstatsc.r, R/sienaDataCreate.r, R/sienaModelCreate.r: adaptive
-	permutation length and probabilities for missings for ML 
+	permutation length and probabilities for missings for ML
 	(in progress still!)
 	* src/model/ml/Chain.cpp: removed structural links from initial
 	chain (ML)
@@ -33,14 +58,14 @@
 2010-07-03 R-forge revision 111
 
 	* src/siena07.cpp, src/model/ml/Chain.cpp,
-	src/model/ml/MLSimulation.cpp, src/model/ml/Option.cpp, 
-	src/model/ml/MLSimulation.h, src/model/ml/Option.h, 
-	R/phase1.r, R/sienaModelCreate.r, R/simstatsc.r, R/maxlike.r, 
+	src/model/ml/MLSimulation.cpp, src/model/ml/Option.cpp,
+	src/model/ml/MLSimulation.h, src/model/ml/Option.h,
+	R/phase1.r, R/sienaModelCreate.r, R/simstatsc.r, R/maxlike.r,
 	man/sienaModelCreate.Rd: ML changes
 	* src/model/variables/NetworkVariable.cpp,
         doc/simstats0c.tex (RSienaTest only): added option of
 	no change for bipartite networks.
-	* doc/RSienaDeveloper.tex (RSienaTest only): added some details 
+	* doc/RSienaDeveloper.tex (RSienaTest only): added some details
 	about C++ and Doxygen.
 
 2010-06-25 R-forge revision 110

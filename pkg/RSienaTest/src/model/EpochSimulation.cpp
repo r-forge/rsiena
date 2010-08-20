@@ -645,9 +645,9 @@ const Model * EpochSimulation::pModel() const
 }
 
 /**
- * Returns the chain repesenting the events simulated by this simulation object.
+ * Returns the chain representing the events simulated by this simulation object.
  */
-Chain * EpochSimulation::pChain()
+Chain * EpochSimulation::pChain() const
 {
     return this->lpChain;
 }

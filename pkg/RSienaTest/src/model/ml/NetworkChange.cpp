@@ -101,7 +101,7 @@ bool NetworkChange::missing(int period) const
 	else
 	{
 		// bipartite network no change option
-		return true;
+		return false;
 	}
 }
 

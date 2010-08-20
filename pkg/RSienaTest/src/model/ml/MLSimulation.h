@@ -19,6 +19,7 @@ enum Aspect {NETWORK, BEHAVIOR};
 
 class Chain;
 class MiniStep;
+class Option;
 
 
 // ----------------------------------------------------------------------------
@@ -31,6 +32,7 @@ public:
 	MLSimulation(Data * pData, Model * pModel);
 	virtual ~MLSimulation();
 
+    void initialize(int period);
 	void connect(int period);
     void updateProbabilities(const Chain * pChain,
     	MiniStep * pFirstMiniStep,
@@ -43,7 +45,7 @@ public:
 
 	int acceptances(int stepType) const;
 	int rejections(int stepType) const;
-	const Chain * pChain() const;
+	Chain * pChain() const;
 	void pChain(Chain * pChain);
 	void pChainProbabilities(Chain * pChain, int period);
 
@@ -54,33 +56,13 @@ public:
 	bool permute(int c0);
 	bool insertPermute(int c0);
 	bool deletePermute(int c0);
+	bool insertMissing();
 	double proposalProbability() const;
 	bool missingData() const;
 	Aspect aspect() const;
 
 	void simpleRates(bool flag);
 	bool simpleRates() const;
-
-	void insertDiagonalProbability(double probability);
-	double insertDiagonalProbability() const;
-
-	void cancelDiagonalProbability(double probability);
-	double cancelDiagonalProbability() const;
-
-	void permuteProbability(double probability);
-	double permuteProbability() const;
-
-	void insertPermuteProbability(double probability);
-	double insertPermuteProbability() const;
-
-	void deletePermuteProbability(double probability);
-	double deletePermuteProbability() const;
-
-	void insertRandomMissingProbability(double probability);
-	double insertRandomMissingProbability() const;
-
-	void deleteRandomMissingProbability(double probability);
-	double deleteRandomMissingProbability() const;
 
 	void missingNetworkProbability(double probability);
 	double missingNetworkProbability() const;
@@ -107,18 +89,14 @@ public:
 private:
 	void setStateBefore(MiniStep * pMiniStep);
 	void resetVariables();
+	bool validInsertMissingStep(const Option * pOption,
+		int d0,
+		const MiniStep * pMiniStepA);
+	MiniStep * createMiniStep(const Option * pOption,
+		int difference = 0) const;
 
 	Chain * lpChain;
 	bool lsimpleRates;
-	double linsertDiagonalProbability;
-	double lcancelDiagonalProbability;
-	double lpermuteProbability;
-	double linsertPermuteProbability;
-	double ldeletePermuteProbability;
-	double linsertRandomMissingProbability;
-	double ldeleteRandomMissingProbability;
-	double lmissingNetworkProbability;
-	double lmissingBehaviorProbability;
 	double lproposalProbability;
 	bool lmissingData;
 	Aspect laspect;
@@ -129,10 +107,15 @@ private:
 	vector<double> lsampledBasicRates;
 	vector<int> lsampledBasicRatesDistributions;
 	map<const EffectInfo *, vector<double> > lcandidates;
+	double lmissingNetworkProbability;
+	double lmissingBehaviorProbability;
 	// current length of permuted interval
 	double lcurrentPermutationLength;
 	int lthisPermutationLength;
+	bool lphase1;
 
+	// A vector of options with missing values in the initial observation
+	vector<const Option *> linitialMissingOptions;
 };
 
 }
