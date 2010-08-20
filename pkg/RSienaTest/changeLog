@@ -1,6 +1,13 @@
+2010-08-20 R-forge revision 118 RSienaTest only
+
+	* src/siena07internals.cpp, src/siena07models.cpp,
+	src/siena07setup.cpp, src/siena07utilities.cpp,
+	src/siena07internals.h, src/siena07models.h,
+	src/siena07setup.h, src/siena07utilities.h: set eol style
+	* doc/config.dox: added doxygen configuration file
+
 2010-08-20 R-forge revision 117 RSienaTest only
 
-	* doc/config.dox: added doxygen configuration file
 	* doc/RSiena.bib, s_man400.tex, Siena_algorithms4.tex,
 	simstats0c.tex: documentation updates
 	* inst/examples/algorithms.r: improvements!
