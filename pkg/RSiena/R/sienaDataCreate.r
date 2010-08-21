@@ -2003,7 +2003,7 @@ covarDist2 <- function(z)
     }
     z
 }
-##@ calcCovarDist2 DataCreate similarity mean for alter of this depvar
+##@calcCovarDist2 DataCreate similarity mean for alter of this depvar
 calcCovarDist2 <- function(covar, depvar, rval=NULL)
 {
     ## remove final obs from depvars
