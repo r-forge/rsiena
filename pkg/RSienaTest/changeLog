@@ -1,9 +1,23 @@
+2010-09-20 R-forge revision 120
+
+	* data/allEffects.csv: added alter average distance 2 effects for
+	behavior variables
+	* R/sienaDataCreate.r: fixed bug in names of dyadic covariates
+	when converted to varying covariates for groups
+	* R/getEffects.r: fixed bug in starting values for behavior
+	variables when all changes were in one direction
+	* R/phase3.r: minor correction to text in siena07 report.
+	* R/print01Report: minor correction to text.
+	* R/simstatsc.r (RSiena only): make sure types are available to
+	multiple processes.
+
+
 2010-08-21 R-forge revision 119
 
 	* R/sienaDataCreate.r: fix function comments so documentation
-	runs. 
+	runs.
 	* R/RSienaRDocumentation.r: minor source format changes.
-	
+
 2010-08-20 R-forge revision 118 RSienaTest only
 
 	* src/siena07internals.cpp, src/siena07models.cpp,
