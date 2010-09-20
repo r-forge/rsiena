@@ -1612,7 +1612,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
                                                 dim3)
                 attr(newcovar, "range2") <- matrix(attr(const[[j]], "range2"),
                                                    ncol=dim3, nrow=2)
-                attr(newcovar, 'name') <- attr(const, "name")
+                attr(newcovar, 'name') <- attr(const[[j]], "name")
                 nVCovar <- nVCovar + 1
                 vars[[nVCovar]] <- newcovar
             }

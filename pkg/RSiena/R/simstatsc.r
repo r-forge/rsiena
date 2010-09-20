@@ -1760,6 +1760,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         basicEffects <- ff$basicEffects
         interactionEffects <- ff$interactionEffects
         nGroup <- ff$nGroup
+        types <- ff$types
     }
     ans <- .Call('effects', PACKAGE=pkgname, pData, basicEffects)
     pModel <- ans[[1]][[1]]

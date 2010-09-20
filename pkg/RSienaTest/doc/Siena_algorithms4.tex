@@ -175,6 +175,8 @@ It is meant as background material for understanding the code of
 RSiena. It is intended to be included later on as part of the
 programmer's manual of RSiena.
 
+The change in the version of August 28, 2010, is a clarification
+at the start of Chapter 9.
 
 The additions in the version of May 30, 2010, pertain
 to the following.
@@ -2635,7 +2637,7 @@ For the very first observation $y(t_1)$,
 a simple specification of these prior distributions is as follows
 (using $m=1$).
 \begin{itemize}
-\item All variables unobserved variables are prior independent.
+\item All unobserved variables are prior independent.
 \item[N.] For the network variables, $N_{ij}^{(r)}(t_{m-1})$
       has a prior distribution with probability\\
       $P\{N_{ij}^{(r)}(t_{m-1}) = 1\} = \textit{net\_prior}(r,i,j)$.
@@ -2677,7 +2679,7 @@ coordinates are being changed in this procedure.
 
 A random selection is made among the coordinates (options) for which
 the initial value is missing.
-This yields the output values $(w_0,i_0,j_0,r_0)$.\\
+This yields the values $(w_0,i_0,j_0,r_0)$.\\
 For this variable, the proposal is made to insert
 a ministep  $(w_0,i_0,j_0,r_0,d_0)$
 before some existing ministep $\ms_a$;
@@ -2818,10 +2820,10 @@ Part \emph{B}:
                       \textit{sigma2\_new}     + (rr_0)^2 \ $ ;
          \end{enumerate}
       \end{enumerate}
-\item If \textit{SimpleRates}, then
+\item If \textit{SimpleRates} (which implies $rr = rr_0$), then
       \begin{enumerate}
       \item  \begin{equation}
-        \textit{KappaFactor} \leftarrow \frac{1}{rr \times \textit{TotNumber } } \nonumber
+        \textit{KappaFactor} \leftarrow \frac{1}{rr_0 \times \textit{TotNumber } } \nonumber
         \end{equation}
       \end{enumerate}
       else (i.e., if not \textit{SimpleRates})
@@ -3001,9 +3003,9 @@ Part \emph{B}:
         \end{enumerate}
       \item\textit{ChangeStep}$(y, \ms)$ \ .
       \end{enumerate}
-\item If \textit{SimpleRates}, then
+\item If \textit{SimpleRates} (which implies $rr = rr_0$), then
       \begin{equation}
-        \textit{KappaFactor} \leftarrow  rr \ttimes ( \textit{TotNumber }-1)  \nonumber
+        \textit{KappaFactor} \leftarrow  rr_0 \ttimes ( \textit{TotNumber }-1)  \nonumber
         \end{equation}
       else (i.e., if not \textit{SimpleRates})
       \begin{equation}
@@ -3040,10 +3042,17 @@ Part \emph{C}:
 
 The simulation of the complete-data log-likelihood
 for a given parameter $\theta$ is done as follows (cf.\ Section 3.4 in
-\citet{SnijdersEA10a}).
+\citet{SnijdersEA10a}). Separate chains are made for all periods
+$m = 1, \ldots, M-1$. This chapter describes what is done
+for each period.
 
 \begin{enumerate}
-\item At initialization, a burn-in is necessary (only once, at the start of the
+\item The chain is initialized by the procedure \emph{Connect} and
+      by setting
+      \[
+      y_{\text{init}}\leftarrow y(t_{m-1}) \ .
+      \]
+\item After this initialization, a burn-in is necessary (only once, at the start of the
       likelihood-based MCMC process, i.e., only for the very first
       value of $\theta$ employed;
       search for ``previous value" in \citet{SnijdersEA10a}).

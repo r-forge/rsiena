@@ -325,10 +325,16 @@ which all contributed to the work on \si.
 {\color{section0}\LARGE\bf\noindent
 Part I\\[1.5ex] Minimal Introduction to \SI  \\[1.8ex]}
 \end{screen}
+There are two ways of getting started with \si:
+by using the  graphical user interface (\emph{gui}) {siena.exe}
+or by using \R commands in the regular \R way.
 We start with a minimal cookbook-style
 introduction for getting started with \SI using
 the graphical user interface (\emph{gui}) {siena.exe}. In Section~\ref{S_SR}
-we explain how to run \SI from within \Rn.
+we explain how to run \SI
+as the package \RS from within \Rn;
+users wishing to do this can have a quick look at section
+\ref{S_datform} on data formats
 If you are looking for help with a specific problem, read
 the section \ref{sec:problems}.
 
@@ -2352,7 +2358,10 @@ but it will not be read.
 The mean is always subtracted from the covariates.
 See the section on \hyperlink{T_S_centering}{\emph{Centering}}.
 
-When an actor covariate is constant within waves, or constant
+When an actor covariate is constant within waves, i.e.,
+within each wave it has the same value for all actors;
+or, more generally, when within each wave it has the same value for
+all actors
 within components separated by structural zeros (which means that
 ties between such components are not allowed), then only the ego effect
 of the actor covariate is made available.
@@ -3037,9 +3046,9 @@ Time variables are changing actor covariates that depend only on the
 observation number and not on the actors. E.g., they could be dummy variables, being 1
 for one or some observations, and 0 for the other observations.
 
-For actor covariates that are constant within observation waves,
+For actor covariates that have the same value for all actors within observation waves,
 or -- in the case that there are structurally determined values --
-constant within connected components,
+that are constant for all actors within the sameconnected components,
 only the ego effects are defined, because only those
 effects are meaningful.
 This exclusion of the alter, similarity and other effects for
@@ -3979,6 +3988,23 @@ to decide which dummy terms to include.
 See \citet{Lospinoso2010a} for a technical presentation of how the test works,
 and \citet{Lospinoso2010b} for a walkthrough on model selection.
 
+\subsection{Limiting the maximum outdegree}
+\label{S_maxdegree}
+
+It is possible to request that all networks simulated have a
+maximum outdegree less than some value.
+This is meaningful only if the observed networks also do
+not have a larger outdegree for any actor at any wave.
+
+This is carried out by specifying the maximum allowed value
+in the \textsf{MaxDegree} parameter of the \textsf{sienaModelCreate}
+function, which determines the settings of the algorithm.
+For example, when there is one dependent network, called \texttt{mynet},
+and the desired maximum outdegree is 10, then this parameter
+should be specified as
+\begin{verbatim}
+MaxDegree = c(mynet=10)
+\end{verbatim}
 
 \begin{print}
 \newpage
@@ -6020,7 +6046,10 @@ Structural effects are the effects depending on the network only.
  the number of actors to whom $i$ is indirectly tied
  (through at least one intermediary, i.e., at sociometric distance 2),\\
  $s^{\rm net}_{i\vit}(x) =  \#\{j \mid x_{ij} = 0,\, \max_h (x_{ih}\, x_{hj}) > 0 \}$;\\
- endowment effect only likelihood-based;
+ endowment effect only likelihood-based because the Method of Moments
+ estimators for endowment effects are based on the `loss' associated
+ with terminated ties, and this cannot be straightforwardly applied
+ for the number of distances two effect.
 
  \item {\em number of doubly achieved distances two effect},
  defined by
@@ -6409,13 +6438,38 @@ of $\breve v_i$ would be the same as the alter effect of $v_i$.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
 
-\item \emph{covariate - alter at distance 2},
+\item \emph{covariate - alter at distance 2}.
+      This effect is associated with an effect parameter
+      which can have values 1 or 2.
+      For parameter 1, it is
       defined as the sum of alters' covariate-average over all actors
       to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \breve v_j
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \breve v_j \hfill (\text{parameter 1}) \hfill
 \]
-
+      For parameter 2, it is defined similarly,
+      but for an alters' covariate-average excluding
+      ego:
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \breve v_j^{(-i)} \hfill (\text{parameter 2}) \hfill
+\]
+      where
+\begin{equation}
+  \breve v_j^{(-i)} = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_{h \neq j} x_{jh}v_h}{x_{j+} - x_{ji}}  &  \text{ if } x_{j+} - x_{ji} > 0     \\
+         0                                &  \text{ if } x_{j+}- x_{ji} = 0  .
+  \end{array}   \right.            \label{alt_av2}
+\end{equation}
+      To compute the contribution for this effect, note that
+\[
+ \sum_j x_{ij} \breve v_j^{(-i)} = \sum_j x_{ij} \, \frac{x_{j+} \breve v_j - x_{ji}v_i}{x_{j+}-x_{ji}}
+\]
+      This shows that, given that $\breve v_j$ is being updated for all $j$, the contribution
+      for this effect for parameter 2 can be computed as
+      \[
+       \frac{x_{j+} \breve v_j - x_{ji}v_i}{x_{j+}-x_{ji}}
+      \]
+      (where 0/0 is interpreted as 0).
 \item \emph{covariate - similarity at distance 2},
       defined as the sum of centered similarity
       values for alters' covariate-average between $i$ and all actors
@@ -8156,8 +8210,19 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-09-20 R-forge revision 120: Bug fixes:
+\begin{itemize}
+\item Multiple groups with 2 dyadic covariates had incorrect names
+\item Multiple processors failed (RSiena only)
+\item Minor print format corrections
+\item New alter average distance two effects did not exist for behavior
+  variables with oneMode networks
+\item Bug in calculation of starting values for behavior variables.
+\end{itemize}
+\item 2010-08-20 R-forge revision 117: RSienaTest only. Documentation updates,
+algorithms may work again!
 \item 2010-08-20 R-forge revision 116: forgotten
-part of change for print of sienaFit
+part of change for print of sienaFit (RSiena only)
 \item 2010-08-20 R-forge revision 115: fixed bug in siena08 p-values on report,
 and minor corrections to layout of print of sienaFit.
 \item 2010-07-19 R-forge revision 114: fix a bug in initial report: names of
