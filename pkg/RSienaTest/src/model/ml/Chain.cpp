@@ -202,7 +202,7 @@ void Chain::insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep)
 	double rr = pNewMiniStep->reciprocalRate();
 	this->lmu += rr;
 	this->lsigma2 += rr * rr;
-	Rprintf("insert step %f %f %f\n", rr, this->lmu, this->lsigma2);
+	// Rprintf("insert step %f %f %f\n", rr, this->lmu, this->lsigma2);
 }
 
 

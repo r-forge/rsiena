@@ -1,3 +1,7 @@
+2010-10-08 R-forge revision 121 RSienaTest only
+
+	* src/model/ml/chain.cpp: commented out a rogue "Rprintf" command
+
 2010-09-20 R-forge revision 120
 
 	* data/allEffects.csv: added alter average distance 2 effects for
@@ -10,7 +14,6 @@
 	* R/print01Report: minor correction to text.
 	* R/simstatsc.r (RSiena only): make sure types are available to
 	multiple processes.
-
 
 2010-08-21 R-forge revision 119
 
