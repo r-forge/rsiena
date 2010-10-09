@@ -55,6 +55,7 @@ public:
 	void remove(MiniStep * pMiniStep);
 	void connect(int period);
 	void onReciprocalRateChange(const MiniStep * pMiniStep, double newValue);
+	void changeInitialState(const MiniStep * pMiniStep);
 
 	// Accessors
 

@@ -1,3 +1,22 @@
+2010-10-09 R-forge revision 122
+
+	* src/siena07models.cpp: corrected loop for return of MH
+	acceptances and rejections. (RSienaTest only)
+	* doc/RSienaDeveloper.tex, doc/RSiena.bib, doc/s_man400.tex,
+	doc/siena_algorithms4.tex, doc/simstats0c.tex: documentation
+	updates.
+	(RSienaTest only)
+	* R/effects.r: fixed bug in starting values for behavior
+	variables when all changes were in one direction (in revision 120
+	for RSienaTest)
+	* src/data/various, src/model/ml: ML code (RSienaTest only)
+	* src/model/effects/AltersCovariateAverageEffect.cpp,
+	CovariateDistance2AlterEffect.cpp: implemented new parameter.
+	* data/allEffects.csv: removed effects added in error (revision
+	120)
+	* data/allEffects.csv: added dyadic/ego to various effects to
+	allow inclusion of interaction effects.
+
 2010-10-08 R-forge revision 121 RSienaTest only
 
 	* src/model/ml/chain.cpp: commented out a rogue "Rprintf" command
@@ -8,8 +27,8 @@
 	behavior variables
 	* R/sienaDataCreate.r: fixed bug in names of dyadic covariates
 	when converted to varying covariates for groups
-	* R/getEffects.r: fixed bug in starting values for behavior
-	variables when all changes were in one direction
+	* R/effects.r: fixed bug in starting values for behavior
+	variables when all changes were in one direction (missed this in RSiena)
 	* R/phase3.r: minor correction to text in siena07 report.
 	* R/print01Report: minor correction to text.
 	* R/simstatsc.r (RSiena only): make sure types are available to

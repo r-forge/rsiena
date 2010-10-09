@@ -85,7 +85,8 @@ Chain::~Chain()
 void Chain::setupInitialState(bool copyValues)
 {
 	delete this->lpInitialState;
-	this->lpInitialState = new State(this->lpData, this->lperiod, copyValues);
+	this->lpInitialState =
+		new State(this->lpData, this->lperiod, copyValues);
 }
 
 
@@ -458,6 +459,45 @@ void Chain::onReciprocalRateChange(const MiniStep * pMiniStep, double newValue)
 
 	this->lmu += newValue;
 	this->lsigma2 += newValue * newValue;
+}
+
+
+/**
+ * Changes the initial state according to the given ministep.
+ */
+void Chain::changeInitialState(const MiniStep * pMiniStep)
+{
+	if (pMiniStep->networkMiniStep())
+	{
+		const NetworkChange * pNetworkChange =
+			dynamic_cast<const NetworkChange *>(pMiniStep);
+
+		// Okay, this is a bad trick and indicates an imperfect design.
+		// We cast away the constness because we need to change the network.
+		// But this method is called only in situation when the initial
+		// state is actually a copy of the observed values and not simply
+		// references to networks in the Data object, so we don't destroy
+		// the observed Data object.
+
+		Network * pNetwork =
+			(Network *) this->lpInitialState->pNetwork(
+				pNetworkChange->variableName());
+		int ego = pNetworkChange->ego();
+		int alter = pNetworkChange->alter();
+		pNetwork->setTieValue(ego, alter, 1 - pNetwork->tieValue(ego, alter));
+	}
+	else
+	{
+		const BehaviorChange * pBehaviorChange =
+			dynamic_cast<const BehaviorChange *>(pMiniStep);
+
+		// Same misdesign here
+
+		int * values =
+			(int *) this->lpInitialState->behaviorValues(
+				pBehaviorChange->variableName());
+		values[pBehaviorChange->ego()] += pBehaviorChange->difference();
+	}
 }
 
 

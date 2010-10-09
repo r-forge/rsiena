@@ -3992,19 +3992,36 @@ and \citet{Lospinoso2010b} for a walkthrough on model selection.
 \label{S_maxdegree}
 
 It is possible to request that all networks simulated have a
-maximum outdegree less than some value.
+maximum outdegree less than or equal to some given value.
 This is meaningful only if the observed networks also do
-not have a larger outdegree for any actor at any wave.
+not have a larger outdegree than this number, for any actor at any wave.
 
 This is carried out by specifying the maximum allowed value
 in the \textsf{MaxDegree} parameter of the \textsf{sienaModelCreate}
 function, which determines the settings of the algorithm.
-For example, when there is one dependent network, called \texttt{mynet},
-and the desired maximum outdegree is 10, then this parameter
-should be specified as
+
+\textsf{MaxDegree} is a named vector, which means that its elements
+have names. The length of this vector is equal to the number of dependent networks.
+Each element of this vector must have a name which is the name of the corresponding network.
+E.g., for one dependent network called \texttt{mynet}, one could use
 \begin{verbatim}
 MaxDegree = c(mynet=10)
 \end{verbatim}
+to restrict the maximum degree to 10.
+For two dependent networks called \texttt{friends} and \texttt{advisors},
+one could use
+\begin{verbatim}
+MaxDegree = c(friends=6, advisors=4)
+\end{verbatim}
+
+For a single network, the default value 0 is used to specify that the maximum is unbounded.
+For multiple networks, if for one network there is a bound for the maximum outdegree
+ but for another network this should not be bounded, then
+ the value 0 will not work, but one should use a bound which is at least $n-1$,
+where $n$ is the number of actors in the network (or the largest number,
+if there are multiple groups).
+
+
 
 \begin{print}
 \newpage
@@ -8210,14 +8227,19 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-10-09 R-forge revision 122:
+\begin{itemize}
+\item Distance two effects: added parameter
+\item Bug in calculation of starting values for behavior variables.
+(RSiena only)
+\end{itemize}
 \item 2010-09-20 R-forge revision 120: Bug fixes:
 \begin{itemize}
 \item Multiple groups with 2 dyadic covariates had incorrect names
 \item Multiple processors failed (RSiena only)
 \item Minor print format corrections
-\item New alter average distance two effects did not exist for behavior
-  variables with oneMode networks
 \item Bug in calculation of starting values for behavior variables.
+(RSienaTest only)
 \end{itemize}
 \item 2010-08-20 R-forge revision 117: RSienaTest only. Documentation updates,
 algorithms may work again!

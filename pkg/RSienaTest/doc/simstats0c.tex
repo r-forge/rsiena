@@ -185,6 +185,9 @@ proportional to the total lambda in each dependent variable.\\
 \STATE Choose actor proportional to lambda\\
 (For symmetric networks use lambda and sum of lambdas as usual, even if
 totlambda was calculated differently)\\
+\IF{\nnm{deriv}}
+\STATE Accumulate rate scores Section \ref{sec:scores}.
+\ENDIF
 Choose change \ref{sec:change}\\
 Update state\\
 If required, add scores to accumulators
@@ -262,19 +265,16 @@ change its value
 \STATE calculate \nnm{p(j, delta)} effect of each
 \nnm{delta} on the objective function (sum of effects multiplied by
 corresponding parameters)\\
-\IF{\nnm{deriv}}
-\STATE Calculate score functions. Section \ref{sec:scores}.
-\ENDIF
 \ENDFOR
 \STATE Choose change proportional to $\exp(\nnm{p(j,delta)})$
-\IF{symmetric and model type is A and subtype is 2 and alter is not 
-  equal to actor}
+\IF{symmetric and model type is A and subtype is 2 (alias M1 in PA paper)
+  and alter is not equal to actor}
 \STATE Check if alter agrees Section \ref{sec:alterSymA}
 \IF{alter does not agree}
 \STATE abort the change
 \ENDIF
 \ENDIF
-\ELSE[symmetric type B]
+\ELSE[symmetric type B  (alias M2, D2, C in PA paper) ]
 \STATE Choose alter with same probabilities as actor
  (repeat until not equal to actor)
 \\ Calculate probabilities of acceptance. Section\ref{sec:alterSymB}
@@ -282,22 +282,39 @@ corresponding parameters)\\
 \STATE abort the change
 \ENDIF
 \ENDIF
+\IF{\nnm{deriv}}
+\STATE Calculate score functions.
+Section \ref{sec:scores}.
+\ENDIF
 \end{algorithmic}
 \subsection{Symmetric network models}
-There are various types in two groups: Type A or type B. In type A the change is
-selected in the normal way, but for subtype 2 the alter gets a chance to say
-no. In type B we select the alter using the rate probabilities and then simply
-consider that one link.
+There are various types in two groups: Type A or type B. In type A the change
+is selected in the normal way, but for subtype 2 the alter gets a chance to
+say no. In type B we select the alter using the rate probabilities and then
+simply consider that one link.\\
+In the PA paper, Type A models have new names:\\
+A subtype 1 = forcing = D1,\\
+A subtype 2 = unilateral \& reciprocal confirmation = M1.\\
+Type B models are called:\\
+BAGREE = B subtype 1 = pairwise conjunctive = M2;\\
+BFORCE = B subtype 2 = pairwise disjunctive = D2;\\
+BJOINT = B subtype 3 = pairwise compensatory = C (same as tie-based).
+\par
+Section \ref{sec:change} referred to the following additional
+steps in the case of a symmetric network.
 \subsubsection{Decision probabilities}
-Decisions are made using a probability, defined for each relevant link from the
+Depending on options and outcomes, we may in the sequel
+need probabilities $p_{ij}$ or $p$ as defined now.
+These probabilities are defined for each relevant link from the
 perspective of the appropriate actor, by
 \begin{algorithmic}
 \STATE Calculate the change contributions for each effect for this link from
-$i$ to $j$, from $i$'s perspective. 
+$i$ to $j$, from $i$'s perspective.
 \STATE Calculate $y_{i,j}$, the unnormalised probability by multiplying by the
 parameters and summing.
 \IF{link between $i$ and $j$ exists}
 \STATE change the sign of the unnormalised probability $y_{i,j}$
+\remark{THIS IS INCOMPLETE, DOES NOT TAKE INTO ACCOUNT ENDOWMENT FUNCTION.}
 \ENDIF
 \IF{subtype not 3}
 \STATE Calculate $$p_{i,j} = \frac{\exp(y_{i,j})} { (1 + \exp(y_{i,j}))}$$
@@ -306,25 +323,31 @@ parameters and summing.
 {(1 + \exp(y_{i,j} + y_{j,i}))}$$
 \ENDIF
 \end{algorithmic}
-\subsubsection{Model Type A}
+\subsubsection{Model Type A subtype 2}
 \label{sec:alterSymA}
 \begin{algorithmic}
+\IF{the proposal implies the creation of a tie}
 \STATE Calculate the probability $p_{alter, actor}$ as defined above.
-\IF{a random number is less than p}
+\IF{a random number is less than $p_{alter, actor}$}
 \STATE alter agrees
 \ELSE
 \STATE alter does not agree
+\ENDIF
 \ENDIF
 \end{algorithmic}
 \subsubsection{Model Type B}
 \label{sec:alterSymB}
 \begin{algorithmic}
-\STATE Calculate $p_{actor, alter}$ and $p_{alter, actor}$  or $p$ 
-as described above.
+\IF{BFORCE or BAGREE}
+\STATE calculate $p_{actor, alter}$ and $p_{alter, actor}$
+as described above
+\ELSIF{BJOINT}
+\STATE calculate $p$ as described above
+\ENDIF
 \IF[either can force existence]{BFORCE}
   \IF{link between $i$ and $j$ exists}
   \STATE accept if product of probabilities is greater than a random number
-  \ELSE 
+  \ELSE
   \STATE accept if $p_{actor, alter} + p_{alter, actor} - p_{actor, alter} *
 p_{alter,actor}$ is greater than a random number.
   \ENDIF
@@ -332,11 +355,11 @@ p_{alter,actor}$ is greater than a random number.
   \IF{link between $i$ and $j$ exists}
   \STATE accept if $p_{actor, alter} + p_{alter, actor} - p_{actor, alter} *
 p_{alter,actor}$ is greater than a random number.
-  \ELSE 
+  \ELSE
   \STATE accept if product of probabilities is greater than a random number
   \ENDIF
 \ELSE [BJOINT, joint decision]
-\STATE accept if p is greater than a random number 
+\STATE accept if p is greater than a random number
 \ENDIF
 \end{algorithmic}
 \subsection{Calculation of scores}
@@ -348,6 +371,10 @@ in section \ref{sec:symScores}.
 
 In \Sn, when calculating scores, only steps which are not aborted because of
 composition change are included in the scores.
+\remark{IN OTHER WORDS (IF MY INTERPRETATION IS CORRECT), THE SUMS OF ACTORS IN THE FOLLOWING
+ARE ONLY OVER PERMITTED ACTORS; THIS EXCLUDES INACTIVE ACTORS, BUT FOR UPONLY,
+DOWNONLY, HIGHER, DISJOINT, ATLEASTONE, SOME ADDITIONAL ACTORS MAY NEED TO BE EXCLUDED.
+GENERALLY, THE SUM IS ONLY OVER THE CONSIDERED ALTERNATIVES.}
 
 Let $z_{rk}$ be the observed value of the $k$th
 statistic in the $r$th simulation\\
@@ -418,11 +445,11 @@ case and basic rate effects are uncorrelated with all other effects.
 \label{sec:symScores}
 \subsubsection{Model type A, subtype 2 (AAGREE)}
 Here we have added a term to the log likelihood, accept or reject with
-probability $p_{ji}$. 
+probability $p_{ji}$.
 The scores for the non rate effects will be
 
 $$c_{rk}= \sum_{m=1}^M \left [ s_{i,j\delta k}- \left(\sum_{a,\nnm{delta}}
-  s_{i,a\delta k}p_{i,a\delta}\right) + 
+  s_{i,a\delta k}p_{i,a\delta}\right) +
 p_{ji}^{1-t} (1-p_{ji})^t (-1)^{1-t}s_{j,i\delta
   k}\right]$$
 
@@ -435,13 +462,13 @@ usual. (Within variable).
 For the other rate effects, we have
 
 $$
-    \text{log likelihood term } = \delta_{pq} \left [\log(f) + \log r_{im} 
+    \text{log likelihood term } = \delta_{pq} \left [\log(f) + \log r_{im}
     - \log(\sum r_{dm})\right ] -ft
 $$
 where
 $$f=(\sum r_{dm})^2 - \sum r_{dm}^2$$
 
-$$\frac{\partial f}{\partial \alpha_k} = 
+$$\frac{\partial f}{\partial \alpha_k} =
 2 \sum r_{dm} \sum r_{dm} s_{dk} - 2 \sum r_{dm}^2 s_{dk}
 $$
 
@@ -450,13 +477,13 @@ so the scores for other rate effects will be:
 $$
 c_{rk} = \delta_{pq}\left [ \dfrac{1}{f} \frac{\partial f}{\partial \alpha_k}  + s_{ik}
 - \dfrac{1}{\sum r_{dm}}\sum
-r_{dm} s_{dk} \right ]- 
+r_{dm} s_{dk} \right ]-
 t\frac{\partial f}{\partial \alpha_k}
 $$
 
 But I have not coded this yet!
 
-The scores for the non rate effects will be: 
+The scores for the non rate effects will be:
 
 For subtype 1 (BFORCE):
 
@@ -465,11 +492,11 @@ change is accepted or not.
 
 $$
 c_{rk}= \sum_{m=1}^M \begin{cases}
- (1-p_{ij})s_{i,j\delta k} + (1-p_{ji}) s_{j,i\delta k} 
+ (1-p_{ij})s_{i,j\delta k} + (1-p_{ji}) s_{j,i\delta k}
 & \exists \text{ link }  i \rightarrow j, \text{ accept}\\
 \dfrac{
- -p_{ji} p_{ij} (1-p_{ij}) s_{i, j\delta k} - p_{ij} p_{ji} (1-p_{ji}) 
-s_{i, j\delta k}}{(1 - p_{ij} p_{ji})} & \exists \text{ link } 
+ -p_{ji} p_{ij} (1-p_{ij}) s_{i, j\delta k} - p_{ij} p_{ji} (1-p_{ji})
+s_{i, j\delta k}}{(1 - p_{ij} p_{ji})} & \exists \text{ link }
 i \rightarrow j, \text{ reject}\\
 \dfrac{s_{i, j\delta k} p_{ij} (1 - p_{ij}) (1-p_{ji}) +
  s_{j, i\delta k} p_{ji} (1 - p_{ji}) (1-p_{ij}) }
@@ -484,11 +511,11 @@ $$
 
 For subtype 2 (BAGREE), the reverse:
 $$c_{rk}= \sum_{m=1}^M \begin{cases}
- (1-p_{ij})s_{i,j\delta k} + (1-p_{ji}) s_{j,i\delta k} 
+ (1-p_{ij})s_{i,j\delta k} + (1-p_{ji}) s_{j,i\delta k}
 & \nexists \text{ link }  i \rightarrow j, \text{ accept}\\
 \dfrac{
- -p_{ji} p_{ij} (1-p_{ij}) s_{i, j\delta k} - p_{ij} p_{ji} (1-p_{ji}) 
-s_{i, j\delta k}}{(1 - p_{ij} p_{ji})} & \nexists \text{ link } 
+ -p_{ji} p_{ij} (1-p_{ij}) s_{i, j\delta k} - p_{ij} p_{ji} (1-p_{ji})
+s_{i, j\delta k}}{(1 - p_{ij} p_{ji})} & \nexists \text{ link }
 i \rightarrow j, \text{ reject}\\
 \dfrac{s_{i, j\delta k} p_{ij} (1 - p_{ij}) (1-p_{ji}) +
  s_{j, i\delta k} p_{ji} (1 - p_{ji}) (1-p_{ij}) }

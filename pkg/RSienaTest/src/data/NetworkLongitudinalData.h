@@ -63,6 +63,7 @@ public:
 	double averageOutDegree() const;
 	void averageInDegree(double val);
 	void averageOutDegree(double val);
+	virtual double observedDistribution(int value, int observation) const;
 
 private:
 	// The set of actors receiving the ties of the network
