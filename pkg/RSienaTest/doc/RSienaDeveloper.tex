@@ -74,7 +74,7 @@ I describe the main details of our current practice:
 \item Indent by 4
 \item Align comments in the body of the code with the surrounding code.
 \item Do not use lines longer than 80 characters in any file, even
-  documentation. 
+  documentation.
 \item New source files need their \sfn{eol-style} set to \sfn{native} when they
   are added to the repository. On Windows, right-click and select
   Tortoise-SVN/properties then add \sfn{eol-style:native}.  (One current
@@ -120,6 +120,8 @@ I describe the main details of our current practice:
 \item More details of the design are in the document \emph{classdesign.tex}.
 \end{enumerate}
 \section{Recreating the package}
+All this may need updating when we get R 2.12.0. For now, these instructions are
+for 32 bit Windows only.
 \begin{enumerate}
 \item If using Windows, download and install the latest
 \textsf{Rtools.exe} from
@@ -187,6 +189,17 @@ possible.
 \item Useful to insert a call to \sfn{browser}, as you won't mind it
   disappearing when you exit from R.
 \end{enumerate}
+\paragraph{Making  binaries}
+If you want to send someone a Windows binary for some reason: on a Windows
+machine, use 
+
+\verb|R CMD INSTALL --build RSiena|
+
+Remember that you should send them the source tar ball too, for compliance with
+GPL licensing.
+
+If you are lucky the same will work with Mac binaries on a Mac, but I have not
+tried this recently, and I may have forgotten some trick. 
 \section{Parallel runs}
 \begin{enumerate}
 \item In Siena3324xx source file \textsf{rangen.pas}, edit the lines at the
@@ -430,11 +443,11 @@ Use the file \sfn{algorithms.r}. This is in the \sfn{inst/examples} directory in
 the source to keep it out of the way of build procedures. (In the examples
 directory in the installed package.) Source it to use it. There is no need to
 rebuild the package after changing this file. (If it needs functions from the
-package it accesses them using \sfn{RSiena:::}. 
+package it accesses them using \sfn{RSiena:::}.
 
 The basic outline is described here. The parameters are passed to the initialize
 routine and then stored on \sfn{z}. I think their use will be fairly clear if
-you read what follows (and the code!) 
+you read what follows (and the code!)
 
 No promises about robustness, and the routine is designed to be hacked rather
 than run unchanged. But examples of use are in file \sfn{runalg.r}.
@@ -445,9 +458,9 @@ a help page.
 The graphs are semi-automatic, driven by a dataframe with a column for each
 panel. Consult the code to see how it works: construct a formula from the column
 names. It is a nice trick. There is no parameter to turn them off: comments them
-out.  
+out.
 
-None of this has been tested with more than two waves or with multiple groups. 
+None of this has been tested with more than two waves or with multiple groups.
 I suspect none of it would work!
 
 \sfn{}
@@ -482,9 +495,9 @@ theta}
 \STATE break
 \ENDIF
 \STATE get predicted values (\ref{sec:pred}) and importance sampling weights at
-new theta 
+new theta
 \IF{variance of importance sampling weights is large or more than
-  \sfn{maxiiter} repeats} 
+  \sfn{maxiiter} repeats}
 \STATE break
 \ENDIF
 \ENDIF
@@ -528,22 +541,22 @@ sampling steps and still low variance or final loop}
 \label{sec:optim}
 \begin{algorithmic}
 \STATE 2 functions provided: mean log likelihood (EM) or log mean
-probability ratios (GT) 
+probability ratios (GT)
 \STATE Derivative calculation routines to match (hope these are correct!)
-\STATE Default method is BFGS 
+\STATE Default method is BFGS
 \STATE Default is just 1 iteration until final loop
 \STATE Rates need logging unless you use L-BFGS-B. The functions take exp() at
 the start.
 \STATE Step length is limited to distance of the scale.
 \STATE With EM you can reuse the historical samples downweighted by factor of
-optimWeight each time. 
-\STATE EM uses importance sampling weights 
+optimWeight each time.
+\STATE EM uses importance sampling weights
 \end{algorithmic}
 \subsubsection{Response surface step}
 \label{sec:resp}
 \begin{algorithmic}
 \STATE Use importance sampling to estimate the statistics at points around the
-current parameter. 
+current parameter.
 \STATE Create a data frame with these and (down-weighted) previous results.
 \STATE Fit a linear regression and solve for targets 0
 \STATE Move is restricted to distance the scale factor.
@@ -568,7 +581,7 @@ derivative matrix as requested.
 \STATE make predictions NA
 \ELSE
 \STATE multiply by statistics or scores
-\ENDIF 
+\ENDIF
 \end{algorithmic}
 \subsubsection{Calculating likelihoods and probabilities}
 Various functions provided: the differences are the use of C or not and stored
@@ -579,13 +592,13 @@ calculations.
   each ministep using change contributions stored in C, and then uses
   getLikelihood3 to do the calculations. Memory intensive but fast. May not be
   robust. Rate values are not stored and rate part of calculation is done in
-  R. Only currently works for forward simulation, where it is least useful! 
+  R. Only currently works for forward simulation, where it is least useful!
 \item[NOT useC AND useSLowC] Uses getProbabilities to pass chain back into C and
   recalculate the chnage contributions to update the ministeps. Fairly quick,
   low memory demand, robust as reuses code that must be maintained. Recommended.
 \item[NOT useC and NOT useSlowC] Uses getProbabilitiesR to calculate the choice
   probs using change contributions matrices stored in R. Not recommended unless
-  you prefer changing R to C. Slow, memory intensive, and clumsy. Then uses 
+  you prefer changing R to C. Slow, memory intensive, and clumsy. Then uses
 getLikelihood2 to combine the values.  Only currently works for forward
 simulation.
 \end{description}
@@ -601,8 +614,8 @@ simulation.
 \STATE set maxiiter to 0
 \STATE set optimFn to optimFinal
 \STATE set useOptim to useOptimFinal: could do Newton-Raphson type updates
-instead. 
-\ELSE 
+instead.
+\ELSE
 \STATE set maxiiter to 20
 \ENDIF
 \end{algorithmic}

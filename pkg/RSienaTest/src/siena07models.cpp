@@ -1163,7 +1163,7 @@ SEXP MCMCcycle(SEXP DATAPTR, SEXP MODELPTR,
 	{
 		pMLSimulation->runEpoch(period);
 		// store the MH statistics for this batch
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 7; i++)
 		{
 			iaccepts[ i * nrunMHBatches + batch] =
 				pMLSimulation->acceptances(i);

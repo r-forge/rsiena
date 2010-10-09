@@ -43,7 +43,7 @@ using namespace siena;
 
 
 /**
- * Matches column names with indices. The object Names is the names of the 
+ * Matches column names with indices. The object Names is the names of the
  * effects data frame.
  */
 void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,

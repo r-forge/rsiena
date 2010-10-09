@@ -866,11 +866,152 @@ from them might be used for this purpose.)
 
 \section{Statistics for MoM}
 
-The statistics used for the MoM also deserve attention as part of the
-algorithm. See
-\citet{Snijders01} and
-\citet{SnijdersEA07}.
-I hope later on to have time for elaborating this here.
+The statistics used for the MoM are proposed in
+\citet{Snijders01} and \citet{SnijdersEA07}.
+
+For an effect $s_{ik}^X(x,z)$, the change statistic or change contribution is defined by
+\begin{equation}
+\Delta_{kij}^X(x,z) = s_{ik}^X(x^{(+ij)},z) - s_{ik}^X(x^{(-ij)},z) \label{Delta}
+\end{equation}
+where $x^{(+ij)}$ is $x$ to which the tie $i \rightarrow j$ has been added, and
+ $x^{(-ij)}$ is $x$ from which the tie $i \rightarrow j$ has been deleted.
+ (Note that this definition implies that (\ref{Delta}) is not affected by the value
+ of $x_{ij}$ in  $x$ as used in the left hand side.)
+The statistic used for estimation is defined by
+\begin{equation}
+ s_{k}^X(x,z) = \sum_i s_{ik}^X(x,z) \ .        \label{fitstat}
+\end{equation}
+
+The quantity introduced in the beginning, called $\Delta f^N(r,i,j,x,z)$,
+is a linear combination of the change statistics:
+\[
+\Delta f^N(r,i,j,x,z) = \pm  \sum_k \beta^{X(r)}_k \Delta_{kij}^{X(r)}(x,z)
+\]
+where $\beta^{X(r)}_k$ is the appropriate element of the parameter vector $\theta$,
+and where $\pm = +1$ if the toggle means that tie  $i \rightarrow j$ is added,
+while $\pm = -1$ if the toggle means that this tie is dropped.
+
+
+\subsection{Interaction effects for networks}
+
+User-defined interactions for network change are defined as follows.
+
+Consider two network effects $ s_{ia}^X(x,z)$ and $ s_{ib}^X(x,z)$.
+Denote their change statistics = change contributions by
+\[
+\Delta_{aij}^X(x,z) \text{  and  }  \Delta_{bij}^X(x,z) \ .
+\]
+\iffalse
+Assume that their statistics used for MoM estimation are
+\begin{equation}
+\sum_i s_{ia}^X(x,z) = \sum_{i,j} x_{ij} \, \Delta_{aij}^X(x,z)  \label{int_cond1}
+\end{equation}
+and similarly for effect $b$; note that (\ref{int_cond1}) does not always hold,
+it is a basic condition for an effect to be included in an interaction.
+\fi
+
+Then the interaction is defined by the change contribution
+\begin{equation}
+\Delta_{a \times b,ij}^X(x,z) = \Delta_{aij}^X(x,z) \times  \Delta_{bij}^X(x,z) \ . \label{int_change}
+\end{equation}
+\iffalse
+and the MoM estimation statistic
+\begin{equation}
+ s_{a \times b}^X(x,z) = \sum_{i,j} x_{ij}
+                      \Big( \Delta_{aij}^X(x,z)  \times  \Delta_{bij}^X(x,z) \Big)  \ . \label{int_fit}
+\end{equation}
+\fi
+
+For interactions between three effects it is analogous,
+with change statistic
+\[
+\Delta_{a \times b \times c,ij}^X(x,z) = \Delta_{aij}^X(x,z) \times \Delta_{bij}^X(x,z)
+                                             \times \Delta_{cij}^X(x,z) \ .
+\]
+\iffalse
+and MoM estimation statistic
+\[
+ \sum_{i,j} x_{ij} \Big( \Delta_{aij}^X(x,z)  \times  \Delta_{bij}^X(x,z)
+                                             \times \Delta_{ij} s_{c}^X(x,z)  \Big)  \ .
+\]
+\fi
+
+The question is, when does this makes sense, and what is the appropriate
+MoM estimation statistic.
+The change statistic and the estimation statistic must hang together according to
+(\ref{Delta}) and (\ref{fitstat}), as mentioned above.
+For user-defined interactions to be properly defined by (\ref{int_change}),
+we must indicate the estimation statistic to be used
+and prove that this satisfies (\ref{Delta}) and (\ref{fitstat}).
+
+Sufficient conditions for user-defined interactions are
+the following.
+
+\subsubsection{Dyadic effects}
+
+An effect is defined to be \emph{dyadic} if it can be written as
+\begin{equation}
+ s_{ik}^X(x,z) = \sum_j x_{ij}\, c_{kij}(x,z) \        \label{dyadic}
+\end{equation}
+where $c_{kij}(x,z)$ is independent of $x_{i\ast}$ defined as the
+row $x_{i\ast} = (x_{i1}, \ldots, x_{in})$.\\
+For a dyadic effect we have
+\[
+ \Delta_{kij}^X(x,z) = c_{kij}(x,z)
+\]
+and
+\[
+   s_{k}^X(x,z) = \sum_{ij} x_{ij}\, c_{kij}(x,z) \ .
+\]
+
+The interaction between two dyadic effects is defined by
+\begin{equation}
+ s_{a \times b,i}^X(x,z) = \sum_j x_{ij}\, c_{aij}(x,z)\, c_{bij}(x,z)   \ .  \label{dyadic_inter}
+\end{equation}
+We then have
+\begin{eqnarray*}
+ \Delta_{a \times b,ij}^X(x,z) &=& c_{aij}(x,z)\, c_{bij}(x,z)   \\
+   s_{a \times b}^X(x,z) &=& \sum_{i} x_{ij}\, c_{aij}(x,z)\, c_{bij}(x,z) \ .
+\end{eqnarray*}
+This indeed satisfies (\ref{Delta}) and (\ref{fitstat}).
+The same holds for interactions between three (or more) dyadic effects.
+One could say that the interaction between two dyadic effects is again
+a dyadic effect.
+
+\subsubsection{Ego effects}
+
+An effect is defined to be an \emph{ego} effect if it can be written as
+\begin{equation}
+ s_{ik}^X(x,z) = \sum_j x_{ij}\, c_{ki}(x,z) \        \label{ego}
+\end{equation}
+where $c_{ki}(x,z)$ is independent of $x_{i\ast}$ defined above,
+and independent of $j$ (as the notation indicates).
+(This definition implies that an ego effect is also a dyadic effect.)
+\\
+For an ego effect we have
+\[
+ \Delta_{kij}^X(x,z) = c_{ki}(x,z)
+\]
+and
+\[
+   s_{k}^X(x,z) = \sum_{ij} x_{ij}\, c_{ki}(x,z) \ .
+\]
+An interaction between an ego effect $a$ and any effect $b$ is defined by
+\begin{equation}
+ s_{a \times b,i}^X(x,z) =  c_{ai}(x,z) \, s_{ib}^X(x,z)  \ .        \label{ego_inter}
+\end{equation}
+This definition implies
+\begin{eqnarray*}
+ \Delta_{a \times b,ij}^X(x,z) &=& c_{ai}(x,z)\, \Delta_{bij}^X(x,z)   \\
+   s_{a \times b}^X(x,z) &=& \sum_{ij} x_{ij}\, c_{ai}(x,z)\, s_{ib}^X(x,z) \ .
+\end{eqnarray*}
+Given that effect $b$ satisfies (\ref{Delta}) and (\ref{fitstat}),
+this interaction also satisfies (\ref{Delta}) and (\ref{fitstat}).
+The same holds for interactions between two ego effects and
+any third effect, because the interaction between two ego effects is again
+an ego effect.
+
+
 
 \subsection{Interaction effects for behavior}
 

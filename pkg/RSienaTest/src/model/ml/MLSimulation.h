@@ -57,6 +57,7 @@ public:
 	bool insertPermute(int c0);
 	bool deletePermute(int c0);
 	bool insertMissing();
+	bool deleteMissing();
 	double proposalProbability() const;
 	bool missingData() const;
 	Aspect aspect() const;
@@ -92,6 +93,7 @@ private:
 	bool validInsertMissingStep(const Option * pOption,
 		int d0,
 		const MiniStep * pMiniStepA);
+	bool validDeleteMissingStep(MiniStep * pMiniStepA, bool applyTwice);
 	MiniStep * createMiniStep(const Option * pOption,
 		int difference = 0) const;
 
