@@ -1,3 +1,7 @@
+2010-10-13 R-forge revision 123 RSienaTest only
+
+	* doc/RSienaDeveloper.tex: added details about change logs etc
+
 2010-10-09 R-forge revision 122
 
 	* src/siena07models.cpp: corrected loop for return of MH

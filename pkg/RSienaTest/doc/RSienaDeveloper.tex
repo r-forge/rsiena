@@ -58,11 +58,25 @@
 The introduction to the RSiena manual describes the basics of how to run the
 program, either `standalone' or within R. The help files in R describe how to
 use the R commands. Here I give some notes for developers.
-\section{Coding standards}
+\section{Coding standards etc}
 I describe the main details of our current practice:
 \subsection{General}
 \begin{enumerate}
-\item Use lots of spaces: particularly around operators and after commas.
+\item Before you commit an update to R-forge please do the following:
+\begin{enumerate}
+\item Record details of the files you have changed in the Changelog for each of
+  RSiena and RSienaTest. The two changelogs are kept identical, otherwise it
+  gets very confusing.
+\item Update the version number and date in the \textsf{DESCRIPTION} file for
+  each package.
+\item Update the version number and date in \textsf{man/RSiena-package.Rd} in
+  each package.
+\item If the change would be noticeable to the users, add the details to the
+  change log at the end of the manual. Create a new pdf and copy to the inst/doc
+  directory of each package.
+\end{enumerate}
+\item Use lots of spaces: particularly around operators and after commas. (But
+  not after the end of your lines!)
 \item Do not use underscores: use variable names made up of several (possibly
   abbreviated, but ideally not) words with all but the first capitalised.
 \item Use braces even when not strictly necessary in \sfn{if} and \sfn{for}
@@ -151,7 +165,7 @@ clever: if you are altering the C and your changes are not appearing, delete the
 to clear out all the .o's and the dll.
 \item On Windows the install procedure downloads the gui installer. If you want
   to bypass this, rename the file \verb|configure.win| in the package
-  directory. 
+  directory.
 \item On linux or Mac, the same commands should work, but you don't need the
   Rtools. I have occasionally had problems with installing from a tarball or
   from source, when I have no permission to write in the standard libraries, but
@@ -191,7 +205,7 @@ possible.
 \end{enumerate}
 \paragraph{Making  binaries}
 If you want to send someone a Windows binary for some reason: on a Windows
-machine, use 
+machine, use
 
 \verb|R CMD INSTALL --build RSiena|
 
@@ -199,7 +213,7 @@ Remember that you should send them the source tar ball too, for compliance with
 GPL licensing.
 
 If you are lucky the same will work with Mac binaries on a Mac, but I have not
-tried this recently, and I may have forgotten some trick. 
+tried this recently, and I may have forgotten some trick.
 \section{Parallel runs}
 \begin{enumerate}
 \item In Siena3324xx source file \textsf{rangen.pas}, edit the lines at the
