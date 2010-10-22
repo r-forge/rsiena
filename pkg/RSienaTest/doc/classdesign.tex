@@ -734,7 +734,7 @@ const ActorSet * pStudents = pData->pActorSet("students");
 OneModeNetworkLongitudinalData * pFriendshipData =
   pData->pOneModeNetworkData("friendship");
 \end{verbatim}
-If some operation is to be performed for all sub-objects of a certain type, one
+If some operation is to be performed for all sub-objects oGenericNetworkEffectf a certain type, one
 can obtain a reference to the vector, where the subobjects of this type are
 stored by the \nnm{Data} class. For example, the values of all constant
 covariates can be printed as follows:
@@ -757,4 +757,144 @@ for (unsigned i = 0; i < rCovariates.size(); i++)
 
 \section{Models}
 
+\subsection{Effects}
+
+\subsubsection{Generic Network Effects}
+
+\paragraph{The Basic Idea.} The class \nnm{GenericNetworkEffect} may be used
+to specify an effect for a network variable $x^{(r)}$ if its evaluation and
+endowment statistics can be conveniently defined as
+\[\sum_{i \neq j} x_{ij}^{(r)} f_{ij}(y)\] and
+\[\sum_{i \neq j} (1-x_{ij}^{(r)}) x_{ij}^{(r)\mathrm{obs}}(t_m) f_{ij}(y^\mathrm{obs}(t_m)),\] respectivelly.
+This function $f_{ij}(y)$ as well as the change contribution $\Delta_{kij}^X(y)$ should be specified as instances of the
+\nnm{AlterFunction} class and passed as parameters when creating the effect.
+
+We illustrate the overall process by defining the density effect $s_{i1}^\mathrm{net}(x)=\sum_j x_{ij}$
+as a generic network effect.
+
+\begin{enumerate}
+\item First, let us define the change contribution function by creating a subclass of \nnm{AlterFunction}. Since in our
+case $\Delta_{1ij}^X(y)=1$, we will name the new class accordingly:
+\begin{verbatim}
+class ConstantOneFunction : public AlterFunction
+{
+  virtual double value(int alter);
+};
+\end{verbatim}
+The method \nnm{value} should be overridden to return the value of the function for the given alter $j$. The ego $i$ is
+implicit and can be accessed by the method \nnm{AlterFunction}::\nnm{ego}(). Here is the trivial implementation of
+the \nnm{value} method:
+\begin{verbatim}
+double ConstantOneFunction::value(int alter)
+{
+  return 1;
+}
+\end{verbatim}
+
+\item Similarly, the tie statistic $f_{ij}(y)$ should be defined. However, since in our case
+$f_{ij}(y)=\Delta_{1ij}^X(y)=1$, we can reuse the same class \nnm{ConstantOneFunction}.
+
+\item Now that the necessary alter functions are implemented, we are ready to create the generic effect:
+\begin{verbatim}
+AlterFunction * pChangeContribution =
+  new ConstantOneFunction();
+AlterFunctoin * pTieStatistic =
+  new ConstantOneFunction();
+Effect * pEffect =
+  new GenericNetworkEffect(pEffectInfo,
+    pChangeContribution,
+    pTieStatistic);
+\end{verbatim}
+If the change contribution and the tie statistic functions are the same (as for the density effect),
+the alternative constructor with a single function is recommended:
+\begin{verbatim}
+Effect * pEffect =
+  new GenericNetworkEffect(pEffectInfo,
+    new ConstantOneFunction());
+\end{verbatim}
+\end{enumerate}
+
+\paragraph{The Anatomy of Alter Functions.} As indicated above, the key method of the \nnm{AlterFunction}
+class is the method \nnm{value} that has to be implemented by all concrete functions. However, there is a
+couple of other methods that may be necessary to override.
+\begin{itemize}
+\item \nnm{initialize}(\nnm{pData}, \nnm{pState}, \nnm{period}, \nnm{pCache}) -- This method is called
+before evaluating the function for a specific period of the observed data and a fixed state of the dependent
+variables. Also, functions may take advantage of the given cache object to speed up the overall
+processing time by avoiding repetitive computation of common values, like the number of two-paths, etc.
+The following example shows the initialization method in the class \nnm{NetworkAlterFunction}, which
+is the base class for all alter functions defined on a network:
+\begin{verbatim}
+void NetworkAlterFunction::initialize(const Data * pData,
+  State * pState,
+  int period,
+  Cache * pCache)OneModeNetworkAlterFunction
+{
+  // Do not forget to initialize the base class
+  AlterFunction::initialize(pData,
+    pState,
+    period,
+    pCache);
+
+  // Obtain the right network from the state
+  this->lpNetwork = pState->pNetwork(this->name());
+
+  // Store the corresponding network cache object
+  this->lpNetworkCache =
+    pCache->pNetworkCache(this->lpNetwork);
+}
+\end{verbatim}
+
+\item \nnm{preprocessEgo}(\nnm{ego}) -- This method is called before calling the \nnm{value} method for any
+specific alters. The base implementation simply stores the ego, which can be later accessed by using the
+\nnm{ego} method. The derived alter functions may override this method to do some other ego-related
+preprocessing.
+\end{itemize}
+
+\paragraph{Important Alter Functions.} There is a whole hierarchy of alter functions implemented in
+\texttt{src/model/effects/generic}, and one should review the existing functions before writing
+his or her own.
+\begin{itemize}
+\item \nnm{NetworkAlterFunction} -- This is the base class for all functions defined on a network
+such as \nnm{InDegreeFunction}, \nnm{InStarFunction}, etc. The name of the network should be given
+as an argument on the construction of the function. The following methods are defined for convenient
+use in the actual derived functions:
+\begin{itemize}
+\item \nnm{Network} * \nnm{pNetwork}() -- Returns the current network this function is computed for.
+\item \nnm{NetworkCache} * \nnm{pNetworkCache}() -- Returns the corresponding cache object for
+efficient calculations.
+\end{itemize}
+
+\item \nnm{OneModeNetworkAlterFunction} -- This is the base class for all functions defined on a
+one-mode network. It is a subclass of \nnm{NetworkAlterFunction} and does nothing more than
+throwing an exception if the underlying network is not a one-mode network.
+
+\item \nnm{ProductFunction} -- A composite function defined as a product of two other alter functions.
+\item \nnm{DifferenceFunction} -- A composite function defined as a difference between two other alter functions.
+\item \nnm{ConditionalFunction} -- A composite function returning the value of either of two other alter functions
+depending on the value of a certain predicate.
+\end{itemize}
+
+\paragraph{Composite Functions.} Composite functions like \nnm{ProductFunction} and \nnm{DifferenceFunction} may
+be used to define new alter funtions without having to implement new classes. For example, consider the
+mutuality effect with the network $W$ on the network $X$, which is formally defined as
+$s_{ik}^\mathrm{net}(y)=\sum_j x_{ij} w_{ij} w_{ji}$. The change contribution is $\Delta_{kij}^X(y)=w_{ij} w_{ji}$,
+which is not implemented directly as an alter function. However, there is a function \nnm{OutTieFunction} that
+returns the values $w_{ij}$ of the outgoing ties and an analogous function \nnm{InTieFunction} that returns
+the values $w_{ji}$ of the incoming ties. These two atomic functions can be easily combined in a product function.
+Assuming that $W$ is a friendship network, the complete code defining the mutuality effect looks like this:
+\begin{verbatim}
+pEffect = new GenericNetworkEffect(pEffectInfo,
+  new ProductFunction(
+    new OutTieFunction("friendship"),
+    new InTieFunction("friendship")));
+\end{verbatim}
+
+\paragraph{Conditional Functions.} The function \nnm{ConditionalFunction} is another type of composite
+functions, which takes three parameters in its constructor -- a predicate and two alter functions. The
+value of the conditional function depends on the value of the predicate. If the predicate holds for
+a certain alter $j$, the if-function is evaluated and its value is returned as the value of the conditional
+function. If the predicated does not hold then the else-function is evaluated. The predicate has to be an
+object of the \nnm{AlterPredicate} class. This class functions very much like \nnm{AlterFunction} except
+that the type of the \nnm{value} method is \verb|bool| instead of \verb|double|.
 \end{document}
