@@ -63,7 +63,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 	## intuitively expected. For now, I just check the dimensionality of the scores,
 	## as it will match the number of included "effects" on dimension 3 if uncond.
 	## estimation was used.
-	if (dim(sienaFit$sf2[,,-escreen])[3] == dim(sienaFit$effects[,,-escreen])[1]) {
+	if (dim(sienaFit$sf2[,,-escreen, drop=FALSE])[3] == dim(sienaFit$effects)[1]) {
 		rscreen <- indRateEffects
 	} else {
 		rscreen <- 99999
@@ -121,16 +121,17 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 	## obsStats, moment, scores are the crucial ingredients from sienaFit which
 	## screen for the base effects and make the rest of the code clean
 	obsStats <- t(sienaFit$targets2[-c(dscreen,rscreen,escreen), ])
-	moment <- sienaFit$sf2[, , -c(dscreen,rscreen,escreen)] - rep(obsStats, each=nSims)
-	scores <- sienaFit$ssc[ , , -c(dscreen,rscreen,escreen)]
+	moment <- sienaFit$sf2[, , -c(dscreen,rscreen,escreen), drop=FALSE] -
+        rep(obsStats, each=nSims)
+	scores <- sienaFit$ssc[ , , -c(dscreen,rscreen,escreen), drop=FALSE]
 	## Because the sienaFit object does not have a strict class definition,
 	## the $sf2 and $targets2 arrays cannot be expected to always have the
 	## proper format. The best we can do is therefore to die gracefully if
 	## the arrays do not line up:
 	G <- array(0, dim=c(nSims, observations - 1, nEffects + nDummies))
 	SF <- array(0, dim=c(nSims, observations - 1, nEffects + nDummies))
-	if (sum(dim(G[, , 1:nEffects]) != dim(moment))+
-		sum(dim(SF[, , 1:nEffects]) != dim(scores))>0) {
+	if (sum(dim(G[, , 1:nEffects, drop=FALSE]) != dim(moment))+
+		sum(dim(SF[, , 1:nEffects, drop=FALSE]) != dim(scores))>0) {
 		stop("The moments and scores in your sienaFit have unexpected dimensions.\n
 			It is possible that your model specifications are not yet implemented\n
 			in sienaTimeTest. Please contact the developers.\n\nDid you include
@@ -641,7 +642,7 @@ sienaTimeFix <- function(effects, data)
 						dvind <- which(names(data$cCovars) ==
 							effects$interaction1[effects$effectNumber==i])
 						if ( length(dvind) == 0) {
-						## It is a varCovar, not a coCovar 
+						## It is a varCovar, not a coCovar
 							dvind <- which(names(data$vCovars) ==
 											effects$interaction1[effects$effectNumber==i])
 							if (length(dvind)==0) {

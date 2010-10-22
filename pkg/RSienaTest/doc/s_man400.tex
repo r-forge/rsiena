@@ -326,11 +326,11 @@ which all contributed to the work on \si.
 Part I\\[1.5ex] Minimal Introduction to \SI  \\[1.8ex]}
 \end{screen}
 There are two ways of getting started with \si:
-by using the  graphical user interface (\emph{gui}) {siena.exe}
+by using the  graphical user interface (\emph{gui}) via \textsf{siena01Gui}
 or by using \R commands in the regular \R way.
 We start with a minimal cookbook-style
 introduction for getting started with \SI using
-the graphical user interface (\emph{gui}) {siena.exe}. In Section~\ref{S_SR}
+the graphical user interface (\emph{gui}) via \textsf{siena01Gui}. In Section~\ref{S_SR}
 we explain how to run \SI
 as the package \RS from within \Rn;
 users wishing to do this can have a quick look at section
@@ -363,27 +363,15 @@ the section \ref{sec:problems}.
 \item If you want to get the latest beta version of \rs, before installing the
   packages, select \sfn{Packages/Select repositories...} and select
   \sfn{R-forge}. Then install the packages in the normal way. \\
-  Note: On Windows if
-  you select \sfn{R-forge}, by default, \sfn{CRAN} will be removed. On Linux or
-  Mac, by default, both will be selected. Ensure that \sfn{CRAN} is deselected.
-\item Install the program \sfn{siena.exe} by, within \Rn, loading the package
-  RSiena using the \sfn{Packages/Load package...} menu. Then, still within \Rn,
-  type \sfn{installGui()}. This will launch the installer which will create
-  shortcuts and Start menu entries for \sfn{siena.exe}. You can then close \Rn.
-\item On Linux or Mac, it may be necessary to use \\
- \sfn{install.packages("RSiena", repos="http://www.stats.ox.ac.uk/pub/RWin")}\\
-or, for to get the version from \sfn{R-forge}, \\
- \sfn{install.packages("RSiena", repos="http://R-Forge.R-project.org")}
-
-
-\item Run \sfn{siena.exe} from the menu or by (double-)clicking a shortcut on
-  the taskbar (or desktop).\\
-  If this does not work for some reason, then see item number \ref{it:prob}
-  below or consult Section~\ref{S_guiinR}.
-\item In Windows, by right-clicking the shortcut and clicking `Properties'
-      you can change the current working directory, given in the
-      `Start in' field. Data files will be searched in first instance
+\item Start up \R from the start menu or by (double-)clicking a shortcut on
+  the taskbar (or desktop).
+\item By right-clicking the shortcut and clicking `Properties'
+      you can change the startup working directory, given in the
+      `Start in' field. Data files will be searched for in the first instance
       in this directory.
+\item Load the \RS package via the menu \texttt{Packages}
+\item Type\\
+\verb|siena01Gui()|
 \item You should see a screen like that shown in \hyperlink{siena1}{Figure
     \ref{fig:siena1}}
   \begin{figure}[ht]
@@ -394,31 +382,29 @@ or, for to get the version from \sfn{R-forge}, \\
 \caption{Siena Data Entry Screen}
 \label{fig:siena1}
   \end{figure}
-\item \label{it:prob} If you do not see this screen, navigate in MyComputer to your \Rn{}
-  distribution (probably somewhere like \textsf{C:/Program Files/R/R-2.11.1}),
-  then move to the \textsf{bin} folder and double click on \textsf{RSetReg.exe}.
-\item Then try running siena again.
 \item If the initial screen appears correctly, then check your working directory
-  or folder. This is
-  the directory that is opened immediately when clicking the \textsf{Add} button.
-  Various problems can be avoided by making sure that the working directory
-  is the directory that also contains the data files and the saved session file
+  or folder. This is the directory that is opened immediately when clicking the
+  \textsf{Add} button.  Various problems can be avoided by making sure that the
+  working directory is the directory that also contains the data files and the
+  saved session file
   (see below)!\\
-  You need to have permission to write files in the working directory,
-  and the data files you want to use need to be in the same directory. To
-  do this:
+  You need to have permission to write files in the working directory, and the
+  data files you want to use need to be in the same directory. To change the
+  directory:
 \begin{enumerate}
-\item Right click on the shortcut, and select Properties. (if somehow you
-don't have permission to do this, try copying the shortcut and pasting
-to create another with fewer restrictions.)  In the \textsf{Start in:} field
-type the name of the directory in which you wish to work, i.e., a
-directory in which you can both read and write files. Then click OK.
+\item Right click on the shortcut, and select Properties. (if somehow you don't
+  have permission to do this, try copying the shortcut and pasting to create
+  another with fewer restrictions. (This may not work in Windows 7: you may need
+  to copy it from the visible desktop and then paste it in Windows Explorer in
+  your personal Desktop area.))  In the \textsf{Start in:} field type the name
+  of the directory in which you wish to work, i.e., a directory in which you can
+  both read and write files. Then click OK.
 
-\item To run the examples, put the session file and the two data files in
-the chosen directory before starting siena.
+\item To run the examples, put the session file and the data files in
+the chosen directory before starting \rs.
 
 \item To use your own data, put that data in the chosen directory before
-starting siena.
+starting \rs.
 \end{enumerate}
 \end{enumerate}
 
@@ -435,7 +421,6 @@ To use the latest beta version, use\\
 %\item It is possible that Mac users on `Tiger' will need\\
 %  \sfn{install.packages("RSiena", repos="http://www.stats.ox.ac.uk/pub/RWin",
 %    type="source")}
-
 \item Navigate to the directory RSiena package, (which you can find from within
   R by running \sfn{system.file(package="RSiena")}) and find a file called
   \sfn{sienascript}.  Run this to produce the Siena GUI screen.(You will
@@ -453,14 +438,14 @@ sudo apt-get install libtktable2.9
 \end{verbatim}
 \end{enumerate}
 
-\subsection{Running  the graphical user interface from within \R}
+\subsection{Running  the graphical user interface: more details}
 \label{S_guiinR}
 
-The GUI interface can be just as easily be executed from within \Rn,
-which may be helpful if for some reason \textsf{siena.exe}
-does not operate as desired.\protect\footnote{We are
+Originally \RS provided access to the GUI interface direct from Windows. This is
+not now possible. This section details some helpful notes about starting \RS
+within R\protect\footnote{We are
 grateful to Paul Johnson for supplying
-these ideas.}
+these ideas.}.
 This is done by starting up \R and working with the following commands.
 Note that \R is case-sensitive, so you must use upper and lower
 case letters as indicated.
@@ -470,11 +455,9 @@ to the same directory that holds the data files;
 for example,\\
 \sfn{setwd('C:/SienaTest')}
 
-\noindent (Note the forward slash
- \protect\footnote{You can use backward ones but they
+\noindent (Note the forward slash\protect\footnote{You can use backward ones but they
  must be doubled: \sfn{setwd('C:\textbackslash\textbackslash SienaTest')}.},
- and the quotes are necessary
- \protect{\footnote{Single or double, as long as they match.}.)
+ and the quotes are necessary\protect{\footnote{Single or double, as long as they match.}.)
 Windows users can use the \sfn{Change dir...} option on the \sfn{File} menu.
 
 You can use the following commands to make sure the working directory is
@@ -8227,6 +8210,11 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-10-22 R-forge revision 124:
+\begin{itemize}
+\item Fixed bug in sienaTimeTest when only one effect
+\item Removed standalone siena01Gui. Still available within \Rn.
+\end{itemize}
 \item 2010-10-09 R-forge revision 122:
 \begin{itemize}
 \item Distance two effects: added parameter

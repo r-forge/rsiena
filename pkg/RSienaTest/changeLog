@@ -1,3 +1,11 @@
+2010-10-22 R-forge revision 124
+
+	* R/sienaTimeTest.r: fix bug causing error when only one effect
+	(added multiple drop=FALSE)
+	* src/win32/(all), configure.win, R/siena01.r: removed siena.exe,
+	install function now gives a message.
+	* doc/classdesign.tex (RSienaTest only) updated documentation
+
 2010-10-13 R-forge revision 123 RSienaTest only
 
 	* doc/RSienaDeveloper.tex: added details about change logs etc
