@@ -293,7 +293,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                )
     if (v1 == 0)
     {
-        stop('need a network')
+        stop('need a dependent variable')
     }
     depvars <- depvars[1:v1]
     if (is.null(nodeSets))
@@ -543,7 +543,11 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
         attr(compositionChange[[i]], "activeStart") <- activeStart
         attr(compositionChange[[i]], "action") <- action
     }
-    for (i in 1:v1)
+    ## dependent variables. First we sort the list so behavior are at the end
+    types <- sapply(depvars, function(x)attr(x, "type"))
+    depvars <- depvars[c(which(types !='behavior'), which(types =="behavior"))]
+
+    for (i in 1:v1) ## dependent variables
     {
         nattr <- attr(depvars[[i]], 'nodeSet')
         netdims <- attr(depvars[[i]], 'netdims')

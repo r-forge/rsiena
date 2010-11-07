@@ -134,10 +134,12 @@ I describe the main details of our current practice:
 \item More details of the design are in the document \emph{classdesign.tex}.
 \end{enumerate}
 \section{Recreating the package}
-All this may need updating when we get R 2.12.0. For now, these instructions are
-for 32 bit Windows only.
+These notes now apply to using R 2.12.0 or later. Please ensure you have the
+latest source (which does not include commands to get the installer for
+\verb|siena.exe|). If you do not then the behavior will not be as documented
+below.
 \begin{enumerate}
-\item If using Windows, download and install the latest
+\item If using Windows, download and install the matching
 \textsf{Rtools.exe} from
   \url{http://www.murdoch-sutherland.com/Rtools/}.  Beware: if you later install
   other programs containing utilities such as tar (delphi is one offender), you
@@ -152,29 +154,42 @@ for 32 bit Windows only.
 \verb|R CMD build RSiena|
 \item You will probably need to either add R to your path, or use
   `path-to-R.exe' in the command above.
+\item You may get warning messages from CYGWIN. This is caused by a recent
+  upgrade in RTools version 2.12. To suppress the warnings, set the environment
+  variable \verb|CYGWIN| to the value \verb|nodosfilewarnings|.
 \item When this one is OK, type\\
 \verb|R CMD INSTALL RSiena_1.0.n.tar.gz|\\
 (where \verb|n| is adjusted to match the file you have just created.)
-\item You now should have a new version of the package ready for use.
+\item You now should have a new version of the package ready for use. (If on 64
+  bit Windows or Mac, you will have two versions.)
 \item Alternatively, instead of the build and INSTALL, just type
 \verb|R CMD INSTALL RSiena|\\
+If you have a 64-bit Windows and R 2.12.0, or a 64-bit Mac, use
+\verb|R CMD INSTALL --no-multiarch RSiena|\\
+instead.
 This will just compile the C that has changed and then do the rest.
 Quicker if you are debugging changes. Note that the \sfn{make} file is not very
 clever: if you are altering the C and your changes are not appearing, delete the
-.o's or .dll to force it, or do a build
-to clear out all the .o's and the dll.
-\item On Windows the install procedure downloads the gui installer. If you want
-  to bypass this, rename the file \verb|configure.win| in the package
-  directory.
+.o's or .dll to force it, or use
+\verb|R CMD INSTALL --preclean RSiena|\\
+to clear out all the .o's and the dll. (Currently \verb|R CMD build| clears out
+.o's but it will not from R 2.13.0)
+\item If you use \verb|R CMD INSTALL --no-multiarch RSiena|
+you get object files in the source tree. If you later want to build multi
+architectures (where the object files are created in a copy of the source tree)
+you need to use \verb|--preclean| to stop confusion between the different object
+files.
 \item On linux or Mac, the same commands should work, but you don't need the
   Rtools. I have occasionally had problems with installing from a tarball or
   from source, when I have no permission to write in the standard libraries, but
   can't remember which one worked: one always did. The most likely to work is to
-  use, within R, \sfn{install.packages("tarball name", repos=NULL)}.
+  use, within R, \sfn{install.packages("tarball name", repos=NULL)}. Or just
+  open up R, and do \verb|install.packages('xtable')| which should create a
+  local library directory for you.
 \item If you find a Mac keeps recompiling all the C, even when you have not
-  changed anything, remove the word ``clean'' from the line beginning with the
-  word ``all'' in the file \verb|RSiena/src/Makevars|. But try to remember not
-  to commit this version!
+  changed anything, comment out, using \#,
+ the line beginning \verb|$(OBJECTS)| in the file
+  \verb|RSiena/src/Makevars|. But try to remember not to commit this version!
 \item Checking the package. Either run \verb|R CMD check RSiena|, or do a build
   and run \verb|R CMD check RSiena_1.0.n.tar.gz|. This will create a directory
   called \verb|RSiena.Rcheck|, and produce some diagnostics to the screen. You
@@ -189,19 +204,23 @@ to clear out all the .o's and the dll.
 will create a file called Rd2.pdf.
 \end{enumerate}
 \paragraph{Alternative methods for small changes}
-Now we have a \textsf{name space} for the package, small changes are not really
-possible.
+Good news: from R 2.12.0 it is often possible to update the R functions in
+RSiena without re-installing the
+package.
 \begin{enumerate}
-\item If you make a change to an R source file, you can sometimes override the
-  package simply by sourcing the R file into the R session. If you have changed
-  the function \textsf{simstats0c}, you will need to recreate the model object
-  too. But if the functions you have changed call hidden functions in the
-  package, then this will fail, unless you source any others necessary\ldots it
-  may be easier to recreate the package.
+\item If you make a change to an R source file, you can override the package
+  simply by using the R command \verb|insert.source|. For example,
+  \verb|insert.source('d:/RSiena/R/phase1.r', package='RSiena')| will update any
+  functions which you have altered which are contained in \verb|phase1.r|.
 \item You can make a small change to a hidden file by using
 \verb|fixInNamespace('function name', 'RSiena')|.
 \item Useful to insert a call to \sfn{browser}, as you won't mind it
   disappearing when you exit from R.
+\item It is likely that neither of these methods will work with S3 methods
+  eg. print.sienaFit. If the function you are trying to alter does not call any
+  hidden functions in RSiena, just source it and bypass the despatch mechanism
+  but calling it directly. (Or add \verb|RSiena:::| in front of all calls to
+  hidden functions.)
 \end{enumerate}
 \paragraph{Making  binaries}
 If you want to send someone a Windows binary for some reason: on a Windows
@@ -407,10 +426,7 @@ A few notes of problems we have had:
   \item If you work on a Mac, currently you will find it easier to remove the
     word \sfn{clean} from the make file \sfn{Makevars}. I suggest you do this in
     a personal copy in a directory \sfn{.R} in your home directory, though, so
-    that when you build and check the package it will get the right one. Also
-    use the INSTALL flag: \sfn{R CMD INSTALL --no-multiarch dirname} to retain
-    unchanged object files between installs. Hopefully this will cease to be a
-    problem at some stage.
+    that when you build and check the package it will get the right one.
 \item Also remove the word \sfn{clean} from the makefile on Linux.
   \item Be careful with \sfn{abs}. The integer version is in \sfn{<cstdlib>} not
     \sfn{<cmath>}. Compilation may fail with message about ambiguity.

@@ -6,7 +6,7 @@
 \usepackage{amssymb}
 \usepackage{algorithm}
 \usepackage{algorithmic}
-\usepackage{hyperref}
+\usepackage[pdfstartview={}]{hyperref}
 \textheight=9.5in
 \topmargin=-0.5in
 \newcommand{\eps}{\varepsilon}
@@ -314,7 +314,6 @@ $i$ to $j$, from $i$'s perspective.
 parameters and summing.
 \IF{link between $i$ and $j$ exists}
 \STATE change the sign of the unnormalised probability $y_{i,j}$
-\remark{THIS IS INCOMPLETE, DOES NOT TAKE INTO ACCOUNT ENDOWMENT FUNCTION.}
 \ENDIF
 \IF{subtype not 3}
 \STATE Calculate $$p_{i,j} = \frac{\exp(y_{i,j})} { (1 + \exp(y_{i,j}))}$$
@@ -370,11 +369,7 @@ rate scores are the same as in this section, but the non-rate scores are defined
 in section \ref{sec:symScores}.
 
 In \Sn, when calculating scores, only steps which are not aborted because of
-composition change are included in the scores.
-\remark{IN OTHER WORDS (IF MY INTERPRETATION IS CORRECT), THE SUMS OF ACTORS IN THE FOLLOWING
-ARE ONLY OVER PERMITTED ACTORS; THIS EXCLUDES INACTIVE ACTORS, BUT FOR UPONLY,
-DOWNONLY, HIGHER, DISJOINT, ATLEASTONE, SOME ADDITIONAL ACTORS MAY NEED TO BE EXCLUDED.
-GENERALLY, THE SUM IS ONLY OVER THE CONSIDERED ALTERNATIVES.}
+composition change are included in the scores. (This is a bug in \Sn.)
 
 Let $z_{rk}$ be the observed value of the $k$th
 statistic in the $r$th simulation\\
@@ -494,17 +489,17 @@ $$
 c_{rk}= \sum_{m=1}^M \begin{cases}
  (1-p_{ij})s_{i,j\delta k} + (1-p_{ji}) s_{j,i\delta k}
 & \exists \text{ link }  i \rightarrow j, \text{ accept}\\
-\dfrac{
- -p_{ji} p_{ij} (1-p_{ij}) s_{i, j\delta k} - p_{ij} p_{ji} (1-p_{ji})
-s_{i, j\delta k}}{(1 - p_{ij} p_{ji})} & \exists \text{ link }
+\dfrac{ -p_{ji} p_{ij}}{(1 - p_{ij} p_{ji})}
+\left[(1-p_{ij}) s_{i, j\delta k} +  (1-p_{ji})
+s_{j, i\delta k}\right ] & \exists \text{ link }
 i \rightarrow j, \text{ reject}\\
-\dfrac{s_{i, j\delta k} p_{ij} (1 - p_{ij}) (1-p_{ji}) +
- s_{j, i\delta k} p_{ji} (1 - p_{ji}) (1-p_{ij}) }
+\dfrac{(1 - p_{ij}) (1-p_{ji} )\left [s_{i, j\delta k} p_{ij}  +
+ s_{j, i\delta k} p_{ji} \right] }
 {p_{ij} + p_{ji} - p_{ij}p_{ji}}& \nexists \text{ link } i \rightarrow j,
 \text{ accept}\\
-\dfrac{-s_{i, j\delta k} p_{ij}(1-p_{ij})(1-p_{ji}) -
-s_{j, i\delta k} p_{ji}(1-p_{ji})(1-p_{ij})}
-{1 -- p_{ij} - p_{ji} + p_{ij}p_{ji}} &\nexists \text{ link } i \rightarrow j,
+-s_{i, j\delta k} p_{ij} -
+s_{j, i\delta k} p_{ji}
+ &\nexists \text{ link } i \rightarrow j,
 \text{ reject}
 \end{cases}
 $$
@@ -513,17 +508,17 @@ For subtype 2 (BAGREE), the reverse:
 $$c_{rk}= \sum_{m=1}^M \begin{cases}
  (1-p_{ij})s_{i,j\delta k} + (1-p_{ji}) s_{j,i\delta k}
 & \nexists \text{ link }  i \rightarrow j, \text{ accept}\\
-\dfrac{
- -p_{ji} p_{ij} (1-p_{ij}) s_{i, j\delta k} - p_{ij} p_{ji} (1-p_{ji})
-s_{i, j\delta k}}{(1 - p_{ij} p_{ji})} & \nexists \text{ link }
+\dfrac{ -p_{ji} p_{ij}}{(1 - p_{ij} p_{ji})}
+\left[(1-p_{ij}) s_{i, j\delta k} +  (1-p_{ji})
+s_{j, i\delta k}\right ] & \nexists \text{ link }
 i \rightarrow j, \text{ reject}\\
-\dfrac{s_{i, j\delta k} p_{ij} (1 - p_{ij}) (1-p_{ji}) +
- s_{j, i\delta k} p_{ji} (1 - p_{ji}) (1-p_{ij}) }
+\dfrac{(1 - p_{ij}) (1-p_{ji} )\left [s_{i, j\delta k} p_{ij}  +
+ s_{j, i\delta k} p_{ji} \right] }
 {p_{ij} + p_{ji} - p_{ij}p_{ji}}& \exists \text{ link } i \rightarrow j,
 \text{ accept}\\
-\dfrac{-s_{i, j\delta k} p_{ij}(1-p_{ij})(1-p_{ji}) -
-s_{j, i\delta k} p_{ji}(1-p_{ji})(1-p_{ij})}
-{1 -- p_{ij} - p_{ji} + p_{ij}p_{ji}} &\exists \text{ link } i \rightarrow j,
+-s_{i, j\delta k} p_{ij} -
+s_{j, i\delta k} p_{ji}
+ &\exists \text{ link } i \rightarrow j,
 \text{ reject}
 \end{cases}
 $$

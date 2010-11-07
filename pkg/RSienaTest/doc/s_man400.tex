@@ -8210,6 +8210,16 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-11-05 R-forge revision 125:
+\begin{itemize}
+\item Corrected bug in report from siena07 about detailing network types.
+\item Networks appear in data object before behavior variables regardless of
+order of submission to sienaDataCreate
+\item RSienaTest only: new effect: in structural equivalence
+\item RSienaTest only: new models for symmetric networks
+\item bug fixed to sienaTimeTest: non included underlying effects for user
+  defined interactions, multiple dependent networks and multiple groups.
+\end{itemize}
 \item 2010-10-22 R-forge revision 124:
 \begin{itemize}
 \item Fixed bug in sienaTimeTest when only one effect

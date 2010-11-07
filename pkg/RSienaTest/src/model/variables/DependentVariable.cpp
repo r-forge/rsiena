@@ -758,6 +758,176 @@ void DependentVariable::accumulateRateScores(double tau,
 }
 
 /**
+ * Updates the rate score functions for this event for this variable.
+ * @param[in] tau the time increment in the current step of the simulation
+ * @param[in] pSelectedVariable the variable, which has been selected in
+ * the current step of the simulation (0, if none is selected)
+ * @param[in] selectedActor the actor, which has been selected to change
+ * the selected variable, if any. If no variable has been selected, this
+ * parameter is ignored.
+ * @param[in] alter the alter, which has been selected to make a two-way
+ * change in this variable. If no variable has been selected, this
+ * parameter is ignored.
+ */
+void DependentVariable::accumulateRateScores(double tau,
+	const DependentVariable * pSelectedVariable,
+	int selectedActor, int alter)
+{
+	 switch (this->pSimulation()->pModel()->modelType())
+	 {
+	 case NOTUSED:
+	 case NORMAL:
+	 case AFORCE:
+	 case AAGREE:
+		 break;
+	 case BFORCE:
+	 case BAGREE:
+	 case BJOINT:
+
+		 // Update the score for the basic rate parameter
+
+		 if (this == pSelectedVariable && this->successfulChange())
+		 {
+			 this->lbasicRateScore += 2.0 / this->basicRate();
+		 }
+		 //	 Rprintf("%f\n", this->lbasicRateScore);
+		 this->lbasicRateScore -=
+			 2 * this->totalRate() * tau / this->basicRate();
+
+		 // Update scores for covariate dependent rate parameters
+
+		 for (std::map<const ConstantCovariate *,
+				  double>::iterator iter =
+				  this->lconstantCovariateScores.begin();
+			  iter != this->lconstantCovariateScores.end();
+			  iter++)
+		 {
+			 const ConstantCovariate * pCovariate = iter->first;
+
+			 if (this == pSelectedVariable && this->successfulChange())
+			 {
+				 iter->second += pCovariate->value(selectedActor) +
+					 pCovariate->value(alter);
+			 }
+
+			 for (int i = 0; i < this->n(); i++)
+			 {
+				 for (int j = 0; j < this->n(); j++)
+				 {
+					 iter->second -=
+						 tau * this->lrate[i] * this->lrate[j]  *
+						 (pCovariate->value(i) + pCovariate->value(j));
+				 }
+			 }
+		 }
+		 for (std::map<const ChangingCovariate *, double>::iterator iter =
+				  this->lchangingCovariateScores.begin();
+			  iter != this->lchangingCovariateScores.end();
+			  iter++)
+		 {
+			 const ChangingCovariate * pCovariate = iter->first;
+
+			 if (this == pSelectedVariable && this->successfulChange())
+			 {
+				 iter->second +=
+						 pCovariate->value(selectedActor, this->period()) +
+					 pCovariate->value(alter, this->period());
+			 }
+
+			 for (int i = 0; i < this->n(); i++)
+			 {
+				 for (int j = 0; j < this->n(); j++)
+				 {
+					 iter->second -=
+						 this->lrate[i] * this->lrate[j] * tau *
+						 (pCovariate->value(i, this->period()) +
+							 pCovariate->value(j, this->period()));
+				 }
+			 }
+		 }
+		 for (std::map<const BehaviorVariable *,
+				  double>::iterator iter =
+				  this->lbehaviorVariableScores.begin();
+			  iter != this->lbehaviorVariableScores.end();
+			  iter++)
+		 {
+			 const BehaviorVariable * pBehavior = iter->first;
+
+			 if (this == pSelectedVariable && this->successfulChange())
+			 {
+				 iter->second += pBehavior->value(selectedActor) +
+					 pBehavior->value(alter);
+			 }
+
+			 for (int i = 0; i < this->n(); i++)
+			 {
+				 for (int j = 0; j < this->n(); j++)
+				 {
+					 iter->second -= this->lrate[i] * this->lrate[j]
+						 * tau * (pBehavior->value(i) +
+							 pBehavior->value(j));
+				 }
+			 }
+		 }
+
+		 // Update scores for structural rate parameters
+
+		 for (std::map<const NetworkVariable *, double>::iterator iter =
+				  this->loutDegreeScores.begin();
+			  iter != this->loutDegreeScores.end();
+			  iter++)
+		 {
+			 const Network * pNetwork = iter->first->pNetwork();
+
+			 if (this == pSelectedVariable && this->successfulChange())
+			 {
+				 iter->second += pNetwork->outDegree(selectedActor) +
+					 pNetwork->outDegree(alter);
+				 //	 Rprintf("%f %d %d %d %d %f\n", iter->second,
+				 //pNetwork->outDegree(selectedActor),
+				 //pNetwork->outDegree(alter), selectedActor, alter, tau);
+			 }
+
+			 for (int i = 0; i < this->n(); i++)
+			 {
+				 for (int j = 0; j < this->n(); j++)
+				 {
+					 iter->second -= this->rate(i) * this->rate(j) * tau *
+						 (pNetwork->outDegree(i)  + pNetwork->outDegree(j));
+					 // Rprintf("%f %d %d %d %d %f\n", iter->second, pNetwork->outDegree(i),
+					 //pNetwork->outDegree(j), i, j, tau);
+				 }
+			 }
+		 }
+
+
+		 for (std::map<const NetworkVariable *, double>::iterator iter =
+				  this->linverseOutDegreeScores.begin();
+			  iter != this->linverseOutDegreeScores.end();
+			  iter++)
+		 {
+			 const Network * pNetwork = iter->first->pNetwork();
+
+			 if (this == pSelectedVariable && this->successfulChange())
+			 {
+				 iter->second += invertor(pNetwork->outDegree(selectedActor))
+					 + invertor(pNetwork->outDegree(alter));
+			 }
+
+			 for (int i = 0; i < this->n(); i++)
+			 {
+				 for (int j = 0; j < this->n(); j++)
+				 {
+					 iter->second -=
+						 this->rate(i) * this->rate(j) * tau *
+						 (invertor(pNetwork->outDegree(i)) +
+							 invertor(pNetwork->outDegree(j)));
+				 }
+			 }
+		 }
+	 }
+}
+/**
  * Calculates the rate score functions for this chain for this variable.
  * @param[in] activeMiniStepCount the number of non-structurally determined
  * links in the current chain for this variable.
@@ -1102,6 +1272,14 @@ bool DependentVariable::behaviorVariable() const
 	return false;
 }
 
+/**
+ * Returns if this is a symmetric one mode network.
+ */
+bool DependentVariable::symmetric() const
+{
+	// This method is overridden in NetworkVariable. Here we return false.
+	return false;
+}
 
 /**
  * Returns if there are any constraints on the permitted changes of this
@@ -1113,4 +1291,27 @@ bool DependentVariable::constrained() const
 		this->pData()->downOnly(this->period());
 }
 
+/**
+ * Returns the alter for this step. Only used for symmetric one mode networks.
+ */
+int DependentVariable::alter() const
+{
+	// This method is overridden in NetworkVariable. Here we return false.
+	return 0;
+}
+/**
+ * Returns whether the most recent change attempted was successful.
+ */
+bool DependentVariable::successfulChange() const
+{
+	return this->lsuccessfulChange;
+}
+
+/**
+ * Stores whether the most recent change attempted was successful.
+ */
+void DependentVariable::successfulChange(bool success)
+{
+	this->lsuccessfulChange = success;
+}
 }

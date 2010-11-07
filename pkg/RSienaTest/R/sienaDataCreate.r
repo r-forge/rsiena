@@ -293,7 +293,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                )
     if (v1 == 0)
     {
-        stop('need a network')
+        stop('need a dependent variable')
     }
     depvars <- depvars[1:v1]
     if (is.null(nodeSets))
@@ -543,7 +543,11 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
         attr(compositionChange[[i]], "activeStart") <- activeStart
         attr(compositionChange[[i]], "action") <- action
     }
-    for (i in 1:v1)
+    ## dependent variables. First we sort the list so behavior are at the end
+    types <- sapply(depvars, function(x)attr(x, "type"))
+    depvars <- depvars[c(which(types !='behavior'), which(types =="behavior"))]
+
+    for (i in 1:v1) ## dependent variables
     {
         nattr <- attr(depvars[[i]], 'nodeSet')
         netdims <- attr(depvars[[i]], 'netdims')
@@ -615,6 +619,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
             attr(depvars[[i]], 'simMean') <- rr$simMean
             attr(depvars[[i]], 'structural') <- FALSE
             attr(depvars[[i]], 'balmean') <- NA
+            attr(depvars[[i]], 'structmean') <- NA
        }
         else
         {
@@ -692,6 +697,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
             if (type == 'oneMode')
             {
                 attr(depvars[[i]], 'balmean') <- calcBalmean(depvars[[i]])
+                attr(depvars[[i]], 'structmean') <- calcStructmean(depvars[[i]])
                 attr(depvars[[i]], 'simMean') <- NA
                 attr(depvars[[i]], 'symmetric') <- TRUE
                 attr(depvars[[i]], 'missing') <- FALSE
@@ -785,6 +791,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                 ## but include diagonal
             {
                 attr(depvars[[i]], 'balmean') <- NA
+                attr(depvars[[i]], 'structmean') <- NA
                 attr(depvars[[i]], 'simMean') <- NA
                 attr(depvars[[i]], 'symmetric') <- FALSE
                 attr(depvars[[i]], 'missing') <- FALSE
@@ -1687,6 +1694,9 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     balmeans <- calcBalmeanGroup (group)
     names(balmeans) <- netnames
     attr(group, "balmean") <- balmeans
+    structmeans <- calcStructmeanGroup (group)
+    names(structmeans) <- netnames
+    attr(group, "structmean") <- structmeans
     ## calculate overall degree averages
     atts <- attributes(group)
     netnames <- atts$netnames
@@ -1723,6 +1733,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     attr(group, "netRanges") <- tmp
     ## copy the global attributes down to individual level where appropriate
     ##group <- copyGroupAttributes(group, "depvars", "balmean", "balmean")
+    ##group <- copyGroupAttributes(group, "depvars", "structmean", "structmean")
     group <- copyGroupAttributes(group, "depvars", "symmetric", "symmetric")
     ##group <- copyGroupAttributes(group, "depvars", "averageInDegree",
     ##                             "averageInDegree")
@@ -1777,7 +1788,7 @@ copyGroupAttributes <- function(group, vartype, groupattrname, attrname,
     group
 }
 
-##@calcBalMeanGroup DataCreate
+##@calcBalmeanGroup DataCreate
 calcBalmeanGroup <- function(data)
 {
     atts <- attributes(data)
@@ -1837,6 +1848,113 @@ calcBalmeanGroup <- function(data)
         }
     }
     balmeans
+}
+##@calcStructmeanGroup DataCreate
+calcStructmeanGroup <- function(data)
+{
+    atts <- attributes(data)
+    netnames <- atts$netnames
+    types <- atts$types
+   ## cat(types,'\n')
+    structmeans <- rep(NA, length(netnames))
+    for (net in seq(along=netnames))
+    {
+        if (types[net] == "oneMode")
+        {
+            tempra <- 0
+            temprb <- 0
+            for (i in 1: length(data))
+            {
+                j <- match(netnames[net], names(data[[i]]$depvars))
+                if (is.na(j))
+                    stop("network names not consistent")
+                depvar <- data[[i]]$depvars[[j]]
+                dims <- attr(depvar, "netdims")
+                for (k in 1 : (dims[3] - 1))
+                {
+                    ## remove structural values here?
+                    if (attr(depvar, "sparse"))
+                    {
+                        tmp <- depvar[[k]]
+                        diag(tmp)  <-  NA ## just in case
+                        x1 <- tmp@x
+                        struct <- !is.na(x1) & x1 %in% c(10, 11)
+                        x1[struct] <- x1[struct] - 10
+                        tmp@x <- x1
+                        tmp1 <- rowSums(is.na(tmp))
+                        tempra <- tempra +
+                            sum(2 * rowSums(tmp, na.rm=TRUE) *
+                                (dims[1] - tmp1 - rowSums(tmp, na.rm=TRUE)),
+                                na.rm=TRUE)
+                        tmp2 <- rowSums(!is.na(tmp))
+                        temprb <- temprb + sum(tmp2 * (tmp2 - 1))
+                    }
+                    else
+                    {
+                        tmp <- depvar[, , k]
+                        diag(tmp) <- NA ## just in case
+                        struct <- !is.na(tmp) & tmp %in% c(10, 11)
+                        tmp[struct] <- tmp[struct] - 10
+                        tempra <- tempra +
+                            sum(2 * rowSums(tmp, na.rm=TRUE) *
+                                rowSums(1 - tmp, na.rm=TRUE),
+                                na.rm=TRUE)
+                        tmp1 <- rowSums(is.na(tmp))
+                        tmp2 <- rowSums(!is.na(tmp))
+                        temprb <- temprb + sum(tmp2 * (tmp2 - 1))
+                    }
+                }
+            }
+            structmeans[net] <- tempra / temprb
+        }
+    }
+    structmeans
+}
+##@calcStructmean DataCreate
+calcStructmean <- function(depvar)
+{
+    tempra <- 0
+    temprb <- 0
+    dims <- attr(depvar, "netdims")
+    for (k in 1 : (dims[3] - 1))
+    {
+        if (attr(depvar, "sparse"))
+        {
+            tmp <- depvar[[k]]
+            diag(tmp)  <-  NA ## just in case
+            x1 <- tmp@x
+            struct <- !is.na(x1) & x1 %in% c(10, 11)
+            x1[struct] <- x1[struct] - 10
+            tmp@x <- x1
+            tmp1 <- rowSums(is.na(tmp))
+            tempra <- tempra +
+                sum(2 * rowSums(tmp, na.rm=TRUE) *
+                    (dims[1] - tmp1 - rowSums(tmp, na.rm=TRUE)),
+                    na.rm=TRUE)
+            tmp2 <- rowSums(!is.na(tmp))
+            temprb <- temprb + sum(tmp2 * (tmp2 - 1))
+     }
+        else
+        {
+            ##extract this observation
+            tmp <- depvar[, , k]
+            ##remove diagonal
+            diag(tmp) <- NA ## just in case
+            ##subtract 10 from structurals
+            struct <- !is.na(tmp) & tmp %in% c(10, 11)
+            tmp[struct] <- tmp[struct] - 10
+            ## rowSums here counts how many 1's or 0's in tmp
+            tempra <- tempra +
+                sum(2 * rowSums(tmp, na.rm=TRUE) *
+                    rowSums(1 - tmp, na.rm=TRUE),
+                    na.rm=TRUE)
+            tmp2 <- rowSums(!is.na(tmp)) ## counts non-missings in row
+            temprb <- temprb + sum(tmp2 * (tmp2 - 1))
+        }
+    }
+    structmean <- tempra / temprb
+    #  cat(tempra, temprb, structmean,'\n')
+    structmean
 }
 ##@calcBalmean DataCreate
 calcBalmean <- function(depvar)

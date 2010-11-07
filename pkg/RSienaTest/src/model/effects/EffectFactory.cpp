@@ -257,6 +257,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new FourCyclesEffect(pEffectInfo);
 	}
+	else if (effectName == "inStructEq")  
+	{
+		pEffect = new InStructuralEquivalenceEffect(pEffectInfo);
+	}
 	else if (effectName == "crprod")
 	{
 		pEffect = new GenericNetworkEffect(pEffectInfo,

@@ -72,7 +72,9 @@ public:
 	int id() const;
 	virtual bool networkVariable() const;
 	virtual bool behaviorVariable() const;
+	virtual bool symmetric() const;
 	virtual bool constrained() const;
+	virtual int alter() const;
 
 	inline const Function * pEvaluationFunction() const;
 	inline const Function * pEndowmentFunction() const;
@@ -81,6 +83,7 @@ public:
 	inline int period() const;
 	virtual bool canMakeChange(int actor) const;
 	virtual void makeChange(int actor) = 0;
+	bool successfulChange() const;
 
 	virtual void actOnJoiner(const SimulationActorSet * pActorSet,
 		int actor);
@@ -99,6 +102,9 @@ public:
 	void accumulateRateScores(double tau,
 		const DependentVariable * pSelectedVariable = 0,
 		int selectedActor = 0);
+	void accumulateRateScores(double tau,
+		const DependentVariable * pSelectedVariable,
+		int selectedActor, int alter);
 	double basicRateScore() const;
 	double constantCovariateScore(const ConstantCovariate * pCovariate) const;
 	double changingCovariateScore(const ChangingCovariate * pCovariate) const;
@@ -151,6 +157,7 @@ protected:
 	inline EpochSimulation * pSimulation() const;
 	void simulatedDistance(int distance);
 	void invalidateRates();
+	void successfulChange(bool success);
 
 private:
 	void initializeFunction(Function * pFunction,
@@ -247,6 +254,8 @@ private:
 	int lacceptances;
 	int lrejections;
 
+	// flag to indicate we gave up on a step due to uponly and other filters
+	bool lsuccessfulChange;
 };
 
 

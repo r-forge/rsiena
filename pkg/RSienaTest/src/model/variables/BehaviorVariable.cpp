@@ -293,6 +293,7 @@ void BehaviorVariable::makeChange(int actor)
 				std::abs(oldValue - observedValue));
 		}
 	}
+	this->successfulChange(true);
 }
 
 

@@ -53,6 +53,7 @@ public:
 	bool oneModeNetwork() const;
 	virtual bool networkVariable() const;
 	virtual bool constrained() const;
+	virtual bool symmetric() const;
 
 	virtual void initialize(int period);
 	virtual bool canMakeChange(int actor) const;
@@ -64,6 +65,7 @@ public:
 	Network * pNetwork() const;
 
 	int ego() const;
+	virtual int alter() const;
 
 	virtual double probability(MiniStep * pMiniStep);
 	virtual bool validMiniStep(const MiniStep * pMiniStep,
@@ -84,6 +86,8 @@ private:
 	bool checkAlterAgreement(int alter);
 	void addAlterAgreementScores(bool accept);
 	void accumulateSymmetricModelScores(int alter, bool accept);
+	void accumulateRateScores(double tau, const DependentVariable *
+		pSelectedVariable, int selectedActor);
 	void calculateSymmetricTieFlipContributions(int alter, int sub);
 	void calculateSymmetricTieFlipProbabilities(int alter, int sub);
 	bool makeModelTypeBChange();

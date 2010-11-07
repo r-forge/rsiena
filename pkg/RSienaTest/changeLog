@@ -1,3 +1,39 @@
+2010-11-06 R-forge revision 125
+
+	* data/allEffects.csv,
+	src/model/effects/InStructuralEquivalenceEffect.cpp,
+	src/model/effects/InStructuralEquivalenceEffect.h,
+	src/model/effects/EffectFactory.cpp,src/model/effects/AllEffects.h,
+	src/data/OneModeNetworkLongitudinalData.cpp,
+	src/data/OneModeNetworkLongitudinalData.h,
+	R/sienadataCreate.r, R/initializeFRAN.r, src/siena07internals.cpp:
+	new in-structural equivalence effect (RSienaTest only)
+	* data/allEffects.csv, R/sienaModelCreate.r, R/initializeFRAN.r,
+	R/sienaprint.r, man/sienaModelCreate.Rd, R/printDataReport.r,
+	src/model/variables/NetworkVariable.cpp,
+	src/model/variables/NetworkVariable.h,
+	src/model/variables/DependentVariable.cpp,
+	src/model/variables/DependentVariable.h,
+	src/model/variables/BehaviorVariable.cpp,
+	src/model/EpochSimulation.cpp, src/model/Model.h,
+	doc/simstats0c.tex: symmetric models
+	(RSienaTest only)
+	* R/robmon.r, man/siena01Gui.Rd : minor textual corrections
+	* R/sienaDataCreate.r: sorted networks before behavior variables
+	* doc/RSienaDeveloper.tex, doc/Siena_algorithms4.tex:
+	documentation (RSienaTest only)
+	* R/phase1.r: do finite difference calculations for fixed
+	parameters during phase 3.
+	* R/print07Report.r, R/phase3.r: fix typos in printing of report.
+	* R/sienaTimeTest.r: fix bugs with missing interaction effects,
+	multiple dependent networks and multiple groups.
+	* src/model/effects/DenseTriadsEffect.cpp: add parentheses to remove a
+	compiler warning.
+	* src/model/ml/MLSimulation.cpp: commented a problem (RSienaTest only)
+	* src/siena07models.cpp: return chains as dataframe not list.
+	(RSienaTest only)
+	* cleanup.win: remove siena01.exe part
+
 2010-10-22 R-forge revision 124
 
 	* R/sienaTimeTest.r: fix bug causing error when only one effect
