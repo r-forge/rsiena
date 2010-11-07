@@ -359,8 +359,9 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 				pModel->needChangeContributions(addChainToStore == 0 &&
 					needChangeContributions == 1);
 				SEXP thisChain =
-					getChainList(*(pEpochSimulation->pChain()),
-						*pEpochSimulation);
+					getChainDF(*(pEpochSimulation->pChain()));
+/*,
+								   *pEpochSimulation);*/
 
 				SET_VECTOR_ELT(VECTOR_ELT(chains, group), period,
 					thisChain);

@@ -28,7 +28,7 @@ namespace siena
  * This enumeration defines the possible types of model for symmetric,
  * undirected networks.
  */
-	enum ModelType { NORMAL, AFORCE, AAGREE, BFORCE, BAGREE, BJOINT };
+	enum ModelType { NOTUSED, NORMAL, AFORCE, AAGREE, BFORCE, BAGREE, BJOINT };
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
 // ----------------------------------------------------------------------------

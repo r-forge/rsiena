@@ -1508,7 +1508,9 @@ bool MLSimulation::deletePermute(int c0)
 			sigma2_new -= rr * rr;
 		}
 	}
-
+	// next statement fails if there is missing data and ministep a
+	// is the final step of the chain. (Step 14 in spec:
+	// ms_a.succ is not a real step.).
 	DependentVariable * pVariable =
 		this->lvariables[pMiniStepA->pNext()->variableId()];
 	this->calculateRates();

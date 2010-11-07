@@ -11,6 +11,7 @@
 % When replacing figures, put a % at the end of the line
 % to prevent a linebreak being read!
 
+
 \usepackage{natbib}
 
 \usepackage{rotating}
@@ -18,15 +19,26 @@
 \usepackage{threeparttablex}
 \usepackage{amsmath}
 \usepackage[top=2.5cm, bottom=2.5cm, left=2cm , right=1.8cm]{geometry}
-%\usepackage[bookmarksopen=false]{hyperref}
-% in the newer version of pdfscreen, hyperref can be loaded first with its own parameters
-%\usepackage[pdfstartview={XYZ null null 1}]{hyperref}
-\usepackage[pdfstartview={},pdftex,bookmarksopen]{hyperref}  % ,colorlinks
 \usepackage[pdftex,dvipsnames]{color}
 
 \usepackage{enumitem}
 \usepackage{appendix}
 \usepackage{framed}
+
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage[bookmarksopen=false]{hyperref}
+% in the newer version of pdfscreen, hyperref can be loaded first with its own parameters
+%\usepackage{hyperref}
+%\usepackage[pdfstartview={},pdftex,bookmarksopen]{hyperref}  % ,colorlinks
+\usepackage[pdfstartview={},pdftex]{hyperref}  % ,colorlinks
+
+
 
 \setlength{\bibsep}{0.01in}
 \renewcommand\bibsection{\section{\refname}}
@@ -41,6 +53,13 @@
   \advance\@totalleftmargin\leftmargin  \@setpar{{\@@par}}%
   \parshape 1 \@totalleftmargin         \linewidth \ignorespaces
   \begin{minipage}[h]{\linewidth}\begin{framed}}{\end{framed}\end{minipage}\par}
+\newenvironment{frindent}[3]
+{\par \setlength{\leftmargin}{#1}       \setlength{\rightmargin}{#2}
+  \advance\linewidth - \leftmargin       \advance\linewidth -\rightmargin
+  \advance\linewidth - #3
+  \advance\@totalleftmargin\leftmargin  \@setpar{{\@@par}}%
+  \parshape 1 \@totalleftmargin         \linewidth \ignorespaces
+  \begin{minipage}[h]{\linewidth}\begin{framed}}{\end{framed}\end{minipage}\par}
 \newenvironment{indentation}[2]
 {\par \setlength{\leftmargin}{#1}       \setlength{\rightmargin}{#2}
   \advance\linewidth -\leftmargin       \advance\linewidth -\rightmargin
@@ -48,13 +67,6 @@
   \parshape 1 \@totalleftmargin         \linewidth \ignorespaces}{\par}
 \makeatother
 
-
-\usepackage{times}
-\usepackage[T1]{fontenc}
-% Or whatever. Note that the encoding and the font should match. If T1
-% does not look nice, try deleting the line with the fontenc.
-\usepackage{amsmath}
-\usepackage{amssymb}
 
 
 \newcommand{\Reals}{\mbox{I}\hspace{-.07ex}\mbox{R}}
@@ -170,10 +182,20 @@
 
 \maketitle
 
+\tableofcontents
+\newpage
+
+\remark{Compilation of this Latex file leads to warning messages.
+       These disappear when hyperref is not loaded.
+       I suppose they are due to a bug in hyperref.}
+
 This paper gives a sketch of the main algorithms used in RSiena.
 It is meant as background material for understanding the code of
 RSiena. It is intended to be included later on as part of the
 programmer's manual of RSiena.
+
+The changes in the version of October 30, 2010, are corrections in part B
+of procedures \textit{MH\_InsMis} and \textit{MH\_DelMis}.
 
 The change in the version of August 28, 2010, is a clarification
 at the start of Chapter 9.
@@ -441,9 +463,9 @@ we define the following logical (boolean) variables:
       Obviously, in many cases, there are never any excluded $j$; and if there
       is only one dependent network variable, the four last conditions
       are never satisfied.\\
-      \adda{If $C$ has one element, this must be $i$; then go to \ref{itemstart}.\\
+      If $C$ has one element, this must be $i$; then go to \ref{itemstart}.\\
       (The following steps in this item then are vacuous, so they can be skipped.)\\
-      If $C$ is empty, this is an error, and the program must stop with an error message.}
+      If $C$ is empty, this is an error, and the program must stop with an error message.
 
       For all $j \in C$, calculate $h_j = \Delta f^N(r,i,j,x,z)$, and $h_i = 0$.\\
       For all $j \in C$ with $N^{r}_{ij} = 1$, calculate $h_j = h_j - g^N(r,i,j,x,z)$.\\
@@ -884,9 +906,9 @@ The statistic used for estimation is defined by
 
 The quantity introduced in the beginning, called $\Delta f^N(r,i,j,x,z)$,
 is a linear combination of the change statistics:
-\[
-\Delta f^N(r,i,j,x,z) = \pm  \sum_k \beta^{X(r)}_k \Delta_{kij}^{X(r)}(x,z)
-\]
+\begin{equation}
+\Delta f^N(r,i,j,x,z) = \pm  \sum_k \beta^{X(r)}_k \Delta_{kij}^{X(r)}(x,z) \label{eq:Deltaf}
+\end{equation}
 where $\beta^{X(r)}_k$ is the appropriate element of the parameter vector $\theta$,
 and where $\pm = +1$ if the toggle means that tie  $i \rightarrow j$ is added,
 while $\pm = -1$ if the toggle means that this tie is dropped.
@@ -1003,7 +1025,7 @@ An interaction between an ego effect $a$ and any effect $b$ is defined by
 This definition implies
 \begin{eqnarray*}
  \Delta_{a \times b,ij}^X(x,z) &=& c_{ai}(x,z)\, \Delta_{bij}^X(x,z)   \\
-   s_{a \times b}^X(x,z) &=& \sum_{ij} x_{ij}\, c_{ai}(x,z)\, s_{ib}^X(x,z) \ .
+   s_{a \times b}^X(x,z) &=& \sum_{ij}  c_{ai}(x,z)\, s_{ib}^X(x,z) \ .
 \end{eqnarray*}
 Given that effect $b$ satisfies (\ref{Delta}) and (\ref{fitstat}),
 this interaction also satisfies (\ref{Delta}) and (\ref{fitstat}).
@@ -1174,11 +1196,6 @@ level of variables (networks or behavioral variables);
 in our current system $D$ is \nnm{True} for networks and \nnm{False} for
 behavioral variables, but this can be different in future uses.
 
-\adda{Comment: In the following the field \textit{lprob}
-in the earlier definition of ministep is
-replaced by the combination of \nnm{lOptionSetProb}
-and \nnm{lChoiceProb}, while
-\nnm{rRate} is renamed  to \nnm{rRate}.}
 
 One change is called a \nnm{ministep}, denoted \ms, and is defined as:
 \begin{equation}
@@ -1205,7 +1222,7 @@ $d$ (`difference') \> = \> meaningless 0 if $D$, amount of change if not $D$\\
 \nnm{lChoiceProb}     (`log choice probability')} \\
 \> = \> \adda{ log probability of making a ministep of this choice,}\\
     \> \>  \adda{ where the choice is $(j,d)$, given that $(w,i,r)$;}\\
-\nnm{rRate} (`reciprocal rate') \> = \> reciprocal of aggregate (summed) )rate function \\
+\nnm{rRate} (`reciprocal rate') \> = \> reciprocal of aggregate (summed) rate function \\
    \> \>      immediately before this ministep.
 \end{tabbing}
 To indicate the components/fields of a ministep we use the notation
@@ -1446,8 +1463,8 @@ this is called the \emph{chain order}.
       The interval $[\ms_a, \ms_a]$ is defined as the ministep $\ms_a$.
 \item In the obvious way, we define recursively
       \begin{align}
-        \ms.\nnm{succ}^0 &=  \ms \nonumber \\
-        \ms.\nnm{succ}^{k+1} &=  \big(\ms.\nnm{succ}^k\big).\nnm{succ} \ . \nonumber
+        \ms.\nnm{succ}^0 &=  \ms  \\
+        \ms.\nnm{succ}^{k+1} &=  \big(\ms.\nnm{succ}^k\big).\nnm{succ} \ .
       \end{align}
       Thus, \textit{length}$(\ms, \ms.\nnm{succ}^{k}) = k+1$ for $k \geq 0$.
 }
@@ -1974,19 +1991,17 @@ Part \emph{B}:
      \begin{align}
      \textit{pra}  \leftarrow \  & \textit{KappaFactor} \ttimes
                     \exp(-\, \ms.\nnm{lChoiceProb} )
-                    % \nonumber \\  & \hspace*{1em}
                     \ttimes
               \frac{\textit{DiagNumber}\ttimes \textit{pridg}}
-                                    {(\textit{TotNumber}-1)\ttimes\textit{prcdg}} \ . \nonumber
+                                    {(\textit{TotNumber}-1)\ttimes\textit{prcdg}} \ .
     \end{align}
         (The earlier formula was, erroneously,)
      \begin{align}
      \textit{pra}  \leftarrow \  & \textit{KappaFactor} \ttimes
                     \exp(-\, \ms.\nnm{lChoiceProb} )
-                    % \nonumber \\  & \hspace*{1em}
                     \ttimes
               \frac{\textit{DiagNumber}\ttimes \textit{pridg}}
-                                    {(\textit{TotNumber}+1)\ttimes\textit{prcdg}} \ . \nonumber
+                                    {(\textit{TotNumber}+1)\ttimes\textit{prcdg}} \ .
     \end{align}
 }\\
     Note: the proposal probability and the new chain probability both include
@@ -2426,26 +2441,26 @@ Part \emph{B}:
 \addcf{
       \begin{enumerate}
       \item if (not \textit{misdat}):
-        \begin{equation}
+        \[
         \textit{KappaFactor} \leftarrow \frac{1}{rr^2
-                      \times \textit{TotNumber } \times(\textit{TotNumber } + 1)} \nonumber
-        \end{equation}
+                      \times \textit{TotNumber } \times(\textit{TotNumber } + 1)}
+        \]
       \item if \textit{misdat}:
-        \begin{equation}
-        \textit{KappaFactor} \leftarrow \frac{1}{rr \times \textit{TotNumber } } \nonumber
-        \end{equation}
+        \[
+        \textit{KappaFactor} \leftarrow \frac{1}{rr \times \textit{TotNumber } }
+        \]
       \end{enumerate}
 (This was changed 30-05-10; earlier. the lines were, erroneously, as follows:)
       \begin{enumerate}
       \item if (not \textit{misdat}):
-        \begin{equation}
+        \[
         \textit{KappaFactor} \leftarrow \frac{1}{rr^2
-                      \times(\textit{TotNumber } + 1) \times(\textit{TotNumber } + 2)} \nonumber
-        \end{equation}
+                      \times(\textit{TotNumber } + 1) \times(\textit{TotNumber } + 2)}
+        \]
       \item if \textit{misdat}:
-        \begin{equation}
-        \textit{KappaFactor} \leftarrow \frac{1}{rr \times(\textit{TotNumber } + 1) } \nonumber
-        \end{equation}
+        \[
+        \textit{KappaFactor} \leftarrow \frac{1}{rr \times(\textit{TotNumber } + 1) }
+        \]
       \end{enumerate}
 }
       else (i.e., if not \textit{SimpleRates})
@@ -2457,9 +2472,7 @@ Part \emph{B}:
 \item \addce{
       \begin{align}
      \textit{pra}  \leftarrow &
-        \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \nonumber \\
-  \nonumber
-%     & \ttimes  \frac{prdpr \ttimes pr_1 \ttimes (\textit{TotNumber}-2)\ttimes \textit{ChoiceLength} }
+        \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \\
       & \ttimes  \frac{prdpr \ttimes pr_1 \ttimes pr_2 \ttimes(\textit{TotNumber}-1)\ttimes \textit{ChoiceLength} }
                      {pripr \ttimes \exp{(lospr + lcpr)}}
     \end{align}
@@ -2708,14 +2721,14 @@ Part \emph{B}:
 \addcf{
       \begin{enumerate}
       \item if (not \textit{misdat}):
-        \begin{equation}
+        \[
         \textit{KappaFactor} \leftarrow rr^2
-                      \times ( \textit{TotNumber }-1) \times(\textit{TotNumber } -2) \nonumber
-        \end{equation}
+                      \times ( \textit{TotNumber }-1) \times(\textit{TotNumber } -2)
+        \]
       \item if \textit{misdat}:
-        \begin{equation}
-        \textit{KappaFactor} \leftarrow rr \times ( \textit{TotNumber } -1)  \nonumber
-        \end{equation}
+        \[
+        \textit{KappaFactor} \leftarrow rr \times ( \textit{TotNumber } -1)
+        \]
       \end{enumerate}
 (This was changed 30-05-10; earlier. the lines were, erroneously, as follows:)
       \begin{enumerate}
@@ -2739,7 +2752,7 @@ Part \emph{B}:
 \item \addce{
       \begin{align}
      \textit{pra}  \leftarrow \ &
-        \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \nonumber \\
+        \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \\
 %          & \ \ttimes  \frac{pripr \ttimes \exp(lpr_0)}{prdpr \ttimes pr_1 \ttimes \textit{TotNumber}
            & \ \ttimes  \frac{pripr \ttimes \exp(lpr_0)}{prdpr \ttimes pr_1 \ttimes
                                       pr_2 \ttimes   ( \textit{TotNumber}+1)
@@ -2922,22 +2935,22 @@ Part \emph{B}:
                           (\ms.\nnm{rRate})^2 \ .
       \end{eqnarray*}
 \newpage
-\item  $y \leftarrow y_{\text{init}}$ ;\\[1em]
+\item \remark{here an error was corrected in items 9 and 11, version 30/10/2010.}\\[1em]
+      $y \leftarrow y_{\text{init}}$ ;\\[1em]
       Let $pr_2$ be the prior probability
       (see \textit{net\_prior} and \textit{beh\_prior} discussed above)
       of value $y(w_0,i_0,j_0,r_0)$
       and $pr_3$ the prior probability of the value when
       this variable is changed according to ministep
       $(w_0,i_0,j_0,r_0,-d_0)$ ;\\[1em]
-      \textit{StepProb2}$(y,w_0,i_0,j_0,r_0,-d_0;  rr_0, lospr_0, lcpr_0)$;\\[1em]
-        \textit{sumlprob\_new} $ \leftarrow \textit{sumlprob\_new} + lcpr_0 + lospr_0 $ ;\\[1em]
+      \textit{ChangeStep}$(y, (w_0,i_0,j_0,r_0,-d_0))$ (now we have the new initial value);\\[1em]
+      \textit{StepProb1}$(y,w_0,i_0,j_0,r_0;  rr_0, lospr_0)$;\\[1em]
       If (not \textit{SimpleRates}), then
       \begin{enumerate}
       \item \textit{mu\_new} $ \leftarrow  \textit{mu\_new} + rr_0 $ ,
       \item \textit{sigma2\_new} $ \leftarrow
            \textit{sigma2\_new}  + (rr_0)^2  $ ;
       \end{enumerate}
-      \textit{ChangeStep}$(y, (w_0,i_0,j_0,r_0,-d_0))$ .
 \item For \ms \ running from \nnm{\nnm{first}.succ} to $\ms_a.\nnm{pred}$ do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y, \ms.\textit{Coordinates}; rr, lospr, lcpr)$,
@@ -2954,12 +2967,6 @@ Part \emph{B}:
 \item \begin{enumerate}
       \item \textit{StepProb2}$(y,w_0,i_0,j_0,r_0,d_0; rr_0, lospr_0, lcpr_0)$
       \item \textit{sumlprob\_new} $ \leftarrow \textit{sumlprob\_new} + lcpr_0 + lospr_0 $
-      \item If (not \textit{SimpleRates}), then
-         \begin{enumerate}
-         \item  \textit{mu\_new} $ \leftarrow \textit{mu\_new} + rr_0 \ $ ;
-         \item \textit{sigma2\_new} $ \leftarrow
-                      \textit{sigma2\_new}     + (rr_0)^2 \ $ ;
-         \end{enumerate}
       \end{enumerate}
 \item If \textit{SimpleRates} (which implies $rr = rr_0$), then
       \begin{enumerate}
@@ -2975,8 +2982,7 @@ Part \emph{B}:
       \end{equation}
 \item  \begin{align}
      \textit{pra}  \leftarrow & \
-        \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \nonumber \\
-  \nonumber
+        \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \\
       & \ \ttimes  \frac{\textit{prdms} \ttimes \textit{ChoiceLength} \ttimes pr_3}
                         {\textit{prims} \ttimes pr_1 \ttimes pr_2}  \ ;
     \end{align}
@@ -3098,9 +3104,10 @@ The proposal probability here is
 This is used in \textit{pra} below.
 
 \newpage
-Part \emph{B}:
+Part \emph{B}:\\
+\remark{here an error was corrected in items 8 and 9, version 30/10/2010.}
 \begin{enumerate}[resume]
-\item
+\item \label{item7}
    \begin{eqnarray*}
        \textit{sumlprob} & \leftarrow & \sum_{\ms = \nnm{first.succ}}^{\ms_a}
              (\ms.(\nnm{lChoiceProb} + \nnm{lOptionSetProb}) \ ; \\[1em]
@@ -3120,15 +3127,14 @@ Part \emph{B}:
       and $pr_3$ the prior probability of the value when
       this variable is changed according to ministep
       $(w_0,i_0,j_0,r_0,d_0)$ \ ;\\[1em]
-      \textit{StepProb2}$(y,w_0,i_0,j_0,r_0,d_0;  rr_0, lospr_0, lcpr_0)$;\\[1em]
-        \textit{sumlprob\_new} $ \leftarrow \textit{sumlprob\_new} + lcpr_0 + lospr_0 $ ;\\[1em]
+      \textit{ChangeStep}$(y, (w_0,i_0,j_0,r_0,d_0))$ \ ; \\[1em]
+      \textit{StepProb1}$(y,w_0,i_0,j_0,r_0;  rr_0, lospr_0)$;\\[1em]
       If (not \textit{SimpleRates}), then
       \begin{enumerate}
       \item \textit{mu\_new} $ \leftarrow  \textit{mu\_new} + rr_0 $ \ ,
       \item \textit{sigma2\_new} $ \leftarrow
-                   \textit{sigma2\_new}  + (rr_0)^2  $ \ ;
+                   \textit{sigma2\_new}  + (rr_0)^2  $ \ .
       \end{enumerate}
-      \textit{ChangeStep}$(y, (w_0,i_0,j_0,r_0,d_0))$ \ .
 \item For \ms \ running from \nnm{\nnm{first}.succ} to $\ms_a.\nnm{pred}$ do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y, \ms.\textit{Coordinates}; rr, lospr, lcpr)$, \\
@@ -3136,11 +3142,14 @@ Part \emph{B}:
             the coordinates of ministep \ms \ ;
       \item  \textit{sumlprob\_new} $ \leftarrow \textit{sumlprob\_new} + lcpr + lospr
       $ \;
-      \item If (not \textit{SimpleRates}), then
+      \item If (not \textit{SimpleRates}) and ($\ms < \ms_a.\nnm{pred}$), then
         \begin{enumerate}
         \item \textit{mu\_new} $ \leftarrow \textit{mu\_new} + rr $\ ,
         \item \textit{sigma2\_new} $ \leftarrow   \textit{sigma2\_new}  + (rr)^2  $ \
         ;
+        \item[comment : ] the reciprocal rate calculated for $\ms = \ms_a.\nnm{pred}$
+                          is, in the proposed new chain, \nnm{rRate} for $\ms_a.\nnm{succ}$,
+                          which is unchanged and has not been subtracted in step~\ref{item7}.
         \end{enumerate}
       \item\textit{ChangeStep}$(y, \ms)$ \ .
       \end{enumerate}
@@ -3157,8 +3166,7 @@ Part \emph{B}:
 \item
  \begin{align}
      \textit{pra}  \leftarrow &
-        \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \nonumber \\
-  \nonumber
+        \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \\
       & \ \ttimes  \frac{ \textit{prims} \ttimes pr_1 \ttimes pr_3 }
                     {\ttimes \textit{prdms} \ttimes \textit{ChoiceLength} \ttimes pr_2 }  \ ;
     \end{align}
@@ -3879,7 +3887,748 @@ for this particular parameter.
 
 \fi
 
+\newpage
+\section{Models for Dynamics of Non-directed Networks }
+\label{S_nondir}
 
+For notational simplicity only, this section assumes that there is only one network.
+This is not a restriction, it merely means that we can denote
+$x_{ij}$ instead  of $x^{(r)}_{ij}$.
+
+In this section it is assumed that the network is
+non-directed, i.e., ties have no directionality:
+$X_{ij} = X_{ji}$ holds by necessity, and the
+tie variables $X_{ij}$ and $X_{ji}$ are treated
+as being one and the same variable. This is the case
+in many types of tie, such as mutual collaboration or agreement.
+Ties now are indicated by $i \leftrightarrow j$.
+
+\subsection{Two-sided Choices}
+For modeling non-directed networks, it is necessary to make
+assumptions about the negotiation or coordination between
+the two actors involved in the creation or termination of a tie.
+We present several models, all based on a two-step process of
+opportunity and choice, and making different assumptions
+concerning the combination of choices between the two actors
+involved in a tie.
+
+For the opportunity, or timing, process, two options are presented.
+\begin{itemize}
+\item[1.] \emph{One-sided initiative}:
+          One actor $i$ is selected and gets the opportunity to make a change,
+          based on rate function $\lambda_{i}(x; \alpha, \rho_m)$.
+\item[2.] \emph{Two-sided opportunity}:
+          An ordered pair of actors $(i,j)$ (with $i \neq j$) is selected
+          and gets the opportunity
+          to make a new decision about the existence of a tie between them.\\
+          This is based on pairwise rate functions
+          denoted $\lambda_{ij}(x; \alpha, \rho_m)$.
+          The waiting time until the next opportunity for change
+          by any pair of actors has the exponential
+          distribution
+          with parameter
+          \[\lambda_{\rm{tot}} = \sum_{i \neq j} \lambda_{ij}(x; \alpha, \rho_m) \ .
+          \]
+          The probability that the next opportunity for change is for pair $(i,j)$ is given by
+          \begin{equation}
+           \P\{ \text{Next opportunity for change is for pair } (i, j) \} = \,
+            \frac{\lambda_{ij}(x; \alpha, \rho_m)}{\lambda_{\rm{tot}}(x; \alpha, \rho_m)} \ .
+          \end{equation}
+          For the moment, we have only implemented the case where $\lambda_{ij}$ is a product
+          \[
+          \lambda_{ij}(x; \alpha, \rho_m) = \lambda_{i}(x; \alpha, \rho_m) \lambda_{j}(x; \alpha, \rho_m) \ ,
+          \]
+          so that
+          \begin{equation}
+           \lambda_{\rm{tot}} = \Big( \sum_{i} \lambda_{i}(x; \alpha, \rho_m)\Big)^2
+                         \, - \,  \sum_{i} \big(\lambda_{i}(x; \alpha, \rho_m)\big)^2 \ .
+          \end{equation}
+\end{itemize}
+
+The choice process is modeled as one of three options
+D(ictatorial), M(utual) and C(ompensatory).
+We now define, for graphs $x$ and $i \neq j$, by $x^{(+ij)}$ the graph
+which is identical to $x$ in all tie variables except possibly
+for the tie between $i$ and $j$,
+and to which the tie $i \leftrightarrow j$
+is added if it was not already there:
+$x^{(+ij)}_{ij} = 1$.
+For the non-directed case, $x^{(\pm ij)}$ is defined
+by analogy to the definition above:
+it is the graph identical to $x$
+except that the indicator for the non-directed
+tie $i \leftrightarrow j$ has been toggled:
+$x^{(\pm ij)}_{ij} = x^{(\pm ij)}_{ji} = 1 - x_{ij} = 1 - x_{ji}$.
+Thus if $x_{ij} = 0$ then $x^{(+ ij)} = x^{(\pm ij)}$;
+if $x_{ij} = 1$ then $x^{(+ ij)} = x$.
+
+In all cases assumption (7.) as defined for the directed case is retained,
+and assumption (8.) is replaced as indicated below.
+\begin{enumerate}
+\item[D.] \emph{Dictatorial}:
+      One actor can impose a decision about a tie on the other.\\
+      Like in the directed case, actor $i$ selects the (myopically)
+      best toggle of a single tie variable
+      $X_{ij}$ given the objective function $f_i(x; \beta)$
+      plus a random disturbance,
+      and actor $j$ just has to accept.
+      Combined with the two opportunity options, this yields the following cases.
+      \begin{itemize}
+      \item[8.D.1.]
+      The probability that the tie variable changed is $X_{ij}$,
+      so that the network $x$ changes into $x^{(\pm ij)}$, is given by
+      \begin{equation}
+        p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+         {\sum_{h=1}^n \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}  \ .   \label{eq:acbD1}
+      \end{equation}
+      \item[8.D.2.]
+      The probability that
+      network $x$ changes into $x^{(\pm ij)}$, is given by
+      \begin{equation}
+        p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+         {\exp\big(f_i(x; \beta)\big) + \exp\big(f_i(x^{(\pm ij)}; \beta)\big)}  \ .
+                                                                      \label{eq:acbD2}
+      \end{equation}
+      \end{itemize}
+\item[M.] \emph{Mutual}:\\
+      Both actors must agree for a tie between them to exist,
+      in line with Jackson and Wolinsky (1996).
+      \begin{itemize}
+      \item[8.M.1.]
+      In the case of one-sided initiative, actor $i$ selects the best
+      possible choice, with probabilities (\ref{eq:acbD1}).
+      If currently $x_{ij} = 0$
+      so that this means creation of a new tie $i \leftrightarrow j$, this is
+      proposed to actor $j$, who then accepts according to a binary choice
+      based on objective function $f_j(x; \beta)$, with
+      acceptance probability
+      \[
+      \P\{j \text{ accepts tie proposal}\} = \frac{\exp\big(f_j(x^{(+ij)}; \beta)\big)}
+                        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ij)}; \beta)\big)} \ .
+      \]
+      If the choice by $i$ means termination of an existing tie,
+      the proposal is always put into effect.
+      Jointly these rules lead to the following probability
+      that the current network $x$ changes into $x^{(\pm ij)}$:
+      \begin{equation}
+        p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+         {\sum_{h=1}^n \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}
+        \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
+                        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)} \right)^{1-x_{ij}}
+          \ .   \label{eq:acbM}
+      \end{equation}
+      (Note that the second factor comes into play only if $x_{ij} = 0$,
+      which implies $x^{(+ ij)} = x^{(\pm ij)}$.)
+      \item[\hspace*{3em}8.M.2.]
+      In the case of two-sided opportunity, actors $i$ and $j$
+      both reconsider the value of the tie variable $X_{ij}$.
+      Actor $i$ proposes a change (toggle) with probability (\ref{eq:acbD2})
+      and actor $j$ similarly.
+      If currently there is no tie, $x_{ij} = 0$, then the tie is created
+      if this is proposed by both actors, which has probability
+      \begin{subequations}
+      \begin{align}
+        & p_{ij}(x, \beta) =   \label{eq:pM2}         \\
+        &  \frac{\exp\big(f_i(x^{(+ ij)}; \beta)\big)}
+         {\Big(\exp\big(f_i(x; \beta)\big) + \exp\big(f_i(x^{(+ ij)}; \beta)\big)\Big)}
+        \frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
+         {\Big(\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)\Big)}  \ .
+            \nonumber
+      \end{align}
+      If currently there is a tie, $x_{ij} = 1$, then the tie is terminated
+      if one or both actors wish to do this, which has probability
+      \begin{align}
+        & p_{ij}(x, \beta) =          \label{eq:qM2} \\
+        &     1 \, - \, \frac{\exp\big(f_i(x; \beta)\big)}
+         {\Big(\exp\big(f_i(x; \beta)\big) + \exp\big(f_i(x^{(\pm ij)}; \beta)\big)\Big)}
+        \frac{\exp\big(f_j(x; \beta)\big)}
+         {\Big(\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(\pm ij)}; \beta)\big)\Big)}  \ .
+          \nonumber
+      \end{align}
+      \end{subequations}
+      \end{itemize}
+\item[C.] \emph{Compensatory}:
+      The two actors decide on the basis of their combined interests.\\
+      The combination with one-sided initiative is rather artificial here,
+      and we only elaborate this option for the two-sided initiative.
+      \begin{itemize}
+      \item[8.C.2.]
+      The binary decision about the existence of the tie $i \leftrightarrow j$
+      is based on the objective function $f_i(x; \beta)+f_j(x; \beta)$.
+      The probability that network $x$ changes into $x^{(\pm ij)}$, now is given by
+      \begin{equation}
+       p_{ij}(x, \beta) =  \frac{\exp\big(f_i(x^{(\pm ij)}; \beta) + f_j(x^{(\pm ij)}; \beta)\big)}
+                 {\exp\big(f_i(x; \beta) + f_j(x; \beta)\big) +
+                    \exp\big(f_i(x^{(\pm ij)}; \beta) + f_j(x^{(\pm ij)}; \beta)\big)} \ .
+                                                                      \label{eq:pC2}
+      \end{equation}
+      \end{itemize}
+\end{enumerate}
+
+The two model components, rate function and objective function,
+can be put together by considering the transition rates.
+Given that the only permitted transitions between networks are toggles of
+a single tie variable, the transition rates can be defined as
+\begin{equation}
+  q_{ij}(x) = \lim_{\Delta t \downarrow 0}
+         \frac{\P \{ X(t + \Delta t) = x^{(\pm ij)} \mid X(t) = x \}}
+                                                {\Delta t}
+\end{equation}
+for $i \neq j$.
+Note that this definition implies that the probabilities of toggling
+a particular tie variable $X_{ij}$ in a short time interval
+are approximated by
+\[
+  \P \{ X(t + \Delta t) = x^{(\pm ij)} \mid X(t) = x \} \approx
+    q_{ij}(x)\, \Delta t\,  .
+\]
+
+In the derivation of the score functions
+account must be taken of the fact that
+toggling variable $X_{ij}$ is the same as toggling $X_{ji}$,
+and the rules described above give different roles
+for the first and the second actor in the pair $(i,j )$.
+For the models with one-sided initiative, the transition rate is
+\begin{equation}
+  q_{ij}(x) = \lambda_i(x; \alpha, \rho_m)\,p_{ij}(x, \beta) +
+              \lambda_j(x; \alpha, \rho_m)\,p_{ji}(x, \beta) \ , \label{q1}
+\end{equation}
+and for the models with two-sided opportunity
+\begin{equation}
+  q_{ij}(x) = \lambda_{ij}(x; \alpha, \rho_m)\,p_{ij}(x, \beta) +
+              \lambda_{ji}(x; \alpha, \rho_m)\,p_{ji}(x, \beta) \ . \label{q2}
+\end{equation}
+
+
+
+\subsection{Score function for two-sided ties: objective function}
+The score function for the complete data likelihood with respect to the
+$\beta$ parameters is as follows. (Explained here in shorthand for readers
+knowing theory and terminology from other papers.) It can be calculated as
+the sum of the contributions from all the ministeps, where ministeps leading
+to no change are also included. Therefore, we only need to give the
+expression for the score function contribution for a single ministep leading
+from $x$ to $x^{( \pm ij)}$; and the contribution for a ministep leading to
+no change, but where the actor or pair of actors concerned in the ministep is
+known.
+
+We must realize that the phrase ``score function for the complete data likelihood"
+is ambiguous, because we have liberty to define what we take as complete data;
+perhaps `augmented data' would be a better term.
+We can use any data augmentation that allows an easy calculation
+of the score functions.
+More extensive augmentation introduces extra variability and thereby
+extra noise in the score function.
+For example, in the models with one-sided initiative, if the data augmentation
+includes the knowledge of who took the initiative, then effectively we are working
+with the transition rates
+\begin{equation}
+  q_{ij}(x) = \lambda_i(x; \alpha, \rho_m)\,p_{ij}(x, \beta)
+\end{equation}
+instead of (\ref{q1}). We shall always do this.
+This leads to simpler but somewhat noisier score functions.
+
+In the following, the complete/augmented data always includes the knowledge
+of the actor $i$ who takes the initiative,
+and in the two-sided opportunity case the ordered pair $(i,j)$ who make the ministep.
+
+For the case M.1 we shall give two different expressions
+which differ in this way.
+
+By $\mathcal A_-$ is denoted the set of potential alters in a given ministep
+and we denote $\mathcal A = \mathcal A_- \cup \{i\}$ where $i$ is the actor making
+the ministep, but signifying here `no change' so
+alternatively this could be denoted by 0. In the default case, $\mathcal A = \{1, \ldots, n\}$;
+if not all actors are active then $\mathcal A_-$ will contain only active actors;
+but it will be potentially a smaller set if one of the conditions uponly, downonly,
+higher, disjoint, or atleastone holds.
+
+Denote the change in objective function when toggling $x_{ij} $ by
+\[
+(\Delta \, f)_{ij}(x, \beta) = f_i\big(x^{(\pm ij)}; \beta\big) - f_i(x; \beta) \ ,
+\]
+which implies
+\[
+(\Delta \, f)_{ii}(x, \beta) = 0 .
+\]
+Further denote
+\begin{equation}        p_{1ij}(x, \beta) =
+                  \frac{\exp\big((\Delta f)_{ij}(x, \beta)\big)}
+         {\sum_{h \in \mathcal A} \exp\big((\Delta f)_{ih})(x, \beta)\big)}  \label{eq:p1}
+\end{equation}
+and
+\begin{equation}        p_{0ij}(x, \beta) =
+                  \frac{\exp\big((\Delta f)_{ij}(x, \beta)\big)}
+         {1 +  \exp\big((\Delta f)_{ij})(x , \beta)\big)}  \label{eq:p0}
+          \ .
+\end{equation}
+In the following, we often use expressions such as
+\[
+\frac{\partial (\Delta\, f)_{ij}(x, \beta)}{\partial \beta_k} \ .
+\]
+Since the changes $\Delta\, f_{ij}(x, \beta)$ are linear combinations
+(\ref{eq:Deltaf}), these partial derivatives are
+the change contributions of the effects,
+\begin{equation}
+\frac{\partial (\Delta\, f)_{ij}(x, \beta)}{\partial \beta_k}  = s_{ki}(x^{(\pm ij)}) - s_{ki}(x) \ .
+\end{equation}
+This is denoted in shorthand by
+\begin{equation}
+s_{ijk}  = s_{ki}(x^{(\pm ij)}) - s_{ki}(x) \ ,  \label{eq:s}
+\end{equation}
+where the dependence on $x$ is omitted. Note that $s_{iik} = 0$.
+
+
+
+
+\subsection{Dictatorial D.1 (alias A-1)}
+Probability of change, see (\ref{eq:acbD1})
+      \begin{equation}
+        p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+         {\sum_{h \in \mathcal A} \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}  =
+%                  \frac{\exp\big((\Delta f)_{ij}(x, \beta)\big)}
+%         {\sum_{h=1}^n \exp\big((\Delta f)_{ih}), \beta)\big)}
+        p_{1ij}(x, \beta)
+          \ .
+      \end{equation}
+This is just the same as the directed case.
+Well-known calculus leads to the score function
+\begin{subequations}
+      \begin{align}
+      \frac{\partial \log\, p_{ij}(x, \beta)}{\partial \beta_k}
+      &=      \frac{\partial \log\, p_{1ij}(x, \beta)}{\partial \beta_k} \nonumber \\
+      &=  \frac{\partial  (\Delta f)_{ij}(x, \beta)}{\partial \beta_k} -  \nonumber
+           \sum_{h  \in \mathcal A}  p_{1ih}(x, \beta) \frac{\partial  (\Delta f)_{ih}(x, \beta)}{\partial \beta_k} \\
+      &=  s_{ijk} -
+           \sum_{h  \in \mathcal A}  p_{1ih}(x, \beta)\,s_{ihk} \ .
+             \label{eq:cD1}
+      \end{align}
+This formula also applies to the case of no change $j = i$, where it yields
+      \begin{align}
+      \frac{\partial \log\, p_{ii}(x, \beta)}{\partial \beta_k}
+      &=   -  \sum_{h \in \mathcal A}  p_{1ih}(x, \beta) \, s_{ijh} \ .
+             \label{eq:cD2}
+      \end{align}
+\end{subequations}
+
+\subsection{Dictatorial D.2 (alias B-1 alias BFORCE)}
+Note that we condition here on the choice, in the opportunity process, of $i$
+and $j$, in this order: $i$ is allowed to make a decision which then is
+imposed on $j$. The probability of change is, see (\ref{eq:acbD2}),
+      \begin{equation}
+        p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+         {\exp\big(f_i(x; \beta)\big) + \exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+%                  = \frac{\exp\big((\Delta\, f)_{ij}(x, \beta)\big)}
+%         {1 + \exp\big((\Delta\,f)_{ij}(x, \beta)\big)}
+           = p_{0ij}(x, \beta) \ .
+      \end{equation}
+%Here $p_{ij} = p_{0ij}$.
+Well-known calculus leads to the score function for change:
+\begin{subequations}
+      \begin{align}
+      \frac{\partial \log\, p_{ij}(x, \beta)}{\partial \beta_k}  \nonumber
+      &=      \frac{\partial \log\, p_{0ij}(x, \beta)}{\partial \beta_k}  \\
+      &=      (1 - p_{0ij}(x, \beta))
+        \frac{\partial  (\Delta f)_{ij}(x, \beta)}{\partial \beta_k} \nonumber \\
+      &=      (1 - p_{0ij}(x, \beta))\, s_{ijk} \ ;
+             \label{eq:cD2a}
+      \end{align}
+for no change:
+      \begin{equation}
+      \frac{\partial \log\, \big(1 - p_{ij}(x, \beta)\big)}{\partial \beta_k} =
+          - p_{0ij}(x, \beta)
+        \frac{\partial  (\Delta f)_{ij}(x, \beta)}{\partial \beta_k}
+        =  - p_{0ij}(x, \beta)\, s_{ijk} \ .
+             \label{eq:cD2b}
+      \end{equation}
+\end{subequations}
+
+
+
+\subsection{Mutual M.1 (alias A-2 alias AAGREE) }
+The probability of change is
+      \begin{align}
+        p_{ij}(x, \beta) &= \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+         {\sum_{h \in \mathcal A} \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}  \nonumber \\
+       & \hspace{2em} \times \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
+                        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)} \right)^{1-x_{ij}} \nonumber \\
+       &= p_{1ij}(x, \beta) \, \big( p_{0ji}(x, \beta)  \big)^{(1-x_{ij})}
+         =   p_{1ij}(x, \beta)\, \big(x_{ij} + (1-x_{ij})p_{0ji}(x, \beta) \big)\ ,   \label{eq:cM}
+      \end{align}
+where it may be noted that $x_{ij}$ is the current state (before the possible
+change).
+
+The outcome `no change' may be further refined into the following list
+of possibilities:
+\begin{itemize}
+\item[[$i-\!\!\!$]]: $i$ decides not to propose any change.
+\item[[$ij-\!\!\!$]]: ($i$ proposes to $j$ to add a tie, but this is rejected by $j$), for $j \in \mathcal A_-$.
+\end{itemize}
+
+The probability that there is no change is as follows
+(somewhat arbitrarily we denote this here by $p_{i0}$)
+\begin{equation}
+  p_{i0}(x, \beta) =
+  1 - \sum_{j \in \mathcal A_-}   p_{1ij}(x, \beta)\, \big(x_{ij} + (1-x_{ij})p_{0ji}(x, \beta) \big)\ .
+\end{equation}
+This can be decomposed into the sub-events as listed above, with probabilities
+\begin{equation}
+  p_{[i-]}(x, \beta) = p_{1ii}(x, \beta) \ ,
+\end{equation}
+\begin{equation}
+  p_{[ij-]}(x, \beta) = (1-x_{ij})\big(1-p_{0ji}(x, \beta) \big)\ .
+\end{equation}
+
+For the score functions, we combine (\ref{eq:cD2a}) and (\ref{eq:cD1}).
+\begin{subequations}
+\noindent
+The score function for a change is
+      \begin{align}
+      \frac{\partial \log\,  p_{ij}(x, \beta)}{\partial \beta_k} &=
+           \frac{\partial  (\Delta f)_{ij}(x, \beta)}{\partial \beta_k} -          \nonumber
+           \sum_{h \in \mathcal A}  p_{1ih}(x, \beta) \frac{\partial  (\Delta f)_{ih}(x, \beta)}{\partial \beta_k} \\
+     &  \hspace{8em}  + (1 - x_{ij})(1 - p_{0ji})\frac{\partial  (\Delta f)_{ji}(x, \beta)}{\partial \beta_k} \nonumber \\
+     &=   s_{ijk} -   \left( \sum_{h \in \mathcal A}  p_{1ih}(x, \beta) s_{ihk} \right) + (1 - x_{ij})(1 - p_{0ji})s_{jik} \ .
+             \label{eq:cM2a}
+      \end{align}
+The score function for no change is a bit tedious,
+\begin{align}
+      \frac{\partial \log\, p_{i0}(x, \beta)}{\partial \beta_k} &=
+     \frac{-1}{p_{i0}(x, \beta)} \sum_{j  \in \mathcal A_-}   \nonumber
+           \bigg\{ x_{ij} \frac{\partial p_{1ij}}{\partial \beta_k} \\
+   &  \hspace{8em}     + (1-x_{ij})\big( p_{0ji}\frac{\partial p_{1ij}}{\partial \beta_k}
+    +    p_{1ij} \frac{\partial p_{0ji}}{\partial \beta_k} \big)     \bigg\}
+\end{align}
+where ${\partial p_{0ij}}/{\partial \beta_k}$ and
+${\partial p_{1ij}}/{\partial \beta_k}$ must be substituted from (\ref{eq:cD2a}) and
+(\ref{eq:cD1}).
+I do not think this can be simplified to an important extent.
+
+If instead of `no change' we work with the sub-events $[i-]$ = `$i$ wishes no change'
+and $[ij-]$ = `$i$ proposed to add a tie which is rejected by $j$', the score functions are
+\begin{equation}
+      \frac{\partial \log\, p_{[i-]}(x, \beta)}{\partial \beta_k} =
+         -  \sum_{h \in \mathcal A}  p_{1ih}(x, \beta) \, s_{ijh}
+\end{equation}
+as in (\ref{eq:cD2}), and
+\begin{equation}
+      \frac{\partial \log\, p_{[ij-]}(x, \beta)}{\partial \beta_k} =
+         (1-x_{ij}) \bigg(s_{ijk} - \sum_{h \in \mathcal A}  p_{1ih}(x, \beta)\,s_{ihk}
+                               - p_{0ji}(x, \beta)\, s_{jik}   \bigg)
+\end{equation}
+which is much simpler indeed.
+\end{subequations}
+
+
+\subsection{Mutual M.2 (alias B-2 alias BAGREE) }
+\begin{subequations}
+The probability of change is:\\
+\noindent
+if $x_{ij} = 0$,
+\begin{equation}
+  p_{ij}(x, \beta) = p_{0ij}(x, \beta)\,  p_{0ji}(x, \beta)
+\end{equation}
+and if $x_{ij} = 1$,
+\begin{equation}
+  p_{ij}(x, \beta) =  p_{0ij}(x, \beta) + p_{0ji}(x, \beta) - p_{0ij}(x, \beta)\,  p_{0ji}(x, \beta) \ .
+\end{equation}
+For the case  $x_{ij} = 1$, it is easier to start working with
+the probability of no change,
+\begin{equation}
+  1 - p_{ij}(x, \beta) = \big( 1- p_{0ij}(x, \beta)\big) \big(1- p_{0ji}(x, \beta)\big)  \ .
+\end{equation}
+\end{subequations}
+This gives the following four cases:
+\begin{subequations}
+\begin{enumerate}
+\item $x_{ij} = 0$, change:
+      \begin{equation}
+        \frac{\partial \log\, p_{ij}(x, \beta)}{\partial \beta_k} =
+%               p_{0ij}(x, \beta) \frac{\partial (\Delta\, f_{ij}(x, \beta))}{\partial \beta_k}
+%               + p_{0ji}(x, \beta) \frac{\partial (\Delta\, f_{ji}(x, \beta))}{\partial \beta_k} \ ;
+               \big(1- p_{0ij}(x, \beta)\big) s_{ijk} + \big(1-p_{0ji}(x, \beta)\big) s_{jik} \ ;
+      \end{equation}
+\item $x_{ij} = 0$, no change:
+      \begin{equation}
+        \frac{\partial \log\, (1 - p_{ij}(x, \beta))}{\partial \beta_k} =
+        - \, \frac{p_{ij}(x, \beta)}{1 - p_{ij}(x, \beta)} \,
+%             \left(  p_{0ij}(x, \beta) \frac{\partial (\Delta\, f_{ij}(x, \beta))}{\partial \beta_k}
+%               + p_{0ji}(x, \beta) \frac{\partial (\Delta\, f_{ji}(x, \beta))}{\partial \beta_k} \right) \ ;
+            \big\{   \big(1- p_{0ij}(x, \beta)\big) s_{ijk} + \big(1-p_{0ji}(x, \beta)\big) s_{jik}\big\} \ ;
+      \end{equation}
+\item $x_{ij} = 1$, change:
+      \begin{equation}
+        \frac{\partial \log\, p_{ij}(x, \beta)}{\partial \beta_k} =
+          \frac{1 - p_{ij}(x, \beta)}{p_{ij}(x, \beta)} \,
+%               \left( p_{0ij}(x, \beta) \frac{\partial (\Delta\, f_{ij}(x, \beta))}{\partial \beta_k}
+%               + p_{0ji}(x, \beta) \frac{\partial (\Delta\, f_{ji}(x, \beta))}{\partial \beta_k} \right) \ ;
+                \big( p_{0ij}(x, \beta) s_{ijk}  + p_{0ji}(x, \beta) s_{jik} \big) \ ;
+      \end{equation}
+\item $x_{ij} = 1$, no change:
+      \begin{equation}
+        \frac{\partial \log\, (1 - p_{ij}(x, \beta))}{\partial \beta_k} =
+%               - p_{0ij}(x, \beta) \frac{\partial (\Delta\, f_{ij}(x, \beta))}{\partial \beta_k}
+%               - p_{0ji}(x, \beta) \frac{\partial (\Delta\, f_{ji}(x, \beta))}{\partial \beta_k} \ .
+               \ - p_{0ij}(x, \beta)\,s_{ijk}   - p_{0ji}(x, \beta)\, s_{jik} \ .
+      \end{equation}
+\end{enumerate}
+\end{subequations}
+Here also a further decomposition would be possible, following the two consecutive
+choices by $i$ and $j$, However, in this case this leads to
+more variability but not much more simplicity, so this is not elaborated now.
+
+
+
+\subsection{Compensatory C (alias B-3 alias BJOINT) }
+The probability of change is
+      \begin{equation}
+       p_{ij}(x, \beta) =  \frac{\exp\big((\Delta\,f_i)(x^{(\pm ij)}; \beta) + (\Delta\,f_j)(x^{(\pm ij)}; \beta)\big)}
+                 {1 +  \exp\big((\Delta\,f_i)(x^{(\pm ij)}; \beta) + (\Delta\,f_j)(x^{(\pm ij)}; \beta)\big)} \ .
+      \end{equation}
+(Note that $x^{(\pm ij)} = x^{(\pm ji)}$, so indeed this is symmetric in $i$ and $j$.)\\
+Here it is convenient to define
+\begin{equation}       p_{2ij}(x, \beta) =
+                  \frac{\exp\big((\Delta f)_{ij}(x, \beta) + (\Delta f)_{ji}(x, \beta)\big)}
+         {1 +  \exp\big((\Delta f)_{ij})(x, \beta)+ (\Delta f)_{ji}(x, \beta)\big)}  \label{eq:p2}
+          \ .
+\end{equation}
+\begin{subequations}
+Well-known calculus leads to the score function:\\
+\noindent
+for change:
+      \begin{align}
+      \frac{\partial \log\, p_{ij}(x, \beta)}{\partial \beta_k}           \nonumber
+      &=      \frac{\partial \log\, p_{2ij}(x, \beta)}{\partial \beta_k}  \\
+      &=      \big(1 - p_{2ij}(x, \beta)\big)\,
+        \frac{\partial  (\Delta f)_{ij}(x, \beta) + (\Delta f)_{ji}(x, \beta) }{\partial \beta_k} \nonumber \\
+      &=      \big(1 - p_{2ij}(x, \beta)\big) (s_{ijk} + s_{jik}) \ ;             \label{eq:cCa}
+      \end{align}
+for no change:
+      \begin{equation}
+      \frac{\partial \log\, \big(1 - p_{ij}(x, \beta)\big)}{\partial \beta_k} =
+          - p_{2ij}(x, \beta) \,
+%        \frac{\partial  (\Delta f)_{ij}(x, \beta)+ (\Delta f)_{ji}(x, \beta)}{\partial \beta_k}  \ .
+        ( s_{ijk} + s_{jik})  \ .
+             \label{eq:cCb}
+      \end{equation}
+\end{subequations}
+
+
+
+\subsection{Coding the score calculations}
+The easiest way is to code the calculation of the scores
+in one routine together with the
+probabilistic choices; and decompose all choices into their components
+(sub-choices).
+For all five procedures this can be done
+using the following three basic procedures.
+Here $\mathcal A_-$ is the set of actors who are candidate alters for a given
+ministep (varies between ministeps), $\mathcal A$ is
+$\mathcal A_-$ to which an option `no change' has been added
+(represented by $i$ = the actor making the ministep,  or 0), while
+ $\mathcal K$ is the set indexing the parameters (always the same).
+
+\noindent
+\textbf{MultipleChoice}\,(\textsf{input:} $\pi, s$; \textsf{output:} $j$;  \textsf{in/output:} $c$).\\
+\textit{Interpretation:}\\
+$\pi$ = probability vector for outcomes $h \in \mathcal A$;\\
+$s$ = array of change contributions $s_{hk}$ for $h \in \mathcal A, k \in \mathcal K$;\\
+$j$ = choice made;\\
+$c$ = vector of scores to which something will be added.\\
+\textit{Body:}\\
+Define $j$ as outcome of probabilistic choice according to $\pi$.\\
+For all $k \in \mathcal K$ do $c_k  \leftarrow c_k + s_{jk} - \sum_{h \in \mathcal A} \pi_h s_{hk}$.\\
+\textit{EndBody.}
+\medskip
+
+\noindent
+\textbf{BinaryChoice}\,(\textsf{input:} $\pi_0, s_0$; \textsf{output:} $r$;  \textsf{in/output:}  $c$).\\
+\textit{Interpretation:}\\
+$\pi_0$ = probability (number between 0 and 1);\\
+$s_0$ = vector of change contributions $s_{k}$ for $ k \in \mathcal K$;\\
+$r$ = result $\in \{T, F\}$, where $T$ denotes True = Accept and $F$ denotes False = Reject;\\
+$c$ = vector of scores to which something will be added.\\
+\textit{Body:}\\
+Define $r$ as outcome of probabilistic choice according to $\pi_0$.\\
+For all $k \in \mathcal K$ do: \big(if $r$ then $c_k \leftarrow c_k + (1-\pi) s_{k}$,
+else $c_k  \leftarrow c_k -\pi\,s_k $\big).\\
+\textit{EndBody.}
+\medskip
+
+\noindent
+\textbf{Change}\,(\textsf{input:} $ i,j$).\\
+\textit{Interpretation:}\\
+Toggle tie $i \leftrightarrow j$ .\\
+\textit{Body:}\\
+If $j \in \mathcal A_-$ then \big(set $x_{ij} \leftarrow 1-x_{ij},\, x_{ji} \leftarrow 1-x_{ji}$\big).\\
+\textit{EndBody.}
+\medskip
+
+\noindent
+The models can can be coded as follows.
+We use $p_{0ij}$, $p_{1ij}$, $s_{ijk}$ as defined in (\ref{eq:p0}, \ref{eq:p1}, \ref{eq:s}).
+
+\begin{itemize}
+\item[D.1 = A-1] Given $i$, use $\pi = p_{1i.}$, $s = s_{i..}$.\\
+                 Apply \textbf{MultipleChoice}\,($\pi,s,j,c$).\\
+                 If $j \neq i$, apply \textbf{Change}($i,j$).
+\item[D.2 = B-1] Given $i$ and $j$ in this order,
+                 use $\pi_0 = p_{0ij}$, $s_0 = s_{ijk}$.\\
+                 Apply \textbf{BinaryChoice}\,($\pi_0,s_0,r,c$).\\
+                 If $r$, apply \textbf{Change}($i,j$).
+\item[M.1 = A-2] Given $i$, use $\pi = p_{1i.}$, $s = s_{i..}$.\\
+                 Apply \textbf{MultipleChoice}\,($\pi,s,j,c$).\\
+                 If $x_{ij} = 1$, apply \textbf{Change}($i,j$);\\
+                 else
+                 \begin{frindent}{2em}{1em}{10em}
+                 Use $\pi_0 = p_{0ji}$, $s_0 = s_{jik}$;\\
+                 Apply \textbf{BinaryChoice}\,($\pi_0,s_0,r,c$);\\
+                 If $r$, apply \textbf{Change}($i,j$).
+                 \end{frindent}
+\item[M2 = B-2]  One implementation is as follows:\\
+                  Given $i$ and $j$ in arbitrary order:\\
+                 Use $\pi_0 = p_{0ij}$, $s_0 = s_{ijk}$.\\
+                 Apply \textbf{BinaryChoice}\,($\pi_0,s_0,r_A,c$).\\
+                 Use $\pi_0 = p_{0ji}$, $s_0 = s_{jik}$.\\
+                 Apply \textbf{BinaryChoice}\,($\pi_0,s_0,r_B,c$).\\
+                 If $(x_{ij} = 0$ and $r_A$ and $r_B$)
+                 or $(x_{ij} = 1$ and \big($r_A$ or $r_B$)\big), apply \textbf{Change}($i,j$).
+
+                 Another implementation, which integrates out over the double choice
+                 and therefore has a less variable score function
+                 and is preferable:\\
+                 If $x_{ij} = 0$:
+                 \begin{frindent}{2em}{1em}{6em}
+                 Use $\pi_0 = p_{0ij}\,p_{0ji}$,
+                 \[
+                 s_0 = \frac{\big(1-p_{0ij}(x, \beta)\big)\, s_{ijk} + \big(1-p_{0ji}(x, \beta)\big)\, s_{jik}}
+                             {1 - p_{0ij}(x, \beta)\,p_{0ji}(x, \beta)} \ ;
+                 \]
+                 Apply \textbf{BinaryChoice}\,($\pi_0,s_0,r,c$);\\
+                 If $r$, apply \textbf{Change}($i,j$).
+                 \end{frindent}
+                 If $x_{ij} = 1$:
+                 \begin{frindent}{2em}{1em}{6em}
+                 Use $\pi_0 = 1 - \big(1 - p_{0ij}\big)\big(1-p_{0ji}\big) = p_{0ij} + p_{0ji} - p_{0ij}p_{0ji}$,
+                 \[
+                 s_0 = \frac{p_{0ij}(x, \beta)\, s_{ijk} + p_{0ji}(x, \beta)\, s_{jik}}
+                             { p_{0ij}(x, \beta) + p_{0ji}(x, \beta) -  p_{0ij}(x, \beta) p_{0ji}(x, \beta)} \ ;
+                 \]
+                 Apply \textbf{BinaryChoice}\,($\pi_0,s_0,r,c$);\\
+                 If $r$, apply \textbf{Change}($i,j$).
+                 \end{frindent}
+\item[C = B-3] Given $i$ and $j$ in arbitrary order,
+                 use $\pi_0 = p_{2ij}$ as in (\ref{eq:p2}), $s_0 = s_{ijk} + s_{jik}$.\\
+                 Apply \textbf{BinaryChoice}\,($\pi_0,s_0,r,c$).\\
+                 If $r$, apply \textbf{Change}($i,j$).
+\end{itemize}
+
+
+
+\section{Score function: rate function}
+We consider here two types of rate function, for the one-sided and
+two-sided opportunity.
+
+\subsection{One-sided opportunity}
+For the one-sided opportunity (D.1 and M.1) the rate of change is
+\begin{equation}
+\lambda_i = \rho\,\exp\Big(\sum_k \alpha_k z_{ik}\Big)  \label{eq:lambda1}
+\end{equation}
+where $z_{ik}$ is a vector which is allowed to depend on the network $x$.
+A ministep by actor $i$,
+when associated with an elapsed waiting time $t$, contributes
+to the probability density of the entire process a factor
+\[
+\lambda_i e^{-t\,\lambda_+}
+\]
+where $\lambda_+ = \sum_i \lambda_i$ is the total rate of change.
+
+Calculus shows that the score function with respect to any parameter
+$\alpha_k$ (including $\rho$) is given by
+\begin{equation}
+    \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_i e^{-t\,\lambda_+} \Big)
+  = \frac{1}{\lambda_i} \frac{\partial \lambda_i}{\partial \alpha_k} \, - \,
+  t  \frac{\partial \lambda_+}{\partial \alpha_k} \ .
+\nonumber %     \label{eq:scorelambda1}
+\end{equation}
+This yields the following contributions to the overall score function.
+
+Since $\partial \lambda_i/\partial \rho = \lambda_i/\rho$, we get
+\begin{equation}
+    \frac{\partial }{\partial \rho} \log \Big( \lambda_i e^{-t\,\lambda_+} \Big)
+  = \frac{1 - t \lambda_+}{\rho}  \ .   \label{eq:scorelambda1r}
+\end{equation}
+Since $\partial \lambda_i/\partial \alpha_k = z_{ik}\,\lambda_i$, we get
+\begin{equation}
+    \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_i e^{-t\,\lambda_+} \Big)
+  = z_{ik} \,-\, t \sum_{j} z_{jk}\lambda_j  \ ,   \label{eq:scorelambda1ak}
+\end{equation}
+where the $\sum_j$ is taken over the set of all active actors.
+
+The term $\sum_{j} z_{jk}\lambda_j $ should be calculated only once.
+
+
+
+
+\subsection{Two-sided opportunity}
+
+For the two-sided opportunity (D.2, M.1 and C) the rate of change is
+the product of two actor-dependent rates,
+\begin{equation}
+\lambda_{ij} = \lambda_{0i}\lambda_{0j} = \rho^2\exp\Big(\sum_k \alpha_k (z_{ik} + z_{jk})\Big) \ .\label{eq:lambda2}
+\end{equation}
+(This may be extended later - this is how it was implemented in Siena 3.)
+A ministep by the pair of actors $i$ and $j$,
+when associated with an elapsed waiting time $t$, contributes
+to the probability density of the entire process a factor
+\[
+\lambda_{ij} e^{-t\,\lambda_+}
+\]
+where $\lambda_+ = \sum_{i,j} \lambda_{ij}$ is the total rate of change,
+the summation being over all pairs of active actors with $i \neq j$.
+
+
+[If conditions such as uponly are implemented, an extra decision must be made
+for how to exclude the non-permitted cases: first loop over $i$; in the inner loop over $j$,
+do we use `choose $j$; if not permitted, exit from inner loop', or `choose $j$ until
+a permitted $j$ is found'? (In the second case, $i$'s without any permitted $j$'s
+must not be active). This affects the definition of $\lambda_+$. The raw sum given above
+corresponds to the first option.]
+
+The development further is totally analogous to the case of one-sided opportunity.
+The score function with respect to any parameter
+$\alpha_k$ (including $\rho$) is given by
+\[
+    \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_{ij} e^{-t\,\lambda_+} \Big)
+  = \frac{1}{\lambda_{ij}} \frac{\partial \lambda_{ij}}{\partial \alpha_k} \, - \,
+  t  \frac{\partial \lambda_+}{\partial \alpha_k} \ .
+\]
+This yields the following contributions to the overall score function.
+
+
+
+Since $\partial \lambda_{ij}/\partial \rho = 2 \lambda_{ij}/\rho$, we get
+\begin{equation}
+    \frac{\partial }{\partial \rho} \log \Big( \lambda_{ij} e^{-t\,\lambda_+} \Big)
+  = 2\, \frac{1 - t \lambda_+}{\rho}  \ .   \label{eq:scorelambda2r}
+\end{equation}
+Since $\partial \lambda_{ij}/\partial \alpha_k = (z_{ik}+z_{jk})\,\lambda_{ij}$, we get
+\begin{equation}
+    \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_{ij} e^{-t\,\lambda_+} \Big)
+  = (z_{ik}+z_{jk}) \,-\, t \sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh}  \ ,   \label{eq:scorelambda2ak}
+\end{equation}
+where the $\sum_{g,h}$ is taken over the set of all active actors, and what was said above
+between square brackets applies again.
+
+
+Certainly the term
+$\sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh} $
+should be calculated only once.
+In regular cases, where there are no uponly etc.\ conditions, this will not require
+the execution of a double summation.
+
+
+\newpage
 \begin{appendices}
 
 \section{The contribution of the number of ministeps to the likelihood }
@@ -4116,7 +4865,6 @@ approximation, it is natural indeed that this should be the linear approximation
 
 
 \end{appendices}
-
 
 \bibliographystyle{Chicago}
 \bibliography{RSiena}

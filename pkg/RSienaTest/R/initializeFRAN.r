@@ -207,7 +207,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             z$theta<- z$theta[-z$condvar]
             z$fixed<- z$fixed[-z$condvar]
             z$test<- z$test[-z$condvar]
-            z$pp<- z$pp-length(z$condvar)
+            z$pp<- z$pp - length(z$condvar)
             z$scale<- z$scale[-z$condvar]
             z$BasicRateFunction <- z$posj[-z$condvar]
             z$posj <- z$posj[-z$condvar]
@@ -235,6 +235,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         attr(f, "compositionChange") <- attr(data, "compositionChange")
         attr(f, "exooptions") <- attr(data, "exooptions")
         attr(f, "groupPeriods") <- attr(data, "groupPeriods")
+        attr(f, "periodNos") <- attr(data, "periodNos")
         attr(f, "numberNonMissingNetwork") <-
             attr(data, "numberNonMissingNetwork")
         attr(f, "numberMissingNetwork") <- attr(data, "numberMissingNetwork")
@@ -250,18 +251,25 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                  "with Maximum likelihood method")
         }
         ## if any networks symmetric must use finite differences and not maxlike
+        ## scores are now available (30.10.10) but still not maxlike.
+        ## check model type: default for symmetric is type 2 (forcing model).
         syms <- attr(data,"symmetric")
-       # z$FinDiffBecauseSymmetric <- FALSE
-       # if (any(!is.na(syms) & syms))
-       # {
-       #     z$FinDiff.method <- TRUE
-       #     z$FinDiffBecauseSymmetric <- TRUE
-       #     if (x$maxlike)
-       #     {
-       #         stop("Maximum likelihood method not implemented",
-       #              "for symmetric networks")
-       #     }
-       # }
+        z$FinDiffBecauseSymmetric <- FALSE
+        z$modelType <- x$modelType
+        if (any(!is.na(syms) & syms))
+        {
+            ##     z$FinDiff.method <- TRUE
+            ##     z$FinDiffBecauseSymmetric <- TRUE
+            if (x$maxlike)
+            {
+                stop("Maximum likelihood method not implemented",
+                     "for symmetric networks")
+            }
+            if (x$modelType == 1)
+            {
+                z$modelType <- 2
+            }
+        }
         if (z$cconditional)
         {
             attr(f, "change") <-
@@ -454,7 +462,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
 
     ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
-                 profileData, z$parallelTesting, x$MODELTYPE)
+                 profileData, z$parallelTesting, x$modelType)
+
     if (x$maxlike)
     {
         ## set up chains and do initial steps
@@ -517,6 +526,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     {
         z$f <- f
         z <- initForAlgorithms(z)
+        z$periodNos <- attr(data, "periodNos")
         z$f[1:nGroup] <- NULL
     }
     if (initC || (z$int == 1 && z$int2 == 1 &&
@@ -982,6 +992,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
     attr(edgeLists, 'symmetric') <- attr(depvar, 'symmetric')
     ## attr balmean
     attr(edgeLists, 'balmean') <- attr(depvar, 'balmean')
+    attr(edgeLists, 'structmean') <- attr(depvar, 'structmean')
     attr(edgeLists, 'averageInDegree') <- attr(depvar, 'averageInDegree')
     attr(edgeLists, 'averageOutDegree') <- attr(depvar, 'averageOutDegree')
     return(edgeLists = edgeLists)
@@ -1307,6 +1318,8 @@ unpackBipartite <- function(depvar, observations, compositionChange)
     attr(edgeLists, 'symmetric') <- attr(depvar, 'symmetric')
     ## attr balmean
     attr(edgeLists, 'balmean') <- attr(depvar, 'balmean')
+    ## attr structmean
+    attr(edgeLists, 'structmean') <- attr(depvar, 'structmean')
     attr(edgeLists, 'averageOutDegree') <- attr(depvar, 'averageOutDegree')
     return(edgeLists = edgeLists)
 }

@@ -1622,6 +1622,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         attr(f, "compositionChange") <- attr(data, "compositionChange")
         attr(f, "exooptions") <- attr(data, "exooptions")
         attr(f, "groupPeriods") <- attr(data, "groupPeriods")
+        attr(f, "periodNos") <- attr(data, "periodNos")
       #  attr(f, "totalMissings") <- attr(data, "totalMissings")
 
         if (x$maxlike && x$FinDiff.method)

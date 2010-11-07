@@ -407,6 +407,9 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 		SEXP balm;
         PROTECT(balm = install("balmean"));
         SEXP balmean = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode), balm);
+		SEXP strm;
+        PROTECT(strm = install("structmean"));
+        SEXP structmean = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode), strm);
 		SEXP avin;
         PROTECT(avin = install("averageInDegree"));
         SEXP averageInDegree = getAttrib(VECTOR_ELT(ONEMODEGROUP, oneMode),
@@ -425,6 +428,7 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
                                      myActorSet);
         pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
         pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
+        pOneModeNetworkLongitudinalData->structuralMean(*(REAL(structmean)));
         pOneModeNetworkLongitudinalData->
 			averageInDegree(*(REAL(averageInDegree)));
         pOneModeNetworkLongitudinalData->
@@ -441,7 +445,7 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 		//Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
 		//	averageInDegree(), pOneModeNetworkLongitudinalData->
 		//	averageOutDegree());
-        UNPROTECT(6);
+        UNPROTECT(7);
     }
 }
 
