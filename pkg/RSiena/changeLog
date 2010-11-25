@@ -1,4 +1,9 @@
-2010-11-07 R-forge revision 126
+2010-11-25 R-forge revision 127
+
+	* man/s_man400.tex: updated examples of sienaTimeTest.
+	* R/initializeFRAN.r: (RSiena only): forgotten new file
+
+2010-11-25 R-forge revision 126
 
 	* DESCRIPTION: new main version number for RSiena, 1.0.12
 	* R/sienaTimeTest.r, R/effects.r, R/sienaeffects.r,
