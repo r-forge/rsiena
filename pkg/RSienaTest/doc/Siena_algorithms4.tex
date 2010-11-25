@@ -131,6 +131,8 @@
 
 \author{Tom A.B.\ Snijders }
 
+\date{November 19, 2010, 2nd version }
+
 \newcommand{\sn}{{\scriptstyle N}}
 \renewcommand{\sb}{{\scriptstyle B}}
 \newcommand{\extraver}{{$\phantom{\Big(}$}}
@@ -193,6 +195,18 @@ This paper gives a sketch of the main algorithms used in RSiena.
 It is meant as background material for understanding the code of
 RSiena. It is intended to be included later on as part of the
 programmer's manual of RSiena.
+
+Changes in the version of November 19, 2010:\\
+correction of \textit{MH\_DelPermute} (the correction
+of November 17 was defined incorrectly).\\
+Some changes in Section \ref{S_14.2} about changes in the rate functions
+and associated scores.
+
+Changes in the version of November 17, 2010:\\
+suppression of some unimportant superfluous operations in \textit{MH\_InsPermute};
+correction of \textit{MH\_DelPermute}. These changes are signaled \remark{in red}.\\
+Also, the last paragraph of Section \ref{S_14.1} was changed,
+and a lot of Section \ref{S_14.2} (further explanation).
 
 The changes in the version of October 30, 2010, are corrections in part B
 of procedures \textit{MH\_InsMis} and \textit{MH\_DelMis}.
@@ -2189,8 +2203,8 @@ $(w_0,i_0,j_0,r_0,d_0)$ before
 a random ministep $\ms_a$, and permute the $c$ ministeps starting with $\ms_a$,
 where again $c$ is $c_0$ truncated to the number of available places.
 
-This proposal has  probability \textit{pra}, and
-with this probability the proposal is put into effect (yielding \textit{accept} = \nnm{True})
+According to a  probability \textit{pra},
+the proposal is put into effect (yielding \textit{accept} = \nnm{True})
 or not (yielding \textit{accept} = \nnm{False}).
 
 The steps taken in the function are as follows.
@@ -2287,6 +2301,10 @@ Part \emph{A}:
       }
       \item $\ms_e \leftarrow \ms_a.\nnm{succ}^{(c-1)}$
       \end{enumerate}
+\item If \textit{misdat}, let $\textit{ThisLength} \leftarrow c$.\\
+      \remark{This is new in the version of November 17, 2010. The earlier version
+      (where \textit{ThisLength} could remain being larger than $c$) was not wrong,
+      but carried out some superfluous mutually canceling subtractions and additions.}
 \item Let \textit{perm} be a random permutation of the numbers $1$ to $c$.
 \item \addce{
       For all variables $(w,r)$ involved in a condition of the kind
@@ -2302,19 +2320,18 @@ Part \emph{A}:
       If at least one of these conditions are not satisfied, exit.
 \end{enumerate}
 The proposal probability is
-\addce{
 \[
 %  \frac{\exp{(lospr + lcpr)}}{(\textit{TotNumber}-2)\ttimes \textit{ChoiceLength} \ttimes (c!)}
   \frac{\exp{(lospr + lcpr)}}{pr_2 \ttimes(\textit{TotNumber}-1)\ttimes \textit{ChoiceLength} \ttimes (c!)}
 \]
-}
+
 
 This is used in \textit{pra} below.\\
 We also need the probability of the inverse proposal
 (except for the factor $c! $ which cancels),
 and therefore calculate the following.
 \begin{enumerate}[resume]
-\item \addcf{This item is used only if not \textit{misdat} :\\
+\item This item is used only if not \textit{misdat} :\\
       if $\textit{NumberOption}(w_0,i_0,j_0,r_0) = 0$ :
       \[
         \textit{NewCCPNumber} \leftarrow \textit{CCPNumber} + 1 \ ;
@@ -2348,9 +2365,7 @@ and therefore calculate the following.
       \]
       where $I\{A\} = 1$ if $A$ is true and 0 otherwise.
       \end{frindentation}
-}
 \item
-\addcf{
       \begin{eqnarray*}
       \text{if (not } \textit{misdat}): & pr_1 \leftarrow &
                 \frac{1 - \textit{prmin} - \textit{prmib}}{\textit{NewCCPNumber} } \ ; \\[1em]
@@ -2359,7 +2374,7 @@ and therefore calculate the following.
        \text{if } \textit{misdat} \text{ and } w_0 = B:  & pr_1 \leftarrow  &
                  \frac{\textit{prmib}}{\textit{ChainNumMisBeh}+1 } \ .
       \end{eqnarray*}
-(only the non-\textit{misdat} case was changed). }
+(only the non-\textit{misdat} case was changed).
 \end{enumerate}
 
 Part \emph{B}:
@@ -2371,7 +2386,7 @@ Part \emph{B}:
       If (not \textit{SimpleRates}), then below we use
       the values \textit{mu} and \textit{sigma2}; \\
       these refer to the current chain.
-\vspace*{-1em}
+\vspace*{-0.3em}
       \[
       \textit{sumlprob\_new}  \leftarrow 0 \ ;
       \]
@@ -2383,7 +2398,7 @@ Part \emph{B}:
       \textit{sigma2\_new}  \leftarrow \textit{sigma2} -  \sum_{s=1}^{\textit{ThisLength}}
              (\ms_a.\nnm{succ}^{s-1}).(\nnm{rRate})^2 \ ;
       \]
-\vspace*{-1em}
+\newpage
 \item Note that still $y =  \textit{StateBefore}(\ms_a)$ as was assigned above.\\
       \textit{StepProb2}$(y,w_0,i_0,j_0,r_0,d_0;  rr_0, lospr_0, lcpr_0)$;\\
         \textit{sumlprob\_new} $ \leftarrow \textit{sumlprob\_new} + lcpr_0 + lospr_0 $ ;\\
@@ -2396,7 +2411,6 @@ Part \emph{B}:
 \item For $1 \leq s \leq \textit{ThisLength}$ \
       denote by $\textit{Coordinates}_s$ the values
       $(w,i,j,r,d)$ of $\ms_a.\nnm{succ}^{s-1}$.
-\newpage
 \item For $s$ running from 1 to $c$, do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y,
@@ -2412,7 +2426,9 @@ Part \emph{B}:
       \item\textit{ChangeStep}$(y,
          \textit{Coordinates}_{\textit{perm}(s)})$ \ .
       \end{enumerate}
-\item For $s$ running from $c+1$ to \textit{ThisLength} do:
+\item if (not \textit{misdat}) \remark{(this condition was added in version 17 Nov 2010
+      to avoid superfluous additions and subtractions)} :\\
+      For $s$ running from $c+1$ to \textit{ThisLength} do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y, \textit{Coordinates}_{s}; rr_s, lospr_s, lcpr_s)$
       \item \textit{sumlprob\_new} $ \leftarrow \textit{sumlprob\_new} + lcpr_s + lospr_s $
@@ -2438,7 +2454,6 @@ Part \emph{B}:
       \end{enumerate}
 \newpage
 \item If \textit{SimpleRates}, then
-\addcf{
       \begin{enumerate}
       \item if (not \textit{misdat}):
         \[
@@ -2462,7 +2477,6 @@ Part \emph{B}:
         \textit{KappaFactor} \leftarrow \frac{1}{rr \times(\textit{TotNumber } + 1) }
         \]
       \end{enumerate}
-}
       else (i.e., if not \textit{SimpleRates})
       \begin{equation}
       \textit{KappaFactor} \leftarrow \sqrt{ \frac{\textit{sigma2}}{\textit{sigma2\_new}} }
@@ -2493,6 +2507,7 @@ Part \emph{C}:
 \end{enumerate}
 
 \subsection{Delete -- Permute}
+\label{S_delper}
 
 The function
 \textit{MH\_DelPermute}
@@ -2535,8 +2550,8 @@ In addition, if $c \geq 2$,
 and the proposal includes permuting the ministeps in the interval
 $[\ms_a.\nnm{succ}, \ms_a.\nnm{succ}^{c}]$ by \textit{perm}.
 
-This proposal has  probability \textit{pra}, and
-with this probability the proposal is put into effect (yielding \textit{accept} = \nnm{True})
+According to aprobability \textit{pra},
+the proposal is put into effect (yielding \textit{accept} = \nnm{True})
 or not (yielding \textit{accept} = \nnm{False}).
 
 The steps taken in the function are as follows.
@@ -2548,7 +2563,7 @@ Part \emph{A}:
       let $\textit{misdat} \leftarrow \nnm{True}$,\\
       else $\textit{misdat} \leftarrow \nnm{False}$.
 \item
-\vspace*{-1em}
+\vspace*{-0.4em}
 \begin{enumerate}
       \item if (not \textit{misdat}):
             \begin{enumerate}
@@ -2578,17 +2593,24 @@ Part \emph{A}:
                     \item $\ms_a \leftarrow $ \textit{RandomMisBeh}
                     \end{enumerate}
             \item $\textit{ThisLength} \leftarrow \textit{length}(\ms_a, \nnm{last})$
+            \item If $\ms_a.\nnm{succ} = \nnm{last}$ (i.e., \textit{ThisLength} = 2), exit.\\
+            \remark{This condition was added in the version of November 17, 2010,
+                    and corrected with the addition of \nnm{succ}
+                    in the version of November 18, 2010,
+                    and is needed in view of the requirement $\ms_a < \nnm{last}$
+                    in step 1.\ of procedure \textit{MH\_DelPermute}.}
             \end{enumerate}
       \end{enumerate}
 \vspace*{-1em}
 \item  $c \leftarrow \min\{c_0, \textit{ThisLength} - 2\}$.\\
-      Note that in the case (not \textit{misdat}) the definition of a CCP implies $c \geq 1$.\\
-      If \textit{misdat}, it is possible that $c=0$, which simply means that
-      the permutation \textit{perm} is nil but formally everything below is OK.
-\addce{
-      \item If $\textit{ThisLength}-2 \leq c_0$, \\
+       Note that in the case (not \textit{misdat}) the definition of a CCP implies $c \geq 1$.\\
+      If \textit{misdat}, the `exit' in the preceding step implies that $c \geq 1$.\\
+      \remark{This was not so in the version before November 17, 2010.}
+      \item If (($\textit{ThisLength}-2 \leq c_0$) and (not \textit{misdat})), \\
             then $\ms_g \leftarrow  \ms_b.\nnm{pred}$,\\
-             else $\ms_g \leftarrow \ms_a.\nnm{succ}^{(c+1)}$ .
+             else $\ms_g \leftarrow \ms_a.\nnm{succ}^{(c+1)}$ .\\
+             ($\ms_g$ is an upper bound to the interval if ministeps
+             that will be permuted.)
       \item If the interval $[\ms_a.\nnm{succ}, \ms_g]$ contains
              any pair of two non-diagonal ministeps of the same \textit{Option}:
       \begin{enumerate}
@@ -2601,17 +2623,15 @@ Part \emph{A}:
              all have distinct \textit{Options} and therefore the permutation cannot
              affect the number of CCPs.)
       \end{enumerate}
-}
 \item Let \textit{perm} be a random permutation of the numbers $1$ to $c$.
 \item $y \leftarrow  \textit{StateBefore}(\ms_a)$ .
-\item  \addce{
-      For all variables $(w,r)$ involved in a condition of the kind
+\item For all variables $(w,r)$ involved in a condition of the kind
       \nnm{higher}, \nnm{disjoint}, or \nnm{atleastone},
       check these conditions for the chain
       with   $\ms_a$ and $\ms_b$ deleted, and with
       $\ms_a.\nnm{succ}$ to $\ms_a.\nnm{succ}^c$  permuted by \textit{perm}.\\
       This needs to be checked
-      here only for ministeps from $\ms_a.\nnm{succ}$ to $\ms_b.\nnm{pred}$.}\\
+      here only for ministeps from $\ms_a.\nnm{succ}$ to $\ms_b.\nnm{pred}$.\\
       If at least one of these conditions are not satisfied, exit.
 \end{enumerate}
 To calculate the proposal probabilities of this proposal and the inverse proposal,
@@ -2649,7 +2669,12 @@ The probability of this proposal is
 \newpage
 Part \emph{B}:
 \begin{enumerate}[resume]
-\item \[ \textit{sumlprob} \leftarrow \sum_{s=1}^{\textit{ThisLength}}
+\item If \textit{misdat} then $ \textit{MaxLength} \leftarrow c$, else
+      $ \textit{MaxLength} \leftarrow \textit{ThisLength}$.\\
+      \remark{This is new in the version of November 17, 2010. The earlier version
+       could for \textit{misdat} request the
+      (\nnm{lChoiceProb} + \nnm{lOptionSetProb}) of the \nnm{last} ministep.}
+\item \[ \textit{sumlprob} \leftarrow \sum_{s=1}^{\textit{MaxLength}}
              (\ms_a.\nnm{succ}^{s-1}).(\nnm{lChoiceProb} + \nnm{lOptionSetProb}) \ ;
       \]
       If (not \textit{SimpleRates}), then below we use
@@ -2659,18 +2684,17 @@ Part \emph{B}:
       \textit{sumlprob\_new}  \leftarrow 0 \ ;
       \]
       \[
-      \textit{mu\_new}  \leftarrow \textit{mu} -  \sum_{s=1}^{\textit{ThisLength}}
+      \textit{mu\_new}  \leftarrow \textit{mu} -  \sum_{s=1}^{\textit{MaxLength}}
              (\ms_a.\nnm{succ}^{s-1}).(\nnm{rRate}) \ ;
       \]
       \[
-      \textit{sigma2\_new}  \leftarrow \textit{sigma2} -  \sum_{s=1}^{\textit{ThisLength}}
+      \textit{sigma2\_new}  \leftarrow \textit{sigma2} -  \sum_{s=1}^{\textit{MaxLength}}
              (\ms_a.\nnm{succ}^{s-1}).(\nnm{rRate})^2 \ ;
       \]
 \item \[
       lpr_0 \leftarrow \ms_a.(\nnm{lChoiceProb} + \nnm{lOptionSetProb})
       \]
       (This is part of the log probability for the reverse proposal.)
-\addce{
 \item Note that still $y =  \textit{StateBefore}(\ms_a)$ as was assigned above.
       \[
       (w_2, i_2, j_2, r_2, d_2) \leftarrow (\ms_a.\nnm{succ}).\textit{Coordinates} \ ;
@@ -2683,10 +2707,11 @@ Part \emph{B}:
       \]
       ($pr_2$ also is part of the log probability for the reverse proposal;
       the others of these numbers with subscript 2 are not used any more.)
-}
 \item For $1 \leq s \leq \textit{ThisLength}-2$ \
       denote by $\textit{Coordinates}_s$ the values
-      $(w,i,j,r,d)$ of $\ms_a.\nnm{succ}^{s}$.
+      $(w,i,j,r,d)$ of $\ms_a.\nnm{succ}^{s}$;\\
+      if \textit{misdat}, this is required only for $1 \leq s \leq c$.
+      \remark{Last remark new in version 17 Nov 2010.}
 \item Note that still $y =  \textit{StateBefore}(\ms_a)$ as was assigned above.\\
       For $s$ running from 1 to $c$, do:
       \begin{enumerate}
@@ -2702,7 +2727,8 @@ Part \emph{B}:
       \item \textit{ChangeStep}$(y, \textit{Coordinates}_{\textit{perm}(s)})$
       \end{enumerate}
 \newpage
-\item For $s$ running from $c+1$ to $\textit{ThisLength} -2$ do:
+\item If not \textit{misdat} \remark{(this condition added
+      version 17 Nov 2010)} then for $s$ running from $c+1$ to $\textit{ThisLength} -2$ do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y, \textit{Coordinates}_{s};
                                             rr_s, lospr_s, lcpr_s)$
@@ -2749,8 +2775,7 @@ Part \emph{B}:
                   \ttimes \exp\left( \frac{\left(1 - \textit{mu} \right)^2}{2\ttimes\textit{sigma2}}
                    - \frac{\left(1 - \textit{mu\_new} \right)^2}{2\ttimes\textit{sigma2\_new}}  \right) \ .
       \end{equation}
-\item \addce{
-      \begin{align}
+\item \begin{align}
      \textit{pra}  \leftarrow \ &
         \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \\
 %          & \ \ttimes  \frac{pripr \ttimes \exp(lpr_0)}{prdpr \ttimes pr_1 \ttimes \textit{TotNumber}
@@ -2758,9 +2783,9 @@ Part \emph{B}:
                                       pr_2 \ttimes   ( \textit{TotNumber}+1)
                                            \ttimes \textit{ChoiceLength} } \ ;
     \end{align}
-}
     if (\textit{pra} $ > 1$), then  \textit{pra} $ \leftarrow 1 $.
 \end{enumerate}
+\newpage
 Part \emph{C}:
 \begin{enumerate}[resume]
 \item With probability \textit{pra} let \textit{accept} $\leftarrow$ \nnm{True}, else
@@ -4140,8 +4165,8 @@ and we denote $\mathcal A = \mathcal A_- \cup \{i\}$ where $i$ is the actor maki
 the ministep, but signifying here `no change' so
 alternatively this could be denoted by 0. In the default case, $\mathcal A = \{1, \ldots, n\}$;
 if not all actors are active then $\mathcal A_-$ will contain only active actors;
-but it will be potentially a smaller set if one of the conditions uponly, downonly,
-higher, disjoint, or atleastone holds.
+but it will be potentially a smaller set if one of the conditions \nnm{uponly},
+\nnm{downonly}, \nnm{higher}, \nnm{disjoint}, or \nnm{atleastone} holds.
 
 Denote the change in objective function when toggling $x_{ij} $ by
 \[
@@ -4530,6 +4555,8 @@ We consider here two types of rate function, for the one-sided and
 two-sided opportunity.
 
 \subsection{One-sided opportunity}
+ \label{S_14.1}
+
 For the one-sided opportunity (D.1 and M.1) the rate of change is
 \begin{equation}
 \lambda_i = \rho\,\exp\Big(\sum_k \alpha_k z_{ik}\Big)  \label{eq:lambda1}
@@ -4544,11 +4571,11 @@ to the probability density of the entire process a factor
 where $\lambda_+ = \sum_i \lambda_i$ is the total rate of change.
 
 Calculus shows that the score function with respect to any parameter
-$\alpha_k$ (including $\rho$) is given by
+$\theta_k$ ($alpha_k$ as well as $\rho$) is given by
 \begin{equation}
-    \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_i e^{-t\,\lambda_+} \Big)
-  = \frac{1}{\lambda_i} \frac{\partial \lambda_i}{\partial \alpha_k} \, - \,
-  t  \frac{\partial \lambda_+}{\partial \alpha_k} \ .
+    \frac{\partial }{\partial \theta_k} \log \Big( \lambda_i e^{-t\,\lambda_+} \Big)
+  = \frac{1}{\lambda_i} \frac{\partial \lambda_i}{\partial \theta_k} \, - \,
+  t  \frac{\partial \lambda_+}{\partial \theta_k} \ .
 \nonumber %     \label{eq:scorelambda1}
 \end{equation}
 This yields the following contributions to the overall score function.
@@ -4565,77 +4592,183 @@ Since $\partial \lambda_i/\partial \alpha_k = z_{ik}\,\lambda_i$, we get
 \end{equation}
 where the $\sum_j$ is taken over the set of all active actors.
 
-The term $\sum_{j} z_{jk}\lambda_j $ should be calculated only once.
-
+For variables $z_{jk}$ that are not changing during the simulations,
+i.e., actor covariates that are not dependent behavior variables,
+the term $\sum_{j} z_{jk}\lambda_j $
+does not change during the simulations, unless there is composition change
+and the set of active actors changes.
+For such variables, it is efficient to calculate $\sum_{j} z_{jk}\lambda_j $
+at the start of each period, and at each composition change,
+but not at each ministep.
 
 
 
 \subsection{Two-sided opportunity}
+\label{S_14.2}
 
-For the two-sided opportunity (D.2, M.1 and C) the rate of change is
+For the two-sided opportunity (D.2, M.1 and C) the pairwise rate of change is
 the product of two actor-dependent rates,
 \begin{equation}
-\lambda_{ij} = \lambda_{0i}\lambda_{0j} = \rho^2\exp\Big(\sum_k \alpha_k (z_{ik} + z_{jk})\Big) \ .\label{eq:lambda2}
+\lambda_{ij} = \lambda_{0i}\lambda_{0j} =
+   \rho^2\exp\Big(\sum_k \alpha_k (z_{ik} + z_{jk})\Big) \ .\label{eq:lambda2}
 \end{equation}
-(This may be extended later - this is how it was implemented in Siena 3.)
-A ministep by the pair of actors $i$ and $j$,
-when associated with an elapsed waiting time $t$, contributes
+(This may be extended later -- this is how it was implemented in Siena 3.)
+
+\remark{This section is changed in the version of November 19, 2010.}
+
+\remark{
+To avoid double summations over actors in the case where some variables $X_{ij}$
+are not allowed to change because of structurally missing values or
+having reached an absorbing state,
+we assume that the pairwise meetings take place
+according to (\ref{eq:lambda2}) between all pairs $(i,j)$
+of actors subject to the conditions that $i$ and $j$ are active, and $i \neq j$.
+If a pair $(i,j)$ meets  which is not allowed to change anything,
+then time will advance, so
+there will be a contribution to the score function for the parameters of the
+rate function, but further nothing happens.}
+
+Ministep are made by all pairs of active actors $i$ and $j$ ($i \neq j$).
+When the elapsed waiting time for a ministep is $t$, the meeting event contributes
 to the probability density of the entire process a factor
 \[
-\lambda_{ij} e^{-t\,\lambda_+}
+\lambda_{ij} e^{-t\,\lambda_{++}}
 \]
-where $\lambda_+ = \sum_{i,j} \lambda_{ij}$ is the total rate of change,
-the summation being over all pairs of active actors with $i \neq j$.
+where
+\begin{equation}
+\lambda_{++} = \sum_{i,j} \lambda_{ij} =
+       \sum_{\text{active }i} \ \sum_{\text{active }j, j \neq i} \lambda_{0i}\lambda_{0j}   \label{eq: lambda++}
+\end{equation}
+is the total rate of change,
+\remark{
+the summation being over all pairs $(i,j)$ of active actors, $i \neq j$.
+}
 
+The pairwise meeting process accordingly proceeds as follows.
+\begin{enumerate}
+\item Define
+      \[
+          \lambda_{0+} =   \sum_{\text{active }i} \lambda_{0i} \ .
+      \]
+\item Repeat
+      \begin{enumerate}
+       \item Choose $i$ among the active $i$ with probabilities
+             \[
+              \frac{\lambda_{0i}} {\lambda_{0+}} \ ,
+              \]
+       \item choose $j$ among the active $j$ with probabilities
+             \[
+              \frac{\lambda_{0j}} {\lambda_{0+}} \ ,
+              \]
+       \end{enumerate}
+       until $i \neq j$.
+\item Increase time by a value drawn from an exponential distribution with parameter
+      (\ref{eq: lambda++}).
+\item If $X_{ij}$ is allowed to change, then determine the new value according
+      to its distribution; if $X_{ij}$ is not allowed to change, continue
+      (one could say that $i$ and $j$ meet but do not change how they are related).
+\end{enumerate}
 
-[If conditions such as uponly are implemented, an extra decision must be made
-for how to exclude the non-permitted cases: first loop over $i$; in the inner loop over $j$,
-do we use `choose $j$; if not permitted, exit from inner loop', or `choose $j$ until
-a permitted $j$ is found'? (In the second case, $i$'s without any permitted $j$'s
-must not be active). This affects the definition of $\lambda_+$. The raw sum given above
-corresponds to the first option.]
+The variable $X_{ij}$ is not allowed to change if:
+\begin{tabbing}
+\hspace*{3em} \=  \hspace*{3em} \=  ($X_{ij}$ is structurally fixed) \\
+       \> or \> ($X_{ij}$ has reached an absorbing state because of a \nnm{$\ast$only} condition).
+\end{tabbing}
+Here \nnm{$\ast$only} stands for any of \nnm{uponly}, \nnm{downonly}, \nnm{higher},
+\nnm{disjoint}, or \nnm{atleastone}.\\
+(The last three conditions depend on other networks, and for those conditions
+the word `absorbing' is perhaps not appropriate
+because when the other network changes the variable $X_{ij}$ also might be allowed to change again.)
+\\
+(Variable $X_{ij}$ also cannot change if $i$ or $j$ is inactive, but this already is excluded
+in the choice of $i$ and $j$.)
 
-The development further is totally analogous to the case of one-sided opportunity.
+See below for a remark about the calculation of $\lambda_{++}$.
+
+\remark{
+The rates $\lambda_{ij}$ may depend on variables changing during the simulations, like
+in- or outdegrees or behavioral dependent variables. Then also $\lambda_{++}$ will change
+as a consequence. In addition,  $\lambda_{++}$ can change during the simulations
+even if the $\lambda_{ij}$ remain constant, namely,  by a composition change.
+}
+
+The development further is analogous to the case of one-sided opportunity.
 The score function with respect to any parameter
-$\alpha_k$ (including $\rho$) is given by
+$\theta_k$ ($\alpha_k$ as well as $\rho$) is given by
 \[
-    \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_{ij} e^{-t\,\lambda_+} \Big)
-  = \frac{1}{\lambda_{ij}} \frac{\partial \lambda_{ij}}{\partial \alpha_k} \, - \,
-  t  \frac{\partial \lambda_+}{\partial \alpha_k} \ .
+    \frac{\partial }{\partial \theta_k} \log \Big( \lambda_{ij} e^{-t\,\lambda_{++}} \Big)
+  = \frac{1}{\lambda_{ij}} \frac{\partial \lambda_{ij}}{\partial \theta_k} \, - \,
+  t  \frac{\partial \lambda_{++}}{\partial \theta_k} \ .
 \]
+
+
 This yields the following contributions to the overall score function.
-
-
 
 Since $\partial \lambda_{ij}/\partial \rho = 2 \lambda_{ij}/\rho$, we get
 \begin{equation}
-    \frac{\partial }{\partial \rho} \log \Big( \lambda_{ij} e^{-t\,\lambda_+} \Big)
-  = 2\, \frac{1 - t \lambda_+}{\rho}  \ .   \label{eq:scorelambda2r}
+    \frac{\partial }{\partial \rho} \log \Big( \lambda_{ij} e^{-t\,\lambda_{++}} \Big)
+  = 2\, \frac{1 - t \lambda_{++}}{\rho}  \ .   \label{eq:scorelambda2r}
 \end{equation}
 Since $\partial \lambda_{ij}/\partial \alpha_k = (z_{ik}+z_{jk})\,\lambda_{ij}$, we get
 \begin{equation}
-    \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_{ij} e^{-t\,\lambda_+} \Big)
+    \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_{ij} e^{-t\,\lambda_{++}} \Big)
   = (z_{ik}+z_{jk}) \,-\, t \sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh}  \ ,   \label{eq:scorelambda2ak}
 \end{equation}
-where the $\sum_{g,h}$ is taken over the set of all active actors, and what was said above
-between square brackets applies again.
+\remark{
+where the $\sum_{g,h}$ is taken over
+all pairs $(g,h)$ where $g$ as well as $h$ are active and $g \neq h$.
+This can change because of a composition change, but also because of a change in $z_{gk}+z_{hk}$
+or in $\lambda_{gh}$,
+which is possible if and only if  $\lambda_{gh}$ depends on endogenously changing variables.
+}
 
 
-Certainly the term
-$\sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh} $
-should be calculated only once.
-In regular cases, where there are no uponly etc.\ conditions, this will not require
-the execution of a double summation.
+\subsubsection{Remark about calculation of the double summations}
+Some attention is needed for the terms
+$\lambda_{++}$ and
+$\sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh} $,
+as these are defined as summations over $n(n-1)$ terms,
+where $n$ is the number of active actors.
+We have
+\begin{eqnarray*}
+ \lambda_{++} &=&  \sum_{\text{active } i} \ \sum_{\text{active } j, j \neq i} \lambda_{0i}\lambda_{0j} \\
+              &=&  \sum_{\text{active } i} \lambda_{0i} \ \sum_{\text{active } j, j \neq i} \lambda_{0j}
+                  \,=\,   \sum_{\text{active } i} \lambda_{0i} \
+                              \Bigg( \Big( \sum_{\text{active } j} \lambda_{0j} \Big) \ - \lambda_{0i} \Bigg) \\
+              &=&  \Big(\sum_{\text{active } i} \lambda_{0i} \Big)^2
+                     \,-\,  \Big(\sum_{\text{active } i} \lambda_{0i}^2 \Big)
+\end{eqnarray*}
+and
+\begin{eqnarray*}
+\sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh} &=&
+            \sum_{\text{active } i} \ \sum_{\text{active } j, j \neq i} (z_{ik}+z_{jk})\lambda_{0i} \lambda_{0j}\\
+              &=& \Big( \sum_{\text{active } i,j}   (z_{ik}+z_{jk})\lambda_{0i} \lambda_{0j} \Big)
+               \,-\, \Big(  \sum_{\text{active } i}   2 \, z_{ik} \lambda_{0i}^2   \Big)  \\
+              &=&   2 \,  \Big(\sum_{\text{active } i} \lambda_{0i} \Big)
+                         \Big(\sum_{\text{active } i} z_{ik} \lambda_{0i} \Big)
+                     \,-\, 2\, \Big(\sum_{\text{active } i} z_{ik} \lambda_{0i}^2 \Big) \ .
+\end{eqnarray*}
+Thus, everything can be expressed as a combination of single summations.
 
+The remark at the end of Section  \ref{S_14.1} applies here, too:
+\remark{if the functions $\lambda_{0i}$
+are not changing during the simulations,
+i.e., either they do not depend on $i$ or only through
+actor covariates that are not dependent behavior variables,}
+these sums do not change during the simulations, unless there is composition change
+and the set of active actors changes.
+For such model specifications, it is efficient to calculate the sums
+at the start of each period, and at each composition change,
+but not again at each ministep because they do not change.
+
+For model specifications where the rate function depends on endogenously
+changing variables, the sums will need to be calculated repeatedly.
 
 \newpage
 \begin{appendices}
 
 \section{The contribution of the number of ministeps to the likelihood }
 \label{S_A1}
-
-\addce{This appendix is changed. }
-%\subsection{The factor $\kappa$}
 
 In \citet{SnijdersEA10a},
 a special role is played by the quantity

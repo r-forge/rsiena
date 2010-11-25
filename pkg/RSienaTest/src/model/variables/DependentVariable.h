@@ -149,9 +149,15 @@ public:
 	double basicRateDerivative() const;
 	virtual double calculateChoiceProbability(const MiniStep * pMiniStep) const = 0;
 
-	// Bayesian related
+	// Bayesian related: get new values
 	void sampleBasicRate(int miniStepCount);
 	double sampleParameters(double scaleFactor);
+	// get and set sampled basic rates and shapes
+	double sampledBasicRates(unsigned iteration) const;
+	void sampledBasicRates(double value);
+	int sampledBasicRatesDistributions(unsigned iteration) const;
+	void sampledBasicRatesDistributions(int value);
+	void clearSampledBasicRates();
 
 protected:
 	inline EpochSimulation * pSimulation() const;
@@ -256,6 +262,11 @@ private:
 
 	// flag to indicate we gave up on a step due to uponly and other filters
 	bool lsuccessfulChange;
+	// store for sampled parameters and the shapes used for basic rate
+	// parameters
+	vector<double> lsampledBasicRates;
+	vector<int> lsampledBasicRatesDistributions;
+
 };
 
 

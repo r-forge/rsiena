@@ -301,6 +301,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
         nodeSets <- list(sienaNodeSet(attr(depvars[[1]],'netdims')[1]))
     }
     nodeSetNames <- sapply(nodeSets,function(x) attr(x,'nodeSetName'))
+    names(nodeSets) <- nodeSetNames
     if (v2 == 0)
     {
         cCovars <- list()
@@ -1133,11 +1134,11 @@ groupRangeAndSimilarityAndMean <- function(group)
         cCovarRange2[, covar] <- attr(group[[i]]$cCovars[[covar]], "range2")
    }
 
-    vCovarRange <- namedVector(NA, atts$vCovar)
-    vCovarSim <- namedVector(NA, atts$vCovar)
-    vCovarPoszvar <- namedVector(TRUE, atts$vCovar)
-    vCovarMoreThan2 <- namedVector(FALSE, atts$vCovar)
-    vCovarMean <- namedVector(NA, atts$vCovar)
+    vCovarRange <- namedVector(NA, atts$vCovars)
+    vCovarSim <- namedVector(NA, atts$vCovars)
+    vCovarPoszvar <- namedVector(TRUE, atts$vCovars)
+    vCovarMoreThan2 <- namedVector(FALSE, atts$vCovars)
+    vCovarMean <- namedVector(NA, atts$vCovars)
     for (covar in seq(along=atts$vCovars))
     {
         vartotal <- 0
@@ -1213,11 +1214,11 @@ groupRangeAndSimilarityAndMean <- function(group)
         vCovarMean[covar] <- varmean
         vCovarMoreThan2[covar] <- length(unique(values)) > 2
     }
-    dycCovarMean <- namedVector(NA, atts$dycCovar)
-    dycCovarRange <- namedVector(NA, atts$dycCovar)
-    dycCovarRange2 <- matrix(NA, 2, length(atts$dycCovar))
-    colnames(dycCovarRange2) <- atts$dycCovar
-    for (covar in seq(along=atts$dycCovar))
+    dycCovarMean <- namedVector(NA, atts$dycCovars)
+    dycCovarRange <- namedVector(NA, atts$dycCovars)
+    dycCovarRange2 <- matrix(NA, 2, length(atts$dycCovars))
+    colnames(dycCovarRange2) <- atts$dycCovars
+    for (covar in seq(along=atts$dycCovars))
     {
         if (length(group) > 1)
             stop("error in dyadic constant covariate, group create")
@@ -1230,9 +1231,9 @@ groupRangeAndSimilarityAndMean <- function(group)
         dycCovarRange[covar] <- attr(group[[1]]$dycCovars[[j]], "range")
         dycCovarRange2[, covar] <- attr(group[[1]]$dycCovars[[j]], "range2")
     }
-    dyvCovarMean <- namedVector(NA, atts$dyvCovar)
-    dyvCovarRange <- namedVector(NA, atts$dyvCovar)
-    for (covar in seq(along=atts$dyvCovar))
+    dyvCovarMean <- namedVector(NA, atts$dyvCovars)
+    dyvCovarRange <- namedVector(NA, atts$dyvCovars)
+    for (covar in seq(along=atts$dyvCovars))
     {
         vartotal <- 0
         nonMissingCount <- 0
@@ -1541,7 +1542,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
                 stop('covariate names inconsistent')
             }
             attribs <- attributes(objlist[[i]]$dycCovars[[j]])
-            if (is.null(dycnodeSets[covarsub]))
+            if (is.null(dycnodeSets[[covarsub]]))
             {
                 dycnodeSets[[covarsub]] <- attribs[['nodeSet']]
             }
@@ -1731,9 +1732,11 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     tmp <- getGroupNetRanges(group)
     colnames(tmp) <- netnames
     attr(group, "netRanges") <- tmp
-    ## copy the global attributes down to individual level where appropriate
+
+    ##copy the global attributes down to individual level where appropriate
     ##group <- copyGroupAttributes(group, "depvars", "balmean", "balmean")
-    ##group <- copyGroupAttributes(group, "depvars", "structmean", "structmean")
+    ##group <- copyGroupAttributes(group, "depvars", "structmean",
+    ## "structmean")
     group <- copyGroupAttributes(group, "depvars", "symmetric", "symmetric")
     ##group <- copyGroupAttributes(group, "depvars", "averageInDegree",
     ##                             "averageInDegree")
@@ -1743,25 +1746,35 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
     group <- copyGroupAttributes(group, "depvars", "bposzvar", "poszvar")
     group <- copyGroupAttributes(group, "depvars", "bRange", "range")
     group <- copyGroupAttributes(group, "depvars", "behRange", "behRange")
-    group <- copyGroupAttributes(group, "depvars", "bMoreThan2", "moreThan2")
+    group <- copyGroupAttributes(group, "depvars", "bMoreThan2",
+                                 "moreThan2")
     group <- copyGroupAttributes(group, "depvars", "anyMissing", "missing")
-    group <- copyGroupAttributes(group, "depvars", "structural", "structural")
+    group <- copyGroupAttributes(group, "depvars", "structural",
+                                 "structural")
 
     ##group <- copyGroupAttributes(group, "vCovars", "vCovarSim", "simMean")
-    group <- copyGroupAttributes(group, "vCovars", "vCovarRange", "range", TRUE)
-    ##group <- copyGroupAttributes(group, "vCovars", "vCovarMean", "mean", TRUE)
-    group <- copyGroupAttributes(group, "vCovars", "vCovarPoszvar", "poszvar")
+    group <- copyGroupAttributes(group, "vCovars", "vCovarRange", "range",
+                                 TRUE)
+    ##group <- copyGroupAttributes(group, "vCovars", "vCovarMean", "mean",
+    ## TRUE)
+    group <- copyGroupAttributes(group, "vCovars", "vCovarPoszvar",
+                                 "poszvar")
     group <- copyGroupAttributes(group, "vCovars", "vCovarMoreThan2",
                                  "moreThan2")
-    ##group <- copyGroupAttributes(group, "dycCovars", "dycCovarMean", "mean")
+    ##group <- copyGroupAttributes(group, "dycCovars", "dycCovarMean",
+    ##  "mean")
     group <- copyGroupAttributes(group, "dycCovars", "dycCovarRange2",
                                  "range2", TRUE)
-    ##group <- copyGroupAttributes(group, "dyvCovars", "dyvCovarMean", "mean")
+    ##group <- copyGroupAttributes(group, "dyvCovars", "dyvCovarMean",
+    ## "mean")
     group <- copyGroupAttributes(group, "dyvCovars", "dyvCovarRange",
                                  "range", TRUE)
     group
 }
 ##@copyGroupAttributes DataCreate
+## copies attribute groupattrname from the top level to the attribute
+## attrname of the corresponding objects of vartype in the subsidiary data
+## objects.
 copyGroupAttributes <- function(group, vartype, groupattrname, attrname,
                                 storage.mode=FALSE)
 {

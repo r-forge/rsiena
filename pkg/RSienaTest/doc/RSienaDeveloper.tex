@@ -156,7 +156,10 @@ below.
   `path-to-R.exe' in the command above.
 \item You may get warning messages from CYGWIN. This is caused by a recent
   upgrade in RTools version 2.12. To suppress the warnings, set the environment
-  variable \verb|CYGWIN| to the value \verb|nodosfilewarnings|.
+  variable \verb|CYGWIN| to the value \verb|nodosfilewarnings|. (CYGWIN may also
+  give you messages if you try to use tar to unpack the tar ball. If so,
+  set the environment variable \verb|TAR_OPTIONS| to
+\verb|--no-same-owner --no-same-permissions|.)
 \item When this one is OK, type\\
 \verb|R CMD INSTALL RSiena_1.0.n.tar.gz|\\
 (where \verb|n| is adjusted to match the file you have just created.)

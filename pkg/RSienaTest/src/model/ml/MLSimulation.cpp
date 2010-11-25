@@ -300,8 +300,11 @@ void MLSimulation::initializeMCMCcycle()
 
 	// clear storage for the sampled parameters.
 	this->lBayesAcceptances.clear();
-	this->lsampledBasicRates.clear();
 	this->lcandidates.clear();
+	for (unsigned i = 0; i < this->lvariables.size(); i++)
+	  {
+		this->lvariables[i]->clearSampledBasicRates();
+	  }
 
 }
 
@@ -562,61 +565,6 @@ int MLSimulation::BayesAcceptances(unsigned iteration) const
 	}
 
 }
-/**
- * Returns the sampled basic rate parameter for the given iteration.
- */
-
-double MLSimulation::sampledBasicRates(unsigned iteration) const
-{
-	if (iteration < this->lsampledBasicRates.size())
-	{
-		return this->lsampledBasicRates[iteration];
-	}
-	else
-	{
-		throw std::out_of_range("The number" + toString(iteration) +
-			" is not in the range [0," +
-			toString(this->lsampledBasicRates.size()) + "].");
-	}
-
-}
-/**
- * Stores the sampled basic rate parameter for the next iteration.
- */
-
-void MLSimulation::sampledBasicRates(double value)
-{
-	this->lsampledBasicRates.push_back(value);
-}
-/**
- * Returns the shape parameter used in the sampled basic rate parameter for
- * the given iteration.
- */
-
-int MLSimulation::sampledBasicRatesDistributions(unsigned iteration) const
-{
-	if (iteration < this->lsampledBasicRatesDistributions.size())
-	{
-		return this->lsampledBasicRatesDistributions[iteration];
-	}
-	else
-	{
-		throw std::out_of_range("The number" + toString(iteration) +
-			" is not in the range [0," +
-			toString(this->lsampledBasicRatesDistributions.size()) + "].");
-	}
-
-}
-/**
- * Stores the shape parameter used in the sampled basic rate parameter for the
- * next iteration.
- */
-
-void MLSimulation::sampledBasicRatesDistributions(int value)
-{
-	this->lsampledBasicRatesDistributions.push_back(value);
-}
-
 /**
  * Returns the candidate value for the given iteration for the given effect.
  * The candidate values are updated in the MHPstep of a Bayesian simulation.

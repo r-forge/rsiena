@@ -38,7 +38,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
    complete iterations at each call.
    If FALSE, multiple processes execute a single wave at each call.}
   \item{\dots}{Arguments for the simulation function, see
-    \code{\link{simstats0c}}: usually, \code{data} and \code{effects}; possibly also
+    \code{\link{simstats0c}}:
+	usually, \code{data} and \code{effects}; possibly also
     \code{prevAns} if a previous reasonable provisional estimate was obtained
     for the same model specification.}
 }
@@ -57,7 +58,11 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 }
 \value{
   Returns an object of class "sienaFit", some parts of which are:
-  \item{theta }{Fitted value of theta.}
+  \item{OK}{Boolean indicating successful termination}
+  \item{termination}{Character string, values: "OK", "Error", or
+	"UserInterrupt". "UserInterrupt" indicates that the user asked for early
+  termination before phase 3. }
+  \item{theta}{Fitted value of theta.}
   \item{covtheta}{Estimated covariance matrix of theta.}
   \item{dfra}{Matrix of estimated derivatives.}
   \item{sf}{Matrix of deviations from target in phase 3.}
@@ -65,11 +70,12 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{targets}{Observed statistics.}
   \item{targets2}{Observed statistics for each wave.}
   \item{ssc}{Score function contributions for each wave for each
-	simulation in phase 3.}
-  \item{sims}{List of simulated networks, currently just one entry for
-  the first network. Each a list of edgelists, one for each period.
+	simulation in phase 3. Zero if finite difference method is used}
+ \item{sims}{List of simulated networks. Each a list of edgelists, one
+   for each period.}
+   \item{Phase3nits}{Number of iterations actually performed in phase 3.}
   Writes text output to the file named "projname.out", where projname is defined
-  in the sienaModel object x.}
+  in the sienaModel object x.
 }
 \references{\itemize{\item Schweinberger, M., and Snijders, T.A.B., (2007).
        Markov models for digraph panel data: Monte Carlo-based

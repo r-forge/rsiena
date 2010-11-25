@@ -29,25 +29,7 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     }
     if (TERM)
     {
-        f <- FRANstore()
-        f$pModel <- NULL
-        f$pData <- NULL
-        FRANstore(NULL) ## clear the stored object
-        if (is.null(z$print) || z$print)
-        {
-            PrintReport(z, x)
-        }
-        if (sum(z$test))
-        {
-            z$fra <- colMeans(z$sf, na.rm=TRUE)
-            ans <- ScoreTest(z$pp, z$dfra, z$msf, z$fra, z$test, x$maxlike)
-            z <- c(z, ans)
-            TestOutput(z, x)
-        }
-        if (!is.null(z$dfra))
-        {
-            dimnames(z$dfra)[[1]] <- as.list(z$requestedEffects$shortName)
-        }
+        z <- terminateFRAN(z, x)
         return(z)
     }
     ######################################################################
@@ -160,6 +142,7 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ## Note that we do not yet deal with rate effects other than the basic
         dff <- matrix(0, nrow=z$pp, ncol=z$pp)
         nPeriods <- length(ans[[7]])
+        dff2 <- array(0, dim=c(nPeriods, z$pp, z$pp))
         for (period in 1:nPeriods)
         {
             dffraw <- ans[[7]][[period]]
@@ -198,6 +181,7 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                 rawsub <- rawsub + nonRates * nonRates
                 dffPeriod <- dffPeriod + t(dffPeriod)
                 diag(dffPeriod) <- diag(dffPeriod) / 2
+                dff2[period , , ] <- dff2[period, , ] - dffPeriod
                 dff <- dff - dffPeriod
             }
         }
@@ -205,11 +189,13 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     else
     {
         dff <- NULL
+        dff2 <- NULL
     }
     ## browser()
 
     list(fra = fra, ntim0 = NULL, feasible = TRUE, OK = TRUE,
-         sims=sims, dff = dff, chain = list(ans[[6]]), accepts=ans[[8]],
+         sims=sims, dff = dff, dff2=dff2,
+         chain = list(ans[[6]]), accepts=ans[[8]],
          rejects= ans[[9]])
 }
 

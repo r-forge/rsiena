@@ -29,31 +29,7 @@ simstats0c <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     }
     if (TERM)
     {
-        if (z$cconditional)
-        {
-            z$rate<- colMeans(z$ntim, na.rm=TRUE)
-            z$vrate <- apply(z$ntim, 2, sd, na.rm=TRUE)
-            z$theta[z$posj] <- z$theta[z$posj] * z$rate
-            z$covtheta[z$posj, ] <- z$covtheta[z$posj, ] * z$rate
-            z$covtheta[, z$posj] <- z$covtheta[,z$posj ] * z$rate
-        }
-        f <- FRANstore()
-        f$pModel <- NULL
-        f$pData <- NULL
-        FRANstore(NULL) ## clear the stored object
-        if (is.null(z$print))
-        {
-            PrintReport(z, x)
-
-            if (sum(z$test))
-            {
-                z$fra <- colMeans(z$sf, na.rm=TRUE)
-                ans <- ScoreTest(z$pp, z$dfra, z$msf, z$fra, z$test, x$maxlike)
-                z <- c(z, ans)
-                TestOutput(z, x)
-            }
-            dimnames(z$dfra)[[1]] <- as.list(z$requestedEffects$shortName)
-        }
+        z <- terminateFRAN(z, x)
         return(z)
     }
     ## ####################################################################

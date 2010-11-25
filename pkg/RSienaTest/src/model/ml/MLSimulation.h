@@ -80,10 +80,6 @@ public:
 	void initializeMCMCcycle();
 	void MHPstep();
 	int BayesAcceptances(unsigned iteration) const;
-	double sampledBasicRates(unsigned iteration) const;
-	void sampledBasicRates(double value);
-	int sampledBasicRatesDistributions(unsigned iteration) const;
-	void sampledBasicRatesDistributions(int value);
 	double candidates(const EffectInfo * pEffect, unsigned iteration) const;
 	void candidates(const EffectInfo * pEffect, double value);
 
@@ -106,8 +102,6 @@ private:
 	int lacceptances[7];
 	int lrejections[7];
 	vector<int> lBayesAcceptances;
-	vector<double> lsampledBasicRates;
-	vector<int> lsampledBasicRatesDistributions;
 	map<const EffectInfo *, vector<double> > lcandidates;
 	double lmissingNetworkProbability;
 	double lmissingBehaviorProbability;

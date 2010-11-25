@@ -72,6 +72,9 @@ public:
 	int id() const;
 	virtual bool networkVariable() const;
 	virtual bool behaviorVariable() const;
+	virtual bool symmetric() const;
+	virtual bool constrained() const;
+	virtual int alter() const;
 
 	inline const Function * pEvaluationFunction() const;
 	inline const Function * pEndowmentFunction() const;
@@ -80,6 +83,7 @@ public:
 	inline int period() const;
 	virtual bool canMakeChange(int actor) const;
 	virtual void makeChange(int actor) = 0;
+	bool successfulChange() const;
 
 	virtual void actOnJoiner(const SimulationActorSet * pActorSet,
 		int actor);
@@ -98,6 +102,9 @@ public:
 	void accumulateRateScores(double tau,
 		const DependentVariable * pSelectedVariable = 0,
 		int selectedActor = 0);
+	void accumulateRateScores(double tau,
+		const DependentVariable * pSelectedVariable,
+		int selectedActor, int alter);
 	double basicRateScore() const;
 	double constantCovariateScore(const ConstantCovariate * pCovariate) const;
 	double changingCovariateScore(const ChangingCovariate * pCovariate) const;
@@ -115,7 +122,8 @@ public:
 	 */
 	virtual double probability(MiniStep * pMiniStep) = 0;
 
-	virtual bool validMiniStep(const MiniStep * pMiniStep) const;
+	virtual bool validMiniStep(const MiniStep * pMiniStep,
+		bool checkUpOnlyDownOnlyConditions = true) const;
 
 	void updateEffectParameters();
 	void updateEffectInfoParameters();
@@ -141,14 +149,21 @@ public:
 	double basicRateDerivative() const;
 	virtual double calculateChoiceProbability(const MiniStep * pMiniStep) const = 0;
 
-	// Bayesian related
+	// Bayesian related: get new values
 	void sampleBasicRate(int miniStepCount);
 	double sampleParameters(double scaleFactor);
+	// get and set sampled basic rates and shapes
+	double sampledBasicRates(unsigned iteration) const;
+	void sampledBasicRates(double value);
+	int sampledBasicRatesDistributions(unsigned iteration) const;
+	void sampledBasicRatesDistributions(int value);
+	void clearSampledBasicRates();
 
 protected:
 	inline EpochSimulation * pSimulation() const;
 	void simulatedDistance(int distance);
 	void invalidateRates();
+	void successfulChange(bool success);
 
 private:
 	void initializeFunction(Function * pFunction,
@@ -239,11 +254,18 @@ private:
 
 	int lvalidRates;
 
-	// store for number of acceptances and rejections for non basic rate 
+	// store for number of acceptances and rejections for non basic rate
 	// parameters in Bayesian modelling
 
 	int lacceptances;
 	int lrejections;
+
+	// flag to indicate we gave up on a step due to uponly and other filters
+	bool lsuccessfulChange;
+	// store for sampled parameters and the shapes used for basic rate
+	// parameters
+	vector<double> lsampledBasicRates;
+	vector<int> lsampledBasicRatesDistributions;
 
 };
 
