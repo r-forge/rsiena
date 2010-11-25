@@ -98,6 +98,17 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                     prevEffects$initialValue[match(efflist, oldlist)][use]
             }
         }
+        ## get data object into group format to save coping with two
+        ## different formats
+        if (inherits(data, 'sienaGroup'))
+        {
+            nGroup <- length(data)
+        }
+        else
+        {
+            nGroup <- 1
+            data <- sienaGroupCreate(list(data), singleOK=TRUE)
+        }
         ## add any effects needed for time dummies
         tmp <- sienaTimeFix(effects, data)
         data <- tmp$data
@@ -106,18 +117,17 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         interactionNos <- unique(c(effects$effect1, effects$effect2,
                                    effects$effect3))
         interactionNos <- interactionNos[interactionNos > 0]
-        interactionMainEffects <- effects[interactionNos, ]
+        interactions <- effects$effectNumber %in%
+                                          interactionNos
+        interactionMainEffects <- effects[interactions, ]
         effects$requested <- effects$include
         requestedEffects <- effects[effects$include, ]
 
-        effects$include[interactionNos] <- TRUE
-        effects <- effects[effects$include,]
+        effects$include[interactions] <- TRUE
+        effects <- effects[effects$include, ]
 
         ## split and rejoin both versions before continuing
-        if (inherits(data, "sienaGroup"))
-            depvarnames <- names(data[[1]]$depvars)
-        else
-            depvarnames <- names(data$depvars)
+        depvarnames <- names(data[[1]]$depvars)
 
         effects1 <- split(requestedEffects, requestedEffects$name)
         effects1order <- match(depvarnames, names(effects1))
@@ -146,17 +156,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         requestedEffects$functionName <- effects[effects$requested,
                                                  "functionName"]
 
-        ## get data object into group format to save coping with two
-        ## different formats
-        if (inherits(data, 'sienaGroup'))
-        {
-            nGroup <- length(data)
-        }
-        else
-        {
-            nGroup <- 1
-            data <- sienaGroupCreate(list(data), singleOK=TRUE)
-        }
         ## if not specified whether conditional or nor, set to conditional
         ## iff there is only one dependent variable (therefore number 1)
         ## and not maxlike
@@ -309,7 +308,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         nGroup <- f$nGroup
         f[(nGroup + 1): length(f)] <- NULL
     }
-    ##browser()
     pData <- .Call('setupData', PACKAGE=pkgname,
                    lapply(f, function(x)(as.integer(x$observations))),
                    lapply(f, function(x)(x$nodeSets)))
@@ -329,7 +327,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                 pData, lapply(f, function(x)x$dyvCovars))
     ans <-.Call('ExogEvent', PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$exog))
-
     ## split the names of the constraints
     higher <- attr(f, "allHigher")
     disjoint <- attr(f, "allDisjoint")
@@ -353,7 +350,12 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         storage.mode(effects$period) <- 'integer'
         effects$effectPtr <- rep(NA, nrow(effects))
         splitFactor <- factor(effects$name, levels=attr(f, "netnames"))
+        if (!all(attr(f,"netnames") %in% effects$name))
+        {
+            stop("Must have at least one effect for each dependent variable")
+        }
         myeffects <- split(effects, splitFactor)
+        myCompleteEffects <- myeffects
         ## remove interaction effects and save till later
         basicEffects <-
             lapply(myeffects, function(x)
@@ -361,21 +363,38 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                    x[!x$shortName %in% c("unspInt", "behUnspInt"), ]
                }
                    )
+         basicEffectsl <-
+            lapply(myeffects, function(x)
+               {
+                   !x$shortName %in% c("unspInt", "behUnspInt")
+               }
+                   )
+
         interactionEffects <-
             lapply(myeffects, function(x)
                {
                    x[x$shortName %in% c("unspInt", "behUnspInt"), ]
                }
                    )
-        ## store effects objects as we may need to recreate them
+         interactionEffectsl <-
+            lapply(myeffects, function(x)
+               {
+                   x$shortName %in% c("unspInt", "behUnspInt")
+               }
+                   )
+       ## store effects objects as we may need to recreate them
         f$interactionEffects <- interactionEffects
         f$basicEffects <- basicEffects
+        f$interactionEffectsl <- interactionEffectsl
+        f$basicEffectsl <- basicEffectsl
     }
     else
     {
-        myeffects <- ff$myeffects
+        myCompleteEffects <- ff$myCompleteEffects
         basicEffects <- ff$basicEffects
         interactionEffects <- ff$interactionEffects
+        basicEffectsl <- ff$basicEffectsl
+        interactionEffectsl <- ff$interactionEffectsl
         types <- ff$types
     }
     ans <- .Call('effects', PACKAGE=pkgname, pData, basicEffects)
@@ -398,7 +417,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     }
     ans <- .Call('interactionEffects', PACKAGE=pkgname,
                  pData, pModel, interactionEffects)
-    ## copy these pointers to the interaction effects and then rejoin
+    ## copy these pointers to the interaction effects and then insert in
+    ## effects object in the same rows for later use
     for (i in 1:length(ans[[1]])) ## ans is a list of lists of
         ## pointers to effects. Each list corresponds to one
         ## dependent variable
@@ -408,11 +428,14 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             effectPtr <- ans[[1]][[i]]
             interactionEffects[[i]]$effectPtr <- effectPtr
         }
-        myeffects[[i]] <- rbind(basicEffects[[i]], interactionEffects[[i]])
+        myCompleteEffects[[i]][basicEffectsl[[i]], ] <- basicEffects[[i]]
+        myCompleteEffects[[i]][interactionEffectsl[[i]],] <-
+            interactionEffects[[i]]
+        ##myeffects[[i]] <- myeffects[[i]][order(myeffects[[i]]$effectNumber),]
     }
     ## remove the effects only created as underlying effects
-    ## for interaction effects
-    myeffects <- lapply(myeffects, function(x)
+    ## for interaction effects. first store the original for use next time
+    myeffects <- lapply(myCompleteEffects, function(x)
                     {
                         x[x$requested, ]
                     }
@@ -505,6 +528,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
          #                     onexit = FALSE)
     }
     f$myeffects <- myeffects
+    f$myCompleteEffects <- myCompleteEffects
     if (!initC)
     {
         if (is.null(z$print) || z$print)
@@ -1585,7 +1609,7 @@ fixUpEffectNames <- function(effects)
            }, y=effects)
 
     ##validate user-specified network interactions
-    interactions <- effects[effects$shortName == "unspInt" &
+    interactions <- effects[effects$shortName == "unspInt" & effects$include &
                             effects$effect1 > 0, ]
     if (nrow(interactions) > 0)
     {
@@ -1687,7 +1711,7 @@ fixUpEffectNames <- function(effects)
                }
                tmpname
            }, y=interactions, z=effects)
-        effects[effects$shortName == "unspInt" &
+        effects[effects$shortName == "unspInt" & effects$include &
                 !is.na(effects$effect1), c("effectName", "functionName")] <-
                     unspIntNames
     }

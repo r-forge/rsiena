@@ -1199,10 +1199,8 @@ void DependentVariable::updateEffectInfoParameters()
 void DependentVariable::sampleBasicRate(int miniStepCount)
 {
 	this->lbasicRate = nextGamma(miniStepCount + 1, 1.0 / this->n());
-	MLSimulation * pMLSimulation =
-		dynamic_cast<MLSimulation * >(this->pSimulation());
-	pMLSimulation->sampledBasicRates(this->lbasicRate);
-	pMLSimulation->sampledBasicRatesDistributions(miniStepCount + 1);
+	this->sampledBasicRates(this->lbasicRate);
+	this->sampledBasicRatesDistributions(miniStepCount + 1);
 	this->lvalidRates = false;
 }
 /**
@@ -1248,7 +1246,68 @@ double DependentVariable::sampleParameters(double scaleFactor)
 	}
 	return priornew - priorold;
 }
+/**
+ * Clears the sampled basic rate parameter store.
+ */
 
+void DependentVariable::clearSampledBasicRates()
+{
+  this->lsampledBasicRates.clear();
+}
+/**
+ * Returns the sampled basic rate parameter for the given iteration.
+ */
+
+double DependentVariable::sampledBasicRates(unsigned iteration) const
+{
+  if (iteration < this->lsampledBasicRates.size())
+	{
+		return this->lsampledBasicRates[iteration];
+	}
+	else
+	{
+		throw std::out_of_range("The number" + toString(iteration) +
+			" is not in the range [0," +
+			toString(this->lsampledBasicRates.size()) + "].");
+	}
+
+}
+/**
+ * Stores the sampled basic rate parameter for the next iteration.
+ */
+
+void DependentVariable::sampledBasicRates(double value)
+{
+	this->lsampledBasicRates.push_back(value);
+}
+/**
+ * Returns the shape parameter used in the sampled basic rate parameter for
+ * the given iteration.
+ */
+
+int DependentVariable::sampledBasicRatesDistributions(unsigned iteration) const
+{
+	if (iteration < this->lsampledBasicRatesDistributions.size())
+	{
+		return this->lsampledBasicRatesDistributions[iteration];
+	}
+	else
+	{
+		throw std::out_of_range("The number" + toString(iteration) +
+			" is not in the range [0," +
+			toString(this->lsampledBasicRatesDistributions.size()) + "].");
+	}
+
+}
+/**
+ * Stores the shape parameter used in the sampled basic rate parameter for the
+ * next iteration.
+ */
+
+void DependentVariable::sampledBasicRatesDistributions(int value)
+{
+	this->lsampledBasicRatesDistributions.push_back(value);
+}
 // ----------------------------------------------------------------------------
 // Section: Properties
 // ----------------------------------------------------------------------------

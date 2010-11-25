@@ -113,10 +113,10 @@ Total of 269 iteration steps.
 > mydata <- sienaDataCreate(mynet1, mynet2)
 > myeff <- getEffects(mydata)
 > myeff <- setEffect(myeff, linear, initialValue=0.34699930338, name="mynet2")
-                       name shortName type interaction1 interaction2 include
-mynet2.objEffects.32 mynet2    linear eval                              TRUE
-                     parm   fix  test initialValue timeDummy
-mynet2.objEffects.32    0 FALSE FALSE    0.3469993         ,
+                    name shortName type interaction1 interaction2 include parm
+mynet2.obj.eval.1 mynet2    linear eval                              TRUE    0
+                    fix  test initialValue timeDummy
+mynet2.obj.eval.1 FALSE FALSE    0.3469993         ,
 > ##myeff$initialValue[98] <- 0.34699930338 ## siena3 starting values differ
 > ##test10
 > print('test10')
@@ -160,8 +160,8 @@ Total of 371 iteration steps.
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 > data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj")
 Loading required package: network
-Classes for Relational Data
-Version 1.4-1 created on July 26, 2008.
+     Classes for Relational Data
+Version      1.5-1 created on      October 18, 2010.
 copyright (c) 2005, Carter T. Butts, University of California-Irvine
                     Mark S. Handcock, University of Washington
                     David R. Hunter, Penn State University

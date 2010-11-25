@@ -1,3 +1,28 @@
+2010-11-07 R-forge revision 126
+
+	* DESCRIPTION: new main version number for RSiena, 1.0.12
+	* R/sienaTimeTest.r, R/effects.r, R/sienaeffects.r,
+	R/effectsMethods.r, man/sienaTimeTest.Rd, plot.sienaTimeTest.Rd,
+	man/print.sienaEffects.Rd, man/includeInteraction.Rd:
+	amendment and extension of sienaTimeTest and sienaTimeFix.
+	includeInteraction now adds rows if necessary and has parameter to
+	suppress printing. Time dummy rows can optionally be added to
+	print and summary of sienaEffects object.
+	* src/siena07internals.cpp, src/model/ml/MLSimulation.cpp,
+        src/model/ml/MLSimulation.h, src/model/variables/DependentVariable.cpp,
+        src/model/variables/DependentVariable.h: return values for rates
+	for multiple dependent variables.
+	* doc/RSiena.bib: minor updates
+	* man/sienaNet.Rd, getEffects.Rd, siena07.Rd, sienaDataCreate.Rd,
+	doc/RSIENAspec.tex: documentation
+	* tests/parallel.Rout.save: minor changes for compatibility
+	* R/terminateFRAN.r, R/simstatsc.r, R/maxlikec.r: new function
+	terminateFRAN in separate file.
+	* R/Sienatest.r: added traps for matrix inversion failure
+	* R/sienaDataCreate.r, R/initializeFRAN: minor amendments
+	* R/phase1.r, R/phase3.r, R/maxlikec.c: return contributions to
+	dfra for maximum likelihood and finite differences by wave
+
 2010-11-06 R-forge revision 125
 
 	* data/allEffects.csv,

@@ -41,11 +41,11 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     #######################################################
     if (useCluster)
     {
-        if (!is.null(x$FRANname) && x$FRANname != "simstats0c")
-        {
-            stop("Multiple processors only for simstats0c at present")
-        }
-        if (!clusterIter && nbrNodes >= z$f$observations)
+       # if (!is.null(x$FRANname) && x$FRANname != "simstats0c")
+       # {
+       #     stop("Multiple processors only for simstats0c at present")
+       # }
+        if (!clusterIter && nbrNodes >= z$observations)
         {
             stop("Not enough observations to use the nodes")
         }
