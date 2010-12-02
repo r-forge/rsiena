@@ -204,7 +204,7 @@ setEffect <- function(myeff, shortName, parameter=0,
                       timeDummy=",",
                       include=TRUE, name=myeff$name[1],
                       type="eval", interaction1="", interaction2="",
-                      character=FALSE)
+                       period=1, group=1, character=FALSE)
 {
     if (!character)
     {
@@ -214,7 +214,9 @@ setEffect <- function(myeff, shortName, parameter=0,
     myeff$name == name &
     myeff$type == type &
     myeff$interaction1 == interaction1 &
-    myeff$interaction2 == interaction2
+    myeff$interaction2 == interaction2 &
+    (is.na(myeff$period) | myeff$period == period) &
+    myeff$group == group
     if (sum(use) == 0)
     {
         stop("Effect not found")
@@ -231,6 +233,6 @@ setEffect <- function(myeff, shortName, parameter=0,
     myeff[use, "timeDummy"] <- timeDummy
     print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
                        "interaction2", "include", "parm", "fix", "test",
-                       "initialValue", "timeDummy")])
+                       "initialValue", "timeDummy", "period", "group")])
     myeff
 }

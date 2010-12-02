@@ -96,7 +96,8 @@ A \nnm{siena} (or \nnm{sienaGroup}) object and a \nnm{sienaEffects} (or
 \item [Virtual data] A set of dependent variables, actor sets representing the
   nodes for the variables, and covariates of various types. Never actually
   exist, but the \R routines must check that each data object is consistent with
-  the virtual data.
+  the virtual data. The virtual data contains details of inter-network
+  constraints: \nnm{higher, atLeastOne, disjoint}
 \item[Data] Each data object consists of several waves for each of the dependent
   variables, each of which uses some subset of each corresponding actor set,
   together with covariate objects of appropriate sizes.

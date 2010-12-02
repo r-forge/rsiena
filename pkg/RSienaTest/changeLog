@@ -1,3 +1,59 @@
+2010-12-02 R-forge revision 128
+
+	* data/allEffects.csv: removed to effect from bipartite bipartite,
+	added altDist2W and simDist2W to group covarNetNetObjective.
+	* R/effects.r: fixed bug meaning covNetNet effect was not added
+	for behavior variables. Altered code for covarNetNetEff to cope
+	with new effects.
+	* R/effectsMethods.r: now interaction names may be expanded even
+	in the absence of time dummies.
+	* R/initializeFRAN.r: make targets2 for maximum likelihood a
+	matrix of the correct size, containing zeros.
+	* R/initializeFRAN.r, R/sienaModelCreate, man/sienaModelCreate.Rd:
+	Add multiplication factor, altered default ML probabiltities
+	* R/sienaEffects.r: added period and group to setEffect so can set
+	initial values on basic rates.
+	* src/model/effects/CovariateDistance2AlterEffect.cpp: fixed a bug
+	in calculation with parameter set to 2.
+	* src/model/effects/EffectFactory.cpp,
+        src/model/effects/generic/CovariateDistance2AlterNetworkFunction.cpp
+	src/model/effects/generic/CovariateDistance2AlterNetworkFunction.h
+	src/model/effects/generic/CovariateDistance2NetworkFunction.cpp
+	src/model/effects/generic/CovariateDistance2NetworkFunction.h
+	src/model/effects/generic/CovariateDistance2SimilarityNetworkFunction.
+	cpp
+	src/model/effects/generic/CovariateDistance2SimilarityNetworkFunction.h
+	src/model/effects/generic/CovariateNetworkAlterFunction.cpp
+	src/model/effects/generic/CovariateNetworkAlterFunction.h
+	src/model/effects/generic/MixedNetworkAlterFunction.cpp
+	src/model/effects/generic/MixedNetworkAlterFunction.h
+	src/model/effects/generic/MixedTwoPathFunction.cpp
+	src/model/effects/generic/MixedTwoPathFunction.h
+	src/model/effects/generic/NetworkAlterFunction.h
+	src/model/tables/MixedConfigurationTable.cpp
+	src/model/tables/MixedConfigurationTable.h
+	src/model/tables/MixedEgocentricConfigurationTable.cpp
+	src/model/tables/MixedEgocentricConfigurationTable.h
+	src/model/tables/MixedTwoPathTable.cpp
+	src/model/tables/MixedTwoPathTable.h
+	src/model/tables/TwoNetworkCache.cpp
+	src/model/tables/TwoNetworkCache.h
+	src/model/tables/Cache.cpp
+	src/model/tables/Cache.h
+	added new effects: to, altDist2W, simDist2W. Altered altDist2 and
+	simDist2 to  be generic effects which use same functions as
+	altDist2W, simDist2W. New two-network cache with mixed-two-path
+	table.
+	* src/model/ml/MLSimulation.cpp: changes to ML routines
+	* src/model/variables/DependentVariable.cpp,
+	 src/model/variables/DependentVariable.h: added calculation loop
+	for rate effects depending on behavior variables, and stored
+	the product term for the scores. Also stored product term for
+	model type B scores.
+	* src/model/variables/NetworkVariable.cpp: fixed bug in
+	calculation of symmetric model type BFORCE scores.
+	* R/sienaTimeTest.r: added code for finitedifferences and ML fits.
+
 2010-11-25 R-forge revision 127
 
 	* man/s_man400.tex: updated examples of sienaTimeTest.

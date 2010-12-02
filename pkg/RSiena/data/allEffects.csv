@@ -174,5 +174,6 @@ bipartiteSymmetricObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx"
 nonSymmetricBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
 nonSymmetricBipartiteObjective,from xxxxxx agreement,"mixed triplets XWW, W = xxxxxx",from,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 bipartiteBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
-bipartiteBipartiteObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx",to,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNetNetObjective,from xxxxxx agr. x same yyyyyy,"m.tr. XWW, W = xxxxxx, same yyyyyy",covNetNet,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
+covarNetNetObjective,yyyyyy alter at distance 2 on xxxxxx,yyyyyy alter at distance 2 on xxxxxx,altDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
+covarNetNetObjective,yyyyyy similarity at distance 2 on xxxxxx,yyyyyy similarity at distance 2 on xxxxxx,simDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,

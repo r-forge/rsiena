@@ -1615,7 +1615,7 @@ in addition to this script.
 
 # Try a plot to see a visual representation of the time test:
 
-    plot(tt2, effects=1:4, dims=c(2,2))
+    plot(tt2, effects=1:4)
 
 # The <<effects>> parameter indicates the effects for which plots
 # are produced, and the <<dims>> the layout on the graphics device.
@@ -1651,7 +1651,7 @@ in addition to this script.
 
     tt3 <- sienaTimeTest(ans3)
     summary(tt3)
-    plot(tt3, effects=1:4, dims=c(2,2))
+    plot(tt3, effects=1:4)
 
 
 ######################### USING FEWER WAVES ##########################
@@ -5033,7 +5033,7 @@ and conduct the timetest through
 \begin{verbatim}
 ## Conduct the score type test to assess whether heterogeneity is present.
 tt2 <- sienaTimeTest(ans2)
-plot(tt2, effects=1:2, dim=c(1,2))
+plot(tt2, effects=1:2)
 \end{verbatim}
 If as a consequence of this analysis you wish to add time dummy terms,
 this may be done via
@@ -8210,10 +8210,25 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2010-12-02 R-forge revision 128:
+\begin{itemize}
+\item Corrections to scores for symmetric pairwise models
+\item ML now runs with missing data. Not yet sure it is correct!
+\item New multiple network effects: To, altDist2W, simDist2W.
+\item Can now use setEffects to update basic rate initial values
+\item multiplication factor for ML now a parameter in sienaModelCreate.
+\item Fixed bug meaning that covariate multiple network effects did not appear
+  if the covariates was a behavior variable.
+\item Can now run sienaTimeTest on fits from finite differences and maximum
+  likelihood. (Not totally sure it is correct yet!)
+\item User defined interactions (and time dummies) can be expanded when printing
+  the effects object, use parameter expandDummies=TRUE.
+\end{itemize}
 \item 2010-11-25 R-forge revision 126:
 \begin{itemize}
-\item Changed version of RSiena to be 1.0.12... RSiena and RSienaTest are
-  functionally the same at this point.
+\item Changed version of RSiena to be 1.0.12 and copied all new features which
+  were only in RSienaTest to RSiena. RSiena and RSienaTest are
+  functionally the same at this time.
 \item New version of sienaTimeTest and sienaTimeFix.
 \item Bayesian routine (experimental) can be used with multiple dependent
   variables.

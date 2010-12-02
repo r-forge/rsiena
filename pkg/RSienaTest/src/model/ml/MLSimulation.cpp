@@ -422,7 +422,6 @@ void MLSimulation::MLStep()
 //	int c0 = this->lcurrentPermutationLength;
 	int c0 = 40;
 //	PrintValue(getChainDF(*this->pChain()));
-	//Rprintf("stepType %d\n", stepType);
 	bool accept = false;
 	switch (stepType)
 	{
@@ -445,10 +444,10 @@ void MLSimulation::MLStep()
 		this->updateCurrentPermutationLength(accept);
 		break;
 	case 5:
-		//accept = this->insertRandomMissing();
+		accept = this->insertMissing();
 		break;
 	case 6:
-		//accept = this->deleteRandomMissing();
+		accept = this->deleteMissing();
 		break;
 	}
 	if (accept)
@@ -930,6 +929,7 @@ bool MLSimulation::insertPermute(int c0)
 
 	if (pLeftMiniStep->pOption() == pMiniStepA->pOption())
 	{
+// surely need to delete pLeftMiniStep here too?
 		return false;
 	}
 	if (pLeftMiniStep->diagonal() ||
@@ -975,6 +975,7 @@ bool MLSimulation::insertPermute(int c0)
 // 	if (this->lphase1)
 // 	{
 // 		Option * pOption= new Option(0, 0, 7);
+
 
 // 		pMiniStepB = this->lpChain->nextMiniStepForOption(*pOption, this->lpChain->pFirst());
 // 		PrintValue(getMiniStepDF(*pMiniStepB));
@@ -1366,6 +1367,10 @@ bool MLSimulation::deletePermute(int c0)
 			}
 
 			pMiniStepA = this->lpChain->randomMissingNetworkMiniStep();
+			if (pMiniStepA->pNext() == this->lpChain->pLast())
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -1375,9 +1380,14 @@ bool MLSimulation::deletePermute(int c0)
 			}
 
 			pMiniStepA = this->lpChain->randomMissingBehaviorMiniStep();
+			if (pMiniStepA->pNext() == this->lpChain->pLast())
+			{
+				return false;
+			}
 		}
 
 		pMiniStepB = this->lpChain->pLast();
+
 	}
 
 	if (pMiniStepA->networkMiniStep())

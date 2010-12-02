@@ -288,8 +288,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                 }
                   for (k in seq(along=xx$depvars))
                 {
-                    if (types[j] == 'behavior' &&
-                        attr(xx$depvars[[j]], 'nodeSet') == nodeSet)
+                    if (types[k] == 'behavior' &&
+                        attr(xx$depvars[[k]], 'nodeSet') == nodeSet)
                     {
                         objEffects <-
                             rbind(objEffects,
@@ -864,13 +864,15 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
     covarNetNetEff<- function(othernetname,
                               covarname, poszvar, moreThan2, name)
     {
-        if (poszvar && (!moreThan2))
+        objEffects <- createEffects("covarNetNetObjective", othernetname,
+                                   covarname, name=name,
+                                   groupName=groupName, group=group,
+                                   netType=netType)
+        if (!(poszvar && (!moreThan2)))
         {
-            createEffects("covarNetNetObjective", othernetname,
-                          covarname, name=name,
-                          groupName=groupName, group=group,
-                          netType=netType)
+            objEffects <- objEffects[objEffects$shortName != "covNetNet", ]
         }
+        objEffects
     }
     ###################################
     ## start of function getEffects
