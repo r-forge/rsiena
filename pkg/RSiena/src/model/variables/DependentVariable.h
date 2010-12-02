@@ -172,7 +172,9 @@ private:
 	bool constantRates() const;
 	double calculateRate(int i);
 	double structuralRate(int i) const;
+	double behaviorVariableRate(int i) const;
 	void updateCovariateRates();
+	void calculateScoreSumTerms();
 
 	// A simulation of the actor-based model, which owns this variable
 	EpochSimulation * lpSimulation;
@@ -248,6 +250,45 @@ private:
 
 	// Scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeScores;
+
+	// Sum term for scores for rate effects depending on constant covariates
+	map<const ConstantCovariate *, double> lconstantCovariateSumTerm;
+
+	// Sum term for scores for rate effects depending on changing covariates
+	map<const ChangingCovariate *, double> lchangingCovariateSumTerm;
+
+	// Sum term for scores for rate effects depending on behavior variables
+	map<const BehaviorVariable *, double> lbehaviorVariableSumTerm;
+
+	// Sum term for scores for rate effects depending on out degree
+	map<const NetworkVariable *, double> loutDegreeSumTerm;
+
+	// Sum term for scores for rate effects depending on in degree
+	map<const NetworkVariable *, double> linDegreeSumTerm;
+
+	// Sum term for scores for rate effects depending on reciprocal degree
+	map<const NetworkVariable *, double> lreciprocalDegreeSumTerm;
+
+	// Sum term for scores for rate effects depending on inverse degree
+	map<const NetworkVariable *, double> linverseOutDegreeSumTerm;
+
+	// Sum term for model B scores for rate effects depending on constant
+	// covariates
+	map<const ConstantCovariate *, double> lconstantCovariateModelBSumTerm;
+
+	// Sum term for model B scores for rate effects depending on changing
+	// covariates
+	map<const ChangingCovariate *, double> lchangingCovariateModelBSumTerm;
+
+	// Sum term for model B scores for rate effects depending on behavior
+	// variables
+	map<const BehaviorVariable *, double> lbehaviorVariableModelBSumTerm;
+
+	// Sum term for model B scores for rate effects depending on out degree
+	map<const NetworkVariable *, double> loutDegreeModelBSumTerm;
+
+	// Sum term for model B scores for rate effects depending on inverse degree
+	map<const NetworkVariable *, double> linverseOutDegreeModelBSumTerm;
 
 	// Indicates if the rates are valid and shouldn't be recalculated
 	// provided that the rates are constant during the period.

@@ -21,11 +21,23 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
         sink(fileName, split=TRUE)
     }
 
-    if (expandDummies && (includeOnly && !all(x[x$include, "timeDummy"] == ",")
-        || !all(x[, "timeDummy"] == ",")))
+    interactions <- x[x$shortName == "unspInt" & x$include &
+                            x$effect1 > 0, ]
+    if (expandDummies)
     {
-        x <- sienaTimeFix(x)$effects
-        x <- fixUpEffectNames(x)
+        if(includeOnly && !all(x[x$include, "timeDummy"] == ",")
+                          || !all(x[, "timeDummy"] == "," ))
+        {
+            x <- sienaTimeFix(x)$effects
+            x <- fixUpEffectNames(x)
+        }
+        else
+        {
+            if (nrow(interactions) > 0)
+            {
+                x <- fixUpEffectNames(x)
+            }
+        }
     }
     if (nrow(x) > 0)
     {
@@ -34,7 +46,7 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
         endowments <- !x$type[x$include] %in% c("rate", "eval")
         timeDummies <- !x$timeDummies[x$include] == ","
         specs <- x[, c("name", "effectName", "include", "fix", "test",
-                                "initialValue", "parm")]
+                       "initialValue", "parm")]
         if (includeOnly)
         {
             specs <- specs[x$include, ]

@@ -451,10 +451,11 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         else
         {
             z$targets <- rep(0, z$pp)
-            z$targets2 <- 0
+            z$targets2 <- ans
+            z$targets2[] <- 0
             z$maxlikeTargets <- rowSums(ans)
             z$maxlikeTargets2 <- ans
-            z$mult <- 1
+            z$mult <- x$mult
             z$nrunMH <- z$mult * sum(z$maxlikeTargets[z$effects$basicRate])
         }
     }

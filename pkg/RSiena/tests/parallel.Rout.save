@@ -115,8 +115,8 @@ Total of 269 iteration steps.
 > myeff <- setEffect(myeff, linear, initialValue=0.34699930338, name="mynet2")
                     name shortName type interaction1 interaction2 include parm
 mynet2.obj.eval.1 mynet2    linear eval                              TRUE    0
-                    fix  test initialValue timeDummy
-mynet2.obj.eval.1 FALSE FALSE    0.3469993         ,
+                    fix  test initialValue timeDummy period group
+mynet2.obj.eval.1 FALSE FALSE    0.3469993         ,   <NA>     1
 > ##myeff$initialValue[98] <- 0.34699930338 ## siena3 starting values differ
 > ##test10
 > print('test10')

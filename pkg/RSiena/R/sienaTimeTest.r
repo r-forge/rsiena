@@ -62,10 +62,10 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
     {
         use <- !fitEffects$basicRate
     }
-    if (sienaFit$maxlike || sienaFit$FinDiff.method)
-    {
-        stop("Not yet implemented for finite differences or maxlike")
-    }
+   # if (sienaFit$maxlike || sienaFit$FinDiff.method)
+   # {
+   #     stop("Not yet implemented for finite differences or maxlike")
+   # }
     ## Identify the effects which will potentially be tested
     baseInFit <- use & !grepl("Dummy", fitEffects$effectName)
 
@@ -183,25 +183,22 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
         derivs <- sienaFit$sdf2[ , , estimatedInFit, estimatedInFit,
                                 drop=FALSE]
         DF <- array(0, dim=c(nSims, nWaves, nEffects + nDummies,
-                           nEffects + nDummies))
+                       nEffects + nDummies))
         DF[, , 1:nEffects, 1:nEffects] <- derivs
-        ## copy over the others
-        subs1 <-  cbind(rep(1:nSims, 2 * nDummies),
-                        rep(toTest$period1[ttt], each=nSims * 2),
-                        c(rep(toTest$rowInD[ttt], each=nSims),
-                          rep(nEffects + 1:nDummies, nSims)),
-                        c(rep(nEffects + 1:nDummies, nSims),
-                          rep(toTest$rowInD[ttt], each=nSims)))
-        subs2 <- cbind(rep(1:nSims, 2 * nDummies),
-                       rep(toTest$period1[ttt], each=nSims * 2),
-                       c(rep(toTest$baseRowInD[ttt], each=nSims),
-                         rep(1:nEffects, nSims)),
-                       c(rep(1:nEffects, nSims),
-                         rep(toTest$baseRowInD[ttt], each=nSims)))
-        DF[subs1] <- derivs[subs2]
-        D <- t(apply(DF, c(2, 3), mean))
+        for (wave in 2:nWaves)
+        {
+            thisWave <- toTest$period == wave & toTest$toTest
+            subs1 <- (1: (nEffects + nDummies))[thisWave]
+            subs2 <- toTest$baseRowInD[thisWave]
+            DF[, wave, subs1, subs1] <- derivs[, wave, subs2, subs2]
+
+            DF[, wave, subs1, 1:nEffects] <- derivs[, wave, subs2, 1:nEffects]
+            DF[, wave, 1:nEffects, subs1] <- derivs[, wave, 1:nEffects, subs2]
+        }
+
+        D <- t(apply(DF, c(3, 4), mean))
     }
-   ## We have now set up all of the ingredients properly, so we may proceed
+    ## We have now set up all of the ingredients properly, so we may proceed
     ## with the score type test of Schweinberger (2007)
 	fra <- apply(G, 3, sum) / nSims
 	doTests <- toTest$toTest
@@ -285,6 +282,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 					  IndividualTestStatistics=individualTest,
 					  CovDummyEst=jointTest$covMatrix,
 					  Moments=G,
+                      Deriv=D,
 					  BaseRowInD=match(which(baseInFit),
                       which(estimatedInFit)),
 					  Waves=dim(G)[2],

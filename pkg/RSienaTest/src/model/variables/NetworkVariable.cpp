@@ -1385,6 +1385,7 @@ bool NetworkVariable::makeModelTypeBChange()
 
 		probability = exp(this->lsymmetricProbabilities[0]);
 		probability = probability / (1.0 + probability);
+		this->lsymmetricProbabilities[0] = probability;
 		break;
 
 	case BAGREE:

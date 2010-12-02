@@ -1,7 +1,8 @@
 
-R version 2.11.0 Patched (2010-04-23 r51810)
+R version 2.12.0 Patched (2010-11-09 r53543)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: i386-pc-mingw32/i386 (32-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -115,8 +116,8 @@ Total of 269 iteration steps.
 > myeff <- setEffect(myeff, linear, initialValue=0.34699930338, name="mynet2")
                     name shortName type interaction1 interaction2 include parm
 mynet2.obj.eval.1 mynet2    linear eval                              TRUE    0
-                    fix  test initialValue timeDummy
-mynet2.obj.eval.1 FALSE FALSE    0.3469993         ,
+                    fix  test initialValue timeDummy period group
+mynet2.obj.eval.1 FALSE FALSE    0.3469993         ,   <NA>     1
 > ##myeff$initialValue[98] <- 0.34699930338 ## siena3 starting values differ
 > ##test10
 > print('test10')

@@ -1,0 +1,571 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[pdftex,dvipsnames]{color}
+\usepackage[noend]{algorithmic}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[pdfstartview={}]{hyperref}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abso}[1]{\;\mid#1\mid\;}
+\renewcommand{\=}{\,=\,}
+\newcommand{\+}{\,+\,}
+% ----------------------------------------------------------------
+\newcommand{\remark}[1]{\par\noindent{\color[named]{ProcessBlue}#1}\par}
+\newcommand{\mcc}[2]{\multicolumn{#1}{c}{#2}}
+\newcommand{\mcp}[2]{\multicolumn{#1}{c|}{#2}}
+\newcommand{\nm}[1]{\textsf{\small #1}}
+\newcommand{\nnm}[1]{\textsf{\small\textit{#1}}}
+\newcommand{\nmm}[1]{\nnm{#1}}
+\newcommand{\ts}[1]{\par{\color[named]{Red}TS: #1}\par}
+
+% no labels in list of references:
+\makeatletter
+\renewcommand\@biblabel{}
+\makeatother
+
+\hyphenation{Snij-ders Duijn DataSpecification dataspecification dependentvariable ModelSpecification}
+
+% centered section headings with a period after the number;
+% sans serif fonts for section and subsection headings
+\renewcommand{\thesection}{\arabic{section}.}
+\renewcommand{\thesubsection}{\thesection\arabic{subsection}}
+\makeatletter
+ \renewcommand{\section}{\@startsection{section}{1}
+                {0pt}{\baselineskip}{0.5\baselineskip}
+                {\centering\sffamily} }
+ \renewcommand{\subsection}{\@startsection{subsection}{2}
+                {0pt}{0.7\baselineskip}{0.3\baselineskip}
+                {\sffamily} }
+ \renewcommand{\subsubsection}{\@startsection{subsubsection}{3}
+                {0pt}{0.5\baselineskip}{0.3\baselineskip}
+                {\it\sffamily} }
+\makeatother
+
+
+\renewcommand{\baselinestretch}{1.0} %% For line spacing.
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus1ex}
+\raggedright
+\newcommand{\sfn}[1]{\textbf{\texttt{#1}}}
+\newcommand{\R}{{\sf R }}
+\newcommand{\Rn}{{\sf R}}
+\newcommand{\rs}{{\sf RSiena}}
+\newcommand{\RS}{{\sf RSiena }}
+\newcommand{\SI}{{\sf Siena3 }}
+\newcommand{\Sn}{{\sf Siena3}}
+\textheight=9.5in
+\topmargin=-0.75in
+\begin{document}
+\algsetup{indent=2em}
+
+\centerline{\huge{RSiena: sienaTimeTest and sienaTimeFix}}
+
+\section{Queries}
+
+\subsection{SienaTimeTest}
+\begin{enumerate}
+\item Have constructed some derivatives for ML and finite differences. Difficult
+  to describe what I have done. Answers for finite differences at least seem
+  sensible.
+\item If we ask for specific effects to be tested, should we remove the others
+  from the problem altogether or just set them not to be tested?
+\item With parameter-wise tests, should this be for a group of eg eval and endow
+  or for each type individually. The latter is done now, and it would be fairly
+  tedious to do the former. But if it would make more sense it could be done.
+\item Conditioning is always done for parameter-wise tests, but is optional for
+  individual tests. This seems to be the cause of the discrepancies where there
+  are three waves. Josh has a note about the possibility of discrepancies: I
+  think it is because different tests were done.
+\item In the print, H0 was defined as all the dummy effects being zero,
+  including any which have been estimated. This seems wrong to me. And I have
+  changed it to only non estimated effects.
+\item All basic rates are excluded. Not clear why you could not include them in
+  the estimated part of the model.
+\end{enumerate}
+
+\subsection{SienaTimeFix}
+
+\begin{enumerate}
+\item I extrapolated for endowment effects. Created an egoX for the covariate
+  and set fix to TRUE unless I wanted a dummy for the density effect. Was I
+  correct?
+\item Not sure what to do for structural rate effects.
+\item Not sure what to do for behavior effects. I have included rateX as they
+  seem to be logically the same as rateX for networks. But for objective
+  function effects, the density effect is accessed for networks...
+\item Is it logically necessary to find the density effect for a network when
+  creating dummies? Should one stop or just ignore it?
+\item Would appreciate an explanation of the difference between rateX and
+  objective function processing.
+\end{enumerate}
+
+\section{sienaTimeTest}
+
+The function is called with a \nnm{sienaFit} object and performs tests for
+heterogeneity of parameters over time.
+
+\subsection{Arguments}
+\begin{description}
+\item[effects] Optionally, tests can be restricted to a set of effects defined
+  by row number in the effects object. This should be the row number in the
+  print of the \nnm{sienaFit}. (Ignoring any 0.n for conditional rates).
+  This excludes all the other effects completely even from the estimated part of
+  the derivative matrix. Is this correct?
+\item[condition] boolean which controls whether to orthogonalise
+individual score tests against just the estimated effects or against the other
+unestimated terms as well. Default (FALSE) is just to use the estimated effects
+in the individual tests. All are used in the parameter-wise tests i.e.\ this is
+the equivalent to \emph{condition=TRUE}.
+\end{description}
+\subsection{Processing}
+\begin{enumerate}
+\item Use the \nnm{requestedEffects} element of the fit.
+\item Validate as in section \ref{sec:valstt}. Stop if error.
+\item Create a logical vector defining the position in the effects object of the
+  effects which may be tested: \verb|baseInFit|. Details in section
+  \ref{sec:baseInFit}
+\item Create a logical vector defining the position in the effects object of the
+  effects which will be in the top left of the Derivative matrix to be created:
+  \verb|estimatedInFit| Details in section \ref{sec:estimatedInFit}
+\item Make a data frame \nnm{toTest} to hold all the data needed: one row for
+  each effect which may be tested and each period for which estimation was
+  performed. Details of the columns is in section \ref{sec:totest}
+\item Match any estimated dummies with their base effects and period in the data
+  frame as described in section \ref{sec:match} and set the field
+  \nnm{toTest} to FALSE in the corresponding row.
+\item Overwrite the column \nnm{rowInD} of the data frame for the rows where
+  \nnm{toTest} is still TRUE.  Sequentially number from one more than the number
+  of rows with \nnm{toTest} equal to FALSE.
+\item Sort the data frame by \nnm{rowInD}.
+\item Create a new field \nnm{dummyNames} as described in section
+  \ref{sec:dummyNames}
+\item Create \nnm{G}, the array of deviations as in section \ref{sec:moment}
+\item Create the covariance matrix \nnm{sigma} of the new moments:
+covariance of sums of \nnm{G} over the second dimension (period).
+\item Create \nnm{D} the derivative matrix, as described in section
+\ref{sec:deriv}.
+\item Calculate \nnm{fra} the mean of the deviations for each effect by summing
+\nnm{G} over the first two dimensions.
+\item Do Joint test: details in section \ref{sec:joint}.
+\item Do Individual tests: details in section \ref{sec:indiv}
+\item Do parameter-wise tests: details in section \ref{sec:par}
+\item Construct a matrix for easy printing of the one step estimates. Details in
+  section \ref{sec:matrix}.
+\item Add more columns to the data frame \nnm{toTest} for the plot as defined in
+  section \ref{sec:extra}.
+\item Return a lot! Class \nnm{sienaTimeTest}.
+\end{enumerate}
+\subsection{Validation}\label{sec:valstt}
+\begin{enumerate}
+\item Check the object is of class ``sienaFit''
+\item Check the estimation finished OK. (\nnm{sienaFit\$OK})
+\item Must be at least two periods estimated. Get this from the length of the
+\nnm{periodNos} attribute of \nnm{sienaFit\$f} because there may be groups. This
+attribute has a number for each wave actually estimated, i.e. omitting the last
+in each group.
+\item Effect numbers requested must be numeric.
+\item Effect numbers requested must be within the number of rows of the
+\nnm{requestedEffects} object of the siena fit.
+\item Effects specified must not be basic rate effects or dummies (i.e. have
+  ``Dummy'' in their name).
+\end{enumerate}
+\subsection{Effects to be tested, maybe: \nnm{baseInFit}}
+\label{sec:baseInFit}
+\begin{enumerate}
+\item If there are requested effects, exclude all others
+\item Exclude any with \nnm{basicRate} TRUE
+\item Exclude any where \nnm{effectName} includes the string ``Dummy''
+\end{enumerate}
+A check will be made for dummies already estimated for these effects: other
+periods will be tested.
+\subsection{Estimated Effects to be included: \nnm{estimatedInFit}}
+\label{sec:estimatedInFit}
+\begin{enumerate}
+\item If there are requested effects, exclude all others
+\item Exclude any with \nnm{basicRate} TRUE
+\item Exclude any with \nnm{shortName} equal to egoX and \nnm{fix} equal TRUE
+where ``Dummy'' occurs in \nnm{effectName}.
+\end{enumerate}
+
+\subsection{Details of data frame \nnm{toTest}}
+\label{sec:totest}
+\begin{description}
+\item[baseEffect] sequential number (1 to length(indBaseEffects))
+\item[effectNumber] effectNumber of base effect corresponding to the row
+\item[period] \verb|periodNos| (extracted as in validation)
+\item[period1] sequential number of period
+\item[toTest] TRUE, initially, except for period 1, when FALSE
+\item[baseRowInD] position of the basic effect corresponding to this row in D.
+Used to find the right scores and deviations for the row. Find by matching
+column \nnm{effectNumber} in the set of effectNumbers for the
+\verb|estimatedInFit| effects.
+\item[effectName] effect name of base effect corresponding to this row
+\item[rowInD] position of this period and effect combination in derivative
+  matrix. Fill in initially by matching effectNumber of the row with the
+  effectNumbers of the \verb|estimatedInFit| effects. Values for period not eual
+  to 1 will be overwritten later.
+\end{description}
+\subsection{Match estimated dummies with base effect}
+\label{sec:match}
+\begin{algorithmic}
+\FORALL{effects in subset \nnm{estimatedInFit} for which \nnm{timeDummy}
+contains the string ``isDummy''}
+\STATE
+\begin{enumerate}
+\item Split the \nnm{timeDummy} field on commas. Should contain two numbers,
+  first is period and second is an effectNumber.
+\item Find the row in the data frame with \nnm{period} and \nnm{effectNumber}
+  equal to the parts of the \nnm{timeDummy} and set \nnm{toTest} to FALSE on
+  this row.
+\item Match the effect number of the row against the effect numbers of the
+  subset \nnm{estimatedInFit} and store it in the field \nnm{rowInD}
+of this row of the data frame.
+\end{enumerate}
+\ENDFOR
+\end{algorithmic}
+\subsection{dummyNames}
+\label{sec:dummyNames}
+\begin{algorithmic}
+\IF{toTest == FALSE}
+\STATE Effect Name from the row. If type is not ``eval'',
+add the type in parentheses
+to make the row unique.
+\ELSE
+\STATE ``(*)Dummy'' plus \nnm{period} plus  \nnm{effectName} from the row.
+\ENDIF
+\end{algorithmic}
+\subsection{Deviations array, \nnm{G}}
+\label{sec:moment}
+\begin{enumerate}
+\item Extract the simulated statistics (or scores in maximum likelihood!)
+ from the fit object \nnm{sienaFit\$sf2} for the estimated effects
+ included to an array \nnm{moment} (\nnm{estimatedInFit})
+\item Substract the corresponding targets from \nnm{sienaFit\$sf2}.
+\item Create the \nnm{G} array with
+  dimensions number of simulations (\nnm{sienaFit\$Phase3nits} by number of
+  waves estimated by number of rows in the data frame \nnm{toTest}.
+\item Copy \nnm{moment} to the first \nnm{nEffects}=sum(\nnm{estimatedInFit})
+  slices of G (the beginning of the 3rd dimension).
+\item Construct two 3-column matrices of subscripts:
+  the first (destination subscripts) is formed by combining by rows
+  (\textsf{rbind}) the result of
+\begin{algorithmic}
+\FORALL{rows to be tested}
+\STATE Combine by
+  columns (\textsf{cbind}): 1:number of iterations, repeated \nnm{period1},
+  repeated \nnm{rowInD}
+\ENDFOR
+\end{algorithmic}
+\item The second is similar, but replace \nnm{rowInD} by \nnm{baseRowInD}.
+This gives the source subscripts.
+\item Copy source entries of \nnm{moment} to destination entries in \nnm{G}
+\end{enumerate}
+\subsection{Derivative matrix \nnm{D}}
+\label{sec:deriv}
+\begin{algorithmic}
+\IF{not maximum likelihood or finite difference}
+\item \begin{enumerate}
+\item Calculate \nnm{scores} by extracting the effects in
+\nnm{estimatedInFit} from \nnm{ssc}.
+\item Create the SF array with dimensions as for G
+\item Copy  \nnm{scores} to the first
+\nnm{nEffects}=sum(\nnm{estimatedInFit})
+slices of  SF (beginning of the 3rd dimension)
+\item Copy source entries of \nnm{scores} to destination entries in \nnm{SF}
+using subscripts as for G.
+\item Call \nnm{derivativeFromScoresAndDeviations} with parameters \nnm{G},
+\nnm{SF} to calculate the derivative matrix \nnm{D}.
+\end{enumerate}
+\ELSE
+\item Calculate the derivative matrix for maximum likelihood or
+finite differences. Essentially copy rows and columns from the base, with an
+extract of the original top left part at bottom right.
+Once constructed, just averaged over waves and iteractions.
+\ENDIF
+\end{algorithmic}
+\subsection{Joint tests}
+\label{sec:joint}
+\begin{enumerate}
+\item Call \nnm{ScoreTest} with parameters \nnm{nrow(toTest), D,
+sigma, fra, toTest\$toTest, maxlike=sienaFit\$maxlike}
+\item Calculate joint test p-value from chisq on sum(toTest\$toTest) df,
+statistic value is \nnm{testresOverall} from \nnm{ScoreTest} return value.
+\item Calculate one step estimates by adding estimated theta or 0 (for tested
+dummies) to the oneStep estimates returned from the joint call.
+\end{enumerate}
+\subsection{Individual tests}
+\label{sec:indiv}
+\begin{algorithmic}
+\STATE Set up logical vector \nnm{doTests} with an entry for each row of
+\nnm{toTests}.
+\IF{condition}
+\FORALL{rows of data frame with totest TRUE}
+\STATE Call ScoreTest with \nnm{doTests} set to FALSE for all except this one.
+All Other parameters as for joint test.
+\STATE Take individual results from \nnm{testresulto} from return value from
+this call.
+\ENDFOR
+\ELSE
+\STATE Take individual results from \nnm{testresulto} from return value from
+joint call.
+\ENDIF
+\STATE Calculate individual test p-value from normal distribution, test
+statistic value is \nnm{testreso} from appropriate \nnm{ScoreTest} return
+value.
+\end{algorithmic}
+\subsection{Parameter-wise tests}
+\label{sec:par}
+\begin{algorithmic}
+\FORALL{distinct base effects in \nnm{toTest}}
+\STATE Call ScoreTest with \nnm{doTests} set to \nnm{toTest\$toTest} for the
+appropriate rows and FALSE for all other rows.
+\STATE Suppress the call if all rows in the group have \nnm{toTest\$toTest}
+FALSE. (This conditions always on the other effects you have not fitted.)
+\ENDFOR
+\STATE Calculate p-values corresponding to the results of the previous step:
+chisq on sum(\nnm{totest\$toTest} for the effect) df.
+\end{algorithmic}
+\subsection{One step estimate matrix}
+\label{sec:matrix}
+Cbind
+\begin{enumerate}
+\item \nnm{sienaFit\$theta[estimatedInFit]} plus 0's for tested dummies
+\item One step estimates as calculated from results of the joint test
+\item p-values: $\hat{\theta}/\mathrm{s.e.}(\hat{\theta})$ for estimated rows
+  (i.e.\ those in \nnm{estimatedInFit}) plus individual p-values for tested
+  dummies calculated in the individual test section.
+\end{enumerate}
+Add row names from \nnm{dummyNames}.
+\subsection{toTest: further columns}
+\label{sec:extra}
+\begin{description}
+\item[InitialEst] As in one step estimate matrix.
+\item[OneStepEst] As in one step estimate matrix.
+\item[p.value] As in one step estimate matrix.
+\item[effectTest] P-value for the parameter wise test for the base effect. NA if
+  no such test performed.
+\item[effectName] Add type if not eval and `\textbackslash np=' plus the
+  \nnm{effectTest} value just created to the \nnm{effectName}, and recreate the
+  factor, to affect the strip text in the plot.
+\item[valsplus] Add \nnm{OneStepEst} (just created) for period 1 (this is the
+  base effect) to corresponding one step estimates of rows for period > 1.
+\item[dummysd] Calculate as follows:
+\begin{description}
+\item[base effect] $ \mathrm{s.e. }\hat{\theta} =
+\sqrt(\mathrm{diag(sienaFit\$covtheta))}$
+\item[others] Invert the field \nnm{p.value} relative to the one step estimates
+  (after adding in $\hat{\theta}$).
+This results in:
+\begin{description}
+\item[estimated dummies]
+Since these p-values for the estimated dummies were calculated as
+$$
+\frac{\hat{\theta}}{se (\hat{\theta})}
+$$
+the resulting sd is
+$$
+\frac{se (\hat{\theta}) * \mathrm{oneStep}}{\hat{\theta}}
+$$
+where $\mathrm{oneStep}$ is the sum of $\hat{\theta}$ plus the one step
+estimate returned from the joint test.
+\item[non-estimated dummies]  Up to rounding, this is the one-step estimate
+  returned from the joint test divided by the test statistic from the individual
+  test.
+\end{description}
+\end{description}
+\end{description}
+\section{plot.sienaTimeTest}
+
+There are two options here, controlled by the argument \nnm{pairwise}. In each
+case a subset of the effects can be selected, using an index displayed in the
+summary method.
+
+If \nnm{pairwise} is TRUE, a pairs plot is produced of the deviations for
+the base tested effects summed over waves, with the value of the correlation in
+the upper quadrant.
+
+If FALSE, there is a plot for each base effect selected, showing, for each wave,
+\begin{enumerate}
+\item 3 wide lines showing confidence intervals for 3 levels, centered around
+  the one step estimate for the wave plus the one step estimate for the first
+  wave for the base effect. (The latter has had the fitted value included.)
+\item a point plot using a long character 45 (minus sign) showing the end of the
+  first two levels (actually positioned at the inside of the rounded end!)
+\item A stepped line for the one step estimates, with filled circles (pch 20)
+at the  points.
+\item A reference line across at the fitted value for the estimate.
+\end{enumerate}
+P-values for the overall tests of each base effect are shown (in the panel strip
+by adding them to the effect name!). These are conditioned on the other dummies.
+
+Layout can be controlled by the layout parameter of lattice. Default is to do
+all the plots, with layout determined by lattice.
+
+Size of font in strips can be changed with the lattice parameters: e.g.\
+\begin{verbatim}
+aa <- trellis.par.get()
+aa$add.text$cex <- 0.75
+trellis.par.set(aa)
+\end{verbatim}
+\section{sienaTimeFix}
+
+
+This function is called during the initialisation phase of siena07, and
+interprets entries in the \nnm{timeDummy} column of the effects object. It adds
+dummy covariates to the data and effects to the effects object.
+
+Some prior processing is done with the user entered data and effects before it
+is called:  Initial values are copied from a previous result, if this is
+requested.  The data is then turned into a group if it not already one.
+
+It may also be called without a data object, when it should simply create the
+new effects. This makes it possible to preview the effects which would be added
+by siena07. It is an option in print.sienaEffects and summary.sienaEffects. Not
+the default as you need a complete effects object for it to make sense, not just
+one or two rows.
+\begin{enumerate}
+\item Do validation (section \ref{sec:validation})
+\item If no requests or none left after validation return input unchanged
+\item Replace requests for all dummies by a list of period numbers using group
+periods established from the group and period numbers in the effects
+object. (Unique group numbers, unique periods within groups plus 1...)
+\item Remove any effects which are already dummies, defined as
+ \emph{timeDummy contains the word ``isDummy''}
+\item Validate the time dummy field. Stop if anything not understood.
+\item Process the rateX effects with time dummy requests as in section
+  \ref{sec:ratex}
+\item Construct two lists of periods with non rateX dummy requests by dependent
+variable. One also split by type of effect.
+\item Process the objective function effects with time dummy requests as in
+  section \ref{sec:obj}
+\item Reorder effects so they are rate/ non interaction/interaction within
+dependent variable. Dependent variables should be ordered as in the input
+effects.
+\item Recreate the group by calling \nnm{sienaGroupCreate}
+to make sure the attributes are correct.
+\end{enumerate}
+
+\subsection{Validation}
+\label{sec:validation}
+\begin{enumerate}
+\item If only 2 periods, all requests are an error
+\item Any requests for basic rate effects are an error
+\item Currently any requests for behavior effects except rateX are an error
+\item Currently any requests for structural rate effects are an error
+\end{enumerate}
+Print warning if any errors and set the corresponding timeDummy columns to ``,''
+\subsection{rateX dummies}
+\label{sec:ratex}
+\begin{algorithmic}
+\FORALL {rateX effects with time dummy requests}
+\STATE Find the covariate whose name is in \nnm{interaction1}
+ in the rate effect in the lists of constant or varying covariates or
+behavior variables in the attributes of the data object (group level).
+\FORALL{periods for which dummies were requested}
+\STATE
+\begin{enumerate}
+\item Construct name for new covariate:
+ covariate name, ``Dummy'', period number, `:', dependent variable name.
+\item Find the relevant covariate and data object for this period.
+\item Make a varying covariate with the column for the current period copied
+from the relevant covariate for this period. Get number of periods from the
+attribute \nnm{netdims} of the dependent variable.
+\item Other periods should be zeros.
+\item Node Set should be copied from the covariate.
+\item Add the attributes to the covariate (these would have been added by
+sienaDataCreate).
+\item Add to the varying covariates in the corresponding data object.
+\item Also add to all the other data objects with zero value. Use the number
+  of periods and the size of the nodeset from each object.
+\item Create an effect as in section \ref{sec:rateeffect}.
+\item Join the effect to the current effects data frame.
+\end{enumerate}
+\ENDFOR
+\ENDFOR
+\end{algorithmic}
+\subsection{RateX effect}
+\label{sec:rateeffect}
+\begin{enumerate}
+\item Use the function \nnm{CreateEffects} to create an effect with effectGroup
+  equal to ``covarNonSymmetricRate'' and short name equal to ``RateX''with name,
+  type, netType, groupName, group taken from the base effect.
+\item Other values: \begin{description}
+\item[fix] FALSE
+\item[include] TRUE
+\item[effectNumber] current maximum + 1
+\item[timeDummy] isDummy, period number, effectNumber of base effect
+\end{description}
+\item Set row name of row to the name of the new covariate
+\end{enumerate}
+\subsection{Objective function effect dummies}
+\label{sec:obj}
+\begin{algorithmic}
+\FORALL{dependent variables with dummies requested}
+\IF{behavior variable}
+\STATE  stop with error message (currently trapped in validation!)
+\ENDIF
+\FORALL{periods for which dummies were requested}
+\STATE Create dummy covariates and egoX effects. See section \ref{sec:objcov}
+\ENDFOR
+\STATE
+\FORALL{periods for which dummies were requested}
+\STATE Create interaction effects. See section \ref{sec:objint}
+
+\ENDFOR
+\ENDFOR
+\end{algorithmic}
+\subsection{Objective function dummy covariates and dummy effects}
+\label{sec:objcov}
+\begin{enumerate}
+\item Find the relevant data object and hence number of actors and periods. Use
+  attribute \nnm{netdims} to avoid complications with sparse matrices.
+\item Convert period number to relative to start of the current data object.
+\item Create a varying covariate with name Dummy followed by the period number
+  plus `:' and the name of the dependent variable. Values are 1 for the relevant
+  period and 0 otherwise.
+\item Add the attributes to the covariate (which would have been added by
+sienaDataCreate)
+\item Add to the varying covariates in the correct data object.
+\item Add a zero valued version of this dummy covariate to all other data
+objects.
+\item Look for the density effects for this dependent variable for any types
+for which any dummies were requested for this variable and establish
+whether a time dummy was requested for these effects for this type for
+this period. Stop if none found.
+\item Create effect(s) as in section \ref{sec:nonrate}
+\item Join the effect(s) to the current effects data frame
+\end{enumerate}
+\subsection{Objective function interaction effects}
+\label{sec:objint}
+\begin{enumerate}
+\item Use includeInteraction to include an interaction between the dummy effect
+for this period and the current requested effect.
+\item Parameters are the short name of the requested effect, ``egoX'',
+interaction1 (second entry) is the new dummy, type from the requested effect,
+and name from the current dependent variable.
+\item Use character=TRUE to avoid problems.
+\item Set the time dummy for this row to ``isDummy, period, effectnumber of
+requested effect.''
+\end{enumerate}
+\subsection{Objective function dummy effect}
+\label{sec:nonrate}
+\begin{enumerate}
+\item The base effects are the density effects. Create row(s) with effectGroup
+equal to ``covarNonSymmetricObjective'' and short name equal to ``egoX''. Name,
+netType, groupName, group, type taken from the base effect(s).
+\item Other values:
+\begin{description}
+\item[fix] FALSE unless a time dummy for the density effect for this type
+has been requested for this period.
+\item[include] FALSE unless a time dummy has been requested for this type for
+  this period
+\item[effectNumber] current maximum + 1:(nunber of effects being created)
+\item[timeDummy] isDummy, period number, effectNumber of density effect for this
+  type
+\end{description}
+
+\item Set row name of row to the name of the new covariate and the type,
+  separated by a `.'.
+\end{enumerate}
+\end{document}
+

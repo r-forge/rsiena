@@ -363,6 +363,7 @@ void EpochSimulation::runStep()
 {
     this->calculateRates();
 	this->drawTimeIncrement();
+
 	double nextTime = this->ltime + this->ltau;
 
     DependentVariable * pSelectedVariable = 0;
