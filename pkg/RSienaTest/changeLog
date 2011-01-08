@@ -1,3 +1,8 @@
+2011-01-08 R-forge revision 129
+
+	* R/sienaTimeTest.r, doc/sienaTimeFix.tex: added interactions
+	types for requested effect in call to includeInteraction.
+
 2010-12-02 R-forge revision 128
 
 	* data/allEffects.csv: removed to effect from bipartite bipartite,
@@ -53,6 +58,7 @@
 	* src/model/variables/NetworkVariable.cpp: fixed bug in
 	calculation of symmetric model type BFORCE scores.
 	* R/sienaTimeTest.r: added code for finitedifferences and ML fits.
+	* doc/sienaTimeFixDoc.tex: added
 
 2010-11-25 R-forge revision 127
 

@@ -1,6 +1,8 @@
 \documentclass[a4paper,fleqn]{article}
 % for the print version, 11pt must be added in the documentclass options;
 % this must be deleted in the screen version.
+\usepackage[pdfstartview={},pdftex,bookmarksopen,colorlinks]{hyperref}  % this gives an option clash but it compiles anyway
+\usepackage[print,nopanel,sectionbreak,palegreen]{pdfscreen}
 
 %Required files: pdfscreen.sty, pdfscreen.cfg, ilcampo_bg.jpg, ilcampo.jpg
 %\usepackage{times}
@@ -12,10 +14,8 @@
  \usepackage[top=2.5cm, bottom=2.5cm, left=2cm , right=1.8cm]{geometry}
 %\usepackage[bookmarksopen=false]{hyperref}
 % in the newer version of pdfscreen, hyperref can be loaded first with its own parameters
-\usepackage[pdftex,dvipsnames]{color}
+%\usepackage[pdftex,dvipsnames]{color}
 %\usepackage[pdfstartview={XYZ null null 1}]{hyperref}  % this gives an option clash but it compiles anyway
-\usepackage[pdfstartview={},pdftex,bookmarksopen,colorlinks]{hyperref}  % this gives an option clash but it compiles anyway
-\usepackage[print,nopanel,sectionbreak,palegreen]{pdfscreen}
 
 
 % choose between print and screen; panelright, paneltoc;
@@ -42,9 +42,7 @@
  \definecolor{section0}{named}{RawSienna}
 \end{screen}
 
-\begin{print}
-\setlength{\oddsidemargin}{15mm}
-\end{print}
+%\setlength{\oddsidemargin}{15mm}
 
 
 %\usepackage[pdftex]{graphicx}
@@ -131,18 +129,11 @@
 %\renewcommand{\baselinestretch}{1.2}
 
 
-\begin{print}
 \setlength{\oddsidemargin}{0.6cm}
 \setlength{\textwidth}{15cm}
-\end{print}
 
 
-\begin{screen}
-\title{\color{section0}{\Huge Manual for \textsf{SIENA} version 4.0} }
-\end{screen}
-\begin{print}
-\title{{\Huge Manual for \textsf{SIENA} version 4.0 \protect\newline \normalsize \emph{Provisional version} } }
-\end{print}
+\title{{\Huge Manual for \textsf{SIENA} version 4.0 \protect\newline \normalsize } }
 \author{\color{section1}\Large Ruth M. Ripley\\[1ex]
         \color{section1}\Large Tom A.B.\ Snijders\\[4ex]
        {\color{section1}\large University of Oxford: Department of Statistics; Nuffield College}\\[1ex]
@@ -152,16 +143,9 @@
 \definecolor{lc}{cmyk}{0,0.5,0,0.5}
 
 \begin{document}
-\begin{print}
 \addtocontents{toc}{\small}
-\end{print}
 
 \maketitle
-
-\begin{screen}
-\vfill
-\end{screen}
-\begin{print}
 
 %\setlength{\unitlength}{1mm}
 %\begin{picture}(100,100)
@@ -172,14 +156,13 @@
 \includegraphics*[scale=3]{ilcampo.jpg}
 \end{center}
 \vfill
-\end{print}
 
 \begin{abstract}
 \noindent \SI (for {\sf Simulation Investigation for Empirical
 Network Analysis}) is a computer program that carries out the
 statistical estimation of models for the evolution of social
 networks according to the dynamic actor-oriented model of \citet{Snijders01,
-Snijders05} and \citet{SnijdersEA07}.
+Snijders05}, \citet{SnijdersEA07}, and \cite{SnijdersEA10a}.
 This is the manual for \SI version 4,
 also called \rs,
 which is a contributed package to
@@ -194,48 +177,28 @@ Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 %\addtocontents{toc}{\setlength{\itemsep}{1pt plus1pt minus1pt}}
 
-\begin{print}
 \vfill
 \newpage
 \tableofcontents
 \newpage
-\end{print}
 
-\begin{screen}
-\vfill
-\sloppy
-\end{screen}
-
-
-\begin{print}
 \makeatletter
 \def\@linkcolor{lc}
 \makeatother
-\end{print}
 
 \section{General information}
 
 
 \si
-\begin{print}
 \footnote{This program was first presented at the
 International Conference for Computer Simulation and the Social
 Sciences, Cortona (Italy), September 1997, which originally was
-scheduled to be held in Siena. See \citet{SnijdersDuijn97}.}
-\end{print}
-\begin{screen}
-\footnote{This program was first presented
-at the International Conference for Computer Simulation and the
-Social Sciences, Cortona (Italy), September 1997, which originally
-was scheduled to be held in Siena. See \citet{SnijdersDuijn97} .
-The background picture in this manual is the Palazzo Pubblico with
-the Torre del Mangia in Siena.}
-\end{screen}
-$\!\!\!$, shorthand for {\sf Simulation Investigation for Empirical
+scheduled to be held in Siena. See \citet{SnijdersDuijn97}.},
+shorthand for {\sf Simulation Investigation for Empirical
 Network Analysis}, is a computer program that carries out the
 statistical estimation of models for repeated measures of social
-networks according to the dynamic actor-oriented model of \citet{SnijdersDuijn97}, \citet{Snijders01}, and
-\citet*{SnijdersEA07}; also see
+networks according to the dynamic actor-oriented model of \citet{SnijdersDuijn97}, \citet{Snijders01},
+\citet*{SnijdersEA07}, and \citet*{SnijdersEA10a}; also see
 \citet*{SteglichEA10}.
 A tutorial for these models is in \citet*{SnijdersEA10b}.
 Some examples are
@@ -317,14 +280,9 @@ and to the foundation ProGAMMA,
 which all contributed to the work on \si.
 
 \newpage
-\begin{print}
 %\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
 \part{Minimal Intro}
-\end{print}
-\begin{screen}
-{\color{section0}\LARGE\bf\noindent
-Part I\\[1.5ex] Minimal Introduction to \SI  \\[1.8ex]}
-\end{screen}
+
 There are two ways of getting started with \si:
 by using the  graphical user interface (\emph{gui}) via \textsf{siena01Gui}
 or by using \R commands in the regular \R way.
@@ -1618,7 +1576,7 @@ in addition to this script.
     plot(tt2, effects=1:4)
 
 # The <<effects>> parameter indicates the effects for which plots
-# are produced, and the <<dims>> the layout on the graphics device.
+# are produced.
 # This plot illustrates the base period (=1) estimate for each effect
 # as a horizontal line. The dots represent one-step estimates for each
 # effect, and the bands around these points represent confidence
@@ -1939,7 +1897,7 @@ reference to this manual is the following.  \smallskip
 \noindent
 Ripley, Ruth M., and Snijders, Tom A.B.
 2010.
-Manual for SIENA version 4.0 (provisional version, \today).
+Manual for SIENA version 4.0 (version \today).
 Oxford: University of Oxford, Department of Statistics; Nuffield College.
 \textsf{http://www.stats.ox.ac.uk/siena/}
 
@@ -1949,6 +1907,8 @@ A basic reference for the network dynamics model is \citet{Snijders01}
 or \citet{Snijders05}.
 Basic references for the model of network-behavior co-evolution
 are \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
+A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
+and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
 
 More specific references are \citet{Schweinberger10} for the score-type goodness
 of fit tests and \citet{SchweinbergerSnijders07a} for the calculation of
@@ -1997,19 +1957,12 @@ continue to use the \SN/ \RS mailing list.
 
 
 \newpage
-\begin{print}
+
 %\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
+
 \part{User's manual}
-\end{print}
-\begin{screen}
-{\color{section0}\LARGE\bf\noindent
-Part II\\[1.5ex] User's manual\\[1.8ex]}
-\end{screen}
 
 
-\begin{print}
-%\newpage
-\end{print}
 
 \section[Program parts]{Parts of the program}
 \label{S_parts}
@@ -2032,9 +1985,7 @@ The main output is written to a text file named \textsf{{\em
 pname}.out}, where \textsf{{\em pname}} is the name
 specified in the call of \textsf{sienaModelCreate()}.
 
-\begin{print}
 \newpage
-\end{print}
 
 \section{Input data}
 \label{S_InputData}
@@ -2496,9 +2447,6 @@ or the actor variable, respectively,
 must provide valid data both at the beginning and at the end of a
 period for being counted in the respective target statistics.
 
-\begin{print}
-%\newpage
-\end{print}
 \subsection{Composition change}
 \label{S_comp}
 
@@ -2589,9 +2537,7 @@ is calculated by a
 
 %The dependent network variable is not centered.
 
-\begin{print}
 \newpage
-\end{print}
 \section{Model specification}
 \label{S_modspec}
 
@@ -3887,12 +3833,6 @@ In addition, there are interactions available between actor variables
 and influence, as described in Section~\ref{S_f_b}.
 
 
-\begin{screen}
-\newpage
-\end{screen}
-\begin{print}
-%\newpage
-\end{print}
 \subsection{Random effects models: unobserved actor heterogeneity}
 
 The network (and behavior) evolution may be affected by the fact that actors are
@@ -4006,9 +3946,7 @@ if there are multiple groups).
 
 
 
-\begin{print}
 \newpage
-\end{print}
 
 \section{Estimation}
 \label{S_Est}
@@ -4370,6 +4308,12 @@ the standard error of the retained effect becomes much smaller by
 omitting the other effect, which can also mean a change of the
 $t$-test from non-significance to significance.
 
+The suggestion of omitting effects that lead to high parameter
+correlations with other effect does not directly apply to
+effects that should be included for other reasons, such as
+the density effect for network dynamics and the linear and
+quadratic shape effects for behaviour dynamics.
+
 However, correlations between parameter estimates close to -1.0 or +1.0
 should not be used too soon in themselves as reasons to exclude effects
 from a model. This is for two reasons.
@@ -4397,12 +4341,6 @@ usually for correlations of estimated structural network effects there is no
 reason for concern even when these correlations
 are as strong as .9.
 
-\begin{screen}
-\newpage
-\end{screen}
-\begin{print}
-%\newpage
-\end{print}
 
 \iffalse
 \subsection{Maximum Likelihood and Bayesian estimation}
@@ -4461,12 +4399,6 @@ The additional results can be best inspected by using {\tt R} and the
 {\tt R} function {\tt siena}\_{\tt bayes} written by Michael
 Schweinberger (see Section \ref{R_functions}).
 
-\begin{screen}
-\newpage
-\end{screen}
-\begin{print}
-%\newpage
-\end{print}
 \subsection{Supplementing {\tt R} functions}
 \label{R_functions}
 
@@ -4523,12 +4455,6 @@ actor-dependent weights (parameters) in the model.
 Examples are provided by \verb@siena_mle("alcohol", 1, 3, 50)@ and\\
 \verb@siena_bayes("alcohol", 1, 3, 50)@.
 
-\begin{screen}
-\newpage
-\end{screen}
-\begin{print}
-%\newpage
-\end{print}
 \subsection{Other remarks about the estimation algorithm}
 
 \subsubsection{Changing initial parameter values for estimation}
@@ -4654,9 +4580,6 @@ If there are changes in network composition (see
 Section~\ref{S_comp}), only the unconditional estimation procedure
 is available.
 
-\begin{print}
-%\newpage
-\end{print}
 
 \subsubsection{Required changes from conditional to unconditional estimation}
 
@@ -4673,9 +4596,6 @@ Section~\ref{S_cond}).
 The solution is either to use standard initial values or to
 to unconditional estimation.
 
-\begin{print}
-%\newpage
-\end{print}
 \hypertarget{T_se}{
 \section{Standard errors}
 }
@@ -4704,9 +4624,7 @@ standard error of the estimated standard errors than the other methods.  \fi It
 is recommended to use at least 1000 iterations (default) in phase 3.  For
 published results, it is recommended to have 2000 or 4000 iterations in phase 3.
 
-\begin{print}
 \newpage
-\end{print}
 \section{Tests}
 \label{S_gof}
 
@@ -5050,9 +4968,7 @@ and so on.
 See \citet{Lospinoso2010b} for a walkthrough of the model selection process
 for time dummy terms.
 
-\begin{print}
 \newpage
-\end{print}
 \section{Simulation}
 
 The simulation option still must be made available in a clear way for \SI
@@ -5143,9 +5059,7 @@ terminated with an error message, saying {\em This distance is not
 achieved for this parameter vector}. In this case, you are advised
 to change to unconditional simulation.
 
-\begin{print}
 \newpage
-\end{print}
 \section[Options for model type, estimation and simulation]{Options for model type, estimation and simulation}
 \label{S_options}
 
@@ -5234,9 +5148,7 @@ estimation in the estimation options, also the simulations are run
 conditionally or unconditionally.\medskip
 
 
-\begin{print}
 \newpage
-\end{print}
 \section{Getting started}
 \label{S_getting}
 
@@ -5289,9 +5201,6 @@ process, the model can be respecified: non-significant effects may
 be excluded (but it is advised always to retain the out-degree and
 the reciprocity effects) and other effects may be included.
 
-\begin{print}
-%\newpage
-\end{print}
 \subsection{Model choice}
 \label{S_model}
 
@@ -5558,9 +5467,6 @@ too little information about their value).
 \fi
 
 \iffalse
-\begin{print}
-%\newpage
-\end{print}
 \subsection{Composition change}
 
 Example data files for a network of changing composition are also
@@ -5721,7 +5627,7 @@ It combines estimates for a common model
    and according to a Fisher-type combination of one-sided $p$-values.
    This combination method of \citet{Fisher32} is described in
 \citet{HedgesOlkin85}
-   and (briefly) in \citet[Chapter 3]{SnijdersBosker99}).
+   and (briefly) in \citet[Chapter 3]{SnijdersBosker99}.
    Some more information is at the \SI website.
 
 \iffalse
@@ -5883,10 +5789,7 @@ Versies voor Liesbeth
 </html>
 \fi
 
-
-\begin{print}
 \newpage
-\end{print}
 \section[Formulas for effects]{Mathematical definition of effects}
 \label{S_math}
 
@@ -5898,7 +5801,9 @@ The effects are grouped into effects for modelling network
 evolution and effects for modelling behavioral evolution (i.e.,
 the dynamics of dependent actor variables). Within each group of
 effects, the effects are listed in the order in which they appear
-in \si.
+in \si. The short name of the effect (\texttt{shortName}),
+as it is specified in \RS is specified in brackets.
+
 
 For two-mode (bipartite) networks, only a subset of the effects is
 meaningful, since the first node set has only outgoing ties
@@ -5976,18 +5881,19 @@ unless a different formula is given explicitly.
 \noindent
 Structural effects are the effects depending on the network only.
 
+
 \begin{enumerate}
- \item {\em out-degree effect} or \emph{density effect},
- \hypertarget{T_density}{defined by the out-degree} \\
+ \item {\em out-degree effect} or \emph{density effect} \texttt{(density)},
+ \hypertarget{T_density}{defined by the out-degree}\\
  $s^{\rm net}_{i\vit}(x) = x_{i+} = \sum_j x_{ij}$,\\
  where $x_{ij}=1$ indicates presence of a tie from $i$ to $j$
  while $x_{ij}=0$ indicates absence of this tie;
 
- \item {\em reciprocity effect},
+ \item {\em reciprocity effect} \texttt{(recip)},
  \hypertarget{T_reci}{defined by the number of reciprocated ties}\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\,x_{ji}$;
 
- \item {\em transitive triplets effect}, defined by the number of transitive
+ \item {\em transitive triplets effect} \texttt{(transTrip)}, defined by the number of transitive
  patterns in $i$'s relations (ordered pairs of actors
  $(j,h)$ to both of whom $i$ is tied, while also $j$ is tied to $h$),\\
  for directed networks,
@@ -5998,9 +5904,10 @@ Structural effects are the effects depending on the network only.
  which amounted to combining the transitive triplets and transitive
  mediated triplets effects;
 
- \item {\em transitive mediated triplets effect}, defined by the number of transitive
- patterns in $i$'s relations where $i$ has the
- mediating position (ordered pairs of actors
+ \item {\em transitive mediated triplets effect} \texttt{(transMedTrip)},
+ defined by the number of transitive patterns in $i$'s
+ relations where $i$ has the mediating position
+ (ordered pairs of actors
  $(j,h)$ for which $j$ is tied to $i$ and $i$ to $h$, while also $j$ is tied to $h$),
  which is different from the transitive triplets effect only for directed networks,\\
   $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ji}\, x_{ih}\, x_{jh}\,$;\\
@@ -6008,26 +5915,27 @@ Structural effects are the effects depending on the network only.
  Method of Moments estimation, because of perfect collinearity
  of the fit statistics;
 
- \item {\em number of 3-cycles},\\
+ \item {\em number of three-cycles} \texttt{(cycle3)}, \\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{jh}\, x_{hi}\,$;
 
 
- \item for two-mode networks: the {\em number of 4-cycles},\\
+ \item for two-mode networks: the {\em number of four-cycles}
+ \texttt{(cycle4)}, \\
  $s^{\rm net}_{i\vit}(x) =  \sum_{i_1, i_2, j_1, j_2}
-            x_{i_1 j_1}\, x_{i_1 j_2}\, x_{i_2 j_1}\, x_{i_2 j_2}\,$;
+            x_{i_1 j_1}\, x_{i_1 j_2}\, x_{i_2 j_1}\, x_{i_2 j_2}\,$;\\
+ for parameter $p=2$ the square root is taken;
 
-
- \item {\em transitive ties effect} (earlier called \emph{(direct and indirect ties) effect}),
+ \item {\em transitive ties effect} \texttt{(transTies)} (earlier called \emph{(direct and indirect ties) effect}),
  defined by
- the number of actors to whom $i$ is directly as well as indirectly tied,\\
+ the number of actors to whom $i$ is directly as well as indirectly tied, \\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij} \, \max_h (x_{ih}\, x_{hj}) $;
 
- \item {\em betweenness count},\\
+ \item {\em betweenness count} \texttt{(between)},\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{hi}\, x_{ij}\, (1-x_{hj})\,$;
 
- \item {\em balance}, defined by the similarity between the outgoing ties
- of actor $i$ and the outgoing ties of the other actors $j$ to whom
- $i$ is tied,
+ \item {\em balance} \texttt{(balance)}, defined by the similarity between
+ the outgoing ties of actor $i$ and the outgoing ties of the other actors
+ $j$ to whom $i$ is tied,
  \[ s^{\rm net}_{i\vit}(x) = \sum_{j=1}^n x_{ij} \neqsum{h}{h}{i,j}
  \left( b_0 - \mid x_{ih} - x_{jh} \mid \right)\, , \]
  where $b_0$ is a constant included to reduce the correlation
@@ -6036,12 +5944,31 @@ Structural effects are the effects depending on the network only.
  \[ b_0 = \frac{1}{(M-1)n(n-1)(n-2)} \sum_{m=1}^{M-1}
  \sum_{i, j=1}^n \neqsum{h}{h}{i,j}
  \mid x_{ih}(t_m) - x_{jh}(t_m) \mid \,.\]
+ This may also be regarded as \emph{structural equivalence
+ with respect to outgoing ties}.
  (In \SI versions before 3.324, this was divided by $n-2$, which for larger networks
  tended to lead to quite large estimates and standard errors.
  Therefore in version 3.324, the division by $n-2$
  -- which had not always been there -- was dropped.)
 
- \item {\em number of distances two effect},
+\item {\em structural equivalence effect with respect to
+      incoming ties} \texttt{(inStructEq)}, which is an analogue to the balance effect
+      but now considering similarity with respect to incoming ties,
+      \begin{subequations}
+      \begin{equation}
+      s^{\rm net}_{i\vit}(x) = \sum x_{ij} d_{ij}
+      \end{equation}
+      with
+      \begin{equation}
+       d_{ij} =  \neqsum{h}{h}{i,j} \big(b_0 - \mid x_{hi} - x_{hj}\mid \big) \ .
+%       =  (n-2)b_0 - \big( x_{+i}+x_{+j} -x_{ij}-x_{ji}-2\sum_h x_{hi}x_{hj} \big)
+      \end{equation}
+      \end{subequations}
+      This effect is not quite finalized yet, because provisionally
+      $b_0 = 0$ instead of a mean of the subtracted values like in the balance effect.
+      Subtraction of the mean will lead to better convergence properties.
+
+ \item {\em number of distances two effect} \texttt{(nbrDist2)},
  \hypertarget{T_dist2}{defined by}
  the number of actors to whom $i$ is indirectly tied
  (through at least one intermediary, i.e., at sociometric distance 2),\\
@@ -6051,7 +5978,7 @@ Structural effects are the effects depending on the network only.
  with terminated ties, and this cannot be straightforwardly applied
  for the number of distances two effect.
 
- \item {\em number of doubly achieved distances two effect},
+ \item {\em number of doubly achieved distances two effect} \texttt{(nbrDist2twice)},
  defined by
  the number of actors to whom $i$
  is not directly tied, and tied through twopaths via at least two intermediaries,\\
@@ -6059,7 +5986,8 @@ Structural effects are the effects depending on the network only.
  endowment effect only likelihood-based;
 
 
- \item {\em number of dense triads}, defined as triads containing at least $c$ ties,\\
+ \item {\em number of dense triads} \texttt{(denseTriads)},
+ defined as triads containing at least $c$ ties,\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h} x_{ij} \, I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
  + x_{jh}\, + x_{hj}\,)\geq c \}\,$,\\
  where the `indicator function' $I\{A\}$ is 1 if the condition
@@ -6074,7 +6002,7 @@ Structural effects are the effects depending on the network only.
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
  I\{ (x_{jh}\,  + x_{hj}\, + x_{jk}\, + x_{kj}\, + x_{hk}\, + x_{kh}\,)\geq c \} \,$;
 
- \item {\em in-degree related popularity effect}
+ \item {\em in-degree related popularity effect} \texttt{(inPop)}
  (earlier called {\em popularity} or {\em popularity of alter effect}), defined by
   the sum of
  the in-degrees of the others to whom $i$ is tied,\\
@@ -6082,7 +6010,7 @@ Structural effects are the effects depending on the network only.
  \sum_j x_{ij} \sum_h x_{hj} $;\\
  until version 3.313, this effect was multiplied by a factor $1/n$;
 
- \item {\em in-degree related popularity (sqrt) effect}
+ \item {\em in-degree related popularity (sqrt) effect} \texttt{(inPopSqrt)}
  (earlier called {\em popularity of alter (sqrt measure) effect}), defined by the sum of
  the square roots of the in-degrees of the others to whom $i$ is tied,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, \sqrt{x_{+j}} =
@@ -6092,7 +6020,7 @@ Structural effects are the effects depending on the network only.
  relatively less important than the same differences between low
  in-degrees;
 
- \item {\em out-degree related popularity effect}
+ \item {\em out-degree related popularity effect} \texttt{(outPop)}
  (earlier called {\em activity} or {\em activity of alter effect}), defined by
   the sum of the out-degrees
  of the others to whom $i$ is tied,\\
@@ -6101,7 +6029,7 @@ Structural effects are the effects depending on the network only.
  until version 3.313, this effect was multiplied by a factor $1/n$;
 
 
- \item {\em out-degree related popularity (sqrt) effect}
+ \item {\em out-degree related popularity (sqrt) effect} \texttt{(outPopSqrt)}
  (earlier called {\em activity of alter (sqrt measure) effect}), defined by the sum of
  the square roots of the out-degrees of the others to whom $i$ is tied,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, \sqrt{x_{j+}} =
@@ -6113,20 +6041,21 @@ Structural effects are the effects depending on the network only.
  effects are taken together as ``degree effects'',
  since in-degrees and out-degrees are the same in this case;
 
- \item {\em in-degree related activity effect}, defined as
-   the cross-product  of the actor's in- and out-degrees,\\
+ \item {\em in-degree related activity effect}, \texttt{(inAct)}
+ defined as  the cross-product  of the actor's in- and out-degrees,\\
  $s^{\rm net}_{i\vit}(x) = x_{i+}\, x_{+i}$;\\
  endowment effect only likelihood-based;
 
- \item {\em in-degree related activity (sqrt) effect}, defined by  \\
+ \item {\em in-degree related activity (sqrt) effect}, \texttt{(inActSqrt)}
+ defined by  \\
  $s^{\rm net}_{i\vit}(x) = x_{i+}\,\sqrt{x_{+i}}$ ;
 
- \item {\em out-degree related activity effect}, defined as
-   the squared out-degree of the actor,
+ \item {\em out-degree related activity effect} \texttt{(outAct)},
+ 	 defined as the squared out-degree of the actor,
  $s^{\rm net}_{i\vit}(x) = x^2_{i+}$;\\
  endowment effect only likelihood-based;
 
- \item {\em out-degree related activity (sqrt) effect}
+ \item {\em out-degree related activity (sqrt) effect}  \texttt{(outActSqrt)}
  (earlier called {\em out-degree$\,\hat{\ }$(1.5)}), defined by  \\
  $s^{\rm net}_{i\vit}(x) = x^{1.5}_{i+} = x_{i+}\,\sqrt{x_{i+}}$ \\
  endowment effect only likelihood-based;
@@ -6148,35 +6077,39 @@ Structural effects are the effects depending on the network only.
  and the density effect;\\
  this is left out in later versions of \si;
 
- \item {\em sum of (1/(out-degree + $c$)}, where $c$ is some constant,
- defined by  \\
+ \item {\em sum of (1/(out-degree + $c$)} \texttt{(outInv)},
+ where $c$ is some constant,  defined by  \\
  $s^{\rm net}_{i\vit}(x) = 1/(x_{i+} + c)$;\\
  endowment effect only likelihood-based;
 
- \item {\em sum of (1/(out-degree + $c$)(out-degree + $c+1$))}, where $c$ is some constant,
- defined by  \\
+ \item {\em sum of (1/(out-degree + $c$)(out-degree + $c+1$))} \texttt{(outSqInv)},
+ where $c$ is some constant, defined by  \\
  $s^{\rm net}_{i\vit}(x) = 1/(x_{i+} + c)(x_{i+} + c + 1)$;\\
  endowment effect only likelihood-based.
 
- \item {\em out-out degree$\,\hat{\ }$(1/c) assortativity},
+ \item {\em out-out degree$\,\hat{\ }$(1/c) assortativity}
+ \texttt{(outOutAss)},
  which represents the differential tendency for actors with high out-degrees
  to be tied to other actors who likewise have high out-degrees,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{i+}^{1/c}} {x_{j+}^{1/c}} $;\\
  $c$ can be 1 or 2 (the latter value is the default);
 
- \item {\em out-in degree$\,\hat{\ }$(1/c) assortativity},
+ \item {\em out-in degree$\,\hat{\ }$(1/c) assortativity}
+ \texttt{(outInAss)},
  which represents the differential tendency for actors with high out-degrees
  to be tied to other actors who have high in-degrees,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{i+}^{1/c}} {x_{+j}^{1/c}} $;\\
  $c$ can be 1 or 2 (the latter value is the default);
 
- \item {\em in-out degree$\,\hat{\ }$(1/c) assortativity},
+ \item {\em in-out degree$\,\hat{\ }$(1/c) assortativity}
+ \texttt{(inOutAss)},
  which represents the differential tendency for actors with high in-degrees
  to be tied to other actors who have high out-degrees,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{+i}^{1/c}} {x_{j+}^{1/c}} $;\\
  $c$ can be 1 or 2 (the latter value is the default);
 
- \item {\em in-in degree$\,\hat{\ }$(1/c) assortativity},
+ \item {\em in-in degree$\,\hat{\ }$(1/c) assortativity}
+ \texttt{(inInAss)},
  which represents the differential tendency for actors with high in-degrees
  to be tied to other actors who likewise have high in-degrees,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{+i}^{1/c}} {x_{+j}^{1/c}} $;\\
@@ -6195,11 +6128,11 @@ The effects for a dyadic covariate $w_{ij}$ are
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
 
- \item {\em covariate (centered) main effect},\\
+ \item {\em covariate (centered) main effect} \texttt{(X)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, (w_{ij} - \bar{w}) $\\
  where $\bar{w}$ is the mean value of $w_{ij}\,$;
 
- \item {\em covariate (centered) $\times$ reciprocity},\\
+ \item {\em covariate (centered) $\times$ reciprocity} \texttt{(XRecip)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} x_{ji} \, (w_{ij} - \bar{w}) $.
 
  \item[{\hspace*{-1ex}$\bigodot$}]
@@ -6218,7 +6151,7 @@ The effects for a dyadic covariate $w_{ij}$ are
 
  \item
 \begin{minipage}[t]{.7\textwidth}
- {\em $WW=>X$ closure of covariate},\\
+ {\em $WW=>X$ closure of covariate} \texttt{(WWX)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{hj}\,$;\\
  this refers to the closure of $W-W$ two-paths;
  each $W-W$ two-path
@@ -6258,7 +6191,7 @@ The effects for a dyadic covariate $w_{ij}$ are
  if the number of nodes is large.
 
 \begin{minipage}[t]{.7\textwidth}
- \item {\em $WX=>X$ closure of covariate},\\
+ \item {\em $WX=>X$ closure of covariate} \texttt{(WXX)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, x_{hj}\,$;\\
  this refers to the closure of mixed $W-X$ two-paths;
  each $W-X$ two-path $i \stackrel{W}{\rightarrow} h \rightarrow j$
@@ -6291,7 +6224,7 @@ The effects for a dyadic covariate $w_{ij}$ are
 \end{minipage}
 
 \begin{minipage}[t]{.7\textwidth}
- \item {\em $XW=>X$ closure of covariate},\\
+ \item {\em $XW=>X$ closure of covariate} \texttt{(XWX)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, x_{ih}\, w_{hj}\,$;\\
  this refers to the closure of mixed $X-W$ two-paths;
  each $X-W$ two-path $i \rightarrow h \stackrel{W}{\rightarrow} j$
@@ -6340,22 +6273,24 @@ the following effects are available:
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
 
- \item {\em covariate-alter} or {\em covariate-related popularity},
+ \item {\em covariate-alter} or {\em covariate-related popularity}
+ \texttt{(altX)},
  defined by the sum of the covariate over all actors to whom $i$ has a tie,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, v_j$;
 
- \item {\em covariate squared - alter} or {\em squared covariate-related popularity},
+ \item {\em covariate squared - alter} or {\em squared covariate-related popularity} \texttt{(altSqX)},
  defined by the sum of the squared centered covariate over all actors to whom $i$ has a tie,
  (not included if the variable has range less than 2)\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, v_j$;
 
- \item {\em covariate-ego} or {\em covariate-related activity},
+ \item {\em covariate-ego} or {\em covariate-related activity}
+ \texttt{(egoX)},
  defined by $i$'s out-degree weighted by his covariate value,\\
  $s^{\rm net}_{i\vit}(x) = v_i \, x_{i+} $;
 
- \item {\em covariate-related similarity}, defined by the
- sum of centered similarity scores ${\rm sim}^v_{ij}$ between $i$
- and the other actors $j$ to whom he is tied,\\
+ \item {\em covariate-related similarity} \texttt{(simX)},
+ defined by the sum of centered similarity scores ${\rm sim}^v_{ij}$
+ between $i$  and the other actors $j$ to whom he is tied,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}^v_{ij} - \widehat{{\rm sim}^v}) $,\\
  where $\widehat{{\rm sim}^v}$ is the mean of all similarity scores, which are defined as
  ${\rm sim}^v_{ij}=\frac{\Delta-\vert v_i - v_j \vert}{\Delta}$ with
@@ -6363,12 +6298,13 @@ the following effects are available:
  (this mean is given in the output file just before the
  ``initial data description'');
 
- \item {\em covariate-related similarity $\times$ reciprocity}, defined by
+ \item {\em covariate-related similarity $\times$ reciprocity}
+ \texttt{(simRecipX)}, defined by
  the sum of centered similarity scores for all
  reciprocal dyads in which $i$ is situated,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}x_{ji} ({\rm sim}^v_{ij} - \widehat{{\rm sim}^v}) $;
 
- \item \emph{same covariate}, which can also be called {\em covariate-related identity},
+ \item \emph{same covariate}, which can also be called {\em covariate-related identity} \texttt{(sameX)},
  defined by the
  number of ties of $i$ to all other actors $j$ who have
  exactly the same value on the covariate,\\
@@ -6376,16 +6312,18 @@ the following effects are available:
  where the indicator function $I\{v_i = v_j \} $ is 1 if the condition $\{v_i = v_j \} $
  is satisfied, and 0 if it is not;
 
- \item {\em same covariate $\times$ reciprocity}, defined by the
+ \item {\em same covariate $\times$ reciprocity}
+\texttt{(sameXRecip)} defined by the
  number of reciprocated ties between $i$ and all other actors $j$ who have
  exactly the same value on the covariate,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} x_{ji}\, I\{v_i = v_j \} $;
 
- \item {\em covariate-ego $\times$ alter},
+ \item {\em covariate-ego $\times$ alter} \texttt{(egoXaltX)},
  defined by the product of $i$'s covariate and the sum of those of his alters,\\
  $s^{\rm net}_{i\vit}(x) = v_i \, \sum_j x_{ij}\, v_j $;
 
- \item {\em covariate-ego $\times$ alter $\times$ reciprocity},
+ \item {\em covariate-ego $\times$ alter $\times$ reciprocity}
+ \texttt{(egoXaltXRecip)},
  defined by the product of $i$'s covariate and the sum of those of his reciprocated alters,\\
  $s^{\rm net}_{i\vit}(x) = v_i \, \sum_j x_{ij}\,x_{ji}\, v_j $;
 
@@ -6397,14 +6335,16 @@ the following effects are available:
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}x_{+j} ({\rm sim}^v_{ij} - \widehat{{\rm sim}^v}) $.
 \fi
 
- \item {\em ego $>$ alter for covariate},
+ \item {\em ego $>$ alter for covariate} \texttt{(higher)} , % \texttt{(higherX)},
  defined by the number of ties where $i$'s covariate
  is larger than alter's, while equality counts for half,\\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \text{dsign}(v_i - v_j) $,\\
  where $\text{dsign}(d) = 0$ for $d < 0$, 0.5 for $d = 0$,
  and 1 for $d > 0$.
 
- \item {\em covariate of indirect ties}, defined by
+ \item {\em covariate of indirect ties}
+ \texttt{(IndTies)}, % \texttt{(IndTiesX)},
+ defined by
  the sum of the covariate over the actors
  to whom $i$ is tied indirectly (at a geodesic distance of 2),\\
  $s^{\rm net}_{i\vit}(x) = \sum_j (1 -x_{ij})
@@ -6438,7 +6378,7 @@ of $\breve v_i$ would be the same as the alter effect of $v_i$.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
 
-\item \emph{covariate - alter at distance 2}.
+\item \emph{covariate - alter at distance 2} \texttt{(altDist2)}. % \texttt{(altXDist2)}.
       This effect is associated with an effect parameter
       which can have values 1 or 2.
       For parameter 1, it is
@@ -6470,7 +6410,7 @@ of $\breve v_i$ would be the same as the alter effect of $v_i$.
        \frac{x_{j+} \breve v_j - x_{ji}v_i}{x_{j+}-x_{ji}}
       \]
       (where 0/0 is interpreted as 0).
-\item \emph{covariate - similarity at distance 2},
+\item \emph{covariate - similarity at distance 2} \texttt{(simDist2)} , % \texttt{(simXDist2)},
       defined as the sum of centered similarity
       values for alters' covariate-average between $i$ and all actors
       $j$ to whom $i$ has a tie,
@@ -6534,13 +6474,26 @@ is denoted by the tie variables $x_{ij}$, while the
 tie variables $w_{ij}$ denote the network that is the
 explanatory variable.
 
+Various of these effects are applicable only if the networks $X$
+and $W$ satisfy certain conditions of conformability; for example,
+the first effect of $W$ on $X$ is meaningful only if $W$ and $X$
+have the same dimensions, i.e., either both are one-mode networks,
+or both are two-mode networks with the same actor set for the second mode;
+as another example, the second effect, of incoming $W$ on $X$,
+is applicable only if $W$ and $X$ are one-mode networks.
+These conditions are hopefully clear from logical considerations,
+and drawing a little diagram of the involved nodes and arrows
+will be helpful in cases of doubt.
+
 In the \SI output for projects with multiple networks,
 the dependent network in each given effect is indicated by
 the first part of the effect name.
 In the list below, a more or less normally formulated name is given first, then the
 name used in \SI between parentheses,
 using $X$ as the name for the dependent network and $W$
-as the name for the explanatory network.
+as the name for the explanatory network,
+then between parentheses in \texttt{typewriter font} the \texttt{shortName}
+as used by \rs.
 Since this is a co-evolution model, \SI will include also the effects
 where the roles of $X$ and $W$ are reversed.
 
@@ -6549,16 +6502,16 @@ as a main effect; the reciprocity and mutuality effects
 will require rather big data sets to be empirically distinguished
 from each other.
 \begin{enumerate}
- \item {\em Effect of W on X} ($X$: $W$),\\
+ \item {\em Effect of W on X} ($X$: $W$)  \texttt{(crprod)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ij}  $ ;\\
  $i \stackrel{W}{\rightarrow} j$ leads to  $i \stackrel{X}{\rightarrow} j$;
 
- \item {\em Effect of incoming W on X} ($X$: reciprocity with $W$),\\
+ \item {\em Effect of incoming W on X} ($X$: reciprocity with $W$)  \texttt{(crprodRecip)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ji}  $ ;\\
  this can be regarded as generalized exchange:
  $j \stackrel{W}{\rightarrow} i$ leads to  $i \stackrel{X}{\rightarrow} j$;
 
- \item {\em Effect of mutual ties in W on X} ($X$: mutuality with $W$),\\
+ \item {\em Effect of mutual ties in W on X} ($X$: mutuality with $W$)  \texttt{(crprodMutual)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ij} \, w_{ji}  $ ;\\
  $j \stackrel{W}{\leftrightarrow} i$ leads to  $i \stackrel{X}{\rightarrow} j$;
 \setcounter{savenumi}{\value{enumi}}
@@ -6577,29 +6530,29 @@ OF THE OUTPUT.
 
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
- \item {\em Effect of in-degree in W on X-popularity } ($X$: indegree$^{1/p}$ $W$ popularity)
+ \item {\em Effect of in-degree in W on X-popularity } ($X$: indegree$^{1/p}$ $W$ popularity)   \texttt{(inPopIntn)}\\
  defined by   the sum of  the $W$-in-degrees of the others to whom $i$ is tied,
  for parameter $p = 2$ the square roots of the $W$-in-degrees:\\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{+j} - \bar w)^{1/p}  $;\\
 
- \item {\em Effect of in-degree in W on X-activity } ($X$: indegree$^{1/p}$ $W$ activity)
+ \item {\em Effect of in-degree in W on X-activity } ($X$: indegree$^{1/p}$ $W$ activity)  \texttt{(inActIntn)}\\
  defined by the $W$-in-degrees of $i$ (for $p = 2$ its square root)
  times $i$'s $X$-out-degree:\\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{+i} - \bar w)^{1/p}
                  =  x_{i+}\, (w_{+i} - \bar w_{+.}) ^{1/p} $;\\
 
- \item {\em Effect of out-degree in W on X-popularity } ($X$: outdegree$^{1/p}$ $W$ popularity)
+ \item {\em Effect of out-degree in W on X-popularity } ($X$: outdegree$^{1/p}$ $W$ popularity) \texttt{(outPopIntn)}\\
  defined by   the sum of  the $W$-out-degrees of the others to whom $i$ is tied,
  for parameter $p = 2$ the square roots of the $W$-out-degrees:\\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{j+} - \bar w)^{1/p}  $;\\
 
- \item {\em Effect of out-degree  in W on X-activity } ($X$: outdegree$^{1/p}$ $W$ activity)
+ \item {\em Effect of out-degree  in W on X-activity } ($X$: outdegree$^{1/p}$ $W$ activity) \texttt{(outActIntn)}\\
  defined by the $W$-out-degrees of $i$ (for $p = 2$ its square root)
  times $i$'s $X$-out-degree:\\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (w_{i+} - \bar w)^{1/p} =
                            x_{i+}\, (w_{i+} - \bar w)^{1/p} $;\\
 
- \item {\em Effect of both in-degrees in W on X-popularity } ($X$: both indegrees$^{1/p}$ $W$ )
+ \item {\em Effect of both in-degrees in W on X-popularity } ($X$: both indegrees$^{1/p}$ $W$ ) \texttt{(both)}\\
  defined by   the sum of  the $W$-in-degrees of the others to whom $i$ is tied
  multiplied by the centered $W$-in-degree of $i$,
  for parameter $p = 2$ the square roots of the $W$-in-degrees:\\
@@ -6620,21 +6573,21 @@ but that are connected through $i$:
 1 or 2.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
- \item {\em Effect of W-betweenness on X-popularity } ($X$: betweenness$^{1/p}$ $W$ popularity)
+ \item {\em Effect of W-betweenness on X-popularity } ($X$: betweenness$^{1/p}$ $W$ popularity)  \texttt{(betweenPop)}
  defined by   the sum of  the $W$-betweenness counts of the others to whom $i$ is tied:\\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \left(\sum_{h,k; h \neq k}w_{hj}\,w_{jk}\,(1-w_{hk})\right)^{1/p}  $;\\
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 \smallskip
-Finally there are four mixed triadic effects.
+Further there are four mixed triadic effects.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
 \item
 \begin{minipage}[t]{.7\textwidth}
- {\em agreement about W leading to X}, ($X$: from $W$ agreement)\\
+ {\em agreement along W leading to X}, ($X$: from $W$ agreement)  \texttt{(from)} \\ % \texttt{(fromWAgree)}\\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{jh}\,$;\\
  this refers to agreement of actors with respect to their $W$-choices
- (structural equivalence with respect to outgoing $W$-choices)
+ (structural equivalence with respect to outgoing $W$-choices);
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
  the number of joint $W$ choices of others,
@@ -6667,10 +6620,11 @@ Finally there are four mixed triadic effects.
 \smallskip
 \item
 \begin{minipage}[t]{.7\textwidth}
- {\em agreement in mutual W-ties leading to X}, ($X$: from $W$ mutual agreement)\\
+ {\em agreement along mutual W-ties leading to X}, ($X$: from $W$ mutual agreement) \texttt{(fromMutual)}
+           \\ % \texttt{(fromWMutualAgree)}\\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\,  w_{hi}\, w_{jh}\, w_{hj}\,$;\\
  this refers to agreement of actors with respect to their mutual $W$-choices
- (structural equivalence with respect to mutual $W$-choices)
+ (structural equivalence with respect to mutual $W$-choices);
  the contribution  of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
  the number of joint mutual $W$ choices of others,
@@ -6705,7 +6659,7 @@ Finally there are four mixed triadic effects.
 \smallskip
  \item
 \begin{minipage}[t]{.7\textwidth}
- {\em  W leading to agreement in X}, ($X$: $W$ to agreement)\\
+ {\em  W leading to agreement along X}, ($X$: $W$ to agreement) \texttt{(to)} \\ %  \texttt{(WToAgree)}\\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, x_{hj}\,$;\\
  this refers to the closure of mixed $W-X$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
@@ -6745,7 +6699,7 @@ Finally there are four mixed triadic effects.
 \end{minipage}
  \item
 \begin{minipage}[t]{.7\textwidth}
- {\em mixed $WW=>X$ closure}, ($X$: closure of $W$)\\
+ {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\ % \texttt{(WClosure)}\\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{hj}\,$;\\
  this refers to the closure of $W-W$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
@@ -6780,6 +6734,115 @@ Finally there are four mixed triadic effects.
 \end{center}
 \vfill
 \end{minipage}
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+
+Then there is a  mixed triadic effect
+restricted to triples with the same value on a covariate.
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em agreement along W leading to X, for same V}, \texttt{(covNetNet)} \\ % \texttt{(fromWAgreeSameX)}\\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{jh}\,I\{v_i = v_j\}$;\\
+ this refers to agreement of actors with respect to their $W$-choices
+ (structural equivalence with respect to outgoing $W$-choices), but only
+ for actors and choices sharing the same value of a covariate $V$;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of joint $W$ choices of others,
+ $i \stackrel{W}{\rightarrow} h \stackrel{W}{\leftarrow} j$,
+ counting only those for which $v_i = v_j = v_h$.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\diamond$} at  2 1
+\put{\large$\diamond$} at  4 1
+\put{\large$\diamond$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from  3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+
+
+\noindent
+There are two effects similar to the effects described above
+depending on the auxiliary variable $\breve v_i$,
+``alters' $v$-average''.
+Now the `alter' is defined, however, by the other network $W$.
+Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
+\begin{equation}
+  \breve v_i^W = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_j w_{ij}v_j}{w_{i+}}  &  \text{ if } w_{i+} > 0     \\
+         0                                &  \text{ if } w_{i+} = 0  .
+  \end{array}   \right.            \label{alt_av_w}
+\end{equation}
+
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+
+\item \emph{covariate - alter at W-distance 2} \texttt{(altDist2W)} \\ % \texttt{(altXDist2W)}.
+      This effect is associated with an effect parameter
+      which can have values 1 or 2.
+      For parameter 1, it is
+      defined as the sum of $W$-alters' covariate-average over all actors
+      to whom $i$ has a tie,
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \breve v_j^W \hfill (\text{parameter 1}). \hfill
+\]
+      For parameter 2, it is defined similarly,
+      but for an alters' covariate-average excluding
+      ego:
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \breve v_j^{W(-i)} \hfill (\text{parameter 2}) \hfill
+\]
+      where
+\begin{equation}
+  \breve v_j^{W(-i)} = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_{h \neq j} w_{jh}v_h}{w_{j+} - w_{ji}}  &  \text{ if } w_{j+} - w_{ji} > 0     \\
+         0                                &  \text{ if } w_{j+}- w_{ji} = 0  .
+  \end{array}   \right.            \label{alt_av2}
+\end{equation}
+\item \emph{covariate - similarity at W-distance 2} \texttt{(simDist2W)}, % \texttt{(simXDist2W)},
+      defined as the sum of centered similarity
+      values for alters' covariate-average between $i$ and all actors
+      $j$ to whom $i$ has a tie,
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\breve v^W)_{ij}
+  - \widehat{{\rm sim}({\breve v}^W)}) \ ,
+\]
+ where the similarity scores ${\rm sim}(\breve v^W)_{ij}$ are defined as
+\[
+{\rm sim}(\breve v^W)_{ij}=
+ \frac{\Delta-\vert \breve v_i^W - \breve v_j^W \vert}{\Delta} \ ,
+\]
+ while
+ $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
+ \emph{original} covariate $v$, and\\
+ $\widehat{{\rm sim}({\breve v}^W)}$ is the
+ \emph{observed} mean of all these similarity scores;
+ this observed mean is defined by calculating the $\breve v_i^W$ values
+ for each of the observations $t_1$ to $t_{M-1}$, and averaging
+ these \\
+ $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
@@ -6818,18 +6881,20 @@ Type) as a product \[ \lambda^{\rm net}_i(\rho, \alpha, x, m) =
 covariates, and actor position \citep[see][p.\ 383]{Snijders01}. The
 corresponding factors in the rate function are the following:
 \begin{enumerate}
- \item The dependence on the period can be represented by a simple factor
+ \item The dependence on the period \texttt{(Rate)}
+ can be represented by a simple factor
  \[ \lambda^{\rm net}_{i1} = \rho^{\rm net}_m \]
  for $m = 1, ..., M-1$. If there are only $M = 2 $ observations,
  \hypertarget{T_rho}{the basic rate parameter} is called $ \rho^{\rm net}$.
 
- \item The effect of actor covariates with values
+ \item The effect of actor covariates \texttt{(RateX)} with values
  $v_{hi}$ can be represented by the factor
  \[ \lambda^{\rm net}_{i2} = \exp(\sum_h \alpha_h \, v_{hi})\,. \]
 
  \item The dependence on the position of the actor can be modeled
- as a function of the actor's out-degree, in-degree, and number
- of reciprocated relations, the `reciprocated degrees'.
+ as a function of the actor's out-degree \texttt{(outRate)},
+ in-degree \texttt{(inRate)}, and number
+ of reciprocated relations \texttt{(recipRate)}, the `reciprocated degrees'.
  Define these by
  \[ x_{i+} = \sum_j x_{ij},\ x_{+i} = \sum_j x_{ji},\ x_{i(r)} = \sum_j x_{ij}x_{ji} \]
  (recalling that $x_{ii} = 0$ for all $i$).\\
@@ -6855,7 +6920,7 @@ if the associated parameter is denoted $\alpha_h$ for some $h$,
 and similarly for the contributions of the in-degrees and the
 reciprocated degrees.
 
- Also an exponential dependence on reciprocals of out-degrees can be specified;
+ Also an exponential dependence on reciprocals of out-degrees \texttt{(outRateInv)} can be specified;
  this can be meaningful because the rate effect of
  the out-degree becoming a value 1 higher might
  become smaller and smaller as the out-degree increases.
@@ -6924,11 +6989,11 @@ minus the overall mean, which is given in the output file under the heading
 \emph{Reading dependent actor variables}.
 
 \begin{enumerate}
- \item {\em behavioral shape effect},\\
+ \item {\em behavioral shape effect} \texttt{(linear)},\\
  $s^{\rm beh}_{i\vit}(x) = z_i \,$,\\
  where $z_{i}$ denotes the value of the dependent behavior variable of actor $i$;
 
- \item {\em quadratic shape effect, or effect of the behavior upon itself},
+ \item {\em quadratic shape effect, or effect of the behavior upon itself} \texttt{(quad)},
  where the attractiveness of further steps up the behavior `ladder'
  depends on where the actor is on the ladder:\\
  $s^{\rm beh}_{i\vit}(x) =  z_i^2$.\\
@@ -6936,53 +7001,56 @@ minus the overall mean, which is given in the output file under the heading
  versions 3 and 4 of \si.
 
 
- \item {\em average similarity effect}, defined by the
+ \item {\em average similarity effect} \texttt{(avSim)}, defined by the
  average of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is tied,\\
  $s^{\rm beh}_{i\vit}(x) = x_{i+}^{-1} \, \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i+} = 0$) ;
 
- \item {\em total similarity effect}, defined by the
+ \item {\em total similarity effect} \texttt{(totSim)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is tied,\\
  $s^{\rm beh}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 
- \item {\em indegree effect}, \\
+ \item {\em indegree effect} \texttt{(indeg)}, \\
  $s^{\rm beh}_{i\vit}(x) = z_i \sum_j x_{ji} $;
 
- \item {\em outdegree effect}, \\
+ \item {\em outdegree effect} \texttt{(outdeg)}, \\
  $s^{\rm beh}_{i\vit}(x) = z_i \sum_j x_{ij} $;
 
 % \item {\em indegree up to $c$ effect}, where $c$ is a constant between 1 and $n-1$,\\
 % $s^{\rm beh}_{i\vit}(x) = z_i I\{x_{+i} \leq c\}$,\\
 % where again $I\{A\}$ denotes the indicator function of the condition $A$;
 
- \item {\em isolate effect}, the differential attractiveness of the behavior
-  for isolates, \\
+ \item {\em isolate effect} \texttt{(isolate)},
+  the differential attractiveness of the behavior for isolates, \\
  $s^{\rm beh}_{i\vit}(x) = z_i I\{x_{+i} = 0 \}$,\\
  where again $I\{A\}$ denotes the indicator function of the condition $A$;
 
 
  \item
- {\em average similarity $\times$ reciprocity effect}, defined by the
- sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
+ {\em average similarity $\times$ reciprocity effect} \texttt{(avSimRecip)},
+ defined by the sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is reciprocally tied,\\
  $s^{\rm beh}_{i\vit}(x) = x_{i(r)}^{-1} \, \sum_j x_{ij} x_{ji} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i(r)} = 0$) ;
 
- \item {\em total similarity $\times$ reciprocity effect}, defined by the
+ \item {\em total similarity $\times$ reciprocity effect}
+ \texttt{(totSimRecip)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is reciprocally tied,\\
  $s^{\rm beh}_{i\vit}(x) =  \sum_j x_{ij} x_{ji} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 
- \item {\em average similarity $\times$ popularity alter effect}, defined by the
+ \item {\em average similarity $\times$ popularity alter effect}
+ \texttt{(avSimPopAlt)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is  tied, multiplied by their indegrees, \\
  $s^{\rm beh}_{i\vit}(x) = x_{i+}^{-1} \, \sum_j x_{ij}  x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i+} = 0$) ;
 
  \item
- {\em total similarity  $\times$ popularity alter effect}, defined by the
+ {\em total similarity  $\times$ popularity alter effect}
+ \texttt{(totSimPopAlt)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is tied, multiplied by their indegrees,\\
  $s^{\rm beh}_{i\vit}(x) =  \sum_j x_{ij} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
@@ -6994,32 +7062,35 @@ minus the overall mean, which is given in the output file under the heading
  (and 0 if $x_{i+} = 0$) ;
 \fi
 
- \item {\em average similarity $\times$ reciprocity $\times$ popularity alter effect}, defined by the
+ \item {\em average similarity $\times$ reciprocity $\times$ popularity alter effect} \texttt{(avSimRecPop)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is reciprocally tied, multiplied by their indegrees, \\
  $s^{\rm beh}_{i\vit}(x) = x_{i(r)}^{-1} \, \sum_j x_{ij} x_{ji} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i(r)} = 0$) ;
 
- \item {\em total similarity $\times$ reciprocity $\times$ popularity alter effect}, defined by the
+ \item {\em total similarity $\times$ reciprocity $\times$ popularity alter effect} \texttt{(totSimRecPop)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is reciprocally tied, multiplied by their indegrees,\\
  $s^{\rm beh}_{i\vit}(x) =  \sum_j x_{ij} x_{ji} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 
- \item {\em average alter effect}, defined by the product of $i$'s
+ \item {\em average alter effect} \texttt{(avAlt)},
+ defined by the product of $i$'s
  behavior multiplied by the average behavior of his alters (a kind
  of ego-alter behavior covariance), \\
  $s^{\rm beh}_{i\vit}(x) =  z_i \big( \sum_j x_{ij}\, z_j \big)
                                 / \big (\sum_j x_{ij}\big)  $\\
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
- \item {\em average reciprocated alter effect}, defined by the product of $i$'s
+ \item {\em average reciprocated alter effect} \texttt{(avRecAlt)},
+ defined by the product of $i$'s
  behavior multiplied by the average behavior of his reciprocated alters, \\
  $s^{\rm beh}_{i\vit}(x) =  z_i \big( \sum_j x_{ij}\, x_{ji}\, z_j \big)
                                 / \big (\sum_j x_{ij}\, x_{ji} \big)  $\\
  (and 0 if the ratio is 0/0) ;
 
 
- \item {\em dense triads effect}, defined by the number of dense triads in which actor $i$ is
+ \item {\em dense triads effect} \texttt{(behDenseTriads)},
+ defined by the number of dense triads in which actor $i$ is
  located, \\
  $s^{\rm beh}_{i\vit}(x) =  z_i \sum_{j,h} I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
  + x_{jh}\, + x_{hj}\,)\geq c \}\,$,\\
@@ -7036,10 +7107,11 @@ minus the overall mean, which is given in the output file under the heading
  I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$;\\
  \emph{this is currently not correctly implemented in \SI 3 };
 
- \item {\em reciprocated degree effect}, \\
+ \item {\em reciprocated degree effect} \texttt{(recipDeg)}, \\
  $s^{\rm beh}_{i\vit}(x) = z_i \sum_j x_{ij}\,x_{ji} $;
 
- \item {\em average similarity $\times$ popularity ego effect}, defined by the
+ \item {\em average similarity $\times$ popularity ego effect}
+ \texttt{(avSimPopEgo)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is  tied, multiplied by ego's indegree, \\
  $s^{\rm beh}_{i\vit}(x) =  x_{+i} \, x_{i+}^{-1} \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
@@ -7063,11 +7135,11 @@ denoted $v_j$), there are the following effects.
 
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
- \item {\em covariate effect},\\
+ \item {\em main covariate effect} \texttt{(effFrom)},\\
  $s^{\rm beh}_{i\vit}(x) = z_{i} v_{i}\,$;\\
  here too, the other dependent behavioral variables are centered so that they
  have overall mean 0;
-\item \emph{alter's covariate average } effect on behavior $z$,
+\item \emph{alter's covariate average } effect on behavior $z$  \texttt{(avAlt)},\\
       defined as the product of $i$'s behavior $z_i$ and
       $i$'s alters' covariate-average $\breve v_i$ as defined
       in (\ref{alt_av}),\\
@@ -8210,17 +8282,23 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2011-01-08  R-forge revision 129:
+\begin{itemize}
+\item fix to sienaTimeFix for time dummies on
+  covariate effects etc.
+\item Suppressed warning message when loading snow package.
+\end{itemize}
 \item 2010-12-02 R-forge revision 128:
 \begin{itemize}
 \item Corrections to scores for symmetric pairwise models
 \item ML now runs with missing data. Not yet sure it is correct!
 \item New multiple network effects: To, altDist2W, simDist2W.
 \item Can now use setEffects to update basic rate initial values
-\item multiplication factor for ML now a parameter in sienaModelCreate.
+\item multipleication factor for ML now a parameter in sienaModelCreate.
 \item Fixed bug meaning that covariate multiple network effects did not appear
   if the covariates was a behavior variable.
 \item Can now run sienaTimeTest on fits from finite differences and maximum
-  likelihood. (Not totally sure it is correct yet!)
+  likelihood.
 \item User defined interactions (and time dummies) can be expanded when printing
   the effects object, use parameter expandDummies=TRUE.
 \end{itemize}
@@ -8609,5 +8687,6 @@ Created RSienaTest which includes user
 
 %\bibliographystyle{JRSS} % TS: I did not find this style so I changed it:
 \bibliographystyle{Chicago}
+%\bibliographystyle{plain}
 \bibliography{RSiena}
 \end{document}

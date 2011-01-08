@@ -776,7 +776,9 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
                                            effect$shortName, "egoX",
                                            character=TRUE,
                                            type=effect$type,
-                                           interaction1= c("", dname),
+                                           interaction1= c(effect$interaction1,
+                                           dname),
+                                           interaction2=effect$interaction2,
                                            name=depvar, verbose=FALSE)
                     ## find the row altered
                     newrow <- newEffects$effect1 == j &
