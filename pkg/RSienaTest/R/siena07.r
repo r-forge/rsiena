@@ -39,7 +39,7 @@ siena07<- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
         {
             stop("cannot parallel test with multiple processes")
         }
-        require(snow)
+        require(snow, warn.conflicts=FALSE)
         require(rlecuyer)
         if (clusterIter)
         {
