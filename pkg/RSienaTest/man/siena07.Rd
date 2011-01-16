@@ -11,7 +11,7 @@
  a \code{\link{sienaModel}} object as produced by \code{\link{sienaModelCreate}} (see examples).}
 \usage{
 siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
-        useCluster=FALSE, nbrNodes=2, initC=FALSE,
+        useCluster=FALSE, nbrNodes=2, initC=TRUE,
         clusterString=rep("localhost", nbrNodes), tt=NULL,
         parallelTesting=FALSE, clusterIter=!x$maxlike, ...)
       }
@@ -27,7 +27,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{nbrNodes}{Number of processes to use if useCluster is TRUE.}
   \item{initC}{Boolean: set to TRUE if the simulation will use C
    routines (currently always needed). Only for use if using
-   multiple processors, to ensure all copies are initialised correctly.}
+   multiple processors, to ensure all copies are initialised
+   correctly. Ignored otherwise, so is set to TRUE by default.}
   \item{clusterString}{Definitions of clusters. Default set up to use
    the local machine only.}
   \item{tt}{A \code{tcltk} toplevel window. Used if called from the

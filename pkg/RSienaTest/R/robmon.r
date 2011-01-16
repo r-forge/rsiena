@@ -35,7 +35,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     {
         x$FRAN <- getFromNamespace(x$FRANname, pos=grep("RSiena", search())[1])
     }
-    z <- x$FRAN(z, x, INIT=TRUE, ...)
+    z <- x$FRAN(z, x, INIT=TRUE, initC=FALSE, ...)
     ##
     ##if conditional, FRAN changes z$theta etc
     #######################################################

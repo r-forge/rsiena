@@ -84,6 +84,9 @@ private:
 	// was calculated.
 
 	int llastSecondModificationCount;
+
+	// The number of elements in ltable
+	int ltableSize;
 };
 
 }

@@ -12,7 +12,7 @@
 
 ##@siena07 siena07
 siena07<- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
-                   useCluster = FALSE, nbrNodes = 2, initC=FALSE,
+                   useCluster = FALSE, nbrNodes = 2, initC=TRUE,
                    clusterString=rep("localhost", nbrNodes), tt=NULL,
                    parallelTesting=FALSE, clusterIter=!x$maxlike, ...)
 {

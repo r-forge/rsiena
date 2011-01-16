@@ -28,7 +28,15 @@ MixedConfigurationTable::MixedConfigurationTable(TwoNetworkCache * pOwner)
 	this->lpOwner = pOwner;
 	this->lpFirstNetwork = pOwner->pFirstNetwork();
 	this->lpSecondNetwork = pOwner->pSecondNetwork();
-	this->ltable = new int[this->lpFirstNetwork->n()];
+
+	// Make sure the table is large enough for any of the involved sets
+	// of actors.
+
+	this->ltableSize =
+		std::max(std::max(this->lpFirstNetwork->n(), this->lpFirstNetwork->m()),
+			std::max(this->lpSecondNetwork->n(), this->lpSecondNetwork->m()));
+
+	this->ltable = new int[this->ltableSize];
 
 	// This will make sure that the table is calculated on the first
 	// call to the get(...) method, as the network modification count
@@ -115,7 +123,7 @@ const Network * MixedConfigurationTable::pSecondNetwork() const
  */
 void MixedConfigurationTable::reset()
 {
-	for (int i = 0; i < this->lpFirstNetwork->n(); i++)
+	for (int i = 0; i < this->ltableSize; i++)
 	{
 		this->ltable[i] = 0;
 	}

@@ -514,8 +514,8 @@ void NetworkVariable::makeChange(int actor)
 		// Siena 3 checks in the diagonal case, so I do too temporarily.
 		//if (alter != actor && !this->lpNetworkCache->outTieExists(alter) &&
 		//	this->pSimulation()->pModel()->modelType() == AAGREE)
-		if (!this->lpNetworkCache->outTieExists(alter) &&
-			this->pSimulation()->pModel()->modelType() == AAGREE)
+		if (this->pSimulation()->pModel()->modelType() == AAGREE &&
+			!this->lpNetworkCache->outTieExists(alter))
 		{
 			accept = this->checkAlterAgreement(alter);
 		}
@@ -770,7 +770,7 @@ void NetworkVariable::calculateTieFlipContributions()
 		{
 			this->levaluationEffectContribution[m][i] = 0;
 		}
-		for (int i = 0; i < evaluationEffectCount; i++)
+		for (int i = 0; i < endowmentEffectCount; i++)
 		{
 			this->lendowmentEffectContribution[m][i] = 0;
 		}
