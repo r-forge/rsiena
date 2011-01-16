@@ -200,7 +200,9 @@ variables have the same number of observations. (Stop if not).
 \STATE stop
 \ENDIF
 \IF{no node set argument}
-\STATE create a list of nodesets from the first dependent variable
+\STATE create a list of nodesets containing a single
+nodeset named Actors, with the number of nodes equal to the number of senders of
+the first dependent variable
 \ENDIF
 \FORALL{covariates}
 \STATE Appropriate validation and processing (see below).
@@ -208,6 +210,10 @@ variables have the same number of observations. (Stop if not).
 \STATE Process any composition change objects (see section
 \ref{sec:compositionChange}) \\
 \STATE Process the dependent variables (see section \ref{sec:dependent})
+\STATE Check constraints if there are multiple networks. (section
+\ref{sec:constraints}).
+\STATE Calculate similarity means for alters for each covariate and dependent
+network (see section \ref{sec:covarDist2})
 \end{algorithmic}
 \subsection{ Covariates}
 \subsubsection{Constant Covariate}
@@ -259,7 +265,7 @@ or any missing\\
 \begin{algorithmic}
 \STATE Check the nodesets (section \ref{sec:nodeset})
 \IF{both nodesets the same}
-\STATE set diagonal to missing so is ignored in mean and range
+\STATE set diagonal to \emph{missing} so is ignored in mean and range
 \ENDIF
 \STATE Create attributes: (a class method) \\
 \sfn{ }\nnm{mean} ignore missings\\
@@ -267,7 +273,7 @@ or any missing\\
 \sfn{ }\nnm{range2} Ends of range, ignore missings\\
 \sfn{ }\nnm{name} name of object
 \IF{both nodesets the same}
-\STATE set diagonal to zero
+\STATE set diagonal to \emph{zero}
 \ENDIF
 \end{algorithmic}
 \subsubsection{Changing dyadic covariate}
@@ -284,14 +290,14 @@ or any missing\\
 dimensions.
 \ENDIF
 \IF{both nodesets the same}
-\STATE set all diagonals to missing so are ignored in mean and range
+\STATE set all diagonals to \emph{missing} so are ignored in mean and range
 \ENDIF
 \STATE Create attributes: (a class method) \\
 \sfn{ }\nnm{mean} ignore missings\\
 \sfn{ }\nnm{range} Extent of range, ignore missings. Make sure a double.\\
 \sfn{ }\nnm{name} name of object
 \IF{both nodesets the same}
-\STATE set all diagonals to zero
+\STATE set all diagonals to \emph{zero}
 \ENDIF
 \end{algorithmic}
 \subsection{Composition change objects}
@@ -347,6 +353,8 @@ of actions(section \ref{sec:actions})\\
 \end{algorithmic}
 \subsection{Dependent variables}
 \label{sec:dependent}
+NB The attributes list tends to change rather quickly and some items may no
+longer be required. Some should be used in the C, but are not...
 \begin{algorithmic}
 \STATE Validate the nodeset(s)
 \STATE Create an attribute \nnm{name} with name of the object
@@ -367,9 +375,11 @@ multiple results?\\
 \sfn{ }\nnm{missing} TRUE if any missing\\
 \sfn{ }\nnm{simMean} value of similarity mean (see section
 \ref{sec:similarityMean})\\
-\sfn{ }\nnm{structural} FALSE Not allowed!
-\sfn{ }\nnm{uponly} TRUE if all changes increase
-\sfn{ }\nnm{downonly} TRUE if all changes decrease
+\sfn{ }\nnm{structural} FALSE Not allowed!\\
+\sfn{ }\nnm{balmean} NA\\
+\sfn{ }\nnm{structMean} NA\\
+\sfn{ }\nnm{uponly} TRUE if all changes increase, ignoring missings\\
+\sfn{ }\nnm{downonly} TRUE if all changes decrease, ignoring missings
 \ELSE[bipartite or onemode]
 \STATE create attributes:\\
 \sfn{ }\nnm{distance} count of changes, ignoring missing and structural values
@@ -379,21 +389,47 @@ and diagonals if not bipartite.\\
 \IF{one-mode}
 \STATE Create attributes:\\
 \sfn{ }\nnm{balMean} see section(\ref{sec:balmean})\\
+\sfn{ }\nnm{structMean} see section(\ref{sec:structmean})\\
 \sfn{ }\nnm{symmetric} TRUE if all waves are symmetric\\
 \sfn{ }\nnm{missing} TRUE if any missing values (except on diagonal)\\
 \sfn{ }\nnm{structural} TRUE if any 10 or 11\\
 \sfn{ }\nnm{vals} table of counts of values by period\\
 \sfn{ }\nnm{nval} Counts of non-missing values by period, excluding diagonal\\
-\sfn{ }\nnm{range} Min and max of non-structural values\\
+\sfn{ }\nnm{range2} Min and max of non-structural values\\
+\sfn{ }\nnm{noMissing} Number of missing values by period\\
+\sfn{ }\nnm{noMissingEither} Number of missing values at start or finish of
+period (excludes final).\\
+\sfn{ }\nnm{nonMissingEither} Number of non missing values at start or finish of
+period (excludes final).\\
+\sfn{ }\nnm{simMean} NA\\
+\sfn{ }\nnm{ones} Count of values equal to 1 by period\\
+\sfn{ }\nnm{density} Density of network by period\\
+\sfn{ }\nnm{degree} Average degree by period\\
+\sfn{ }\nnm{averageOutDegree} overall average degree\\
+\sfn{ }\nnm{averageInDegree} overall average degree\\
+\sfn{ }\nnm{missings} count of missings by period\\
 \ELSIF{bipartite}
 \STATE Create attributes:\\
-\sfn{ }\nnm{balMean} see section(\ref{sec:balmean})\\
+\sfn{ }\nnm{balMean} NA\\
+\sfn{ }\nnm{structMean} NA\\
 \sfn{ }\nnm{symmetric} FALSE\\
 \sfn{ }\nnm{missing} TRUE if any missing values\\
 \sfn{ }\nnm{structural} TRUE if any 10 or 11\\
 \sfn{ }\nnm{vals} table of counts of values by period\\
 \sfn{ }\nnm{nval} Counts of non-missing values by period\\
-\sfn{ }\nnm{range} Min and max of non-structural values\\
+\sfn{ }\nnm{range2} Min and max of non-structural values\\
+\sfn{ }\nnm{noMissing} Number of missing values by period\\
+\sfn{ }\nnm{noMissingEither} Number of missing values at start or finish of
+period (excludes final).\\
+\sfn{ }\nnm{nonMissingEither} Number of non missing values at start or finish of
+period (excludes final).\\
+\sfn{ }\nnm{simMean} NA\\
+\sfn{ }\nnm{ones} Count of values equal to 1 by period\\
+\sfn{ }\nnm{density} Density of network by period\\
+\sfn{ }\nnm{degree} Average degree by period\\
+\sfn{ }\nnm{averageOutDegree} overall average degree\\
+\sfn{ }\nnm{averageInDegree} overall average degree\\
+\sfn{ }\nnm{missings} count of missings by period\\
 \ENDIF
 \ENDIF
 \end{algorithmic}
@@ -410,6 +446,7 @@ and diagonals if not bipartite.\\
 \ENDFOR
 \STATE Sum nonmissing entries and counts over each column
 \STATE Calculate the similarity mean as total sum divided by total count.
+\STATE For possible later use, also return the total sum and total count.
 \end{algorithmic}
 \subsection{Balance mean}
 \label{sec:balmean}
@@ -421,6 +458,82 @@ values represented.\\
 \STATE Denominator = sum over all columns of \\
 count of non-missing entries times one less than this.
 \STATE Mean is numerator divided by denominator.
+\end{algorithmic}
+\subsection{Structural  mean}
+\label{sec:structmean}
+\begin{algorithmic}
+\STATE In calculations, remove diagonal and replace structural values by the
+values represented.\\
+\STATE Numerator = sum over all rows of\\
+2 * count of non-zero entries * count of non-missing non-nonzero entries\\
+\STATE Denominator = sum over all rows of \\
+count of non-missing entries times one less than this.
+\STATE Mean is numerator divided by denominator.
+\end{algorithmic}
+\subsection{Constraints between networks}
+\label{sec:constraints}
+\begin{algorithmic}
+\STATE Make a two column matrix containing the names of all possible pairs of
+dependent variables, including pairs with themselves.
+\STATE Identify any dependent variables that can relate: same type and have the
+same node sets.
+\STATE Create a list of these possibly relating dependent variables for each of
+access later.
+\FORALL{row in the matrix of pairs where the two columns are not the same}
+\IF{nodeset(s) match and type matches and not behavior}
+\STATE In checks, replaces structurals by 0/1 first, and ignore missings
+\STATE Check \emph{higher}: first network always greater than or equal to second
+network.
+\STATE Check \emph{disjoint}: sum of product of two networks not greater than 0.
+\STATE Check \emph{atLeastOne}: sum of two networks never equal 0.
+\ENDIF
+\ENDFOR
+\end{algorithmic}
+\subsection{Similarity means at distance 2}
+\label{sec:covarDist2}
+\begin{algorithmic}
+\FORALL{constant covariates, varying covariates}
+\FORALL{dependent networks which have the node set of the constant covariate as
+  their receivers (not behavior variables)}
+\STATE Calculate the corresponding similarity mean: see section
+\ref{sec:simdist2}).
+\ENDFOR
+\ENDFOR
+\FORALL{behavior variables}
+\FORALL{dependent networks which have the node set of the constant covariate as
+  their receivers (not behavior variables)}
+\STATE Substract the mean from the behavior variable
+\STATE FInd the range of the behavior variable
+\STATE Calculate the corresponding similarity mean using the centered behavior
+variable values (omitting final column) and the calculated range: see section
+\ref{sec:simdist2}).
+(i.e.\ centering and range are done on complete variable)
+\ENDFOR
+\ENDFOR
+\end{algorithmic}
+\subsubsection{Alter similarity calculation}
+\label{sec:simdist2}
+\begin{algorithmic}
+\FORALL{observations except the last}
+\STATE Replace structurals by 0/1
+\FORALL{rows of network matrix}
+\IF{sum of nonmissing entries is 0}
+\STATE Set vi for row to 0
+\ELSIF{all covariate values corresponding to non zero network entries are
+  missing}
+\STATE Set vi for row to NA
+\ELSE
+\STATE Set vi for row to sum of covariate times network row divided by the sum
+of the network row, ignoring missings in both cases.
+\ENDIF
+\ENDFOR
+\STATE Call rangeAndSimilarity using vi and the range if passed in (behavior
+variables) to obtain the values \nnm{simTotal} and \nnm{simCnt} for this
+overvation.
+\STATE Accumulate these two values
+\ENDFOR
+Divide sum of \nnm{simTotal} by sum of \nnm{simCnt} over observations (excluding
+the final one).
 \end{algorithmic}
 \section{getEffects}
 
@@ -437,11 +550,12 @@ to the first data object. The only changes required are to fill in the starting
 values for the rate effects for the later objects and to adjust the starting
 values for density, reciprocity, linear effects.
 
-The function \sfn{networkRateEffects} creates the required number of
-rate effects for networks.  \sfn{createEffects} extracts the rows
-from the effects data frame for an effect group and calls the function
-\sfn{substituteNames} to replace the variable fields by the current variable
-name.
+The function \sfn{networkRateEffects} creates the required number of rate
+effects for networks.  \sfn{createEffects} extracts the rows from the effects
+data frame for an effect group and calls the function \sfn{substituteNames} to
+replace the variable fields by the current variable name. It now creates the
+complete effect rows including endowment effect copies.
+
 \subsection{Siena Data Object}
 \begin{algorithmic}
 \FORALL{dependent variables}
@@ -482,9 +596,6 @@ effects
   \STATE paste the network name at the front of all the objective function
   effects
   \ENDIF
-  \STATE Create the effects data frame by calling \sfn{createObjEffectList} and
-  \sfn{createRateEffectList}.  This creates e.g.\ the evaluation and endowment
-  effect copies.
   \STATE Alter the text for endowment effects to start "Lost ties:"
   \STATE Calculate the starting values for the default effects
   (see section \ref{sec:onemodestart})
@@ -600,11 +711,11 @@ effect group to create the objective function effects
 \STATE Use \sfn{covarSymmetricRate} or \sfn{covarNonSymmetricRate} to create the
 rate effects
 \IF {not poszvar}
-\STATE reduce the new objective function effects to the rows 1 and 2 (symmetric)
-or 3 (non symmetric)
+\STATE Reduce the new objective function effects to just ``altX'' and ``altSqX'' (symmetric)
+or ``egoX'' (non symmetric)
 \ENDIF
 \IF{ not morethan2}
-\STATE remove the second objective function effect
+\STATE Remove the ``altSqX'' effect.
 \ENDIF
 \end{algorithmic}
 \subsection{covarBipartiteEff}
@@ -616,11 +727,12 @@ rate effects
 \STATE Use \sfn{covarBipartiteObjective} effect group to create the objective
 function effects
 \IF{first node set matches}
-\STATE reduce the objective function effects to the third row
-\ELSIF {not poszvar}
-\STATE reduce the new objective function effects to the rows 1 and 2
+\STATE reduce the objective function effects to ``egoX''
+\ELSIF {poszvar}
+\STATE reduce the new objective function effects to the rows ``altX'' and
+``altSqX''
 \IF{ not morethan2}
-\STATE remove the second objective function effect
+\STATE remove the ``altSqX'' effect
 \ENDIF
 \ELSE
 \STATE no objective function effects
@@ -880,12 +992,11 @@ values are calculated.
 The following overall values are copied down to the individual objects:
 \begin{description}
 
-\item[dependent variables] balance mean, symmetric, missing, structural,
-similarity mean, poszvar, range, min, max, moreThan2,  missing, structural
-\item[changing covariates] similarity mean, mean, range, min, max, poszvar,
-  moreThan2
-\item[constant dyadic covariates] mean, min, max
-\item[changing dyadic covariates] mean, range
+\item[dependent variables] symmetric, missing, structural, poszvar, range,
+min, max, moreThan2 (some only if behavior)
+\item[changing covariates] range,  poszvar, moreThan2
+\item[constant dyadic covariates] min, max
+\item[changing dyadic covariates] range
 
 \end{description}
 \subsection{Group attributes}
@@ -897,10 +1008,18 @@ attributes on the individual objects.
 \item[netnames] the names of the dependent variables (these must be the same in
   each data object)
 \item[symmetric] logical vector indicating whether the corresponding independent
-  variable is symmetric (set to FALSE for behavior variabnles and bipartite
+  variable is symmetric (set to FALSE for behavior variables and bipartite
   networks.
 \item[structural] logical vector indicating presence or absence of any
   structural values
+\item[numberNonMissingNetwork] vector of count of non missing values for non
+  behavior variables
+\item[numberMissingNetwork] vector of count of missing values for non
+  behavior variables
+\item[numberNonMissingBehavior] vector of count of non missing values for
+  behavior variables
+\item[numberMissingBehavior] vector of count of missing values for
+  behavior variables
 \item[allUpOnly] logical vector indicating that the values for this
   independent variable never decrease over time
 \item[allDownOnly] logical vector indicating that the values for this
@@ -909,12 +1028,26 @@ attributes on the individual objects.
   the values for this independent variable do not decrease
 \item[anyDownOnly] logical vector indicating that for one or more of the
   intervals the values for this independent variable do not increase.
+\item[allHigher] Table of logicals indicating whether \emph{higher} attribute is
+  true for each pair of networks in every data object
+\item[allDisjoint] Table of logicals indicating whether \emph{disjoint}
+  attribute is true for each pair of networks in every data object
+\item[allAtLeastOne] Table of logicals indicating whether \emph{atLeastOne}
+  attribute is true for each pair of networks in every data object
+\item[anyHigher] Table of logicals indicating whether \emph{higher} attribute is
+  true for each pair of networks in any data object
+\item[anyDisjoint] Table of logicals indicating whether \emph{disjoint}
+  attribute is true for each pair of networks in any data object
+\item[anyAtLeastOne] Table of logicals indicating whether \emph{atLeastOne}
+  attribute is true for each pair of networks in any data object
 \item[types] types of the independent variables
 \item[observations] A single integer with the total number of periods to
   process.
 \item[periodNos] A list of the period numbers (misses out the final one for each
   data object)
-\item[netnodesets] A list containing the nodeset(s) for each independent
+\item[groupPeriods] Vecotr of the number of total number of periods for each
+  data object.
+\item[netnodesets] A list containing the nodeset(s) for each dependent
   variable
 \item[cCovars] Vector of names of constant covariates
 \item[vCovars] Vector of names of changing covariates
@@ -933,7 +1066,13 @@ attributes on the individual objects.
 \item[names] Vector of names of the data objects
 \item[class] ("sienaGroup", "siena")
 \item[balmean] Vector of overall balance means, one for each dependent variable,
-  NA for behavior variables.
+  NA for behavior variables and bipartites.
+\item[structmean] Vector of overall structural means, one for each dependent
+  variable, NA for behavior variables and bipartites.
+\item[averageOutDegree] Vector of overall average outdegrees. NA for behavior
+  variables.
+\item[averageInDegree] Vector of overall average indegrees. NA for behavior
+  variables and bipartites.
 \item[bRange] Vector of overall ranges for behavior variables: entries
   corresponding to networks are NA
 \item[behRange] Matrix with two rows, and column for each independent

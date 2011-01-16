@@ -1,7 +1,27 @@
+2011-01-16 R-forge revision 130
+
+	* R/phase3.r: correct number of iterations in field Phase3nits
+	* R/robmon.r, R/siena07.r, man/siena07.Rd: make initC=TRUE the
+	default
+	* src/model/variables/NetworkVariable.cpp: fix array bound error in
+	initialisation for bipartite networks and reverse order of tests
+	for symmetric model types to avoid problem with bipartite no
+	change.
+	* src/model/effects/generic/GenericNetworkEffect.cpp: edits to
+	comments
+	* src.model/tables/MixedConfigurationTable.cpp,
+	MixedConfigurationTable.h: make size of table big enough for any
+	of the senders or receivers.
+	* doc/s_man400.tex, doc/RSiena.bib: various edits.
+	* tests/parallel.R, test/parallel.Rout.save: added test with bipartite
+	network and multiple processes.
+
 2011-01-08 R-forge revision 129
 
 	* R/sienaTimeTest.r, doc/sienaTimeFix.tex: added interactions
 	types for requested effect in call to includeInteraction.
+	* R/siena07.r: suppress warning message when loading snow
+	package. (Ineffective in sub processes)
 
 2010-12-02 R-forge revision 128
 
@@ -58,7 +78,7 @@
 	* src/model/variables/NetworkVariable.cpp: fixed bug in
 	calculation of symmetric model type BFORCE scores.
 	* R/sienaTimeTest.r: added code for finitedifferences and ML fits.
-	* doc/sienaTimeFixDoc.tex: added
+	* doc/sienaTimeFixDoc.tex: added to RSienaTest
 
 2010-11-25 R-forge revision 127
 

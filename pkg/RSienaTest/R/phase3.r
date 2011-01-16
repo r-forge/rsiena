@@ -193,6 +193,7 @@ phase3 <- function(z, x, ...)
                     z$ssc <- z$ssc[1:nit, , , drop=FALSE]
                     z$sdf <-z$sdf[1:nit, , , drop=FALSE]
                     z$sdf2 <-z$sdf2[1:nit, , , ,drop=FALSE]
+                    endNit <- nit
                     break
                 }
                 if (UserRestartFlag())
@@ -204,9 +205,9 @@ phase3 <- function(z, x, ...)
     {
         return(z)
     }
-    z$Phase3nits <- nit
-    z$n3 <- nit
-    z<- phase3.2(z,x)
+    z$Phase3nits <- endNit
+    z$n3 <- endNit
+    z <- phase3.2(z,x)
     z
 }
 
