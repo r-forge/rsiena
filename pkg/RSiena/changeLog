@@ -1,3 +1,15 @@
+2011-01-17 R-forge revision 132
+	* Changing revision 131 to conform with coding standards
+2011-01-17 R-forge revision 131
+	* Changes to RSienaTest Only
+	* R/gof.r: Added. Contains the function sienaGof and other functions
+	for performing basic goodness of fit tests from arbitrary functions.
+	This function requires the snopgof package to perform the Monte
+	Carlo test. There are also plotting facilities.
+	* man/gof.rd: Added. Contains basics of how to use sienaGof
+	* NAMESPACE: Added sienaGof functions to namespace for proper operation
+	* DESCRIPTION: Added snopgof to the recommended packages.
+
 2011-01-16 R-forge revision 130
 
 	* R/phase3.r: correct number of iterations in field Phase3nits
