@@ -8,7 +8,7 @@
 \usage{
 \method{print}{sienaMeta}(x, file=FALSE, ...)
 
-\method{summary}{sienaMeta}(object, file=FALSE, extra=TRUE, ...)
+\method{summary}{sienaMeta}(x, file=FALSE, extra=TRUE, ...)
 
 \method{print}{summary.sienaMeta}(x, file=FALSE, extra=TRUE, ...)
 
@@ -19,7 +19,6 @@
    \code{sienaMeta} objects.
 }
 \arguments{
-  \item{object}{An object of class \code{sienaMeta}}
   \item{x}{An object of class \code{sienaMeta}, or
 	\code{summary.sienaMeta} as appropriate}
   \item{file}{Boolean: if TRUE, sends output to file named
@@ -42,7 +41,8 @@
  argument to \code{siena08}.
 
  The function \code{plot.sienaMeta} plots estimates against standard
- errors for each effect, with lines added at \verb{x=\pm 2}.
+ errors for each effect, with reference lines added at the two-sided 
+ significance threshold 0.05.
 }
 \references{
   T. A. B. Snijders and Chris Baerveldt.
