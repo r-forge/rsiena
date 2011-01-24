@@ -1,3 +1,13 @@
+2011-01-25 R-forge revision 133
+        * changes to RSienaTest only
+        * R/phase2.r: comment out two test lines causing a crash of the ML
+        estimation when model specifications get so large that subphases
+        exceed 1000 iterations.
+        * R/siena08.r: debugging and adding of functionalities to the meta-
+        analysis.
+        * man/siena08.Rd: explain new features in help function
+        * man/print.sienaMeta.Rd: explain new features in help function
+        
 2011-01-17 R-forge revision 132
 	* Changing revision 131 to conform with coding standards
 2011-01-17 R-forge revision 131

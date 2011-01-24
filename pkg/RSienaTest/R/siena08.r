@@ -1,5 +1,5 @@
 #/******************************************************************************
-# * SIENA: Simulation Investigation for Empirical Network Analysis
+# * SIENA: Simulation Investigation for Empirical bwork Analysis
 # *
 # * Web: http://www.stats.ox.ac.uk/~snidjers/siena
 # *
@@ -90,6 +90,14 @@ siena08 <- function(..., projname="sienaMeta", bound=5)
         x1 <- x[!is.na(x$theta) & !is.na(x$se) & x$se < bound,]
         if (any(x1$theta != 0))
         {
+            if (sum((x1$se < bound)) >= 3)
+            {
+                check.correl <- cor.test(x1$theta,x1$se)
+            } 
+            else 
+            {
+                check.correl <- data.frame(estimate=NA,p.value=NA)         
+            }                
             regfit <- iwlsm(theta ~ 1, psi=psi.iwlsm, data=x1,
                             ses=x1$se^2)
             regfit$terms <- NA
@@ -105,7 +113,9 @@ siena08 <- function(..., projname="sienaMeta", bound=5)
             cjminus <- -2 * sum(pnorm(x1$theta / x1$se, log=TRUE))
             cjplusp <- 1 - pchisq(cjplus, 2 * nrow(x1))
             cjminusp <- 1 - pchisq(cjminus, 2 * nrow(x1))
-            ret1 <- list(regfit=regfit, regsummary=regsummary,
+            ret1 <- list(cor.est=check.correl$estimate,
+                         cor.pval=check.correl$p.value,
+                         regfit=regfit, regsummary=regsummary,
                          Tsq=Tsq, pTsq=1 - pchisq(Tsq, nrow(x1) - 1),
                          tratio=tratio,
                          ptratio=2 * pnorm(abs(tratio), lower.tail=FALSE),
@@ -145,7 +155,7 @@ siena08 <- function(..., projname="sienaMeta", bound=5)
     meta$thetadf <- mydf
     class(meta) <- "sienaMeta"
     meta$projname <- projname
-    meta$bound <- 5
+    meta$bound <- bound
     ## count the score tests
     meta$scores <- by(mydf, mydf$effects, function(x)
                       any(!is.na(x$scoretests)))
@@ -208,16 +218,34 @@ print.sienaMeta <- function(x, file=FALSE, ...)
        Report(c(" ", y$n1, " datasets used.\n\n"), sep="", outf)
        if (y$n1 > 0)
        {
-           Report(c("\nTest that all parameters are 0 : \n"), outf)
+           Report("Test that estimates and standard errors are uncorrelated", outf)
+           if (is.na(y$cor.est))
+           {
+               Report("\ncannot be performed.\n\n", outf)               
+           }
+           else
+           {
+               Report(c(": \nPearson correlation =", format(round(y$cor.est, 4), width=9),
+                        ", two-sided ",reportp(y$cor.pval,3), "\n\n"), sep="", outf)
+           }
+           Report(c("Test that all parameters are 0 : \n"), outf)
            Report(c("chi-squared =", format(round(y$Tsq, 4), width=9),
                     ", d.f. = ", y$n1, ", ",
                     reportp(y$pTsq, 3), "\n\n"), sep="", outf)
            Report(c("Estimated mean parameter",
-                    format(round(y[[2]]$coefficients[1, 1], 4), width=9),
-                    " (s.e.", format(round(y[[2]]$coefficients[1, 2], 4),
-                                     width=9), "), two-sided ",
-                    reportp(2 * pt(-abs(y[[2]]$coefficients[1, 3]),
-                               y$n1 - 1), 3), "\n\n"), sep="", outf)
+                    format(round(y$regsummary$coefficients[1, 1], 4), width=9),
+                    " (s.e.", format(round(y$regsummary$coefficients[1, 2], 4),
+                    width=9), "), two-sided ",
+                    reportp(2 * pt(-abs(y$regsummary$coefficients[1, 3]),
+                    y$n1 - 1), 3), "\n"), sep="", outf)
+           Report("based on IWLS modification of Snijders & Baerveldt (2003). \n\n", outf)
+           Report(c("Residual standard error",
+                    format(round(y$regsummary$stddev, 4), width=9)), outf)
+           Report("\nTest that variance of parameter is 0 :\n",outf)
+           Report(c("Chi-squared = ", format(round(y$Qstat, 4), width=9),
+                    " (d.f. = ", y$n1-1, "), ", reportp(y$pttilde, 3),
+                    "\n"), sep="", outf)
+	   Report("based on IWLS modification of Snijders & Baerveldt (2003). \n\n", outf)
            Report("Fisher's combination of one-sided tests\n", outf)
            Report("----------------------------------------\n", outf)
            Report("Combination of right one-sided p-values:\n", outf)
@@ -228,7 +256,7 @@ print.sienaMeta <- function(x, file=FALSE, ...)
            Report(c("Chi-squared = ", format(round(y$cjminus, 4), width=9),
                     " (d.f. = ", 2 * y$n1, "), ", reportp(y$cjminusp, 3),
                     "\n"), sep="", outf)
-       }
+	}
        else
        {
            Report(c("There were no data sets satisfying the bounds for",
@@ -296,13 +324,13 @@ reportp <- function(p, ndec)
 plot.sienaMeta <- function(x, ...)
 {
     library(lattice)
-    tmp <- xyplot(se ~ theta|effects, data=x$thetadf, xlab="estimates",
-           ylab="standard errors", layout=c(4,4),
+    tmp <- xyplot(theta ~ se|effects, data=x$thetadf, ylab="estimates",
+           xlab="standard errors", layout=c(4,4),
            panel=function(x, y)
        {
            panel.xyplot(x, y)
-           panel.abline(0, 2)
-           panel.abline(0, -2)
+           panel.abline(0, qnorm(0.025))
+           panel.abline(0, qnorm(0.975))
        }, scales="free")
     tmp[!sapply(tmp$y.limits, function(x)all(is.na(x)))]
 }
@@ -397,7 +425,7 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
     }
     Report(c("================================= SIENA08 ",
              "================================================\n",
-             "Multilevel use of Siena algorithms according to",
+             "Multilevel use of Siena algorithms according to ",
              "Snijders & Baerveldt (2003) with extension\n",
              "=================================================",
              "=========================================\n\n"), sep="", outf)
@@ -501,25 +529,43 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
        {
            if (extra)
            {
-               Report(c("Snijders-Baerveldt (2003) method of combining",
+               Report(c("IWLS modification of Snijders-Baerveldt (2003) method of combining",
                         "estimates"), outf)
-               Report(c("\n---------------------------------------",
-                        "----------------\n"), sep="", outf)
+               Report(c("\n--------------------------------------------",
+                        "---------------------------------\n"), sep="", outf)
                Report(c("This method assumes that true parameters and",
                         " standard errors are uncorrelated.\n",
-                        "This can be checked from the plots.\n"), sep="",
+                        "This can be checked by the plot method and the test below.\n\n"), sep="",
                       outf)
            }
-           Report(c("\nTest that all parameters are 0 : \n"), outf)
+           Report("Test that estimates and standard errors are uncorrelated", outf)
+           if (is.na(y$cor.est))
+           {
+               Report("\ncannot be performed.\n\n", outf)               
+           }
+           else
+           {
+               Report(c(": \nPearson correlation =", format(round(y$cor.est, 4), width=9),
+                        ", two-sided ",reportp(y$cor.pval,3), "\n\n"), sep="", outf)
+           }
+           Report(c("Test that all parameters are 0 : \n"), outf)
            Report(c("chi-squared =", format(round(y$Tsq, 4), width=9),
                     ", d.f. = ", y$n1, ", ",
                     reportp(y$pTsq, 3), "\n\n"), sep="", outf)
            Report(c("Estimated mean parameter",
-                    format(round(y[[2]]$coefficients[1, 1], 4), width=9),
-                    " (s.e.", format(round(y[[2]]$coefficients[1, 2], 4),
+                    format(round(y$regsummary$coefficients[1, 1], 4), width=9),
+                    " (s.e.", format(round(y$regsummary$coefficients[1, 2], 4),
                                      width=9), "), two-sided ",
-                    reportp(pt(y[[2]]$coefficients[1, 3],
-                               y$n1 - 1), 3), "\n\n"), sep="", outf)
+                    reportp(pt(y$regsummary$coefficients[1, 3],
+                               y$n1 - 1), 3), "\n"), sep="", outf)
+	   Report("based on IWLS modification of Snijders & Baerveldt (2003). \n\n", outf)                                 
+	   Report(c("Residual standard error",
+	            format(round(y$regsummary$stddev, 4), width=9)), outf)
+	   Report("\nTest that variance of parameter is 0 :\n",outf)
+	   Report(c("Chi-squared = ", format(round(y$Qstat, 4), width=9),
+	            " (d.f. = ", y$n1-1, "), ", reportp(y$pttilde, 3),
+	            "\n"), sep="", outf)
+	   Report("based on IWLS modification of Snijders & Baerveldt (2003). \n\n", outf)                                 
            Report("Fisher's combination of one-sided tests\n", outf)
            Report("----------------------------------------\n", outf)
            Report("Combination of right one-sided p-values:\n", outf)
