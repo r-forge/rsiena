@@ -1665,7 +1665,17 @@ MiniStep * NetworkVariable::randomMiniStep(int ego)
 	this->pSimulation()->pCache()->initialize(ego);
 	this->lego = ego;
 	this->calculateTieFlipProbabilities();
-	int alter = nextIntWithProbabilities(this->m(), this->lprobabilities);
+
+	int m = 0;
+	if (this->oneModeNetwork())
+	{
+		m = this->m();
+	}
+	else
+	{
+		m = this->m() + 1;
+	}
+	int alter = nextIntWithProbabilities(m, this->lprobabilities);
 
 	MiniStep * pMiniStep =
 		new NetworkChange(this->lpData, ego, alter);

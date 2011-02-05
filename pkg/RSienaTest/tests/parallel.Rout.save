@@ -204,31 +204,7 @@ Total of 614 iteration steps.
                     name shortName type interaction1 interaction2 include
 mynet1.obj.eval.3 mynet1     inPop eval                              TRUE
 > ans <- siena07(sienaModelCreate(n3=100,nsub=2, seed=1, projname="test12"),
-+                data=mydata, effects=myeff, useCluster=TRUE, nbrNodes=3,
-+                batch=TRUE, silent=TRUE)
-Loading required package: snow
-Loading required package: rlecuyer
-
-Attaching package: 'snow'
-
-The following object(s) are masked from 'package:base':
-
-    enquote
-
-
-Attaching package: 'snow'
-
-The following object(s) are masked from 'package:base':
-
-    enquote
-
-
-Attaching package: 'snow'
-
-The following object(s) are masked from 'package:base':
-
-    enquote
-
++                data=mydata, effects=myeff, batch=TRUE, silent=TRUE)
 > ans
 Estimates, standard errors and t-statistics for convergence
 
@@ -236,14 +212,14 @@ Estimates, standard errors and t-statistics for convergence
                                                 Error                
 
 Rate parameters: 
-  0.1      Rate parameter period 1  4.2106  ( 0.6113   )             
-  0.2      Rate parameter period 2  3.4877  ( 0.5629   )             
+  0.1      Rate parameter period 1  4.2062  ( 0.5851   )             
+  0.2      Rate parameter period 2  3.4880  ( 0.5183   )             
 
 Other parameters: 
-  1.  eval outdegree (density)     -1.7588  ( 0.1711   )  0.1545     
-  2.  eval indegree - popularity    0.0595  ( 0.0570   ) -0.1043     
+  1.  eval outdegree (density)     -1.7536  ( 0.1460   ) -0.0832     
+  2.  eval indegree - popularity    0.0517  ( 0.0500   ) -0.3291     
 
-Total of 213 iteration steps.
+Total of 190 iteration steps.
 
 > tt <- sienaTimeTest(ans)
 > 

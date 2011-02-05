@@ -79,7 +79,6 @@ mydata <- sienaDataCreate(mynet1, nodeSets=list(senders, receivers))
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff,  inPop)
 ans <- siena07(sienaModelCreate(n3=100,nsub=2, seed=1, projname="test12"),
-               data=mydata, effects=myeff, useCluster=TRUE, nbrNodes=3,
-               batch=TRUE, silent=TRUE)
+               data=mydata, effects=myeff, batch=TRUE, silent=TRUE)
 ans
 tt <- sienaTimeTest(ans)

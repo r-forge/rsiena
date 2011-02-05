@@ -61,7 +61,7 @@ void NetworkChange::makeChange(DependentVariable * pVariable)
 {
 	MiniStep::makeChange(pVariable);
 
-	if (this->ego() != this->lalter)
+	if (!this->diagonal())
 	{
 		NetworkVariable * pNetworkVariable =
 			dynamic_cast<NetworkVariable *>(pVariable);
@@ -80,7 +80,9 @@ void NetworkChange::makeChange(DependentVariable * pVariable)
  */
 bool NetworkChange::diagonal() const
 {
-	return this->ego() == this->lalter;
+	bool oneMode = this->lpData->pSenders() == this->lpData->pReceivers();
+	return (oneMode && this->ego() == this->lalter) || (!oneMode &&
+		this->lalter ==	this->lpData->pReceivers()->n());
 }
 
 

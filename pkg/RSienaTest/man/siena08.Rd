@@ -1,7 +1,7 @@
 \name{siena08}
 \alias{siena08}
 \title{
-Funtion to perform a meta analysis of a collection of Siena fits.
+Function to perform a meta analysis of a collection of Siena fits.
 }
 \description{
 Estimates a meta analysis based on  a collection of Siena fits.
