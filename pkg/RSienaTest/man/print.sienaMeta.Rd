@@ -8,7 +8,7 @@
 \usage{
 \method{print}{sienaMeta}(x, file=FALSE, ...)
 
-\method{summary}{sienaMeta}(x, file=FALSE, extra=TRUE, ...)
+\method{summary}{sienaMeta}(object, file=FALSE, extra=TRUE, ...)
 
 \method{print}{summary.sienaMeta}(x, file=FALSE, extra=TRUE, ...)
 
@@ -19,6 +19,7 @@
    \code{sienaMeta} objects.
 }
 \arguments{
+  \item{object}{An object of class \code{sienaMeta}}
   \item{x}{An object of class \code{sienaMeta}, or
 	\code{summary.sienaMeta} as appropriate}
   \item{file}{Boolean: if TRUE, sends output to file named

@@ -753,13 +753,13 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                    vals <- lapply(depvars[[i]], function(x)
                                    c(x@x[!(is.na(x@x) |
                                            x@x %in% c(10, 11))] , 0))
-                    attr(depvars[[i]], "range") <-
+                    attr(depvars[[i]], "range2") <-
                         do.call(range, vals)
                }
                 else
                 {
                     tmp <- depvars[[i]]
-                    attr(depvars[[i]], "range") <-
+                    attr(depvars[[i]], "range2") <-
                         range(tmp[!(is.na(tmp) | tmp %in% c(10, 11))])
                 }
                 ## average degree
@@ -903,7 +903,7 @@ checkConstraints <- function(z)
     disjoint <- namedVector(FALSE, pairsNames )
 
     ## identify any nets which may relate. These are those that
-    ## share a node set and type.
+    ## share both node sets and type.
     relates <- data.frame(name=names(z$depvars), type=types,
                           nodeSets=sapply(nodeSets, paste, collapse=","),
                           tn=paste(types, sapply(nodeSets, paste,
@@ -2077,16 +2077,17 @@ covarDist2 <- function(z)
     netNames <- names(z$depvars)
     netTypes <- sapply(z$depvars, function(x)attr(x, "type"))
     netActorSet <- sapply(z$depvars, function(x)
+                      {
                           if (attr(x, "type") == "bipartite")
-                      {
-                          attr(x, "nodeSet")[2]
-                      }
+                          {
+                              attr(x, "nodeSet")[2]
+                          }
                           else
-                      {
-                          attr(x, "nodeSet")
+                          {
+                              attr(x, "nodeSet")
+                          }
                       }
                           )
-    ## find the constant covariates
     for (i in seq(along=z$cCovars))
     {
         nodeSet <- attr(z$cCovars[[i]], "nodeSet")
@@ -2160,7 +2161,7 @@ calcCovarDist2 <- function(covar, depvar, rval=NULL)
         }
         else
         {
-            dep <- depvar[, , i]
+            dep <- depvar[, , i, drop=FALSE]
             dep[dep %in% c(10, 11)] <- dep[dep %in% c(10, 11)] - 10
         }
         vi <- apply(dep, 1, function(x)

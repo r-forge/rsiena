@@ -555,6 +555,13 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
 #                " for network effects of type eval or for RateX.")
 #        effects$timeDummy[!implemented] <- ","
 #	}
+    structuralRate <- effects$type == "rate" & effects$rateType %in% "structural"
+    if (any(effects$timeDummy[structuralRate] != ","))
+    {
+		warning("Time dummy effects are not implemented",
+                " for structural rate effects.")
+        effects$timeDummy[structuralRate] <- ","
+    }
     behaviorNonRateX <- effects$netType =="behavior" & effects$type != "rate"
     if (any(effects$timeDummy[behaviorNonRateX] != ","))
     {

@@ -909,10 +909,17 @@ bool MLSimulation::insertPermute(int c0)
 
 	DependentVariable * pVariable =
 		this->lvariables[pMiniStepA->variableId()];
-	double pr2 = 1 - pVariable->rate(pMiniStepA->ego()) / this->totalRate();
+//	double pr2 = 1 - pVariable->rate(pMiniStepA->ego()) / this->totalRate();
+	double pr2 = 1;
 
 	pVariable = this->chooseVariable();
 	int i = this->chooseActor(pVariable);
+
+	if (pVariable == this->lvariables[pMiniStepA->variableId()]
+		&& i == pMiniStepA->ego())
+	{
+		return false;
+	}
 
 	if (!pVariable->pActorSet()->active(i))
 	{

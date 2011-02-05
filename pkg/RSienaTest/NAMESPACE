@@ -6,7 +6,8 @@ sienaGroupCreate,  sienaModelCreate, sienaNet, sienaNodeSet, #simstats0c,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, #maxlikefn,
        installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy,
-       evaluateAuxiliaryStatistics.observed, evaluateAuxiliaryStatistics.simulated,
+       evaluateAuxiliaryStatistics.observed,
+       evaluateAuxiliaryStatistics.simulated,
        evaluateAuxiliaryStatistics, sienaGOF)
 
 import(Matrix)

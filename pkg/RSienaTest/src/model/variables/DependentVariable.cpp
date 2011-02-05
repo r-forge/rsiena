@@ -654,6 +654,7 @@ void DependentVariable::accumulateRateScores(double tau,
 		this->lbasicRateScore += 1.0 / this->basicRate();
 		if (this->pSimulation()->pModel()->modelTypeB())
 		{
+			throw logic_error("model type b");
 			this->lbasicRateScore += 1.0 / this->basicRate();
 		}
 	}
@@ -661,6 +662,7 @@ void DependentVariable::accumulateRateScores(double tau,
 
 	if (this->pSimulation()->pModel()->modelTypeB())
 	{
+		throw logic_error("model type b");
 		this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
 	}
 
