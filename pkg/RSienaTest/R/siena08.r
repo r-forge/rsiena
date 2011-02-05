@@ -578,8 +578,8 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
            Report(c("Chi-squared = ", format(round(y$Qstat, 4), width=9),
 	            " (d.f. = ", y$n1-1, "), ", reportp(y$pttilde, 3),
 	            "\n"), sep="", outf)
-           Report("based on IWLS modification of Snijders & Baerveldt (2003).",
-                  "\n\n", sep="", outf)
+           Report(c("based on IWLS modification of Snijders & Baerveldt (2003).",
+                  "\n\n"), sep="", outf)
            Report("Fisher's combination of one-sided tests\n", outf)
            Report("----------------------------------------\n", outf)
            Report("Combination of right one-sided p-values:\n", outf)
