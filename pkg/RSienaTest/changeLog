@@ -1,3 +1,7 @@
+2011-02-05 R-forge revision 135
+
+	* R/siena08.r: fix bug in summary method. Just layout, caused crash.
+
 2011-02-05 R-forge revision 134
 
 	* R/phase2.r, R/siena08.r, man/siena08.Rd, man/print.sienaMeta.Rd:
