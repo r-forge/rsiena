@@ -1,3 +1,9 @@
+2011-02-21 R-forge revision 136
+
+	* R/initializeFRAN.r: fix bug in bipartite networks: diagonals
+	were being zeroed.
+	* R/siena01.r: correct test for maximum degree in display
+
 2011-02-05 R-forge revision 135
 
 	* R/siena08.r: fix bug in summary method. Just layout, caused crash.

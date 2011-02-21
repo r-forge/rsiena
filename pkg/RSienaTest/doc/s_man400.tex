@@ -620,6 +620,9 @@ would describe a network with 4 nodes, and 3 observations. Actor 1 is present
 all the time, actor 2 joins at time 1.5, actor 3 leaves and time 1.4 then
 rejoins at time 2.3, actor 4 joins at time 2.4. All intervals are treated as
 closed.
+\item If you use software such as Excel or SPSS to create input files to use
+  with RSiena on a Mac, try to ensure that you do not create Unicode files. This
+  is an option in SPSS, and will depend on the file type with Excel.
 \end{enumerate}
 \subsection{Continuing the estimation}
 \begin{enumerate}
@@ -8282,6 +8285,12 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2011-02-21 R-forge revision 136:
+\begin{itemize}
+\item Fixed bug in bipartite network processing. Diagonal (up to number of
+  senders) was being zeroed.
+\item siena01Gui: corrected test for maximum degree in display.
+\end{itemize}
 \item 2011-02-05 R-forge revision 134:
 \begin{itemize}
 \item Enhanced features (and minor bug fixes) in siena08 report. (in revision

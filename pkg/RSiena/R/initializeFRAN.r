@@ -567,7 +567,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     z
 }
 ##@createEdgeLists siena07 Reformat data for C++
-createEdgeLists<- function(mat, matorig)
+createEdgeLists<- function(mat, matorig, bipartite)
 {
     ## mat1 is basic values, with missings and structurals replaced
     tmp <- lapply(1 : nrow(mat), function(x, y)
@@ -589,8 +589,11 @@ createEdgeLists<- function(mat, matorig)
                   mymat
               }, y = matorig)
     mat2 <- do.call(rbind, tmp)
-    ## remove the diagonal
-    mat2 <- mat2[mat2[, 1] != mat2[, 2], , drop=FALSE]
+    ## remove the diagonal if not bipartite
+    if (!bipartite)
+    {
+        mat2 <- mat2[mat2[, 1] != mat2[, 2], , drop=FALSE]
+    }
     ## mat3 structurals
     struct <- mat1[,3] %in% c(10, 11)
     mat1[struct, 3] <- mat1[struct,3] - 10
@@ -602,8 +605,7 @@ createEdgeLists<- function(mat, matorig)
     storage.mode(mat2) <- 'integer'
     storage.mode(mat3) <- 'integer'
     ## add attribute of size
-    nodeSets <- attr(matorig, "nodeSet")
-    if (length(nodeSets) > 1) ## bipartite
+    if (bipartite)
     {
         attr(mat1,'nActors') <- c(nrow(mat), ncol(mat))
         attr(mat2,'nActors') <- c(nrow(mat), ncol(mat))
@@ -1001,7 +1003,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                     attr(depvar, 'downonly')[i] <- TRUE
             }
             diag(networks[[i]]) <- 0
-            edgeLists[[i]] <- createEdgeLists(networks[[i]], depvar[, , i])
+            edgeLists[[i]] <- createEdgeLists(networks[[i]], depvar[, , i], FALSE)
         }
     }
     ## add attribute of nodeset
@@ -1326,8 +1328,7 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                     attr(depvar, 'downonly')[i] <- TRUE
             }
 
-            diag(networks[[i]]) <- 0
-            edgeLists[[i]] <- createEdgeLists(networks[[i]], depvar[, , i])
+            edgeLists[[i]] <- createEdgeLists(networks[[i]], depvar[, , i], TRUE)
         }
     }
     ## add attribute of nodeset
