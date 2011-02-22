@@ -294,7 +294,8 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
                       sqrt(diag(sienaFit$covtheta))[estimatedInFit],
 					  ToTest=toTest,
 					  ScreenedEffects=which(!use),
-                      WaveNumbers=waveNumbers
+                      WaveNumbers=waveNumbers,
+					  IndividualTestsOrthogonalized=condition
 					  )
 	class(returnObj) <- "sienaTimeTest"
 	returnObj
@@ -323,11 +324,14 @@ print.summary.sienaTimeTest <- function(x, ...)
 	cat("\nParameter-wise joint significance tests (i.e. each
 		parameter across all dummies):\n")
 	print(x$EffectTest)
-	if (x$Waves <=2)
+	if (x$Waves <=2 && ! x$IndividualTestsOrthogonalized)
 	{
 		cat("\n\nNote that these parameter-wise tests have a different
 			form than the individual tests, thus testing with 3 observations
 			may yield different individual and parameter-wise values.\n\n")
+	} else if (x$IndividualTestsOrthogonalized) {
+		cat("\nNote that the individual test statistics were orthogonalized",
+				" with respect to each other (condition=TRUE).")
 	}
 	tmp <- paste(" (", 1:length(x$BaseRowInD), ") ",
 				 rownames(x$IndividualTest)[x$BaseRowInD], "\n", sep="")
@@ -499,7 +503,8 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
                          tmprows$type %in% effects$type[i], ]
         tmprows$fix <- fix
         tmprows$include <- include
-        tmprows$effectNumber <- max(newEffects$effectNumber) + (1:nrow(tmprows))
+        tmprows$effectNumber <- max(newEffects$effectNumber) + 
+				(1:nrow(tmprows))
         tmprows$timeDummy <- timeDummy
         rownames(tmprows) <- paste(newname, effects$type[i], sep=".")
         newEffects <- rbind(newEffects, tmprows)
@@ -541,7 +546,7 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
         effects$timeDummy <- ","
     }
 
- # Josh tested these covariate effects, they work as-is for sienaTimeFix.
+ # JAL: tested these covariate effects, they work as-is for sienaTimeFix.
  #   covar <- effects$interaction1 != ""
  #   if (any(effects$timeDummy[covar] != ","))
  #   {
@@ -555,17 +560,21 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
 #                " for network effects of type eval or for RateX.")
 #        effects$timeDummy[!implemented] <- ","
 #	}
-    structuralRate <- effects$type == "rate" & effects$rateType %in% "structural"
+    structuralRate <- effects$type == "rate" & effects$rateType %in% 
+			"structural"
     if (any(effects$timeDummy[structuralRate] != ","))
     {
 		warning("Time dummy effects are not implemented",
                 " for structural rate effects.")
         effects$timeDummy[structuralRate] <- ","
     }
-    behaviorNonRateX <- effects$netType =="behavior" & effects$type != "rate"
+ # JAL: Implementing these 20-FEB-2011 in RSeinaTest
+ # TODO: Behavioral interactions need to be implemented for these to work.
+ # Once they are, we can comment lines 575-577 and 717-720 out.
+ 	behaviorNonRateX <- effects$netType =="behavior" & effects$type != "rate"
     if (any(effects$timeDummy[behaviorNonRateX] != ","))
     {
-		warning("Time dummy effects are not implemented",
+ 		warning("Time dummy effects are not implemented",
                 " for behavior effects of type eval or endow.")
         effects$timeDummy[behaviorNonRateX] <- ","
     }
@@ -602,7 +611,11 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
 
         timesd <- lapply(timesd, function(x)as.numeric(x[x %in% periodNos]))
         dummiedEffects <- sapply(timesd, function(x)length(x) > 0)
-
+		
+		baseType <- list(number=which(dummiedEffects), 
+				type=effects$netType[dummiedEffects],
+				name=effects$name[dummiedEffects])
+		
         rateXDummies <- effects$shortName == "RateX" & dummiedEffects
 
         newEffects <- effects
@@ -742,29 +755,62 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
                         }
                     }
                 }
-
-                ##find the density rows for this depvar
-                i <- which(effects$name == depvar &
-                           effects$shortName=="density" &
-                           effects$type %in% types)
-
-                if (length(i) == 0)
-                {
-                    stop("Cannot find density effect(s) for ", depvar,
-                         " ", types)
-                }
-
-                ## establish whether we want the egoXs included, fixed or not
-                fix <- sapply(timesd[i], function(x)!p %in% x)
-                typesNames <- paste(depvar, effects$type[i], sep=".")
-                includeTypes <- !sapply(timesTypelist[typesNames], is.null)
-
-                ## add one or more effects (depending on types requested)
-                newEffects <- addEffect(newEffects, i, dname,
-                                     "covarNonSymmetricObjective", "egoX",
-                                     paste('isDummy', p,
-                                           effects$effectNumber[i], sep=','),
-                                     fix=fix, include=includeTypes)
+				# This is where the behaviors are treated differently 
+				if (baseType$type[baseType$name==depvar][1] == "behavior") {
+					##find the linear effect rows for this depvar
+					i <- which(effects$name == depvar &
+									effects$shortName=="linear" &
+									effects$type %in% types)
+					
+					if (length(i) == 0)
+					{
+						stop("Cannot find 'effect from' effect(s) for ", depvar,
+								" ", types)
+					}
+					
+					## establish whether we want the effFroms
+					## included, fixed or not
+					fix <- sapply(timesd[i], function(x)!p %in% x)
+					typesNames <- paste(depvar, effects$type[i], sep=".")
+					includeTypes <- !sapply(timesTypelist[typesNames], is.null)
+					
+					## add one or more effects (depending on types requested)
+					newEffects <- addEffect(newEffects, i, dname,
+							"covarBehaviorObjective", "effFrom",
+							paste('isDummy', p,
+									effects$effectNumber[i], sep=','),
+							fix=fix, include=includeTypes)
+					newEffects[nrow(newEffects),"effectName"] <-
+							gsub("yyyyyy", dname,
+									newEffects[nrow(newEffects),"effectName"])
+					newEffects[nrow(newEffects),"functionName"] <-
+							gsub("yyyyyy", dname,
+									newEffects[nrow(newEffects),"functionName"])
+					newEffects[nrow(newEffects),"interaction1"] <- dname
+				} else {
+					##find the density rows for this depvar
+					i <- which(effects$name == depvar &
+									effects$shortName=="density" &
+									effects$type %in% types)
+					
+					if (length(i) == 0)
+					{
+						stop("Cannot find density effect(s) for ", depvar,
+								" ", types)
+					}
+					
+					## establish whether we want the egoXs included, fixed or not
+					fix <- sapply(timesd[i], function(x)!p %in% x)
+					typesNames <- paste(depvar, effects$type[i], sep=".")
+					includeTypes <- !sapply(timesTypelist[typesNames], is.null)
+					
+					## add one or more effects (depending on types requested)
+					newEffects <- addEffect(newEffects, i, dname,
+							"covarNonSymmetricObjective", "egoX",
+							paste('isDummy', p,
+									effects$effectNumber[i], sep=','),
+							fix=fix, include=includeTypes)
+				}
             }
 
             ## now the interactions for any dummied effects for this
@@ -778,15 +824,27 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
                 {
                     dname <- paste("Dummy", p, ":", depvar, sep="")
                     effect <- effects[j, ]
-                    newEffects <-
-                        includeInteraction(newEffects,
-                                           effect$shortName, "egoX",
-                                           character=TRUE,
-                                           type=effect$type,
-                                           interaction1= c(effect$interaction1,
-                                           dname),
-                                           interaction2=effect$interaction2,
-                                           name=depvar, verbose=FALSE)
+					if (baseType$type[baseType$name==depvar][1] == "behavior") {
+						newEffects <-
+								includeInteraction(newEffects,
+										effect$shortName, "effFrom",
+										character=TRUE,
+										type=effect$type,
+										interaction1= c(effect$interaction1,
+												dname),
+										interaction2=effect$interaction2,
+										name=depvar, verbose=FALSE)
+					} else {
+	                    newEffects <-
+	                        includeInteraction(newEffects,
+	                                        effect$shortName, "egoX",
+	                                        character=TRUE,
+	                                        type=effect$type,
+	                                        interaction1= c(effect$interaction1,
+	                                        dname),
+	                                        interaction2=effect$interaction2,
+	                                        name=depvar, verbose=FALSE)
+					}
                     ## find the row altered
                     newrow <- newEffects$effect1 == j &
                     newEffects$effect2 ==
