@@ -1,7 +1,35 @@
+2011-02-23 R-forge revision 139
+
+	* src/model/ml/MLsimulation.cpp,
+	src/model/variables/NetworkVariable.cpp: ML for bipartite
+	networks.
+
+2011-02-22 R-forge revision 138
+
+	Change version number on RSiena to 137
+
+2011-02-22 R-forge revision 137
+
+	* Changes to RSienaTest Only
+	* DESCRIPTION: removed dependency on snopgof (for now!) and add
+	  -ed dependency for MASS, sna, vioplot for sienaGOF.
+	* R/sienaTimeTest.r: added functionality for behavioral dummies
+	  but they will not work until behavioral interaction effects
+	  are supported.
+	* R/sienaGOF.r: removed dependency on snopgof (runs standalone)
+	  and a number of smaller features like being able to run a
+	  joint test across all waves or break them out, having control
+	  over the centrality measure (mean, median, etc.), and not
+	  requiring that the auxiliary statistics are non-collinear
+	  (this is where MASS's ginv comes in). I also moved the
+	  relevant functionality from snopgof directly into the code.
+	* man/sienaGOF.Rd: Changes to reflect the above
+
 2011-02-21 R-forge revision 136
 
 	* R/initializeFRAN.r: fix bug in bipartite networks: diagonals
 	were being zeroed.
+	* R/siena01.r: correct test for maximum degree in display
 
 2011-02-05 R-forge revision 135
 

@@ -614,6 +614,8 @@ bool MLSimulation::insertDiagonalMiniStep()
 	int i = this->chooseActor(pVariable);
 	BehaviorVariable * pBehaviorVariable =
 		dynamic_cast<BehaviorVariable *>(pVariable);
+	NetworkVariable * pNetworkVariable =
+		dynamic_cast<NetworkVariable *>(pVariable);
 	if (!pVariable->pActorSet()->active(i) ||
 		(pBehaviorVariable && pBehaviorVariable->structural(i)))
 	{
@@ -632,11 +634,23 @@ bool MLSimulation::insertDiagonalMiniStep()
 	}
 	else
 	{
-		pNewMiniStep =
-			new NetworkChange(
-				dynamic_cast<NetworkLongitudinalData *>(pVariable->pData()),
-				i,
-				i);
+		if (pNetworkVariable->oneModeNetwork())
+		{
+			pNewMiniStep =
+				new NetworkChange(
+					dynamic_cast<NetworkLongitudinalData *>(pVariable->pData()),
+					i,
+					i);
+		}
+		else
+		{
+			pNewMiniStep =
+				new NetworkChange(
+					dynamic_cast<NetworkLongitudinalData *>(pVariable->pData()),
+					i,
+					pVariable->m());
+
+		}
 	}
 
 	double rr = 1 / this->totalRate();
