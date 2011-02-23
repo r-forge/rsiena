@@ -7142,7 +7142,8 @@ denoted $v_j$), there are the following effects.
  $s^{\rm beh}_{i\vit}(x) = z_{i} v_{i}\,$;\\
  here too, the other dependent behavioral variables are centered so that they
  have overall mean 0;
-\item \emph{alter's covariate average } effect on behavior $z$  \texttt{(avAlt)},\\
+\item \emph{alter's covariate average } effect on behavior $z$
+ \texttt{(AltsAvAlt)},\\
       defined as the product of $i$'s behavior $z_i$ and
       $i$'s alters' covariate-average $\breve v_i$ as defined
       in (\ref{alt_av}),\\
@@ -8285,6 +8286,9 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{itemize}
+\item 2011-02-24 R-forge revision 139: fixes for bipartite networks with
+  ML. ML is still incomplete, and will not work correctly with missing data or
+  endowment effects.
 \item 2011-02-22 R-forge revision 137: (RSienaTest only)
 Additional work on the goodness of fit functionality (see ?sienaGOF)
 \item 2011-02-21 R-forge revision 136:

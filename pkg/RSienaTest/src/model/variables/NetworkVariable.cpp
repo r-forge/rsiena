@@ -1709,7 +1709,8 @@ bool NetworkVariable::structural(const MiniStep * pMiniStep) const
 {
 	const NetworkChange * pNetworkChange =
 		dynamic_cast<const NetworkChange *>(pMiniStep);
-	return this->lpData->structural(pNetworkChange->ego(),
+	return !pMiniStep->diagonal() &&
+		this->lpData->structural(pNetworkChange->ego(),
 			pNetworkChange->alter(),
 			this->period());
 }

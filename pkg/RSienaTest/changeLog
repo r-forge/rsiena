@@ -1,3 +1,13 @@
+2011-02-23 R-forge revision 139
+
+	* src/model/ml/MLsimulation.cpp,
+	src/model/variables/NetworkVariable.cpp: ML for bipartite
+	networks.
+
+2011-02-22 R-forge revision 138
+
+	Change version number on RSiena to 137
+
 2011-02-22 R-forge revision 137
 
 	* Changes to RSienaTest Only
