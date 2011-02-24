@@ -1,287 +1,441 @@
-##/*****************************************************************************
-## * SIENA: Simulation Investigation for Empirical Network Analysis
-## *
-## * Web: http://www.stats.ox.ac.uk/~snidjers/siena
-## *
-## * File: gof.r
-## *
-## * Description: This file contains the code to assess goodness of fit
-## *
-## ****************************************************************************/
+## /*****************************************************************************
+##  * SIENA: Simulation Investigation for Empirical Network Analysis
+##  *
+##  * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+##  *
+##  * File: gof.r
+##  *
+##  * Description: This file contains the code to assess goodness of fit
+##  *
+##  ****************************************************************************/
 
-## Convenience function for evaluating statistics
-evaluateAuxiliaryStatistics <- function(sienaObject, ...) {
-	if (class(sienaObject) == "sienaFit") {
-		evaluateAuxiliaryStatistics.simulated(sienaObject, ...)
-	} else if (class(sienaObject) == "siena") {
-		evaluateAuxiliaryStatistics.observed(sienaObject, ...)
-	}
-}
-
-## Sienafit object, returns a list of auxiliary 
-## statistics from the given function
-evaluateAuxiliaryStatistics.simulated <- function(sienaFitObject, 
-		groupName, varName, auxiliaryFunction, wave=NULL,
-		verbose=FALSE, join=TRUE) {
-	if (! sienaFitObject$returnDeps) {
+sienaGOF <- function(sienaDataObject,
+		sienaFitObject, groupName, varName,  auxiliaryFunction, wave=NULL,
+		verbose=FALSE, join=TRUE, expectationFunction=mean,
+		twoTailed=FALSE, cumulative=FALSE,...) 
+	{
+	require(MASS)
+	##  require(Matrix)
+	##  Check input
+	if (! sienaFitObject$returnDeps) 
+	{
 		stop("You must instruct siena07 to return the simulated networks")
 	}
 	iterations = length(sienaFitObject$sims)
-	if (iterations < 1) {
+	if (iterations < 1) 
+	{
 		stop("You need at least one iteration.")
 	}
 	groups = length(sienaFitObject$sims[[1]])
 	if (verbose) cat("Detected", iterations, "iterations and", groups,
 				"groups.\n")
 	groupNumber = which(names(sienaFitObject$sims[[1]]) == groupName)
-	if (is.na(groupNumber)) {
+	if (is.na(groupNumber))
+	{
 		stop("Invalid group name.")
 	}
 	if (verbose) cat("Group", groupName, "corresponds to index",
 				groupNumber,".\n")
 	varNumber = which(names(sienaFitObject$sims[[1]][[groupNumber]]) == 
 					varName)
-	if (varNumber < 1 | varNumber > 
-			length(sienaFitObject$sims[[1]][[groupNumber]])) {
+	if (varNumber < 1 | varNumber > length(sienaDataObject$depvars))
+	{
 		stop("Invalid variable number -- out of bounds.")
 	}
-	if (verbose) cat("Variable", varName, "corresponds to index",
-				varNumber,".\n")
-	if (is.null(wave)) {
-		wave = 1:length(sienaFitObject$sims[[1]][[groupNumber]][[varNumber]])
-	}
-	if (min(wave) < 1 | max(wave) > 
-			length(sienaFitObject$sims[[1]][[groupNumber]][[varNumber]])){
-		stop("Invalid wave index -- out of bounds")
-	}
-	if (verbose) cat("Calculating auxiliary statistics for waves",wave,".\n")
-	if (join) {
-		ttc <- system.time(tmp <- lapply(wave, function (j) {
-					tmp <- sapply(1:iterations, function (i) 
-					{ auxiliaryFunction(sienaFitObject$
-					sims[[i]][[groupNumber]][[varNumber]][[j]])})
-					dimnames(tmp)[[2]] <-  1:iterations
-					t(tmp)
-				}))
-		ret <- tmp[[1]]
-		if (length(tmp)>1) {
-			for (i in 2:length(tmp)) {
-				ret = ret + tmp[[i]]
-			}
-		}
-		ret <- list(Joint=ret)
-	} else {
-		ttc <- system.time(ret <- lapply(wave, function (j) {
-					tmp <- sapply(1:iterations, function (i) {
-					auxiliaryFunction(sienaFitObject$
-					sims[[i]][[groupNumber]][[varNumber]][[j]])})
-					dimnames(tmp)[[2]] <-  1:iterations
-					t(tmp)
-				}))
-		names(ret) <- paste("Wave",wave)
-	}
-	class(ret) <- "simulatedAuxiliaryStatistics"
-	attr(ret,"auxiliaryStatisticName") <- deparse(substitute(auxiliaryFunction))
-	attr(ret,"joint") = join
-	attr(ret,"time") = ttc
-	ret
-}
-
-## Sienafit object, returns a list of auxiliary statistics from the given function
-evaluateAuxiliaryStatistics.observed <- function(sienaDataObject, 
-		varName, auxiliaryFunction, wave=NULL, verbose=FALSE, join=TRUE) {
-	varNumber = which(names(sienaDataObject$depvars) == varName)
-	if (varNumber < 1 | varNumber > length(sienaDataObject$depvars)) {
-		stop("Invalid variable number -- out of bounds.")
-	}
-	if (verbose) cat("Variable", varName, 
+	if (verbose)
+	{
+		cat("Variable", varName, 
 				"corresponds to index",varNumber,".\n")
-	if (is.null(wave) ) {
+	}
+	if (is.null(wave) )
+	{
 		wave = 1:(dim(sienaDataObject$depvars[[varNumber]])[3] - 1)
 	}
 	if (min(wave) < 1 | max(wave) > 
-			dim(sienaDataObject$depvars[[varNumber]])[3] - 1){
+			dim(sienaDataObject$depvars[[varNumber]])[3] - 1 | 
+			max(wave) > 
+			length(sienaFitObject$sims[[1]][[groupNumber]][[varNumber]])
+		)
+	{
 		stop("Invalid wave index -- out of bounds")
 	}
-	if (verbose) cat("Calculating auxiliary statistics for waves",wave,".\n")
-	if (join) {
-		tmp <- lapply(wave, function (j) {
-					auxiliaryFunction(sienaDataObject$
-									depvars[[varNumber]][,,j+1])
-				})
-		ret <- tmp[[1]]
+	if (varNumber < 1 | varNumber > 
+			length(sienaFitObject$sims[[1]][[groupNumber]]))
+	{
+		stop("Invalid variable number -- out of bounds.")
+	}
+	if (is.null(wave))
+	{
+		wave = 1:length(sienaFitObject$sims[[1]][[groupNumber]][[varNumber]])
+	}
+	
+	##  Need to cast all of the observations and statistics into sparse matrices
+	observedSp <- lapply(wave, function(j) { 
+				Matrix(sienaDataObject$depvars[[varNumber]][,, j+1],
+						sparse=TRUE)})
+	dimsOfDepVar <- dim(observedSp[[1]])
+	missingSp <- lapply(wave, function(j) { 
+				Matrix(is.na(sienaDataObject$depvars[[varNumber]][,, j+1]),
+						sparse=TRUE)})
+	simsSp <- lapply(1:iterations, function(i){ lapply(wave, function(j) 
+						{ 
+				sparseMatrix(sienaFitObject$
+					sims[[i]][[groupNumber]][[varNumber]][[j]][,1],
+					sienaFitObject$
+					sims[[i]][[groupNumber]][[varNumber]][[j]][,2],
+					x=1,dims=dimsOfDepVar ) })})
+
+	##  Now observation auxiliary statistics
+	if (join) 
+	{
+		tmp <- lapply(wave, function (j) 
+				{
+					auxiliaryFunction(observedSp[[j]], missingSp[[j]]) })
+		obsStats <- tmp[[1]]
 		if (length(tmp)>1) {
 			for (i in 2:length(tmp)) {
-				ret = ret + tmp[[i]]
+				obsStats = obsStats + tmp[[i]]
 			}
 		}
-		ret <- list(Joint=ret)
+		ttcObservation <- system.time(obsStats <- list(Joint=obsStats))
 	} else {
-		ret <- lapply(wave, function (j) {
-					auxiliaryFunction(sienaDataObject$
-									depvars[[varNumber]][,,j+1])
-				})
-		names(ret) <- paste("Wave",wave)
+		ttcObservation <- system.time( obsStats <- lapply(wave, function (j) {
+			auxiliaryFunction(observedSp[[j]], missingSp[[j]]) }))
+		screen = lapply(wave, function (j) {
+					is.na(sienaDataObject$depvars[[varNumber]][,,j+1])})
+		names(obsStats) <- paste("Wave",wave)
 	}
-	class(ret) <- "observedAuxiliaryStatistics"
-	attr(ret,"auxiliaryStatisticName") <-
+	class(obsStats) <- "observedAuxiliaryStatistics"
+	attr(obsStats,"auxiliaryStatisticName") <-
 			deparse(substitute(auxiliaryFunction))
-	attr(ret,"joint") = join
-	ret
-}
-
-
-sienaGOFPreprocess <- function(simulated, expectationFunction=mean) {
-	require(MASS)
-	if (class(simulated) != "matrix") {
-		stop("Invalid input.")
-	}
-	a <- cov(simulated)
-	 # How do we make this error get thrown
-	 #up the call stack? It will look much
-	 # nicer if we can get that to work
-	 # tryCatch(
-	 # ainv <- solve(a)	
-	 #, error = 
-	 # function(e)simpleError(paste("Your testing functions are producing",
-     # "collinear statistics which cannot be handled by the",
- 	 # "Mahalanobis distance. Try reducing the number of statistics",
- 	 # "returned by your testing function (e.g. Geodesic distances 1:10",
-	 # "to 1:5 or so).")))
-	# Using generalized inverse instead of regular inverse so
-	# we don't have to worry
-	# about collinearity
-	ainv <- ginv(a)
-	simulations=nrow(simulated)
-	variates=ncol(simulated)
-	expectation = apply(simulated, 2, expectationFunction);
-	centeredSimulations <- t(sapply(1:simulations, 
-			function(i) simulated[i,] - expectation))
-	if (variates==1) {
-		centeredSimulations <- t(centeredSimulations)
-	}
-	ttc <- system.time(mahalanobisDistances <- 
-					sapply(1:simulations, function(i) 
-					  centeredSimulations[i,] %*% 
-					  ainv %*% centeredSimulations[i,]))
-	ret <- list(
-			Iterations=dim(simulated)[1], 
-			Variates=dim(simulated)[2], 
-			Original=simulated, 
-			Covariance=a, InverseCovariance=ainv,
-			Expectation=expectation,
-			CenteredSimulations=centeredSimulations, 
-			MHDistances = sort(mahalanobisDistances),
-			ExpectationFunction=expectationFunction, 
-			ComputeTime=ttc)
-	class(ret) <- "sienaGOFPreprocess"
-	ret
-}
-
-sienaGOFProcess <- function(observed, simulated, twoTailed=FALSE) {
-	if (class(observed) == "numeric") {
-		observed <- matrix(observed,nrow=1)
-	}
-	if (class(observed) != "matrix" |
-			class(simulated) != "sienaGOFPreprocess") {
-		stop("simulated must be a sienaGOFPreprocess object.")
-	}
-	if (ncol(observed) != simulated$Variates) {
-		stop("Dimensionality of function parameters do not match.")
-	}
-	observations = nrow(observed)
-	mhd <- sapply(1:observations, function(i) 
-			  t(observed[i,] - simulated$Expectation) %*%
-			  simulated$InverseCovariance %*% 
-			  (observed[i,] - simulated$Expectation) )
-	if (twoTailed) {
-		p.mhd <- sapply(1:observations, function (i) 
-			1 - abs(1 - 2 * sum(mhd[i] <= 
-			simulated$MHDistances)/simulated$Iterations) )
-	} else {
-		p.mhd <- sapply(1:observations, function (i) 
-			sum(mhd[i] <=  simulated$MHDistances)
-			/simulated$Iterations)
-	}
-	return = list(
-			Observation=observed, 
-			Preprocess=simulated, 
-			MHDistance=mhd, 
-			p.MHD = p.mhd,
-			TwoTailed = twoTailed)
-	class(return) <- "sienaGOFProcess"
-	return
-}
-
-sienaGOF <- function(obsList, simList) {
-	if ((class(obsList) != "observedAuxiliaryStatistics") |
-			(class(simList) != "simulatedAuxiliaryStatistics") |
-			(length(obsList) != length(simList))
-			| (attr(obsList,"auxiliaryStatisticName")
-				!= attr(simList,"auxiliaryStatisticName"))) {
-		stop("Arguments invalid")
-	}
-
-	pre <- lapply(1:length(simList), function (i)
-				sienaGOFPreprocess(simList[[i]]))
-	res <- lapply(1:length(simList), function (i) 
-				sienaGOFProcess(obsList[[i]], pre[[i]]) )
+	attr(obsStats,"joint") = join
+	attr(obsStats,"time") = ttcObservation
 	
-	ret <- list(ObservedStatistics=obsList, SimulatedStatistics=simList, 
-			Results=res)
-	class(ret) <- "sienaGOF"
-	attr(ret,"auxiliaryStatisticName") <-
-			attr(obsList,"auxiliaryStatisticName")
-	ret
+	##  Calculate the simulated auxiliary statistics
+	if (verbose) cat("Calculating auxiliary statistics for waves",wave,".\n")
+	if (join) 
+	{
+		ttcSimulation <- system.time(tmp <- lapply(wave, function (j) {
+					tmp <- sapply(1:iterations, function (i) 
+					{ auxiliaryFunction(simsSp[[i]][[j]], missingSp[[j]])})
+					dimnames(tmp)[[2]] <-  1:iterations
+					t(tmp)
+				}))
+		simStats <- tmp[[1]]
+		if (length(tmp)>1) {
+			for (i in 2:length(tmp)) {
+				simStats = simStats + tmp[[i]]
+			}
+		}
+		simStats <- list(Joint=simStats)
+	} else {
+		ttcSimulation <- system.time(simStats <- lapply(wave, function (j) {
+					tmp <- sapply(1:iterations, function (i) {
+					auxiliaryFunction(simsSp[[i]][[j]], missingSp[[j]])
+				})
+					dimnames(tmp)[[2]] <-  1:iterations
+					t(tmp)
+				}))
+		names(simStats) <- paste("Wave",wave)
+	}
+	class(simStats) <- "simulatedAuxiliaryStatistics"
+	attr(simStats,"auxiliaryStatisticName") <-
+			deparse(substitute(auxiliaryFunction))
+	attr(simStats,"joint") = join
+	attr(simStats,"time") = ttcSimulation
+	
+	applyTest <-  function (observed, simulated) 
+	{
+		if (class(simulated) != "matrix")
+		{
+			stop("Invalid input.")
+		}
+		if (class(observed) != "matrix") 
+		{
+			observed <- matrix(observed,nrow=1)
+		}
+		if (class(observed) != "matrix") 
+		{
+			stop("Observation must be a matrix.")
+		}
+		if (ncol(observed) != ncol(simulated)) 
+		{
+			stop("Dimensionality of function parameters do not match.")
+		}
+		observations = nrow(observed)
+		simulations=nrow(simulated)
+		variates=ncol(simulated)
+		
+		a <- cov(simulated)
+		ainv <- ginv(a)
+		arank <- rankMatrix(a)
+		expectation = apply(simulated, 2, expectationFunction);
+		centeredSimulations <- t(sapply(1:simulations, 
+				function(i) simulated[i,] - expectation))
+		if (variates==1) 
+		{
+			centeredSimulations <- t(centeredSimulations)
+		}
+		simTestStat <- sapply(1:simulations, function(i) 
+						  centeredSimulations[i,] %*% 
+						  ainv %*% centeredSimulations[i,])
+		obsTestStat <- sapply(1:observations, function(i) 
+					t(observed[i,] - expectation) %*%
+							ainv %*% 
+							(observed[i,] - expectation))
+		if (twoTailed) 
+		{
+			p <- sapply(1:observations, function (i) 
+						1 - abs(1 - 2 * sum(obsTestStat[i] <= 
+						simTestStat)/length(simTestStat)) )
+		} 
+		else
+		{
+			p <- sapply(1:observations, function (i) 
+				sum(obsTestStat[i] <= simTestStat) /length(simTestStat))
+		}
+		ret <- list( p = p,
+				SimulatedTestStat=simTestStat,
+				ObservedTestStat=obsTestStat,
+				TwoTailed=twoTailed,
+				Simulations=simulated,
+				Observations=observed,
+				Rank=arank)
+		class(ret) <- "sienaGofTest"
+		attr(ret,"auxiliaryStatisticName") <- 
+				attr(obsStats,"auxiliaryStatisticName")
+		ret
+	}
+	applyCumulativeTest <-  function (observed, simulated) 
+	{
+		if (class(simulated) != "matrix") 
+		{
+			stop("Invalid input.")
+		}
+		if (class(observed) != "matrix")
+		{
+			observed <- matrix(observed,nrow=1)
+		}
+		if (class(observed) != "matrix")
+		{
+			stop("Observation must be a matrix.")
+		}
+		if (ncol(observed) != ncol(simulated))
+		{
+			stop("Dimensionality of function parameters do not match.")
+		}
+		observations = nrow(observed)
+		simulations=nrow(simulated)
+		variates=ncol(simulated)
+		nonnormalizedCdf = apply(simulated,2,mean)
+		
+		simTestStat <- sapply(1:simulations, function(i) 
+					max(abs(simulated[i,] - nonnormalizedCdf)))
+		obsTestStat <- sapply(1:observations, function(i) 
+					max(abs(observed[i,] - nonnormalizedCdf)))
+		if (twoTailed) 
+		{
+			p <- sapply(1:observations, function (i) 
+					1 - abs(1 - 2 * sum(obsTestStat[i] <= 
+					simTestStat)/length(simTestStat)) )
+		} 
+		else
+		{
+			p <- sapply(1:observations, function (i) 
+					sum(obsTestStat[i] <= simTestStat) /length(simTestStat))
+		}
+		ret <- list( p = p,
+				SimulatedTestStat=simTestStat,
+				ObservedTestStat=obsTestStat,
+				TwoTailed=twoTailed,
+				Simulations=simulated,
+				Observations=observed,
+				Rank=NULL)
+		class(ret) <- "sienaGofTest"
+		attr(ret,"auxiliaryStatisticName") <- 
+				attr(obsStats,"auxiliaryStatisticName")
+		ret
+	}
+	if (cumulative)
+	{
+		testTime <- system.time(res <- lapply(1:length(simStats), function (i) 
+					applyCumulativeTest(obsStats[[i]], simStats[[i]]) ))
+	}
+	else 
+	{
+		testTime <- system.time(res <- lapply(1:length(simStats), function (i) 
+					 applyTest(obsStats[[i]], simStats[[i]]) ))
+	}
+
+	names(res) <- names(obsStats)
+	class(res) <- "sienaGOF"
+	attr(res, "originalSimulations") <- simsSp
+	attr(res, "originalObservations") <- observedSp
+	attr(res, "originalMissings") <- missingSp
+	attr(res,"auxiliaryStatisticName") <-
+			attr(obsStats,"auxiliaryStatisticName")
+	attr(res, "obsTime") <- attr(obsStats,"time")
+	attr(res, "simTime") <- attr(simStats,"time")
+	attr(res, "testTime") <- testTime
+	attr(res, "twoTailed") <- twoTailed
+	attr(res, "joined") <- join
+	attr(res, "cumulative") <- cumulative
+	res
 }
 
 print.sienaGOF <- function (x, ...) {
-	pVals = sapply(1:length(x$Results), function(i) 
-				x$Results[[i]]$p.MHD)
-	ctimes = sapply(1:length(x$Results), function(i)
-				as.numeric(x$Results[[i]]$Preprocess$ComputeTime["elapsed"]))
+	## require(Matrix)
+	levels <- 1:length(x)
+	pVals = sapply(levels, function(i) x[[i]]$p)
+	if (attr(x, "cumulative"))
+	{
+		titleStr= "Monte Carlo Kolmogorov-Smirnov test P-value: "
+	} 
+	else
+	{
+		titleStr= "Monte Carlo Mahalanobis distance test P-value: "
+	}
 	cat("Siena Goodness of Fit (", 
 			attr(x,"auxiliaryStatisticName") ,")\n=====\n")
-	if (! attr(x$SimulatedStatistics,"joint")) {
-		cat(" > Monte Carlo Mahalanobis distance test P-values:\n")
-		for (i in 1:length(pVals)) {
+	if (! attr(x,"join"))
+	{
+		cat(" >",titleStr, "\n")
+		for (i in 1:length(pVals))
+		{
 			cat(" > Wave ", i, ": ", pVals[i], "\n")
 		}
-	} else {
-		cat("Monte Carlo Mahalanobis distance test P-value: ",pVals[1], "\n")
+		for (i in 1:length(pVals)) 
+		{
+			if (! attr(x, "cumulative") &&
+					x[[i]]$Rank != ncol(x[[i]]$Simulations)) 
+			{
+				cat(" * Note for wave ",i,
+					": Only ", x[[i]]$Rank, " statistics are ",
+					"necessary in the auxiliary function.\n")
+			}	
+		}
 	}
-	if (x$Results[[1]]$TwoTailed) {
+	else
+	{
+		cat(titleStr,pVals[1], "\n")
+		if (! attr(x, "cumulative") && 
+				x[[1]]$Rank != ncol(x[[1]]$Simulations))
+		{
+			cat("**Note: Only ", x[[1]]$Rank, " statistics are ",
+					"necessary in the auxiliary function.\n")
+		}
+	}
+	
+	if ( attr(x, "twoTailed") ) 
+	{
 		cat("-----\nTwo tailed test used.")	
-	} else {
+	} 
+	else 
+	{
 		cat("-----\nOne tailed test used ",
 		"(i.e. area under curve for greater distance than observation).")	
 	}
-	cat("\nBased on ", x$Results[[1]]$Preprocess$Iterations,
-			" simulated draws from the null distribution.")
-	cat("\nComputation time for auxiliary statistic calculations: ",
-			attr(x$SimulatedStatistics,"time")["elapsed"] , "seconds.")
+	
+	cat("\nComputation time for auxiliary statistic calculations on observation: ",
+			attr(x, "obsTime")["elapsed"] , "seconds.")
+	
+	cat("\nComputation time for auxiliary statistic calculations on simulations: ",
+			attr(x, "simTime")["elapsed"] , "seconds.")
+	
 	cat("\nComputation time for distance/test statistic calculations: ",
-			sum(ctimes), "seconds.\n")
+			attr(x, "testTime")["elapsed"] , "seconds.\n")
 }
 
-plot.sienaGOF <- function (x, standardize=3, violin=TRUE, 
+dyadGOF <- function (x, wave, threshold, ...)
+{
+	## require(Matrix)
+	a <- attr(x,"originalSimulations")
+	b <- attr(x,"originalMissings")
+	c <- attr(x,"originalObservations")
+	truePositive <- a[[1]][[wave]] * 0
+	trueNegative <- a[[1]][[wave]] * 0
+	falsePositive <- a[[1]][[wave]] * 0
+	falseNegative <- a[[1]][[wave]] * 0
+	
+	for(i in 1:length(a)) 
+	{
+		truePositive = truePositive + 
+			a[[i]][[wave]] * c[[wave]]
+		falseNegative = falseNegative + 
+			(1-a[[i]][[wave]]) * c[[wave]]
+		falsePositive = falsePositive +
+			a[[i]][[wave]] * (1-c[[wave]])
+		trueNegative = trueNegative +
+			(1-a[[i]][[wave]]) * (1-c[[wave]])
+	}
+	threshold = length(a) * threshold
+	
+## 	trueNegative[trueNegative < threshold] <- 0
+## 	trueNegative[trueNegative > 0] <- 1
+## 	truePositive[truePositive < threshold] <- 0
+## 	truePositive[truePositive > 0] <- 1
+## 	falseNegative[falseNegative < (1-threshold)] <- 0
+## 	falseNegative[falseNegative > 0] <- 1
+## 	falsePositive[falsePositive < (1-threshold)] <- 0
+## 	falsePositive[falsePositive > 0] <- 1
+
+	falseNegative[falseNegative > threshold] <- 1
+	falseNegative[falseNegative < 1] <- 0
+	falsePositive[falsePositive > threshold] <- 1
+	falsePositive[falsePositive < 1] <- 0
+	
+	plotted = as.matrix(-1*falsePositive + falseNegative)
+	if (sum(plotted)==0) 
+	{
+		plotted <- matrix(0, nrow=nrow(plotted),ncol=ncol(plotted))
+	}
+	diag(plotted)
+	image(z=plotted, zlim=c(-1,1), 
+			col=c("red", "white", "blue"), ...)
+}
+
+plot.sienaGOF <- function (x, standardize=NA, violin=TRUE, 
 			ylim=NULL, xlim=NULL, 
-			xlab=NULL, ylab=NULL, key=NULL, perc=.05, wave=1, main=NULL, ...) {
-		if (is.null(main)) {
+			xlab=NULL, ylab=NULL, key=NULL, 
+			perc=.05, wave=1, main=NULL, 
+			image=FALSE, imageThreshold=.3, ...) 
+	{
+	## require(Matrix)
+	if (image) 
+	{
+		dyadGOF(x, wave, imageThreshold)
+	}
+	else 
+	{
+		if (is.null(main))
+		{
 			main=paste("Goodness of Fit of ", 
-					attr(x$Observed,"auxiliaryStatisticName"))	
+					attr(x,"auxiliaryStatisticName"))	
 		}
-		if (!attr(x$Observed,"joint")){
+		if (!attr(x,"joined"))
+		{
 			main = paste(main, "Wave", wave)
 		}
-		x <- x$Results[[wave]]
-		itns <- x$Preprocess$Iterations
-		vars <- x$Preprocess$Variates
-		sims <- x$Preprocess$Original
-		obs <- x$Observation
+		cumulative = attr(x,"cumulative")
+		if (is.na(standardize)) 
+		{
+			if (attr(x,"cumulative")) 
+			{
+				standardize=0
+			}
+			else 
+			{
+				standardize=3
+			}
+		}
+		x <- x[[wave]]
+		itns <- nrow(x$Simulations)
+		vars <- ncol(x$Simulations)
+		sims <- x$Simulations
+		obs <- x$Observations
 		n.obs <- nrow(obs)
-		
-		if (standardize==3) {
+		if (standardize==3) 
+		{
 			sims.median <- apply(sims, 2, median)
 			sims.min <- apply(sims, 2, min)
 			sims.max <- apply(sims, 2, max)
@@ -289,35 +443,44 @@ plot.sienaGOF <- function (x, standardize=3, violin=TRUE,
 						(sims[,i] - sims.median[i])/(sims.max[i] - 
 									sims.min[i] ) )
 			obs <- matrix(sapply(1:ncol(sims), function(i) 
-						(obs[,i] - sims.median[i])/(sims.max[i] -
-									sims.min[i] ) ), nrow=n.obs )
-		} else if (standardize==2) {
+								(obs[,i] - sims.median[i])/(sims.max[i] -
+											sims.min[i] ) ), nrow=n.obs )
+		} 
+		else if (standardize==2) 
+		{
 			sims.min <- apply(sims, 2, min)
 			sims.max <- apply(sims, 2, max)
 			sims <- sapply(1:ncol(sims), function(i) (sims[,i] -
-						sims.min[i])/(sims.max[i] - sims.min[i] ) )
+									sims.min[i])/(sims.max[i] - sims.min[i] ) )
 			obs <- matrix(sapply(1:ncol(sims), function(i) (obs[,i] -
-						sims.min[i])/(sims.max[i] - sims.min[i] )
-						), nrow=n.obs )
-		} else if (standardize==1) {
+											sims.min[i])/(sims.max[i] - sims.min[i] )
+					), nrow=n.obs )
+		} 
+		else if (standardize==1)
+		{
 			sims.mean <- apply(sims, 2, mean)
 			sims <- sapply(1:ncol(sims), function(i)
 						(sims[,i] - sims.mean[i]) )
 			obs <- matrix(sapply(1:ncol(sims), function(i)
-						(obs[,i] - sims.mean[i]) ), nrow=n.obs )
+								(obs[,i] - sims.mean[i]) ), nrow=n.obs )
 		}
-		
-		if (is.null(ylim)) {
+		sims[is.nan(sims)] <- 0
+		obs[is.nan(obs)] <- 0
+		if (is.null(ylim)) 
+		{
 			ylim = c(min(obs, sims), max(obs, sims))
 		}
-		if (is.null(xlim)) {
+		if (is.null(xlim)) 
+		{
 			xlim = c(0, ncol(obs)+1)
 		}
-		if (is.null(xlab)) {
+		if (is.null(xlab))
+		{
 			xlab= paste( paste("p:", round(x$p, 3), 
-						collapse = " "), collapse = "\n")
+							collapse = " "), collapse = "\n")
 		}
-		if (is.null(ylab)) {
+		if (is.null(ylab)) 
+		{
 			ylab = "Statistic Values"
 		}
 		xAxis <- (1:vars)
@@ -325,12 +488,16 @@ plot.sienaGOF <- function (x, standardize=3, violin=TRUE,
 		plot(obs[1,]~xAxis, col="white", type="p",
 				ylim=ylim, xlim=xlim, main=main,
 				xlab=xlab, ylab=ylab, axes=FALSE, ...)
-		if (!is.null(key)) {
-			if (length(key) != ncol(obs)) {
+		if (!is.null(key)) 
+		{
+			if (length(key) != ncol(obs)) 
+			{
 				stop("Key length does not match the number of variates.")
 			}
 			axis(1, at=xAxis, lab=key)
-		} else {
+		} 
+		else 
+		{
 			axis(1, at=xAxis, lab=paste("v", xAxis, sep=""))
 		}
 		
@@ -343,18 +510,24 @@ plot.sienaGOF <- function (x, standardize=3, violin=TRUE,
 		lines(yperc.lower~xAxis, lty=3, col = "gray", lwd=3)
 		lines(yperc.upper~xAxis, lty=3, col = "gray", lwd=3)
 		
-		if (violin) {
+		if (violin) 
+		{
 			require(vioplot)
-			for (i in 1:ncol(sims)) {
+			for (i in 1:ncol(sims))
+			{
 				vioplot(sims[,i], at=xAxis[i],
 						add=TRUE, col="gray", wex=.75, ...)
 			}
-		} else {
+		} 
+		else
+		{
 			boxplot(as.numeric(sim)~rep(1:vars, each=itns), add=TRUE, ...)
 		}
-		for(i in 1:nrow(obs)) {
+		for(i in 1:nrow(obs))
+		{
 			lines(obs[i,]~xAxis, col="red", type="l", lwd=1, ...)
 			lines(obs[i,]~xAxis, col="red", type="p", lwd=3, pch=19, ...)
 			text(xAxis, obs[i,], labels=round(x$Observation[i,],3), pos=4)
 		}
+	}
 }

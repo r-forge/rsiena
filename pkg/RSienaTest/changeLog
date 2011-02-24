@@ -1,3 +1,10 @@
+2011-02-24 R-forge revision 140
+
+	* R/sienaGOF.r: Added cumulative tests, simulated image
+	  function imageGOF, and cleaned up the code to reflect
+	  RSiena coding standards. Added image plot to plot.sienaGOF.
+	* man/sienaGOF.Rd: Changes to reflect the above
+
 2011-02-23 R-forge revision 139
 
 	* src/model/ml/MLsimulation.cpp,
