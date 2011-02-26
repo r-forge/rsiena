@@ -1,3 +1,7 @@
+2011-02-26 R-forge revision 141
+
+	* man/RSiena-package.Rd, DESCRIPTION: fix typos, one making check fail!
+
 2011-02-24 R-forge revision 140
 
 	* R/sienaGOF.r: Added cumulative tests, simulated image
