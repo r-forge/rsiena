@@ -1,3 +1,27 @@
+2011-03-06 R-forge revision 142
+
+	* R/sienaGOF: fixed a plotting issue with missing data
+	*  src/model/effects/EffectFactory.cpp: added GWESP terms
+	* src/model/effects/AllEffects.h: added GWESP terms
+	* src/model/effects/EffectFactory.cpp: added GWESP terms
+	* data/allEffects.csv: added GWESP terms
+	* man/sienaGOF.Rd: Incorporated GWESP into the model
+	* src/model/effects/GwespBFEffect.h added
+	* src/model/effects/GwespFBEffect.h added
+	* src/model/effects/GwespBBEffect.h added
+	* src/model/effects/GwespFFEffect.h added
+	* src/model/effects/GwespRREffect.h added
+	* src/model/effects/GwespBFEffect.cpp added
+	* src/model/effects/GwespFBEffect.cpp added
+	* src/model/effects/GwespBBEffect.cpp added
+	* src/model/effects/GwespFFEffect.cpp added
+	* src/model/effects/GwespRREffect.cpp added
+	* NOTE: the 'parm' column needs an integer, and I got
+	around this by using it as a "hundredths" interpretation
+	so that I x 100 when it reaches the effect object's
+	constructor. It would be nice to have it imported in
+	"createEffect" as a double.
+
 2011-02-26 R-forge revision 141
 
 	* man/RSiena-package.Rd, DESCRIPTION: fix typos, one making check fail!

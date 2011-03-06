@@ -260,6 +260,26 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new FourCyclesEffect(pEffectInfo);
 	}
+	else if (effectName == "gwespFF")
+	{
+		pEffect = new GwespFFEffect(pEffectInfo);
+	}
+	else if (effectName == "gwespFB")
+	{
+		pEffect = new GwespFBEffect(pEffectInfo);
+	}
+	else if (effectName == "gwespBF")
+	{
+		pEffect = new GwespBFEffect(pEffectInfo);
+	}
+	else if (effectName == "gwespBB")
+	{
+		pEffect = new GwespBBEffect(pEffectInfo);
+	}
+	else if (effectName == "gwespRR")
+	{
+		pEffect = new GwespRREffect(pEffectInfo);
+	}
 	else if (effectName == "inStructEq")
 	{
 		pEffect = new InStructuralEquivalenceEffect(pEffectInfo);
