@@ -27,7 +27,6 @@ sienaGOF(sienaDataObject,
 \method{print}{sienaGOF}(x, \dots)
 }
 \arguments{
- ## sienaGOF(\dots):
   \item{sienaDataObject}{Results from a call to \code{sienaDataCreate}.}
   \item{sienaFitObject}{Results from a call to \code{siena07}.}
   \item{groupName}{The name of the sienaGroup to be used.}
@@ -51,7 +50,6 @@ sienaGOF(sienaDataObject,
   \item{twoTailed}{Whether to use two tails for calculating p values on the
    Monte Carlo test. Recommended for 
   advanced users only, as it is probably only applicable in rare cases.}
-  ## plot(\dots):
   \item{x}{ Object from a call to sienaGOF. }
   \item{standardize}{ One of three levels of standardization to be performed
   on the auxiliary statistics (for layout):
@@ -72,7 +70,6 @@ sienaGOF(sienaDataObject,
   This option will negate most of the others. }
   \item{imageThreshold}{ Threshold for the ratio of errors required
   to plot a false dyad in the image.}
-  ## Both:
   \item{wave}{Wave(s) to be used.}
   \item{\dots}{Other arguments.}
 }
@@ -149,25 +146,26 @@ mymodel <- sienaModelCreate(fn=simstats0c, nsub=4, n3=50)
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
-myeff <- includeEffects(myeff, transTrip, balance)
+myeff <- includeEffects(myeff, gwespFB, balance)
+# The 'parm' column only accepts integers, so the convention is
+# to specify alpha * 100, i.e. in hundredths:
+myeff[myeff$shortName=='gwespFB', 'parm'] <- 30
 ans <- siena07(mymodel, data=mydata, effects=myeff, returnDeps=TRUE, batch=TRUE)
 
 require(sna)
 require(network)
+
+missingsToZero <- function(x, missingData) {
+	x[is.na(x)] <- 0
+	1*( (x==1 & !missingData) )
+}
+
 triadCensus <- function (x, missingData) {
 	# Zero out the missing data
-	zeroed <- 1*( (x==1 & !missingData) )
+	zeroed <- missingsToZero(x, missingData)
 	triad.census(as.matrix(zeroed))
-	## ALTERNATELY: Utilize the edgelist. This can be
-	## slower, depending on the package used. For
-	## traid.census, this approach takes 1.5x the time
-	# summary() of a sparse matrix gets the egdelist
-	#edgelist <- summary(zeroed)
-	# Ensure all nodes are represented in the edgelist
-	#edgelist <- rbind(edgelist,c(nrow(x),nrow(x),0))
-	#triad.census(network(edgelist))
-
 }
+
 res <- sienaGOF(mydata, ans,"Data1", "mynet1", triadCensus, verbose=TRUE,
  join=TRUE)
 
@@ -178,7 +176,7 @@ plot(res, key=c("003", "012","102","021D","021U","021C",
 
 # We can also do cumulative tests:
 outdegreeDistribution <- function(x, missingData) {
-	zeroed <- 1*( (x==1 & !missingData) )
+	zeroed <- missingsToZero(x, missingData)
 	outdegrees <- apply(zeroed,1,sum)
 	# Returns the cumulative distribution of outdegrees from levels 0 to 7
 	cumulativeOutdegrees = sapply(0:7, function(i)sum(outdegrees<=i))

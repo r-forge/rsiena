@@ -429,10 +429,12 @@ plot.sienaGOF <- function (x, standardize=NA, violin=TRUE,
 			}
 		}
 		x <- x[[wave]]
-		itns <- nrow(x$Simulations)
-		vars <- ncol(x$Simulations)
 		sims <- x$Simulations
 		obs <- x$Observations
+		itns <- nrow(sims)
+		vars <- ncol(sims)
+
+		## Need to check for useless statistics here:
 		n.obs <- nrow(obs)
 		if (standardize==3) 
 		{
@@ -464,8 +466,15 @@ plot.sienaGOF <- function (x, standardize=NA, violin=TRUE,
 			obs <- matrix(sapply(1:ncol(sims), function(i)
 								(obs[,i] - sims.mean[i]) ), nrow=n.obs )
 		}
-		sims[is.nan(sims)] <- 0
-		obs[is.nan(obs)] <- 0
+		
+		screen <- sapply(1:ncol(obs),function(i){
+			(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
+			(diag(var(rbind(sims,obs)))!=0)
+		sims <- sims[,screen, drop=FALSE]
+		obs <- obs[,screen, drop=FALSE]
+		obsLabels <- round(x$Observations[,screen, drop=FALSE],3)
+		key <- key[screen]
+		
 		if (is.null(ylim)) 
 		{
 			ylim = c(min(obs, sims), max(obs, sims))
@@ -483,7 +492,7 @@ plot.sienaGOF <- function (x, standardize=NA, violin=TRUE,
 		{
 			ylab = "Statistic Values"
 		}
-		xAxis <- (1:vars)
+		xAxis <- (1:sum(screen))
 		
 		plot(obs[1,]~xAxis, col="white", type="p",
 				ylim=ylim, xlim=xlim, main=main,
@@ -527,7 +536,7 @@ plot.sienaGOF <- function (x, standardize=NA, violin=TRUE,
 		{
 			lines(obs[i,]~xAxis, col="red", type="l", lwd=1, ...)
 			lines(obs[i,]~xAxis, col="red", type="p", lwd=3, pch=19, ...)
-			text(xAxis, obs[i,], labels=round(x$Observation[i,],3), pos=4)
+			text(xAxis, obs[i,], labels=obsLabels[i,], pos=4)
 		}
 	}
 }
