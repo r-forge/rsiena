@@ -1,3 +1,21 @@
+2011-03-13 R-forge revision 143
+
+	* data/allEffects.csv: Modified default parm for Gwesp effects
+	* src/model/effects/GwespEffect.h added as superclass to all Gwesp effects
+	* src/model/effects/GwespEffect.cpp Now implements GwespAbstract class
+	* src/model/effects/GwespBFEffect.h Now implements GwespAbstract class
+	* src/model/effects/GwespFBEffect.h Now implements GwespAbstract class
+	* src/model/effects/GwespBBEffect.h Now implements GwespAbstract class
+	* src/model/effects/GwespFFEffect.h Now implements GwespAbstract class
+	* src/model/effects/GwespRREffect.h Now implements GwespAbstract class
+	* src/model/effects/GwespBFEffect.cpp Now implements GwespAbstract class
+	* src/model/effects/GwespFBEffect.cpp Now implements GwespAbstract class
+	* src/model/effects/GwespBBEffect.cpp Now implements GwespAbstract class
+	* src/model/effects/GwespFFEffect.cpp Now implements GwespAbstract class
+	* src/model/effects/GwespRREffect.cpp Now implements GwespAbstract class
+	* man/sienaGOF.Rd: Added primitive snow cluster support, option for robust covariance estimation
+	* R/sienaGOF.r: Added primitive snow cluster support, option for robust covariance estimation
+
 2011-03-06 R-forge revision 142
 
 	* R/sienaGOF: fixed a plotting issue with missing data

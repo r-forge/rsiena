@@ -18,7 +18,7 @@
 sienaGOF(sienaDataObject,
 		sienaFitObject, groupName, varName,  auxiliaryFunction, wave=NULL,
 		verbose=FALSE, join=TRUE, expectationFunction=mean,
-		twoTailed=FALSE, cumulative=FALSE, \dots)
+		twoTailed=FALSE, cumulative=FALSE, cluster=NULL, robust=FALSE, \dots)
 \method{plot}{sienaGOF}(x,  standardize=NA, violin=TRUE, 
 			ylim=NULL, xlim=NULL, 
 			xlab=NULL, ylab=NULL, key=NULL, 
@@ -51,6 +51,7 @@ sienaGOF(sienaDataObject,
    Monte Carlo test. Recommended for 
   advanced users only, as it is probably only applicable in rare cases.}
   \item{x}{ Object from a call to sienaGOF. }
+  \item{robust}{ Whether to use robust estimation of the covariance matrix. }
   \item{standardize}{ One of three levels of standardization to be performed
   on the auxiliary statistics (for layout):
   3 -- center by median and scale;
@@ -71,6 +72,8 @@ sienaGOF(sienaDataObject,
   \item{imageThreshold}{ Threshold for the ratio of errors required
   to plot a false dyad in the image.}
   \item{wave}{Wave(s) to be used.}
+  \item{cluster}{Optionally, a \code{snow} cluster to execute the auxiliary
+  function calculations on. This can have dramatic improvements on speed!}
   \item{\dots}{Other arguments.}
 }
 \details{
