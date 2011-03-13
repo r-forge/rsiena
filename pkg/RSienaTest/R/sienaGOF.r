@@ -12,8 +12,9 @@
 sienaGOF <- function(sienaDataObject,
 		sienaFitObject, groupName, varName,  auxiliaryFunction, wave=NULL,
 		verbose=FALSE, join=TRUE, expectationFunction=mean,
-		twoTailed=FALSE, cumulative=FALSE,...) 
+		twoTailed=FALSE, cumulative=FALSE,  cluster=NULL, robust=FALSE, ...) 
 	{
+
 	require(MASS)
 	##  require(Matrix)
 	##  Check input
@@ -115,12 +116,22 @@ sienaGOF <- function(sienaDataObject,
 	if (verbose) cat("Calculating auxiliary statistics for waves",wave,".\n")
 	if (join) 
 	{
-		ttcSimulation <- system.time(tmp <- lapply(wave, function (j) {
-					tmp <- sapply(1:iterations, function (i) 
-					{ auxiliaryFunction(simsSp[[i]][[j]], missingSp[[j]])})
-					dimnames(tmp)[[2]] <-  1:iterations
-					t(tmp)
-				}))
+		if (!is.null(cluster)) {
+			ttcSimulation <- system.time(tmp <- lapply(wave, function (j) {
+								tmp <- parSapply(cluster, 1:iterations, function (i) 
+										{ auxiliaryFunction(simsSp[[i]][[j]], missingSp[[j]])})
+								dimnames(tmp)[[2]] <-  1:iterations
+								t(tmp)
+							}))
+		} else {
+			ttcSimulation <- system.time(tmp <- lapply(wave, function (j) {
+								tmp <- sapply(1:iterations, function (i) 
+										{ auxiliaryFunction(simsSp[[i]][[j]], missingSp[[j]])})
+								dimnames(tmp)[[2]] <-  1:iterations
+								t(tmp)
+							}))
+		}
+
 		simStats <- tmp[[1]]
 		if (length(tmp)>1) {
 			for (i in 2:length(tmp)) {
@@ -129,13 +140,23 @@ sienaGOF <- function(sienaDataObject,
 		}
 		simStats <- list(Joint=simStats)
 	} else {
-		ttcSimulation <- system.time(simStats <- lapply(wave, function (j) {
-					tmp <- sapply(1:iterations, function (i) {
-					auxiliaryFunction(simsSp[[i]][[j]], missingSp[[j]])
-				})
-					dimnames(tmp)[[2]] <-  1:iterations
-					t(tmp)
-				}))
+		if (!is.null(cluster)) {
+			ttcSimulation <- system.time(simStats <- lapply(wave, function (j) {
+								tmp <- parSapply(cluster, 1:iterations, function (i) {
+											auxiliaryFunction(simsSp[[i]][[j]], missingSp[[j]])
+										})
+								dimnames(tmp)[[2]] <-  1:iterations
+								t(tmp)
+							}))
+		} else {
+			ttcSimulation <- system.time(simStats <- lapply(wave, function (j) {
+								tmp <- sapply(1:iterations, function (i) {
+											auxiliaryFunction(simsSp[[i]][[j]], missingSp[[j]])
+										})
+								dimnames(tmp)[[2]] <-  1:iterations
+								t(tmp)
+							}))
+		}
 		names(simStats) <- paste("Wave",wave)
 	}
 	class(simStats) <- "simulatedAuxiliaryStatistics"
@@ -165,8 +186,11 @@ sienaGOF <- function(sienaDataObject,
 		observations = nrow(observed)
 		simulations=nrow(simulated)
 		variates=ncol(simulated)
-		
-		a <- cov(simulated)
+		if (robust) {
+			a <- cov.rob(simulated)$cov
+		} else {
+			a <- cov(simulated)
+		}
 		ainv <- ginv(a)
 		arank <- rankMatrix(a)
 		expectation = apply(simulated, 2, expectationFunction);

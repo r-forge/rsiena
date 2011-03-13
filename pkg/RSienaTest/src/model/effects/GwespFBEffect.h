@@ -13,24 +13,17 @@
 #define GwespFBEffect_H_
 
 #include "model/effects/NetworkEffect.h"
+#include "GwespEffect.h"
 
 namespace siena
 {
 
-/**
- * This class defines the transitive triads effect. It is a version of the
- * transitive triplets effect for symmetric networks.
- */
-class GwespFBEffect : public NetworkEffect
+class GwespFBEffect : public GwespEffect
 {
 public:
 	GwespFBEffect(const EffectInfo * pEffectInfo);
-
-	virtual double calculateContribution(int alter) const;
-
 protected:
-	virtual double tieStatistic(int alter);
-	double weight;
+	virtual inline ConfigurationTable * pStatisticTable() const;
 };
 
 }
