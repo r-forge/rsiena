@@ -11,7 +11,20 @@ of network and behaviour, for which models can be fitted quickly.
  Adjacency matrix for the network at time point 3.
 }
 \source{
- s50-network3.dat from Stocnet
+\url{http://www.stats.ox.ac.uk/~snijders/siena/s50_data.zip}
 }
-\references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
+\references{
+West, P. and Sweeting, H. (1995) Background Rationale and Design of the 
+West of Scotland 11-16 Study. 
+Working Paper No. 52. MRC Medical Sociology Unit Glasgow.
+
+See \url{http://www.stats.ox.ac.uk/~snijders/siena/s50_data.htm}
+}
+\seealso{\code{\link{s501}}, \code{\link{s502}}, \code{\link{s50a}}
+}
+\examples{
+mynet <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mybeh <- sienaNet(s50a, type='behavior')
+mydata <- sienaDataCreate(mynet, mybeh)
+}
 \keyword{datasets}
