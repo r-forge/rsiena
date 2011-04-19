@@ -131,8 +131,6 @@
 
 \author{Tom A.B.\ Snijders }
 
-\date{November 19, 2010, 2nd version }
-
 \newcommand{\sn}{{\scriptstyle N}}
 \renewcommand{\sb}{{\scriptstyle B}}
 \newcommand{\extraver}{{$\phantom{\Big(}$}}
@@ -195,6 +193,10 @@ This paper gives a sketch of the main algorithms used in RSiena.
 It is meant as background material for understanding the code of
 RSiena. It is intended to be included later on as part of the
 programmer's manual of RSiena.
+
+Changes in the version of January 3, 2011:\\
+An erroneous change in the version of November 17, 2010,
+ in \textit{MH\_InsPermute} and  \textit{MH\_DelPermute}, was redressed.
 
 Changes in the version of November 19, 2010:\\
 correction of \textit{MH\_DelPermute} (the correction
@@ -2301,10 +2303,8 @@ Part \emph{A}:
       }
       \item $\ms_e \leftarrow \ms_a.\nnm{succ}^{(c-1)}$
       \end{enumerate}
-\item If \textit{misdat}, let $\textit{ThisLength} \leftarrow c$.\\
-      \remark{This is new in the version of November 17, 2010. The earlier version
-      (where \textit{ThisLength} could remain being larger than $c$) was not wrong,
-      but carried out some superfluous mutually canceling subtractions and additions.}
+\item \remark{At this place the erroneous change in the version of November 17, 2010
+      is dropped again.}
 \item Let \textit{perm} be a random permutation of the numbers $1$ to $c$.
 \item \addce{
       For all variables $(w,r)$ involved in a condition of the kind
@@ -2426,8 +2426,8 @@ Part \emph{B}:
       \item\textit{ChangeStep}$(y,
          \textit{Coordinates}_{\textit{perm}(s)})$ \ .
       \end{enumerate}
-\item if (not \textit{misdat}) \remark{(this condition was added in version 17 Nov 2010
-      to avoid superfluous additions and subtractions)} :\\
+\item \remark{(Here also an erroneous change in version 17 Nov 2010
+      was dropped, January 3, 2011.)} \\
       For $s$ running from $c+1$ to \textit{ThisLength} do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y, \textit{Coordinates}_{s}; rr_s, lospr_s, lcpr_s)$
@@ -2598,7 +2598,7 @@ Part \emph{A}:
                     and corrected with the addition of \nnm{succ}
                     in the version of November 18, 2010,
                     and is needed in view of the requirement $\ms_a < \nnm{last}$
-                    in step 1.\ of procedure \textit{MH\_DelPermute}.}
+                    in step 1.\ of procedure \textit{MH\_InsPermute}.}
             \end{enumerate}
       \end{enumerate}
 \vspace*{-1em}
@@ -2709,9 +2709,8 @@ Part \emph{B}:
       the others of these numbers with subscript 2 are not used any more.)
 \item For $1 \leq s \leq \textit{ThisLength}-2$ \
       denote by $\textit{Coordinates}_s$ the values
-      $(w,i,j,r,d)$ of $\ms_a.\nnm{succ}^{s}$;\\
-      if \textit{misdat}, this is required only for $1 \leq s \leq c$.
-      \remark{Last remark new in version 17 Nov 2010.}
+      $(w,i,j,r,d)$ of $\ms_a.\nnm{succ}^{s}$.\\
+      \remark{Erroneous change in version 17 Nov 2010 dropped, 3 Jan 2011.}
 \item Note that still $y =  \textit{StateBefore}(\ms_a)$ as was assigned above.\\
       For $s$ running from 1 to $c$, do:
       \begin{enumerate}
@@ -2727,8 +2726,8 @@ Part \emph{B}:
       \item \textit{ChangeStep}$(y, \textit{Coordinates}_{\textit{perm}(s)})$
       \end{enumerate}
 \newpage
-\item If not \textit{misdat} \remark{(this condition added
-      version 17 Nov 2010)} then for $s$ running from $c+1$ to $\textit{ThisLength} -2$ do:
+\item  \remark{Erroneous change in version 17 Nov 2010 dropped, 3 Jan 2011.}\\
+      For $s$ running from $c+1$ to $\textit{ThisLength} -2$ do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y, \textit{Coordinates}_{s};
                                             rr_s, lospr_s, lcpr_s)$
@@ -4652,6 +4651,7 @@ The pairwise meeting process accordingly proceeds as follows.
       \]
 \item Repeat
       \begin{enumerate}
+
        \item Choose $i$ among the active $i$ with probabilities
              \[
               \frac{\lambda_{0i}} {\lambda_{0+}} \ ,

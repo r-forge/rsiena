@@ -1,4 +1,29 @@
-2011-03-13 R-forge revision 143
+2011-04-19 R-forge revision 144
+
+	* data/allEffects.csv, src/model/effects/AllEffects.h,
+	src/model/effects/EffectFactory.cpp,
+	src/model/effects/OutTruncEffect.h,
+	src/model/effects/OutTruncEffect.spp: new effect OutTruncEffect
+
+	* R/siena08.r, R/observationsErrors.r,
+	man/print.sienaMeta.Rd, man/siena08.Rd: added ML
+	method to siena08, enhanced plots.
+
+	* doc/RSiena.bib, doc/Siena_algorithms4.tex,
+	doc/s_man400.tex, doc/RscriptDataFormat.R,
+	doc/RscriptSienaBehaviour.R, doc/RscriptSienaRunModel.R,
+	doc/RscripSienaVariableFormat.R: major edits, scripts now included
+	in latex.
+
+	* man/includeEffects.Rd: added another example
+
+	* man/s50.Rd, man/s501.Rd, man/s502.Rd, man/s503.Rd, man/s50a.Rd:
+	more helpful information.
+
+	* R/initializeFRAN.r, R/maxlikec.r, man/summary.iwlsm.Rd:
+	added eolstyle property.
+
+2011-03-13 R-forge revision 143 RSienaTest only
 
 	* data/allEffects.csv: Modified default parm for Gwesp effects
 	* src/model/effects/GwespEffect.h added as superclass to all Gwesp effects
@@ -13,10 +38,12 @@
 	* src/model/effects/GwespBBEffect.cpp Now implements GwespAbstract class
 	* src/model/effects/GwespFFEffect.cpp Now implements GwespAbstract class
 	* src/model/effects/GwespRREffect.cpp Now implements GwespAbstract class
-	* man/sienaGOF.Rd: Added primitive snow cluster support, option for robust covariance estimation
-	* R/sienaGOF.r: Added primitive snow cluster support, option for robust covariance estimation
+	* man/sienaGOF.Rd: Added primitive snow cluster support,
+	option for robust covariance estimation
+	* R/sienaGOF.r: Added primitive snow cluster support,
+	option for robust covariance estimation
 
-2011-03-06 R-forge revision 142
+2011-03-06 R-forge revision 142 RSienaTest only
 
 	* R/sienaGOF: fixed a plotting issue with missing data
 	*  src/model/effects/EffectFactory.cpp: added GWESP terms
