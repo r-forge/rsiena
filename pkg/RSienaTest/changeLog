@@ -1,3 +1,7 @@
+2011-04-20 R-forge revision 145
+
+	* src/model/effects/outTruncEffect.cpp: reformating
+
 2011-04-19 R-forge revision 144
 
 	* data/allEffects.csv, src/model/effects/AllEffects.h,
