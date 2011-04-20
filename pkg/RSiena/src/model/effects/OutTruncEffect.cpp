@@ -51,15 +51,18 @@ double OutTruncEffect::calculateContribution(int alter) const
 		// the new effect value would have decreased by 1 if d <= this->lc
 
       if (d <= this->lc)
-        {change = 1;}
-
+	  {
+		  change = 1;
+	  }
 	}
 	else
 	{
 		// When introducing a new tie, the new out-degree would be d+1, and
 		// the new effect value would have increased by 1 if d < this->lc
       if (d < this->lc)
-        {change = 1;}
+	  {
+		  change = 1;
+	  }
 	}
 
 	return change;
@@ -77,12 +80,14 @@ double OutTruncEffect::egoStatistic(int ego,
 	int d =	this->pNetwork()->outDegree(this->ego());
 
    if (d <= this->lc)
-     {return d;}
-   else 
-     {return this->lc;}
+   {
+	   return d;
+   }
+   else
+   {
+	   return this->lc;
+   }
 }
-
-
 
 /**
  * Returns the statistic corresponding to this effect as part of

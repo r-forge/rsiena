@@ -1,3 +1,7 @@
+2011-04-20 R-forge revision 145
+
+	* src/model/effects/outTruncEffect.cpp: reformating
+
 2011-04-19 R-forge revision 144
 
 	* data/allEffects.csv, src/model/effects/AllEffects.h,
@@ -20,7 +24,8 @@
 	* man/s50.Rd, man/s501.Rd, man/s502.Rd, man/s503.Rd, man/s50a.Rd:
 	more helpful information.
 
-	* R/initializeFRAN.r, R/maxlikec.r: added eolstyle property.
+	* R/initializeFRAN.r, R/maxlikec.r, man/summary.iwlsm.Rd:
+	added eolstyle property.
 
 2011-03-13 R-forge revision 143 RSienaTest only
 
@@ -37,10 +42,12 @@
 	* src/model/effects/GwespBBEffect.cpp Now implements GwespAbstract class
 	* src/model/effects/GwespFFEffect.cpp Now implements GwespAbstract class
 	* src/model/effects/GwespRREffect.cpp Now implements GwespAbstract class
-	* man/sienaGOF.Rd: Added primitive snow cluster support, option for robust covariance estimation
-	* R/sienaGOF.r: Added primitive snow cluster support, option for robust covariance estimation
+	* man/sienaGOF.Rd: Added primitive snow cluster support,
+	option for robust covariance estimation
+	* R/sienaGOF.r: Added primitive snow cluster support,
+	option for robust covariance estimation
 
-2011-03-06 R-forge revision 142
+2011-03-06 R-forge revision 142 RSienaTest only
 
 	* R/sienaGOF: fixed a plotting issue with missing data
 	*  src/model/effects/EffectFactory.cpp: added GWESP terms
