@@ -1,3 +1,16 @@
+2011-05-16 R-forge revision 146
+
+	* src/Makevars.win: alter linking to reduce command line length
+	* doc/s_man400.tex: add tex code to reduce size of pdf, many
+	updates
+	* doc/RSiena.bib, doc/simstatsc.tex, doc/RSienaDeveloper.tex:
+	updated documentation for symmetric networks and other minor changes.
+	* R/siena08.r: formatting changes only
+	* R/sienaDataCreate.r: set diagonals to NA for sparse matrices
+	when calculating degree and setting attributes
+	* R/sienaDataCreateFromSession.r: if using read.pajek to read a
+	non-directed network duplicate the ties in the edgelist.
+
 2011-04-20 R-forge revision 145
 
 	* src/model/effects/outTruncEffect.cpp: reformating

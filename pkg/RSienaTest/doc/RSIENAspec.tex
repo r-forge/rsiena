@@ -4,7 +4,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amsfonts}
-\usepackage{hyperref}
+\usepackage[pdfstartview={}]{hyperref}
 \newcommand{\eps}{\varepsilon}
 \newcommand{\abso}[1]{\;\mid#1\mid\;}
 \renewcommand{\=}{\,=\,}
@@ -436,16 +436,16 @@ period (excludes final).\\
 \subsection{Similarity mean}
 \label{sec:similarityMean}
 \begin{algorithmic}
-\FORALL{columns of matrix}
-\FORALL{entries in column}
+\FORALL[waves]{columns of matrix}
+\FORALL[actors]{entries in column}
 \STATE in a copy of the column set this entry to NA
 \STATE Calculate 1 - abs(this entry - copy column)/ range
-\STATE Sum the nonmissing entries in this vector
+\STATE Sum this over the nonmissing entries in this vector
 \STATE Count the nonmissing entries in this vector
 \ENDFOR
 \ENDFOR
-\STATE Sum nonmissing entries and counts over each column
-\STATE Calculate the similarity mean as total sum divided by total count.
+\STATE Sum nonmissing entries and counts over the columns
+\STATE Calculate the similarity mean as this total sum divided by total count.
 \STATE For possible later use, also return the total sum and total count.
 \end{algorithmic}
 \subsection{Balance mean}

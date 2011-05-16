@@ -123,6 +123,18 @@
 \setlength{\oddsidemargin}{0.6cm}
 \setlength{\textwidth}{15cm}
 
+\ifx\pdfoutput\undefined
+\else
+  \ifx\pdfoutput\relax
+  \else
+    \ifnum\pdfoutput>0
+      % PDF output
+      \pdfminorversion=5
+      \pdfcompresslevel=9
+      \pdfobjcompresslevel=3
+    \fi
+  \fi
+\fi
 
 \title{{\Huge Manual for \textsf{RSiena} } }
 %\protect\newline \normalsize } }
@@ -4031,7 +4043,7 @@ that the network dynamics depends on sex.
 
 A generalized Neyman-Rao score test
 is implemented for the MoM estimation method
-in \SI (see Schweinberger, 2005).
+in \SI \citep[see][]{Schweinberger10}.
 \iffalse
 For the ML estimation method,
 following the same steps produces the \citet{Rao47} efficient score test.
@@ -4051,13 +4063,13 @@ the first network: Suppose this effect has \sfn{effectNumber} equal to 10, the
 commands can be as follows.
 
 \begin{verbatim}
-myeff[10, 9] <- TRUE
-myeff[10, 'fix'] <- TRUE
-myeff[10, 'test'] <- TRUE
+myeff[10, 9]              <- TRUE
+myeff[10, 'fix']          <- TRUE
+myeff[10, 'test']         <- TRUE
 myeff[10, 'initialValue'] <- ((value to be used for test))
-## or, more easily
+## or, more easily,
 myeff <- setEffect(myeff, recip, fix=TRUE, test=TRUE,
-initialValue=(value to be used for test))
+                   initialValue=(value to be used for test))
 \end{verbatim}
 
 
@@ -4956,8 +4968,8 @@ networks are the same -- except
 for the basic rate parameters and for
 those differences that are explicitly modeled by interactions
 with dummy variables indicating the different networks.
-The first and third options require that the number of observations is the same
-for the different networks. This is not required for the
+The first and third options require that the number of observations
+is the same for the different networks. This is not required for the
 second option.
 These methods can be applied for two or more networks.
 \medskip
@@ -4967,7 +4979,8 @@ The three options are:
 \begin{enumerate}
 \item Combining the different networks in one large network,
       indicating by structural zeros that ties between the
-      networks are not permitted. This is explained in Section~\ref{S_struct}.\\
+      networks are not permitted.
+      This is explained in Section~\ref{S_struct}.\\
       The special effort to be made here is the construction
       of the data files for the large (combined) network.
 \item Combining different sub-projects
@@ -4989,7 +5002,8 @@ The three options are:
       This is explained in Section~\ref{S_Siena08}.
 \end{enumerate}
 The first and second options will yield nearly the same results, with the
-differences depending on the basic rate (and perhaps other) parameters that are
+differences depending on the basic rate (and perhaps other) parameters
+that are
 allowed to differ between the different networks, and of course
 also depending on the randomness of the estimation algorithm.
 The second option is more `natural' given the design of \SI and
@@ -5035,8 +5049,8 @@ These sub-projects then are combined into one project
 where the number of actors is the largest of the number of
 actors of the sub-projects, and the number of observations
 is the sum of the observations of the sub-projects.
-As an example, suppose that three projects with names {\tt sub1}, {\tt sub2}, and
-{\tt sub3} are combined. Suppose {\tt sub1} has 21 actors and
+As an example, suppose that three projects with names {\tt sub1}, {\tt sub2},
+and {\tt sub3} are combined. Suppose {\tt sub1} has 21 actors and
 2 observations, {\tt sub2} has 35 actors and 4 observations,
 and {\tt sub3} has 24 actors with 5 observations.
 Then the combined multi-group project has 35 actors and 11 observations.
@@ -5092,7 +5106,8 @@ $N$ data sets are denoted $\theta_1, \theta_2, \ldots, \theta_N$,
 while their \emph{estimates} are denoted
  $\hat\theta_1, \hat\theta_2, \ldots, \hat\theta_N$.
 
-\subsubsection{Meta-analysis directed at the mean and variance of the parameters}
+\subsubsection{Meta-analysis directed at the mean
+               and variance of the parameters}
 
 In this meta-analysis it is assumed that the data sets can be
 regarded as a sample from a population -- i.e., a population
@@ -5125,21 +5140,26 @@ and tests several hypotheses concerning these `meta-parameters':
 \item Test $H_0^{(0)}:\ \mu_\theta = \sigma^2_\theta = 0$
                        (all $\theta_j = 0$),
                       i.e., effect $\theta$ is nil altogether.\\
-      This is done by means of a chi-squared test statistic $T^2$ with $N$ d.f.
+      This is done by means of a chi-squared test statistic $T^2$
+      with $N$ d.f.
 \item Estimate  $\mu_\theta $.
 \item Test $H_0^{(1)}:\ \mu_\theta = 0$.\\
-      This is done by means of a standard normal test statistic $ t_{\mu_\theta}$,
-      being the ration of the estimate for $\mu_\theta $ to its standard error.
+      This is done by means of a standard normal test statistic
+      $ t_{\mu_\theta}$,
+      being the ration of the estimate for $\mu_\theta $
+      to its standard error.
 \item Test $H_0^{(2)}:\ \sigma^2_\theta = 0$,
                      i.e., $\theta_j = \mu_\theta$ for all $j$. \\
-      This is done by means of a chi-squared test statistic $Q$ with $N-1$ d.f.
+      This is done by means of a chi-squared test statistic $Q$
+      with $N-1$ d.f.
 \item Estimate  $\sigma^2_\theta$ .
 \end{enumerate}
 Two approaches are followed and presented in the output.
 The first is an iterative weighted least squares method based on
-Cochran (1954) and Snijders and Baerveldt (2003).
-The second is a maximum likelihood method under the assumption
-of normal distributions; the associated confidence intervals
+\citet{Cochran54} and \citet{SnijdersBaerveldt03}.
+The second is a likelihood-based method under the assumption
+of normal distributions: the estimators are maximum likelihood
+estimators; the associated confidence intervals
 are based on profile likelihoods, and therefore will be
 asymmetric. The reported
 $p$-values for the population mean (hypothesis $H_0^{(1)}$)
@@ -5147,11 +5167,12 @@ are based on the $t$ distribution with $N-1$ d.f.
 In all cases, it is possible that some of the data sets $j$ are
 dropped for some of the parameters because the standard error $s_j$
 is too large (see below);
-in that case, the number $N$ mentioned above
+in that case, the number $N$ used here
 is the number of data sets actually used for the
 parameter under consideration.
 
-For these two approaches, it is assumed that the true deviations $\theta_j - \theta$
+For both of these two approaches,
+it is assumed that the true deviations $\theta_j - \theta$
 and the random errors $E_j$ are uncorrelated.
 This is not always a plausible assumption; Fisher's combination,
 mentioned below, does not make this assumption.
@@ -5165,10 +5186,24 @@ given the true parameter values $\theta_j$, the
 estimates $\hat{\theta}_j$ are approximately normally distributed
 with mean $\theta_j$ and variance $s^2_j$.
 This is often a reasonable assumption.
-The maximum-likelihood based methods also assume that the true values
-	$\theta_j$ are normally distributed in the population.
-If this is a reasonable approach, the maximum-likelihood based methods
+
+The likelihood-based methods also assume that the true values
+$\theta_j$ are normally distributed in the population.
+If this is a reasonable approach, the likelihood-based methods
 are preferable.
+A disadvantage of the iterative weighted least squares method
+is that results are possible
+where the outcome of the test of $H_0^{(2)}$ is significant
+at a usual level of significance,
+i.e., $\sigma^2_\theta$ is thought to be positive, whereas
+the estimate is $\hat\sigma^2_\theta = 0$.
+This  potential inconsistency is possible because the test
+and the estimator in this approach are not directly related
+\citep[cf.][]{SnijdersBaerveldt03}.
+The likelihood-based method does not suffer from this problem
+because the maximum likelihood estimate always is contained
+in the confidence interval based on the profile likelihood.
+\bigskip
 
 There may be reasons to distrust the estimates which are
 large with also a large standard error. (This is known as the Donner-Hauck
@@ -5186,7 +5221,8 @@ variances (less than .1).
 
 \subsubsection{Meta-analysis directed at testing the parameters}
 
-Another method for combining the various data sets, which does not make the assumption
+Another method for combining the various data sets,
+which does not make the assumption
 that the parameters are a sample from a population and also
 makes no assumptions of absence of correlation\footnote{This correlation
 is defined for the population of networks, and if the population
@@ -5201,22 +5237,28 @@ This principle here is applied in a double test:
 \begin{enumerate}
 \item for detecting if there are any networks with a positive parameter value,
          the null hypothesis tested is\\
-       $H_0 :$   For all networks, the value of this parameter is zero or less than zero;\\
+       $H_0 :$   For all networks, the value of this parameter
+            is zero or less than zero;\\
             with the alternative hypothesis;\\
         $H_1 :$
-             For at least one network, the value of this parameter is greater than zero;
+             For at least one network, the value of this parameter
+             is greater than zero;
 \item for detecting if there are any networks with a negative parameter value,
          the null hypothesis tested is\\
-            $H_0 :$ For all networks, the value of this parameter is zero or greater than zero;\\
+            $H_0 :$ For all networks, the value of this parameter
+                  is zero or greater than zero;\\
             with the alternative hypothesis\\
-            $H_1 :$ For at least one network, the value of this parameter is less than zero.
+            $H_1 :$ For at least one network, the value of this parameter
+                   is less than zero.
 \end{enumerate}
       For each of these combined tests, the $p$-value is given.
 
       It is advisable to use for each the significance level of $\alpha/2$
-      (e.g., 0.025 if $\alpha = 0.05$) which yields an overall combined test at significance level $\alpha$.
+      (e.g., 0.025 if $\alpha = 0.05$) which yields an overall combined test
+      at significance level $\alpha$.
       Note that four different overall results are possible.
-      Indicating the right-sided and the left-sided p-values by $p_r$ and $p_l$,
+      Indicating the right-sided and the left-sided p-values
+      by $p_r$ and $p_l$,
       respectively, these possible results are:
       \begin{enumerate}
          \item $p_r >   \alpha/2, \  p_l >   \alpha/2$:\\
@@ -5232,7 +5274,8 @@ This principle here is applied in a double test:
          and some others have a positive parameter value.
 \end{enumerate}
       If all networks have a zero true parameter value,
-      i.e., under the combined null hypothesis that $\theta_j = 0$  for all $j$,
+      i.e., under the combined null hypothesis that
+      $\theta_j = 0$  for all $j$,
       the probability of result (1) is less than or equal to $\alpha$;
       this is the way in which this combined test respects the
       overall probability of an error of the first kind.
@@ -5253,11 +5296,14 @@ Fisher-combination results of Siena08:
      where p is the p-value obtained for the score test;
 <li> add c_r to the right-sided chi-squared value
      and c_l to the left-sided chi-square value reported by Siena08;
-<li> these are again chi-squared values, but the degrees of freedom are 2 higher.
+<li> these are again chi-squared values, but the degrees of freedom
+     are 2 higher.
 </ol>
 A disadvantage of this procedure is that if there are two or more
-tested parameters having large standard errors, this procedure including the estimation
-must be carried out SEPARATELY for each tested parameter, because in testing each parameter
+tested parameters having large standard errors, this procedure
+including the estimation
+must be carried out SEPARATELY for each tested parameter,
+because in testing each parameter
 you wish to control for all other effects and therefore not fix any other
 effects to 0.
 \fi
@@ -8360,6 +8406,11 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2011-05-16 R-forge 146:
+\begin{itemize}
+\item Documentation improvements
+\item Can read (some) undirected networkd from Pajek files
+\end{itemize}
 \item 2011-04-19 R-forge revision 144:
 \begin{itemize}
 \item New effects: out trunc effect
