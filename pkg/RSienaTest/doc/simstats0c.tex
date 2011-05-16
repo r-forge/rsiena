@@ -215,10 +215,11 @@ selected rate effects multiplied by relevant theta value
 \STATE Add to totlambda
 \ENDFOR
 \STATE Add to sum of totlambda
-\ENDFOR
 \IF{model type BFORCE, BAGREE, BJOINT}
-\STATE Replace totlambda by square of totlambda - sum of squared lambdas
+\STATE Replace totlambda by square of totlambda - sum of squared lambdas\\
+\STATE (This is $\sum_{i<>j} \lambda_i \lambda_j$ for active $i, j$.)
 \ENDIF
+\ENDFOR
 \STATE Get a random exponential with sum of totlambda as parameter.\\
 \end{algorithmic}
 \subsection{Choose Change}
@@ -338,19 +339,17 @@ parameters and summing.
 \subsubsection{Model Type B}
 \label{sec:alterSymB}
 \begin{algorithmic}
-\IF{BFORCE or BAGREE}
+\IF{BFORCE}
+\STATE calculate $p_{actor, alter}$
+as described above
+\ELSIF{BAGREE}
 \STATE calculate $p_{actor, alter}$ and $p_{alter, actor}$
 as described above
 \ELSIF{BJOINT}
 \STATE calculate $p$ as described above
 \ENDIF
-\IF[either can force existence]{BFORCE}
-  \IF{link between $i$ and $j$ exists}
-  \STATE accept if product of probabilities is greater than a random number
-  \ELSE
-  \STATE accept if $p_{actor, alter} + p_{alter, actor} - p_{actor, alter} *
-p_{alter,actor}$ is greater than a random number.
-  \ENDIF
+\IF[actor forces]{BFORCE}
+  \STATE accept if $p_{actor, alter}$ is greater than a random number
 \ELSIF[both must agree for existence]{BAGREE}
   \IF{link between $i$ and $j$ exists}
   \STATE accept if $p_{actor, alter} + p_{alter, actor} - p_{actor, alter} *
@@ -370,7 +369,8 @@ rate scores are the same as in this section, but the non-rate scores are defined
 in section \ref{sec:symScores}.
 
 In \Sn, when calculating scores, only steps which are not aborted because of
-composition change are included in the scores. (This is a bug in \Sn.)
+composition change are included in the scores. (This is a bug in \Sn. We include
+them unless we are parallel running.)
 
 Let $z_{rk}$ be the observed value of the $k$th
 statistic in the $r$th simulation\\
@@ -455,57 +455,50 @@ Here we do not do the normal choice. My calculations suggest that for the basic
 rates it should be twice the normal scores using total rate and basic rate as
 usual. (Within variable).
 
-For the other rate effects, we have
+The total rate for each variable is
+$$r_m = \sum_{i<>j} r_{im} r_{jm} \text{ for active }i, j$$
+
+So the rate scores will be,
+\begin{align*}
+\intertext{for a basic rate parameter, $(\lambda)$, for a
+dependent variable,}
+c_{rk} &= \sum_{m=1}^M \left(
+  \frac{2\delta_{pq}}{\lambda_m} - 2 r_m t_m / \lambda_m\right ) - 2\delta_{bc}
+r_M  \left (1- \sum_{m=1}^M t_m - \sum_ct_c
+  \right)/\lambda_m\\
+\intertext{for other rate parameter, with $j$ the alter,}
+c_{rk}&= \sum_{m=1}^M \left [\delta_{pq} (s_{ikm} + s_{jkm}) -
+ \sum_{i<>j} (s_{ikm} + s_{jkm}) r_{im}r_{jm}t_m\right]\\
+& \qquad - \delta_{bc}\sum_{i<>j} (s_{ikM} +s_{jkM})
+r_{iM}r_{jM}\left (1- \sum_{m=1}^M t_m  \right)
+\end{align*}
+
+While calculating rates we store
+
+$$ 2 \left [r_m \sum_i s_{ikm} r_{im} - \sum_i s_{ikm} r_{im}^2 \right]$$ because
 
 $$
-    \text{log likelihood term } = \delta_{pq} \left [\log(f) + \log r_{im}
-    - \log(\sum r_{dm})\right ] -ft
+\sum_{i<>j} (s_{ikm} + s_{jkm}) r_{im}r_{jm} = 2 \left [\sum_ir_i \sum_i s_{ikm} r_{im}
+  - \sum_i s_{ikm} r_{im}^2 \right]
 $$
-where
-$$f=(\sum r_{dm})^2 - \sum r_{dm}^2$$
-
-$$\frac{\partial f}{\partial \alpha_k} =
-2 \sum r_{dm} \sum r_{dm} s_{dk} - 2 \sum r_{dm}^2 s_{dk}
-$$
-
-so the scores for other rate effects will be:
-
-$$
-c_{rk} = \delta_{pq}\left [ \dfrac{1}{f} \frac{\partial f}{\partial \alpha_k}  + s_{ik}
-- \dfrac{1}{\sum r_{dm}}\sum
-r_{dm} s_{dk} \right ]-
-t\frac{\partial f}{\partial \alpha_k}
-$$
-
-But I have not coded this yet!
 
 The scores for the non rate effects will be:
 
 For subtype 1 (BFORCE):
 
-4 different cases: whether there is a link from $i$ to $j$, and whether the
-change is accepted or not.
+2 different cases: the probability incorporates whether there is a link from $i$
+to $j$, so the scores will differ depending whether the change is accepted or
+not.
 
 $$
 c_{rk}= \sum_{m=1}^M \begin{cases}
- (1-p_{ij})s_{i,j\delta k} + (1-p_{ji}) s_{j,i\delta k}
-& \exists \text{ link }  i \rightarrow j, \text{ accept}\\
-\dfrac{ -p_{ji} p_{ij}}{(1 - p_{ij} p_{ji})}
-\left[(1-p_{ij}) s_{i, j\delta k} +  (1-p_{ji})
-s_{j, i\delta k}\right ] & \exists \text{ link }
-i \rightarrow j, \text{ reject}\\
-\dfrac{(1 - p_{ij}) (1-p_{ji} )\left [s_{i, j\delta k} p_{ij}  +
- s_{j, i\delta k} p_{ji} \right] }
-{p_{ij} + p_{ji} - p_{ij}p_{ji}}& \nexists \text{ link } i \rightarrow j,
-\text{ accept}\\
--s_{i, j\delta k} p_{ij} -
-s_{j, i\delta k} p_{ji}
- &\nexists \text{ link } i \rightarrow j,
-\text{ reject}
+ (1-p_{ij})s_{i,j\delta k} &\text{ accept}\\
+-p_{ij} s_{i, j\delta k}  &  \text{ reject}\\
 \end{cases}
 $$
 
-For subtype 2 (BAGREE), the reverse:
+For subtype 2 (BAGREE), 4 different cases as we combine the probabilities
+differently depending on whether there is a tie or not:
 $$c_{rk}= \sum_{m=1}^M \begin{cases}
  (1-p_{ij})s_{i,j\delta k} + (1-p_{ji}) s_{j,i\delta k}
 & \nexists \text{ link }  i \rightarrow j, \text{ accept}\\
