@@ -194,6 +194,14 @@ It is meant as background material for understanding the code of
 RSiena. It is intended to be included later on as part of the
 programmer's manual of RSiena.
 
+Changes in the version of May 17, 2011:\\
+the \emph{Connect} procedure now avoids the creation of
+incompatibilities due to  \nnm{higher},
+\nnm{disjoint}, or \nnm{atleastone} requirements.
+
+Changes in the version of February 11, 2011:\\
+creation effect distinguished from endowment effect.
+
 Changes in the version of January 3, 2011:\\
 An erroneous change in the version of November 17, 2010,
  in \textit{MH\_InsPermute} and  \textit{MH\_DelPermute}, was redressed.
@@ -352,9 +360,10 @@ $\lambda^B(r,i,x,z)$ \hspace*{3em} \> rate function, behavior $r$.\\
                                   \> (0 for inactive actors)\\[1ex]
 $f^N(r,i,x,z)$ \hspace*{3em} \> evaluation function function, network $r$.\\[1ex]
 $f^B(r,i,x,z)$ \hspace*{3em} \> evaluation function, behavior $r$.\\[1ex]
-$g^N(r,i,j,x,z)$ \hspace*{3em} \> endowment function function, network $r$\\
-                     \> (used also as creation function!) \\[1ex]
-$g^B(r,i,x,z)$ \hspace*{3em} \> endowment function, behavior $r$.\\[1ex]
+$g_e^N(r,i,j,x,z)$ \hspace*{3em} \> endowment function function, network $r$\\[1ex]
+$g_c^N(r,i,j,x,z)$ \hspace*{3em} \> creation function function, network $r$\\[1ex]
+$g_e^B(r,i,x,z)$ \hspace*{3em} \> endowment function, behavior $r$.\\[1ex]
+$g_c^B(r,i,x,z)$ \hspace*{3em} \> creation function, behavior $r$.\\[1ex]
 $\Delta f^N(r,i,j,x,z)$ \hspace*{3em} \> change in $f^N(r,i,x,z)$
                                 by toggling $N^{(r)}_{ij}$.\\[1ex]
 $\Delta f^B(r,i,v,x,z)$ \hspace*{3em} \> change in $f^B(r,i,x,z)$
@@ -484,8 +493,8 @@ we define the following logical (boolean) variables:
       If $C$ is empty, this is an error, and the program must stop with an error message.
 
       For all $j \in C$, calculate $h_j = \Delta f^N(r,i,j,x,z)$, and $h_i = 0$.\\
-      For all $j \in C$ with $N^{r}_{ij} = 1$, calculate $h_j = h_j - g^N(r,i,j,x,z)$.\\
-      For all $j \in C$ with $N^{r}_{ij} = 0$, calculate $h_j = h_j + g^N(r,i,j,x,z)$.\\
+      For all $j \in C$ with $N^{r}_{ij} = 1$, calculate $h_j = h_j - g_e^N(r,i,j,x,z)$.\\
+      For all $j \in C$ with $N^{r}_{ij} = 0$, calculate $h_j = h_j + g_c^N(r,i,j,x,z)$.\\
       Choose $j \in C \cup {i}$ with probabilities
       \begin{equation}
          \pi_j = \frac{\exp(h_j) }{ \sum_k \exp(h_k) }               \label{pij}
@@ -494,12 +503,14 @@ we define the following logical (boolean) variables:
       $J_m = J_m + \partial h_j / \partial \theta \,-\, \sum_k \pi_k\, \partial h_k / \partial \theta  $.\\
       If $j \neq i$, toggle $N^{r}_{ij}$. (\emph{network step})\\
       Goto \ref{itemstart}.
+\newpage
 \item \label{itemz}
       Let $C$ be the set of $v \in \{-1, 1\}$ \\
       for which $B^{(r)}_i + v$ is
       within the range of $B^{(r)}_i$.\\
       For all $v \in C$, calculate $h_v = \Delta f^B(r,i,v,x,z)$, and $h_0 = 0$.\\
-      If $-1 \in C$, calculate $h_{-1} = h_{-1} - g^B(r,i,x,z)$.\\
+      If $-1 \in C$, calculate $h_{-1} = h_{-1} - g_e^B(r,i,x,z)$.\\
+      If $+1 \in C$, calculate $h_{+1} = h_{+1} + g_c^B(r,i,x,z)$.\\
       Choose $v \in C \cup {0}$ with probabilities
       \begin{equation}
          \pi_v = \frac{  \exp(h_v) }{ \sum_u \exp(h_u) }              \label{piv}
@@ -1590,32 +1601,77 @@ derived variables and pointers.
 The consistency of the log probabilities and reciprocal rates
 is treated separately (when it is needed), see Section~\ref{S_prob}.
 \begin{enumerate}
-\item \emph{Create} an empty chain consisting only of the elements (\nnm{first}, \nnm{last}).
+\item \emph{Create} an empty chain consisting only
+       of the elements (\nnm{first}, \nnm{last}).
 %      with \textit{Valid} = \nnm{False}.
 %\item \emph{Validate}, check that the chain connects $y(t_{m-1})$ to $y(t_m)$
 %      and if so, calculate the log probabilities and rates
 %      and set \textit{Valid} to \nnm{True}.
 \item \emph{InsertBefore}$(\ms, w,i,j,d,r)$ :\\
-      for a currently existing ministep $\ms \neq $  \nnm{first}, insert the ministep
+      for a currently existing ministep $\ms \neq $  \nnm{first},
+      insert the ministep
       with values $(w,i,j,d,r)$ between \ms.\nnm{pred} and \ms.
 \item \emph{Delete}  a ministep, and link up its predecessor and successor.
 \item \emph{RandomElement}      :\\
-      draw a random ministep from the chain, excluding the \nnm{first} element;
+      draw a random ministep from the chain,
+      excluding the \nnm{first} element;
       note that the probabilities are 1/\textit{TotNumber}.
+\item \emph{RandomElementNotAfter(\ms)}      :\\
+      draw a random ministep from the chain,
+      among the elements after the \nnm{first} element up to and including
+      ministep \ms;
 \item \emph{Connect} : construct randomly a chain that connects
       two outcomes $y(t_{m-1})$ and $y(t_m)$ .\\
-      This is done by repeatedly applying \emph{RandomElement} and \emph{InsertBefore}:
+      This is done by repeatedly applying \emph{RandomElement}
+      and \emph{InsertBefore}.
+      If there are no \nnm{higher}, \nnm{disjoint}, or
+      \nnm{atleastone} relations between the various different networks
+      (in particular if $R_N = 1$), the following procedure can be used.
       \begin{tabbing}
       For all \= $R_N$ networks:\\
          \> For all \= $(i,j), i \neq j$:\\
-          \> \> if $N^{(r)}_{ij}(t_{m-1}) \neq N^{(r)}_{ij}(t_m)$,\\
-            \> \> then \textit{InsertBefore}(\textit{RandomElement}, $N,i,j,0,r$);\\
+          \> \> if $N^{(r)}_{ij}(t_{m-1}) \neq N^{(r)}_{ij}(t_m)$, \\
+            \> \> then \textit{InsertBefore}
+                               (\textit{RandomElement}, $N,i,j,0,r$);\\
       For all \= $R_B$ behaviors: \\
          \> For all \= $i$:\\
           \> \> Define $D = B^{(r)}_{i}(t_{m}) - B^{(r)}_{i}(t_{m-1})$;\\
-            \> \> if $D > 0$, then $D$ times \textit{InsertBefore}(\textit{RandomElement}, $B,i,0,1,r$);\\
-            \> \> if $D < 0$, then $-D$ times \textit{InsertBefore}(\textit{RandomElement}, $B,i,0,-1,r$).\\
+            \> \> if $D > 0$, then $D$ times
+                \textit{InsertBefore}(\textit{RandomElement}, $B,i,0,1,r$);\\
+            \> \> if $D < 0$, then $-D$ times
+               \textit{InsertBefore}(\textit{RandomElement}, $B,i,0,-1,r$).
        \end{tabbing}
+       However, if there are any \nnm{higher}, \nnm{disjoint}, or
+       \nnm{atleastone} relations in force, then inserting the changes
+       at randomly chosen places can lead to violations of these
+       requirements. Inserted network changes that might lead to
+       such violations therefore must take account of
+       earlier inserted changes for the same $(i,j)$.
+       In such cases the connections for the networks can be made
+       by the following procedure.
+       With `incompatible' is referred to the incompatibility
+       because of the \nnm{higher}, \nnm{disjoint}, or \nnm{atleastone}
+       requirements.
+      \begin{tabbing}
+      For $ r $ \= running from 1 to $R_N$ :\\
+         \> For all \= $(i,j), i \neq j$:\\
+          \> \> if $N^{(r)}_{ij}(t_{m-1}) \neq N^{(r)}_{ij}(t_m)$,
+                define by $\mathcal R$ the set of networks $r'$,
+                       $1 \leq r' < r$, \\
+          \> \> for which $ N^{(r)}_{ij}(t_m)$ is incompatible
+                with $ N^{(r')}_{ij}(t_{m-1})$.\\
+          \> \> (For these $r'$ it must hold that
+                 $N^{(r')}_{ij}(t_{m-1}) \neq N^{(r')}_{ij}(t_m)$, \\
+          \> \> because $ N^{(r)}_{ij}(t_m)$ must be compatible
+                with $ N^{(r')}_{ij}(t_{m})$;\\
+          \> \> therefore the following requires the change in option ($N,i,j,0,r$) to \\
+          \> \> take place   before the changes in options ($N,i,j,0,r'$) for $r' \in \mathcal R$.)\\
+          \> \> Let \ms \ be \\
+          \> \> the first ministep among all inserted ministeps of option
+            ($N, i,\, j,\, r'$) for $r' \in \mathcal R$;\\
+            \> \> then \textit{InsertBefore}
+                          (\textit{RandomElementNotAfter(\ms)}, $N,i,j,0,r$).
+      \end{tabbing}
 \end{enumerate}
 
 \adda{
@@ -4651,7 +4707,6 @@ The pairwise meeting process accordingly proceeds as follows.
       \]
 \item Repeat
       \begin{enumerate}
-
        \item Choose $i$ among the active $i$ with probabilities
              \[
               \frac{\lambda_{0i}} {\lambda_{0+}} \ ,
