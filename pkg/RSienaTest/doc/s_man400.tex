@@ -104,6 +104,13 @@
 
 \newcounter{savenumi}
 
+\newenvironment{startenum}
+{\begin{enumerate}}{\setcounter{savenumi}{\value{enumi}\end{enumerate}}}
+
+\newenvironment{followenum}
+{\begin{enumerate}\setcounter{enumi}{\value{savenumi}}}
+{\setcounter{savenumi}{\value{enumi}\end{enumerate}}}
+
 \newcounter{thisno}
 \newcommand{\startno}{\setcounter{thisno}{0}}
 \newcommand{\nextno}{\addtocounter{thisno}{1}\thethisno .\ }
@@ -168,10 +175,8 @@ Network Analysis}) is a computer program that carries out the
 statistical estimation of models for the evolution of social
 networks according to the dynamic actor-oriented model of \citet{Snijders01,
 Snijders05}, \citet{SnijdersEA07}, and \cite{SnijdersEA10a}.
-This is the manual for \SI version 4,
-also called \rs,
-which is a contributed package to
-the statistical system \Rn.
+This is the manual for \rs, which also may be called \SI version 4,
+a contributed package to the statistical system \Rn.
 The manual is based on the earlier manual for \SI version 3,
 and also contains contributions written for that manual by
 Mark Huisman, Michael Schweinberger, and Christian Steglich.
@@ -210,12 +215,13 @@ Some examples are
 presented, e.g., in \citet*{vanBunt99, vanBuntEA99} and \citet*{vanDuijnEA03};
 and \citet*{SteglichEA06}.
 
-A website for \SI is maintained at \url{http://www.stats.ox.ac.uk/~snijders/siena/}~.
+A website for \SI is maintained at
+{\small\url{http://www.stats.ox.ac.uk/~snijders/siena/}~}.
 At this website (`publications' tab)
 you shall also find references to introductions in various other languages.
 
-This is a manual for \SI version 4.0,
-which is also called \rs; the manual is provisional in the sense
+This is a manual for \rs, which also may be called \SI version 4.0;
+the manual is provisional in the sense
 that it still is continually being updated.
 \RS is a contributed package for the \R statistical system
 which can be downloaded from\\
@@ -230,7 +236,7 @@ In addition to the `official' \R distribution of \rs, there is
 an additional distribution at R-Forge, which is
 a central platform for the development of \R packages
 offering facilities for source code management.
-Sometimes latest versions of \RS are available at
+Sometimes latest versions of \RS are available at\\
 \url{http://r-forge.r-project.org/R/?group_id=461}
 before being incorporated into the R package that can be downloaded from CRAN.
 In addition, at R-Forge there is a package RSienaTest which may include
@@ -927,8 +933,8 @@ more relevant references of the methods implemented in the program.  The
 reference to this manual is the following.  \smallskip
 
 \noindent
-Ripley, Ruth M., and Snijders, Tom A.B.
-2010.
+Ripley, Ruth M., Snijders, Tom A.B., and Preciado Lopez, P.
+2011.
 Manual for SIENA version 4.0 (version \today).
 Oxford: University of Oxford, Department of Statistics; Nuffield College.
 \textsf{http://www.stats.ox.ac.uk/siena/}
@@ -998,19 +1004,20 @@ continue to use the \SN/ \RS mailing list.
 \section[Program parts]{Parts of the program}
 \label{S_parts}
 
-The operation of the \SI program is comprised of four main parts:
+The operation of the \SI program is comprised of five main parts:
 \begin{enumerate}
  \item input of basic data description,
  \item model specification,
  \item estimation of parameter values using stochastic simulation,
+ \item testing parameters and assessing goodness of fit,
  \item simulation of the model with given and fixed parameter values.
 \end{enumerate}
 
 The normal operation is to start with data input, then specify a
-model and estimate its parameters, and then continue with new
-model specifications followed by estimation or simulation. For the
-comparison of (nested) models, statistical tests can be carried out.
-
+model and estimate its parameters,
+assess goodness of fit and the significance of the parameters,
+and then possibly continue with new
+model specifications followed by estimation or simulation.
 
 The main output is written to a text file named \textsf{{\em
 pname}.out}, where \textsf{{\em pname}} is the name
@@ -1021,7 +1028,7 @@ specified in the call of \textsf{sienaModelCreate()}.
 \section{Input data}
 \label{S_InputData}
 
-The main statistical method implemented in \SI  is for the analysis
+\SI  is a program for the statistical analysis
 of repeated measures of social networks, and requires network data
 collected at two or more time points. It is possible to include
 changing actor variables (representing behavior, attitudes,
@@ -1150,22 +1157,26 @@ adjacency matrix to an edge list, and back again.
 If \texttt{a} is an adjacency matrix, then the following commands
 can be used to create the corresponding edge list,
 called \texttt{edges} here.
-% \begin{verbatim}
-% # create empty edge list of desired length
-% edges     <- matrix(NA,sum(a),3)
-% # create indicator matrix
-% ones      <- a != 0
-% # fill the columns of the edge list
-% edges[,1] <- row(a)[ones]
-% edges[,2] <- col(a)[ones]
-% edges[,3] <- a[ones]
-% # if desired, order edge list by senders and then receivers
-% edges     <- edges[order(edges[,1],edges[,2]),]
-% \end{verbatim}
+ \begin{verbatim}
+ # create indicator matrix
+ ones <- !a %in%  0
+ # create empty edge list of desired length
+ edges <- matrix(NA, sum(ones), 3)
+ # fill the columns of the edge list
+ edges[,1] <- row(a)[ones]
+ edges[,2] <- col(a)[ones]
+ edges[,3] <- a[ones]
+ # if desired, order edge list by senders and then receivers
+ edges     <- edges[order(edges[, 1], edges[, 2]), ]
+ \end{verbatim}
+It is more efficient, however, to work with sparse matrices;
+this also is done internally in \rs.
+Using the \texttt{Matrix} package for sparse matrix manipulations,
+the same results can be obtained as follows.
 \begin{verbatim}
 library(Matrix)
 tmp <- as(Matrix(a), "dgTMatrix")
-edges <- cbind(tmp@i + 1, tmp@j + 1, tmp@x)
+edges2 <- cbind(tmp@i + 1, tmp@j + 1, tmp@x)
 \end{verbatim}
 Similarly, if \texttt{edges} is an edge list, then the following commands
 can be used to create the corresponding
@@ -1179,7 +1190,7 @@ adj[edges[, 1:2]] <- edges[, 3]
 \end{verbatim}
 To check the results, after doing these two operations, the command
 \begin{verbatim}
-length(which(a!=adj))
+length(which(a != adj))
 \end{verbatim}
 should return the value 0.
 
@@ -1464,7 +1475,8 @@ impair the analyses: technically, because estimation will be
 less stable; substantively, because the assumption of
 non-informative missingness often is not quite justified.
 Up to $10\%$ missing data will usually not give many difficulties
-or distortions, provided missingness is indeed non-informative.
+or distortions, provided missingness is indeed non-informative
+\citep{HuismanSteglich08}.
 When one has more than $20\%$ missing data on any variable, however,
 one may expect problems in getting good estimates.
 
@@ -1649,7 +1661,8 @@ or on the out-degree.)
 %See XXXXXXX.
 \item {\em evaluation function effects}\\
 The evaluation function\footnote{The evaluation function was called
-\emph{objective function} in \citet{Snijders01}} models the network actors' satisfaction with their local
+\emph{objective function} in \citet{Snijders01}.}
+models the network actors' satisfaction with their local
 network neighborhood configuration. It is assumed that actors
 change their scores on the dependent variable such that they
 improve their total satisfaction -- with a random element
@@ -1671,8 +1684,9 @@ prevalence of the behavior, and
 (unless the behavior is dichotomous) the quadratic shape effect,
 to account more precisely for the distribution of the behavior.
 \item {\em endowment function effects}\\
-The endowment function\footnote{The endowment function is similar to the {\it gratification
-function} in \citet{Snijders01}} is an extension of the evaluation
+The endowment
+function\footnote{The endowment function is similar to the {\it gratification
+function} in \citet{Snijders01}.} is an extension of the evaluation
 function that allows to distinguish between new and old network
 ties (when evaluating possible network changes) and between
 increasing or decreasing behavioral scores (when evaluating
@@ -1907,16 +1921,17 @@ The mathematical formulae for these and other effects are given
 in Section~\ref{S_math}. Here we give a more qualitative description.
 \begin{enumerate}
 \item The \emph{out-degree effect} which always must be included.
-
+      \vspace{-3em}
+% Unclear why there is such a large vertical white space if
+% this negative space is not put here.
 \item \begin{minipage}[t]{.6\textwidth}
       Transitivity in two-mode networks is expressed in the first
       place by the number of \emph{four-cycles} \citep{RobinsAlexander04}.
       This reflects the extent to which actors who make one choice in common
       also make other choices in common.
-      \vfill
-\end{minipage}
-\hfill
-\begin{minipage}[t]{.25\textwidth}
+      \end{minipage}
+\hspace{1em}\hfill
+\begin{minipage}[t]{.2\textwidth}
 \linethickness{0.3pt}
 \begin{center}
 \beginpicture
@@ -1937,7 +1952,6 @@ in Section~\ref{S_math}. Here we give a more qualitative description.
 \endpicture
 \end{center}
 \end{minipage}
-
 \item[{\hspace*{-1ex}$\bigodot$}]
      The following three degree-related effects may be important especially for networks
      where degrees are theoretically important and represent social status
@@ -2120,6 +2134,7 @@ If $X$ is a one-mode network, the \emph{from W agreement} effect
 \end{minipage}
 \hfill
 \begin{minipage}[t]{.15\textwidth}
+\vspace{-1em}
 \linethickness{0.3pt}
 \vfill
 \begin{center}
@@ -2143,17 +2158,19 @@ If $X$ is a one-mode network, the \emph{from W agreement} effect
 \vfill
 \end{minipage}
 
+\vspace{-1em}
 \item
 \begin{minipage}[t]{0.7\textwidth}
 If $W$ is a one-mode network, the \emph{W to agreement} effect
-      represents the extent to which a $W$ tie $i \stackrel{W}{\rightarrow} j$
-      leads to agreement between $i$ and $j$
+      represents the extent to which a $W$ tie $i \stackrel{W}{\rightarrow} h$
+      leads to agreement between $i$ and $h$
       with respect to outgoing $X$-ties to others, i.e.,
-      $X$-ties to the same third actors $h$,
-      $i \stackrel{X}{\rightarrow} h$ and $j \stackrel{X}{\rightarrow} h$.
+      $X$-ties to the same third actors $j$,
+      $i \stackrel{X}{\rightarrow} j$ and $h \stackrel{X}{\rightarrow} j$.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{.15\textwidth}
+\vspace{-1em}
 \linethickness{0.3pt}
 \vfill
 \begin{center}
@@ -2166,27 +2183,30 @@ If $W$ is a one-mode network, the \emph{W to agreement} effect
 \put{$i$} at 2 0.4
 \put{$j$} at 4 0.4
 \put{$h$} at 3 3.4
-\put{{\small $X$}} at 2.1 1.9
+\put{{\small $W$}} at 2.1 1.9
 \put{{\small $X$}} at 3.9 1.9
-\put{{\small $W$}} at 3.0 0.6
-\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
-\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
-\arrow <2mm> [.2,.6]  from 3.9 1.1732 to 3.1 2.559
+\put{{\small $X$}} at 3.0 0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1           % i -> j
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559  % i -> h
+%\arrow <2mm> [.2,.6]  from 3.9 1.1732 to 3.1 2.559  % j -> h
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732   % h -> j
 \endpicture
 \end{center}
 \vfill
 \end{minipage}
 
+\vspace{-1em}
 \item
 \begin{minipage}[t]{0.7\textwidth}
 If $X$ and $W$ both are one-mode networks, the \emph{closure of W} effect
- represents the tendency closure of $W-W$ two-paths
+ represents the tendency closure of $W-W$ two-paths\\
  $i \stackrel{W}{\rightarrow} h \stackrel{W}{\rightarrow} j$
  by an $X$ tie
   $i \stackrel{X}{\rightarrow} j$.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{.15\textwidth}
+\vspace{-1em}
 \linethickness{0.3pt}
 \vfill
 \begin{center}
@@ -2964,7 +2984,8 @@ Currently for the case of a one mode network, you can include
 time heterogeneous parameters in your model. Consider the reformulation of
 the evaluation function into
 \begin{align}
-f^{(m)}_{ij}(\mathbf{x})= \sum_k (\beta_k + \delta_k^{(m)} h_k^{(m)}) s_{ik}(\mathbf{x}(i \leadsto j))
+f^{(m)}_{ij}(\mathbf{x})= \sum_k \Big(\beta_k + \delta_k^{(m)} h_k^{(m)}\Big)
+                              \,      s_{ik}\big(\mathbf{x}(i \leadsto j)\big)
 \label{eq:fmij}
 \end{align}
 where $m$ denotes the period (from wave $m$ to wave $m+1$ in the panel data set)
@@ -2972,7 +2993,8 @@ and $\delta_k^{(m)}$ are parameters for the effects interacted
 with time dummies. You
 can include these in your model simply via the function
 \begin{verbatim}
-myeffects <- includeTimeDummy(myeffects, density, reciprocity, timeDummy="2,3,6")
+myeffects <- includeTimeDummy(myeffects,
+                              density, reciprocity, timeDummy="2,3,6")
 \end{verbatim}
 which would add three time dummy terms to each effect listed in the function.
 
@@ -3281,16 +3303,24 @@ are the following.
 
 \begin{tabbing}
  \texttt{ans\$theta  }\hspace{3em}    \=  estimates                        \\
- \texttt{ans\$covtheta   }            \> covariance matrix of the estimates           \\
+ \texttt{ans\$covtheta   }            \> covariance matrix of the estimates \\
  \texttt{ans\$pp}                     \> number of parameters  \\
  \texttt{ans\$targets }               \> targets (observed statistics)  \\
  \texttt{ans\$tconv   }               \> $t$-ratios for convergence  \\
  \texttt{ans\$sf    }                 \>  generated statistics in Phase 3 \\
- \texttt{ans\$msf   }                 \>  covariance matrix of  \texttt{ans\$sf    } \\
- \texttt{ans\$dfra  }                 \> estimated derivative of expected statistics w.r.t.\ parameters  \\
- \texttt{ans\$effects }               \> effects object  \\
+ \texttt{ans\$msf   }                 \>  covariance matrix of
+                                           \texttt{ans\$sf    } \\
+ \texttt{ans\$dfra  }                 \> estimated derivative of expected
+                                            statistics w.r.t.\ parameters  \\
+ \texttt{ans\$effects }               \> effects object used in the call
+                                           of \textsf{siena07}  \\
+ \texttt{ans\$sims }               \> simulated values of dependent variables
+                                      in Phase 3 of the algorithm      \\
+                                    \>     (see Section~\ref{S_sims}),
+                                        if \textsf{returnDeps = TRUE}
+                                        in the call of \textsf{siena07}.
 \end{tabbing}
-Like for any \R object, the internal structure of the effects object
+Like for any \R object, the internal structure of the \textsf{sienaFit} object
 can be requested by requesting
 \begin{verbatim}
 source("ans.txt")
@@ -3370,7 +3400,8 @@ phase 3, are determined by parameters \textsf{nsub} and \textsf{n3}
 in the call of \textsf{sienaModelCreate}.
 
 During the estimation process, if the graphical user interface
-is used (the default \texttt{batch = FALSE} in the call of \textsf{siena07}),
+is used (the default \\
+\texttt{batch = FALSE} in the call of \textsf{siena07}),
 the user can break in and modify the estimation process in two
 ways:
 \begin{enumerate}
@@ -3502,7 +3533,7 @@ in the network, but as all other statistics are correlated with the
 density, the density is difficult to interpret by itself.
 
 \medskip
-
+\newpage
 \noindent{\em 3. Collinearity check}\smallskip
 
 In the output file, the covariance matrix
@@ -3839,8 +3870,9 @@ values were chosen in an unfortunate way such that the conditional
 simulation does not succeed in ever attaining the condition required
 by \hyperlink{T_distance_stop}{its stopping rule} (see
 Section~\ref{S_cond}).
-The solution is either to use standard initial values or to
-to unconditional estimation.
+The solution is either to use different
+(perhaps standard) initial values or to go over to
+unconditional estimation.
 
 
 \newpage
@@ -3969,11 +4001,11 @@ test statistic, the number of degrees of freedom, and the $p$-value.
 \begin{verbatim}
 Wald.RSiena <- function(A, ans)
 {
-    th <- A %*% ans$theta
-    cov <- A %*% ans$covtheta %*% t(A)
+    th    <- A %*% ans$theta
+    cov   <- A %*% ans$covtheta %*% t(A)
     chisq <- t(th) %*% solve(cov) %*% th
-    df <- nrow(as.matrix(A))
-    pval <- 1 - pchisq(chisq,df)
+    df    <- nrow(as.matrix(A))
+    pval  <- 1 - pchisq(chisq,df)
     c(chisquare = chisq, df = df, pvalue = pval)
 }
 \end{verbatim}
@@ -4017,7 +4049,7 @@ To test the null hypothesis that the three sex effects
 the matrix $A$ is constructed as follows, and the Wald test then is requested.
 \begin{small}
 \begin{verbatim}
-A <- matrix(0, 3, 8)
+A       <- matrix(0, 3, 8)
 A[1, 6] <- 1
 A[2, 7] <- 1
 A[3, 8] <- 1
@@ -4296,8 +4328,8 @@ for time heterogeneity in all of the effects is considered as a modification of
 \eqref{f_net}:
 
 \begin{align}
-f^{(m)}_{ij}(\mathbf{x})= \sum_k (\beta_k + \delta_k^{(m)} h_k^{(m)})
-s_{ik}(\mathbf{x}(i \leadsto j))
+f^{(m)}_{ij}(\mathbf{x})= \sum_k \Big(\beta_k + \delta_k^{(m)} h_k^{(m)}\Big)
+           \, s_{ik}\big(\mathbf{x}(i \leadsto j)\big)
 \label{eq:fmij2}
 \end{align}
 where $\delta_k^{(m)}$ are parameters for interactions of the effects
@@ -4317,11 +4349,11 @@ test to your dataset, run an estimation in the usual way, e.g. as follows
 very quickly):
 \begin{verbatim}
 mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
-mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mydata <- sienaDataCreate(mynet1)
-myeff <- getEffects(mydata)
-myeff <- includeEffects(myeff, transTrip, balance)
-ans2 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+mynet1  <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mydata  <- sienaDataCreate(mynet1)
+myeff   <- getEffects(mydata)
+myeff   <- includeEffects(myeff, transTrip, balance)
+ans2    <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 \end{verbatim}
 and conduct the timetest through
 \begin{verbatim}
@@ -4333,7 +4365,7 @@ If as a consequence of this analysis you wish to add time dummy terms,
 this may be done via
 \begin{verbatim}
 myeff <- includeTimeDummy(myeff, recip, balance, timeDummy="2")
-ans3 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+ans3  <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 \end{verbatim}
 and testing again,
 \begin{verbatim}
@@ -4417,6 +4449,7 @@ generated statistics can also be obtained by the
 appropriate calculations and graphical representations in \Rn.
 
 \subsection{Accessing the generated networks}
+\label{S_sims}
 
 If one is interested in the networks generated, not only
 in the statistics internally calculated,
@@ -5207,7 +5240,9 @@ in the confidence interval based on the profile likelihood.
 
 There may be reasons to distrust the estimates which are
 large with also a large standard error. (This is known as the Donner-Hauck
-phenomenon in logistic regression.) Unfortunately, it is impossible to say in
+phenomenon in logistic regression, discussed in
+Section~\ref{S_fixingparameters}.)
+Unfortunately, it is impossible to say in
 general what is to be regarded as a large standard error.
 A threshold of 4 or 5 for the standard error often is reasonable
 for most effects; if a tested
@@ -6404,7 +6439,7 @@ relations.
 The network endowment function is zero for creation of ties,
 and is given by
 \begin{equation}
-g^{\rm net}(x) \, = \, \sum_k \gamma_k s^{\rm net}_{ik}(x)   \label{g_net}
+g^{\rm net}(x) \, = \, \sum_k \gamma_k \, s^{\rm net}_{ik}(x)   \label{g_net}
 \end{equation}
 for dissolution of ties.
 In this formula, the $\gamma_k$ are the parameters for the endowment function.
@@ -6440,7 +6475,8 @@ corresponding factors in the rate function are the following:
  in-degree \texttt{(inRate)}, and number
  of reciprocated relations \texttt{(recipRate)}, the `reciprocated degrees'.
  Define these by
- \[ x_{i+} = \sum_j x_{ij},\ x_{+i} = \sum_j x_{ji},\ x_{i(r)} = \sum_j x_{ij}x_{ji} \]
+ \[ x_{i+} \,=\, \sum_j x_{ij}, \phantom{abcde} x_{+i} \,=\, \sum_j x_{ji},
+                \phantom{abcde} x_{i(r)} \,=\, \sum_j x_{ij}x_{ji} \]
  (recalling that $x_{ii} = 0$ for all $i$).\\
 
  \iffalse
@@ -6792,7 +6828,7 @@ then $f^{\rm net}(x_b) - f^{\rm net}(x_a)$ is the log odds ratio
 for choosing between these two alternatives -- so that the ratio
 of the probability of $x_b$ and $x_a$ as next states is
 \[
-  \exp(f^{\rm net}(x_b) - f^{\rm net}(x_a)) \ .
+  \exp\big(f^{\rm net}(x_b) - f^{\rm net}(x_a)\big) \ .
 \]
 Note that, when the current state is $x$, the possibilities
 for $x_a$ and $x_b$ are $x$ itself (no change), or $x$ with one extra
@@ -6969,6 +7005,7 @@ For the drinking behavior, formula (\ref{eq_sel}) yields
 \noindent
 In \R the following code can be used to construct the selection table.
 Note that the function \sfn{outer} here is very convenient.
+\newpage
 \begin{footnotesize}
 \begin{verbatim}
 # First define a function that incorporates the relevant part
@@ -7275,7 +7312,7 @@ for this model specification is
    u^{\rm beh} \,=\, \beta_{\rm trend} \, (z_i - \bar z)
                \,+\, \beta_{\rm drink} \, (z_i - \bar z)^2 \,+\,
                  \beta_{\rm av.\ sim}\,  \frac{1}{x_{i+}} \,
-                  \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) \ .
+          \sum_j x_{ij} \big({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}\big) \ .
                     \label{eq_f_b1}
 \end{equation}
 
@@ -7335,7 +7372,7 @@ evaluation function then reads
 \[
    u^{\rm beh} \,=\, 0.3618 \, (z_i - \bar z)
               \,-\, 0.06 \, (z_i - \bar z)^2 \,+\,
-                   3.9689 \,  ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) \ .
+             3.9689 \,  \big({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}\big) \ .
 \]
 This can be calculated by \R  as follows.
 \begin{footnotesize}

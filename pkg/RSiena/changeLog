@@ -1,3 +1,8 @@
+2011-05-19 R-forge revision 147 RSienaTest only
+
+	* doc/s_man400.tex, doc/Siena_algorithms4.tex: updated
+	documentation
+
 2011-05-16 R-forge revision 146
 
 	* src/Makevars.win: alter linking to reduce command line length
