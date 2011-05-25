@@ -1,3 +1,9 @@
+2011-05-25 R-forge revision 148 RSienaTest only
+
+	* man/sienaGOF.Rd, man/sienaGOFsupplement.Rd,
+	R/sienaGOF.R, NAMESPACE, src/sienaGOF.r, 
+	src/initializeFRAN.r: overhaul of sienaGOF.
+
 2011-05-19 R-forge revision 147 RSienaTest only
 
 	* doc/s_man400.tex, doc/Siena_algorithms4.tex: updated

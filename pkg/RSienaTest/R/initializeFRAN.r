@@ -552,7 +552,9 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         z$f <- f
         z <- initForAlgorithms(z)
         z$periodNos <- attr(data, "periodNos")
-        z$f[1:nGroup] <- NULL
+		if (! returnDeps) {
+			z$f[1:nGroup] <- NULL
+		}
     }
     if (initC || (z$int == 1 && z$int2 == 1 &&
                   (is.null(z$nbrNodes) || z$nbrNodes == 1)))
