@@ -5,7 +5,10 @@ sienaCompositionChangeFromFile, sienaDataCreate, sienaDataCreateFromSession,
 sienaGroupCreate,  sienaModelCreate, sienaNet, sienaNodeSet, #simstats0c,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, #maxlikefn,
-       installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy, sienaGOF)
+       installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy, sienaGOF,
+       sparseMatrixExtraction, snaEdgelistExtraction, snaSociomatrixExtraction,
+       igraphEdgelistExtraction, OutdegreeDistribution, IndegreeDistribution,
+       GeodesicDistribution, TriadCensus, KnnDistribution)
 
 import(Matrix)
 import(xtable)

@@ -2,32 +2,26 @@
 \alias{sienaGOF}
 \alias{print.sienaGOF}
 \alias{plot.sienaGOF}
-
 \title{Functions to assess goodness of fit for SAOMs}
 \description{
  Goodness of fit functionality requiring a \code{sienaFit} object, a
  \code{siena} data object, and a function for calculating auxiliary
  statistics on graphs. A Monte Carlo test based on the Mahalanobis
  distance based test is used to calculate frequentist p-values and
- plotting functions can be used to diagnose bad fit. Alternately, a
- Kolmogorov-Smirnov test statistic can be used for cumulative
- auxiliary statistics.
+ plotting functions can be used to diagnose bad fit. There are basic
+ functions for calculating auxiliary statistics available out of the
+ box, and the user is also permitted to create custom functions.
  }
 
 \usage{
-sienaGOF(sienaDataObject,
-		sienaFitObject, groupName, varName,  auxiliaryFunction, wave=NULL,
-		verbose=FALSE, join=TRUE, expectationFunction=mean,
-		twoTailed=FALSE, cumulative=FALSE, cluster=NULL, robust=FALSE, \dots)
-\method{plot}{sienaGOF}(x,  standardize=NA, violin=TRUE, 
-			ylim=NULL, xlim=NULL, 
-			xlab=NULL, ylab=NULL, key=NULL, 
-			perc=.05, wave=1, main=NULL, 
-			image=FALSE, imageThreshold=.3, \dots)
+sienaGOF(sienaFitObject, auxiliaryFunction, groupName=NULL, 
+		varName=NULL, wave=NULL, verbose=FALSE, join=TRUE, twoTailed=FALSE, 
+		cluster=NULL, robust=FALSE, \dots)
+\method{plot}{sienaGOF}(x,  center=FALSE, scale=FALSE, violin=TRUE, 
+		key=NULL, perc=.05, wave=1, main=main, ylab=ylab, \dots)
 \method{print}{sienaGOF}(x, \dots)
 }
 \arguments{
-  \item{sienaDataObject}{Results from a call to \code{sienaDataCreate}.}
   \item{sienaFitObject}{Results from a call to \code{siena07}.}
   \item{groupName}{The name of the sienaGroup to be used.}
   \item{varName}{The value of the variable to be used, whether a 
@@ -35,45 +29,28 @@ sienaGOF(sienaDataObject,
   \item{join}{Boolean: should sienaGOF do tests on all of the waves 
   individually, or sum across waves?}
   \item{auxiliaryFunction}{Function to be used to calculate statistics, 
-  e.g. from the \code{sna} package.
-  	The function must accept two arguments of the order (dependentVariable, 
-  	missingData), and return a
-  	numeric vector of constant length.}
+  e.g. one implementing the \code{sna} or \code{igraph} packages.
+  	There functions \code{IndegreeDistribution}, \code{OutdegreeDistribution},
+  	\code{GeodesicDistribution}, \code{TriadCensus}, and \code{KnnDistribution}
+  	are already available with \code{RSiena}. The user can write custom functions
+  	fairly easily, however. See \code{Examples} for more information.}
   \item{verbose}{Whether to print intermediate results. Calculations can 
   take some time, and user feedback may be useful.}
-  \item{expectationFunction}{The function to be used for centering the 
-  Mahalanobis distances. 
-  Not used if \code{cumulative=TRUE}.}
-  \item{cumulative}{If the auxiliary function returns cumulative values, 
-  this option will use a Kolmogorov-Smirnov
-  test statistic instead of the Mahalanobis distance.}
   \item{twoTailed}{Whether to use two tails for calculating p values on the
    Monte Carlo test. Recommended for 
   advanced users only, as it is probably only applicable in rare cases.}
   \item{x}{ Object from a call to sienaGOF. }
+  \item{ylab}{ The y-axis label for the plot. }
   \item{robust}{ Whether to use robust estimation of the covariance matrix. }
-  \item{standardize}{ One of three levels of standardization to be performed
-  on the auxiliary statistics (for layout):
-  3 -- center by median and scale;
-  2 -- map to [0,1] interval;
-  1 -- center by mean;
-  0 -- perform no manipulations.
-  Default for non-cumulative is 3, default for cumulative is 0.}
-  \item{violin}{ Use violin plots (vs. box plots)? }
-  \item{ylim}{ Limits on x axis. For plotting sections of the test. }
-  \item{xlim}{ Limits on y axis. For plotting sections of the test. }
-  \item{xlab}{ Label for the x axis. }
-  \item{ylab}{ Label for the y axis. }
-  \item{key}{ Keys for the auxiliary statistic levels. }
-  \item{perc}{ P value for the confidence bands. }
+  \item{center}{ Whether to center the statistics by median during plotting.}
+  \item{scale}{ Whether to scale the statistics by range during plotting.}
+  \item{violin}{ Use violin plots (vs. box plots only)? }
+  \item{key}{ Keys for the auxiliary statistic levels in the plot. }
+  \item{perc}{ P value for the confidence bands (two sided). }
   \item{main}{ Main title. }
-  \item{image}{ Plot the image matrix of dyadic errors only.
-  This option will negate most of the others. }
-  \item{imageThreshold}{ Threshold for the ratio of errors required
-  to plot a false dyad in the image.}
   \item{wave}{Wave(s) to be used.}
   \item{cluster}{Optionally, a \code{snow} cluster to execute the auxiliary
-  function calculations on. This can have dramatic improvements on speed!}
+  function calculations on.}
   \item{\dots}{Other arguments.}
 }
 \details{
@@ -113,10 +90,57 @@ We recommend the following heuristic approach to fitting your model:
 
 3. Assess goodness of fit (i.e. using join=TRUE) on auxiliary statistics,
  and refine the model.
+ 
+ The \code{print} function will display some useful information to help with
+ model selection if some effects are set to FIX and TEST on the effects
+ object. A rough estimator for the Mahalanobis distance at each proposed
+ specification is given in the output. There are three headings for various
+ estimators of this specification:
+ 
+ --MM(Full) gives the one step estimator
+ which will correspond with the estimator available on the \code{siena07}
+ object
+ 
+ --MM(Par.) only adds the candidate effect coordinate to the current estimate
+ 
+ --GMM, for "Generalized Method of moments", gives the approximate global
+ minimum Mahalanobis distance that could be achieved under the specification.
+ 
+ For these specifications, Mahalanobis distances as well as parameter estimates
+ are given to help guide model selection. See the manual, or the citations for
+ more information.
+
+These functions are pre-fabricated for ease of use, and can be passed in as the
+\code{auxiliaryFunction} with no extra effort:
+ 
+\code{ GeodesicDistribution(\dots)}
+
+\code{ IndegreeDistribution(\dots)}
+
+\code{ KnnDistribution(\dots)}
+
+\code{ OutdegreeDistribution(\dots)}
+
+\code{ TriadCensus(\dots)}
+
+These functions are pre-fabricated for those users wanting to create their own
+custom auxiliary functions. They will help with extracting the appropriate
+ingredients from the observations and simulations:
+
+\code{igraphEdgelistExtraction(\dots)}
+
+\code{snaEdgelistExtraction(\dots)}
+
+\code{snaSociomatrixExtraction(\dots)}
+
+\code{sparseMatrixExtraction(\dots)}
+
+See the manual for instructions on how to implement these extractor functions.
+
 }
 \value{
   \code{sienaGOF} Returns a list of class \code{sienaGofTest}, which
-   contains the following:
+   includes the following:
   \item{SimulatedMhd}{ Mahalanobis distances for the simulations. }
   \item{ObservedMhd}{ Mahalanobis distances for the observation. }
   \item{TwoTailed}{ Whether the p value corresponds to a one or two 
@@ -143,52 +167,18 @@ Stochastic Actor Oriented Models." Working Paper.
 \author{Josh Lospinoso}
 \seealso{\code{\link{siena07}}, \code{\link{sienaTimeTest}} }
 \examples{
-# Fifty iterations being used, but we recommend using
-# many more (perhaps 1000 or 1500)
-mymodel <- sienaModelCreate(fn=simstats0c, nsub=4, n3=50)
-mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mydata <- sienaDataCreate(mynet1)
-myeff <- getEffects(mydata)
-myeff <- includeEffects(myeff, gwespFB, balance)
-# The 'parm' column only accepts integers, so the convention is
-# to specify alpha * 100, i.e. in hundredths:
-myeff[myeff$shortName=='gwespFB', 'parm'] <- 30
-ans <- siena07(mymodel, data=mydata, effects=myeff, returnDeps=TRUE, batch=TRUE)
-
-require(sna)
-require(network)
-
-missingsToZero <- function(x, missingData) {
-	x[is.na(x)] <- 0
-	1*( (x==1 & !missingData) )
+\dontrun{
+	mymodel <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
+	mynet1 <- sienaNet(array(c(tmp3,tmp4), dim=c(32, 32, 2)))
+	mydata <- sienaDataCreate(mynet1)
+	myeff <- getEffects(mydata)
+	myeff <- includeEffects(myeff, transTrip, inAct, cycle3, balance)
+	myeff[myeff$shortName=='inAct', c('fix', 'test')] <-TRUE
+	myeff[myeff$shortName=='cycle3', c('fix', 'test')] <-TRUE
+	myeff[myeff$shortName=='balance', c('fix', 'test')] <-TRUE
+	ans <- siena07(mymodel, data=mydata, effects=myeff, returnDeps=TRUE, batch=TRUE)
+	( res <- sienaGOF(ans, KnnDistribution, cumulative=TRUE) )
+	plot(res)
 }
-
-triadCensus <- function (x, missingData) {
-	# Zero out the missing data
-	zeroed <- missingsToZero(x, missingData)
-	triad.census(as.matrix(zeroed))
-}
-
-res <- sienaGOF(mydata, ans,"Data1", "mynet1", triadCensus, verbose=TRUE,
- join=TRUE)
-
-# And plots if desired
-plot(res, key=c("003", "012","102","021D","021U","021C",
-	"111D","111U","030T","030C","201",
-	"120D","120U","120C","210","300"))
-
-# We can also do cumulative tests:
-outdegreeDistribution <- function(x, missingData) {
-	zeroed <- missingsToZero(x, missingData)
-	outdegrees <- apply(zeroed,1,sum)
-	# Returns the cumulative distribution of outdegrees from levels 0 to 7
-	cumulativeOutdegrees = sapply(0:7, function(i)sum(outdegrees<=i))
-}
-res <- sienaGOF(mydata, ans,"Data1", "mynet1", outdegreeDistribution, 
-join=TRUE, cumulative=TRUE)
-plot(res,key=paste("OD<=",0:7,sep=""))
-
-# Finally, see the image matrix for the simulations
-plot(res, image=TRUE)
 }
 \keyword{models}
