@@ -1,6 +1,5 @@
 \name{sienaGOF}
 \alias{sienaGOF}
-\alias{print.sienaGOF}
 \alias{plot.sienaGOF}
 \title{Functions to assess goodness of fit for SAOMs}
 \description{
@@ -19,7 +18,6 @@ sienaGOF(sienaFitObject, auxiliaryFunction, groupName=NULL,
 		cluster=NULL, robust=FALSE, \dots)
 \method{plot}{sienaGOF}(x,  center=FALSE, scale=FALSE, violin=TRUE, 
 		key=NULL, perc=.05, wave=1, main=main, ylab=ylab, \dots)
-\method{print}{sienaGOF}(x, \dots)
 }
 \arguments{
   \item{sienaFitObject}{Results from a call to \code{siena07}.}

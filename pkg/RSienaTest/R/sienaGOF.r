@@ -8,7 +8,7 @@
 ##  * Description: This file contains the code to assess goodness of fit
 ##  *
 ##  ****************************************************************************/
-
+##@sienaGOF siena07 Does test for goodness of fit
 sienaGOF <- function(
 		sienaFitObject, 
 		auxiliaryFunction, 
@@ -86,7 +86,7 @@ sienaGOF <- function(
 						matrix(
 						auxiliaryFunction(NULL,
 								sienaFitObject$f, sienaFitObject$sims,
-								groupName, varName, wave), nrow=1) })
+								groupName, varName, j), nrow=1) })
 	if (join) 
 	{
 		obsStats <- Reduce("+", obsStatsByWave)
@@ -113,7 +113,7 @@ sienaGOF <- function(
 						{ auxiliaryFunction(i,
 									sienaFitObject$f, 
 									sienaFitObject$sims,
-									groupName, varName, wave)
+									groupName, varName, j)
 							if (verbose && (i %% 100 == 0) ) 
 								cat("  > Completed ", i,
 									" calculations\n")
@@ -138,7 +138,7 @@ sienaGOF <- function(
 											auxiliaryFunction(i,
 													sienaFitObject$f, 
 													sienaFitObject$sims,
-													groupName, varName, wave)
+													groupName, varName, j)
 									})
 							simStatsByWave <-
 									matrix(simStatsByWave, ncol=iterations)
@@ -238,17 +238,15 @@ sienaGOF <- function(
 				 applyTest(obsStats[[i]], simStats[[i]]) })
 	mhdTemplate <- rep(0, sum(sienaFitObject$test))
 	names(mhdTemplate) <- rep(0, sum(sienaFitObject$test))
-	if (join) {
-		OneStepMHD <- list(mhdTemplate)
-		PartialOneStepMHD <- list(mhdTemplate)
-		GmmMhdValue <- list(mhdTemplate)
-	} 
-	else  
-	{
-		OneStepMHD <- lapply(wave, function(i) (mhdTemplate))
-		PartialOneStepMHD <- lapply(wave, function(i) (mhdTemplate))
-		GmmMhdValue <- lapply(wave, function(i) (mhdTemplate))
-	}
+
+	JoinedOneStepMHD <- mhdTemplate
+	JoinedPartialOneStepMHD <- mhdTemplate
+	JoinedGmmMhdValue <- mhdTemplate
+
+	OneStepMHD <- lapply(wave, function(i) (mhdTemplate))
+	PartialOneStepMHD <- lapply(wave, function(i) (mhdTemplate))
+	GmmMhdValue <- lapply(wave, function(i) (mhdTemplate))
+
 	obsMhd <- NULL
 	
 	ExpStat <- lapply(wave, function(i) {
@@ -279,25 +277,21 @@ sienaGOF <- function(
 	if (sum(sienaFitObject$test) > 0) {
 		effectsObject <- sienaFitObject$requestedEffects
 		nSims <- sienaFitObject$Phase3nits
-		if (join) {
-			names(OneStepMHD[[1]]) <- 
+		for (i in wave) {
+			names(OneStepMHD[[i]]) <- 
 					effectsObject$effectName[sienaFitObject$test]
-			names(PartialOneStepMHD[[1]]) <- 
+			names(PartialOneStepMHD[[i]]) <-
 					effectsObject$effectName[sienaFitObject$test]
-			names(GmmMhdValue[[1]]) <- 
+			names(GmmMhdValue[[i]]) <-
 					effectsObject$effectName[sienaFitObject$test]
-		} 
-		else  
-		{
-			for (i in wave) {
-				names(OneStepMHD[[i]]) <- 
-						effectsObject$effectName[sienaFitObject$test]
-				names(PartialOneStepMHD[[i]]) <-
-						effectsObject$effectName[sienaFitObject$test]
-				names(GmmMhdValue[[i]]) <-
-						effectsObject$effectName[sienaFitObject$test]
-			}
 		}
+		names(JoinedOneStepMHD) <- 
+				effectsObject$effectName[sienaFitObject$test]
+		names(JoinedPartialOneStepMHD) <- 
+				effectsObject$effectName[sienaFitObject$test]
+		names(JoinedGmmMhdValue) <- 
+				effectsObject$effectName[sienaFitObject$test]
+		
 		rownames(OneStepSpecs) <- effectsObject$effectName
 		colnames(OneStepSpecs) <- effectsObject$effectName[sienaFitObject$test]
 		rownames(PartialOneStepSpecs) <- effectsObject$effectName
@@ -370,50 +364,34 @@ sienaGOF <- function(
 					theta0 + mmPartialThetaDelta
 			GmmOneStepSpecs[effectsToInclude,counterTestEffects] <- theta0 + 
 					gmmThetaDelta
-			if (join) {
-				OneStepMHD[[1]][counterTestEffects] <-
-					as.numeric(
-					sum(obsMhd) + 
-					mmThetaDelta %*% Reduce("+", Gradient) + 0.5 *
-					mmThetaDelta %*% Reduce("+", Hessian) %*% 
-					mmThetaDelta)
-				PartialOneStepMHD[[1]][counterTestEffects] <-
-					as.numeric(
-					sum(obsMhd) + 
-					mmPartialThetaDelta %*% Reduce("+", Gradient) + 0.5 *
-					mmPartialThetaDelta %*% Reduce("+", Hessian) %*% 
-					mmPartialThetaDelta)
-				GmmMhdValue[[1]][counterTestEffects] <-
-					as.numeric( obsMhd + 
-					gmmThetaDelta %*% 
-					Reduce("+", Gradient) + 0.5 *
-					gmmThetaDelta %*% 
-					Reduce("+", Hessian) %*%
-					gmmThetaDelta )
-		} 
-		else  
-		{
-				for (i in 1:length(obsMhd)) {
-					OneStepMHD[[i]][counterTestEffects] <-  as.numeric(
+			for (i in 1:length(obsMhd)) {
+				OneStepMHD[[i]][counterTestEffects] <-  as.numeric(
+					obsMhd[i] + 
+					mmThetaDelta %*% Gradient[[i]] + 0.5 *
+					mmThetaDelta %*% Hessian[[i]] %*% mmThetaDelta)
+				GmmMhdValue[[i]][counterTestEffects] <-
+						as.numeric( obsMhd[i] + 
+						gmmThetaDelta %*% 
+						Gradient[[i]] + 0.5 *
+						gmmThetaDelta %*% 
+						Hessian[[i]] %*%
+						gmmThetaDelta )
+				PartialOneStepMHD[[i]][counterTestEffects] <-
+						as.numeric(
 						obsMhd[i] + 
-						mmThetaDelta %*% Gradient[[i]] + 0.5 *
-						mmThetaDelta %*% Hessian[[i]] %*% mmThetaDelta)
-					GmmMhdValue[[i]][counterTestEffects] <-
-							as.numeric( obsMhd[i] + 
-							gmmThetaDelta %*% 
-							Gradient[[i]] + 0.5 *
-							gmmThetaDelta %*% 
-							Hessian[[i]] %*%
-							gmmThetaDelta )
-					PartialOneStepMHD[[1]][counterTestEffects] <-
-							as.numeric(
-							sum(obsMhd) + 
-							mmPartialThetaDelta %*% Reduce("+", Gradient) + 
-							0.5 *
-							mmPartialThetaDelta %*% Reduce("+", Hessian) %*% 
-							mmPartialThetaDelta)
-				}
+						mmPartialThetaDelta %*% 
+						Gradient[[i]] + 
+						0.5 *
+						mmPartialThetaDelta %*% 
+						Hessian[[i]] %*% 
+						mmPartialThetaDelta)
 			}
+			JoinedOneStepMHD[counterTestEffects] <-
+					Reduce("+",OneStepMHD)[counterTestEffects]
+			JoinedPartialOneStepMHD[counterTestEffects] <-
+					Reduce("+",PartialOneStepMHD)[counterTestEffects]
+			JoinedGmmMhdValue[counterTestEffects] <-
+					Reduce("+",GmmMhdValue)[counterTestEffects]
 		}
 	}
 
@@ -421,12 +399,16 @@ sienaGOF <- function(
 	class(res) <- "sienaGOF"
 	attr(res, "scoreTest") <- (sum(sienaFitObject$test) > 0)
 	attr(res, "originalMahalanobisDistances") <- obsMhd
-	attr(res, "oneStepMahalanobisDistances") <- OneStepMHD
+	attr(res, "joinedOneStepMahalanobisDistances") <- 
+			JoinedOneStepMHD
 	attr(res, "oneStepSpecs") <- OneStepSpecs
 	attr(res, "partialOneStepMahalanobisDistances") <- PartialOneStepMHD
+	attr(res, "joinedPartialOneStepMahalanobisDistances") <- 
+			JoinedPartialOneStepMHD
 	attr(res, "partialOneStepSpecs") <- PartialOneStepSpecs
 	attr(res, "gmmOneStepSpecs") <- GmmOneStepSpecs
 	attr(res, "gmmOneStepMahalanobisDistances") <- GmmMhdValue
+	attr(res, "joinedGmmOneStepMahalanobisDistances") <- JoinedGmmMhdValue
 	attr(res,"auxiliaryStatisticName") <-
 			attr(obsStats,"auxiliaryStatisticName")
 	attr(res, "simTime") <- attr(simStats,"time")
@@ -434,7 +416,7 @@ sienaGOF <- function(
 	attr(res, "joined") <- join
 	res
 }
-
+##@print.sienaGOF siena07 Print method for sienaGOF
 print.sienaGOF <- function (x, ...) {
 	## require(Matrix)
 	levels <- 1:length(x)
@@ -442,7 +424,7 @@ print.sienaGOF <- function (x, ...) {
 	titleStr <- "Monte Carlo Mahalanobis distance test P-value: "
 	cat("Siena Goodness of Fit (", 
 			attr(x,"auxiliaryStatisticName") ,")\n=====\n")
-	if (! attr(x,"join"))
+	if (! attr(x,"joined"))
 	{
 		cat(" >",titleStr, "\n")
 		for (i in 1:length(pVals))
@@ -484,6 +466,11 @@ print.sienaGOF <- function (x, ...) {
 					originalMhd[j],") for current model.")
 		}
 	}
+}
+##@summary.sienaGOF siena07 Summary method for sienaGOF
+summary.sienaGOF <- function(object, ...) {
+	x <- object
+	print(x)
 	if (attr(x, "scoreTest")) {
 		oneStepSpecs <- attr(x, "oneStepSpecs")
 		oneStepMhd <- attr(x, "oneStepMahalanobisDistances")
@@ -491,15 +478,18 @@ print.sienaGOF <- function (x, ...) {
 		gmmOneStepSpecs <- attr(x, "gmmOneStepSpecs")
 		partialOneStepSpecs <- attr(x, "partialOneStepSpecs")
 		partialOneStepMhd <- attr(x, "partialOneStepMahalanobisDistances")
-		
+		joinedPartialOneStepMhd <- 
+				attr(x, "joinedPartialOneStepMahalanobisDistances")
+		joinedOneStepMhd <- attr(x, "joinedOneStepMahalanobisDistances")
+		joinedGmmMhd <- attr(x, "joinedGmmOneStepMahalanobisDistances")
 		if (attr(x, "joined")) {
 			for (i in 1:ncol(oneStepSpecs)) {
 				a <- cbind(oneStepSpecs[,i, drop=FALSE],
 						partialOneStepSpecs[,i, drop=FALSE],
 						gmmOneStepSpecs[,i, drop=FALSE] )
-				b <- matrix( c(oneStepMhd[[1]][i], 
-								partialOneStepMhd[[1]][i],
-								gmmMhd[[1]][i]), ncol=3)
+				b <- matrix( c(joinedOneStepMhd[i], 
+								joinedPartialOneStepMhd[i],
+								joinedGmmMhd[i]), ncol=3)
 				rownames(b) <- c("MHD")
 				a <- rbind(a, b)
 				a <- round(a, 3)
@@ -529,10 +519,10 @@ print.sienaGOF <- function (x, ...) {
 		}
 		cat("\n-----")
 	}
-cat("\nComputation time for auxiliary statistic calculations on simulations: ",
+	cat("\nComputation time for auxiliary statistic calculations on simulations: ",
 			attr(x, "simTime")["elapsed"] , "seconds.")
 }
-
+##@plot.sienaGOF siena07 Plot method for sienaGOF
 plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE, 
 		key=NULL, perc=.05, wave=1, main=main, ylab=ylab,  ...) 
 {
@@ -710,8 +700,8 @@ snaSociomatrixExtraction <- function (i, data, sims, groupName, varName, wave) {
 	require(sna)
 	dimsOfDepVar=dim(data[[groupName]]$depvars[[varName]][,,wave])
 	missing <- as.sociomatrix.sna(
-			as.edgelist.sna(
-					is.na(data[[groupName]]$depvars[[varName]][,,wave])))
+		1*is.na(data[[groupName]]$depvars[[varName]][,,wave]))
+
 	if (is.null(i)) {
 		# sienaGOF wants the observation:
 		returnValue <- data[[groupName]]$depvars[[varName]][,,wave]

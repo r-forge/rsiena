@@ -1,7 +1,14 @@
+2011-05-26 R-forge revision 149 RSienaTest only
+
+	* R/sienaGOF.R, NAMESPACE, doc/RSiena.bib, doc/s_man400.tex:
+	Minor debugs for multi-wave
+	data in sienaGOF, added summary.sienaGOF functionality,
+	added a model selection script to the manual.
+	
 2011-05-25 R-forge revision 148 RSienaTest only
 
 	* man/sienaGOF.Rd, man/sienaGOFsupplement.Rd,
-	R/sienaGOF.R, NAMESPACE, src/sienaGOF.r, 
+	R/sienaGOF.R, NAMESPACE,
 	src/initializeFRAN.r: overhaul of sienaGOF.
 
 2011-05-19 R-forge revision 147 RSienaTest only
