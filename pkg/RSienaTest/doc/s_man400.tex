@@ -3042,7 +3042,359 @@ For multiple networks, if for one network there is a bound for the maximum outde
 where $n$ is the number of actors in the network (or the largest number,
 if there are multiple groups).
 
+\subsection{Goodness of fit with auxiliary statistics}
+There is now available in RSienaTest a function \verb!sienaGOF! which permits users to
+define auxiliary functions of networks, e.g. geodesic distributions, that are not explicitly fit
+by a particular effect, but are nonetheless important features of the network to represent in the
+probability model. The following script gives a walkthrough for this functionality. The interface
+may change in the future, as this function is still in progress. See the working paper by
+\citet{Lospinoso2011b} for technical information about the test.
+\begin{verbatim}
+################################################################################
+## Model selection and RSiena								                   #
+## Script prepared by Josh Lospinoso (stats.ox.ac.uk/~lospinos)                #
+## Date: 5/26/2011											                   #
+## Version: 3												                   #
+################################################################################
 
+# In this script, we will load the s50 data (type ?s50 for more information) 
+# and go through an iteration of forward model selection. The idea is to specify
+# a restricted model containing a conservative number of effects and then 
+# evaluate evidence for inclusion of more elaborate terms. This approach 
+# contrasts with backward model selection, which would entail inclusion of a 
+# large number of terms and subsequent evaluation for omission of terms.
+
+# It is strongly emphasized here that theory should always guide model 
+# selection! In this script, our intent is to illustrate some of the tools that
+# are available to you and not necessarily to provide a "cookie cutter" solution
+# to fitting SAOMs to all datasets:
+#
+# 1) sienaTimeTest
+# 2) sienaGOF
+# 3) The score type test of Schweinberger
+
+# First, we will install the experimental "RSienaTest" from R-Forge.
+# This version is updated more often than the RSiena package on CRAN.
+# Currently, one of the functions (sienaGOF) is not yet available in the 
+# CRAN version.
+install.packages("RSienaTest", repos="http://R-Forge.R-project.org")
+
+# Later, we will use the sna and network packages to show the new GOF
+# functionality, as well as a few other packages to help us later on:
+install.packages(c("network", "sna"))
+
+# After these packages have been installed, you must tell R to load the
+# RSienaTest package:
+library(RSienaTest)
+
+# First, give some estimation settings. Here we will use 4 phase 2 subphases 
+# and 1000 phase 3 iterations. These settings come generally recommended for
+# most datasets.
+estimationSettings <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
+
+# The s50 dataset is already loaded into the R environment once the 
+# library(.) function is called. See e.g. ?s501 for information on 
+# each data object.
+
+# This will load three waves of 50 actors into a sienaNet
+friendship <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+alcohol <- varCovar(s50a)
+s50data <- sienaDataCreate(friendship, alcohol)
+
+# Here we begin to build up a preliminary model selection. By default, this
+# model will have density and reciprocity effects included from getEffects(.)
+model1 <- getEffects(s50data)
+
+# Or with the include effects (preferred option):
+
+model1 <- includeEffects(model1, transTrip, cycle3, name="friendship")
+model1 <- includeEffects(model1, simX, interaction1="alcohol", 
+	name="friendship")
+# Here, we can add a few score type tests for covariate terms (which can be 
+# highly correlated). These tests will help us to determine whether we should 
+# include more complicated selection effects in future iterations.
+model1 <- setEffect(model1, egoX, interaction1="alcohol", name="friendship", 
+	fix=TRUE, test=TRUE, include=TRUE)
+model1 <- setEffect(model1, altX, interaction1="alcohol", name="friendship", 
+	fix=TRUE, test=TRUE, include=TRUE)
+model1 <- setEffect(model1, higher, interaction1="alcohol", name="friendship", 
+	fix=TRUE, test=TRUE, include=TRUE)
+
+# Check what is specified in model1:
+model1
+
+# We have chosen to start with two transitivity terms (transitive triplets 
+# and three cycles), and one selection, one influence term for alcohol 
+# consumption. 
+
+# We use the siena07() function to estimate the parameters of model1
+# NOTE: you MUST specify returnDeps=TRUE in order to use the goodness of 
+# fit testing functionality.
+( results1 <- siena07(estimationSettings, data=s50data, effects=model1, 
+	batch=TRUE, returnDeps=TRUE) )
+
+# Next, we perform a test for time heterogeneity. This will help us see 
+# if the parameters have shifted over time. It comes highly
+# recommended to perform this step before checking other goodness of fit!
+( timetest1 <- sienaTimeTest(results1) )
+# With a p value of about .30, there is very little joint evidence against
+# the hypothesis of time homogeneity.
+
+# To get a more informal feel for how time heterogeneity may be present in
+# the data, we can plot the test for each effect:
+plot(timetest1, effects=1:4)
+plot(timetest1, effects=5:8)
+# Gray bands indicate the base periods (or, alternately, time dummies that
+# have been estimated using siena07), and red bands indicate potential time
+# dummies. These bands are 95% confidence bands. Where they do not overlap,
+# there is (individual) evidence against the time homogeneity hypothesis.
+
+# There is some information on sienaTimeTest available in the help file,
+# where you can find the citation for Lospinoso et. al (2010) 
+# where the test is developed.
+?sienaTimeTest
+
+# We can now check the score type test results for more involved 
+# selection terms. Summary of a siena07 object gives us a wealth
+# of information about estimation, but it will also give us a score-type
+# test of Schweinberger (2007) calculated for those effects which we have
+# denoted fix=TRUE, test=TRUE above:
+summary(results1)
+# In the section "Generalised score test <c>", we are presented with the
+# results. Since the joint p value is about .66, there is very little
+# evidence that these effects (alch alter, alch ego, higher alch)
+# are fit poorly with respect to their statistics.
+
+# We have checked time heterogeneity and the goodness of fit of a few
+# alcohol-related statistics, but we perform one last check using the
+# sienaGOF function. Lospinoso and Snijders (2011) propose to calculate
+# auxiliary statistics, i.e. statistics that are important to represent
+# with the model but that are not strictly fit by the parameters of the
+# model. There is a simple battery of auxiliary statistics that is already
+# implemented in RSiena: indegree and outdegree distributions, triad census,
+# and average nearest neighboor degree (KNN) distributions. First, let us 
+# calculate these using our results:
+
+# - Indegree distribution ( # of nodes with indegree < A for A in 1:MAX)
+( id1 <- sienaGOF(results1, IndegreeDistribution, verbose=TRUE) )
+
+# - Outdegree distribution ( # of nodes with outdegree < A for A in 1:MAX)
+( od1 <- sienaGOF(results1, OutdegreeDistribution, verbose=TRUE) )
+
+# - Triad census (see ?triad.census in the sna package)
+( tc1 <- sienaGOF(results1, TriadCensus, verbose=TRUE) )
+
+# - Geodesic distribution  ( # of geodesces < A for A in 1:MAX)
+( ge1 <- sienaGOF(results1, GeodesicDistribution, verbose=TRUE) )
+
+# For now, we will not worry about the contents of the text output for these
+# objects, but we will seek to get an intuitive feel for how well these features
+# are fitting by using the plot.sienaGOF functionality:
+plot(id1)
+# These plots give a solid red line denoting the observed value of the auxiliary
+# statistic (in this case, # of nodes with outdegree < x). The "violin plots"
+# show the simulated values of these statistics as both a box plot and a
+# kernel density estimate. The dashed gray line represents a 95% confidence
+# band for the simulations. Finally, a p value is displayed on the X axis
+# label. This p value comes from the Monte Carlo Mahalanobis Distance Test
+# of Lospinoso and Snijders (2011) (see ?sienaGOF for more information).
+# The null hypothesis for this p value is that the auxiliary statistics
+# for the observed data are distributed according to the statistics shown in
+# the plot. For id1, we see that the p value is about .35, so we are left
+# with the impression that fit is quite good. (This can be seen visually also!)
+
+# Try outdegree also:
+plot(od1)
+# We see some marginal fit on the outdegree (p is .062), but the observations
+# are within the 95% bands. We will see what we can do to improve this fit.
+
+# Triad census:
+plot(tc1)
+# How can we possibly read this? Use centering and scaling:
+plot(tc1, scale=TRUE, center=TRUE)
+# We can use the keys given in ?triad.classify of the sna package to help
+# us understand where fit is lacking:
+triad.keys <- c("003","012","102","021D","021U","021C","111D","111U",
+		"030T","030C","201","120D","120U","120C","210","300")
+# and add these to the plot:
+plot(tc1, scale=TRUE, center=TRUE, key = triad.keys)
+# The following triads are not being represented well in the model, based
+# on a 95% confidence interval cutoff:
+# 111U: a     b  -> c ; a <-> c  (Too many being simulated)
+# 030T: a  -> b <-  c ; a  -> c  (Too few being simulated)
+#  201: a  -> b <-> c ; a <-> c  (Too many being simulated)
+
+# And geodesic distance:
+plot(ge1)
+# The fit is marginal (p is roughly .09), but for a fairly simple model not
+# too bad. The observations are on the bottom of the confidence interval.
+# Since there are a finite number of dyads in the graph, this means that the
+# simulations are too connected--that is, there are more geodesces
+# less than, say, 8 in the simulations than in the observations, so the
+# observed geodesces must be more frequent at higher numbers.
+
+# So far, we have reached two conclusions about goodness of fit:
+# 1) More involved alter selection effects do not seem necessary
+# 2) There is pretty good fit for such a simple model. We could try to improve
+# 	 fit on the geodesic distribution and a few of the triads.
+#
+# Our strategy is then to try fitting geodesic distances better. Let us add
+# actors at distance two:
+model2 <- includeEffects(model1, nbrDist2)
+# We also tidy up the effects by removing the tests for more involved selection
+# effects on alcohol:
+model2 <- setEffect(model2, egoX, interaction1="alcohol", name="friendship", 
+		fix=FALSE, test=FALSE, include=FALSE)
+model2 <- setEffect(model2, altX, interaction1="alcohol", name="friendship", 
+		fix=FALSE, test=FALSE, include=FALSE)
+model2 <- setEffect(model2, higher, interaction1="alcohol", name="friendship", 
+		fix=FALSE, test=FALSE, include=FALSE)
+# Not wanting to make too many changes to the model at once, let us also try
+# some degree related effects to help our outdegree fit:
+model2 <- setEffect(model2, outPop, fix=TRUE, test=TRUE, include=TRUE)
+model2 <- setEffect(model2, outAct, fix=TRUE, test=TRUE, include=TRUE)
+
+# Estimate our model (note the use of prevAns to speed up convergence):
+( results2 <- siena07(estimationSettings, data=s50data, effects=model2, 
+					batch=TRUE, returnDeps=TRUE, prevAns=results1) )
+
+# Next, we perform a test for time heterogeneity:
+( timetest2 <- sienaTimeTest(results2) )
+# Which still indicates that there is little evidence against the
+# time homogeneity assumption.
+
+# Again, we perform sienaGOF on the indegree, outdegree, and geodesic
+# distributions as well as triad census:
+( id2 <- sienaGOF(results2, IndegreeDistribution, verbose=TRUE) )
+( od2 <- sienaGOF(results2, OutdegreeDistribution, verbose=TRUE) )
+( tc2 <- sienaGOF(results2, TriadCensus, verbose=TRUE) )
+( ge2 <- sienaGOF(results2, GeodesicDistribution, verbose=TRUE) )
+# We will treat each of these in turn.
+
+# First, we will look at indegree distribution:
+summary(id2)
+# The summary output tells us information first about the Monte Carlo
+# Mahalanobis Distance goodness of fit test of Lospinoso and Snijders (2011).
+# The p value of .03 tells us that fit is marginal on indegree distribution.
+# This is a potentially frustrating aspect of testing GOF on auxiliary
+# statistics! There is no guarantee that adding more terms to a model will
+# not decrease fit! Recall that
+id1
+# showed good fit.
+# The next item to notice in
+summary(id2)
+# are the outdegree - popularity and outdegree - activity displays.
+# These two effects had test=TRUE selected on the effects object, so 
+# sienaGOF treats these specially. It considers a polynomial approximation
+# to the Mahalanobis distance with respect to the parameters of the model
+# so that we can posit various specifications and compare their expected
+# Mahalanobis distances (for details see Lospinoso and Snijders 2011):
+#
+# MM(Full) -- For "method of moments  (full)" corresponds to the one step
+# 	estimates of Schweinberger (2007). This specification allows the most
+#	drastic differences from the current parameter estimates, and is our
+#	best guess at what the new parameter estimates would be at the proposed
+#	specification. Since the one step estimates can be erratic for values
+#	far away from the current parameters, we also provide some other estimates
+#	below.
+#
+# MM(Par.) -- For "method of moments  (partial)" corresponds to an estimate
+#	where we only take the one step estimate coordinate from MM(full) for
+#	the effect under consideration. E.g. for "outdegree - popularity", 
+#	all parameters are equivalent to the current estimates, but we replace
+#	the 0 for outdegree - popularity with its one step estimate.
+#
+# 	   GMM -- If MM(Full) and MM(Par.) are not well behaved, there is another
+#	alternative to consider. GMM, for "generalized method of moments", does
+#	not depend on the one step estimates at all. It is the parameterization
+#	for the particular model under consideration that minimizes the quadratic
+#	approximation for the Mahalanobis distance. It, by definition, will have
+#	a MHD less than both MM(Full) and MM(Par.).
+#
+#	Unfortunately, it appears that for both models under consideration, the
+#	Mahalanobis distance will increase. We must take this guidance with a heavy
+#	grain of salt for the reasons mentioned above; we recommend comparing the
+#	relative MHDs to guide selection. If we place some trust in the one step
+#	estimates (which seem fairly plausible for both models), we are led to
+#	select outdegree - popularity to help with indegree distribution. Indeed,
+# 	this selection tends to make theortical sense, since activity is synonymous
+# 	with indegree!
+
+# For outdegree,
+summary(od2)
+# it seems also that outdegree - popularity is the best choice (although we note
+# that the fit is quite good on outdegree already!)
+
+# For geodesic distances,
+summary(ge2)
+# we might also be led towards including outdegree popularity (although, again,
+# it seems that we have achieved quite good fit for geodesic distances with a
+# p value of .707)
+
+# For triad census,
+summary(tc2)
+# where fit is the worst across all of the statistics, outdegree popularity seems
+# to be the best candidate as well.
+
+# Model selection is an art, and thus there is no strictly superior criteria
+# for updating our model. In the current selection, it seems that the
+# outdegree popularity model has accumulated enough support across the four
+# tests that we decide to include it here:
+model3 <- setEffect(model2, outPop, fix=FALSE, test=FALSE, include=TRUE)
+model3 <- setEffect(model3, outAct, fix=FALSE, test=FALSE, include=FALSE)
+
+# Estimate our model
+( results3 <- siena07(estimationSettings, data=s50data, effects=model3, 
+					batch=TRUE, returnDeps=TRUE, prevAns=results2) )
+# Convergence could be improved:
+( results3 <- siena07(estimationSettings, data=s50data, effects=model3, 
+					batch=TRUE, returnDeps=TRUE, prevAns=results3) )
+
+# Time test
+( tt3 <- sienaTimeTest(results3) )
+# All is still well with time homogeneity
+
+# Check goodness of fit again:
+( id3 <- sienaGOF(results3, IndegreeDistribution, verbose=TRUE) )
+( od3 <- sienaGOF(results3, OutdegreeDistribution, verbose=TRUE) )
+( tc3 <- sienaGOF(results3, TriadCensus, verbose=TRUE) )
+( ge3 <- sienaGOF(results3, GeodesicDistribution, verbose=TRUE) )
+
+# It seems that the test for indegree distribution indicates evidence of
+# poor fit:
+id3
+# but when we plot it:
+plot(id3)
+# the fit seems quite good. This is an artifact of the default settings for our
+# IndegreeDistribution function. It seems that there are few actors with indegree
+# higher than, say, 6, so the non-normality of this data is causing problems.
+# We can define a custom function easily which restricts the support:
+CustomIndegreeDistribution <- function(...) {
+	IndegreeDistribution(..., levels=1:6)
+}
+# and run this test again: 
+( id3 <- sienaGOF(results3, CustomIndegreeDistribution, verbose=TRUE) )
+plot(id3)
+# where now we have a test agreeing with the plot.
+
+# The only other problems we seem to have are with triad census:
+plot(tc3, scale=TRUE, center=TRUE, key=triad.keys)
+# which have persisted throughout the two model updates we have proposed!
+# Graphically, the data is not too implausible, so we might take heed of
+# George Box's famous quote "All models are wrong, some are useful" and
+# proceed with our inference. If, however, triad census across the configurations
+# that seem to not fit well could have an impact on your inference, we strongly
+# recommend spending some more time trying new specifications.
+
+# Geodesic distance distribution
+plot(ge3)
+# and outdegree
+plot(od3)
+# fit adequately.
+
+# Now that goodness of fit has been addressed, and we have settled in on a model,
+# we can continue on drawing inference on the sustantive hypotheses of interest.
+\end{verbatim}
 
 \newpage
 
@@ -8442,6 +8794,11 @@ This begins at end October 2009, and only details changes which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{small}
+\begin{itemize}
+\item 2011-05-26 R-forge 148:
+\begin{itemize}
+\item Improvements to sienaGOF, added script to manual.
+\end{itemize}
 \begin{itemize}
 \item 2011-05-16 R-forge 146:
 \begin{itemize}
