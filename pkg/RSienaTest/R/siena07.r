@@ -398,7 +398,7 @@ tkErrorMessage <- function()
 ##@errorHandler Miscellaneous Not used
 errorHandler <- function()
 {
-    opts <- options()
+    ##  opts <- options()
     if (!is.batch())
     {
         options(show.error.messages=FALSE)

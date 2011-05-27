@@ -1,10 +1,29 @@
+2011-05-27 R-forge revision 150
+
+	* cleanup.win, cleanup, src/Makevars, src/Makevars.win: changes
+	for building and cleaning directories.
+	* src/siena07utilities.cpp, src/sienaModels.cpp,
+	src/models/ml/chain.cpp: remove compiler warning about set but
+	unused variables
+	* R/phase3.r, R/print01Report, R/siena08.r, R/sienaDataCreate.r,
+	R/sienaDataCreateFromSession.r: remove partial argument matches
+	* R/bayes.r, R/effects.r, R/initializeFRAN.r, R/maxlike.r,
+	R/maxlikecalc.r, R/observationErrors.r, R/phase1.r, R/phase2.r,
+	R/print01Report.r, R/printDataReport.r,
+	R/printInitialDescription.r, R/robmon.r, R/RSienaRDocumentation.r,
+	R/siena01.r, R/siena07.r, R/sienaDataCreate.r,
+	R/sienaDataCrateFromSession.r, R/Sienatest.r, R/simstatsc.r:
+	remove codetools warnings about variables set but unused
+	* R/observationErrors.r: added various traps for vectors of length
+	1, removed spaces from function comments.
+
 2011-05-26 R-forge revision 149 RSienaTest only
 
 	* R/sienaGOF.R, NAMESPACE, doc/RSiena.bib, doc/s_man400.tex:
 	Minor debugs for multi-wave
 	data in sienaGOF, added summary.sienaGOF functionality,
 	added a model selection script to the manual.
-	
+
 2011-05-25 R-forge revision 148 RSienaTest only
 
 	* man/sienaGOF.Rd, man/sienaGOFsupplement.Rd,

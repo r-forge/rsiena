@@ -930,8 +930,6 @@ SEXP getChainProbabilitiesList(SEXP CHAIN, SEXP DATAPTR, SEXP MODELPTR,
 	double *rscores, *rdff;
 	PROTECT(scores = allocVector(REALSXP, dim));
 	rscores = REAL(scores);
-	PROTECT(dff = allocMatrix(REALSXP, dim, dim));
-	rdff = REAL(dff);
 
 	/* collect the scores and derivatives */
 	State State(pMLSimulation);

@@ -3057,14 +3057,14 @@ may change in the future, as this function is still in progress. See the working
 ## Version: 3												                   #
 ################################################################################
 
-# In this script, we will load the s50 data (type ?s50 for more information) 
+# In this script, we will load the s50 data (type ?s50 for more information)
 # and go through an iteration of forward model selection. The idea is to specify
-# a restricted model containing a conservative number of effects and then 
-# evaluate evidence for inclusion of more elaborate terms. This approach 
-# contrasts with backward model selection, which would entail inclusion of a 
+# a restricted model containing a conservative number of effects and then
+# evaluate evidence for inclusion of more elaborate terms. This approach
+# contrasts with backward model selection, which would entail inclusion of a
 # large number of terms and subsequent evaluation for omission of terms.
 
-# It is strongly emphasized here that theory should always guide model 
+# It is strongly emphasized here that theory should always guide model
 # selection! In this script, our intent is to illustrate some of the tools that
 # are available to you and not necessarily to provide a "cookie cutter" solution
 # to fitting SAOMs to all datasets:
@@ -3075,7 +3075,7 @@ may change in the future, as this function is still in progress. See the working
 
 # First, we will install the experimental "RSienaTest" from R-Forge.
 # This version is updated more often than the RSiena package on CRAN.
-# Currently, one of the functions (sienaGOF) is not yet available in the 
+# Currently, one of the functions (sienaGOF) is not yet available in the
 # CRAN version.
 install.packages("RSienaTest", repos="http://R-Forge.R-project.org")
 
@@ -3087,13 +3087,13 @@ install.packages(c("network", "sna"))
 # RSienaTest package:
 library(RSienaTest)
 
-# First, give some estimation settings. Here we will use 4 phase 2 subphases 
+# First, give some estimation settings. Here we will use 4 phase 2 subphases
 # and 1000 phase 3 iterations. These settings come generally recommended for
 # most datasets.
 estimationSettings <- sienaModelCreate(fn=simstats0c, nsub=4, n3=1000)
 
-# The s50 dataset is already loaded into the R environment once the 
-# library(.) function is called. See e.g. ?s501 for information on 
+# The s50 dataset is already loaded into the R environment once the
+# library(.) function is called. See e.g. ?s501 for information on
 # each data object.
 
 # This will load three waves of 50 actors into a sienaNet
@@ -3108,32 +3108,32 @@ model1 <- getEffects(s50data)
 # Or with the include effects (preferred option):
 
 model1 <- includeEffects(model1, transTrip, cycle3, name="friendship")
-model1 <- includeEffects(model1, simX, interaction1="alcohol", 
+model1 <- includeEffects(model1, simX, interaction1="alcohol",
 	name="friendship")
-# Here, we can add a few score type tests for covariate terms (which can be 
-# highly correlated). These tests will help us to determine whether we should 
+# Here, we can add a few score type tests for covariate terms (which can be
+# highly correlated). These tests will help us to determine whether we should
 # include more complicated selection effects in future iterations.
-model1 <- setEffect(model1, egoX, interaction1="alcohol", name="friendship", 
+model1 <- setEffect(model1, egoX, interaction1="alcohol", name="friendship",
 	fix=TRUE, test=TRUE, include=TRUE)
-model1 <- setEffect(model1, altX, interaction1="alcohol", name="friendship", 
+model1 <- setEffect(model1, altX, interaction1="alcohol", name="friendship",
 	fix=TRUE, test=TRUE, include=TRUE)
-model1 <- setEffect(model1, higher, interaction1="alcohol", name="friendship", 
+model1 <- setEffect(model1, higher, interaction1="alcohol", name="friendship",
 	fix=TRUE, test=TRUE, include=TRUE)
 
 # Check what is specified in model1:
 model1
 
-# We have chosen to start with two transitivity terms (transitive triplets 
-# and three cycles), and one selection, one influence term for alcohol 
-# consumption. 
+# We have chosen to start with two transitivity terms (transitive triplets
+# and three cycles), and one selection, one influence term for alcohol
+# consumption.
 
 # We use the siena07() function to estimate the parameters of model1
-# NOTE: you MUST specify returnDeps=TRUE in order to use the goodness of 
+# NOTE: you MUST specify returnDeps=TRUE in order to use the goodness of
 # fit testing functionality.
-( results1 <- siena07(estimationSettings, data=s50data, effects=model1, 
+( results1 <- siena07(estimationSettings, data=s50data, effects=model1,
 	batch=TRUE, returnDeps=TRUE) )
 
-# Next, we perform a test for time heterogeneity. This will help us see 
+# Next, we perform a test for time heterogeneity. This will help us see
 # if the parameters have shifted over time. It comes highly
 # recommended to perform this step before checking other goodness of fit!
 ( timetest1 <- sienaTimeTest(results1) )
@@ -3150,11 +3150,11 @@ plot(timetest1, effects=5:8)
 # there is (individual) evidence against the time homogeneity hypothesis.
 
 # There is some information on sienaTimeTest available in the help file,
-# where you can find the citation for Lospinoso et. al (2010) 
+# where you can find the citation for Lospinoso et. al (2010)
 # where the test is developed.
 ?sienaTimeTest
 
-# We can now check the score type test results for more involved 
+# We can now check the score type test results for more involved
 # selection terms. Summary of a siena07 object gives us a wealth
 # of information about estimation, but it will also give us a score-type
 # test of Schweinberger (2007) calculated for those effects which we have
@@ -3172,7 +3172,7 @@ summary(results1)
 # with the model but that are not strictly fit by the parameters of the
 # model. There is a simple battery of auxiliary statistics that is already
 # implemented in RSiena: indegree and outdegree distributions, triad census,
-# and average nearest neighboor degree (KNN) distributions. First, let us 
+# and average nearest neighboor degree (KNN) distributions. First, let us
 # calculate these using our results:
 
 # - Indegree distribution ( # of nodes with indegree < A for A in 1:MAX)
@@ -3243,11 +3243,11 @@ plot(ge1)
 model2 <- includeEffects(model1, nbrDist2)
 # We also tidy up the effects by removing the tests for more involved selection
 # effects on alcohol:
-model2 <- setEffect(model2, egoX, interaction1="alcohol", name="friendship", 
+model2 <- setEffect(model2, egoX, interaction1="alcohol", name="friendship",
 		fix=FALSE, test=FALSE, include=FALSE)
-model2 <- setEffect(model2, altX, interaction1="alcohol", name="friendship", 
+model2 <- setEffect(model2, altX, interaction1="alcohol", name="friendship",
 		fix=FALSE, test=FALSE, include=FALSE)
-model2 <- setEffect(model2, higher, interaction1="alcohol", name="friendship", 
+model2 <- setEffect(model2, higher, interaction1="alcohol", name="friendship",
 		fix=FALSE, test=FALSE, include=FALSE)
 # Not wanting to make too many changes to the model at once, let us also try
 # some degree related effects to help our outdegree fit:
@@ -3255,7 +3255,7 @@ model2 <- setEffect(model2, outPop, fix=TRUE, test=TRUE, include=TRUE)
 model2 <- setEffect(model2, outAct, fix=TRUE, test=TRUE, include=TRUE)
 
 # Estimate our model (note the use of prevAns to speed up convergence):
-( results2 <- siena07(estimationSettings, data=s50data, effects=model2, 
+( results2 <- siena07(estimationSettings, data=s50data, effects=model2,
 					batch=TRUE, returnDeps=TRUE, prevAns=results1) )
 
 # Next, we perform a test for time heterogeneity:
@@ -3284,7 +3284,7 @@ id1
 # The next item to notice in
 summary(id2)
 # are the outdegree - popularity and outdegree - activity displays.
-# These two effects had test=TRUE selected on the effects object, so 
+# These two effects had test=TRUE selected on the effects object, so
 # sienaGOF treats these specially. It considers a polynomial approximation
 # to the Mahalanobis distance with respect to the parameters of the model
 # so that we can posit various specifications and compare their expected
@@ -3300,7 +3300,7 @@ summary(id2)
 #
 # MM(Par.) -- For "method of moments  (partial)" corresponds to an estimate
 #	where we only take the one step estimate coordinate from MM(full) for
-#	the effect under consideration. E.g. for "outdegree - popularity", 
+#	the effect under consideration. E.g. for "outdegree - popularity",
 #	all parameters are equivalent to the current estimates, but we replace
 #	the 0 for outdegree - popularity with its one step estimate.
 #
@@ -3344,10 +3344,10 @@ model3 <- setEffect(model2, outPop, fix=FALSE, test=FALSE, include=TRUE)
 model3 <- setEffect(model3, outAct, fix=FALSE, test=FALSE, include=FALSE)
 
 # Estimate our model
-( results3 <- siena07(estimationSettings, data=s50data, effects=model3, 
+( results3 <- siena07(estimationSettings, data=s50data, effects=model3,
 					batch=TRUE, returnDeps=TRUE, prevAns=results2) )
 # Convergence could be improved:
-( results3 <- siena07(estimationSettings, data=s50data, effects=model3, 
+( results3 <- siena07(estimationSettings, data=s50data, effects=model3,
 					batch=TRUE, returnDeps=TRUE, prevAns=results3) )
 
 # Time test
@@ -3372,7 +3372,7 @@ plot(id3)
 CustomIndegreeDistribution <- function(...) {
 	IndegreeDistribution(..., levels=1:6)
 }
-# and run this test again: 
+# and run this test again:
 ( id3 <- sienaGOF(results3, CustomIndegreeDistribution, verbose=TRUE) )
 plot(id3)
 # where now we have a test agreeing with the plot.
@@ -8796,10 +8796,7 @@ repository.)
 \begin{small}
 \begin{itemize}
 \item 2011-05-26 R-forge 148:
-\begin{itemize}
-\item Improvements to sienaGOF, added script to manual.
-\end{itemize}
-\begin{itemize}
+Improvements to sienaGOF, added script to manual.
 \item 2011-05-16 R-forge 146:
 \begin{itemize}
 \item Documentation improvements
