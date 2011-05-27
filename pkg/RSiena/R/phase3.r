@@ -454,7 +454,6 @@ phase3.2 <- function(z, x, ...)
 ##@CalulateDerivative3 siena07 Calculates derivative at end of phase 3
 CalculateDerivative3<- function(z,x)
 {
-    f <- FRANstore()
     z$mnfra <- colMeans(z$sf)
     if (z$FinDiff.method || x$maxlike)
     {
@@ -479,7 +478,7 @@ CalculateDerivative3<- function(z,x)
     z$msf <- cov(z$sf)
     if (z$Phase3nits > 2)
     {
-       z$sfl <- apply(z$sf, 2, function(x)acf(x, plot=FALSE, lag=1)[[1]][[2]])
+       z$sfl <- apply(z$sf, 2, function(x)acf(x, plot=FALSE, lag.max=1)[[1]][[2]])
    }
     z$dfra1 <- z$dfra
     z$dfra <- dfra

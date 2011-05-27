@@ -119,7 +119,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         interactionNos <- interactionNos[interactionNos > 0]
         interactions <- effects$effectNumber %in%
                                           interactionNos
-        interactionMainEffects <- effects[interactions, ]
         effects$requested <- effects$include
         requestedEffects <- effects[effects$include, ]
 
@@ -168,7 +167,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             }
         }
         types <- sapply(data[[1]]$depvars, function(x) attr(x, 'type'))
-        nets <- sum(types != "behavior")
+        ##nets <- sum(types != "behavior")
         ## now check if conditional estimation is OK and copy to z if so
         z$cconditional <- FALSE
         if (x$cconditional)
@@ -1354,7 +1353,6 @@ unpackBehavior<- function(depvar, observations)
 {
     beh <- depvar[, 1, ]
     behmiss <- is.na(beh)
-    origbeh <- beh
     allna <- apply(beh, 1, function(x)all(is.na(x)))
     modes <- attr(depvar, "modes")
     ## carry forward missings ### nb otherwise use the mode
@@ -1463,7 +1461,6 @@ unpackCDyad<- function(dycCovar)
 unpackVDyad<- function(dyvCovar, observations)
 {
     edgeLists <- vector('list', observations)
-    varmats <- vector('list', observations)
     sparse <- attr(dyvCovar, 'sparse')
     means <- attr(dyvCovar, "meanp")
     nodeSets <- attr(dyvCovar, "nodeSet")
@@ -1565,7 +1562,6 @@ unpackCompositionChange <- function(compositionChange)
     atts <- attributes(compositionChange)
     events <- atts$events
     activeStart <- atts$activeStart
-    nActors <- nrow(activeStart)
     observations <- ncol(activeStart)
     ## check that there is someone there always
     for (i in 1:(observations - 1))

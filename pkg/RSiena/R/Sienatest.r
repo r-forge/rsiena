@@ -16,7 +16,7 @@ InstabilityAnalysis<- function(z)
     ## can be obtained via svd(data) (which is stored in z$sf). Square of ratio
     ## of smallest to largest singular value.
     Report('Instability Analysis\n')
-    pp<- length(z$diver)
+   # pp<- length(z$diver)
     constant<- z$diver
     test<- z$test
     covtheta<- z$covtheta

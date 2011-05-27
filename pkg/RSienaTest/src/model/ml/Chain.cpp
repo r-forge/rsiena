@@ -916,7 +916,7 @@ void Chain::dumpChain() const
 			 this->lfirstMiniStepPerOption.end();
 		 iter++)
 	{
-		Option myOption = iter->first;
+		//Option myOption = iter->first;
 		if (iter->second)
 		{
 			PrintValue(getMiniStepDF(*iter->second));

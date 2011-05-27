@@ -581,7 +581,7 @@ SEXP getMiniStepList(const MiniStep& miniStep, int period,
 			{
 				for (int j = 0; j < nRows; j++)
 				{
-					reval[pos++] = networkChange.
+					rendow[pos++] = networkChange.
 						endowmentEffectContribution(j, i);
 				}
 			}
@@ -620,7 +620,7 @@ SEXP getMiniStepList(const MiniStep& miniStep, int period,
 			{
 				for (int j = 0; j < nRows; j++)
 				{
-					reval[pos++] =
+					rendow[pos++] =
 						behaviorChange.endowmentEffectContribution(j, i);
 				}
 			}

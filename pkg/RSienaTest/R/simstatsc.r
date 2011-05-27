@@ -189,12 +189,10 @@ doModel <- function(x, Deriv, seeds, fromFiniteDiff, theta, randomseed2,
 ##@clearData siena07 Finalizer to clear Data object in C++
 clearData <- function(pData)
 {
-    ans <- .Call('deleteData', PACKAGE=pkgname,
-                 pData)
+    .Call('deleteData', PACKAGE=pkgname, pData)
 }
 ##@clearModel siena07 Finalizer to clear Model object in C++
 clearModel <- function(pModel)
 {
-    ans <- .Call('deleteModel', PACKAGE=pkgname,
-                 pModel)
+    .Call('deleteModel', PACKAGE=pkgname, pModel)
 }

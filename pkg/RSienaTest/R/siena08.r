@@ -114,8 +114,8 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05)
             ttilde <- sum(x1$theta / x1$se^2) / sqrt(sum(1 / x1$se^2))
             Qstat <- Tsq - ttilde^2
             cjplus <- -2 * sum(pnorm(x1$theta / x1$se, lower.tail=FALSE,
-                                     log=TRUE))
-            cjminus <- -2 * sum(pnorm(x1$theta / x1$se, log=TRUE))
+                                     log.p=TRUE))
+            cjminus <- -2 * sum(pnorm(x1$theta / x1$se, log.p=TRUE))
             cjplusp <- 1 - pchisq(cjplus, 2 * nrow(x1))
             cjminusp <- 1 - pchisq(cjminus, 2 * nrow(x1))
             ## ML estimates and confidence intervals
@@ -146,8 +146,8 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05)
         {
             n <- sum(!is.na(x$scoretests))
             cjplus <- -2 * sum(pnorm(x$scoretests, lower.tail=FALSE,
-                                     log=TRUE), na.rm=TRUE)
-            cjminus <- -2 * sum(pnorm(x$scoretests, log=TRUE),
+                                     log.p=TRUE), na.rm=TRUE)
+            cjminus <- -2 * sum(pnorm(x$scoretests, log.p=TRUE),
                                 na.rm=TRUE)
             cjplusp <- 1 - pchisq(cjplus, 2 * n)
             cjminusp <- 1 - pchisq(cjminus, 2 * n)
@@ -200,10 +200,10 @@ print.sienaMeta <- function(x, file=FALSE, ...)
     {
         Report(openfiles=TRUE, type="n") #initialise with no file
     }
-    projnames <- unique(x$thetadf$projname)
-    nProjects <- length(projnames)
+    ## projnames <- unique(x$thetadf$projname)
+    ## nProjects <- length(projnames)
     effects <- unique(x$thetadf$effects)
-    nEffects <- length(effects)
+    ## nEffects <- length(effects)
     ## results
 
     ## estimates
@@ -432,7 +432,7 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
         ## do some sums for the heading
 
         namelen <- nchar(projname) + 4
-        linelen <- 80
+        ##linelen <- 80
         astlen <- min(namelen + 10, 80)
         nBlanks <- if (astlen < 80)
         {

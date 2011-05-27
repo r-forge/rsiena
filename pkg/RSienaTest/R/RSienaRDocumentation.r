@@ -58,7 +58,7 @@ getRSienaRDocumentation <- function(Rdir)
     mystr <- paste("##", "@", sep="")
     comms1 <- strsplit(comms, mystr)
     ## join up rest
-    comms2 <- do.call(rbind, comms1)
+    ## comms2 <- do.call(rbind, comms1)
     ## turn into dataframe
     comms3 <- sapply(comms1, function(x)
                  {
@@ -107,7 +107,6 @@ getRSienaRDocumentation <- function(Rdir)
     tt <- lapply(1:length(ttmp), function(x, y, z)
              {
                  yy <- y[x]
-                 zz <- z[[x]]
                  yy <- getFromNamespace(yy, pkgname)
                  targs <- formals(yy)
                  n <- length(targs)
@@ -126,7 +125,7 @@ getRSienaRDocumentation <- function(Rdir)
                   yy <- y[[x]]
                   n <- length(y[[x]])
                   bb <- names(yy)
-                  t1<- lapply(1:length(yy), function(x,  b, a)
+                  t1<- lapply(1:n, function(x,  b, a)
                           {
                               y <- a[[x]]
                               bb <- b[[x]]
@@ -136,7 +135,7 @@ getRSienaRDocumentation <- function(Rdir)
                               else
                                   c( bb, " ")
                           },  a=yy, b=bb)
-                  t2 <- do.call(rbind,t1)
+                  do.call(rbind,t1)
               }, y=tt
                   )
 
@@ -200,7 +199,7 @@ getRSienaRDocumentation <- function(Rdir)
     names(tttt7) <- c("Called from", "Function")
     tttt7 <- tttt7[order(tttt7[,2],tttt7[,1]), ]
 
-    tmp7bit <- tmp7[tmp7$Function %in% tttt7$Function, ]
+   ## tmp7bit <- tmp7[tmp7$Function %in% tttt7$Function, ]
 
     tmp7new <- merge(tmp7, tttt7, by=c("Function", "Called from"), all=TRUE)
 

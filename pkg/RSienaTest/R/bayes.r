@@ -100,7 +100,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             {
                 u <- 1 / (2 - (actual / desired))
             }
-            if (tol <- abs(actual - desired) <= tolerance)
+            if (abs(actual - desired) <= tolerance)
             {
                 number <<- number + 1
                 if (number == 2) success <<- TRUE
@@ -172,7 +172,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 
     npar <- length(z$theta)
     basicRate <- z$effects$basicRate
-    iter <- 0
+    ##iter <- 0
     z$numm <- 20
     z$scaleFactor <- 1
     z <- createStores()

@@ -408,7 +408,6 @@ phase1.2 <- function(z, x, ...)
 ##@CalculateDerivative siena07 Calculates derivative in Phase 1
 CalculateDerivative <- function(z, x)
 {
-    f <- FRANstore()
     if (z$FinDiff.method || x$maxlike)
     {
         dfra <- t(apply(z$sdf, c(2, 3), mean))

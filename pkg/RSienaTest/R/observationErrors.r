@@ -114,7 +114,6 @@ confint.mu <- function(x, se, alpha=0.05)
     ## confidence level (1-alpha).
     ma <- max(x)
     mi <- min(x)
-    ra <- max(x) - min(x)          # easy upper bound for sigma
     maxli <- maxlik(x, se)        # ML estimators
     mindev <- maxli$deviance       # minimized deviance
     mlemu <- maxli$mu             # MLE for mu
@@ -148,7 +147,6 @@ confint.sig <- function(x, se, alpha=0.05)
     ## with length(x) = length(se)
     ## returns list consisting of bounds confidence interval and
     ## confidence level (1 - alpha).     ma <- max(x)
-    mi <- min(x)
     ra <- max(x) - min(x)          # easy upper bound for sigma
     maxli  <- maxlik(x, se)        # ML estimators
     mindev <- maxli$deviance       # minimized deviance
