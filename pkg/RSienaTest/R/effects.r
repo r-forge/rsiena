@@ -264,26 +264,20 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                     {
                         objEffects <-
                             rbind(objEffects,
-                                  createEffects("covarNetNetObjective",
-                                                otherName,
-                                                names(xx$cCovars)[k],
-                                                name=varname,
-                                         groupName=groupName, group=group,
-                                         netType=netType))
+                                  covarNetNetEff(otherName, names(xx$cCovars)[k],
+                                                 attr(xx$cCovars[[k]], 'poszvar'),
+                                                 name=varname))
                     }
                 }
-                 for (k in seq(along=xx$vCovars))
+                for (k in seq(along=xx$vCovars))
                 {
                     if (attr(xx$vCovars[[k]], 'nodeSet') == nodeSet)
                     {
                         objEffects <-
                             rbind(objEffects,
-                                  createEffects("covarNetNetObjective",
-                                                otherName,
-                                                names(xx$vCovars)[k],
-                                                name=varname,
-                                         groupName=groupName, group=group,
-                                         netType=netType))
+                                  covarNetNetEff(otherName, names(xx$vCovars)[k],
+                                                 attr(xx$vCovars[[k]], 'poszvar'),
+                                                 name=varname))
                     }
                 }
                   for (k in seq(along=xx$depvars))
@@ -293,12 +287,9 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                     {
                         objEffects <-
                             rbind(objEffects,
-                                  createEffects("covarNetNetObjective",
-                                                otherName,
-                                                names(xx$depvars)[k],
-                                                name=varname,
-                                         groupName=groupName, group=group,
-                                         netType=netType))
+                                  covarNetNetEff(otherName, names(xx$depvars)[k],
+                                                 poszvar=TRUE,
+                                                 name=varname))
                     }
                 }
 
@@ -862,13 +853,13 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
     }
     ##@covarNetNetEff internal getEffects
     covarNetNetEff<- function(othernetname,
-                              covarname, poszvar, moreThan2, name)
+                              covarname, poszvar, name)
     {
         objEffects <- createEffects("covarNetNetObjective", othernetname,
                                    covarname, name=name,
                                    groupName=groupName, group=group,
                                    netType=netType)
-        if (!(poszvar && (!moreThan2)))
+        if (!poszvar)
         {
             objEffects <- objEffects[objEffects$shortName != "covNetNet", ]
         }
@@ -914,12 +905,12 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
     }
     n <- length(xx$depvars)
     types <- sapply(xx$depvars, function(x)attr(x, 'type'))
-    sparses <- sapply(xx$depvars, function(x)attr(x, 'sparse'))
+    #sparses <- sapply(xx$depvars, function(x)attr(x, 'sparse'))
     nOneModes <- sum(types == 'oneMode')
-    nBehaviors <- sum(types == 'behavior')
+    #nBehaviors <- sum(types == 'behavior')
     nBipartites <- sum(types =='bipartite')
     effects <- vector('list',n)
-    nodeSetNames <- sapply(xx$nodeSets, function(x)attr(x, 'nodeSetName'))
+    #nodeSetNames <- sapply(xx$nodeSets, function(x)attr(x, 'nodeSetName'))
     names(effects) <- names(xx$depvars)
     for (i in 1:n)
     {
