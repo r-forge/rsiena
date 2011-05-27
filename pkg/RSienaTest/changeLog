@@ -1,3 +1,10 @@
+2011-05-27 R-forge revision 151
+
+	* R/observationErrors.r: added various traps for vectors of length
+	1, removed spaces from function comments (RSienaTest was missed in
+	revision 150).
+	* R/effects.r: remove final few unused variables.
+
 2011-05-27 R-forge revision 150
 
 	* cleanup.win, cleanup, src/Makevars, src/Makevars.win: changes
