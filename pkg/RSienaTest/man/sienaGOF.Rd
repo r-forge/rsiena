@@ -175,8 +175,18 @@ Stochastic Actor Oriented Models." Working Paper.
 	myeff[myeff$shortName=='cycle3', c('fix', 'test')] <-TRUE
 	myeff[myeff$shortName=='balance', c('fix', 'test')] <-TRUE
 	ans <- siena07(mymodel, data=mydata, effects=myeff, returnDeps=TRUE, batch=TRUE)
-	( res <- sienaGOF(ans, KnnDistribution, cumulative=TRUE) )
+	( res <- sienaGOF(ans, KnnDistribution) )
 	plot(res)
+	
+	## We can also make a custom function:
+	#
+	CustomTriadCensus <- function(...) {
+		require(sna)
+		x <- snaEdgelistExtraction(...)
+		triad.census(x)[6:16]
+	}
+	# Execute the test:
+	( res <- sienaGOF(ans, CustomTriadCensus) )	
 }
 }
 \keyword{models}

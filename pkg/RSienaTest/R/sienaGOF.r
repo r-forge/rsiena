@@ -68,7 +68,8 @@ sienaGOF <- function(
 	}
 	if (is.null(wave) )
 	{
-		wave <- 1:(dim(sienaFitObject$f[[groupName]]$depvars[[varName]])[3] - 1)
+		wave <- 1:(attr(sienaFitObject$f[[groupName]]$depvars[[varName]], 
+						"netdims")[3] - 1)
 	}
 	if (varNumber < 1 || varNumber >
 			length(sienaFitObject$sims[[1]][[groupNumber]]))
@@ -76,8 +77,8 @@ sienaGOF <- function(
 		stop("Invalid variable number -- out of bounds.")
 	}
 	if (min(wave) < 1 || max(wave) >
-			dim(sienaFitObject$f[[groupName]]$depvars[[varName]])[3] - 1
-		)
+			attr(sienaFitObject$f[[groupName]]$depvars[[varName]], 
+							"netdims")[3] - 1)
 	{
 		stop("Invalid wave index -- out of bounds")
 	}
@@ -86,7 +87,9 @@ sienaGOF <- function(
 						matrix(
 						auxiliaryFunction(NULL,
 								sienaFitObject$f, sienaFitObject$sims,
-								groupName, varName, j), nrow=1) })
+								groupName, varName, j)
+						, nrow=1) 
+				})
 	if (join)
 	{
 		obsStats <- Reduce("+", obsStatsByWave)
@@ -194,7 +197,7 @@ sienaGOF <- function(
 		}
 		ainv <- ginv(a)
 		arank <- rankMatrix(a)
-		expectation <- apply(simulated, 2, mean);
+		expectation <- colMeans(simulated);
 		centeredSimulations <- scale(simulated, scale=FALSE)
 		if (variates==1)
 		{
@@ -250,7 +253,7 @@ sienaGOF <- function(
 	obsMhd <- NULL
 
 	ExpStat <- lapply(wave, function(i) {
-				apply(simStatsByWave[[i]], 2, mean)
+				colMeans(simStatsByWave[[i]])
 			})
 	OneStepSpecs <- matrix(0, ncol=sum(sienaFitObject$test),
 			nrow=length(sienaFitObject$theta))
@@ -341,11 +344,9 @@ sienaGOF <- function(
 							sigma, fra, doTests,
 							maxlike=sienaFitObject$maxlike)$oneStep )
 			mmPartialThetaDelta <- rep(0,length(theta0))
-			mmPartialThetaDelta[length(theta0)] <-
-					mmThetaDelta[length(theta0)]
+			mmPartialThetaDelta[length(theta0)] <- mmThetaDelta[length(theta0)]
 			JacobianExpStat <- lapply(wave, function (i) {
-				t(SF[,i,]) %*% simStatsByWave[[i]] / nSims
-					})
+				t(SF[,i,]) %*% simStatsByWave[[i]]/ nSims  }) 
 			Gradient <- lapply(wave, function(i) {
 						-2  * JacobianExpStat[[i]] %*%
 								covInvByWave[[i]] %*%
@@ -669,11 +670,13 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 
 sparseMatrixExtraction <- function (i, data, sims, groupName, varName, wave) {
 	#require(Matrix)
-	dimsOfDepVar=dim(data[[groupName]]$depvars[[varName]][,,wave])
-	missing <- Matrix(is.na(data[[groupName]]$depvars[[varName]][,,wave])*1)
+	dimsOfDepVar<- 
+			attr(data[[groupName]]$depvars[[varName]],
+					"netdims")
+	missing <- Matrix(is.na(data[[groupName]]$depvars[[varName]][,,wave+1])*1)
 	if (is.null(i)) {
 		# sienaGOF wants the observation:
-		returnValue <- Matrix(data[[groupName]]$depvars[[varName]][,,wave])
+		returnValue <- Matrix(data[[groupName]]$depvars[[varName]][,,wave+1])
 		returnValue[is.na(returnValue)] <- 0
 	}
 	else
@@ -698,23 +701,23 @@ snaEdgelistExtraction <- function (i, data, sims, groupName, varName, wave) {
 
 snaSociomatrixExtraction <- function (i, data, sims, groupName, varName, wave) {
 	require(sna)
-	dimsOfDepVar=dim(data[[groupName]]$depvars[[varName]][,,wave])
-	missing <- as.sociomatrix.sna(
-		1*is.na(data[[groupName]]$depvars[[varName]][,,wave]))
-
+	actors <- attr(data[[groupName]]$nets[[varName]][[wave+1]]$mat1,
+			"nActors")
+	missing <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat1)
+	attr(missing, "n") <- actors
+	missing <- 1*is.na( as.sociomatrix.sna( missing ) )
+	
 	if (is.null(i)) {
 		# sienaGOF wants the observation:
-		returnValue <- data[[groupName]]$depvars[[varName]][,,wave]
-		returnValue <- as.sociomatrix.sna(returnValue)
-		returnValue[is.na(returnValue)] <- 0
+		returnValue <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat1)
 	}
 	else
 	{
 		#sienaGOF wants the i-th simulation:
 		returnValue <- sims[[i]][[groupName]][[varName]][[wave]]
-		attr(returnValue, "n") <- dimsOfDepVar[1]
-		returnValue <- as.sociomatrix.sna( returnValue )
 	}
+	attr(returnValue, "n") <- actors
+	returnValue <- as.sociomatrix.sna( returnValue )
 	returnValue = 1*((returnValue - missing) > 0)
 	returnValue
 }
