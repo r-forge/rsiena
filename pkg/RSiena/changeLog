@@ -1,3 +1,7 @@
+2011-05-29 R-forge revision 152 RSienaTest only
+
+	* R/sienaGOF.r: Fixed a few bugs,  doc/s_400.tex: updated the script
+
 2011-05-27 R-forge revision 151
 
 	* R/observationErrors.r: added various traps for vectors of length
