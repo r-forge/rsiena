@@ -381,7 +381,8 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
             behEffects$effectName
     }
     mydf[nrates + (1:x$pp), 'row'] <-  1:x$pp
-    mydf[nrates + (1:x$pp), 'type' ] <- effects$type
+    mydf[nrates + (1:x$pp), 'type' ] <- ifelse(effects$type == "creation",
+                                               "creat", effects$type)
     mydf[nrates + (1:x$pp), 'text' ] <- effects$effectName
     mydf[nrates + (1:x$pp), 'value' ] <- theta
     mydf[nrates + (1:x$pp), 'se' ] <- ses

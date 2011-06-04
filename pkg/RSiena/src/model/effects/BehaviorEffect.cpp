@@ -174,6 +174,43 @@ double BehaviorEffect::endowmentStatistic(const int * difference,
 		this->pEffectInfo()->effectName());
 }
 
+
+/**
+ * Returns the statistic corresponding to this effect as part of
+ * the creation function.
+ * @param[in] difference an array of differences per each actor where the
+ * current value is subtracted from the initial value. Thus positive
+ * differences indicate a decrease of actors' behavior, while negative values
+ * indicate an increase of actors' behavior.
+ * @param[in] currentValues the current state of the behavior variable
+ */
+double BehaviorEffect::creationStatistic(int * difference,
+	double *currentValues)
+{
+	// Here we use a trick. The creation statistics are very similar to the
+	// endowmnent statistics, but instead of summing over all actors with
+	// decreasing values, we must now sum over all actors with increasing
+	// values. So we just reverse the differences and call the endowment
+	// statistic.
+
+	int n = this->n();
+
+	for (int i = 0; i < n; i++)
+	{
+		difference[i]  = -difference[i];
+	}
+
+	double statistic = this->endowmentStatistic(difference, currentValues);
+
+	for (int i = 0; i < n; i++)
+	{
+		difference[i]  = -difference[i];
+	}
+
+	return -statistic;
+}
+
+
 /**
  * Does the necessary preprocessing work for calculating the probabilities
  * for a specific ego. This method must be invoked before

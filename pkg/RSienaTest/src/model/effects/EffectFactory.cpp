@@ -29,6 +29,7 @@
 #include "model/effects/generic/OutDegreeFunction.h"
 #include "model/effects/generic/EgoOutDegreeFunction.h"
 #include "model/effects/generic/BetweennessFunction.h"
+#include "model/effects/generic/GwespFunction.h"
 #include "model/effects/generic/InStarFunction.h"
 #include "model/effects/generic/ReciprocatedTwoPathFunction.h"
 #include "model/effects/generic/TwoPathFunction.h"
@@ -38,6 +39,8 @@
 #include "model/effects/generic/MissingCovariatePredicate.h"
 #include "model/effects/generic/CovariateDistance2AlterNetworkFunction.h"
 #include "model/effects/generic/CovariateDistance2SimilarityNetworkFunction.h"
+#include "model/tables/EgocentricConfigurationTable.h"
+#include "model/tables/NetworkCache.h"
 
 namespace siena
 {
@@ -266,23 +269,55 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "gwespFF")
 	{
-		pEffect = new GwespFFEffect(pEffectInfo);
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pTwoPathTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->variableName(),
+				mytable, pEffectInfo->internalEffectParameter());
+
+ 		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
 	}
 	else if (effectName == "gwespFB")
-	{
-		pEffect = new GwespFBEffect(pEffectInfo);
+ 	{
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pInStarTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->variableName(),
+				mytable, pEffectInfo->internalEffectParameter());
+
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
 	}
 	else if (effectName == "gwespBF")
 	{
-		pEffect = new GwespBFEffect(pEffectInfo);
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pOutStarTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->variableName(),
+				mytable, pEffectInfo->internalEffectParameter());
+ 		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
 	}
 	else if (effectName == "gwespBB")
 	{
-		pEffect = new GwespBBEffect(pEffectInfo);
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pReverseTwoPathTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->variableName(),
+				mytable, pEffectInfo->internalEffectParameter());
+ 		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
 	}
 	else if (effectName == "gwespRR")
 	{
-		pEffect = new GwespRREffect(pEffectInfo);
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pRRTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->variableName(),
+				mytable, pEffectInfo->internalEffectParameter());
+ 		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
 	}
 	else if (effectName == "inStructEq")
 	{

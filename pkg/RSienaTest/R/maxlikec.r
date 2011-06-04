@@ -12,7 +12,7 @@
 ##@maxlikec siena07 ML Simulation Module
 maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                     effects=NULL, profileData=FALSE, prevAns=NULL,
-                    returnDeps=FALSE)
+                    returnDeps=FALSE, returnChains=FALSE)
 {
     if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
     {
@@ -59,7 +59,9 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ans <- .Call('mlPeriod', PACKAGE=pkgname, z$Deriv, f$pData,
                      f$pModel, f$myeffects, z$theta,
                      returnDeps, 1, 1, z$nrunMH, z$addChainToStore,
-                     z$needChangeContributions)
+                     z$needChangeContributions, z$returnDataFrame,
+                     returnChains)
+        ans[[6]] <- list(ans[[6]])
         ans[[7]] <- list(ans[[7]])
     }
     else
@@ -68,14 +70,16 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         {
             anss <- apply(callGrid, 1, doMLModel, z$Deriv, z$theta,
                           returnDeps,  z$nrunMH, z$addChainToStore,
-                          z$needChangeContributions)
+                          z$needChangeContributions, z$returnDataFrame,
+                          returnChains)
         }
         else
         {
             use <- 1:(min(nrow(callGrid), z$int2))
             anss <- parRapply(z$cl[use], callGrid, doMLModel, z$Deriv, z$theta,
                               returnDeps, z$nrunMH, z$addChainToStore,
-                              z$needChangeContributions)
+                              z$needChangeContributions,
+                              z$returnDataFrame, returnChains)
         }
         ## reorganize the anss so it looks like the normal one
         ans <- NULL
@@ -84,27 +88,37 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ans[[3]] <- NULL ## seeds
         ans[[4]] <- NULL ## ntim
         ans[[5]] <- NULL # randomseed
-        if (returnDeps) ## chains
+        ##   if (returnDeps) ## this is for dependent variables but
+        ##       ## these are not returned yet
+        ##   {
+        ##       fff <- lapply(anss, "[[", 6)
+        ##       fff <- split(fff, callGrid[1, ]) ## split by group
+        ##       ans[[6]] <-
+        ##           lapply(fff, function(x)
+        ##              {
+        ##                  lapply(1:length(f$depNames), function(x, z)
+        ##                          lapply(z, "[[", x), z=x)
+        ##               }
+        ##                   )
+        ##    }
+        ##    else
+        ##    {
+        ##        ans[[6]] <-  NULL
+        ##    }
+       ## browser()
+        if (returnChains)
         {
-            fff <- lapply(anss, "[[", 6)
-            fff <- split(fff, callGrid[, 1])
-            ans[[6]] <-
-                lapply(fff, function(x)
-                   {
-                       lapply(1:length(f$depNames), function(x, z)
-                              lapply(z, "[[", x), z=x)
-                   }
-                       )
-        }
-        else
-        {
-            ans[[6]] <-  NULL
+            fff <- lapply(anss, function(x) x[[6]][[1]])
+            fff <- split(fff, callGrid[1, ]) ## split by group
+            ans[[6]] <- fff
         }
         ans[[7]] <- lapply(anss, "[[", 7) ## derivative
         ans[[8]] <- lapply(anss, "[[", 8)
         ans[[8]] <- do.call("+",  ans[[8]]) ## accepts
         ans[[9]] <- lapply(anss, "[[", 9)
         ans[[9]] <- do.call("+",  ans[[9]]) ## rejects
+        ans[[10]] <- lapply(anss, "[[", 10)
+        ans[[10]] <- do.call("+",  ans[[10]]) ## aborts
     }
 
     dff <- ans[[7]]
@@ -112,28 +126,28 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 
     FRANstore(f)
 
-    if (returnDeps)
-        sims <- ans[[6]]
-    else
-        sims <- NULL
+ ##   if (returnDeps)
+  ##      sims <- ans[[6]]
+   ## else
+       sims <- NULL
 
     #print(length(sims[[1]]))
-    if (returnDeps) ## this is not finished yet!
-    {
-        ## attach the names
-        names(sims) <- f$groupNames
-        periodNo <- 1
-        for (i in 1:length(sims))
-        {
-            names(sims[[i]]) <- f$depNames
-            for (j in 1:length(sims[[i]]))
-            {
-                periodNos <- periodNo:(periodNo  + length(sims[[i]][[j]]) - 1)
-                names(sims[[i]][[j]]) <- periodNos
-            }
-            periodNo <- periodNos[length(periodNos)] + 2
-       }
-    }
+    ##if (returnDeps) ## this is not finished yet!
+    ##{
+    ##    ## attach the names
+    ##    names(sims) <- f$groupNames
+    ##    periodNo <- 1
+    ##    for (i in 1:length(sims))
+    ##    {
+    ##        names(sims[[i]]) <- f$depNames
+    ##        for (j in 1:length(sims[[i]]))
+    ##        {
+    ##            periodNos <- periodNo:(periodNo  + length(sims[[i]][[j]]) - 1)
+    ##            names(sims[[i]][[j]]) <- periodNos
+     ##       }
+    ##        periodNo <- periodNos[length(periodNos)] + 2
+    ##   }
+    ##}
     if (z$Deriv) ## need to reformat the derivatives
     {
         ## current format is a list of vectors of the lower? triangle
@@ -191,12 +205,12 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         dff <- NULL
         dff2 <- NULL
     }
-    ## browser()
-
+    # browser()
+#print(length(ans[[6]][[1]][[1]]))
     list(fra = fra, ntim0 = NULL, feasible = TRUE, OK = TRUE,
          sims=sims, dff = dff, dff2=dff2,
-         chain = list(ans[[6]]), accepts=ans[[8]],
-         rejects= ans[[9]])
+         chain = ans[[6]], accepts=ans[[8]],
+         rejects= ans[[9]], aborts=ans[[10]])
 }
 
 dist2full<-function(dis) {
@@ -212,11 +226,11 @@ dist2full<-function(dis) {
 }
 ##@doMLModel Maximum likelihood
 doMLModel <- function(x, Deriv, theta, returnDeps, nrunMH, addChainToStore,
-                      needChangeContributions)
+                      needChangeContributions, returnDataFrame, returnChains)
 {
     f <- FRANstore()
     .Call("mlPeriod", PACKAGE=pkgname, Deriv, f$pData,
           f$pModel, f$myeffects, theta, returnDeps,
           as.integer(x[1]), as.integer(x[2]), nrunMH, addChainToStore,
-          needChangeContributions)
+          needChangeContributions, returnDataFrame, returnChains)
 }

@@ -28,10 +28,13 @@ algorithms <- function(data, effects, x, ...)
     z$thetasub <- z$thetasub + 1
     z$thetaHistory[z$thetasub, ] <- z$theta
 
-    repeat
+    repeat ## done twice once for main body and once for final loop
     {
-        repeat
+        repeat ## done numiter times plus final loop
         {
+            ########################################################
+            ## initialize for a new set of samples
+            ########################################################
             z$iter <- z$iter + 1
             ##print(z$theta)
 
@@ -45,8 +48,9 @@ algorithms <- function(data, effects, x, ...)
                 z$importanceSamplingWeights <- rep(1, z$nIter)
             }
             cat(z$iter, z$nIter, '\n')
-
+            #########################################################
             ## get the next set of samples
+            #########################################################
             if (finalLoop && z$variedThetas)
             {
                 thetas <- data.matrix(z$thetaHistory)[1:z$thetasub, ]
@@ -64,14 +68,13 @@ algorithms <- function(data, effects, x, ...)
             {
                 z <- getSamples(z, x, z$nIter)
             }
-            predictions <- colMeans(z$fra, dim=2)
+            predictions <- colSums(colMeans(z$fra)) - z$targets
 
             iiter <- 0
-
+            #######################################################
             ## do update steps with these samples
-
+            ######################################################
             z$maxVar <- var(c(rep(0, z$nIter - 1), 1)) / 10
-
             repeat
             {
                 iiter <- iiter + 1
@@ -122,9 +125,12 @@ algorithms <- function(data, effects, x, ...)
                         z$thetasub <- z$thetasub + 1
                         z$thetaHistory[z$thetasub, ] <- z$theta
                     }
+                        cat(z$oldTheta - z$theta, '\n')
 
-                    if (finalLoop && all(abs(z$oldTheta - z$theta) < 0.1))
+                    if (finalLoop && all(abs(z$oldTheta - z$theta) < 0.01))
                     {
+                        ##browser()
+                        cat(z$oldTheta - z$theta, '\n')
                         break
                     }
                     else
@@ -140,11 +146,14 @@ algorithms <- function(data, effects, x, ...)
                     }
                 }
             }
+            #######################################################
+            ## finished with these samples
+            #######################################################
             if (z$thetasub > 1)
             {
                 myformula <- as.formula(paste(z$formula, z$thetasub))
                 print(xyplot(myformula, data=z$thetaHistory[1:z$thetasub, ],
-                             outer=TRUE, layout=c(3, 3), scales="free",
+                             outer=TRUE,  scales="free",
                              type="l"))
             }
             ## clear the storage
@@ -153,20 +162,28 @@ algorithms <- function(data, effects, x, ...)
                 f <- RSiena:::FRANstore()
                 .Call("clearStoredChains", PACKAGE=pkgname, f$pModel, x$maxlike)
             }
-            if (z$useHistory)
+            if (z$useHistory) #&& z$iter > 4)
             {
                 z$storedZZZ[[z$iter]] <- z$zzz
+                ##     z$storedZZZ[[z$iter - 4]] <- z$zzz
+                ##   if (z$iter > 14)
+                if (z$iter > 3)
+                {
+                    z$storedZZZ[z$iter - 3] <- list(NULL)
+                }
             }
-            #z$zzz <- NULL
-            #gc()
-            #cat(varPs, z$maxVar,'\n')
-            if (z$iter == z$numiter ||
-                (iiter > z$maxiiter && varPs < z$maxVar / 2) || finalLoop )
+            ##z$zzz <- NULL
+            ##gc()
+            #print(object.size(z))
+            ##cat(varPs, z$maxVar,'\n')
+            if (z$iter == z$numiter || finalLoop)
+                ## (iiter > z$maxiiter && varPs < z$maxVar / 2) || finalLoop )
             {
                 iter <- 0
                 break
             }
-        }
+        }  # end of inner repeat
+        ## only final loop to do now
         if (finalLoop)
         {
             break
@@ -187,6 +204,13 @@ algorithms <- function(data, effects, x, ...)
         z$maxit <- 100
         z$optimFn <- z$optimFinal
         z$useOptim <- z$useOptim && z$useOptimFinal
+    }  ## end of outer repeat loop
+    if (z$thetasub > 1)
+    {
+        myformula <- as.formula(paste(z$formula, z$thetasub))
+        print(xyplot(myformula, data=z$thetaHistory[1:z$thetasub, ],
+                     outer=TRUE,  scales="free",
+                     type="l"))
     }
 
     ans <- z$FRAN(z, x, TERM=TRUE)
@@ -196,12 +220,40 @@ algorithms <- function(data, effects, x, ...)
     }
     if (z$useHistory)
     {
-        z$storedZZZ <- NULL
+        z$storedZZZ <- NULL ## reduce size
     }
+ #   z$zzz <- NULL
+    z$FRAN <- NULL
+    ## if FRAN is there you will load RSiena on startup
+    ## if the return object is in your
+    ## workspace. Then it is difficult to recreate RSiena.
     ##print(z$theta)
     z
 }
 
+getProbs <- function(x, theta, getScores, ratePar, nactors)
+{
+    f <- RSiena:::FRANstore()
+    group <- attr(x, "group")
+    period <-attr(x, "period")
+    k <- ratePar[[group]][[period]]
+    resp <- .Call("getChainProbabilitiesList",
+                  PACKAGE = pkgname, x,
+                  f$pData, f$pModel, as.integer(group),
+                  as.integer(period), f$myeffects,
+                  theta, getScores)
+    lik <- getLikelihood(resp[[1]])#, nactors[[group]],
+                         ##theta[k])
+    if (getScores)
+    {
+        sc <- resp[[2]]
+    }
+    else
+    {
+        sc <- NULL
+    }
+    list(lik=lik, sc=sc)
+}
 
 ##@getProbabilities algorithms Recalculates change contributions
 getProbabilities <- function(chain, theta, nactors, rateParameterPosition,
@@ -209,77 +261,41 @@ getProbabilities <- function(chain, theta, nactors, rateParameterPosition,
                              getScores=FALSE, cl=NULL)
 {
     f <-  RSiena:::FRANstore()
-                                        #print(theta)
-    for (i in 1:length(chain)) # group
-    {
-        for (j in 1:length(chain[[i]])) # period
-        {
-            if (!is.null(cl) )
-            {
-                tmp <- parLapply(cl, chain[[i]][[j]],
-                                 function(x, i, j, theta, getScores, k, n)
-                             {
-                                 f <- RSiena:::FRANstore()
-                                 resp <- .Call("getChainProbabilitiesList",
-                                               PACKAGE = pkgname, x,
-                                               f$pData, f$pModel, as.integer(i),
-                                               as.integer(j), f$myeffects,
-                                               theta, getScores)
-                                 lik <-
-                                     getLikelihood(resp[[1]], nactors[[i]],
-                                                   theta[k])
-                                 if (getScores)
-                                 {
-                                     sc <- resp[[2]]
-                                 }
-                                 else
-                                 {
-                                     sc <- NULL
-                                 }
-                                 list(lik=lik, sc=sc)
-                             }, i=i, j=j, theta=theta, getScores=getScores,
-                                 k=rateParameterPosition[[i]][[j]],
-                                 n=nactors[[i]]
-                                 )
-                lik <- sapply(tmp, function(x)x[[1]])
-                if (getScores)
-                {
-                    sc <- t(sapply(tmp, function(x)x[[2]]))
-                }
-                else
-                {
-                    sc <- NULL
-                }
-            }
-            else
-            {
-                lik <- rep(0, length(chain[[i]][[j]]))
-                sc <- matrix(0, nrow=length(chain[[i]][[j]]),
-                             ncol=length(theta))
-                for (k in 1:length(chain[[i]][[j]])) # one chain
-                {
-                    resp <- .Call("getChainProbabilitiesList",
-                                  PACKAGE = pkgname,
-                                  chain[[i]][[j]][[k]],
-                                  f$pData, f$pModel, as.integer(i),
-                                  as.integer(j), f$myeffects, theta,
-                                  getScores)
 
-                    lik[k] <-
-                        getLikelihood(resp[[1]], nactors[[i]],
-                                      theta[rateParameterPosition[[i]][[j]]])
-                    if (getScores)
-                    {
-                        sc[k,] <- resp[[2]]
-                    }
-                }
-            }
-        }
+    groupPeriods <- attr(f, "groupPeriods")
+    callGrid <- cbind(rep(1:f$nGroup, groupPeriods - 1),
+                      as.vector(unlist(sapply(groupPeriods - 1,
+                                              function(x) 1:x))))
+    nIter <- length(chain) / nrow(callGrid)
+    if (!is.null(cl) )
+    {
+        use <- 1:min(length(chain), length(cl))
+        tmp <- parLapply(cl[use], chain, getProbs, theta=theta,
+                         getScores=getScores,
+                         ratePar=rateParameterPosition, nactors=nactors
+                         )
+    }
+    else
+    {
+        tmp <- lapply(chain, getProbs, theta=theta, getScores=getScores,
+                     ratePar=rateParameterPosition, nactors=nactors)
+    }
+    lik <- sapply(tmp, function(x)x[[1]])
+    lik <- matrix(lik, ncol=nIter)
+    if (getScores)
+    {
+        sc <- t(sapply(tmp, function(x)x[[2]]))
+        dim(sc) <- c(nrow(lik), nIter, length(theta))
+    }
+    else
+    {
+        sc <- NULL
     }
     list(lik=lik, sc=sc)
 }
 
 ##getProbabilitiesFromCStore algorithms Uses stored changed contributions in C
+## probably does not work. will not get scores.
 getProbabilitiesFromCStore <- function(chain, theta, nactors,
                                        rateParameterPosition,
                                        evalParameterPosition,
@@ -287,11 +303,11 @@ getProbabilitiesFromCStore <- function(chain, theta, nactors,
 {
     f <-  RSiena:::FRANstore()
 
-    for (i in 1:length(chain))
+    for (i in 1:length(chain)) ## group
     {
         nactors <- nactors[[i]]
         ratePar <- rateParameterPosition[[i]]
-        for (j in 1:length(chain[[i]]))
+        for (j in 1:length(chain[[i]])) ## period
         {
             thisRatePar <- ratePar[[j]]
             rateth <- theta[thisRatePar]
@@ -321,6 +337,7 @@ getProbabilitiesFromCStore <- function(chain, theta, nactors,
 }
 
 ##@getProbabilitiesR algorithms Uses stored changes in R
+## probably does not work. will not calculate scores.
 getProbabilitiesR <- function(chain, theta, nactors, rateParameterPosition,
                      evalParameterPosition, endowParameterPosition)
 {
@@ -374,20 +391,24 @@ getProbabilitiesR <- function(chain, theta, nactors, rateParameterPosition,
     list(lik=mysum)
 }
 
-getLikelihood <- function(chain, nactors, lambda)
+getLikelihood <- function(chain)#, nactors, lambda)
 {
     loglik <- 0
-    ncvals <- sapply(chain, function(x)x[[3]])
-    nc <- nactors
-    nc[] <- 0
-    ncvals <- table(ncvals)
-    nc[names(ncvals)] <- ncvals
+   # ncvals <- sapply(chain, function(x)x[[3]])
+   # nc <- nactors
+   # nc[] <- 0
+   # ncvals <- table(ncvals)
+   # nc[names(ncvals)] <- ncvals
     logChoiceProb <- sapply(chain, function(x)x[[9]])
     logOptionSetProb <- sapply(chain, function(x)x[[8]])
-    loglik <- sum(logChoiceProb)  #+ sum(logOptionSetProb)
+    loglik <- sum(logChoiceProb)  + sum(logOptionSetProb)
     #print(sum(logOptionSetProb))
-    loglik <- loglik - sum(nactors * lambda) + sum(nc * log(lambda))-
-        sum(lfactorial(nc))
+    #loglik <- loglik - sum(nactors * lambda) + sum(nc * log(lambda))-
+    #    sum(lfactorial(nc))
+    mu <- attr(chain, "mu")
+    sigma <- sqrt(attr(chain, "sigma2"))
+    finalReciprocalRate <- attr(chain, "finalReciprocalRate")
+    loglik <- loglik + dnorm(1, mu, sigma, log=TRUE) + log(finalReciprocalRate)
     loglik
 }
 
@@ -455,7 +476,7 @@ doOptimStep <- function(z, x)
     z$par <- theta -  move * (theta - tmp$par)
     z$par[z$posj] <- exp(z$par[z$posj])
     z$theta <- z$par
-    cat(z$theta, move,'\n')
+    #cat(z$theta, move,'\n')
     z
 }
 
@@ -465,7 +486,7 @@ derivFn <- function(theta, z)
     sc <- getLikelihoods(theta, z$zzz, z, getScores=TRUE)$sc
     sc <- colMeans(sc)
     sc[z$posj] <- sc[z$posj] * theta[z$posj]
-    if (z$useHistory && z$iter > 1)
+    if (z$useHistory && z$iter > 1) #was 5
     {
         prevScores <- sapply(z$storedZZZ, function(x)
                          {
@@ -484,10 +505,16 @@ derivFn <- function(theta, z)
                              }
                          }
                              )
-
-        weight <- 1 - sum(z$optimWeights[1 : (z$iter - 1)])
-        sc <- weight * sc + rowSums(rep(z$optimWeights, each=length(z$theta)) *
-            prevScores)
+        use <- max(1, z$iter - 3) : (z$iter - 1)
+        use1 <- 1 : min(3, z$iter - 1)
+        useWeights <- z$optimWeights[use1]
+        sumWeights <- sum(useWeights)
+        weights <- useWeights * z$optimWeight / sumWeights
+        weight <- 1 - z$optimWeight
+        weights <- rev(weights)
+       # browser()
+        sc <- weight * sc + rowSums(rep(weights, each=length(z$theta)) *
+            prevScores[, use, drop=FALSE])
     }
    # print(sc)
 
@@ -499,7 +526,7 @@ derivFn2 <- function(theta, z)
     theta[z$posj] <- exp(theta[z$posj])
     tmp <- getLikelihoods(theta, z$zzz, z, getScores=TRUE)
     sc <- tmp$sc
-    sc[, z$posj] <- sc[, z$posj] * rep(theta[z$posj], each=z$nIter)
+    sc[, z$posj] <- sc[, z$posj] * rep(theta[z$posj], each=nrow(sc))
     loglik <- tmp$lik
     ps <- exp(loglik - z$lik0)
     if (z$verbose)
@@ -528,8 +555,20 @@ optimFn <- function(theta, z)
                              }
                          }
                              )
-        weight <- 1 - sum(z$optimWeights[1 : (z$iter - 1)])
-        loglik <- weight * loglik + sum(z$optimWeights * prevLoglik)
+    #    use <- 1 : min(10, (z$iter - 5))
+        use1 <- 1 : min(3, (z$iter - 1))
+        use <- max(1, z$iter - 3) : (z$iter - 1)
+        useWeights <- z$optimWeights[use1]
+        sumWeights <- sum(useWeights)
+        weights <- useWeights * z$optimWeight / sumWeights
+        weight <- 1 - z$optimWeight
+        weights <- rev(weights)
+        #browser()
+       # print(sumWeights)
+       # print(sum(weights))
+       # print(weights)
+       # print(weight)
+        loglik <- weight * loglik + sum(weights * prevLoglik[use])
     }
     - loglik
 }
@@ -544,10 +583,13 @@ optimFn2 <- function(theta, z)
 }
 getPredictions <- function(theta, z, predictions=TRUE)
 {
-
     ps <- getLikelihoods(theta, z$zzz, z)$lik
-    ## cat(ps,'\n')
-    ps <- exp(unlist(ps) - z$lik0)
+   ##browser()
+   # ps <- colSums(ps)
+   #  cat(ps,"\n")
+   # browser()
+   # ps <- exp(unlist(ps) - z$lik0)
+    ps <- exp(ps - z$lik0)
     rawps <- ps
     ps <- ps / sum(ps)
     if (z$verbose && any(!is.na(ps)))
@@ -562,7 +604,11 @@ getPredictions <- function(theta, z, predictions=TRUE)
         }
         else
         {
-            predictions <-  apply(z$fra[, 1, ], 2, function(x) sum(x*ps))
+            fras <- apply(z$fra, 3, function(x) colSums(x*ps))
+            ## dim fras is nwaves-1 by number of parameters (vector if nwaves=2)
+            ## so recreate it
+            dim(fras) <- dim(z$fra)[2:3]
+            predictions <- colSums(fras) - z$targets
         }
         list(predictions=predictions, varPs=var(ps), ps)
     }
@@ -578,19 +624,15 @@ algorithmsInitialize <-
              finalIter=100, optimMaxit=1, optimWeight=0.7, useHistory=FALSE,
              optimSchedule=c(rep(c(20, 50, 100), c(10, 10, 10))),
              responseSurface=FALSE, variedThetas=FALSE,
-             optimFinal=2, useOptimFinal=TRUE, nbrNodes=1)
+             optimFinal=2, useOptimFinal=TRUE, nbrNodes=1,
+             returnDataFrame=FALSE)
 {
     ##Report(openfiles=TRUE, type="n", silent=TRUE) #initialise with no file
-
-    ## do initial call to FRAN. Need to fix FRAN so these need not be set.
     z  <-  NULL
-    z$FinDiff.method <- FALSE
     ## get the function: simstats or maxlikec
     z$FRAN <- getFromNamespace(x$FRANname, pos=grep("RSiena",
                                                    search())[1])
     z$maxlike <- x$maxlike
-    z$int <- 1
-    z$int2 <- 1
     x$cconditional <-  FALSE
     z$gain <- scale
     z$diag <- diag
@@ -613,6 +655,7 @@ algorithmsInitialize <-
     z$thetasub <- 0
     z$variedThetas <- variedThetas
     z$nbrNodes <- nbrNodes
+    z$returnDataFrame <- returnDataFrame
     if (!is.null(x$randomSeed))
     {
         set.seed(x$randomSeed)
@@ -626,26 +669,34 @@ algorithmsInitialize <-
     }
 
     z <- RSiena:::initializeFRAN(z, x, data, effects, prevAns=NULL,
-                        initC=FALSE, profileData=FALSE,
-                        returnDeps=TRUE)
+                                 initC=FALSE, profileData=FALSE,
+                                 returnDeps=FALSE)
 
 
     if (z$nbrNodes > 1)
     {
         require(snow)
         require(rlecuyer)
-        clusterString=rep("localhost", nbrNodes)
+        clusterString <- rep("localhost", nbrNodes)
         z$cl <- makeCluster(clusterString, type = "SOCK",
                             outfile = "cluster.out")
+   ##     clusterCall(z$cl, function(x)print(ls(envir=.GlobalEnv)))
+    ##    clusterCall(z$cl, function(x)print(search()))
+     ##   clusterCall(z$cl, function(x)print(gc()))
         clusterCall(z$cl, library, pkgname, character.only = TRUE)
         clusterCall(z$cl, RSiena:::storeinFRANstore,  RSiena:::FRANstore())
         ans <- clusterCall(z$cl, RSiena:::FRANstore)
         ans <-  clusterCall(z$cl, RSiena:::initializeFRAN, z, x,
                             initC = TRUE,
-                            profileData=FALSE, returnDeps=TRUE)
-        ans <- clusterCall(z$cl, source, "algorithms.r")
+                            profileData=FALSE, returnDeps=FALSE)
+        ans <- clusterCall(z$cl, source,
+                           "~ruth/nuffieldsiena/inst/examples/algorithms.r")
         clusterSetupRNG(z$cl,
                         seed = as.integer(runif(6, max=.Machine$integer.max)))
+        if (z$maxlike)
+        {
+            z$int2 <- nbrNodes
+        }
     }
 
 
@@ -690,6 +741,10 @@ algorithmsInitialize <-
     z$formula <- paste(z$formula, "~ 1:")
     z
 }
+doSimstats <- function(i, z)
+{
+    RSiena:::simstats0c(z, NULL, returnDeps=FALSE, returnChains=TRUE)
+}
 
 getSamples <- function(z, x, nIter, thetas=NULL)
 {
@@ -704,59 +759,83 @@ getSamples <- function(z, x, nIter, thetas=NULL)
     {
         doDeriv <- FALSE
     }
-    if (z$nbrNodes > 1 && (!z$maxlike || nrow(thetas) > 1))
+    if (z$nbrNodes > 1 && (!z$maxlike || nrow(thetas) > 1 || z$observations > 2))
     {
         zsmall <- RSiena:::makeZsmall(z)
-        if (!z$maxlike) # straight repeats with same theta
+        if (nrow(thetas) == 1) # straight repeats with same theta
         {
-            tmp <- parLapply(z$cl, 1:nIter, function(i, z)
-                         {
-                             RSiena:::simstats0c(z, NULL, returnDeps=TRUE)
-                         }, z=zsmall
-                             )
-            fra <- t(sapply(tmp, function(x) colSums(x$fra)- z$targets))
-            dim(fra) <- c(nIter, 1, z$pp)
-            sc <- t(sapply(tmp, function(x)x[[2]]))
-            dim(sc) <- c(nIter, 1, z$pp)
-            z$fra <- fra
-            z$ssc <- sc
-            zzz <- lapply(tmp, function(x)x[[8]][[1]][[1]])
-            zzz <- list(list(zzz))
-            z$lik0 <- getLikelihoods(z$theta, zzz, z, getScores=FALSE)$lik
-        }
+            if (z$maxlike)
+            {
+                ## not a parLapply as we only parallelize by wave and
+                ## this is done in maxlikec automatically controlled by z$int2
+                tmp <- lapply(1:nIter, function(i, z)
+                          {
+                              RSiena:::maxlikec(z, NULL, returnDeps=FALSE,
+                                                returnChains=TRUE)
 
+                          },
+                              z=zsmall
+                              )
+                sdf <- t(sapply(tmp, function(x) x$dff))
+                dim(sdf) <- c(nIter, length(z$theta), length(z$theta))
+                sc <- array(0, dim=c(nIter, z$observations - 1, length(z$theta)))
+            }
+            else
+            {
+                tmp <- parLapply(z$cl, 1:nIter, doSimstats, z=zsmall)
+                sc <- t(sapply(tmp, function(x)x$sc))
+                nobs <- dim(tmp[[1]]$fra)[1]
+                dim(sc) <- c(nIter, nobs, z$pp)
+                sdf <- array(0, dim=c(nIter, length(z$theta), length(z$theta)))
+            }
+            fra <- t(sapply(tmp, function(x)x$fra))
+            nobs <- dim(tmp[[1]]$fra)[1]
+            dim(fra) <- c(nIter, nobs, z$pp)
+            z$fra <- fra
+            zzz <- lapply(tmp, function(x)x$chain)
+            lik <- sapply(zzz, getLikelihoodLocal, theta=z$theta,
+                                     z=z)
+            ## dim(lik) will be number of waves - 1 by number of samples.
+            dim(lik) <- c(nobs, nIter)
+            z$lik0 <- colSums(lik)
+        }
         else ## multiple different thetas. Keep same thetas on one process
         {
-            sc <- array(0, dim=c(nIter, 1, length(z$theta)))
+            sc <- array(0, dim=c(nIter, z$observations - 1, length(z$theta)))
             niter <- ceiling(nIter / nrow(thetas))
             oldtheta <- z$theta
-            tmp <- parRapply(z$cl, thetas, function(th, z, n)
+                   ##alternative: turn off z$int2 and use parRapply here.
+                ## need another function defined outside this one to reduce
+                ##traffic
+           tmp <- apply(thetas, 1, function(th, z, n)
                          {
                              z$theta <- th
-                             lapply(1:n, function(i, z1)
+                             tt <- lapply(1:n, function(i, z1)
                                 {
                                     RSiena:::maxlikec(z1, NULL,
-                                                      returnDeps=TRUE ,
-                                                      INIT=FALSE,
-                                                      TERM=FALSE)
+                                                      returnChains=TRUE)
                                 }, z1=z)
+                             tt
                          }, z=zsmall, n=niter)
 
             ## likelihood
-
-            z$lik0 <- as.vector(sapply(1:length(tmp), function(i, tt, th)
-                       {
-                           tt <- tt[[i]]
-                           th <- th[i, ]
-                           zzz <-
-                               list(list(lapply(tt,
-                                                function(x)x[[7]][[1]][[1]])))
-                           lik0 <- getLikelihoods(th,
-                                                  zzz, z, getScores=FALSE)$lik
-                       }, tt=tmp, th=thetas))
+            z$lik0 <-
+                c(sapply(1:length(tmp), function(i, tt, th)
+                     {
+                         tt <- tt[[i]]
+                         th <- th[i, ]
+                         zzz <- lapply(tt, function(x) x$chain)
+                         lik <- sapply(zzz, function(xx)
+                                        getLikelihoodLocal(xx, theta=th, z=z))
+                         dim(lik) <- c(z$observations - 1, niter)
+                         colSums(lik)
+                     }, tt=tmp, th=thetas))
             ##fra
-            fra <- sapply(tmp, function(i) t(sapply(i, function(x)x$fra)))
-            dim(fra) <- c(niter*nrow(thetas), 1, z$pp)
+            fra <- lapply(tmp, function(i) lapply(i, function(x)x$fra))
+            fra <- do.call(c, fra)
+            fra <- array(unlist(fra),
+                         dim=c(z$observations - 1, z$pp, length(fra)))
+            fra <- aperm(fra, c(3, 1, 2))
             ##deriv
             sdf <- array(0, dim=c(niter*nrow(thetas),
                             length(z$theta), length(z$theta)))
@@ -770,23 +849,20 @@ getSamples <- function(z, x, nIter, thetas=NULL)
 
             ## chains
             zzz <- lapply(tmp, function(y)
-                          lapply(y, function(x)x[[7]][[1]][[1]]))
-            zzz <- do.call(c, zzz)
-            zzz <- list(list(zzz))
+                          lapply(y, function(x)x$chain))
+           zzz <- do.call(c, zzz)
             z$theta <- oldtheta
         }
     }
     else
     {
-        zzz <- lapply(1:z$nGroup, function(x)
-                      lapply(1:z$groupPeriods[x], function(y)
-                             vector("list", nIter)))
-        fra <- array(0, dim=c(nIter, 1, length(z$theta)))
-        sc <- array(0, dim=c(nIter, 1, length(z$theta)))
+        zzz <- vector("list", nIter)
+        fra <- array(0, dim=c(nIter, z$observations - 1, length(z$theta)))
+        sc <- array(0, dim=c(nIter, z$observations - 1, length(z$theta)))
         sdf <- array(0, dim=c(nIter, length(z$theta), length(z$theta)))
         z$startTheta <- z$theta
         thetasub <- 1
-        lik0 <- rep(NA, nIter)
+        lik0 <- matrix(NA, ncol=nIter, nrow=z$observations - 1)
         oldtheta <- z$theta
         for (i in (1:nIter))
         {
@@ -799,8 +875,8 @@ getSamples <- function(z, x, nIter, thetas=NULL)
             {
                 thetasub <- 1
             }
-            ans <- myfran(z, x)
-            fra[i, , ] <- colSums(ans$fra) - z$targets ## statistics
+            ans <- myfran(z, x, returnChains=TRUE)
+            fra[i, , ] <- ans$fra ## statistics
             if (x$maxlike)
             {
                 sdf[i, , ] <- ans$dff
@@ -809,40 +885,17 @@ getSamples <- function(z, x, nIter, thetas=NULL)
             {
                 sc[i, , ] <- ans$sc
             }
-            for (ii in 1:z$nGroup)
-            {
-                for (jj in 1:z$groupPeriods[ii])
-                {
-                    zzz[[ii]][[jj]][[i]] <- ans$chain[[ii]][[jj]]
-                }
-            }
+            zzz[[i]] <- ans$chain
             if (nrow(thetas) > 1)
             {
-                lik0[i] <-
-                    sum(sapply(1:z$nGroup, function(x, chains,
-                                                    periods,
-                                                    nactors,
-                                                    ratePar)
-                           {
-                               chains <- chains[[x]]
-                               nactors <- nactors[[x]]
-                               ratePar <- ratePar[[x]]
-                               sapply(1:periods[x], function(y)
-                                  {
-                                      getLikelihood(chains[[y]], nactors,
-                                                    z$theta[ratePar[[y]]])
-                                  })
-                           }, chains=ans$chain, periods=z$groupPeriods,
-                               nactors=z$nactors,
-                               ratePar=z$rateParameterPosition))
-
+                lik0[, i] <- getLikelihoodLocal(ans$chain,z, z$theta)
             }
         }
         if (nrow(thetas) == 1)
         {
-            lik0 <- getLikelihoods(z$theta, zzz, z, getScores=FALSE)$lik
-        }
-        z$lik0 <- lik0
+           lik0[] <- sapply(zzz, getLikelihoodLocal, theta=z$theta, z=z)
+      }
+        z$lik0 <- colSums(lik0)
         z$theta <- oldtheta
     }
     z$zzz <- zzz
@@ -870,9 +923,45 @@ getSamples <- function(z, x, nIter, thetas=NULL)
   #      z$dfra <- NULL
   #      z$dinv <- NULL
     }
+    ## flatten list of chains and add group and period as attributes
+    z$zzz <- flattenChains(z$zzz)
     z
 }
 
+flattenChains <- function(zz)
+{
+    for (i in 1:length(zz)) ## iter
+    {
+        for (j in 1:length(zz[[i]])) ##group
+        {
+            for (k in 1:length(zz[[i]][[j]])) ## period
+            {
+                attr(zz[[i]][[j]][[k]], "group") <- j
+                attr(zz[[i]][[j]][[k]], "period") <- k
+            }
+        }
+    }
+    zz <- do.call(c, zz)
+    zz <- do.call(c, zz)
+    zz
+}
+
+getLikelihoodLocal <- function(chains, z, theta)
+{
+    sapply(1:z$nGroup, function(x, chains, periods, nactors, ratePar)
+       {
+           chains2 <- chains[[x]]
+           nactors <- nactors[[x]]
+           ratePar <- ratePar[[x]]
+           sapply(1:periods[x], function(y)
+              {
+                  getLikelihood(chains2[[y]])#, nactors,
+                                ##z$theta[ratePar[[y]]])
+              })
+       }, chains=chains, periods=z$groupPeriods,
+           nactors=z$nactors,
+           ratePar=z$rateParameterPosition)
+}
 getLikelihoods <- function(newTheta, zzz, z, getScores=FALSE)
 {
     if (z$useC)
@@ -898,12 +987,17 @@ getLikelihoods <- function(newTheta, zzz, z, getScores=FALSE)
                        z$evalParameterPosition,
                        z$endowParameterPosition)
     }
+    ps$lik <- colSums(ps$lik)
+    if (!is.null(ps$sc))
+    {
+        ps$sc <- colSums(ps$sc)
+    }
     ps
 }
 ##@myfran models wrapper so profiler will include this separately
-myfran <- function(z, x)
+myfran <- function(z, x, ...)
 {
-    z$FRAN(z, x)
+    z$FRAN(z, x, ...)
 }
 
 doAlgorithmChangeStep <- function(z, x, fra)
@@ -1068,7 +1162,7 @@ profileLikelihoods <- function(resp, x, data, effects,
         {
             z$zzz <- resp$zzz
         }
-        z$importanceSamplingWeights <- rep(1, length(z$zzz[[1]][[1]]))
+        z$importanceSamplingWeights <- rep(1, nIter)
     }
     theta <- z$theta
     theta[z$posj] <- log(theta[z$posj])

@@ -51,9 +51,10 @@ createEffects <- function(effectGroup, xName=NULL, yName=NULL, name,
     if (!all(is.na(effects$endowment)))
     {
         neweffects <- effects[rep(1:nn,
-                               times=(1 + as.numeric(effects$endowment))), ]
-        neweffects$type <-  unlist(lapply(effects$endowment, function(x) if (x)
-                                       c('eval', 'endow') else 'eval'))
+                               times=(1 + 2 * as.numeric(effects$endowment))), ]
+        neweffects$type <-
+            unlist(lapply(effects$endowment, function(x) if (x)
+                          c('eval', 'endow', 'creation') else 'eval'))
         effects <- neweffects
         nn <- nrow(effects)
     }
@@ -306,10 +307,13 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         #objEffects <- createObjEffectList(objEffects, varname)
         #rateEffects <- createRateEffectList(rateEffects, varname)
 
-        ## replace the text for endowment effects
+        ## replace the text for endowment and creation effects
         tmp <- objEffects$functionName[objEffects$type =='endow']
         tmp <- paste('Lost ties:', tmp)
         objEffects$functionName[objEffects$type == 'endow'] <- tmp
+        tmp <- objEffects$functionName[objEffects$type =='creation']
+        tmp <- paste('New ties:', tmp)
+        objEffects$functionName[objEffects$type == 'creation'] <- tmp
 
         ## get starting values
         starts <- getNetworkStartingVals(depvar)
@@ -504,10 +508,13 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         rateEffects[1:noPeriods, 'initialValue'] <-  starts$startRate
         rateEffects$basicRate[1:observations] <- TRUE
 
-        ## alter the text for endowment names
+        ## alter the text for endowment and creation names
         objEffects$effectName[objEffects$type == 'endow'] <-
             sub('behavior', 'dec. beh.',
                 objEffects$effectName[objEffects$type == 'endow'])
+        objEffects$effectName[objEffects$type == 'creation'] <-
+            sub('behavior', 'inc. beh.',
+                objEffects$effectName[objEffects$type == 'creation'])
 
         list(effects = rbind(rateEffects = rateEffects,
              objEffects = objEffects), starts=starts)
@@ -666,6 +673,9 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         objEffects$functionName[objEffects$type == 'endow'] <-
             paste('Lost ties:',
                   objEffects$functionName[objEffects$type =='endow'])
+        objEffects$functionName[objEffects$type == 'creation'] <-
+            paste('New ties:',
+                  objEffects$functionName[objEffects$type =='creation'])
 
         ## get starting values
         starts <- getBipartiteStartingVals(depvar)

@@ -27,7 +27,7 @@ namespace siena
 class MiniStep;
 class Data;
 class State;
-
+class MLSimulation;
 
 // ----------------------------------------------------------------------------
 // Section: Class definition
@@ -53,9 +53,12 @@ public:
 	void clear();
 	void insertBefore(MiniStep * pNewMiniStep, MiniStep * pExistingMiniStep);
 	void remove(MiniStep * pMiniStep);
-	void connect(int period);
+	void connect(int period, MLSimulation * pMLSimulation);
 	void onReciprocalRateChange(const MiniStep * pMiniStep, double newValue);
 	void changeInitialState(const MiniStep * pMiniStep);
+	void recreateInitialState();
+	void createInitialStateDifferences();
+	void addInitialStateDifference(MiniStep * pMiniStep);
 
 	// Accessors
 
@@ -64,6 +67,7 @@ public:
 	MiniStep * pFirst() const;
 	MiniStep * pLast() const;
 	const State * pInitialState() const;
+	const vector<MiniStep * > & pInitialStateDifferences() const;
 	int ministepCount() const;
 	int diagonalMinistepCount() const;
 	int consecutiveCancelingPairCount() const;
@@ -71,6 +75,8 @@ public:
 	int missingBehaviorMiniStepCount() const;
 	double mu() const;
 	double sigma2() const;
+	double finalReciprocalRate() const;
+	void finalReciprocalRate(double value);
 	void printConsecutiveCancelingPairs() const;
 
 	// Intervals
@@ -83,6 +89,11 @@ public:
 	MiniStep * firstMiniStepForOption(const Option & rOption) const;
 	MiniStep * nextMiniStepForOption(const Option & rOption,
 		const MiniStep * pFirstMiniStep) const;
+
+	// Same dyad related
+
+	MiniStep * pFirstMiniStepForLink(const MiniStep * pLinkMiniStep) const;
+	MiniStep * pLastMiniStepForLink(const MiniStep * pLinkMiniStep) const;
 
 	// Random draws
 
@@ -118,6 +129,10 @@ private:
 	// The initial state of the variables (denoted y_init in the specification)
 	State * lpInitialState;
 
+	// The initial state of the variables stored as a vector of ministeps
+	// relative to data (to save space)
+	vector<MiniStep *> linitialStateDifferences;
+
 	// Stores the ministeps in no particular order.
 	// The first (dummy) ministep is not stored in this vector.
 
@@ -140,6 +155,9 @@ private:
 
 	// Sum of squared reciprocal rates over all non-dummy ministeps.
 	double lsigma2;
+
+	// Final reciprocal rate when updating part por all of the probabilities.
+	double lfinalReciprocalRate;
 
 	// Maps each option to its first ministep in the chain (if any)
 	map<const Option, MiniStep *> lfirstMiniStepPerOption;

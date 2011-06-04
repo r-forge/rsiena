@@ -57,6 +57,7 @@ DependentVariable::DependentVariable(string name,
 	this->lcovariateRates = new double[this->n()];
 	this->lpEvaluationFunction = new Function();
 	this->lpEndowmentFunction = new Function();
+	this->lpCreationFunction = new Function();
 }
 
 
@@ -243,7 +244,11 @@ void DependentVariable::initializeRateFunction()
 			}
 		}
 	}
-
+	if (this->lstructuralRateEffects.size() > 0)
+	{
+		this->lstructuralRateEffectCandidates.resize(
+			this->lstructuralRateEffects.size());
+	}
 	// If there are no rate effects depending on changing covariates,
     // or behavior variables then the covariate based rates can be calculated
 	// just once.
@@ -256,6 +261,9 @@ void DependentVariable::initializeRateFunction()
 }
 
 
+/**
+ * Creates the evaluation effects and stores them in the evaluation function.
+ */
 void DependentVariable::initializeEvaluationFunction()
 {
 	this->initializeFunction(this->lpEvaluationFunction,
@@ -263,10 +271,23 @@ void DependentVariable::initializeEvaluationFunction()
 }
 
 
+/**
+ * Creates the endowment effects and stores them in the endowment function.
+ */
 void DependentVariable::initializeEndowmentFunction()
 {
 	this->initializeFunction(this->lpEndowmentFunction,
 		this->lpSimulation->pModel()->rEndowmentEffects(this->name()));
+}
+
+
+/**
+ * Creates the tie creation effects and stores them in the creation function.
+ */
+void DependentVariable::initializeCreationFunction()
+{
+	this->initializeFunction(this->lpCreationFunction,
+		this->lpSimulation->pModel()->rCreationEffects(this->name()));
 }
 
 
@@ -291,6 +312,7 @@ DependentVariable::~DependentVariable()
 {
 	delete this->lpEvaluationFunction;
 	delete this->lpEndowmentFunction;
+	delete this->lpCreationFunction;
 	delete[] this->lrate;
 	delete[] this->lcovariateRates;
 
@@ -304,7 +326,7 @@ DependentVariable::~DependentVariable()
 	this->lcovariateRates = 0;
 	this->lpEvaluationFunction = 0;
 	this->lpEndowmentFunction = 0;
-
+	this->lpCreationFunction = 0;
 }
 
 
@@ -1264,8 +1286,20 @@ bool DependentVariable::validMiniStep(const MiniStep * pMiniStep,
 {
 	return true;
 }
+/**
+ * Updates basic rate effect parameters. Not necessary in Bayesian context
+ * unless to copy froma another process. But necessary when calculating
+ * probabilities for chains with a new theta. Which might include a new rate.
+ * If included with the other parameters in updateEffectParameters,
+ * must copy all sampled parameters to the model also.
+ */
 
-
+void DependentVariable::updateBasicRate(int period)
+{
+	this->lbasicRate =
+		this->lpSimulation->pModel()->basicRateParameter(this->pData(),
+			period);
+}
 /**
  * Updates effect parameters
  */
@@ -1294,6 +1328,76 @@ void DependentVariable::updateEffectParameters()
 		Effect * pEffect = pFunction->rEffects()[i];
 		pEffect->parameter(rEffects2[i]->parameter());
 	}
+
+	// Update the creation effect parameters
+
+	const vector<EffectInfo *> rCreationEffectInfos =
+		this->lpSimulation->pModel()->rCreationEffects(this->name());
+	pFunction = this->pCreationFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		Effect * pEffect = pFunction->rEffects()[i];
+		pEffect->parameter(rCreationEffectInfos[i]->parameter());
+	}
+
+	// find the Rate effectInfos
+	const vector<EffectInfo *>  rRateEffects =
+		this->lpSimulation->pModel()->rRateEffects(this->name());
+
+	vector < StructuralRateEffect * >::iterator iter =
+		this->lstructuralRateEffects.begin();
+	const Data * pData = this->lpSimulation->pData();
+
+	for (unsigned i = 0; i < rRateEffects.size(); i++)
+	{
+		EffectInfo * pEffectInfo = rRateEffects[i];
+		string interactionName = pEffectInfo->interactionName1();
+		string rateType = pEffectInfo->rateType();
+
+		if (rateType == "covariate")
+		{
+			ConstantCovariate * pConstantCovariate =
+				pData->pConstantCovariate(interactionName);
+			ChangingCovariate * pChangingCovariate =
+				pData->pChangingCovariate(interactionName);
+			const BehaviorVariable * pBehaviorVariable =
+				(const BehaviorVariable *)
+				this->lpSimulation->pVariable(interactionName);
+
+			if (pConstantCovariate)
+			{
+				this->lconstantCovariateParameters[pConstantCovariate] =
+					pEffectInfo->parameter();
+			}
+			else if (pChangingCovariate)
+			{
+				this->lchangingCovariateParameters[pChangingCovariate] =
+					pEffectInfo->parameter();
+			}
+			else if (pBehaviorVariable)
+			{
+				this->lbehaviorVariableParameters[pBehaviorVariable] =
+					pEffectInfo->parameter();
+			}
+			else
+			{
+				throw logic_error(
+					"No individual covariate named '" +
+					interactionName +
+					"'.");
+			}
+		}
+		else
+		{
+			// assume everything is is the right order!
+			StructuralRateEffect *pEffect = *iter;
+			//	Rprintf("%f %f to effect \n", pEffect->parameter(),
+			//		pEffectInfo->parameter());
+			pEffect->parameter(pEffectInfo->parameter());
+			iter++;
+		}
+	}
 }
 /**
  * Updates effect info parameters from the effects (used if accepted)
@@ -1302,7 +1406,7 @@ void DependentVariable::updateEffectParameters()
 void DependentVariable::updateEffectInfoParameters()
 {
 	// find the Evaluation effectInfos
-	const vector<EffectInfo *>  rEffects=
+	const vector<EffectInfo *>  rEffects =
 		this->lpSimulation->pModel()->rEvaluationEffects(this->name());
 
 	const Function * pFunction = this->pEvaluationFunction();
@@ -1313,7 +1417,7 @@ void DependentVariable::updateEffectInfoParameters()
 		rEffects[i]->parameter(pEffect->parameter());
 	}
 	// find the Endowment effectInfos
-	const vector<EffectInfo *>  rEffects2=
+	const vector<EffectInfo *>  rEffects2 =
 	 this->lpSimulation->pModel()->rEndowmentEffects(this->name());
 
 	pFunction = this->pEndowmentFunction();
@@ -1323,6 +1427,75 @@ void DependentVariable::updateEffectInfoParameters()
 		Effect * pEffect =	pFunction->rEffects()[i];
 		rEffects2[i]->parameter(pEffect->parameter());
 	}
+
+	// Update parameters for creation effect infos
+
+	const vector<EffectInfo *>  rCreationEffectInfos =
+		this->lpSimulation->pModel()->rCreationEffects(this->name());
+
+	pFunction = this->pCreationFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		Effect * pEffect =	pFunction->rEffects()[i];
+		rCreationEffectInfos[i]->parameter(pEffect->parameter());
+	}
+
+	// find the Rate effectInfos
+	const vector<EffectInfo *>  rRateEffects =
+	 this->lpSimulation->pModel()->rRateEffects(this->name());
+
+	const Data * pData = this->lpSimulation->pData();
+	int index = 0;
+	for (unsigned i = 0; i < rRateEffects.size(); i++)
+	{
+		EffectInfo * pEffectInfo = rRateEffects[i];
+		string interactionName = pEffectInfo->interactionName1();
+		string rateType = pEffectInfo->rateType();
+		if (rateType == "covariate")
+		{
+				ConstantCovariate * pConstantCovariate =
+					pData->pConstantCovariate(interactionName);
+				ChangingCovariate * pChangingCovariate =
+					pData->pChangingCovariate(interactionName);
+				const BehaviorVariable * pBehaviorVariable =
+					(const BehaviorVariable *)
+						this->lpSimulation->pVariable(interactionName);
+
+				if (pConstantCovariate)
+				{
+					pEffectInfo->parameter(
+						this->lconstantCovariateParameters[pConstantCovariate]);
+				}
+				else if (pChangingCovariate)
+				{
+					pEffectInfo->parameter(
+						this->lchangingCovariateParameters[pChangingCovariate]);
+				}
+				else if (pBehaviorVariable)
+				{
+					pEffectInfo->parameter(
+						this->lbehaviorVariableParameters[pBehaviorVariable]);
+				}
+				else
+				{
+					throw logic_error(
+						"No individual covariate named '" +
+						interactionName +
+						"'.");
+				}
+		}
+		else
+		{
+			// assume everything is is the right order!
+			vector < double > candidates =
+				this->lstructuralRateEffectCandidates[index];
+			double candidate = candidates.back();
+			//	Rprintf("%f to effectinfo \n",candidate);
+			pEffectInfo->parameter(candidate);
+			index++;
+		}
+	}
 }
 
 /**
@@ -1331,9 +1504,9 @@ void DependentVariable::updateEffectInfoParameters()
  */
 void DependentVariable::sampleBasicRate(int miniStepCount)
 {
-	this->lbasicRate = nextGamma(miniStepCount + 1, 1.0 / this->n());
+	this->lbasicRate = nextGamma(miniStepCount , 1.0 / this->n());
 	this->sampledBasicRates(this->lbasicRate);
-	this->sampledBasicRatesDistributions(miniStepCount + 1);
+	this->sampledBasicRatesDistributions(miniStepCount );
 	this->lvalidRates = false;
 }
 /**
@@ -1377,6 +1550,77 @@ double DependentVariable::sampleParameters(double scaleFactor)
 		priorold += normalDensity(pEffect->parameter(), 0, priorSD,	true);
 		pEffect->parameter(candidate);
 	}
+
+	pFunction = this->pCreationFunction();
+
+	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	{
+		Effect * pEffect = pFunction->rEffects()[i];
+		double candidate = pEffect->parameter() + nextNormal(0, scaleFactor);
+		priornew += normalDensity(candidate, 0, priorSD, true);
+		pMLSimulation->candidates(pEffect->pEffectInfo(), candidate);
+		priorold += normalDensity(pEffect->parameter(), 0, priorSD,	true);
+		pEffect->parameter(candidate);
+	}
+
+	// now the rate effects (can use for Bayes without scores or derivs)
+
+	for (std::map<const ConstantCovariate *, double>::iterator iter =
+			this->lconstantCovariateParameters.begin();
+		iter != this->lconstantCovariateParameters.end();
+		iter++)
+	{
+		const ConstantCovariate * pCovariate = iter->first;
+		double parameter = iter->second;
+		double candidate = parameter + nextNormal(0, scaleFactor);
+		priornew += normalDensity(candidate, 0, priorSD, true);
+		this->lconstantCovariateCandidates[pCovariate].push_back(candidate);
+		priorold += normalDensity(parameter, 0, priorSD, true);
+		iter->second = candidate;
+	}
+
+	for (std::map<const ChangingCovariate *, double>::iterator iter =
+			this->lchangingCovariateParameters.begin();
+		iter != this->lchangingCovariateParameters.end();
+		iter++)
+	{
+		const ChangingCovariate * pCovariate = iter->first;
+		double parameter = iter->second;
+		double candidate = parameter + nextNormal(0, scaleFactor);
+		priornew += normalDensity(candidate, 0, priorSD, true);
+		this->lchangingCovariateCandidates[pCovariate].push_back(candidate);
+		priorold += normalDensity(parameter, 0, priorSD, true);
+		iter->second = candidate;
+	}
+
+	for (std::map<const BehaviorVariable *, double>::iterator iter =
+			this->lbehaviorVariableParameters.begin();
+		iter != this->lbehaviorVariableParameters.end();
+		iter++)
+	{
+		const BehaviorVariable * pCovariate = iter->first;
+		double parameter = iter->second;
+		double candidate = parameter + nextNormal(0, scaleFactor);
+		priornew += normalDensity(candidate, 0, priorSD, true);
+		this->lbehaviorVariableCandidates[pCovariate].push_back(candidate);
+		priorold += normalDensity(parameter, 0, priorSD, true);
+		iter->second = candidate;
+	}
+
+	int effectCount = this->lstructuralRateEffects.size();
+
+	for (int effectIndex = 0; effectIndex < effectCount; effectIndex++)
+	{
+		StructuralRateEffect * pEffect =
+			this->lstructuralRateEffects[effectIndex];
+		double parameter = pEffect->parameter();
+		double candidate = parameter + nextNormal(0, scaleFactor);
+		priornew += normalDensity(candidate, 0, priorSD, true);
+		this->lstructuralRateEffectCandidates[effectIndex].push_back(candidate);
+		priorold += normalDensity(parameter, 0, priorSD, true);
+		pEffect->parameter(candidate);
+	}
+
 	return priornew - priorold;
 }
 /**
@@ -1387,6 +1631,136 @@ void DependentVariable::clearSampledBasicRates()
 {
   this->lsampledBasicRates.clear();
 }
+
+/**
+ * Clears the rate parameters candidate stores.
+ */
+
+void DependentVariable::clearRateCandidates()
+{
+  this->lconstantCovariateCandidates.clear();
+  this->lchangingCovariateCandidates.clear();
+  this->lbehaviorVariableCandidates.clear();
+  for (vector < vector<double> >::iterator iter =
+	  this->lstructuralRateEffectCandidates.begin();
+		iter != this->lstructuralRateEffectCandidates.end();
+		iter++)
+  {
+	  iter->clear();
+  }
+}
+
+/**
+ * Returns the sampled constant covariate rate parameter
+ * for the given iteration.
+ */
+double DependentVariable::constantCovariateCandidates(const ConstantCovariate *
+	pConstantCovariate, unsigned iteration) const
+{
+ 	map<const ConstantCovariate *, vector<double> >::const_iterator iter =
+		this->lconstantCovariateCandidates.find(pConstantCovariate);
+	double candidate = 0;
+
+	if (iter != this->lconstantCovariateCandidates.end())
+	{
+		if (iteration < iter->second.size())
+		{
+			candidate = iter->second[iteration];
+		}
+		else
+		{
+			throw std::out_of_range("The number" + toString(iteration) +
+				" is not in the range [0," +
+				toString(iter->second.size()) + "].");
+		}
+	}
+	return candidate;
+}
+
+/**
+ * Returns the sampled chqnging covariate rate parameter
+ * for the given iteration.
+ */
+double DependentVariable::changingCovariateCandidates(const ChangingCovariate *
+	pChangingCovariate, unsigned iteration) const
+{
+ 	map<const ChangingCovariate *, vector<double> >::const_iterator iter =
+		this->lchangingCovariateCandidates.find(pChangingCovariate);
+	double candidate = 0;
+
+	if (iter != this->lchangingCovariateCandidates.end())
+	{
+		if (iteration < iter->second.size())
+		{
+			candidate = iter->second[iteration];
+		}
+		else
+		{
+			throw std::out_of_range("The number" + toString(iteration) +
+				" is not in the range [0," +
+				toString(iter->second.size()) + "].");
+		}
+	}
+	return candidate;
+}
+
+/**
+ * Returns the sampled behavior variable rate parameter
+ * for the given iteration.
+ */
+double DependentVariable::behaviorVariableCandidates(const BehaviorVariable *
+	pBehaviorVariable, unsigned iteration) const
+{
+ 	map<const BehaviorVariable *, vector<double> >::const_iterator iter =
+		this->lbehaviorVariableCandidates.find(pBehaviorVariable);
+	double candidate = 0;
+
+	if (iter != this->lbehaviorVariableCandidates.end())
+	{
+		if (iteration < iter->second.size())
+		{
+			candidate = iter->second[iteration];
+		}
+		else
+		{
+			throw std::out_of_range("The number" + toString(iteration) +
+				" is not in the range [0," +
+				toString(iter->second.size()) + "].");
+		}
+	}
+	return candidate;
+}
+
+/**
+ * Returns the sampled basic rate parameter for the given iteration.
+ */
+
+double DependentVariable::structuralRateCandidates(unsigned index,
+	unsigned iteration) const
+{
+	if (index < this->lstructuralRateEffectCandidates.size())
+	{
+		if (iteration < this->lstructuralRateEffectCandidates[index].size())
+		{
+			return this->lstructuralRateEffectCandidates[index][iteration];
+		}
+		else
+		{
+			throw std::out_of_range("The number" + toString(iteration) +
+				" is not in the range [0," +
+				toString(this->lstructuralRateEffectCandidates[index].size()) + "].");
+		}
+	}
+	else
+	{
+			throw std::out_of_range("The number" + toString(index) +
+				" is not in the range [0," +
+				toString(this->lstructuralRateEffectCandidates.size()) + "].");
+
+	}
+
+}
+
 /**
  * Returns the sampled basic rate parameter for the given iteration.
  */

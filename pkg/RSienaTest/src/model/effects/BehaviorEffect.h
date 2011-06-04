@@ -53,6 +53,8 @@ public:
 	virtual double evaluationStatistic(double * currentValues);
 	virtual double endowmentStatistic(const int * difference,
 		double * currentValues);
+	virtual double creationStatistic(int * difference,
+		double * currentValues);
 	virtual double egoStatistic(int ego, double * currentValues);
 
 protected:

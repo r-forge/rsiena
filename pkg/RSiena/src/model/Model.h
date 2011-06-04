@@ -85,6 +85,7 @@ public:
 	const vector<EffectInfo *> & rRateEffects(string variableName) const;
 	const vector<EffectInfo *> & rEvaluationEffects(string variableName) const;
 	const vector<EffectInfo *> & rEndowmentEffects(string variableName) const;
+	const vector<EffectInfo *> & rCreationEffects(string variableName) const;
 
 	void chainStore(const Chain& chain, int periodFromStart);
 	vector <Chain *> & rChainStore( int periodFromStart);
@@ -205,6 +206,9 @@ private:
 
 	// A vector of endowment effects per variable
 	map<string, vector<EffectInfo *> > lendowmentEffects;
+
+	// A vector of creation effects per variable
+	map<string, vector<EffectInfo *> > lcreationEffects;
 
 	// A dummy vector of effect infos in case we need a reference to
 	// non-existent vectors

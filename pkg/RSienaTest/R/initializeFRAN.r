@@ -488,43 +488,67 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
 
     if (x$maxlike)
     {
-        ## set up chains and do initial steps
-        simpleRates <- TRUE
-
-        types <- attr(f, "types")
-        nbrNonMissNet <- attr(f, "numberNonMissingNetwork")
-        nbrMissNet <- attr(f, "numberMissingNetwork")
-        nbrNonMissBeh <- attr(f, "numberNonMissingBehavior")
-        nbrMissBeh <- attr(f, "numberMissingBehavior")
-
-        z$prmin <-   nbrMissNet/ (nbrMissNet + nbrNonMissNet)
-        if (sum(nbrMissBeh + nbrNonMissBeh) > 0)
+        simpleRates <- TRUE ## get a sensible test for this soon!
+        if (any(!z$effects$basicRate & z$effects$type =="rate"))
         {
-            z$prmib <-   nbrMissBeh/ (nbrMissBeh + nbrNonMissBeh)
+           # browser()
+            simpleRates <- FALSE
         }
-        else
+        z$simpleRates <- simpleRates
+        if (!initC)
         {
-            z$prmib <- rep(0, length(nbrMissBeh))
-        }
-        ## cat (z$prmin, z$prmib, '\n')
-        z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms,
-                     x$prdrms)
-        cat(z$probs,'\n')
-        ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
-                     simpleRates, z$probs, z$prmin, z$prmib,
-                     x$minimumPermutationLength,
-                     x$maximumPermutationLength,
-                     x$initialPermutationLength)
+            ## set up chains and do initial steps
 
-        f$minimalChain <- ans[[1]]
-        f$chain <- ans[[2]]
-      #  print(nrow(ans[[1]][[1]]))
-      #  print(nrow(ans[[2]][[1]]))
-      # browser()
-        ##store address of simulation object
-       # f$pMLSimulation <- ans[[1]][[1]]
-        #ans1 <- reg.finalizer(f$pMLSimulation, clearMLSimulation,
-         #                     onexit = FALSE)
+            types <- attr(f, "types")
+            nbrNonMissNet <- attr(f, "numberNonMissingNetwork")
+            nbrMissNet <- attr(f, "numberMissingNetwork")
+            nbrNonMissBeh <- attr(f, "numberNonMissingBehavior")
+            nbrMissBeh <- attr(f, "numberMissingBehavior")
+
+            if (sum(nbrMissNet + nbrNonMissNet) > 0)
+            {
+                z$prmin <- nbrMissNet/ (nbrMissNet + nbrNonMissNet)
+            }
+            else
+            {
+                z$prmin <- rep(0, length(nbrMissNet))
+            }
+            if (sum(nbrMissBeh + nbrNonMissBeh) > 0)
+            {
+                z$prmib <-   nbrMissBeh/ (nbrMissBeh + nbrNonMissBeh)
+            }
+            else
+            {
+                z$prmib <- rep(0, length(nbrMissBeh))
+            }
+            ## cat (z$prmin, z$prmib, '\n')
+            z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms,
+                         x$prdrms)
+            cat(z$probs,'\n')
+            ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
+                         simpleRates, z$probs, z$prmin, z$prmib,
+                         x$minimumPermutationLength,
+                         x$maximumPermutationLength,
+                         x$initialPermutationLength)
+
+            f$minimalChain <- ans[[1]]
+            f$chain <- ans[[2]]
+            f$simpleRates <- simpleRates
+            ##  print(nrow(ans[[1]][[1]]))
+            ##  print(nrow(ans[[2]][[1]]))
+            ## browser()
+        }
+        else ## set up the initial chains in the sub processes
+        {
+            ans <- .Call("mlInitializeSubProcesses",
+                         PACKAGE=pkgname, pData, pModel,
+                         simpleRates, z$probs, z$prmin, z$prmib,
+                         x$minimumPermutationLength,
+                         x$maximumPermutationLength,
+                         x$initialPermutationLength, ff$chain, ff$missingChain)
+            f$chain <- ff$chain
+            f$missingChain <- ff$missingChain
+       }
     }
     f$myeffects <- myeffects
     f$myCompleteEffects <- myCompleteEffects
@@ -607,15 +631,15 @@ createEdgeLists<- function(mat, matorig, bipartite)
     ## add attribute of size
     if (bipartite)
     {
-        attr(mat1,'nActors') <- c(nrow(mat), ncol(mat))
-        attr(mat2,'nActors') <- c(nrow(mat), ncol(mat))
-        attr(mat3,'nActors') <- c(nrow(mat), ncol(mat))
+        attr(mat1, 'nActors') <- c(nrow(mat), ncol(mat))
+        attr(mat2, 'nActors') <- c(nrow(mat), ncol(mat))
+        attr(mat3, 'nActors') <- c(nrow(mat), ncol(mat))
     }
     else
     {
-        attr(mat1,'nActors') <- nrow(mat)
-        attr(mat2,'nActors') <- nrow(mat)
-        attr(mat3,'nActors') <- nrow(mat)
+        attr(mat1, 'nActors') <- nrow(mat)
+        attr(mat2, 'nActors') <- nrow(mat)
+        attr(mat3, 'nActors') <- nrow(mat)
     }
 
     list(mat1 = t(mat1), mat2 = t(mat2), mat3 = t(mat3))
@@ -643,8 +667,8 @@ createCovarEdgeList<- function(mat, matorig)
               }, y = matorig)
     mat2 <- do.call(rbind, tmp)
     ## add attribute of size
-    attr(mat1,'nActors1') <- nrow(mat)
-    attr(mat1,'nActors2') <- ncol(mat)
+    attr(mat1, 'nActors1') <- nrow(mat)
+    attr(mat1, 'nActors2') <- ncol(mat)
     list(mat1=t(mat1), mat2=t(mat2))
 }
 ##@unpackOneMode siena07 Reformat data for C++
@@ -986,14 +1010,14 @@ unpackOneMode <- function(depvar, observations, compositionChange)
             if (i < observations)
             {
                 ## recreate distances, as we have none in c++. (no longer true)
-                mymat1 <- depvar[,,i, drop=FALSE]
-                mymat2 <- depvar[,,i + 1,drop=FALSE]
+                mymat1 <- depvar[, ,i, drop=FALSE]
+                mymat2 <- depvar[, ,i + 1, drop=FALSE]
                 ##remove structural values
-                mymat1[mymat1 %in% c(10,11)] <- NA
-                mymat2[mymat2 %in% c(10,11)] <- NA
+                mymat1[mymat1 %in% c(10, 11)] <- NA
+                mymat2[mymat2 %in% c(10, 11)] <- NA
                 ## and the diagonal
-                diag(mymat1[,,1]) <- 0
-                diag(mymat2[,,1]) <- 0
+                diag(mymat1[, ,1]) <- 0
+                diag(mymat2[, ,1]) <- 0
                 mydiff <- mymat2 - mymat1
                 attr(depvar, 'distance')[i] <- sum(mydiff != 0,
                                                    na.rm = TRUE)
@@ -1607,6 +1631,11 @@ fixUpEffectNames <- function(effects)
                gsub("#", y$parm, y$functionName)
            }, y=effects)
 
+    if (any(effects$shortName == "behUnspInt" & effects$include &
+                            effects$effect1 > 0))
+    {
+        stop("User specified behavior interactions are not yet implemented")
+    }
     ##validate user-specified network interactions
     interactions <- effects[effects$shortName == "unspInt" & effects$include &
                             effects$effect1 > 0, ]
@@ -1652,8 +1681,8 @@ fixUpEffectNames <- function(effects)
 					#		   "with different specifications eval/endow/rate ",
 					#		   "trying with experimental code. Remove these ",
 					#		   "Interactions if this does not work.")
-                       stop("invalid interaction specification: ",
-                            "must be same type: evaluation or endowment")
+                       stop("invalid interaction specification: must",
+                            "be same type: evaluation, endowment or creation")
                    }
                }
                else
@@ -1667,8 +1696,8 @@ fixUpEffectNames <- function(effects)
                    if (inter1$type != inter2$type ||
                        inter1$type != inter3$type)
                    {
-                       stop("invalid interaction specification:",
-                            "must all be same type: evaluation or endowment")
+                       stop("invalid interaction specification: must all be",
+                            "same type: evaluation, endowment or creation")
                    }
                }
                ## check types

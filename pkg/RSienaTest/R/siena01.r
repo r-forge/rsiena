@@ -1167,14 +1167,14 @@ siena01Gui <- function(getDocumentation=FALSE)
                                    width=20, values=ff, cursor="arrow"))
     ## insert them in the table, and set focus bindings?
     lapply(1:tableRows, function(x)
-              {
-                  mypos <- paste(x, ',',4, sep='')
-                  tkwindow.configure(table1, mypos, window=formatspins[[x]])
-                  tkbind(formatspins[[x]], "<FocusIn>",
-                         function(y){tcl(table1,"activate", "1,4")
-                                     tkXselection.own(selection=y)})
-              }
-                  )
+       {
+           mypos <- paste(x, ',',4, sep='')
+           tkwindow.configure(table1, mypos, window=formatspins[[x]])
+           tkbind(formatspins[[x]], "<FocusIn>",
+                  function(y){tcl(table1,"activate", "1,4")
+                              tkXselection.own(selection=y)})
+       }
+           )
 
     ##create spinboxes for type
     typelist <- c("network", "bipartite", "behavior", "constant covariate",

@@ -1,3 +1,57 @@
+2011-06-04 R-forge revision 153
+
+	* R/effects.r, R/initializeFRAN.r, R/print07Report.r, R/sienaprint.r,
+	src/model/effects/BehaviorEffect.cpp, src/model/effects/BehaviorEffect.h,
+	src/model/effects/NetworkEffect.cpp, src/model/effects/NetworkEffect.h,
+	src/model/EpochSimulation.cpp,
+	src/model/ml/BehaviorChange.cpp, src/model/ml/BehaviorChange.h,
+	src/model/ml/NetworkChange.cpp, src/model/ml/NetworkChange.h,
+	src/model/model.cpp, src/model/model.h,
+	src/model/StatisticCalculator.cpp, src/model/StatisticCalculator.h,
+	src/model/variables/BehaviorVariable.cpp,
+	src/model/variables/BehaviorVariable.h,
+	src/model/variables/DependentVariable.cpp,
+	src/model/variables/DependentVariable.h,
+	src/model/variables/NetworkVariable.cpp,
+	src/model/variables/NetworkVariable.h,
+	src/siena07internals.cpp: creation effects (incomplete)
+	* src/model/variables/NetworkVariable.cpp,
+	src/model/variables/NetworkVariable.h:
+	Minor changes to algorithm for model type B.
+	* R/initializeFRAN.r, R/maxlikec.r, R/phase3.r, R/simstats0c.r
+	src/model/ml/BehaviorChange.cpp, src/model/ml/BehaviorChange.h,
+	src/model/ml/Chain.cpp, src/model/ml/Chain.h,
+	src/model/ml/MiniStep.cpp, src/model/ml/MiniStep.h,
+	src/model/ml/MLSimulation.cpp, src/model/ml/MLSimulation.h
+	src/model/ml/NetworkChange.cpp, src/model/ml/NetworkChange.h,
+	src/siena07models.cpp, src/siena07setup.cpp, src/siena07setup.h,
+	src/siena07utilities.cpp, src/siena07utilities.h: ML work in progress.
+	Includes corrections for bipartites, new parameter to return the chains,
+	construction of initial chain corrected with constraints between
+	networks, variable permutation lengths
+	* R/bayes.r, src/model/effects/StructuralRateEffect.cpp,
+	src/model/effects/StructuralRateEffect.h,
+	src/model/EpochSimulation.cpp, src/model/EpochSimulation.h,
+	src/model/ml/BehaviorChange.cpp, src/model/ml/BehaviorChange.h,
+	src/model/variables/DependentVariable.cpp,
+	src/model/variables/DependentVariable.h, src/siena07internals.cpp,
+	src/siena07models.cpp, inst/examples/algorithms.r, int/examples/runalg.r:
+	Bayes, algorithms (still incomplete)
+	* R/effectsMethods: fix bug which prevented time dummies showing
+	on a print of the effects object.
+	* R/phase3.r: minor change to code controlling iterations for
+	multiple processors. Stop allocating unnecessary arrays.
+	* R/siena07.r, R/siena01.r, R/sienatest.r,
+	src/model/effects/OutTruncEffect.cpp: reformatting only
+	* (RSienaTest only)
+	src/model/effects/EffectFactory.cpp, src/model/effects/AllEffects.h,
+	src/model/effects/generic/GwespFunction.cpp,
+	src/model/effects/generic/GwespFunction.h: replaced GwespEffects by a
+	generic one using a GwespFunction.
+	* doc/RSiena_Manual.tex rename from doc/s_man400.tex
+	*doc/RSienaDeveloper.tex: added C++ standards, notes about environment
+	variables for use when checking packages.
+
 2011-05-29 R-forge revision 152 RSienaTest only
 
 	* R/sienaGOF.r: Fixed a few bugs,  doc/s_400.tex: updated the script
