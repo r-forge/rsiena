@@ -441,7 +441,7 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 
 		// Once all network data has been stored, calculate some
 		// statistical properties of that data.
-		//pOneModeNetworkLongitudinalData->calculateProperties();
+		pOneModeNetworkLongitudinalData->calculateProperties();
 		//Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
 		//	averageInDegree(), pOneModeNetworkLongitudinalData->
 		//	averageOutDegree());
@@ -1518,6 +1518,22 @@ void getStatistics(SEXP EFFECTSLIST,
 						score = 0;
 					}
 				}
+				else if (strcmp(effectType, "creation") == 0)
+				{
+					EffectInfo * pEffectInfo = (EffectInfo *)
+						R_ExternalPtrAddr(
+							VECTOR_ELT(VECTOR_ELT(EFFECTS,
+									pointerCol), i));
+					statistic = pCalculator->statistic(pEffectInfo);
+					if (pEpochSimulation)
+					{
+						score = pEpochSimulation->score(pEffectInfo);
+					}
+					else
+					{
+						score = 0;
+					}
+				}
 				else
 				{
 					error("invalid effect type %s\n", effectType);
@@ -1686,6 +1702,14 @@ void getCandidatesAndShapes(SEXP EFFECTSLIST, int period, int group,
 
 	int storeCandidates = 0;
 
+	// create a set of counters for each variable so I can access the
+	// structural rate effect candidates.
+
+	vector<int> counters;
+	for (unsigned ii = 0; ii < pMLSimulation->rVariables().size(); ii++)
+	{
+		counters.push_back(0);
+	}
 	for (int ii = 0; ii < length(EFFECTSLIST); ii++)
 	{
 		const char * networkName =
@@ -1699,6 +1723,12 @@ void getCandidatesAndShapes(SEXP EFFECTSLIST, int period, int group,
 				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, effectCol),  i));
 			const char * effectType =
 				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), i));
+			const char * interaction1 =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, int1Col),i));
+			//	const char * netType =
+			//	CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, netTypeCol), i));
+			const char * rateType =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, rateTypeCol), i));
 			if (strcmp(effectType, "rate") == 0)
 			{
 				if (strcmp(effectName, "Rate") == 0)
@@ -1709,7 +1739,6 @@ void getCandidatesAndShapes(SEXP EFFECTSLIST, int period, int group,
 						INTEGER(VECTOR_ELT(EFFECTS, periodCol))[i];
 					if ((periodno - 1) == period && (groupno - 1) == group)
 					{
-						//TODO: make this work for more than one variable
 						const DependentVariable * pVariable =
 							pMLSimulation->pVariable(networkName);
 						for (int batch = 0; batch < nBatches; batch++)
@@ -1722,10 +1751,65 @@ void getCandidatesAndShapes(SEXP EFFECTSLIST, int period, int group,
 						}
 					}
 				}
+				else if (strcmp(rateType, "structural") == 0)
+				{
+					const DependentVariable * pVariable =
+						pMLSimulation->pVariable(networkName);
+					int id = pVariable->id();
+					int index = counters[id];
+					for (int batch = 0; batch < nBatches; batch++)
+					{
+						(*rcandidates)[storeCandidates + batch] =
+							pVariable->structuralRateCandidates(index, batch);
+						(*ibayesshapes)[storeCandidates + batch] = 0;
+					}
+					counters[id] ++;
+				}
 				else
 				{
-					error("Non constant rate effects are not %s",
-						"implemented for maximum likelihood.");
+					ConstantCovariate * pConstantCovariate =
+						pData->pConstantCovariate(interaction1);
+					ChangingCovariate * pChangingCovariate =
+						pData->pChangingCovariate(interaction1);
+					BehaviorVariable * pBehavior =
+						(BehaviorVariable *)
+						pMLSimulation->pVariable(interaction1);
+
+					const DependentVariable * pVariable =
+						pMLSimulation->pVariable(networkName);
+
+					if (pConstantCovariate)
+					{
+						for (int batch = 0; batch < nBatches; batch++)
+						{
+							(*rcandidates)[storeCandidates + batch] =
+								pVariable->
+								constantCovariateCandidates(
+									pConstantCovariate, batch);
+							(*ibayesshapes)[storeCandidates + batch] = 0;
+						}
+					}
+					else if (pChangingCovariate)
+					{
+						for (int batch = 0; batch < nBatches; batch++)
+						{
+							(*rcandidates)[storeCandidates + batch] =
+								pVariable->
+								changingCovariateCandidates(
+									pChangingCovariate, batch);
+							(*ibayesshapes)[storeCandidates + batch] = 0;
+						}
+					}
+					else if (pBehavior)
+					{
+						for (int batch = 0; batch < nBatches; batch++)
+						{
+							(*rcandidates)[storeCandidates + batch] =
+								pVariable->
+								behaviorVariableCandidates(pBehavior, batch);
+							(*ibayesshapes)[storeCandidates + batch] = 0;
+						}
+					}
 				}
 			}
 			else

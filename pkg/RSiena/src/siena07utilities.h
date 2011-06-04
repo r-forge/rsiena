@@ -18,6 +18,7 @@ namespace siena
     class Network;
 	class MiniStep;
 	class Chain;
+	class State;
 }
 using namespace std;
 using namespace siena;
@@ -51,6 +52,7 @@ void printOutData(Data *pData);
 SEXP getBehaviorValues(const BehaviorVariable & behavior);
 SEXP getAdjacency(const Network& net);
 SEXP getEdgeList(const Network& net);
+
 /**
  * utilities to access chains and ministeps
  *
@@ -58,9 +60,14 @@ SEXP getEdgeList(const Network& net);
 namespace siena
 {
 	SEXP getMiniStepDF(const MiniStep& miniStep);
-	SEXP getChainDF(const Chain& chain);
+	SEXP getChainDF(const Chain& chain, bool sort=true);
 	SEXP getMiniStepList(const MiniStep& miniStep, int period,
 		const EpochSimulation& epochSimulation);
-	SEXP getChainList(const Chain& chain, const EpochSimulation& epochSimulation);
+	SEXP getChainList(const Chain& chain,
+		const EpochSimulation& epochSimulation);
+	Chain * makeChainFromList(Data * pData, SEXP CHAIN, int period);
+	MiniStep * makeMiniStepFromList(Data * pData, SEXP MINISTEP, int period);
+	Chain * createMissingChain(int period, Data * data,
+		const State& initialState);
 }
 #endif /*SIENA07UTILITIES_H_*/

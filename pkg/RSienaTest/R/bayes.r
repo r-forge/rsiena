@@ -10,29 +10,32 @@
 ## ****************************************************************************/
 ##@bayes algorithm  fit a Bayesian model
 bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
-                 nrunMH=100, save=TRUE)
+                 nrunMH=100, save=TRUE, nbrNodes=1, seed=1)
 {
-    createStores <- function()
+    createStores <- function(z)
     {
+        npar <- length(z$theta)
+        basicRate <- z$basicRate
+        numberRows <- nmain * nrunMHBatches *
+                               (z$observations - 1)
         z$posteriorTot <- rep(0, npar)
         z$posteriorMII <- matrix(0, nrow=npar, ncol=npar)
-        z$lambdadist <- matrix(NA, nrow=nmain * nrunMHBatches,
-                               ncol=sum(basicRate))
-        z$lambdas  <- matrix(NA, nrow=nmain * nrunMHBatches,
-                             ncol=sum(basicRate))
-        z$betas <- matrix(NA, nrow=nmain * nrunMHBatches, ncol=sum(!basicRate))
-        z$candidates <- matrix(NA, nrow=nmain * nrunMHBatches,
-                               ncol=sum(!basicRate))
-        z$acceptances <- rep(NA, nmain * nrunMHBatches)
-        z$MHacceptances <- matrix(NA, nrow=nmain * nrunMHBatches, ncol=7)
-        z$MHrejections <- matrix(NA, nrow=nmain * nrunMHBatches , ncol=7)
-        z$MHproportions <- matrix(NA, nrow=nmain *  nrunMHBatches, ncol=7)
+        z$lambdadist <- matrix(NA, nrow=numberRows, ncol=sum(basicRate))
+        z$lambdas  <- matrix(NA, nrow=numberRows, ncol=sum(basicRate))
+        z$betas <- matrix(NA, nrow=numberRows, ncol=sum(!basicRate))
+        z$candidates <- matrix(NA, nrow=numberRows, ncol=sum(!basicRate))
+        z$acceptances <- rep(NA, numberRows)
+        z$MHacceptances <- matrix(NA, nrow=numberRows, ncol=7)
+        z$MHrejections <- matrix(NA, nrow=numberRows , ncol=7)
+        z$MHproportions <- matrix(NA, nrow=numberRows, ncol=7)
         z
     }
     storeData <- function()
     {
         start <- z$sub + 1
         nrun <- nrow(z$parameters)
+        basicRate <- z$basicRate
+        npar <- length(z$theta)
         end <- start + nrun - 1
         z$accepts <- as.logical(z$accepts)
         z$acceptances[start:end] <- z$accepts
@@ -43,7 +46,6 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         z$parameters[, !basicRate] <-
             carryForward(z$parameters[, !basicRate], z$betas[1:end,])
         z$betas[start:end, ] <- z$parameters[, !basicRate]
-
         z$posteriorTot <- z$posteriorTot + colSums(z$parameters)
         for (i in npar)
         {
@@ -56,7 +58,9 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         z$sub <- z$sub + nrun
         z
     }
-
+    ## we have removed the rejected values of betas and now want to fill in
+    ## the gaps by duplicating the previous value. Need to use last one from
+    ## previous or original theta if we have NA in first row.
     carryForward <- function(parameters, betas)
     {
         npar <- nrow(parameters)
@@ -64,6 +68,10 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         if (npar < nbeta)
         {
             parameters <- rbind(betas[(nbeta - npar), ], parameters)
+        }
+        else
+        {
+            parameters <- rbind(z$theta[!z$basicRate], parameters)
         }
         parameters <-
             apply(parameters, 2, function(x)
@@ -77,16 +85,8 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
                                  length(x) - x.pos[length(x.pos)] + 1))]
               }
                   )
-        if (npar < nbeta)
-        {
-            parameters[-1, ]
-        }
-        else
-        {
-            parameters
-        }
+        parameters[-1, ]
     }
-
     improveMH <- function(z, x, tiny=1.0e-15, desired=40, maxiter=100,
                           tolerance=15)
     {
@@ -119,7 +119,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             iter <- iter + 1
             z <- MCMCcycle(z, nrunMH=1, nrunMHBatches=100)
             actual <- z$BayesAcceptances ## acceptances
-            ans <- rescaleCGD(100)
+            ans <- rescaleCGD(100 * (z$observations - 1))
             z$scaleFactor <- z$scaleFactor * ans
             if (success | iter == maxiter)
             {
@@ -127,7 +127,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             }
             if (z$scaleFactor < tiny)
             {
-                cat('calefactor < tiny\n')
+                cat('scalefactor < tiny\n')
                 browser()
             }
         }
@@ -135,9 +135,19 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             z$scaleFactor, '\n')
        z
     }
+    ## ################################
+    ## start of function proper
+    ## ################################
 
-    ## initialise
-    Report(openfiles=TRUE, type="n") #initialise with no file
+    ## Should we save and restore theta if we use multiple processors?
+    ## Currently get separate thetas per wave (and then mix them up).
+    z <- initializeBayes(data, effects, model, nbrNodes, seed)
+    z <- createStores(z)
+
+    z$sub <- 0
+
+    z <- improveMH(z)
+
     if (!save)
     {
         require(lattice)
@@ -146,38 +156,6 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         dev.new()
         acceptsplot = dev.cur()
     }
-    z  <-  NULL
-    z$FinDiff.method <- FALSE
-    z$maxlike <- TRUE
-    model$maxlike <- TRUE
-    model$FRANname <- "maxlikec"
-    z$print <- FALSE
-    z$int <- 1
-    z$int2 <- 1
-    model$cconditional <-  FALSE
-    if (!is.null(model$randomSeed))
-    {
-        set.seed(model$randomSeed)
-    }
-    model$FRAN <- getFromNamespace(model$FRANname, pos=grep("RSiena",
-                                                   search())[1])
-    z <- model$FRAN(z, model, INIT=TRUE, data=data, effects=effects,
-                    returnDeps=TRUE)
-    ##if (useCluster)
-    ##   cl <- makeCluster(rep("localhost", 2), type = "SOCK")
-
-    is.batch(TRUE)
-
-    WriteOutTheta(z)
-
-    npar <- length(z$theta)
-    basicRate <- z$effects$basicRate
-    ##iter <- 0
-    z$numm <- 20
-    z$scaleFactor <- 1
-    z <- createStores()
-    z$sub <- 0
-    z <- improveMH(z)
 
     for (ii in 1:nwarm)
     {
@@ -187,16 +165,20 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 
     for (ii in 1:nmain)
     {
-        z <- MCMCcycle(z, nrunMH=100, nrunMHBatches=20)
+        z <- MCMCcycle(z, nrunMH=nrunMH, nrunMHBatches=nrunMHBatches)
         z <- storeData()
 
         numm <- z$numm
+
         if (ii %% 10 == 0 && !save) ## do some plots
         {
             cat('main after ii',ii,numm, '\n')
             dev.set(thetaplot)
-            thetadf <- data.frame(z$lambdas, z$betas)
-            acceptsdf <- data.frame(z$MHproportions[, 1:5],
+            basicRate <- z$basicRate
+            lambdas <- z$lambdas
+            lambdas[lambdas == 0] <- NA
+            thetadf <- data.frame(lambdas, z$betas)
+            acceptsdf <- data.frame(z$MHproportions,
                                     z$acceptances)
             lambdaNames <- paste(z$effects$name[basicRate],
                                  z$effects$shortName[basicRate],
@@ -204,20 +186,32 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
                                  z$effects$group[basicRate], sep=".")
             betaNames <- paste(z$effects$name[!basicRate],
                                z$effects$shortName[!basicRate], sep=".")
-            names(thetadf) <- c(lambdaNames, betaNames)
+            names(thetadf) <- make.names(c(lambdaNames, betaNames),
+                                         unique=TRUE)
             names(acceptsdf) <- c("InsDiag", "CancDiag", "Permute", "InsPerm",
-                                  "CancPerm", #"Missing",
+                                  "DelPerm", "InsMissing", "DelMissing",
                                   "BayesAccepts")
             varnames <- paste(names(thetadf), sep="", collapse= " + ")
             varcall <- paste("~ ", varnames,  sep="", collapse="")
             print(histogram(as.formula(varcall), data=thetadf, scales="free",
-                            outer=TRUE, breaks=NULL))
+                            outer=TRUE, breaks=NULL, type="density",
+                            panel=function(x, ...)
+                        {
+                            panel.histogram(x, ...)
+                            panel.densityplot(x, darg=list(na.rm=TRUE), ...)
+                        }
+                            ))
             dev.set(acceptsplot)
             varnames <- paste(names(acceptsdf), sep="", collapse= " + ")
             varcall <- paste("~ ", varnames,  sep="", collapse="")
             print(histogram(as.formula(varcall), data=acceptsdf,
                             scales=list(x="same", y="free"),
-                            outer=TRUE, breaks=NULL, type="density"))
+                            outer=TRUE, breaks=NULL, type="density",
+                            panel=function(x, ...)
+                        {
+                            panel.histogram(x, ...)
+                            panel.densityplot(x, darg=list(na.rm=TRUE), ...)
+                        }))
         }
     }
     z
@@ -225,17 +219,45 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 
 MCMCcycle <- function(z, nrunMH, nrunMHBatches)
 {
-    ## this function assumes only one period at the moment, but would deal with
-    ## multiple periods locally, calling MCMCcycle for each. Not yet available
-    ## in C, due to need to keep multiple chains in existence. I have not
-    ## decided how to do it yet!
-    period <- 1
-    group <- 1
-    f <- FRANstore()
-    ans <- .Call("MCMCcycle", PACKAGE=pkgname, f$pData, f$pModel,
-                 f$myeffects, as.integer(period),
-                 as.integer(group),
-                 z$scaleFactor, nrunMH, nrunMHBatches)
+    f <- FRANstore() ## retrieve info
+
+    ## set up a matrix of required group/periods
+    groupPeriods <- attr(f, "groupPeriods")
+    callGrid <- cbind(rep(1:f$nGroup, groupPeriods - 1),
+                      as.vector(unlist(sapply(groupPeriods - 1,
+                                              function(x) 1:x))))
+
+    ## z$int2 is the number of processors if iterating by period, so 1 means
+    ## we are not. Can only parallelize by period at the moment.
+    ## browser()
+    if (nrow(callGrid) == 1)
+    {
+        ans <- .Call("MCMCcycle", PACKAGE=pkgname, f$pData, f$pModel,
+                     f$myeffects, as.integer(1), as.integer(1),
+                     z$scaleFactor, nrunMH, nrunMHBatches)
+    }
+    else
+    {
+        if (z$int2 == 1)
+        {
+            anss <- apply(callGrid, 1, doMCMCcycle, z$scaleFactor,
+                          nrunMH, nrunMHBatches)
+        }
+        else
+        {
+            use <- 1:(min(nrow(callGrid), z$int2))
+            anss <- parRapply(z$cl[use], callGrid, doMCMCcycle, z$scaleFactor,
+                          nrunMH, nrunMHBatches)
+        }
+         ## reorganize the anss so it looks like the normal one
+        ans <- NULL
+        ans[[1]] <- c(sapply(anss, "[[", 1))## acceptances
+        ans[[2]] <- do.call(rbind, lapply(anss, "[[", 2))
+        ans[[3]] <- do.call(rbind, lapply(anss, "[[", 3))
+        ans[[4]] <- do.call(rbind, lapply(anss, "[[", 4))
+        ans[[5]] <- do.call(rbind, lapply(anss, "[[", 5))
+         ans[[6]] <- do.call(c, lapply(anss, "[[", 6))
+   }
     ## process the return values
     z$BayesAcceptances <- sum(ans[[1]])
     z$accepts <- ans[[1]]
@@ -243,8 +265,66 @@ MCMCcycle <- function(z, nrunMH, nrunMHBatches)
     z$shapes <- ans[[3]]
     z$MHaccepts <- ans[[4]]
     z$MHrejects <- ans[[5]]
+    z$chains <- ans[[6]]
     z
 }
 
+doMCMCcycle <- function(x, scaleFactor, nrunMH, nrunMHBatches)
+{
+    group <- x[1]
+    period <- x[2]
+    f <- FRANstore()
+    .Call("MCMCcycle", PACKAGE=pkgname, f$pData, f$pModel,
+                 f$myeffects, as.integer(period),
+                 as.integer(group),
+                 scaleFactor, nrunMH, nrunMHBatches)
+}
+
+initializeBayes <- function(data, effects, model, nbrNodes, seed)
+{
+    ## initialise
+    set.seed(seed)
+    Report(openfiles=TRUE, type="n") #initialise with no file
+    z  <-  NULL
+    z$FinDiff.method <- FALSE
+    z$maxlike <- TRUE
+    model$maxlike <- TRUE
+    model$FRANname <- "maxlikec"
+    z$print <- FALSE
+    z$int <- 1
+    z$int2 <- nbrNodes
+    model$cconditional <-  FALSE
+    if (!is.null(model$randomSeed))
+    {
+        set.seed(model$randomSeed)
+    }
+    model$FRAN <- getFromNamespace(model$FRANname, pos=grep("RSiena",
+                                                   search())[1])
+    z <- model$FRAN(z, model, INIT=TRUE, data=data, effects=effects)
+
+    is.batch(TRUE)
+
+    WriteOutTheta(z)
+
+    if (nbrNodes > 1)
+    {
+        require(snow)
+        require(rlecuyer)
+        clusterString <- rep("localhost", nbrNodes)
+        z$cl <- makeCluster(clusterString, type = "SOCK",
+                            outfile = "cluster.out")
+        clusterCall(z$cl, library, pkgname, character.only = TRUE)
+        clusterCall(z$cl, storeinFRANstore,  FRANstore())
+        clusterCall(z$cl, FRANstore)
+        clusterCall(z$cl, initializeFRAN, z, model,
+                            initC = TRUE, profileData=FALSE, returnDeps=FALSE)
+        clusterSetupRNG(z$cl,
+                        seed = as.integer(runif(6, max=.Machine$integer.max)))
+    }
+
+    z$numm <- 20
+    z$scaleFactor <- 1
 
 
+    z
+}

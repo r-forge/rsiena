@@ -33,18 +33,20 @@ public:
 	virtual ~MLSimulation();
 
     void initialize(int period);
+	void initializeInitialState(int period);
 	void connect(int period);
-    void updateProbabilities(const Chain * pChain,
-    	MiniStep * pFirstMiniStep,
-    	MiniStep * pLastMiniStep);
-    void executeMiniSteps(MiniStep * pFirstMiniStep, MiniStep * pLastMiniStep);
 	void preburnin();
 	void runEpoch(int period);
 	void MLStep();
 	void setUpProbabilityArray();
+    void updateProbabilities(Chain * pChain,
+    	MiniStep * pFirstMiniStep,
+    	MiniStep * pLastMiniStep);
+    void executeMiniSteps(MiniStep * pFirstMiniStep, MiniStep * pLastMiniStep);
 
 	int acceptances(int stepType) const;
 	int rejections(int stepType) const;
+	int aborted(int stepType) const;
 	Chain * pChain() const;
 	void pChain(Chain * pChain);
 	void pChainProbabilities(Chain * pChain, int period);
@@ -76,6 +78,8 @@ public:
 
 	void updateCurrentPermutationLength(bool accept);
 
+	void createEndStateDifferences();
+
 	// Bayesian routines
 	void initializeMCMCcycle();
 	void MHPstep();
@@ -91,7 +95,7 @@ private:
 		const MiniStep * pMiniStepA);
 	bool validDeleteMissingStep(MiniStep * pMiniStepA, bool applyTwice);
 	MiniStep * createMiniStep(const Option * pOption,
-		int difference = 0) const;
+		int difference, bool value) const;
 
 	Chain * lpChain;
 	bool lsimpleRates;
@@ -101,6 +105,7 @@ private:
 	double lprobabilityArray[7];
 	int lacceptances[7];
 	int lrejections[7];
+	int laborted[7];
 	vector<int> lBayesAcceptances;
 	map<const EffectInfo *, vector<double> > lcandidates;
 	double lmissingNetworkProbability;
@@ -108,7 +113,10 @@ private:
 	// current length of permuted interval
 	double lcurrentPermutationLength;
 	int lthisPermutationLength;
-	bool lphase1;
+	// The final state of the variables stored as a vector of ministeps
+	// relative to data (to save space)
+	vector<MiniStep *> lendStateDifferences;
+
 
 	// A vector of options with missing values in the initial observation
 	vector<const Option *> linitialMissingOptions;

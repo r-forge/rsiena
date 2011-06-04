@@ -64,6 +64,7 @@ public:
 	void initializeRateFunction();
 	void initializeEvaluationFunction();
 	void initializeEndowmentFunction();
+	void initializeCreationFunction();
 
 	inline const SimulationActorSet * pActorSet() const;
 	int n() const;
@@ -78,6 +79,7 @@ public:
 
 	inline const Function * pEvaluationFunction() const;
 	inline const Function * pEndowmentFunction() const;
+	inline const Function * pCreationFunction() const;
 
 	virtual void initialize(int period);
 	inline int period() const;
@@ -96,6 +98,7 @@ public:
 	double totalRate() const;
 	double rate(int actor) const;
 	inline double basicRate() const;
+	void updateBasicRate(int period);
 
 	int simulatedDistance() const;
 
@@ -157,7 +160,16 @@ public:
 	void sampledBasicRates(double value);
 	int sampledBasicRatesDistributions(unsigned iteration) const;
 	void sampledBasicRatesDistributions(int value);
+	double constantCovariateCandidates(const ConstantCovariate *
+		pConstantCovariate, unsigned iteration) const;
+	double changingCovariateCandidates(const ChangingCovariate *
+		pChangingCovariate, unsigned iteration) const;
+	double behaviorVariableCandidates(const BehaviorVariable *
+		pBehaviorVariable, unsigned iteration) const;
+	double structuralRateCandidates(unsigned index, unsigned iteration) const;
+
 	void clearSampledBasicRates();
+	void clearRateCandidates();
 
 protected:
 	inline EpochSimulation * pSimulation() const;
@@ -217,6 +229,9 @@ private:
 
 	// The endowment function for this variable
 	Function * lpEndowmentFunction;
+
+	// The creation function for this variable
+	Function * lpCreationFunction;
 
 	// The distance of this variable from the observed data at the beginning
 	// of the current period
@@ -307,6 +322,28 @@ private:
 	// parameters
 	vector<double> lsampledBasicRates;
 	vector<int> lsampledBasicRatesDistributions;
+	map<const ConstantCovariate *, vector<double> >
+		lconstantCovariateCandidates;
+	map<const ChangingCovariate *, vector<double> >
+		lchangingCovariateCandidates;
+	map<const BehaviorVariable *, vector<double> >
+		lbehaviorVariableCandidates;
+	vector< vector<double> > lstructuralRateEffectCandidates;
+
+/* 	map<const ConstantCovariate *, vector<double> >  */
+/* 		lconstantCovariateStoredParameters; */
+/* 	map<const ChangingCovariate *, vector<double> >  */
+/* 		lchangingCovariateStoredParameters; */
+/* 	map<const BehaviorVariable *, vector<double> >  */
+/* 		lbehaviorVariableStoredParameters; */
+/* 	map<const NetworkVariable *, vector<double> >  */
+/* 		loutDegreeStoredParameters; */
+/* 	map<const NetworkVariable *, vector<double> >  */
+/* 		linDegreeStoredParameters; */
+/* 	map<const NetworkVariable *, vector<double> >  */
+/* 		lreciprocalDegreeStoredParameters; */
+/* 	map<const NetworkVariable *, vector<double> >  */
+/* 		linverseOutDegreeStoredParameters; */
 
 };
 
@@ -348,6 +385,15 @@ const Function * DependentVariable::pEvaluationFunction() const
 const Function * DependentVariable::pEndowmentFunction() const
 {
 	return this->lpEndowmentFunction;
+}
+
+
+/**
+ * Returns the tie creation function of this variable.
+ */
+const Function * DependentVariable::pCreationFunction() const
+{
+	return this->lpCreationFunction;
 }
 
 
