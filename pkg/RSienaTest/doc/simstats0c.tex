@@ -575,7 +575,8 @@ the composition changes.
   removed. (not done yet!)
 \item[missing data] Create a separate edge list, and replace in the original one
   by 0 or any value in a preceding network. Similarly for
-    behavior variables: impute by 0 or last previous observation.
+    behavior variables: impute by last previous observation or next following or
+    mode for the wave.
 \item[structural zeros and ones] Create a separate edge list, and replace by
   (value-10) in the original one. To do: Make the value 10 a parameter,
     with any lower values non-structural and those higher structural.
@@ -600,9 +601,9 @@ present.
 \begin{description}
 \item[action] matrix with row for each actor, column for each observation.
 Values are \begin{enumerate}
-\item  Imputed or zeroed data is not preceded by real data
-\item  Imputed or zeroed data is both preceded and followed by real data
-\item  Imputed or zeroed data is not follwed by any real data
+\item  Data to be imputed or zeroed is not preceded or followed by real data
+\item  Data to be imputed or zeroed is preceded but not followed by real data
+\item  Data to be imputed or zeroed is both preceded and followed by real data
 \end{enumerate}
 \item[event] data frame with details of the events in the format required for
   C++ (see above!) (Actually exclude events at less then time 1e-10 here).

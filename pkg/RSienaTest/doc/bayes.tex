@@ -1,0 +1,103 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[pdftex,dvipsnames]{color}
+\usepackage{graphicx,times}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage[pdfstartview={}]{hyperref}
+\textheight=9.5in
+\textwidth=6.0in
+\topmargin=-0.5in
+\evensidemargin=0in
+\oddsidemargin=0in
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abso}[1]{\;\mid#1\mid\;}
+\renewcommand{\=}{\,=\,}
+\newcommand{\+}{\,+\,}
+% ----------------------------------------------------------------
+\newcommand{\remark}[1]{\par\noindent{\color[named]{ProcessBlue}#1}\par}
+\newcommand{\mcc}[2]{\multicolumn{#1}{c}{#2}}
+\newcommand{\mcp}[2]{\multicolumn{#1}{c|}{#2}}
+\newcommand{\nm}[1]{\textsf{\small #1}}
+\newcommand{\nnm}[1]{\textsf{\small\textit{#1}}}
+\newcommand{\nmm}[1]{\nnm{#1}}
+\newcommand{\R}{{\sf R }}
+\newcommand{\sfn}[1]{\textbf{\texttt{#1}}}
+\newcommand{\Rn}{{\sf R}}
+\newcommand{\rs}{{\sf RSiena}}
+\newcommand{\RS}{{\sf RSiena }}
+\newcommand{\SI}{{\sf Siena3 }}
+\newcommand{\Sn}{{\sf Siena3}}
+% no labels in list of references:
+\makeatletter
+\renewcommand\@biblabel{}
+\makeatother
+
+\hyphenation{Snij-ders Duijn DataSpecification dataspecification dependentvariable ModelSpecification}
+
+% centered section headings with a period after the number;
+% sans serif fonts for section and subsection headings
+\renewcommand{\thesection}{\arabic{section}.}
+\renewcommand{\thesubsection}{\thesection\arabic{subsection}}
+\makeatletter
+ \renewcommand{\section}{\@startsection{section}{1}
+                {0pt}{\baselineskip}{0.5\baselineskip}
+                {\centering\sffamily} }
+ \renewcommand{\subsection}{\@startsection{subsection}{2}
+                {0pt}{0.7\baselineskip}{0.3\baselineskip}
+                {\sffamily} }
+\makeatother
+
+\newcommand{\ts}[1]{\par{\color[named]{Red}TS: #1}\par}
+
+\renewcommand{\baselinestretch}{1.0} %% For line spacing.
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus1ex}
+\begin{document}
+
+\title{RSiena: Bayesian models}
+\author{Ruth Ripley}
+\date{}
+\maketitle
+
+\centerline{\emph{\today}}
+\bigskip
+\begin{enumerate}
+\item Input of a covariance matrix for the prior is mandatory: default the
+  identity times 10000.
+\item Input of a covariance matrix for the Bayesian proposal is optional: if
+  null it will be calculated from a few iterations of the MH step.
+\item Default number of iterations for this step if performed is 10.
+\item Could allow clever extraction of dfra from a previous result of siena07 or
+  bayes. Maybe this will work anyway via prevAns.
+\end{enumerate}
+\paragraph{Main algorithm}
+\begin{algorithmic}
+\STATE set up data in C as usual
+\STATE create minimal chain and do burnin
+\STATE Do $n$ groups of \sfn{nrunMH} steps to estimate \nnm{dfra} as in siena07
+\STATE Get scalefactors such that about 40 out of 100 Bayesian proposals after
+single MH steps are accepted. See below for details of
+generation and probabilities for Bayesian proposals.
+
+\end{algorithmic}
+\paragraph{Bayesian proposals}
+\label{sec:prop}
+\begin{algorithmic}
+\FORALL {groups}
+\STATE get a multivariate normal with mean 0 and covariance \nnm{dfra} *
+scale factor for this group
+\STATE Calculate the proposal probability:
+\begin{description}
+\item[prior] Multivariate normal density for the parameters with mean 0
+  and covariance as supplied in the input argument.
+\item[chain] Calculate sum of log probabilities of choice of variable/actor
+plus log choice probabilities.
+\end{description}
+\STATE The log probability of acceptance is then new - old  of log prior +
+log chain
+\ENDFOR
+\end{algorithmic}
+\end{document}
