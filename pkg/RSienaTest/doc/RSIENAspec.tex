@@ -310,7 +310,8 @@ per nodeset is allowed.
 \STATE Check that the ends of each interval in each object are not less than 1
 or greater than the number of waves and that each line has an even number of
 digits.
-\STATE Generate a data frame of events(section \ref{sec:events}), a matrix of active flags(section \ref{sec:active}) and a matrix
+\STATE Generate a data frame of events(section \ref{sec:events}),
+a matrix of activeStart flags(section \ref{sec:active}) and a matrix
 of actions(section \ref{sec:actions})\\
 \STATE Add these to the object as attributes
 \ENDFOR
@@ -325,11 +326,11 @@ of actions(section \ref{sec:actions})\\
 \sfn{ }\nnm{actor}\\
 \sfn{ }\nnm{time} between 0 and 1
 \end{algorithmic}
-\subsubsection{ActiveFlags}
+\subsubsection{ActiveStart Flags}
 \label{sec:active}
 \begin{algorithmic}
-\STATE Active flags matrix has a row per actor and a column per period\\
-\sfn{ }TRUE if the actor is present at the start of the period
+\STATE activeStart matrix has a row per actor and a column per period\\
+\sfn{ }TRUE if the actor is active at the start of the period
 \end{algorithmic}
 \subsubsection{Action}
 \label{sec:actions}

@@ -1,3 +1,9 @@
+2011-06-05 R-forge revision 154 RSienaTest only
+
+	* doc/missingsEtc.tex, doc/bayes.tex, doc.maxlikec.tex: added
+	* doc/RSienaSpec.tex, doc/simstats0c.tex: updated
+	* R/bayes.r, R/maxlikec.r, R/initializeFRAN.r: new Bayes routine
+
 2011-06-04 R-forge revision 153
 
 	* R/effects.r, R/initializeFRAN.r, R/print07Report.r, R/sienaprint.r,
