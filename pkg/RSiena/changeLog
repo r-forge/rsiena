@@ -1,3 +1,9 @@
+2011-06-12 R-forge revision 155
+
+	* R/initializeFRAN.r: fix bug re behavior variables with values 10 or 11
+	* data/allEffects.csv: alter short name for egoXaltX for symmetric
+	networks to match that for non-symmetric ones.
+
 2011-06-05 R-forge revision 154 RSienaTest only
 
 	* doc/missingsEtc.tex, doc/bayes.tex, doc.maxlikec.tex: added

@@ -1394,21 +1394,12 @@ unpackBehavior<- function(depvar, observations)
     {
             beh[is.na(beh[, i]), i] <-  beh[is.na(beh[, i]), i +1]
     }
-   #browser()
-   # for (i in seq(2:observations)
-   # {
-   #     if (i == 1)
-   #     {
-   #         beh[is.na(beh[, i]), i] <- modes[1]
-   #     else ##carry missing forward if there
-   #     {
-   #         beh[is.na(beh[, i]), i] <- ifelse(beh[is.na(beh[, i] , i - 1]
-   #             beh[is.na(beh[, i]), i - 1]
-   # }
-    struct <- beh[beh %in% c(10,11)]
-    beh[struct] <- beh[struct] - 10
-    behstruct <- beh
-    behstruct[!struct] <- 0
+    ## need a better definition of structural for behavior variables
+    ## struct <- beh %in% c(10, 11)
+    ## beh[struct] <- beh[struct] - 10
+    ## behstruct <- beh
+    ## behstruct[!struct] <- 0
+
     ## add attribute of nodeset
     attr(beh, 'nodeSet') <- attr(depvar, 'nodeSet')
     ## add attribute of name
