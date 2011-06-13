@@ -455,6 +455,14 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             z$maxlikeTargets2 <- ans
             z$mult <- x$mult
             z$nrunMH <- z$mult * sum(z$maxlikeTargets[z$effects$basicRate])
+            ##thetaMat is to allow different thetas for each group in Bayes
+            z$thetaMat <- matrix(z$theta, nrow=nGroup, ncol=z$pp, byrow=TRUE)
+            ## create a grid of periods with group names in case want to
+            ## parallelize using this
+            groupPeriods <- attr(f, "groupPeriods")
+            z$callGrid <- cbind(rep(1:nGroup, groupPeriods - 1),
+                                as.vector(unlist(sapply(groupPeriods - 1,
+                                                        function(x) 1:x))))
         }
     }
 
@@ -488,7 +496,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
 
     if (x$maxlike)
     {
-        simpleRates <- TRUE ## get a sensible test for this soon!
+        simpleRates <- TRUE
         if (any(!z$effects$basicRate & z$effects$type =="rate"))
         {
            # browser()
@@ -574,14 +582,16 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         z$f <- f
         z <- initForAlgorithms(z)
         z$periodNos <- attr(data, "periodNos")
-		if (! returnDeps) {
+        z$f$myeffects <- NULL
+        z$f$myCompleteEffects <- NULL
+		if (!returnDeps)
+		{
 			z$f[1:nGroup] <- NULL
 		}
     }
     if (initC || (z$int == 1 && z$int2 == 1 &&
                   (is.null(z$nbrNodes) || z$nbrNodes == 1)))
     {
-
         f[1:nGroup] <- NULL
     }
     FRANstore(f) ## store f in FRANstore

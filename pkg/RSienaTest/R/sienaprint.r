@@ -479,3 +479,20 @@ print.xtable.sienaFit <- function(x, ...)
     }
     invisible(x)
 }
+
+print.chains.data.frame <- function(x, ...)
+{
+    NextMethod(x)
+	initState <- attr(x, "initialStateDifferences")
+	endState <- attr(x, "endStateDifferences")
+	if (nrow(initState) > 0)
+	{
+		cat("\n Initial State Differences:\n")
+		print(initState)
+	}
+	if (nrow(endState) > 0)
+	{
+		cat("\n End State Differences:\n")
+		print(endState)
+	}
+}

@@ -59,6 +59,8 @@ public:
 	void recreateInitialState();
 	void createInitialStateDifferences();
 	void addInitialStateDifference(MiniStep * pMiniStep);
+	void addEndStateDifference(MiniStep * pMiniStep);
+	void clearEndStateDifferences();
 
 	// Accessors
 
@@ -67,7 +69,6 @@ public:
 	MiniStep * pFirst() const;
 	MiniStep * pLast() const;
 	const State * pInitialState() const;
-	const vector<MiniStep * > & pInitialStateDifferences() const;
 	int ministepCount() const;
 	int diagonalMinistepCount() const;
 	int consecutiveCancelingPairCount() const;
@@ -78,6 +79,8 @@ public:
 	double finalReciprocalRate() const;
 	void finalReciprocalRate(double value);
 	void printConsecutiveCancelingPairs() const;
+	const vector <MiniStep *> & rEndStateDifferences() const;
+	const vector <MiniStep *> & rInitialStateDifferences() const;
 
 	// Intervals
 
@@ -132,6 +135,10 @@ private:
 	// The initial state of the variables stored as a vector of ministeps
 	// relative to data (to save space)
 	vector<MiniStep *> linitialStateDifferences;
+
+	// The final state of the variables stored as a vector of ministeps
+	// relative to data (to save space)
+	vector<MiniStep *> lendStateDifferences;
 
 	// Stores the ministeps in no particular order.
 	// The first (dummy) ministep is not stored in this vector.

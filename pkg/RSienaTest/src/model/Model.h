@@ -172,12 +172,6 @@ public:
 	bool simpleRates() const;
 	void simpleRates(bool simpleRates);
 
-	void numberMHBatches(int value);
-	int numberMHBatches() const;
-
-	void BayesianScaleFactor(double value);
-	double BayesianScaleFactor() const;
-
 private:
 	// Indicates if conditional simulation has to be carried out
 	bool lconditional;
@@ -258,12 +252,6 @@ private:
 
 	vector <double> lmissingNetworkProbability;
 	vector <double> lmissingBehaviorProbability;
-
-	// number of steps in a MCMC run for ML
-	int lnumberMHBatches;
-
-	// Bayesian scale factor for normal random variates
-	double lBayesianScaleFactor;
 
 	// chain storage: vector of chains for each period for each set of samples
 	// lchainStore[i] is set of entries for periodFromStart <i>,

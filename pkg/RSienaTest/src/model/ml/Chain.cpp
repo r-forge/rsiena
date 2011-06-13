@@ -80,6 +80,7 @@ Chain::~Chain()
 	delete this->lpInitialState;
 	this->lpInitialState = 0;
 	deallocateVector(this->linitialStateDifferences);
+	deallocateVector(this->lendStateDifferences);
 }
 
 
@@ -796,7 +797,21 @@ void Chain::createInitialStateDifferences()
 	}
 //	Rprintf("xx ********%d %d end create initial diff\n", this->linitialStateDifferences.size(), period);
 }
+/**
+ *  Adds a single ministep to the vector of endStateDifferences
+ */
+void Chain::addEndStateDifference(MiniStep * pMiniStep)
+{
+	this->lendStateDifferences.push_back(pMiniStep);
+}
 
+/**
+ *  Clears the vector of endStateDifferences
+ */
+void Chain::clearEndStateDifferences()
+{
+	this->lendStateDifferences.clear();
+}
 
 /**
  * Assigns new ordering keys for the ministeps of this chain. The new
@@ -935,14 +950,6 @@ const State * Chain::pInitialState() const
 }
 
 /**
- * Returns the initial state of the variables of this chain.
- */
-const vector<MiniStep * > & Chain::pInitialStateDifferences() const
-{
-	return this->linitialStateDifferences;
-}
-
-/**
  * Returns the number of ministeps of this chain excluding the first,
  * but including the last dummy ministep.
  */
@@ -1025,6 +1032,24 @@ int Chain::missingBehaviorMiniStepCount() const
 	return this->lmissingBehaviorMiniSteps.size();
 }
 
+/**
+ * Returns the vector of ministeps representing differences between the
+ * current initial state and the observed data at the start of the
+ * current period.
+ */
+const vector<MiniStep *> & Chain::rInitialStateDifferences() const
+{
+	return this->linitialStateDifferences;
+}
+/**
+ * Returns the vector of ministeps representing differences between the
+ * current end state and the observed data at the end of the
+ * current period.
+ */
+const vector<MiniStep *> & Chain::rEndStateDifferences() const
+{
+	return this->lendStateDifferences;
+}
 
 // ----------------------------------------------------------------------------
 // Section: Random draws
@@ -1301,6 +1326,11 @@ Chain * Chain::copyChain() const
 	{
 		pChain->linitialStateDifferences.push_back(
 			this->linitialStateDifferences[i]->createCopyMiniStep());
+	}
+	for(unsigned i=0; i < this->lendStateDifferences.size(); i++)
+	{
+		pChain->lendStateDifferences.push_back(
+			this->lendStateDifferences[i]->createCopyMiniStep());
 	}
 // 	for(int i=0; i< this->linitialStateDifferences.size(); i++)
 // 	{

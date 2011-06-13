@@ -850,7 +850,7 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		SEXP theseValues;
 		if (returnDataFrame)
 		{
-			theseValues = getChainDF(*(pMLSimulation->pChain()));
+			theseValues = getChainDFPlus(*(pMLSimulation->pChain()), true);
 		}
 		else
 		{
@@ -1022,7 +1022,8 @@ SEXP getStoredChainProbabilities(SEXP DATAPTR, SEXP MODELPTR,
 	return logprob;
 }
 
-/** Clears the chains that have been stored on a model. Leave final one for ML.
+/**
+ * Clears the chains that have been stored on a model. Leave final one for ML.
  */
 SEXP clearStoredChains(SEXP MODELPTR, SEXP MAXLIKE)
 {
@@ -1040,7 +1041,8 @@ SEXP clearStoredChains(SEXP MODELPTR, SEXP MAXLIKE)
 	return R_NilValue;
 }
 
-/** Reads a chain from a data frame into C, updates theta and recalculates
+/**
+ * Reads a chain from a data frame into C, updates theta and recalculates
  * the probabilities.
  */
 SEXP getChainProbabilities(SEXP CHAIN, SEXP DATAPTR, SEXP MODELPTR,
@@ -1109,154 +1111,6 @@ SEXP getChainProbabilities(SEXP CHAIN, SEXP DATAPTR, SEXP MODELPTR,
 	return  ans;
 }
 
-/** Samples from parameter distributions, then runs MH steps.
- */
-SEXP MCMCcycle(SEXP DATAPTR, SEXP MODELPTR,
-	SEXP EFFECTSLIST, SEXP PERIOD, SEXP GROUP, SEXP SCALEFACTOR,
-	SEXP NRUNMH, SEXP NRUNMHBATCHES)
-{
-	/* get hold of the data vector */
-	vector<Data *> * pGroupData = (vector<Data *> *)
-		R_ExternalPtrAddr(DATAPTR);
-
-	int period = asInteger(PERIOD) - 1;
-	int group = asInteger(GROUP) - 1;;
-	int groupPeriod = periodFromStart(*pGroupData, group, period);
-	Data * pData = (*pGroupData)[group];
-
-	/* get hold of the model object */
-	Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
-
-//	Rprintf("in hchc 1\n");
-	int nrunMH = asInteger(NRUNMH);
-	int nrunMHBatches = asInteger(NRUNMHBATCHES);
-	double scaleFactor = asReal(SCALEFACTOR);
-
-	pModel->numberMHBatches(nrunMHBatches) ;
-
-	pModel->numberMLSteps(nrunMH);
-
-	pModel->BayesianScaleFactor(scaleFactor);
-
-	/* set up storage for statistics for MH accept and reject */
-	SEXP accepts;
-	PROTECT(accepts = allocMatrix(INTSXP, nrunMHBatches, 7));
-	SEXP rejects;
-	PROTECT(rejects = allocMatrix(INTSXP, nrunMHBatches, 7));
-	int * iaccepts = INTEGER(accepts);
-	int * irejects = INTEGER(rejects);
-
-	GetRNGstate();
-//	Rprintf("in hchc 2\n");
-
-	/* create the ML simulation object */
-	MLSimulation * pMLSimulation = new MLSimulation(pData, pModel);
-
-	pMLSimulation->simpleRates(pModel->simpleRates());
-
-	// next calls are ambiguous unless I use a const pModel
-	const Model * pConstModel = pModel;
-//	Rprintf("in hchc 3\n");
-
-	pMLSimulation->
-		missingNetworkProbability(pConstModel->
-			missingNetworkProbability(groupPeriod));
-	pMLSimulation->
-		missingBehaviorProbability(pConstModel->
-			missingBehaviorProbability(groupPeriod));
-//	Rprintf("in hchc 4\n");
-
-	// copy chain  back for this period
-	Chain * pChain = pModel->rChainStore(groupPeriod).back();
-	pMLSimulation->pChain(pChain->copyChain());
-//	Rprintf("in hchc 5\n");
-
-	// ready to recreate after the simulation
-	pModel->deleteLastChainStore(groupPeriod);
-//	Rprintf("in hchc 6\n");
-
-	pMLSimulation->initializeMCMCcycle();
-	for (int batch = 0; batch < nrunMHBatches; batch++)
-	{
-		pMLSimulation->runEpoch(period);
-		// store the MH statistics for this batch
-		for (int i = 0; i < 7; i++)
-		{
-			iaccepts[ i * nrunMHBatches + batch] =
-				pMLSimulation->acceptances(i);
-			irejects[ i * nrunMHBatches + batch] =
-				pMLSimulation->rejections(i);
-		}
-
-		pMLSimulation->MHPstep();
-	}
-//	Rprintf("in hchc 7\n");
-
-	PutRNGstate();
-	/* store chain on Model */
-	pChain = pMLSimulation->pChain();
-	pChain->createInitialStateDifferences();
-	pModel->chainStore(*pChain, groupPeriod);
-
-
-	SEXP ans;  // main return list
-	PROTECT(ans = allocVector(VECSXP, 6));
-
-	SEXP BayesAccepts; // vector of acceptances
-	PROTECT(BayesAccepts = allocVector(INTSXP, nrunMHBatches));
-	int * iBayes = INTEGER(BayesAccepts);
-	for (int i = 0; i < nrunMHBatches; i++)
-	{
-		iBayes[i] =  pMLSimulation->BayesAcceptances(i);
-	}
-
-	/* count up the total number of parameters */
-	int dim = 0;
-	for (int i = 0; i < length(EFFECTSLIST); i++)
-	{
-		dim += length(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, i), 0));
-	}
-
-	SEXP BayesCandidates; // matrix of candidate parameter values
-	PROTECT(BayesCandidates = allocMatrix(REALSXP, nrunMHBatches, dim));
-	double * rcandidates = REAL(BayesCandidates);
-
-	SEXP BayesShapes;
-	PROTECT(BayesShapes = allocMatrix(INTSXP, nrunMHBatches, dim));
-	int * ibayesshapes = INTEGER(BayesShapes);
-
-	vector<int> shapes(nrunMHBatches * dim);
-	vector<double> candidates(nrunMHBatches * dim);
-
-	getCandidatesAndShapes(EFFECTSLIST, period, group, pData, pMLSimulation,
-		&candidates, &shapes, nrunMHBatches);
-	/* fill up vectors for  return value list */
-	for (unsigned effectNo = 0; effectNo < candidates.size();
-		 effectNo++)
-	{
-		rcandidates[effectNo] = candidates[effectNo];
-		ibayesshapes[effectNo] = shapes[effectNo];
-	}
-	/* sims will be the returned chain */
-	SEXP sims;
-	PROTECT(sims = allocVector(VECSXP, 1));
-
-	SEXP theseValues;
-	theseValues =
-		getChainList(*(pMLSimulation->pChain()), *pMLSimulation);
-	SET_VECTOR_ELT(sims, 0, theseValues);
-
-	SET_VECTOR_ELT(ans, 0, BayesAccepts);
-	SET_VECTOR_ELT(ans, 1, BayesCandidates);
-	SET_VECTOR_ELT(ans, 2, BayesShapes);
-	SET_VECTOR_ELT(ans, 3, accepts);
-	SET_VECTOR_ELT(ans, 4, rejects);
-	SET_VECTOR_ELT(ans, 5, sims);
-	delete pMLSimulation;
-
-	UNPROTECT(7);
-	return  ans;
-}
 
 
 }

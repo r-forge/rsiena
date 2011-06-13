@@ -80,13 +80,6 @@ public:
 
 	void createEndStateDifferences();
 
-	// Bayesian routines
-	void initializeMCMCcycle();
-	void MHPstep();
-	int BayesAcceptances(unsigned iteration) const;
-	double candidates(const EffectInfo * pEffect, unsigned iteration) const;
-	void candidates(const EffectInfo * pEffect, double value);
-
 private:
 	void setStateBefore(MiniStep * pMiniStep);
 	void resetVariables();
@@ -106,16 +99,11 @@ private:
 	int lacceptances[7];
 	int lrejections[7];
 	int laborted[7];
-	vector<int> lBayesAcceptances;
-	map<const EffectInfo *, vector<double> > lcandidates;
 	double lmissingNetworkProbability;
 	double lmissingBehaviorProbability;
 	// current length of permuted interval
 	double lcurrentPermutationLength;
 	int lthisPermutationLength;
-	// The final state of the variables stored as a vector of ministeps
-	// relative to data (to save space)
-	vector<MiniStep *> lendStateDifferences;
 
 
 	// A vector of options with missing values in the initial observation
