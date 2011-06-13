@@ -736,9 +736,10 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES,
 				pMLSimulation->MLStep();
 			}
 
-			/* store chain on Model after creating a difference vector*/
+			/* store chain on Model after creating difference vectors */
 			Chain * pChain = pMLSimulation->pChain();
 			pChain->createInitialStateDifferences();
+			pMLSimulation->createEndStateDifferences();
 			pModel->chainStore(*pChain, periodFromStart);
 
 			/* return chain as a list. */

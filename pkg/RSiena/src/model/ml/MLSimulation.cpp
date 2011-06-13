@@ -253,7 +253,7 @@ void MLSimulation::runEpoch(int period)
 	this->initialize(period);
 	// create an initial state object
 	this->initializeInitialState(period);
-	// in case we have copied in a previous chain, copy over the initial state differences
+	// copy over the initial state differences from the stored vector
 	this->pChain()->recreateInitialState();
 
 	this->setUpProbabilityArray();
@@ -299,103 +299,6 @@ void MLSimulation::pChainProbabilities(Chain * pChain, int period)
 
 	this->updateProbabilities(this->lpChain, this->lpChain->pFirst()->pNext(),
 			this->lpChain->pLast()->pPrevious());
-}
-
-/*
- * Clears the stores for MCMC.
- */
-void MLSimulation::initializeMCMCcycle()
-{
-
-	// clear storage for the sampled parameters.
-	this->lBayesAcceptances.clear();
-	this->lcandidates.clear();
-	for (unsigned i = 0; i < this->lvariables.size(); i++)
-	  {
-		this->lvariables[i]->clearSampledBasicRates();
-		this->lvariables[i]->clearRateCandidates();
-	  }
-
-}
-
-/*
- * Sample from the priors for the parameters.
- *
- */
-void MLSimulation::MHPstep()
-{
-	double scaleFactor = this->pModel()->BayesianScaleFactor();
-	double probabilityRatio;
-
-	// first count how many steps for each variable and accumulate the log probs
-	int * stepCount = new int[this->lvariables.size()];
-	for (unsigned i = 0; i < this->lvariables.size(); i++)
-	{
-		stepCount[i] = 0;
-	}
-	double oldLogLikelihood = 0;
-	double newLogLikelihood = 0;
-	MiniStep * pMiniStep = this->pChain()->pFirst()->pNext();
-	MiniStep * pLastMiniStep = this->pChain()->pLast();
-
-	while (pMiniStep!= pLastMiniStep)
-	{
-		stepCount[pMiniStep->variableId()] ++;
-		oldLogLikelihood += pMiniStep->logOptionSetProbability() +
-			pMiniStep->logChoiceProbability();
-		pMiniStep = pMiniStep->pNext();
-	}
-//	Rprintf("%d %d\n", stepCount[0], this->pChain()->ministepCount());
-	double priorRatio = 0;
-
-	for (unsigned i = 0; i < this->lvariables.size(); i++)
-	{
-		// generate gamma random variate for each basic rate
-		this->lvariables[i]->sampleBasicRate(stepCount[i]);
-
-		// generate normal random variate for each other effect
-		priorRatio  += this->lvariables[i]->sampleParameters(scaleFactor);
-	}
-
-	//  calculate the acceptance probability for the non basic rate effects
-	this->updateProbabilities(this->lpChain, this->lpChain->pFirst()->pNext(),
-			this->lpChain->pLast()->pPrevious());
-	pMiniStep = this->lpChain->pFirst()->pNext();
-	while (pMiniStep!= pLastMiniStep)
-	{
-		newLogLikelihood += pMiniStep->logOptionSetProbability() +
-			pMiniStep->logChoiceProbability();
-		pMiniStep = pMiniStep->pNext();
-	}
-
-	probabilityRatio = exp(-oldLogLikelihood  + newLogLikelihood + priorRatio);
-
-	if (nextDouble() < probabilityRatio)
-	{
-		this->lBayesAcceptances.push_back(true);
-		// copy these parameters to the effectInfo's so they are the
-		// default next time we reject
-		for (unsigned i = 0; i < this->lvariables.size(); i++)
-		{
-			this->lvariables[i]->updateEffectInfoParameters();
-		}
-	}
-	else
-	{
-		this->lBayesAcceptances.push_back(false);
-		// re-initialize the rate functions of all variables and parameters
-		// for effects from those in the effectinfo's
-		// not necessary for basic rate (Gibbs step)
-		for (unsigned i = 0; i < this->lvariables.size(); i++)
-		{
-			this->lvariables[i]->updateEffectParameters();
-		}
-		// reset the chain probabilities
-		this->updateProbabilities(this->lpChain,
-			this->lpChain->pFirst()->pNext(),
-			this->lpChain->pLast()->pPrevious());
-	}
-	delete[] stepCount;
 }
 
 /**
@@ -560,60 +463,6 @@ void MLSimulation::resetVariables()
 			}
 		}
 	}
-}
-
-
-/**
- * Returns the Bayes Acceptance for the given iteration.
- */
-int MLSimulation::BayesAcceptances(unsigned iteration) const
-{
-	if (iteration < this->lBayesAcceptances.size())
-	{
-		return this->lBayesAcceptances[iteration];
-	}
-	else
-	{
-		throw std::out_of_range("The number" + toString(iteration) +
-			" is not in the range [0," +
-			toString(this->lBayesAcceptances.size()) + "].");
-	}
-
-}
-/**
- * Returns the candidate value for the given iteration for the given effect.
- * The candidate values are updated in the MHPstep of a Bayesian simulation.
- */
-double MLSimulation::candidates(const EffectInfo * pEffect,
-	unsigned iteration) const
-{
-	map<const EffectInfo *, vector<double> >::const_iterator iter =
-		this->lcandidates.find(pEffect);
-	double candidate = 0;
-
-	if (iter != this->lcandidates.end())
-	{
-		if (iteration < iter->second.size())
-		{
-			candidate = iter->second[iteration];
-		}
-		else
-		{
-			throw std::out_of_range("The number" + toString(iteration) +
-				" is not in the range [0," +
-				toString(iter->second.size()) + "].");
-		}
-	}
-
-	return candidate;
-}
-/**
- * Stores the candidate value for the next iteration for the given effect.
- * The candidate values are updated in the MHPstep of a Bayesian simulation.
- */
-void MLSimulation::candidates(const EffectInfo * pEffect, double value)
-{
-	this->lcandidates[pEffect].push_back(value);
 }
 
 // ----------------------------------------------------------------------------
@@ -918,16 +767,6 @@ bool MLSimulation::insertPermute(int c0)
 	bool accept = false;
 
 	MiniStep * pMiniStepA = this->lpChain->randomMiniStep();
-
-// 	if (this->lphase1)
-// 	{
-// 		Option * pOption= new Option(0, 17, 45);
-
-// 		pMiniStepA = this->lpChain->nextMiniStepForOption(*pOption, this->lpChain->pFirst());
-// 		PrintValue(getMiniStepDF(*pMiniStepA));
-// 		pMiniStepA = this->lpChain->nextMiniStepForOption(*pOption, pMiniStepA->pNext());
-// 		PrintValue(getMiniStepDF(*pMiniStepA));
-// 	}
 
 	while (pMiniStepA == this->lpChain->pLast())
 	{
@@ -2661,7 +2500,8 @@ void MLSimulation::updateCurrentPermutationLength(bool accept)
  */
 void MLSimulation::createEndStateDifferences()
 {
-	this->lendStateDifferences.clear();
+//	this->lendStateDifferences.clear();
+	this->lpChain->clearEndStateDifferences();
 //	Rprintf("%d begin create end state\n",this->lendStateDifferences.size() );
 	const Data * pData = this->pData();
 	int period = this->period();
@@ -2714,8 +2554,7 @@ void MLSimulation::createEndStateDifferences()
 							//{
 							//	PrintValue(getMiniStepDF(*pMiniStep));
 								//}
-							this->lendStateDifferences.
-								push_back(pMiniStep);
+							this->lpChain->addEndStateDifference(pMiniStep);
 
 							iter1.next();
 							//	PrintValue(getMiniStepDF(
@@ -2735,7 +2574,8 @@ void MLSimulation::createEndStateDifferences()
 							// period + 1)
 							)
 						{
-							this->lendStateDifferences.push_back(
+							this->lpChain->addEndStateDifference(
+							//	this->lendStateDifferences.push_back(
 								new NetworkChange(pNetworkData,
 									i,
 									iter2.actor(), false));
@@ -2784,7 +2624,8 @@ void MLSimulation::createEndStateDifferences()
 						)
 
 					{
-						this->lendStateDifferences.push_back(
+						this->lpChain->addEndStateDifference(
+							//this->lendStateDifferences.push_back(
 							new BehaviorChange(pBehaviorData,
 								i,
 								singleChange));

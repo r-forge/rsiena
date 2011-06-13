@@ -269,37 +269,6 @@ double Model::initialPermutationLength() const
 	return this->linitialPermutationLength;
 }
 
-/**
- * Stores the number of MH batches
- */
-void Model::numberMHBatches(int value)
-{
-	this->lnumberMHBatches = value;
-}
-
-/**
- * Returns the number of MH batches
- */
-int Model::numberMHBatches() const
-{
-	return this->lnumberMHBatches;
-}
-/**
- * Stores the Bayesian scale factor
- */
-void Model::BayesianScaleFactor(double value)
-{
-	this->lBayesianScaleFactor = value;
-}
-
-
-/**
- * Returns the Bayesian scale factor
- */
-double Model::BayesianScaleFactor() const
-{
-	return this->lBayesianScaleFactor;
-}
 // ----------------------------------------------------------------------------
 // Section: Effect management
 // ----------------------------------------------------------------------------

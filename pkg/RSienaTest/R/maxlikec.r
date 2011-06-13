@@ -12,12 +12,15 @@
 ##@maxlikec siena07 ML Simulation Module
 maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                     effects=NULL, profileData=FALSE, prevAns=NULL,
-                    returnDeps=FALSE, returnChains=FALSE, byGroup=FALSE)
+                     returnDeps=FALSE, returnChains=FALSE, byGroup=FALSE,
+                     returnDataFrame=FALSE)
 {
     if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
     {
         z <- initializeFRAN(z, x, data, effects, prevAns, initC,
                             profileData=profileData, returnDeps=returnDeps)
+        z$returnDataFrame <- returnDataFrame
+        z$returnChains <- returnChains
         if (initC)
         {
             return(NULL)
@@ -45,22 +48,24 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     {
         returnDeps <- z$returnDeps
     }
-    ## create a grid of periods with group names in case want to parallelize
-    ## using this
-    groupPeriods <- attr(f, "groupPeriods")
-    callGrid <- cbind(rep(1:f$nGroup, groupPeriods - 1),
-                      as.vector(unlist(sapply(groupPeriods - 1,
-                                              function(x) 1:x))))
+    callGrid <- z$callGrid
     ## z$int2 is the number of processors if iterating by period, so 1 means
     ## we are not. Can only parallelize by period at the moment.
-    ## browser()
     if (nrow(callGrid) == 1)
     {
+		if (byGroup)
+		{
+			theta <- z$thetaMat[1,]
+		}
+		else
+		{
+			theta <- z$theta
+		}
         ans <- .Call('mlPeriod', PACKAGE=pkgname, z$Deriv, f$pData,
-                     f$pModel, f$myeffects, z$theta,
+                     f$pModel, f$myeffects, theta,
                      returnDeps, 1, 1, z$nrunMH, z$addChainToStore,
                      z$needChangeContributions, z$returnDataFrame,
-                     returnChains)
+                     z$returnChains)
         ans[[6]] <- list(ans[[6]])
         ans[[7]] <- list(ans[[7]])
     }
@@ -71,7 +76,7 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             anss <- apply(callGrid, 1, doMLModel, z$Deriv, z$thetaMat,
                           returnDeps,  z$nrunMH, z$addChainToStore,
                           z$needChangeContributions, z$returnDataFrame,
-                          returnChains)
+                          z$returnChains, byGroup, z$theta)
         }
         else
         {
@@ -80,7 +85,7 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                               z$thetaMat,
                               returnDeps, z$nrunMH, z$addChainToStore,
                               z$needChangeContributions,
-                              z$returnDataFrame, returnChains)
+                              z$returnDataFrame, z$returnChains, byGroup, z$theta)
         }
         ## reorganize the anss so it looks like the normal one
         ans <- NULL
@@ -111,7 +116,7 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         {
             ##TODO put names on these?
             fff <- lapply(anss, function(x) x[[6]][[1]])
-            fff <- split(fff, callGrid[1, ]) ## split by group
+            fff <- split(fff, callGrid[, 1 ]) ## split by group
             ans[[6]] <- fff
         }
         ans[[7]] <- lapply(anss, "[[", 7) ## derivative
@@ -174,11 +179,20 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 
 ##@doMLModel Maximum likelihood
 doMLModel <- function(x, Deriv, thetaMat, returnDeps, nrunMH, addChainToStore,
-                      needChangeContributions, returnDataFrame, returnChains)
+                      needChangeContributions, returnDataFrame, returnChains,
+					  byGroup, theta)
 {
     f <- FRANstore()
+	if (byGroup)
+	{
+		theta <- thetaMat[x[1], ]
+	}
+	else
+	{
+		theta <- theta
+	}
     .Call("mlPeriod", PACKAGE=pkgname, Deriv, f$pData,
-          f$pModel, f$myeffects, thetaMat[x[1], ], returnDeps,
+          f$pModel, f$myeffects, theta, returnDeps,
           as.integer(x[1]), as.integer(x[2]), nrunMH, addChainToStore,
           needChangeContributions, returnDataFrame, returnChains)
 }

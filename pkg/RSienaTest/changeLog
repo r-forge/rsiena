@@ -1,3 +1,21 @@
+2011-06-13 R-forge revision 156
+
+	* R/bayes.r, R/maxlikec.r, R/initializeFRAN.r, R/phase1.r,
+	src/model/ml/chain.cpp, src/model/ml/chain.h,
+	src/model/ml/MLSimulation.cpp, src/model/ml/MLSimulation.h,
+	src/model/model.cpp, src/model/model.h,
+	src/model/variables/DependentVariable.cpp,
+	src/model/variables/DependentVariable.h,
+	src/siena07internals.cpp, src/siena07internals.h,
+	src/siena07models.cpp, src/siena07models.h, src/siena07setup.cpp,
+	src/siena07/utilities.cpp, src/siena07utilities.h: Bayesian
+	routine now in R, calling normal maxlike routine. Also end state vector
+	for chains.
+	* R/effects.r: minor bug if up or down only for some waves only and
+	bipartite. Density effect was removed.
+	* R/sienaprint.r: new method to print initial and end states of chains:
+	chains.data.frame.
+
 2011-06-12 R-forge revision 155
 
 	* R/initializeFRAN.r: fix bug re behavior variables with values 10 or 11

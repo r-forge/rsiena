@@ -150,26 +150,8 @@ public:
 	void calculateMaximumLikelihoodRateScores(int activeMiniStepCount);
 	void calculateMaximumLikelihoodRateDerivatives(int activeMiniStepCount);
 	double basicRateDerivative() const;
-	virtual double calculateChoiceProbability(const MiniStep * pMiniStep) const = 0;
-
-	// Bayesian related: get new values
-	void sampleBasicRate(int miniStepCount);
-	double sampleParameters(double scaleFactor);
-	// get and set sampled basic rates and shapes
-	double sampledBasicRates(unsigned iteration) const;
-	void sampledBasicRates(double value);
-	int sampledBasicRatesDistributions(unsigned iteration) const;
-	void sampledBasicRatesDistributions(int value);
-	double constantCovariateCandidates(const ConstantCovariate *
-		pConstantCovariate, unsigned iteration) const;
-	double changingCovariateCandidates(const ChangingCovariate *
-		pChangingCovariate, unsigned iteration) const;
-	double behaviorVariableCandidates(const BehaviorVariable *
-		pBehaviorVariable, unsigned iteration) const;
-	double structuralRateCandidates(unsigned index, unsigned iteration) const;
-
-	void clearSampledBasicRates();
-	void clearRateCandidates();
+	virtual double calculateChoiceProbability(const MiniStep * pMiniStep)
+		const = 0;
 
 protected:
 	inline EpochSimulation * pSimulation() const;
@@ -310,40 +292,8 @@ private:
 
 	int lvalidRates;
 
-	// store for number of acceptances and rejections for non basic rate
-	// parameters in Bayesian modelling
-
-	int lacceptances;
-	int lrejections;
-
 	// flag to indicate we gave up on a step due to uponly and other filters
 	bool lsuccessfulChange;
-	// store for sampled parameters and the shapes used for basic rate
-	// parameters
-	vector<double> lsampledBasicRates;
-	vector<int> lsampledBasicRatesDistributions;
-	map<const ConstantCovariate *, vector<double> >
-		lconstantCovariateCandidates;
-	map<const ChangingCovariate *, vector<double> >
-		lchangingCovariateCandidates;
-	map<const BehaviorVariable *, vector<double> >
-		lbehaviorVariableCandidates;
-	vector< vector<double> > lstructuralRateEffectCandidates;
-
-/* 	map<const ConstantCovariate *, vector<double> >  */
-/* 		lconstantCovariateStoredParameters; */
-/* 	map<const ChangingCovariate *, vector<double> >  */
-/* 		lchangingCovariateStoredParameters; */
-/* 	map<const BehaviorVariable *, vector<double> >  */
-/* 		lbehaviorVariableStoredParameters; */
-/* 	map<const NetworkVariable *, vector<double> >  */
-/* 		loutDegreeStoredParameters; */
-/* 	map<const NetworkVariable *, vector<double> >  */
-/* 		linDegreeStoredParameters; */
-/* 	map<const NetworkVariable *, vector<double> >  */
-/* 		lreciprocalDegreeStoredParameters; */
-/* 	map<const NetworkVariable *, vector<double> >  */
-/* 		linverseOutDegreeStoredParameters; */
 
 };
 

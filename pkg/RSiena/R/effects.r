@@ -696,12 +696,12 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
             objEffects <-
                 objEffects[!objEffects$shortName == "density", ]
         }
-        if (attr(xx$depvars[[i]],'uponly') || attr(xx$depvars[[i]],
-                                                   'downonly'))
-        {
-            objEffects <-
-                objEffects[!objEffects$shortName == "density", ]
-        }
+        ##   if (attr(xx$depvars[[i]],'uponly') || attr(xx$depvars[[i]],
+        ##                                              'downonly'))
+        ##  {
+        ##     objEffects <-
+        ##        objEffects[!objEffects$shortName == "density", ]
+        ##  }
 
         rateEffects$basicRate[1:observations] <- TRUE
 

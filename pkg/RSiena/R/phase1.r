@@ -577,7 +577,11 @@ makeZsmall <- function(z)
     zsmall$pp <- z$pp
     zsmall$nrunMH <- z$nrunMH
     zsmall$returnDeps <- z$returnDeps
+    zsmall$returnChains <- z$returnChains
+    zsmall$returnDataFrame <- z$returnDataFrame
     zsmall$addChainToStore <- z$addChainToStore
     zsmall$needChangeContributions <- z$needChangeContributions
+	zsmall$callGrid <- z$callGrid
+	zsmall$thetaMat <- z$thetaMat
     zsmall
 }
