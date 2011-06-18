@@ -16,7 +16,6 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     createStores <- function(z)
     {
         npar <- length(z$theta)
-        basicRate <- z$basicRate
         numberRows <- nmain * nrunMHBatches
         z$posteriorTot <- matrix(0, nrow=z$nGroup, ncol=npar)
         z$posteriorMII <- array(0, dim=c(z$nGroup, npar, npar))
@@ -31,7 +30,6 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     {
         start <- z$sub + 1
         nrun <- nrow(z$parameters)
-        basicRate <- z$basicRate
         npar <- length(z$theta)
         end <- start + nrun - 1
         z$acceptances[, start:end] <- z$accepts

@@ -39,7 +39,7 @@ getInternals <- function()
 ##@getRSienaDocumentation Documentation
 getRSienaRDocumentation <- function(Rdir)
 {
-   # library(xtable)
+	library(xtable)
     library(codetools)
 
     thisdir <- getwd()

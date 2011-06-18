@@ -42,7 +42,7 @@ phase2.1<- function(z, x, ...)
         tkconfigure(z$tkvars$subphaselabel,state='normal')
     }
     z$Deriv <- FALSE
-    z$sd <- sqrt(apply(z$sf, 2, function(x) sum(x^2) / z$n1 - mean(x)^2))
+    z$sd <- sqrt(apply(z$sf, 2, function(x) sum(x^2) / nrow(z$sf) - mean(x)^2))
     z$sd[z$fixed] <- 0
     ##   browser()
     Report(paste('\nPhase 2 has', x$nsub, 'subphases.\n'), cf)

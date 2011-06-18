@@ -103,7 +103,7 @@ effectsDocumentation <- function(type="html", display=type=="html",
         filename2 <- paste(filename,".tex", sep="", collapse="")
         includefile <- paste(filename,".include.tex", sep="", collapse="")
         includepart <- paste(filename,".include", sep="", collapse="")
-        print(xtable(y), add.to.row=add.to.row, file=includefile,
+        print(xtable::xtable(y), add.to.row=add.to.row, file=includefile,
               tabular.environment="longtable", hline.after=c(-1),
               floating=FALSE, include.rownames=FALSE)
 
@@ -125,7 +125,7 @@ effectsDocumentation <- function(type="html", display=type=="html",
     else
     {
         filename <- paste(filename,".html", sep="", collapse="")
-        print(xtable(y), add.to.row=add.to.row,
+        print(xtable::xtable(y), add.to.row=add.to.row,
               file=filename,
               type="html", hline.after=c(-1),
               sanitize.text.function=function(x){x},

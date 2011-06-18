@@ -261,8 +261,10 @@ doPhase1it<- function(z, x, zsmall, xsmall, ...)
     {
       #  Report(c('Phase', z$Phase, 'Iteration ', z$nit, '\n'))
         if (is.batch())
+		{
             Report(c('Phase ', z$Phase, ' Iteration ', z$nit, ' Progress: ',
                      round(progress), '%\n'), sep='')
+		}
         else
         {
             DisplayTheta(z)

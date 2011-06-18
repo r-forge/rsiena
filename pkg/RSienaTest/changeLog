@@ -1,3 +1,15 @@
+2011-06-18 R-forge revision 157
+
+	* R/phase2.r: corrected definition of standard deviation used to control
+	maximum jump. Was incorrect if using prevAns as it had the deviations
+	from phase 3 rather than phase 1.
+	* R/phase1.r, R/maxlikec.r, R/siena08.r: reformatting, using complete
+	object names
+	* R/bayes.r: remove unused variables to avoid warnings
+	* man/sienaFit.Rd, R/effectsDocumentation.r, R/RSienaRDocumentation.r,
+	R/sienaprint.r, DESCRIPTION, NAMESPACE: alter interface to xtable to
+	allow loading package without it.
+
 2011-06-13 R-forge revision 156
 
 	* R/bayes.r, R/maxlikec.r, R/initializeFRAN.r, R/phase1.r,
