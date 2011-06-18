@@ -11,7 +11,7 @@
 # *****************************************************************************/
 ##@maxlikec siena07 ML Simulation Module
 maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
-                    effects=NULL, profileData=FALSE, prevAns=NULL,
+                     effects=NULL, profileData=FALSE, prevAns=NULL,
                      returnDeps=FALSE, returnChains=FALSE, byGroup=FALSE,
                      returnDataFrame=FALSE)
 {

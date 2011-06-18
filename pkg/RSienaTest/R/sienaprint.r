@@ -458,7 +458,7 @@ xtable.sienaFit <- function(x, caption = NULL, label = NULL, align = NULL,
         format(mydf[mydf$row < 1, 'row'])
     mydf[mydf[,'row'] >= 1, 'row'] <- paste(format(mydf[mydf$row >= 1,
              'row']), '.', sep='')
-    tmp <- list(xtable(mydf, caption=caption, label=label, align=align,
+    tmp <- list(xtable::xtable(mydf, caption=caption, label=label, align=align,
                        digits=digits, display=display), add.to.row=addtorow,
                 include.colnames=FALSE, include.rownames=FALSE, ...)
     class(tmp) <- c("xtable.sienaFit", "xtable")

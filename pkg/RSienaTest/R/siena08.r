@@ -119,9 +119,9 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05)
             cjplusp <- 1 - pchisq(cjplus, 2 * nrow(x1))
             cjminusp <- 1 - pchisq(cjminus, 2 * nrow(x1))
             ## ML estimates and confidence intervals
-            maxxlik <- maxlik(x1$theta,x1$se)
-            cmu  <- confint.mu(x1$theta,x1$se,alpha)
-            csig <- confint.sig(x1$theta,x1$se,alpha)
+            maxxlik <- maxlik(x1$theta, x1$se)
+            cmu  <- confint.mu(x1$theta, x1$se, alpha)
+            csig <- confint.sig(x1$theta, x1$se, alpha)
             ret1 <- list(cor.est=check.correl$estimate,
                          cor.pval=check.correl$p.value,
                          cor.meth=check.correl$method,
@@ -133,7 +133,7 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05)
                          pttilde=1 - pchisq(Qstat, nrow(x1) - 1),
                          cjplus=cjplus, cjminus=cjminus,
                          cjplusp=cjplusp, cjminusp=cjminusp, n1=nrow(x1),
-                         mu.ml=maxxlik$mu, sigma.ml=maxxlik$sig,
+                         mu.ml=maxxlik$mu, sigma.ml=maxxlik$sigma,
                          mu.ml.se=maxxlik$se.mu,
                          mu.confint=cmu, sigma.confint=csig)
         }
@@ -283,7 +283,7 @@ print.sienaMeta <- function(x, file=FALSE, ...)
                     ",",
                     format(round(y$mu.confint[2], 4), width=7), "]\n"), outf)
            Report(c("Estimated standard deviation",
-                    ifelse((y$sigma.ml > 0.0001)|(y$sigma.ml < 0.0000001),
+                    ifelse((y$sigma.ml > 0.0001) | (y$sigma.ml < 0.0000001),
                            format(round(y$sigma.ml, 4), width=9), " < 0.0001"),
                      "\n"), outf)
            Report(c(format(round(y$sigma.confint[3], 2), width=4),
