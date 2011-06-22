@@ -114,8 +114,9 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         data <- tmp$data
         effects <- tmp$effects
         ## find any effects not included which are needed for interactions
-        interactionNos <- unique(c(effects$effect1, effects$effect2,
-                                   effects$effect3))
+        tmpEffects <- effects[effects$include, ]
+        interactionNos <- unique(c(tmpEffects$effect1, tmpEffects$effect2,
+                                   tmpEffects$effect3))
         interactionNos <- interactionNos[interactionNos > 0]
         interactions <- effects$effectNumber %in%
                                           interactionNos
@@ -1632,118 +1633,215 @@ fixUpEffectNames <- function(effects)
                gsub("#", y$parm, y$functionName)
            }, y=effects)
 
-    if (any(effects$shortName == "behUnspInt" & effects$include &
-                            effects$effect1 > 0))
-    {
-        stop("User specified behavior interactions are not yet implemented")
-    }
+    #if (any(effects$shortName == "behUnspInt" & effects$include &
+    #                        effects$effect1 > 0))
+    #{
+    #    stop("User specified behavior interactions are not yet implemented")
+    #}
     ##validate user-specified network interactions
     interactions <- effects[effects$shortName == "unspInt" & effects$include &
                             effects$effect1 > 0, ]
     if (nrow(interactions) > 0)
     {
-        unspIntNames <- sapply(1:nrow(interactions), function(x, y, z)
-           {
-               y <- y[x, ] ## get the interaction effect
-               twoway <- y$effect3 == 0
-               ## now get the rows which are to interact
-               inter1 <- z[z$effectNumber == y$effect1, ]
-               if (nrow(inter1) != 1 )
+        unspIntNames <-
+            sapply(1:nrow(interactions), function(x, y, z)
                {
-                   stop("invalid interaction specification effect number 1")
-               }
-               inter2 <- z[z$effectNumber == y$effect2, ]
-               if (nrow(inter2) != 1 )
-               {
-                   stop("invalid interaction specification effect number 2")
-               }
-               if (!twoway)
-               {
-                   inter3 <- z[z$effectNumber == y$effect3, ]
-                   if (nrow(inter3) != 1)
+                   y <- y[x, ] ## get the interaction effect
+                   twoway <- y$effect3 == 0
+                   ## now get the rows which are to interact
+                   inter1 <- z[z$effectNumber == y$effect1, ]
+                   if (nrow(inter1) != 1 )
                    {
-                       stop("invalid interaction specification effect number 3")
+                       stop("invalid network interaction specification: ",
+                            "effect number 1")
                    }
-               }
-               else
-               {
-                   inter3 <- z[is.na(z$effectNumber),] ## should be empty row
-               }
-               if (twoway)
-               {
-                   if (inter1$name != inter2$name)
+                   inter2 <- z[z$effectNumber == y$effect2, ]
+                   if (nrow(inter2) != 1 )
                    {
-                       stop("invalid interaction specification: ",
-                            "must be same network")
+                       stop("invalid network interaction specification: ",
+                            "effect number 2")
                    }
-                   if (inter1$type != inter2$type)
+                   if (!twoway)
                    {
-					#   warning("Interaction specification gives effects ",
-					#		   "with different specifications eval/endow/rate ",
-					#		   "trying with experimental code. Remove these ",
-					#		   "Interactions if this does not work.")
-                       stop("invalid interaction specification: must",
-                            "be same type: evaluation, endowment or creation")
+                       inter3 <- z[z$effectNumber == y$effect3, ]
+                       if (nrow(inter3) != 1)
+                       {
+                           stop("invalid network interaction specification: ",
+                                "effect number 3")
+                       }
                    }
-               }
-               else
-               {
-                   if (inter1$name != inter2$name ||
-                       inter1$name != inter3$name)
+                   else
                    {
-                       stop("invalid interaction specification:",
-                            "must all be same network")
+                       inter3 <- z[is.na(z$effectNumber), ]
+                       ## should be empty row
                    }
-                   if (inter1$type != inter2$type ||
-                       inter1$type != inter3$type)
+                   if (twoway)
                    {
-                       stop("invalid interaction specification: must all be",
-                            "same type: evaluation, endowment or creation")
+                       if (inter1$name != inter2$name)
+                       {
+                           stop("invalid network interaction specification: ",
+                                "must all be same network")
+                       }
+                       if (inter1$type != inter2$type)
+                       {
+                           stop("invalid network interaction specification: ",
+                                "must all be same type: ",
+                                "evaluation, endowment or creation")
+                       }
                    }
-               }
-               ## check types
-               inters <- rbind(inter1, inter2, inter3)
-               egos <- which(inters$interactionType == "ego")
-               egoCount <- length(egos)
-               dyads <- which(inters$interactionType == "dyadic")
-               dyadCount <- length(dyads)
-               if (twoway)
-               {
-                   if (egoCount < 1 && dyadCount != 2)
+                   else
                    {
-                       stop("invalid interaction specification:",
-                            "must be at least one ego or both dyadic effects")
+                       if (inter1$name != inter2$name ||
+                           inter1$name != inter3$name)
+                       {
+                           stop("invalid network interaction specification: ",
+                                "must all be same network")
+                       }
+                       if (inter1$type != inter2$type ||
+                           inter1$type != inter3$type)
+                       {
+                           stop("invalid network interaction specification: ",
+                                "must all be ",
+                                "same type: evaluation, endowment or creation ")
+                       }
                    }
-               }
-               else
-               {
-                   if (egoCount < 2 && dyadCount != 3)
+                   ## check types
+                   inters <- rbind(inter1, inter2, inter3)
+                   egos <- which(inters$interactionType == "ego")
+                   egoCount <- length(egos)
+                   dyads <- which(inters$interactionType == "dyadic")
+                   dyadCount <- length(dyads)
+                   if (twoway)
                    {
-                       stop("invalid interaction specification:",
-                            "must be at least two ego or all dyadic effects")
+                       if (egoCount < 1 && dyadCount != 2)
+                       {
+                           stop("invalid network interaction specification: ",
+                                "must be at least one ego or both dyadic ",
+                                "effects")
+                       }
                    }
-               }
-               ## construct a name
-               ### make sure the egos are at the front of inters
-               if (egoCount > 0)
-               {
-                   inters <- rbind(inters[egos, ], inters[-egos, ])
-               }
-               tmpname <- paste(inters$effectName, collapse = " x ")
-               if (twoway && nchar(tmpname) < 38)
-               {
-                   tmpname <- paste("int. ", tmpname)
-               }
-               if (!twoway)
-               {
-                   tmpname <- paste("i3.", tmpname)
-               }
-               tmpname
-           }, y=interactions, z=effects)
+                   else
+                   {
+                       if (egoCount < 2 && dyadCount != 3)
+                       {
+                           stop("invalid network interaction specification: ",
+                                "must be at least two ego or all dyadic ",
+                                "effects")
+                       }
+                   }
+                   ## construct a name
+                   ## make sure the egos are at the front of inters
+                   if (egoCount > 0)
+                   {
+                       inters <- rbind(inters[egos, ], inters[-egos, ])
+                   }
+                   tmpname <- paste(inters$effectName, collapse = " x ")
+                   if (twoway && nchar(tmpname) < 38)
+                   {
+                       tmpname <- paste("int. ", tmpname)
+                   }
+                   if (!twoway)
+                   {
+                       tmpname <- paste("i3.", tmpname)
+                   }
+                   tmpname
+               }, y=interactions, z=effects)
         effects[effects$shortName == "unspInt" & effects$include &
+                !is.na(effects$effect1), c("effectName", "functionName")] <-
+                    unspIntNames
+    }
+    ##validate user-specified behavior interactions
+    interactions <- effects[effects$shortName == "behUnspInt" &
+                            effects$include &
+                            effects$effect1 > 0, ]
+    if (nrow(interactions) > 0)
+    {
+        unspIntNames <-
+            sapply(1:nrow(interactions), function(x, y, z)
+               {
+                   y <- y[x, ] ## get the interaction effect
+                   twoway <- y$effect3 == 0
+                   ## now get the rows which are to interact
+                   inter1 <- z[z$effectNumber == y$effect1, ]
+                   if (nrow(inter1) != 1 )
+                   {
+                       stop("invalid behavior interaction specification: ",
+                            "effect number 1")
+                   }
+                   inter2 <- z[z$effectNumber == y$effect2, ]
+                   if (nrow(inter2) != 1 )
+                   {
+                       stop("invalid behavior interaction specification: ",
+                            "effect number 2")
+                   }
+                   if (!twoway)
+                   {
+                       inter3 <- z[z$effectNumber == y$effect3, ]
+                       if (nrow(inter3) != 1)
+                       {
+                           stop("invalid behavior interaction specification: ",
+                                "effect number 3")
+                       }
+                   }
+                   else
+                   {
+                       inter3 <- z[is.na(z$effectNumber), ]
+                       ## should be empty row
+                   }
+                   if (twoway)
+                   {
+                       if (inter1$name != inter2$name)
+                       {
+                           stop("invalid behavior interaction specification: ",
+                                "must all be same behavior variable")
+                       }
+                       if (inter1$type != inter2$type)
+                       {
+                           stop("invalid behavior interaction specification: ",
+                                "must be same type: evaluation, endowment ",
+                                "or creation")
+                       }
+                   }
+                   else
+                   {
+                       if (inter1$name != inter2$name ||
+                           inter1$name != inter3$name)
+                       {
+                           stop("invalid behavior interaction specification: ",
+                                "must all be same behavior variable")
+                       }
+                       if (inter1$type != inter2$type ||
+                           inter1$type != inter3$type)
+                       {
+                           stop("invalid behavior interaction specification: ",
+                                "must all be ",
+                                "same type: evaluation, endowment or creation")
+                       }
+                   }
+                   ## check types - all should be OK here
+                   inters <- rbind(inter1, inter2, inter3)
+                   if (any(inters$interactionType != "OK"))
+                   {
+                       stop("invalid behavior interaction specification: ",
+                            "only effects with interactionType OK are allowed")
+                   }
+                   ## construct a name
+                   tmpname <- paste(inters$effectName, collapse = " x ")
+                   if (twoway && nchar(tmpname) < 38)
+                   {
+                       tmpname <- paste("int. ", tmpname)
+                   }
+                   if (!twoway)
+                   {
+                       tmpname <- paste("i3.", tmpname)
+                   }
+                   tmpname
+               }, y=interactions, z=effects)
+        effects[effects$shortName == "behUnspInt" & effects$include &
                 !is.na(effects$effect1), c("effectName", "functionName")] <-
                     unspIntNames
     }
     effects
 }
+
 

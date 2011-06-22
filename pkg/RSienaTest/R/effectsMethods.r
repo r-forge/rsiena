@@ -21,7 +21,7 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
         sink(fileName, split=TRUE)
     }
 
-    interactions <- x[x$shortName == "unspInt" & x$include &
+    interactions <- x[x$shortName %in% c("unspInt", "behUnspInt") & x$include &
                             x$effect1 > 0, ]
     if (expandDummies)
     {

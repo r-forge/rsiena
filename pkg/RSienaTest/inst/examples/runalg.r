@@ -132,8 +132,9 @@ profileLikelihoods(list(theta=c(5.2, 5.2,-2.5, 2, .7, -0.1, -0.03, 1, 1, .4, -0.
 
 ##bayes
 print("resp9")
-resp9 <- RSiena:::bayes(mydatam, myeffm, MLmodel, nrunMH=200, nbrNodes=2,save=FALSE)
+resp9 <- RSienaTest:::bayes(mydatam, myeffm, MLmodel, nrunMH=200, nbrNodes=2,save=FALSE)
 
+resp9 <- RSienaTest:::bayes(mydata, myeff, mymodel, nrunMH=200, nbrNodes=1,save=FALSE)
 
 
 acc <- resp9$MHacceptances[1:10,]

@@ -419,7 +419,7 @@ double BehaviorVariable::totalEvaluationContribution(int actor,
 			(BehaviorEffect *) pFunction->rEffects()[i];
 		double thisContribution =
 			pEffect->calculateChangeContribution(actor, difference);
-		this->levaluationEffectContribution[difference+1][i] =
+		this->levaluationEffectContribution[difference + 1][i] =
 			thisContribution;
 		contribution += pEffect->parameter() * thisContribution;
 	}
@@ -438,7 +438,7 @@ double BehaviorVariable::totalEndowmentContribution(int actor,
 			(BehaviorEffect *) pFunction->rEffects()[i];
 		double thisContribution =
 			pEffect->calculateChangeContribution(actor, difference);
-		this->lendowmentEffectContribution[difference+1][i] =
+		this->lendowmentEffectContribution[difference + 1][i] =
 			thisContribution;
 		contribution += pEffect->parameter() * thisContribution;
 	}
@@ -463,7 +463,7 @@ double BehaviorVariable::totalCreationContribution(int actor,
 			(BehaviorEffect *) pFunction->rEffects()[i];
 		double thisContribution =
 			pEffect->calculateChangeContribution(actor, difference);
-		this->lcreationEffectContribution[difference+1][i] =
+		this->lcreationEffectContribution[difference + 1][i] =
 			thisContribution;
 		contribution += pEffect->parameter() * thisContribution;
 	}
@@ -692,7 +692,7 @@ void BehaviorVariable::accumulateDerivatives() const
 				product[effect1] +=
 					this->levaluationEffectContribution[2][effect1] *
 					this->lprobabilities[2];
-					if (R_IsNaN(product[effect1]))
+				if (R_IsNaN(product[effect1]))
 				{
 					Rprintf("eval up effect 1 %d %f %f \n", effect1,
 						this->levaluationEffectContribution[2][effect1],
@@ -713,20 +713,6 @@ void BehaviorVariable::accumulateDerivatives() const
 						this->lprobabilities[2]);
 				}
 			}
-			// else
-			// {
-			// // 	product[effect1] +=
-			// // 		this->lendowmentEffectContribution[2][endowment1] *
-			// // 		this->lprobabilities[2];
-			// // 	//if (R_IsNaN(product[effect1]))
-			//  	if (this->lendowmentEffectContribution[2][endowment1])
-			//  	{
-			//  		Rprintf("endow up non zero effect 1 %d %d %f %f \n",
-			//  			effect1, endowment1,
-			//  			this->lendowmentEffectContribution[2][endowment1],
-			//  			this->lprobabilities[2]);
-			//  	}
-			//  }
 		}
 		if (this->ldownPossible)
 		{
@@ -749,7 +735,8 @@ void BehaviorVariable::accumulateDerivatives() const
 					this->lprobabilities[0];
 				if (R_IsNaN(product[effect1]))
 				{
-					Rprintf("endow down effect 1 %d %d%f %f \n", effect1, endowment1,
+					Rprintf("endow down effect 1 %d %d%f %f \n", effect1,
+						endowment1,
 						this->lendowmentEffectContribution[0][endowment1],
 						this->lprobabilities[0]);
 				}

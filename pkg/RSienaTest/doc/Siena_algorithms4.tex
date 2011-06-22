@@ -1083,6 +1083,7 @@ Note that this concerns effect for the same behavior variable $Z$.
 For such effects, the change contribution is $s_{ik}^{Z0}(x,z)$ and
 the evaluation statistic is (\ref{beh_eff_standard}).
 
+
 The interaction of two such effects, with indices $k_1$ and $k_2$
 (where it is allowed that $k_1 = k_2$) is defined by the
 evaluation statistic
@@ -1094,6 +1095,17 @@ and the change contribution
 \[
    s_{ik_1}^{Z0}(x,z) \, s_{ik_2}^{Z0}(x,z)  \ .
 \]
+
+??????? RSiena is written in terms of an arbitrary allowed change. I have coded
+the change as\[
+  \textrm{difference}  * s_{ik_1}^{Z0}(x,z) \, s_{ik_2}^{Z0}(x,z)  \ .
+\]
+
+I have I hope this is correct. I have multiplied together the terms for each ego
+and then divided by the value or difference until only one value or difference
+is retained.
+
+
 
 For interactions between three effects it is just the same.
 The same effects qualify, the evaluation statistic is

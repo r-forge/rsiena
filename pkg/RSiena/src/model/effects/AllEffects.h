@@ -16,6 +16,7 @@
 #include "AverageAlterEffect.h"
 #include "AverageReciprocatedAlterEffect.h"
 #include "BalanceEffect.h"
+#include "BehaviorInteractionEffect.h"
 #include "BetweennessEffect.h"
 #include "CovariateAlterEffect.h"
 #include "CovariateDistance2AlterEffect.h"

@@ -1,3 +1,33 @@
+2011-06-22 R-forge revision 158
+
+	* data/allEffects.csv, R/effects.r,
+	src/model/effects/InteractionCovariateEffect.cpp,
+	src/model/effects/InteractionCovariateEffect.h,
+	src/model/effects/SimilarityEffect.cpp,
+	src/model/effects/SimilarityEffect.h: fix replication bug in unspecified
+	interactions, remove influence 1-sided effects, replace influence
+	interaction effects by 3 options. Tidy up covarBehaviorObjective group.
+	* data/allEffects.csv, R/effectsMethods.r, R/initializeFRAN.r,
+	src/model/effects/allEffects.h,
+	src/model/effects/AltersCovariateAverageEffect.cpp,
+	src/model/effects/AltersCovariateAverageEffect.h,
+	src/model/effects/AverageAlterEffect.cpp,
+	src/model/effects/AverageAlterEffect.h,
+	src/model/effects/BehaviorEffect.cpp, src/model/effects/BehaviorEffect.h,
+	src/model/EffectFactory.cpp,
+	src/model/effects/IndegreeEffect.cpp, src/model/effects/indegreeEffect.h,
+	src/model/effects/LinearShapeEffect.cpp,
+	src/model/effects/LinearShapeEffect.h,
+	src/model/effects/MainCovariateEffect.cpp,
+	src/model/effects/MainCovariateEffect.h,
+	src/model/effects/OutdegreeEffect.cpp,
+	src/model/effects/OutdegreeEffect.h,
+	src/model/variables/BehaviorVariable.cpp: behavior interactions
+	* R/initializeFRAN.r: fix bug: underlying effects of interactions with
+	include = FALSE were being included.
+	* R/sienaTimeTest.r, doc/sienaTimeFix.doc (RSienaTest only): implement
+	time dummies for behavior effects.
+
 2011-06-18 R-forge revision 157
 
 	* R/phase2.r: corrected definition of standard deviation used to control
