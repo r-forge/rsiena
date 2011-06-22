@@ -75,7 +75,8 @@
 \item Conditioning is always done for parameter-wise tests, but is optional for
   individual tests. This seems to be the cause of the discrepancies where there
   are three waves. Josh has a note about the possibility of discrepancies: I
-  think it is because different tests were done.
+  think it is because different tests were done. 22/06/2011: Josh has changed
+  the note.
 \item In the print, H0 was defined as all the dummy effects being zero,
   including any which have been estimated. This seems wrong to me. And I have
   changed it to only non estimated effects.
@@ -93,6 +94,7 @@
 \item Not sure what to do for behavior effects. I have included rateX as they
   seem to be logically the same as rateX for networks. But for objective
   function effects, the density effect is accessed for networks...
+22/06/2011: now done: linear effect plays the role of density effect.
 \item Is it logically necessary to find the density effect for a network when
   creating dummies? Should one stop or just ignore it?
 \item Would appreciate an explanation of the difference between rateX and

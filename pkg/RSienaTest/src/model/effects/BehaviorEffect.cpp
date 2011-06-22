@@ -164,13 +164,36 @@ double BehaviorEffect::egoStatistic(int ego, double * currentValues)
 
 /**
  * Returns the statistic corresponding to this effect as part of
+ * the endowment function with respect to the given values of
+ * the behavior variable.
+ */
+double BehaviorEffect::endowmentStatistic(const int * difference,
+	double * currentValues)
+{
+	double statistic = 0;
+	int n = this->n();
+
+	for (int i = 0; i < n; i++)
+	{
+		this->preprocessEgo(i);
+		if (!this->missing(this->period(), i))
+		{
+			statistic += this->egoEndowmentStatistic(i, difference,
+				currentValues);
+		}
+	}
+
+	return statistic;
+}
+/**
+ * Returns the statistic corresponding the given ego as part of
  * the endowment function with respect to an initial behavior
  * variable and the current state.
  */
-double BehaviorEffect::endowmentStatistic(const int * difference,
+double BehaviorEffect::egoEndowmentStatistic(int i, const int * difference,
 	double *currentValues)
 {
-	throw runtime_error("endowmentStatistic not implemented for " +
+	throw runtime_error("egoEndowmentStatistic not implemented for " +
 		this->pEffectInfo()->effectName());
 }
 
