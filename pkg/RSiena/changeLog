@@ -1,3 +1,9 @@
+2011-06-23 R-forge revision 159
+
+	* src/model/effects/BehaviorInteractionEffect.cpp,
+	src/model/effects/BehaviorInteractionEffect.h: forgotten in previous
+	revision.
+
 2011-06-22 R-forge revision 158
 
 	* data/allEffects.csv, R/effects.r,
