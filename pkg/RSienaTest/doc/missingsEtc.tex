@@ -211,6 +211,11 @@ value is carried forward.
   networks these have all values missing at either end of the period set to
   zero. For behavior variable we only set to zero the values which are missing
   at the start of the period.
+\item In the simulated values data for any actors who are inactive at the end of
+  the period are set to the values at the start of the period so as not to
+  affect the statistics. This is done in a routine named \nnm{setLeaverBack} but
+  in fact it affects all actors inactive at the time, not just leavers during
+  the period.
 \item Then each dependent variable is processed in turn. The three types of
   effects are processed differently, and differently for networks and behavior
   variables:

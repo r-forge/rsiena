@@ -75,7 +75,8 @@ double AltersCovariateAverageEffect::egoEndowmentStatistic(int ego,
 
 	if (difference[ego] > 0 && !this->missingDummy(ego))
 	{
-		statistic = currentValues[ego] * this->averageAlterValue(ego);
+		//statistic = currentValues[ego] * this->averageAlterValue(ego);
+		statistic -= difference[ego] * this->averageAlterValue(ego);
 	}
 
 	return statistic;

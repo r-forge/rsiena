@@ -68,9 +68,8 @@ double OutdegreeEffect::egoEndowmentStatistic(int ego, const int * difference,
 
 	if (difference[ego] > 0)
 	{
-		statistic += currentValues[ego] * this->pNetwork()->outDegree(ego);
-		//		-(currentValues[i] + difference[i]) *
-		//	this->pNetworkVariable()->pPredictorNetwork()->outDegree(i);
+//		statistic += currentValues[ego] * this->pNetwork()->outDegree(ego);
+		statistic -= difference[ego] * this->pNetwork()->outDegree(ego);
 	}
 
 	return statistic;
