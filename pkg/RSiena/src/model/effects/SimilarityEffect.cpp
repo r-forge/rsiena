@@ -203,8 +203,8 @@ double SimilarityEffect::egoEndowmentStatistic(int ego, const int * difference,
 
 				statistic = thisStatistic;
 
-				// do the same using the difference in i's value
-				// rather than current state and subtract it.
+				// do the same using the current state plus difference
+				// in i's value rather than current state and subtract it.
 				// not sure whether this is correct.
 
 				thisStatistic = 0;

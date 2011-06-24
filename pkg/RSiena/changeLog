@@ -1,3 +1,16 @@
+2011-06-24 R-forge revision 160
+
+	* src/model/effects/BehaviorInteractionEffect.cpp,
+	src/model/effects/AltersCovariateAverageEffect.cpp,
+	src/model/effects/LinearShapeEffect.cpp,
+	src/model/effects/MainCovariateEffect.cpp,
+	src/model/effects/IndegreeEffect.cpp,
+	src/model/effects/OutdegreeEffect.cpp,
+	src/model/effects/SimilarityEffect.cpp (this one was changed in the
+	previous revision): make endowment and creation
+	effects consistently subtract the previous value. Interactions now
+	divide by minus the difference rather than the current value.
+
 2011-06-23 R-forge revision 159
 
 	* src/model/effects/BehaviorInteractionEffect.cpp,

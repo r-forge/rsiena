@@ -68,10 +68,8 @@ double IndegreeEffect::egoEndowmentStatistic(int i, const int * difference,
 
 	if (difference[i] > 0)
 	{
-		statistic += currentValues[i] *
-			this->pNetwork()->inDegree(i);
-		//		-(currentValues[i] + difference[i]) *
-		//	this->pNetworkVariable()->pPredictorNetwork()->inDegree(i);
+		//	statistic += currentValues[i] * this->pNetwork()->inDegree(i);
+		statistic -= difference[i] * this->pNetwork()->inDegree(i);
 	}
 
 	return statistic;

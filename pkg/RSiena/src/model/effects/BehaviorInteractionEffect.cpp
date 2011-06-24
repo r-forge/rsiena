@@ -158,12 +158,15 @@ double BehaviorInteractionEffect::egoEndowmentStatistic(int i,
 			this->lpEffect2->egoEndowmentStatistic(i, difference,
 				currentValues);
 
-		statistic /= currentValues[i];
+		//	statistic /= currentValues[i];
+		statistic /=  - difference[i];
 
 		if (this->lpEffect3)
 		{
+			// statistic *= this->lpEffect3->egoEndowmentStatistic(i, difference,
+			// 	currentValues) / currentValues[i];
 			statistic *= this->lpEffect3->egoEndowmentStatistic(i, difference,
-				currentValues) / currentValues[i];
+				currentValues) / - difference[i];
 		}
 	}
 	else

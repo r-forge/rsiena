@@ -58,7 +58,8 @@ double LinearShapeEffect::egoEndowmentStatistic(int ego,
 
 	if (difference[ego] > 0)
 	{
-		statistic = currentValues[ego] ;
+		//	statistic = currentValues[ego] ;
+		statistic -= difference[ego];
 	}
 
 	return statistic;
