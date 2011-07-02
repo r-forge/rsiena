@@ -1,3 +1,15 @@
+2011-07-02 R-forge revision 161
+
+	* man.siena08.Rd: add note about names of effects need to match
+	* man/siena07.Rd, man/simstats0c.Rd: minor edits.
+	* R/effects.r, R/sienaDataCreate.r: minor edits of comments
+	* R/bayes.r, R/maxlikec.r, inst/examples/algorithms.r: Bayesian routine
+	was failing for single data objects.
+	* R/RSienaRDocumentation.r: fix for internal functions of internal
+	functions. Clumsy at present.
+	* man/RscriptSienaRunModel.R: minor correction to text, many trailing
+	spaces removed.
+
 2011-06-24 R-forge revision 160
 
 	* src/model/effects/BehaviorInteractionEffect.cpp,

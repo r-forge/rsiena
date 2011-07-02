@@ -727,7 +727,7 @@ the\\ \sfn{verbose=TRUE} option of \sfn{siena07}.
 \item Note that it is possible to use multiple processors in \sfn{siena07}. For
   details see section~\ref{S_multipleProcesses}.
 \item Also note the availability of the parameter \sfn{prevAns} to reuse
-  estimates and derivatives from a previous run with the same effects.
+  estimates and derivatives from a previous run with similar effects.
 \end{enumerate}
 Basic output will be written to a file. Further output can be obtained by using
 the \sfn{verbose=TRUE} option of \sfn{siena07}.
@@ -8814,6 +8814,13 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2011-07-02
+\begin{itemize}
+\item Fix problem with bayes routine with single data object only.
+\item Fix problems with getRSienaRDocumentation: internal functions within
+internal functions  now work (but still not automatically)
+and function now runs on non-Windows too.
+\end{itemize}
 \item 2011-06-24. R-forge revision 160: behavior endowment effects are now
   all defined consistently as current value less previous one, as in the manual.
 \item 2011-06-22, 2011-06-23. R-forge revision 158/159: behavior

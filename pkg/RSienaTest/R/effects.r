@@ -8,7 +8,7 @@
 # * Description: This module contains the code for the creation of the
 # * effects object to go with a Siena data object or group object.
 # *****************************************************************************/
-##@substituteNames  replace xxxxxx, yyyyyy, zzzzzz
+##@substituteNames DataCreate replace xxxxxx, yyyyyy, zzzzzz
 substituteNames <- function(nameVectors, xName=NULL, yName=NULL, zName=NULL)
 {
     effects <- nameVectors[, c("effectName", "functionName",
@@ -32,7 +32,7 @@ substituteNames <- function(nameVectors, xName=NULL, yName=NULL, zName=NULL)
                     "interaction1", "interaction2")] <- effects
     nameVectors
 }
-##@createEffects  Extract required rows and change text
+##@createEffects DataCreate Extract required rows and change text
 createEffects <- function(effectGroup, xName=NULL, yName=NULL, zName = NULL,
 						  name, groupName, group, netType)
 {
@@ -70,7 +70,7 @@ createEffects <- function(effectGroup, xName=NULL, yName=NULL, zName = NULL,
     effects <- data.frame(name=effectsname, effects, stringsAsFactors=FALSE)
     effects
 }
-##@getEffects DataCreate
+##@getEffects DataCreate create effects object
 getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 {
     ##@duplicateDataFrameRow internal getEffects Put period numbers in
@@ -122,7 +122,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         }
         rateEffects
     }
-    ##@oneModeNet internal getEffects
+    ##@oneModeNet internal getEffects process a one mode net
     oneModeNet <- function(depvar, varname)
     {
         symmetric <- attr(depvar, "symmetric")
