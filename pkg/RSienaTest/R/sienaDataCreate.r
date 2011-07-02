@@ -8,7 +8,7 @@
 # * Description: This module contains the code to create
 # * Siena data object and group data objects.
 # *****************************************************************************/
-##@addeAttributes DataCreate method for attaching attributes to objects
+##@addAttributes DataCreate method for attaching attributes to objects
 addAttributes <- function(x, name, ...) UseMethod("addAttributes")
 
 ##@addAttributes.coCovar DataCreate

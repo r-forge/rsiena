@@ -231,7 +231,7 @@ algorithms <- function(data, effects, x, ...)
     z
 }
 
-getProbs <- function(x, theta, getScores, ratePar, nactors)
+getProbsAlgs <- function(x, theta, getScores, ratePar, nactors)
 {
     f <- RSiena:::FRANstore()
     group <- attr(x, "group")
@@ -242,7 +242,7 @@ getProbs <- function(x, theta, getScores, ratePar, nactors)
                   f$pData, f$pModel, as.integer(group),
                   as.integer(period), f$myeffects,
                   theta, getScores)
-    lik <- getLikelihood(resp[[1]])#, nactors[[group]],
+    lik <- getLikelihoodAlgs(resp[[1]])#, nactors[[group]],
                          ##theta[k])
     if (getScores)
     {
@@ -270,14 +270,14 @@ getProbabilities <- function(chain, theta, nactors, rateParameterPosition,
     if (!is.null(cl) )
     {
         use <- 1:min(length(chain), length(cl))
-        tmp <- parLapply(cl[use], chain, getProbs, theta=theta,
+        tmp <- parLapply(cl[use], chain, getProbsAlgs, theta=theta,
                          getScores=getScores,
                          ratePar=rateParameterPosition, nactors=nactors
                          )
     }
     else
     {
-        tmp <- lapply(chain, getProbs, theta=theta, getScores=getScores,
+        tmp <- lapply(chain, getProbsAlgs, theta=theta, getScores=getScores,
                      ratePar=rateParameterPosition, nactors=nactors)
     }
     lik <- sapply(tmp, function(x)x[[1]])
@@ -391,7 +391,7 @@ getProbabilitiesR <- function(chain, theta, nactors, rateParameterPosition,
     list(lik=mysum)
 }
 
-getLikelihood <- function(chain)#, nactors, lambda)
+getLikelihoodAlgs <- function(chain)#, nactors, lambda)
 {
     loglik <- 0
    # ncvals <- sapply(chain, function(x)x[[3]])
@@ -955,7 +955,7 @@ getLikelihoodLocal <- function(chains, z, theta)
            ratePar <- ratePar[[x]]
            sapply(1:periods[x], function(y)
               {
-                  getLikelihood(chains2[[y]])#, nactors,
+                  getLikelihoodAlgs(chains2[[y]])#, nactors,
                                 ##z$theta[ratePar[[y]]])
               })
        }, chains=chains, periods=z$groupPeriods,

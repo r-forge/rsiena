@@ -8,11 +8,12 @@
 ## * Description: This file contains the code to run Bayesian simulation
 ## *
 ## ****************************************************************************/
-##@bayes algorithm  fit a Bayesian model
+##@bayes Bayesian fit a Bayesian model
 bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
                   nrunMH=100, save=TRUE, nbrNodes=1, seed=1, dfra=NULL,
-                  priorSigma=NULL, prevAns=NULL)
+                  priorSigma=NULL, prevAns=NULL, getDocumentation=FALSE)
 {
+    ##@createStores internal bayes Bayesian set up stores
     createStores <- function(z)
     {
         npar <- length(z$theta)
@@ -26,6 +27,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         z$MHproportions <- array(NA, dim=c(numberRows, z$nGroup, 7))
         z
     }
+    ##@storeData internal bayes Bayesian put data in stores
     storeData <- function()
     {
         start <- z$sub + 1
@@ -50,12 +52,14 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         z$sub <- z$sub + nrun
         z
     }
+	##@improveMH internal bayes Bayesian find scale factors
     improveMH <- function(z, x, tiny=1.0e-15, desired=40, maxiter=100,
-                          tolerance=15)
+                          tolerance=15, getDocumentation=FALSE)
     {
+		##@rescaleCGD internal improveMH Bayesian
         rescaleCGD <- function(iter)
         {
-            u <- ifelse (actual > desired,
+			u <- ifelse (actual > desired,
                          2 - ((iter - actual) / (iter - desired)),
                          1 / (2 - (actual / desired)))
             number <<- ifelse(abs(actual - desired) <= tolerance,
@@ -63,6 +67,11 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             success <<- number >= 2
             u
         }
+		if (getDocumentation)
+		{
+			tt <- getInternals()
+			return(tt)
+		}
         iter <- 0
         number <- rep(0, z$nGroup)
         success <- rep(FALSE, z$nGroup)
@@ -92,6 +101,25 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     ## ################################
     ## start of function proper
     ## ################################
+	if (getDocumentation != FALSE)
+	{
+		if (getDocumentation == TRUE)
+		{
+			tt <- getInternals()
+			return(tt)
+		}
+		else ## need to run getInternals on the argument value
+		{
+			targs <- formals(getDocumentation[1])
+			targs[1:length(targs)] <- 1
+			targs['getDocumentation'] <- TRUE
+			if (length(getDocumentation) > 1)
+			{
+				targs['getDocumentation'] <- getDocumentation[-1]
+			}
+			return(do.call(getDocumentation[1], targs))
+		}
+	}
 
     z <- initializeBayes(data, effects, model, nbrNodes, seed, priorSigma,
                          prevAns=prevAns)
@@ -163,8 +191,10 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             ##thetadf <- data.frame(z$candidates)
             acceptsdf <- data.frame(z$MHproportions,
                                     z$acceptances)
-            ratesdf <- thetadf[, -1][, z$basicRate]
-            thetadf <- cbind(Group=thetadf[, 1], thetadf[, -1][, !z$basicRate])
+            ratesdf <- thetadf[, -1, drop=FALSE][, z$basicRate, drop=FALSE]
+            thetadf <- cbind(Group=thetadf[, 1, drop=FALSE],
+							 thetadf[, -1, drop=FALSE][,
+										   !z$basicRate, drop=FALSE])
             thetaNames<- paste(z$effects$name[!z$basicRate],
                                z$effects$shortName[!z$basicRate], sep=".")
             rateNames <- paste(z$effects$name[basicRate],
@@ -172,7 +202,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
                                            z$effects$period[basicRate],
                                            z$effects$group[basicRate], sep=".")
             names(ratesdf) <- rateNames
-            ratesdf <- cbind(Group=thetadf[, 1], ratesdf)
+            ratesdf <- cbind(Group=thetadf[, 1, drop=FALSE], ratesdf)
             names(thetadf)[-1] <- make.names(thetaNames, unique=TRUE)
             names(acceptsdf) <- c("InsDiag", "CancDiag", "Permute", "InsPerm",
                                   "DelPerm", "InsMissing", "DelMissing",
@@ -226,7 +256,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     z$FRAN <- NULL
     z
 }
-
+##@MCMCcycle algorithms do some loops of (MH steps and sample parameters)
 MCMCcycle <- function(z, nrunMH, nrunMHBatches, change=TRUE)
 {
     z$accepts <- matrix(NA, nrow=z$nGroup, nrunMHBatches)
@@ -259,6 +289,7 @@ MCMCcycle <- function(z, nrunMH, nrunMHBatches, change=TRUE)
     z$nrunMH <- storeNrunMH
     z
 }
+##@sampleParameters algorithms propose new parameters and accept them or not
 sampleParameters <- function(z, change=TRUE)
 {
     ## get a multivariate normal with covariance matrix dfra multiplied by a
@@ -325,7 +356,7 @@ sampleParameters <- function(z, change=TRUE)
     z
 }
 
-
+##@initializeBayes algorithms do set up for Bayesian model
 initializeBayes <- function(data, effects, model, nbrNodes, seed, priorSigma,
                             prevAns)
 {
@@ -395,7 +426,7 @@ initializeBayes <- function(data, effects, model, nbrNodes, seed, priorSigma,
                                                 function(x) 1:x))))
     z
 }
-
+##@getDFRA algorithms do a few ML iterations and calculate a derivative matrix
 getDFRA <- function(z, n)
 {
     ## do n MLmodelsteps with the initial thetas and get
@@ -425,7 +456,7 @@ getDFRA <- function(z, n)
     ##z$covFactor <- z$eS$vectors %*% diag(sqrt(pmax(z$ev, 0)), z$pp)
     z
 }
-
+##@getLikelihood algorithms calculated likelihood for one chain
 getLikelihood <- function(chain, nactors, lambda, simpleRates)
 {
     loglik <- 0
@@ -437,11 +468,11 @@ getLikelihood <- function(chain, nactors, lambda, simpleRates)
     logChoiceProb <- sapply(chain, function(x)x[[9]])
     logOptionSetProb <- sapply(chain, function(x)x[[8]])
     loglik <- sum(logChoiceProb)  + sum(logOptionSetProb)
-                                        #print(sum(logOptionSetProb))
+	##print(sum(logOptionSetProb))
     if (simpleRates)
     {
         loglik <- loglik - sum(nactors * lambda) + sum(nc * log(lambda))# -
-           # sum(lfactorial(nc))
+		## sum(lfactorial(nc)) don't need factorial in bayes!
     }
     else
     {
@@ -453,7 +484,7 @@ getLikelihood <- function(chain, nactors, lambda, simpleRates)
     }
     loglik
 }
-
+##@getProbs algorithms calculates likelihood sum over nested list of chains
 getProbs <- function(z, chain)
 {
     sapply(1: length(chain), function(i)
@@ -471,7 +502,7 @@ getProbs <- function(z, chain)
        }
            )
 }
-
+##@flattenChains algorithms converts a nested list of chains to a single list
 flattenChains <- function(zz)
 {
         for (i in 1:length(zz)) ##group
@@ -485,7 +516,8 @@ flattenChains <- function(zz)
     zz <- do.call(c, zz)
     zz
 }
-
+##@dmvnorm algorithms calculated multivariate normal density:
+##inefficient: should not call mahalanobis and eigen with same sigma repeatedly
 dmvnorm <- function(x, mean , sigma)
 {
     if (is.vector(x))

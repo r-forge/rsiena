@@ -9,15 +9,15 @@
 # RscriptDataFormat.R, followed by
 # RscriptSienaVariableFormat.R, which formats data and specifies the model, and
 # RscriptSienaRunModel.R, which runs the model and estimates parameters
-# RscriptSienaBehaviour.R, which illustrates an example of analysing the 
+# RscriptSienaBehaviour.R, which illustrates an example of analysing the
 # coevolution of networks and behaviour.
-# Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley, 
+# Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley,
 # Johan Koskinen, and Paulina Preciado.
 #
-# This script, RscriptSienaRunModel.R, runs the estimation in RSiena for the 
+# This script, RscriptSienaRunModel.R, runs the estimation in RSiena for the
 # model set up and defined in the script RscriptSienaVariableFormat.R.
 #
-# A quick version of the model fitting without comments is given at the end 
+# A quick version of the model fitting without comments is given at the end
 # of this script
 
 ########################### ESTIMATION OF PARAMETERS ###########################
@@ -62,7 +62,7 @@
 # and intermediate information will be written to the console.
 
 # Function siena07 produces a so-called sienaFit object, here called ans;
-# and it fills in a few things in the sienaEffects object myeff, 
+# and it fills in a few things in the sienaEffects object myeff,
 # if this is the first use of myeff in a siena07 call.
 # By using various different effects objects, i.e., with different names,
 # you can switch between specifications.
@@ -70,7 +70,7 @@
 # The batch = FALSE parameters will give a graphical user interface being opened
 # which reports on the progress of the estimation algorithm;
 
-# verbose = TRUE leads to extensive diagnostic information being sent 
+# verbose = TRUE leads to extensive diagnostic information being sent
 # to the console during the estimation, and results after the estimation
 # (these results are also copied to the output file projname.out, mentioned above);
 # while batch=TRUE gives only a limited amount of printout sent to the console
@@ -79,7 +79,7 @@
 # which monitors the progress of the estimation algorithm in  a different way.
 
 # The call of siena07 leads to output in the file s50_3.out
-# (or more generally projname.out, 
+# (or more generally projname.out,
 # where projname is the name given in sienaModelCreate)
 # and to the creation of the object which here is called ans (for "answer").
 
@@ -92,15 +92,15 @@
 # Adjust the nbrNodes to the number available.
 # If you wish to work on with other programs while running siena07,
 # it is advisable to use one node less than the number of available processors.
-# If you wish to use other machines as well, 
+# If you wish to use other machines as well,
 # see the more detailed instructions below.
 # You will then need to use the clusterString argument as well.
 #
 # For more advanced use, it can be helpful to have access to the networks
 # simulated in the so-called third phase of the estimation algorithm.
 # These networks can be used, e.g., for checking goodness of fit.
-# This can be achieved by using the parameter returnDeps=TRUE. 
-# The fitted object ans will then have a component named "sims" 
+# This can be achieved by using the parameter returnDeps=TRUE.
+# The fitted object ans will then have a component named "sims"
 # which contains a list (each iteration) of lists (each data object)
 # of lists (each dependent network or behavior variable) of edgelists for
 # networks or vectors for behavior variables.
@@ -113,7 +113,7 @@
 ################### LOOKING AT THE RESULTS ################################
 
 # The file "s50_3.out" will contain the results of the estimation.
-# It is contained in the current directory ("getwd()"). 
+# It is contained in the current directory ("getwd()").
 # This file can be read by any text editor.
 # A summary of the results is obtained on the screen by
 
@@ -127,36 +127,36 @@
 # the results could be something like the following.
 
 # Estimates, standard errors and t-statistics for convergence
-# 
-#                                        Estimate   Standard   t statistic 
-#                                                     Error                
-# 
-# Rate parameters: 
-#   0.1      Rate parameter period 1      6.5644  ( 1.1020   )             
-#   0.2      Rate parameter period 2      5.1981  ( 0.8611   )             
-# 
-# Other parameters: 
-#   1.  eval outdegree (density)         -2.7027  ( 0.1253   ) -0.0025     
-#   2.  eval reciprocity                  2.3894  ( 0.2157   ) -0.0335     
-#   3.  eval transitive triplets          0.6111  ( 0.1392   ) -0.0247     
-#   4.  eval 3-cycles                    -0.0069  ( 0.2731   )  0.0126     
-#   5.  eval smoke1 similarity            0.2595  ( 0.2107   )  0.0144     
-#   6.  eval alcohol alter               -0.0195  ( 0.0699   ) -0.0155     
-#   7.  eval alcohol ego                  0.0374  ( 0.0801   ) -0.0681     
-#   8.  eval alcohol ego x alcohol alter  0.1297  ( 0.0527   ) -0.0001     
-# 
+#
+#                                        Estimate   Standard   t statistic
+#                                                     Error
+#
+# Rate parameters:
+#   0.1      Rate parameter period 1      6.5644  ( 1.1020   )
+#   0.2      Rate parameter period 2      5.1981  ( 0.8611   )
+#
+# Other parameters:
+#   1.  eval outdegree (density)         -2.7027  ( 0.1253   ) -0.0025
+#   2.  eval reciprocity                  2.3894  ( 0.2157   ) -0.0335
+#   3.  eval transitive triplets          0.6111  ( 0.1392   ) -0.0247
+#   4.  eval 3-cycles                    -0.0069  ( 0.2731   )  0.0126
+#   5.  eval smoke1 similarity            0.2595  ( 0.2107   )  0.0144
+#   6.  eval alcohol alter               -0.0195  ( 0.0699   ) -0.0155
+#   7.  eval alcohol ego                  0.0374  ( 0.0801   ) -0.0681
+#   8.  eval alcohol ego x alcohol alter  0.1297  ( 0.0527   ) -0.0001
+#
 
 # The results can also be viewed externally in the output file s50_3.out
 # It is advisable that you have a look at all three reports and
 # understand how information is organized in each of them.
 
-# To understand the table above, note that the "t statistic" 
+# To understand the table above, note that the "t statistic"
 # is the t-statistic for convergence checking,
 # not the t statistic for testing the significance of this effect!
 # (See Section 6.2 of the manual.)
 # In the external output file, these are called
 # "t-ratios for deviations from targets".
-# The rule of thumb is that all t-ratios for convergence 
+# The rule of thumb is that all t-ratios for convergence
 # should ideally be less than 0.1 in absolute value;
 # this signifies good convergence of the algorithm.
 # In the example here, this is the case.
@@ -175,7 +175,7 @@
         ans$covtheta
 
 # contains the covariance matrix of the estimates.
-# There are several "methods" available for viewing the object 
+# There are several "methods" available for viewing the object
 # containing the results of the estimation.
 # Above we already mentioned
 #        ans
@@ -205,14 +205,14 @@
 # (it 'has not converged well'),
 # as will be indicated by some of the t-ratios for convergence
 # being larger than 0.1 (this threshold is not to be taken too precisely, though),
-# the best thing to do is continuing the estimation, 
+# the best thing to do is continuing the estimation,
 # using the estimates produced here,
 # and contained in ans, as the new initial values.
 # This is done by the option prevAns ('previous ans') as in
 
         ans <- siena07(mymodel, data=mydata, effects=myeff, prevAns=ans)
 
-# the parameter estimates in ans then are  extracted and 
+# the parameter estimates in ans then are  extracted and
 # used in the new estimation,
 # and moreover Phase 1 will be omitted from the algorithm,
 # as derivatives and covariance matrix are used from the previous run.
@@ -225,7 +225,7 @@
 #       mymodel$useStdInits <- FALSE
 # To understand what happens here, read on:
 
-# Another and more flexible way for determining initial values is by 
+# Another and more flexible way for determining initial values is by
 # using the useStdInits element of the model object,
 # and the initial values in the effects object.
 # This is done as follows.
@@ -239,7 +239,7 @@
 #       mymodel$useStdInits <- TRUE
 
 # Putting the estimates from the results object ans into the
-# effects object myeff, if ans used conditional estimation, is done by
+# effects object myeff, if ans used unconditional estimation, is done by
 #       myeff$initialValue[myeff$include] <- ans$theta
 # and if conditional estimation was used, conditioning on the first
 # dependent network, by
@@ -264,13 +264,13 @@
 ################################################################################
 #
 # Two types of tests are available in SIENA.
-# 1. t-type tests of single parameters can be carried out by dividing 
-# the parameter estimate by its standard error. 
+# 1. t-type tests of single parameters can be carried out by dividing
+# the parameter estimate by its standard error.
 # Under the null hypothesis that the parameter is 0, these tests have
 # approximately a standard normal distribution.
-# 2. Score-type tests of single and multiple parameters are described 
+# 2. Score-type tests of single and multiple parameters are described
 # in the manual.
-# Parameters can be restricted by putting TRUE in the 
+# Parameters can be restricted by putting TRUE in the
 # include, fix and test columns of the effects object.
 # For example, to request a score test for the indegree popularity effect,
 # the commands can be as follows.
@@ -281,7 +281,7 @@
 
 # After such an operation, again request
 #        myeff
-# to see what you have done.  
+# to see what you have done.
 
 
 ################################################################################
@@ -290,12 +290,12 @@
 ###
 ################################################################################
 #
-# An application of the score test is given for the special case of parameter 
-# heterogeneity by Lospinoso et al. (2010) and implemented in RSiena. 
+# An application of the score test is given for the special case of parameter
+# heterogeneity by Lospinoso et al. (2010) and implemented in RSiena.
 # To apply the test to the results obtained above. request, e.g.,
 #        tt2 <- sienaTimeTest(ans)
 #        plot(tt2, effects=3:4)
-# If as a consequence of this analysis you wish to add time dummy terms, 
+# If as a consequence of this analysis you wish to add time dummy terms,
 # this may be done via
 #        myeff <- includeTimeDummy(myeff, transTrip, cycle3, timeDummy="2")
 #        ans3 <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
@@ -319,7 +319,7 @@
         friend.data.w1[ friend.data.w2 %in% c(6,9) ] <- NA
         friend.data.w1[ friend.data.w3 %in% c(6,9) ] <- NA
 
-        friendship <- sienaNet( array( c( friend.data.w1, 
+        friendship <- sienaNet( array( c( friend.data.w1,
                                           friend.data.w2, friend.data.w3 ),
                                dim = c( 50, 50, 3 ) ) )
 
@@ -331,7 +331,7 @@
 
         myeff <- getEffects( mydata )# create effects structure
 
-        print01Report( mydata, myeff, modelname = 's50_3_init' ) 
+        print01Report( mydata, myeff, modelname = 's50_3_init' )
 
         myeff <- includeEffects( myeff, transTrip, cycle3 )
         myeff <- includeEffects( myeff, egoX, altX,
@@ -339,4 +339,4 @@
         myeff <- includeEffects( myeff, simX, interaction1 = "smoke1" )
 
         mymodel <- sienaModelCreate( useStdInits = TRUE, projname = 's50_3' )
-        ans <- siena07( mymodel, data = mydata, effects = myeff)    
+        ans <- siena07( mymodel, data = mydata, effects = myeff)

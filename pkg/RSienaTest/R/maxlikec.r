@@ -68,7 +68,13 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                      z$returnChains)
         ans[[6]] <- list(ans[[6]])
         ans[[7]] <- list(ans[[7]])
-    }
+        if (byGroup)
+        {
+			ans[[8]] <- list(ans[[8]])
+			ans[[9]] <- list(ans[[9]])
+			ans[[10]] <- list(ans[[10]])
+        }
+   }
     else
     {
         if (z$int2 == 1)
