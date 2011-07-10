@@ -116,9 +116,6 @@ double BehaviorInteractionEffect::calculateChangeContribution(int actor,
 double BehaviorInteractionEffect::egoStatistic(int i,
 	double * currentValues)
 {
-	int egoEffectCount = 0;
-	int effectCount = 2;
-
 	double statistic;
 
 	if (currentValues[i] != 0)

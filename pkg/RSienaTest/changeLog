@@ -1,6 +1,15 @@
+2011-07-10 R-forge revision 162
+
+	* src/model/effects/OutTruncEffect.cpp,
+	src/model/effects/OutTruncEffect.h, src/model/effects/allEffects.h,
+	src/model/effects/EffectFactory.cpp: renamed effect to TruncatedOutDegree
+	to comply with standards.
+	* src/model/effects/BehaviorInteractionEffect.cpp: remove extraneous
+	variable definitions to remove compiler warnings.
+
 2011-07-02 R-forge revision 161
 
-	* man.siena08.Rd: add note about names of effects need to match
+	* man.siena08.Rd: add note that names of effects must match
 	* man/siena07.Rd, man/simstats0c.Rd: minor edits.
 	* R/effects.r, R/sienaDataCreate.r: minor edits of comments
 	* R/bayes.r, R/maxlikec.r, inst/examples/algorithms.r: Bayesian routine

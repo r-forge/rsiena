@@ -6013,7 +6013,8 @@ Structural effects are the effects depending on the network only.
  $s^{\rm net}_{i\vit}(x) = x^{1.5}_{i+} = x_{i+}\,\sqrt{x_{i+}}$ \\
  endowment effect only likelihood-based;
 
- \item {\em out-degree up to $c$} (\emph{truncated out-degree}), where $c$ is some constant
+ \item {\em out-degree up to $c$} (\emph{truncated out-degree}),
+where $c$ is some constant
  (internal effect parameter, see above),  \texttt{(outTrunc)},
  defined by  \\
  $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;
@@ -8035,9 +8036,9 @@ an elaborate example.
                   add the lines
                 \begin{verbatim}
     else if (effectName == "newEf")
-	{
-		pEffect = new NewEffect(pEffectInfo);
-	}
+    {
+        pEffect = new NewEffect(pEffectInfo);
+    }
                 \end{verbatim}
 			\item Now you will need to create two files (namely header
                   and source files for
@@ -8066,6 +8067,9 @@ of outdegree, or a behavior effect depending nonlinearly
 on the behavior and nothing else.
 After having obtained experience with such a simple effect,
 continue with the effect that you are interested in.
+
+Note that if your new effect could usefully be used as part of a multiple
+network effect you should use the generic effect approach and not the following.
 
 \subsection{Example: adding the truncated out-degree effect}
 
@@ -8107,26 +8111,26 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
       \\
       The package was built. Loading it in \R and creating an
       \RS data set showed that indeed the effect was there.
-\item The name \sfn{OutTruncEffect} was chosen for the new function.\\
+\item The name \sfn{TruncatedOutdegreeEffect} was chosen for the new function.\\
       In the file \textsf{AllEffects.h} the line
       \begin{verbatim}
-        #include "OutTruncEffect.h"
+    #include "TruncatedOutdegreeEffect.h"
       \end{verbatim}
       was included at the appropriate alphabetic place.
 
       In the file \textsf{EffectFactory.cpp}, after the piece referring
       to \texttt{effectName == "outActSqrt"}, the lines
 \begin{verbatim}
-  else if (effectName == "outTrunc")
+    else if (effectName == "outTrunc")
     {
-     pEffect = new OutTruncEffect(pEffectInfo);
+         pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
     }
 \end{verbatim}
-      were inserted.
-      This refers the program, when it encounters short name \sfn{outTrunc},
-      to the function \sfn{OutTruncEffect}. The next step was to construct
-      this function.
-\item To choose a template for \sfn{OutTruncEffect}, we could make various
+      were inserted.  This refers the program, when it encounters short name
+      \sfn{outTrunc}, to the function \sfn{TruncatedOutdegreeEffect}.  The next
+      step was to construct this function.
+\item To choose a template for \sfn{TruncatedOutdegreeEffect},
+  we could make various
       different choices; here it is important to have a look at the various
       effects defined in Section~\ref{S_math} that depend only on the
       outdegree. Consider the effects Outdegree activity - sqrt
@@ -8164,22 +8168,23 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
 
       As a first step,   the files \textsf{InverseOutdegreeEffect.h} and
       \textsf{InverseOutdegreeEffect.cpp} were saved under the new names
-      \textsf{OutTruncEffect.h} and \textsf{OutTruncEffect.cpp}.
+      \textsf{TruncatedOutdegreeEffect.h} and
+      \textsf{TruncatedOutdegreeEffect.cpp}.
       \\
-      For the header file \textsf{OutTruncEffect.h}, all strings
+      For the header file \textsf{TruncatedOutdegreeEffect.h}, all strings
       `inverseoutdegreeeffect'
-      were changed into `outtrunceffect' while retaining the original
+      were changed into `truncatedoutdegreeeffect' while retaining the original
       use of upper and lower case.
       The explanation also was adapted.
       The header file now implies that for the function
-      \texttt{OutTruncEffect}
+      \texttt{TruncatedOutdegreeEffect}
       functions are needed of the types \sfn{calculateContribution},\\
       \sfn{endowmentStatistic} and \sfn{egoStatistic}.
       \\
-      This was implemented in the file \textsf{OutTruncEffect.cpp},
+      This was implemented in the file \textsf{TruncatedOutdegreeEffect.cpp},
       which just was created by renaming \textsf{InverseOutdegreeEffect.cpp}.
       First  all strings `outdegreeactivitysqrteffect'
-      were changed into `outtrunceffect', again retaining the original
+      were changed into `truncatedoutdegreeeffect', again retaining the original
       use of upper and lower case.\\
       To understand the C++ syntax, keep into account
       the object-oriented nature of C++.
@@ -8200,26 +8205,34 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
 
 {\small
 \begin{verbatim}
-double OutTruncEffect::calculateContribution(int alter) const
+double TruncatedOutdegreeEffect::calculateContribution(int alter) const
 {
     double change = 0;
+
     // Current out-degree
     int d =	this->pNetwork()->outDegree(this->ego());
     if (this->outTieExists(alter))
-  	  {
-		// After a tie withdrawal, the new out-degree would be d-1, and
-		// the new effect value would have decreased by 1 if d <= this->lc
-      if (d <= this->lc)
-        {change = 1;}
-   	  }
-	else
-	  {
-		// When introducing a new tie, the new out-degree would be d+1, and
-		// the new effect value would have increased by 1 if d < this->lc
-      if (d < this->lc)
-        {change = 1;}
-	  }
-	return change;
+    {
+        // After a tie withdrawal, the new out-degree would be d-1, and
+        // the new effect value would have decreased by 1 if d <= this->lc
+
+        if (d <= this->lc)
+        {
+            change = 1;
+        }
+    }
+    else
+    {
+        // When introducing a new tie, the new out-degree would be d+1, and
+        // the new effect value would have increased by 1 if d < this->lc
+
+        if (d < this->lc)
+        {
+            change = 1;
+        }
+    }
+
+    return change;
 }
 \end{verbatim}
 }
@@ -8229,15 +8242,20 @@ double OutTruncEffect::calculateContribution(int alter) const
 
 {\small
 \begin{verbatim}
-double OutTruncEffect::egoStatistic(int ego,
-	const Network * pNetwork)
+double TruncatedOutdegreeEffect::egoStatistic(int ego,
+    const Network * pNetwork)
 {
-	// Current out-degree
-   int d =	this->pNetwork()->outDegree(this->ego());
-   if (d <= this->lc)
-     {return d;}
-   else
-     {return this->lc;}
+    // Current out-degree
+    int d =	this->pNetwork()->outDegree(this->ego());
+
+    if (d <= this->lc)
+    {
+        return d;
+    }
+    else
+    {
+        return this->lc;
+    }
 }
 \end{verbatim}
 }
@@ -8283,7 +8301,7 @@ Observed values of target statistics are
       \]
       This can be directly calculated in \R by requesting
 \begin{verbatim}
-sum(pmin(rowSums(s502),3))
+sum(pmin(rowSums(s502), 3))
 \end{verbatim}
       which indeed returns the value 105, confirming that the calculation
       of the ego statistic seems correct.
