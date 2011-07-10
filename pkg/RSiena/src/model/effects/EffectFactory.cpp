@@ -194,7 +194,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "outTrunc")
 	{
-		pEffect = new OutTruncEffect(pEffectInfo);
+		pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
 	}
 	else if (effectName == "outInv")
 	{
