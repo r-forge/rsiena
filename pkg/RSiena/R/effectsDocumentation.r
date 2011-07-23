@@ -65,13 +65,11 @@ effectsDocumentation <- function(type="html", display=type=="html",
                  "behaviorOneModeObjective",
                  "behaviorBipartiteObjective",
                  "covarBehaviorObjective",
-                 "behaviorOneModeObjective2",
-                 "behaviorBipartiteObjective2",
                  "unspecifiedBehaviorInteraction")
 
     mytab <- table(allEffects[,1])
 
-    addtorowPos <- cumsum(c(0, mytab[myorder]))[1:37]
+    addtorowPos <- cumsum(c(0, mytab[myorder]))[1:35]
     addtorowText <- names(mytab[myorder])
     if (type=="latex")
     {
