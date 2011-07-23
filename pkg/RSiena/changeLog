@@ -1,3 +1,8 @@
+2011-07-23 R-forge revision 163
+
+	* R/effectsDocumentation.r: fix bug caused by changes to effects
+	* R/phase1.r: avoid allocation of unnecessary storage for derivatives
+
 2011-07-10 R-forge revision 162
 
 	* src/model/effects/OutTruncEffect.cpp,
