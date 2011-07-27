@@ -489,7 +489,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         {
             objEffects <- objEffects[objEffects$shortName != "linear", ]
         }
-        if (attr(depvar, "range") > 2)
+        if (attr(depvar, "range") >= 2)
         {
             objEffects[grepl("quadratic shape", objEffects$effectName) &
                        objEffects$type == 'eval','include']  <- TRUE

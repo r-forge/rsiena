@@ -41,8 +41,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{\dots}{Arguments for the simulation function, see
     \code{\link{simstats0c}}:
 	usually, \code{data} and \code{effects}; possibly also
-    \code{prevAns} if a previous reasonable provisional estimate was obtained
-    for the same model specification.}
+    \code{prevAns} if a previous reasonable provisional estimate was
+	obtained for a similar model.}
 }
 \details{
  Runs a Robbins-Monro algorithm for parameter estimation using the three-phase
@@ -96,9 +96,10 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
            }
 }
 \author{Ruth Ripley }
-\seealso{There are print, summary and xtable methods for \code{\link{sienaFit}}
-  objects
-  \code{\link{sienaModelCreate}}, \code{\link{print.sienaFit}}}
+
+\seealso{There are print, summary and xtable
+  methods for \code{\link{sienaFit}}
+  objects \code{\link{sienaModelCreate}}, \code{\link{print.sienaFit}}}
 \examples{
 mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
 # nsub=2 and n3=100 is used here for having a brief computation, not for practice.

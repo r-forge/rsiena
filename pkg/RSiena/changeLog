@@ -1,3 +1,12 @@
+2011-07-24 R-forge revision 164
+
+	* R/effects.r: change default behavior effects to include quadratic
+	shape unless range is less than 2 (from less than or equal to 2).
+	* R/siena01.r: change name of manual.
+	* R/initializeFRAN.r: remove duplicate variable names from behavior
+	interaction effects.
+	* man/siena07.Rd: correct description of prevAns.
+
 2011-07-23 R-forge revision 163
 
 	* R/effectsDocumentation.r: fix bug caused by changes to effects

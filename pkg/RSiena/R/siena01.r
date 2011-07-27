@@ -274,7 +274,7 @@ siena01Gui <- function(getDocumentation=FALSE)
     ##@helpFn internal siena01Gui
     helpFn <- function() ## display the manual
     {
-        RShowDoc("s_man400", package=pkgname)
+        RShowDoc("RSiena_Manual", package=pkgname)
     }
     ##@myStop internal siena01Gui
     myStop<- function()
