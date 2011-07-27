@@ -1820,16 +1820,25 @@ fixUpEffectNames <- function(effects)
                    }
                    ## check types - all should be OK here
                    inters <- rbind(inter1, inter2, inter3)
+                   ##if (length(which(inters$interactionType != "OK")) > 1)
+				   ##{
+				   ##	   stop("invalid behavior interaction specification: ",
+				   ##			"at most one effect with interactionType ",
+				   ##			"not OK is allowed")
+                   ##}
                    if (any(inters$interactionType != "OK"))
                    {
                        stop("invalid behavior interaction specification: ",
                             "only effects with interactionType OK are allowed")
                    }
                    ## construct a name
-                   tmpname <- paste(inters$effectName, collapse = " x ")
+				   tmpnames <- inters$effectName
+				   tmpnames[-1] <- sub(paste("behavior ", inters$name[1], " ",
+											 sep=""), "", tmpnames[-1])
+				   tmpname <- paste(tmpnames, collapse = " x ")
                    if (twoway && nchar(tmpname) < 38)
                    {
-                       tmpname <- paste("int. ", tmpname)
+                       tmpname <- paste("int.", tmpname)
                    }
                    if (!twoway)
                    {
