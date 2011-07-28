@@ -674,7 +674,7 @@ for getting started with \rs.
 \item Install \Rn.
 \item Install (within \Rn) the package \rs, and
   possibly \sfn{network} (required to read Pajek files), \sfn{snow} and
-  \sfn{rlecuyer} (required to use multiple processors).
+  \sfn{rlecuyer} (required to use multiple processes).
 \item Set the working directory of \R appropriately (\sfn{setwd()} within \Rn
  or via a desktop shortcut).
 \item You can get help by the command
@@ -724,7 +724,7 @@ the\\ \sfn{verbose=TRUE} option of \sfn{siena07}.
  and \sfn{includeInteraction()} to further specify the model.
 \item Use \sfn{sienaModelCreate()} to create a model object.
 \item Use \sfn{siena07()} to run the estimation procedure.
-\item Note that it is possible to use multiple processors in \sfn{siena07}. For
+\item Note that it is possible to use multiple processes in \sfn{siena07}. For
   details see section~\ref{S_multipleProcesses}.
 \item Also note the availability of the parameter \sfn{prevAns} to reuse
   estimates and derivatives from a previous run with similar effects.
@@ -857,7 +857,7 @@ in addition to this script.
 \label{S_multipleProcesses}
 \begin{enumerate}
 \item
-If multiple processors are available, then using
+If multiple processes are available, then using
 multiple processes can speed up the estimation in \sfn{siena07}.
 
 \item In Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
@@ -869,7 +869,7 @@ multiple processes can speed up the estimation in \sfn{siena07}.
 \item The parameters required to run all processes on one computer are fairly
   simple: in your call to \sfn{siena07}, set \sfn{nbrNodes} to the number of
   processes and \sfn{useCluster} and \sfn{initC} to TRUE. The \sfn{Model
-    Options} screen also allows you to specify the number of processors, and
+    Options} screen also allows you to specify the number of processes, and
   will automatically set the other required parameters for you.
 
 \item To use more than one machine is more complicated, but it can be done by
@@ -1038,7 +1038,6 @@ As repeated measures data on social networks, at the very least, {\em two or mor
 files with digraphs} are required: the observed networks, one for
 each time point. The number of time points is denoted $M$.
 
-
 In addition, various kinds of variables are allowed:
 
 \begin{enumerate}
@@ -1047,7 +1046,8 @@ In addition, various kinds of variables are allowed:
       which can be symbolized as $v_i$ for each actor $i$;
       these can be constant over time or changing; \\
       the changing individual variables can be dependent variables
-      (changing dynamically in mutual dependence with the changing network)
+      (changing dynamically in mutual dependence with the changing network;
+      then they are also called dependent behavior variables)
       or independent variables (exogenously changing variables;
       then they are also called individual covariates).
 \item {\em dyadic covariates}, which can be symbolized as $w_{ij}$
@@ -1060,6 +1060,8 @@ In addition, various kinds of variables are allowed:
      these likewise can be constant over time or changing.
 \end{enumerate}
 
+Dependent variables (which can be networks or behavior variables)
+all must be available for the same set of time points.
 
 All variables must be available in ASCII (`raw text') data files, described in
 detail below. It is best to use the `classical' type of filenames, without embedded blanks
@@ -1134,9 +1136,10 @@ Data input as edge lists will also be made available by means of the
 
 Missing values must be indicated in the way usual for \Rn,
 by \texttt{NA}.
-
-
-
+For data specification by the graphical interface \textsf{siena01Gui}
+or by the function \textsf{sienaDataCreateFromSession},
+instead of \texttt{NA} any numerical code can be used
+given that this is indicated to be a missing value code.
 
 Although this section talks only about digraphs (directed graphs), it is
 also possible that all observed ties (for all time points) are mutual.
@@ -1149,6 +1152,8 @@ that termination of ties is impossible.
 (In other words, in the simulations of the actor-based model
 the actors have only the option to create new ties or to retain
 the status quo, not to delete existing ties.)
+Similarly if ties never are created (but only terminated),
+then this will be respected in the simulations.
 
 \subsubsection{Transformation between matrix and edge list formats}
 
@@ -1158,17 +1163,30 @@ If \texttt{a} is an adjacency matrix, then the following commands
 can be used to create the corresponding edge list,
 called \texttt{edges} here.
  \begin{verbatim}
- # create indicator matrix
+ # create indicator matrix of non-zero entries of a
  ones <- !a %in%  0
  # create empty edge list of desired length
- edges <- matrix(NA, sum(ones), 3)
+ edges <- matrix(0, sum(ones), 3)
  # fill the columns of the edge list
- edges[,1] <- row(a)[ones]
- edges[,2] <- col(a)[ones]
- edges[,3] <- a[ones]
+ edges[, 1] <- row(a)[ones]
+ edges[, 2] <- col(a)[ones]
+ edges[, 3] <- a[ones]
  # if desired, order edge list by senders and then receivers
- edges     <- edges[order(edges[, 1], edges[, 2]), ]
+ edges      <- edges[order(edges[, 1], edges[, 2]), ]
  \end{verbatim}
+Some notes on the commands used here:\\
+These commands can be used not only if the adjacency matrix
+contains only 0 and 1 entries, but also if it contains values
+\texttt{NA}, 10, or 11. The possibility of \texttt{NA}
+entries requires special attention;
+\texttt{\%in\%}
+does just what we need, as it quietly says that
+\texttt{NA}'s are not \texttt{\%in\%}
+anything, returning \texttt{FALSE}, which is transformed to
+\texttt{TRUE} by the \texttt{!} function.
+The edge list is created having all 0 values and at the end
+should have no 0 values at all.
+
 It is more efficient, however, to work with sparse matrices;
 this also is done internally in \rs.
 Using the \texttt{Matrix} package for sparse matrix manipulations,
@@ -1178,10 +1196,11 @@ library(Matrix)
 tmp <- as(Matrix(a), "dgTMatrix")
 edges2 <- cbind(tmp@i + 1, tmp@j + 1, tmp@x)
 \end{verbatim}
-Similarly, if \texttt{edges} is an edge list, then the following commands
+Conversely, if \texttt{edges} is an edge list, then the following commands
 can be used to create the corresponding
 adjacency matrix, called \texttt{adj},
-with $n$ nodes.
+with $n$ nodes. (For a bipartite network the two dimensions
+will normally be distinct numbers.)
 \begin{verbatim}
 # create empty adjacency matrix
 adj <- matrix(0, n, n)
@@ -1625,101 +1644,230 @@ is calculated by a
 
 %The dependent network variable is not centered.
 
+\subsection{Monotone dependent variables}
+
+In some data sets, a dependent variable only increases, or only decreases.
+For a network, this means that ties can be created but not terminated,
+or the other way around.
+This will be noted by \RS and mentioned in the output file generated by
+\textsf{print01Report}.
+This constraint then is also respected in the simulations. This is represented
+internally by a variable called \texttt{uponly} indicating that the
+dependent variable cannot decrease,
+and a variable \texttt{downonly} indicating that the
+dependent variable cannot increase.
+
+In such cases, the outdegree effect for a dependent network variable,
+and the linear shape effect for a dependent behavior variable (these effects
+are defined below), are not identified and should be dropped from the
+model specification.
+
+
 \newpage
 \section{Model specification}
 \label{S_modspec}
 
-After defining the data, the next step is to specify a model.\medskip
+\subsection{Definition of the model}
+\label{S_defmod}
 
-The model specification consists of a selection of `effects' for
-the evolution of each dependent variable (network or behavior).
-%  A
-% list of all available effects for a given \SI project is given in
-% the secondary output file \textsf{{\em pname}.log}.
-% A list of all effects in the objective function is given in
-% the file \textsf{{\em pname}.eff}.
+After defining the data, the next step is to specify a model.
+The model specification consists of a selection of `effects'
+for the evolution of each dependent variable (network or behavior).
+To understand this, first a brief review of the definition of the
+actor-oriented model is given
+\citep*[for further explanations see][]{Snijders01, Snijders05,
+SnijdersEA07, SnijdersEA10b}.
 
-For the longitudinal case, three types of
-effects are distinguished \citep*[see][]{Snijders01, SnijdersEA10b}:
+The model is based on four functions, which first are explained in an
+intuitive way.
+These functions depend on the actor (hence the name `actor-oriented')
+and on the state of the network, behavior, and covariates.
+All these functions are constituted by a weighted sum
+of so-called \emph{effects}, which define the characteristics of
+the network (and behavior, if this is included as a dependent variable)
+that determine the probabilities of changes.
+
 
 \begin{itemize}
-\item {\em rate function effects}\\
+\item {\em rate function}\\
 The rate function models the speed by which the dependent variable
 changes; more precisely: the speed by which each network actor
 gets an opportunity for changing her score on the dependent
 variable.\\
 Advice: in most cases, start modeling with a constant rate function without
-additional rate function effects. Constant rate functions are
-selected by exclusively checking the `basic rate parameter' (for
-network evolution) and the main rate effects (for behavioral
-evolution) on the {\sf model specification} screen.
+additional rate function effects.
 (When there are important size or activity differences between
 actors, it is possible that different advice must be given,
 and it may be necessary to let the rate function
 depend on the individual covariate that indicates this size;
 or on the out-degree.)
-%See XXXXXXX.
-\item {\em evaluation function effects}\\
+\item {\em evaluation function }\\
 The evaluation function\footnote{The evaluation function was called
 \emph{objective function} in \citet{Snijders01}.}
-models the network actors' satisfaction with their local
+is the primary determinant of the probabilities of changes.
+Probabilities are higher for moving towards states with a higher value
+of the evaluation function.
+One way of representing this is that the evaluation function
+models the actor's `satisfaction'\footnote{The term
+`satisfaction' should be interpreted here in a very loose sense;
+the satisfaction interpretation is not necessary at all, but it does give
+a convenient intuitive way of thinking about the model.}
+with her/his local
 network neighborhood configuration. It is assumed that actors
 change their scores on the dependent variable such that they
 improve their total satisfaction -- with a random element
 to represent the limited predictability of behavior.
-In contrast to the endowment
-function (described below), the evaluation function evaluates only
+In contrast to the creation and endowment
+functions (described below), the evaluation function evaluates only
 the local network neighborhood configuration that results from the
-change under consideration.
+change under consideration, without considering `where you come from'.
 In most applications, the evaluation function will
 be the main focus of model selection.\\
-The network evaluation function normally should always contain the
-`density', or `out-degree' effect, to account for the observed
-density. For directed networks,
-it mostly is also advisable to include the reciprocity
-effect, this being one of the most fundamental network effects.
-Likewise, behavior evaluation functions should normally always
-contain the shape parameter, to account for the observed
-prevalence of the behavior, and
-(unless the behavior is dichotomous) the quadratic shape effect,
-to account more precisely for the distribution of the behavior.
-\item {\em endowment function effects}\\
-The endowment
-function\footnote{The endowment function is similar to the {\it gratification
-function} in \citet{Snijders01}.} is an extension of the evaluation
-function that allows to distinguish between new and old network
+\item {\em creation function }\\
+The creation function\footnote{A special case of the {\it gratification
+function} in \citet{Snijders01}.}
+distinguishes between new and old network
 ties (when evaluating possible network changes) and between
 increasing or decreasing behavioral scores (when evaluating
-possible behavioral changes). The function models the loss of
-satisfaction incurred when existing network ties are dissolved or
-when behavioral scores
-are decreased to a lower value (hence the label `endowment').\\
-For a number of effects, the endowment function is implemented
-not for the Method of Moments estimation method,
-but only for Maximum Likelihood and Bayesian estimation.
-This is indicated in Section~\ref{S_math}.\\
-Advice: start modeling without any endowment effects,
-and add them at a later stage.
-Do not use endowment effects for behavior unless
-the behavior variable is dichotomous.
+possible behavioral changes).
+It is a component of the probabilities of change only for changes in
+an upward direction: creation of new ties, augmentation of values
+of the behavior dependent variable.\\
+In the interpretation using satisfaction, the creation function
+models the gain in satisfaction incurred when network ties are created
+or behavioral scores are increased.\\
+\item {\em endowment function}\\
+The endowment function\footnote{The endowment function also is
+a special case of the {\it gratification function} in \citet{Snijders01}.}
+also distinguishes between new and old network
+ties (when evaluating possible network changes) and between
+increasing or decreasing behavioral scores (when evaluating
+possible behavioral changes).
+It is a component of the probabilities of change only for changes in
+a downward direction: termination of existing ties, decrease of values
+of the behavior dependent variable.\\
+In the interpretation using satisfaction, the endowment function
+models the loss in satisfaction incurred when network ties are dissolved or
+behavioral scores are decreased (hence the label `endowment').
 \end{itemize}
 
-The estimation and simulation procedures of \SI operate on the basis
-of the model specification which comprises the set of
-effects included in the model as described above,
-together with the current
-parameter values.
-% and the Model Type
-%(see Section~\ref{S_modeltype}).
-After data input, the constant rate
-parameters and the density effect in the network evaluation function
-have default initial values, depending on the data. All other
-parameter values initially are 0. The estimation process changes
-the current value of the parameters to the estimated values.
-Values of effects not included in the model are not changed by the
-estimation process. It is possible for the user to change
-parameter values and to request that some of the parameters are
-fixed in the estimation process at their current value.
+Leaving aside the rate effects, a given effect can normally be included
+in the model in any of the three `types' or `roles' of
+evaluation, creation, or endowment effect.
+In almost all cases, the advice is to
+start modeling without any creation or endowment effects,
+and add them perhaps at a later stage.
+For example, if the network dynamics in a given data set is such
+that ties mainly are created, and they are dissolved rather rarely,
+then the data will contain little information about the question whether
+creating ties follows different rules than dissolving ties,
+and if one would try to include   creation or endowment effects
+for effects already included in the evaluation function,
+this would lead to large standard errors.
+Creation and endowment effects for behavior for behavior variables with more
+than 2 values are still under investigation, and their interpretation
+for practical research still is uncertain.
+
+A model specification with only evaluation effects and without creation and
+endowment effects leads to exactly the same network dynamics as a specification
+where these effects are turned into creation and endowment effects,
+with the same parameters.
+For any given effect, normally it makes no sense to include the effect
+in all three roles: evaluation, creation, endowment.
+If one wishes to go beyond evaluation effects, then the user has to choose
+between adding an effect in either the creation or the endowment role.
+
+\subsubsection{Mathematical specification}
+\label{S_mathmod}
+
+To attach precise meaning to the intuitive explanations above,
+the mathematical definition of the model is given as follows.
+To keep notation simple, we leave all statistical parameters out of the
+formulae. To keep the section short, we do not give a lot of explanation,
+but refer to the mentioned literature for that purpose.
+
+As explained in \citet*{SnijdersEA10b}, the model is a continuous-time
+Markov chain, and represents how the network (and behavior) has changed
+in small steps (the so-called \emph{ministeps}) from one observed
+to a later observed value. Each ministep entails a change in only
+one tie value, or one behavioral variable, and is modeled as follows.
+
+First consider the network dynamics.
+At any given moment, let the network be denoted $x^0$.
+The rate function for actor $i$ is denoted $\lambda_i(x)$;
+the evaluation function is $f_i(x)$; the creation function is $c_i(x)$;
+and the endowment function is $g_i(x)$.
+
+At any given moment, let the current network be denoted $x^0$.
+The time duration until the next opportunity of change
+is exponentially distributed with parameter
+\[
+  \lambda_+(x^0) \,=\, \sum_i \lambda_i(x^0) \ .
+\]
+This means that the expected time duration is
+\[
+   \frac{1}{\lambda_+(x^0)} \ .
+\]
+The probability that actor $i$ will be the next to
+have an opportunity for change is
+\[
+  \frac{\lambda_i(x^0)}{\lambda_+(x^0)} \ .
+\]
+Now suppose that actor $i$ is the one who has the next opportunity
+for change; one could say, this is the focal actor.
+Actor $i$ then has the possibility to change one network tie,
+or to keep the network as it is.
+Denote by $\mathcal C$ the set of all networks that can be obtained
+as a result.
+Then the probability of the network obtained from this step depends on
+something called the objective function $u_i(x^0, x)$ which will be defined
+in a moment.
+The probability that the next network is $x$ is given by
+\[
+     \frac{\exp(u_i(x^0, x)\big)}
+          {\sum_{x' \in \mathcal C} \exp\big(u_i(x^0, x')\big)} \ .
+\]
+The numerator is required to make all probabilities for this step sum to 1.
+
+The objective function is defined as follows.
+If there is only an evaluation function (mathematically, this means that
+the creation and endowment functions are 0), then
+the objective function is equal to the evaluation function for the new state,
+\[
+   u_i(x^0, x) \,=\, f_i(x) \ .
+\]
+Because of the properties of the exponential function one can just as
+well use define the objective function as the gain in evaluation function,
+\[
+   u_i(x^0, x) \,=\, f_i(x) - f_i(x^0) \ .
+\]
+To define the general case, note that if $x^0$ and $x$ are not the same,
+then they differ in only one tie variable $x_{ij}$.
+Define  $\Delta^+(x^0, x) = 1$ if $x$ has one tie more than $x^0$,
+meaning that a tie is created by this change, and $\Delta^+(x^0, x) = 0$
+otherwise.
+Similarly, define  $\Delta^-(x^0, x) = 1$ if $x$ has one tie less than $x^0$,
+meaning that a tie is dissolved by this change, and $\Delta^-(x^0, x) = 0$
+otherwise.
+Then the general definition of the objective function is
+\[
+   u_i(x^0, x) \,=\, \big(f_i(x) - f_i(x^0)\big)
+                   \,+\,  \Delta^+(x^0, x)\,\big(c_i(x) - c_i(x^0)\big)
+                   \,+\,  \Delta^-(x^0, x)\,\big(g_i(x) - g_i(x^0)\big)    \ .
+\]
+This shows that the change in creation function plays a role
+only if a tie is created ($\Delta^+(x^0,x) = 1$), and the change in
+endowment function plays a role
+only if a tie is dissolved ($\Delta^-(x^0,x) = 1$).
+\medskip
+
+For behavior dynamics the definitions are analogous.
+Here a basic assumption is that, when there is an opportunity for change,
+the possible new values for the behavior variable are the current
+value, this value + 1, and this value --1, as long as these changes
+do not take the value out of the permitted range.
+More elaborate explanations are in
+\citep*{SnijdersEA07, SnijdersEA10b, SteglichEA10}.
 
 \subsection{Important structural effects for network dynamics:
            \protect\newline one-mode networks}
@@ -1991,7 +2139,7 @@ with the network with respect to number of units (rows/columns).
 \item the covariate's effect on the rate of network change of the
 actor;
 \end{enumerate}
-\item {\em network evaluation and endowment functions}
+\item {\em network evaluation, creation, and endowment functions}
 \begin{enumerate}
 \item the covariate-similarity effect, which is suitable for variables
       measured on an interval scale (or at least an ordinal scale
@@ -2048,7 +2196,7 @@ actor;
 \end{itemize}
 The usual order of importance of these covariate effects on
 network evolution is: evaluation effects are most important, followed
-by endowment and rate effects. Inside the group of evaluation
+by creation, endowment and rate effects. Inside the group of evaluation
 effects, for variables measured on an interval scale
 (or ordinal scale with reasonable numerical values),
 it is the covariate-similarity effect that is most
@@ -2076,7 +2224,7 @@ such actor variables applies only to variables without any missing values.
 For each dyadic covariate, the following network evaluation effects
 can be included in the model for network evolution:
 \begin{itemize}
-\item {\em network evaluation and endowment functions}
+\item {\em network evaluation, creation, and endowment functions}
 \begin{enumerate}
 \item main effect of the dyadic covariate;
 \item the interaction
@@ -2369,7 +2517,7 @@ decreasing the out-degree are expressed by the distributional
 tendency function $\xi$ (indicated in the output as \emph{xi}) and
 the volatility function $\nu$ (indicated as \emph{nu}). Which new
 tie to create, or which existing tie to withdraw, depends in the
-usual way on the evaluation and endowment functions. Thus, the
+usual way on the evaluation, creation, and endowment functions. Thus, the
 outdegree distribution is governed by parameters that are not
 connected to the parameters for the structural dynamics. The use of
 such an approach in statistical modeling minimizes the influence of
@@ -2438,7 +2586,7 @@ mutually dependent).
 For this purpose, Model Type 6 can be chosen,
 while for one or more network effects such as the effects
 representing transitivity, the null hypothesis is tested that their
-coefficients are zero (see Section~\ref{S_gof}).
+coefficients are zero (see Section~\ref{S_test}).
 
 
 \fi
@@ -2502,18 +2650,23 @@ The numerical interpretation is different from that in Models 1-2.
 \label{S_int_eff}
 
 It is possible for the user to define additional interaction effects for the
-network. % and the behavior.
+network and the behavior.
 The basis is provided by the initial definition, by \si, of `unspecified
-interaction effects'.  Modifying two or three of the columns named `effect1',
-`effect2', and `effect3' of the effects dataframe
-allows the definition of two-way
-or three-way interactions. The \emph{effectNumber} of the effects between which
-an interaction is required should be entered in the `effect1' and `effect2',
-and for three-way effects, the `effect3' columns. The interaction effect must
-also be `included', but the underlying effects need only be `included' if
+interaction effects'.
+The interaction is defined by
+the columns \texttt{effect1} and \texttt{effect2},
+and for three-way effects, \texttt{effect3},
+in the effects object; they contain the \texttt{effectNumber}
+of the effects that are interacting.
+The interaction effect must also be `included',
+but the underlying effects need only be `included' if
 they are also required individually.
 
-\sfn{includeInteraction} is an \R function provided to facilitate the definition
+One way to specify an interaction is to take one of the unspecified
+interaction effects, work directly on these columns,
+and set the \texttt{include} value to \texttt{TRUE};
+but it is more convenient to work with \sfn{includeInteraction},
+an \R function provided to facilitate the definition
 of interaction effects. Such effects can be specified simply by short names and
 the names of any variables required to identify the underlying effects: it is
 not necessary to know the effectNumbers of the effects. (The effectNumbers would
@@ -2526,7 +2679,8 @@ library, accessible from within \R using the command
 Alternatively a new version of this list can be displayed in a browser by using
 the function:
 
-\verb|effectsDocumentation()|
+\verb|effectsDocumentation()| \\
+Section~\ref{S_math} of this manual also gives the short names of all effects.
 
 \subsubsection{Interaction effects for network dynamics}
 
@@ -2537,9 +2691,15 @@ for the network dynamics.
   Ego effects of actor variables can interact with all effects.
   \item[b.] Dyadic effects can interact with each other.
 \end{description}
-(The column ``InteractionType'' in the effects data frame indicates which
-effects are `ego' effects and which are `dyadic' effects.)
-
+Whether an effect is an ego effect or a dyadic effect is defined by
+the column \texttt{interactionType} in the effects data frame.
+You can see the values of the \texttt{interactionType} by requesting,
+if the network variable is called, e.g., \texttt{friendship}, the following:
+\begin{verbatim}
+cbind(myeff[myeff$name=="friendship","effectName"],
+      myeff[myeff$name=="friendship","shortName"],
+      myeff[myeff$name=="friendship","interactionType"])
+\end{verbatim}
 Thus a two-way interaction must be between two dyadic effects or between one
 ego effect and another effect. A three-way interaction may be between three
 dyadic effects, two dyadic effects and an ego effect, or two ego effects and
@@ -2548,8 +2708,8 @@ another effect.
 All effects used in interactions must be defined on the same network
 (in the role of dependent variable): that for
 which the ``unspecified
-interaction effects'' is defined.  And either all must be evaluation effects or
-all must be endowment effects.
+interaction effects'' is defined.  And either all must be
+of the same type (evaluation, endowment, or creation effects).
 \iffalse
 
   b. Further, interaction effects are permitted
@@ -2861,16 +3021,19 @@ on actor variable number \textsf{def}:
 for code \texttt{1003def} between actors $i$ and $j$,
 for \texttt{2003def} between actors $i$ and $h$,
 for \texttt{3003def} between actors $j$ and $h$, and
-for \texttt{4003def} by the product of the similarity between actors $i$ and $h$
+for \texttt{4003def} by the product of the similarity
+between actors $i$ and $h$
 and the similarity between actors $j$ and $h$.
-Analogously, the parameter \texttt{11003def}, \texttt{12003def}, \texttt{13003def},
+Analogously, the parameter \texttt{11003def}, \texttt{12003def},
+\texttt{13003def},
 and \texttt{14003def},
 specifies transitive triplet effects where the transitive triplet
 is weighted by dyadic variable number \textsf{def}:
 for code \texttt{11003def} for actors $i$ and $j$,
 for \texttt{12003def} for actors $i$ and $h$, and
 for \texttt{13003def} for actors $j$ and $h$, and
-for \texttt{14003def} by the product of the dyadic variable for actors $i$ and $h$
+for \texttt{14003def} by the product of the
+dyadic variable for actors $i$ and $h$
 and for actors $j$ and $h$.
 The dyadic variables here are not centered!!
 For example, for the first actor variable,
@@ -2885,69 +3048,133 @@ same value of an actor variable; or triplets in which all pairs
 have the value 1 on a dyadic covariate.
 This is achieved by the following codes:
 \begin{description}
-\item[\texttt{8003def}]\ : \ transitive triplets restricted to triplets of actors
-                        having the same value on actor covariate number \texttt{def};
+\item[\texttt{8003def}]\ : \ transitive triplets
+                         restricted to triplets of actors
+                        having the same value on actor
+                        covariate number \texttt{def};
 \item[\texttt{8005def}]\ : \  3-cycles restricted to triplets of actors
-                        having the same value on actor covariate number \texttt{def};
+                        having the same value
+                        on actor covariate number \texttt{def};
 \item[\texttt{8006def}]\ : \  transitive ties restricted to triplets of actors
-                        having the same value on actor covariate number \texttt{def};
-\item[\texttt{18003def}]\ : \  transitive triplets restricted to triplets of actors
-                        where all pairs have the value 1 on dyadic covariate number \texttt{def};
+                        having the same value
+                        on actor covariate number \texttt{def};
+\item[\texttt{18003def}]\ : \  transitive triplets restricted
+                        to triplets of actors
+                        where all pairs have the value 1
+                        on dyadic covariate number \texttt{def};
 \item[\texttt{18005def}]\ : \  3-cycles restricted to triplets of actors
-                        where all pairs have the value 1 on dyadic covariate number \texttt{def};
-\item[\texttt{18006def}]\ : \  transitive ties restricted to triplets of actors
-                        where all pairs have the value 1 on dyadic covariate number \texttt{def}.
+                        where all pairs have the value 1
+                        on dyadic covariate number \texttt{def};
+\item[\texttt{18006def}]\ : \  transitive ties restricted to
+                        triplets of actors
+                        where all pairs have the value 1
+                        on dyadic covariate number \texttt{def}.
 \end{description}
 
 
 The calculation of user-defined effects is slightly more time-consuming
 than the calculation of internally defined effects. Therefore, when there
-is the choice between two equivalent effects -- e.g.,
-in longitudinal modeling, interactions
+is the choice between two equivalent effects -- e.g., interactions
 of actor covariates with reciprocity -- it is advisable to use
 the predefined interaction effects.
+\fi
 
 \subsubsection{Interaction effects for behavior dynamics}
+\label{S_beh_infl}
 
 For behavior dynamics, interaction effects can be defined
 by the user, for each dependent behavior variable separately,
-as interactions of two or three actor variables.
-The actor variables (changing and non-changing) are numbered
-in the order in which they appear in the \textsf{{\em pname}.mo} file:
-first the dependent variables, then the non-changing actor variables,
-then the other changing actor variables.
-For the internal effect parameter defining the interaction effect,
-each actor variable is represented by its index number
-in this order, in two digits (including leading zero
-if the number is less than 10).
-E.g., the parameter 0203 represents the interaction between variables
-number 2 and number 3, and parameter 010404 represents the interaction
-between variables 1, 4 and 4. The interactions are represented
-by products of the centered variables.
+as interactions of two or three actor variables,
+again using the function \textsf{includeInteraction}.
+These are interactions on the ego level, in line with the
+actor-oriented nature of the model.
 
-In addition, there are interactions available between actor variables
-and influence, as described in Section~\ref{S_f_b}.
+Only selected behavior effects can be interacted with each other.
+Of course,  they should refer to the same dependent behavior variable.
+What is permitted depends on the so-called \texttt{interactionType} of the
+effects, which for behavior effects can be \texttt{OK}\footnote{The value
+is \texttt{OK} for the effects of which the
+formula as defined in Section~\ref{S_f_b}
+is given by $z_i$ multiplied by something not dependent on $z_i$.}
+or empty.
+You can see the values of the \texttt{interactionType} by requesting,
+if the behavior variable is called, e.g., \texttt{drinkingbeh}, the following:
+\begin{verbatim}
+cbind(myeff[myeff$name=="drinkingbeh","effectName"],
+      myeff[myeff$name=="drinkingbeh","shortName"],
+      myeff[myeff$name=="drinkingbeh","interactionType"])
+\end{verbatim}
+The behavioral effects with non-\texttt{OK} (i.e., empty)
+\texttt{interactionType} include,
+in particular, all effects of which the name
+includes the word ``similarity",
+or alternatively, the short name includes the string ``sim".
 
+The requirement for behavior interactions is that,
+of the interacting effects, all or all but one have
+the value \texttt{OK}. Thus, for an interaction between two effects,
+one or both should be \texttt{OK}; for a three-effect interaction,
+two or all three should be \texttt{OK}.
 
+As an example, suppose that we have a data set with a dependent
+network variable \texttt{friendship} and a dependent behavior variable
+\texttt{drinkingbeh} (drinking behavior), and we are interested whether
+social influence, as represented by the `average alter' effect, differs
+between actors depending on whether currently they drink little or much.
+Then the commands
+\begin{verbatim}
+myeff <- includeEffects(myeff, avAlt,
+                name="drinkingbeh", interaction1="friendship")
+myeff <- includeInteraction(myeff, quad, avAlt,
+                name="drinkingbeh", interaction1=c("","friendship"))
+\end{verbatim}
+define a model with the average alter effect (representing social influence)
+and an interaction between this and the quadratic shape effect.
+Recall that the latter can be regarded
+as the effect of drinking behavior on drinking behavior.
+Briefly, the interaction is between current drinking behavior
+and the average drinking behavior of friends.
+By consulting Section~\ref{S_f_b} on the mathematical definitions of the
+effects one can derive that this leads to the following objective function;
+where it is assumed that also the linear and quadratic shape effects are
+included in the model.
+\[
+f^{\rm beh}_i(x, z) \,=\, \beta^{\rm beh}_1 z_i \,+\, \beta^{\rm beh}_2 z_i^2
+        \,+\, \beta^{\rm beh}_3 z_i \,
+        \frac{ \sum_j x_{ij}\, z_j }{\sum_j x_{ij}}
+       \,+\, \beta^{\rm beh}_4 z_i^2 \,
+              \frac{ \sum_j x_{ij}\, z_j }{\sum_j x_{ij}} \ .
+\]
+\medskip
+
+In addition, there are predefined interactions available
+between actor variables and influence, as described in Section~\ref{S_f_b}.
+
+\iffalse
 \subsection{Random effects models: unobserved actor heterogeneity}
 
-The network (and behavior) evolution may be affected by the fact that actors are
-heterogeneous.
-If all relevant actor heterogeneity is observed in the form of actor covariates,
-then actor heterogeneity can be taken into account by including covariates in the model.
+The network (and behavior) evolution may be affected
+by the fact that actors are heterogeneous.
+If all relevant actor heterogeneity is observed in the form of actor
+covariates,
+then actor heterogeneity can be taken into account by including
+covariates in the model.
 If not all relevant actor heterogeneity is observed,
 then more complex models are required, such as random effects models.
 Random effects models \citep[see][]{SchweinbergerSnijders07b} allow to take
 unobserved actor heterogeneity into account
-by assuming that the network (and behavior) evolution is affected by unobserved
+by assuming that the network (and behavior) evolution is affected
+by unobserved
 outcomes of actor-dependent random variables (random effects),
 which represent the combined effect of the unobserved actor
 heterogeneity on the network (and behavior) evolution.
 
 These models can be estimated only using the maximum likelihood
 estimation option, see Section~\ref{S_Est}.
-The maximum likelihood estimation of random effects models requires MCMC-based data
-imputation of the unobserved random effects (which can be regarded as missing data).
+The maximum likelihood estimation of random effects models requires
+MCMC-based data
+imputation of the unobserved random effects (which can be regarded
+as missing data).
 \SI supplies three alternative MCMC algorithms for the MCMC-based
 data imputation of the random effects:
 \begin{itemize}
@@ -2955,7 +3182,8 @@ data imputation of the random effects:
 \item[(2)] autoregressive M-H,
 \item[(3)] independence sampler (default).
 \end{itemize}
-The algorithms require the determination of the scale factor of the so-called proposal distribution,
+The algorithms require the determination of the scale factor of
+the so-called proposal distribution,
 which may affect the efficiency of the algorithms and
 the accuracy of the results (for a given number of iterations).
 It is recommended to choose the default algorithm (3);
@@ -2966,10 +3194,13 @@ the defaults within the algorithm,
 which features an adaptive method for determining suitable scale factors.
 In the ideal case, the choice of algorithm does not affect the
 parameter estimates---though the efficiency of
-the algorithms and the accuracy of the results (for a given number of iterations) may be affected.
+the algorithms and the accuracy of the results
+(for a given number of iterations) may be affected.
 
-The estimation of random effects models (i.e., the estimation of the parameters,
-including the variances of the random effects) may be done by either Maximum Likelihood
+The estimation of random effects models
+(i.e., the estimation of the parameters,
+including the variances of the random effects)
+may be done by either Maximum Likelihood
 or Bayesian estimation (see Section~\ref{S_Bayes}).
 
 %The interpretation of the parameter estimates is straightforward;
@@ -2988,7 +3219,8 @@ f^{(m)}_{ij}(\mathbf{x})= \sum_k \Big(\beta_k + \delta_k^{(m)} h_k^{(m)}\Big)
                               \,      s_{ik}\big(\mathbf{x}(i \leadsto j)\big)
 \label{eq:fmij}
 \end{align}
-where $m$ denotes the period (from wave $m$ to wave $m+1$ in the panel data set)
+where $m$ denotes the period (from wave $m$ to wave $m+1$
+in the panel data set)
 and $\delta_k^{(m)}$ are parameters for the effects interacted
 with time dummies. You
 can include these in your model simply via the function
@@ -2998,8 +3230,10 @@ myeffects <- includeTimeDummy(myeffects,
 \end{verbatim}
 which would add three time dummy terms to each effect listed in the function.
 
-We recommend that you start with simple models, and use the score type test for
-assessing heterogeneity, i.e., if \texttt{ans} is the object of results produced
+We recommend that you start with simple models,
+and use the score type test for
+assessing heterogeneity, i.e., if \texttt{ans}
+is the object of results produced
 by \texttt{siena07},
 \begin{verbatim}
 tt <- sienaTimeTest(ans)
@@ -3022,8 +3256,10 @@ in the \textsf{MaxDegree} parameter of the \textsf{sienaModelCreate}
 function, which determines the settings of the algorithm.
 
 \textsf{MaxDegree} is a named vector, which means that its elements
-have names. The length of this vector is equal to the number of dependent networks.
-Each element of this vector must have a name which is the name of the corresponding network.
+have names. The length of this vector
+is equal to the number of dependent networks.
+Each element of this vector must have a name
+which is the name of the corresponding network.
 E.g., for one dependent network called \texttt{mynet}, one could use
 \begin{verbatim}
 MaxDegree = c(mynet=10)
@@ -3035,20 +3271,32 @@ one could use
 MaxDegree = c(friends=6, advisors=4)
 \end{verbatim}
 
-For a single network, the default value 0 is used to specify that the maximum is unbounded.
-For multiple networks, if for one network there is a bound for the maximum outdegree
+For a single network, the default value 0 is used
+to specify that the maximum is unbounded.
+For multiple networks, if for one network
+there is a bound for the maximum outdegree
  but for another network this should not be bounded, then
- the value 0 will not work, but one should use a bound which is at least $n-1$,
+ the value 0 will not work,
+ but one should use a bound which is at least $n-1$,
 where $n$ is the number of actors in the network (or the largest number,
 if there are multiple groups).
 
 \subsection{Goodness of fit with auxiliary statistics}
-There is now available in RSienaTest a function \verb!sienaGOF! which permits users to
-define auxiliary functions of networks, e.g. geodesic distributions, that are not explicitly fit
-by a particular effect, but are nonetheless important features of the network to represent in the
-probability model. The following script gives a walkthrough for this functionality. The interface
-may change in the future, as this function is still in progress. See the working paper by
-\citet{Lospinoso2011b} for technical information about the test.
+\label{S_gof}
+
+There is now available in RSienaTest a function \verb!sienaGOF!
+which permits users to assess the fit of the model with respect to
+auxiliary functions of networks,
+e.g. geodesic distributions,
+that are not explicitly fit by a particular effect,
+but are nonetheless important features of the network to represent by the
+probability model.
+The following script gives a walkthrough for this functionality. The interface
+may change in the future, as this function is still in progress.
+See the working paper by \citet{Lospinoso2011b}
+for technical information about the test.
+
+\begin{footnotesize}
 \begin{verbatim}
 ################################################################################
 ## Model selection and RSiena								                   #
@@ -3414,6 +3662,9 @@ model5[model5$shortName=="denseTriads","parm"] <- 6
 ( tc5 <- sienaGOF(results5, CustomTriadCensus, verbose=TRUE) )
 ( ge5 <- sienaGOF(results5, GeodesicDistribution, verbose=TRUE) )
 \end{verbatim}
+\end{footnotesize}
+
+
 
 \newpage
 
@@ -3433,8 +3684,10 @@ the Method of Moments (MoM) \citep*{Snijders01, SnijdersEA07};
  The Method of Moments is the default;
  the other two methods require much more computing time.
  Given the greater efficiency but longer required computing time
- for the ML and Bayesian methods, these can be useful especially for smaller data sets
- and relatively complicated models (networks and behavior; endowment effects).
+ for the ML and Bayesian methods,
+ these can be useful especially for smaller data sets
+ and relatively complicated models
+ (networks and behavior; creation or endowment effects).
 
 
 In the following, the number of
@@ -3539,15 +3792,28 @@ The \emph{initial values} can be given in three ways.}
       These consist of some reasonable values for the rate parameters and the
       outdegree parameter, as well as for the linear shape parameter
       for behavioral dependent variables (if any);
-      and 0 parameters for the rest.
+      and 0 parameters for the rest.\\
+      The default is  \texttt{useStdInits = FALSE}.
 \item If \texttt{useStdInits = FALSE} and no \textsf{prevAns}
       parameter is given in the call of \textsf{siena07},
       the initial values are taken from
       the \textsf{sienaEffects} object,
       in this example called \texttt{myeff}.\\
-      \hyperlink{T_change_init}{Below, we give a way to change the values} contained in
-      the \textsf{sienaEffects} object.
-\item If \texttt{useStdInits = FALSE} and the \textsf{prevAns} (`previous answer')
+      Requesting
+\begin{verbatim}
+myeff
+\end{verbatim}
+      will show the initial values.
+      As long as no time dummies have been requested
+      using \textsf{sienaTimeFix}, the initial values for the requested
+      effects are in the vector
+\begin{verbatim}
+myeff$initialValue[myeff$include]
+\end{verbatim}
+      \hyperlink{T_change_init}{Below, we give a way to change}
+       the initial values contained in the \textsf{sienaEffects} object.
+\item If \texttt{useStdInits = FALSE} and the \textsf{prevAns}
+      (`previous answer')
       parameter is used, such as in
       \begin{verbatim}
 results1 <- siena07(model1, data = mydate, effects = myeff,
@@ -3556,7 +3822,8 @@ results1 <- siena07(model1, data = mydate, effects = myeff,
       the initial parameter estimates are taken from the results of
       what is given as the
       \textsf{prevAns} parameter. This must be a
-      \textsf{sienaFit} object; in this example it is given as \texttt{results0}.
+      \textsf{sienaFit} object; in this example it is given as
+      \texttt{results0}.
 \end{enumerate}
 
 When parameters have been estimated, first the
@@ -3631,7 +3898,8 @@ $t$-ratio is important.
 \medskip
 
 \noindent
-\hypertarget{T_change_init}{\emph{Changing the starting values in the effects object}}
+\hypertarget{T_change_init}
+        {\emph{Changing the starting values in the effects object}}
 \smallskip
 
 In a \textsf{sienaEffects} object, which here we shall denote
@@ -3639,7 +3907,8 @@ by the name \texttt{myeff},
 the initial values are contained in the column \texttt{myeff\$initialValue}.
 To change them, in most cases it is most convenient to access only the values
 for effects included in the model.
-The estimates obtained from a previous fit can be included as
+Unless time dummies have been requested using \textsf{sienaTimeFix},
+the estimates obtained from a previous fit can be included as
 initial values by a command such as
 \begin{verbatim}
 myeff$initialValue[results1$requestedEffects$effectNumber] <-
@@ -3650,7 +3919,9 @@ estimation run. The column with name \textsf{theta} contains the parameter
 estimates.  Of course, instead of \texttt{results1\$theta} one could use any
 other desired vector of the correct length.
 
-Warning: this code will not work if you have requested time dummies.
+Warning: this code will not work if you have requested time dummies
+using \textsf{sienaTimeFix}. In such more complicated cases a
+suitable \textsf{match} command can be used.
 
 Another way is to select the parameters for which initial values are
 changed not by the result of a fit, but by the effects object itself.
@@ -3671,12 +3942,16 @@ If a user would like to do further calculations, it can be
 useful to know about the following components of  \textsf{sienaFit} objects.
 Suppose the object is called \texttt{ans}. Some of the components
 are the following.
+Further details are in the help file for \textsf{siena07}.
 
 \begin{tabbing}
- \texttt{ans\$theta  }\hspace{3em}    \=  estimates                        \\
+ \texttt{ans\$theta  }\hspace{3em}    \=  estimates  \\
+                                       \> (but not for the rate parameter used for conditioning;\\
+                                       \> if time dummies were requested using \textsf{sienaTimeFix},\\
+                                       \> these are also in \texttt{theta}).           \\
  \texttt{ans\$covtheta   }            \> covariance matrix of the estimates \\
  \texttt{ans\$pp}                     \> number of parameters  \\
- \texttt{ans\$targets }               \> targets (observed statistics)  \\
+ \texttt{ans\$targets }               \> targets (observed statistics) for Method of Moments estimation  \\
  \texttt{ans\$tconv   }               \> $t$-ratios for convergence  \\
  \texttt{ans\$sf    }                 \>  generated statistics in Phase 3 \\
  \texttt{ans\$msf   }                 \>  covariance matrix of
@@ -3791,31 +4066,36 @@ ways:
 \subsection{Output}
 \label{S_output}
 
+Output can be obtained in several ways.
+\begin{enumerate}
+  \item On the \R console.\\
+        When the \textsf{sienaFit} object produced by \textsf{siena07}
+        is called \texttt{ans},
+        requesting just \texttt{ans} or \texttt{print(ans)}
+        produces output on the \R console. The function
+        \texttt{summary(ans)} produces more extensive output.
+  \item A table in latex or htlm format can be produced by the
+        \textsf{xtable.sienaFit} method.
+        For example.
+        \begin{verbatim}
+        xtable(ans, file="ans1.htm", type="html")
+        \end{verbatim}
+        produces in the working directory a html file with the \texttt{ans}
+        results in
+        tabular form. The \textsf{xtable} library has many further options.
+  \item The function \textsf{siena07}
+        writes an output file which is an ASCII (`text') file that can be
+        read by any text editor.
+        It is called \textsf{{\em pname}.out},
+        where \textsf{{\em pname}} is the name
+        specified in the call of \textsf{sienaModelCreate()}.
 
-When the \textsf{sienaFit} object produced by \textsf{siena07}
-is called \texttt{ans}, it was mentioned above
-that requesting just \texttt{ans} or \texttt{summary(ans)}
-produce output on the \R console.
-A table in latex or htlm format can be produced from this output by the
-\textsf{xtable.sienaFit} method.
-For example.
-\begin{verbatim}
-xtable(ans, file="ans1.htm", type="html")
-\end{verbatim}
-produces in the working directory a html file with the \texttt{ans} results in
-tabular form. The \textsf{xtable} library has many further options.
-
-The function \textsf{siena07}
-writes an output file which is an ASCII (`text') file that can be
-read by any text editor.
-It is called \textsf{{\em pname}.out},
-where \textsf{{\em pname}} is the name
-specified in the call of \textsf{sienaModelCreate()}.
-
-The output file is divided into sections indicated by a line {\tt @1},
-subsections indicated by a line {\tt @2}, subsubsections indicated
-by {\tt @3}, etc. For getting the main structure of the output, it
-is convenient to have a look at the {\tt @1} marks first.
+        This output file is divided into sections
+        indicated by a line {\tt @1},
+        subsections indicated by a line {\tt @2}, subsubsections indicated
+        by {\tt @3}, etc. For getting the main structure of the output, it
+        is convenient to have a look at the {\tt @1} marks first.
+\end{enumerate}
 
 The primary information in the output of the estimation process
 consists of the following three parts.
@@ -3830,17 +4110,19 @@ This was discussed \hyperlink{T_convergence}{above}.
 
 The next crucial part of the output is the list of estimates and
 standard errors. Suppose that the
-following result was obtained.
+following result was obtained on the \R console.
 
 {\footnotesize
 \begin{verbatim}
+                              Estimate   Standard   t statistic
+                                           Error
 Rate parameters:
   0       Rate parameter       6.0742  ( 1.0134   )
-  1. eval outdegree (density) -2.5341  ( 0.1445   ) 0.0571
-  2. eval reciprocity          2.1106  ( 0.2625   ) 0.0710
-  3. eval transitive triplets  0.5449  ( 0.1781   ) 0.0584
-  4. eval 3-cycles             0.0779  ( 0.3425   ) 0.0777
-  5. eval smoke1 similarity    0.4519  ( 0.2497   ) 0.0400
+  1. eval outdegree (density) -2.5341  ( 0.1445   )  0.0571
+  2. eval reciprocity          2.1106  ( 0.2625   )  0.0710
+  3. eval transitive triplets  0.5449  ( 0.1781   )  0.0584
+  4. eval 3-cycles             0.0779  ( 0.3425   )  0.0777
+  5. eval smoke1 similarity    0.4519  ( 0.2497   )  0.0400
 \end{verbatim}
 }
 
@@ -3876,7 +4158,7 @@ where again some rounding was applied in view of the standard errors.
 The parameter estimates can be combined with
 the standard errors to test the parameters.
 (Testing of parameters is discussed more extensively
-in Chapter~\ref{S_gof}.)
+in Chapter~\ref{S_test}.)
 
  For the rate
 parameter, testing the hypothesis that it is 0 is meaningless
@@ -3910,8 +4192,8 @@ density, the density is difficult to interpret by itself.
 In the output file, the covariance matrix
 of the estimates is presented.
 This can also be requested by \texttt{summary(ans)}.
-For conditional estimation, the rate parameters are
-not included in this matrix.
+For conditional estimation, the rate parameters of the dependent variables
+used for conditioning are not included in this matrix.
 In this case the covariance matrix is as follows.
 
 {\footnotesize
@@ -4276,7 +4558,7 @@ specifications for the algorithm
 
 \newpage
 \section{Tests}
-\label{S_gof}
+\label{S_test}
 
 %Three
 Two types of tests are available in \si.
@@ -4317,6 +4599,8 @@ for different models fitted to a given data set,
 all are comparable.
 \fi
 \end{enumerate}
+In addition, there are procedures for assessing goodness of fit
+as explained in Section~\ref{S_gof}.
 
 \subsection{Wald-type tests}
 \label{Waldtest}
@@ -4541,7 +4825,7 @@ number of restricted parameters. The corresponding $p$-value is
 given in the output file.
 
 In the present case, one parameter is restricted (reciprocity),
-hence there is one degree of freedom {\tt d.f. = 1}. The value of
+hence there is one degree of freedom {\tt d.f.\ = 1}. The value of
 the test statistic {\tt c = 3.9982} at one degree of freedom
 gives {\tt p = 0.0455}.
 That is, it seems that reciprocity
@@ -4573,10 +4857,6 @@ freedom, additional tests with one degree of freedom that test the
 single parameters one-by-one. The goodness-of-fit table is as
 follows:
 
-% I do not understand this, but the verbatim environment
-% does something with < and > signs.
-% Unpaired < signs lead to errors later on.
-% Therefore I changed < and > to [ and ]. TS.
 \newpage
 {\footnotesize
 \begin{verbatim}
@@ -4593,24 +4873,24 @@ ________________________________________________
 
 Joint test:
 -----------
-   c =  92.5111   d.f. = 3   p-value [ 0.0001
+   c =  92.5111   d.f. = 3   p-value < 0.0001
 
 (1) tested separately:
 ----------------------
  - two-sided:
-   c =  62.5964   d.f. = 1   p-value [ 0.0001
+   c =  62.5964   d.f. = 1   p-value < 0.0001
  - one-sided (normal variate):   7.9118
 
 (2) tested separately:
 ----------------------
  - two-sided:
-   c =  16.3001   d.f. = 1   p-value [ 0.0001
+   c =  16.3001   d.f. = 1   p-value < 0.0001
  - one-sided (normal variate):   4.0373
 
 (3) tested separately:
 ----------------------
  - two-sided:
-   c =  23.4879   d.f. = 1   p-value [ 0.0001
+   c =  23.4879   d.f. = 1   p-value < 0.0001
  - one-sided (normal variate):   4.8464
 ________________________________________________
 
@@ -4918,13 +5198,14 @@ default) and the simulations do not succeed in achieving the
 condition required by
 \hyperlink{T_distance_stop}{its stopping rule}
 (see Section~\ref{S_cond}), then the simulation is
-terminated with an error message, saying {\em This distance is not
-achieved for this parameter vector}. In this case, you are advised
-to change to unconditional simulation.
+terminated with an error message, saying
+\emph{Unlikely to terminate this epoch}.
+In this case, you are advised to change to unconditional simulation.
 
 \iffalse
 \newpage
-\section[Options for model type, estimation and simulation]{Options for model type, estimation and simulation}
+\section[Options for model type, estimation and simulation]
+        {Options for model type, estimation and simulation}
 \label{S_options}
 
 \hypertarget{T_S_options}{}
@@ -5188,7 +5469,7 @@ Here we give a more qualitative description.
 
 The present section describes an exploratory approach to model
 specification. A more advanced approach to testing model
-specifications is described in Section~\ref{S_gof}.
+specifications is described in Section~\ref{S_test}.
 
 For an exploration of further effects to be included, the
 following steps may be followed:
@@ -5780,33 +6061,31 @@ the weights of the effects in the objective function.)
 \subsection{Network evolution}
 The model of network evolution consists of the model of actors'
 decisions to establish new ties or dissolve existing ties
-(according to {\it evaluation} and {\it endowment functions}) and the
+(according to {\it evaluation}, {\it creation},
+and {\it endowment functions}) and the
 model of the timing of these decisions (according to the {\it rate
 function}).
-The objective function of the actor is the sum of the
-network evaluation
-function and the network endowment function
-\begin{equation}
-u^{\rm net}(x) \, = \, f^{\rm net}(x) + g^{\rm net}(x)  \ , \label{u_net}
-\end{equation}
-and a random term; where the evaluation function $f^{\rm net}(x)$ and the endowment
-function $g^{\rm net}(x)$ are as defined in the following subsections.
+The model, and the roles played by these three functions,
+were briefly explained in Section~\ref{S_defmod}.
 
-For some effects %(those for which the function $f1i $ in Section~\ref{S_efdef} is non-zero)
-the endowment function is implemented not for estimation by the Method of Moments
+For some effects
+the creation and endowment functions are
+implemented not for estimation by the Method of Moments
 but only by the Maximum Likelihood or Bayesian method;
 this is indicated below by ``endowment effect only likelihood-based''.
 
-(It may be noted that the network evaluation function was called objective function,
-and the endowment function was called gratification function, in
-\citet{Snijders01}.)
+(It may be noted that the network evaluation function
+was called objective function,
+and the creation and endowment functions were called gratification function,
+in \citet{Snijders01}.)
 
 \subsubsection{Network evaluation function}
 \label{S_f}
 
 The network evaluation function for actor $i$ is defined as
 \begin{equation}
-f^{\rm net}(x) \, = \, \sum_k \beta^{\rm net}_k s^{\rm net}_{ik}(x)   \label{f_net}
+f^{\rm net}_i(x) \, = \,
+              \sum_k \beta^{\rm net}_k s^{\rm net}_{ik}(x)   \label{f_net}
 \end{equation}
 where $\beta^{\rm net}_k$ are parameters and $s^{\rm net}_{ik}(x)$
 are effects as defined below.
@@ -6014,7 +6293,7 @@ Structural effects are the effects depending on the network only.
  endowment effect only likelihood-based;
 
  \item {\em out-degree up to $c$} (\emph{truncated out-degree}),
-where $c$ is some constant
+ where $c$ is some constant
  (internal effect parameter, see above),  \texttt{(outTrunc)},
  defined by  \\
  $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;
@@ -6618,7 +6897,7 @@ Further there are four mixed triadic effects.
  this refers to the closure of mixed $W-X$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
- the number of mixed $W-x$ two-paths
+ the number of mixed $W-X$ two-paths
  $i \stackrel{W}{\rightarrow} h \stackrel{X}{\rightarrow} j$.\\
  Note that since this is the evaluation function for actor $i$ with
  respect to network $X$, only the $x_{ij}$ tie indicator in the formula,
@@ -6802,19 +7081,45 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
 
 
 
+\subsubsection{Network creation function} \label{S_c}
+
+The network creation function
+is one way of modeling effects which operate in
+different strengths for the creation and the dissolution of
+relations.
+The network creation function is zero for dissolution of ties,
+and is given by
+\begin{equation}
+c^{\rm net}_i(x) \, = \, \sum_k \zeta_k^{\rm net} \, s^{\rm net}_{ik}(x)
+                             \label{c_net}
+\end{equation}
+for creation of ties.
+In this formula, the $\zeta_k^{\rm net}$
+are the parameters for the endowment function.
+The potential effects $s^{\rm net}_{ik}(x) $ in this function, and their
+formulae, are the same as in the evaluation function;
+except that not all are available, as indicated in the preceding subsection.
+For further explication, consult \citet{Snijders01, Snijders05};
+(here, the `gratification function' is used rather than the creation function),
+\citet*{SnijdersEA07}, and \citet*{SteglichEA10}
+(here only the endowment function is treated and not the creation function,
+but they are similar in an opposite way).
+
 \subsubsection{Network endowment function} \label{S_g}
 
-The \hypertarget{T_gratification}{network endowment function}
+The network endowment function
 is the way of modeling effects which operate in
 different strengths for the creation and the dissolution of
 relations.
 The network endowment function is zero for creation of ties,
 and is given by
 \begin{equation}
-g^{\rm net}(x) \, = \, \sum_k \gamma_k \, s^{\rm net}_{ik}(x)   \label{g_net}
+g^{\rm net}(x) \, = \, \sum_k \gamma^{\rm net}_k \, s^{\rm net}_{ik}(x)
+                                                           \label{g_net}
 \end{equation}
 for dissolution of ties.
-In this formula, the $\gamma_k$ are the parameters for the endowment function.
+In this formula, the $\gamma_k^{\rm net}$
+are the parameters for the endowment function.
 The potential effects $s^{\rm net}_{ik}(x) $ in this function, and their
 formulae, are the same as in the evaluation function;
 except that not all are available, as indicated in the preceding subsection.
@@ -6922,7 +7227,8 @@ Also to this exponent effects of actor covariates can be added.
 \subsection{Behavioral evolution}
 The model of the dynamics of a dependent actor variable
 consists of a model of actors' decisions (according to {\it
-evaluation} and {\it endowment functions}) and a model of the timing
+evaluation}, {\it creation}, and {\it endowment functions})
+and a model of the timing
 of these decisions (according to a {\it rate function}),
 just like the model for the network dynamics. The
 decisions now do not concern the creation or dissolution of
@@ -6933,71 +7239,104 @@ is.
 \subsubsection{Behavioral evaluation function}
 \label{S_f_b}
 
-Effects for the behavioral evaluation function $u^{\rm beh}$ can be
-selected from the following.
-Here the dependent variable is transformed to have an overall average value of 0;
+The behavior evaluation function for actor $i$ is defined as
+\begin{equation}
+f^{\rm beh}_i(x, z) \, = \, \sum_k \beta^{\rm beh}_k s^{\rm beh}_{ik}(x, z)
+                                             \label{f_beh}
+\end{equation}
+where $\beta^{\rm beh}_k$ are parameters and $s^{\rm beh}_{ik}(x, z)$
+are effects as defined below.
+The behavioral dependent variable is denoted by $z$ and the
+dependent network variable by $x$.
+Here the dependent variable is transformed
+to have an overall average value of 0;
 in other words, $z$ denotes the original input variable
 minus the overall mean, which is given in the output file under the heading
 \emph{Reading dependent actor variables}.
 
-\begin{enumerate}
- \item {\em behavioral shape effect} \texttt{(linear)},\\
- $s^{\rm beh}_{i\vit}(x) = z_i \,$,\\
- where $z_{i}$ denotes the value of the dependent behavior variable of actor $i$;
+First there are effects that have to do only
+with the behavioral variable itself.
 
- \item {\em quadratic shape effect, or effect of the behavior upon itself} \texttt{(quad)},
+\begin{startenum}
+ \item {\em behavioral shape effect} \texttt{(linear)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \,$,\\
+ where $z_{i}$ denotes the value of the dependent behavior variable
+ of actor $i$;
+
+ \item {\em quadratic shape effect, or effect of the behavior upon itself}
+                                                             \texttt{(quad)},
  where the attractiveness of further steps up the behavior `ladder'
  depends on where the actor is on the ladder:\\
- $s^{\rm beh}_{i\vit}(x) =  z_i^2$.\\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i^2$.\\
  The position of this effect in the sequence of effects is different between
  versions 3 and 4 of \si.
-
-
+\end{startenum}
+Next there is a list of effects that have to do with the influence of
+the network on the behavior.
+To specify such effects in \RS using, e.g., function \sfn{includeEffects},
+it is necessary to specify the dependent behavior variable
+in the keyword \sfn{name}
+as well as the network in the keyword \sfn{interaction1}.
+For example,
+{\small
+\begin{verbatim}
+  myCoEvolutionEff <- includeEffects( myCoEvolutionEff, name = "drinkingbeh",
+                                      avSim, indeg, outdeg,
+                                      interaction1 = "friendship" )
+\end{verbatim}
+}
+The list of these effects is the following.
+\begin{followenum}
  \item {\em average similarity effect} \texttt{(avSim)}, defined by the
  average of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is tied,\\
- $s^{\rm beh}_{i\vit}(x) = x_{i+}^{-1} \, \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
+ $s^{\rm beh}_{i\vit}(x, z) = x_{i+}^{-1} \,
+           \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i+} = 0$) ;
 
  \item {\em total similarity effect} \texttt{(totSim)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is tied,\\
- $s^{\rm beh}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
+ $s^{\rm beh}_{i\vit}(x, z) =
+            \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 
  \item {\em indegree effect} \texttt{(indeg)}, \\
- $s^{\rm beh}_{i\vit}(x) = z_i \sum_j x_{ji} $;
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ji} $;
 
  \item {\em outdegree effect} \texttt{(outdeg)}, \\
- $s^{\rm beh}_{i\vit}(x) = z_i \sum_j x_{ij} $;
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij} $;
 
 % \item {\em indegree up to $c$ effect}, where $c$ is a constant between 1 and $n-1$,\\
-% $s^{\rm beh}_{i\vit}(x) = z_i I\{x_{+i} \leq c\}$,\\
+% $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} \leq c\}$,\\
 % where again $I\{A\}$ denotes the indicator function of the condition $A$;
 
  \item {\em isolate effect} \texttt{(isolate)},
   the differential attractiveness of the behavior for isolates, \\
- $s^{\rm beh}_{i\vit}(x) = z_i I\{x_{+i} = 0 \}$,\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} = 0 \}$,\\
  where again $I\{A\}$ denotes the indicator function of the condition $A$;
 
 
  \item
  {\em average similarity $\times$ reciprocity effect} \texttt{(avSimRecip)},
- defined by the sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
+ defined by the sum of centered similarity scores
+ ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is reciprocally tied,\\
- $s^{\rm beh}_{i\vit}(x) = x_{i(r)}^{-1} \, \sum_j x_{ij} x_{ji} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
+ $s^{\rm beh}_{i\vit}(x, z) = x_{i(r)}^{-1} \,
+            \sum_j x_{ij} x_{ji} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i(r)} = 0$) ;
 
  \item {\em total similarity $\times$ reciprocity effect}
  \texttt{(totSimRecip)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is reciprocally tied,\\
- $s^{\rm beh}_{i\vit}(x) =  \sum_j x_{ij} x_{ji} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
+ $s^{\rm beh}_{i\vit}(x, z) =
+         \sum_j x_{ij} x_{ji} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 
  \item {\em average similarity $\times$ popularity alter effect}
  \texttt{(avSimPopAlt)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is  tied, multiplied by their indegrees, \\
- $s^{\rm beh}_{i\vit}(x) = x_{i+}^{-1} \, \sum_j x_{ij}  x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
+ $s^{\rm beh}_{i\vit}(x, z) = x_{i+}^{-1} \, \sum_j x_{ij}  x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i+} = 0$) ;
 
  \item
@@ -7005,38 +7344,38 @@ minus the overall mean, which is given in the output file under the heading
  \texttt{(totSimPopAlt)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is tied, multiplied by their indegrees,\\
- $s^{\rm beh}_{i\vit}(x) =  \sum_j x_{ij} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
+ $s^{\rm beh}_{i\vit}(x, z) =  \sum_j x_{ij} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 \iffalse
  \\ if the parameter for this effect is equal to 1:\\
  {\em popularity alter effect}, defined by the
  average in-degrees of the other actors $j$ to whom $i$ is tied,\\
- $s^{\rm beh}_{i\vit}(x) =   x_{i+}^{-1} \, \sum_j x_{ij} x_{+j}  $;\\
+ $s^{\rm beh}_{i\vit}(x, z) =   x_{i+}^{-1} \, \sum_j x_{ij} x_{+j}  $;\\
  (and 0 if $x_{i+} = 0$) ;
 \fi
 
  \item {\em average similarity $\times$ reciprocity $\times$ popularity alter effect} \texttt{(avSimRecPop)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is reciprocally tied, multiplied by their indegrees, \\
- $s^{\rm beh}_{i\vit}(x) = x_{i(r)}^{-1} \, \sum_j x_{ij} x_{ji} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
+ $s^{\rm beh}_{i\vit}(x, z) = x_{i(r)}^{-1} \, \sum_j x_{ij} x_{ji} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i(r)} = 0$) ;
 
  \item {\em total similarity $\times$ reciprocity $\times$ popularity alter effect} \texttt{(totSimRecPop)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is reciprocally tied, multiplied by their indegrees,\\
- $s^{\rm beh}_{i\vit}(x) =  \sum_j x_{ij} x_{ji} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
+ $s^{\rm beh}_{i\vit}(x, z) =  \sum_j x_{ij} x_{ji} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 
  \item {\em average alter effect} \texttt{(avAlt)},
  defined by the product of $i$'s
  behavior multiplied by the average behavior of his alters (a kind
  of ego-alter behavior covariance), \\
- $s^{\rm beh}_{i\vit}(x) =  z_i \big( \sum_j x_{ij}\, z_j \big)
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, z_j \big)
                                 / \big (\sum_j x_{ij}\big)  $\\
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
  \item {\em average reciprocated alter effect} \texttt{(avRecAlt)},
  defined by the product of $i$'s
  behavior multiplied by the average behavior of his reciprocated alters, \\
- $s^{\rm beh}_{i\vit}(x) =  z_i \big( \sum_j x_{ij}\, x_{ji}\, z_j \big)
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, x_{ji}\, z_j \big)
                                 / \big (\sum_j x_{ij}\, x_{ji} \big)  $\\
  (and 0 if the ratio is 0/0) ;
 
@@ -7044,35 +7383,35 @@ minus the overall mean, which is given in the output file under the heading
  \item {\em dense triads effect} \texttt{(behDenseTriads)},
  defined by the number of dense triads in which actor $i$ is
  located, \\
- $s^{\rm beh}_{i\vit}(x) =  z_i \sum_{j,h} I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h} I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
  + x_{jh}\, + x_{hj}\,)\geq c \}\,$,\\
  where $c$ is either 5 or 6; \\
  \emph{this is currently not correctly implemented in \SI 3 };
 
  \item {\em peripheral effect}, defined by the number of dense triads to which actor $i$ stands
  in a unilateral-peripheral relation,\\
- $s^{\rm beh}_{i\vit}(x) =  z_i \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
  I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$,\\
  where $c$ is the same constant as in the {\it dense triads} effect;\\
  for symmetric networks, the unilateral condition is dropped, and the effect is\\
- $s^{\rm beh}_{i\vit}(x) =  z_i \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
  I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$;\\
  \emph{this is currently not correctly implemented in \SI 3 };
 
  \item {\em reciprocated degree effect} \texttt{(recipDeg)}, \\
- $s^{\rm beh}_{i\vit}(x) = z_i \sum_j x_{ij}\,x_{ji} $;
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\,x_{ji} $;
 
  \item {\em average similarity $\times$ popularity ego effect}
  \texttt{(avSimPopEgo)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
  and the other actors $j$ to whom he is  tied, multiplied by ego's indegree, \\
- $s^{\rm beh}_{i\vit}(x) =  x_{+i} \, x_{i+}^{-1} \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
+ $s^{\rm beh}_{i\vit}(x, z) =  x_{+i} \, x_{i+}^{-1} \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i+} = 0$) ;\\
  because of collinearity, under the Method of Moments this cannot be estimated together with the
   average similarity $\times$ popularity alter effect.
 
 \setcounter{savenumi}{\value{enumi}}
-\end{enumerate}
+\end{followenum}
 \medskip
 
 \noindent
@@ -7084,11 +7423,10 @@ For each actor-dependent covariate $v_j$ (recall that these are
 centered internally by \si) as well as for each of the other
 dependent behavior variables (for notational simplicity here also
 denoted $v_j$), there are the following effects.
-
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
  \item {\em main covariate effect} \texttt{(effFrom)},\\
- $s^{\rm beh}_{i\vit}(x) = z_{i} v_{i}\,$;\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_{i} v_{i}\,$;\\
  here too, the other dependent behavioral variables are centered so that they
  have overall mean 0;
 \item \emph{alter's covariate average } effect on behavior $z$
@@ -7096,48 +7434,127 @@ denoted $v_j$), there are the following effects.
       defined as the product of $i$'s behavior $z_i$ and
       $i$'s alters' covariate-average $\breve v_i$ as defined
       in (\ref{alt_av}),\\
-       $s^{\rm beh}_{i\vit}(x) = z_i \, \breve v_i $.\\
+       $s^{\rm beh}_{i\vit}(x, z) = z_i \, \breve v_i $.\\
       This is similar to the `average alter' effect; for
       $v_i = z_i$ it would reduce to the latter effect.
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
-
-
+There are also the following interaction effects between actor covariates
+(which includes other dependent behavior variables)
+and influence effects.
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+\item {\em interaction of actor variable with average similarity},
+                       \texttt{(avSimX)} \\
+ $s^{\rm beh}_{i\vit}(x, z) = (v_i / x_{i+}) \,
+         \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
+ (and the mean behavior, i.e. $0$, if $x_{i+} = 0$) ;
+\item {\em interaction of actor variable with total similarity},
+                       \texttt{(totSimX)} \\
+ $s^{\rm beh}_{i\vit}(x, z) = v_i \,
+         \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
+\item {\em interaction of actor variable with average alter},
+                       \texttt{(avAltX)} \\
+ $s^{\rm beh}_{i\vit}(x, z) =  v_i \, z_i \big( \sum_j x_{ij}\, z_j \big)
+                                / \big (\sum_j x_{ij}\big)  $\\
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
 \iffalse
- and one interaction effect,
+% the following would be the non publicized inflIntX :
 the latter of which is a choice among three, dependent on the
 \hyperlink{T_effpar}{internal parameter} for this effect:
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
  \item depending on the parameter value (1, 2, or 3):
- \begin{enumerate}
+\begin{enumerate}
    \item[value 1:] {\em interaction of actor variable with average similarity},\\
- $s^{\rm beh}_{i\vit}(x) = (v_i / x_{i+}) \,
+ $s^{\rm beh}_{i\vit}(x, z) = (v_i / x_{i+}) \,
          \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
     (and 0 if $x_{i+} = 0$) ;
    \item[value 2:] {\em interaction of actor variable with total similarity},\\
- $s^{\rm beh}_{i\vit}(x) = v_i \,
+ $s^{\rm beh}_{i\vit}(x, z) = v_i \,
          \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
    \item[value 3:] {\em interaction of actor variable with average alter},\\
- $s^{\rm beh}_{i\vit}(x) =  v_i \, z_i \big( \sum_j x_{ij}\, z_j \big)
+ $s^{\rm beh}_{i\vit}(x, z) =  v_i \, z_i \big( \sum_j x_{ij}\, z_j \big)
                                 / \big (\sum_j x_{ij}\big)  $\\
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
- \end{enumerate}
-\item There are also {\em user-defined interaction effects}
-      between actor variables, defined as the product of two
-      or three grand mean centered variables.
-      (If these include the dependent variable itself,
-      special formulae are used for the change statistic.)
-
-
-\setcounter{savenumi}{\value{enumi}}
+  \end{enumerate}
 \end{enumerate}
 \fi
+\medskip
+
+\noindent
+\textbf{\emph{User-defined interaction effects}}
+\medskip
+
+\noindent
+
+The \emph{user-defined interaction effects} of Section~\ref{S_beh_infl}
+are defined as follows.
+Suppose we consider two effects $s^{\rm beh}_{ia}(x, z)$ and
+$s^{\rm beh}_{ib}(x, z)$. Then their interaction effect is defined by
+\begin{equation}
+    s^{\rm beh}_{i [a\ast b] }(x, z) \,=\,
+      \frac{1}{z_i} \, s^{\rm beh}_{ia}(x, z) \, s^{\rm beh}_{ib}(x, z) \ .
+\end{equation}
+For three effects $s^{\rm beh}_{ia}(x, z)$,
+$s^{\rm beh}_{ib}(x, z)$ and $s^{\rm beh}_{ic}(x, z)$,
+the interaction effect is defined by
+\begin{equation}
+    s^{\rm beh}_{i [a\ast b \ast c] }(x, z) \,=\,
+      \frac{1}{z_i^2} \, s^{\rm beh}_{ia}(x, z) \,
+                      s^{\rm beh}_{ib}(x, z) \, s^{\rm beh}_{ic}(x, z)\ .
+\end{equation}
+The division by $z_i$ or $z_i^2$, respectively, is necessary to offset the
+fact that all behavior effects of \texttt{interactionType = OK} contain
+a factor $z_i$, and further do not depend on $z_i$.
+For example, the interaction between two main effects (\texttt{effFrom})
+of actor covariates $v_{1i}$ and $v_{2i}$, is the same as
+the main effect of the product variable $v_{1i}\times v_{2i}$,
+with the proviso that the user-defined interaction does not center
+the product variable;  the user-defined interaction
+then is defined by
+\begin{equation}
+    s^{\rm beh}_{i [v_1\ast v_2] }(x, z) \,=\,
+              \frac{1}{z_i}\, ( z_i \, v_{1i})  \, ( z_i \, v_{2i}) \,=\,
+                      z_i \, v_{1i}\,v_{2i}  \ ,
+\end{equation}
+where both component variables $v_{1i}$ and $v_{2i}$
+are internally centered, but the product variable will generally not have
+mean 0.
+
+
+\subsubsection{Behavioral creation function}
+Also the behavioral model knows the distinction between evaluation,
+creation, and
+endowment effects. The formulae of the effects that can be included
+in the behavioral creation function $c^{\rm beh}$ are the same as
+those given for the behavioral evaluation function. However, they enter
+calculation of the creation function only when the actor considers
+increasing his behavioral score by one unit (downward steps), not
+when downward steps (or no change) are considered. For more details,
+consult
+\citet*{SnijdersEA07} and \citet*{SteglichEA10}
+and replace `going down' by `going up'.
+
+The statistics reported as \emph{inc.\ beh.} (increase in behavior)
+are the sums of the changes in actor-dependent values
+for only those actors who increased in behavior.
+More precisely, it is
+\begin{equation}
+\sum_{m=1}^{M-1} \sum_{i=1}^n I\{z_{i}(t_{m+1}) > z_{i}(t_m) \}\,
+     \big( s^{\rm beh}_{ik}(x(t_{m+1})) -  s^{\rm beh}_{ik}(x(t_m))   \big) ,
+\end{equation}
+where $M$ is the number of observations, $x(t_m)$ is the observed situation
+at observation $m$, and the indicator function
+$I\{A\}$ is 0 if event $A$ is true
+and 0 if it is untrue.
 
 \subsubsection{Behavioral endowment function}
 Also the behavioral model knows the distinction between evaluation and
 endowment effects. The formulae of the effects that can be included
-in the behavioral endowment function $e^{\rm beh}$ are the same as
+in the behavioral endowment function $g^{\rm beh}$ are the same as
 those given for the behavioral evaluation function. However, they enter
 calculation of the endowment function only when the actor considers
 decreasing his behavioral score by one unit (downward steps), not
@@ -7152,7 +7569,7 @@ for only those actors who decreased in behavior.
 More precisely, it is
 \begin{equation}
 \sum_{m=1}^{M-1} \sum_{i=1}^n I\{z_{i}(t_{m+1}) < z_{i}(t_m) \}\,
-     \big( s^{\rm beh}_{ik}(x(t_{m+1})) -  s^{\rm beh}_{ik}(x(t_m))   \big) ,
+     \big( s^{\rm beh}_{ik}(x(t_{m})) -  s^{\rm beh}_{ik}(x(t_{m+1}))   \big) ,
 \end{equation}
 where $M$ is the number of observations, $x(t_m)$ is the observed situation
 at observation $m$, and the indicator function
@@ -7171,15 +7588,13 @@ beh}_m \] for $m = 1, ..., M-1$.
 \section{Parameter interpretation}
 \label{S_interpret}
 
-\subsection{Longitudinal models}
-
 The main `driving force' of the actor-oriented model
 is the evaluation function
 \citep[in earlier publications called objective function,
 see][]{Snijders01, Snijders05} given in formula (\ref{f_net})
 (for the network) as
 \[
-f^{\rm net}(x) \, = \, \sum_k \beta^{\rm net}_k \, s^{\rm net}_{ik}(x)   \ .
+f^{\rm net}_i(x) \, = \, \sum_k \beta^{\rm net}_k \, s^{\rm net}_{ik}(x)   \ .
 \]
 The evaluation function can be regarded as the ``attractiveness"
 of the network (or behavior, respectively) for a given actor.
@@ -7196,11 +7611,11 @@ An alternative interpretation is that when actor $i$ is making
 a `ministep', i.e., a single change in his outgoing ties
 (where no change also is an option), and
 $x_a$ and $x_b$ are two possible results of this ministep,
-then $f^{\rm net}(x_b) - f^{\rm net}(x_a)$ is the log odds ratio
+then $f^{\rm net}_i(x_b) - f^{\rm net}_i(x_a)$ is the log odds ratio
 for choosing between these two alternatives -- so that the ratio
 of the probability of $x_b$ and $x_a$ as next states is
 \[
-  \exp\big(f^{\rm net}(x_b) - f^{\rm net}(x_a)\big) \ .
+  \exp\big(f^{\rm net}_i(x_b) - f^{\rm net}_i(x_a)\big) \ .
 \]
 Note that, when the current state is $x$, the possibilities
 for $x_a$ and $x_b$ are $x$ itself (no change), or $x$ with one extra
@@ -7681,7 +8096,7 @@ whether it was also a dependent variable or not.)
 The formulae in Section \ref{S_f_b} show that the evaluation function
 for this model specification is
 \begin{equation}
-   u^{\rm beh} \,=\, \beta_{\rm trend} \, (z_i - \bar z)
+   f^{\rm beh}_i \,=\, \beta_{\rm trend} \, (z_i - \bar z)
                \,+\, \beta_{\rm drink} \, (z_i - \bar z)^2 \,+\,
                  \beta_{\rm av.\ sim}\,  \frac{1}{x_{i+}} \,
           \sum_j x_{ij} \big({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}\big) \ .
@@ -7701,7 +8116,7 @@ In the second model, the table gave the following results.
 \noindent
 Here the evaluation function is
 \begin{equation}
-   u^{\rm beh} \,=\, \beta_{\rm trend} \, (z_i - \bar z)
+   f^{\rm beh}_i \,=\, \beta_{\rm trend} \, (z_i - \bar z)
            \,+\, \beta_{\rm drink} \, (z_i - \bar z)^2 \,+\,
           \beta_{\rm av.\ alter}\,  (z_i - \bar z)(\bar z_{(i)} - \bar z)  \ ,
                     \label{eq_f_b2}
@@ -7742,7 +8157,7 @@ that all their friends have the same behavior $z_{ij}$.
 For the parameters given above, the behavior
 evaluation function then reads
 \[
-   u^{\rm beh} \,=\, 0.3618 \, (z_i - \bar z)
+   f^{\rm beh}_i \,=\, 0.3618 \, (z_i - \bar z)
               \,-\, 0.06 \, (z_i - \bar z)^2 \,+\,
              3.9689 \,  \big({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}\big) \ .
 \]
@@ -7792,7 +8207,7 @@ earlier, wrong:
 For the other model, filling in the estimated parameters
 in (\ref{eq_f_b2}) yields
 \[
-   u^{\rm beh} \,=\, 0.3820 \, (z_i - \bar z)
+   f^{\rm beh}_i \,=\, 0.3820 \, (z_i - \bar z)
                  \,-\, 0.5428 \, (z_i - \bar z)^2 \,+\,
                    1.1414  \, (z_i - \bar z) ( \bar z_{(i)} - \bar z) \ .
 \]
@@ -7840,7 +8255,7 @@ effect, but these differences here are not significant.
 Another way to look at the behavior evaluation function is to consider
 the location of its maximum. This function here can be written also as
 \[
-   u^{\rm beh} \,=\, \big( 0.382 +
+   f^{\rm beh}_i \,=\, \big( 0.382 +
                 1.1414( \bar z_{(i)} - \bar z) \big) \, (z_i - \bar z)
        \,-\, 0.5428 \, (z_i - \bar z)^2   \ .
 \]
@@ -7968,16 +8383,26 @@ You can unpack a tar ball by using
 
 \verb|tar xf tar-ball-name|
 
-\section{Adding an effect}
+\section{Understanding and adding an effect}
 
-Effects can be added to your personalized version of \rs.
+If you wish to check the definition of an effect,
+you can locate it in the source code and study it.
+You may also add
+effects to your personalized version of \rs.
 If you think the effect could be useful for others, too,
 it will be appreciated if you propose it for inclusion through
 one of the discussion lists or directly to the maintainer
 of the package.
-This section gives the outline of the procedure, and then presents
+This section gives the outline of the procedure for adding an effect, and then presents
 an elaborate example.
 
+If you only wish to understand an effect without creating
+a new one, then you may
+follow the appropriate steps of this section.
+The main things then are to go to the \textsf{Effectfactory.cpp}
+file, find the name of the effect you are interested in and
+from there the function that implements it
+and read the code of this function.
 
 \begin{enumerate}
 
@@ -8032,13 +8457,13 @@ an elaborate example.
 			\item In the file AllEffects.h you need to add the line\\
                 \texttt{ \#include "NewEffect.h" }\\
                  where it is alphabetically appropriate.
-            \item In the file EffectFactory.cpp, at the appropriate place,
+            \item In the file \textsf{EffectFactory.cpp}, at the appropriate place,
                   add the lines
                 \begin{verbatim}
     else if (effectName == "newEf")
-    {
-        pEffect = new NewEffect(pEffectInfo);
-    }
+	{
+		pEffect = new NewEffect(pEffectInfo);
+	}
                 \end{verbatim}
 			\item Now you will need to create two files (namely header
                   and source files for
@@ -8070,6 +8495,7 @@ continue with the effect that you are interested in.
 
 Note that if your new effect could usefully be used as part of a multiple
 network effect you should use the generic effect approach and not the following.
+
 
 \subsection{Example: adding the truncated out-degree effect}
 
@@ -8121,16 +8547,16 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
       In the file \textsf{EffectFactory.cpp}, after the piece referring
       to \texttt{effectName == "outActSqrt"}, the lines
 \begin{verbatim}
-    else if (effectName == "outTrunc")
+  else if (effectName == "outTrunc")
     {
-         pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
+     pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
     }
 \end{verbatim}
       were inserted.  This refers the program, when it encounters short name
       \sfn{outTrunc}, to the function \sfn{TruncatedOutdegreeEffect}.  The next
       step was to construct this function.
 \item To choose a template for \sfn{TruncatedOutdegreeEffect},
-  we could make various
+      we could make various
       different choices; here it is important to have a look at the various
       effects defined in Section~\ref{S_math} that depend only on the
       outdegree. Consider the effects Outdegree activity - sqrt
@@ -8212,27 +8638,26 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
     // Current out-degree
     int d =	this->pNetwork()->outDegree(this->ego());
     if (this->outTieExists(alter))
-    {
-        // After a tie withdrawal, the new out-degree would be d-1, and
-        // the new effect value would have decreased by 1 if d <= this->lc
+  	  {
+		// After a tie withdrawal, the new out-degree would be d-1, and
+		// the new effect value would have decreased by 1 if d <= this->lc
 
-        if (d <= this->lc)
+      if (d <= this->lc)
         {
-            change = 1;
+         change = 1;}
         }
-    }
-    else
-    {
-        // When introducing a new tie, the new out-degree would be d+1, and
-        // the new effect value would have increased by 1 if d < this->lc
+	else
+	  {
+		// When introducing a new tie, the new out-degree would be d+1, and
+		// the new effect value would have increased by 1 if d < this->lc
 
-        if (d < this->lc)
+      if (d < this->lc)
         {
-            change = 1;
+         change = 1;
         }
-    }
+	  }
 
-    return change;
+	return change;
 }
 \end{verbatim}
 }
@@ -8243,19 +8668,19 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
 {\small
 \begin{verbatim}
 double TruncatedOutdegreeEffect::egoStatistic(int ego,
-    const Network * pNetwork)
+	const Network * pNetwork)
 {
-    // Current out-degree
-    int d =	this->pNetwork()->outDegree(this->ego());
+	// Current out-degree
+   int d =	this->pNetwork()->outDegree(this->ego());
 
-    if (d <= this->lc)
-    {
-        return d;
-    }
-    else
-    {
-        return this->lc;
-    }
+   if (d <= this->lc)
+     {
+      return d;
+     }
+   else
+     {
+      return this->lc;
+     }
 }
 \end{verbatim}
 }
@@ -8301,7 +8726,7 @@ Observed values of target statistics are
       \]
       This can be directly calculated in \R by requesting
 \begin{verbatim}
-sum(pmin(rowSums(s502), 3))
+sum(pmin(rowSums(s502),3))
 \end{verbatim}
       which indeed returns the value 105, confirming that the calculation
       of the ego statistic seems correct.
@@ -8710,7 +9135,7 @@ MyModel $<$-- model.create \newline
 object that can be used to call siena07. ``fn'' is function to do one
 simulation in the Robbins-Monro algorithm.
 %``usesimstats0c'' is boolean, if true the standard algorithm
-% is being used which can be used with multiple processors.
+% is being used which can be used with multiple processes.
 % Just used for validation.
 ``projname'' is character string name of
 project. No embedded spaces. ``MaxDegree'' is a named vector of maximum degree
@@ -8761,11 +9186,11 @@ boolean variable to indicate if it is desired to open the GUI of Siena
 simulation; ``verbose'' is a boolean variable to produce output on the console;
 ``silent'' is also a boolean variable, if true, no output is printed to the
 console; ``useCluster'' is a boolean variable to indicate if it is desired to
-use a cluster of processors; ``nbrNodes'' is the number of processors to use if
+use a cluster of processes; ``nbrNodes'' is the number of processes to use if
 useCluster is TRUE; `
 %`initC'' is boolean: set to TRUE if the simulation will
 %use C routines (currently always needed). Only relevant if using multiple
-%processors, to ensure all copies are initialised correctly.
+%processes, to ensure all copies are initialised correctly.
 ``clusterString''
 is the definition of clusters, default set up to use the local machine only;
 %``tt'' is a tcltk toplevel window used if called from the model options screen;
@@ -8979,7 +9404,7 @@ order of submission to sienaDataCreate
 \item 2010-09-20 R-forge revision 120: Bug fixes:
 \begin{itemize}
 \item Multiple groups with 2 dyadic covariates had incorrect names
-\item Multiple processors failed (RSiena only)
+\item Multiple processes failed (RSiena only)
 \item Minor print format corrections
 \item Bug in calculation of starting values for behavior variables.
 (RSienaTest only)
@@ -9125,7 +9550,7 @@ New print, summary and edit methods for Siena effects objects
 \end{itemize}
 \item 2010-03-27 R-forge revision 70 (RSiena only)
 \begin{itemize}
-\item Fix to crash at end of phase 3 with multiple processors and
+\item Fix to crash at end of phase 3 with multiple processes and
 conditional estimation
 \item Correct carry forward/backward/use mode for behavior variables
 \item Fix bug causing crash in Finite Differences with only one effect
@@ -9144,14 +9569,14 @@ arbitrarily, rather than insisting on 1-n. Change simply allows this, the actual
 wave numbers are not yet used on reports etc.
 \item 2010-03-17 R-forge revision 66
 Corrected processing of user-specified interaction effects with multiple
-processors. This had originally worked but failed when one no longer had to
+processes. This had originally worked but failed when one no longer had to
 include the underlying effects.
 \item 2010-03-16 R-forge revision 64
 covarBipartite ego effect had been given type dyadic rather than ego.
 \item 2010-03-16 R-forge revision 63 (RSienaTest only)
 \begin{itemize}
 \item new functions \sfn{siena08} and \sfn{iwlsm}, for meta analysis
-\item can now use different processors for each wave. Not recommended: usually
+\item can now use different processes for each wave. Not recommended: usually
   slower than by iteration, but will be useful with ML routines when they are
   completed.
 \item No longer crashes with missing dyadic covariates.
@@ -9163,7 +9588,7 @@ covarBipartite ego effect had been given type dyadic rather than ego.
 \item 2010-02-16 R-forge revision 60 (RSienaTest only) added average indegrees
   to reports. Also constraints.
 \item 2010-02-12 R-forge revision 59 (RSienaTest only) Fix to bugs in printing
-  version numbers and in using multiple processors (would revert to RSiena
+  version numbers and in using multiple processes (would revert to RSiena
   package.) Added a skeleton MCMC routine.
 \item 2010-02-11 R-forge revision 57 Fix to bug in siena01Gui where in
   conditional estimation, the
@@ -9254,11 +9679,11 @@ Fixed bug in 3-way interactions in RSienaTest
 
 \item 2009-12-14 R-forge revision 28
 
- Fixed bug in use of multiple processors for RSiena.
+ Fixed bug in use of multiple processes for RSiena.
 
 \item 2009-12-14 R-forge revision 27
 
-Fixed bug in use of multiple processors for
+Fixed bug in use of multiple processes for
   RSienaTest.
 
 \item 2009-12-01 R-forge revision 26
