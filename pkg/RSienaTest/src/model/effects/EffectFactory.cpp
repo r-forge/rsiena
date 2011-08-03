@@ -600,15 +600,15 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	// 	pEffect = new InteractionCovariateEffect(pEffectInfo, false, false,
 	// 		false);
 	//}
-	else if (effectName == "avSimX")
+	else if (effectName == "avSimEgoX")
 	{
 		pEffect = new InteractionCovariateEffect(pEffectInfo, true, false, false);
 	}
-	else if (effectName == "totSimX")
+	else if (effectName == "totSimEgoX")
 	{
 		pEffect = new InteractionCovariateEffect(pEffectInfo, false, true, false);
 	}
-	else if (effectName == "avAltX")
+	else if (effectName == "avAltEgoX")
 	{
 		pEffect = new InteractionCovariateEffect(pEffectInfo, false, false, true);
 	}

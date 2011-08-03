@@ -377,53 +377,82 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 
         for (j in seq(along=xx$depvars))
         {
-            if (types[j] == 'oneMode' &&
-                attr(xx$depvars[[j]], 'nodeSet') == nodeSet)
+            if (types[j] == "oneMode" &&
+                attr(xx$depvars[[j]], "nodeSet") == nodeSet)
             {
-                objEffects <-
-                    rbind(objEffects,
-                          createEffects("behaviorOneModeObjective",
-                                        varname, names(xx$depvars)[j],
-                                        name=varname,
-                                        groupName=groupName, group=group,
-                                        netType=netType))
-                rateEffects <-
-                    rbind(rateEffects,
-                          createEffects("behaviorOneModeRate",
-                                        varname, names(xx$depvars)[j],
-                                        name=varname,
-                                        groupName=groupName, group=group,
-                                        netType=netType))
-            }
-            if (types[j] == 'bipartite' &&
+				depvarname <- names(xx$depvars)[j]
+                tmpObjEffects <-
+					createEffects("behaviorOneModeObjective",
+								  varname, depvarname, name=varname,
+								  groupName=groupName, group=group,
+								  netType=netType)
+				tmpRateEffects <-
+					createEffects("behaviorOneModeRate",
+								  varname, depvarname, name=varname,
+								  groupName=groupName, group=group,
+								  netType=netType)
+				if ((nOneModes + nBipartites) > 1) ## add the network name
+				{
+					tmpObjEffects$functionName <-
+						paste(tmpObjEffects$functionName,
+							  " (", depvarname, ")", sep="")
+					tmpObjEffects$effectName <-
+						paste(tmpObjEffects$effectName,
+							  " (", depvarname, ")", sep = "")
+					tmpRateEffects$functionName <-
+						paste(tmpRateEffects$functionName,
+							  " (", depvarname, ")", sep="")
+					tmpRateEffects$effectName <-
+						paste(tmpRateEffects$effectName,
+							  " (", depvarname, ")", sep = "")
+				}
+
+				objEffects <- rbind(objEffects, tmpObjEffects)
+				rateEffects <- rbind(rateEffects, tmpRateEffects)
+			}
+			if (types[j] == 'bipartite' &&
                 (attr(xx$depvars[[j]], 'nodeSet')[1] == nodeSet))
             {
-                 objEffects <-
-                     rbind(objEffects,
-                           createEffects("behaviorBipartiteObjective",
-                                         varname, names(xx$depvars)[j],
-                                         name=varname,
-                                         groupName=groupName, group=group,
-                                         netType=netType))
-                 rateEffects <-
-                     rbind(rateEffects,
-                           createEffects("behaviorBipartiteRate",
-                                         varname, names(xx$depvars)[j],
-                                         name=varname,
-                                         groupName=groupName, group=group,
-                                         netType=netType))
-             }
-        }
+   				depvarname <- names(xx$depvars)[j]
+				tmpObjEffects <-
+					createEffects("behaviorBipartiteObjective",
+								  varname, depvarname, name=varname,
+								  groupName=groupName, group=group,
+								  netType=netType)
+				tmpRateEffects <-
+					createEffects("behaviorBipartiteRate",
+								  varname, depvarname, name=varname,
+								  groupName=groupName, group=group,
+								  netType=netType)
+				if ((nOneModes + nBipartites) > 1) ## add the network name
+				{
+					tmpObjEffects$functionName <-
+						paste(tmpObjEffects$functionName,
+							  " (", depvarname, ")", sep="")
+					tmpObjEffects$effectName <-
+						paste(tmpObjEffects$effectName,
+							  " (", depvarname, ")", sep = "")
+					tmpRateEffects$functionName <-
+						paste(tmpRateEffects$functionName,
+							  " (", depvarname, ")", sep="")
+					tmpRateEffects$effectName <-
+						paste(tmpRateEffects$effectName,
+							  " (", depvarname, ")", sep = "")
+				}
 
-        for (j in seq(along = xx$cCovars))
-        {
+				objEffects <- rbind(objEffects, tmpObjEffects)
+				rateEffects <- rbind(rateEffects, tmpRateEffects)
+			}
+		}
+		for (j in seq(along = xx$cCovars))
+		{
             if (attr(xx$cCovars[[j]], 'nodeSet') == nodeSet)
             {
                 tmp <- covBehEff(varname, names(xx$cCovars)[j], nodeSet,
                                  type='', name=varname)
                 objEffects<- rbind(objEffects, tmp$objEff)
                 rateEffects<- rbind(rateEffects, tmp$rateEff)
-           }
+			}
         }
         for (j in seq(along=xx$depvars))
         {
@@ -434,7 +463,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                                  type='Beh', name=varname)
                 objEffects<- rbind(objEffects, tmp$objEff)
                 rateEffects<- rbind(rateEffects, tmp$rateEff)
-           }
+			}
         }
         for (j in seq(along=xx$vCovars))
         {
@@ -446,29 +475,6 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                 rateEffects<- rbind(rateEffects, tmp$rateEff)
             }
         }
-        ##for (j in seq(along=xx$depvars))
-        ##{
-        ##    if (types[j] == 'oneMode' &&
-        ##        attr(xx$depvars[[j]], 'nodeSet') == nodeSet)
-        ##    {
-        ##         objEffects <- rbind(objEffects,
-        ##                            createEffects("behaviorOneModeObjective2",
-        ##                                       varname, names(xx$depvars)[j],
-        ##                                          name=varname,
-        ##                                 groupName=groupName, group=group,
-        ##                                 netType=netType))
-        ##    }
-        ##    if (types[j] == 'bipartite' &&
-        ##        attr(xx$depvars[[j]], 'nodeSet')[1] == nodeSet)
-        ##    {
-        ##         objEffects <- rbind(objEffects,
-        ##                            createEffects("behaviorBipartiteObjective2",
-        ##                                       varname, names(xx$depvars)[j],
-        ##                                          name=varname,
-        ##                                 groupName=groupName, group=group,
-        ##                                 netType=netType))
-        ##    }
-        ##}
         interaction <- createEffects("unspecifiedBehaviorInteraction",
                                      varname, name=varname,
                                          groupName=groupName, group=group,
