@@ -1,8 +1,8 @@
 Package: RSiena
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.0.12.164
-Date: 2011-07-27
+Version: 1.0.12.167
+Date: 2011-08-03
 Author: Various
 Depends: R (>= 2.10.0)
 Imports: Matrix
@@ -13,4 +13,5 @@ Description: Fits models to longitudinal networks
 License: GPL (>=2)
 LazyLoad: yes
 LazyData: yes
+BuildResaveData: no
 URL: http://www.stats.ox.ac.uk/~snijders/siena

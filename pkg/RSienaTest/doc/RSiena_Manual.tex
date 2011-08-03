@@ -3960,9 +3960,9 @@ Further details are in the help file for \textsf{siena07}
 Like for any \R object, the internal structure of the \textsf{sienaFit} object
 can be requested by requesting
 \begin{verbatim}
-source("ans.txt")
+sink("ans.txt")
 str(ans)
-source()
+sink()
 \end{verbatim}
 This writes the structure to the external file \texttt{ans.txt}, which may
 be better than printing it to the console, because it is a long story.
@@ -4648,14 +4648,14 @@ Wald.RSiena <- function(A, ans)
 {
     if (is.vector(A))
     {
-        A <- matrix(A, nrow=1)
+        A  <- matrix(A, nrow=1)
     }
-    th    <- A %*% ans$theta
-    cov   <- A %*% ans$covtheta %*% t(A)
-    chisq <- t(th) %*% solve(cov) %*% th
-    df    <- nrow(A)
-    pval  <- 1 - pchisq(chisq,df)
-    c(chisquare = chisq, df = df, pvalue = pval)
+    th     <- A %*% ans$theta
+    covmat <- A %*% ans$covtheta %*% t(A)
+    chisq  <- drop(t(th) %*% solve(covmat) %*% th)
+    d.f.   <- nrow(A)
+    pval   <- 1 - pchisq(chisq, d.f.)
+    c(chisquare = chisq, df = d.f., pvalue = pval)
 }
 \end{verbatim}
 
@@ -7441,16 +7441,16 @@ and influence effects.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
 \item {\em interaction of actor variable with average similarity},
-                       \texttt{(avSimX)} \\
+                       \texttt{(avSimEgoX)} \\
  $s^{\rm beh}_{i\vit}(x, z) = (v_i / x_{i+}) \,
          \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and the mean behavior, i.e. $0$, if $x_{i+} = 0$) ;
 \item {\em interaction of actor variable with total similarity},
-                       \texttt{(totSimX)} \\
+                       \texttt{(totSimEgoX)} \\
  $s^{\rm beh}_{i\vit}(x, z) = v_i \,
          \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 \item {\em interaction of actor variable with average alter},
-                       \texttt{(avAltX)} \\
+                       \texttt{(avAltEgoX)} \\
  $s^{\rm beh}_{i\vit}(x, z) =  v_i \, z_i \big( \sum_j x_{ij}\, z_j \big)
                                 / \big (\sum_j x_{ij}\big)  $\\
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
@@ -8543,9 +8543,9 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
       In the file \textsf{EffectFactory.cpp}, after the piece referring
       to \texttt{effectName == "outActSqrt"}, the lines
 \begin{verbatim}
-  else if (effectName == "outTrunc")
+    else if (effectName == "outTrunc")
     {
-     pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
+         pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
     }
 \end{verbatim}
       were inserted.  This refers the program, when it encounters short name
@@ -8634,26 +8634,27 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
     // Current out-degree
     int d =	this->pNetwork()->outDegree(this->ego());
     if (this->outTieExists(alter))
-  	  {
-		// After a tie withdrawal, the new out-degree would be d-1, and
-		// the new effect value would have decreased by 1 if d <= this->lc
+    {
+        // After a tie withdrawal, the new out-degree would be d-1, and
+        // the new effect value would have decreased by 1 if d <= this->lc
 
-      if (d <= this->lc)
+        if (d <= this->lc)
         {
-         change = 1;}
+             change = 1;
         }
-	else
-	  {
-		// When introducing a new tie, the new out-degree would be d+1, and
-		// the new effect value would have increased by 1 if d < this->lc
+    }
+    else
+    {
+        // When introducing a new tie, the new out-degree would be d+1, and
+        // the new effect value would have increased by 1 if d < this->lc
 
-      if (d < this->lc)
+        if (d < this->lc)
         {
-         change = 1;
+             change = 1;
         }
-	  }
+    }
 
-	return change;
+    return change;
 }
 \end{verbatim}
 }
@@ -8664,19 +8665,19 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
 {\small
 \begin{verbatim}
 double TruncatedOutdegreeEffect::egoStatistic(int ego,
-	const Network * pNetwork)
+    const Network * pNetwork)
 {
-	// Current out-degree
-   int d =	this->pNetwork()->outDegree(this->ego());
+    // Current out-degree
+    int d =	this->pNetwork()->outDegree(this->ego());
 
-   if (d <= this->lc)
-     {
-      return d;
-     }
-   else
-     {
-      return this->lc;
-     }
+    if (d <= this->lc)
+    {
+         return d;
+    }
+    else
+    {
+         return this->lc;
+    }
 }
 \end{verbatim}
 }
@@ -9253,6 +9254,15 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2011-08-02
+\begin{itemize}
+\item Fix another display of manual in siena01Gui
+\item Added network names to relevant behavior effects if there is more than one
+  network.
+\item Altered names of interaction effects to remove duplicate network names
+\item Renamed avSimX, totSimX, avAltX to avSimEgoX, totSimEgoX, avAltEgoX
+\item Trapped error caused by omitting Actors node set when specifying others.
+\end{itemize}
 \item 2011-07-27
 \begin{itemize}
 \item

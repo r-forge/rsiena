@@ -182,15 +182,12 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
     ##@validNodeSet internal sienaDataCreate
     validNodeSet <- function(nodeSetName, n)
     {
-        if (!nodeSetName == 'Actors')
-        {
-            sub <- match(nodeSetName, nodeSetNames)
-            if (is.na(sub))
-                stop('node set not found')
-            n == length(nodeSets[[sub]])
-        }
-        else
-            TRUE
+		sub <- match(nodeSetName, nodeSetNames)
+		if (is.na(sub))
+		{
+			stop("node set not found")
+		}
+		n == length(nodeSets[[sub]])
     }
     if (getDocumentation)
     {

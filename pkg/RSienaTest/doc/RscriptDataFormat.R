@@ -2,16 +2,16 @@
 ###
 ### ---- RscriptDataFormat.R: a script for the introduction to RSiena -------------
 ###
-###                               version: April 11, 2011                
+###                               version: April 11, 2011
 ###################################################################################
 #
 # RscriptDataFormat.R is followed by
 # RscriptSienaVariableFormat.R, which formats data and specifies the model, and
 # RscriptSienaRunModel.R, which runs the model and estimates parameters
-# RscriptSienaBehaviour.R, which illustrates an example of analysing the 
+# RscriptSienaBehaviour.R, which illustrates an example of analysing the
 # coevolution of networks and behaviour
 #
-# The entire model fitting is summarised at the end of RscriptSienaRunModel.R 
+# The entire model fitting is summarised at the end of RscriptSienaRunModel.R
 # (without comments)
 #
 # This is an R script for getting started with RSiena, written by
@@ -33,7 +33,7 @@
 # Help within R can be called by typing a question mark and the name of the
 # function you need help with. For example ?library loading will bring up a
 # file titled "loading and listing of packages".
-# Comments are made at the end of commands after #, 
+# Comments are made at the end of commands after #,
 # or in lines staring with # telling R to ignore everything beyond it.
 # This session will be using s50 data which are supposed to be
 # present in the working directory.
@@ -55,21 +55,21 @@
         library(network)# automatically if required)
         library(rlecuyer)
 
-# You need to have INSTALLED all of them 
+# You need to have INSTALLED all of them
 
 	?install.packages
-	
+
 # Or click on the tab "Packages", "Instal package(s)", then select a CRAN mirror
-# (e.g. Bristol if you are in the UK) and finally select from the list 
+# (e.g. Bristol if you are in the UK) and finally select from the list
 # the package you wish to install.
 
 # Where are you?
 
 	getwd()
 
-# By something like 
-	# setwd('C:/SienaTest') 
-# you can set the directory but note the quotes and forward slash. 
+# By something like
+	# setwd('C:/SienaTest')
+# you can set the directory but note the quotes and forward slash.
 # It is also possible to set the directory using the menus if you have them.
 # On a windows machine, you can predetermine the working directory
 # in the <Properties> of the shortcut to R;
@@ -102,19 +102,19 @@
 
 # Where is the manual?
 
-         RShowDoc("s_man400", package="RSiena")
+         RShowDoc("RSiena_Manual", package="RSiena")
 
 # (Note, however, that it is possible that the Siena website
 # at http://www.stats.ox.ac.uk/~snijders/siena/ contains a more recent version.)
 
-# Each data is named (for example below we name it friend.data.w1) 
+# Each data is named (for example below we name it friend.data.w1)
 # so that we can call it as an object within R.
 # If you read an object straight into R, it will treat it as a
 # dataset, or in R terminology a "data frame".
 # Here this is not what we want, therefore on reading
 # we will immediately convert it to a matrix.
 # R will read in many data formats, these are saved as .dat files, the command
-# to read them is read.table. 
+# to read them is read.table.
 # If we wished to read a .csv file we would have
 # used the read.csv command.
 # The pathnames have forward slashes, or double backslashes
@@ -123,7 +123,7 @@
 
 #-----------------------------------------------------------------------------
 
-# Quick start(Data assignment). 
+# Quick start(Data assignment).
 # Please make sure the data is in your working directory
 
         friend.data.w1 <- as.matrix(read.table("s50-network1.dat"))
@@ -132,7 +132,7 @@
         drink <- as.matrix(read.table("s50-alcohol.dat"))
         smoke <- as.matrix(read.table("s50-smoke.dat"))
 
-# You need the data to be in your working directory. 
+# You need the data to be in your working directory.
 # The data set is on ther Siena website ("Datasets" tab) and must be
 # unzipped in your working directory.
 
@@ -163,7 +163,7 @@
 ################# - FROM DATA FRAME TO MATRIX - ####################################
 ###
 ### ---- Data frame ----------------------------------------------------------------
-### The data frame is like a spreadsheet of cases by variables, 
+### The data frame is like a spreadsheet of cases by variables,
 ### where the variables are the columns, and these have the names
 ###        names( data )
 ### a spreadsheet view of a data frame is given by the fix() command
@@ -177,9 +177,9 @@
       	weight <- c( 11, 14, 17, 18, 17, 18, 11, 12, 10, 15 )
 ### collect these in a data frame
 	      data <- data.frame( height, weight )
-### and look at the results        
+### and look at the results
 		    data
-### The columns of a data frame may be extracted using a "$" sign and their names. 
+### The columns of a data frame may be extracted using a "$" sign and their names.
 ### For example:
 		names( data )
 		data$height
@@ -224,13 +224,13 @@
 ### (code needs to be customized for each selected wave set)
 ### Select by wave, only for recievers where nominee is "best friend" (bff)
 ### (NOTE: does not account for 0's, i.e. no bff's chosen. Done later.)
-		
+
 		SAff.1 <- with(ArcList, ArcList[ wid == 1, ] ) #extracts edges in wave 1
 		SAff.2 <- with(ArcList, ArcList[ wid == 2, ] ) #extracts edges in wave 2
 		SAff.3 <- with(ArcList, ArcList[ wid == 3, ] ) #extracts edges in wave 3
 		n <- 50 # this is the number of nodes which is not provided by the arclist
 
-### and has to be reported separately for each of the waves 
+### and has to be reported separately for each of the waves
 ### (you may loop over the waves if you like),
 
 ### The package "sna" has functions to transform adjacency or arc lists into
@@ -250,10 +250,10 @@
 	## Change the names to make them usable by "sna"
 		colnames(SAff.1.copy) <-  c("snd", "rec", "val")
 	## Specify the number of actors
-		attr(SAff.1.copy, "n") <- 50 
+		attr(SAff.1.copy, "n") <- 50
 	## Transform into matrix
 		(SAff.1.matrix <- as.sociomatrix.sna(SAff.1.copy))
-		
+
 ###################################################################################
 ################ - READING IN PAJEK DATA - ########################################
 ###
@@ -263,10 +263,10 @@
 ###
 ###   par( mfrow = c( 2, 2 ) )
 ###
-###   test.net.1 <- read.paj( 
+###   test.net.1 <- read.paj(
                 "http://vlado.fmf.uni-lj.si/pub/networks/data/GD/gd98/A98.net" )
 ###   plot( test.net.1,main = test.net.1$gal$title )
-###   test.net.2 <- read.paj( 
+###   test.net.2 <- read.paj(
                 "http://vlado.fmf.uni-lj.si/pub/networks/data/mix/USAir97.net" )
 ###   plot( test.net.2,main = test.net.2$gal$title )
 ###
@@ -297,7 +297,7 @@
         table( smoke, useNA = 'always' )
 
 # NA is the R code for missing data (Not Available).
-# This data set happens to have no missings 
+# This data set happens to have no missings
 # (see the data description on the Siena website).
 # If there are any missings, it is necessary to tell R about the missing data codes.
 # Let us do as if the missing codes for the friendship network were 6 and 9.
@@ -324,9 +324,9 @@
         plot.sociomatrix( net2,drawlab = F, diaglab = F, xlab = 'friendship t2' )
         plot.sociomatrix( net3,drawlab = F, diaglab = F, xlab = 'friendship t3' )
 
-# The class, 
+# The class,
 	class( net1 )
-# with attributes 
+# with attributes
 	attributes( net1 )
 # has special methods associated with it.
 # while  plot( friend.data.w1 ) only produces a rather dull plot of
@@ -352,7 +352,7 @@
 
       sum( use )
 
-# or 
+# or
 
 	table( use )
 
@@ -382,7 +382,7 @@
       	net1.1 <- as.network(friend1.data.w1)
       	plot.network(net1)
       	plot.sociomatrix( net1,drawlab = F, diaglab = F, xlab = 'friendship t1' )
-        
+
 ################# - MORE ON DESCRIPTIVES - #####################################
 #
 # Some further descriptives you can do for the data are plotting and
@@ -473,7 +473,7 @@
 
 # measures of connectivity and distance
 
-        dist <- geodist(net1, inf.replace = Inf, count.paths = TRUE) 
+        dist <- geodist(net1, inf.replace = Inf, count.paths = TRUE)
 # calculate the geodesic distance (shortest path length) matrix
    	   dist$gd
 # matrix of geodesic distances

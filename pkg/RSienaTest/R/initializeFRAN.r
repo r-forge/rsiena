@@ -1633,11 +1633,6 @@ fixUpEffectNames <- function(effects)
                gsub("#", y$parm, y$functionName)
            }, y=effects)
 
-    #if (any(effects$shortName == "behUnspInt" & effects$include &
-    #                        effects$effect1 > 0))
-    #{
-    #    stop("User specified behavior interactions are not yet implemented")
-    #}
     ##validate user-specified network interactions
     interactions <- effects[effects$shortName == "unspInt" & effects$include &
                             effects$effect1 > 0, ]
@@ -1735,7 +1730,10 @@ fixUpEffectNames <- function(effects)
                    {
                        inters <- rbind(inters[egos, ], inters[-egos, ])
                    }
-                   tmpname <- paste(inters$effectName, collapse = " x ")
+ 				   tmpnames <- inters$effectName
+				   tmpnames[-1] <- sub(paste(inters$name[1], ": ",
+											 sep=""), "", tmpnames[-1])
+				   tmpname <- paste(tmpnames, collapse = " x ")
                    if (twoway && nchar(tmpname) < 38)
                    {
                        tmpname <- paste("int. ", tmpname)
@@ -1838,7 +1836,7 @@ fixUpEffectNames <- function(effects)
 				   tmpname <- paste(tmpnames, collapse = " x ")
                    if (twoway && nchar(tmpname) < 38)
                    {
-                       tmpname <- paste("int.", tmpname)
+                       tmpname <- paste("int. ", tmpname)
                    }
                    if (!twoway)
                    {

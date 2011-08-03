@@ -644,7 +644,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         ##@modelhelpFn internal siena01Gui
         modelhelpFn <- function()
         {
-            RShowDoc("s_man400", package=pkgname)
+			RShowDoc("RSiena_Manual", package=pkgname)
         }
         ##@randomseedFn internal siena01Gui
         randomseedFn <- function()

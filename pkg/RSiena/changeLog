@@ -1,12 +1,31 @@
+2011-08-03 R-forge revision 167
+
+	* doc/RSiena_manual.tex: minor changes
+	* data/allEffects.csv, src.effects/effectFactory.cpp: renamed avSimX,
+	totSimX, avAltX to avSimEgoX etc in preparation for avSimAlterX etc
+	to appear soon!
+	* R/effects.r: added network names to behavior effects if there is more
+	than one network.
+	* R/initializeFRAN.r: removed duplicate variable names from network
+	interaction effects.
+	* R/siena01.r, doc/RscriptDataFormat.R: change name of manual in model
+	help function and script.
+	* R/sienaDataCreate.r: trap missing Actors node set if node sets are
+	supplied. (was crashing!)
+	* DESCRIPTION: added BuildResaveData:no to stop allEffects.r being
+	compressed in the build.
+
 2011-08-02 R-forge revision 166
-   * doc/RSiena_Manual.tex: corrections
-   * doc/RSiena.bib: small format corrections
+
+	* doc/RSiena_Manual.tex: corrections
+	* doc/RSiena.bib: small format corrections
 
 2011-07-28 R-forge revision 165
-   * doc/RSiena_Manual.tex: corrections
-   * doc/RSiena.bib: a few additions
 
-2011-07-24 R-forge revision 164
+	* doc/RSiena_Manual.tex: corrections
+	* doc/RSiena.bib: a few additions
+
+2011-07-27 R-forge revision 164
 
 	* R/effects.r: change default behavior effects to include quadratic
 	shape unless range is less than 2 (from less than or equal to 2).
