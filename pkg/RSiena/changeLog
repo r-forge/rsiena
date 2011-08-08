@@ -1,3 +1,41 @@
+2011-08-08 R-forge revision 168 RSienaTest only.
+
+	* R/sienaprint.r: altered headings from 't-statistics for convergence'
+	to 'convergence t-ratios'
+	* doc/bayes.tex, doc/maxlikec.tex, doc/RSiena_Manual.tex,
+	doc/RSienaDeveloper.tex, doc/RSIENAspec.tex, doc/simstats0c.tex:
+	updates to the documentation.
+	* R/bayes.r, R/maxlikec.r, R/initializeFRAN.r, R/printDataReport.r,
+	R/print07Report.r, R/robmon.r, R/siena07Gui.r, R/sienaModelCreate.r,
+	R/simstatsc.r, man/bayes.Rd, man/maxlikec.Rd, man/sienaModelCreate.Rd,
+	man/simstats0c.Rd, NAMESPACE, src/siena07Models.cpp,
+	src/siena07Models.h, src/siena07utilities.cpp, src/siena07setup.cpp,
+	src/model/ml/MiniStep.cpp, src/model/ml/MLSimulation.cpp,
+	src/model/ml/MLSimulation.h, src/model/variables/DependentVariable.cpp,
+	src/model/variables/DependentVariable.h: exported bayes, added help
+	pages for maximum likelihood and bayes.  Various changes to maximum
+	likelihood: still in progress.
+	* man/updateTheta.Rd, R/initializeFRAN.r: new function to update theta
+	initial values from a sienaFit. Reordered adding time dummies to happen
+	before prevAns processing in siena06.
+	* R/effects.r, src/model/ml/chain.cpp: tidy up code.
+	* R/globals.r: allow format of printed matrices to be controlled by an
+	environment variable. Designed for use in testing as there were rounding
+	incompatibilities between platforms.
+	* R/maxlikec.r, R/phase1.r, R/phase3.r, R/sienaTimeTest.r,
+	man/sienaTimeTest.Rd: simplified code, added new utility functions,
+	changed format of stored derivative matricesand made the by wave set
+	optional to save memory. Matrix objects are used for maxlike
+	(as symmetric and this will save space) with minimal compatible changes
+	to finite differences. Revert to normal matrix for dfra.
+	* src/data/ConstantDyadicCovariate.cpp,
+	src/data/ConstantDyadicCovariate.h,
+	src/model/variable/NetworkVariable.cpp,
+	src/model/variable/NetworkVariable.h: Added access method to map of row
+	values. Also some commented out code eg to select alter from a smaller
+	set.
+	* tests/parallel.Rout.save: updated output from tests
+
 2011-08-03 R-forge revision 167
 
 	* doc/RSiena_manual.tex: minor changes

@@ -66,7 +66,7 @@
 
 The \R function \nnm{maxlikec} (so named during development when I had other
 versions which did not call C!) is the function which controls the maximum
-likleihood simulations.  It is used as an argument to the function
+likelihood simulations.  It is used as an argument to the function
 \nnm{sienaModelCreate} and its name is stored as the element named \nm{FRAN} of
 the model object.  It has three (or 3+) modes: initial, to set up the C++ data
 structure, terminal (to tidy up) and ordinary (to do one complete
@@ -75,23 +75,32 @@ some of the work of an initial call.) It uses C++ functions for most of its
 work.
 
 The interface to C++ and to \nnm{robmon} is more or less the same as for
-\nnm{simstats0c}. The terminal call is the same as for \nnm{simstats0c}.
-
+\nnm{simstats0c}. The terminal call is the same as for \nnm{simstats0c} and is
+done by the function \nnm{terminateFRAN}. The initial call is process by the
+funciton \nnm{initializeFRAN}.
 
 \section{Initial call to maxlikec}
-As for \nnm{simstatsc}, plus an additional call to C++ to initialise the
+
+
+
+ Call \nnm{initializeFRAN}, which does the data set up in C++ as for
+\nnm{simstats0c} plus a call to C++ to initialise the
 chains.
 
+Extra details beyond \nnm{simstats0c} processing:
 \begin{enumerate}
-\item Copy over the parameters needed for maxmimum liklihood:
+\item Calculate \nnm{nrunMH} as the multiplication factor (stored on \nnm{x} or
+  \nnm{z}) times the sum over dependent variables of the distances by
+  wave. Store on \nnm{z}.
+\item Store in C++ the parameters needed for maximum likelihood:
 \begin{enumerate}
-\item Values controlling length of permutation
+\item Values controlling length of permutation (on the input model)
 \begin{description}
 \item[maximumPermutationLength]
 \item[minimumPermutationLength]
 \item[initialPermutationLength]
 \end{description}
-\item Probabilities of the different MH steps
+\item Probabilities of the different MH steps (on the input model)
 \begin{description}
 \item[insertDiagonalProbability]
 \item[cancelDiagonalProbability]
@@ -101,26 +110,32 @@ chains.
 \item[insertRandomMissingProbability]
 \item[deleteRandomMissingProbability]
 \end{description}
-\item Proportion of missing data
+\item Proportion of missing data for each period: calculate from the number of
+  missing and non missing entries in each of the dependent variables, which are
+  stored as attributes of the group (which is either input or created for
+  convenience in \nnm{initializeFRAN}).
 \begin{description}
 \item[prmin]
 \item[prmib]
 \end{description}
+\item Simple rates flag: TRUE unless any selected effects have type "rate" but
+  are not basic rate effects.
 \end{enumerate}
 \item
 \begin{algorithmic}
-\IF{this is the first call, (to main process)}
+\IF{this is the first call, (i.e.\ to main process)}
 \STATE Set up a minimal chain: see section \ref{sec:minch}.
 \STATE Do a pre burnin for each chain: see section \ref{sec:preburnin}
 \STATE Do 500 normal MHsteps.
-\STATE Return minimal and post burnin chains.
+\STATE Return minimal and post burnin chains as lists.
+\STATE Store the final chains on the model in C++, along with any intial and
+end state differences.
 \ELSE
-\STATE Copy over the post burnin chains from the main process.
-(They should be addedto FRANstore, I think?)
+\STATE Copy the post burnin chains from the main process. Add them to
+ FRANstore (for use in R, for debugging only?) and store on the model in C++.
 \ENDIF
 \end{algorithmic}
 \end{enumerate}
-Do not need to return targets as these are 0: the expected values of the scores.
 
 \subsection{Minimal Chain}
 \label{sec:minch}
@@ -130,7 +145,7 @@ Do not need to return targets as these are 0: the expected values of the scores.
 \FORALL{actors}
 \IF{network variable}
 \FORALL{alters present in out ties for one only of this period or the next}
-\STATE create a link in the chain.
+\STATE create a ministep
 \ENDFOR
 \ELSE[behavior]
 \STATE If the values at either end are different, create enough plus or minus 1
@@ -140,7 +155,22 @@ steps to get from one to the other.
 \ENDFOR
 \STATE In each case ignore structural links or values. We do not need them in
 the processing, although they should be added in before returning a chain to
-\Rn.
+\Rn. TODO: this is not currently done.
+\IF {no constraints between the networks}
+\STATE Create a chain from the ministeps in random order
+\ELSE
+\REPEAT
+\FORALL{ministeps}
+\STATE Try to insert in a random position in the chain
+\STATE If this fails, try to insert after any other for the same
+actor/alter combination in any network.
+\STATE Finally try to insert before any other for the same actor and alter.
+\ENDFOR
+\UNTIL{done as many loops as dependent variables}
+\IF{ any ministeps left}
+\STATE stop with error
+\ENDIF
+\ENDIF
 \STATE Initialize the variables for this period
 \STATE Calculate the probabilities for the chain (section \ref{sec:chprob})
 \ENDFOR
@@ -157,40 +187,54 @@ the processing, although they should be added in before returning a chain to
   \end{algorithmic}
  \section{Simulation  call}
 \begin{enumerate}
-\item Set up the data from its store on the Model Object:
+\item Copy over the updated parameters to the Model object.
+\item Create a simulation object and set up, from stored values on the Model
+  Object:
 \begin{description}
 \item[simpleRates] flag
-\item[chain] for this period, terminal chain from last time. Reinstate the
-  initial state by executing the vector of ministeps defining the differences.
 \item[prmin] Proportion of missing network data for this period
 \item[prmib] Proportion missing behavior data for this period
-\item[nrunMH] Number of MH steps to do
+\item[chain] for this period, terminal chain from last time.
 \end{description}
-\item Clear out the storage area for the chains
-\item set flags:
+\item Clear out the storage area for this chain.
+\item Set up from the input parameters:
 \begin{description}
 \item[addChainToStore]
-\item[needChangeContributions]
+\item[needChangeContributions] Set to 1 if either addChainToStore or
+  needChangeContributions is 1 (not sure why!)
+\item[returnChains] Do we want the final chain returned
+\item[returnDataFrame] Return chain, if requested, as data frame rather than
+  list.
+\item[deriv] do we need to do derivatives (not in phase 2)
+\item[nrunMH] Number of MH steps to do
 \end{description}
-\item Copy over the updated parameters to the Model object.
-\item Initialise the simulation object. This sets up the initial
-  missing data lists (but no longer the initial state)
+\item Run Initialize method of the simulation object. This sets up the initial
+  missing data lists (but no longer the initial state).
+\item Reinstate the
+  initial state by executing the vector of ministeps defining the differences.
   from the data.
-\item The initial state will be in places on the chain, reinstated from the
-  model. We need to keep the same process for each wave, which happens by
-  default. Just don't try to use load-balancing.
-\item Do a set of MH steps (section \ref{sec:mh})
+\item If using multiple processes, we need to keep the same process for each
+  wave, which happens by default in snow. Just don't try to use load-balancing.
+\item Set up the probabilityArray (maybe I could not find anywhere to store
+  this, but it also initialises the stores for acceptance and rejection
+  statistics).
+\item Calculate the chain probabilities (to use the new parameters)
+\item Do \nnm{nrunMH} MH steps (section \ref{sec:mh})
 \item Set the flags \nnm{needScores} (always set to FALSE while doing the MH
   steps and TRUE at this point) and optionally \nnm{needDerivatives}.
 \item Do a final pass of the chain calculating probabilities, scores and
   optionally derivatives.
 \item Store the current chain on the model, after converting the initial state
   to a vector of ministeps defining the differences.
+\item Calculate the end state differences. The latter are not currently used: if
+  they were to be carried over as an initial state for the next wave the chain
+  would need correcting. They are returned to \R with the chain.
 \item Return:
 \begin{description}
 \item[scores] These are the simulated targets
-\item[derivatives] Returned as a lower triangle of the matrix.
-\item[acceptance and rejection statistics]
+\item[derivatives] Returned as a lower triangle of the matrix. (eventually!)
+\item[acceptance and rejection statistics] by variable. Permutation steps are
+  recorded under the first variable. \nnm{misdat} steps are separated out.
 \item[chain] Optional, based on \nnm{returnChains}. Can select format based on
   returnDataFrame or not.
 \end{description}
@@ -199,20 +243,9 @@ the processing, although they should be added in before returning a chain to
 \subsection{MH steps}
 \label{sec:mh}
 \begin{enumerate}
-\item Initialise the rate functions for the variables and copy over the
-  parameters from the model to the variables.There is a separate function to copy
-  the basic rate parameters, as they do not need doing mid-bayesian step where
-  the others may do.
-\item Set up the probabilityArray (maybe I could not find anywhere to store
-  this, but it also initialises the stores for acceptance and rejection
-  statistics).
-\item Calculate the chain probabilities (to use the new parameters)
-\item Do the requested number of MH steps:
-\begin{enumerate}
 \item Choose a steptype with probability as in the array
 \item Do the step
 \item Store whether accepted or rejected
-\end{enumerate}
 \end{enumerate}
 \subsection{Individual Steps}
 \subsubsection{Insert Diagonal}

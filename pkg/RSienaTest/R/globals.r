@@ -166,14 +166,16 @@ Heading<- function(level=1, dest, text, fill=FALSE)
 ##@PrtOutMat Reporting
 PrtOutMat<- function(mat, dest)
 {
+	testing <- Sys.getenv("RSIENATESTING")
+	testing <- testing != ""
     if (missing(dest))
     {
-        Report(format(t(mat), scientific=FALSE),
+        Report(format(t(mat), scientific=testing),
                sep=c(rep.int(" ", ncol(mat) - 1), "\n"))
     }
     else
     {
-        Report(format(t(mat), scientific=FALSE),
+        Report(format(t(mat), scientific=testing),
                sep=c(rep.int(" ", ncol(mat) - 1), "\n"),
                hdest=deparse(substitute(dest)))
         Report("\n", hdest=deparse(substitute(dest)))

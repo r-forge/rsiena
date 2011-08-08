@@ -47,6 +47,7 @@
 #include "model/Model.h"
 #include "utils/Utils.h"
 #include "model/EpochSimulation.h"
+#include "model/ml/MLSimulation.h"
 #include "model/variables/DependentVariable.h"
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"

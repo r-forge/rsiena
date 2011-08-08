@@ -36,6 +36,15 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 		stop("You must have at least three time periods to test ",
              "for non-heterogeneity across time.")
 	}
+	## if this is a maximim likelihood fit or finite differences we need
+	## the optional objects sdf2
+	if (sienaFit$maxlike || sienaFit$FinDiff.method)
+	{
+		if (is.null(sienaFit$sdf2[[1]]))
+		{
+			stop("rerun Siena07 with the byWave option TRUE")
+		}
+	}
 	## get the desired effects
 	if (!is.null(effects))
     {
@@ -180,8 +189,24 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
     }
     else
     {
-        derivs <- sienaFit$sdf2[ , , estimatedInFit, estimatedInFit,
-                                drop=FALSE]
+		if (sienaFit$FinDiff.method)
+		{
+			##sienaFit$sdf2 is a list of arrays, one for each iteration
+			derivs <- t(sapply(sienaFit$sdf2, function(x)
+							 x[, estimatedInFit, estimatedInFit, drop=FALSE]))
+		}
+		else
+		{
+			##sienaFit$sdf2 is a list of lists of Matrix objects
+			derivs <-
+				t(sapply(sienaFit$sdf2, function(xx)
+					   array(t(sapply(xx, function(x)
+									  as.matrix(x[estimatedInFit,
+												  estimatedInFit,
+												  drop=FALSE]))),
+							 dim=c(nWaves, nEffects, nEffects))))
+		}
+		derivs <- array(derivs, dim=c(nSims, nWaves, nEffects, nEffects))
         DF <- array(0, dim=c(nSims, nWaves, nEffects + nDummies,
                        nEffects + nDummies))
         DF[, , 1:nEffects, 1:nEffects] <- derivs

@@ -37,7 +37,14 @@ namespace siena
 SEXP getMiniStepDF(const MiniStep& miniStep);
 SEXP getChainDF(const Chain& chain, bool sort=true);
 
+// ----------------------------------------------------------------------------
+// Section: Constructors and destructors
+// ----------------------------------------------------------------------------
 
+/**
+ * Creates a MLsimulation object for the given observed data and an
+ * actor-based model for that data.
+ */
 MLSimulation::MLSimulation(Data * pData, Model * pModel) :
 	EpochSimulation(pData, pModel)
 {
@@ -54,12 +61,18 @@ MLSimulation::MLSimulation(Data * pData, Model * pModel) :
 }
 
 
+/**
+ * Deallocates this simulation object.
+ */
 MLSimulation::~MLSimulation()
 {
 	delete this->lpChain;
 	deallocateVector(this->linitialMissingOptions);
 }
 
+// ----------------------------------------------------------------------------
+// Section: Model simulations
+// ----------------------------------------------------------------------------
 
 /**
  * Initializes the simulation as of the beginning of the specified
@@ -106,6 +119,7 @@ void MLSimulation::initialize(int period)
 		}
 	}
 }
+
 /**
  * Initializes the initial state from the observed data for the specified
  * period. Not to be done too often. Once a chain exists it needs its
@@ -272,13 +286,17 @@ void MLSimulation::runEpoch(int period)
 }
 
 /**
- * Returns the chain representing the events simulated by this simulation object.
+ * Returns the chain representing the events simulated by this object.
  */
 Chain * MLSimulation::pChain() const
 {
     return this->lpChain;
 }
 
+/**
+ * Sets the chain representing the events simulated by this object to the
+ * given chain.
+ */
 void MLSimulation::pChain(Chain * pChain)
 {
 	this->lpChain = pChain;
@@ -305,7 +323,6 @@ void MLSimulation::pChainProbabilities(Chain * pChain, int period)
  *  sets up probability array
  *
  */
-
 void MLSimulation::setUpProbabilityArray()
 {
 	this->lprobabilityArray[0] = this->pModel()->insertDiagonalProbability();
@@ -330,7 +347,6 @@ void MLSimulation::setUpProbabilityArray()
  *  Does one step in the current chain
  *
  */
-
 void MLSimulation::MLStep()
 {
 	int stepType = nextIntWithProbabilities(7, this->lprobabilityArray);
@@ -381,6 +397,40 @@ void MLSimulation::MLStep()
 	}
 }
 
+/**
+ * records the outcome of the current MH step
+ */
+void MLSimulation::recordOutcome(const MiniStep & miniStep, bool accept,
+	int stepType, bool misdat)
+{
+	DependentVariable * pVariable =
+		this->lvariables[miniStep.variableId()];
+
+	if (stepType == PERMUTE)
+	{
+		pVariable =	this->lvariables[0];
+	}
+	if (misdat)
+	{
+		stepType = stepType + 4;
+	}
+	if (accept)
+	{
+		pVariable->incrementAcceptances(stepType);
+	}
+	else if (this->lproposalProbability > 0)
+	{
+		pVariable->incrementRejections(stepType);
+	}
+	else
+	{
+		pVariable->incrementAborts(stepType);
+	}
+}
+
+/**
+ * sets the current state to immediately before the given mini step.
+ */
 void MLSimulation::setStateBefore(MiniStep * pMiniStep)
 {
 	this->resetVariables();
@@ -406,6 +456,9 @@ void MLSimulation::executeMiniSteps(MiniStep * pFirstMiniStep,
 	}
 }
 
+/**
+ * Resets the variables when it is necessary to read the initial state.
+ */
 void MLSimulation::resetVariables()
 {
 	// Initialize each dependent variable
@@ -469,6 +522,9 @@ void MLSimulation::resetVariables()
 // Section: Metropolis-Hastings steps
 // ----------------------------------------------------------------------------
 
+/**
+ * Implements the MH_InsDiag Metropolis-Hastings step.
+ */
 bool MLSimulation::insertDiagonalMiniStep()
 {
 	bool accept = false;
@@ -549,21 +605,25 @@ bool MLSimulation::insertDiagonalMiniStep()
 		((this->lpChain->diagonalMinistepCount() + 1) *
 			this->pModel()->insertDiagonalProbability());
 
-	if (this->lproposalProbability > 1)
-	{
-		this->lproposalProbability = 1;
-	}
+//	if (this->lproposalProbability > 1)
+//	{
+//		this->lproposalProbability = 1;
+//	}
 
-	if (nextDouble() < this->lproposalProbability)
+	accept = nextDouble() < this->lproposalProbability;
+	if (accept)
 	{
-		accept = true;
 		this->lpChain->insertBefore(pNewMiniStep, pMiniStep);
 	}
 
+	this->recordOutcome(*pNewMiniStep, accept, INSDIAG, false);
+// don't I need to delete the ministep if rejected?
 	return accept;
 }
 
-
+/**
+ * Implements the MH_CancDiag Metropolis-Hastings step.
+ */
 bool MLSimulation::cancelDiagonalMiniStep()
 {
 	bool accept = false;
@@ -604,16 +664,21 @@ bool MLSimulation::cancelDiagonalMiniStep()
 		this->lproposalProbability = 1;
 	}
 
-	if (nextDouble() < this->lproposalProbability)
+	accept = nextDouble() < this->lproposalProbability;
+
+	this->recordOutcome(*pMiniStep, accept, CANCDIAG, false);
+
+	if (accept)
 	{
-		accept = true;
 		this->lpChain->remove(pMiniStep);
 	}
 
 	return accept;
 }
 
-
+/**
+ * Implements the MH_permute Metropolis-Hastings step.
+ */
 bool MLSimulation::permute(int c0)
 {
 	if (this->lpChain->ministepCount() <= 2)
@@ -726,10 +791,9 @@ bool MLSimulation::permute(int c0)
 			this->lproposalProbability = 1;
 		}
 
-		if (nextDouble() < this->lproposalProbability)
+		accept = nextDouble() < this->lproposalProbability;
+		if (accept)
 		{
-			accept = true;
-
 			for (unsigned i = 0; i < interval.size(); i++)
 			{
 				pMiniStep = interval[i];
@@ -749,14 +813,19 @@ bool MLSimulation::permute(int c0)
 		}
 	}
 
+	this->recordOutcome(*interval[0], accept, PERMUTE, false);
+
 	delete[] newReciprocalRate;
 	delete[] newOptionSetProbability;
 	delete[] newChoiceProbability;
 
+
 	return accept;
 }
 
-
+/**
+ * Implements the MH_insPermute Metropolis-Hastings step.
+ */
 bool MLSimulation::insertPermute(int c0)
 {
 	if (this->lpChain->ministepCount() <= 1)
@@ -803,11 +872,13 @@ bool MLSimulation::insertPermute(int c0)
 
 	MiniStep * pLeftMiniStep = pVariable->randomMiniStep(i);
 
-	if (pLeftMiniStep->pOption() == pMiniStepA->pOption())
-	{
-// surely need to delete pLeftMiniStep here too?
-		return false;
-	}
+// 	if (pLeftMiniStep->pOption() == pMiniStepA->pOption())
+// 	{
+// // surely need to delete pLeftMiniStep here too? in fact have quit already if even var and actor
+// are the same as ministep a.
+// 		Rprintf("should have memory leack\n");
+// 		return false;
+// 	}
 	if (pLeftMiniStep->diagonal() ||
 		!pVariable->validMiniStep(pLeftMiniStep))
 	{
@@ -1142,7 +1213,7 @@ bool MLSimulation::insertPermute(int c0)
 				exp(sumlprob_new - sumlprob) *
 			this->pModel()->deletePermuteProbability() *
 				pr1 * pr2 *
-				(this->lpChain->ministepCount() - 2) *
+				(this->lpChain->ministepCount() - 1) *
 				choiceLength /
 			(this->pModel()->insertPermuteProbability() * exp(lospr0 + lcpr0));
 
@@ -1150,12 +1221,22 @@ bool MLSimulation::insertPermute(int c0)
 		{
 			this->lproposalProbability = 1;
 		}
-		if (nextDouble() < this->lproposalProbability)
+// 	if(misdat)
+// 	{
+// 		PrintValue(getMiniStepDF(*pLeftMiniStep));
+// 	}
+		accept =  nextDouble() < this->lproposalProbability;
+
+		this->recordOutcome(*pLeftMiniStep,  accept, INSPERM, misdat);
+		if (misdat)
+		{
+			//	Rprintf("mis %d %f \n", accept, this->lproposalProbability);
+			//PrintValue(getMiniStepDF(*pLeftMiniStep));
+		}
+
+		if (accept)
 		{
 			// Change the chain permanently
-
-			accept = true;
-			//	PrintValue(getMiniStepDF(*pLeftMiniStep));
 			for (unsigned i = 0; i < interval.size(); i++)
 			{
 				pMiniStep = interval[i];
@@ -1184,7 +1265,6 @@ bool MLSimulation::insertPermute(int c0)
 		{
 			// Operation not accepted, so we don't need the generated
 			// pair of ministeps.
-
 			delete pLeftMiniStep;
 			delete pRightMiniStep;
 		}
@@ -1194,10 +1274,18 @@ bool MLSimulation::insertPermute(int c0)
 	delete[] newOptionSetProbability;
 	delete[] newChoiceProbability;
 
+	if(misdat)
 	return accept;
+	else
+	{
+		this->lproposalProbability = 0;
+		return false;
+	}
 }
 
-
+/**
+ * Implements the MH_DelPermute Metropolis-Hastings step.
+ */
 bool MLSimulation::deletePermute(int c0)
 {
 	this->lmissingData =
@@ -1334,7 +1422,7 @@ bool MLSimulation::deletePermute(int c0)
 	this->calculateRates();
 	double pr2 = 1 - pVariable->rate(pMiniStepA->pNext()->ego()) /
 		this->totalRate();
-
+	pr2 = 1;
 	// We execute the new chain, do the necessary calculations, and
 	// simultaneously check if the new chain is valid.
 
@@ -1447,7 +1535,7 @@ bool MLSimulation::deletePermute(int c0)
 // 					if (pPreviousMiniStep)
 // 					{
 // 						dPlus = pPreviousMiniStep->difference();
-// 					}
+// 					}miniStep.variableId()
 // 					if (pNextMiniStep)
 // 					{
 // 						dMinus = pNextMiniStep->difference();
@@ -1509,7 +1597,7 @@ bool MLSimulation::deletePermute(int c0)
 		// Calculate choiceLength
 
 		double choiceLength = 1;
-
+		double positionChoice = this->lpChain->ministepCount() - 2;
 		if (!this->lmissingData)
 		{
 			MiniStep * pMiniStepD = pMiniStepB->pNextWithSameOption();
@@ -1521,6 +1609,7 @@ bool MLSimulation::deletePermute(int c0)
 
 			choiceLength =
 				this->lpChain->intervalLength(pMiniStepA, pMiniStepD) - 3;
+			positionChoice --;
 		}
 
 		double lpr0 = pMiniStepA->logChoiceProbability() +
@@ -1558,7 +1647,8 @@ bool MLSimulation::deletePermute(int c0)
 				exp(lpr0) /
 			(this->pModel()->deletePermuteProbability() *
 				pr1 * pr2 *
-				(this->lpChain->ministepCount() + 1) *
+// 				(this->lpChain->ministepCount() + 1) *
+				positionChoice *
 				choiceLength);
 
 		if (this->lproposalProbability > 1)
@@ -1566,11 +1656,21 @@ bool MLSimulation::deletePermute(int c0)
 			this->lproposalProbability = 1;
 		}
 
-		if (nextDouble() < this->lproposalProbability)
+		accept = nextDouble() < this->lproposalProbability;
+
+		this->recordOutcome(*pMiniStepA,  accept, DELPERM,
+			this->lmissingData);
+
+		if (this->lmissingData)
+		{
+			//Rprintf("dat %d %f \n", accept, this->lproposalProbability);
+			//PrintValue(getMiniStepDF(*pMiniStepA));
+		}
+		if (accept)
 		{
 			// Change the chain permanently
-			//PrintValue(getMiniStepDF(*pMiniStepB));
-			accept = true;
+			//if (this->lmissingData)
+			//	PrintValue(getMiniStepDF(*pMiniStepA));
 			this->lpChain->remove(pMiniStepA);
 
 			for (unsigned i = 0; i < interval.size(); i++)
@@ -1600,8 +1700,13 @@ bool MLSimulation::deletePermute(int c0)
 	delete[] newReciprocalRate;
 	delete[] newOptionSetProbability;
 	delete[] newChoiceProbability;
-
+	if (this->lmissingData)
 	return accept;
+	else
+	{
+		this->lproposalProbability = 0;
+		return false;
+	}
 }
 
 
@@ -1726,6 +1831,9 @@ bool MLSimulation::insertMissing()
 	{
 		sumlprob += pMiniStep->logChoiceProbability() +
 			pMiniStep->logOptionSetProbability();
+//		Rprintf("insert %f %f %f \n",sumlprob,
+//pMiniStep->logChoiceProbability(),
+//			pMiniStep->logOptionSetProbability());
 		mu_new -= pMiniStep->reciprocalRate();
 		sigma2_new -= pMiniStep->reciprocalRate() *
 			pMiniStep->reciprocalRate();
@@ -1757,7 +1865,8 @@ bool MLSimulation::insertMissing()
 	double pr3 =
 		pVariable->pData()->observedDistribution(changedInitialValue,
 			this->period());
-
+//	pr2=1;
+//	pr3=1;
 	// The ministep to be inserted before pMiniStepA
 	MiniStep * pNewMiniStep = this->createMiniStep(pOption, d0, false);
 
@@ -1791,6 +1900,9 @@ bool MLSimulation::insertMissing()
 
 		sumlprob_new += lospr + lcpr;
 
+//		Rprintf("insert new %f %f %f \n",sumlprob_new,
+//			lospr,
+//			lcpr);
 		if (!this->simpleRates())
 		{
 			mu_new += rr;
@@ -1846,6 +1958,11 @@ bool MLSimulation::insertMissing()
 	}
 
 	// 13.
+//	Rprintf("insert %f %f %f %f %f %f %f %f %f \n", kappaFactor,
+	//	sumlprob_new, sumlprob,
+	//	this->pModel()->insertRandomMissingProbability(),
+	//	pr1, pr3, pr2, choiceLength,
+	//	this->pModel()->deleteRandomMissingProbability());
 
 	this->lproposalProbability =
 		kappaFactor *
@@ -1866,11 +1983,15 @@ bool MLSimulation::insertMissing()
 
 	bool accept = nextDouble() < this->lproposalProbability;
 
+	this->recordOutcome(*pNewMiniStep, accept, INSMISS, false);
+
 	// 15.
+	//Rprintf("ins %d %f\n", accept, this->lproposalProbability);
+	//PrintValue(getMiniStepDF(*pNewMiniStep));
 
 	if (accept)
 	{
-		//		PrintValue(getMiniStepDF(*pNewMiniStep));
+		// 	PrintValue(getMiniStepDF(*pNewMiniStep));
 		this->lpChain->changeInitialState(pDummyMiniStep);
 
 		int i = 0;
@@ -1978,7 +2099,10 @@ bool MLSimulation::deleteMissing()
 			pr1 = 1;
 		}
 	}
-
+	else
+	{
+		pr1 = 1.0;
+	}
 	// 6.
 
 	if (pVariable->constrained())
@@ -2009,6 +2133,9 @@ bool MLSimulation::deleteMissing()
 	{
 		sumlprob += pMiniStep->logChoiceProbability() +
 			pMiniStep->logOptionSetProbability();
+//		Rprintf("delete %f %f %f \n",sumlprob,
+//pMiniStep->logChoiceProbability(),
+//			pMiniStep->logOptionSetProbability());
 		mu_new -= pMiniStep->reciprocalRate();
 		sigma2_new -= pMiniStep->reciprocalRate() *
 			pMiniStep->reciprocalRate();
@@ -2045,14 +2172,15 @@ bool MLSimulation::deleteMissing()
 	double pr3 =
 		pVariable->pData()->observedDistribution(changedInitialValue,
 			this->period());
-
+//	pr2=1;
+//	pr3=1;
 	this->calculateRates();
 	double rr0 = 1 / this->totalRate();
 	double lospr0 =
 		log(pVariable->rate(pOption->ego()) * rr0);
 	double lcpr0 = log(pVariable->probability(pMiniStepA));
 
-	sumlprob_new += lospr0 + lcpr0;
+	//sumlprob_new += lospr0 + lcpr0;
 
 	if (!this->simpleRates())
 	{
@@ -2086,6 +2214,8 @@ bool MLSimulation::deleteMissing()
 		double lcpr = log(pVariable->probability(pMiniStep));
 
 		sumlprob_new += lospr + lcpr;
+//	Rprintf("delete new %f %f %f \n",sumlprob_new,
+//lospr, lcpr);
 
 		if (!this->simpleRates())
 		{
@@ -2122,7 +2252,11 @@ bool MLSimulation::deleteMissing()
 	}
 
 	// 11.
-
+//	Rprintf("delete %f %f %f %f %f %f %f %f %f \n", kappaFactor,
+//		sumlprob_new, sumlprob,
+//		this->pModel()->insertRandomMissingProbability(),
+//		pr1, pr3, pr2, choiceLength,
+//		this->pModel()->deleteRandomMissingProbability());
 	this->lproposalProbability =
 		kappaFactor *
 			exp(sumlprob_new - sumlprob) *
@@ -2145,6 +2279,9 @@ bool MLSimulation::deleteMissing()
 	bool accept = nextDouble() < this->lproposalProbability;
 
 	// 13.
+	this->recordOutcome(*pMiniStepA, accept, DELMISS, false);
+	//Rprintf("del %d %f\n", accept, this->lproposalProbability);
+	//PrintValue(getMiniStepDF(*pMiniStepA));
 
 	if (accept)
 	{

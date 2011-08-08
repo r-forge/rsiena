@@ -667,7 +667,7 @@ SEXP modelPeriod(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
  * better to do it in C unless parallel processing.
  */
 SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
-	SEXP THETA, SEXP RETURNDEPS, SEXP GROUP, SEXP PERIOD,
+	SEXP THETA, SEXP GROUP, SEXP PERIOD,
 	SEXP NRUNMH, SEXP ADDCHAINTOSTORE, SEXP NEEDCHANGECONTRIBUTIONS,
 	SEXP RETURNDATAFRAME, SEXP RETURNCHAINS)
 {
@@ -717,18 +717,6 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 
 	int addChainToStore = 0;
 	int needChangeContributions = 0;
-
-//	int returnDependents = asInteger(RETURNDEPS);
-	int returnDataFrame = 0;
-	if (!isNull(RETURNDATAFRAME))
-	{
-		returnDataFrame = asInteger(RETURNDATAFRAME);
-	}
-	int returnChains = 0;
-	if (!isNull(RETURNCHAINS))
-	{
-		returnChains = asInteger(RETURNCHAINS);
-	}
 	if (!isNull(ADDCHAINTOSTORE))
 	{
 		addChainToStore = asInteger(ADDCHAINTOSTORE);
@@ -739,12 +727,21 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		needChangeContributions = asInteger(NEEDCHANGECONTRIBUTIONS);
 	}
 
+	int returnChains = 0;
+	if (!isNull(RETURNCHAINS))
+	{
+		returnChains = asInteger(RETURNCHAINS);
+	}
+	int returnDataFrame = 0;
+	if (!isNull(RETURNDATAFRAME))
+	{
+		returnDataFrame = asInteger(RETURNDATAFRAME);
+	}
+
 	int deriv = asInteger(DERIV);
 
 	pModel->needChangeContributions((addChainToStore == 1) ||
 		(needChangeContributions == 1));
-	/* set the chain flag on the model */
-	pModel->needChain(returnChains == 1 || addChainToStore == 1);
 
 	/* count up the total number of parameters */
 	int dim = 0;
@@ -807,7 +804,12 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		pMLSimulation->pChain()->pFirst()->pNext(),
 		pMLSimulation->pChain()->pLast()->pPrevious());
 
-    pMLSimulation->createEndStateDifferences();
+ 	/* store chain on Model */
+	pChain = pMLSimulation->pChain();
+	pChain->createInitialStateDifferences();
+	pModel->chainStore(*pChain, groupPeriod);
+	pMLSimulation->createEndStateDifferences();
+
 	/* collect the scores and derivatives */
 	vector<double> derivs(dim * dim);
 	vector<double> score(dim);
@@ -816,21 +818,28 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		&derivs, &score);
 
 	/* get hold of the statistics for accept and reject */
+	const vector < DependentVariable * > & rVariables =
+		pMLSimulation->rVariables();
+	int numberVariables = rVariables.size();
+
 	SEXP accepts;
-	PROTECT(accepts = allocVector(INTSXP, 7));
+	PROTECT(accepts = allocMatrix(INTSXP, numberVariables, 9));
 	SEXP rejects;
-	PROTECT(rejects = allocVector(INTSXP, 7));
+	PROTECT(rejects = allocMatrix(INTSXP, numberVariables, 9));
 	SEXP aborts;
-	PROTECT(aborts = allocVector(INTSXP, 7));
+	PROTECT(aborts = allocMatrix(INTSXP, numberVariables, 9));
 	int * iaccepts = INTEGER(accepts);
 	int * irejects = INTEGER(rejects);
 	int * iaborts = INTEGER(aborts);
 
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		iaccepts[i] = pMLSimulation->acceptances(i);
-		irejects[i] = pMLSimulation->rejections(i);
-		iaborts[i] = pMLSimulation->aborted(i);
+		for (int j = 0; j < numberVariables; j++)
+		{
+			iaccepts[i + numberVariables * j] = rVariables[j]->acceptances(i);
+			irejects[i + numberVariables * j] = rVariables[j]->rejections(i);
+			iaborts[i + numberVariables * j] = rVariables[j]->aborts(i);
+		}
 	}
 
 	/* fill up vectors for  return value list */
@@ -873,11 +882,6 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	SET_VECTOR_ELT(ans, 7, accepts);
 	SET_VECTOR_ELT(ans, 8, rejects);
 	SET_VECTOR_ELT(ans, 9, aborts);
-
-	/* store chain on Model */
-	pChain = pMLSimulation->pChain();
-	pChain->createInitialStateDifferences();
-	pModel->chainStore(*pChain, groupPeriod);
 
 //	PrintValue(getChainDF(*pChain, true));
 
