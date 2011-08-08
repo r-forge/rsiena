@@ -69,17 +69,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             }
             effects$initialValue <- defaultEffects$initialValue
         }
-		## add any effects needed for time dummies
-        tmp <- sienaTimeFix(effects, data)
-        data <- tmp$data
-        effects <- tmp$effects
-		if (!x$useStdInits)
-        {
-			if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
-			{
-				effects <- updateThetas(effects, prevAns)
-			}
-        }
         ## get data object into group format to save coping with two
         ## different formats
         if (inherits(data, 'sienaGroup'))
@@ -90,6 +79,17 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         {
             nGroup <- 1
             data <- sienaGroupCreate(list(data), singleOK=TRUE)
+        }
+		## add any effects needed for time dummies
+        tmp <- sienaTimeFix(effects, data)
+        data <- tmp$data
+        effects <- tmp$effects
+		if (!x$useStdInits)
+        {
+			if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
+			{
+				effects <- updateTheta(effects, prevAns)
+			}
         }
         ## find any effects not included which are needed for interactions
         tmpEffects <- effects[effects$include, ]
