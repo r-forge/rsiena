@@ -1,3 +1,7 @@
+2011-08-09 R-forge revision 169 RSienaTest only
+
+	* R/initializeFRAN.r: bug fix to order of sienaTimeFix and prevans etc.
+
 2011-08-08 R-forge revision 168 RSienaTest only.
 
 	* R/sienaprint.r: altered headings from 't-statistics for convergence'
