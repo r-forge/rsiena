@@ -12,13 +12,14 @@
 simstats0c <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                        effects=NULL, fromFiniteDiff=FALSE,
                        profileData=FALSE, prevAns=NULL, returnDeps=FALSE,
-                       returnChains=FALSE)
+                       returnChains=FALSE, byWave=FALSE)
 {
     if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
     {
         z <- initializeFRAN(z, x, data, effects, prevAns, initC,
                             profileData=profileData, returnDeps=returnDeps)
 
+ 		z$byWave <- byWave
         if (initC)
         {
             return(NULL)

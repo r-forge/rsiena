@@ -3783,16 +3783,16 @@ could give a summary such as
 \par
 {\footnotesize
 \begin{verbatim}
-Estimates, standard errors and t-statistics for convergence
-                              Estimate   Standard   t statistic
-                                           Error
+Estimates, standard errors and convergence t-ratios
+                              Estimate   Standard   Convergence
+                                           Error      t-ratio
 Rate parameters:
   0       Rate parameter       5.9379  ( 1.0007   )
-  1. eval outdegree (density) -2.4742  ( 0.1316   )  0.1328
-  2. eval reciprocity          2.0198  ( 0.2505   ) -0.0260
-  3. eval transitive triplets  0.5137  ( 0.1726   ) -0.0053
-  4. eval 3-cycles             0.1278  ( 0.3462   )  0.0189
-  5. eval smoke1 similarity    0.4477  ( 0.2576   )  0.0244
+  1. eval outdegree (density) -2.4742  ( 0.1316   )   0.1328
+  2. eval reciprocity          2.0198  ( 0.2505   )  -0.0260
+  3. eval transitive triplets  0.5137  ( 0.1726   )  -0.0053
+  4. eval 3-cycles             0.1278  ( 0.3462   )   0.0189
+  5. eval smoke1 similarity    0.4477  ( 0.2576   )   0.0244
 Total of 1399 iteration steps.
 \end{verbatim}
 }
@@ -4105,15 +4105,15 @@ following result was obtained on the \R console.
 
 {\footnotesize
 \begin{verbatim}
-                              Estimate   Standard   t statistic
-                                           Error
+                              Estimate   Standard   Convergence
+                                           Error      t-ratio
 Rate parameters:
   0       Rate parameter       6.0742  ( 1.0134   )
-  1. eval outdegree (density) -2.5341  ( 0.1445   )  0.0571
-  2. eval reciprocity          2.1106  ( 0.2625   )  0.0710
-  3. eval transitive triplets  0.5449  ( 0.1781   )  0.0584
-  4. eval 3-cycles             0.0779  ( 0.3425   )  0.0777
-  5. eval smoke1 similarity    0.4519  ( 0.2497   )  0.0400
+  1. eval outdegree (density) -2.5341  ( 0.1445   )   0.0571
+  2. eval reciprocity          2.1106  ( 0.2625   )   0.0710
+  3. eval transitive triplets  0.5449  ( 0.1781   )   0.0584
+  4. eval 3-cycles             0.0779  ( 0.3425   )   0.0777
+  5. eval smoke1 similarity    0.4519  ( 0.2497   )   0.0400
 \end{verbatim}
 }
 
@@ -5825,7 +5825,7 @@ and tests several hypotheses concerning these `meta-parameters':
 \item Test $H_0^{(1)}:\ \mu_\theta = 0$.\\
       This is done by means of a standard normal test statistic
       $ t_{\mu_\theta}$,
-      being the ration of the estimate for $\mu_\theta $
+      being the ratio of the estimate for $\mu_\theta $
       to its standard error.
 \item Test $H_0^{(2)}:\ \sigma^2_\theta = 0$,
                      i.e., $\theta_j = \mu_\theta$ for all $j$. \\
@@ -9254,6 +9254,23 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2011-08-08 RSienaTest only
+\begin{itemize}
+\item More work on maximum likelihood.
+\item When using finite difference derivative estimation or maxmimum likelihood
+  estimation, return of derivatives by wave is optional, controlled by parameter
+  byWave to siena07.
+\item Format of derivatives by wave has altered: sienaTimeTest will be
+  incompatible with older objects which used finite differences or maximum
+  likelihood.
+\item New function \sfn{updateTheta} to copy theta values from a fit to an
+  effects object.
+\item Time dummies in siena07 are created before the initial values are updated
+  from any prevAns, so values may be copied to time dummies also.
+\item Amended headings in print and summary for siena fit objects.
+\item New function \sfn{bayes} is now fully available with a help page and no
+  need to use RSiena::: when calling it.
+\end{itemize}
 \item 2011-08-02
 \begin{itemize}
 \item Fix another display of manual in siena01Gui

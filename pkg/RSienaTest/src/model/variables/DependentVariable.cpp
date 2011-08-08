@@ -58,6 +58,9 @@ DependentVariable::DependentVariable(string name,
 	this->lpEvaluationFunction = new Function();
 	this->lpEndowmentFunction = new Function();
 	this->lpCreationFunction = new Function();
+	this->lacceptances.resize(NBRTYPES, 0);
+	this->lrejections.resize(NBRTYPES, 0);
+	this->laborts.resize(NBRTYPES, 0);
 }
 
 
@@ -1455,4 +1458,59 @@ void DependentVariable::successfulChange(bool success)
 {
 	this->lsuccessfulChange = success;
 }
+
+// ----------------------------------------------------------------------------
+// Section: MH step counts
+// ----------------------------------------------------------------------------
+
+/**
+ * increments the number of acceptances for the given steptype for this variable
+ */
+void DependentVariable::incrementAcceptances(int stepType)
+{
+	this->lacceptances[stepType]++;
+}
+
+/**
+ * increments the number of rejections for the given steptype for this variable
+ */
+void DependentVariable::incrementRejections(int stepType)
+{
+	this->lrejections[stepType]++;
+}
+
+/**
+ * increments the number of aborted steps
+ * for the given steptype for this variable
+ */
+void DependentVariable::incrementAborts(int stepType)
+{
+	this->laborts[stepType]++;
+}
+
+/**
+ * returns the number of accepted steps
+ * for the given steptype for this variable
+ */
+int DependentVariable::acceptances(int stepType) const
+{
+	return this->lacceptances[stepType];
+}
+/**
+ * returns the number of rejected steps
+ * for the given steptype for this variable
+ */
+int DependentVariable::rejections(int stepType) const
+{
+	return this->lrejections[stepType];
+}
+/**
+ * returns the number of aborted steps
+ * for the given steptype for this variable
+ */
+int DependentVariable::aborts(int stepType) const
+{
+	return this->laborts[stepType];
+}
+
 }

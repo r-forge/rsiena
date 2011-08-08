@@ -12,15 +12,16 @@
 ##@maxlikec siena07 ML Simulation Module
 maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                      effects=NULL, profileData=FALSE, prevAns=NULL,
-                     returnDeps=FALSE, returnChains=FALSE, byGroup=FALSE,
-                     returnDataFrame=FALSE)
+                     returnChains=FALSE, byGroup=FALSE,
+                     returnDataFrame=FALSE, byWave=FALSE)
 {
     if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
     {
         z <- initializeFRAN(z, x, data, effects, prevAns, initC,
-                            profileData=profileData, returnDeps=returnDeps)
+                            profileData=profileData, returnDeps=FALSE)
         z$returnDataFrame <- returnDataFrame
         z$returnChains <- returnChains
+		z$byWave <- byWave
         if (initC)
         {
             return(NULL)
@@ -40,14 +41,14 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     ######################################################################
     ## retrieve stored information
     f <- FRANstore()
-    if (z$Phase == 2)
-    {
-        returnDeps <- FALSE
-    }
-    else
-    {
-        returnDeps <- z$returnDeps
-    }
+    ##if (z$Phase == 2)
+    ##{
+    ##    returnDeps <- FALSE
+    ##}
+    ##else
+    ##{
+    ##    returnDeps <- z$returnDeps
+    ##}
     callGrid <- z$callGrid
     ## z$int2 is the number of processors if iterating by period, so 1 means
     ## we are not. Can only parallelize by period at the moment.
@@ -61,9 +62,9 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 		{
 			theta <- z$theta
 		}
-        ans <- .Call('mlPeriod', PACKAGE=pkgname, z$Deriv, f$pData,
+        ans <- .Call("mlPeriod", PACKAGE=pkgname, z$Deriv, f$pData,
                      f$pModel, f$myeffects, theta,
-                     returnDeps, 1, 1, z$nrunMH, z$addChainToStore,
+                      1, 1, z$nrunMH, z$addChainToStore,
                      z$needChangeContributions, z$returnDataFrame,
                      z$returnChains)
         ans[[6]] <- list(ans[[6]])
@@ -74,24 +75,26 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 			ans[[9]] <- list(ans[[9]])
 			ans[[10]] <- list(ans[[10]])
         }
-   }
+	}
     else
     {
         if (z$int2 == 1)
         {
-            anss <- apply(callGrid, 1, doMLModel, z$Deriv, z$thetaMat,
-                          returnDeps,  z$nrunMH, z$addChainToStore,
+            anss <- apply(cbind(callGrid, 1:nrow(callGrid)),
+						  1, doMLModel, z$Deriv, z$thetaMat,
+                          z$nrunMH, z$addChainToStore,
                           z$needChangeContributions, z$returnDataFrame,
                           z$returnChains, byGroup, z$theta)
         }
         else
         {
             use <- 1:(min(nrow(callGrid), z$int2))
-            anss <- parRapply(z$cl[use], callGrid, doMLModel, z$Deriv,
-                              z$thetaMat,
-                              returnDeps, z$nrunMH, z$addChainToStore,
+            anss <- parRapply(z$cl[use], cbind(callGrid, 1:nrow(callGrid)),
+							  doMLModel, z$Deriv, z$thetaMat,
+                              z$nrunMH, z$addChainToStore,
                               z$needChangeContributions,
-                              z$returnDataFrame, z$returnChains, byGroup, z$theta)
+                              z$returnDataFrame, z$returnChains, byGroup,
+							  z$theta)
         }
         ## reorganize the anss so it looks like the normal one
         ans <- NULL
@@ -117,8 +120,7 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ##    {
         ##        ans[[6]] <-  NULL
         ##    }
-       ## browser()
-        if (returnChains)
+        if (z$returnChains)
         {
             ##TODO put names on these?
             fff <- lapply(anss, function(x) x[[6]][[1]])
@@ -129,9 +131,9 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ans[[8]] <- lapply(anss, "[[", 8)
         ans[[9]] <- lapply(anss, "[[", 9)
         ans[[10]] <- lapply(anss, "[[", 10)
-        if (!byGroup)
-        {
-            ans[[8]] <- Reduce("+",  ans[[8]]) ## accepts
+		if (!byGroup)
+		{
+			ans[[8]] <- Reduce("+",  ans[[8]]) ## accepts
             ans[[9]] <- Reduce("+",  ans[[9]]) ## rejects
             ans[[10]] <- Reduce("+",  ans[[10]]) ## aborts
         }
@@ -140,12 +142,14 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     fra <- -t(ans[[1]]) ##note sign change
 
     FRANstore(f)
-
-    ##   if (returnDeps)
-    ##      sims <- ans[[6]]
-    ## else
-    sims <- NULL
-
+	#if (returnDeps || z$returnChains)
+	#{
+	#	sims <- ans[[6]]
+	#}
+	#else
+	#{
+		sims <- NULL
+	#}
     ##print(length(sims[[1]]))
     ##if (returnDeps) ## this is not finished yet!
     ##{
@@ -184,7 +188,7 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 }
 
 ##@doMLModel Maximum likelihood
-doMLModel <- function(x, Deriv, thetaMat, returnDeps, nrunMH, addChainToStore,
+doMLModel <- function(x, Deriv, thetaMat, nrunMH, addChainToStore,
                       needChangeContributions, returnDataFrame, returnChains,
 					  byGroup, theta)
 {
@@ -198,8 +202,8 @@ doMLModel <- function(x, Deriv, thetaMat, returnDeps, nrunMH, addChainToStore,
 		theta <- theta
 	}
     .Call("mlPeriod", PACKAGE=pkgname, Deriv, f$pData,
-          f$pModel, f$myeffects, theta, returnDeps,
-          as.integer(x[1]), as.integer(x[2]), nrunMH, addChainToStore,
+          f$pModel, f$myeffects, theta,
+          as.integer(x[1]), as.integer(x[2]), nrunMH[x[3]], addChainToStore,
           needChangeContributions, returnDataFrame, returnChains)
 }
 
@@ -209,9 +213,14 @@ reformatDerivs <- function(z, f, derivList)
     ## of the matrix. Need to be put into a symmetric matrix.
     ## Tricky part is getting the rates in the right place!
     ## Note that we do not yet deal with rate effects other than the basic
-    dff <- matrix(0, nrow=z$pp, ncol=z$pp)
+    dff <- as(Matrix(0, z$pp, z$pp), "dsyMatrix")
     nPeriods <- length(derivList)
-    dff2 <- array(0, dim=c(nPeriods, z$pp, z$pp))
+	dff2 <- vector("list", nPeriods)
+	if (z$byWave)
+	{
+		tmp <- as(Matrix(0, z$pp, z$pp), "dsyMatrix")
+		dff2[] <- tmp
+	}
     for (period in 1:nPeriods)
     {
         dffraw <- derivList[[period]]
@@ -250,7 +259,10 @@ reformatDerivs <- function(z, f, derivList)
             rawsub <- rawsub + nonRates * nonRates
             dffPeriod <- dffPeriod + t(dffPeriod)
             diag(dffPeriod) <- diag(dffPeriod) / 2
-            dff2[period , , ] <- dff2[period, , ] - dffPeriod
+			if (z$byWave)
+			{
+				dff2[[period]] <- dff2[[period]] - dffPeriod
+			}
             dff <- dff - dffPeriod
         }
     }

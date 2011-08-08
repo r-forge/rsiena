@@ -13,8 +13,8 @@
 \newcommand{\remark}[1]{\par\noindent{\color[named]{ProcessBlue}#1}\par}
 \newcommand{\mcc}[2]{\multicolumn{#1}{c}{#2}}
 \newcommand{\mcp}[2]{\multicolumn{#1}{c|}{#2}}
-\newcommand{\nm}[1]{\textsf{\small #1}}
-\newcommand{\nnm}[1]{\textsf{\small\textit{#1}}}
+\newcommand{\nm}[1]{\textsf{ #1}}
+\newcommand{\nnm}[1]{\textsf{\textit{#1}}}
 \newcommand{\nmm}[1]{\nnm{#1}}
 \newcommand{\ts}[1]{\par{\color[named]{Red}TS: #1}\par}
 
@@ -69,22 +69,22 @@ facilitate understanding by those who have a knowledge
 of the code of \Sn. Readers who have no such knowledge
 can happily ignore these references.
 
-Two special features of the \RS package are that it uses C++ code
-for time-consuming parts, and that a wrapper is available to use
-the package seemingly independently of \Rn.
+Two special features of the \RS package are that it uses C++ code for
+time-consuming parts, and that a wrapper is available to use the package
+seemingly independently of \Rn.
 
-The C wrapper program \sfn{siena.exe} starts up \R in
-such a way that it launches a tcl/tk graphical user interface (gui)
-resembling the Stocnet interface for \Sn,
-and controls all processing thereafter. There is a corresponding script file,
-\sfn{sienascript}, which does the same job under Linux or Mac.
+The script file \nnm{sienascript} starts up \R in such a way that it launches a
+tcl/tk graphical user interface (gui) resembling the Stocnet interface for \Sn,
+and controls all processing thereafter. This interface is accessible on Windows
+via the command \nnm{siena01Gui}. (Prior to R 2.12.0 the funciton
+\sfn{siena.exe} was provided as an equivalent to \sfn{sienascript}: it has been
+removed as it was rarely used and proved difficult to maintain.)
 
-The high-level functions called by the gui, such as \nnm{siena07} described below,
-are also accessible within \R with the usual \Rn-type user interface
-along the lines
-of model-fitting functions such as \verb|lm()|. (A formula interface is still on
-the wish list, but already now it is relatively straightforward to use the package without
-the gui.)
+The high-level functions called by the gui, such as \nnm{siena07} described
+below, are also accessible within \R with the usual \Rn-type user interface
+along the lines of model-fitting functions such as \verb|lm()|. (A formula
+interface is still on the wish list, but already now it is relatively
+straightforward to use the package without the gui.)
 
 The \R functions call C++ only where speed is critical. From my profiling of
 \nnm{siena07}, the estimation function, I think that only the simulation
@@ -95,40 +95,37 @@ the effects when simulating.
 
 In \Sn, this simulation function is \nm{FRAN} which, for method of moments
 estimation, simply calls \nm{simstats}: in \rs, it is the C++ function
-\nnm{model} called by the \R function \nnm{simstats0c}, which is (currently the
-only candidate for) the element of the \RS model object named \nnm{FRAN}. In
-this document I have used the name \nm{FRAN} to refer to the simulation routine.
+\nnm{model} called by one of the \R functions \nnm{simstats0c} or
+\nnm{maxlikec}, which are the two candidates currently available for the element
+of the \RS model object named \nnm{FRAN}. In this document I have used the name
+\nm{FRAN} to refer to the simulation routine.
 
 \nnm{siena07} is intended to be written in such a way that different simulation
 functions could be used within the same Robbins Monro algorithm. In practice the
 separation is not quite complete, but it is nearly so.
-
-The only simulation function currently provided as an \nm{FRAN} is
-\nnm{simstats0c}, although there is a simple maximum likelihood routine which I
-have used in testing, for which some interface exists.
 
 It would be feasible within a C++ \nm{FRAN} to call \R functions for some
 effects or functions if desired, to facilitate adding new ones, although they
 would be slow to run!
 
 We use functions from the C part of \R, to provide random numbers within the
-C++.
-
-\nnm{simstats0c} has three types of calls: a initial one which calls various C++
-routines to setup the data, a final one which sets the C++ data pointers to null
-to clean up the C++ memory, and multiple ``normal'' ones which call the function
-\nnm{model} to perform one complete simulation. (In this it does not correspond
-exactly to \nm{simstats}!)
+C++.1 \nnm{simstats0c} and \nnm{maxlikec} have three types of calls: a initial
+one which calls various C++ routines to setup the data, a final one which sets
+the C++ data pointers to null to clean up the C++ memory, and multiple
+``normal'' ones which call the function \nnm{model} to perform one complete
+simulation. (In this it does not correspond exactly to \nm{simstats} in Siena3!)
 
 With this design, we have introduced parallel processing by using multiple \R
-processes, each running some of the simulations. This was trivial to introduce
-into Phase 1 and Phase 3, but to use it in Phase2 we have altered the algorithm
-to use the average of more than one simulation at a time. We use the \R package
-\verb|snow| to create and control the multiple processes, and the package
-\verb|rlecuyer| to provide multiple random number streams.  The term `cluster'
-below refers to the cluster of multiple processors. (I vary between using
-\emph{processors} and \emph{processes} as it is possible to run \RS with
+processes. In \nnm{simstats0c} we run some of the simulations in each process:
+this was trivial to introduce into Phase 1 and Phase 3, but to use it in Phase2
+we have altered the algorithm to use the average of more than one simulation at
+a time. For \nnm{maxlikec} we use different processes for each wave.  We use the
+\R package \verb|snow| to create and control the multiple processes, and the
+package \verb|rlecuyer| to provide multiple random number streams.  The term
+`cluster' below refers to the cluster of multiple processors. (I vary between
+using \emph{processors} and \emph{processes} as it is possible to run \RS with
 multiple \emph{processes} on a machine with only one processor.)
+
 
 \section{Data types}
 
@@ -170,11 +167,11 @@ objects or still on files.
 
 The function \nnm{robmon} requires a \nnm{sienaModel} object
 as an argument. One element of this object is named \nm{FRAN} and contains the
-required simulation function.
+name of the required simulation function.
 
-The function \nnm{simstats0c}, used as an instance of \nm{FRAN}, requires a
-\nnm{siena} (or \nnm{sienaGroup}) object and a \nnm{sienaEffects} (or
-\nnm{sienaGroupEffects}) object as arguments.
+The functions\nnm{simstats0c} or \nnm{maxlikec}, used as an instance of
+\nm{FRAN}, require a \nnm{siena} (or \nnm{sienaGroup}) object and a
+\nnm{sienaEffects} (or \nnm{sienaGroupEffects}) object as arguments.
 
 \section{sienaDataCreate}
 
@@ -330,7 +327,7 @@ of actions(section \ref{sec:actions})\\
 \label{sec:active}
 \begin{algorithmic}
 \STATE activeStart matrix has a row per actor and a column per period\\
-\sfn{ }TRUE if the actor is active at the start of the period
+\sfn{ }TRUE if the actor is active at the start of the period, otherwise FALSE
 \end{algorithmic}
 \subsubsection{Action}
 \label{sec:actions}
@@ -344,9 +341,7 @@ of actions(section \ref{sec:actions})\\
 \subsection{Check NodeSet}
 \label{sec:nodeset}
 \begin{algorithmic}
-\IF{nodeset name is ``Actors''}
-\STATE Valid
-\ELSIF {Nodeset name in the list and lengths match}
+\IF {Nodeset name in the list and lengths match}
 \STATE Valid
 \ELSE
 \STATE Invalid
@@ -1178,7 +1173,8 @@ it may be helpful to have read that outline.
 \subsection{Input (from \nm{siena07})}
 \begin{description}
 \item[\nnm{z}] Model fitting object.
-\item[\nnm{x}] Input model object, as described under \nnm{sienaModelCreate}.
+\item[\nnm{x}] Input model object, as described in the help page for
+ \nnm{sienaModelCreate}.
 \item[...] Extra parameters for \nm{FRAN} (including the data!).
 \end{description}
 

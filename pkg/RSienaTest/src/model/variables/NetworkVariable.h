@@ -170,6 +170,10 @@ private:
 	// cooperation between actor and alter
 
 	double lsymmetricProbability;
+
+	map<int, double> lsetting;
+
+	vector<int> lalterSet;
 };
 
 

@@ -209,7 +209,6 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
             }
         }
 
-### not sure we need this: if so then check relevant combinations of nodesets
         if (length(xx$cCovars) + length(xx$vCovars) +
             length(xx$dycCovars) + length(xx$dyvCovars) +
             length(types=='behavior') > 0)
@@ -606,7 +605,6 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                 rateEffects <- rbind(rateEffects, tmp$rateEff)
             }
         }
-### not sure we need this: if so then check relevant combinations of nodesets
         if (length(xx$cCovars) + length(xx$vCovars) +
             length(xx$dycCovars) + length(xx$dyvCovars) +
             length(types=='behavior') > 0)
@@ -665,9 +663,6 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
             objEffects$effectName <- paste(varname, ': ',
                                            objEffects$effectName, sep = '')
         }
-        ## now create the real effects, extra rows for endowment effects etc
-        ##objEffects <- createObjEffectList(objEffects, varname)
-        ##rateEffects <- createRateEffectList(rateEffects, varname)
 
         objEffects$functionName[objEffects$type == 'endow'] <-
             paste('Lost ties:',
@@ -695,12 +690,6 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
             objEffects <-
                 objEffects[!objEffects$shortName == "density", ]
         }
-        ##   if (attr(xx$depvars[[i]],'uponly') || attr(xx$depvars[[i]],
-        ##                                              'downonly'))
-        ##  {
-        ##     objEffects <-
-        ##        objEffects[!objEffects$shortName == "density", ]
-        ##  }
 
         rateEffects$basicRate[1:observations] <- TRUE
 
@@ -1418,4 +1407,3 @@ getBipartiteStartingVals <- function(depvar)
     list(startRate=startRate, degree=alphaf1, alpha=alpha, prec=prec, tmp=tmp,
         untrimmed = untrimmed)
 }
-

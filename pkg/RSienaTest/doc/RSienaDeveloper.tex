@@ -25,19 +25,9 @@
 \renewcommand\@biblabel{}
 \makeatother
 
-\hyphenation{Snij-ders Duijn DataSpecification dataspecification dependentvariable ModelSpecification}
+\hyphenation{Snij-ders Duijn DataSpecification dataspecification
+  dependentvariable ModelSpecification}
 
-% centered section headings with a period after the number;
-% sans serif fonts for section and subsection headings
-\renewcommand{\thesection}{\arabic{section}.}
-\renewcommand{\thesubsection}{\thesection\arabic{subsection}}
-\makeatletter
- \renewcommand{\section}{\@startsection{section}{1}
-                {0pt}{\baselineskip}{0.5\baselineskip}
-                {\centering\sffamily} }
- \renewcommand{\subsection}{\@startsection{subsection}{2}
-                {0pt}{0.7\baselineskip}{0.3\baselineskip}
-                {\sffamily} }
 \makeatother
 
 
@@ -58,11 +48,133 @@
 The introduction to the RSiena manual describes the basics of how to run the
 program, either `standalone' or within R. The help files in R describe how to
 use the R commands. Here I give some notes for developers.
-\section{Coding standards etc}
-I describe the main details of our current practice:
-\subsection{General}
+
+Note that this file changes fairly frequently.
+\section{Documentation}
+\subsection{Getting the documentation: Windows Users}
 \begin{enumerate}
-\item Before you commit an update to R-forge please do the following:
+\item Install TortoiseSVN. This will also install \textsf{svn}
+    and a version of \textsf{plink}.\\
+    Installation of TortoiseSVN may be sensitive. It is advised to
+    install it when no other programs are running, and after installing
+    to restart your computer immediately.
+    A successful installation will show by having items
+    SVN Checkout and TortoiseSVN
+    in the popup window opening at a right mouse click in Windows Explorer.
+\item If you have not already done so, \emph{register} on r-forge and ask to
+  join RSiena.
+\item When you get an email saying you have been allowed to join RSiena,
+  go to R-forge RSiena SCM tab at
+  \url{https://r-forge.r-project.org/scm/?group_id=461} and find the address of
+  the repository:
+\url{svn+ssh://developername@svn.r-forge.r-project.org/svnroot/rsiena}
+\item Go into Windows Explorer and create a folder to hold the source files.
+\item Navigate to this directory.
+\item Right-Click and select SVN Checkout...
+\item Paste the repository address in the top box, replace the word
+  \emph{developername} by your r-forge user name and hit OK
+\item When it finishes, you will have the source of RSiena and RSienaTest, in
+  subdirectories of the \textsf{pkg} directory.
+\item Each of RSiena and RSienaTest has the same basic layout of files, but
+  RSienaTest has some extras: documentation source.
+\item The documentation is in RSienaTest/doc.
+\end{enumerate}
+\subsection{Getting the documentation: non-Windows Users}
+\begin{enumerate}
+\item If you have not already done so, \emph{register} on r-forge and ask to
+  join RSiena.
+\item When you get an email saying you have been allowed to join RSiena, go to
+  R-forge RSiena SCM tab at
+  \url{https://r-forge.r-project.org/scm/?group_id=461} and find the checkout
+  command: \sfn{\small svn checkout
+    svn+ssh://developername@svn.r-forge.r-project.org/svnroot/rsiena} replacing
+\verb|developername| by your name.
+\item Create a folder to hold the source files.
+\item In a terminal window, navigate to this directory.
+\item Type the checkout command.
+\item On Macs, you could try using \textsf{svnX} rather than the terminal
+  interface.
+\item When it finishes, you will have the source of RSiena and RSienaTest, in
+  subdirectories of the \textsf{pkg} directory.
+\item Each of RSiena and RSienaTest has the same basic layout of files, but
+  RSienaTest has some extras: documentation source.
+\item The documentation is in RSienaTest/doc.
+\end{enumerate}
+\subsection{Automatically generated documentation}
+\begin{description}
+\item[C]
+\begin{enumerate}
+\item Install \sfn{Doxygen} and \sfn{GraphViz}
+\item Use the configuration file \sfn{RSienaTest/doc/config.dox} to run the
+  Doxywizard. On Windows you need the File/Open \texttt{config.dox} (in
+  \texttt{RSienaTest/doc}).  On a Mac, you need to use the expert/dot tab in the
+  Wizard, and enter \texttt{/usr/local/bin} in the box marked DOT\_PATH. On
+  Linux I do not know!
+\item The documentation is a set of html files. Open one and then you can
+  navigate round the set.
+\end{enumerate}
+\item[R]
+\begin{enumerate}
+\item Run the function \sfn{RSiena:::getRSienaRDocumentation()} with the
+  argument set to the path to your R source files for RSiena or RSienaTest.
+\item This generates a .csv file, a latex table or an R data frame (called
+  tmp12) with details of the functions in. To make the csv more readable,
+  autofit the columns and save as .xls.
+\item NB You need RTools (see later) installed to do this on Windows.
+\end{enumerate}
+\end{description}
+\subsection{Other documentation}
+There are other documentation files:
+\begin{description}
+\item[RSienaSpec] Specification of the R side.  Details of creation of objects
+  and \nnm{siena07} Robbins-Monro algorithm.
+\item[simstats0c] Specification of C++ simulation for forward simulation
+\item[maxlikec] C++ simulation for maximum likelihood estimation
+\item[bayes] Bayesian function
+\item[sienaTimeFix] Details of the implementation of testing for time
+  heterogeneity and creation of time dummies.
+\item[classdesign] Details of the C++ side.
+\item[missingsEtc] Details of the treatment of missing values and structural
+  values. Also describes processing of composition change.
+\end{description}
+This file contains a description of some ways of adapting the algorithms.
+
+There are also a file called siena\_algorithms4,
+which contain descriptions of the algorithms. It do not always match the
+code, whereas I hope the files referred to above do.
+\section{Updating the package on R-forge}
+\subsection{A few notes about svn}
+I am not an expert on this, and you do not need to know much. But a few notes
+may help.
+\begin{itemize}
+\item R-forge will allow source files to be updated only if you have performed a
+  developer secure checkout. Previously I suggested doing a read-only checkout
+  first, but I now think that this is not a good idea. I recommend you go
+  straight to a secure checkout and remove any other version of the r-forge
+  source which you may have lying around.
+ \item To make a change, edit the files you checked out and use \textsf{svn
+     commit} from the same directories as you checked them out into.
+ \item To get the most recent source at any time after checking out, use
+   \textsf{svn update}. (A Right-click option on the directory in Windows
+   Explorer for Windows users)
+\item It is a good idea to do \textsf{svn update} before \textsf{svn commit}, as
+  you will find out about conflicts and can solve them rather than leaving the
+  repository in a conflicted state.
+\item But \emph{never} do \textsf{svn update} and then copy your new versions on
+  top of the updated files. This way you remove any changes between your
+  checkout and the update. If you do risk this and rely on checking the
+  differences, you must check for alterations in the blank spaces as well or you
+  risk annoying someone who has reformatted code by removing their changes.
+\item If you wish to rename or delete a file under svn control, use the svn
+  options to do it. On Windows this is available via right-click from Tortoise.
+\item If you add new text files of any type, set the svn property
+  \textsf{eol-style} to have value \textsf{native}.  Again, available via
+  Tortoise on Windows, via svnX on Mac.
+\item Details of how to set up a personal/provate key pair are in section
+  \ref{key}. This removes the need to type your password multiple times.
+\end{itemize}
+\subsection{Files which always need updating}
+ Before you commit an update to R-forge please do the following:
 \begin{enumerate}
 \item Record details of the files you have changed in the Changelog for each of
   RSiena and RSienaTest. The two changelogs are kept identical, otherwise it
@@ -75,6 +187,10 @@ I describe the main details of our current practice:
   change log at the end of the manual. Create a new pdf and copy to the inst/doc
   directory of each package.
 \end{enumerate}
+\section{Coding standards etc}
+I describe the main details of our current practice:
+\subsection{General}
+\begin{enumerate}
 \item Use spaces: particularly around operators and after commas. (But
   not after the end of your lines!)
 \item Do not use underscores: use variable names made up of several (possibly
@@ -127,10 +243,6 @@ I describe the main details of our current practice:
 \subsection{C++}
 \begin{enumerate}
 \item Use \texttt{this-\textgreater} even when not strictly necessary.
-\item Documentation is provided via Doxygen: install this and Graphviz. Use the
-  doxygen wizard: File/open \texttt{config.dox} (in \texttt{RSienaTest/doc}).
-  On a Mac, you need to use the expert/dot tab in the Wizard, and enter
-  \texttt{/usr/local/bin} in the box marked DOT\_PATH.
 \item If you add new files or functions, ensure they are
   Doxygen-documented by copying the comment structure at the start of file or
   function from a similar one.
@@ -141,7 +253,7 @@ I describe the main details of our current practice:
 \item Arguments lists should each be on a separate line unless all will fit on a
   single line.
 \item Only declare one variable per line.
-\item Use upper case forthe preprocessor comments at the beginning and end of
+\item Use upper case for the preprocessor comments at the beginning and end of
   the header files.
 \item Put comments before blocks such as Forward declarations, Class
   definitions.
@@ -149,7 +261,7 @@ I describe the main details of our current practice:
 \item In particular note the naming conventions described there.
 \end{enumerate}
 \section{Recreating the package}
-These notes now apply to using R 2.12.0 or later. Please ensure you have the
+These notes apply to using R 2.12.0 or later. Please ensure you have the
 latest source (which does not include commands to get the installer for
 \verb|siena.exe|). If you do not then the behavior will not be as documented
 below.
@@ -161,7 +273,7 @@ below.
   may need to uninstall and reinstall Rtools, as you need Rtools at the start of
   your path. (Or edit the path!).
 \item If using a Mac, you will need the Xcode tools installed.
-\item Obtain the current source.
+\item Obtain the current source using a developer secure checkout.
 \item In a command prompt window, navigate to the directory above the siena
   tree. Here I assume it is called \sfn{RSiena}. (You may have minor
   difficulties if it is not!)
@@ -179,13 +291,15 @@ below.
 \verb|R CMD INSTALL RSiena_1.0.n.tar.gz|\\
 (where \verb|n| is adjusted to match the file you have just created.)
 \item You now should have a new version of the package ready for use. (If on 64
-  bit Windows or Mac, you will have two versions.)
+  bit Windows or Mac, you will have two versions, and you will two copies of the
+  course directories.)
 \item Alternatively, instead of the build and INSTALL, just type
 \verb|R CMD INSTALL RSiena|\\
 If you have a 64-bit Windows and R 2.12.0, or a 64-bit Mac, use
 \verb|R CMD INSTALL --no-multiarch RSiena|\\
-instead.
-This will just compile the C that has changed and then do the rest.
+instead. After the first compile, where using
+\verb|R CMD INSTALL --preclean RSiena| \\is recommended,
+this will just compile the C that has changed and then do the rest.
 Quicker if you are debugging changes. Note that the \sfn{make} file is not very
 clever: if you are altering the C and your changes are not appearing, delete the
 .o's or .dll to force it, or use
@@ -201,13 +315,12 @@ files.
   Rtools. I have occasionally had problems with installing from a tarball or
   from source, when I have no permission to write in the standard libraries, but
   can't remember which one worked: one always did. The most likely to work is to
-  use, within R, \sfn{install.packages("tarball name", repos=NULL)}. Or just
-  open up R, and do \verb|install.packages('xtable')| which should create a
+  use, within R,\\
+ \sfn{install.packages("tarball name", repos=NULL)}\\
+ Or just
+  open up R, and do \\
+\verb|install.packages('xtable')| \\which should create a
   local library directory for you.
-\item If you find a Mac keeps recompiling all the C, even when you have not
-  changed anything, comment out, using \#,
- the line beginning \verb|$(OBJECTS)| in the file
-  \verb|RSiena/src/Makevars|. But try to remember not to commit this version!
 \end{enumerate}
 \subsection{Checking the amended package}
 \begin{enumerate}
@@ -216,17 +329,16 @@ files.
   called \verb|RSiena.Rcheck|, and produce some diagnostics to the
   screen.
 \item Please set environment variables to ensure you have tested everything you
-  can. Details in section \ref{below}. You should have no warnings at all from
+  can. Details below. You should have no warnings at all from
   the tar ball version, maybe some to do with presence of object files with the
   other version.
 \item Final check of pdf: once the warnings have gone away, do a visual check on
   the pdf version of the help pages which will be in the directory
   RSiena.RCheck. Check any pages you have changed for lines that are too long:
   the usage section, I think, does not wrap automatically.
-\item If you just want to check the format of the help pages in  the pdf, you
-  can use
-\verb|R CMD Rd2dvi --pdf man| or e.g.\ \verb|R CMD --pdf man/siena7.Rd|, which
-will create a file called Rd2.pdf.
+\item If you just want to check the format of the help pages in the pdf, you can
+  use \\ \verb|R CMD Rd2dvi --pdf man| \\ or e.g.\ \\
+  \verb|R CMD --pdf man/siena7.Rd|\\ which will create a file called Rd2.pdf.
 \end{enumerate}
 \paragraph{Environment variables}
  \label{below}
@@ -259,14 +371,15 @@ containing your installed packages.
 
 You might like to add
 \verb|_R_CHECK_FORCE_SUGGESTS_=FALSE| which just stops the check failing because
-some suggested packages which are not actually used in the code aren ot
+some suggested packages which are not actually used in the code are not
 installed.
-\item[build.Renviron] This is the file used for the build procedure. I suggest
+\item[build.Renviron] This is the file used for the build procedure.  I suggest
+  you set \verb|CYGWIN=nodosfilewarning| here. (Only necessary in Windows but
+  will do no harm on Mac or Linux.). We also need
 \begin{verbatim}
-_R_BUILD_RESAVE_DATA=no
+_R_BUILD_RESAVE_DATE=no
 \end{verbatim}
-  On Windows you could also set \verb|CYGWIN=nodosfilewarning| here (and for
-  portability it will not matter on Linux or Mac).
+but I have added this to the DESCRIPTION file.
 \end{description}
 \paragraph{Alternative methods for small changes}
 Good news: from R 2.12.0 it is often possible to update the R functions in
@@ -277,7 +390,7 @@ package.
   simply by using the R command \verb|insert.source|. For example,
   \verb|insert.source('d:/RSiena/R/phase1.r', package='RSiena')| will update any
   functions which you have altered which are contained in \verb|phase1.r|.
-\item You can make a small change to a hidden file by using
+\item Alternatively, you can make a small change to a hidden file by using
 \verb|fixInNamespace('function name', 'RSiena')|.
 \item Useful to insert a call to \sfn{browser}, as you won't mind it
   disappearing when you exit from R.
@@ -298,7 +411,52 @@ GPL licensing.
 
 If you are lucky the same will work with Mac binaries on a Mac, but I have not
 tried this recently, and I may have forgotten some trick.
+\section{Personal/private keys}
+\label{key}
+You can set up a personal/private ssh key pair so you do not need to type the
+R-forge password. The details for Windows are: (linux and Mac users can probably
+find our how to do this by googling).
+\begin{enumerate}
+\item Install \sfn{putty.exe} and its associated programs using the putty
+  Windows installer for the whole set from
+  {\small{\url{http://www.chiark.greenend.org.uk/~sgtatham/putty/}}}
+\item After installation, run \sfn{putty.exe} and create a session for rforge:
+Use \sfn{rforgename@svn.r-forge.r-project.org} as the host name. (Use your
+r-forge name in place of \verb|rforgename|.)
+\item Port should be 22
+\item Connection type should be \verb|ssh|.
+\item Save the session with name \verb|rforge|.
+\item In TortoiseSVN, check out the source using the address
+  \verb|svn+ssh://rforge/svnroot/rsiena| to check your session address is
+  correct. You will have to type the password twice.
+\item Make the key:
+\begin{enumerate}
+\item Run \sfn{puttygen.exe}.
+\item You want \sfn{SSH-2 RSA}.
+\item Click \sfn{Generate}
+\item Move mouse over the blank area until the key has been generated.
+\item Save Private Key
+\end{enumerate}
+\item Login to R-forge
+\item Go to Account Maintenance/Edit Keys
+\item Copy the public key from the puttygen window and paste into the R-forge
+  window.
+\item Click Update
+\item Open your putty window, load the r-forge session and find the SSH/Auth
+  page.
+\item Put the name (complete path) of your private key file in the box provided.
+\item Defaults for other fields should be OK. (On mine the two boxes  `Attempt
+  authentication via Pageant' and `Attempt keyboard-interactive auth (SSH-2)'
+  are checked.)
+\item Go back to the session screen (you need to scroll up the left panel!) and
+  save the session again.
+\item An hour later, try it out by doing another secure checkout. You should not
+  be asked for your password this time.
+\end{enumerate}
+
 \section{Parallel runs}
+Most of RSiena is set up to produce the same results as Siena3, but some effects
+have been redefined and maximum likelihood uses a different algorithm.
 \begin{enumerate}
 \item In Siena3324xx source file \textsf{rangen.pas}, edit the lines at the
   bottom so that \textsf{version = 5} and \textsf{version2 = 6}.
@@ -395,12 +553,15 @@ more gprof.out
 \item Google for ``gprof'' to find out how to understand the output!
 \end{enumerate}
 
-There are alternatives on linux (\textsf{oprofile}) or Mac OS (\textsf{shark}).
+There are alternatives on linux (\textsf{oprofile}) or Mac OS (\textsf{shark},
+or
+\textsf{Instruments/TimeProfiler}).
 A few notes about each:
 \begin{description}
 \item[oprofile]
 \begin{enumerate}
-\item You need root privileges to start or stop the daemon, and to reset it.
+\item When I last tried, you needed root privileges to start or stop the daemon,
+  and to reset it.
 \item It is a resource hog.
 \item The callgraph option only used to work on 32 bit machines.
 \item Failed to work on Fedora 10 as installed in the statistics department, but
@@ -419,17 +580,26 @@ A few notes about each:
 \item Make sure shark is installed
 \item Start it
 \item Run your R command
+\item Attach shark to this command.
 \item During the run, click Start and then Stop  on the Shark window
 \item If you have the right settings a callgraph will appear in Shark.
 \item I found that saving the results usually failed to work.
-\item This route is the only one I found which would include C functions like
-  exp in the profiling, although it is possible you may find a profiled gcc
-  math library available for a Linux installation.
+\item This route and TimeProfiler are the only ones I found which would include
+  C functions like exp in the profiling, although it is possible you may find a
+  profiled gcc math library available for a Linux installation.
+\end{enumerate}
+\item[TimeProfiler]
+\begin{enumerate}
+\item Start Instruments and select TimeProfiler
+\item Use ChooseTarget to attach to the R process
+\item Click Record and later Stop
+\item You should be able to get a callgraph.
 \end{enumerate}
 \end{description}
 
 In any of these cases, you may find results vary due to garbage
-collection in R.
+collection in R. Also changes which spped up the Mac may not speed up Windows,
+particularly changing memory allocation.
 \section{Debugging C++}
 You may find that R tends to crash when you change the C++. You can try to trap
 the error using \sfn{Rprintf} statements to print out details at intervals. The
@@ -439,6 +609,14 @@ need the header file \sfn{"R\_ext/Print.h"} which may already be
 included in any file I have debugged! To print out R objects (arguments or
 objects you have created in the C++), use
 \sfn{PrintValue(SEXP xx)}: this requires the header file \sfn{Rinternals.h}.
+
+For debugging chains there are utility functions \textsf{getChainDF} and similar
+which create a data frame from a ministep or a chain. Within C++, you can use
+\textsf{PrintValue(getChainDF(...));} to produce a readable output of the
+chain. There is an option to sort if you want to check how many of a particular
+link occur. For initial and end states there is a more sophosticated version
+which adds these as attributes and a corresponding R print method to display
+them. As always, you can use sink() to get console output to a file.
 
 If you have access to a Linux machine, you can use a program called
 \sfn{valgrind} to find places where you access memory which you should not, and
@@ -457,8 +635,9 @@ If \sfn{valgrind} reports use of uninitialised variables, use the option
 \sfn{--track-origins=yes} to find out where the problem started. It can be
 surprisingly difficult to track these down!
 \section{The R C++ interface}
-This is not easy to understand from the documentation, but there should be
-examples of most functions in the code already. Some notes:
+This is not easy to understand from the documentation (Writing R Extensions
+manual), but there should be examples of most functions in the code
+already. Some notes:
 \begin{description}
 \item[random numbers]
 We use the R random number functions such as \sfn{rexp}. These work slightly

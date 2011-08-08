@@ -21,6 +21,7 @@
 #include "network/OneModeNetwork.h"
 #include "network/IncidentTieIterator.h"
 #include "data/NetworkLongitudinalData.h"
+#include "data/ConstantDyadicCovariate.h"
 #include "data/OneModeNetworkLongitudinalData.h"
 #include "model/EpochSimulation.h"
 #include "model/SimulationActorSet.h"
@@ -527,7 +528,10 @@ void NetworkVariable::makeChange(int actor)
 			m = this->m() + 1;
 		}
 
-		alter = nextIntWithProbabilities(m, this->lprobabilities);
+		//	int alteri = nextIntWithProbabilities(this->lalterSet.size(),
+		//	this->lprobabilities);
+		//alter = this->lalterSet[alteri];
+			alter = nextIntWithProbabilities(m,	this->lprobabilities);
 
 		// Siena 3 checks in the diagonal case, so I do too temporarily.
 		//if (alter != actor && !this->lpNetworkCache->outTieExists(alter) &&
@@ -695,6 +699,20 @@ void NetworkVariable::calculatePermissibleChanges()
 
 	for (int i = 0; i < m; i++)
 	{
+//	bool needEgo = true;
+// 	for (map<int, double>::const_iterator iter =
+// 			 this->lsetting.begin();
+// 		 iter != this->lsetting.end();
+// 		 iter++)
+// 	{
+// 		int i = iter->first;
+// 		if (needEgo && i > this->lego )
+// 		{
+// 			this->lalterSet.push_back(this->lego);
+// 			this->lpermitted[this->lego] = true;
+// 			needEgo = false;
+// 		}
+// 		this->lalterSet.push_back(i);
 		if (this->lpNetworkCache->outTieExists(i))
 		{
 			this->lpermitted[i] = !pData->upOnly(this->period());
@@ -713,6 +731,12 @@ void NetworkVariable::calculatePermissibleChanges()
 			this->lpermitted[i] = true;
 		}
 	}
+// 	if (needEgo )
+// 	{
+// 		this->lalterSet.push_back(this->lego);
+// 		this->lpermitted[this->lego] = true;
+// 		needEgo = false;
+// 	}
 
 	// Prohibit the change of structural ties
 
@@ -737,6 +761,7 @@ void NetworkVariable::calculatePermissibleChanges()
 	// {
 	// 	Rprintf("permitted %d %d\n", i, this->lpermitted[i]);
 	// }
+
 }
 
 
@@ -764,9 +789,13 @@ void NetworkVariable::calculateTieFlipContributions()
 	int m = this->m();
 
 	for (int alter = 0; alter < m; alter++)
+//	for (unsigned alteri = 0; alteri < this->lalterSet.size(); alteri++)
 	{
 		// alter = ego for one-mode networks means no change.
 		// No change, no contribution.
+		//if (this->lalterSet.size() < m)
+		//{
+		//	int alter = this->lalterSet[alteri];
 
 		if (this->lpermitted[alter] &&
 			(twoModeNetwork || alter != this->lego))
@@ -894,8 +923,23 @@ void NetworkVariable::calculateTieFlipContributions()
  */
 void NetworkVariable::calculateTieFlipProbabilities()
 {
+//	ConstantDyadicCovariate * pCov =
+//		this->pSimulation()->pData()->rConstantDyadicCovariates()[0];
+//	this->liter = pCov->pRowValues(this->lego).begin();
+//	this->lsetting = pCov->rRowValues(this->lego);
+//	this->lalterSet.clear();
 	this->preprocessEgo(this->lego);
 	this->calculatePermissibleChanges();
+//	int m = this->m();
+//	int fastAlter = this->lego;
+//	while(fastAlter == this->lego && this->lpermitted[fastAlter])
+//	{
+//		fastAlter = nextInt(m);
+//	}
+
+//	this->lalterSet.push_back(min(this->lego, fastAlter));
+//	this->lalterSet.push_back(max(this->lego, fastAlter));
+
 	this->calculateTieFlipContributions();
 
 	int evaluationEffectCount = this->pEvaluationFunction()->rEffects().size();
@@ -904,9 +948,15 @@ void NetworkVariable::calculateTieFlipProbabilities()
 
 	double total = 0;
 	int m = this->m();
+//	Rprintf("%d\n", this->lego);
 
 	for (int alter = 0; alter < m; alter++)
 	{
+//	for (unsigned alteri = 0; alteri < this->lalterSet.size(); alteri++)
+//	{
+//			if (this->lalterSet.size() < m)
+//	{
+//		int alter = this->lalterSet[alteri];
 		if (this->lpermitted[alter])
 		{
 			// Calculate the total contribution of all effects
@@ -918,7 +968,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 				Effect * pEffect = this->pEvaluationFunction()->rEffects()[i];
 				contribution +=
 					pEffect->parameter() *
-						this->levaluationEffectContribution[alter][i];
+					this->levaluationEffectContribution[alter][i];
 			}
 
 			if (this->lpNetworkCache->outTieExists(alter))
@@ -929,7 +979,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 						this->pEndowmentFunction()->rEffects()[i];
 					contribution +=
 						pEffect->parameter() *
-							this->lendowmentEffectContribution[alter][i];
+						this->lendowmentEffectContribution[alter][i];
 				}
 			}
 			else
@@ -940,12 +990,13 @@ void NetworkVariable::calculateTieFlipProbabilities()
 						this->pCreationFunction()->rEffects()[i];
 					contribution +=
 						pEffect->parameter() *
-							this->lcreationEffectContribution[alter][i];
+						this->lcreationEffectContribution[alter][i];
 				}
 			}
 
 			// The selection probability is the exponential of the total
 			// contribution.
+			//	this->lprobabilities[alteri] = exp(contribution);
 
 			this->lprobabilities[alter] = exp(contribution);
 		}
@@ -956,18 +1007,26 @@ void NetworkVariable::calculateTieFlipProbabilities()
 
 		total += this->lprobabilities[alter];
 	}
+//	}
 	if (!this->oneModeNetwork())
 	{
 		total += 1;
 		this->lprobabilities[m] = 1;
 		m++;
 	}
+//	m = this->lalterSet.size();
+//	if (!this->oneModeNetwork())
+//	{
+//		total += 1;
+//		this->lprobabilities[this->lalterSet.size()] = 1;
+//		m++;
+//	}
 
 	// Normalize
 
 	if (total != 0)
 	{
-		for (int alter = 0; alter < m; alter++)
+	   	for (int alter = 0; alter < m; alter++)
 		{
 			this->lprobabilities[alter] /= total;
 		}
@@ -982,24 +1041,29 @@ void NetworkVariable::calculateTieFlipProbabilities()
 void NetworkVariable::accumulateScores(int alter) const
 {
 
-	int m = this->m();
-
+ int m = this->m();
 	for (unsigned i = 0;
-		i < this->pEvaluationFunction()->rEffects().size();
-		i++)
+		 i < this->pEvaluationFunction()->rEffects().size();
+		 i++)
 	{
 		Effect * pEffect = this->pEvaluationFunction()->rEffects()[i];
 		double score = this->levaluationEffectContribution[alter][i];
 
 		for (int j = 0; j < m; j++)
+		//	for (unsigned alteri = 0; alteri < this->lalterSet.size(); alteri++)
 		{
+			//	if (this->lalterSet.size() < m)
+			//{
+			//int j = this->lalterSet[alteri];
 			if (this->lpermitted[j])
 			{
 				score -=
 					this->levaluationEffectContribution[j][i] *
+					//				this->lprobabilities[alteri];
 					this->lprobabilities[j];
 			}
 		}
+		//	}
 		this->pSimulation()->score(pEffect->pEffectInfo(),
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 	}
@@ -1026,14 +1090,13 @@ void NetworkVariable::accumulateScores(int alter) const
 					this->lprobabilities[j];
 			}
 		}
-
 		this->pSimulation()->score(pEffect->pEffectInfo(),
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 	}
 
 	for (unsigned i = 0;
-		i < this->pCreationFunction()->rEffects().size();
-		i++)
+		 i < this->pCreationFunction()->rEffects().size();
+		 i++)
 	{
 		Effect * pEffect = this->pCreationFunction()->rEffects()[i];
 
@@ -1051,10 +1114,9 @@ void NetworkVariable::accumulateScores(int alter) const
 			{
 				score -=
 					this->lcreationEffectContribution[j][i] *
-						this->lprobabilities[j];
+					this->lprobabilities[j];
 			}
 		}
-
 		this->pSimulation()->score(pEffect->pEffectInfo(),
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 	}
