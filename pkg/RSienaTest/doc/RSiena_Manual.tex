@@ -950,7 +950,7 @@ are \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
 A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
 and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
 
-More specific references are \citet{Schweinberger10} for the score-type goodness
+More specific references are \citet{Schweinberger11} for the score-type goodness
 of fit tests and \citet{SchweinbergerSnijders07a} for the calculation of
 standard errors of the Method of Moments estimators. For assessing and
 correcting time heterogeneity, and associated model selection considerations,
@@ -2607,59 +2607,73 @@ coefficients are zero (see Section~\ref{S_test}).
 
 \fi
 
-\iffalse
-\subsubsection{Model Type: non-directed networks}
+\subsection{Model Type: non-directed networks}
 \label{S_modeltype_nd}
 
 Non-directed networks are an undocumented option (there currently
-only is the presentation \citet{Snijders07}, and therefore
-mentioned here reluctantly for those users who want to use
-this option anyway.
+only is the presentation \citet{Snijders07}.
 
-\SI detects automatically when the networks all are non-directed, and then employs a model for this
-special case. For non-directed networks, the Model Type has seven possible values,
+\SI detects automatically when the networks all are non-directed,
+and then employs a model for this special case.
+For non-directed networks, the Model Type has five possible values,
 as described in \citet{Snijders07}.
+This is specified by the parameter \sfn{modelType} in function
+\sfn{sienaModelCreate}.
+Value \texttt{modelType = 1} is for directed networks, values
+\texttt{2-6} for non-directed networks.
+
+% Model.h gives the order of the model types:
+% 0-6 = { NOTUSED, NORMAL, AFORCE, AAGREE, BFORCE, BAGREE, BJOINT };
+% See Siena_algorithms4;
+% A = unilateral, B = two-sided initiative
+% help file: modelType Type of model to be fitted:
+% 1=directed, 2:6 for symmetric networks: 2=forcing, 3=Initiative model,
+% 4=Pairwise forcing model, 5=Pairwise mutual model, 6=Pairwise joint model
 
 \begin{enumerate}
-\item Forcing model: \\
+\item Forcing model, \texttt{modelType = 2}: \\ % AFORCE
       one actor takes the initiative and unilaterally
       imposes that a tie is created or dissolved.
-\item Unilateral initiative and reciprocal confirmation:\\
+\item Unilateral initiative and reciprocal confirmation,
+      \texttt{modelType = 3}:\\ % AAGREE
       one actor takes the initiative and proposes a new tie
       or dissolves an existing tie; if the actor proposes a new tie, the other
       has to confirm, otherwise the tie is not created;
       for dissolution, confirmation is not required.
+\iffalse
 \item Tie-based model:\\
       a random pair of actors is chosen (actor-specific rate functions
       are not used here),
       and the average change in objective function (\ref{u_net})
       for toggling $(i,j)$ and $(j,i)$
       is the log-odds of the probability of changing the tie variable.
-\item Pairwise conjunctive model:\\
-      a pair of actors is chosen and reconsider
-      whether a tie will exist between them;
-      the tie will exist if both agree,
-      it will not exist if at least one does not choose for it.
-\item Pairwise disjunctive (forcing) model:\\
+\fi
+\item Pairwise disjunctive (forcing) model, \texttt{modelType = 4}:\\ %BFORCE
       a pair of actors is chosen and reconsider
       whether a tie will exist between them;
       the tie will exist if at least one of them chooses for the tie,
       it will not exist if both do not want it.
-\item Pairwise compensatory (additive) model:\\
+\item Pairwise conjunctive model, \texttt{modelType = 5}:\\  % BAGREE
+      a pair of actors is chosen and reconsider
+      whether a tie will exist between them;
+      the tie will exist if both agree,
+      it will not exist if at least one does not choose for it.
+\item Pairwise compensatory (additive) model,
+      \texttt{modelType = 6}:\\ %BJOINT
       a pair of actors is chosen and reconsider
       whether a tie will exist between them;
       this is based on the sum of their utilities
       for the existence of this tie.
 \end{enumerate}
-In Models 1-2, where the initiative is one-sided,
+In the first two of these models, where the initiative is one-sided,
 the rate function is comparable to the rate function in directed models.
-In Models 4-6, however, the pair of actors is chosen at a rate
+In the last three models, however, the pair of actors is chosen at a rate
 which is the \emph{product} of the rate functions
 $\lambda_i$ and $\lambda_j$ for the two actors.
 This means that opportunities for change of the single tie variable $x_{ij}$
 occur at the rate $\lambda_i \times \lambda_j$.
-The numerical interpretation is different from that in Models 1-2.
-\fi
+The numerical interpretation is different from that in the first two models.
+
 \hypertarget{T_int_eff}{
 \subsection{Additional interaction effects}
 }
@@ -3849,7 +3863,17 @@ results1 <- siena07(model1, data = mydate, effects = myeff,
       what is given as the
       \textsf{prevAns} parameter. This must be a
       \textsf{sienaFit} object; in this example it is given as
-      \texttt{results0}.
+      \texttt{results0}.\\
+      If the specification of the effects object used to obtain
+      \texttt{results0} was the same as \texttt{myeff}, then also the initial
+      values are copied, and Phase 1 of the algorithm is skipped,
+      because information for the sensitivity of the statistics with
+      respect to the parameters is taken from the results of Phase 3
+      of \texttt{results0}.\\
+      If the specification of the effects object used to obtain
+      \texttt{results0} was not the same as \texttt{myeff}, then for those
+      parameters that do match, the initial values are copied
+      from \texttt{results0}.
 \end{enumerate}
 
 When parameters have been estimated, first the
@@ -4724,11 +4748,9 @@ that the network dynamics depends on sex.
 
 A generalized Neyman-Rao score test
 is implemented for the MoM estimation method
-in \SI \citep[see][]{Schweinberger10}.
-\iffalse
+in \SI \citep[see][]{Schweinberger11}.
 For the ML estimation method,
 following the same steps produces the \citet{Rao47} efficient score test.
-\fi
 
 Most goodness-of-fit tests will have the following form: some model
 is specified and one or more parameters are restricted to some
@@ -6097,6 +6119,9 @@ Model Type 2.
 \fi
 For non-directed networks, the same formulae are used,
 unless a different formula is given explicitly.
+Some of the effects are dropped for non-directed networks, because
+they are not meaningful; and some of the names differ in the
+non-directed case.
 \medskip
 
 \noindent
@@ -7868,7 +7893,7 @@ which leads to the following table.
 \begin{center}
 %\begin{tabular}{l| r@{.}l  r@{.}l  r@{.}l  r@{.}l }
 \begin{tabular}{l r@{.}l  r@{.}l  r@{.}l  r@{.}l }
-$ z_i \ \  \backslash  \ \ z_j $   &  \mcc{2}{ 1}
+$ v_i \ \  \backslash  \ \ v_j $   &  \mcc{2}{ 1}
               & \mcc{2}{ 2} & \mcc{2}{ 3} &  \mcc{2}{ 4}
 \separationb
  1        &    0&16    &  --0&19    &  --0&54    &  --0&89   \\
@@ -8074,6 +8099,10 @@ from the output tables and the formulae for the effects
 we can construct tables indicating how attractive
 various different values of the behavior are,
 depending on the behavior of the actor's friends.
+Again, the functions used to define the effects can be found
+in Section~\ref{S_f}, and it must not be forgotten that all variables
+are internally centered in \rs, and the subtracted means are reported
+in the initial output produced by \sfn{print01Report}.
 
 In the first model, the estimated coefficients in the
 behavior evaluation function are as follows.
@@ -8161,18 +8190,18 @@ This can be calculated by \R  as follows.
 \begin{footnotesize}
 \begin{verbatim}
 # Define part of evaluation function
-obj_b <- function(vi, vj){
-         b1*(vi-v_av) + b2*(vi-v_av)^2 + b3*(1 - abs(vi-vj)/ran_v - sim_av)
+obj_b <- function(zi, zj){
+         b1*(zi-z_av) + b2*(zi-z_av)^2 + b3*(1 - abs(zi-zj)/ran_v - sim_av)
                          }
 # Fill in the values of the parameter estimates and the averages.
-v_av   <-  3.113
+z_av   <-  3.113
 sim_av <-  0.6983
 b1     <-  0.3618
 b2     <- -0.06
 b3     <-  3.9689
-vv     <-  c(1, 2, 3, 4, 5)
-# The table is transposed: vi in the columns!
-t(outer(vv, vv, obj_b))
+zz     <-  c(1, 2, 3, 4, 5)
+# The table is transposed: zi in the columns!
+t(outer(zz, zz, obj_b))
 \end{verbatim}
 \end{footnotesize}
 
@@ -8297,6 +8326,13 @@ This will lead to a directory structure where at some place
 there is a directory called \texttt{RSiena} and/or a directory
 called \texttt{RSienaTest}, which includes the source code
 of the package.
+
+In the file structure for \texttt{RSienaTest} there is a directory
+\texttt{doc} which contains a lot of programmers' documentation.
+These are in the form of \LaTeX \ files, which can be compiled
+to produce .pdf files.
+The first one to look at is \texttt{RSienaDeveloper.tex}.
+This will guide you to the further documentation.
 
 \section{Other tools you need}
 \begin{description}
