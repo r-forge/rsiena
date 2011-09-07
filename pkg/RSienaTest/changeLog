@@ -1,7 +1,25 @@
+2011-09-07 R-forge revision 171
+
+	* R/globals.r, R/siena08.r, man/siena08.Rd: fix bugs in siena08 which was
+	using out of date effects object which included unselected underlying
+	effects from interactions, and report would not print if it had
+	previously been displayed. New parameter to control maximum numnber of
+	iterations.
+	* R/printInitialDescription.r: fix bug in description of more than two
+	groups.
+	* R/initializeFRAN.r: (RSienaTest only) add some validation to
+	updateTheta.
+	* R/globals.r: (To Rsiena also now) allow format of printed matrices to
+	be controlled by an environment variable. Designed for use in testing as
+	there are rounding incompatibilities between platforms.
+	* man/simstats0c.Rd: (RSiena only) updated page.
+	* R/sienaprint.r, R/printDataReport.r, R/print07report.r, R/robmon.r,
+	R/siena07Gui.r: (RSiena only) as for revision 168 in RSienatest.
+
 2011-08-22 R-forge revision 170
 
 	* doc/RSiena_manual.tex: changes mainly for non-directed models
-   * doc/RSiena.bib: small updates.
+	* doc/RSiena.bib: small updates.
 
 2011-08-09 R-forge revision 169 RSienaTest only
 

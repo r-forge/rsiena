@@ -11,6 +11,13 @@
 ##@DataReport siena07 Print report
 DataReport <- function(z, x, f)
 {
+	if (z$maxlike)
+	{
+		Report(c(z$nrunMH,
+				 "MCMC steps per RM step (multiplication factor =",
+				 x$mult), outf)
+		Report(")\n", outf)
+	}
     ## f could be a group, but has attributes like a group even if not!
     oneMode <- attr(f, "types") == "oneMode"
     bipartite <- attr(f, "types") == "bipartite"
@@ -88,7 +95,7 @@ DataReport <- function(z, x, f)
                       width = 4), '.\n'),sep='',  outf)
         }
     }
-    else
+    else if (!z$maxlike)
     {
         Report("unconditional moment estimation.\n", outf)
 
@@ -107,6 +114,10 @@ DataReport <- function(z, x, f)
         }
         Report('is 1.0.\n', outf)
     }
+	else
+	{
+		Report("Maximum likelihood estimation\n", outf)
+	}
     if (z$FinDiff.method)
     {
         Report(c('Standard errors are estimated with the finite difference',

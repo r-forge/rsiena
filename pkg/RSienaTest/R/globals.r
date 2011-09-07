@@ -33,6 +33,7 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
             type <- match.arg(type)
             beverbose <<- verbose
             besilent <<- silent
+			noReportFile <<- FALSE
             if (type =='w')
             {
                 x$outf <<- file(paste(projname, ".out", sep=""), open="w")
