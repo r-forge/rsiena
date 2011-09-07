@@ -9290,6 +9290,15 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2011-09-07 R-forge revision 171
+\begin{itemize}
+\item Fix bug in siena08: crashed if underlying effects for interaction were not
+  selected. (Or possibly with time dummies!).
+\item Fix bug where print from siena08 was not produced if a previous display to
+  the screen had occurred.
+\item New parameter in siena08 to control number of iterations.
+\item RSienaTest only: added validation to updateTheta
+\end{itemize}
 \item 2011-08-08 RSienaTest only R-forge revision 168/9
 \begin{itemize}
 \item More work on maximum likelihood.

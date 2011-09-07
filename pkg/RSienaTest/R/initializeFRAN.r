@@ -1838,31 +1838,36 @@ fixUpEffectNames <- function(effects)
 ##@updateTheta siena07 Copy theta values from previous fit
 updateTheta <- function(effects, prevAns)
 {
-	if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
+	if (!inherits(effects, "data.frame"))
 	{
-		prevEffects <- prevAns$requestedEffects
-		prevEffects$initialValue <- prevAns$theta
-		if (prevAns$cconditional)
-		{
-			condEffects <- attr(prevAns$f, "condEffects")
-			condEffects$initialValue <- prevAns$rate
-			prevEffects <- rbind(prevEffects, condEffects)
-		}
-		oldlist <- apply(prevEffects, 1, function(x)
-						 paste(x[c("name", "shortName",
-								   "type", "groupName",
-								   "interaction1", "interaction2",
-								   "period")],
-							   collapse="|"))
-		efflist <- apply(effects, 1, function(x)
-						 paste(x[c("name", "shortName",
-								   "type", "groupName",
-								   "interaction1", "interaction2",
-								   "period")],
-							   collapse="|"))
-		use <- efflist %in% oldlist
-		effects$initialValue[use] <-
-			prevEffects$initialValue[match(efflist, oldlist)][use]
+		stop("effects is not a data.frame")
 	}
+	if (!inherits(prevAns, "sienaFit"))
+	{
+		stop("prevAns is not an RSiena fit object")
+	}
+	prevEffects <- prevAns$requestedEffects
+	prevEffects$initialValue <- prevAns$theta
+	if (prevAns$cconditional)
+	{
+		condEffects <- attr(prevAns$f, "condEffects")
+		condEffects$initialValue <- prevAns$rate
+		prevEffects <- rbind(prevEffects, condEffects)
+	}
+	oldlist <- apply(prevEffects, 1, function(x)
+					 paste(x[c("name", "shortName",
+							   "type", "groupName",
+							   "interaction1", "interaction2",
+							   "period")],
+						   collapse="|"))
+	efflist <- apply(effects, 1, function(x)
+					 paste(x[c("name", "shortName",
+							   "type", "groupName",
+							   "interaction1", "interaction2",
+							   "period")],
+						   collapse="|"))
+	use <- efflist %in% oldlist
+	effects$initialValue[use] <-
+		prevEffects$initialValue[match(efflist, oldlist)][use]
 	effects
 }

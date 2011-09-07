@@ -3,7 +3,7 @@
 \title{A version of FRAN}
 \description{
  The function to be called as 'FRAN' by \code{\link{siena07}}
- in case of estimation by Method of Moments. Calls compiled C++.
+ when using estimation by Method of Moments. Calls compiled C++.
 }
 \usage{
 simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
@@ -19,7 +19,7 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
   \item{initC}{If TRUE, call is to setup the data and model in C++. For
 	use with multiple processes only.}
   \item{data}{A sienaData object as returned by \code{\link{sienaDataCreate}}.}
-  \item{effects}{List of sienaEffects objects as
+  \item{effects}{A sienaEffects object as
 	returned by \code{\link{getEffects}}.}
   \item{fromFiniteDiff}{Boolean used during calculation of derivatives
 	by finite differences. Not for user use.}
@@ -42,7 +42,8 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
   \item{returnChains}{Boolean. Whether to return the chains.}
 }
 \details{
-  This should be used for the element FRAN of the model object in case of
+  The name of this function should be used for the element FRAN of the
+  model object when using
   estimation by Method of Moments.
   The arguments with no defaults must be passed in on the call to
   \code{\link{siena07}}.
@@ -72,10 +73,9 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
 
 mynet1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
-myeff<- getEffects(mydata)
-myeff[myeff$effectName=='transitive triplets'&
-            myeff$type=='eval','include']<- TRUE
-mymodel<- sienaModelCreate(fn = simstats0c, nsub=2, n3=100)
-ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE)
+myeff <- getEffects(mydata)
+myeff <- includeEffects(myeff, transTrip)
+mymodel <- sienaModelCreate(nsub=2, n3=100)
+ans <- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE)
 }
 \keyword{models}
