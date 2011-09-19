@@ -35,6 +35,7 @@
 #include "model/variables/NetworkVariable.h"
 #include "model/variables/BehaviorVariable.h"
 #include "model/tables/Cache.h"
+#include "network/IncidentTieIterator.h"
 
 namespace siena
 {
@@ -959,7 +960,7 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 				}
 				//}
 		}
-		else
+		else if (rateType == "structural")
 		{
 			// We expect a structural (network-dependent) rate effect here.
 
@@ -1001,6 +1002,48 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 				{
 					throw domain_error("Unexpected rate effect " + effectName);
 				}
+			}
+
+			this->lstatistics[pInfo] = statistic;
+			delete pStructural;
+		}
+		else if (rateType == "diffusion")
+		{
+			NetworkLongitudinalData *pNetworkData = this->lpData->
+				pNetworkData(interactionName);
+			Network * pStructural =
+				pNetworkData->pNetwork(this->lperiod)->clone();
+			this->subtractNetwork(pStructural,
+				pNetworkData->pMissingTieNetwork(this->lperiod));
+
+			double statistic = 0;
+			for (int i = 0; i < pBehaviorData->n(); i++)
+			{
+				if (effectName == "avExposure")
+				{
+				  double totalAlterValue = 0;
+				  double averageAlterValue = 0;
+				  if (pStructural->outDegree(i)>0)
+				    {
+				      for (IncidentTieIterator iter = pStructural->outTies(i);
+					   iter.valid();
+					   iter.next())
+					{
+					  double alterValue = pBehaviorData->
+					    value(this->lperiod,iter.actor());
+					  totalAlterValue += alterValue;
+					}
+				      averageAlterValue = totalAlterValue / 
+					pStructural->outDegree(i);
+				    }
+
+				  statistic += averageAlterValue *
+				    difference[i];
+				}
+				else
+				  {
+				    throw domain_error("Unexpected rate effect " + effectName);
+				  }
 			}
 
 			this->lstatistics[pInfo] = statistic;
