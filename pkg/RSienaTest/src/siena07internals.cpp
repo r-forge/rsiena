@@ -1430,6 +1430,47 @@ void getStatistics(SEXP EFFECTSLIST,
 						score = 0;
 					}
 				}
+				else if (strcmp(rateType, "diffusion") == 0)
+				{
+					EffectInfo * pEffectInfo = (EffectInfo *)
+						R_ExternalPtrAddr(
+							VECTOR_ELT(VECTOR_ELT(EFFECTS,
+									pointerCol), i));
+					statistic = pCalculator->statistic(pEffectInfo);
+					if (pEpochSimulation)
+					{
+						const DependentVariable * pVariable =
+							pEpochSimulation->pVariable(networkName);
+						const NetworkVariable * pNetworkVariable;
+						if (strcmp(interaction1, "") == 0)
+						{
+							pNetworkVariable =
+								(const NetworkVariable *)
+								pEpochSimulation->pVariable(networkName);
+						}
+						else
+						{
+							pNetworkVariable =
+								(const NetworkVariable *)
+								pEpochSimulation->pVariable(interaction1);
+						}
+						if (strcmp(effectName, "avExposure") == 0)
+						{
+							score =
+								pVariable->averageExposureScore(pNetworkVariable);
+						}
+						else
+						{
+
+							error("Unexpected rate effect %s\n",
+								effectName);
+						}
+					}
+					else
+					{
+						score = 0;
+					}
+				}
 				else
 				{
 					EffectInfo * pEffectInfo = (EffectInfo *)

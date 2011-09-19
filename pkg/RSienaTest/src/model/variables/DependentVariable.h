@@ -41,6 +41,7 @@ class NetworkLongitudinalData;
 class Network;
 class EffectInfo;
 class StructuralRateEffect;
+class DiffusionRateEffect;
 class MiniStep;
 
 
@@ -118,6 +119,10 @@ public:
 	double reciprocalDegreeScore(const NetworkVariable * pNetwork) const;
 	double inverseOutDegreeScore(const NetworkVariable * pNetwork) const;
 
+	// Diffusion effects
+	
+	double averageExposureScore(const NetworkVariable * pNetwork) const;
+
 	// Maximum likelihood related
 
 	/**
@@ -174,6 +179,7 @@ private:
 	bool constantRates() const;
 	double calculateRate(int i);
 	double structuralRate(int i) const;
+	double diffusionRate(int i) const;
 	double behaviorVariableRate(int i) const;
 	void updateCovariateRates();
 	void calculateScoreSumTerms();
@@ -213,6 +219,10 @@ private:
 	// reciprocal degree, and inverse out-degree effects.
 
 	vector<StructuralRateEffect *> lstructuralRateEffects;
+
+	// The diffusion rate effects.
+
+	vector<DiffusionRateEffect *> ldiffusionRateEffects;
 
 	// The evaluation function for this variable
 	Function * lpEvaluationFunction;
@@ -256,6 +266,9 @@ private:
 	// Scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeScores;
 
+	// Scores for rate effects depending on average exposure
+	map<const NetworkVariable *, double> laverageExposureScores;
+
 	// Sum term for scores for rate effects depending on constant covariates
 	map<const ConstantCovariate *, double> lconstantCovariateSumTerm;
 
@@ -276,6 +289,9 @@ private:
 
 	// Sum term for scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeSumTerm;
+
+	// Sum term for scores for rate effects depending on average exposure
+	map<const NetworkVariable *, double> laverageExposureSumTerm;
 
 	// Sum term for model B scores for rate effects depending on constant
 	// covariates
