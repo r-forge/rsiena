@@ -1,3 +1,7 @@
+2011-09-29 R-forge revision 173
+	* doc/RSiena_manual.tex: some changes, explanation mainly
+   * doc/RSiena.bib: very small updates.
+
 2011-09-19 R-forge revision 172 RSienaTest only
 
 	* src/model/effects/DiffusionRateEffect.cpp,
