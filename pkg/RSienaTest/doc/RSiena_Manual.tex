@@ -147,7 +147,7 @@
 %\protect\newline \normalsize } }
 \author{\Large Ruth M.\ Ripley\\[1ex]
         \Large Tom A.B.\ Snijders\\[1ex]
-        \Large Paulina Preciado Lopez \\[4ex]
+        \Large Paulina Preciado  \\[4ex]
        {\large University of Oxford: Department of Statistics; Nuffield College}\\[1ex]
     }
 %\date{}
@@ -174,7 +174,7 @@
 Network Analysis}) is a computer program that carries out the
 statistical estimation of models for the evolution of social
 networks according to the dynamic actor-oriented model of \citet{Snijders01,
-Snijders05}, \citet{SnijdersEA07}, and \cite{SnijdersEA10a}.
+Snijders05}, \citet*{SnijdersEA07}, and \citet*{SnijdersEA10a}.
 This is the manual for \rs, which also may be called \SI version 4,
 a contributed package to the statistical system \Rn.
 The manual is based on the earlier manual for \SI version 3,
@@ -935,7 +935,7 @@ more relevant references of the methods implemented in the program.  The
 reference to this manual is the following.  \smallskip
 
 \noindent
-Ripley, Ruth M., Snijders, Tom A.B., and Preciado Lopez, P.
+Ripley, Ruth M., Snijders, Tom A.B., and Preciado, Paulina.
 2011.
 Manual for SIENA version 4.0 (version \today).
 Oxford: University of Oxford, Department of Statistics; Nuffield College.
@@ -1361,7 +1361,7 @@ with covariate matrices are needed.
 % values.
 
 The mean is always subtracted from the covariates.
-See the section on \hyperlink{T_S_centering}{\emph{Centering}}.
+See Section~\ref{S_center} on centering.
 
 \subsection{Individual covariates}
 
@@ -1407,7 +1407,7 @@ It is not a problem if there is an $M$'th column in the file,
 but it will not be read.
 
 The mean is always subtracted from the covariates.
-See the section on \hyperlink{T_S_centering}{\emph{Centering}}.
+See Section~\ref{S_center} on centering.
 
 When an actor covariate is constant within waves, i.e.,
 within each wave it has the same value for all actors;
@@ -1434,25 +1434,35 @@ independent of the observed data.
 
 \subsection{Interactions and dyadic transformations of covariates}
 
-For actor covariates, two kinds of transformations to dyadic covariates
+For actor covariates (also called monadic covariates),
+two kinds of transformations to dyadic covariates
 are made internally in \si. Denote the actor covariate by $v_i$,
 and the two actors in the dyad by $i$ and $j$.
 Suppose that the range of $v_i$ (i.e., the difference between the
 highest and the lowest values) is given by $r_V$.
 The two transformations are the following:
 \begin{enumerate}
-\item \emph{dyadic similarity}, defined by $ 1 - \big( \vert v_i - v_j \vert / r_V \big) $,
+\item \emph{dyadic similarity}, defined by
+      $ 1 - \big( \vert v_i - v_j \vert / r_V \big) $,
       and centered so the the mean of this similarity variable becomes 0;\\
       note that before centering, the similarity variable is 1 if
       the two actors have the same value, and 0 if one has the highest and the
       other the lowest possible value;
+      the mean of the similarity variable is calculated by function
+      \sfn{sienaDataCreate} and stored as the \sfn{simMean} attribute
+      of \texttt{mydata\$cCovars\$myvar}, where \texttt{mydata} is the name
+      of the object created by \sfn{sienaDataCreate}, and \texttt{myvar}
+      is the name of the variable used as the argument for
+      \sfn{sienaDataCreate}, while the name \texttt{cCovars} applies for
+      constant monadic covariates, and is to be replaced by \texttt{vCovars}
+      for changing (varying) monadic covariates;
 \item \emph{same $V$}, defined by 1 if $v_i = v_j$,
       and 0 otherwise (not centered) ($V$ is the name of the variable).
-      This can also be referred to as \emph{dyadic identity} with respect to $V$.
+      This can also be referred to as \emph{dyadic identity}
+      with respect to $V$.
 \end{enumerate}
-Dyadic similarity is relevant for variables that can be treated as interval-level
-variables; dyadic identity is relevant for categorical variables.
-
+Dyadic similarity is relevant for variables that can be treated as
+interval-level variables; dyadic identity is relevant for categorical variables.
 
 In addition, \SI offers the possibility of user-defined two- and three-variable
 interactions between covariates; see Section~\ref{S_int_eff}.
@@ -1624,30 +1634,67 @@ described in Section~\ref{S_datform}.
 
 
 \subsection{Centering}
+\label{S_center}
 
-Individual as well as dyadic covariates are
-\hypertarget{T_S_centering}{centered}
+Individual as well as dyadic covariates are centered
 by the program in the following way.
 
 For individual covariates, the mean value is subtracted
-immediately after reading the variables. For the changing
+by function \sfn{SienaDataCreate}. For the changing
 covariates, this is the global mean (averaged over all periods).
 The values of these subtracted means are reported in the output.
 
 For the dyadic covariates and the similarity variables derived
-from the individual covariates, the grand mean is calculated,
-stored, and subtracted during the program calculations. (Thus,
+from the individual covariates, the grand mean is calculated
+and stored by function \sfn{SienaDataCreate},
+and subtracted during the program calculations. (Thus,
 dyadic covariates are treated internally by the program differently than
 individual covariates in the sense that the mean is subtracted at
 a different moment, but the effect is exactly the same.)
 Unlike the `covariate similarity' effect,
 the `same covariate' effect is not centered but keeps its 0-1 values.
 
+
+These means are stored as attributes on the object created by
+\sfn{SienaDataCreate}.
+If you wish to access them, the following steps can show
+where these means can be found.
+For example, suppose that the command given was
+\begin{verbatim}
+mydata <- sienaDataCreate( friendship, smoke1, alcohol )
+\end{verbatim}
+The structure of this object is obtained by requesting
+\begin{verbatim}
+str(mydata, 1)
+\end{verbatim}
+Looking at the response, you
+will see that this object contains (among other things):
+\begin{enumerate}
+\item the constant actor covariates as \texttt{mydata\$cCovars}
+\item the varying actor covariates as \texttt{mydata\$vCovars}
+\item the constant dyadic covariates as \texttt{mydata\$dycCovars}
+\item the varying dyadic covariates as \texttt{mydata\$dyvCovars}
+\end{enumerate}
+Since \texttt{smoke1} is a constant covariate and \texttt{alcohol}
+a changing covariate, their means can be requested by
+\begin{verbatim}
+attr(mydata$cCovars$smoke1, "mean")
+attr(mydata$vCovars$alocohol, "mean")
+\end{verbatim}
+The mean of the similarity variable is stored as the \sfn{simMean} attribute,
+and is obtained, e.g., by
+\begin{verbatim}
+attr(mydata$cCovars$smoke1, "simMean")
+\end{verbatim}
+
 The formula for balance is a kind of dissimilarity between rows of
 the adjacency matrix. The mean dissimilarity is subtracted in this
-formula and also reported in the output. This mean dissimilarity
-is calculated by a
+formula, having been calculated according to a
 \hyperlink{T_meanbal}{formula given in Section}~\ref{S_math}.
+It is also reported in the output and available -- for the first
+dependent variable -- as \texttt{attr(mydata\$depvars[[1]], "balmean")}.
+Instead of \texttt{[[1]]} you can request a different number or
+the name of the variable.
 
 %The dependent network variable is not centered.
 
@@ -4114,14 +4161,12 @@ Output can be obtained in several ways.
 
 The primary information in the output of the estimation process
 consists of the following three parts.
-\medskip
-
-\noindent{\em 1. Convergence check}\smallskip
+\subsubsection{Convergence check}
 
 This was discussed \hyperlink{T_convergence}{above}.
 \medskip
 
-\noindent{\em 2. Parameter values and standard errors}\smallskip
+\subsubsection{Parameter values and standard errors}
 
 The next crucial part of the output is the list of estimates and
 standard errors. Suppose that the
@@ -4200,9 +4245,8 @@ important that this parameter is included to control for the density
 in the network, but as all other statistics are correlated with the
 density, the density is difficult to interpret by itself.
 
-\medskip
-\newpage
-\noindent{\em 3. Collinearity check}\smallskip
+\subsubsection{Collinearity check}
+\label{S_collinear}
 
 In the output file, the covariance matrix
 of the estimates is presented.
@@ -4395,14 +4439,68 @@ actor-dependent weights (parameters) in the model.
 Examples are provided by \verb@siena_mle("alcohol", 1, 3, 50)@ and\\
 \verb@siena_bayes("alcohol", 1, 3, 50)@.
 
+\fi
+
 \subsection{Other remarks about the estimation algorithm}
 
-\subsubsection{Changing initial parameter values for estimation}
-\label{S_st}
+\subsubsection{Conditional and unconditional estimation}
+\label{S_cond}
 
-When you wish to change initial parameter values for running a new
-estimation procedure, this can be done by `breaking in' into the \SI program.
-\fi
+\SI has two methods for MoM estimation and simulation:
+\hypertarget{T_S_cond}{conditional and unconditional}. They differ
+in the {\em stopping rule} for the simulations of the network
+evolution. In unconditional estimation, the simulations of the
+network evolution in each time period (and the co-evolution of the
+behavioral dimensions, if any are included) carry on until the
+predetermined time length (chosen as 1.0
+for each time period between consecutive observation moments) has elapsed.
+
+In conditional estimation, in each period
+the simulations run on until a stopping
+criterion is reached that is calculated from the observed data.
+Conditioning is possible for each of the dependent variables
+(network, or behavior), where `conditional' means `conditional on
+the observed number of changes on this dependent variable'.
+
+Conditioning on the network variable means running simulations
+until the number of different entries between the initially
+observed network of this period and the simulated network
+\hypertarget{T_distance_stop}{is equal to the number} of entries
+in the adjacency matrix that differ between the initially and the
+finally observed networks of this period.
+
+Conditioning on a behavioral variable means running simulations
+until the sum of absolute score differences on the behavioral
+variable between the initially observed behavior of this period
+and the simulated behavior is equal to the sum of absolute score
+differences between the initially and the finally observed
+behavior of this period.
+
+Conditional estimation is slightly more stable and efficient,
+because the corresponding rate parameters are not estimated by the
+Robbins Monro algorithm, so this method decreases the number of
+parameters estimated by this algorithm.
+% Therefore, it is the
+% default for models that do not include any dependent behavior
+% variables. For models including dependent behavior variables,
+% the default estimation type is unconditional (because in most
+% applications, there will be no straightforward choice for the
+% conditioning variable).
+\medskip
+
+The choice between
+unconditional and the different types of conditional estimation is
+made in the \textsf{sienaModelCreate} function by setting the
+\textsf{cond} parameter.
+For data specifications with multiple dependent variables,
+at most one dependent variable can be used for conditioning.
+This choice is made dependent on the
+\textsf{condvarno} and \textsf{condname} parameters in this function.
+
+If there are changes in network composition (see
+Section~\ref{S_comp}), only the unconditional estimation procedure
+is available.
+
 
 \subsubsection{Fixing parameters}
 \label{S_fixingparameters}
@@ -4466,65 +4564,6 @@ and indeed
 (see Section~\ref{S_model}).
 
 
-\subsubsection{Conditional and unconditional estimation}
-\label{S_cond}
-
-\SI has two methods for MoM estimation and simulation:
-\hypertarget{T_S_cond}{conditional and unconditional}. They differ
-in the {\em stopping rule} for the simulations of the network
-evolution. In unconditional estimation, the simulations of the
-network evolution in each time period (and the co-evolution of the
-behavioral dimensions, if any are included) carry on until the
-predetermined time length (chosen as 1.0
-for each time period between consecutive observation moments) has elapsed.
-
-In conditional estimation, in each period
-the simulations run on until a stopping
-criterion is reached that is calculated from the observed data.
-Conditioning is possible for each of the dependent variables
-(network, or behavior), where `conditional' means `conditional on
-the observed number of changes on this dependent variable'.
-
-Conditioning on the network variable means running simulations
-until the number of different entries between the initially
-observed network of this period and the simulated network
-\hypertarget{T_distance_stop}{is equal to the number} of entries
-in the adjacency matrix that differ between the initially and the
-finally observed networks of this period.
-
-Conditioning on a behavioral variable means running simulations
-until the sum of absolute score differences on the behavioral
-variable between the initially observed behavior of this period
-and the simulated behavior is equal to the sum of absolute score
-differences between the initially and the finally observed
-behavior of this period.
-
-Conditional estimation is slightly more stable and efficient,
-because the corresponding rate parameters are not estimated by the
-Robbins Monro algorithm, so this method decreases the number of
-parameters estimated by this algorithm.
-% Therefore, it is the
-% default for models that do not include any dependent behavior
-% variables. For models including dependent behavior variables,
-% the default estimation type is unconditional (because in most
-% applications, there will be no straightforward choice for the
-% conditioning variable).
-\medskip
-
-The choice between
-unconditional and the different types of conditional estimation is
-made in the \textsf{sienaModelCreate} function by setting the
-\textsf{cond} parameter.
-For data specifications with multiple dependent variables,
-at most one dependent variable can be used for conditioning.
-This choice is made dependent on the
-\textsf{condvarno} and \textsf{condname} parameters in this function.
-
-If there are changes in network composition (see
-Section~\ref{S_comp}), only the unconditional estimation procedure
-is available.
-
-
 \subsubsection{Required changes from conditional to unconditional estimation}
 
 Even though conditional estimation is slightly more efficient than
@@ -4548,7 +4587,8 @@ unconditional estimation.
 }
 \label{S_se}
 
-The estimation of standard errors of the MoM estimates requires the estimation of derivatives,
+The estimation of standard errors of the MoM estimates requires
+the estimation of derivatives,
 which indicate how sensitive the expected values of the statistics
 (see Section~\ref{S_algorithm}) are with respect to the parameters.
 The derivatives can be estimated by two methods:
@@ -4559,16 +4599,67 @@ The derivatives can be estimated by two methods:
 The finite difference method is explained (briefly) in \citet{Snijders01},
 the score function method was developed in \citet{SchweinbergerSnijders07a}
 (where also the finite difference method is explained).
-The score function method demands less computation time than finite differences,
-but requires more iterations in phase 3 of the estimation algorithm,
-explained in Section~\ref{S_algorithm}.
-It is recommended to use at least 1000 iterations (default) in phase 3.  For
+The score function method is preferable, because it is unbiased
+and demands less computation time than finite differences,
+although it requires more iterations in phase 3 of the estimation algorithm
+(see Section~\ref{S_algorithm}).
+It is recommended to use the score function method with
+at least 1000 iterations (default) in phase 3.  For
 published results, it is recommended to have 2000 or 4000 iterations in phase 3.
 
-In \rs, the method for estimating derivatives is set by the \sfn{findiff} parameter
-and the number of iterations in phase 3 by the \sfn{n3} parameter, both in
-function \sfn{sienaModelCreate()} that creates the object with
-specifications for the algorithm
+The method for estimating derivatives is set
+by the \sfn{findiff} parameter and the number of iterations in phase 3
+by the \sfn{n3} parameter, both in function \sfn{sienaModelCreate()}
+that creates the object with specifications for the algorithm.
+
+\subsection{Multicollinearity}
+
+The estimated standard errors are less reliable in
+cases with strong multicollinearity, i.e., high correlations\footnote{More
+precisely, multicollinearity means that the matrix that is inverted
+to give the correlation matrix is ill-conditioned.
+Correlations between parameter estimates
+close to $\pm 1$ are the most usual signs of this.} between
+the parameter estimates. Estimates for these correlations
+are given under the heading
+\texttt{Covariance matrix of estimates (correlations below diagonal)}
+in the output file, and in the \textsf{summary(...)} of the estimation results
+(see Section~\ref{S_collinear}).
+Strong collinearity may in practice lead to large differences
+between the estimated standard errors,
+and also to considerable differences between the parameter estimates,
+when comparing the results produced by different estimation runs.
+The remedy is to reduce the model to a more parsimonious one
+by excluding non-significant effects of which the parameter
+estimates are highly correlated with others.
+
+Provisionally (until further experience has been collected),
+the following may be a reasonable guideline.
+High parameter correlations with the outdegree effect are not a
+reason for worry, but high parameter correlations with other effects are
+a reason for checking the stability of the estimated standard errors. The
+threshold for finding a parameter correlation `too high' in this respect
+can be rather high, such as 0.95, with 0.90 or 0.80 as a secondary threshold.
+In cases of high parameter correlations, estimating the model twice
+(or more) and considering the stability of the standard errors will be
+a good way for seeing whether there are reasons for special caution.
+If the standard errors are stable, then parameter correlations above
+0.90 still can be acceptable -- in particular, when they are obtained
+for parameters that are significantly different from 0 and of which
+estimates as well as standard errors are stable across repeated runs of
+the estimation algorithm.
+
+\subsection{Precision of the finite differences method}
+
+The implementation of the finite differences method is not
+scale-invariant\footnote{The scales are determined by the
+variable \sfn{z\$scale} in function \sfn{robmon}.
+A better procedure would be to set the scale adaptively,
+but the finite differences method is hardly ever used any more,
+having been superseded by the score function method,
+and therefore this improvement has not been effectuated.},
+with the result that the standard errors produced by this method
+are not very reliable if they are of the order of 0.02 or less.
 
 \newpage
 \section{Tests}
@@ -7407,7 +7498,6 @@ The list of these effects is the following.
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h} I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
  + x_{jh}\, + x_{hj}\,)\geq c \}\,$,\\
  where $c$ is either 5 or 6; \\
- \emph{this is currently not correctly implemented in \SI 3 };
 
  \item {\em peripheral effect}, defined by the number of dense triads to which actor $i$ stands
  in a unilateral-peripheral relation,\\
@@ -7417,7 +7507,6 @@ The list of these effects is the following.
  for symmetric networks, the unilateral condition is dropped, and the effect is\\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
  I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$;\\
- \emph{this is currently not correctly implemented in \SI 3 };
 
  \item {\em reciprocated degree effect} \texttt{(recipDeg)}, \\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\,x_{ji} $;
@@ -7720,6 +7809,9 @@ and $x_{ij}=0$  ---  can be calculated from this formula.
 It should be noted that all variables are internally centered by \si,
 and that the mean values used for the centering
 are given near the beginning of the input file.
+More precision can be obtained by requesting the \textsf{"mean"}
+attributes of the covariates, as explained in
+Section~\ref{S_center}.
 This is made explicit in the following by the subtraction
 of the mean $\bar v$. The contribution of variable $V$ to the
 network evaluation function of actor $i$ is given by
@@ -8095,14 +8187,17 @@ as can be shown e.g.\ by score-type tests.
 \subsection{Ego -- alter influence tables}
 
 In quite a similar way as in the preceding section,
-from the output tables and the formulae for the effects
-we can construct tables indicating how attractive
-various different values of the behavior are,
+from the parameter estimates as presented in the
+output tables, combined with the formulae for the effects,
+we can construct tables indicating how attractive are
+various different values of the behavior,
 depending on the behavior of the actor's friends.
-Again, the functions used to define the effects can be found
-in Section~\ref{S_f}, and it must not be forgotten that all variables
+The functions used to define the effects can be found
+in Section~\ref{S_f_b}, and it must not be forgotten that all variables
 are internally centered in \rs, and the subtracted means are reported
-in the initial output produced by \sfn{print01Report}.
+in the initial output produced by \sfn{print01Report},
+but more precision can be obtained by requesting the \textsf{"mean"}
+attributes of the covariates, see Section~\ref{S_center}.
 
 In the first model, the estimated coefficients in the
 behavior evaluation function are as follows.
@@ -8117,7 +8212,7 @@ behavior evaluation function are as follows.
 The dependent behavior variable now is indicated $Z$. (In the preceding
 section the letter $V$ was used, but this referred to any actor variable
 predicting network dynamics,
-whether it was also a dependent variable or not.)
+irrespective of whether it was also a dependent behavior variable.)
 The formulae in Section \ref{S_f_b} show that the evaluation function
 for this model specification is
 \begin{equation}
@@ -8176,14 +8271,15 @@ since the average is the same,
 both actors would be drawn equally strongly toward
 the average value 3.
 
-For model (\ref{eq_f_b1}), consider actors
-in the extreme situation
-that all their friends have the same behavior $z_{ij}$.
+Since the objective function for model (\ref{eq_f_b1}) depends
+not generally on the average behavior of the actor's friends,
+here we present a table only for the special case of actors
+all whose friends have the same behavior $z_{j}$.
 For the parameters given above, the behavior
 evaluation function then reads
 \[
    f^{\rm beh}_i \,=\, 0.3618 \, (z_i - \bar z)
-              \,-\, 0.06 \, (z_i - \bar z)^2 \,+\,
+              \,-\, 0.0600 \, (z_i - \bar z)^2 \,+\,
              3.9689 \,  \big({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}\big) \ .
 \]
 This can be calculated by \R  as follows.
@@ -8228,9 +8324,21 @@ earlier, wrong:
 \hline
 \end{tabular}
 \end{center}
+The interpretation is that each row corresponds to a given common behavior
+of the focal actor's friends; comparing the different values in the row
+shows the relative attractiveness of the different potential values
+of ego's own behavior.
+The maximum in each row is assumed at the diagonal. This means that
+for each value for the common friends' behavior $\bar z_{(i)}$,
+the focal actor prefers to have the same behavior as all these friends.
+The differences in the bottom rows are larger than in the top rows,
+indicating that in the case where the friends who do not drink at all,
+the preference (or social pressure) toward imitating their behavior is
+less strong than in the case where all the friends drink a lot.
 
-For the other model, filling in the estimated parameters
-in (\ref{eq_f_b2}) yields
+For the other model the objective function depends on the behavior of
+the focal actor's friends only as a function of their average behavior.
+Filling in the estimated parameters in (\ref{eq_f_b2}) yields
 \[
    f^{\rm beh}_i \,=\, 0.3820 \, (z_i - \bar z)
                  \,-\, 0.5428 \, (z_i - \bar z)^2 \,+\,
@@ -8271,29 +8379,32 @@ for these parameters the highest values of the
 behavior evaluation function are obtained indeed
 when the focal actor ($i$) behaves just like
 the average of his friends.
-It should be noted that no between-ego comparisons are made,
-so comparisons are meaningful only within rows.
 The values far away from the maximum contrast in this case more
 strongly than in the case of the model with the average similarity
-effect, but these differences here are not significant.
+effect, but neither of these models fits clearly better than the other.
+
+These tables present only the contribution of some of the terms of the
+objective function, and the behavior dynamics will of course
+be compounded if the objective function contains more effects.
 
 Another way to look at the behavior evaluation function is to consider
 the location of its maximum. This function here can be written also as
 \[
-   f^{\rm beh}_i \,=\, \big( 0.382 +
+   f^{\rm beh}_i \,=\, \big( 0.3820 +
                 1.1414( \bar z_{(i)} - \bar z) \big) \, (z_i - \bar z)
        \,-\, 0.5428 \, (z_i - \bar z)^2   \ .
 \]
 Differentiating with respect to $z_i$ shows that
 this function is maximal for
 \[
-   z_i = \bar z \,+\, \frac{0.382 +
+   z_i = \bar z \,+\, \frac{0.3820 +
                1.1414( \bar z_{(i)} - \bar z)}{2 \times  0.5428 }
     \,=\,  0.19 \,+\, 1.05 \,  \bar z_{(i)}  \ ,
 \]
 just a little bit larger than $ \bar z_{(i)}$.
-Indeed in the table we see that, for the rounder integer values 1, 2, 3, 4, 5
-of $ \bar z_{(i)}$, the highest values are obtained exactly
+Indeed in the table we see that, if $ \bar z_{(i)}$
+has integer values 1, 2, 3, 4, or 5,
+the highest values are obtained exactly
 for  $z_i = \bar z_{(i)}$.
 
 
