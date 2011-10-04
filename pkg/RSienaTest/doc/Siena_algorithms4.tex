@@ -3799,14 +3799,14 @@ and \nnm{rRate} = 0.
 If there are several such variables, the order in which these changes are enforced
 does not matter (and is inconsequential).
 
-\iffalse
 \section{Meta-analysis }
 \label{S_meta}
 
 Results from several independent network data sets can be combined
 in a meta-analysis according to the method of
-\citet{SnijdersBaerveldt03}, who applied the method of \citet{Cochran1954}
-(also described by \citet{HedgesOlkin1985}) to this type of analysis.
+\citet{SnijdersBaerveldt03}, who applied the method of \citet{Cochran54}
+(also described by \citet{HedgesOlkin85}) to this type of analysis.
+This section also elaborates some further methods.
 
 Suppose we have $N$ independent network data sets, in which the
 same sets of covariates are used, and that were analyzed
@@ -3833,8 +3833,12 @@ estimating and testing $\mu_\theta$ and $\sigma^2_\theta$.
 What we observe from data set $j$ is not \th{j} but
 the estimate ${\hat{\theta}}_j\,$. This is a random variable
 with mean $\mu_\theta$ and variance $\sigma^2_\theta + s_j^2\,$.
-In the following, an unbiased estimator for $\sigma^2_\theta$ and
-a two-stage estimator for the mean $\mu_\theta$ are given.
+
+\subsection{Preliminary and two-step estimator}
+
+Here we give the unbiased estimator for $\sigma^2_\theta$ and
+a two-stage estimator for the mean $\mu_\theta$ that were presented
+in \citet{SnijdersBaerveldt03}, following \citet{Cochran54}.
 
 A preliminary unbiased estimator for $\mu_\theta$ is given by
 \begin{equation}
@@ -3851,8 +3855,9 @@ Its standard error is
 \end{equation}
 where
 \begin{equation}
-{\bar{s}}^2 =  \frac{1}{N} \sum_j s^2_j\ .
+{\bar{s}}^2 =  \frac{1}{N} \sum_j s^2_j
 \end{equation}
+is the \emph{average error variance}.
 An unbiased estimator for the variance $\sigma^2_\theta$ is
 \begin{equation}
  {\hat{\sigma}}^{2, \mbox{\tiny OLS}}_\theta =
@@ -3860,52 +3865,108 @@ An unbiased estimator for the variance $\sigma^2_\theta$ is
                          {\hat{\mu}}^{\mbox{\tiny OLS}}_\theta \right)^2
                \, - \, {\bar{s}}^2  \ .          \label{sigmahat}
 \end{equation}
-If this yields a negative value, it will be good to truncate it to 0.
+In words, this is the the \emph{observed variance} of the
+estimates minus the \emph{average error variance}.
+If this difference yields a negative value, it will be good to truncate it to 0.
 
 Given that the latter estimator has been calculated, it can be used for an improved
 estimation of $\mu_\theta$, viz., by the weighted least squares
 (WLS) estimator
 \begin{equation}
  {\hat{\mu}}_\theta^{\mbox{\tiny WLS}} =
-       \frac{ \sum_j \left( {\hat{\theta}}_j / ({\hat{\sigma}}^{2, \mbox{\tiny OLS}}_\theta
-                    + s^2_j ) \right) }
-            { \sum_j \left( 1/({\hat{\sigma}}^{2, \mbox{\tiny OLS}}_\theta + s^2_j ) \right)} \ .
+       \frac{ \sum_j \big( {\hat{\theta}}_j / ({\hat{\sigma}}^{2, \mbox{\tiny OLS}}_\theta
+                    + s^2_j ) \big) }
+            { \sum_j \big( 1/({\hat{\sigma}}^{2, \mbox{\tiny OLS}}_\theta + s^2_j ) \big)} \ .
                                                \label{muwls}
 \end{equation}
-This is the 'semi-weighted mean' of Cochran (1954)
-treated also in Hedges and Olkin (1985, Section 9.F).
+This is the `semi-weighted mean' of \citet{Cochran54},
+treated also in \citet{HedgesOlkin85}, Section 9.F.
 Its standard error can be calculated as
 \begin{equation}
- \mbox{s.e.}\left( {\hat{\mu}}_\theta^{\mbox{\tiny WLS}} \right) =
+ \mbox{s.e.}\big( {\hat{\mu}}_\theta^{\mbox{\tiny WLS}} \big) =
      \frac {1}
      {\sqrt{ \sum_j 1/({\hat{\sigma}}^{2, \mbox{\tiny OLS}}_\theta + s^2_j ) } } \ .  \label{se1}
 \end{equation}
 
-It is also possible to continue and iterate the two equations
-\begin{eqnarray*}
- {\hat{\sigma}}^2 &=& \max\left\{
-   \frac{1}{N-1} \sum_j \left( {\hat{\theta}}_j -
-                         {\hat{\mu}} \right)^2
-               \, - \, {\bar{s}}^2
-               , \, 0 \right\}                     \\            \label{sigma2}
- {\hat{\mu}} &=&
-       \frac{ \sum_j \left( {\hat{\theta}}_j / ({\hat{\sigma}}^2
-                    + s^2_j ) \right) }
-            { \sum_j \left( 1/({\hat{\sigma}}^2 + s^2_j ) \right)}
+\subsection{Maximum likelihood estimator}
+\label{S_metamle}
+
+The maximum likelihood estimator (MLE)
+under the assumption that the $\hat\theta_j$ are independent and normally
+distributed (note that this is an assumption about their marginal
+distributions, not their distributions conditional on
+the true values $\theta_j$)
+is defined by two equations.
+The first is the equation for $\hat\mu$ given ${\sigma}^2 $:
+\begin{equation}
+ {\hat{\mu}} \,=\,
+       \frac{ \sum_j \big( {\hat{\theta}}_j / (\sigma^2
+                    + s^2_j ) \big) }
+            { \sum_j \big( 1/({\sigma}^2 + s^2_j ) \big)} \ .
                                                \label{mu2}
-\end{eqnarray*}
-until convergence. (Normally, a few iteration steps should suffice.)
+\end{equation}
+The second is the requirement that the profile log-likelihood for $\sigma^2$
+is maximized. This profile log-likelihood is given by
+\begin{equation}
+  p(\sigma^2) \,=\, - \,  \frac12 \sum_j \log\big(\sigma^2 + s_j^2) \,-\,
+         \frac12 \sum_j \frac{\big(\hat\theta_j - \hat\mu\big)^2}{\sigma^2 + s_j^2} \ .
+\end{equation}
+As a first step to maximize this, the derivative
+and second derivative can be computed; here
+it should be kept in mind that $\hat\mu = \hat\mu(\hat\sigma^2)$ is given as
+a function of $\hat\sigma^2$ in (\ref{mu2}) -- however, that part cancels out
+in the derivative
+so forgetting this might still yield the correct answer. Further it is
+convenient to work with the function $c_j(\sigma^2) = 1/(\sigma^2 + s_j^2)$
+and note that $dc_j/d\sigma^2 = - c_j^2$. The result is
+\begin{eqnarray}
+\frac{d\, p(\sigma^2)}{d\,\sigma^2} &=&
+     - \, \frac12 \sum_j \frac{1}{\sigma^2 + s_j^2} \,+\,
+     \frac12 \sum_j \frac{(\hat\theta_j - \hat\mu)^2}{(\sigma^2 + s_j^2)^2}
+                                     \label{dpf} \\
+\frac{d^2\, p(\sigma^2)}{d\,(\sigma^2)^2} &=&
+     - \, \frac12 \sum_j \frac{1}{\big(\sigma^2 + s_j^2\big)^2} \,-\,
+           \sum_j \frac{(\hat\theta_j - \hat\mu)^2}{(\sigma^2 + s_j^2)^3} \ .
+                     \label{dpf2}
+\end{eqnarray}
+Thus, one way to compute the MLE is to iterate the two steps:
+\begin{enumerate}
+\item Compute $\hat\mu$ by (\ref{mu2})
+\item Solve ${d\, p(\sigma^2)}/{d\,\sigma^2} = 0$ using definition (\ref{dpf}).
+\end{enumerate}
+Another way is to iterate the two steps:
+\begin{enumerate}
+\item Compute $\hat\mu$ by (\ref{mu2})
+\item One Newton-Raphson step (or two):
+\begin{equation}
+      \sigma^2_{\text{new}} \,=\, \sigma^2 \,+\,
+        \frac{\sum_j c_j (c_j d_j^2 - 1)}
+         { \, \sum_j c_j^2 (2 c_j d_j^2 + 1) \, }
+\end{equation}
+where
+\[
+  c_j \,=\, \frac{1}{\sigma^2 + s_j^2} \ , \
+         d_j \,=\, \hat\theta_j - \hat\mu \ .
+\]
+\end{enumerate}
+
 The results of this iteration scheme will be denoted by
 ${\hat{\mu}}_\theta^{\mbox{\tiny IWLS}}$ and
-${\hat{\sigma}}_\theta^{2, \mbox{\tiny IWLS}}$.
+${\hat{\sigma}}_\theta^{2, \mbox{\tiny IWLS}}$
+(IWLS for \emph{iteratively reweighted least squares}),
+but the name ML could equally well be used.
 
 The standard error
 of  $\hat\mu_\theta^{\mbox{\tiny IWLS}}$ can be calculated as
 \begin{equation}
- \mbox{s.e.}\left( {\hat{\mu}}_\theta^{\mbox{\tiny IWLS}} \right) =
+ \mbox{s.e.}\big( {\hat{\mu}}_\theta^{\mbox{\tiny IWLS}} \big) =
      \frac {1}
      {\sqrt{ \sum_j 1/({\hat{\sigma}}^{2, \mbox{\tiny IWLS}}_\theta + s^2_j ) } } \ .  \label{se2}
 \end{equation}
+
+\subsection{Testing}
+
+(This section again follows \citet{SnijdersBaerveldt03}.)
 
 For testing $\mu_\theta$ and $\sigma^2_\theta$,
 it is assumed that the parameter estimates ${\hat{\theta}}_j$
@@ -3922,7 +3983,7 @@ The test that the mean effect $\mu_\theta$ is zero can be tested
 on the basis of the $t$-ratio
 \begin{equation}
  t_{\mu_\theta} =   \frac{{\hat{\mu}}_\theta}
-                    { \mbox{s.e.}\left( {\hat{\mu}}_\theta \right) }
+                    { \mbox{s.e.}\big( {\hat{\mu}}_\theta \big) }
 \end{equation}
 which has approximately a standard normal distribution
 under the null hypothesis.
@@ -3941,7 +4002,31 @@ with $N-1$ degrees of freedom.
 
 \subsection{Fisher combination of $p$-values}
 
-Calculate $p_j^+$ and $p_j^-$ being the right and left one-sided
+
+Fisher's (1932) procedure for combination of independent $p$-values
+is applied both to left-sided and right-sided $p$-values. In this way,
+we are able to report tests for both the following testing problems:
+\begin{eqnarray*}
+ H_0^{(R)}: \ &\theta_j \leq 0 & \mbox{ for all } j; \\
+ H_1^{(R)}: \ &\theta_j > 0 & \mbox{ for at least one } j .
+\end{eqnarray*}
+Significance is interpreted here,
+that there is evidence that in \emph{some} (at least one) data set,
+parameter $\theta_j$ is positive.
+\begin{eqnarray*}
+ H_0^{(L)}:\ &\theta_j \geq 0& \mbox{ for all } j; \\
+ H_1^{(L)}:\ &\theta_j < 0& \mbox{ for at least one } j .
+\end{eqnarray*}
+Significance is interpreted here,
+that there is evidence that in \emph{some} (at least one) data set,
+parameter $\theta_j$ is negative.
+
+Note that it is very well possible that both one-sided combination tests
+are significant: then there is evidence for
+some positive and some negative effects.
+
+The procedure operates as follows.
+Calculate $p_j^+$ and $p_j^-$, being the right and left one-sided
 $p$-values:
 \begin{eqnarray*}
    p_j^+ &=& 1 - \Phi\left(\frac{\hat\theta_j}{s_j}\right) \\
@@ -3950,11 +4035,43 @@ $p$-values:
 where $\Phi$ is the c.d.f.\ of the standard normal distribution.
 The Fisher combination statistic is defined as
 \begin{eqnarray*}
-  C^+_j &=& - 2\, \sum_{j=1}^N \ln\left(p_j^+\right) \\
-  C^-_j &=& - 2\, \sum_{j=1}^N \ln\left(p_j^-\right) \ .
+  C^+_j &=& - 2\, \sum_{j=1}^N \ln\big(p_j^+\big) \\
+  C^-_j &=& - 2\, \sum_{j=1}^N \ln\big(p_j^-\big) \ .
 \end{eqnarray*}
 Both of these must be tested in a $\chi^2$ distribution with
 $2\,N$ degrees of freedom.
+
+\subsection{Combinations of score-type tests}
+
+It is possible that for a parameter, score-type tests are given
+instead of estimates. Then these score-type tests can be
+combined also in a Fisher procedure.
+This is done just as above; but now for $p$-values obtained from
+the standard normal variates obtained as a result from the score-type test.
+Of course this makes sense only if the tested null values are all the same
+(usually 0).
+
+\subsection{Further regression analyses}
+
+The data frame of values $(\hat\theta_j, s_j),\, j = 1, \ldots, N$ is made
+available for further analysis, possibly extended by other variables $x$,
+for analysis according to the model
+\begin{equation}
+  \hat\theta_j \sim \mathcal{N}\big(x_j'\beta,\, \sigma^2 + s_j^2\big),
+           \hspace{2em} \text{ independent for } j = 1, \ldots, N.
+\end{equation}
+Note that the IWLS estimates of Section~\ref{S_metamle}
+are the estimates under such a model
+if $x_j' \beta$ is comprised of just a constant term.
+
+IWLS/ML regression analysis here can be carried out by
+iteration of the two steps mentioned above, but now the step (\ref{mu2})
+is replaced by a weighted least squares analysis with weights being normalised
+versions of
+\[
+  w_j \,=\, \frac{1}{\sigma^2 + s_j^2} \ .
+\]
+
 
 \subsection{Differences in model specification}
 
@@ -3970,14 +4087,9 @@ This then must be noted in the output; and the data sets combined
 as if this parameter here has an estimate 0 but with an infinite
 standard error -- in other words, this parameter should be ignored
 for this data set;
-
 and this data set should not add to the degrees of freedom
 for this particular parameter.
 
-
-\subsection{Output to be generated}
-
-\fi
 
 \newpage
 \section{Models for Dynamics of Non-directed Networks }
@@ -4064,29 +4176,31 @@ and assumption (8.) is replaced as indicated below.
       $X_{ij}$ given the objective function $f_i(x; \beta)$
       plus a random disturbance,
       and actor $j$ just has to accept.
-      Combined with the two opportunity options, this yields the following cases.
+      Combined with the two opportunity options,
+      this yields the following cases.
       \begin{itemize}
-      \item[8.D.1.]
+      \item[8.D.1.] (alias A-1 alias AFORCE) \\
       The probability that the tie variable changed is $X_{ij}$,
       so that the network $x$ changes into $x^{(\pm ij)}$, is given by
       \begin{equation}
         p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
-         {\sum_{h=1}^n \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}  \ .   \label{eq:acbD1}
+         {\sum_{h=1}^n \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}  \ .
+                                                         \label{eq:acbD1}
       \end{equation}
-      \item[8.D.2.]
+      \item[8.D.2.] (alias B-1 alias BFORCE) \\
       The probability that
       network $x$ changes into $x^{(\pm ij)}$, is given by
       \begin{equation}
         p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
-         {\exp\big(f_i(x; \beta)\big) + \exp\big(f_i(x^{(\pm ij)}; \beta)\big)}  \ .
-                                                                      \label{eq:acbD2}
+         {\exp\big(f_i(x; \beta)\big) + \exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+                                       \ .         \label{eq:acbD2}
       \end{equation}
       \end{itemize}
 \item[M.] \emph{Mutual}:\\
       Both actors must agree for a tie between them to exist,
       in line with Jackson and Wolinsky (1996).
       \begin{itemize}
-      \item[8.M.1.]
+      \item[8.M.1.] (alias A-2 alias AAGREE) \\
       In the case of one-sided initiative, actor $i$ selects the best
       possible choice, with probabilities (\ref{eq:acbD1}).
       If currently $x_{ij} = 0$
@@ -4095,8 +4209,9 @@ and assumption (8.) is replaced as indicated below.
       based on objective function $f_j(x; \beta)$, with
       acceptance probability
       \[
-      \P\{j \text{ accepts tie proposal}\} = \frac{\exp\big(f_j(x^{(+ij)}; \beta)\big)}
-                        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ij)}; \beta)\big)} \ .
+      \P\{j \text{ accepts tie proposal}\} =
+                   \frac{\exp\big(f_j(x^{(+ij)}; \beta)\big)}
+        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ij)}; \beta)\big)} \ .
       \]
       If the choice by $i$ means termination of an existing tie,
       the proposal is always put into effect.
@@ -4106,12 +4221,13 @@ and assumption (8.) is replaced as indicated below.
         p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
          {\sum_{h=1}^n \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}
         \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
-                        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)} \right)^{1-x_{ij}}
+          {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)}
+                         \right)^{1-x_{ij}}
           \ .   \label{eq:acbM}
       \end{equation}
       (Note that the second factor comes into play only if $x_{ij} = 0$,
       which implies $x^{(+ ij)} = x^{(\pm ij)}$.)
-      \item[\hspace*{3em}8.M.2.]
+      \item[\hspace*{3em}8.M.2.] (alias B-2 alias BAGREE) \\
       In the case of two-sided opportunity, actors $i$ and $j$
       both reconsider the value of the tie variable $X_{ij}$.
       Actor $i$ proposes a change (toggle) with probability (\ref{eq:acbD2})
@@ -4122,9 +4238,11 @@ and assumption (8.) is replaced as indicated below.
       \begin{align}
         & p_{ij}(x, \beta) =   \label{eq:pM2}         \\
         &  \frac{\exp\big(f_i(x^{(+ ij)}; \beta)\big)}
-         {\Big(\exp\big(f_i(x; \beta)\big) + \exp\big(f_i(x^{(+ ij)}; \beta)\big)\Big)}
+         {\Big(\exp\big(f_i(x; \beta)\big) +
+                           \exp\big(f_i(x^{(+ ij)}; \beta)\big)\Big)}
         \frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
-         {\Big(\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)\Big)}  \ .
+         {\Big(\exp\big(f_j(x; \beta)\big) +
+                                \exp\big(f_j(x^{(+ ij)}; \beta)\big)\Big)}  \ .
             \nonumber
       \end{align}
       If currently there is a tie, $x_{ij} = 1$, then the tie is terminated
@@ -4132,14 +4250,16 @@ and assumption (8.) is replaced as indicated below.
       \begin{align}
         & p_{ij}(x, \beta) =          \label{eq:qM2} \\
         &     1 \, - \, \frac{\exp\big(f_i(x; \beta)\big)}
-         {\Big(\exp\big(f_i(x; \beta)\big) + \exp\big(f_i(x^{(\pm ij)}; \beta)\big)\Big)}
+         {\Big(\exp\big(f_i(x; \beta)\big) +
+                             \exp\big(f_i(x^{(\pm ij)}; \beta)\big)\Big)}
         \frac{\exp\big(f_j(x; \beta)\big)}
-         {\Big(\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(\pm ij)}; \beta)\big)\Big)}  \ .
+         {\Big(\exp\big(f_j(x; \beta)\big) +
+                             \exp\big(f_j(x^{(\pm ij)}; \beta)\big)\Big)}  \ .
           \nonumber
       \end{align}
       \end{subequations}
       \end{itemize}
-\item[C.] \emph{Compensatory}:
+\item[C.] \emph{Compensatory}: (alias B-3 alias BJOINT) \\
       The two actors decide on the basis of their combined interests.\\
       The combination with one-sided initiative is rather artificial here,
       and we only elaborate this option for the two-sided initiative.
@@ -4147,12 +4267,14 @@ and assumption (8.) is replaced as indicated below.
       \item[8.C.2.]
       The binary decision about the existence of the tie $i \leftrightarrow j$
       is based on the objective function $f_i(x; \beta)+f_j(x; \beta)$.
-      The probability that network $x$ changes into $x^{(\pm ij)}$, now is given by
+      The probability that network $x$ changes into $x^{(\pm ij)}$,
+      now is given by
       \begin{equation}
-       p_{ij}(x, \beta) =  \frac{\exp\big(f_i(x^{(\pm ij)}; \beta) + f_j(x^{(\pm ij)}; \beta)\big)}
+       p_{ij}(x, \beta) =  \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)
+                                 + f_j(x^{(\pm ij)}; \beta)\big)}
                  {\exp\big(f_i(x; \beta) + f_j(x; \beta)\big) +
-                    \exp\big(f_i(x^{(\pm ij)}; \beta) + f_j(x^{(\pm ij)}; \beta)\big)} \ .
-                                                                      \label{eq:pC2}
+         \exp\big(f_i(x^{(\pm ij)}; \beta) + f_j(x^{(\pm ij)}; \beta)\big)} \ .
+                                                              \label{eq:pC2}
       \end{equation}
       \end{itemize}
 \end{enumerate}
@@ -4273,7 +4395,7 @@ where the dependence on $x$ is omitted. Note that $s_{iik} = 0$.
 
 
 
-\subsection{Dictatorial D.1 (alias A-1)}
+\subsection{Dictatorial D.1 (alias A-1 alias AFORCE)}
 Probability of change, see (\ref{eq:acbD1})
       \begin{equation}
         p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}

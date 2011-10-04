@@ -7191,9 +7191,11 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
 
 
 
-\subsubsection{Network creation function} \label{S_c}
+\subsubsection{Network creation and endowment functions}
+\label{S_c}
+\label{S_e}
 
-The network creation function
+The \emph{network creation function}
 is one way of modeling effects which operate in
 different strengths for the creation and the dissolution of
 relations.
@@ -7205,7 +7207,7 @@ c^{\rm net}_i(x) \, = \, \sum_k \zeta_k^{\rm net} \, s^{\rm net}_{ik}(x)
 \end{equation}
 for creation of ties.
 In this formula, the $\zeta_k^{\rm net}$
-are the parameters for the endowment function.
+are the parameters for the creation function.
 The potential effects $s^{\rm net}_{ik}(x) $ in this function, and their
 formulae, are the same as in the evaluation function;
 except that not all are available, as indicated in the preceding subsection.
@@ -7215,10 +7217,8 @@ For further explication, consult \citet{Snijders01, Snijders05};
 (here only the endowment function is treated and not the creation function,
 but they are similar in an opposite way).
 
-\subsubsection{Network endowment function} \label{S_e}
-
-The network endowment function
-is the way of modeling effects which operate in
+The \emph{network endowment function}
+is another way of modeling effects which operate in
 different strengths for the creation and the dissolution of
 relations.
 The network endowment function is zero for creation of ties,
@@ -7236,6 +7236,28 @@ except that not all are available, as indicated in the preceding subsection.
 For further explication, consult \citet{Snijders01, Snijders05};
 (here, the `gratification function' is used rather than the endowment function),
 \citet*{SnijdersEA07}, and \citet*{SteglichEA10}.
+
+These functions are combined in the following way.
+For the creation of ties, the objective function used is
+\begin{equation}
+f_i^{\rm net}(x) \,+\, c_i^{\rm net}(x)     \ ,             \label{fc_net}
+\end{equation}
+in other words, the parameters for the evaluation and creation effects are
+added.
+For the dissolution of ties, on the other hand, the objective function is
+\begin{equation}
+f_i^{\rm net}(x) \,+\, e_i^{\rm net}(x)      \ ,            \label{fe_net}
+\end{equation}
+in other words, the parameters for the evaluation and endowment effects are
+added.
+Therefore, a model with a parameter with some value $\beta_k$
+for a given evaluation effect,
+and for which there are no separate creation and endowment effects,
+has exactly the same consequences as a model for which this
+evaluation effect is excluded, and that includes a creation as well as
+an endowment effect, both with the same parameter value
+$\zeta_k = \beta_k$ and $\gamma_k = \beta_k$.
+
 
 \subsubsection{Network rate function} \label{S_r}
 
