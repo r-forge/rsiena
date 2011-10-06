@@ -176,7 +176,12 @@
 
 # For bipartite networks you would have to specify the node sets, e.g.,
 
-        mybidata <- sienaDataCreate(bfriendship, alcohol,
+        mybidata <- sienaDataCreate(bfriendship,
+                                    nodeSets=list(senders, receivers))
+
+# If you wish to use a covariate, the relevant nodeSet must match, e.g.,
+        balcohol <- varCovar(drink, nodeSet="senders")
+        mybidata <- sienaDataCreate(bfriendship, balcohol,
                                     nodeSets=list(senders, receivers))
 
 # but we will not use this in these scripts.

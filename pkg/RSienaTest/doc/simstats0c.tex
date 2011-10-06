@@ -214,7 +214,7 @@ selected rate effects multiplied by relevant theta value
 \STATE Add to totlambda
 \ENDFOR
 \STATE Add to sum of totlambda
-\IF{model type BFORCE, BAGREE, BJOINT}
+\IF{symmetric and model type BFORCE, BAGREE, BJOINT}
 \STATE Replace totlambda by square of totlambda - sum of squared lambdas\\
 \STATE (This is $\sum_{i<>j} \lambda_i \lambda_j$ for active $i, j$.)
 \ENDIF

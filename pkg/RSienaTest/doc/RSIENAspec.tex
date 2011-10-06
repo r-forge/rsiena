@@ -476,7 +476,8 @@ same node sets.
 \STATE Create a list of these possibly relating dependent variables for each of
 access later.
 \FORALL{row in the matrix of pairs where the two columns are not the same}
-\IF{nodeset(s) match and type matches and not behavior}
+\IF{nodeset(s) match and type matches and not behavior and either both networks
+ are symmetric or neither is}
 \STATE In checks, replaces structurals by 0/1 first, and ignore missings
 \STATE Check \emph{higher}: first network always greater than or equal to second
 network.

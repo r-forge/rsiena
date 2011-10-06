@@ -63,14 +63,14 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
         set.seed(1, kind='Wich')
         ## randomseed2 is for second generator needed only for parallel testing
         randomseed2 <- .Random.seed
-      #  .Random.seed[2:4] <- as.integer(c(1,2,3))
-       # randomseed2[2:4] <- as.integer(c(3,2,1))
+		## .Random.seed[2:4] <- as.integer(c(1,2,3))
+		## randomseed2[2:4] <- as.integer(c(3,2,1))
         randomseed2[2:4] <- as.integer(c(1, 2, 3))
         seed <- 1
         newseed <- 1
         z$parallelTesting <- TRUE
     }
-    else
+	else
     {
         randomseed2 <-  NULL
         ## x$randomSeed is the user seed, if any
@@ -80,20 +80,40 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
             seed <- x$randomSeed
         }
         else
-        {
-            if (exists(".Random.seed"))
-            {
-                rm(.Random.seed, pos=1)
-            }
-            newseed <- trunc(runif(1) * 1000000)
-            set.seed(newseed)  ## get R to create a random number seed for me.
-            seed <- NULL
-        }
-    }
+		{
+			if (!nzchar(Sys.getenv("RSIENA_TESTING")))
+			{
+				if (exists(".Random.seed"))
+				{
+					rm(.Random.seed, pos=1)
+				}
+				newseed <- trunc(runif(1) * 1000000)
+				set.seed(newseed)  ## get R to create a random number seed for me.
+				seed <- NULL
+			}
+			else
+			{
+				newseed <- NULL
+				seed <- NULL
+			}
+		}
+	}
     z$randomseed2 <- randomseed2
 
     ## set the global is.batch
-    is.batch(batch)
+	batchUse <- batch
+	if (!batch)
+	{
+		if (.Platform$OS.type != "windows")
+		{
+			if (!capabilities("X11"))
+			{
+				batchUse <- TRUE
+				cat("No X11 device available, must use batch")
+			}
+		}
+	}
+    is.batch(batchUse)
 
     ## open the output file
     Report(openfiles=TRUE, projname=x$projname, verbose=verbose, silent=silent)
@@ -156,7 +176,10 @@ InitReports <- function(z, seed, newseed)
     if (is.null(seed))
     {
         Report("Random initialization of random number stream.\n", outf)
-        Report(sprintf("Current random number seed is %d.\n", newseed), outf)
+		if (!is.null(newseed))
+		{
+			Report(sprintf("Current random number seed is %d.\n", newseed), outf)
+		}
     }
     else
     {

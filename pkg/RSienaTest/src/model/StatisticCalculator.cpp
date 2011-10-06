@@ -1021,29 +1021,29 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 			{
 				if (effectName == "avExposure")
 				{
-				  double totalAlterValue = 0;
-				  double averageAlterValue = 0;
-				  if (pStructural->outDegree(i)>0)
+					double totalAlterValue = 0;
+					double averageAlterValue = 0;
+					if (pStructural->outDegree(i) > 0)
 				    {
-				      for (IncidentTieIterator iter = pStructural->outTies(i);
-					   iter.valid();
-					   iter.next())
-					{
-					  double alterValue = pBehaviorData->
-					    value(this->lperiod,iter.actor());
-					  totalAlterValue += alterValue;
-					}
-				      averageAlterValue = totalAlterValue / 
-					pStructural->outDegree(i);
+						for (IncidentTieIterator iter = pStructural->outTies(i);
+							 iter.valid();
+							 iter.next())
+						{
+							double alterValue = pBehaviorData->
+								value(this->lperiod,iter.actor());
+							totalAlterValue += alterValue;
+						}
+						averageAlterValue = totalAlterValue /
+							pStructural->outDegree(i);
 				    }
 
-				  statistic += averageAlterValue *
-				    difference[i];
+					statistic += averageAlterValue *
+						difference[i];
 				}
 				else
-				  {
+				{
 				    throw domain_error("Unexpected rate effect " + effectName);
-				  }
+				}
 			}
 
 			this->lstatistics[pInfo] = statistic;

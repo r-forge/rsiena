@@ -1,0 +1,91 @@
+
+R version 2.13.2 (2011-09-30)
+Copyright (C) 2011 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i386-pc-mingw32/i386 (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> if(!nzchar(Sys.getenv("RSIENA_TESTING"))) q("no")
+> 
+> runone <- function(f)
++ {
++     message("  Running ", sQuote(basename(f)))
++     outfile <- paste(basename(f), "out", sep = "")
++     failfile <- paste(outfile, "fail", sep=".")
++     unlink(c(outfile, failfile))
++     cmd <- paste(shQuote(file.path(R.home(), "bin", "R")),
++                  "CMD BATCH --no-save",
++                  shQuote(f), shQuote(outfile))
++     res <- system(cmd)
++     if (res) {
++         cat(tail(readLines(outfile), 20), sep="\n")
++         file.rename(outfile, failfile)
++         return(1L)
++     }
++     0L
++ }
+> 
+> 
+> ##library(RSienaTest)
+> ## get the data files
+> datafiles <- system.file("examples", package="RSiena")
+> files1 <- list.files(datafiles, pattern="\\.dat$", full.names=TRUE)
+> file.copy(files1, ".", overwrite=TRUE)
+ [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+[16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+[31] TRUE
+> 
+> ## write some initialisation data
+> unlink("scriptfile.R")
+> writeLines(c("options(error=NULL)", "set.seed(1)"), "scriptfile.R")
+> 
+> ## now concatenate the scripts
+> dd <- system.file("scripts", package="RSiena")
+> files <- list.files(dd, pattern="\\.R$", full.names=TRUE)
+> for (f in files)
++ {
++ 	file.append("scriptfile.R", f)
++ }
+> 
+> ## now run it
+> res <- 0L
+> runone("scriptfile.R")
+  Running 'scriptfile.R'
+[1] 0
+> 
+> ## now look at the differences
+> 
+> system("diff scriptfile.Rout scriptFile.Rout.save")
+3511c3511
+< % Thu Oct 06 16:45:13 2011
+---
+> % Thu Oct 06 16:30:57 2011
+3539c3539
+< <!-- Thu Oct 06 16:45:13 2011 -->
+---
+> <!-- Thu Oct 06 16:30:57 2011 -->
+4036c4036
+<  339.57    1.71  343.48 
+---
+>  336.10    2.01  345.31 
+> 
+> proc.time()
+   user  system elapsed 
+   0.28    0.04  344.01 
+> 
+> if (res > 0)
++ {
++ 	stop("scripts failed")
++ }
+> 

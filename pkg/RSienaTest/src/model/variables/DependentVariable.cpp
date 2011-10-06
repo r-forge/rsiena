@@ -250,18 +250,18 @@ void DependentVariable::initializeRateFunction()
 		}
 		else if (rateType == "diffusion")
 		{
-			
+
 			const NetworkVariable * pVariable;
-			const BehaviorVariable * pBehaviorVariable = 
+			const BehaviorVariable * pBehaviorVariable =
 				dynamic_cast<const BehaviorVariable *>(this);
 
 			if (interactionName == "")
 			{
-				 pVariable = dynamic_cast<const NetworkVariable *>(this);
+				pVariable = dynamic_cast<const NetworkVariable *>(this);
 			}
 			else
 			{
-				 pVariable = dynamic_cast<const NetworkVariable *>(
+				pVariable = dynamic_cast<const NetworkVariable *>(
 					this->lpSimulation->pVariable(interactionName));
 			}
 
@@ -499,7 +499,7 @@ void DependentVariable::calculateRates()
 			{
 				this->calculateScoreSumTerms();
 			}
-			if(this->pSimulation()->pModel()->modelTypeB())
+			if(this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 			{
 				this->ltotalRate = this->totalRate() * this->totalRate() -
 					sumRatesSquared;
@@ -555,7 +555,7 @@ double DependentVariable::calculateRate(int i)
 	return this->basicRate() *
 	  this->lcovariateRates[i] *
 	  this->behaviorVariableRate(i) *
-	  this->structuralRate(i) * 
+	  this->structuralRate(i) *
 	  this->diffusionRate(i);
 }
 
@@ -743,15 +743,16 @@ void DependentVariable::accumulateRateScores(double tau,
 	if (this == pSelectedVariable)
 	{
 		this->lbasicRateScore += 1.0 / this->basicRate();
-		if (this->pSimulation()->pModel()->modelTypeB())
+		if (this->symmetric() &&
+			this->pSimulation()->pModel()->modelTypeB())
 		{
 			throw logic_error("model type b");
-			this->lbasicRateScore += 1.0 / this->basicRate();
+			//this->lbasicRateScore += 1.0 / this->basicRate();
 		}
 	}
 	this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
 
-	if (this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 	{
 		throw logic_error("model type b");
 		this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
@@ -865,7 +866,7 @@ void DependentVariable::accumulateRateScores(double tau,
 
 		iter->second -= this->linverseOutDegreeSumTerm[iter->first] * tau;
 	}
-	
+
 	// Update scores for diffusion rate parameters
 
 	for (std::map<const NetworkVariable *, double>::iterator iter =
@@ -882,7 +883,7 @@ void DependentVariable::accumulateRateScores(double tau,
 			double averageAlterValue = 0;
 			if (pNetwork->outDegree(selectedActor) > 0)
 			{
-				for (IncidentTieIterator iter2 = 
+				for (IncidentTieIterator iter2 =
 				       pNetwork->outTies(selectedActor);
 					iter2.valid();
 					iter2.next())
@@ -893,8 +894,8 @@ void DependentVariable::accumulateRateScores(double tau,
 				}
 				averageAlterValue = totalAlterValue /
 				  pNetwork->outDegree(selectedActor);
-			}	
-			
+			}
+
 			iter->second += averageAlterValue;
 		}
 
@@ -1052,7 +1053,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += pCovariate->value(i) * this->lrate[i];
-			if (this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 			{
 				timesRateSquared += pCovariate->value(i) * this->lrate[i] *
 					this->lrate[i];
@@ -1074,7 +1075,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += pCovariate->value(i, this->period()) * this->lrate[i];
-			if (this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 			{
 				timesRateSquared += pCovariate->value(i, this->period()) *
 					this->lrate[i] * this->lrate[i];
@@ -1097,7 +1098,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += pBehavior->value(i) * this->lrate[i];
-			if (this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 			{
 				timesRateSquared += pBehavior->value(i) * this->lrate[i] *
 					this->lrate[i];
@@ -1137,7 +1138,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += pNetwork->outDegree(i) * this->lrate[i];
-			if (this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 			{
 				timesRateSquared += pNetwork->outDegree(i) * this->lrate[i] *
 					this->lrate[i];
@@ -1176,7 +1177,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += invertor(pNetwork->outDegree(i)) * this->lrate[i];
-			if (this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 			{
 				timesRateSquared += invertor(pNetwork->outDegree(i)) *
 					this->lrate[i] * this->lrate[i];
@@ -1214,7 +1215,7 @@ void DependentVariable::calculateScoreSumTerms()
 						value(iter2.actor());
 					totalAlterValue += alterValue;
 				}
-				averageAlterValue = totalAlterValue / 
+				averageAlterValue = totalAlterValue /
 				  pNetwork->outDegree(i);
 			}
 
@@ -1554,7 +1555,7 @@ void DependentVariable::updateEffectParameters()
 
 	vector < DiffusionRateEffect * >::iterator iter2 =
 		this->ldiffusionRateEffects.begin();
-	
+
 	for (unsigned i = 0; i < rRateEffects.size(); i++)
 	{
 		EffectInfo * pEffectInfo = rRateEffects[i];

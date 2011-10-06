@@ -214,9 +214,9 @@
 
 ################## - EXAMPLE FOR ARC LIST - ########################################
 ###
-### If data (e.g. "arclistdata.dat") is in arclist format, with columns
+### If data (e.g. "s50e.dat") is in arclist format, with columns
 ### sender id, receiver id, value of tie, wave.
-		ArcList <- read.table( "arclistdata.dat", header=FALSE ) # creates data frame
+		ArcList <- read.table( "s50e.dat", header=FALSE ) # creates data frame
 		names(ArcList) <- c( "sid", "recid", "bff", "wid" ) # adds names to columns
 		ArcList <- with( ArcList, ArcList[ order( sid, recid, wid), ] )
 
@@ -263,11 +263,9 @@
 ###
 ###   par( mfrow = c( 2, 2 ) )
 ###
-###   test.net.1 <- read.paj(
-                "http://vlado.fmf.uni-lj.si/pub/networks/data/GD/gd98/A98.net" )
+###test.net.1 <- read.paj("http://vlado.fmf.uni-lj.si/pub/networks/data/GD/gd98/A98.net" )
 ###   plot( test.net.1,main = test.net.1$gal$title )
-###   test.net.2 <- read.paj(
-                "http://vlado.fmf.uni-lj.si/pub/networks/data/mix/USAir97.net" )
+###   test.net.2 <- read.paj("http://vlado.fmf.uni-lj.si/pub/networks/data/mix/USAir97.net" )
 ###   plot( test.net.2,main = test.net.2$gal$title )
 ###
 ###################################################################################
