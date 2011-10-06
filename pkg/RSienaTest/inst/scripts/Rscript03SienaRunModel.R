@@ -87,7 +87,7 @@
 # processors, use
 
 #         ans <- siena07( mymodel, data = mydata, effects = myeff, batch = TRUE,
-                        verbose = TRUE, nbrNodes = 2, useCluster = TRUE)
+#                        verbose = TRUE, nbrNodes = 2, useCluster = TRUE)
 
 # Adjust the nbrNodes to the number available.
 # If you wish to work on with other programs while running siena07,

@@ -16,7 +16,6 @@
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/DiffusionEffectValueTable.h"
 #include "network/IncidentTieIterator.h"
-#include <cmath>
 #include <R_ext/Print.h>
 
 namespace siena
@@ -36,23 +35,23 @@ DiffusionRateEffect::DiffusionRateEffect(const NetworkVariable * pVariable,
 	double parameter)
 {
 	this->lpVariable = pVariable;
-	this->lpBehaviorVariable = pBehaviorVariable;	
+	this->lpBehaviorVariable = pBehaviorVariable;
 	this->ltype = type;
-		
+
 	double possibleDegreeNumer = 1;
 	double possibleDegreeDenom = 1;
 
 	if (this->ltype == AVERAGE_EXPOSURE_RATE)
 	{
-		possibleDegreeNumer = (this->lpBehaviorVariable->range())*
-		  max(this->lpVariable->n(),
-		      this->lpVariable->m());
+		possibleDegreeNumer = (this->lpBehaviorVariable->range()) *
+			max(this->lpVariable->n(),
+				this->lpVariable->m());
 		possibleDegreeDenom = max(this->lpVariable->n(),
-					  this->lpVariable->m());
+			this->lpVariable->m());
 	}
-	this->lpTable = new DiffusionEffectValueTable(possibleDegreeNumer, 
-						      possibleDegreeDenom);
-	this->lpTable->parameter(parameter);		
+	this->lpTable = new DiffusionEffectValueTable(possibleDegreeNumer,
+		possibleDegreeDenom);
+	this->lpTable->parameter(parameter);
 }
 
 /**
@@ -79,23 +78,23 @@ double DiffusionRateEffect::value(int i)
 			if (pNetwork->outDegree(i) > 0)
 			{
 				for (IncidentTieIterator iter = pNetwork->outTies(i);
-					iter.valid();
-					iter.next())
+					 iter.valid();
+					 iter.next())
 				{
 					double alterValue = this->lpBehaviorVariable->
-					  value(iter.actor());
+						value(iter.actor());
 					totalAlterValue += alterValue;
 				}
 			}
-						
+
 			if (totalAlterValue==0)
 			{
-			return 1;
+				return 1;
 			}
 			if (totalAlterValue>0)
 			{
-			return this->lpTable->value(totalAlterValue,max(1,
-				pNetwork->outDegree(i)));
+				return this->lpTable->value(totalAlterValue,max(1,
+						pNetwork->outDegree(i)));
 			}
 		}
 	}

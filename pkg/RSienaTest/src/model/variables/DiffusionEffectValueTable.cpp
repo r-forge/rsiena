@@ -19,24 +19,24 @@ namespace siena
  * Creates a new look-up table for <i>n</i> actors.
  */
 
-DiffusionEffectValueTable::DiffusionEffectValueTable(int numeratorRange, 
+DiffusionEffectValueTable::DiffusionEffectValueTable(int numeratorRange,
 						     int denominatorRange)
 {
-	this->lvalues = new double[numeratorRange*denominatorRange];
-	this->lparameterValues = new double[numeratorRange*denominatorRange];
-	
+	this->lvalues = new double[numeratorRange * denominatorRange];
+	this->lparameterValues = new double[numeratorRange * denominatorRange];
+
 	// Calculate the table for parameter 0
 
 	this->lparameter = 0;
 	this->ldenominatorRange = denominatorRange;
 	this->lnumeratorRange = numeratorRange;
 
-	for (int i = 0; i < numeratorRange*denominatorRange; i++)
+	for (int i = 0; i < numeratorRange * denominatorRange; i++)
 	{
 		// exp(0) = 1
 
 		this->lvalues[i] = 1;
-		this->lparameterValues[i] = 0;	
+		this->lparameterValues[i] = 0;
 	}
 }
 
@@ -77,16 +77,16 @@ void DiffusionEffectValueTable::parameter(double value)
 
 double DiffusionEffectValueTable::value(int numerator, int denominator)
 {
-	int arrayIndex = ((numerator-1)*this->ldenominatorRange)+
-	  (denominator-1);
-	
+	int arrayIndex = ((numerator - 1) * this->ldenominatorRange) +
+	  (denominator - 1);
+
 	if (this->lparameterValues[arrayIndex] != this->lparameter)
 	{
 		// The value stored in the table was calculated for a different
 		// parameter, hence we must recalculate the value.
 
 		this->lvalues[arrayIndex] = exp(this->lparameter *
-						numerator/denominator);
+			numerator / denominator);
 		this->lparameterValues[arrayIndex] = this->lparameter;
 	}
 

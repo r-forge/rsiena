@@ -812,12 +812,12 @@ The appendix of this manual contains a list of \RS functions which may be consul
 in addition to this script.
 
 {\footnotesize
-\verbatiminput{RscriptDataFormat.R}
+\verbatiminput{../inst/scripts/Rscript01DataFormat.R}
 \newpage
-\verbatiminput{RscriptSienaVariableFormat.R}
-\verbatiminput{RscriptSienaRunModel.R}
+\verbatiminput{../inst/scripts/Rscript02SienaVariableFormat.R}
+\verbatiminput{../inst/scripts/Rscript03SienaRunModel.R}
 \newpage
-\verbatiminput{RscriptSienaBehaviour.R}
+\verbatiminput{../inst/scripts/Rscript04SienaBehaviour.R}
 }
 
 \subsection{Outline of estimation procedure}
@@ -9423,6 +9423,15 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2011-10-06 R-forge revision 175
+\begin{itemize}
+\item Fix bug with multiple symmetric networks.
+\item Limit constraints to be between both symmetric or non-symmetric networks
+\item Added scripts to package (RSienaTest only)
+\item siena07 called with batch=FALSE no longer crashes if called on mac or
+linux with no X11 available. (RSienaTest only)
+\end{itemize}
+\item 2011-09-19 R-forge revision 172: (RSienaTest only) Diffusion rate effects.
 \item 2011-09-07 R-forge revision 171
 \begin{itemize}
 \item Fix bug in siena08: crashed if underlying effects for interaction were not
@@ -9955,7 +9964,7 @@ Created RSienaTest which includes user
 \nocite{JariegoFederico06}
 
 %\bibliographystyle{JRSS} % TS: I did not find this style so I changed it:
-\bibliographystyle{Chicago}
+\bibliographystyle{apalike}
 %\bibliographystyle{plain}
 \bibliography{RSiena}
 \end{document}

@@ -497,7 +497,7 @@ void NetworkVariable::makeChange(int actor)
 
 	this->successfulChange(true);
 
-	if (this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 	{
 		if (this->calculateModelTypeBProbabilities())
 		{
@@ -536,7 +536,8 @@ void NetworkVariable::makeChange(int actor)
 		// Siena 3 checks in the diagonal case, so I do too temporarily.
 		//if (alter != actor && !this->lpNetworkCache->outTieExists(alter) &&
 		//	this->pSimulation()->pModel()->modelType() == AAGREE)
-		if (this->pSimulation()->pModel()->modelType() == AAGREE &&
+			if (this->symmetric() &&
+				this->pSimulation()->pModel()->modelType() == AAGREE &&
 			!this->lpNetworkCache->outTieExists(alter))
 		{
 			 this->checkAlterAgreement(alter);
@@ -572,10 +573,11 @@ void NetworkVariable::makeChange(int actor)
 		}
 		this->pSimulation()->pChain()->insertBefore(pMiniStep,
 			this->pSimulation()->pChain()->pLast());
-		if (!this->pSimulation()->pModel()->modelTypeB())
+		if (!this->symmetric() || !this->pSimulation()->pModel()->modelTypeB())
 		{
 			pMiniStep->logChoiceProbability(log(this->lprobabilities[alter]));
-			if (this->pSimulation()->pModel()->modelType() == AAGREE)
+			if (this->symmetric() &&
+				this->pSimulation()->pModel()->modelType() == AAGREE)
 			{
 				pMiniStep->logChoiceProbability(pMiniStep->
 					logChoiceProbability() + log(this->lsymmetricProbability));
@@ -757,6 +759,7 @@ void NetworkVariable::calculatePermissibleChanges()
 		pFilter->filterPermittedChanges(this->lego, this->lpermitted);
 		//Rprintf(" filtered %d %d\n ", i, this->lpermitted);
 	}
+	//if (this->id() > 0)
 	// for (int i = 0; i < m; i++)
 	// {
 	// 	Rprintf("permitted %d %d\n", i, this->lpermitted[i]);
@@ -815,6 +818,7 @@ void NetworkVariable::calculateTieFlipContributions()
 				}
 
 				this->levaluationEffectContribution[alter][i] = contribution;
+				//	Rprintf("%d %d %f\n", alter, i, contribution);
 			}
 		}
 		else
@@ -823,6 +827,7 @@ void NetworkVariable::calculateTieFlipContributions()
 			{
 				if (!this->lpermitted[alter])
 				{
+					//Rprintf(" %d %d fff\n", this->lego, alter);
 					this->levaluationEffectContribution[alter][i] = R_NaN;
 				}
 				else
@@ -1048,7 +1053,8 @@ void NetworkVariable::accumulateScores(int alter) const
 	{
 		Effect * pEffect = this->pEvaluationFunction()->rEffects()[i];
 		double score = this->levaluationEffectContribution[alter][i];
-
+		//Rprintf(" %d %d %f %f\n", alter, i, score,
+		//	this->levaluationEffectContribution[alter][i]);
 		for (int j = 0; j < m; j++)
 		//	for (unsigned alteri = 0; alteri < this->lalterSet.size(); alteri++)
 		{
@@ -1061,11 +1067,26 @@ void NetworkVariable::accumulateScores(int alter) const
 					this->levaluationEffectContribution[j][i] *
 					//				this->lprobabilities[alteri];
 					this->lprobabilities[j];
+				//Rprintf("%d %d %d %f %f\n ",alter, j, i,
+				//	this->levaluationEffectContribution[j][i],
+				//	this->lprobabilities[j]);
 			}
 		}
 		//	}
+		if (R_IsNaN(score))
+		{
+			error("nan score 1");
+		}
+		if (R_IsNaN(this->pSimulation()->score(pEffect->pEffectInfo())))
+		{
+			error("nan score");
+		}
+
+
 		this->pSimulation()->score(pEffect->pEffectInfo(),
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
+		//Rprintf(" %f %f\n ",score,
+		//	this->pSimulation()->score(pEffect->pEffectInfo()));
 	}
 
 	for (unsigned i = 0;
@@ -1769,7 +1790,7 @@ double NetworkVariable::probability(MiniStep * pMiniStep)
 	NetworkChange * pNetworkChange =
 		dynamic_cast<NetworkChange *>(pMiniStep);
 	this->lego = pNetworkChange->ego();
-	if (this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 	{
 		this->calculateModelTypeBProbabilities();
 		if (this->pSimulation()->pModel()->needScores())

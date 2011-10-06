@@ -1,8 +1,43 @@
-2011-09-29 R-forge revision 173
-	* doc/RSiena_manual.tex: some changes, explanation mainly
-   * doc/RSiena.bib: very small updates.
+2011-10-06 R-forge revision 175 RSienaTest only
 
-2011-09-19 R-forge revision 172 RSienaTest only
+	* doc/RScriptDataFormat.R, doc/RScriptSienaVariable.R,
+	doc/RScriptSienaRunModel.R, doc/RScriptSienaBehaviour.R: moved to
+	inst/scripts. Renamed to have a numbering sequence so can concatenate in
+	correct order for testing. Minimal changes to make the tests work within
+	R CMD check sequence.
+	* R/siena07.r: check for availability of X11 device on non-Windows and
+	force batch=TRUE if necessary. Only set random seed if not testing
+	scripts.
+	* R/effectsMethods.r: make fix command for a sienaEffects object
+	terminate return the object unchanged if called non-interactively.
+	* R/sienaprint.r, NAMESPACE, man/xtable.Rd: added dummy xtable command
+	to call real one.
+	* tests/scripts.R, tests/scripts.Rout,save, tests/scriptfile.Rout.save: 
+	added file to test
+	scripts, controlled by an environment variable.
+	* doc/RSiena_Manual.tex: altered path to scripts and file names.
+	* R/sienaDataCreate.r: remove inter-network constraints which relate a
+	symmetric network to a non-symmetric network
+	* src/model/variables/DependentVariable.cpp,
+	src/model/variables/NetworkVariable.cpp, doc/simstats0c.tex,
+	doc/RSienaSpec.tex: fix bug causing crashes with
+	symmetric networks alongside either behavior variable or non-symmetric
+	network.
+	* src/model/effects/DiffusionRateEffect.cpp,
+	src/model/StatisticCalculator.cpp,
+	src/model/variables/DiffusionEffectValueTable.cpp: minor formatting
+
+2011-10-04 R-forge revision 174
+
+	* doc/RSiena_Manual.tex, doc/Siena_algorithms4.tex: added meta-analysis,
+	minor changes to manual.
+
+2011-09-29 R-forge revision 173
+
+	* doc/RSiena_Manual.tex: some changes, explanation mainly
+	* doc/RSiena.bib: very small updates.
+
+2011-09-19 R-forge revision 172 RSienaTest only (NB version number did not match)
 
 	* src/model/effects/DiffusionRateEffect.cpp,
 	src/model/effects/DiffusionRateEffect.h,
@@ -35,8 +70,8 @@
 
 2011-08-22 R-forge revision 170
 
-	* doc/RSiena_manual.tex: changes mainly for non-directed models
-   * doc/RSiena.bib: small updates.
+	* doc/RSiena_Manual.tex: changes mainly for non-directed models
+	* doc/RSiena.bib: small updates.
 
 2011-08-09 R-forge revision 169 RSienaTest only
 
@@ -82,7 +117,7 @@
 
 2011-08-03 R-forge revision 167
 
-	* doc/RSiena_manual.tex: minor changes
+	* doc/RSiena_Manual.tex: minor changes
 	* data/allEffects.csv, src.effects/effectFactory.cpp: renamed avSimX,
 	totSimX, avAltX to avSimEgoX etc in preparation for avSimAlterX etc
 	to appear soon!
