@@ -122,6 +122,21 @@ Note that this file changes fairly frequently.
   autofit the columns and save as .xls.
 \item NB You need RTools (see later) installed to do this on Windows.
 \end{enumerate}
+\item[Table of functions for the manual]
+\begin{enumerate}
+\item The file \sfn{document.r} in \sfn{RSienaTest} contains a function
+  \sfn{RSienaAutoHelpTable} which will generate \LaTeX source  from the .Rd
+  files for a table of functions similar to that in the manual
+\item You need to run \sfn{RSienaAutoHelpTables} and then run \LaTeX on the file
+  \sfn{auto.tex} in the doc directory of the source (not installed) package.
+\item It is controlled by a data frame of functions hard coded in the file
+  \sfn{document.r}.
+\item The text is based on the \sfn{Description} field in the .Rd file. Moving
+  information from this field to the \sfn{Details} field should allow sufficient
+  flexibility to get the required table.
+\item There are a few sample text processing commands commented out in the
+  source file \sfn{document.r} which might prove useful.
+\end{enumerate}
 \end{description}
 \subsection{Other documentation}
 There are other documentation files:

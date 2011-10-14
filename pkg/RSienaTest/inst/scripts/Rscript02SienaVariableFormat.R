@@ -2,21 +2,22 @@
 ###
 ### -- RscriptSienaVariableFormat.R: a script for the introduction to RSiena --
 ###
-###                               version April 11, 2011                
+###                               version April 11, 2011
 ###############################################################################
 #
 # The introductory script is divided into the following script files:
 # RscriptDataFormat.R, followed by
+# RScriptSNADescriptives.R, code for descriptive analysis of the data, and
 # RscriptSienaVariableFormat.R, which formats data and specifies the model, and
 # RscriptSienaRunModel.R, which runs the model and estimates parameters
-# RscriptSienaBehaviour.R, which illustrates an example of analysing the 
+# RscriptSienaBehaviour.R, which illustrates an example of analysing the
 # coevolution of networks and behaviour
-# Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley, 
+# Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley,
 # Johan Koskinen, and Paulina Preciado.
 #
 # This script, RscriptSienaVariableFormat.R, sets up the variables for analysis.
-# The manipulations in this script requires that you have gone through the 
-# first part, "CALLING THE DATA AND PRELIMINARY MANIPULATIONS", 
+# The manipulations in this script requires that you have gone through the
+# first part, "CALLING THE DATA AND PRELIMINARY MANIPULATIONS",
 # of the script "RscriptDataFormat.R" beforehand;
 # or that you have defined the data and the model by means of the
 # siena01Gui() function and have saved and loaded the results,
@@ -24,7 +25,7 @@
 
 #### FORMATING DATA ACCORDING TO THEIR ROLES AS VARIABLES IN A SIENA MODEL #####
 
-# A number of objects need to be created in R, as preparations to letting 
+# A number of objects need to be created in R, as preparations to letting
 # siena07 execute the estimation. This will be indicated by
 # A: dependent variables;
 # B: explanatory variables;
@@ -34,25 +35,25 @@
 # ---- A. ----------------------------------------------------------------------
 # First we have to create objects for the dependent variables.
 
-# sienaNet creates a Siena network object from a matrix or array or list of 
+# sienaNet creates a Siena network object from a matrix or array or list of
 # sparse matrix of triples.
 # This object will have the role of a dependent variable in the analysis.
 # The name of this network object (here: friendship) will be used
 # in the output file.
 
- friendship <- sienaNet( 
+ friendship <- sienaNet(
                      array( c( friend.data.w1, friend.data.w2, friend.data.w3 ),
                      dim = c( 50, 50, 3 ) ) )
 
 # The integers in the dim() here refer to the number of nodes (senders,
 # receivers) and the number of waves.
-# This object is an array of dimension 50 x 50 x 3, representing 
-# three adjacency matrices, with a number of attributes. 
+# This object is an array of dimension 50 x 50 x 3, representing
+# three adjacency matrices, with a number of attributes.
 # Note that this is an object
 
         class(friendship)
 
-# with specific attributes and methods associated with it. 
+# with specific attributes and methods associated with it.
 # You can get the detailed information by requesting
 
         dim( friendship )
@@ -67,22 +68,22 @@
 
 #       friendship
 
-# but this gives a lot of output which you may not want, 
+# but this gives a lot of output which you may not want,
 # hence the # sign in front.
 
 # The function sienaNet can also be used to create a behavior variable object
 # with the extra argument type = "behavior".
-# (Non-mentioned attributes get the default value, and in this case 
+# (Non-mentioned attributes get the default value, and in this case
 # oneMode is the default;  see below.)
 
-# The 'drink' data (created in  RscriptDataFormat.R ) is made available as a 
+# The 'drink' data (created in  RscriptDataFormat.R ) is made available as a
 # dependent behavior variable by the function
 
         drinkingbeh <- sienaNet( drink, type = "behavior" )
 
 # the class, class(drinkingbeh), is still sienaNet
 
-# (NB: only use the variable in ONE role in a given model: 
+# (NB: only use the variable in ONE role in a given model:
 #  behavior variable or changing covariate!)
 
 # The options available for a sienaNet object are displayed when typing
@@ -95,11 +96,11 @@
 # that it is mentioned first.
 
 # To create bipartite network objects you need two node sets and must create
-# the node sets too. The following is an example 
+# the node sets too. The following is an example
 # (not really meaningful, just for the syntax):
 
  bfriendship <- sienaNet(array(c(friend.data.w1, friend.data.w2, friend.data.w3),
-                               dim=c(50, 50, 3)), 
+                               dim=c(50, 50, 3)),
                                "bipartite", nodeSet=c("senders", "receivers"))
  senders <- sienaNodeSet(50, nodeSetName="senders")
  receivers <- sienaNodeSet(50, nodeSetName="receivers")
@@ -128,7 +129,7 @@
 
         smoke1 <- coCovar( smoke[ , 1 ] )
 
-# This selects the first column of smoke, 
+# This selects the first column of smoke,
 # which contains the first wave observations,
 # and makes it available as a constant covariate.
 # This is the pattern for for evey covariate file, e.g.
@@ -168,10 +169,10 @@
 
 # You should now understand how the result of this differs from the
 # result of
-#       mybehdata <- sienaDataCreate( friendship, smoke1, drinkingbeh 
+#       mybehdata <- sienaDataCreate( friendship, smoke1, drinkingbeh
 
 # If you would like to use different names, you could request this as follows:
-#        mydata <- sienaDataCreate( nominations = friendship, smoke1, 
+#        mydata <- sienaDataCreate( nominations = friendship, smoke1,
 #                                   drinking = alcohol )
 
 # For bipartite networks you would have to specify the node sets, e.g.,
@@ -222,7 +223,7 @@
 
        myeff
 
-# For starting, the model specification is just a very limited default 
+# For starting, the model specification is just a very limited default
 # (including rates of change, outdegree and reciprocity only)
 # To make a meaningful analysis, you will need to add to it.
 
@@ -233,9 +234,9 @@
 
 # you see the type of information that is stored about the effects,
 # i.e., the columns (variables) defined for the effects.
-# If desired, more information about these variables can be obtained 
+# If desired, more information about these variables can be obtained
 # from the help files:
-#      ?getEffects         
+#      ?getEffects
 
 # Among these variables is the effectName.
 # The set of available effects can be inspected by requesting their names:
@@ -260,7 +261,7 @@
 # directly to option 3, ' Adding/removing effects using includeEffects'.
 
 # For identifying your effects you need the "shortName"s,
-# which can be read in the manual (section "Mathematical definition of effects"), 
+# which can be read in the manual (section "Mathematical definition of effects"),
 # or obtained from the "sink" command below.
 
 # ---- 1. Adding/removing effects using fix() ----------------------------------
@@ -269,8 +270,8 @@
 
         fix( myeff )
 
-# How to use fix() is presented merely for getting to know what myeff is. 
-# In practical analysis it is more convenient 
+# How to use fix() is presented merely for getting to know what myeff is.
+# In practical analysis it is more convenient
 # to use routine "includeEffects" instead, as explained below.
 # fix() may not be usable if you do not have tcl/tk available!
 # Note that the top of the dataframe shows the names of the columns:
@@ -285,14 +286,14 @@
 # of the interal strtucture of the effects object.
 # The commands below are used to set "include" to TRUE or FALSE,
 # as an alternative to using the data editor.
-# The "include" column with values TRUE or FALSE will always be 
+# The "include" column with values TRUE or FALSE will always be
 # ocated at the 9th column,
 # but transitive triplets will not always be at the 13th row as this depends
 # on the number of periods and variables; further, the list of available effects
 # may change in future versions.
 # Note: These row numbers may not be the current ones, as they depend on the
 # list of effects implemented, which is changeable.
-# Some examples are the following 
+# Some examples are the following
 # (preceded by # because not proposed to be applied).
 
         #myeff[13,9] <- TRUE   #transitive triples
@@ -365,7 +366,7 @@
 # ---- 3. Adding/removing effects using includeEffects -------------------------
 # A third way of specifying the model is by the includeEffects function.
 # This function uses short names instead of full names.
-# The short names are listed in the descriptions given in 
+# The short names are listed in the descriptions given in
 # Section 12 of the manual.
 # A list of the short names can also be obtained by
 
@@ -373,7 +374,7 @@
         myeff$shortName
         sink()
 
-# A more general table of effect information including short names 
+# A more general table of effect information including short names
 # is also available as a pdf file in the R directory, and can be opened by
 
         RShowDoc("effects", package="RSiena")
@@ -410,11 +411,11 @@
 
 # results in a message that does not (like the earlier one)
 # confirm the newly included effect.
-# The covariates are indicated by the variable "interaction1" 
+# The covariates are indicated by the variable "interaction1"
 # in the sienaEffects object,
 # and this has to be mentioned to include these effects:
 
-        myeff <- includeEffects( myeff, egoX, altX, egoXaltX, 
+        myeff <- includeEffects( myeff, egoX, altX, egoXaltX,
                                  interaction1 = "alcohol" )
         myeff <- includeEffects( myeff, simX, interaction1 = "smoke1" )
 
@@ -454,7 +455,7 @@
 # A second special topic is how to access other characteristics of effects
 # without referring to the effect numbers.
 # This can be done by the setEffect function.
-# E.g., the dense triads effects 
+# E.g., the dense triads effects
 # counts the number of triplets with at least xx ties,
 # where xx is the parameter of the effect, which can be 5 or 6
 # (note that 6 is the maximum number of ties in a triplet).

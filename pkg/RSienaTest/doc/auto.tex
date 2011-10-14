@@ -1,0 +1,46 @@
+\documentclass[a4paper, fleqn]{article}
+% for the print version, 11pt must be added in the documentclass options;
+% this must be deleted in the screen version.
+
+%Required files: pdfscreen.sty, pdfscreen.cfg, ilcampo_bg.jpg, ilcampo.jpg
+%\usepackage{times}
+%\usepackage[DIV=11]{typearea}
+\usepackage{natbib}
+\usepackage{rotating}
+\usepackage{longtable, lscape}
+\usepackage{threeparttablex}
+\usepackage{amsmath}
+\begin{document}
+\begin{landscape}
+%\begin{footnotesize}
+\begin{longtable}{c | p{3cm} | p{5.2cm} | p{4.2cm} | p{8.5cm} }
+\caption[List of  Functions: Execution] {List of  Functions in order of
+Execution}
+\label{tab:ListSienaExec} \\
+\hline
+
+\multicolumn{1}{c}{\textbf{Stage}} & \multicolumn{1}{c}{\textbf{Name}} &
+\multicolumn{1}{c}{\textbf{Syntax}} & \multicolumn{1}{c}{\textbf{Examples}} &
+\multicolumn{1}{c}{\textbf{Description}} \\
+\hline
+\endfirsthead
+
+\multicolumn{5}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline \multicolumn{1}{c}{\textbf{Stage}} & \multicolumn{1}{c}{\textbf{Name}} &
+\multicolumn{1}{c}{\textbf{Syntax}} & \multicolumn{1}{c}{\textbf{Examples}} &
+\multicolumn{1}{c}{\textbf{Description}} \\
+\hline
+\endhead
+
+\hline \multicolumn{5}{|r|}{{\tiny{Continued...}}} \\
+\hline
+\endfoot
+
+\hline \hline
+\endlastfoot
+\input{docn.tex}
+%\raggedright
+\end{longtable}
+\end{landscape}
+\end{document}

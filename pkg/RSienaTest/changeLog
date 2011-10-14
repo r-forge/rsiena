@@ -1,3 +1,20 @@
+2011-10-14 r-forge revision 176 RSienaTest only
+
+	* inst/scripts/RScriptDataFormat.R,
+	inst/scripts/RScriptSienaVariable.R,
+	inst/scripts/RScriptSienaRunModel.R,
+	inst/scripts/RScriptSienaBehaviour.R,
+	inst/scripts/RSienaSNADescriptives.R: removed sna and network code to
+	separate file which is excluded from testing by containing 'SNA' in the
+	name
+	* R/siena07.r, tests/scripts.R, tests/scriptfile.Rout.save,
+	tests/scripts.Rout.save, tests/scriptfile.Rout.win:
+	amended to work better multi-platform, although linux not yet tested.
+	* R/document.r, doc/auto.tex, RSienaDeveloper.tex: new function to
+	automate construction of the function table in the manual.
+	* src/model/variables/DependentVariable.cpp: fix bug in diffusion
+	effects.
+
 2011-10-06 R-forge revision 175 RSienaTest only
 
 	* doc/RScriptDataFormat.R, doc/RScriptSienaVariable.R,
@@ -12,7 +29,7 @@
 	terminate return the object unchanged if called non-interactively.
 	* R/sienaprint.r, NAMESPACE, man/xtable.Rd: added dummy xtable command
 	to call real one.
-	* tests/scripts.R, tests/scripts.Rout,save, tests/scriptfile.Rout.save: 
+	* tests/scripts.R, tests/scripts.Rout,save, tests/scriptfile.Rout.save:
 	added file to test
 	scripts, controlled by an environment variable.
 	* doc/RSiena_Manual.tex: altered path to scripts and file names.

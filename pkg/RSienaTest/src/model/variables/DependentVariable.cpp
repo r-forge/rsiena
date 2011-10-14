@@ -275,7 +275,7 @@ void DependentVariable::initializeRateFunction()
 					interactionName);
 			}
 
-			if (effectName == "averageExposure")
+			if (effectName == "avExposure")
 			{
 				if (this->lpActorSet != pVariable->pSenders())
 				{
