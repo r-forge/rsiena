@@ -7,16 +7,17 @@
 #
 # The introductory script is divided into the follwing script files:
 # RscriptDataFormat.R, followed by
+# RScriptSNADescriptives.R, code for descriptive analysis of the data, and
 # RscriptSienaVariableFormat.R, that formats data and specifies the model, and
 # RscriptSienaRunModel.R, that runs the model and estimates parameters
-# RscriptSienaBehaviour.R, that illustrates an example of analysing the 
+# RscriptSienaBehaviour.R, that illustrates an example of analysing the
 # coevolution of networks and behaviour
-# Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley, 
+# Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley,
 # and Johan Koskinen.
 #
 
-# Here is a short script for analysing the co-evolution of the 
-# friendship network and drinking behaviour for the 50 girls in the 
+# Here is a short script for analysing the co-evolution of the
+# friendship network and drinking behaviour for the 50 girls in the
 # Teenage Friends and Lifestyle Study data
 # (http://www.stats.ox.ac.uk/~snijders/siena/s50_data.zip), described in
 # http://www.stats.ox.ac.uk/~snijders/siena/s50_data.htm
@@ -31,14 +32,14 @@
         smoke <- as.matrix(read.table("s50-smoke.dat"))# covariate
 
 # At this point it is a good idea to use the sna package to plot the networks
-# and the behavioural variable. Descriptive measures of the similarity of 
+# and the behavioural variable. Descriptive measures of the similarity of
 # "friends" with respect to behaviour (like Moran's I) are given by the function
 # nacf() in the sna package
 
-# Tell RSiena that the adjacency matrices are network data and in what order 
+# Tell RSiena that the adjacency matrices are network data and in what order
 # they should be treated
 
-      friendship <- sienaNet( array( c( friend.data.w1, friend.data.w2, 
+      friendship <- sienaNet( array( c( friend.data.w1, friend.data.w2,
                                         friend.data.w3 ),
                              dim = c( 50, 50, 3 ) ) )# create dependent variable
 
@@ -47,42 +48,42 @@
         drinkingbeh <- sienaNet( drink, type = "behavior" )
 
         smoke1 <- coCovar( smoke[ , 1 ] )
-       
+
         myCoEvolutionData <- sienaDataCreate( friendship, smoke1, drinkingbeh )
 
         myCoEvolutionEff <- getEffects( myCoEvolutionData )
 
-# Run reports to check that data is properly formated and 
+# Run reports to check that data is properly formated and
 # to get some basic descriptives
 
-        print01Report( myCoEvolutionData, myCoEvolutionEff, 
+        print01Report( myCoEvolutionData, myCoEvolutionEff,
                        modelname = 's50_3_CoEvinit' )
 
 # Define the effects to include in the coevolution model
 # Start with some structural effects (use the shortnames that you find in
 # RShowDoc("effects", package="RSiena") )
-      
+
         myCoEvolutionEff <- includeEffects( myCoEvolutionEff, transTrip, cycle3)
 
 # Include a homophily effect for the constant covariate smoking
-      
-        myCoEvolutionEff <- includeEffects( myCoEvolutionEff, simX, 
+
+        myCoEvolutionEff <- includeEffects( myCoEvolutionEff, simX,
                                             interaction1 = "smoke1" )
 
-# If we want to parse out whether there is a selection or influence (or both) 
-# effect for drinking behaviour, 
-# we need to first include sender, receiver and homophily effects 
+# If we want to parse out whether there is a selection or influence (or both)
+# effect for drinking behaviour,
+# we need to first include sender, receiver and homophily effects
 # of drinking for friendship formation:
-   
-        myCoEvolutionEff <- includeEffects(myCoEvolutionEff, egoX, altX, simX, 
+
+        myCoEvolutionEff <- includeEffects(myCoEvolutionEff, egoX, altX, simX,
                                            interaction1 = "drinkingbeh" )
 
-# For the influence part, i.e. the effect of the network on behaviour, 
-# we specify the following effects: 
+# For the influence part, i.e. the effect of the network on behaviour,
+# we specify the following effects:
 # Now indegree, outdegree and assimilation effects for drinking
 
-  myCoEvolutionEff <- includeEffects( myCoEvolutionEff, name = "drinkingbeh", 
-                                      avAlt,indeg, outdeg, 
+  myCoEvolutionEff <- includeEffects( myCoEvolutionEff, name = "drinkingbeh",
+                                      avAlt,indeg, outdeg,
                                       interaction1 = "friendship" )
 
 # Check what effects you have decided to include:
@@ -91,13 +92,13 @@
 
 # Define the model as data + effects:
 
-        myCoEvModel <- sienaModelCreate( useStdInits = TRUE, 
+        myCoEvModel <- sienaModelCreate( useStdInits = TRUE,
                                          projname = 's50CoEv_3' )
 
 # Estimate model
 
-        ans <- siena07( myCoEvModel, data = myCoEvolutionData, 
-                        effects = myCoEvolutionEff) 
+        ans <- siena07( myCoEvModel, data = myCoEvolutionData,
+                        effects = myCoEvolutionEff)
 
 # THE RESULTS
 
@@ -117,8 +118,8 @@
 # For this small data set, the model for behavior dynamics is over-specified,
 # leading to some very large standard errors.
 # Running a model modified by
-#          myCoEvolutionEff <- includeEffects( myCoEvolutionEff, 
-#                               name = "drinkingbeh", indeg, outdeg, 
+#          myCoEvolutionEff <- includeEffects( myCoEvolutionEff,
+#                               name = "drinkingbeh", indeg, outdeg,
 #                               interaction1 = "friendship" ,include = FALSE)
 # without degree effects on behaviour gives better results.
 

@@ -6,6 +6,7 @@
 ###################################################################################
 #
 # RscriptDataFormat.R is followed by
+# RScriptSNADescriptives.R, code for descriptive analysis of the data, and
 # RscriptSienaVariableFormat.R, which formats data and specifies the model, and
 # RscriptSienaRunModel.R, which runs the model and estimates parameters
 # RscriptSienaBehaviour.R, which illustrates an example of analysing the
@@ -230,29 +231,31 @@
 		SAff.3 <- with(ArcList, ArcList[ wid == 3, ] ) #extracts edges in wave 3
 		n <- 50 # this is the number of nodes which is not provided by the arclist
 
-### and has to be reported separately for each of the waves
+### and has to be repeated separately for each of the waves
 ### (you may loop over the waves if you like),
-
-### The package "sna" has functions to transform adjacency or arc lists into
-### matrices and vice versa
-
-		library(sna)
 
 ### For transforming a matrix into an adjacency list
 
-		(friend.data.w1.arclist <- as.edgelist.sna(friend.data.w1))
+## create indicator matrix of non-zero entries of a
+        ones <- !friend.data.w1 %in% 0
+## create empty edge list of desired length
+        edges <- matrix(0, sum(ones), 3)
+# fill the columns of the edge list
+        edges[, 1] <- row(friend.data.w1)[ones]
+        edges[, 2] <- col(friend.data.w1)[ones]
+        edges[, 3] <- friend.data.w1[ones]
+# if desired, order edge list by senders and then receivers
+        edges <- edges[order(edges[, 1], edges[, 2]), ]
 
 ### For transforming an arclist into a matrix
 	## First remove the fourth coulmn indicating the wave, so that we are left
 	## with sender, receiver and value of the tie, and make it into matrix format
-		SAff.1.copy <- SAff.1[,1:3]
+		SAff.1.copy <- SAff.1[, 1:3]
 		SAff.1.copy <- as.matrix(SAff.1.copy)
-	## Change the names to make them usable by "sna"
-		colnames(SAff.1.copy) <-  c("snd", "rec", "val")
-	## Specify the number of actors
-		attr(SAff.1.copy, "n") <- 50
-	## Transform into matrix
-		(SAff.1.matrix <- as.sociomatrix.sna(SAff.1.copy))
+# create empty adjacency matrix
+        adj <- matrix(0, 50, 50)
+# put edge values in desired places
+        adj[edges[, 1:2]] <- edges[, 3]
 
 ###################################################################################
 ################ - READING IN PAJEK DATA - ########################################
@@ -301,36 +304,14 @@
 # Let us do as if the missing codes for the friendship network were 6 and 9.
 # This leads to the following commands.
 # (For new R users: the c() function used here as "c(6,9)" constructs
-#  a vector [c for column] consisting of the numbers 6 and 9.
+#  a vector [c for concatenate] consisting of the numbers 6 and 9.
 #  This function is used a lot in basic R.)
 
         friend.data.w1[ friend.data.w1 %in% c(6,9) ] <- NA
         friend.data.w1[ friend.data.w2 %in% c(6,9) ] <- NA
         friend.data.w1[ friend.data.w3 %in% c(6,9) ] <- NA
 
-# A visual inspection of the adjacency matrices can sometimes be useful.
-# This will, for example, help in highlighting outliers with respect to
-# outdegrees or indegrees, if there are any of such outliers.
-# This requires package "sna":
-
-        library( network )
-        library( sna )
-        net1 <- as.network( friend.data.w1 )
-        net2 <- as.network( friend.data.w2 )
-        net3 <- as.network( friend.data.w3 )
-        plot.sociomatrix( net1,drawlab = F, diaglab = F, xlab = 'friendship t1' )
-        plot.sociomatrix( net2,drawlab = F, diaglab = F, xlab = 'friendship t2' )
-        plot.sociomatrix( net3,drawlab = F, diaglab = F, xlab = 'friendship t3' )
-
-# The class,
-	class( net1 )
-# with attributes
-	attributes( net1 )
-# has special methods associated with it.
-# while  plot( friend.data.w1 ) only produces a rather dull plot of
-# the first two columns
-#       plot( net1, xlab = 'friendship t1' )
-# produces a nice sociogram
+# Commands for descriptive analysis are in the script: RSienaSNADescriptives.R
 
 ############## - SELECTING SUBSETS OF DATA - ###################################
 
@@ -376,113 +357,10 @@
         friend1.data.w2 <- friend.data.w2[ use, use ]
         drink1 <- drink[ use, ]
 
-# To check what has changed
-      	net1.1 <- as.network(friend1.data.w1)
-      	plot.network(net1)
-      	plot.sociomatrix( net1,drawlab = F, diaglab = F, xlab = 'friendship t1' )
 
-################# - MORE ON DESCRIPTIVES - #####################################
-#
-# Some further descriptives you can do for the data are plotting and
-# calculating some statistics.
-
-        plot( net1, xlab = 'friendship t1' )
-
-# add the attribute drink to the network object
-
-        net1 %v% "drink" <- drink[ , 1 ]
-
-# color the nodes by drink
-
-        plot( net1, vertex.col = "drink", xlab = 'friendship t1' )
-
-
-# Now let's color the nodes by drink and scale the vertex by degree of nodes!
-#
-# First calculate degree:
-
-        deg <- rowSums( as.matrix( net1 ) )# NB:  rowSums() is define for class matrix
-
-# have a look at the degree distribution
-
-        table( deg, useNA = 'always' )
-
-# Now do the desired plot:
-
-        plot( net1, vertex.col = "drink", vertex.cex = (deg + 1)/1.5 )
-
-# ---- Plot the three waves of data --------------------------------------------
-
-# Add drink to waves 2 and 3
-        net2 %v% "drink" <- drink[ , 2 ]
-        net3 %v% "drink" <- drink[ , 3 ]
-      	deg2 <- rowSums( as.matrix( net2 ) )
-      	deg3 <- rowSums( as.matrix( net3 ) )
-
-# Create a set of panels ( 1 row by 3 columns, or 3 columns by 1 row)
-
-        par( mfrow = c( 1, 3 ) )
-
-# creating three plots after each other will place them in consecutive panels
-
-        plot( net1, vertex.col = "drink", vertex.cex = (deg + 1)/1.5 )
-        plot( net2, vertex.col = "drink", vertex.cex = (deg2 + 1)/1.5 )
-        plot( net3, vertex.col = "drink", vertex.cex = (deg3 + 1)/1.5 )
-
-# Each time we make a plot the coordinates move - because always
-# the starting values are random. We can also save coordinates
-# and use them for later plotting:
-
-        par( mfrow = c( 1, 3 ) )
-        coordin <-  plot( net1, vertex.col = "drink", vertex.cex = (deg +1 )/1.5 )
-        plot( net2, coord = coordin, vertex.col = "drink", vertex.cex = (deg2 + 1)/1.5 )
-        plot( net3, coord = coordin, vertex.col = "drink", vertex.cex = (deg3 + 1) /1.5 )
-
-# To get coordinates based on all three waves: coordin <-  plot( net1 + net2 + net3 )
-# For more plotting options, try the gplot function in the "sna" library
-
-        ?gplot
-        ?gplot.layout
-
-
-# ---- Basic network statistics ------------------------------------------------
-
-# The package "sna" can be used for a variety of descriptions and analyses.
-# The following are examples.
-# some important graph level statistics
-
-        gden( net1 ) # density
-        grecip( net1 ) # proportion of dyads that are symmetric
-        grecip( net1, measure = "dyadic.nonnull" ) # reciprocity, ignoring the null dyads
-        gtrans( net1 ) # transitivity
-
-# dyad and triad census
-
-        dyad.census( net1 )
-        triad.census( net1 )
-
-# out degree distribution (of course for a symmetric network outdegree=indegree)
-
-        outdegree <- degree( net1, cmode = "outdegree" )
-        outdegree #outgoing ties of each note
-
-        hist( outdegree )
-        quantile( outdegree )
-
-# measures of connectivity and distance
-
-        dist <- geodist(net1, inf.replace = Inf, count.paths = TRUE)
-# calculate the geodesic distance (shortest path length) matrix
-   	   dist$gd
-# matrix of geodesic distances
-	      dist$counts
-# matrix containing the number of paths at each geodesic between each pair of vertices
-        dist
-        reach <- reachability( net1 )  # calculate the reachability matrix
-        reach
 
 ################################################################################
 ###
-### ---- PROCEED TO RscriptSienaVariableFormat.R FOR PREPARING DATA FOR RSIENA -
+### ---- PROCEED TO RscriptSNADescriptives.R FOR DESCRIPTIVE ANAYLSIS ----------
 ###
 ################################################################################

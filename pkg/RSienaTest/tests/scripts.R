@@ -27,23 +27,39 @@ file.copy(files1, ".", overwrite=TRUE)
 
 ## write some initialisation data
 unlink("scriptfile.R")
-writeLines(c("options(error=NULL)", "set.seed(1)"), "scriptfile.R")
-
+writeLines(c("options(error=NULL)", "set.seed(1)",
+			 "options(help_type='text')"), "scriptfile.R")
+if (.Platform$OS.type == "windows")
+{
+	cat("options(pager='console')\n", file="scriptfile.R", append=TRUE)
+}
 ## now concatenate the scripts
 dd <- system.file("scripts", package="RSiena")
 files <- list.files(dd, pattern="\\.R$", full.names=TRUE)
 for (f in files)
 {
-	file.append("scriptfile.R", f)
+	if (!grepl("SNA", f))
+	{
+		file.append("scriptfile.R", f)
+	}
 }
 
 ## now run it
 res <- 0L
 runone("scriptfile.R")
 
-## now look at the differences
-
-system("diff scriptfile.Rout scriptFile.Rout.save")
+## now look at the differences in extra braces because of executing in batch
+{if (.Platform$OS.type == "windows")
+{
+	previousFile <- "scriptFile.Rout.win"
+}
+else
+{
+	previousFile <- "scriptFile.Rout.save"
+}}
+#system("diff scriptfile.Rout scriptFile.Rout.save")
+library(tools)
+Rdiff("scriptfile.Rout", previousFile)
 
 proc.time()
 

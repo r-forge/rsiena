@@ -7,6 +7,7 @@
 #
 # The introductory script is divided into the following script files:
 # RscriptDataFormat.R, followed by
+# RScriptSNADescriptives.R, code for descriptive analysis of the data, and
 # RscriptSienaVariableFormat.R, which formats data and specifies the model, and
 # RscriptSienaRunModel.R, which runs the model and estimates parameters
 # RscriptSienaBehaviour.R, which illustrates an example of analysing the

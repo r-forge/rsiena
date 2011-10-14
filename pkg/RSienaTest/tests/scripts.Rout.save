@@ -2,7 +2,7 @@
 R version 2.13.2 (2011-09-30)
 Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: i386-pc-mingw32/i386 (32-bit)
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -48,14 +48,21 @@ Type 'q()' to quit R.
 > 
 > ## write some initialisation data
 > unlink("scriptfile.R")
-> writeLines(c("options(error=NULL)", "set.seed(1)"), "scriptfile.R")
-> 
+> writeLines(c("options(error=NULL)", "set.seed(1)",
++ 			 "options(help_type='text')"), "scriptfile.R")
+> if (.Platform$OS.type == "windows")
++ {
++ 	writeLines("options(pager='console')", "scriptfile.R",)
++ }
 > ## now concatenate the scripts
 > dd <- system.file("scripts", package="RSiena")
 > files <- list.files(dd, pattern="\\.R$", full.names=TRUE)
 > for (f in files)
 + {
-+ 	file.append("scriptfile.R", f)
++ 	if (!grepl("SNA", f))
++ 	{
++ 		file.append("scriptfile.R", f)
++ 	}
 + }
 > 
 > ## now run it
@@ -64,25 +71,68 @@ Type 'q()' to quit R.
   Running 'scriptfile.R'
 [1] 0
 > 
-> ## now look at the differences
-> 
-> system("diff scriptfile.Rout scriptFile.Rout.save")
-3511c3511
-< % Thu Oct 06 16:45:13 2011
+> ## now look at the differences in extra braces because of executing in batch
+> {if (.Platform$OS.type == "windows")
++ {
++ 	previousFile <- "scriptFile.Rout.win"
++ }
++ else
++ {
++ 	previousFile <- "scriptFile.Rout.save"
++ }}
+> #system("diff scriptfile.Rout scriptFile.Rout.save")
+> library(tools)
+> Rdiff("scriptfile.Rout", previousFile)
+
+364c364
+< [45] "scriptfile.Rout.save"     "scriptfile.Rout.win"     
 ---
-> % Thu Oct 06 16:30:57 2011
-3539c3539
-< <!-- Thu Oct 06 16:45:13 2011 -->
+> [45] "scriptfile.Rout.save"     "scripts.R"               
+365c365
+< [47] "scripts.R"                "scripts.Rout"            
 ---
-> <!-- Thu Oct 06 16:30:57 2011 -->
-4036c4036
-<  339.57    1.71  343.48 
+> [47] "scripts.Rout"             "scripts.Rout.save"       
+366c366
+< [49] "scripts.Rout.save"        "startup.Rs"              
 ---
->  336.10    2.01  345.31 
+> [49] "startup.Rs"               "test10.out"              
+367c367
+< [51] "test10.out"               "test12.out"              
+---
+> [51] "test12.out"               "test3.out"               
+368c368
+< [53] "test3.out"                "test4.out"               
+---
+> [53] "test4.out"                "test7.out"               
+369c369
+< [55] "test7.out"                "test8.out"               
+---
+> [55] "test8.out"                "tmp3a.dat"               
+370c370
+< [57] "tmp3a.dat"                "tmp4a.dat"               
+---
+> [57] "tmp4a.dat"               
+462c462
+< Packaged:             2011-10-13 15:02:38 UTC; ruth
+---
+> Packaged:             2011-10-13 13:33:58 UTC; ruth
+464c464
+<                       15:02:47 UTC; unix
+---
+>                       13:56:27 UTC; unix
+2252c2252
+< % Thu Oct 13 16:05:41 2011
+---
+> % Thu Oct 13 14:59:24 2011
+2280c2280
+< <!-- Thu Oct 13 16:05:42 2011 -->
+---
+> <!-- Thu Oct 13 14:59:24 2011 -->
+[1] 1
 > 
 > proc.time()
    user  system elapsed 
-   0.28    0.04  344.01 
+141.005   1.344 144.082 
 > 
 > if (res > 0)
 + {
