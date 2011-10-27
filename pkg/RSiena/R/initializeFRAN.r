@@ -69,35 +69,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             }
             effects$initialValue <- defaultEffects$initialValue
         }
-        else
-        {
-            if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
-            {
-                prevEffects <- prevAns$requestedEffects
-                prevEffects$initialValue <- prevAns$theta
-                if (prevAns$cconditional)
-                {
-                    condEffects <- attr(prevAns$f, "condEffects")
-                    condEffects$initialValue <- prevAns$rate
-                    prevEffects <- rbind(prevEffects, condEffects)
-                }
-                oldlist <- apply(prevEffects, 1, function(x)
-                                 paste(x[c("name", "shortName",
-                                           "type", "groupName",
-                                           "interaction1", "interaction2",
-                                           "period")],
-                                       collapse="|"))
-                efflist <- apply(effects, 1, function(x)
-                                 paste(x[c("name", "shortName",
-                                           "type", "groupName",
-                                           "interaction1", "interaction2",
-                                           "period")],
-                                       collapse="|"))
-                use <- efflist %in% oldlist
-                effects$initialValue[use] <-
-                    prevEffects$initialValue[match(efflist, oldlist)][use]
-            }
-        }
         ## get data object into group format to save coping with two
         ## different formats
         if (inherits(data, 'sienaGroup'))
@@ -109,10 +80,17 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             nGroup <- 1
             data <- sienaGroupCreate(list(data), singleOK=TRUE)
         }
-        ## add any effects needed for time dummies
+		## add any effects needed for time dummies
         tmp <- sienaTimeFix(effects, data)
         data <- tmp$data
         effects <- tmp$effects
+		if (!x$useStdInits)
+        {
+			if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
+			{
+				effects <- updateTheta(effects, prevAns)
+			}
+        }
         ## find any effects not included which are needed for interactions
         tmpEffects <- effects[effects$include, ]
         interactionNos <- unique(c(tmpEffects$effect1, tmpEffects$effect2,
@@ -241,7 +219,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             attr(data, "numberNonMissingBehavior")
         attr(f, "numberMissingBehavior") <- attr(data, "numberMissingBehavior")
 
-      #  attr(f, "totalMissings") <- attr(data, "totalMissings")
+		##  attr(f, "totalMissings") <- attr(data, "totalMissings")
 
         if (x$maxlike && x$FinDiff.method)
         {
@@ -310,7 +288,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     pData <- .Call('setupData', PACKAGE=pkgname,
                    lapply(f, function(x)(as.integer(x$observations))),
                    lapply(f, function(x)(x$nodeSets)))
-    ans <- .Call('OneMode', PACKAGE=pkgname,
+	ans <- .Call('OneMode', PACKAGE=pkgname,
                  pData, lapply(f, function(x)x$nets))
     ans <- .Call('Bipartite', PACKAGE=pkgname,
                  pData, lapply(f, function(x)x$bipartites))
@@ -320,11 +298,11 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                 pData, lapply(f, function(x)x$cCovars))
     ans <-.Call('ChangingCovariates', PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$vCovars))
-    ans <-.Call('DyadicCovariates', PACKAGE=pkgname,
+	ans <-.Call('DyadicCovariates', PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$dycCovars))
-    ans <-.Call('ChangingDyadicCovariates', PACKAGE=pkgname,
+	ans <-.Call('ChangingDyadicCovariates', PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$dyvCovars))
-    ans <-.Call('ExogEvent', PACKAGE=pkgname,
+	ans <-.Call('ExogEvent', PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$exog))
     ## split the names of the constraints
     higher <- attr(f, "allHigher")
@@ -396,7 +374,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         interactionEffectsl <- ff$interactionEffectsl
         types <- ff$types
     }
-    ans <- .Call('effects', PACKAGE=pkgname, pData, basicEffects)
+	ans <- .Call('effects', PACKAGE=pkgname, pData, basicEffects)
     pModel <- ans[[1]][[1]]
     for (i in seq(along=(ans[[2]]))) ## ans[[2]] is a list of lists of
         ## pointers to effects. Each list corresponds to one
@@ -455,7 +433,13 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             z$maxlikeTargets <- rowSums(ans)
             z$maxlikeTargets2 <- ans
             z$mult <- x$mult
-            z$nrunMH <- z$mult * sum(z$maxlikeTargets[z$effects$basicRate])
+            z$nrunMH <-
+				z$mult * colSums(z$maxlikeTargets2[z$effects$basicRate, ,
+												   drop=FALSE ])
+			z$nrunMH < pmax(z$nrunMH, 2)
+			## make the number pretty
+			z$nrunMH <- ifelse (z$nrunMH > 100,
+								 round(z$nrunMH / 100) * 100, z$nrunMH)
             ##thetaMat is to allow different thetas for each group in Bayes
             z$thetaMat <- matrix(z$theta, nrow=nGroup, ncol=z$pp, byrow=TRUE)
             ## create a grid of periods with group names in case want to
@@ -549,7 +533,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         }
         else ## set up the initial chains in the sub processes
         {
-            ans <- .Call("mlInitializeSubProcesses",
+			ans <- .Call("mlInitializeSubProcesses",
                          PACKAGE=pkgname, pData, pModel,
                          simpleRates, z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
@@ -1851,4 +1835,39 @@ fixUpEffectNames <- function(effects)
     effects
 }
 
-
+##@updateTheta siena07 Copy theta values from previous fit
+updateTheta <- function(effects, prevAns)
+{
+	if (!inherits(effects, "data.frame"))
+	{
+		stop("effects is not a data.frame")
+	}
+	if (!inherits(prevAns, "sienaFit"))
+	{
+		stop("prevAns is not an RSiena fit object")
+	}
+	prevEffects <- prevAns$requestedEffects
+	prevEffects$initialValue <- prevAns$theta
+	if (prevAns$cconditional)
+	{
+		condEffects <- attr(prevAns$f, "condEffects")
+		condEffects$initialValue <- prevAns$rate
+		prevEffects <- rbind(prevEffects, condEffects)
+	}
+	oldlist <- apply(prevEffects, 1, function(x)
+					 paste(x[c("name", "shortName",
+							   "type", "groupName",
+							   "interaction1", "interaction2",
+							   "period")],
+						   collapse="|"))
+	efflist <- apply(effects, 1, function(x)
+					 paste(x[c("name", "shortName",
+							   "type", "groupName",
+							   "interaction1", "interaction2",
+							   "period")],
+						   collapse="|"))
+	use <- efflist %in% oldlist
+	effects$initialValue[use] <-
+		prevEffects$initialValue[match(efflist, oldlist)][use]
+	effects
+}

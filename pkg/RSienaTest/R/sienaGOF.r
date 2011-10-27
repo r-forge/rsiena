@@ -20,7 +20,7 @@ sienaGOF <- function(
 		cluster=NULL, robust=FALSE, ...)
 	{
 	require(MASS)
-	#require(Matrix)
+	##require(Matrix)
 	##  Check input
 	if (! sienaFitObject$returnDeps)
 	{
@@ -221,6 +221,7 @@ sienaGOF <- function(
 			p <- sapply(1:observations, function (i)
 				sum(obsTestStat[i] <= simTestStat) /length(simTestStat))
 		}
+
 		ret <- list( p = p,
 				SimulatedTestStat=simTestStat,
 				ObservedTestStat=obsTestStat,
@@ -234,6 +235,7 @@ sienaGOF <- function(
 				attr(obsStats,"auxiliaryStatisticName")
 		ret
 	}
+
 	res <- lapply(1:length(simStats),
 					function (i) {
 				 applyTest(obsStats[[i]], simStats[[i]]) })
@@ -701,10 +703,9 @@ snaSociomatrixExtraction <- function (i, data, sims, groupName, varName, wave) {
 	require(sna)
 	actors <- attr(data[[groupName]]$nets[[varName]][[wave+1]]$mat1,
 			"nActors")
-	missing <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat2)
+	missing <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat1)
 	attr(missing, "n") <- actors
-	#missing <- 1*is.na( as.sociomatrix.sna( missing ) )
-	missing <- as.sociomatrix.sna( missing )
+	missing <- 1*is.na( as.sociomatrix.sna( missing ) )
 
 	if (is.null(i)) {
 		# sienaGOF wants the observation:

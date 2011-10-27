@@ -2,7 +2,7 @@
 R version 2.13.2 (2011-09-30)
 Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: i386-pc-mingw32/i386 (32-bit)
+Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -19,7 +19,6 @@ Type 'q()' to quit R.
 > options(error=NULL)
 > set.seed(1)
 > options(help_type='text')
-> options(pager='console')
 > ###################################################################################
 > ###
 > ### ---- RscriptDataFormat.R: a script for the introduction to RSiena -------------
@@ -114,10 +113,10 @@ _A_r_g_u_m_e_n_t_s:
     pkgs: character vector of the names of packages whose current
           versions should be downloaded from the repositories.
 
-          If 'repos = NULL', a character vector of file paths of '.zip'
-          files containing binary builds of packages.  With suitable
-          tools installed (see the 'Details' below) source directories
-          or '.tar.gz' archives may also be installed.
+          If 'repos = NULL', a character vector of file paths of
+          '.tar.gz' files.  These can be source archives or binary
+          package archive files (as created by 'R CMD build --binary').
+          Tilde-expansion will be done on the file paths.
 
           If this is missing or a zero-length character vector, a
           listbox of available packages is presented where possible.
@@ -238,26 +237,12 @@ _D_e_t_a_i_l_s:
      if there is more than one.)  If 'lib' is omitted or is of length
      one and is not a (group) writable directory, the code offers to
      create a personal library tree (the first element of
-     'Sys.getenv("R_LIBS_USER")') and install there.  Detection of a
-     writable directory is problematic on Windows: see the 'Note'
-     section.
+     'Sys.getenv("R_LIBS_USER")') and install there.
 
      For source packages from a repository an attempt is made to
      install the packages in an order that respects their dependencies.
      This does assume that all the entries in 'lib' are on the default
      library path for installs (set by 'R_LIBS').
-
-     Using packages with 'type = "source"' always works on Windows
-     provided the package contains no C/C++/Fortran code that needs
-     compilation.  Otherwise you will need to have installed the Rtools
-     collection as described in the 'R for Windows FAQ' _and_ you must
-     have the 'PATH' environment variable set up as required by Rtools.
-
-     When installing a binary package, 'install.packages' will abort
-     the install if it detects that the package is already installed
-     and is currently in use.  In some circumstances (e.g. multiple
-     instances of R running at the same time and sharing a library) it
-     will not detect a problem, but the installation may fail.
 
      You are advised to run 'update.packages' before 'install.packages'
      to ensure that any already installed dependencies have their
@@ -304,14 +289,14 @@ _L_o_c_k_i_n_g:
 
 _N_o_t_e:
 
-     'install.packages' tries to detect if you have write permission on
-     the library directories specified, but Windows reports unreliably.
-     If there is only one library directory (the default), R tries to
-     find out by creating a test directory, but even this need not be
-     the whole story.  Under Windows Vista and later you may have
-     permission to write in a library directory but lack permission to
-     write binary files (such as '.dll' files) there.  See the 'R for
-     Windows FAQ' for workarounds.
+     Some binary distributions of R have 'INSTALL' in a separate
+     bundle, e.g. an 'R-devel' RPM.  'install.packages' will give an
+     error if called with 'type = "source"' on such a system.
+
+     Some binary distributions can be installed on a machine without
+     the tools needed to install packages: the remedy is to do a
+     complete install of R which should bring in all those tools as
+     dependencies.
 
 _S_e_e _A_l_s_o:
 
@@ -339,6 +324,7 @@ _E_x_a_m_p_l_e_s:
                             RSPerl = "--with-modules='IO Fcntl'"))
      ## End(Not run)
      
+
 > 
 > # Or click on the tab "Packages", "Instal package(s)", then select a CRAN mirror
 > # (e.g. Bristol if you are in the UK) and finally select from the list
@@ -347,7 +333,7 @@ _E_x_a_m_p_l_e_s:
 > # Where are you?
 > 
 > 	getwd()
-[1] "D:/Rforge2011/pkg/RSienaTest.Rcheck/tests"
+[1] "/Users/ruth/ruthsvn/siena/RSiena.Rcheck/tests"
 > 
 > # By something like
 > 	# setwd('C:/SienaTest')
@@ -372,28 +358,28 @@ _E_x_a_m_p_l_e_s:
  [1] "EIES1.dat"                "EIES2.dat"               
  [3] "EIESATD.dat"              "EIESATT.dat"             
  [5] "cbc1.dat"                 "cbc3.dat"                
- [7] "cbc6.dat"                 "klas12b-advice.dat"      
- [9] "klas12b-alcohol.dat"      "klas12b-delinquency.dat" 
-[11] "klas12b-demographics.dat" "klas12b-net-1.dat"       
-[13] "klas12b-net-2.dat"        "klas12b-net-3.dat"       
-[15] "klas12b-net-3m.dat"       "klas12b-net-4.dat"       
-[17] "klas12b-net-4m.dat"       "klas12b-present.dat"     
-[19] "klas12b-primary.dat"      "parallel.R"              
-[21] "parallel.Rout"            "parallel.Rout.save"      
-[23] "s50-alc2.dat"             "s50-alcohol.dat"         
-[25] "s50-dr2.dat"              "s50-network1.dat"        
-[27] "s50-network2.dat"         "s50-network3.dat"        
-[29] "s50-smoke.dat"            "s50-sp2.dat"             
-[31] "s50-sport.dat"            "s50.csv"                 
-[33] "s50.out"                  "s50_d1.net"              
-[35] "s50_d2.net"               "s50_d3.net"              
-[37] "s50e.csv"                 "s50e.dat"                
-[39] "s50e.out"                 "s50paj.csv"              
-[41] "s50paj.out"               "scriptfile.R"            
-[43] "scriptfile.Rout"          "scriptfile.Rout.save"    
-[45] "scriptfile.Rout.win"      "scripts.R"               
-[47] "scripts.Rout"             "scripts.Rout.save"       
-[49] "sienaGOF.Roneday"         "startup.Rs"              
+ [7] "cbc6.dat"                 "effectsTest.r"           
+ [9] "klas12b-advice.dat"       "klas12b-alcohol.dat"     
+[11] "klas12b-delinquency.dat"  "klas12b-demographics.dat"
+[13] "klas12b-net-1.dat"        "klas12b-net-2.dat"       
+[15] "klas12b-net-3.dat"        "klas12b-net-3m.dat"      
+[17] "klas12b-net-4.dat"        "klas12b-net-4m.dat"      
+[19] "klas12b-present.dat"      "klas12b-primary.dat"     
+[21] "parallel.R"               "parallel.Rout"           
+[23] "parallel.Rout.save"       "s50-alc2.dat"            
+[25] "s50-alcohol.dat"          "s50-dr2.dat"             
+[27] "s50-network1.dat"         "s50-network2.dat"        
+[29] "s50-network3.dat"         "s50-smoke.dat"           
+[31] "s50-sp2.dat"              "s50-sport.dat"           
+[33] "s50.csv"                  "s50.out"                 
+[35] "s50_d1.net"               "s50_d2.net"              
+[37] "s50_d3.net"               "s50e.csv"                
+[39] "s50e.dat"                 "s50e.out"                
+[41] "s50paj.csv"               "s50paj.out"              
+[43] "scriptfile.R"             "scriptfile.Rout"         
+[45] "scriptfile.Rout.save"     "scriptfile.Rout.win"     
+[47] "scripts.R"                "scripts.Rout"            
+[49] "scripts.Rout.save"        "startup.Rs"              
 [51] "test10.out"               "test12.out"              
 [53] "test3.out"                "test4.out"               
 [55] "test7.out"                "test8.out"               
@@ -458,6 +444,7 @@ _E_x_a_m_p_l_e_s:
      mymodel <- sienaModelCreate(findiff=FALSE, fn=simstats0c, nsub=2, n3=100)
      ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
      
+
 > 
 > # (these are .htlm HELP PAGES)
 > 
@@ -489,8 +476,9 @@ LazyLoad:             yes
 LazyData:             yes
 BuildResaveData:      no
 URL:                  http://www.stats.ox.ac.uk/~snijders/siena
-Built:                R 2.13.2; i386-pc-mingw32; 2011-10-24 18:56:11
-                      UTC; windows
+Packaged:             2011-10-13 13:33:58 UTC; ruth
+Built:                R 2.13.2; universal-apple-darwin9.8.0; 2011-10-13
+                      13:56:27 UTC; unix
 
 Index:
 
@@ -1265,6 +1253,7 @@ _E_x_a_m_p_l_e_s:
      mymat3s <- spMatrix(50, 50, mymat3[, 1], mymat3[, 2], mymat3[, 3])
      mynet4 <- sienaNet(list(mymat1s, mymat2s, mymat3s))
      
+
 > 
 > # This shows that next to one-mode (unipartite) and behavior dependent variables,
 > # also two-mode (bipartite) dependent variables are possible.
@@ -1938,6 +1927,7 @@ _E_x_a_m_p_l_e_s:
      myeff <- includeEffects(myeff, transTrip, balance)
      myeff <- includeEffects(myeff, avAlt, name="mynet2", interaction1="mynet1")
      
+
 > 
 > # you can see how to include endowment effects and how to exclude effects.
 > 
@@ -2274,8 +2264,8 @@ Covariance matrix of X (correlations below diagonal):
 > # The command
 > 
 >         xtable( ans )
-% latex table generated in R 2.13.2 by xtable 1.6-0 package
-% Thu Oct 27 18:09:19 2011
+% latex table generated in R 2.13.2 by xtable 1.5-6 package
+% Thu Oct 13 14:59:24 2011
 \begin{table}[ht]
 \begin{center}
 \begin{tabular}{llllrlrlr}
@@ -2302,8 +2292,8 @@ Covariance matrix of X (correlations below diagonal):
 > # or formatted in html. Use e.g.
 > 
 >         xtable( ans, type = 'html' )
-<!-- html table generated in R 2.13.2 by xtable 1.6-0 package -->
-<!-- Thu Oct 27 18:09:19 2011 -->
+<!-- html table generated in R 2.13.2 by xtable 1.5-6 package -->
+<!-- Thu Oct 13 14:59:24 2011 -->
 <TABLE border=1>
   <TR> <TD colspan=9 align=left> Rate parameters:  </TD> </TR> <TR> </TR> 
  <TR> <TD>   </TD> <TD> 0.1 </TD> <TD>  </TD> <TD> Rate parameter period 1 </TD> <TD align="right"> 6.57 </TD> <TD> ( </TD> <TD align="right"> 1.16 </TD> <TD> ) </TD> <TD align="right">  </TD> </TR>
@@ -2801,4 +2791,4 @@ Covariance matrix of X (correlations below diagonal):
 > 
 > proc.time()
    user  system elapsed 
- 324.07    1.67  327.07 
+141.418   1.284 144.660 

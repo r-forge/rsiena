@@ -36,7 +36,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 		stop("You must have at least three time periods to test ",
              "for non-heterogeneity across time.")
 	}
-	## if this is a maximim likelihood fit or finite differences we need
+	## if this is a maximum likelihood fit or finite differences we need
 	## the optional objects sdf2
 	if (sienaFit$maxlike || sienaFit$FinDiff.method)
 	{

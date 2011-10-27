@@ -17,7 +17,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
      prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
      prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
-     modelType=1, mult=4)
+     modelType=1, mult=5)
 }
 \arguments{
   \item{fn}{Function to do one simulation in the Robbins-Monro

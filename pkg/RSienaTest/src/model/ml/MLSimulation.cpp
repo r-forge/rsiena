@@ -1535,7 +1535,7 @@ bool MLSimulation::deletePermute(int c0)
 // 					if (pPreviousMiniStep)
 // 					{
 // 						dPlus = pPreviousMiniStep->difference();
-// 					}miniStep.variableId()
+// 					}
 // 					if (pNextMiniStep)
 // 					{
 // 						dMinus = pNextMiniStep->difference();

@@ -22,24 +22,8 @@ phase3 <- function(z, x, ...)
     z$returnDeps <- z$returnDepsStored
 
     if (x$checktime) z$ctime <- proc.time()[3]
+
     ## fix up iteration numbers if using multiple processors
-   # if (10 %% int == 0)
-   # {
-   #     firstNit <- 10
-   # }
-  #  else
-   # {
-   #     firstNit <- 10 + int - 10 %% int
-   # }
-   # if ((x$n3 - firstNit) %% int == 0)
-   # {
-   #     endNit <- x$n3
-   # }
-   # else
-   # {
-   #     endNit <- x$n3  + int - (x$n3 - firstNit) %% int
-   # }
-   #  cat("endNit", endNit, "n3 ", x$n3, "\n")
     if (x$n3 %% int > 0)
     {
         endNit <- x$n3 + int - x$n3 %%int
@@ -48,17 +32,8 @@ phase3 <- function(z, x, ...)
     {
         endNit <- x$n3
     }
-   z$n3 <- endNit
-    z$sf <- matrix(0, nrow = z$n3, ncol = z$pp)
-    z$sf2 <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
-    z$accepts3 <- matrix(0, nrow=z$n3, ncol=7)
-    z$rejects3 <- matrix(0, nrow=z$n3, ncol=7)
-    z$aborted3 <- matrix(0, nrow=z$n3, ncol=7)
-    if (!is.null(z$cconditional) && z$cconditional)
-    {
-        z$ntim <- matrix(NA, nrow=z$n3, ncol=f$observations - 1)
-    }
-    z$sims <- vector("list", z$n3)
+	z$n3 <- endNit
+
     ## revert to original requested method for phase 3 unless symmetric
     if (z$FinDiff.method && !x$FinDiff.method &&
         (!is.null(z$FinDiffBecauseSymmetric)) && z$FinDiffBecauseSymmetric)
@@ -77,15 +52,7 @@ phase3 <- function(z, x, ...)
     else
         Report('Estimation of derivatives by the LR method (type 1).\n\n', outf)
 
-    if (!x$maxlike & !z$FinDiff.method)
-    {
-        z$ssc <- array(0, dim = c(z$n3, f$observations - 1, z$pp))
-    }
-    else
-    {
-        z$sdf <- array(0, dim = c(z$n3, z$pp, z$pp))
-        z$sdf2 <- array(0, dim = c(z$n3, f$observations - 1, z$pp, z$pp))
-    }
+	z <- createSiena07stores(z, z$n3, f)
     xsmall<- NULL
     zsmall <- makeZsmall(z)
     if (!x$maxlike && !is.null(z$writefreq))
@@ -98,16 +65,6 @@ phase3 <- function(z, x, ...)
     }
     z <- AnnouncePhase(z, x)
     Report('Simulated values, phase 3.\n', cf)
-    #cat("endNit", endNit, "n3 ", x$n3, "\n")
-    #if (x$n3 %% int > 0)
-    #{
-    #    endNit <- x$n3 + int - x$n3 %%int
-    #}
-    #else
-    #{
-    #    endNit <- x$n3
-    #}
-    #cat("endNit", endNit, "n3", x$n3, "z$n3", z$n3, "\n")
     nits <- seq(1, endNit, int)
     nits11 <- min(c(endNit, nits[nits >= 11]))
     writefreq <- z$writefreq
@@ -180,34 +137,36 @@ phase3 <- function(z, x, ...)
 ###############################
         z <- doPhase3it(z, x, nit, zsmall=zsmall, xsmall=xsmall, ...)
 ##############################
-        ##  browser()
         if (!is.batch())
         {
-          #  if (nit<=3 || nit %%z$writefreq ==0)
-          #      DisplayTheta(z)
             if (nit < 10)
                 Report(c("  ", nit, " ", format(z$sf[nit,], width=10,
                                              digits=4, nsmall=4), "\n"), cf)
             if (nit >= 10)
             {
                 CheckBreaks()
-                ##    if (nit==10) set up stopkey hint Early termination of estimation
+                ##    if (nit==10) set up stopkey hint
+				##   Early termination of estimation
                 if( UserInterruptFlag())
                 {
-                    Report(c("The user asked for an early stop of the algorithm ",
-                             "during phase 3.\n"), outf)
+                   Report(c("The user asked for an early stop of the ",
+                             "algorithm during phase 3.\n"), outf)
                     z$Phase3Interrupt <- TRUE
                     if (nit < 500)
                     {
                         if (EarlyEndPhase2Flag())
+						{
                             Report('This implies that ', outf)
+						}
                         else
-                            Report('This implies that the estimates are as usual,\nbut ',
-                                   outf)
-                        Report(c('the diagnostic checks, covariance matrices and',
-                                 't-values \nare less reliable, because they are now',
-                                 'based on only', nit,
-                                 'phase-3 iterations.\n'), outf)
+						{
+                            Report(c("This implies that the estimates are as",
+								   "usual,\nbut the "), outf)
+						}
+                        Report(c('diagnostic checks, covariance matrices and ',
+                                 't-values \nare less reliable, because they ',
+                                 'are now based on only', nit,
+                                 'phase-3 iterations.\n\n'), outf)
                     }
                     z$sf <- z$sf[1:nit, , drop=FALSE]
                     z$sf2 <- z$sf2[1:nit, , , drop=FALSE]
@@ -242,8 +201,7 @@ phase3 <- function(z, x, ...)
 ##@doPhase3it siena07 Does one iteration in phase 3
 doPhase3it<- function(z, x, nit, zsmall, xsmall, ...)
 {
-    int <- z$int
-    if (int == 1)
+    if (z$int == 1)
     {
         zz <- x$FRAN(zsmall, xsmall)
         if (!zz$OK)
@@ -252,83 +210,14 @@ doPhase3it<- function(z, x, nit, zsmall, xsmall, ...)
             z$zz <- zz
             return(z)
         }
-        z$n<- z$n + 1
+        z$n <- z$n + 1
     }
     else
     {
-  ##zz <- clusterCall(cl, simstats0c, zsmall, xsmall)
-        zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
+		zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
         z$n <- z$n + z$int
-      #  browser()
-   }
-    if (int == 1)
-    {
-        fra <- colSums(zz$fra)
-        fra <- fra - z$targets
-        z$sf[nit, ] <- fra
-        z$sf2[nit, , ] <- zz$fra
-        z$sims[[nit]] <- zz$sims
-        fra <- fra + z$targets
-        fra2 <- zz$fra
-    }
-    else
-    {
-        for (i in 1:int)
-        {
-            fra <- colSums(zz[[i]]$fra)
-            fra <- fra - z$targets
-            z$sf[nit + (i - 1), ] <- fra
-            z$sf2[nit + (i - 1), , ] <- zz[[i]]$fra
-            z$sims[[nit + (i - 1)]] <- zz[[i]]$sims
-        }
-        fra <- t(sapply(zz, function(x)colSums(x$fra)))
-        fra2 <- t(sapply(zz, function(x)x$fra))
-        dim(fra2) <- c(int, nrow(zz[[1]]$fra), z$pp)
-    }
-    if ((!x$maxlike) && z$cconditional)
-    {
-        if (int==1)
-        {
-            z$ntim[nit,] <- zz$ntim0
-        }
-        else
-        {
-            for (i in 1:int)
-            {
-                z$ntim[nit+(i-1),] <- zz[[i]]$ntim0
-            }
-        }
-    }
-    if (z$FinDiff.method)
-    {
-        z <- FiniteDifferences(z, x, fra, fra2, ...)
-        z$sdf[nit:(nit + (int - 1)), , ] <- z$sdf0
-        z$sdf2[nit:(nit + (int - 1)), , ,] <- z$sdf02
-    }
-    else if (x$maxlike) ## as far as I can see
-    {
-        z$sdf[nit, , ] <- zz$dff
-        z$sdf2[nit, , , ] <- zz$dff2
-        z$accepts3[z$nit, ] <- zz$accepts
-        z$rejects3[z$nit, ] <- zz$rejects
-        z$aborted3[z$nit, ] <- zz$aborts
-    }
-    else
-    {
-            if (int==1)
-            {
-                if (!is.null(zz[['sc']]))
-                    z$ssc[nit , ,] <- zz$sc
-            }
-            else
-            {
-                for (i in 1:int)
-                {
-                    if (!is.null(zz[[i]][['sc']]))
-                        z$ssc[nit + (i - 1), , ] <- zz[[i]]$sc
-                }
-            }
-        }
+ 	}
+	z <- updateSiena07stores(z, zz, x)
     z
 }
 
@@ -343,10 +232,11 @@ phase3.2 <- function(z, x, ...)
     z <- PotentialNR(z, x, FALSE)
     if (any(z$newfixed))
     {
-        Report('There was a problem in obtaining convergence)\n', outf)
-        Report(c('Therefore, the program decided tentatively to fix parameter(s)',
-               cat(c(1:z$pp)[z$newfixed]), '.\n'), outf)
-        Report(c('It may be better to start all over again, ',
+        Report('There was a problem in obtaining convergence.\n', outf)
+        Report(c('Therefore, the program decided tentatively to fix',
+				 'parameter(s)',
+               c(1:z$pp)[z$newfixed], '.\n'), outf)
+        Report(c('It may be better to start all over again,',
                  'with better initial values or a reduced model.\n',
                  '(Check that you entered the data properly!)\n'), outf)
     }
@@ -359,8 +249,8 @@ phase3.2 <- function(z, x, ...)
         Report(c('basic rate parameter',
                  c('', 's')[as.integer(z$f$observations > 2) + 1],
                  ' as well as \n'), sep='', outf)
-    Report(c('convergence diagnostics, covariance and derivative matrices based on ',
-             z$Phase3nits, ' iterations.\n\n'), sep='', outf)
+    Report(c('convergence diagnostics, covariance and derivative matrices ',
+			 'based on ', z$Phase3nits, ' iterations.\n\n'), sep='', outf)
     Report('Information for convergence diagnosis.\n', outf)
     Report(c('Averages, standard deviations, ',
            'and t-ratios for deviations from targets:\n'), sep='', outf)
@@ -419,10 +309,16 @@ phase3.2 <- function(z, x, ...)
     if (x$maxlike)
     {
         Report('Autocorrelations during phase 3 : \n', outf)
-        Report(paste(format(1:z$pp,width=3), '. ',
+        Report(paste(format(1:z$pp, width=3), '. ',
                      format(z$sfl, width=8, digits=4),
-                     '\n'), outf)
+                     '\n', collapse=""), outf)
         Report ('\n', outf)
+        Report('Autocorrelations during phase 3 : \n', cf)
+        Report(paste(format(1:z$pp, width=3), '. ',
+                     format(z$sfl, width=8, digits=4),
+                     '\n', collapse=""), cf)
+        Report ('\n', cf)
+
     }
     for (j in 1:z$pp)
         if (z$diver[j]) ### don't understand this condition, as AllFixed is true
@@ -443,7 +339,8 @@ phase3.2 <- function(z, x, ...)
         PrtOutMat(z$msf, cf)
         Report('\n', cf)
         dfrac <- z$dfra - z$msf
-     ##   dfrac[z$fixed[row(dfrac)]|z$fixed[col(dfrac)]]<- 0 a clever way to do it
+		## dfrac[z$fixed[row(dfrac)] | z$fixed[col(dfrac)]] <- 0
+		## a clever way to do it
         dfrac[z$fixed, ] <- 0
         dfrac[ ,z$fixed] <- 0
         diag(dfrac)[z$fixed] <- 1
@@ -454,32 +351,42 @@ phase3.2 <- function(z, x, ...)
         }
     }
     else
+	{
         cov <- z$dinv %*% z$msfc %*% t(z$dinv)
+	}
     error <- FALSE
     if (inherits(try(msfinv <- solve(z$msfc)), "try-error"))
     {
         Report('Covariance matrix not positive definite: \n', outf)
         if (any(z$fixed || any(z$newfixed)))
+		{
             Report(c('(This may be unimportant, and related to the fact\n',
                    'that some parameters are fixed.)\n'), outf)
+		}
         else
+		{
             Report(c('This may mean that the reported standard errors ',
                      'are invalid.\n'), outf)
+		}
         z$msfinv <- NULL
     }
     else
+	{
         z$msfinv <- msfinv
+	}
     if (!is.null(cov))
     {
-        z$diver <- (z$fixed | z$diver | diag(cov) <1e-9) & (!z$AllUserFixed)
-        cov[z$diver,] <- Root(diag(cov))* 33
-        ##not sure this does not use very small vals
-        cov[,z$diver] <- Root(diag(cov))* 33
-        diag(cov)[z$diver]<- 999
+        z$diver <- (z$fixed | z$diver | diag(cov) < 1e-9) & (!z$AllUserFixed)
+		## beware: recycling works for one direction but not the other
+        diag(cov)[z$diver] <- 99 * 99
+        cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
+		diag(cov)[z$diver] <- 99 * 99
+		cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
+        diag(cov)[z$diver] <- 99 * 99
     }
     z$covtheta <- cov
-   # ans<-InstabilityAnalysis(z)
-   z
+	## ans<-InstabilityAnalysis(z)
+	z
 }
 
 ##@CalulateDerivative3 siena07 Calculates derivative at end of phase 3
@@ -488,7 +395,7 @@ CalculateDerivative3<- function(z,x)
     z$mnfra <- colMeans(z$sf)
     if (z$FinDiff.method || x$maxlike)
     {
-        dfra <- t(apply(z$sdf, c(2,3), mean))
+		dfra <- t(as.matrix(Reduce("+", z$sdf) / length(z$sdf)))
     }
    else
     {
@@ -509,8 +416,9 @@ CalculateDerivative3<- function(z,x)
     z$msf <- cov(z$sf)
     if (z$Phase3nits > 2)
     {
-       z$sfl <- apply(z$sf, 2, function(x)acf(x, plot=FALSE, lag.max=1)[[1]][[2]])
-   }
+        z$sfl <- apply(z$sf, 2,
+                       function(x)acf(x, plot=FALSE, lag.max=1)[[1]][[2]])
+    }
     z$dfra1 <- z$dfra
     z$dfra <- dfra
     z
@@ -563,24 +471,29 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
     Report('         change     new value \n', cf)
     Report(c(paste('  ', format(1:z$pp, width=2), '. ',
                    format(round(-fchange, digits=6), width=12, nsmall=6),
-                   format(round(z$theta-fchange, 6), width=12, nsmall=6),
+                   format(round(z$theta - fchange, 6), width=12, nsmall=6),
                    sep='', collapse='\n'), '\n'), cf)
     if (MakeStep) ##currently not used
     {
-        Report(c('\nAt the end of phase ',z$phase,', parameter values are \n'),outf)
+        Report(c('\nAt the end of phase ', z$phase,
+				 ', parameter values are \n'), outf)
         Report(paste(1:z$pp,'. ',format(z$theta,width=18,digits=6)),outf)
-        Report(c('A full Quasi-Newton-Raphson step after phase 3\nwould add the ',
-                 'following numbers to the parameters:\n'),outf)
-        Report(paste(1:z$pp,'. ',format(-round(fchange,6), width=12)),outf)
-        Report('\n\n',outf)
-        if (z$SomeFixed) fchange[z$fixed] <- 0
+        Report(c('A full Quasi-Newton-Raphson step after phase 3\n',
+				 'would add the ',
+                 'following numbers to the parameters:\n'), outf)
+        Report(paste(1:z$pp, '. ', format(-round(fchange, 6), width=12)), outf)
+        Report('\n\n', outf)
+        if (z$SomeFixed)
+		{
+			fchange[z$fixed] <- 0
+		}
         ##check positivity
         if (z$anyposj)
         {
-            neg<-z$posj& fchange>= z$theta
-            fchange[neg]<- 0.5*z$theta[neg]
+            neg <- z$posj & fchange >= z$theta
+            fchange[neg] <- 0.5 * z$theta[neg]
             Report(c('Intervention 3.4.3: positivity restriction after phase 3',
-                     'coordinate(s)',neg,'.\n'),cf)
+                     'coordinate(s)', neg, '.\n'), cf)
         }
     }
     z

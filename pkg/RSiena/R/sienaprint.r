@@ -445,6 +445,12 @@ sienaFitCovarianceCorrelation <- function(x)
 
 }
 
+##@xtable fake in case package not loaded
+xtable <- function(x, ...)
+{
+	xtable::xtable(x, ...)
+}
+
 ##@xtable.sienaFit Methods
 xtable.sienaFit <- function(x, caption = NULL, label = NULL, align = NULL,
                             digits = NULL, display = NULL, ...)

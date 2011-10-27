@@ -12,13 +12,14 @@
 simstats0c <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                        effects=NULL, fromFiniteDiff=FALSE,
                        profileData=FALSE, prevAns=NULL, returnDeps=FALSE,
-                       returnChains=FALSE)
+                       returnChains=FALSE, byWave=FALSE)
 {
     if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
     {
         z <- initializeFRAN(z, x, data, effects, prevAns, initC,
                             profileData=profileData, returnDeps=returnDeps)
 
+ 		z$byWave <- byWave
         if (initC)
         {
             return(NULL)
@@ -87,6 +88,15 @@ simstats0c <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
     callGrid <- cbind(rep(1:f$nGroup, groupPeriods - 1),
                       as.vector(unlist(sapply(groupPeriods - 1,
                                               function(x) 1:x))))
+	if (R.version$minor < 14.0) ##fake this to repeat old results
+##	if (TRUE)
+	{
+		useStreams <- TRUE
+	}
+	else
+	{
+		useStreams <- FALSE
+	}
     ## z$int2 is the number of processors if iterating by period, so 1 means
     ## we are not
     if (z$int2==1 || nrow(callGrid) == 1)
@@ -95,7 +105,7 @@ simstats0c <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ans <- .Call('model', PACKAGE=pkgname, z$Deriv, f$pData, seeds,
                      fromFiniteDiff, f$pModel, f$myeffects, z$theta,
                      randomseed2, returnDeps, z$FinDiff.method,
-                     !is.null(z$cl), z$addChainToStore,
+                     !is.null(z$cl) && useStreams, z$addChainToStore,
                      z$needChangeContributions, returnChains)
     }
     else
@@ -103,7 +113,7 @@ simstats0c <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         use <- 1:(min(nrow(callGrid), z$int2))
         anss <- parRapply(z$cl[use], callGrid, doModel,
                           z$Deriv, seeds, fromFiniteDiff, z$theta,
-                          randomseed2, returnDeps, z$FinDiff.method, TRUE,
+                          randomseed2, returnDeps, z$FinDiff.method, useStreams,
                           returnChains)
         ## reorganize the anss so it looks like the normal one
         ## browser()

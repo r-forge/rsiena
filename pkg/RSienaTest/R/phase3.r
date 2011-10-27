@@ -379,9 +379,9 @@ phase3.2 <- function(z, x, ...)
         z$diver <- (z$fixed | z$diver | diag(cov) < 1e-9) & (!z$AllUserFixed)
 		## beware: recycling works for one direction but not the other
         diag(cov)[z$diver] <- 99 * 99
-        cov[z$diver, ] <- rep(Root(diag(cov)), each=3) * 33
+        cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
 		diag(cov)[z$diver] <- 99 * 99
-		cov[, z$diver] <- rep(Root(diag(cov)), 3) * 33
+		cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
         diag(cov)[z$diver] <- 99 * 99
     }
     z$covtheta <- cov
