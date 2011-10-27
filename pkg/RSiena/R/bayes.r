@@ -10,7 +10,7 @@
 ## ****************************************************************************/
 ##@bayes Bayesian fit a Bayesian model
 bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
-                  nrunMH=100, save=TRUE, nbrNodes=1, seed=1, dfra=NULL,
+                  plotit=FALSE, nbrNodes=1, dfra=NULL, n=10,
                   priorSigma=NULL, prevAns=NULL, getDocumentation=FALSE)
 {
     ##@createStores internal bayes Bayesian set up stores
@@ -22,9 +22,9 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         z$posteriorMII <- array(0, dim=c(z$nGroup, npar, npar))
         z$candidates <- array(NA, dim=c(numberRows, z$nGroup, npar))
         z$acceptances <- matrix(NA, nrow=z$nGroup, ncol=numberRows)
-        z$MHacceptances <- array(NA, dim=c(numberRows, z$nGroup, 7))
-        z$MHrejections <- array(NA, dim=c(numberRows, z$nGroup, 7))
-        z$MHproportions <- array(NA, dim=c(numberRows, z$nGroup, 7))
+        z$MHacceptances <- array(NA, dim=c(numberRows, z$nGroup, 9))
+        z$MHrejections <- array(NA, dim=c(numberRows, z$nGroup, 9))
+        z$MHproportions <- array(NA, dim=c(numberRows, z$nGroup, 9))
         z
     }
     ##@storeData internal bayes Bayesian put data in stores
@@ -121,7 +121,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 		}
 	}
 
-    z <- initializeBayes(data, effects, model, nbrNodes, seed, priorSigma,
+    z <- initializeBayes(data, effects, model, nbrNodes, priorSigma,
                          prevAns=prevAns)
     z <- createStores(z)
 
@@ -129,7 +129,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 
     if (is.null(z$dfra) && is.null(dfra))
     {
-        z <- getDFRA(z, 10)
+        z <- getDFRA(z, n)
     }
     else
     {
@@ -152,7 +152,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     }
     z <- improveMH(z)
 
-    if (!save)
+    if (plotit)
     {
         require(lattice)
         dev.new()
@@ -172,10 +172,10 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 
     for (ii in 1:nmain)
     {
-        z <- MCMCcycle(z, nrunMH=nrunMH, nrunMHBatches=nrunMHBatches)
+        z <- MCMCcycle(z, nrunMH=z$nrunMH, nrunMHBatches=nrunMHBatches)
         z <- storeData()
 
-        if (ii %% 10 == 0 && !save) ## do some plots
+        if (ii %% 10 == 0 && plotit) ## do some plots
         {
             cat('main after ii', ii, '\n')
             dev.set(thetaplot)
@@ -261,9 +261,9 @@ MCMCcycle <- function(z, nrunMH, nrunMHBatches, change=TRUE)
 {
     z$accepts <- matrix(NA, nrow=z$nGroup, nrunMHBatches)
     z$parameters <- array(NA, dim=c(nrunMHBatches, z$nGroup, z$pp))
-    z$MHaccepts <- array(NA, dim=c(nrunMHBatches, z$nGroup, 7))
-    z$MHrejects <- array(NA, dim=c(nrunMHBatches, z$nGroup, 7))
-    z$MHaborts <- array(NA, dim=c(nrunMHBatches, z$nGroup, 7))
+    z$MHaccepts <- array(NA, dim=c(nrunMHBatches, z$nGroup, 9))
+    z$MHrejects <- array(NA, dim=c(nrunMHBatches, z$nGroup, 9))
+    z$MHaborts <- array(NA, dim=c(nrunMHBatches, z$nGroup, 9))
     storeNrunMH <- z$nrunMH
     z$nrunMH <- nrunMH
     for (i in 1:nrunMHBatches)
@@ -357,11 +357,10 @@ sampleParameters <- function(z, change=TRUE)
 }
 
 ##@initializeBayes algorithms do set up for Bayesian model
-initializeBayes <- function(data, effects, model, nbrNodes, seed, priorSigma,
+initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
                             prevAns)
 {
     ## initialise
-    set.seed(seed)
     Report(openfiles=TRUE, type="n") #initialise with no file
     z  <-  NULL
     z$Phase <- 1
@@ -377,8 +376,19 @@ initializeBayes <- function(data, effects, model, nbrNodes, seed, priorSigma,
     if (!is.null(model$randomSeed))
     {
         set.seed(model$randomSeed)
+		##seed <- model$randomSeed
     }
-    z$FRAN <- getFromNamespace(model$FRANname, pos=grep("RSiena",
+	else
+	{
+		if (exists(".Random.seed"))
+		{
+			rm(.Random.seed, pos=1)
+		}
+		newseed <- trunc(runif(1) * 1000000)
+		set.seed(newseed)  ## get R to create a random number seed for me.
+		##seed <- NULL
+	}
+   z$FRAN <- getFromNamespace(model$FRANname, pos=grep("RSiena",
                                                search())[1])
     z <- z$FRAN(z, model, INIT=TRUE, data=data, effects=effects,
                 prevAns=prevAns)

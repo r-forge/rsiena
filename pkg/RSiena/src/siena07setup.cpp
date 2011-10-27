@@ -23,6 +23,7 @@
 #include "data/NetworkLongitudinalData.h"
 #include "model/Model.h"
 #include "model/ml/Chain.h"
+#include "model/ml/MiniStep.h"
 #include "model/State.h"
 #include "model/StatisticCalculator.h"
 #include "data/ActorSet.h"
@@ -716,7 +717,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES,
 			pMLSimulation->connect(period);
 
 			SEXP ch;
-			PROTECT(ch = getChainDF(*(pMLSimulation->pChain())));
+			PROTECT(ch = getChainDFPlus(*(pMLSimulation->pChain()), true));
 			SET_VECTOR_ELT(minimalChains, periodFromStart, ch);
 			UNPROTECT(1);
 
@@ -738,14 +739,18 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES,
 
 			/* store chain on Model after creating difference vectors */
 			Chain * pChain = pMLSimulation->pChain();
+			pMLSimulation->updateProbabilities(pChain,
+				pChain->pFirst()->pNext(),
+				pChain->pLast()->pPrevious());
 			pChain->createInitialStateDifferences();
 			pMLSimulation->createEndStateDifferences();
 			pModel->chainStore(*pChain, periodFromStart);
 
-			/* return chain as a list. */
+			/* return chain as a list */
  			SEXP ch1;
  			PROTECT(ch1 = getChainList(*pChain,	*pMLSimulation));
- 			SET_VECTOR_ELT(currentChains, periodFromStart, ch1);
+  			//PROTECT(ch1 = getChainDFPlus(*pChain, true));
+			SET_VECTOR_ELT(currentChains, periodFromStart, ch1);
  			UNPROTECT(1);
 
 			periodFromStart++;
@@ -763,7 +768,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES,
 }
 
 /** Sets up a minimal chain and does pre burnin and burnin.
- * Processes a complete set of data objects, crewating a chain for each
+ * Processes a complete set of data objects, creating a chain for each
  * period and storing them on the model object.
  */
 SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES,

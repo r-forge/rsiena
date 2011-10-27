@@ -1,19 +1,70 @@
-2011-10-27 R-forge revision 177
+2011-10-27 R-forge revision 178. Fixes from rev 175 and rev 177 copied to RSiena.
 
-	* inst/scripts/Rscript01DataFormat.R, tests/scripts.R,
-	tests/scriptfile.Rout.save, tests/parallel.Rout.save: minor
+	* R/phase3.r: correct covariance matrix for effects that have been
+	fixed. Second attempt for RSienaTest
+	* R/sienaGOF.r: RSienaTest only: back out change in rev 177.
+	* R/effects.r: Rsiena only: remove out-of-date comments
+	* R/sienaDataCreate.r: RSiena only. Remove inter-network
+	constraints which relate a symmetric network to a non-symmetric
+	network.
+	* R/effectsMethods.r: RSiena only. make fix(myeff) return quietly
+	with no change if session is not interactive.
+	* man/bayes.Rd, man/maxlikec.Rd, R/bayes.r, NAMESPACE: bayes now
+	exported in RSiena too (see rev 168)
+	* man/updateTheta.Rd, R/initializeFRAN.r, NAMESPACE: new function:
+	updateTheta (See rev 168/9)
+	* inst/examples/s50e.dat, inst/scripts/*, tests/scripts.R,
+	tests/scriptfile.Rout.save, tests/scripts.Rout.save,
+	tests/scriptfile.Rout.win: added scripts, data file
+	to use in script checking (see rev 175/6)
+	* R/simstatsc.r, R/siena07.R, R/robmon.R, man.siena07.Rd:
+	snow/rlecuyer or parallel used depending on R version. New
+	argument for siena07 to allow option FORK as well as PSOCK.
+	* man/sienaModelCreate.Rd, R/sienaModelCreate.r: altered
+	multiplication factor from 4 to 5.
+	* man/sienaTimeTest.Rd,R/sienaTimeTest.r: added tests for models
+	fitted by finite differences or maximum likelihood.
+	* R/simstatsc.r, R/maxlikec.r, R/phase1.r, R/phase3.r: simplified
+	code, added new utility functions, changed format of stored
+	derivative matrices and made the by wave set optional to save
+	memory. Matrix objects are used for maxlike (as symmetric and this
+	will save space) with minimal compatible changes to finite
+	differences. Revert to normal matrix for dfra. (see rev 168)
+	* R/sienaprint.r, NAMESPACE, man/xtable.Rd: added dummy xtable command
+	to call real one.
+	* src/model/ml/Chain.cpp, src/model/ml/MiniStep.cpp,
+	src/model/ml/MLSimulation.cpp, src/model/ml/MLSimulation.h,
+	src/model/variables/DependentVariable.cpp,
+	src/model/variables/DependentVariable.h,
+	src/siena07models.cpp, src/siena07setup.cpp, src/siena07models.h:
+	maximum likelihood updates
+	* src/model/variables/DependentVariable.cpp,
+	src/model/variables/NetworkVariable.cpp: fix bug causing crashes with
+	symmetric networks alongside either behavior variable or non-symmetric
+	network. (see rev 175)
+	* tests/parallel.Rout.save: updating the comparison file.
+	* doc/_emacs, doc/.emacs: sample emacs initialization files
+
+2011-10-27 R-forge revision 177 RSienaTest only (committed prematurely!)
+
+	* inst/scripts/Rscript01DataFormat.R, inst/examples/s50e.dat,
+	tests/scripts.R, tests/scriptfile.Rout.save,
+	tests/parallel.Rout.save: added data file for testing scripts. Minor
 	textual changes. Removed library commands for snow and rlecuyer as
 	will not be necessary in 2.14.0.
 	* src/model/variables/DependentVariable.cpp, R/sienaDataCreate.r:
 	formatting changes
-	* R/simstatsc.r, R/siena07.R, R/robmon.R, man.siena07.Rd: snow/rlecuyer or
-	parallel used depending on R version. New argument for siena07 to
-	allow option FORK as well as PSOCK.
-	* R/phase3.r: correct covariance matrix for effects that have been fixed.
+	* R/simstatsc.r, R/siena07.R, R/robmon.R, man.siena07.Rd:
+	snow/rlecuyer or parallel used depending on R version. New
+	argument for siena07 to allow option FORK as well as PSOCK.
+	* R/phase3.r: correct covariance matrix for effects that have been
+	fixed.
 	* R/sienaTimeTest.r: fix bug since replaced arrays for derivatives
 	by wave by lists of sparse matrices: the error trap failed.
-	* doc/RSienaDeveloper.tex, doc/_emacs, doc/.emacs: added comments
-	about emacs, debugging R, new parallel package, etc.
+	* doc/RSienaDeveloper.tex: added comments about emacs, debugging
+	R, new parallel package, etc.
+	* R/sienaGOF.r: local change committed in error: backed our in
+	r178.
 
 2011-10-14 R-forge revision 176 RSienaTest only
 
@@ -46,9 +97,8 @@
 	terminate return the object unchanged if called non-interactively.
 	* R/sienaprint.r, NAMESPACE, man/xtable.Rd: added dummy xtable command
 	to call real one.
-	* tests/scripts.R, tests/scripts.Rout,save, tests/scriptfile.Rout.save:
-	added file to test
-	scripts, controlled by an environment variable.
+	* tests/scripts.R, tests/scripts.Rout.save, tests/scriptfile.Rout.save:
+	added file to test scripts, controlled by an environment variable.
 	* doc/RSiena_Manual.tex: altered path to scripts and file names.
 	* R/sienaDataCreate.r: remove inter-network constraints which relate a
 	symmetric network to a non-symmetric network
@@ -130,7 +180,7 @@
 	likelihood: still in progress.
 	* man/updateTheta.Rd, R/initializeFRAN.r: new function to update theta
 	initial values from a sienaFit. Reordered adding time dummies to happen
-	before prevAns processing in siena06.
+	before prevAns processing in siena07.
 	* R/effects.r, src/model/ml/chain.cpp: tidy up code.
 	* R/globals.r: allow format of printed matrices to be controlled by an
 	environment variable. Designed for use in testing as there were rounding

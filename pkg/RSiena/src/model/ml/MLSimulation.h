@@ -12,6 +12,12 @@ namespace siena
 
 enum Aspect {NETWORK, BEHAVIOR};
 
+/**
+ * This enumeration defines the possible types of MH step
+ */
+
+enum MHStepType {INSDIAG, CANCDIAG, PERMUTE, INSPERM, DELPERM, INSMISS,
+				 DELMISS, INSMISDAT, DELMISDAT, NBRTYPES};
 
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
@@ -79,6 +85,9 @@ public:
 	void updateCurrentPermutationLength(bool accept);
 
 	void createEndStateDifferences();
+
+	void recordOutcome(const MiniStep & miniStep, bool accept,
+		int stepType, bool misdat);
 
 private:
 	void setStateBefore(MiniStep * pMiniStep);

@@ -85,19 +85,27 @@ Type 'q()' to quit R.
 > library(tools)
 > Rdiff("scriptfile.Rout", previousFile)
 
-2262c2262
-< % Thu Oct 27 18:09:19 2011
+466c466
+< Packaged:             2011-10-27 15:18:11 UTC; ruth
 ---
-> % Thu Oct 27 17:41:46 2011
-2290c2290
-< <!-- Thu Oct 27 18:09:19 2011 -->
+> Packaged:             2011-10-27 15:03:38 UTC; ruth
+467c467
+< Built:                R 2.13.2; i386-pc-mingw32; 2011-10-27 15:18:28
 ---
-> <!-- Thu Oct 27 17:41:46 2011 -->
+> Built:                R 2.13.2; i386-pc-mingw32; 2011-10-27 15:04:08
+2251c2251
+< % Thu Oct 27 16:23:45 2011
+---
+> % Thu Oct 27 16:10:24 2011
+2279c2279
+< <!-- Thu Oct 27 16:23:45 2011 -->
+---
+> <!-- Thu Oct 27 16:10:24 2011 -->
 [1] 1
 > 
 > proc.time()
    user  system elapsed 
-   0.43    0.04  327.60 
+   0.42    0.04  334.56 
 > 
 > if (res > 0)
 + {

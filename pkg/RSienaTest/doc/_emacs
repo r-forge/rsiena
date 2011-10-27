@@ -1,0 +1,75 @@
+(mouse-wheel-mode t)
+(setq inhibit-splash-screen t)
+(add-hook 'text-mode-hook
+            '(lambda () (auto-fill-mode 1)))
+(global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
+(set-face-foreground 'font-lock-string-face "Coral")
+(setq comint-scroll-to-bottom-on-output t)  ; needed for latex, S
+
+; bibtex mode
+(add-hook 'bibtex-mode-hook 'turn-on-auto-fill)
+(setq bibtex-field-left-delimiter "\"")
+(setq bibtex-field-right-delimiter "\"")
+
+; latex via auctex
+(setq-default TeX-master nil) ; Query for master file.
+(setq TeX-open-quote "\"") ; preserve standard behaviour of "
+(setq TeX-close-quote "\"")
+
+(setq visible-bell t)
+
+(global-set-key [f2] 'undo)
+(global-set-key [f3] 'yank)
+(global-set-key [f4] 'nonincremental-search-forward)
+(global-set-key [f8] 'nonincremental-repeat-search-forward)
+(global-set-key [f9] 'kill-region)
+(define-key global-map [f12]       'next-error)
+(setq w32-swap-mouse-buttons t)
+(setenv "ALWAYS_PROMPT" "T")
+
+
+(pc-selection-mode)
+(define-key global-map [home]      'beginning-of-buffer-nomark)
+(define-key global-map [end]       'end-of-buffer-nomark)
+
+(add-hook 'ess-mode-hook
+          (lambda ()
+             (setq indent-tabs-mode t)))
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(setq  ess-nuke-trailing-whitespace-p t)
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "SystemWindow" :foreground "SystemWindowText" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "outline" :family "Consolas")))))
+
+(put 'upcase-region 'disabled nil)
+
+(put 'downcase-region 'disabled nil)
+
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(TeX-PDF-mode t)
+ '(TeX-command-list (quote (("TeX" "%(PDF)%(tex) %`%S%(PDFout)%(mode)%' %t" TeX-run-TeX nil (plain-tex-mode texinfo-mode ams-tex-mode) :help "Run plain TeX") ("LaTeX" "%`%l%(mode)%' %t" TeX-run-TeX nil (latex-mode doctex-mode) :help "Run LaTeX") ("Makeinfo" "makeinfo %t" TeX-run-compile nil (texinfo-mode) :help "Run Makeinfo with Info output") ("Makeinfo HTML" "makeinfo --html %t" TeX-run-compile nil (texinfo-mode) :help "Run Makeinfo with HTML output") ("AmSTeX" "%(PDF)amstex %`%S%(PDFout)%(mode)%' %t" TeX-run-TeX nil (ams-tex-mode) :help "Run AMSTeX") ("ConTeXt" "texexec --once --texutil %(execopts)%t" TeX-run-TeX nil (context-mode) :help "Run ConTeXt once") ("ConTeXt Full" "texexec %(execopts)%t" TeX-run-TeX nil (context-mode) :help "Run ConTeXt until completion") ("BibTeX" "bibtex %s" TeX-run-BibTeX nil t :help "Run BibTeX") ("View" "%V" TeX-run-discard nil t :help "Run Viewer") ("Print" "%p" TeX-run-command t t :help "Print the file") ("Queue" "%q" TeX-run-background nil t :help "View the printer queue" :visible TeX-queue-command) ("dvips" "%(o?)dvips %d -o %f " TeX-run-command t t :help "Generate PostScript file") ("gsview" "\"c:\\\\Ghostgum\\\\gsview\\\\gsview64 %f\"" TeX-run-discard nil t :help "View postscript file") ("View pdf in gsview" "\"c:\\\\Ghostgum\\\\gsview\\\\gsview64 %f1\"" TeX-run-discard nil t) ("Index" "makeindex %s" TeX-run-command nil t :help "Create index file") ("Check" "lacheck %s" TeX-run-compile nil (latex-mode) :help "Check LaTeX file for correctness") ("Spell" "(TeX-ispell-document \"\")" TeX-run-function nil t :help "Spell-check the document") ("Clean" "TeX-clean" TeX-run-function nil t :help "Delete generated intermediate files") ("Clean All" "(TeX-clean t)" TeX-run-function nil t :help "Delete generated intermediate and output files") ("Other" "" TeX-run-command t t :help "Run an arbitrary command"))))
+ '(TeX-expand-list (quote (("%p" TeX-printer-query) ("%q" (lambda nil (TeX-printer-query t))) ("%V" (lambda nil (TeX-source-correlate-start-server-maybe) (TeX-view-command-raw))) ("%vv" (lambda nil (TeX-source-correlate-start-server-maybe) (TeX-output-style-check TeX-output-view-style))) ("%v" (lambda nil (TeX-source-correlate-start-server-maybe) (TeX-style-check TeX-view-style))) ("%r" (lambda nil (TeX-style-check TeX-print-style))) ("%l" (lambda nil (TeX-style-check LaTeX-command-style))) ("%(PDF)" (lambda nil (if (and (eq TeX-engine (quote default)) (or TeX-PDF-mode TeX-DVI-via-PDFTeX)) "pdf" ""))) ("%(PDFout)" (lambda nil (cond ((and (eq TeX-engine (quote xetex)) (not TeX-PDF-mode)) " -no-pdf") ((and (eq TeX-engine (quote luatex)) (not TeX-PDF-mode)) " --output-format=dvi") ((and (eq TeX-engine (quote default)) (not TeX-PDF-mode) TeX-DVI-via-PDFTeX) " \"\\pdfoutput=0 \"") (t "")))) ("%(mode)" (lambda nil (if TeX-interactive-mode "" " -interaction=nonstopmode"))) ("%(o?)" (lambda nil (if (eq TeX-engine (quote omega)) "o" ""))) ("%(tex)" (lambda nil (eval (nth 2 (assq TeX-engine (TeX-engine-alist)))))) ("%(latex)" (lambda nil (eval (nth 3 (assq TeX-engine (TeX-engine-alist)))))) ("%(execopts)" ConTeXt-expand-options) ("%S" TeX-source-correlate-expand-options) ("%dS" TeX-source-specials-view-expand-options) ("%cS" TeX-source-specials-view-expand-client) ("%(outpage)" (lambda nil (if TeX-source-correlate-output-page-function (funcall TeX-source-correlate-output-page-function) "1"))) ("%s" file nil t) ("%t" file t t) ("%`" (lambda nil (setq TeX-command-pos t TeX-command-text ""))) (" \"\\" (lambda nil (if (eq TeX-command-pos t) (setq TeX-command-pos pos pos (+ 3 pos)) (setq pos (1+ pos))))) ("\"" (lambda nil (if (numberp TeX-command-pos) (setq TeX-command-text (concat TeX-command-text (substring command TeX-command-pos (1+ pos))) command (concat (substring command 0 TeX-command-pos) (substring command (1+ pos))) pos TeX-command-pos TeX-command-pos t) (setq pos (1+ pos))))) ("%'" (lambda nil (prog1 (if (stringp TeX-command-text) (progn (setq pos (+ (length TeX-command-text) 9) TeX-command-pos (and (string-match " " (funcall file t t)) "\"")) (concat TeX-command-text " \"\\input\"")) (setq TeX-command-pos nil) "") (setq TeX-command-text nil)))) ("%n" TeX-current-line) ("%d" file "dvi" t) ("%f" file "ps" t) ("%f1" file "pdf" t) ("%o" (lambda nil (funcall file (TeX-output-extension) t))) ("%b" TeX-current-file-name-master-relative) ("%m" preview-create-subdirectory))))
+ '(c-basic-offset 4)
+ '(c-default-style "bsd")
+ '(c-offsets-alist (quote ((case-label . +) (arglist-cont-nonempty . +) (inextern-lang . 0) (innamespace . 0))))
+ '(column-number-mode t)
+ '(fill-column 80)
+ '(mouse-wheel-scroll-amount (quote (1 ((shift) . 1) ((control)))))
+ '(save-abbrevs nil)
+ '(show-paren-mode t)
+ '(tab-stop-list (quote (4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 88 96 104 112 120)))
+ '(tab-width 4)
+ '(tool-bar-mode nil))
+
+(add-to-list 'initial-frame-alist '(height . 46))
+(add-to-list 'initial-frame-alist '(width . 82))
+(add-to-list 'initial-frame-alist '(left . 50))
+(add-to-list 'initial-frame-alist '(top . 50))

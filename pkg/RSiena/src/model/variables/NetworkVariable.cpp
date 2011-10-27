@@ -496,7 +496,7 @@ void NetworkVariable::makeChange(int actor)
 
 	this->successfulChange(true);
 
-	if (this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 	{
 		if (this->calculateModelTypeBProbabilities())
 		{
@@ -532,7 +532,8 @@ void NetworkVariable::makeChange(int actor)
 		// Siena 3 checks in the diagonal case, so I do too temporarily.
 		//if (alter != actor && !this->lpNetworkCache->outTieExists(alter) &&
 		//	this->pSimulation()->pModel()->modelType() == AAGREE)
-		if (this->pSimulation()->pModel()->modelType() == AAGREE &&
+			if (this->symmetric() &&
+				this->pSimulation()->pModel()->modelType() == AAGREE &&
 			!this->lpNetworkCache->outTieExists(alter))
 		{
 			 this->checkAlterAgreement(alter);
@@ -568,10 +569,11 @@ void NetworkVariable::makeChange(int actor)
 		}
 		this->pSimulation()->pChain()->insertBefore(pMiniStep,
 			this->pSimulation()->pChain()->pLast());
-		if (!this->pSimulation()->pModel()->modelTypeB())
+		if (!this->symmetric() || !this->pSimulation()->pModel()->modelTypeB())
 		{
 			pMiniStep->logChoiceProbability(log(this->lprobabilities[alter]));
-			if (this->pSimulation()->pModel()->modelType() == AAGREE)
+			if (this->symmetric() &&
+				this->pSimulation()->pModel()->modelType() == AAGREE)
 			{
 				pMiniStep->logChoiceProbability(pMiniStep->
 					logChoiceProbability() + log(this->lsymmetricProbability));
@@ -1707,7 +1709,7 @@ double NetworkVariable::probability(MiniStep * pMiniStep)
 	NetworkChange * pNetworkChange =
 		dynamic_cast<NetworkChange *>(pMiniStep);
 	this->lego = pNetworkChange->ego();
-	if (this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
 	{
 		this->calculateModelTypeBProbabilities();
 		if (this->pSimulation()->pModel()->needScores())
