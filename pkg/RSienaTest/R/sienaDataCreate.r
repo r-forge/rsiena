@@ -563,8 +563,8 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
         attr(depvars[[i]], 'vals') <- vector("list", observations)
         attr(depvars[[i]], 'nval') <- rep(NA, observations)
         attr(depvars[[i]], 'noMissing') <- rep(0, observations)
-        attr(depvars[[i]], 'noMissingEither') <- rep(0, observations -1)
-        attr(depvars[[i]], 'nonMissingEither') <- rep(0, observations -1)
+        attr(depvars[[i]], 'noMissingEither') <- rep(0, observations - 1)
+        attr(depvars[[i]], 'nonMissingEither') <- rep(0, observations - 1)
         if (type == 'behavior')
         {
             attr(depvars[[i]], 'noMissing') <- FALSE

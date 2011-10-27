@@ -12,9 +12,10 @@
 
 ##@siena07 siena07
 siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
-                   useCluster = FALSE, nbrNodes = 2, initC=TRUE,
-                   clusterString=rep("localhost", nbrNodes), tt=NULL,
-                   parallelTesting=FALSE, clusterIter=!x$maxlike, ...)
+					useCluster = FALSE, nbrNodes = 2, initC=TRUE,
+					clusterString=rep("localhost", nbrNodes), tt=NULL,
+					parallelTesting=FALSE, clusterIter=!x$maxlike,
+					clusterType=c("PSOCK", "FORK"), ...)
 {
     exitfn <- function()
     {
@@ -39,8 +40,22 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
         {
             stop("cannot parallel test with multiple processes")
         }
-        require(snow, warn.conflicts=FALSE)
-        require(rlecuyer)
+		clusterType <- match.arg(clusterType)
+		if (.Platform$OS.type == "windows" && clusterType != "PSOCK")
+		{
+			stop("cannot use forking processes on Windows")
+		}
+		if (R.version$minor < 14.0) ## fake this to recreate old results
+	##	if (TRUE)
+		{
+			require(snow, warn.conflicts=FALSE)
+			require(rlecuyer)
+			clusterType <- "SOCK"
+		}
+		else
+		{
+			require(parallel)
+		}
         if (clusterIter)
         {
             x$firstg <- x$firstg * sqrt(nbrNodes)
@@ -139,7 +154,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
     }
 
     z <- robmon(z, x, useCluster, nbrNodes, initC, clusterString,
-                clusterIter, ...)
+                clusterIter, clusterType, ...)
 
     time1 <-  proc.time()['elapsed']
     Report(c("Total computation time", round(time1 - time0, digits=2),

@@ -1,4 +1,21 @@
-2011-10-14 r-forge revision 176 RSienaTest only
+2011-10-27 R-forge revision 177
+
+	* inst/scripts/Rscript01DataFormat.R, tests/scripts.R,
+	tests/scriptfile.Rout.save, tests/parallel.Rout.save: minor
+	textual changes. Removed library commands for snow and rlecuyer as
+	will not be necessary in 2.14.0.
+	* src/model/variables/DependentVariable.cpp, R/sienaDataCreate.r:
+	formatting changes
+	* R/simstatsc.r, R/siena07.R, R/robmon.R, man.siena07.Rd: snow/rlecuyer or
+	parallel used depending on R version. New argument for siena07 to
+	allow option FORK as well as PSOCK.
+	* R/phase3.r: correct covariance matrix for effects that have been fixed.
+	* R/sienaTimeTest.r: fix bug since replaced arrays for derivatives
+	by wave by lists of sparse matrices: the error trap failed.
+	* doc/RSienaDeveloper.tex, doc/_emacs, doc/.emacs: added comments
+	about emacs, debugging R, new parallel package, etc.
+
+2011-10-14 R-forge revision 176 RSienaTest only
 
 	* inst/scripts/RScriptDataFormat.R,
 	inst/scripts/RScriptSienaVariable.R,

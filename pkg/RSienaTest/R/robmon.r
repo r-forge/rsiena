@@ -13,7 +13,7 @@
 ## returns updated z
 ##@robmon siena07 Controls MOM process
 robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
-                   clusterIter, ...)
+                   clusterIter, clusterType, ...)
 {
     z$FinDiff.method<- x$FinDiff.method
     z$n <- 0
@@ -57,11 +57,20 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         {
             stop("Not enough observations to use the nodes")
         }
-        cl <- makeCluster(clusterString, type = "SOCK",
+        cl <- makeCluster(clusterString, type = clusterType,
                           outfile = "cluster.out")
         clusterCall(cl, library, pkgname, character.only = TRUE)
-        clusterSetupRNG(cl, seed = as.integer(runif(6,
-                            max=.Machine$integer.max)))
+		if (R.version$minor < 14.0) ## fake this to recreate old results
+	##	if (TRUE)
+		{
+			clusterSetupRNG(cl, seed = as.integer(runif(6,
+								max=.Machine$integer.max)))
+		}
+		else
+		{
+			clusterSetRNGStream(cl, iseed = as.integer(runif(1,
+								max=.Machine$integer.max)))
+		}
         clusterCall(cl, storeinFRANstore,  FRANstore())
         if (initC)
         {

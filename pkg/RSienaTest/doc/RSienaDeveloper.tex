@@ -191,9 +191,12 @@ may help.
 \subsection{Files which always need updating}
  Before you commit an update to R-forge please do the following:
 \begin{enumerate}
-\item Record details of the files you have changed in the Changelog for each of
-  RSiena and RSienaTest. The two changelogs are kept identical, otherwise it
-  gets very confusing.
+\item Record details of the files you have changed in the Changelog for
+  RSienaTest. If you have \emph{only} changed documentation files in
+  \textsf{RSienaTest/doc} directory, you may ignore what follows.
+\item Record details of the files you have changed in the Changelog for Riena.
+  The two changelogs are kept identical, apart from changes which only affect
+  the documentation source, otherwise it gets very confusing.
 \item Update the version number and date in the \textsf{DESCRIPTION} file for
   each package.
 \item Update the version number and date in \textsf{man/RSiena-package.Rd} in
@@ -203,7 +206,25 @@ may help.
   directory of each package.
 \end{enumerate}
 \section{Coding standards etc}
-I describe the main details of our current practice:
+
+I describe below the main details of our current practice: for other points
+please copy what you see!
+
+For the convenience of any emacs users, I have added my emacs initialization
+files \sfn{\_emacs} and \sfn{.emacs} to the doc directory of RSienaTest. They
+will format R and C++ more or less to standards. If you want to use the package
+on Mac or Windows, I recommend the versions on Vincent Goulet's Site
+\url{http://vgoulet.act.ulaval.ca/en/emacs/} which come packaged with ess (for
+R) and auctex (for \LaTeX). For Windows use \sfn{\_emacs} and put it in
+``c:\textbackslash documents and settings\textbackslash user name\textbackslash
+AppData\textbackslash roaming'' (Windows Vista or 7) or ``c:\textbackslash
+documents and settings\textbackslash user name\textbackslash Application Data''
+(Windows XP). On Mac use \sfn{.emacs} and put it in your home directory. Emacs
+has a nice habit of copying text as soon as you highlight it and then you can
+paste it with a right (Windows with my initialization file) or middle button
+(Linux/Mac) click. There are very few Mac specific commands (to make the copy
+behave as on other platforms), so most of \sfn{.emacs} should also give you a
+guide on Linux.
 \subsection{General}
 \begin{enumerate}
 \item Use spaces: particularly around operators and after commas. (But
@@ -306,8 +327,8 @@ below.
 \verb|R CMD INSTALL RSiena_1.0.n.tar.gz|\\
 (where \verb|n| is adjusted to match the file you have just created.)
 \item You now should have a new version of the package ready for use. (If on 64
-  bit Windows or Mac, you will have two versions, and you will two copies of the
-  course directories.)
+  bit Windows or Mac, you will have two versions, and you will have two copies
+  of the source directories.)
 \item Alternatively, instead of the build and INSTALL, just type
 \verb|R CMD INSTALL RSiena|\\
 If you have a 64-bit Windows and R 2.12.0, or a 64-bit Mac, use
@@ -364,9 +385,10 @@ files.
 \begin{description}
 \item[.R directory] Create, in your home directory, a directory called .R (on
   Windows you will have to use mkdir in a command prompt window to do this). You
-  can use this directory to provide your own version of \verb|Makevars| (useful
+  can use this directory to provide your own version of \verb|Makevars|
+(useful
   for \textsf{valgrind} users on linux where you need to turn off optimisation).
-\item[.check.Renviron] This file is used in the check procedure. It should
+\item[check.Renviron] This file is used in the check procedure. It should
  contain at least the following:
 {\small
 \begin{verbatim}
@@ -390,11 +412,11 @@ some suggested packages which are not actually used in the code are not
 installed.
 \item[build.Renviron] This is the file used for the build procedure.  I suggest
   you set \verb|CYGWIN=nodosfilewarning| here. (Only necessary in Windows but
-  will do no harm on Mac or Linux.). We also need
+  will do no harm on Mac or Linux.). We also used to need
 \begin{verbatim}
 _R_BUILD_RESAVE_DATE=no
 \end{verbatim}
-but I have added this to the DESCRIPTION file.
+but I have added this to the DESCRIPTION file so it is always set.
 \end{description}
 \paragraph{Alternative methods for small changes}
 Good news: from R 2.12.0 it is often possible to update the R functions in
@@ -468,7 +490,33 @@ r-forge name in place of \verb|rforgename|.)
 \item An hour later, try it out by doing another secure checkout. You should not
   be asked for your password this time.
 \end{enumerate}
+\section{Testing}
+Some testing is done automatically  by the \sfn{R CMD check} procedure. This
+includes all examples on help pages except parts marked \sfn{\textbackslash
+  dontrun} or \sfn{\textbackslash donttest}.
 
+Since the checking is done every day by other people, we are limited as to the
+amount of their time we are allowed to use up. There are now extra testing
+facilities in \sfn{RSienaTest} designed to be run by ourselves only. They should
+be run every time a significant change is made.  Testing is via the check
+procedure after setting the environment variable \sfn{RSIENA\_TESTING} to any
+non-null value.
+\begin{description}
+\item[scripts] There is a file \sfn{scripts.R} in the \sfn{tests} directory
+  which is designed to test the scripts in the manual. Since I got different
+  final \sfn{.Random.Seed} on different platforms when running
+  \sfn{plot.network} I have removed the \sfn{sna}, \sfn{network} etc code to a
+  separate script file with ``SNA'' in its name.  The
+  scripts are concatenated (I added numbers to the names to make this happen in
+  the correct order) and run, after copying all the files from the examples
+  directory to the testing one. Any scripts which contain the text ``SNA'' in the
+  name are ignored. Some difference output will typically be produced: check
+  manually that it does not look important.
+\item[other tests]
+I have begun to create test files for testing the package itself. More will
+follow. But I must ask that for any new features added by others, test data and
+results are added to the testing system somehow.
+\end{description}
 \section{Parallel runs}
 Most of RSiena is set up to produce the same results as Siena3, but some effects
 have been redefined and maximum likelihood uses a different algorithm.
@@ -615,7 +663,11 @@ A few notes about each:
 In any of these cases, you may find results vary due to garbage
 collection in R. Also changes which spped up the Mac may not speed up Windows,
 particularly changing memory allocation.
-\section{Debugging C++}
+\section{Debugging}
+
+\subsection{Debugging R}
+Refer to session 7 of my R programming slides.
+\subsection{Debugging C++}
 You may find that R tends to crash when you change the C++. You can try to trap
 the error using \sfn{Rprintf} statements to print out details at intervals. The
 syntax for \sfn{Rprintf} is the same as the C function \sfn{printf}, but output
@@ -629,7 +681,7 @@ For debugging chains there are utility functions \textsf{getChainDF} and similar
 which create a data frame from a ministep or a chain. Within C++, you can use
 \textsf{PrintValue(getChainDF(...));} to produce a readable output of the
 chain. There is an option to sort if you want to check how many of a particular
-link occur. For initial and end states there is a more sophosticated version
+link occur. For initial and end states there is a more sophisticated version
 which adds these as attributes and a corresponding R print method to display
 them. As always, you can use sink() to get console output to a file.
 
@@ -648,7 +700,8 @@ an embarrassingly large memory usage, which will fail sooner or later.
 
 If \sfn{valgrind} reports use of uninitialised variables, use the option
 \sfn{--track-origins=yes} to find out where the problem started. It can be
-surprisingly difficult to track these down!
+surprisingly difficult to track these down! But it usually reports some from R,
+which you can ignore.
 \section{The R C++ interface}
 This is not easy to understand from the documentation (Writing R Extensions
 manual), but there should be examples of most functions in the code
@@ -671,10 +724,18 @@ where we need common random number streams I have advanced to a new substream at
 the beginning of each real iteration and reset to this point at the beginning of
 each finite difference one. The jump to the new substream ignores the current
 state so it does not matter if the streams get muddled up during the finite
-differencing stage.
+differencing stage. As from R version 2.14.0 this package can be removed as
+there will be a new type of random number within R itself, to be used with the
+new \sfn{parallel} package. For the time being the original code can be run if
+desired by replacing the 3 checks for R.version less than 14.0 by TRUE, but I
+intend to remove \sfn{rlecuyer} altogether in due course.
 \item[errors]
 Error messages can use the function \sfn{error} which is similar to
 \sfn{Rprintf} in syntax, and needs the header file \sfn{R\_ext/error.h}.
+\item[Interrupt processing] There is a function provided to make C++ interrupts
+  return to R rather than die completely. It needs to be called at the start:
+  generally one sets up data first, so it is called in the function
+  \sfn{setUpData}.
 \end{description}
 \section{C++ platform independence}
 A few notes of problems we have had:

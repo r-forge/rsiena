@@ -351,32 +351,42 @@ phase3.2 <- function(z, x, ...)
         }
     }
     else
+	{
         cov <- z$dinv %*% z$msfc %*% t(z$dinv)
+	}
     error <- FALSE
     if (inherits(try(msfinv <- solve(z$msfc)), "try-error"))
     {
         Report('Covariance matrix not positive definite: \n', outf)
         if (any(z$fixed || any(z$newfixed)))
+		{
             Report(c('(This may be unimportant, and related to the fact\n',
                    'that some parameters are fixed.)\n'), outf)
+		}
         else
+		{
             Report(c('This may mean that the reported standard errors ',
                      'are invalid.\n'), outf)
+		}
         z$msfinv <- NULL
     }
     else
+	{
         z$msfinv <- msfinv
+	}
     if (!is.null(cov))
     {
-        z$diver <- (z$fixed | z$diver | diag(cov) <1e-9) & (!z$AllUserFixed)
-        cov[z$diver,] <- Root(diag(cov))* 33
-        ##not sure this does not use very small vals
-        cov[,z$diver] <- Root(diag(cov))* 33
-        diag(cov)[z$diver]<- 999
+        z$diver <- (z$fixed | z$diver | diag(cov) < 1e-9) & (!z$AllUserFixed)
+		## beware: recycling works for one direction but not the other
+        diag(cov)[z$diver] <- 99 * 99
+        cov[z$diver, ] <- rep(Root(diag(cov)), each=3) * 33
+		diag(cov)[z$diver] <- 99 * 99
+		cov[, z$diver] <- rep(Root(diag(cov)), 3) * 33
+        diag(cov)[z$diver] <- 99 * 99
     }
     z$covtheta <- cov
-   # ans<-InstabilityAnalysis(z)
-   z
+	## ans<-InstabilityAnalysis(z)
+	z
 }
 
 ##@CalulateDerivative3 siena07 Calculates derivative at end of phase 3

@@ -48,16 +48,17 @@ for (f in files)
 res <- 0L
 runone("scriptfile.R")
 
-## now look at the differences in extra braces because of executing in batch
+## now look at the differences
+## code within extra braces because we execute it in batch mode
 {if (.Platform$OS.type == "windows")
 {
-	previousFile <- "scriptFile.Rout.win"
+	previousFile <- "scriptfile.Rout.win"
 }
 else
 {
-	previousFile <- "scriptFile.Rout.save"
+	previousFile <- "scriptfile.Rout.save"
 }}
-#system("diff scriptfile.Rout scriptFile.Rout.save")
+#system("diff scriptfile.Rout scriptfile.Rout.save")
 library(tools)
 Rdiff("scriptfile.Rout", previousFile)
 

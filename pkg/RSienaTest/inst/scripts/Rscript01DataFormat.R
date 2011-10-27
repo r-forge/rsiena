@@ -52,15 +52,14 @@
 # The library command loads the packages needed during the session.
 
         library(RSiena)
-        library(snow) # (these four additional libraries will be loaded
-        library(network)# automatically if required)
-        library(rlecuyer)
 
-# You need to have INSTALLED all of them
+# You need to have INSTALLED the packages xtable and network,
+# and for R versions older than 2.14.0 you need snow and rlecuyer
+# if you want to use multiple processes.
 
 	?install.packages
 
-# Or click on the tab "Packages", "Instal package(s)", then select a CRAN mirror
+# Or click on the tab "Packages", "Install package(s)", then select a CRAN mirror
 # (e.g. Bristol if you are in the UK) and finally select from the list
 # the package you wish to install.
 
