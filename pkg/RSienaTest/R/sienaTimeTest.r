@@ -40,7 +40,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, condition=FALSE)
 	## the optional objects sdf2
 	if (sienaFit$maxlike || sienaFit$FinDiff.method)
 	{
-		if (is.null(sienaFit$sdf2[[1]]))
+		if (is.null(sienaFit$sdf2[[1]][[1]]))
 		{
 			stop("rerun Siena07 with the byWave option TRUE")
 		}

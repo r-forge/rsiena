@@ -68,7 +68,7 @@ sienaGOF <- function(
 	}
 	if (is.null(wave) )
 	{
-		wave <- 1:(attr(sienaFitObject$f[[groupName]]$depvars[[varName]], 
+		wave <- 1:(attr(sienaFitObject$f[[groupName]]$depvars[[varName]],
 						"netdims")[3] - 1)
 	}
 	if (varNumber < 1 || varNumber >
@@ -77,7 +77,7 @@ sienaGOF <- function(
 		stop("Invalid variable number -- out of bounds.")
 	}
 	if (min(wave) < 1 || max(wave) >
-			attr(sienaFitObject$f[[groupName]]$depvars[[varName]], 
+			attr(sienaFitObject$f[[groupName]]$depvars[[varName]],
 							"netdims")[3] - 1)
 	{
 		stop("Invalid wave index -- out of bounds")
@@ -88,7 +88,7 @@ sienaGOF <- function(
 						auxiliaryFunction(NULL,
 								sienaFitObject$f, sienaFitObject$sims,
 								groupName, varName, j)
-						, nrow=1) 
+						, nrow=1)
 				})
 	if (join)
 	{
@@ -221,7 +221,6 @@ sienaGOF <- function(
 			p <- sapply(1:observations, function (i)
 				sum(obsTestStat[i] <= simTestStat) /length(simTestStat))
 		}
-
 		ret <- list( p = p,
 				SimulatedTestStat=simTestStat,
 				ObservedTestStat=obsTestStat,
@@ -235,7 +234,6 @@ sienaGOF <- function(
 				attr(obsStats,"auxiliaryStatisticName")
 		ret
 	}
-
 	res <- lapply(1:length(simStats),
 					function (i) {
 				 applyTest(obsStats[[i]], simStats[[i]]) })
@@ -346,7 +344,7 @@ sienaGOF <- function(
 			mmPartialThetaDelta <- rep(0,length(theta0))
 			mmPartialThetaDelta[length(theta0)] <- mmThetaDelta[length(theta0)]
 			JacobianExpStat <- lapply(wave, function (i) {
-				t(SF[,i,]) %*% simStatsByWave[[i]]/ nSims  }) 
+				t(SF[,i,]) %*% simStatsByWave[[i]]/ nSims  })
 			Gradient <- lapply(wave, function(i) {
 						-2  * JacobianExpStat[[i]] %*%
 								covInvByWave[[i]] %*%
@@ -670,7 +668,7 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 
 sparseMatrixExtraction <- function (i, data, sims, groupName, varName, wave) {
 	#require(Matrix)
-	dimsOfDepVar<- 
+	dimsOfDepVar<-
 			attr(data[[groupName]]$depvars[[varName]],
 					"netdims")
 	missing <- Matrix(is.na(data[[groupName]]$depvars[[varName]][,,wave+1])*1)
@@ -703,10 +701,11 @@ snaSociomatrixExtraction <- function (i, data, sims, groupName, varName, wave) {
 	require(sna)
 	actors <- attr(data[[groupName]]$nets[[varName]][[wave+1]]$mat1,
 			"nActors")
-	missing <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat1)
+	missing <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat2)
 	attr(missing, "n") <- actors
-	missing <- 1*is.na( as.sociomatrix.sna( missing ) )
-	
+	#missing <- 1*is.na( as.sociomatrix.sna( missing ) )
+	missing <- as.sociomatrix.sna( missing )
+
 	if (is.null(i)) {
 		# sienaGOF wants the observation:
 		returnValue <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat1)

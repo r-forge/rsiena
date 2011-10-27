@@ -377,13 +377,13 @@ _E_x_a_m_p_l_e_s:
 [39] "s50e.dat"                 "s50e.out"                
 [41] "s50paj.csv"               "s50paj.out"              
 [43] "scriptfile.R"             "scriptfile.Rout"         
-[45] "scriptfile.Rout.save"     "scripts.R"               
-[47] "scripts.Rout"             "scripts.Rout.save"       
-[49] "startup.Rs"               "test10.out"              
-[51] "test12.out"               "test3.out"               
-[53] "test4.out"                "test7.out"               
-[55] "test8.out"                "tmp3a.dat"               
-[57] "tmp4a.dat"               
+[45] "scriptfile.Rout.save"     "scriptfile.Rout.win"     
+[47] "scripts.R"                "scripts.Rout"            
+[49] "scripts.Rout.save"        "startup.Rs"              
+[51] "test10.out"               "test12.out"              
+[53] "test3.out"                "test4.out"               
+[55] "test7.out"                "test8.out"               
+[57] "tmp3a.dat"                "tmp4a.dat"               
 > 
 > # What is available in RSiena?
 > 
@@ -417,8 +417,8 @@ _D_e_t_a_i_l_s:
 
        Package:   RSiena     
        Type:      Package    
-       Version:   1.0.12.175 
-       Date:      2011-10-06 
+       Version:   1.0.12.176 
+       Date:      2011-10-14 
        License:   GPL-2      
        LazyLoad:  yes        
       
@@ -460,13 +460,14 @@ Package:              RSiena
 Type:                 Package
 Title:                Siena - Simulation Investigation for Empirical
                       Network Analysis
-Version:              1.0.12.175
-Date:                 2011-10-06
+Version:              1.0.12.176
+Date:                 2011-10-14
 Author:               Various
 Depends:              R (>= 2.10.0)
 Imports:              Matrix
 Suggests:             tcltk, snow, rlecuyer, network, codetools,
-                      lattice, MASS, sna, igraph, xtable
+                      lattice, MASS, parallel, sna, igraph, xtable,
+                      tools
 SystemRequirements:   GNU make, tcl/tk 8.5, Tktable
 Maintainer:           Ruth Ripley <ruth@stats.ox.ac.uk>
 Description:          Fits models to longitudinal networks
@@ -560,7 +561,6 @@ varCovar                Function to create a changing covariate object.
 varDyadCovar            Function to create a changing dyadic covariate
                         object.
 xtable                  Access xtable in package xtable
-
 
 > 
 > # which is very useful

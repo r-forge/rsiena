@@ -537,8 +537,8 @@ bool DependentVariable::canMakeChange(int actor) const
 bool DependentVariable::constantRates() const
 {
 	return this->lstructuralRateEffects.empty() &&
-	  this->ldiffusionRateEffects.empty() &&
-	  this->lbehaviorVariableParameters.empty();
+		this->ldiffusionRateEffects.empty() &&
+		this->lbehaviorVariableParameters.empty();
 }
 
 
@@ -553,10 +553,10 @@ double DependentVariable::calculateRate(int i)
 	// later two components are precomputed for efficiency.
 
 	return this->basicRate() *
-	  this->lcovariateRates[i] *
-	  this->behaviorVariableRate(i) *
-	  this->structuralRate(i) *
-	  this->diffusionRate(i);
+		this->lcovariateRates[i] *
+		this->behaviorVariableRate(i) *
+		this->structuralRate(i) *
+		this->diffusionRate(i);
 }
 
 
