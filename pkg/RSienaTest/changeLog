@@ -1,3 +1,8 @@
+2011-10-28 R-forge revision 179.
+
+	* R/robmon.r: fix problem with forking clusters.
+	* tests/scriptfile.Rout.save: updated version of script test output.
+
 2011-10-27 R-forge revision 178. Fixes from rev 175 and rev 177 copied to RSiena.
 
 	* R/phase3.r: correct covariance matrix for effects that have been

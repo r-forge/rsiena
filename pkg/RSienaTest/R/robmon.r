@@ -57,8 +57,16 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         {
             stop("Not enough observations to use the nodes")
         }
-        cl <- makeCluster(clusterString, type = clusterType,
+		if (clusterType == "FORK")
+		{
+			cl <- makeCluster(nbrNodes, type = clusterType,
                           outfile = "cluster.out")
+		}
+		else
+		{
+			cl <- makeCluster(clusterString, type = clusterType,
+                          outfile = "cluster.out")
+		}
         clusterCall(cl, library, pkgname, character.only = TRUE)
 		if (R.version$minor < 14.0) ## fake this to recreate old results
 	##	if (TRUE)
