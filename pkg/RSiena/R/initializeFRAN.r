@@ -419,7 +419,9 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                         )
     if (!initC)
     {
-        ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects)
+        ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
+					 z$parallelTesting)
+		##stop('done')
         if (!x$maxlike)
         {
             z$targets <- rowSums(ans)

@@ -385,7 +385,7 @@ void setupOneModeObservations(SEXP ONEMODES,
     	setupOneModeNetwork(VECTOR_ELT(ONEMODES, period),
 			pOneModeNetworkLongitudinalData,
 			period);
-   }
+	}
     UNPROTECT(2);
 }
 /**
@@ -585,7 +585,7 @@ void setupBipartiteGroup(SEXP BIPARTITEGROUP, Data * pData)
 		// Once all network data has been stored, calculate some
 		// statistical properties of that data.
 
-		//pNetworkLongitudinalData->calculateProperties();
+		pNetworkLongitudinalData->calculateProperties();
         UNPROTECT(3);
     }
 }

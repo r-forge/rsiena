@@ -35,7 +35,6 @@
 #include "model/variables/NetworkVariable.h"
 #include "model/variables/BehaviorVariable.h"
 #include "model/tables/Cache.h"
-#include "network/IncidentTieIterator.h"
 
 namespace siena
 {
@@ -61,6 +60,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData,
 	this->lpState = pState;
 	this->lperiod = period;
 	this->lpPredictorState = new State();
+	this->lpStateLessMissingsEtc = new State();
 
 	this->calculateStatistics();
 }
@@ -82,11 +82,15 @@ StatisticCalculator::~StatisticCalculator()
 
 	// The state just stores the values, but does not own them. It means that
 	// the destructor of the state won't deallocate the memory, and we must
-	// request that explicitly.
+	// request that explicitly. The basic predictor state is stored on the data
+	// so lpredictorState is just a pointer.
 
-	this->lpPredictorState->deleteValues();
+	//	this->lpPredictorState->deleteValues();
 	delete this->lpPredictorState;
 	this->lpPredictorState = 0;
+	this->lpStateLessMissingsEtc->deleteValues();
+	delete this->lpStateLessMissingsEtc;
+	this->lpStateLessMissingsEtc = 0;
 }
 
 
@@ -141,7 +145,7 @@ void StatisticCalculator::calculateStatistics()
 	const vector<LongitudinalData *> & rVariables =
 		this->lpData->rDependentVariableData();
 
-	// set up the predictor states of these variables
+	// set up the predictor and currentLessMissingsEtc states of these variables
 
 	for (unsigned i = 0; i < rVariables.size(); i++)
 	{
@@ -153,33 +157,45 @@ void StatisticCalculator::calculateStatistics()
 
 		if (pNetworkData)
 		{
-			Network * pPredictor =
-				pNetworkData->pNetwork(this->lperiod)->clone();
-			this->subtractNetwork(pPredictor,
-				pNetworkData->pMissingTieNetwork(this->lperiod));
-			this->subtractNetwork(pPredictor,
-				pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+			const Network * pPredictor =
+				pNetworkData->pNetworkLessMissing(this->lperiod);
 			this->lpPredictorState->pNetwork(name, pPredictor);
+
+			// Duplicate the current network and remove those ties that are
+			// missing at either end of the period.
+
+			Network * pNetwork =
+				this->lpState->pNetwork(pNetworkData->name())->clone();
+
+			subtractNetwork(pNetwork,
+				pNetworkData->pMissingTieNetwork(this->lperiod));
+			subtractNetwork(pNetwork,
+				pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+
+			// for not-targets, overwrite the current network for values
+			// structurally fixed for the next period. (no effect for targets)
+
+			replaceNetwork(pNetwork,
+				pNetworkData->pNetwork(this->lperiod + 1),
+				pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+			// for targets look backwards and mimic the simulation by carrying
+			// forward structural values.
+
+			replaceNetwork(pNetwork,
+				pNetworkData->pNetwork(this->lperiod),
+				pNetworkData->pStructuralTieNetwork(this->lperiod));
+
+			this->lpStateLessMissingsEtc->pNetwork(name, pNetwork);
+
 		}
 		else if (pBehaviorData)
 		{
  			// create a copy of the start of the period and zero any values
 			// missing at (either end?) start of period
 
-			int * values = new int[pBehaviorData->n()];
-
-			for (int i = 0; i < pBehaviorData->n(); i++)
-			{
-				values[i] = pBehaviorData->value(this->lperiod, i);
-				//		if (pBehaviorData->missing(this->lperiod, i) ||
-				//			pBehaviorData->missing(this->lperiod + 1, i))
-
-				if (pBehaviorData->missing(this->lperiod, i) )
-				{
-					values[i] = 0;
-				}
-			}
-
+			const int * values =
+				pBehaviorData->valuesLessMissingStarts(this->lperiod);
 			this->lpPredictorState->behaviorValues(name, values);
 		}
 		else
@@ -222,37 +238,15 @@ void StatisticCalculator::calculateStatistics()
 void StatisticCalculator::calculateNetworkEvaluationStatistics(
 	NetworkLongitudinalData * pNetworkData)
 {
-	// Duplicate the current network and remove those ties that are
-	// missing at either end of the period.
-
-	Network * pNetwork =
-		this->lpState->pNetwork(pNetworkData->name())->clone();
-
-	this->subtractNetwork(pNetwork,
-		pNetworkData->pMissingTieNetwork(this->lperiod));
-	this->subtractNetwork(pNetwork,
-		pNetworkData->pMissingTieNetwork(this->lperiod + 1));
-
-	// for not-targets, overwrite the current network for values
-	// structurally fixed for the next period. (no effect for targets)
-
-	this->replaceNetwork(pNetwork,
-		pNetworkData->pNetwork(this->lperiod + 1),
-		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
-
-	// for targets look backwards and mimic the simulation by carrying forward
-	// structural values.
-
-	this->replaceNetwork(pNetwork,
-		pNetworkData->pNetwork(this->lperiod),
-		pNetworkData->pStructuralTieNetwork(this->lperiod));
-
 	// We want to pass all networks to the effects in a single state,
 	// hence we overwrite the network in the predictor state.
+	// We do not use the predictor network with effects this network owns.
 
 	string name = pNetworkData->name();
 	const Network * pPredictorNetwork = this->lpPredictorState->pNetwork(name);
-	this->lpPredictorState->pNetwork(name, pNetwork);
+	const Network * pCurrentLessMissingsEtc =
+		this->lpStateLessMissingsEtc->pNetwork(name);
+	this->lpPredictorState->pNetwork(name, pCurrentLessMissingsEtc);
 
 	// Loop through the evaluation effects, calculate the statistics,
 	// and store them.
@@ -283,7 +277,6 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 	// Restore the predictor network
 	this->lpPredictorState->pNetwork(name, pPredictorNetwork);
 
-	delete pNetwork;
 }
 
 
@@ -294,12 +287,12 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 void StatisticCalculator::calculateNetworkEndowmentStatistics(
 	NetworkLongitudinalData * pNetworkData)
 {
-	// First make sure we have some endowment effects selected
-
+	// To save a lot of unnecessary effort, check first we have some
+	// endowment effects
 	const vector<EffectInfo *> & rEffects =
 		this->lpModel->rEndowmentEffects(pNetworkData->name());
 
-    if (rEffects.size() > 0)
+	if (rEffects.size() > 0)
 	{
 		// In order to calculate the statistics of network endowment effects,
 		// we need the initial network of the given period, and the network
@@ -316,39 +309,35 @@ void StatisticCalculator::calculateNetworkEndowmentStatistics(
 
 		// Replace values for structurally determined values from previous
 		// or current period
-		this->replaceNetwork(pCurrentNetwork,
+		replaceNetwork(pCurrentNetwork,
 			pNetworkData->pNetwork(this->lperiod + 1),
 			pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
 
-		this->replaceNetwork(pCurrentNetwork,
+		replaceNetwork(pCurrentNetwork,
 			pNetworkData->pNetwork(this->lperiod),
 			pNetworkData->pStructuralTieNetwork(this->lperiod));
 
 		// remove missings and current
 
-		this->subtractNetwork(pLostTieNetwork,
+		subtractNetwork(pLostTieNetwork,
 			pCurrentNetwork);
-		this->subtractNetwork(pLostTieNetwork,
+		subtractNetwork(pLostTieNetwork,
 			pNetworkData->pMissingTieNetwork(this->lperiod + 1));
 
-		// create a new predictor network with only some missings removed
-		Network * pPredictor =
-			pNetworkData->pNetwork(this->lperiod)->clone();
-		this->subtractNetwork(pPredictor,
-			pNetworkData->pMissingTieNetwork(this->lperiod));
+		// overwrite the predictor network with only start missings removed
+		const Network * pPredictor =
+			pNetworkData->pNetworkLessMissingStart(this->lperiod);
 
 		// We want to pass all networks to the effects in a single state,
 		// hence we overwrite the network in the predictor state.
 
 		string name = pNetworkData->name();
-		const Network * pPredictorNetwork = this->lpPredictorState->pNetwork(name);
+		const Network * pPredictorNetwork =
+			this->lpPredictorState->pNetwork(name);
 		this->lpPredictorState->pNetwork(name, pPredictor);
 
 		// Loop through the endowment effects, calculate the statistics,
 		// and store them.
-
-		//const vector<EffectInfo *> & rEffects =
-		//this->lpModel->rEndowmentEffects(pNetworkData->name());
 
 		EffectFactory factory(this->lpData);
 		Cache cache;
@@ -374,7 +363,6 @@ void StatisticCalculator::calculateNetworkEndowmentStatistics(
 		// Restore the predictor network
 		this->lpPredictorState->pNetwork(name, pPredictorNetwork);
 
-		delete pPredictor;
 		delete pCurrentNetwork;
 		delete pLostTieNetwork;
 	}
@@ -388,118 +376,65 @@ void StatisticCalculator::calculateNetworkEndowmentStatistics(
 void StatisticCalculator::calculateNetworkCreationStatistics(
 	NetworkLongitudinalData * pNetworkData)
 {
- 	const vector<EffectInfo *> & rEffects =
- 		this->lpModel->rCreationEffects(pNetworkData->name());
+	// To save a lot of unnecessary effort, check first we have some
+	// endowment effects
+	const vector<EffectInfo *> & rEffects =
+		this->lpModel->rCreationEffects(pNetworkData->name());
+
 	if (rEffects.size() > 0)
 	{
-	// Duplicate the current network and remove those ties that are
-	// missing at either end of the period.
+		// We want to pass all networks to the effects in a single state,
+		// hence we overwrite the network in the predictor state.
+		// We do not use the predictor network with effects this network owns.
 
-	Network * pNetwork =
-		this->lpState->pNetwork(pNetworkData->name())->clone();
+		string name = pNetworkData->name();
+		const Network * pPredictorNetwork =
+			this->lpPredictorState->pNetwork(name);
+		const Network * pCurrentLessMissingsEtc =
+			this->lpStateLessMissingsEtc->pNetwork(name);
+		this->lpPredictorState->pNetwork(name, pCurrentLessMissingsEtc);
 
-	this->subtractNetwork(pNetwork,
-		pNetworkData->pMissingTieNetwork(this->lperiod));
-	this->subtractNetwork(pNetwork,
-		pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+		// In order to calculate the statistics of tie creation effects, we
+		// need to know the ties that are gained, namely, those that are
+		// known to be absent in the beginning of the period.
 
-	// for not-targets, overwrite the current network for values
-	// structurally fixed for the next period. (no effect for targets)
+		Network * pGainedTieNetwork = pCurrentLessMissingsEtc->clone();
 
-	this->replaceNetwork(pNetwork,
-		pNetworkData->pNetwork(this->lperiod + 1),
-		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+		subtractNetwork(pGainedTieNetwork,
+			pNetworkData->pNetwork(this->lperiod));
+		// not sure we need this one!
+		subtractNetwork(pGainedTieNetwork,
+			pNetworkData->pMissingTieNetwork(this->lperiod));
 
-	// for targets look backwards and mimic the simulation by carrying forward
-	// structural values.
+		// Loop through the creation effects, calculate the statistics,
+		// and store them.
 
-	this->replaceNetwork(pNetwork,
-		pNetworkData->pNetwork(this->lperiod),
-		pNetworkData->pStructuralTieNetwork(this->lperiod));
+		EffectFactory factory(this->lpData);
+		Cache cache;
 
-	// In order to calculate the statistics of tie creation effects, we
-	// need to know the ties that are gained, namely, those that are
-	// known to be absent in the beginning of the period.
+		for (unsigned i = 0; i < rEffects.size(); i++)
+		{
+			EffectInfo * pInfo = rEffects[i];
+			NetworkEffect * pEffect =
+				(NetworkEffect *) factory.createEffect(pInfo);
 
-	Network * pGainedTieNetwork = pNetwork->clone();
+			// Initialize the effect to work with our data and state of variables.
 
-	this->subtractNetwork(pGainedTieNetwork,
-		pNetworkData->pNetwork(this->lperiod));
-	this->subtractNetwork(pGainedTieNetwork,
-		pNetworkData->pMissingTieNetwork(this->lperiod));
+			pEffect->initialize(this->lpData,
+				this->lpPredictorState,
+				this->lperiod,
+				&cache);
 
-	// We want to pass all networks to the effects in a single state,
-	// hence we overwrite the network in the predictor state.
+			this->lstatistics[pInfo] =
+				pEffect->creationStatistic(pGainedTieNetwork);
 
-	string name = pNetworkData->name();
-	const Network * pPredictorNetwork = this->lpPredictorState->pNetwork(name);
-	this->lpPredictorState->pNetwork(name, pNetwork);
+			delete pEffect;
+		}
 
-	// Loop through the creation effects, calculate the statistics,
-	// and store them.
+		// Restore the predictor network
+		this->lpPredictorState->pNetwork(name, pPredictorNetwork);
 
-	//	const vector<EffectInfo *> & rEffects =
- 	//	this->lpModel->rCreationEffects(pNetworkData->name());
-
- 	EffectFactory factory(this->lpData);
- 	Cache cache;
-
-	for (unsigned i = 0; i < rEffects.size(); i++)
-	{
-		EffectInfo * pInfo = rEffects[i];
-		NetworkEffect * pEffect =
-			(NetworkEffect *) factory.createEffect(pInfo);
-
-		// Initialize the effect to work with our data and state of variables.
-
-		pEffect->initialize(this->lpData,
-			this->lpPredictorState,
-			this->lperiod,
-			&cache);
-
-		this->lstatistics[pInfo] =
-			pEffect->creationStatistic(pGainedTieNetwork);
-
-		delete pEffect;
-	}
-
-	// Restore the predictor network
-	this->lpPredictorState->pNetwork(name, pPredictorNetwork);
-
-	delete pNetwork;
-	delete pGainedTieNetwork;
-	}
-}
-
-
-/**
- * Removes the ties of the first network that are present in the second
- * network.
- */
-void StatisticCalculator::subtractNetwork(Network * pNetwork,
-	const Network * pSubtrahendNetwork) const
-{
-	for (TieIterator iter = pSubtrahendNetwork->ties();
-		iter.valid();
-		iter.next())
-	{
-		pNetwork->setTieValue(iter.ego(), iter.alter(), 0);
-	}
-}
-
-/**
- * Replaces the values of the first network with values in the second network
-    for ties that are present in the third network.
- */
-void StatisticCalculator::replaceNetwork(Network * pNetwork,
-	const Network * pValueNetwork, const Network * pDecisionNetwork ) const
-{
-	for (TieIterator iter = pDecisionNetwork->ties();
-		iter.valid();
-		iter.next())
-	{
-		pNetwork->setTieValue(iter.ego(), iter.alter(),
-			pValueNetwork->tieValue(iter.ego(), iter.alter()));
+		delete pGainedTieNetwork;
 	}
 }
 
@@ -635,87 +570,108 @@ void StatisticCalculator::calculateBehaviorStatistics(
 void StatisticCalculator::calculateNetworkRateStatistics(
 	NetworkLongitudinalData * pNetworkData)
 {
-	// Duplicate the current network and remove those ties that are
-	// missing at either end of the period. TODO set leavers back.
-
-	Network * pNetwork =
-		this->lpState->pNetwork(pNetworkData->name())->clone();
-
-	this->subtractNetwork(pNetwork,
-		pNetworkData->pMissingTieNetwork(this->lperiod));
-	this->subtractNetwork(pNetwork,
-		pNetworkData->pMissingTieNetwork(this->lperiod + 1));
-
-// 	// Replace values for structurally determined values from previous
-// 	// or current period. Siena 3 does not do this ... so we won't yet
-
-// 	this->replaceNetwork(pNetwork,
-// 		pNetworkData->pNetwork(this->lperiod + 1),
-// 		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
-
-// 	this->replaceNetwork(pNetwork,
-// 		pNetworkData->pNetwork(this->lperiod),
-// 		pNetworkData->pStructuralTieNetwork(this->lperiod));
-
-	// instead, remove all structurally determined ties at either end
-	this->subtractNetwork(pNetwork,
-		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
-
-	this->subtractNetwork(pNetwork,
-		pNetworkData->pStructuralTieNetwork(this->lperiod));
-
-	// construct a network of differences between current and start
-    // of period.
-
-	Network * pStart = pNetworkData->pNetwork(this->lperiod)->clone();
-
-	this->subtractNetwork(pStart,
-		pNetworkData->pMissingTieNetwork(this->lperiod));
-	this->subtractNetwork(pStart,
-		pNetworkData->pMissingTieNetwork(this->lperiod + 1));
-
-	// remove all structurally determined ties at either end
-	this->subtractNetwork(pStart,
-		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
-
-	this->subtractNetwork(pStart,
-		pNetworkData->pStructuralTieNetwork(this->lperiod));
-	Network * pDifference = symmetricDifference(pStart, pNetwork);
-
-	// basic rate distance
-
-	if (!this->ldistances[pNetworkData])
-	{
-		int * array =
-			new int[pNetworkData->observationCount() - 1];
-
-		this->ldistances[pNetworkData] = array;
-	}
-
-	this->ldistances[pNetworkData][this->lperiod] = pDifference->tieCount();
-
-//	Rprintf("basic rate change %d\n", pDifference->tieCount());
-
-	// Loop through the rate effects, calculate the statistics,
-	// and store them.
-
-	const vector<EffectInfo *> & rEffects =
-		this->lpModel->rRateEffects(pNetworkData->name());
-
-	for (unsigned i = 0; i < rEffects.size(); i++)
-	{
-		EffectInfo * pInfo = rEffects[i];
-		//	double parameter = pInfo->parameter();
-		string effectName = pInfo->effectName();
-		string interactionName = pInfo->interactionName1();
-		string rateType = pInfo->rateType();
-
-		if (rateType == "covariate")
+		Network * pNetwork;
+		// if parallel running, do processing from scratch
+		if (this->lpModel->parallelRun())
 		{
-			// Covariate-dependent rate effect
+			// Duplicate the current network and remove those ties that are
+			// missing at either end of the period. TODO set leavers back.
+			// (Is the TODO not done for the current network?)
 
-			//	if (parameter != 0)
-			//	{
+			pNetwork =
+				this->lpState->pNetwork(pNetworkData->name())->clone();
+			subtractNetwork(pNetwork,
+				pNetworkData->pMissingTieNetwork(this->lperiod));
+			subtractNetwork(pNetwork,
+				pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+
+			// Replace values for structurally determined values from previous
+			// or current period. Siena 3 does not do this ... so we won't yet
+
+			// 	this->replaceNetwork(pNetwork,
+			// 		pNetworkData->pNetwork(this->lperiod + 1),
+			// 		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+			// 	this->replaceNetwork(pNetwork,
+			// 		pNetworkData->pNetwork(this->lperiod),
+			// 		pNetworkData->pStructuralTieNetwork(this->lperiod));
+
+			// instead, remove all structurally determined ties at either end
+			subtractNetwork(pNetwork,
+				pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+			subtractNetwork(pNetwork,
+				pNetworkData->pStructuralTieNetwork(this->lperiod));
+		}
+		else
+		{
+		pNetwork =
+				this->lpStateLessMissingsEtc->
+				pNetwork(pNetworkData->name())->clone();
+		}
+
+		// construct a network of differences between current and start
+		// of period.
+
+		Network * pStart = pNetworkData->
+			pNetworkLessMissing(this->lperiod)->clone();
+
+		// must match with above code: the net result is probably equivalent
+		if (this->lpModel->parallelRun())
+		{
+			// remove all structurally determined ties at either end
+			subtractNetwork(pStart,
+				pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+			subtractNetwork(pStart,
+				pNetworkData->pStructuralTieNetwork(this->lperiod));
+		}
+		else
+		{
+			replaceNetwork(pStart,
+				pNetworkData->pNetwork(this->lperiod + 1),
+				pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+			replaceNetwork(pStart,
+				pNetworkData->pNetwork(this->lperiod),
+				pNetworkData->pStructuralTieNetwork(this->lperiod));
+
+		}
+		Network * pDifference = symmetricDifference(pStart, pNetwork);
+
+		// basic rate distance
+
+		if (!this->ldistances[pNetworkData])
+		{
+			int * array =
+				new int[pNetworkData->observationCount() - 1];
+
+			this->ldistances[pNetworkData] = array;
+		}
+
+		this->ldistances[pNetworkData][this->lperiod] = pDifference->tieCount();
+
+		//Rprintf("basic rate change %d\n", pDifference->tieCount());
+
+		// Loop through the rate effects, calculate the statistics,
+		// and store them.
+		const vector<EffectInfo *> & rEffects =
+			this->lpModel->rRateEffects(pNetworkData->name());
+
+		for (unsigned i = 0; i < rEffects.size(); i++)
+		{
+			EffectInfo * pInfo = rEffects[i];
+			//	double parameter = pInfo->parameter();
+			string effectName = pInfo->effectName();
+			string interactionName = pInfo->interactionName1();
+			string rateType = pInfo->rateType();
+
+			if (rateType == "covariate")
+			{
+				// Covariate-dependent rate effect
+
+				//	if (parameter != 0)
+				//	{
 				ConstantCovariate * pConstantCovariate =
 					this->lpData->pConstantCovariate(interactionName);
 				ChangingCovariate * pChangingCovariate =
@@ -776,70 +732,71 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 						"'.");
 				}
 				//}
-		}
-		else
-		{
-			// We expect a structural (network-dependent) rate effect here.
-			NetworkLongitudinalData * pExplanatoryNetwork;
-			if (interactionName == "")
-			{
-				pExplanatoryNetwork = pNetworkData;
 			}
 			else
 			{
-				pExplanatoryNetwork =
-					this->lpData->pNetworkData(interactionName);
-			}
-
-			Network * pStructural =
-				pExplanatoryNetwork->pNetwork(this->lperiod)->clone();
-			this->subtractNetwork(pStructural,
-				pExplanatoryNetwork->pMissingTieNetwork(this->lperiod));
-
-			double statistic = 0;
-
-			for (TieIterator iter = pDifference->ties();
-				 iter.valid();
-				 iter.next())
-			{
-				if (effectName == "outRate")
+				// We expect a structural (network-dependent) rate effect here.
+				NetworkLongitudinalData * pExplanatoryNetwork;
+				if (interactionName == "")
 				{
-					statistic += pStructural->outDegree(iter.ego()) *
-						iter.value();
-				}
-				else if (effectName == "inRate")
-				{
-					statistic += pStructural->inDegree(iter.ego()) *
-						iter.value();
-				}
-				else if (effectName == "recipRate")
-				{
-					OneModeNetwork * pOneModeNetwork =
-						(OneModeNetwork *) pStructural;
-					statistic +=
-						pOneModeNetwork->reciprocalDegree(iter.ego()) *
-						iter.value();
-				}
-				else if (effectName == "outRateInv")
-				{
-					statistic +=
-						1.0 / (pStructural->outDegree(iter.ego()) + 1) *
-						iter.value();
+					pExplanatoryNetwork = pNetworkData;
 				}
 				else
 				{
-					throw domain_error("Unexpected rate effect " + effectName);
+					pExplanatoryNetwork =
+						this->lpData->pNetworkData(interactionName);
 				}
+
+				const Network * pStructural =
+					pExplanatoryNetwork->pNetworkLessMissing(this->lperiod);
+
+				double statistic = 0;
+
+				for (TieIterator iter = pDifference->ties();
+					 iter.valid();
+					 iter.next())
+				{
+					if (effectName == "outRate")
+					{
+						statistic += pStructural->outDegree(iter.ego()) *
+							iter.value();
+					}
+					else if (effectName == "inRate")
+					{
+						statistic += pStructural->inDegree(iter.ego()) *
+							iter.value();
+					}
+					else if (effectName == "recipRate")
+					{
+						OneModeNetwork * pOneModeNetwork =
+							(OneModeNetwork *) pStructural;
+						statistic +=
+							pOneModeNetwork->reciprocalDegree(iter.ego()) *
+							iter.value();
+					}
+					else if (effectName == "outRateInv")
+					{
+						statistic +=
+							1.0 / (pStructural->outDegree(iter.ego()) + 1) *
+							iter.value();
+					}
+					else
+					{
+						throw domain_error("Unexpected rate effect " + effectName);
+					}
+				}
+
+				this->lstatistics[pInfo] = statistic;
 			}
-
-			this->lstatistics[pInfo] = statistic;
-			delete pStructural;
 		}
-	}
 
-	delete pStart;
-	delete pDifference;
-	delete pNetwork;
+		delete pStart;
+		delete pDifference;
+		if (this->lpModel->parallelRun())
+		{
+			delete pNetwork;
+		}
+
 }
 /**
  * Calculates the statistics for the rate effects of the given
@@ -919,9 +876,9 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 
 			//	if (parameter != 0)
 			//	{
-				ConstantCovariate * pConstantCovariate =
-					this->lpData->pConstantCovariate(interactionName);
-				ChangingCovariate * pChangingCovariate =
+			ConstantCovariate * pConstantCovariate =
+				this->lpData->pConstantCovariate(interactionName);
+			ChangingCovariate * pChangingCovariate =
 					this->lpData->pChangingCovariate(interactionName);
 				BehaviorLongitudinalData * pBehavior =
 					this->lpData->pBehaviorData(interactionName);
@@ -973,16 +930,14 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 				}
 				//}
 		}
-		else if (rateType == "structural")
+		else
 		{
 			// We expect a structural (network-dependent) rate effect here.
 
 			NetworkLongitudinalData *pNetworkData = this->lpData->
 				pNetworkData(interactionName);
-			Network * pStructural =
-				pNetworkData->pNetwork(this->lperiod)->clone();
-			this->subtractNetwork(pStructural,
-				pNetworkData->pMissingTieNetwork(this->lperiod));
+			const Network * pStructural =
+				pNetworkData->pNetworkLessMissingStart(this->lperiod);
 
 			double statistic = 0;
 			for (int i = 0; i < pBehaviorData->n(); i++)
@@ -1018,54 +973,8 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 			}
 
 			this->lstatistics[pInfo] = statistic;
-			delete pStructural;
-		}
-		else if (rateType == "diffusion")
-		{
-			NetworkLongitudinalData *pNetworkData = this->lpData->
-				pNetworkData(interactionName);
-			Network * pStructural =
-				pNetworkData->pNetwork(this->lperiod)->clone();
-			this->subtractNetwork(pStructural,
-				pNetworkData->pMissingTieNetwork(this->lperiod));
-
-			double statistic = 0;
-			for (int i = 0; i < pBehaviorData->n(); i++)
-			{
-				if (effectName == "avExposure")
-				{
-					double totalAlterValue = 0;
-					double averageAlterValue = 0;
-					if (pStructural->outDegree(i) > 0)
-				    {
-						for (IncidentTieIterator iter = pStructural->outTies(i);
-							 iter.valid();
-							 iter.next())
-						{
-							double alterValue = pBehaviorData->
-								value(this->lperiod,iter.actor());
-							totalAlterValue += alterValue;
-						}
-						averageAlterValue = totalAlterValue /
-							pStructural->outDegree(i);
-				    }
-
-					statistic += averageAlterValue *
-						difference[i];
-				}
-				else
-				{
-				    throw domain_error("Unexpected rate effect " + effectName);
-				}
-			}
-
-			this->lstatistics[pInfo] = statistic;
-			delete pStructural;
 		}
 	}
-
-	delete[] difference;
-	delete[] currentValues;
 }
 
 }
