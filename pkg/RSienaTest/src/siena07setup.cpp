@@ -571,7 +571,8 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
  *  Gets target values relative to the input data
  */
 
-SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST)
+SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
+	SEXP PARALLELRUN)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -579,6 +580,11 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST)
 
 	/* get hold of the model object */
 	Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+	if (!isNull(PARALLELRUN))
+	{
+		pModel->parallelRun(true);
+	}
 
 	int nGroups = pGroupData->size();
 

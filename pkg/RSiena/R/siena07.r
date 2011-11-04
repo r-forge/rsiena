@@ -161,7 +161,11 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
              "seconds.\n"), outf)
 
     if (useCluster)
+	{
         stopCluster(z$cl)
+		## need to reset the random number type to the normal one
+		assign(".Random.seed", z$oldRandomNumbers, pos=1)
+	}
 
     class(z) <- "sienaFit"
     z$tkvars <- NULL

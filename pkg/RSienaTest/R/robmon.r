@@ -68,6 +68,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
                           outfile = "cluster.out")
 		}
         clusterCall(cl, library, pkgname, character.only = TRUE)
+		z$oldRandomNumbers <- .Random.seed
 		if (R.version$minor < 14.0) ## fake this to recreate old results
 	##	if (TRUE)
 		{

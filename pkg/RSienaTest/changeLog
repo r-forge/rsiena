@@ -1,10 +1,27 @@
+2011-11-04 R-forge revision 181.
+
+	* src/data/BehaviorLongitudinalData.cpp,
+	src/data/BehaviorLongitudinalData.h,
+	src/data/NetworkLongitudinalData.cpp, src/siena07Setup.cpp,
+	src/data/NetworkLongitudinalData.h, src/siena07Internals.cpp,
+	src/model/StatisticCalculator.cpp, src/network/NetworkUtils.h,
+	src/model/StatisticCalculator.h, src/network/NetworkUtils.cpp,
+	R/initializeFRAN.r: Reorganised calculation of dependent variables
+	with missing data removed. Hopefully speedier.
+	* src.network/Network.cpp: added a doxygen commment for clone
+	* R/siena07.r, R/robmon.r: reset the random number generator to
+	* src/model/effects/behaviorInteractionEffect.h: correct
+	properties to be eol-style not executable
+	normal type after using parallel package. (RSiena only)
+
 2011-11-04 R-forge revision 180.
 
 	* R/phase1.r, R/phase3.r: revision to avoid time consuming copies
-	* src/model/StatisticalCalculator.cpp: stop setting up of networks
-	if no endowment or creation effects.
-	* src/model/effects/behaviorInteractionEffect.cpp: correct properties to be 
-	eol-style not executable
+	* src/model/StatisticalCalculator.cpp: stop setting up of extra networks
+	if no endowment or creation effects. (Diffusion rate effects were
+	included in RSiena inadvertently: code removed in revision 181)..
+	* src/model/effects/behaviorInteractionEffect.cpp: correct
+	properties to be eol-style not executable (RSiena only)
 
 2011-10-28 R-forge revision 179.
 
