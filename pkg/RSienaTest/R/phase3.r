@@ -33,6 +33,7 @@ phase3 <- function(z, x, ...)
         endNit <- x$n3
     }
 	z$n3 <- endNit
+    z$Phase3nits <- endNit
 
     ## revert to original requested method for phase 3 unless symmetric
     if (z$FinDiff.method && !x$FinDiff.method &&
@@ -72,152 +73,9 @@ phase3 <- function(z, x, ...)
     {
         z$writefreq <- 10
     }
-    for (nit in nits)
-    {
-        z$nit <- nit
-        if (is.null(writefreq))
-        {
-            if (nit == nits[2])
-            {
-                z$time1 <- proc.time()[[3]]
-            }
-            else if (nit == nits11)
-            {
-                time1 <- proc.time()[[3]] - z$time1
-                if (time1 > 1e-5)
-                {
-                    z$writefreq <- max(1, round(20.0 / time1))
-                }
-                else
-                {
-                    z$writefreq <- 20
-                }
-                if (is.batch())
-                {
-                    z$writefreq <-  z$writefreq * 2 ##compensation for it
-                    ## running faster with no tcl/tk
-                }
-                z$writefreq <- roundfreq(z$writefreq)
-                writefreq <- z$writefreq
-            }
-        }
-        if (nit <= 5 || nit == 10 || (int==1 && nit %% z$writefreq == 0 ) ||
-            (int > 1 && (z$writefreq + 1) < z$n3%/%int &&
-             nit %in% nits[seq(z$writefreq + 1, x$n3 %/% int,
-                                          z$writefreq)]))
-        {
-            if (!is.batch())
-            {
-                DisplayIteration(z)
-              #  DisplayTheta(z)
-                DisplayDeviations(z, z$sf[nit-1,])
-            }
-           ## else
-           ## {
-           ##     Report(c('Phase ', z$Phase,' Iteration ',nit,'\n'))
-           ## }
-            if (nit %% z$writefreq == 0 || (int > 1 &&
-                       nit %% z$writefreq == 1) )
-            {
-                increment <- ifelse(nit <= 5, int,
-                                    ifelse(nit <= 10, 5, z$writefreq * int))
-                val<- getProgressBar(z$pb)
-                if (z$FinDiff.method)
-                    val <- val + increment * (z$pp + 1)
-                else
-                    val <- val + increment
-                ## sort out progress bar
-                z$pb <- setProgressBar(z$pb, val)
-                if (is.batch())
-                    Report(c("Phase ", z$Phase, " Iteration ", nit,
-                             " Progress ",
-                             round(val / z$pb$pbmax * 100), "%\n"), sep='')
-            }
-        }
-###############################
-        z <- doPhase3it(z, x, nit, zsmall=zsmall, xsmall=xsmall, ...)
-##############################
-        if (!is.batch())
-        {
-            if (nit < 10)
-                Report(c("  ", nit, " ", format(z$sf[nit,], width=10,
-                                             digits=4, nsmall=4), "\n"), cf)
-            if (nit >= 10)
-            {
-                CheckBreaks()
-                ##    if (nit==10) set up stopkey hint
-				##   Early termination of estimation
-                if( UserInterruptFlag())
-                {
-                   Report(c("The user asked for an early stop of the ",
-                             "algorithm during phase 3.\n"), outf)
-                    z$Phase3Interrupt <- TRUE
-                    if (nit < 500)
-                    {
-                        if (EarlyEndPhase2Flag())
-						{
-                            Report('This implies that ', outf)
-						}
-                        else
-						{
-                            Report(c("This implies that the estimates are as",
-								   "usual,\nbut the "), outf)
-						}
-                        Report(c('diagnostic checks, covariance matrices and ',
-                                 't-values \nare less reliable, because they ',
-                                 'are now based on only', nit,
-                                 'phase-3 iterations.\n\n'), outf)
-                    }
-                    z$sf <- z$sf[1:nit, , drop=FALSE]
-                    z$sf2 <- z$sf2[1:nit, , , drop=FALSE]
-                    if (!x$maxlike)
-                    {
-                        z$ssc <- z$ssc[1:nit, , , drop=FALSE]
-                    }
-                    else
-                    {
-                        z$sdf <-z$sdf[1:nit, , , drop=FALSE]
-                        z$sdf2 <-z$sdf2[1:nit, , , ,drop=FALSE]
-                    }
-                    z$sims <-z$sims[1:nit]
-                    endNit <- nit
-                    break
-                }
-                if (UserRestartFlag())
-                    break
-            }
-        }
-    }
-    if (!z$OK || UserRestartFlag())
-    {
-        return(z)
-    }
-    z$Phase3nits <- endNit
-    z$n3 <- endNit
+	z <- doPhase1or3Iterations(3, z, x, zsmall, xsmall, nits, 0, nits11,
+							   writefreq)
     z <- phase3.2(z,x)
-    z
-}
-
-##@doPhase3it siena07 Does one iteration in phase 3
-doPhase3it<- function(z, x, nit, zsmall, xsmall, ...)
-{
-    if (z$int == 1)
-    {
-        zz <- x$FRAN(zsmall, xsmall)
-        if (!zz$OK)
-        {
-            z$OK <- zz$OK
-            z$zz <- zz
-            return(z)
-        }
-        z$n <- z$n + 1
-    }
-    else
-    {
-		zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
-        z$n <- z$n + z$int
- 	}
-	z <- updateSiena07stores(z, zz, x)
     z
 }
 
@@ -498,3 +356,320 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
     }
     z
 }
+
+doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
+								  nits11=0, writefreq)
+{
+	int <- z$int
+	for (nit in nits)
+	{
+		z$nit <- nit
+		## initial steps differ between phases
+		if (phase == 1)
+		{
+			if (length(nits) > 1 && nit == nits[2])
+			{
+				time1 <- proc.time()['elapsed']
+				if (x$checktime)
+				{
+					z$ctime <- time1
+				}
+			}
+			if (nit == nits6)
+			{
+				time1 <- proc.time()['elapsed']-time1
+				if (time1 > 1e-5)
+				{
+					z$writefreq <- round(20.0/time1)
+				}
+				else
+				{
+					z$writefreq <- 5
+				}
+				if (is.batch())
+				{
+					z$writefreq <- 10 * z$writefreq
+				}
+				z$writefreq <- roundfreq(z$writefreq)
+			}
+			if (nit > nits6 && is.null(z$ctime))
+			{
+				time1 <- proc.time()['elapsed']
+				if (x$checktime)
+				{
+					z$ctime <- time1
+				}
+			}
+			DisplayIteration(z)
+		}
+		else ## phase 3
+		{
+			if (is.null(writefreq))
+			{
+				if (nit == nits[2])
+				{
+					z$time1 <- proc.time()[[3]]
+				}
+				else if (nit == nits11)
+				{
+					time1 <- proc.time()[[3]] - z$time1
+					if (time1 > 1e-5)
+					{
+						z$writefreq <- max(1, round(20.0 / time1))
+					}
+					else
+					{
+						z$writefreq <- 20
+					}
+					if (is.batch())
+					{
+						z$writefreq <-  z$writefreq * 2 ##compensation for it
+						## running faster with no tcl/tk
+					}
+					z$writefreq <- roundfreq(z$writefreq)
+					writefreq <- z$writefreq
+				}
+			}
+			if (nit <= 5 || nit == 10 || (int==1 && nit %% z$writefreq == 0 ) ||
+				(int > 1 && (z$writefreq + 1) < z$n3%/%int &&
+				 nit %in% nits[seq(z$writefreq + 1, x$n3 %/% int,
+								   z$writefreq)]))
+			{
+				if (!is.batch())
+				{
+					DisplayIteration(z)
+					##  DisplayTheta(z)
+					DisplayDeviations(z, z$sf[nit-1,])
+				}
+				## else
+				## {
+				##     Report(c('Phase ', z$Phase,' Iteration ',nit,'\n'))
+				## }
+				if (nit %% z$writefreq == 0 || (int > 1 &&
+						   nit %% z$writefreq == 1))
+				{
+					increment <- ifelse(nit <= 5, int,
+										ifelse(nit <= 10, 5, z$writefreq * int))
+					val<- getProgressBar(z$pb)
+					if (z$FinDiff.method)
+						val <- val + increment * (z$pp + 1)
+					else
+						val <- val + increment
+					## sort out progress bar
+					z$pb <- setProgressBar(z$pb, val)
+					if (is.batch())
+						Report(c("Phase ", z$Phase, " Iteration ", nit,
+								 " Progress ",
+								 round(val / z$pb$pbmax * 100), "%\n"), sep='')
+				}
+			}
+		}
+		## iteration proper
+		if (z$int == 1)
+		{
+			zz <- x$FRAN(zsmall, xsmall)
+			if (!zz$OK)
+			{
+				z$OK <- zz$OK
+				z$zz <- zz
+				return(z)
+			}
+			z$n <- z$n + 1
+			if (phase == 1)
+			{
+				z$phase1Its <- z$phase1Its + 1
+			}
+		}
+		else
+		{
+			zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
+			z$n <- z$n + z$int
+			if (phase == 1)
+			{
+				z$phase1Its <- z$phase1Its + z$int
+			}
+		}
+		## now update the stores
+		if (z$int == 1)
+		{
+			fra <- colSums(zz$fra)
+			fra <- fra - z$targets
+			fra2 <- zz$fra
+			z$sf[z$nit, ] <- fra
+			z$sf2[z$nit, , ] <- zz$fra
+			z$sims[[z$nit]] <- zz$sims
+			z$chain[[z$nit]] <- zz$chain
+			fra <- fra + z$targets
+		}
+		else
+		{
+			for (i in 1:int)
+			{
+				fra <- colSums(zz[[i]]$fra)
+				fra <- fra - z$targets
+				z$sf[z$nit + (i - 1), ] <- fra
+				z$sf2[z$nit + (i - 1), , ] <- zz[[i]]$fra
+				z$sims[[z$nit + (i - 1)]] <- zz[[i]]$sims
+			}
+			fra2 <- t(sapply(zz, function(x)x$fra))
+			dim(fra2) <- c(int, nrow(zz[[1]]$fra), z$pp)
+			fra <- t(sapply(zz, function(x) colSums(x$fra)))
+		}
+		if (x$maxlike)
+		{
+			z$sdf[[z$nit]] <- zz$dff
+			z$sdf2[[z$nit]] <- zz$dff2
+			z$accepts[z$nit, , ] <- zz$accepts
+			z$rejects[z$nit, , ] <- zz$rejects
+			z$aborts[z$nit, , ] <- zz$aborts
+		}
+		else if (z$FinDiff.method)
+		{
+			z <- FiniteDifferences(z, x, fra, fra2)
+			for (i in 0:(z$int - 1))
+			{
+				z$sdf[[z$nit + i]] <- z$sdf0[i + 1, , ]
+				if (z$byWave)
+				{
+					z$sdf2[[z$nit + i]] <- z$sdf02[i + 1, , , ]
+				}
+			}
+		}
+		else
+		{
+			if (int==1)
+			{
+				if (!is.null(zz[['sc']]))
+				{
+					z$ssc[z$nit , ,] <- zz$sc
+				}
+			}
+			else
+			{
+                for (i in 1:int)
+                {
+                    if (!is.null(zz[[i]][['sc']]))
+					{
+                        z$ssc[z$nit + (i - 1), , ] <- zz[[i]]$sc
+					}
+                }
+            }
+		}
+		if ((!x$maxlike) && z$cconditional && z$Phase == 3)
+		{
+			if (int == 1)
+			{
+				z$ntim[z$nit, ] <- zz$ntim0
+			}
+			else
+			{
+				for (i in 1:int)
+				{
+					z$ntim[z$nit + (i-1), ] <- zz[[i]]$ntim0
+				}
+			}
+		}
+		## post processing also differs
+		if (phase == 1)
+		{
+			CheckBreaks()
+			if (UserInterruptFlag() || UserRestartFlag())
+			{
+				return(z)
+			}
+			val <- getProgressBar(z$pb)
+			if (z$FinDiff.method)
+			{
+				val <- val + z$pp + 1
+			}
+			else
+			{
+				val <- val + 1
+			}
+			z$pb <- setProgressBar(z$pb, val)
+			progress <- val / z$pb$pbmax * 100
+			if (z$nit <= 5 || z$nit %% z$writefreq == 0 || z$nit %%5 == 0 ||
+				x$maxlike || z$FinDiff.method ||
+				(z$int > 1 && z$nit %% z$writefreq < z$int))
+			{
+				##  Report(c('Phase', z$Phase, 'Iteration ', z$nit, '\n'))
+				if (is.batch())
+				{
+					Report(c('Phase ', z$Phase, ' Iteration ', z$nit,
+							 ' Progress: ', round(progress), '%\n'), sep='')
+				}
+				else
+				{
+					DisplayTheta(z)
+					DisplayDeviations(z, z$sf[z$nit, ])
+				}
+			}
+			if (!z$OK || UserRestartFlag() || UserInterruptFlag())
+				return(z)
+		}
+		else ## phase 3
+		{
+			if (!is.batch())
+			{
+				if (nit < 10)
+				{
+					Report(c("  ", nit, " ",
+							 format(z$sf[nit,], width=1, digits=4, nsmall=4),
+							 "\n"), cf)
+					if (nit >= 10)
+					{
+						CheckBreaks()
+						##    if (nit==10) set up stopkey hint
+						##   Early termination of estimation
+						if( UserInterruptFlag())
+						{
+							Report(c("The user asked for an early stop of the ",
+									 "algorithm during phase 3.\n"), outf)
+							z$Phase3Interrupt <- TRUE
+							if (nit < 500)
+							{
+								if (EarlyEndPhase2Flag())
+								{
+									Report('This implies that ', outf)
+								}
+								else
+								{
+									Report(c("This implies that the estimates",
+											 "are as usual,\nbut the "), outf)
+								}
+								Report(c("diagnostic checks, covariance",
+										 "matrices and t-values \nare less ",
+										 "reliable, because they ",
+										 'are now based on only', nit,
+										 'phase-3 iterations.\n\n'), outf)
+							}
+							z$sf <- z$sf[1:nit, , drop=FALSE]
+							z$sf2 <- z$sf2[1:nit, , , drop=FALSE]
+							if (!x$maxlike)
+							{
+								z$ssc <- z$ssc[1:nit, , , drop=FALSE]
+							}
+							else
+							{
+								z$sdf <-z$sdf[1:nit, , , drop=FALSE]
+								z$sdf2 <-z$sdf2[1:nit, , , ,drop=FALSE]
+							}
+							z$sims <-z$sims[1:nit]
+                            z$Phase3nits <- nit
+                            z$n3 <- nit
+							break
+						}
+						if (UserRestartFlag())
+							break
+					}
+				}
+			}
+			if (!z$OK || UserRestartFlag())
+			{
+				return(z)
+			}
+		}
+	}
+	z
+}
+
