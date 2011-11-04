@@ -5,16 +5,16 @@
 ## *
 ## * File: phase1.r
 ## *
-## * Description: This module contains the functions phase1.1, doPhase1it,
+## * Description: Phase 1 processing is controlled by the functions phase1.1
 ## * and phase1.2. phase1.1 does the first 10 iterations and checks that
 ## * finite differencing is going OK. If not, alters epsilon and forces a
 ## * restart. Phase 1.2 does the rest of the iterations and then calculates
-## * the derivative estimate. doPhase1it does one iteration, is called by
-## * phase1.1 and phase1.2.
+## * the derivative estimate. Both call doPhase1or3iterations which does a block
+## * of iterations, to save copying large objects around.
 ## ****************************************************************************/
 ##args: x model object (readonly), z control object
 ##
-##@phase1.1 siena07 Do first 10 iterations (before check if using finite differences)
+##@phase1.1 siena07 Do first 10 iters (before check if using finite differences)
 phase1.1 <- function(z, x, ...)
 {
     ## initialise phase 1
@@ -55,45 +55,11 @@ phase1.1 <- function(z, x, ...)
         nits6 <- min(nits[nits >= 6 ])
     }
     else
+	{
         nits6 <- -1
-    for (nit in nits)
-    {
-         z$nit <- nit
-         if (length(nits) > 1 && nit == nits[2])
-         {
-             time1 <- proc.time()['elapsed']
-             if (x$checktime)
-             {
-                 z$ctime <- time1
-             }
-         }
-         if (nit == nits6)
-         {
-             time1 <- proc.time()['elapsed']-time1
-             if (time1 > 1e-5)
-             {
-                 z$writefreq <- round(20.0/time1)
-             }
-             else
-             {
-                 z$writefreq <- 5
-             }
-             if (is.batch())
-             {
-                 z$writefreq <- 10 * z$writefreq
-             }
-             z$writefreq <- roundfreq(z$writefreq)
-         }
-         ## #######################################
-         ## # do iteration
-         ## #######################################
-         z <- doPhase1it(z, x, zsmall=zsmall, xsmall=xsmall, ...)
-         ## #######################################
-         ## #
-         ## #######################################
-         if (!z$OK || UserRestartFlag() || UserInterruptFlag())
-             return(z)
-     }
+	}
+	### call the subroutine to do the iterations
+	z <- doPhase1or3Iterations(1, z, x, zsmall, xsmall, nits, nits6)
 
     if (z$FinDiff.method)
     {
@@ -153,66 +119,7 @@ phase1.1 <- function(z, x, ...)
     z
 }
 
-##@doPhase1it siena07 does 1 iteration in Phase 1
-doPhase1it<- function(z, x, zsmall, xsmall, ...)
-{
-    DisplayIteration(z)
-    if (z$int == 1)
-    {
-        zz <- x$FRAN(zsmall, xsmall)
-        if (!zz$OK)
-        {
-            z$OK <- zz$OK
-            z$zz <- zz
-            return(z)
-        }
-        z$n <- z$n + 1
-        z$phase1Its <- z$phase1Its + 1
-    }
-    else
-    {
-        zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
-        z$n <- z$n + z$int
-        z$phase1Its <- z$phase1Its + z$int
-      #  browser()
-    }
-	z <- updateSiena07stores(z, zz, x)
-    CheckBreaks()
-    if (UserInterruptFlag() || UserRestartFlag())
-    {
-        return(z)
-    }
-    val <- getProgressBar(z$pb)
-    if (z$FinDiff.method)
-    {
-        val <- val + z$pp + 1
 
-    }
-    else
-    {
-        val <- val + 1
-    }
-    z$pb <- setProgressBar(z$pb, val)
-    progress <- val / z$pb$pbmax * 100
-    if (z$nit <= 5 || z$nit %% z$writefreq == 0 || z$nit %%5 == 0 ||
-        x$maxlike || z$FinDiff.method ||
-        (z$int > 1 && z$nit %% z$writefreq < z$int))
-    {
-      #  Report(c('Phase', z$Phase, 'Iteration ', z$nit, '\n'))
-        if (is.batch())
-		{
-            Report(c('Phase ', z$Phase, ' Iteration ', z$nit, ' Progress: ',
-                     round(progress), '%\n'), sep='')
-		}
-        else
-        {
-            DisplayTheta(z)
-            DisplayDeviations(z, z$sf[z$nit, ])
-        }
-    }
-    #browser()
-    z
-}
 ##@phase1.2 siena07 Do rest of phase 1 iterations
 phase1.2 <- function(z, x, ...)
 {
@@ -223,23 +130,7 @@ phase1.2 <- function(z, x, ...)
     if (z$n1 > z$phase1Its)
     {
         nits <- seq((z$phase1Its+1), z$n1, int)
-        for (nit in nits)
-        {
-            if (is.null(z$ctime))
-            {
-                time1 <- proc.time()['elapsed']
-                if (x$checktime)
-                {
-                    z$ctime <- time1
-                }
-            }
-            z$nit <- nit
-            z <- doPhase1it(z, x, zsmall=zsmall, xsmall=xsmall, ...)
-            if (!z$OK || UserInterruptFlag() || UserRestartFlag())
-            {
-                return(z)
-            }
-        }
+		z <- doPhase1or3Iterations(1, z, x, zsmall, xsmall, nits)
     }
     z$timePhase1 <- (proc.time()['elapsed'] - z$ctime) / (z$nit - 1)
     if (x$checktime  && !is.na(z$timePhase1))
@@ -252,7 +143,7 @@ phase1.2 <- function(z, x, ...)
     Report('after phase 1:\n', cf)
     PrtOutMat(format(as.matrix(z$mnfra), width = 15, nsmall = 6), cf)
     z <- CalculateDerivative(z, x)
-  ##browser()
+	##browser()
     if (!z$OK || z$DerivativeProblem) ##longer phase 1 or use finite differences
     {
         return(z)
@@ -565,90 +456,5 @@ createSiena07stores <- function(z, nIterations, f)
         z$ntim <- matrix(NA, nrow=nIterations, ncol=f$observations - 1)
     }
     z$sims <- vector("list", nIterations)
-	z
-}
-##@updateSiena07Stores siena07 store data in phase 1 and 3
-updateSiena07stores <- function(z, zz, x)
-{
-	int <- z$int
-	if (int == 1)
-    {
-        fra <- colSums(zz$fra)
-        fra <- fra - z$targets
-        fra2 <- zz$fra
-        z$sf[z$nit, ] <- fra
-        z$sf2[z$nit, , ] <- zz$fra
-        z$sims[[z$nit]] <- zz$sims
-        z$chain[[z$nit]] <- zz$chain
-        fra <- fra + z$targets
-    }
-    else
-    {
-        for (i in 1:int)
-        {
-            fra <- colSums(zz[[i]]$fra)
-            fra <- fra - z$targets
-            z$sf[z$nit + (i - 1), ] <- fra
-            z$sf2[z$nit + (i - 1), , ] <- zz[[i]]$fra
-            z$sims[[z$nit + (i - 1)]] <- zz[[i]]$sims
-        }
-        fra2 <- t(sapply(zz, function(x)x$fra))
-        dim(fra2) <- c(int, nrow(zz[[1]]$fra), z$pp)
-        fra <- t(sapply(zz, function(x) colSums(x$fra)))
-    }
-    if (x$maxlike)
-    {
-        z$sdf[[z$nit]] <- zz$dff
-        z$sdf2[[z$nit]] <- zz$dff2
-        z$accepts[z$nit, , ] <- zz$accepts
-        z$rejects[z$nit, , ] <- zz$rejects
-		z$aborts[z$nit, , ] <- zz$aborts
-	}
-    else if (z$FinDiff.method)
-    {
-        z <- FiniteDifferences(z, x, fra, fra2)
-		for (i in 0:(z$int - 1))
-		{
-			z$sdf[[z$nit + i]] <- z$sdf0[i + 1, , ]
-			if (z$byWave)
-			{
-				z$sdf2[[z$nit + i]] <- z$sdf02[i + 1, , , ]
-			}
-		}
-    }
-    else
-    {
-        if (int==1)
-        {
-            if (!is.null(zz[['sc']]))
-			{
-                z$ssc[z$nit , ,] <- zz$sc
-			}
-        }
-        else
-        {
-                for (i in 1:int)
-                {
-                    if (!is.null(zz[[i]][['sc']]))
-					{
-                        z$ssc[z$nit + (i - 1), , ] <- zz[[i]]$sc
-					}
-                }
-            }
-    }
-    if ((!x$maxlike) && z$cconditional && z$Phase == 3)
-    {
-        if (int == 1)
-        {
-            z$ntim[z$nit, ] <- zz$ntim0
-        }
-        else
-        {
-            for (i in 1:int)
-            {
-				z$ntim[z$nit + (i-1), ] <- zz[[i]]$ntim0
-            }
-        }
-    }
 	z
 }

@@ -1,3 +1,11 @@
+2011-11-04 R-forge revision 180.
+
+	* R/phase1.r, R/phase3.r: revision to avoid time consuming copies
+	* src/model/StatisticalCalculator.cpp: stop setting up of networks
+	if no endowment or creation effects.
+	* src/model/effects/behaviorInteractionEffect.cpp: correct properties to be 
+	eol-style not executable
+
 2011-10-28 R-forge revision 179.
 
 	* R/robmon.r: fix problem with forking clusters.

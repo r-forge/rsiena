@@ -294,82 +294,90 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 void StatisticCalculator::calculateNetworkEndowmentStatistics(
 	NetworkLongitudinalData * pNetworkData)
 {
-	// In order to calculate the statistics of network endowment effects,
-	// we need the initial network of the given period, and the network
-	// of lost ties, namely, the ties that are present in the initial
-	// network, not missing at the start of the period, and absent in the
-	// current network.
-
-	const Network * pInitialNetwork = pNetworkData->pNetwork(this->lperiod);
-	Network * pLostTieNetwork = pInitialNetwork->clone();
-
-	// Duplicate the current network so can overwrite the structurals
-	Network * pCurrentNetwork =
-		this->lpState->pNetwork(pNetworkData->name())->clone();
-
-	// Replace values for structurally determined values from previous
-	// or current period
-	this->replaceNetwork(pCurrentNetwork,
-		pNetworkData->pNetwork(this->lperiod + 1),
-		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
-
-	this->replaceNetwork(pCurrentNetwork,
-		pNetworkData->pNetwork(this->lperiod),
-		pNetworkData->pStructuralTieNetwork(this->lperiod));
-
-	// remove missings and current
-
-	this->subtractNetwork(pLostTieNetwork,
-		pCurrentNetwork);
-	this->subtractNetwork(pLostTieNetwork,
-		pNetworkData->pMissingTieNetwork(this->lperiod + 1));
-
-	// create a new predictor network with only some missings removed
-	Network * pPredictor =
-		pNetworkData->pNetwork(this->lperiod)->clone();
-	this->subtractNetwork(pPredictor,
-		pNetworkData->pMissingTieNetwork(this->lperiod));
-
-	// We want to pass all networks to the effects in a single state,
-	// hence we overwrite the network in the predictor state.
-
-	string name = pNetworkData->name();
-	const Network * pPredictorNetwork = this->lpPredictorState->pNetwork(name);
-	this->lpPredictorState->pNetwork(name, pPredictor);
-
-	// Loop through the endowment effects, calculate the statistics,
-	// and store them.
+	// First make sure we have some endowment effects selected
 
 	const vector<EffectInfo *> & rEffects =
 		this->lpModel->rEndowmentEffects(pNetworkData->name());
 
- 	EffectFactory factory(this->lpData);
- 	Cache cache;
-
-	for (unsigned i = 0; i < rEffects.size(); i++)
+    if (rEffects.size() > 0)
 	{
-		EffectInfo * pInfo = rEffects[i];
-		NetworkEffect * pEffect =
-			(NetworkEffect *) factory.createEffect(pInfo);
+		// In order to calculate the statistics of network endowment effects,
+		// we need the initial network of the given period, and the network
+		// of lost ties, namely, the ties that are present in the initial
+		// network, not missing at the start of the period, and absent in the
+		// current network.
 
-		// Initialize the effect to work with our data and state of variables.
+		const Network * pInitialNetwork = pNetworkData->pNetwork(this->lperiod);
+		Network * pLostTieNetwork = pInitialNetwork->clone();
 
-		pEffect->initialize(this->lpData,
-			this->lpPredictorState,
-			this->lperiod,
-			&cache);
+		// Duplicate the current network so can overwrite the structurals
+		Network * pCurrentNetwork =
+			this->lpState->pNetwork(pNetworkData->name())->clone();
 
-		this->lstatistics[pInfo] =
-			pEffect->endowmentStatistic(pLostTieNetwork);
-		delete pEffect;
+		// Replace values for structurally determined values from previous
+		// or current period
+		this->replaceNetwork(pCurrentNetwork,
+			pNetworkData->pNetwork(this->lperiod + 1),
+			pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+		this->replaceNetwork(pCurrentNetwork,
+			pNetworkData->pNetwork(this->lperiod),
+			pNetworkData->pStructuralTieNetwork(this->lperiod));
+
+		// remove missings and current
+
+		this->subtractNetwork(pLostTieNetwork,
+			pCurrentNetwork);
+		this->subtractNetwork(pLostTieNetwork,
+			pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+
+		// create a new predictor network with only some missings removed
+		Network * pPredictor =
+			pNetworkData->pNetwork(this->lperiod)->clone();
+		this->subtractNetwork(pPredictor,
+			pNetworkData->pMissingTieNetwork(this->lperiod));
+
+		// We want to pass all networks to the effects in a single state,
+		// hence we overwrite the network in the predictor state.
+
+		string name = pNetworkData->name();
+		const Network * pPredictorNetwork = this->lpPredictorState->pNetwork(name);
+		this->lpPredictorState->pNetwork(name, pPredictor);
+
+		// Loop through the endowment effects, calculate the statistics,
+		// and store them.
+
+		//const vector<EffectInfo *> & rEffects =
+		//this->lpModel->rEndowmentEffects(pNetworkData->name());
+
+		EffectFactory factory(this->lpData);
+		Cache cache;
+
+		for (unsigned i = 0; i < rEffects.size(); i++)
+		{
+			EffectInfo * pInfo = rEffects[i];
+			NetworkEffect * pEffect =
+				(NetworkEffect *) factory.createEffect(pInfo);
+
+			// Initialize the effect to work with our data and state of variables.
+
+			pEffect->initialize(this->lpData,
+				this->lpPredictorState,
+				this->lperiod,
+				&cache);
+
+			this->lstatistics[pInfo] =
+				pEffect->endowmentStatistic(pLostTieNetwork);
+			delete pEffect;
+		}
+
+		// Restore the predictor network
+		this->lpPredictorState->pNetwork(name, pPredictorNetwork);
+
+		delete pPredictor;
+		delete pCurrentNetwork;
+		delete pLostTieNetwork;
 	}
-
-	// Restore the predictor network
-	this->lpPredictorState->pNetwork(name, pPredictorNetwork);
-
-	delete pPredictor;
-	delete pCurrentNetwork;
-	delete pLostTieNetwork;
 }
 
 
@@ -380,6 +388,10 @@ void StatisticCalculator::calculateNetworkEndowmentStatistics(
 void StatisticCalculator::calculateNetworkCreationStatistics(
 	NetworkLongitudinalData * pNetworkData)
 {
+ 	const vector<EffectInfo *> & rEffects =
+ 		this->lpModel->rCreationEffects(pNetworkData->name());
+	if (rEffects.size() > 0)
+	{
 	// Duplicate the current network and remove those ties that are
 	// missing at either end of the period.
 
@@ -426,8 +438,8 @@ void StatisticCalculator::calculateNetworkCreationStatistics(
 	// Loop through the creation effects, calculate the statistics,
 	// and store them.
 
- 	const vector<EffectInfo *> & rEffects =
- 		this->lpModel->rCreationEffects(pNetworkData->name());
+	//	const vector<EffectInfo *> & rEffects =
+ 	//	this->lpModel->rCreationEffects(pNetworkData->name());
 
  	EffectFactory factory(this->lpData);
  	Cache cache;
@@ -456,6 +468,7 @@ void StatisticCalculator::calculateNetworkCreationStatistics(
 
 	delete pNetwork;
 	delete pGainedTieNetwork;
+	}
 }
 
 
