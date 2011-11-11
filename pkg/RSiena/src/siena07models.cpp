@@ -836,9 +836,9 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	{
 		for (int j = 0; j < numberVariables; j++)
 		{
-			iaccepts[i + numberVariables * j] = rVariables[j]->acceptances(i);
-			irejects[i + numberVariables * j] = rVariables[j]->rejections(i);
-			iaborts[i + numberVariables * j] = rVariables[j]->aborts(i);
+			iaccepts[i + 9 * j] = rVariables[j]->acceptances(i);
+			irejects[i + 9 * j] = rVariables[j]->rejections(i);
+			iaborts[i + 9 * j] = rVariables[j]->aborts(i);
 		}
 	}
 
