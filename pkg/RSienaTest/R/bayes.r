@@ -22,9 +22,12 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         z$posteriorMII <- array(0, dim=c(z$nGroup, npar, npar))
         z$candidates <- array(NA, dim=c(numberRows, z$nGroup, npar))
         z$acceptances <- matrix(NA, nrow=z$nGroup, ncol=numberRows)
-        z$MHacceptances <- array(NA, dim=c(numberRows, z$nGroup, 9))
-        z$MHrejections <- array(NA, dim=c(numberRows, z$nGroup, 9))
-        z$MHproportions <- array(NA, dim=c(numberRows, z$nGroup, 9))
+        z$MHacceptances <- array(NA, dim=c(numberRows, z$nGroup,
+									 z$nDependentVariables, 9))
+        z$MHrejections <- array(NA, dim=c(numberRows, z$nGroup,
+									 z$nDependentVariables, 9))
+        z$MHproportions <- array(NA, dim=c(numberRows, z$nGroup,
+									 z$nDependentVariables, 9))
         z
     }
     ##@storeData internal bayes Bayesian put data in stores
@@ -45,9 +48,9 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
                     outer(z$parameters[i, group, ], z$parameters[i, group,])
             }
         }
-        z$MHacceptances[start:end, , ] <- z$MHaccepts
-        z$MHrejections[start:end, , ] <- z$MHrejects
-        z$MHproportions[start:end, , ] <- z$MHaccepts /
+        z$MHacceptances[start:end, , , ] <- z$MHaccepts
+        z$MHrejections[start:end, , , ] <- z$MHrejects
+        z$MHproportions[start:end, , , ] <- z$MHaccepts /
             (z$MHaccepts + z$MHrejects)
         z$sub <- z$sub + nrun
         z
@@ -261,9 +264,12 @@ MCMCcycle <- function(z, nrunMH, nrunMHBatches, change=TRUE)
 {
     z$accepts <- matrix(NA, nrow=z$nGroup, nrunMHBatches)
     z$parameters <- array(NA, dim=c(nrunMHBatches, z$nGroup, z$pp))
-    z$MHaccepts <- array(NA, dim=c(nrunMHBatches, z$nGroup, 9))
-    z$MHrejects <- array(NA, dim=c(nrunMHBatches, z$nGroup, 9))
-    z$MHaborts <- array(NA, dim=c(nrunMHBatches, z$nGroup, 9))
+    z$MHaccepts <- array(NA, dim=c(nrunMHBatches, z$nGroup,
+		z$nDependentVariables, 9))
+    z$MHrejects <- array(NA, dim=c(nrunMHBatches, z$nGroup,
+							 z$nDependentVariables, 9))
+    z$MHaborts <- array(NA, dim=c(nrunMHBatches, z$nGroup,
+							z$nDependentVariables, 9))
     storeNrunMH <- z$nrunMH
     z$nrunMH <- nrunMH
     for (i in 1:nrunMHBatches)
@@ -273,14 +279,14 @@ MCMCcycle <- function(z, nrunMH, nrunMHBatches, change=TRUE)
         z <- sampleParameters(z, change)
         z$accepts[, i] <- z$accept
         z$parameters[i, , ] <- z$thetaMat
-        z$MHaccepts[i, ,] <-
+        z$MHaccepts[i, , , ] <-
             t(do.call(cbind,
                       tapply(ans$accepts, factor(z$callGrid[, 1]),
                              function(x)Reduce("+", x))))
-        z$MHrejects[i, , ] <-
+        z$MHrejects[i, , , ] <-
             t(do.call(cbind, tapply(ans$rejects, factor(z$callGrid[, 1]),
                                     function(x)Reduce("+", x))))
-        z$MHaborts[i, , ] <- t(do.call(cbind,
+        z$MHaborts[i, , , ] <- t(do.call(cbind,
                                        tapply(ans$aborts,
                                               factor(z$callGrid[, 1]),
                                               function(x)Reduce("+", x))))
@@ -441,16 +447,16 @@ getDFRA <- function(z, n)
 {
     ## do n MLmodelsteps with the initial thetas and get
     ## derivs
-    z$sdf <- array(0, dim=c(n, z$pp, z$pp))
+    z$sdf <- vector("list", n)
     z$ssc <- matrix(0, nrow=n, ncol=z$pp)
     z$Deriv <- TRUE
     for (i in 1:n)
     {
         ans <- z$FRAN(z)
-        z$sdf[i, , ] <- ans$dff
+        z$sdf[[i]] <- ans$dff
         z$ssc[i,  ] <- colSums(ans$fra)
     }
-    dfra <- t(apply(z$sdf, c(2, 3), mean))
+    dfra <- t(as.matrix(Reduce("+", z$sdf))) / length(z$sdf)
     ssc <- colMeans(z$ssc)
     z$dfra <- dfra
     lambda <- z$theta[z$basicRate]

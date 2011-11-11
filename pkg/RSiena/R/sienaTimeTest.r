@@ -697,9 +697,9 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
                         if (ii != dataSub)
                         {
                             nActors <-
-                                length(data[[dataSub]]$nodeSets[[nodeSet]])
+                                length(data[[ii]]$nodeSets[[nodeSet]])
                             nPer <-
-                                attr(data[[dataSub]]$depvars[[effect$name]],
+                                attr(data[[ii]]$depvars[[effect$name]],
                                      "netdims")[3]
                             base <- matrix(0, nrow=nActors, ncol=nPer - 1)
                             data <- addVarCovar(data, base, nodeSet, dname, ii)
@@ -760,10 +760,10 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
                     {
                         if ( i != dataSub)
                         {
-                            dims <- attr(data[[dataSub]]$depvars[[depvar]],
+                            dims <- attr(data[[i]]$depvars[[depvar]],
                                          "netdims")
                             nodeSet <-
-                                attr(data[[dataSub]]$depvars[[depvar]],
+                                attr(data[[i]]$depvars[[depvar]],
                                      "nodeSet")[1]
                             nActors <- dims[1]
                             nPer <- dims[3]
