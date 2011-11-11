@@ -1,3 +1,9 @@
+2011-11-11 R-forge revision 183.
+
+	* R/initializeFRAN.r, R/phase1.r, R/phase3.r: fix minor
+	bugs. Could not interrupt phase 1 or 3 of siena07, could use dfra
+	from MOL with ML and vice versa.
+
 2011-11-11 R-forge revision 182.
 
 	* R/bayes.r, src/siena07models.cpp:correct return of acceptances
