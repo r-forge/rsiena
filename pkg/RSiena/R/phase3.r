@@ -616,58 +616,58 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 					Report(c("  ", nit, " ",
 							 format(z$sf[nit,], width=1, digits=4, nsmall=4),
 							 "\n"), cf)
-					if (nit >= 10)
+				}
+				if (nit >= 10)
+				{
+					CheckBreaks()
+					##    if (nit==10) set up stopkey hint
+					##   Early termination of estimation
+					if( UserInterruptFlag())
 					{
-						CheckBreaks()
-						##    if (nit==10) set up stopkey hint
-						##   Early termination of estimation
-						if( UserInterruptFlag())
+						Report(c("The user asked for an early stop of the ",
+								 "algorithm during phase 3.\n"), outf)
+						z$Phase3Interrupt <- TRUE
+						if (nit < 500)
 						{
-							Report(c("The user asked for an early stop of the ",
-									 "algorithm during phase 3.\n"), outf)
-							z$Phase3Interrupt <- TRUE
-							if (nit < 500)
+							if (EarlyEndPhase2Flag())
 							{
-								if (EarlyEndPhase2Flag())
-								{
-									Report('This implies that ', outf)
-								}
-								else
-								{
-									Report(c("This implies that the estimates",
-											 "are as usual,\nbut the "), outf)
-								}
-								Report(c("diagnostic checks, covariance",
-										 "matrices and t-values \nare less ",
-										 "reliable, because they ",
-										 'are now based on only', nit,
-										 'phase-3 iterations.\n\n'), outf)
-							}
-							z$sf <- z$sf[1:nit, , drop=FALSE]
-							z$sf2 <- z$sf2[1:nit, , , drop=FALSE]
-							if (!x$maxlike)
-							{
-								z$ssc <- z$ssc[1:nit, , , drop=FALSE]
+								Report('This implies that ', outf)
 							}
 							else
 							{
-								z$sdf <-z$sdf[1:nit, , , drop=FALSE]
-								z$sdf2 <-z$sdf2[1:nit, , , ,drop=FALSE]
+								Report(c("This implies that the estimates",
+										 "are as usual,\nbut the "), outf)
 							}
-							z$sims <-z$sims[1:nit]
-                            z$Phase3nits <- nit
-                            z$n3 <- nit
-							break
+							Report(c("diagnostic checks, covariance",
+									 "matrices and t-values \nare less ",
+									 "reliable, because they ",
+									 'are now based on only', nit,
+									 'phase-3 iterations.\n\n'), outf)
 						}
-						if (UserRestartFlag())
-							break
+						z$sf <- z$sf[1:nit, , drop=FALSE]
+						z$sf2 <- z$sf2[1:nit, , , drop=FALSE]
+						if (!x$maxlike)
+						{
+							z$ssc <- z$ssc[1:nit, , , drop=FALSE]
+						}
+						else
+						{
+							z$sdf <-z$sdf[1:nit]
+							z$sdf2 <-z$sdf2[1:nit]
+						}
+						z$sims <-z$sims[1:nit]
+						z$Phase3nits <- nit
+						z$n3 <- nit
+						break
 					}
+					if (UserRestartFlag())
+						break
 				}
 			}
-			if (!z$OK || UserRestartFlag())
-			{
-				return(z)
-			}
+		}
+		if (!z$OK || UserRestartFlag())
+		{
+			return(z)
 		}
 	}
 	z

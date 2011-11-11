@@ -258,10 +258,12 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             effects <- effects[-effcondvar, ]
             requestedEffects <- requestedEffects[-z$condvar,]
         }
-        ## use previous dfra only if everything matches
-        if (!is.null(prevAns) && inherits(prevAns, "sienaFit"))
+        ## use previous dfra only if everything matches including method
+        if (!is.null(prevAns) && inherits(prevAns, "sienaFit") &&
+			prevAns$maxlike == z$maxlike)
         {
-            if ((nrow(prevAns$dfra) == nrow(requestedEffects)) &&
+            if (!is.null(prevAns$dfra) &&
+				 nrow(prevAns$dfra) == nrow(requestedEffects) &&
                 all(rownames(prevAns$dfra) == requestedEffects$shortName)
                 && !is.null(prevAns$sf))
             {
@@ -519,7 +521,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
             ## cat (z$prmin, z$prmib, '\n')
             z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms,
                          x$prdrms)
-            cat(z$probs,'\n')
+            ##cat(z$probs,'\n')
             ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
                          simpleRates, z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,

@@ -61,6 +61,10 @@ phase1.1 <- function(z, x, ...)
 	### call the subroutine to do the iterations
 	z <- doPhase1or3Iterations(1, z, x, zsmall, xsmall, nits, nits6)
 
+	if (UserInterruptFlag() || UserRestartFlag())
+	{
+		return(z)
+	}
     if (z$FinDiff.method)
     {
         npos <- z$npos
@@ -132,6 +136,10 @@ phase1.2 <- function(z, x, ...)
         nits <- seq((z$phase1Its+1), z$n1, int)
 		z <- doPhase1or3Iterations(1, z, x, zsmall, xsmall, nits)
     }
+	if (UserInterrupt() || UserRestartFlag())
+	{
+		return(z)
+	}
     z$timePhase1 <- (proc.time()['elapsed'] - z$ctime) / (z$nit - 1)
     if (x$checktime  && !is.na(z$timePhase1))
     {
