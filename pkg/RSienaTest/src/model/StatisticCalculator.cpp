@@ -83,8 +83,8 @@ StatisticCalculator::~StatisticCalculator()
 
 	// The state just stores the values, but does not own them. It means that
 	// the destructor of the state won't deallocate the memory, and we must
-	// request that explicitly. The basic predictor state is stored on the data
-	// so lpredictorState is just a pointer.
+	// request that explicitly. The basic predictor state is now
+	// stored on the data so lpredictorState is just a pointer.
 
 	//	this->lpPredictorState->deleteValues();
 	delete this->lpPredictorState;
@@ -571,232 +571,236 @@ void StatisticCalculator::calculateBehaviorStatistics(
 void StatisticCalculator::calculateNetworkRateStatistics(
 	NetworkLongitudinalData * pNetworkData)
 {
-		Network * pNetwork;
-		// if parallel running, do processing from scratch
-		if (this->lpModel->parallelRun())
-		{
-			// Duplicate the current network and remove those ties that are
-			// missing at either end of the period. TODO set leavers back.
-			// (Is the TODO not done for the current network?)
+	Network * pNetwork;
+	const Network * pConstNetwork;
+	Network * pDifference;
 
-			pNetwork =
-				this->lpState->pNetwork(pNetworkData->name())->clone();
-			subtractNetwork(pNetwork,
-				pNetworkData->pMissingTieNetwork(this->lperiod));
-			subtractNetwork(pNetwork,
-				pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+	// if parallel running, do processing from scratch
+	if (this->lpModel->parallelRun())
+	{
+		// Duplicate the current network and remove those ties that are
+		// missing at either end of the period. TODO set leavers back.
+		// (Is the TODO not done for the current network?)
 
-			// Replace values for structurally determined values from previous
-			// or current period. Siena 3 does not do this ... so we won't yet
-
-			// 	this->replaceNetwork(pNetwork,
-			// 		pNetworkData->pNetwork(this->lperiod + 1),
-			// 		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
-
-			// 	this->replaceNetwork(pNetwork,
-			// 		pNetworkData->pNetwork(this->lperiod),
-			// 		pNetworkData->pStructuralTieNetwork(this->lperiod));
-
-			// instead, remove all structurally determined ties at either end
-			subtractNetwork(pNetwork,
-				pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
-
-			subtractNetwork(pNetwork,
-				pNetworkData->pStructuralTieNetwork(this->lperiod));
-		}
-		else
-		{
 		pNetwork =
-				this->lpStateLessMissingsEtc->
-				pNetwork(pNetworkData->name())->clone();
-		}
+			this->lpState->pNetwork(pNetworkData->name())->clone();
+		subtractNetwork(pNetwork,
+			pNetworkData->pMissingTieNetwork(this->lperiod));
+		subtractNetwork(pNetwork,
+			pNetworkData->pMissingTieNetwork(this->lperiod + 1));
 
-		// construct a network of differences between current and start
-		// of period.
+		// Replace values for structurally determined values from previous
+		// or current period. Siena 3 does not do this ... so we won't yet
 
-		Network * pStart = pNetworkData->
-			pNetworkLessMissing(this->lperiod)->clone();
+		// 	this->replaceNetwork(pNetwork,
+		// 		pNetworkData->pNetwork(this->lperiod + 1),
+		// 		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
 
-		// must match with above code: the net result is probably equivalent
-		if (this->lpModel->parallelRun())
+		// 	this->replaceNetwork(pNetwork,
+		// 		pNetworkData->pNetwork(this->lperiod),
+		// 		pNetworkData->pStructuralTieNetwork(this->lperiod));
+
+		// instead, remove all structurally determined ties at either end
+		subtractNetwork(pNetwork,
+			pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+		subtractNetwork(pNetwork,
+			pNetworkData->pStructuralTieNetwork(this->lperiod));
+	}
+	else
+	{
+		pConstNetwork =	this->lpStateLessMissingsEtc->
+			pNetwork(pNetworkData->name());
+	}
+
+	// construct a network of differences between current and start
+	// of period.
+
+	Network * pStart = pNetworkData->
+		pNetworkLessMissing(this->lperiod)->clone();
+
+	// must match with above code: the net result is probably equivalent
+	if (this->lpModel->parallelRun())
+	{
+		// remove all structurally determined ties at either end
+		subtractNetwork(pStart,
+			pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+		subtractNetwork(pStart,
+			pNetworkData->pStructuralTieNetwork(this->lperiod));
+
+		pDifference = symmetricDifference(pStart, pNetwork);
+	}
+	else
+	{
+		replaceNetwork(pStart,
+			pNetworkData->pNetwork(this->lperiod + 1),
+			pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+
+		replaceNetwork(pStart,
+			pNetworkData->pNetwork(this->lperiod),
+			pNetworkData->pStructuralTieNetwork(this->lperiod));
+
+		pDifference = symmetricDifference(pStart, pConstNetwork);
+	}
+
+	// basic rate distance
+
+	if (!this->ldistances[pNetworkData])
+	{
+		int * array =
+			new int[pNetworkData->observationCount() - 1];
+
+		this->ldistances[pNetworkData] = array;
+	}
+
+	this->ldistances[pNetworkData][this->lperiod] = pDifference->tieCount();
+
+	//Rprintf("basic rate change %d\n", pDifference->tieCount());
+
+	// Loop through the rate effects, calculate the statistics,
+	// and store them.
+	const vector<EffectInfo *> & rEffects =
+		this->lpModel->rRateEffects(pNetworkData->name());
+
+	for (unsigned i = 0; i < rEffects.size(); i++)
+	{
+		EffectInfo * pInfo = rEffects[i];
+		//	double parameter = pInfo->parameter();
+		string effectName = pInfo->effectName();
+		string interactionName = pInfo->interactionName1();
+		string rateType = pInfo->rateType();
+
+		if (rateType == "covariate")
 		{
-			// remove all structurally determined ties at either end
-			subtractNetwork(pStart,
-				pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+			// Covariate-dependent rate effect
 
-			subtractNetwork(pStart,
-				pNetworkData->pStructuralTieNetwork(this->lperiod));
-		}
-		else
-		{
-			replaceNetwork(pStart,
-				pNetworkData->pNetwork(this->lperiod + 1),
-				pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+			//	if (parameter != 0)
+			//	{
+			ConstantCovariate * pConstantCovariate =
+				this->lpData->pConstantCovariate(interactionName);
+			ChangingCovariate * pChangingCovariate =
+				this->lpData->pChangingCovariate(interactionName);
+			BehaviorLongitudinalData * pBehavior =
+				this->lpData->pBehaviorData(interactionName);
 
-			replaceNetwork(pStart,
-				pNetworkData->pNetwork(this->lperiod),
-				pNetworkData->pStructuralTieNetwork(this->lperiod));
-
-		}
-		Network * pDifference = symmetricDifference(pStart, pNetwork);
-
-		// basic rate distance
-
-		if (!this->ldistances[pNetworkData])
-		{
-			int * array =
-				new int[pNetworkData->observationCount() - 1];
-
-			this->ldistances[pNetworkData] = array;
-		}
-
-		this->ldistances[pNetworkData][this->lperiod] = pDifference->tieCount();
-
-		//Rprintf("basic rate change %d\n", pDifference->tieCount());
-
-		// Loop through the rate effects, calculate the statistics,
-		// and store them.
-		const vector<EffectInfo *> & rEffects =
-			this->lpModel->rRateEffects(pNetworkData->name());
-
-		for (unsigned i = 0; i < rEffects.size(); i++)
-		{
-			EffectInfo * pInfo = rEffects[i];
-			//	double parameter = pInfo->parameter();
-			string effectName = pInfo->effectName();
-			string interactionName = pInfo->interactionName1();
-			string rateType = pInfo->rateType();
-
-			if (rateType == "covariate")
+			if (pConstantCovariate)
 			{
-				// Covariate-dependent rate effect
-
-				//	if (parameter != 0)
-				//	{
-				ConstantCovariate * pConstantCovariate =
-					this->lpData->pConstantCovariate(interactionName);
-				ChangingCovariate * pChangingCovariate =
-					this->lpData->pChangingCovariate(interactionName);
-				BehaviorLongitudinalData * pBehavior =
-					this->lpData->pBehaviorData(interactionName);
-
-				if (pConstantCovariate)
-				{
-					double statistic = 0;
-
-					for (TieIterator iter = pDifference->ties();
-						 iter.valid();
-						 iter.next())
-					{
-						statistic += pConstantCovariate->value(iter.ego()) *
-							iter.value();
-					}
-
-					this->lstatistics[pInfo] = statistic;
-				}
-				else if (pChangingCovariate)
-				{
-					double statistic = 0;
-
-					for (TieIterator iter = pDifference->ties();
-						 iter.valid();
-						 iter.next())
-					{
-						statistic +=
-							pChangingCovariate->value(iter.ego(),
-								this->lperiod) *
-							iter.value();
-					}
-
-					this->lstatistics[pInfo] = statistic;
-				}
-				else if (pBehavior)
-				{
-					double statistic = 0;
-
-					for (TieIterator iter = pDifference->ties();
-						 iter.valid();
-						 iter.next())
-					{
-						statistic +=
-							pBehavior->value(this->lperiod, iter.ego()) *
-							iter.value();
-					}
-
-					this->lstatistics[pInfo] = statistic;
-				}
-				else
-				{
-					throw logic_error(
-						"No individual covariate named '" +
-						interactionName +
-						"'.");
-				}
-				//}
-			}
-			else
-			{
-				// We expect a structural (network-dependent) rate effect here.
-				NetworkLongitudinalData * pExplanatoryNetwork;
-				if (interactionName == "")
-				{
-					pExplanatoryNetwork = pNetworkData;
-				}
-				else
-				{
-					pExplanatoryNetwork =
-						this->lpData->pNetworkData(interactionName);
-				}
-
-				const Network * pStructural =
-					pExplanatoryNetwork->pNetworkLessMissing(this->lperiod);
-
 				double statistic = 0;
 
 				for (TieIterator iter = pDifference->ties();
 					 iter.valid();
 					 iter.next())
 				{
-					if (effectName == "outRate")
-					{
-						statistic += pStructural->outDegree(iter.ego()) *
-							iter.value();
-					}
-					else if (effectName == "inRate")
-					{
-						statistic += pStructural->inDegree(iter.ego()) *
-							iter.value();
-					}
-					else if (effectName == "recipRate")
-					{
-						OneModeNetwork * pOneModeNetwork =
-							(OneModeNetwork *) pStructural;
-						statistic +=
-							pOneModeNetwork->reciprocalDegree(iter.ego()) *
-							iter.value();
-					}
-					else if (effectName == "outRateInv")
-					{
-						statistic +=
-							1.0 / (pStructural->outDegree(iter.ego()) + 1) *
-							iter.value();
-					}
-					else
-					{
-						throw domain_error("Unexpected rate effect " + effectName);
-					}
+					statistic += pConstantCovariate->value(iter.ego()) *
+						iter.value();
 				}
 
 				this->lstatistics[pInfo] = statistic;
 			}
-		}
+			else if (pChangingCovariate)
+			{
+				double statistic = 0;
 
-		delete pStart;
-		delete pDifference;
-		if (this->lpModel->parallelRun())
-		{
-			delete pNetwork;
+				for (TieIterator iter = pDifference->ties();
+					 iter.valid();
+					 iter.next())
+				{
+					statistic +=
+						pChangingCovariate->value(iter.ego(),
+							this->lperiod) *
+						iter.value();
+				}
+
+				this->lstatistics[pInfo] = statistic;
+			}
+			else if (pBehavior)
+			{
+				double statistic = 0;
+
+				for (TieIterator iter = pDifference->ties();
+					 iter.valid();
+					 iter.next())
+				{
+					statistic +=
+						pBehavior->value(this->lperiod, iter.ego()) *
+						iter.value();
+				}
+
+				this->lstatistics[pInfo] = statistic;
+			}
+			else
+			{
+				throw logic_error(
+					"No individual covariate named '" +
+					interactionName +
+					"'.");
+			}
+			//}
 		}
+		else
+		{
+			// We expect a structural (network-dependent) rate effect here.
+			NetworkLongitudinalData * pExplanatoryNetwork;
+			if (interactionName == "")
+			{
+				pExplanatoryNetwork = pNetworkData;
+			}
+			else
+			{
+				pExplanatoryNetwork =
+					this->lpData->pNetworkData(interactionName);
+			}
+
+			const Network * pStructural =
+				pExplanatoryNetwork->pNetworkLessMissing(this->lperiod);
+
+			double statistic = 0;
+
+			for (TieIterator iter = pDifference->ties();
+				 iter.valid();
+				 iter.next())
+			{
+				if (effectName == "outRate")
+				{
+					statistic += pStructural->outDegree(iter.ego()) *
+						iter.value();
+				}
+				else if (effectName == "inRate")
+				{
+					statistic += pStructural->inDegree(iter.ego()) *
+						iter.value();
+				}
+				else if (effectName == "recipRate")
+				{
+					OneModeNetwork * pOneModeNetwork =
+						(OneModeNetwork *) pStructural;
+					statistic +=
+						pOneModeNetwork->reciprocalDegree(iter.ego()) *
+						iter.value();
+				}
+				else if (effectName == "outRateInv")
+				{
+					statistic +=
+						1.0 / (pStructural->outDegree(iter.ego()) + 1) *
+						iter.value();
+				}
+				else
+				{
+					throw domain_error("Unexpected rate effect " + effectName);
+				}
+			}
+
+			this->lstatistics[pInfo] = statistic;
+		}
+	}
+
+	delete pStart;
+	delete pDifference;
+	if (this->lpModel->parallelRun())
+	{
+		delete pNetwork;
+	}
 
 }
 /**
