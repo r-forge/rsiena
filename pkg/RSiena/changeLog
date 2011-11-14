@@ -1,3 +1,9 @@
+2011-11-14 R-forge revision 184.
+
+	* src/model/StatisticCalculator.cpp: fix memory leaks in network and
+	behavior rate statistics. (Latter is long standing, former
+	introduced in revision 181.
+
 2011-11-11 R-forge revision 183.
 
 	* R/initializeFRAN.r, R/phase1.r, R/phase3.r: fix minor
