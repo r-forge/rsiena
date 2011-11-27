@@ -1,3 +1,21 @@
+2011-11-27 R-forge revision 185.
+
+	* R/robmon.r, inst/examples/algorithms.r, inst/examples/runalg.r:
+	minor changes to paths. Added parallel package to algorithm code 
+	(RSienaTest only for the algorithm code)
+	* R/bayes.r: made functions internal to reduce copying. Replaced snow
+	and Rlecuyer by parallel (non optionally)
+	* src/model/ml/Chain.cpp, src/model/ml/MLSimulation.cpp,
+	src/model/model.cpp: remove memory leaks.
+	* src/siena07models.cpp: Ensure end state is on stored chain. Fix
+	protection imbalance.
+	* src/siena07utilities.cpp: correct copy of initial state to sub
+	processes.
+	* src/siena07setup.cpp: remove print of probabilities at start.
+	* src/model/ml/Chain.h, src/model/MLSimulation.h,
+	src/model/Model.h, src/model/tables/Cache.cpp,
+	src/model/tables/Cache.h: altered comments only
+
 2011-11-14 R-forge revision 184.
 
 	* src/model/StatisticCalculator.cpp: fix memory leaks in network and

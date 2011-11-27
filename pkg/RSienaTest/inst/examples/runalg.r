@@ -1,9 +1,10 @@
-library(RSiena)
+library(RSienaTest)
 
-source('d:/sienasvn/siena/inst/examples/algorithms.r')
+source('~/rforge2011/pkg/RSienaTest/inst/examples/algorithms.r')
+source('~/ruthsvn/siena/RSiena/R/algorithms.r')
 
 mynet1 <- sienaNet(array(c(s501,s502,s503), dim=c(50, 50, 3)))
-mynet2 <- sienaNet(s50a[,1:2], type='behavior')
+mynet2 <- sienaNet(s50a, type='behavior')
 mydata <- sienaDataCreate(mynet1, mynet2)
 mynet1 <- sienaNet(array(c(s501,s502), dim=c(50, 50,2)))
 mydata <- sienaDataCreate(mynet1)
@@ -75,13 +76,13 @@ resp8 <- algorithms(mydata, myeff, MOMmodel, nIter=100, numiter=10, useC=FALSE,
                     optimWeight=0.75, nbrNodes=2)
 
 ## profileLikelihoods
-profileLikelihoods(list(theta=c(5.2, 5.2,-2.5, 2, .7, -0.1, -0.03, 1, 1, .4, -0.05)),
-                   MLmodel, mydata, myeff,
+profileLikelihoods(list(theta=c(5.2,-2.5, 2, .7, 0.05)),
+profileLikelihoods(resp8, MLmodel, mydata, myeff,
                    1,3, gridl=c(0.9,1.1),nIter=100, nbrNodes=2)
 
 ##bayes
 print("resp9")
-resp9 <- RSiena:::bayes(mydata, myeff, MLmodel, nrunMH=200, nbrNodes=1,save=FALSE)
+resp9 <- RSienaTest:::bayes(mydata, myeff, MLmodel, nrunMH=200, nbrNodes=1,plotit=FALSE)
 
 
 resp1 <- algorithms(mydatam, myeffm, MOMmodel, nIter=20, numiter=20, useC=FALSE,

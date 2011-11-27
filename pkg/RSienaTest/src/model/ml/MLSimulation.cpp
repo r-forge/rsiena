@@ -299,6 +299,7 @@ Chain * MLSimulation::pChain() const
  */
 void MLSimulation::pChain(Chain * pChain)
 {
+	delete this->lpChain;
 	this->lpChain = pChain;
 }
 
@@ -355,7 +356,7 @@ void MLSimulation::MLStep()
 //	PrintValue(getChainDF(*this->pChain()));
 	bool accept = false;
 	this->lproposalProbability = -1;
-//	Rprintf("steptype %d\n", stepType);
+
 	switch (stepType)
 	{
 	case 0:
@@ -617,6 +618,10 @@ bool MLSimulation::insertDiagonalMiniStep()
 	}
 
 	this->recordOutcome(*pNewMiniStep, accept, INSDIAG, false);
+	if (!accept)
+	{
+		delete pNewMiniStep;
+	}
 // don't I need to delete the ministep if rejected?
 	return accept;
 }
@@ -671,6 +676,7 @@ bool MLSimulation::cancelDiagonalMiniStep()
 	if (accept)
 	{
 		this->lpChain->remove(pMiniStep);
+		delete pMiniStep;
 	}
 
 	return accept;
@@ -1269,7 +1275,10 @@ bool MLSimulation::insertPermute(int c0)
 			delete pRightMiniStep;
 		}
 	}
-
+	else
+	{
+		delete pLeftMiniStep;
+	}
 	delete[] newReciprocalRate;
 	delete[] newOptionSetProbability;
 	delete[] newChoiceProbability;
@@ -1672,6 +1681,7 @@ bool MLSimulation::deletePermute(int c0)
 			//if (this->lmissingData)
 			//	PrintValue(getMiniStepDF(*pMiniStepA));
 			this->lpChain->remove(pMiniStepA);
+			delete pMiniStepA;
 
 			for (unsigned i = 0; i < interval.size(); i++)
 			{
@@ -1693,6 +1703,7 @@ bool MLSimulation::deletePermute(int c0)
 			if (!this->lmissingData)
 			{
 				this->lpChain->remove(pMiniStepB);
+				delete pMiniStepB;
 			}
 		}
 	}

@@ -636,6 +636,7 @@ void Model::setupChainStore(int numberPeriods)
 
 void Model::deleteLastChainStore(int periodFromStart)
 {
+	delete this->lchainStore[periodFromStart].back();
 	this->lchainStore[periodFromStart].pop_back();
 }
 
