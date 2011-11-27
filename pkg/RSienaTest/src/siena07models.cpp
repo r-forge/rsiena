@@ -709,7 +709,7 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	// get chain for this period from model
 	Chain * pChain = pModel->rChainStore(groupPeriod).back();
 
-	// then copy the chain to the MLSimulation object.
+	// then copy the chain to the MLSimulation object. (deleting new one first)
 	pMLSimulation->pChain(pChain->copyChain());
 
 	// prepare to recreate after the simulation
@@ -807,8 +807,8 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
  	/* store chain on Model */
 	pChain = pMLSimulation->pChain();
 	pChain->createInitialStateDifferences();
-	pModel->chainStore(*pChain, groupPeriod);
 	pMLSimulation->createEndStateDifferences();
+	pModel->chainStore(*pChain, groupPeriod);
 
 	/* collect the scores and derivatives */
 	vector<double> derivs(dim * dim);
@@ -970,7 +970,7 @@ SEXP getChainProbabilitiesList(SEXP CHAIN, SEXP DATAPTR, SEXP MODELPTR,
 	SET_VECTOR_ELT(returnval, 0, ans);
 	if (needScores)
 	{
-		UNPROTECT(2);
+		UNPROTECT(1);
 	}
 	UNPROTECT(2);
 	return  returnval;

@@ -27,6 +27,10 @@ class Chain;
 class MiniStep;
 class Option;
 
+/**
+ * This class provides the functionality necessary for simulating an ML model
+ * between two observations.
+ */
 
 // ----------------------------------------------------------------------------
 // Section: Class definition

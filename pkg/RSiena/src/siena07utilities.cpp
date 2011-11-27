@@ -919,7 +919,7 @@ Chain * makeChainFromList(Data * pData, SEXP CHAIN, int period)
 	}
 
     SEXP init;
-    PROTECT(init = install("initialState"));
+    PROTECT(init = install("initialStateDifferences"));
     SEXP initialState = getAttrib(CHAIN, init);
 	for (int i = 0; i < length(initialState); i++)
 	{

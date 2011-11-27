@@ -195,13 +195,13 @@ private:
 	// A vector of rate effects (except the basic rate effects) per variable
 	map<string, vector<EffectInfo *> > lrateEffects;
 
-	// A vector of evaluation effects per variable
+	// A vector of pointers to evaluation effects per variable
 	map<string, vector<EffectInfo *> > levaluationEffects;
 
-	// A vector of endowment effects per variable
+	// A vector of pointers to endowment effects per variable
 	map<string, vector<EffectInfo *> > lendowmentEffects;
 
-	// A vector of creation effects per variable
+	// A vector of pointers to creation effects per variable
 	map<string, vector<EffectInfo *> > lcreationEffects;
 
 	// A dummy vector of effect infos in case we need a reference to

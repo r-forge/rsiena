@@ -682,7 +682,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR, SEXP SIMPLERATES,
 	pModel->insertPermuteProbability(REAL(PROBS)[3]);
 	pModel->deletePermuteProbability(REAL(PROBS)[4]);
 	pModel->insertRandomMissingProbability(REAL(PROBS)[5]);
-	PrintValue(PROBS);
+	//PrintValue(PROBS);
 	pModel->deleteRandomMissingProbability(REAL(PROBS)[6]);
 
 	double * prmin = REAL(PRMIN);

@@ -14,7 +14,7 @@
 ##options useC - store change contributions in C
 ## useSlowC - don't store change contributions
 ## if neither, return change contributions to R.
-pkgname <- "RSiena"
+pkgname <- "RSienaTest"
 algorithms <- function(data, effects, x, ...)
 {
     ## initialize
@@ -159,7 +159,7 @@ algorithms <- function(data, effects, x, ...)
             ## clear the storage
             if (z$useC)
             {
-                f <- RSiena:::FRANstore()
+                f <- RSienaTest:::FRANstore()
                 .Call("clearStoredChains", PACKAGE=pkgname, f$pModel, x$maxlike)
             }
             if (z$useHistory) #&& z$iter > 4)
@@ -233,7 +233,7 @@ algorithms <- function(data, effects, x, ...)
 
 getProbsAlgs <- function(x, theta, getScores, ratePar, nactors)
 {
-    f <- RSiena:::FRANstore()
+    f <- RSienaTest:::FRANstore()
     group <- attr(x, "group")
     period <-attr(x, "period")
     k <- ratePar[[group]][[period]]
@@ -260,7 +260,7 @@ getProbabilities <- function(chain, theta, nactors, rateParameterPosition,
                              evalParameterPosition, endowParameterPosition,
                              getScores=FALSE, cl=NULL)
 {
-    f <-  RSiena:::FRANstore()
+    f <-  RSienaTest:::FRANstore()
 
     groupPeriods <- attr(f, "groupPeriods")
     callGrid <- cbind(rep(1:f$nGroup, groupPeriods - 1),
@@ -301,7 +301,7 @@ getProbabilitiesFromCStore <- function(chain, theta, nactors,
                                        evalParameterPosition,
                                        endowParameterPosition)
 {
-    f <-  RSiena:::FRANstore()
+    f <-  RSienaTest:::FRANstore()
 
     for (i in 1:length(chain)) ## group
     {
@@ -610,6 +610,8 @@ getPredictions <- function(theta, z, predictions=TRUE)
             dim(fras) <- dim(z$fra)[2:3]
             predictions <- colSums(fras) - z$targets
         }
+		print(theta)
+		print(predictions)
         list(predictions=predictions, varPs=var(ps), ps)
     }
     else
@@ -630,8 +632,7 @@ algorithmsInitialize <-
     ##Report(openfiles=TRUE, type="n", silent=TRUE) #initialise with no file
     z  <-  NULL
     ## get the function: simstats or maxlikec
-    z$FRAN <- getFromNamespace(x$FRANname, pos=grep("RSiena",
-                                                   search())[1])
+    z$FRAN <- getFromNamespace(x$FRANname, pkgname)
     z$maxlike <- x$maxlike
     x$cconditional <-  FALSE
     z$gain <- scale
@@ -668,31 +669,29 @@ algorithmsInitialize <-
         }
     }
 
-    z <- RSiena:::initializeFRAN(z, x, data, effects, prevAns=NULL,
+    z <- RSienaTest:::initializeFRAN(z, x, data, effects, prevAns=NULL,
                                  initC=FALSE, profileData=FALSE,
                                  returnDeps=FALSE)
 
-
     if (z$nbrNodes > 1)
     {
-        require(snow)
-        require(rlecuyer)
+        require(parallel)
         clusterString <- rep("localhost", nbrNodes)
-        z$cl <- makeCluster(clusterString, type = "SOCK",
+        z$cl <- makeCluster(clusterString, type = "PSOCK",
                             outfile = "cluster.out")
    ##     clusterCall(z$cl, function(x)print(ls(envir=.GlobalEnv)))
     ##    clusterCall(z$cl, function(x)print(search()))
      ##   clusterCall(z$cl, function(x)print(gc()))
         clusterCall(z$cl, library, pkgname, character.only = TRUE)
-        clusterCall(z$cl, RSiena:::storeinFRANstore,  RSiena:::FRANstore())
-        ans <- clusterCall(z$cl, RSiena:::FRANstore)
-        ans <-  clusterCall(z$cl, RSiena:::initializeFRAN, z, x,
+        clusterCall(z$cl, RSienaTest:::storeinFRANstore,  RSienaTest:::FRANstore())
+        ans <- clusterCall(z$cl, RSienaTest:::FRANstore)
+        ans <-  clusterCall(z$cl, RSienaTest:::initializeFRAN, z, x,
                             initC = TRUE,
                             profileData=FALSE, returnDeps=FALSE)
         ans <- clusterCall(z$cl, source,
-                           "~ruth/nuffieldsiena/inst/examples/algorithms.r")
-        clusterSetupRNG(z$cl,
-                        seed = as.integer(runif(6, max=.Machine$integer.max)))
+                        "~/rforge2011/pkg/RSienaTest/inst/examples/algorithms.r")
+        clusterSetRNGStream(z$cl,
+                        iseed = as.integer(runif(1, max=.Machine$integer.max)))
         if (z$maxlike)
         {
             z$int2 <- nbrNodes
@@ -723,8 +722,16 @@ algorithmsInitialize <-
         z$addChainToStore <- FALSE
         z$needChangeContributions <- TRUE
     }
-    z$thetaHistory <- matrix(NA, nrow=z$numiter*z$maxiiter + 100,
-                             ncol=length(z$theta))
+	if (useOptim)
+	{
+		z$thetaHistory <- matrix(NA, nrow=length(optimSchedule) * z$maxiiter + 100,
+								 ncol=length(z$theta))
+	}
+	else
+	{
+		z$thetaHistory <- matrix(NA, nrow=z$numiter*z$maxiiter + 100,
+								 ncol=length(z$theta))
+	}
     colnames(z$thetaHistory) <- z$effects$shortName
     z$thetaHistory <- data.frame(z$thetaHistory)
     if (z$useOptim)
@@ -739,17 +746,19 @@ algorithmsInitialize <-
     }
     z$formula <- paste(names(z$thetaHistory), collapse="+")
     z$formula <- paste(z$formula, "~ 1:")
+	z$returnChains <- TRUE
+	z$byWave <- FALSE
     z
 }
 doSimstats <- function(i, z)
 {
-    RSiena:::simstats0c(z, NULL, returnDeps=FALSE, returnChains=TRUE)
+    RSienaTest:::simstats0c(z, NULL, returnDeps=FALSE, returnChains=TRUE)
 }
 
 getSamples <- function(z, x, nIter, thetas=NULL)
 {
     ## get a set of z$nIter samples
-    sdf <- array(0, dim=c(nIter, length(z$theta), length(z$theta)))
+    sdf <- vector('list', nIter)
     if (is.null(thetas))
     {
         doDeriv <- TRUE
@@ -761,7 +770,7 @@ getSamples <- function(z, x, nIter, thetas=NULL)
     }
     if (z$nbrNodes > 1 && (!z$maxlike || nrow(thetas) > 1 || z$observations > 2))
     {
-        zsmall <- RSiena:::makeZsmall(z)
+        zsmall <- RSienaTest:::makeZsmall(z)
         if (nrow(thetas) == 1) # straight repeats with same theta
         {
             if (z$maxlike)
@@ -770,14 +779,14 @@ getSamples <- function(z, x, nIter, thetas=NULL)
                 ## this is done in maxlikec automatically controlled by z$int2
                 tmp <- lapply(1:nIter, function(i, z)
                           {
-                              RSiena:::maxlikec(z, NULL, returnDeps=FALSE,
+                              RSienaTest:::maxlikec(z, NULL,
                                                 returnChains=TRUE)
 
                           },
                               z=zsmall
                               )
-                sdf <- t(sapply(tmp, function(x) x$dff))
-                dim(sdf) <- c(nIter, length(z$theta), length(z$theta))
+                sdf <- lapply(tmp, function(x) x$dff)
+                ##dim(sdf) <- c(nIter, length(z$theta), length(z$theta))
                 sc <- array(0, dim=c(nIter, z$observations - 1, length(z$theta)))
             }
             else
@@ -786,7 +795,7 @@ getSamples <- function(z, x, nIter, thetas=NULL)
                 sc <- t(sapply(tmp, function(x)x$sc))
                 nobs <- dim(tmp[[1]]$fra)[1]
                 dim(sc) <- c(nIter, nobs, z$pp)
-                sdf <- array(0, dim=c(nIter, length(z$theta), length(z$theta)))
+               # sdf <- array(0, dim=c(nIter, length(z$theta), length(z$theta)))
             }
             fra <- t(sapply(tmp, function(x)x$fra))
             nobs <- dim(tmp[[1]]$fra)[1]
@@ -812,7 +821,7 @@ getSamples <- function(z, x, nIter, thetas=NULL)
                              z$theta <- th
                              tt <- lapply(1:n, function(i, z1)
                                 {
-                                    RSiena:::maxlikec(z1, NULL,
+                                    RSienaTest:::maxlikec(z1, NULL,
                                                       returnChains=TRUE)
                                 }, z1=z)
                              tt
@@ -837,14 +846,13 @@ getSamples <- function(z, x, nIter, thetas=NULL)
                          dim=c(z$observations - 1, z$pp, length(fra)))
             fra <- aperm(fra, c(3, 1, 2))
             ##deriv
-            sdf <- array(0, dim=c(niter*nrow(thetas),
-                            length(z$theta), length(z$theta)))
+            sdf <- vector('list', niter)
             for (i in 1:nrow(thetas))
             {
                 tmpa <- tmp[[i]]
-                tmp1 <- t(sapply(tmpa, function(x)x$dff))
-                dim(tmp1) <- c(niter, z$pp, z$pp)
-                sdf[((i-1) * niter + 1):(i * niter), , ] <- tmp1
+                tmp1 <- lapply(tmpa, function(x)x$dff)
+
+				sdf[((i-1) * niter + 1):(i * niter)] <- tmp1
             }
 
             ## chains
@@ -859,7 +867,7 @@ getSamples <- function(z, x, nIter, thetas=NULL)
         zzz <- vector("list", nIter)
         fra <- array(0, dim=c(nIter, z$observations - 1, length(z$theta)))
         sc <- array(0, dim=c(nIter, z$observations - 1, length(z$theta)))
-        sdf <- array(0, dim=c(nIter, length(z$theta), length(z$theta)))
+        sdf <- vector("list", nIter)
         z$startTheta <- z$theta
         thetasub <- 1
         lik0 <- matrix(NA, ncol=nIter, nrow=z$observations - 1)
@@ -879,7 +887,7 @@ getSamples <- function(z, x, nIter, thetas=NULL)
             fra[i, , ] <- ans$fra ## statistics
             if (x$maxlike)
             {
-                sdf[i, , ] <- ans$dff
+                sdf[[i]] <- ans$dff
             }
             else
             {
@@ -907,12 +915,12 @@ getSamples <- function(z, x, nIter, thetas=NULL)
     {
         if (!z$maxlike)
         {
-            z$dfra <- RSiena:::derivativeFromScoresAndDeviations(z$sc, z$fra)
+            z$dfra <- RSienaTest:::derivativeFromScoresAndDeviations(z$sc, z$fra)
         }
         else
         {
-            z$dfra <- t(apply(z$sdf, c(2, 3), mean))
-        }
+			z$dfra <- t(as.matrix(Reduce("+", z$sdf) / length(z$sdf)))
+       }
         if (inherits(try(z$dinv <- solve(z$dfra)), 'try-error'))
         {
             z$dinv <- NULL
@@ -1004,7 +1012,7 @@ doAlgorithmChangeStep <- function(z, x, fra)
 {
     z$oldTheta <- z$theta
     x$diag <- z$diag
-    z <- RSiena:::doChangeStep(z, x, fra)
+    z <- RSienaTest:::doChangeStep(z, x, fra)
     z
 }
 

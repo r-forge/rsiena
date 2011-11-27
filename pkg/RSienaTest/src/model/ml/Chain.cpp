@@ -659,7 +659,7 @@ void Chain::recreateInitialState()
  */
 void Chain::createInitialStateDifferences()
 {
-	this->linitialStateDifferences.clear();
+	deallocateVector(this->linitialStateDifferences);
 	//Rprintf("******** %d create initial\n",this->linitialStateDifferences.size() );
 	Data * pData = this->lpData;
 	State * initialState = this->lpInitialState;
@@ -798,7 +798,7 @@ void Chain::addEndStateDifference(MiniStep * pMiniStep)
  */
 void Chain::clearEndStateDifferences()
 {
-	this->lendStateDifferences.clear();
+	deallocateVector(this->lendStateDifferences);
 }
 
 /**

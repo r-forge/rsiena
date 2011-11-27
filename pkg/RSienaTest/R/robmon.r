@@ -37,7 +37,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     #######################################################
     if (!is.function(x$FRAN))
     {
-        x$FRAN <- getFromNamespace(x$FRANname, pos=grep("RSiena", search())[1])
+        x$FRAN <- getFromNamespace(x$FRANname, pkgname)
     }
     z <- x$FRAN(z, x, INIT=TRUE, initC=FALSE, ...)
 	if (z$maxlike && !is.batch())
