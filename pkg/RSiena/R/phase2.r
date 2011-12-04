@@ -12,11 +12,6 @@
 ## args: z: internal control object
 ##       x: model object (readonly as not returned)
 
-##@usesim siena07 Used to avoid Namespace problems with multiple processes
-usesim <- function(...)
-{
-   simstats0c(...)
-}
 ##@storeinFRANstore siena07 Used to avoid Namespace problems with multiple processes
 storeinFRANstore <- function(...)
 {
@@ -258,7 +253,7 @@ doIterations<- function(z, x, subphase,...)
             }
         }
         zsmall$nit <- z$nit
-        if (z$int == 1)
+        if (z$int == 1) ## not parallel runs at this level
         {
             zz <- x$FRAN(zsmall, xsmall)
           ##  browser()
@@ -271,7 +266,7 @@ doIterations<- function(z, x, subphase,...)
         }
         else
         {
-            zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
+            zz <- clusterCall(z$cl, simstats0c, zsmall, xsmall)
             fra <- sapply(zz, function(x) colSums(x$fra)- z$targets)
             dim(fra) <- c(z$pp, z$int)
             fra <- rowMeans(fra)
@@ -316,7 +311,9 @@ doIterations<- function(z, x, subphase,...)
                 z$truncated[z$nit] <- TRUE
             }
             else
+			{
                 maxrat <- 1.0
+			}
             fchange<- z$gain * fra * maxrat / diag(z$dfra)
         }
         else
@@ -450,7 +447,7 @@ doIterationsCopy <- function(z, x, subphase, numberIterations=10,
         }
         else
         {
-            zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
+            zz <- clusterCall(z$cl, simstats0c, zsmall, xsmall)
             fra <- sapply(zz, function(x) colSums(x$fra) - z$targets)
             dim(fra) <- c(z$pp, z$int)
             fra <- rowMeans(fra)
@@ -538,9 +535,9 @@ setUpPhase2Storage <- function(z, niter)
 {
     nGroup <- z$f$nGroup
     z$chains <- lapply(1:nGroup, function(x)
-                      lapply(1:z$groupPeriods[x], function(y)
+                      lapply(1:(z$f$groupPeriods[x] - 1), function(y)
                              vector("list", niter)))
-    z$lik0 <- rep(0, niter * sum(z$groupPeriods - 1))
+    z$lik0 <- rep(0, niter * sum(z$f$groupPeriods - 1))
     z$iterFra <- matrix(0, ncol=z$pp, nrow=niter)
     z$thetaStore <- matrix(0, ncol=z$pp, nrow=z$n2max)
     z$sf <- matrix(0, ncol=z$pp, nrow=z$n2max)
@@ -552,7 +549,7 @@ storeChainsAndFra <- function(z, zz, i, fra)
 {
     for (ii in 1:z$nGroup)
     {
-        for (jj in 1:z$groupPeriods[ii])
+        for (jj in 1:(z$f$groupPeriods[ii] - 1))
         {
             z$chains[[ii]][[jj]][[i]] <- zz$chain[[ii]][[jj]]
         }
@@ -569,7 +566,7 @@ calculateLikelihoods <- function(z)
     storeSub <- 1
     for (ii in 1:z$nGroup)
     {
-        for (jj in 1:z$groupPeriods[ii])
+        for (jj in 1:(z$f$groupPeriods[ii] - 1))
         {
             chains <- z$chains[[ii]][[jj]]
             for (chain in chains)
@@ -747,9 +744,9 @@ initForAlgorithms <- function(z)
         return(z)
     }
     nGroup <- z$f$nGroup
+	groupPeriods <- attr(z$f, "groupPeriods")
     z$nDependentVariables <- length(z$f$depNames)
-    atts <- attributes(z$f)
-    z$groupPeriods <- atts$groupPeriods - 1
+   ## atts <- attributes(z$f)
     netnames <- names(z$f[[1]]$depvars)
     z$nactors <-  lapply(1:nGroup, function(i, periods, data)
                    {
@@ -757,7 +754,7 @@ initForAlgorithms <- function(z)
                                           dim(x)[1])
                       tmp <- tmp[match(netnames, names(data[[i]]$depvars))]
                       tmp
-                   }, periods=z$groupPeriods, data=z$f[1:nGroup]
+                   }, periods=groupPeriods - 1, data=z$f[1:nGroup]
                        )
     z$rateParameterPosition <-
         lapply(1:nGroup, function(i, periods, data)
@@ -776,7 +773,7 @@ initForAlgorithms <- function(z)
                       tmp
                   }
                       )
-           }, periods=z$groupPeriods, data=z$f[1:nGroup]
+           }, periods=groupPeriods - 1, data=z$f[1:nGroup]
                )
     z$evalParameterPosition <-
         lapply(netnames, function(x)

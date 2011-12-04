@@ -480,9 +480,9 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 				z$phase1Its <- z$phase1Its + 1
 			}
 		}
-		else
+		else ### only do parallels at this level for forward simulation
 		{
-			zz <- clusterCall(z$cl, usesim, zsmall, xsmall)
+			zz <- clusterCall(z$cl, simstats0c, zsmall, xsmall)
 			z$n <- z$n + z$int
 			if (phase == 1)
 			{

@@ -8,7 +8,8 @@
 \usage{
 bayes(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
       plotit=FALSE, nbrNodes=1, dfra=NULL, n=10,
-      priorSigma=NULL, prevAns=NULL, getDocumentation=FALSE)
+      priorSigma=NULL, prevAns=NULL, clusterType=c("PSOCK", "FORK"),
+      getDocumentation=FALSE)
 }
 \arguments{
   \item{data}{A sienaData object as returned by \code{\link{sienaDataCreate}}.}
@@ -40,6 +41,8 @@ bayes(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 	values, but an estimate of the Hessian will still be made.
 	If the results used as \code{prevAns} are a reasonable starting point,
 	this will increase the efficiency of the algorithm. }
+   \item{clusterType}{If using multiple processes, whether to use
+	 forking processes or not. (Only "PSOCK" can be used on Windows.)}
    \item{getDocumentation}{Flag to allow documentation of internal
     functions, not for use by users.}
 }

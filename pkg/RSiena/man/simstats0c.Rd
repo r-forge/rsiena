@@ -9,7 +9,7 @@
 simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
            data=NULL, effects=NULL, fromFiniteDiff=FALSE,
            profileData=FALSE, prevAns=NULL, returnDeps=FALSE,
-           returnChains=FALSE, byWave=FALSE)
+           returnChains=FALSE, byWave=FALSE, returnLoglik=FALSE)
 }
 \arguments{
   \item{z}{Control object, passed in automatically in  \code{\link{siena07}}.}
@@ -43,6 +43,8 @@ simstats0c(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
   \item{byWave}{Boolean. Whether to return the finite difference
 	derivatives by wave (uses a great deal of memory). Only necessary
 	for \code{\link{sienaTimeTest}}}
+  \item{returnLoglik}{Boolean. Whether to return the log likelihood of
+	the simulated chain. Used in \code{\link{bayes}}}
 }
 \details{
   The name of this function should be used for the element FRAN of the

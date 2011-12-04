@@ -269,6 +269,34 @@ double Model::initialPermutationLength() const
 	return this->linitialPermutationLength;
 }
 
+/**
+ * Returns the current permutation length
+ */
+double Model::currentPermutationLength(int period) const
+{
+	return this->lcurrentPermutationLength[period];
+}
+
+/**
+ * Initializes the current permutation length
+ */
+void Model::initializeCurrentPermutationLength()
+{
+	for (int i = 0; i < this->lnumberOfPeriods; i++)
+	{
+		this->lcurrentPermutationLength.
+			push_back(this->linitialPermutationLength);
+	}
+}
+
+/**
+ * Stores the current permutation length
+ */
+void Model::currentPermutationLength(int period, double value)
+{
+	this->lcurrentPermutationLength[period] = value;
+}
+
 // ----------------------------------------------------------------------------
 // Section: Effect management
 // ----------------------------------------------------------------------------
@@ -595,38 +623,31 @@ vector<Chain *> & Model::rChainStore(int periodFromStart)
 	return this->lchainStore[periodFromStart];
 }
 
-void Model::partClearChainStore()
+void Model::clearChainStore(int keep, int groupPeriod)
 {
-	for (unsigned i = 0; i < this->lchainStore.size(); i++)
+	int size = this->lchainStore[groupPeriod].size();
+	if (keep > 0)
 	{
-		// need to keep the final one to continue from
-		for (unsigned j = 0; j < this->lchainStore[i].size() - 1; j++)
+		vector<Chain *>::iterator iter = this->lchainStore[groupPeriod].begin();
+
+		for (unsigned j = 0; j < size - keep; j++)
 		{
 			//delete the chain pointed to
-			delete this->lchainStore[i][j];
+			delete this->lchainStore[groupPeriod][j];
 		}
-		vector<Chain *>::iterator iter = this->lchainStore[i].begin();
-		for (unsigned j = 0; j < this->lchainStore[i].size() - 1; j++)
-		{
-			//erase the entry
-			this->lchainStore[i].erase(iter);
-			iter++;
-		}
+		this->lchainStore[groupPeriod].erase(iter, iter + size - keep);
 
 	}
-}
-void Model::clearChainStore()
+	else
 {
-	for (unsigned i = 0; i < this->lchainStore.size(); i++)
+		for (unsigned chain = 0; chain < size; chain++)
 	{
-		deallocateVector(this->lchainStore[i]);
+			delete lchainStore[groupPeriod][chain];
 	}
+		this->lchainStore[groupPeriod].clear();
 
 }
 
-void Model::clearChainStore(int periodFromStart)
-{
-	deallocateVector(this->lchainStore[periodFromStart]);
 }
 
 void Model::setupChainStore(int numberPeriods)
