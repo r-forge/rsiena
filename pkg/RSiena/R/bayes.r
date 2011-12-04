@@ -12,7 +12,8 @@
 ##@bayes Bayesian fit a Bayesian model
 bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
                   plotit=FALSE, nbrNodes=1, dfra=NULL, n=10,
-                  priorSigma=NULL, prevAns=NULL, getDocumentation=FALSE)
+                  priorSigma=NULL, prevAns=NULL, clusterType=c("PSOCK", "FORK"),
+				  getDocumentation=FALSE)
 {
     ##@createStores internal bayes Bayesian set up stores
     createStores <- function()
@@ -22,7 +23,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         z$posteriorTot <<- matrix(0, nrow=z$nGroup, ncol=npar)
         z$posteriorMII <<- array(0, dim=c(z$nGroup, npar, npar))
         z$candidates <<- array(NA, dim=c(numberRows, z$nGroup, npar))
-        z$acceptances <<- matrix(NA, nrow=z$nGroup, ncol=numberRows)
+        z$acceptances <<- matrix(NA, ncol=z$nGroup, nrow=numberRows)
         z$MHacceptances <<- array(NA, dim=c(numberRows, z$nGroup,
 									 z$nDependentVariables, 9))
         z$MHrejections <<- array(NA, dim=c(numberRows, z$nGroup,
@@ -37,7 +38,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         nrun <- nrow(z$parameters)
         npar <- length(z$theta)
         end <- start + nrun - 1
-        z$acceptances[, start:end] <<- z$accepts
+        z$acceptances[start:end, ] <<- z$accepts
         z$candidates[start:end,, ] <<- z$parameters
         z$posteriorTot <<- z$posteriorTot + colSums(z$parameters)
         for (group in 1:z$nGroup)
@@ -99,9 +100,8 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         }
         cat('fine tuning took ', iter, ' iterations. Scalefactor:',
             z$scaleFactors, '\n')
-
     }
-	##@MCMCcycle algorithms do some loops of (MH steps and sample parameters)
+	##@MCMCcycle internal Bayes do some loops of (MH steps and sample parameters)
 	MCMCcycle <- function(nrunMH, nrunMHBatches, change=TRUE)
 	{
 		z$accepts <<- matrix(NA, nrow=z$nGroup, nrunMHBatches)
@@ -116,15 +116,16 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 		z$nrunMH <<- nrunMH
 		for (i in 1:nrunMHBatches)
 		{
-										#	c1 <- proc.time()[1]
-			ans <- z$FRAN(z, returnChains=TRUE, byGroup=TRUE)
+		#	cc <- proc.time()[1]
+
+			ans <- z$FRAN(z, byGroup=TRUE, returnLoglik=TRUE, onlyLoglik=TRUE)
 										#	c2 <- proc.time()[1]
-										#	cat ('fran',c2-c1,'\n')
-			z$chain <<- ans$chain
-										#	c1 <- proc.time()[1]
+										#	cat ('fran',c2-cc,'\n')
+			z$loglik <<- ans$loglik
+										#	cc <- proc.time()[1]
 			sampleParameters(change)
-										#	c2 <- proc.time()[1]
-										#	cat ('sam',c2-c1,'\n')
+										#	cc1 <- proc.time()[1]
+										#	cat('samp',cc1-cc, '\n')
 			z$accepts[, i] <<- z$accept
 			z$parameters[i, , ] <<- z$thetaMat
 			z$MHaccepts[i, , , ] <<-
@@ -141,7 +142,6 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 		}
 		z$BayesAcceptances <<- rowSums(z$accepts)
 		z$nrunMH <<- storeNrunMH
-
 	}
 	##@sampleParameters algorithms propose new parameters and accept them or not
 	sampleParameters <- function(change=TRUE)
@@ -181,16 +181,13 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 								   sigma=z$priorSigma[use, use])
 					   }
 						   )
-		logpOld <- getProbs(z, z$chain)
+		logpOld <- z$loglik
 
-		storeNrunMH <- z$nrunMH
-		z$nrunMH <<- 0
 		thetaNew[, z$basicRate] <- exp(thetaNew[, z$basicRate])
 		z$thetaMat <<- thetaNew
-		resp <- z$FRAN(z, returnChains=TRUE, byGroup=TRUE)
-		logpNew <- getProbs(z, resp$chain)
-
+		logpNew <- getProbabilitiesFromC(z)[[1]]
 		proposalProbability <- priorNew - priorOld + logpNew - logpOld
+##cat(proposalProbability, priorNew, priorOld, logpNew, logpOld, '\n')
 
 		z$accept <<- log(runif(length(proposalProbability))) < proposalProbability
 		thetaOld[, z$basicRate] <- exp(thetaOld[, z$basicRate])
@@ -203,11 +200,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 			##print(z$thetaMat)
 			z$thetaMat[!z$accept, ] <<- thetaOld[!z$accept, ]
 		}
-		z$nrunMH <<- storeNrunMH
-		## cat(thetaNew, priorNew, priorOld, logpNew, logpOld,
-		##  exp(proposalProbability),
-		## z$accept,'\n')
-
+##		print(thetaNew)
     }
     ## ################################
     ## start of function proper
@@ -234,7 +227,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 	ctime <- proc.time()[1]
 
     z <- initializeBayes(data, effects, model, nbrNodes, priorSigma,
-                         prevAns=prevAns)
+                         prevAns=prevAns, clusterType=clusterType)
     createStores()
 
     z$sub <- 0
@@ -249,16 +242,15 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         {
             z$dfra <- dfra
         }
-        lambda <- z$theta[z$basicRate]
-        dfra <- z$dfra
-        z$dfra[z$basicRate, ] <- z$dfra[z$basicRate,] * lambda
-        z$dfra[, z$basicRate] <- z$dfra[, z$basicRate] * lambda
-        diag(z$dfra)[z$basicRate] <- lambda *
-            diag(dfra)[z$basicRate] + lambda * lambda *
-                colMeans(z$sf)[z$basicRate]
-										#    print(z$dfra)
-        z$dfra <- solve(z$dfra)
-										#   print(z$dfra)
+		else
+		{
+			if (is.null(z$sf))
+			{
+				stop("need some scores to scale dfra")
+			}
+			z$dfra <- scaleDfra(z)
+		}
+
     }
 	ctime1 <- proc.time()[1]
 	cat(ctime1-ctime,'\n')
@@ -284,7 +276,6 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     {
         MCMCcycle(nrunMH=4, nrunMHBatches=20)
     }
-
 	print('endof warm')
 	ctime3<- proc.time()[1]
 
@@ -296,6 +287,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 		ctime4<- proc.time()[1]
 		cat('main', ii, ctime4-ctime3,'\n')
 		ctime3 <- ctime4
+
         if (ii %% 10 == 0 && plotit) ## do some plots
         {
             cat('main after ii', ii, '\n')
@@ -329,7 +321,16 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
                                   "DelPerm", "InsMissing", "DelMissing",
                                   "BayesAccepts")
             varnames <- paste(names(thetadf)[-1], sep="", collapse= " + ")
-            varcall <- paste("~ ", varnames,  " | Group", sep="", collapse="")
+			if (z$nGroup > 1)
+			{
+				varcall <- paste("~ ", varnames,  " | Group", sep="",
+								 collapse="")
+			}
+			else
+			{
+				varcall <- paste("~ ", varnames,  sep="", collapse="")
+
+			}
             print(histogram(as.formula(varcall), data=thetadf, scales="free",
                             outer=TRUE, breaks=NULL, type="density",
                             panel=function(x, ...)
@@ -350,8 +351,18 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
                         }
                             ))
             varnames <- paste(names(thetadf)[-1], sep="", collapse= " + ")
-            varcall <- paste(varnames,  "~ 1:", ii * nrunMHBatches * z$nGroup,
+			if (z$nGroup > 1)
+			{
+				varcall <- paste(varnames,  "~ 1:", ii *
+								 nrunMHBatches * z$nGroup,
                              " | Group", sep="", collapse="")
+			}
+			else
+			{
+				varcall <- paste(varnames,  "~ 1:", ii *
+								 nrunMHBatches * z$nGroup,
+								 sep="", collapse="")
+			}
             dev.set(tseriesplot)
             print(xyplot(as.formula(varcall), data=thetadf, scales="free",
                          outer=TRUE))
@@ -380,7 +391,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 
 ##@initializeBayes algorithms do set up for Bayesian model
 initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
-                            prevAns)
+                            prevAns, clusterType=c("PSOCK", "FORK"))
 {
     ## initialise
     Report(openfiles=TRUE, type="n") #initialise with no file
@@ -417,24 +428,33 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
 
     WriteOutTheta(z)
 
-    if (nbrNodes > 1)
+    if (nbrNodes > 1 && z$observations > 1)
     {
         require(parallel)
+		clusterType <- match.arg(clusterType)
+		if (clusterType == "PSOCK")
+		{
         clusterString <- rep("localhost", nbrNodes)
         z$cl <- makeCluster(clusterString, type = "PSOCK",
                             outfile = "cluster.out")
+		}
+		else
+		{
+			z$cl <- makeCluster(nbrNodes, type = "FORK",
+								outfile = "cluster.out")
+		}
         clusterCall(z$cl, library, pkgname, character.only = TRUE)
         clusterCall(z$cl, storeinFRANstore,  FRANstore())
         clusterCall(z$cl, FRANstore)
         clusterCall(z$cl, initializeFRAN, z, model,
                     initC = TRUE, profileData=FALSE, returnDeps=FALSE)
-        clusterSetRNGStream(z$cl,
-                        iseed = as.integer(runif(1, max=.Machine$integer.max)))
+		clusterSetRNGStream(z$cl, iseed = as.integer(runif(1,
+								max=.Machine$integer.max)))
     }
 
     z$scaleFactors <- rep(1, z$nGroup)
     ## z$returnDataFrame <- TRUE # chains come back as data frames not lists
-    z$returnChains <- TRUE
+    z$returnChains <- FALSE
     if (is.null(priorSigma))
     {
         z$priorSigma <- diag(z$pp) * 10000
@@ -451,9 +471,6 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
         use[!z$basicRate] <- TRUE
         z$thetaMat[i, !use] <- NA
     }
-    z$callGrid <- cbind(rep(1:z$nGroup, z$groupPeriods),
-                        as.vector(unlist(sapply(z$groupPeriods,
-                                                function(x) 1:x))))
     z
 }
 ##@getDFRA algorithms do a few ML iterations and calculate a derivative matrix
@@ -462,76 +479,32 @@ getDFRA <- function(z, n)
     ## do n MLmodelsteps with the initial thetas and get
     ## derivs
     z$sdf <- vector("list", n)
-    z$ssc <- matrix(0, nrow=n, ncol=z$pp)
+    z$sf <- matrix(0, nrow=n, ncol=z$pp)
     z$Deriv <- TRUE
     for (i in 1:n)
     {
         ans <- z$FRAN(z)
         z$sdf[[i]] <- ans$dff
-        z$ssc[i,  ] <- colSums(ans$fra)
+        z$sf[i,  ] <- colSums(ans$fra)
     }
-    dfra <- t(as.matrix(Reduce("+", z$sdf))) / length(z$sdf)
-    ssc <- colMeans(z$ssc)
+	dfra <- t(as.matrix(Reduce("+", z$sdf) / length(z$sdf)))
     z$dfra <- dfra
+	z$dfra <- scaleDfra(z)
+	z$Deriv <- FALSE
+    z
+}
+scaleDfra <- function(z)
+{
     lambda <- z$theta[z$basicRate]
+	dfra <- z$dfra
     z$dfra[z$basicRate, ] <- z$dfra[z$basicRate,] * lambda
     z$dfra[, z$basicRate] <- z$dfra[, z$basicRate] * lambda
     diag(z$dfra)[z$basicRate] <- lambda *
-        diag(dfra)[z$basicRate] + lambda * lambda * ssc[z$basicRate]
-    ##print(z$dfra)
-    z$dfra <- solve(z$dfra)
-    ##print(z$dfra)
-    ##$eS <- eigen(z$dfra, symmetric=TRUE, EISPACK=TRUE)
-    ##z$ev <- z$eS$values
-    ##z$covFactor <- z$eS$vectors %*% diag(sqrt(pmax(z$ev, 0)), z$pp)
-    z
+		diag(dfra)[z$basicRate] + lambda * lambda *
+			colMeans(z$sf)[z$basicRate]
+	chol2inv(chol(z$dfra))
 }
-##@getLikelihood algorithms calculated likelihood for one chain
-getLikelihood <- function(chain, nactors, lambda, simpleRates)
-{
-    loglik <- 0
-    ncvals <- sapply(chain, function(x)x[[3]])
-    nc <- nactors
-    nc[] <- 0
-    ncvals <- table(ncvals)
-    nc[names(ncvals)] <- ncvals
-    logChoiceProb <- sapply(chain, function(x)x[[9]])
-    logOptionSetProb <- sapply(chain, function(x)x[[8]])
-    loglik <- sum(logChoiceProb)  + sum(logOptionSetProb)
-	##print(sum(logOptionSetProb))
-    if (simpleRates)
-    {
-        loglik <- loglik - sum(nactors * lambda) + sum(nc * log(lambda))# -
-		## sum(lfactorial(nc)) don't need factorial in bayes!
-    }
-    else
-    {
-        mu <- attr(chain, "mu")
-        sigma <- sqrt(attr(chain, "sigma2"))
-        finalReciprocalRate <- attr(chain, "finalReciprocalRate")
-        loglik <- loglik + dnorm(1, mu, sigma, log=TRUE) +
-            log(finalReciprocalRate)
-    }
-    loglik
-}
-##@getProbs algorithms calculates likelihood sum over nested list of chains
-getProbs <- function(z, chain)
-{
-    sapply(1: length(chain), function(i)
-       {
-           groupChain <- chain[[i]]
-           sum(sapply(1:length(groupChain), function(j)
-                  {
-                      periodChain <- groupChain[[j]]
-                      theta1 <- z$thetaMat[i, ]
-                      k <- z$rateParameterPosition[[i]][[j]]
-                      getLikelihood(periodChain, z$nactors[[i]], theta1[k],
-                                    z$simpleRates)
-                  }
-                      ))
-       }
-           )
-}
+
 ##@flattenChains algorithms converts a nested list of chains to a single list
 flattenChains <- function(zz)
 {
@@ -557,4 +530,57 @@ dmvnorm <- function(x, mean , sigma)
     distval <- mahalanobis(x, center=mean, cov=sigma)
     logdet <- sum(log(eigen(sigma, symmetric=TRUE, only.values=TRUE)$values))
     -(ncol(x) * log(2 * pi) + logdet + distval) / 2
+}
+
+##@getProbabilitiesFromC bayes gets loglik from chains in C
+getProbabilitiesFromC <- function(z, index=1, getScores=FALSE)
+{
+	## expects maximum likelihood parallelisations
+    f <- FRANstore()
+
+	callGrid <- z$callGrid
+    ## z$int2 is the number of processors if iterating by period, so 1 means
+    ## we are not. Can only parallelize by period1
+    if (nrow(callGrid) == 1)
+    {
+		theta <- z$thetaMat[1,]
+        ans <- .Call("getChainProbabilities", PACKAGE = pkgname, f$pData,
+					 f$pModel, as.integer(1), as.integer(1),
+					 as.integer(index), f$myeffects, theta, getScores)
+        anss <- list(ans)
+	}
+    else
+    {
+        if (z$int2 == 1 )
+        {
+            anss <- apply(callGrid, 1,
+						  doGetProbabilitiesFromC, z$thetaMat, index, getScores)
+        }
+        else
+        {
+            use <- 1:(min(nrow(callGrid), z$int2))
+            anss <- parRapply(z$cl[use], callGrid,
+							  doGetProbabilitiesFromC, z$thetaMat, index,
+							  getScores)
+        }
+    }
+	ans <- list()
+	ans[[1]] <- sum(sapply(anss, "[[", 1))
+	if (getScores)
+	{
+		ans[[2]] <- rowSums(sapply(anss, "[[", 2))
+	}
+	ans[[3]] <- sapply(anss, "[[", 3)
+	ans
+}
+
+##@doGetProbabilitiesFromC Maximum likelihood
+doGetProbabilitiesFromC <- function(x, thetaMat, index, getScores)
+{
+    f <- FRANstore()
+	theta <- thetaMat[x[1], ]
+    .Call("getChainProbabilities", PACKAGE = pkgname, f$pData,
+		  f$pModel, as.integer(x[1]), as.integer(x[2]),
+		  as.integer(index), f$myeffects, theta, getScores)
+
 }

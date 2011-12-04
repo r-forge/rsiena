@@ -12,10 +12,10 @@
 ##@maxlikec siena07 ML Simulation Module
 maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                      effects=NULL, profileData=FALSE, prevAns=NULL,
-                     returnChains=FALSE, byGroup=FALSE,
-                     returnDataFrame=FALSE, byWave=FALSE)
+                     returnChains=FALSE, byGroup=FALSE, returnDataFrame=FALSE,
+					 byWave=FALSE, returnLoglik=FALSE, onlyLoglik=FALSE)
 {
-    if (INIT || initC)  ## initC is to initialise multiple C processes in phase3
+    if (INIT || initC)  ## initC is to initialise multiple C processes in
     {
         z <- initializeFRAN(z, x, data, effects, prevAns, initC,
                             profileData=profileData, returnDeps=FALSE)
@@ -66,7 +66,9 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                      f$pModel, f$myeffects, theta,
                       1, 1, z$nrunMH, z$addChainToStore,
                      z$needChangeContributions, z$returnDataFrame,
-                     z$returnChains)
+                     z$returnChains, returnLoglik, onlyLoglik)
+		if (!onlyLoglik)
+		{
         ans[[6]] <- list(ans[[6]])
         ans[[7]] <- list(ans[[7]])
         if (byGroup)
@@ -78,13 +80,22 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 	}
     else
     {
+			ans[[2]] <- list(ans[[2]])
+			ans[[3]] <- list(ans[[3]])
+			ans[[4]] <- list(ans[[4]])
+
+		}
+	}
+    else
+    {
         if (z$int2 == 1)
         {
             anss <- apply(cbind(callGrid, 1:nrow(callGrid)),
 						  1, doMLModel, z$Deriv, z$thetaMat,
                           z$nrunMH, z$addChainToStore,
                           z$needChangeContributions, z$returnDataFrame,
-                          z$returnChains, byGroup, z$theta)
+                          z$returnChains, byGroup, z$theta, returnLoglik,
+						  onlyLoglik)
         }
         else
         {
@@ -94,35 +105,19 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                               z$nrunMH, z$addChainToStore,
                               z$needChangeContributions,
                               z$returnDataFrame, z$returnChains, byGroup,
-							  z$theta)
+							  z$theta, returnLoglik, onlyLoglik)
         }
         ## reorganize the anss so it looks like the normal one
-        ans <- NULL
+        ans <- list()
+ 		if (!onlyLoglik)
+		{
         ans[[1]] <- sapply(anss, "[[", 1) ## statistics
         ans[[2]] <- NULL ## scores
         ans[[3]] <- NULL ## seeds
         ans[[4]] <- NULL ## ntim
         ans[[5]] <- NULL # randomseed
-        ##   if (returnDeps) ## this is for dependent variables but
-        ##       ## these are not returned yet
-        ##   {
-        ##       fff <- lapply(anss, "[[", 6)
-        ##       fff <- split(fff, callGrid[1, ]) ## split by group
-        ##       ans[[6]] <-
-        ##           lapply(fff, function(x)
-        ##              {
-        ##                  lapply(1:length(f$depNames), function(x, z)
-        ##                          lapply(z, "[[", x), z=x)
-        ##               }
-        ##                   )
-        ##    }
-        ##    else
-        ##    {
-        ##        ans[[6]] <-  NULL
-        ##    }
         if (z$returnChains)
         {
-            ##TODO put names on these?
             fff <- lapply(anss, function(x) x[[6]][[1]])
             fff <- split(fff, callGrid[, 1 ]) ## split by group
             ans[[6]] <- fff
@@ -137,38 +132,20 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
             ans[[9]] <- Reduce("+",  ans[[9]]) ## rejects
             ans[[10]] <- Reduce("+",  ans[[10]]) ## aborts
         }
+			ans[[11]] <- sapply(anss, "[[", 11)
+		}
+		else ##onlyLoglik is always byGroup (bayes)
+		{
+			ans[[1]] <- sum(sapply(anss, '[[', 1))## loglik
+			ans[[2]] <- lapply(anss, "[[", 2)
+			ans[[3]] <- lapply(anss, "[[", 3)
+			ans[[4]] <- lapply(anss, "[[", 4)
+		}
     }
 
-    fra <- -t(ans[[1]]) ##note sign change
-
     FRANstore(f)
-	#if (returnDeps || z$returnChains)
-	#{
-	#	sims <- ans[[6]]
-	#}
-	#else
-	#{
-		sims <- NULL
-	#}
-    ##print(length(sims[[1]]))
-    ##if (returnDeps) ## this is not finished yet!
-    ##{
-    ##    ## attach the names
-    ##    names(sims) <- f$groupNames
-    ##    periodNo <- 1
-    ##    for (i in 1:length(sims))
-    ##    {
-    ##        names(sims[[i]]) <- f$depNames
-    ##        for (j in 1:length(sims[[i]]))
-    ##        {
-    ##            periodNos <- periodNo:(periodNo  + length(sims[[i]][[j]]) - 1)
-    ##            names(sims[[i]][[j]]) <- periodNos
-    ##       }
-    ##        periodNo <- periodNos[length(periodNos)] + 2
-    ##   }
-    ##}
 
-    if (z$Deriv) ## need to reformat the derivatives
+    if (z$Deriv && !onlyLoglik) ## need to reformat the derivatives
     {
         resp <- reformatDerivs(z, f, ans[[7]])
         dff <- resp[[1]]
@@ -179,18 +156,26 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         dff <- NULL
         dff2 <- NULL
     }
-    ## browser()
-    ##print(length(ans[[6]][[1]][[1]]))
-    list(fra = fra, ntim0 = NULL, feasible = TRUE, OK = TRUE,
-         sims=sims, dff = dff, dff2=dff2,
-         chain = ans[[6]], accepts=ans[[8]],
-         rejects= ans[[9]], aborts=ans[[10]])
+	if (!onlyLoglik)
+	{
+		fra <- -t(ans[[1]]) ##note sign change
+
+		list(fra = fra, ntim0 = NULL, feasible = TRUE, OK = TRUE,
+			 sims=NULL, dff = dff, dff2=dff2,
+			 chain = ans[[6]], accepts=ans[[8]],
+			 rejects= ans[[9]], aborts=ans[[10]], loglik=ans[[11]])
+	}
+	else
+	{
+		list(loglik=ans[[1]], accepts=ans[[2]],
+			 rejects= ans[[3]], aborts=ans[[4]])
+	}
 }
 
 ##@doMLModel Maximum likelihood
 doMLModel <- function(x, Deriv, thetaMat, nrunMH, addChainToStore,
                       needChangeContributions, returnDataFrame, returnChains,
-					  byGroup, theta)
+					  byGroup, theta, returnLoglik, onlyLoglik)
 {
     f <- FRANstore()
 	if (byGroup)
@@ -204,9 +189,11 @@ doMLModel <- function(x, Deriv, thetaMat, nrunMH, addChainToStore,
     .Call("mlPeriod", PACKAGE=pkgname, Deriv, f$pData,
           f$pModel, f$myeffects, theta,
           as.integer(x[1]), as.integer(x[2]), nrunMH[x[3]], addChainToStore,
-          needChangeContributions, returnDataFrame, returnChains)
+          needChangeContributions, returnDataFrame, returnChains,
+		  returnLoglik, onlyLoglik)
 }
 
+##@reformatDerivs Maximum likelihood move this back to inline or internal function
 reformatDerivs <- function(z, f, derivList)
 {
     ## current format is a list of vectors of the lower? triangle

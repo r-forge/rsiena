@@ -51,6 +51,7 @@
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/ml/Chain.h"
+#include "model/ml/MLSimulation.h"
 #include "model/ml/MiniStep.h"
 #include "model/ml/NetworkChange.h"
 #include "model/ml/BehaviorChange.h"
@@ -803,8 +804,8 @@ SEXP getMiniStepList(const MiniStep& miniStep, int period,
 	return MINISTEP;
 }
 
-/** Create a list from a chain. Easy to create, but prints untidily!
- *
+/**
+ * Create a list from a chain. Easy to create, but prints untidily!
  */
 SEXP getChainList(const Chain& chain, const EpochSimulation& epochSimulation)
 {

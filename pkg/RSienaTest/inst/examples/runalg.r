@@ -1,22 +1,20 @@
 library(RSienaTest)
 
-source('~/rforge2011/pkg/RSienaTest/inst/examples/algorithms.r')
-source('~/ruthsvn/siena/RSiena/R/algorithms.r')
-
 mynet1 <- sienaNet(array(c(s501,s502,s503), dim=c(50, 50, 3)))
 mynet2 <- sienaNet(s50a, type='behavior')
 mydata <- sienaDataCreate(mynet1, mynet2)
-mynet1 <- sienaNet(array(c(s501,s502), dim=c(50, 50,2)))
-mydata <- sienaDataCreate(mynet1)
+#mynet1 <- sienaNet(array(c(s501,s502), dim=c(50, 50,2)))
+#mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, recip, include=TRUE)
 myeff <- includeEffects(myeff, transTrip, inPopSqrt)
 myeff <- includeEffects(myeff, altX, interaction1='mynet2')
-myeff <- includeEffects(myeff, outRateInv, type="rate", include=FALSE)
+myeff <- includeEffects(myeff, outRateInv, type="rate", include=TRUE)
 
 mynetm1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32,32,2)))
 mydatam <- sienaDataCreate(mynetm1)
 myeffm <- getEffects(mydatam)
+myeffm <- includeEffects(myeffm, transTrip, inPopSqrt)
 MOMmodel <- sienaModelCreate(cond=FALSE, maxlike=FALSE, n3=100, seed=1)
 MLmodel <- sienaModelCreate(cond=FALSE,  maxlike=TRUE, n3=100, seed=1)
 
@@ -31,123 +29,117 @@ ansml <- siena07(MLmodel, data=mydatam, effects=myeffm, useCluster=FALSE,
 
 ## MOM statistics / Gelman few/ few many/all
 print("resp1")
-resp1 <- algorithms(mydata, myeff, MOMmodel, nIter=20, numiter=20, useC=FALSE,
-                    nbrNodes=1)
+system.time(resp1 <- algorithms(mydata, myeff, MOMmodel, nIter=20, numiter=20,
+                    nbrNodes=2))
 myeff <- includeEffects(myeff, outRateInv, type="rate", include=FALSE)
 
 ## ML scores / Gelman few/ few many/all
 print("resp2")
-resp2 <- algorithms(mydata, myeff, MLmodel, nIter=20, numiter=20, useC=FALSE,
-                    nbrNodes=1)
+system.time(resp2 <- algorithms(mydata, myeff, MLmodel, nIter=20, numiter=20, nbrNodes=2))
 
 ## SEM + Gelman
 print("resp3")
-resp3 <- algorithms(mydata, myeff, MLmodel, useC=FALSE, finalIter=50,
+system.time(resp3 <- algorithms(mydata, myeff, MLmodel, finalIter=50,
                     useOptim=TRUE, optimFinal=1, optimSchedule=rep(50, 10),
-                    nbrNodes=1)
+                    nbrNodes=2))
 ## EM varied sampling rate
 print("resp4")
-resp4 <- algorithms(mydata, myeff, MLmodel, useC=FALSE, useOptim=TRUE,
+system.time(resp4 <- algorithms(mydata, myeff, MLmodel,  useOptim=TRUE,
                     optimFinal=1,
-                    scale=1, nbrNodes=2)
+                    scale=1, nbrNodes=2))
 ## EM reuse history
 print("resp5")
-resp5 <- algorithms(mydata, myeff, MLmodel, useC=FALSE, useOptim=TRUE,
+system.time(resp5 <- algorithms(mydata, myeff, MLmodel,  useOptim=TRUE,
                     optimFinal=1, useHistory=TRUE, optimWeight=0.25,
-                    scale=1, nbrNodes=2)
+                    scale=1, nbrNodes=2))
 
 ## Geyer in final loop
 print("resp6")
-resp6 <- algorithms(mydata, myeff, MLmodel, useC=FALSE, useOptim=TRUE,
-                    optimFinal=2, scale=0.5, nbrNodes=2)
+system.time(resp6<-algorithms(mydata, myeff, MLmodel,  useOptim=TRUE,
+                    optimFinal=2, scale=0.5, nbrNodes=2))
 
 ## Geyer with varied theta
 print("resp7")
-resp7 <- algorithms(mydata, myeff, MLmodel, useC=FALSE, useOptim=TRUE,
+system.time(resp7 <- algorithms(mydata, myeff, MLmodel,  useOptim=TRUE,
                     optimFinal=2, variedThetas=TRUE, scale=0.5,
                     finalIter=100, optimSchedule=c(10, 20, 20, 20, 50,50),
-                    nbrNodes=2)
+                    nbrNodes=2))
 
 
 ## response surface
 print("resp8")
-resp8 <- algorithms(mydata, myeff, MOMmodel, nIter=100, numiter=10, useC=FALSE,
+system.time(resp8 <- algorithms(mydata, myeff, MOMmodel, nIter=100, numiter=10,
                     finalIter=100, responseSurface=TRUE, scale=1,
-                    optimWeight=0.75, nbrNodes=2)
+                    optimWeight=0.75, nbrNodes=2))
 
 ## profileLikelihoods
-profileLikelihoods(list(theta=c(5.2,-2.5, 2, .7, 0.05)),
-profileLikelihoods(resp8, MLmodel, mydata, myeff,
-                   1,3, gridl=c(0.9,1.1),nIter=100, nbrNodes=2)
+
+profileLikelihoods(list(theta=c(5.2,5.2,-2.5, 2, .7, 0.05, .1,1, 1, .5, .5)),
+system.time(RSiena:::profileLikelihoods(resp8, MLmodel, mydata, myeff,
+                   1,3, gridl=c(0.9,1.1),nIter=100, nbrNodes=2))
+system.time(RSienaTest:::profileLikelihoods(resp8, MLmodel, mydata, myeff,
+                   1,3, gridl=c(0.9,1.1),nIter=100, nbrNodes=2))
+RSienaTest:::profileLikelihoods(list(theta=c(5.2,5,-2.5, 2, .7, 0.05, .1, 1, 1, .5, .5)),
+MLmodel, mydata, myeff,
+                   1,3, gridl=c(0.9,1.1),nIter=100, nbrNodes=1)
 
 ##bayes
 print("resp9")
-resp9 <- RSienaTest:::bayes(mydata, myeff, MLmodel, nrunMH=200, nbrNodes=1,plotit=FALSE)
+system.time(resp9 <- bayes(mydata, myeff, MLmodel, nwarm=1,nmain=1, nbrNodes=2))
 
 
-resp1 <- algorithms(mydatam, myeffm, MOMmodel, nIter=20, numiter=20, useC=FALSE,
-                    nbrNodes=1)
+system.time(resp1 <- algorithms(mydatam, myeffm, MOMmodel, nIter=20, numiter=20,
+                    nbrNodes=1))
 
 ## ML scores / Gelman few/ few many/all
 print("resp2")
-resp2 <- algorithms(mydatam, myeffm, MLmodel, nIter=20, numiter=20, useC=FALSE,
-                    nbrNodes=1)
+system.time(resp2 <- algorithms(mydatam, myeffm, MLmodel, nIter=20, numiter=20,
+                    nbrNodes=1))
 
 ## SEM + Gelman
 print("resp3")
-resp3 <- algorithms(mydatam, myeffm, MLmodel, useC=FALSE, finalIter=50,
+system.time(resp3 <- algorithms(mydatam, myeffm, MLmodel,  finalIter=50,
                     useOptim=TRUE, optimFinal=1, optimSchedule=rep(50, 10),
-                    nbrNodes=2)
+                    nbrNodes=1))
 ## EM varied sampling rate
 print("resp4")
-resp4 <- algorithms(mydatam, myeffm, MLmodel, useC=FALSE, useOptim=TRUE,
+system.time(resp4 <- algorithms(mydatam, myeffm, MLmodel,  useOptim=TRUE,
                     optimFinal=1, optimSchedule=c(10, 20, 20, 20, 50),
-                    scale=1, nbrNodes=2)
+                    scale=1, nbrNodes=1))
 ## EM reuse history
 print("resp5")
-resp5 <- algorithms(mydatam, myeffm, MLmodel, useC=FALSE, useOptim=TRUE,
-                    optimFinal=1, useHistory=TRUE, scale=0.75, nbrNodes=2)
+system.time(resp5 <- algorithms(mydatam, myeffm, MLmodel,  useOptim=TRUE,
+								optimFinal=1, useHistory=TRUE, scale=0.75,
+								optimSchedule=c(10,20,20,20,50)))
 ## Geyer in final loop
 print("resp6")
-resp6 <- algorithms(mydatam, myeffm, MLmodel, useC=FALSE, useOptim=TRUE,
-                    optimFinal=2, scale=0.5, nbrNodes=2)
+system.time(resp6 <- algorithms(mydatam, myeffm, MLmodel, useOptim=TRUE,
+                    optimFinal=2, scale=0.5, nbrNodes=1,
+								optimSchedule=c(10,20,20,20,50)))
 
 ## Geyer with varied theta
 print("resp7")
-resp7 <- algorithms(mydatam, myeffm, MLmodel, useC=FALSE, useOptim=TRUE,
+system.time(resp7 <- algorithms(mydatam, myeffm, MLmodel, useOptim=TRUE,
                     optimFinal=2, variedThetas=TRUE, scale=0.5,
                     finalIter=100, optimSchedule=c(10, 20, 20, 20, 50,50),
-                    nbrNodes=2)
+                    nbrNodes=1))
 
 
 ## response surface
 print("resp8")
-resp8 <- algorithms(mydatam, myeffm, MOMmodel, nIter=100, numiter=10, useC=FALSE,
+system.time(resp8 <- algorithms(mydatam, myeffm, MOMmodel, nIter=100, numiter=10,
                     finalIter=100, responseSurface=TRUE, scale=1,
-                    optimWeight=0.75, nbrNodes=2)
+                    optimWeight=0.75, nbrNodes=1))
 
 ## profileLikelihoods
-profileLikelihoods(list(theta=c(5.2, 5.2,-2.5, 2, .7, -0.1, -0.03, 1, 1, .4, -0.05)),
-                   MLmodel, mydata, myeff,
-                   1,3, gridl=c(0.9,1.1),nIter=100, nbrNodes=2)
+system.time(RSiena:::profileLikelihoods(resp8,
+                   MLmodel, mydatam, myeffm,
+                   1,3, gridl=c(0.9,1.1),nIter=100, nbrNodes=1))
+system.time(RSienaTest:::profileLikelihoods(resp8,
+                   MLmodel, mydatam, myeffm,
+                   1,3, gridl=c(0.9,1.1),nIter=100, nbrNodes=1))
 
 ##bayes
 print("resp9")
-resp9 <- RSienaTest:::bayes(mydatam, myeffm, MLmodel, nrunMH=200, nbrNodes=2,save=FALSE)
-
-resp9 <- RSienaTest:::bayes(mydata, myeff, mymodel, nrunMH=200, nbrNodes=1,save=FALSE)
-
-
-acc <- resp9$MHacceptances[1:10,]
-rej <- resp9$MHrejections[1:10,]
-
-
-rdf <- data.frame(outcome=rep("Reject", nrow(rej)), rej)
-adf <- data.frame(outcome=rep("Accept", nrow(rej)), acc)
-ardf <- rbind(adf,rdf)
-names(ardf) <- c("Outcome", "InsDiag", "CancDiag", "Permute", "InsPerm",
-                                  "DelPerm", "InsMissing", "DelMissing")
-varnames <- paste(names(ardf), sep="", collapse= " + ")
-varcall <- paste("~ ", varnames,  sep="", collapse="")
-artab <- xtabs(as.formula(varcall), data=ardf)
+system.time(resp9 <- bayes(mydatam, myeffm, MLmodel,nwarm=10,nmain=10, nbrNodes=1, plot=TRUE))
 

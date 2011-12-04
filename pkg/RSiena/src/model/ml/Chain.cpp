@@ -1329,6 +1329,7 @@ Chain * Chain::copyChain() const
 	}
 void Chain::dumpChain() const
 {
+	Rprintf(" period %d %x\n",this->lperiod, this->lpInitialState);
 	for (unsigned i = 0; i < this->lminiSteps.size(); i++)
 	{
 		PrintValue(getMiniStepDF(*this->lminiSteps[i]));
@@ -1365,5 +1366,10 @@ void Chain::dumpChain() const
 		//PrintValue(getMiniStepDF(*iter->second));
 	}
 
+	for(int i=0; i< this->linitialStateDifferences.size(); i++)
+ 	{
+ 		PrintValue(getMiniStepDF(*(this->linitialStateDifferences[i])));
 }
+}
+
 }

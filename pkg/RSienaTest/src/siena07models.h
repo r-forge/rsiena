@@ -26,18 +26,16 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 SEXP modelPeriod(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 	SEXP FROMFINITEDIFF, SEXP MODELPTR, SEXP EFFECTSLIST,
 	SEXP THETA, SEXP RANDOMSEED2, SEXP RETURNDEPS, SEXP NEEDSEEDS,
-	SEXP USESTREAMS, SEXP GROUP, SEXP PERIOD);
+	SEXP USESTREAMS, SEXP GROUP, SEXP PERIOD, SEXP RETURNLOGLIK);
 
 /** Does some MH steps for a specified group and period.
- * Designed to be used for parallel processing, and currently the only
- * function available. Loop is always constructed in R. Probably would be
- * better to do it in C unless parallel processing.
+ *  For multiple periods, the loop is always constructed in R.
  */
 SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR,
 	SEXP MODELPTR, SEXP EFFECTSLIST,
 	SEXP THETA, SEXP GROUP, SEXP PERIOD,
 	SEXP NRUNMH, SEXP ADDCHAINTOSTORE, SEXP NEEDCHANGECONTRIBUTIONS,
-	SEXP RETURNDATAFRAME, SEXP RETURNCHAINS);
+	SEXP RETURNDATAFRAME, SEXP RETURNCHAINS, SEXP RETURNLOGLIK);
 
 /* Recalculates the probabilities for a single chain, corresponding to a
  * specific group and period. Optionally returns the scores and derivatives

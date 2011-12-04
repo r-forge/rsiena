@@ -9,7 +9,8 @@
 maxlikec(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
            data=NULL, effects=NULL, profileData=FALSE,
            prevAns=NULL, returnChains=FALSE, byGroup=FALSE,
-           returnDataFrame=FALSE, byWave=FALSE)
+           returnDataFrame=FALSE, byWave=FALSE,
+           returnLoglik=FALSE, onlyLoglik=FALSE)
 }
 \arguments{
   \item{z}{Control object, passed in automatically by
@@ -45,6 +46,10 @@ maxlikec(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
 	processes to fail.}
   \item{byWave}{Boolean: whether to return the Hessian for each wave
 	separately. Necessary for using \code{\link{sienaTimeTest}}.}
+  \item{returnLoglik}{Boolean: whether to return the likelihood for
+	the simulated chain.}
+  \item{onlyLoglik}{Boolean: whether to return just the likelihood for
+	the simulated chain, plus details of steps accepted and rejected. }
 }
 \details{
   This should be used for the element FRAN of the model object
@@ -73,9 +78,8 @@ maxlikec(z, x, INIT = FALSE, TERM = FALSE, initC=FALSE,
 	(permute steps are counted under first dependent variable)}
   \item{rejects}{Number of rejected MH steps by dependent variable
  	(permute steps are counted under first dependent variable)}
- \item{aborts}{Number of aborted MH steps by dependent variable
-	(permute steps are counted under first dependent variable)}
-}
+ \item{aborts}{Number of aborted MH steps counted under first dependent variable
+}}
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
 \seealso{\code{\link{siena07}} , \code{\link{simstats0c}}, \code{\link{bayes}}}

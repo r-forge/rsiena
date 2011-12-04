@@ -8,7 +8,8 @@ sienaGroupCreate,  sienaModelCreate, sienaNet, sienaNodeSet, xtable.sienaFit,
        installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy, sienaGOF,
        sparseMatrixExtraction, snaEdgelistExtraction, snaSociomatrixExtraction,
        igraphEdgelistExtraction, OutdegreeDistribution, IndegreeDistribution,
-       GeodesicDistribution, TriadCensus, KnnDistribution, xtable)
+       GeodesicDistribution, TriadCensus, KnnDistribution, xtable, algorithms,
+	   profileLikelihoods)
 
 import(Matrix)
 

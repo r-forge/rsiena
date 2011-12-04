@@ -9,7 +9,8 @@
 # * and for ML making the initial chain.
 # *****************************************************************************/
 ##@initializeFRAN siena07 reformat data and send to C. get targets.
-initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
+initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
+						   profileData=FALSE,
                            returnDeps)
 {
     ## fix up the interface so can call from outside robmon framework
@@ -25,7 +26,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
     {
         z$int2 <- 1
     }
-
     if (!initC) ## ie first time round
     {
         if (!inherits(data,'siena'))
@@ -424,6 +424,12 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
 					 z$parallelTesting)
 		##stop('done')
+		## create a grid of periods with group names in case want to
+		## parallelize using this or to access chains easily
+		groupPeriods <- attr(f, "groupPeriods")
+		z$callGrid <- cbind(rep(1:nGroup, groupPeriods - 1),
+							as.vector(unlist(sapply(groupPeriods - 1,
+													function(x) 1:x))))
         if (!x$maxlike)
         {
             z$targets <- rowSums(ans)
@@ -446,12 +452,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
 								 round(z$nrunMH / 100) * 100, z$nrunMH)
             ##thetaMat is to allow different thetas for each group in Bayes
             z$thetaMat <- matrix(z$theta, nrow=nGroup, ncol=z$pp, byrow=TRUE)
-            ## create a grid of periods with group names in case want to
-            ## parallelize using this
-            groupPeriods <- attr(f, "groupPeriods")
-            z$callGrid <- cbind(rep(1:nGroup, groupPeriods - 1),
-                                as.vector(unlist(sapply(groupPeriods - 1,
-                                                        function(x) 1:x))))
         }
     }
 
@@ -479,19 +479,20 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
         CONDTARGET <- NULL
     }
 
-    ans <- .Call("setupModelOptions", PACKAGE=pkgname,
-                 pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
-                 profileData, z$parallelTesting, x$modelType)
-
-    if (x$maxlike)
-    {
         simpleRates <- TRUE
         if (any(!z$effects$basicRate & z$effects$type =="rate"))
         {
-           # browser()
+		## browser()
             simpleRates <- FALSE
         }
         z$simpleRates <- simpleRates
+
+	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
+                 pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
+                 profileData, z$parallelTesting, x$modelType, z$simpleRates)
+
+    if (x$maxlike)
+    {
         if (!initC)
         {
             ## set up chains and do initial steps
@@ -523,17 +524,15 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                          x$prdrms)
             ##cat(z$probs,'\n')
             ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
-                         simpleRates, z$probs, z$prmin, z$prmib,
+                         z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
                          x$maximumPermutationLength,
                          x$initialPermutationLength)
 
             f$minimalChain <- ans[[1]]
             f$chain <- ans[[2]]
-            f$simpleRates <- simpleRates
             ##  print(nrow(ans[[1]][[1]]))
             ##  print(nrow(ans[[2]][[1]]))
-            ## browser()
         }
         else ## set up the initial chains in the sub processes
         {
@@ -542,11 +541,11 @@ initializeFRAN <- function(z, x, data, effects, prevAns, initC, profileData,
                          simpleRates, z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
                          x$maximumPermutationLength,
-                         x$initialPermutationLength, ff$chain, ff$missingChain)
+                         x$initialPermutationLength, ff$chain)
             f$chain <- ff$chain
-            f$missingChain <- ff$missingChain
        }
     }
+	f$simpleRates <- simpleRates
     f$myeffects <- myeffects
     f$myCompleteEffects <- myCompleteEffects
     if (!initC)
