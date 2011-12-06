@@ -28,7 +28,7 @@
 #include "model/StatisticCalculator.h"
 #include "data/ActorSet.h"
 #include "model/ml/MLSimulation.h"
-#include "model/variables/Dependentvariable.h"
+#include "model/variables/DependentVariable.h"
 
 using namespace std;
 using namespace siena;
