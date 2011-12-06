@@ -1,3 +1,9 @@
+2011-12-06 R-forge revision 187.
+
+	* src/siena07setup.cpp: correct change to name of included file in
+	previous version: did not compile on case-sensitive systems.
+	* doc/RSienaDeveloper.tex: fixed a latex error. (RSienaTest only)
+
 2011-12-04 R-forge revision 186.
 
 	* R/bayes.r, R/initializeFRAN.r, R/maxlikec.r, R/phase1.r,
