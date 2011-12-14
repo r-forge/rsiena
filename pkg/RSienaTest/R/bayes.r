@@ -423,7 +423,7 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
 	}
    	z$FRAN <- getFromNamespace(model$FRANname, pkgname)
     z <- initializeFRAN(z, model, data=data, effects=effects,
-                prevAns=prevAns)
+                prevAns=prevAns, initC=FALSE)
 	z$basicRate <- z$effects$basicRate
     z$nGroup <- z$f$nGroup
 	is.batch(TRUE)
@@ -465,7 +465,28 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
     {
         z$priorSigma <- priorSigma
     }
-    z$ratePositions <- lapply(z$rateParameterPosition, unlist)
+  	groupPeriods <- attr(z$f, "groupPeriods")
+    netnames <- z$f$depNames
+	z$rateParameterPosition <-
+        lapply(1:z$nGroup, function(i, periods, data)
+           {
+               lapply(1:periods[i], function(j)
+                  {
+                      rateEffects <-
+                          z$effects[z$effects$basicRate &
+                                    z$effects$period == j &
+                                    z$effects$group == i,]
+                      rateEffects <-
+                          rateEffects[match(netnames,
+                                            rateEffects$name), ]
+                      tmp <- as.numeric(row.names(rateEffects))
+                      names(tmp) <- netnames
+                      tmp
+                  }
+                      )
+           }, periods=groupPeriods - 1, data=z$f[1:z$nGroup]
+               )
+	z$ratePositions <- lapply(z$rateParameterPosition, unlist)
     for (i in 1:z$nGroup)
     {
         use <- rep(FALSE, z$pp)
