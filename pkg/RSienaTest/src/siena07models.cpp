@@ -682,9 +682,11 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 			rfra[effectNo] = score[effectNo];
 		}
 		if (deriv)
-		for (unsigned ii = 0; ii < derivs.size(); ii++)
 		{
-			rdff[ii] = derivs[ii];
+			for (unsigned ii = 0; ii < derivs.size(); ii++)
+			{
+				rdff[ii] = derivs[ii];
+			}
 		}
 		PROTECT(ans = allocVector(VECSXP, 11));
 		nProtects++;

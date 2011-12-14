@@ -422,9 +422,11 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
 		##seed <- NULL
 	}
    	z$FRAN <- getFromNamespace(model$FRANname, pkgname)
-    z <- z$FRAN(z, model, INIT=TRUE, data=data, effects=effects,
+    z <- initializeFRAN(z, model, data=data, effects=effects,
                 prevAns=prevAns)
-    is.batch(TRUE)
+	z$basicRate <- z$effects$basicRate
+    z$nGroup <- z$f$nGroup
+	is.batch(TRUE)
 
     WriteOutTheta(z)
 

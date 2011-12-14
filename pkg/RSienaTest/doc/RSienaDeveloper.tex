@@ -123,7 +123,7 @@ Note that this file changes fairly frequently.
   autofit the columns and save as .xls.
 \item NB You need RTools (see later) installed to do this on Windows.
 \end{enumerate}
-\item[Table of functions for the manual]
+\item[R: Table of functions for the manual]
 \begin{enumerate}
 \item The file \sfn{document.r} in \sfn{RSienaTest} contains a function
   \sfn{RSienaAutoHelpTable} which will generate \LaTeX source  from the .Rd
@@ -186,7 +186,7 @@ may help.
 \item If you add new text files of any type, set the svn property
   \textsf{eol-style} to have value \textsf{native}.  Again, available via
   Tortoise on Windows, via svnX on Mac.
-\item Details of how to set up a personal/provate key pair are in section
+\item Details of how to set up a personal/private key pair are in section
   \ref{key}. This removes the need to type your password multiple times.
 \end{itemize}
 \subsection{Files which always need updating}
@@ -194,8 +194,9 @@ may help.
 \begin{enumerate}
 \item Record details of the files you have changed in the Changelog for
   RSienaTest. If you have \emph{only} changed documentation files in
-  \textsf{RSienaTest/doc} directory, you may ignore what follows.
-\item Record details of the files you have changed in the Changelog for Riena.
+  \textsf{RSienaTest/doc} directory, you may ignore the remainder of this
+  section.
+\item Record details of the files you have changed in the Changelog for RSiena.
   The two changelogs are kept identical, apart from changes which only affect
   the documentation source, otherwise it gets very confusing.
 \item Update the version number and date in the \textsf{DESCRIPTION} file for
@@ -586,7 +587,9 @@ siena07(...)
 Rprof(NULL)
 summaryRprof()
 \end{verbatim}
-For the C part it is a lot harder. An outline of the use of \verb|gprof|:
+For the C part it is a lot harder. We have an out-of-date system for running
+\sfn{gprof} which could be upuadated if desired.  An outline of the use of
+is given here:
 \begin{enumerate}
 \item Our set-up works for networks, behavior variables and the various
   covariates. 1 group only.
@@ -625,24 +628,38 @@ A few notes about each:
 \begin{description}
 \item[oprofile]
 \begin{enumerate}
-\item When I last tried, you needed root privileges to start or stop the daemon,
-  and to reset it.
+\item You need root privileges to start or stop the daemon,
+  and to reset it. I suggest using it on an Ubuntu installation of your own to
+  avoid permission problems. There are instruction on CRAN about how to install
+  R on Ubuntu. Thre is a Windows Installer to create Ubuntu alongside a Windows
+  installation which is easy to use. Alternatively, install Ubuntu from the
+  download, but take care to defragment and check your disk first as it will be
+  repartitioned and this can cause problems if highly fragmented.
 \item It is a resource hog.
-\item The callgraph option only used to work on 32 bit machines.
-\item Failed to work on Fedora 10 as installed in the statistics department, but
-  possibly this has been updated.
+\item The callgraph option only used to work on 32 bit machines but seems to
+  work ok on 64 bit now.
 \item \verb|opcontrol --start| to start it
-\item \verb|opcontrol --callgraph=n| to get a callgraph.
+\item \verb|opcontrol --callgraph=5| to get a callgraph.
 \item \verb|opcontrol --reset| to start the collection again
+\item May need to change buffer sizes: eg
+\verb|opcontrol --buffer-size=10000000|
+\verb|opcontrol --buffer-watershed=2500000|
+\verb|opcontrol --cpu-buffer-size=1000000|
 \item Then run the R command
-\item \verb|opcontrol --dump| create a file you can get reports from
+\item \verb|opcontrol --dump| to create a file you can get reports from.
+Follow by \verb|opcontrol --shutdown| to avoid errors due to files not being in
+the expected place.
 \item \verb|opreport -l siena.so| to get a report. (Maybe Rsiena.so now)
 \item \verb|opannotate -d src srcdir| to get annotated output
+\item \verb|ogprof path/to/RSiena.so| to create output like \sfn{gprof}.
+Follow by
+\verb|gprof path/to/RSiena.so > my.out| to store the report in \sfn{my.out}.
 \item \verb|opcontrol --shutdown| to stop daemon
+\item Read the help: all this will probably change!
 \end{enumerate}
 \item[shark]
 \begin{enumerate}
-\item Make sure shark is installed
+\item Make sure shark is installed. Not available in Xcode 4 (lion)
 \item Start it
 \item Run your R command
 \item Attach shark to this command.
@@ -658,12 +675,13 @@ A few notes about each:
 \item Start Instruments and select TimeProfiler
 \item Use ChooseTarget to attach to the R process
 \item Click Record and later Stop
-\item You should be able to get a callgraph.
+\item You can get some sort of callgraph, but not the total time spent in a
+  procedure.
 \end{enumerate}
 \end{description}
 
 In any of these cases, you may find results vary due to garbage
-collection in R. Also changes which spped up the Mac may not speed up Windows,
+collection in R. Also changes which speed up the Mac may not speed up Windows,
 particularly changing memory allocation.
 \section{Debugging}
 
@@ -703,7 +721,11 @@ an embarrassingly large memory usage, which will fail sooner or later.
 If \sfn{valgrind} reports use of uninitialised variables, use the option
 \sfn{--track-origins=yes} to find out where the problem started. It can be
 surprisingly difficult to track these down! But it usually reports some from R,
-which you can ignore.
+and the C++ library which you can ignore.
+
+I have failed to get valgrind to work on a Mac, although others report no
+problems. It is worth a try: get the source from the svn, and follow their
+install instructions. It may help to build your own R.
 \section{The R C++ interface}
 This is not easy to understand from the documentation (Writing R Extensions
 manual), but there should be examples of most functions in the code
@@ -712,13 +734,16 @@ already. Some notes:
 \item[random numbers]
 We use the R random number functions such as \sfn{rexp}. These work slightly
 differently from the R versions, you need to check the syntax of the call in
-the manual if adding new ones. The header required is \sfn{Rmath.h}.
+the manual if adding new ones. The header required is \sfn{Rmath.h}. We use
+\sfn{unif\_rand} rather than \sfn{runif} probably to enable profiling to
+work where we had to run outside R.
+
 \item[Random number seeds] The functions\sfn{GetRNGstate} and
 \sfn{PutRNGstate}  are used to get the R random number seed into the C++
 process and then replace it in the R. The header for these is
 \sfn{R\_ext/Random.h}.
 \item[rlecuyer]
-With multiple processes we use the random numbers from the \sfn{rlecuyer}
+With multiple processes we used to use the random numbers from the \sfn{rlecuyer}
 package. The seed is set in eg \sfn{robmon} (in the R code). There is code in
 \sfn{siena07.cpp} which shows how to set and reset these if you must. The
 different streams are intended to be kept apart, so for finite differencing
@@ -729,8 +754,7 @@ state so it does not matter if the streams get muddled up during the finite
 differencing stage. As from R version 2.14.0 this package can be removed as
 there will be a new type of random number within R itself, to be used with the
 new \sfn{parallel} package. For the time being the original code can be run if
-desired by replacing the 3 checks for R.version less than 14.0 by TRUE, but I
-intend to remove \sfn{rlecuyer} altogether in due course.
+desired by replacing the 3 checks for R.version less than 14.0 by TRUE.
 \item[errors]
 Error messages can use the function \sfn{error} which is similar to
 \sfn{Rprintf} in syntax, and needs the header file \sfn{R\_ext/error.h}.
@@ -754,71 +778,25 @@ A few notes of problems we have had:
     \sfn{<cmath>}. Compilation may fail with message about ambiguity.
 \end{itemize}
 \section{Algorithms}
-This section outlines the different options available to the (expert!) user.
-\subsection{Within siena07}
-\begin{itemize}
-\item I have created a copy of \sfn{DoIterations}, called
-  \sfn{DoIterationsCopy}. Moving a `\#' from one call to the other in
-  \sfn{proc2subphase} will switch usage. Make your changes to the copy version,
-  so you can reinstate the working version by reverting the comment placing.
-\item Most of the possible changes are in \sfn{DoIterations}, but I have added
-  the facility to use regression rather than a simple average at the end of the
-  subphases. This is controlled by a parameter \sfn{useAerage} in
-  \sfn{proc2Subphase}, set to \sfn{TRUE} by default. Change it by editing the
-  file! You also need to use \sfn{doIterationsCopy} to force the retention of
-  all the parameter values and deviations.
-\item Within \sfn{doIterationsCopy}, the update step has been removed to a
-  function, \sfn{doChangeStep}, and a loop to do importance sampling steps
-  inserted. The step continue until the variance of the weights is greater than
-  one tenth the value with all mass concentrated at one point., or to 25
-  (hard-coded!). A parameter \sfn{numberIterations} controls the number of
-  samples used. Default to 10, change it by editing!
-\item Flags are available in \sfn{doIterationsCopy} to store the chains and
-  change contributions in C. Predicted statistics or scores are obtained from
-  the function \sfn{predictOutcomes}, which uses the robust method of
-  recalculation of likelihood in C.
-\item If you have sourced the file \sfn{algorithms.r}, then other options for
-  this calculation could be tried using the functions in that file.
-\item There is also a preexisting system for maximum likelihood which just
-  recalculates the scores and does another iteration. Based on
-  \sfn{doMoreUpdates}.
-\item \sfn{doIterationsCopy} will not function with conditional estimation,
-and will not do anything sensible with missing data (yet!). So avoid missing
-data.
-\item You need to set \sfn{returnDeps=TRUE} on the call to \sfn{siena07}.
-\item You might want to alter the number of iterations per subphase. This is set
-  in the function \sfn{AnnouncePhase} (code in \sfn{siena07.r}).
-\item More than two waves, or multigroups, would be very experimental!
-\item Beware that the two functions may drift apart over time!
-\end{itemize}
-\subsection{Standalone}
-Use the file \sfn{algorithms.r}. This is in the \sfn{inst/examples} directory in
-the source to keep it out of the way of build procedures. (In the examples
-directory in the installed package.) Source it to use it. There is no need to
-rebuild the package after changing this file. (If it needs functions from the
-package it accesses them using \sfn{RSiena:::}.
+This section outlines some different options available to the (expert!) user via
+the functions \sfn{algorithms} (exported, with a help page) and
+\sfn{profileLikelihoods} (not exported, no help page) The functions are in the
+  package \sfn{RSienaTest}.
 
-The basic outline is described here. The parameters are passed to the initialize
-routine and then stored on \sfn{z}. I think their use will be fairly clear if
-you read what follows (and the code!)
+  The basic outline is described here. The parameters are passed to the
+  initialize routine and then stored on \sfn{z}. I think their use will be
+  fairly clear if you read what follows (and the code!)
 
 No promises about robustness, and the routine is designed to be hacked rather
-than run unchanged. But examples of use are in file \sfn{runalg.r}.
-
-Bayesian routine is not documented here, as it is part of the package and has
-a help page.
+than run unchanged. But examples of use are in file \sfn{inst/examples/runalg.r}.
 
 The graphs are semi-automatic, driven by a dataframe with a column for each
 panel. Consult the code to see how it works: construct a formula from the column
 names. It is a nice trick. There is no parameter to turn them off: comment them
 out.
 
-This has been tested with more than two waves and a main path will work (use the
-option to recalculate the change contributions within C) .  Multiple groups I am
-less sure about, although it would not need major work.
-
 \sfn{}
-
+\subsection{Outline processing}
 \begin{algorithmic}
 \STATE Call AlgorithmsInitialize \ref{sec:init}
 \REPEAT
@@ -887,9 +865,8 @@ sampling steps and still low variance or final loop}
 \subsubsection{Get next set of samples}
 \label{sec:samples}
 \begin{algorithmic}
-\STATE get the samples
-\STATE calculate derivative matrix
-\STATE calculate likelihoods
+\STATE get the samples with their likelihoods
+\STATE calculate derivative matrix if required
 \end{algorithmic}
 \subsubsection{Optim change step}
 \label{sec:optim}
@@ -921,7 +898,7 @@ I coded it wrong. It uses raw orthogonal polynomials.
 \subsubsection{Non optim change step}
 \label{sec:algchange}
 \begin{algorithmic}
-\STATE Uses the phase 2 update step from siena07, with diagonal or full
+\STATE Uses a copy of the phase 2 update step from siena07, with diagonal or full
 derivative matrix as requested.
 \end{algorithmic}
 \subsubsection{Predictions}
@@ -938,24 +915,10 @@ derivative matrix as requested.
 \ENDIF
 \end{algorithmic}
 \subsubsection{Calculating likelihoods and probabilities}
-Various functions provided: the differences are the use of C or not and stored
-change contributions or not, and which format is most convenient for the final
-calculations.
-\begin{description}
-\item[useC] Uses getProbabilitiesFromCSTore to get hold of the log choices for
-  each ministep using change contributions stored in C, and then uses
-  getLikelihood3 to do the calculations. Memory intensive but fast. May not be
-  robust. Rate values are not stored and rate part of calculation is done in
-  R. Only currently works for forward simulation, where it is least useful!
-\item[NOT useC AND useSLowC] Uses getProbabilities to pass chain back into C and
-  recalculate the chnage contributions to update the ministeps. Fairly quick,
-  low memory demand, robust as reuses code that must be maintained. Recommended.
-\item[NOT useC and NOT useSlowC] Uses getProbabilitiesR to calculate the choice
-  probs using change contributions matrices stored in R. Not recommended unless
-  you prefer changing R to C. Slow, memory intensive, and clumsy. Then uses
-getLikelihood2 to combine the values.  Only currently works for forward
-simulation.
-\end{description}
+For speed and maintainability, this is done in C. There is an option to return
+likelihoods for each iteration, and another to pass new parameters in to obtain
+an updated likelihood (and optionally scores) for a specified (by group, period
+and index) chain.
 \subsubsection{Set up final iteration}
 \label{sec:final}
 \begin{algorithmic}

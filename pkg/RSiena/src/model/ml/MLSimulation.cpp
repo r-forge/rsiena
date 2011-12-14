@@ -356,7 +356,7 @@ void MLSimulation::MLStep()
 	{
 		this->laborted[stepType]++;
 	}
-//	Rprintf("%d % %f\n",stepType, accept, this->lproposalProbability);
+//	Rprintf("%d %d %f\n",stepType, accept, this->lproposalProbability);
 }
 
 /**
@@ -1608,7 +1608,7 @@ bool MLSimulation::deletePermute(int c0)
 			kappaFactor *
 				exp(sumlprob_new - sumlprob) *
 			this->pModel()->insertPermuteProbability() *
-				exp(lpr0) /
+			 exp(lpr0) /
 			(this->pModel()->deletePermuteProbability() *
 				pr1 * pr2 *
 // 				(this->pChain()->ministepCount() + 1) *

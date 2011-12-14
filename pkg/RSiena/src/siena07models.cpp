@@ -682,26 +682,28 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 			rfra[effectNo] = score[effectNo];
 		}
 		if (deriv)
-		for (unsigned ii = 0; ii < derivs.size(); ii++)
 		{
-			rdff[ii] = derivs[ii];
+			for (unsigned ii = 0; ii < derivs.size(); ii++)
+			{
+				rdff[ii] = derivs[ii];
+			}
 		}
 		PROTECT(ans = allocVector(VECSXP, 11));
 		nProtects++;
 
-	/* set up the return object */
-	if (deriv)
-	{
-		SET_VECTOR_ELT(ans, 6, dff);
-	}
-	if (returnChains)
-	{
-		SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 !!!!test this*/
-	}
-	SET_VECTOR_ELT(ans, 0, fra);
-	SET_VECTOR_ELT(ans, 7, accepts);
-	SET_VECTOR_ELT(ans, 8, rejects);
-	SET_VECTOR_ELT(ans, 9, aborts);
+		/* set up the return object */
+		if (deriv)
+		{
+			SET_VECTOR_ELT(ans, 6, dff);
+		}
+		if (returnChains)
+		{
+			SET_VECTOR_ELT(ans, 5, sims);/* not done in phase 2 !!!!test this*/
+		}
+		SET_VECTOR_ELT(ans, 0, fra);
+		SET_VECTOR_ELT(ans, 7, accepts);
+		SET_VECTOR_ELT(ans, 8, rejects);
+		SET_VECTOR_ELT(ans, 9, aborts);
 		SET_VECTOR_ELT(ans, 10, ScalarReal(loglik));
 
 //	PrintValue(getChainDF(*pChain, true));

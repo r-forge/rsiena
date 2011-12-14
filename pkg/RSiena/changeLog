@@ -1,3 +1,11 @@
+2011-12-10 R-forgre revision 188.
+
+	* added directory po with .pot files for translators.
+	* R/algorithms.r, R/phase2.r: rationalised algorithm code and
+	added function comment headers
+	* doc/RSienaDeveloper.tex: updated to reflect changes in
+	algorithms and other minor details.
+
 2011-12-06 R-forge revision 187.
 
 	* src/siena07setup.cpp: correct change to name of included file in

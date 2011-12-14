@@ -7,51 +7,17 @@
 # *
 # * Description: This module contains the code for simulating the process,
 # * communicating with C++. For use with maximum likelihood method, so
-# * never conditional or from finite differences, or parallel testing!
+# * never conditional or from finite differences, or parallel testing.
 # *****************************************************************************/
 ##@maxlikec siena07 ML Simulation Module
-maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
-                     effects=NULL, profileData=FALSE, prevAns=NULL,
-                     returnChains=FALSE, byGroup=FALSE, returnDataFrame=FALSE,
-					 byWave=FALSE, returnLoglik=FALSE, onlyLoglik=FALSE)
+maxlikec <- function(z, x, data=NULL, effects=NULL,
+                     returnChains=FALSE, byGroup=FALSE, byWave=FALSE,
+					 returnDataFrame=FALSE,
+					 returnLoglik=FALSE, onlyLoglik=FALSE)
 {
-    if (INIT || initC)  ## initC is to initialise multiple C processes in
-    {
-        z <- initializeFRAN(z, x, data, effects, prevAns, initC,
-                            profileData=profileData, returnDeps=FALSE)
-        z$returnDataFrame <- returnDataFrame
-        z$returnChains <- returnChains
-		z$byWave <- byWave
-        if (initC)
-        {
-            return(NULL)
-        }
-        else
-        {
-            return(z)
-        }
-    }
-    if (TERM)
-    {
-        z <- terminateFRAN(z, x)
-        return(z)
-    }
-    ######################################################################
-    ## iteration entry point
-    ######################################################################
     ## retrieve stored information
     f <- FRANstore()
-    ##if (z$Phase == 2)
-    ##{
-    ##    returnDeps <- FALSE
-    ##}
-    ##else
-    ##{
-    ##    returnDeps <- z$returnDeps
-    ##}
     callGrid <- z$callGrid
-    ## z$int2 is the number of processors if iterating by period, so 1 means
-    ## we are not. Can only parallelize by period at the moment.
     if (nrow(callGrid) == 1)
     {
 		if (byGroup)
@@ -69,17 +35,17 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
                      z$returnChains, returnLoglik, onlyLoglik)
 		if (!onlyLoglik)
 		{
-        ans[[6]] <- list(ans[[6]])
-        ans[[7]] <- list(ans[[7]])
-        if (byGroup)
-        {
-			ans[[8]] <- list(ans[[8]])
-			ans[[9]] <- list(ans[[9]])
-			ans[[10]] <- list(ans[[10]])
-        }
-	}
-    else
-    {
+			ans[[6]] <- list(ans[[6]])
+			ans[[7]] <- list(ans[[7]])
+			if (byGroup)
+			{
+				ans[[8]] <- list(ans[[8]])
+				ans[[9]] <- list(ans[[9]])
+				ans[[10]] <- list(ans[[10]])
+			}
+		}
+		else
+		{
 			ans[[2]] <- list(ans[[2]])
 			ans[[3]] <- list(ans[[3]])
 			ans[[4]] <- list(ans[[4]])
@@ -88,6 +54,8 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
 	}
     else
     {
+		## z$int2 is the number of processors if iterating by period, so 1 means
+		## we are not. Can only parallelize by period withmaxlike.
         if (z$int2 == 1)
         {
             anss <- apply(cbind(callGrid, 1:nrow(callGrid)),
@@ -111,27 +79,27 @@ maxlikec <- function(z, x, INIT=FALSE, TERM=FALSE, initC=FALSE, data=NULL,
         ans <- list()
  		if (!onlyLoglik)
 		{
-        ans[[1]] <- sapply(anss, "[[", 1) ## statistics
-        ans[[2]] <- NULL ## scores
-        ans[[3]] <- NULL ## seeds
-        ans[[4]] <- NULL ## ntim
-        ans[[5]] <- NULL # randomseed
-        if (z$returnChains)
-        {
-            fff <- lapply(anss, function(x) x[[6]][[1]])
-            fff <- split(fff, callGrid[, 1 ]) ## split by group
-            ans[[6]] <- fff
-        }
-        ans[[7]] <- lapply(anss, "[[", 7) ## derivative
-        ans[[8]] <- lapply(anss, "[[", 8)
-        ans[[9]] <- lapply(anss, "[[", 9)
-        ans[[10]] <- lapply(anss, "[[", 10)
-		if (!byGroup)
-		{
-			ans[[8]] <- Reduce("+",  ans[[8]]) ## accepts
-            ans[[9]] <- Reduce("+",  ans[[9]]) ## rejects
-            ans[[10]] <- Reduce("+",  ans[[10]]) ## aborts
-        }
+			ans[[1]] <- sapply(anss, "[[", 1) ## statistics
+			ans[[2]] <- NULL ## scores
+			ans[[3]] <- NULL ## seeds
+			ans[[4]] <- NULL ## ntim
+			ans[[5]] <- NULL # randomseed
+			if (z$returnChains)
+			{
+				fff <- lapply(anss, function(x) x[[6]][[1]])
+				fff <- split(fff, callGrid[, 1 ]) ## split by group
+				ans[[6]] <- fff
+			}
+			ans[[7]] <- lapply(anss, "[[", 7) ## derivative
+			ans[[8]] <- lapply(anss, "[[", 8)
+			ans[[9]] <- lapply(anss, "[[", 9)
+			ans[[10]] <- lapply(anss, "[[", 10)
+			if (!byGroup)
+			{
+				ans[[8]] <- Reduce("+",  ans[[8]]) ## accepts
+				ans[[9]] <- Reduce("+",  ans[[9]]) ## rejects
+				ans[[10]] <- Reduce("+",  ans[[10]]) ## aborts
+			}
 			ans[[11]] <- sapply(anss, "[[", 11)
 		}
 		else ##onlyLoglik is always byGroup (bayes)

@@ -85,7 +85,7 @@ MLmodel, mydata, myeff,
 
 ##bayes
 print("resp9")
-system.time(resp9 <- bayes(mydata, myeff, MLmodel, nwarm=1,nmain=1, nbrNodes=2))
+system.time(resp9 <- bayes(mydata, myeff, MLmodel, nwarm=100,nmain=100, nbrNodes=2))
 
 
 system.time(resp1 <- algorithms(mydatam, myeffm, MOMmodel, nIter=20, numiter=20,

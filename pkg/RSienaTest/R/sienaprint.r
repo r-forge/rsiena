@@ -288,25 +288,32 @@ print.sienaModel <- function(x, ...)
         '\n')
     cat(' Number of subphases in phase 2:', x$nsub, '\n')
     cat(' Number of iterations in phase 3:', x$n3, '\n')
-    if (is.na(x$cconditional) || !x$cconditional)
-    {
-        cat(" Unconditional simulation\n")
-    }
-    else
-    {
-        cat(" Conditional simulation:")
-        if (x$condname != '')
+	if (x$maxlike)
+	{
+		cat(" Fitting by maximum likelihood\n")
+	}
+	else
+	{
+		if (is.na(x$cconditional) || !x$cconditional)
 		{
-            cat('conditioned on', x$condname, '\n')
+			cat(" Unconditional simulation\n")
 		}
-        else
+		else
 		{
-            if (x$condvarno > 0)
+			cat(" Conditional simulation:")
+			if (x$condname != '')
 			{
-                cat('conditioned on First variable')
+				cat('conditioned on', x$condname, '\n')
+			}
+			else
+			{
+				if (x$condvarno > 0)
+				{
+					cat('conditioned on variable number', x$condvarno, '\n')
+				}
 			}
 		}
-    }
+	}
     cat(" Model Type:", ModelTypeStrings[x$modelType], "\n")
     invisible(x)
 
