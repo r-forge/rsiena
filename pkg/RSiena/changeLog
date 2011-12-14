@@ -1,10 +1,30 @@
-2011-12-10 R-forgre revision 188.
+2011-12-14 R-forge revision 190.
 
-	* added directory po with .pot files for translators.
-	* R/algorithms.r, R/phase2.r: rationalised algorithm code and
-	added function comment headers
+	* R/bayes.r: fix bugs from previous changes
+
+2011-12-14 R-forge revision 189.
+
+	* po/R-RSiena.pot, po/RSienaTest.pot added files for translators.
 	* doc/RSienaDeveloper.tex: updated to reflect changes in
 	algorithms and other minor details.
+	* data/allEffects.csv: fixed typo in shortName for symmetric
+	networks
+	* man/sienaModelCreate.Rd: updated details
+	* R/initializeFRAN.r, R/simstatsc.r, R/maxlikec.r, R/bayes.r,
+	R/phase1.r, R/phase2.r, R/robmon.r,
+	R/algorithms.r (RSienaTest only): rationalized and tidied code.
+	* man/maxlikec.Rd: removed file, details now in man/simstatsc.Rd.
+	* max/simstatsc.Rd: expanded to include maxlikec, initializeFRAN
+	and terminateFRAN.
+	* R/print01Report.r, R/printDataReport.r, R/sienaPrint.r, : minor
+	changes to reports.
+	* R/sienaeffects.r: fixed bug in error messages
+	* src/model/ml/MLSimulation.cpp, src/model/Model.cpp,
+	src/siena07Models.cpp: formatting source only.
+
+2011-12-07 R-forge revision 188.
+
+	* added directories po ready for translation files.
 
 2011-12-06 R-forge revision 187.
 
@@ -22,7 +42,8 @@
 	src/model/Model.cpp, src/model/Model.h, src/model/State.cpp,
 	src/ml/MLSimulation.cpp, src/model/ml/MLSimulation.h: added
 	facility to return log likelihood after simulation, stopped
-	returning of chains every iteration. Bug fixes for ML.
+	returning of chains every iteration. Bug fixes for ML. Added
+	R/algorithms.r to RSienaTest (previously in examples directory).
 
 2011-11-27 R-forge revision 185.
 

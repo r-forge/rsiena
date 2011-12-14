@@ -1,3 +1,7 @@
+2011-12-14 R-forge revision 190.
+
+	* R/bayes.r: fix bugs from previous changes
+
 2011-12-14 R-forge revision 189.
 
 	* po/R-RSiena.pot, po/RSienaTest.pot added files for translators.
@@ -38,7 +42,8 @@
 	src/model/Model.cpp, src/model/Model.h, src/model/State.cpp,
 	src/ml/MLSimulation.cpp, src/model/ml/MLSimulation.h: added
 	facility to return log likelihood after simulation, stopped
-	returning of chains every iteration. Bug fixes for ML.
+	returning of chains every iteration. Bug fixes for ML. Added
+	R/algorithms.r to RSienaTest (previously in examples directory).
 
 2011-11-27 R-forge revision 185.
 
