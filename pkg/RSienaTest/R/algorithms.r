@@ -197,7 +197,7 @@ algorithms <- function(data, effects, x, ...)
             if (z$iter == z$numiter || finalLoop)
                 ## (iiter > z$maxiiter && varPs < z$maxVar / 2) || finalLoop )
             {
-                iter <- 0
+                ##iter <- 0
                 break
             }
         }  # end of inner repeat
@@ -230,7 +230,7 @@ algorithms <- function(data, effects, x, ...)
                      outer=TRUE,  scales="free", type="l"))
     }
 
-    z <- z$FRAN(z, x, TERM=TRUE)
+    z <- terminateFRAN(z, x)
     if (z$nbrNodes > 1)
     {
         stopCluster(z$cl)
@@ -247,9 +247,7 @@ algorithms <- function(data, effects, x, ...)
     z
 }
 
-
-
-
+##@doOptimStep algorithms Do one call to optim
 doOptimStep <- function(z, x)
 {
     theta <- z$theta
@@ -280,6 +278,7 @@ doOptimStep <- function(z, x)
     z
 }
 
+##@derivFn algorithms Gradient function for optim for sum(weighted(log ratios))
 derivFn <- function(theta, z)
 {
 	theta[z$posj] <- exp(theta[z$posj])
@@ -322,6 +321,8 @@ derivFn <- function(theta, z)
     }
     -sc
 }
+
+##@derivFn2 algorithms Gradient function for optim for sum(weighted(log ratios))
 derivFn2 <- function(theta, z)
 {
     opt <- optimFn2(theta,z)
@@ -337,6 +338,7 @@ derivFn2 <- function(theta, z)
     }
     - 1/exp(opt) /z$nIter* colSums(sc*ps)
 }
+##@optimFn algorithms Function for optim for sum(weighted(log ratios))
 optimFn <- function(theta, z)
 {
     theta[z$posj] <- exp(theta[z$posj])
@@ -376,6 +378,7 @@ optimFn <- function(theta, z)
     }
     - loglik
 }
+##@optimFn2 algorithms Function for optim for log(mean(likelihood ratios))
 optimFn2 <- function(theta, z)
 {
     theta[z$posj] <- exp(theta[z$posj])
@@ -383,7 +386,8 @@ optimFn2 <- function(theta, z)
     ps <- exp(loglik - z$lik0)
     -  log(mean(ps))
 }
-##@doGetProbabilitiesFromC Maximum likelihood
+
+##@doGetProbabilitiesFromC algorithms Get likelihood for a stored chain
 forwardGetProbabilitiesFromC <- function(index, z, getScores=FALSE)
 {
     f <- FRANstore()
@@ -399,6 +403,8 @@ forwardGetProbabilitiesFromC <- function(index, z, getScores=FALSE)
 
 	ans
 }
+
+##@getLikelihoods algorithms Get likelihoods from C for stored chainss
 getLikelihoods <- function(theta, z, getScores=FALSE, iterSequence)
 {
 	z$thetaMat <- matrix(theta, nrow=1)
@@ -432,11 +438,12 @@ getLikelihoods <- function(theta, z, getScores=FALSE, iterSequence)
 	list(lik=lik, sc=sc, deriv=deriv)
 
 }
+
+##@getPredictions algorithms Get predicted likelihood from stored simulations
 getPredictions <- function(theta, z, predictions=TRUE)
 {
 	ps <- getLikelihoods(theta, z)$lik
     ps <- exp(ps - z$lik0)
-    rawps <- ps
     ps <- ps / sum(ps)
     if (z$verbose && any(!is.na(ps)))
 	{
@@ -464,6 +471,7 @@ getPredictions <- function(theta, z, predictions=TRUE)
     }
 }
 
+##@algorithmsInitialize algorithms Initialize algorithm setup
 algorithmsInitialize <-
     function(data, effects, x, scale=0.2, nIter=10,
              verbose=TRUE, numiter=10, maxiiter=10, useOptim=FALSE, diag=TRUE,
@@ -498,9 +506,6 @@ algorithmsInitialize <-
     z$thetasub <- 0
     z$variedThetas <- variedThetas
     z$nbrNodes <- nbrNodes
-    z$returnDataFrame <- returnDataFrame
-	z$returnChains <- FALSE
-	z$byWave <- FALSE
     if (!is.null(x$randomSeed))
     {
         set.seed(x$randomSeed, kind="default")
@@ -593,6 +598,8 @@ algorithmsInitialize <-
     z$formula <- paste(z$formula, "~ 1:")
     z
 }
+
+##@doCreateChains algorithms Create storage for forward simulation chains
 doCreateChains <- function()
 {
 	f <- FRANstore()
@@ -602,6 +609,7 @@ doCreateChains <- function()
 	FRANstore(f)
 }
 
+##@getSamples algorithms Get a set of samples from FRAN
 getSamples <- function(z, x, nIter, thetas=NULL)
 {
     ## get a set of z$nIter samples
@@ -759,33 +767,8 @@ getSamples <- function(z, x, nIter, thetas=NULL)
             z$dinv <- NULL
         }
     }
-    else
-    {
-		##      z$dfra <- NULL
-		##      z$dinv <- NULL
-    }
-    ## flatten list of chains and add group and period as attributes
-    ##z$zzz <- flattenChains(z$zzz)
     z
 }
-
-#flattenChains <- function(zz)
-#{
-#    for (i in 1:length(zz)) ## iter
-#    {
-#        for (j in 1:length(zz[[i]])) ##group
-#        {
-#           for (k in 1:length(zz[[i]][[j]])) ## period
-##          {
-##              attr(zz[[i]][[j]][[k]], "group") <- j
-#               attr(zz[[i]][[j]][[k]], "period") <- k
-#           }
-#       }
-#   }
-#   zz <- do.call(c, zz)
-#   zz <- do.call(c, zz)
-#   zz
-#}
 
 ##@myfran models wrapper so profiler will include this separately
 myfran <- function(z, x, ...)
@@ -793,6 +776,7 @@ myfran <- function(z, x, ...)
     z$FRAN(z, x, ...)
 }
 
+##@doAlgorithmChangeStep algorithms Change step for algorithms
 doAlgorithmChangeStep <- function(z, x, fra)
 {
     z$oldTheta <- z$theta
@@ -802,6 +786,7 @@ doAlgorithmChangeStep <- function(z, x, fra)
 }
 
 
+##@responseSurfaceChangeStep algorithms Change step for linear surface
 responseSurfaceChangeStep <- function(z, eps=0.1)
 {
     npar <- length(z$theta)
@@ -849,6 +834,8 @@ responseSurfaceChangeStep <- function(z, eps=0.1)
     z$theta <- z$theta -  move * (z$theta - newvals)
     z
 }
+
+##@responseSurfaceQuadChangeStep algorithms Change step for quadratic surface
 responseSurfaceQuadChangeStep <- function(z, eps=0.1)
 {
     npar <- length(z$theta)
@@ -937,6 +924,7 @@ responseSurfaceQuadChangeStep <- function(z, eps=0.1)
     z
 }
 
+##@profileLikelihoods algorithm Calculate profile likelihood
 profileLikelihoods <- function(resp, x, data, effects,
                                i, j=NULL, gridl=c(0.8, 1.2), seqlen=5,
                                maxit=2, method="BFGS", trace=0,
@@ -999,52 +987,70 @@ profileLikelihoods <- function(resp, x, data, effects,
         contour(grid1, grid2, zmat)
         points(grid1, grid2)
     }
-    if (init)
-    {
-        z <- z$FRAN(z, x, TERM=TRUE)
-        if (z$nbrNodes > 1)
-        {
-            stopCluster(z$cl)
-        }
-    }
+	z <- terminateFRAN(z, x)
+	if (z$nbrNodes > 1)
+	{
+		stopCluster(z$cl)
+	}
     z$zz <- zz
 	z
 }
 
+##@profOptimFn algorithms Function for optimizing profile likelihoods
 profOptimFn <- function(theta, z, fix, thetaFix)
 {
     theta[fix] <- thetaFix[fix]
     optimFn(theta, z)
 }
 
+##@profDerivFn algorithms Gradient function for optimizing profile likelihoods
 profDerivFn <- function(theta, z, fix, thetaFix)
 {
     theta[fix] <- thetaFix[fix]
     derivFn(theta, z)
 }
-## for use to check things
-mylog <- function(chain, nactors=50, lambda=4.696, simple=TRUE)
-{
-    loglik <- 0
-	nc <-length(chain)
-    logChoiceProb <- sapply(chain, function(x)x[[9]])
-    logOptionSetProb <- sapply(chain, function(x)x[[8]])
-    loglik <- sum(logChoiceProb)  #+ sum(logOptionSetProb)
-    print(sum(logOptionSetProb))
-	if (simple)
-	{
-		loglik <- loglik - sum(nactors * lambda) + sum(nc * log(lambda))#-
-			#sum(lfactorial(nc))
-	}
-	else
-	{
-		loglik <- loglik + sum(logOptionSetProb)
 
-		mu <- attr(chain, "mu")
-		sigma <- sqrt(attr(chain, "sigma2"))
-		finalReciprocalRate <- attr(chain, "finalReciprocalRate")
-		loglik <- loglik + dnorm(1, mu, sigma, log=TRUE) +
-			log(finalReciprocalRate)
-	}
-	loglik
+##@clearStoredChains algorithms Clears storage used for chains in C.
+clearStoredChains <- function()
+{
+    f <- FRANstore()
+    .Call("clearStoredChains", PACKAGE=pkgname, f$pModel)
 }
+
+##@doChangeStep algorithms change step for use in algorithms NB may be out of sync with phase 2
+doChangeStep <- function(z, x, fra)
+{
+    ## limit change.  Reporting is delayed to end of phase.
+    if (x$diag)## !maxlike at present
+    {
+        maxrat<- max(ifelse(z$sd, abs(fra)/ z$sd, 1.0))
+        if (maxrat > x$maxmaxrat)
+        {
+            maxrat <- x$maxmaxrat / maxrat
+            z$truncated[z$nit] <- TRUE
+        }
+        else
+            maxrat <- 1.0
+        fchange<- z$gain * fra * maxrat / diag(z$dfra)
+    }
+    else
+    {
+        fchange <- as.vector(z$gain * fra %*% z$dinv)
+    }
+    fchange[z$fixed] <- 0.0
+    ## check positivity restriction
+    if (!is.null(z$nit))
+    {
+        z$positivized[z$nit, ] <- z$posj & (fchange > z$theta)
+    }
+    fchange <- ifelse(z$posj & (fchange > z$theta), z$theta * 0.5, fchange)
+
+    z$theta <- z$theta - fchange
+    if (!is.null(z$thav))
+    {
+      z$thav <- z$thav + z$theta
+    z$thavn <- z$thavn + 1
+    }
+    z
+}
+

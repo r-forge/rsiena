@@ -10,10 +10,13 @@
 # *****************************************************************************/
 ##@initializeFRAN siena07 reformat data and send to C. get targets.
 initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
-						   profileData=FALSE,
-                           returnDeps)
+						   profileData=FALSE, returnDeps=FALSE,
+						   returnChains=FALSE, byGroup=FALSE,
+						   returnDataFrame=FALSE, byWave=FALSE,
+						   returnLoglik=FALSE, onlyLoglik=FALSE)
 {
-    ## fix up the interface so can call from outside robmon framework
+	z$effectsName <- deparse(substitute(effects))
+	## fix up the interface so can call from outside robmon framework
     if (is.null(z$FinDiff.method))
     {
         z$FinDiff.method <- FALSE
@@ -479,13 +482,13 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         CONDTARGET <- NULL
     }
 
-        simpleRates <- TRUE
-        if (any(!z$effects$basicRate & z$effects$type =="rate"))
-        {
+	simpleRates <- TRUE
+	if (any(!z$effects$basicRate & z$effects$type =="rate"))
+	{
 		## browser()
-            simpleRates <- FALSE
-        }
-        z$simpleRates <- simpleRates
+		simpleRates <- FALSE
+	}
+	z$simpleRates <- simpleRates
 
 	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
@@ -568,7 +571,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
     if (!initC)
     {
         z$f <- f
-        z <- initForAlgorithms(z)
+        ##z <- initForAlgorithms(z)
         z$periodNos <- attr(data, "periodNos")
         z$f$myeffects <- NULL
         z$f$myCompleteEffects <- NULL
@@ -586,7 +589,19 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
     z$returnDeps <- returnDeps
     z$returnDepsStored <- returnDeps
     z$observations <- f$observations
-    z
+	z$returnChains <- returnChains
+	z$byGroup <- byGroup
+	z$byWave <- byWave
+	z$returnDataFrame <- returnDataFrame
+    z$nDependentVariables <- length(z$f$depNames)
+	if (initC)
+	{
+		NULL
+	}
+	else
+	{
+		z
+	}
 }
 ##@createEdgeLists siena07 Reformat data for C++
 createEdgeLists<- function(mat, matorig, bipartite)

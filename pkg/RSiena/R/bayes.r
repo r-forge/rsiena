@@ -201,7 +201,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 			z$thetaMat[!z$accept, ] <<- thetaOld[!z$accept, ]
 		}
 ##		print(thetaNew)
-    }
+	}
     ## ################################
     ## start of function proper
     ## ################################
@@ -226,7 +226,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 	}
 	ctime <- proc.time()[1]
 
-    z <- initializeBayes(data, effects, model, nbrNodes, priorSigma,
+	z <- initializeBayes(data, effects, model, nbrNodes, priorSigma,
                          prevAns=prevAns, clusterType=clusterType)
     createStores()
 
@@ -270,7 +270,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         tseriesplot = dev.cur()
         dev.new()
         tseriesratesplot = dev.cur()
-   }
+	}
 
     for (ii in 1:nwarm)
     {
@@ -311,9 +311,9 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             thetaNames<- paste(z$effects$name[!z$basicRate],
                                z$effects$shortName[!z$basicRate], sep=".")
             rateNames <- paste(z$effects$name[basicRate],
-                                           z$effects$shortName[basicRate],
-                                           z$effects$period[basicRate],
-                                           z$effects$group[basicRate], sep=".")
+							   z$effects$shortName[basicRate],
+							   z$effects$period[basicRate],
+							   z$effects$group[basicRate], sep=".")
             names(ratesdf) <- rateNames
             ratesdf <- cbind(Group=thetadf[, 1, drop=FALSE], ratesdf)
             names(thetadf)[-1] <- make.names(thetaNames, unique=TRUE)
@@ -424,7 +424,9 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
    	z$FRAN <- getFromNamespace(model$FRANname, pkgname)
     z <- z$FRAN(z, model, INIT=TRUE, data=data, effects=effects,
                 prevAns=prevAns)
-    is.batch(TRUE)
+	z$basicRate <- z$effects$basicRate
+    z$nGroup <- z$f$nGroup
+	is.batch(TRUE)
 
     WriteOutTheta(z)
 

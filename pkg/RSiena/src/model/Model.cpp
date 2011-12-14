@@ -639,14 +639,14 @@ void Model::clearChainStore(int keep, int groupPeriod)
 
 	}
 	else
-{
-		for (unsigned chain = 0; chain < size; chain++)
 	{
+		for (unsigned chain = 0; chain < size; chain++)
+		{
 			delete lchainStore[groupPeriod][chain];
-	}
+		}
 		this->lchainStore[groupPeriod].clear();
 
-}
+	}
 
 }
 

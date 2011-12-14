@@ -39,7 +39,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     {
         x$FRAN <- getFromNamespace(x$FRANname, pkgname)
     }
-    z <- x$FRAN(z, x, INIT=TRUE, initC=FALSE, ...)
+    z <- initializeFRAN(z, x, initC=FALSE, ...)
 	if (z$maxlike && !is.batch())
 	{
 		tkconfigure(z$tkvars$phaselabel, text="Phase")
@@ -84,14 +84,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         clusterCall(cl, storeinFRANstore,  FRANstore())
         if (initC)
         {
-			if (!x$maxlike)
-			{
-				clusterCall(cl, simstats0c, z, x, INIT=FALSE, initC = initC)
-			}
-			else
-			{
-				clusterCall(cl, maxlikec, z, x, INIT=FALSE, initC = initC)
-            }
+			clusterCall(cl, initializeFRAN, z, x, initC=initC)
         }
         z$cl <- cl
     }
@@ -315,7 +308,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     ## #####################################################
     ## do final call of FRAN
     ## #####################################################
-    z <- x$FRAN(z, x, TERM=TRUE,...)
+    z <- terminateFRAN(z, x)
     ## #####################################################
     ## call to FRAN changes covariance matrix for conditional estimation
     z$diver<- (z$fixed | z$diver | diag(z$covtheta) < 1e-9) & (!z$AllUserFixed)

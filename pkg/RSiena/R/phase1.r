@@ -342,7 +342,7 @@ FiniteDifferences <- function(z, x, fra, fra2)
         }
         if (int == 1)
         {
-            zz <- x$FRAN(zdummy, xsmall, INIT=FALSE, fromFiniteDiff=TRUE)
+            zz <- x$FRAN(zdummy, xsmall, fromFiniteDiff=TRUE)
             if (!zz$OK)
             {
                 z$OK <- zz$OK
@@ -352,7 +352,7 @@ FiniteDifferences <- function(z, x, fra, fra2)
         else
         {
             zz <- clusterCall(z$cl, simstats0c, zdummy, xsmall,
-                              INIT=FALSE, fromFiniteDiff=TRUE)
+                              fromFiniteDiff=TRUE)
         }
         if (int == 1)
         {

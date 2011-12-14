@@ -356,7 +356,7 @@ void MLSimulation::MLStep()
 	{
 		this->laborted[stepType]++;
 	}
-//	Rprintf("%d % %f\n",stepType, accept, this->lproposalProbability);
+//	Rprintf("%d %d %f\n",stepType, accept, this->lproposalProbability);
 }
 
 /**
