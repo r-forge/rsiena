@@ -151,8 +151,6 @@ public:
 	void calculateMaximumLikelihoodRateScores(int activeMiniStepCount);
 	void calculateMaximumLikelihoodRateDerivatives(int activeMiniStepCount);
 	double basicRateDerivative() const;
-	virtual double calculateChoiceProbability(const MiniStep * pMiniStep)
-		const = 0;
 
 	void incrementAcceptances(int stepType);
 	void incrementRejections(int stepType);

@@ -21,8 +21,10 @@ runone <- function(f)
 
 ##library(RSienaTest)
 ## get the data files
-datafiles <- system.file("examples", package="RSiena")
+datafiles <- system.file("examples", package="RSienaTest")
 files1 <- list.files(datafiles, pattern="\\.dat$", full.names=TRUE)
+file.copy(files1, ".", overwrite=TRUE)
+files1 <- list.files(datafiles, pattern="\\.DAT$", full.names=TRUE)
 file.copy(files1, ".", overwrite=TRUE)
 
 ## write some initialisation data
@@ -34,7 +36,7 @@ if (.Platform$OS.type == "windows")
 	cat("options(pager='console')\n", file="scriptfile.R", append=TRUE)
 }
 ## now concatenate the scripts
-dd <- system.file("scripts", package="RSiena")
+dd <- system.file("scripts", package="RSienaTest")
 files <- list.files(dd, pattern="\\.R$", full.names=TRUE)
 for (f in files)
 {

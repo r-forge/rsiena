@@ -115,9 +115,6 @@ public:
 	void needDerivatives(bool flag);
 	bool needDerivatives() const;
 
-	void needChangeContributions(bool flag);
-	bool needChangeContributions() const;
-
 	void parallelRun(bool flag);
 	bool parallelRun() const;
 

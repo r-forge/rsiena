@@ -73,7 +73,6 @@ public:
 	virtual MiniStep * randomMiniStep(int ego);
 	virtual bool missing(const MiniStep * pMiniStep) const;
 	virtual bool structural(const MiniStep * pMiniStep) const;
-	virtual double calculateChoiceProbability(const MiniStep * pMiniStep) const;
 
 private:
 	void preprocessEgo(int ego);

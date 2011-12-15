@@ -25,6 +25,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
        }
        ## close the report file
        Report(closefiles=TRUE)
+       RNGkind("default")
     }
     on.exit(exitfn())
 
@@ -91,7 +92,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
         ## x$randomSeed is the user seed, if any
         if (!is.null(x$randomSeed))
         {
-            set.seed(x$randomSeed)
+            set.seed(x$randomSeed, kind="default")
             seed <- x$randomSeed
         }
         else

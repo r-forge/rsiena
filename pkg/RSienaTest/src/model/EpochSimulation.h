@@ -81,7 +81,6 @@ public:
 	Chain * pChain();
 	void  pChain(Chain * pChain);
 	void clearChain();
-	double calculateChainProbabilities(Chain * pChain);
 	void updateParameters(int period);
     double calculateLikelihood() const;
 
