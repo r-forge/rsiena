@@ -30,8 +30,8 @@ maxlikec <- function(z, x, data=NULL, effects=NULL,
 		}
         ans <- .Call("mlPeriod", PACKAGE=pkgname, z$Deriv, f$pData,
                      f$pModel, f$myeffects, theta,
-                      1, 1, z$nrunMH, z$addChainToStore,
-                     z$needChangeContributions, z$returnDataFrame,
+					 1, 1, z$nrunMH, z$addChainToStore,
+                     z$returnDataFrame,
                      z$returnChains, returnLoglik, onlyLoglik)
 		if (!onlyLoglik)
 		{
@@ -61,7 +61,7 @@ maxlikec <- function(z, x, data=NULL, effects=NULL,
             anss <- apply(cbind(callGrid, 1:nrow(callGrid)),
 						  1, doMLModel, z$Deriv, z$thetaMat,
                           z$nrunMH, z$addChainToStore,
-                          z$needChangeContributions, z$returnDataFrame,
+                          z$returnDataFrame,
                           z$returnChains, byGroup, z$theta, returnLoglik,
 						  onlyLoglik)
         }
@@ -71,7 +71,6 @@ maxlikec <- function(z, x, data=NULL, effects=NULL,
             anss <- parRapply(z$cl[use], cbind(callGrid, 1:nrow(callGrid)),
 							  doMLModel, z$Deriv, z$thetaMat,
                               z$nrunMH, z$addChainToStore,
-                              z$needChangeContributions,
                               z$returnDataFrame, z$returnChains, byGroup,
 							  z$theta, returnLoglik, onlyLoglik)
         }
@@ -142,7 +141,7 @@ maxlikec <- function(z, x, data=NULL, effects=NULL,
 
 ##@doMLModel Maximum likelihood
 doMLModel <- function(x, Deriv, thetaMat, nrunMH, addChainToStore,
-                      needChangeContributions, returnDataFrame, returnChains,
+                      returnDataFrame, returnChains,
 					  byGroup, theta, returnLoglik, onlyLoglik)
 {
     f <- FRANstore()
@@ -157,7 +156,7 @@ doMLModel <- function(x, Deriv, thetaMat, nrunMH, addChainToStore,
     .Call("mlPeriod", PACKAGE=pkgname, Deriv, f$pData,
           f$pModel, f$myeffects, theta,
           as.integer(x[1]), as.integer(x[2]), nrunMH[x[3]], addChainToStore,
-          needChangeContributions, returnDataFrame, returnChains,
+		  returnDataFrame, returnChains,
 		  returnLoglik, onlyLoglik)
 }
 

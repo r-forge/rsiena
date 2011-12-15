@@ -9423,6 +9423,15 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2011-12-15 R-forge revision 191. Some of these may alter results slightly.
+\begin{itemize}
+\item Altered calculations of probabilities to avoid overflows
+\item Fixed bug in storage of MII in bayes
+\item Removed endowment effect for IndTies for symmetric networks.
+\item Removed code for storing change contributions on ministeps: not
+  functioning
+\item Set random number type to "default" at start of siena07.
+\end{itemize}
 \item 2011-12-14 R-forge revision 190
 Fixed bug in Bayes left over from R 189.
 \item 2011-12-14 R-forge revision 189

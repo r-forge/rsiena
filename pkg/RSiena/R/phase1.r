@@ -433,7 +433,6 @@ makeZsmall <- function(z)
     zsmall$returnChains <- z$returnChains
     zsmall$returnDataFrame <- z$returnDataFrame
     zsmall$addChainToStore <- z$addChainToStore
-    zsmall$needChangeContributions <- z$needChangeContributions
 	zsmall$callGrid <- z$callGrid
 	zsmall$thetaMat <- z$thetaMat
 	zsmall$byWave <- z$byWave

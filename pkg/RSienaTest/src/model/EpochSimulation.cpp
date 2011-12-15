@@ -829,34 +829,7 @@ double EpochSimulation::derivative(const EffectInfo * pEffect1,
 
 	return derivative;
 }
-/**
- * Returns the sum of the logChoiceProb for the chain.
- */
-double EpochSimulation::calculateChainProbabilities(Chain * pChain)
-{
-//	Rprintf("  %x\n", pChain);
-	MiniStep *pMiniStep = pChain->pFirst()->pNext();
-	double logprob=0;
 
-//	Rprintf("%d %x %x\n", pChain->ministepCount(), pMiniStep, pChain->pLast());
-	int i = 0;
-	while(pMiniStep != pChain->pLast())
-	{
-		i ++;
-		DependentVariable * pVariable =
-    		this->lvariables[pMiniStep->variableId()];
-
-		logprob +=
-			pVariable->calculateChoiceProbability(pMiniStep);
-		//	Rprintf(" i epoch %d %f %x\n", i, logprob, pMiniStep);
-		//const EpochSimulation *xx = this;
-		//	PrintValue(getMiniStepList(*pMiniStep,this->lperiod, *xx ));
-		//	if (i > 1) error("what now");
-		pMiniStep = pMiniStep->pNext();
-	}
-//	Rprintf("%f\n", logprob);
-	return logprob;
-}
 /**
  * Calculates the likelihood from the chain ignoring the log factorial for
  * constant rates.

@@ -1,5 +1,5 @@
 
-R version 2.13.1 (2011-07-08)
+R version 2.14.0 (2011-10-31)
 Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
@@ -211,14 +211,14 @@ Estimates, standard errors and convergence t-ratios
                                                 Error      t-ratio   
 
 Rate parameters: 
-  0.1      Rate parameter period 1  4.2062  ( 0.5851   )             
-  0.2      Rate parameter period 2  3.4880  ( 0.5183   )             
+  0.1      Rate parameter period 1  4.2553  ( 0.6363   )             
+  0.2      Rate parameter period 2  3.5608  ( 0.5237   )             
 
 Other parameters: 
-  1.  eval outdegree (density)     -1.7536  ( 0.1460   )   -0.0832   
-  2.  eval indegree - popularity    0.0517  ( 0.0500   )   -0.3291   
+  1.  eval outdegree (density)     -1.7724  ( 0.1924   )    0.1217   
+  2.  eval indegree - popularity    0.0560  ( 0.0668   )   -0.1674   
 
-Total of 190 iteration steps.
+Total of 210 iteration steps.
 
 > tt <- sienaTimeTest(ans)
 > 

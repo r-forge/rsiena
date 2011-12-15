@@ -570,7 +570,6 @@ algorithmsInitialize <-
     z$Phase <- 1
 
 	z$addChainToStore <- TRUE
-	z$needChangeContributions <- FALSE
 	if (useOptim)
 	{
 		z$thetaHistory <-

@@ -24,6 +24,8 @@ runone <- function(f)
 datafiles <- system.file("examples", package="RSiena")
 files1 <- list.files(datafiles, pattern="\\.dat$", full.names=TRUE)
 file.copy(files1, ".", overwrite=TRUE)
+files1 <- list.files(datafiles, pattern="\\.DAT$", full.names=TRUE)
+file.copy(files1, ".", overwrite=TRUE)
 
 ## write some initialisation data
 unlink("scriptfile.R")

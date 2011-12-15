@@ -1,3 +1,32 @@
+2011-12-15 R-forge revision 191.
+
+	* src/model/variables/BehaviorVariable.cpp,
+	src/model/variables/NetworkVariable.cpp: altered calculations of
+	probabilities to avoid overflow.
+	* R/bayes.r: fix bug in accumulation of MII
+	* src/model/filters/lowerfilter.cpp: fix bug which made no change
+	not permitted
+	* data/allEffects.csv: removed endowment effect for indTies for
+	symmetric networks
+	* R/algorithms.r, R/maxlikec.r, R/phase1.r, R/simstatsc.r,
+	src/siena07utilities.cpp, src/siena07models.cpp,
+	src/model/ml/BehaviorChange.cpp, src/model/ml/BehaviorChange.h:
+	src/model/ml/NetworkChange.cpp, src/model/ml/NetworkChange.h,
+	src/model/Model.cpp, src/model/Model.h,
+	src/model/variables/BehaviorVariable.cpp,
+	src/model/variables/NetworkVariable.cpp,
+	src/model/variables/BehaviorVariable.h,
+	src/model/variables/NetworkVariable.h,
+	src/model/variables/DependentVariable.h:
+	removed option (non-functioning) to store change contributions on
+	ministeps
+	* src/model/EpochSimulation.cpp, src/model/EpochSimulation.h,
+	src/siena07Models.cpp, src/siena07models.h:
+	remove some non-functioning options to do calculations for chains.
+	* R/siena07.r: more attempts to reset the random number kind
+	* tests/scripts.R: copied more data files to use for further
+	scripts
+
 2011-12-14 R-forge revision 190.
 
 	* R/bayes.r: fix bugs from previous changes

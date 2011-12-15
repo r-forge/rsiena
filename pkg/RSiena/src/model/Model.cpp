@@ -34,7 +34,6 @@ Model::Model()
 	this->lneedChain = false;
 	this->lneedScores = false;
 	this->lneedDerivatives = false;
-	this->lneedChangeContributions = false;
 	this->lparallelRun = false;
 	this->linsertDiagonalProbability = 0;
 	this->lcancelDiagonalProbability = 0;
@@ -167,22 +166,6 @@ bool Model::needDerivatives() const
 {
 	return this->lneedDerivatives;
 }
-/**
- * Stores if change contributions are to be stored on ministeps
- */
-void Model::needChangeContributions(bool flag)
-{
-	this->lneedChangeContributions = flag;
-}
-
-
-/**
- * Returns if change contributions are to be stroed on ministeps
- */
-bool Model::needChangeContributions() const
-{
-	return this->lneedChangeContributions;
-}
 
 /**
  * Stores if this is a parallel run
@@ -191,7 +174,6 @@ void Model::parallelRun(bool flag)
 {
 	this->lparallelRun = flag;
 }
-
 
 /**
  * Returns if this is a parallel run

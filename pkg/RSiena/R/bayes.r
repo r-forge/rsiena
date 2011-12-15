@@ -36,17 +36,16 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     {
         start <- z$sub + 1
         nrun <- nrow(z$parameters)
-        npar <- length(z$theta)
         end <- start + nrun - 1
         z$acceptances[start:end, ] <<- z$accepts
         z$candidates[start:end,, ] <<- z$parameters
         z$posteriorTot <<- z$posteriorTot + colSums(z$parameters)
         for (group in 1:z$nGroup)
         {
-            for (i in npar)
+            for (i in dim(z$parameters)[1])
             {
                 z$posteriorMII[group, , ] <<- z$posteriorMII[group, ,] +
-                    outer(z$parameters[i, group, ], z$parameters[i, group,])
+                    outer(z$parameters[i, group, ], z$parameters[i, group, ])
             }
         }
         z$MHacceptances[start:end, , , ] <<- z$MHaccepts
