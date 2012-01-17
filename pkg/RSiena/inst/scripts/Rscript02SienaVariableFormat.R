@@ -1,24 +1,24 @@
 ###############################################################################
 ###
-### -- RscriptSienaVariableFormat.R: a script for the introduction to RSiena --
+### -- Rscript02SienaVariableFormat.R: a script for the introduction to RSiena --
 ###
-###                               version April 11, 2011
+###                               version January 17, 2012
 ###############################################################################
 #
 # The introductory script is divided into the following script files:
-# RscriptDataFormat.R, followed by
+# Rscript01DataFormat.R, followed by
 # RScriptSNADescriptives.R, code for descriptive analysis of the data, and
-# RscriptSienaVariableFormat.R, which formats data and specifies the model, and
-# RscriptSienaRunModel.R, which runs the model and estimates parameters
-# RscriptSienaBehaviour.R, which illustrates an example of analysing the
+# Rscript02SienaVariableFormat.R, which formats data and specifies the model, and
+# Rscript03SienaRunModel.R, which runs the model and estimates parameters
+# Rscript04SienaBehaviour.R, which illustrates an example of analysing the
 # coevolution of networks and behaviour
 # Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley,
 # Johan Koskinen, and Paulina Preciado.
 #
-# This script, RscriptSienaVariableFormat.R, sets up the variables for analysis.
+# This script, Rscript02SienaVariableFormat.R, sets up the variables for analysis.
 # The manipulations in this script requires that you have gone through the
 # first part, "CALLING THE DATA AND PRELIMINARY MANIPULATIONS",
-# of the script "RscriptDataFormat.R" beforehand;
+# of the script "Rscript01DataFormat.R" beforehand;
 # or that you have defined the data and the model by means of the
 # siena01Gui() function and have saved and loaded the results,
 # as described in Section 2.3.3 of the Siena manual.
@@ -105,6 +105,7 @@
  senders <- sienaNodeSet(50, nodeSetName="senders")
  receivers <- sienaNodeSet(50, nodeSetName="receivers")
 
+
 # ---- B. ----------------------------------------------------------------------
 # Second we construct objects for the explanatory (independent) variables.
 # From the help request
@@ -169,7 +170,7 @@
 
 # You should now understand how the result of this differs from the
 # result of
-#       mybehdata <- sienaDataCreate( friendship, smoke1, drinkingbeh
+#       mybehdata <- sienaDataCreate( friendship, smoke1, drinkingbeh )
 
 # If you would like to use different names, you could request this as follows:
 #        mydata <- sienaDataCreate( nominations = friendship, smoke1,
@@ -256,9 +257,11 @@
 # 2. Changing myeff directly by operating on its elements;
 # 3. Using RSiena functions "includeEffects", "setEffects", etc.
 # Which one to use is a matter of personal preference.
-# The third way is most in line with the design philosophy of R.
-# We suggest that you skip the explanations of options 1 and 2, and proceed
-# directly to option 3, ' Adding/removing effects using includeEffects'.
+# The third way is most in line with the design philosophy of R,
+# and allows you to save scripts that also can be used when
+# there will be new versions of RSiena.
+# Therefore, we suggest that you skip the explanations of options 1 and 2, and 
+# proceed directly to option 3, ' Adding/removing effects using includeEffects'.
 
 # For identifying your effects you need the "shortName"s,
 # which can be read in the manual (section "Mathematical definition of effects"),
@@ -374,6 +377,7 @@
         myeff$shortName
         sink()
 
+# This will create a file in your working directory named "effectshortlist.txt" 
 # A more general table of effect information including short names
 # is also available as a pdf file in the R directory, and can be opened by
 
@@ -428,17 +432,26 @@
         ?includeEffects
 
 # you can see how to include endowment effects and how to exclude effects.
+# Effects that depend on other variables, such as egoX, altX, etc. above,
+# need the specification of these variables to define them.
+# This is dnoe by the interaction1 parameter 
+# when only one variable name is needed,
+# and by interaction2 if there is a second variable involved,
+# such as AltsAvAlt (see the manual). 
 
 
 # ---- Creating interactions ---------------------------------------------------
 # As a special topic, let us show how interaction effects are created.
 
 # A convenient method to include an interaction is offered by the
-# includeInteraction function. The interaction between smoke1 ego
-# and reciprocity, for instance, can be defined by the command
+# includeInteraction function. 
+# This can be used to interact two or three effects 
+# (if the interactions are allowed; see the manual for this).
+# The interaction between smoke1 ego and reciprocity, for instance, 
+# can be defined by the command
 
         myeff <- includeInteraction( myeff, egoX, recip, include = FALSE,
-                                    interaction1 = "smoke1" )
+                                    interaction1 = c("smoke1","") )
 
 # and, e.g., an interaction between smoke1 ego and alcohol ego is defined by
 
@@ -451,6 +464,11 @@
 # Note that the keyword 'interaction1' used by RSiena is used for identifying
 # the covariate for which the ego effect is selected, and does not
 # refer to the interaction effect itself.
+# If at least one of the interacting effects requires the interaction1 parameter
+# for it specification, then this parameter is also required for the
+# includeInteraction function. 
+# Here the two or three interaction1 parameters must be combined using c(); 
+# the same goes for interaction2.
 
 # A second special topic is how to access other characteristics of effects
 # without referring to the effect numbers.
@@ -468,6 +486,6 @@
 
 ################################################################################
 ###
-### ---- PROCEED TO RscriptSienaRunModel.R FOR PREPARING DATA FOR RSIENA -------
+### -- PROCEED TO Rscript03SienaRunModel.R FOR PARAMETER ESTIMATION BY RSIENA --
 ###
 ################################################################################

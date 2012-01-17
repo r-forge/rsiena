@@ -147,7 +147,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         }
         for (j in seq(along = xx$dycCovars))
         {
-            if (attr(xx$dycCovars[[j]], 'nodeSet')[1] == nodeSet)
+            if (attr(xx$dycCovars[[j]], "type") == "oneMode" &&
+				attr(xx$dycCovars[[j]], 'nodeSet')[1] == nodeSet)
             {
                 objEffects <- rbind(objEffects,
                                     createEffects("dyadObjective",
@@ -160,7 +161,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         }
         for (j in seq(along = xx$dyvCovars))
         {
-            if (attr(xx$dyvCovars[[j]], 'nodeSet')[1] == nodeSet)
+            if (attr(xx$dyvCovars[[j]], "type") == "oneMode" &&
+				attr(xx$dyvCovars[[j]], 'nodeSet')[1] == nodeSet)
             {
                 objEffects <- rbind(objEffects,
                                     createEffects("dyadObjective",
@@ -265,7 +267,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                         objEffects <-
                             rbind(objEffects,
                                   covarNetNetEff(otherName, names(xx$cCovars)[k],
-                                                 attr(xx$cCovars[[k]], 'poszvar'),
+                                                 attr(xx$cCovars[[k]],
+													  'poszvar'),
                                                  name=varname))
                     }
                 }
@@ -276,7 +279,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                         objEffects <-
                             rbind(objEffects,
                                   covarNetNetEff(otherName, names(xx$vCovars)[k],
-                                                 attr(xx$vCovars[[k]], 'poszvar'),
+                                                 attr(xx$vCovars[[k]],
+													  'poszvar'),
                                                  name=varname))
                     }
                 }
@@ -533,7 +537,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 
         for (j in seq(along = xx$dycCovars))
         {
-            if (all(nodeSets == attr(xx$dycCovars[[j]], 'nodeSet')))
+			if (attr(xx$dycCovars[[j]], "type") == "bipartite" &&
+				all(nodeSets == attr(xx$dycCovars[[j]], 'nodeSet')))
             {
                 objEffects <- rbind(objEffects,
                                     createEffects("dyadBipartiteObjective",
@@ -545,7 +550,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         }
         for (j in seq(along = xx$dyvCovars))
         {
-            if (all(nodeSets == attr(xx$dyvCovars[[j]], 'nodeSet')))
+            if (attr(xx$dyvCovars[[j]], "type") == "bipartite" &&
+				all(nodeSets == attr(xx$dyvCovars[[j]], 'nodeSet')))
             {
                 objEffects <- rbind(objEffects,
                                     createEffects("dyadBipartiteObjective",

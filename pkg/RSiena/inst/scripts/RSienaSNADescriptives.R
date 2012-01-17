@@ -2,17 +2,17 @@
 ###
 ### ---- RscriptSNADescriptives.R: a script for the introduction to RSiena -------
 ###
-###                               version: April 11, 2011
+###                               version: January 17, 2012
 ##################################################################################
 #
-# RscriptDataFormat.R is followed by
+# Rscript01DataFormat.R is followed by
 # RScriptSNADescriptives.R, code for descriptive analysis of the data, and
-# RscriptSienaVariableFormat.R, which formats data and specifies the model, and
-# RscriptSienaRunModel.R, which runs the model and estimates parameters
-# RscriptSienaBehaviour.R, which illustrates an example of analysing the
+# Rscript02SienaVariableFormat.R, which formats data and specifies the model, and
+# Rscript03SienaRunModel.R, which runs the model and estimates parameters
+# Rscript04SienaBehaviour.R, which illustrates an example of analysing the
 # coevolution of networks and behaviour
 #
-# The entire model fitting is summarised at the end of RscriptSienaRunModel.R
+# The entire model fitting is summarised at the end of Rscript03SienaRunModel.R
 # (without comments)
 #
 # This is an R script for getting started with RSiena, written by
@@ -62,7 +62,7 @@
 #
 # First calculate degree:
 
-        deg <- rowSums( as.matrix( net1 ) )# NB:  rowSums() is define for class matrix
+        deg <- rowSums( as.matrix( net1 ) )# NB:  rowSums() is defined for class matrix
 
 # have a look at the degree distribution
 
@@ -143,6 +143,6 @@
         reach
 ################################################################################
 ###
-### ---- PROCEED TO RscriptSienaVariableFormat.R FOR PREPARING DATA FOR RSIENA -
+### ---- PROCEED TO Rscript02SienaVariableFormat.R FOR PREPARING DATA FOR RSIENA -
 ###
 ################################################################################

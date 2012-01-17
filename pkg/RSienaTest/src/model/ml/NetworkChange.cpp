@@ -82,7 +82,7 @@ void NetworkChange::makeChange(DependentVariable * pVariable)
  */
 bool NetworkChange::missing(int period) const
 {
-	bool oneMode = this->lpData->pSenders() == this->lpData->pReceivers();
+	bool oneMode = this->lpData->oneModeNetwork();
 
 	if (oneMode || this->alter() <
 		this->lpData->pReceivers()->n())
@@ -106,7 +106,7 @@ bool NetworkChange::missing(int period) const
  */
 bool NetworkChange::missingStart(int period) const
 {
-	bool oneMode = this->lpData->pSenders() == this->lpData->pReceivers();
+	bool oneMode = this->lpData->oneModeNetwork();
 
 	if (oneMode || this->alter() <
 		this->lpData->pReceivers()->n())
@@ -128,10 +128,9 @@ bool NetworkChange::missingStart(int period) const
  */
 bool NetworkChange::missingEnd(int period) const
 {
-	bool oneMode = this->lpData->pSenders() == this->lpData->pReceivers();
+	bool oneMode = this->lpData->oneModeNetwork();
 
-	if (oneMode || this->alter() <
-		this->lpData->pReceivers()->n())
+	if (oneMode || this->alter() < this->lpData->pReceivers()->n())
 	{
 		// return this->lpData->missing(this->ego(), this->lalter, period) ||
 		// 	this->lpData->missing(this->ego(), this->lalter, period + 1);

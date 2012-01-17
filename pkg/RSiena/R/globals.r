@@ -167,6 +167,10 @@ Heading<- function(level=1, dest, text, fill=FALSE)
 ##@PrtOutMat Reporting
 PrtOutMat<- function(mat, dest)
 {
+	if (is.null(mat))
+	{
+		return()
+	}
 	testing <- Sys.getenv("RSIENATESTING")
 	testing <- testing != ""
     if (missing(dest))

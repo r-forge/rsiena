@@ -38,7 +38,8 @@ NetworkLongitudinalData::NetworkLongitudinalData(int id,
 	std::string name,
 	const ActorSet * pSenders,
 	const ActorSet * pReceivers,
-	int observationCount) :
+	int observationCount,
+	bool oneMode) :
 		LongitudinalData(id, name, pSenders, observationCount)
 {
 	this->lpReceivers = pReceivers;
@@ -49,10 +50,11 @@ NetworkLongitudinalData::NetworkLongitudinalData(int id,
 	this->lnetworksLessMissingStarts = new Network * [observationCount];
 	this->lmaxDegree = std::numeric_limits<int>::max();
 	this->ldensity = new double[observationCount];
+	this->loneMode = oneMode;
 
 	for (int i = 0; i < observationCount; i++)
 	{
-		if (pSenders == pReceivers)
+		if (oneMode)
 		{
 			this->lnetworks[i] = new OneModeNetwork(pSenders->n(), false);
 			this->lstructuralTieNetworks[i] =
@@ -426,4 +428,11 @@ double NetworkLongitudinalData::observedDistribution(int value,
 	return frequency;
 }
 
+/**
+ * Returns whether this is a one mode network or not.
+ */
+bool NetworkLongitudinalData::oneModeNetwork() const
+{
+	return this->loneMode;
+}
 }

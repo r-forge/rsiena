@@ -261,7 +261,7 @@ or any missing\\
 \subsubsection{Constant dyadic covariate}
 \begin{algorithmic}
 \STATE Check the nodesets (section \ref{sec:nodeset})
-\IF{both nodesets the same}
+\IF{attribute type is oneMode}
 \STATE set diagonal to \emph{missing} so is ignored in mean and range
 \ENDIF
 \STATE Create attributes: (a class method) \\
@@ -269,7 +269,7 @@ or any missing\\
 \sfn{ }\nnm{range} Extent of range, ignore missings. Make sure a double.\\
 \sfn{ }\nnm{range2} Ends of range, ignore missings\\
 \sfn{ }\nnm{name} name of object
-\IF{both nodesets the same}
+\IF{attribute type is oneMode}
 \STATE set diagonal to \emph{zero}
 \ENDIF
 \end{algorithmic}
@@ -286,14 +286,14 @@ or any missing\\
 \STATE remove the excess, carefully preserving the attributes apart from the
 dimensions.
 \ENDIF
-\IF{both nodesets the same}
+\IF{attribute type is oneMode}
 \STATE set all diagonals to \emph{missing} so are ignored in mean and range
 \ENDIF
 \STATE Create attributes: (a class method) \\
 \sfn{ }\nnm{mean} ignore missings\\
 \sfn{ }\nnm{range} Extent of range, ignore missings. Make sure a double.\\
 \sfn{ }\nnm{name} name of object
-\IF{both nodesets the same}
+\IF{attribute type is oneMode}
 \STATE set all diagonals to \emph{zero}
 \ENDIF
 \end{algorithmic}
