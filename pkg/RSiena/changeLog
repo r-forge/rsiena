@@ -1,3 +1,8 @@
+2012-01-17 R-forge revision 192.
+
+   * minor but extensive changes to manual
+   * minor changes to scripts
+
 2011-12-15 R-forge revision 191.
 
 	* src/model/variables/BehaviorVariable.cpp,

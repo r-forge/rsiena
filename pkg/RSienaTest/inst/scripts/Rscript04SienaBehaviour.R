@@ -1,16 +1,16 @@
 ################################################################################
 ###
-### ---- RscriptSienaBehaviour.R: a script for the introduction to RSiena ------
+### ---- Rscript04SienaBehaviour.R: a script for the introduction to RSiena ------
 ###
-###                                    version April 11, 2011
+###                                    version January 17, 2012
 ################################################################################
 #
 # The introductory script is divided into the follwing script files:
-# RscriptDataFormat.R, followed by
+# Rscript01DataFormat.R, followed by
 # RScriptSNADescriptives.R, code for descriptive analysis of the data, and
-# RscriptSienaVariableFormat.R, that formats data and specifies the model, and
-# RscriptSienaRunModel.R, that runs the model and estimates parameters
-# RscriptSienaBehaviour.R, that illustrates an example of analysing the
+# Rscript02SienaVariableFormat.R, that formats data and specifies the model, and
+# Rscript03SienaRunModel.R, that runs the model and estimates parameters
+# Rscript04SienaBehaviour.R, that illustrates an example of analysing the
 # coevolution of networks and behaviour
 # Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley,
 # and Johan Koskinen.

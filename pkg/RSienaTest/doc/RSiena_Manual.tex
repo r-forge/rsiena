@@ -115,7 +115,7 @@
 \newcommand{\startno}{\setcounter{thisno}{0}}
 \newcommand{\nextno}{\addtocounter{thisno}{1}\thethisno .\ }
 
-\hyphenation{Snij-ders Duijn Huis-man Steg-lich Schwein-ber-ger}
+\hyphenation{Snij-ders Duijn Huis-man Steg-lich Schwein-ber-ger siena-Data-Create-From-Session}
 
 \newcommand{\interruptenum}{
       \setcounter{savenumi}{\value{enumi}}
@@ -606,8 +606,10 @@ The details of this screen are explained in Section~\ref{S_de_screen}.
 \item[\sfn{Type}] Indicate here what type of data the file contains. Options
   are:
 \begin{description}
-\item[\sfn{network}] (i.e., a one-mode network)
-\item[\sfn{bipartite}] (i.e., a two-mode network)
+\item[\sfn{network}] (i.e., a one-mode network, which is the
+     usual type)
+\item[\sfn{bipartite}] (i.e., a two-mode network, which is a network with two
+    node sets, and all ties are between the first and the second node set)
 \item[\sfn{behavior}]
 \item[\sfn{constant covariate}]
 \item[\sfn{changing covariate}]
@@ -787,11 +789,11 @@ function.
 The precise point to continue from here, using the scripts
 in the next section and also on the \RS website,
 is to use
-script \sfn{RscriptSienaVariableFormat.R},
+script \sfn{Rscript02SienaVariableFormat.R},
 starting with section~D (\emph{Defining Effects}),
 part~3 (\emph{Adding/removing effects using includeEffects}).
 After this, you are advised to continue with script
-\sfn{RscriptSienaRunModel.R}.
+\sfn{Rscript03SienaRunModel.R}.
 
 
 \subsection{An example \R script for getting started}
@@ -803,7 +805,7 @@ The script  below is useful for this purpose.
 At the `RSiena scripts' page
 \url{http://www.stats.ox.ac.uk/~snijders/siena/siena_scripts.htm}
  of the \RS website
-it is available divided into smaller pieces, and updated.
+it is available divided into smaller pieces.
 The script is written so as to be useful for novice
 as well as experienced \R users.
 The `RSiena scripts' page of the \RS website
@@ -811,12 +813,13 @@ also contains some other scripts that may be useful.
 The appendix of this manual contains a list of \RS functions which may be consulted
 in addition to this script.
 
+\newpage
 {\footnotesize
 \verbatiminput{../inst/scripts/Rscript01DataFormat.R}
 \newpage
+\verbatiminput{../inst/scripts/RSienaSNADescriptives.R}
 \verbatiminput{../inst/scripts/Rscript02SienaVariableFormat.R}
 \verbatiminput{../inst/scripts/Rscript03SienaRunModel.R}
-\newpage
 \verbatiminput{../inst/scripts/Rscript04SienaBehaviour.R}
 }
 
@@ -1036,9 +1039,9 @@ collected at two or more time points. It is possible to include
 changing actor variables (representing behavior, attitudes,
 outcomes, etc.) which also develop in a dynamic process, together
 with the social networks.
-As repeated measures data on social networks, at the very least, {\em two or more data
-files with digraphs} are required: the observed networks, one for
-each time point. The number of time points is denoted $M$.
+As repeated measures data on social networks, at the very least,
+{\em two or more repeated observations of a network}
+are required. The number of time points is denoted $M$.
 
 In addition, various kinds of variables are allowed:
 
@@ -1054,88 +1057,86 @@ In addition, various kinds of variables are allowed:
       then they are also called individual covariates).
 \item {\em dyadic covariates}, which can be symbolized as $w_{ij}$
       for each ordered pair of actors $(i,j)$;
-%they are allowed only
-%      to have integer values ranging from 0 to 255.
-%      If one has real-valued dyadic covariates, then one option
-%      is to multiply them e.g. by 10 or 100 so that they still have a range
-%      between 0 and 255, and used the rounded values.
      these likewise can be constant over time or changing.
 \end{enumerate}
 
 Dependent variables (which can be networks or behavior variables)
 all must be available for the same set of time points.
 
-All variables must be available in ASCII (`raw text') data files, described in
-detail below. It is best to use the `classical' type of filenames, without embedded blanks
-and not containing special characters.
-These files, the names of the corresponding
-variables, and the coding of missing data, must be made available
-to \si.
+It is advisable to use names of variables consisting of at most 12 characters.
+This is because they are used as parts of the names of effects which
+can be included in the model, and the effect names should not be too long.
 
-Names of variables must be composed of at most 12 characters. This
-is because they are used as parts of the names of effects which
-can be included in the model, and the effect names should not be
-too long.
+The data specification in \RS consists of two steps.
+First, the role of each variable to be used must be defined using
+the functions \sfn{sienaNet}, \sfn{coCovar}, \sfn{varCovar},
+\sfn{coDyadCovar}, \sfn{varDyadCovar}, or \sfn{sienaCompositionChange}.
+Second, the variables must be combined into one \RS data set by the function
+\sfn{sienaDataCreate}.
 
-\subsection{Digraph data files}
+\subsection{Digraph data}
 
-Each digraph must be contained in a separate input file.
 For data specification by the \textsf{sienaNet} function, the network
-must be specified as a matrix.
+must be specified as a matrix or array or list of sparse matrix of triples.
+The help file for \sfn{sienaNet} shows by examples how the
+specification can be given by sparse matrices.
+Here we only discuss the specification by matrices.
+
 For data specification by the graphical interface \textsf{siena01Gui}
 or by the function \textsf{sienaDataCreateFromSession},
 edge list formats are also allowed. This can be either the
 format of the Pajek program, or a raw edge list, here called Siena format.
 For large number of nodes (say, larger than 100), the edge list
 format is more efficient in use of computer memory.
-Data input as edge lists will also be made available by means of the
-\textsf{sienaNet} function (in some future version of \sn).
+%Data input as edge lists will also be made available by means of the
+%\textsf{sienaNet} function (in some future version of \sn).
+The three possible formats for digraph input are as follows.
 \begin{enumerate}
 \item \emph{Adjacency matrices}.\\
-      The first is an adjacency matrix, i.e., $n$ lines each with $n$ integer
-      numbers, separated by blanks or tabs, each line ended by a hard return.
+      These can be used in  \sfn{sienaNet} and in
+      \sfn{sienaDataCreateFromSession}.\\
+      In the usual case of a one-mode network the adjacency matrix consists of
+      $n$ lines each with $n$ integer numbers,
+      separated by blanks or tabs, each line ended by a hard return.
       The diagonal values are meaningless but must be present.
+      In the case of a two-mode network (which is a network with two
+      node sets, and all ties are between the first and the second node set)
+      the matrix does not have to be
+      square, as usually the number of nodes in the first set will not be
+      equal to the number of nodes in the second set;
+      and if it would be square, the diagonal still would be meaningful.
 
-      Although this section talks only about digraphs (directed graphs), it is
+      Although this section talks only about digraphs (directed graphs),
+      for one-mode networks it is
       also possible that all observed adjacency matrices are symmetric.
       This will be automatically detected by \si, and
       the program will then utilize methods for non-directed networks.
 
-      The data matrices for the digraphs
-       must be coded in the sense
-      that their values are converted by the program to the 0 and 1
-      entries in the adjacency matrix. A set of code numbers is required
-      for each digraph data matrix; these codes are regarded as the
-      numbers representing a present arc in the digraph, i.e., a 1 entry
-      in the adjacency matrix; all other numbers will be regarded as 0
-      entries in the adjacency matrix. Of course, there must be at least
-      one such code number. All code numbers must be in the range from 0
-      to 9, except for structurally determined values (see below).
-
-      This implies that if the data are already in 0-1 format, the
-      single code number 1 must be given. As another example, if the
-      data matrix contains values 1 to 5 and only the values 4 and 5 are
-      to be interpreted as present arcs, then the code numbers 4 and 5
-      must be given.
+      The values of the ties must be 0, 1, or \texttt{NA}
+      (not available = missing);
+      or 10 or 11 for structurally determined values (see below).
     \item \emph{Pajek format}.\\
+      These can be used in \sfn{sienaDataCreateFromSession}.\\
       If the digraph data file has extension name \texttt{.net}, then the
-      program assumes that the data file has Pajek format.  The format required
-      differs from that in the previous versions of \SI.  The file should relate
-      to one observation only, and should contain a list of vertices (using the
+      program assumes that the data file has Pajek format.
+      The file should relate to one observation only,
+      and should contain a list of vertices (using the
       keyword \texttt{*Vertices}, together with (currently) a list of arcs,
       using the keyword \texttt{*Arcs}
       followed by data lines according to the Pajek rules.
       These keywords must be in lines that contain no further characters.
       An example of such input files is given in the s50 data set
-      that is distributed in the \texttt{examples} directory.
+      that is distributed in the \texttt{examples} directory of the
+      source code.
     \item \emph{Siena format}.\\
-      An edge list containing three or four columns:
+      These can be used in \sfn{sienaDataCreateFromSession}.\\
+      An edge list is a matrix containing three or four columns:
       from, to, value, wave (optional).\\
       Like the Pajek format, this has the advantage that absent ties
       (tie variables with the value 0) do not need to be mentioned
-      in the data file.
+      in the data matrix.
       By specifying the waves in the fourth column in the \sfn{Siena} format,
-      one file can be used to contain data for all the waves.
+      one matrix can be used to contain data for all the waves.
 \end{enumerate}
 
 Missing values must be indicated in the way usual for \Rn,
@@ -1144,11 +1145,6 @@ For data specification by the graphical interface \textsf{siena01Gui}
 or by the function \textsf{sienaDataCreateFromSession},
 instead of \texttt{NA} any numerical code can be used
 given that this is indicated to be a missing value code.
-
-Although this section talks only about digraphs (directed graphs), it is
-also possible that all observed ties (for all time points) are mutual.
-This will be automatically detected by \si, and
-the program will then utilize methods for non-directed networks.
 
 If the data set is such that it is never observed that ties are terminated,
 then the network dynamics is automatically specified internally in such a way
@@ -1160,6 +1156,7 @@ Similarly if ties never are created (but only terminated),
 then this will be respected in the simulations.
 
 \subsubsection{Transformation between matrix and edge list formats}
+\label{S_trafos}
 
 The following \R commands can be used for transforming an
 adjacency matrix to an edge list, and back again.
@@ -1248,17 +1245,12 @@ Structurally determined values are defined by reserved codes in
 the input data: the value 10 indicates a structural zero, the
 value 11 indicates a structural one. Structurally determined
 values can be different for the different time points. (The
-diagonal of the data matrix always is composed of structural
+diagonal of the data matrix for a one-mode network
+always is composed of structural
 zeros, but this does not have to be indicated in the data matrix
 by special codes.) The correct definition of the structurally
 determined values can be checked from the brief report of this in
 the output file.
-%, and by looking at the file \textsf{\em pname}.s01
-%(for the first time point), \textsf{\em pname}.s02 (second time
-%point), etc. In these files, the structurally determined positions
-%(structural zeros as well as structural ones) are indicated by the
-%value 1, all others (i.e., the positions where ties are random) by
-%the value 0.
 
 Structural zeros offer the possibility of analyzing several
 networks simultaneously under the assumption that the parameters
@@ -1269,7 +1261,7 @@ E.g., if there are three networks with 12, 20 and
 network of 12 + 20 + 15 = 47 actors, by specifying that ties
 between actors in different networks are structurally impossible.
 This means that the three adjacency matrices are combined in one
-$47 \times 47$ data file, with values 10 for all entries that
+$47 \times 47$ data matrix, with values 10 for all entries that
 refer to the tie from an actor in one network to an actor in a
 different network. In other words, the adjacency matrices will be
 composed of three diagonal blocks, and the off-diagonal blocks
@@ -1331,14 +1323,24 @@ is replaced by the structurally fixed value  $x_{ij}(t_{m})$.
 This gives the best possible correspondence between target values
 and simulated values in the case of changing structural fixation.
 
+\subsection{Dependent behavioral variables}
+
+Dependent actor-level variables, also called dependent
+behavior variables, are changing variables at the actor level,
+analysed according to the ``networks and behavior" actor-oriented
+model of \citet{SnijdersEA07, SteglichEA10}.
+This means they change dynamically in
+mutual dependence with the changing network.
+These variables also are defined using the \sfn{sienaNet} function,
+now requiring the \texttt{type = behavior} parameter.
+
 \subsection{Dyadic covariates}
 
-As the digraph data, also each measurement of a dyadic covariate
-must be contained in a separate input file with a square data
-matrix, i.e., $n$ lines each with $n$ integer numbers, separated by
-blanks or tabs, each line ended by a hard return. The diagonal values are
-meaningless but must be present.
-Pajek input format is currently not possible for dyadic covariates.
+Like the digraph data, also each measurement of a dyadic covariate
+must be contained in a separate matrix.
+For one-mode data this is a square data matrix,
+and the diagonal values are meaningless.
+%Pajek input format is currently not possible for dyadic covariates.
 
 A distinction is made between constant and changing dyadic
 covariates, where change refers to changes over time. Each constant
@@ -1348,47 +1350,31 @@ variable. Changing covariates, on the other hand, have one such
 value for each period between measurement points. If there are $M$
 waves (i.e., observation moments) of network data,
 this covers $M-1$ periods, and accordingly,
-for specifying a single changing dyadic covariate, $M-1$ data files
-with covariate matrices are needed.
+for specifying a single changing dyadic covariate, $M-1$
+covariate matrices are needed.
 
-% The reasons for restricting dyadic covariates to integer values from
-% 0 to 255 are historical and have to do with how the constant dyadic
-% covariate data are stored internally. If the user wishes to use a
-% dyadic covariate with a different range, this variable first must be
-% transformed to integer values from 0 to 255. E.g., for a continuous
-% variable ranging from 0 to 1, the most convenient way probably is to
-% multiply by 100 (so the range becomes 0--100) and round to integer
-% values.
+Constant dyadic covariates are specified using function
+\sfn{coDyadCovar}, and changing dyadic covariates by \sfn{varDyadCovar}.
 
 The mean is always subtracted from the covariates.
 See Section~\ref{S_center} on centering.
 
 \subsection{Individual covariates}
 
-Individual (i.e., actor-bound) variables can be combined in one or
-more files. If there are $k$ variables in one file, then this data
-file must contain $n$ lines, with on each line $k$ numbers which all
-are read as real numbers (i.e., a decimal point is allowed). The
-numbers in the file must be separated by blanks and each line must
-be ended by a hard return. There must not be blank lines after the
-last data line.
+Individual (i.e., actor-bound, or monadic) variables
+are defined by the functions
+\sfn{coCovar} in the case they are constant over time,
+and \sfn{varCovar} if they are changing over time.
 
-Also here, a distinction is made between constant and changing actor
-variables. Each constant actor covariate has one value per actor
+Each constant actor covariate has one value per actor
 valid for all observation moments, and has the role of an
 independent variable.
 
-Changing variables can change between observation moments. They
-can have the role of dependent variables (changing dynamically in
-mutual dependence with the changing network) or of independent
-variables; in the latter case, they are also called `changing
-individual covariates'. Dependent variables are treated in the
-section below, this section is about individual variables
-in the role of independent variables -- then they are also
-called individual covariates.
+Changing variables can change between observation moments;
+then they are called `changing individual covariates',
+and have the role of independent variables.
 
-When changing individual variables have the role of
-independent variables, they are assumed to have constant values from one
+Changing individual covariates are assumed to have constant values from one
 observation moment to the next. If observation moments for the
 network are $t_1, t_2, ..., t_M$, then the changing covariates
 should refer to the $M-1$ moments $t_1$ through $t_{M-1}\,$, and
@@ -1400,11 +1386,10 @@ only if there are 3 or more observation moments,
 because for 2 observation moments the distinction between
 constant and changing covariates is not meaningful.
 
-Each changing individual covariate must be given in one file,
-containing $k = M-1$ columns that correspond to the $M-1$ periods
+Each changing individual covariate must be specified
+in a separate call fo \sfn{varCovar}, using for input
+an $n \times M-1$ matrix where the columns correspond to the $M-1$ periods
 between observations.
-It is not a problem if there is an $M$'th column in the file,
-but it will not be read.
 
 The mean is always subtracted from the covariates.
 See Section~\ref{S_center} on centering.
@@ -1418,18 +1403,15 @@ ties between such components are not allowed), then only the ego effect
 of the actor covariate is made available.
 This is because the other effects then are meaningless.
 This may cause problems for combining several data sets
-in a meta-analysis (see Section ~\ref{S_mulev}).
+in a multi-group project (see Section ~\ref{S_mulev}).
 If at least one case is missing (i.e., has the missing value data code),
 then the other covariate effects are made available.
 When analysing multiple data sets in parallel,
-for which the same set of effects is desired to be included % in
-%the .MO file,
+for which the same set of effects is desired to be included,
 it is therefore advisable to give data sets in which
 a given covariate has the same value for all actors
-one missing value in this covariate;
-purely to make
-the total list of effects % in the MO file
-independent of the observed data.
+one missing value in this covariate; purely to make
+the total list of effects independent of the observed data.
 
 
 \subsection{Interactions and dyadic transformations of covariates}
@@ -1490,7 +1472,7 @@ constant between observations.
 Dependent action variables must have nonnegative integer values;
 e.g., 0 and 1, or a range of integers like 0,1,2 or 1,2,3,4,5.
 Each dependent action variable must be given in one
-file, containing $k = M$ columns, corresponding to the $M$
+matrix, containing $k = M$ columns, corresponding to the $M$
 observation moments.
 
 If any values are not integers, a warning will be printed on the initial report
@@ -1588,22 +1570,24 @@ How to do this is described in subsection~\ref{S_struct}.
 This is straightforward and not further explained here.
 This subsection explains the method of Huisman and Snijders
 (2003), which uses the information about composition change
-in a sightly more efficient way.
-
-For this case, a data file is needed in which the
-\emph{times of composition change} are given. For networks with
-constant composition (no entering or leaving actors), this file is
-omitted and the current subsection can be disregarded.
+in a slightly more efficient way.
 
 Network composition change, due to actors joining or leaving the
 network, is handled separately from the treatment of missing data.
-The digraph data files must contain all actors who are part of the
-network at any observation time (denoted by $n$) and each actor
-must be given a separate (and fixed) line in these files, even for
+The digraph data matrices must contain all actors who are part of the
+network at any observation time.
+If adjacency matrices are used as data input, they must therefore
+all have the same number of $n$ lines, each actor
+having a separate (and fixed) line in these matrices, even for
 observation times where the actor is not a part of the network
 (e.g., when the actor did not yet join or the actor already left
-the network). In other words, the adjacency matrix for each
-observation time has dimensions $n \times n$.
+the network).
+
+The \emph{times of composition change} can be given
+either in a data file or in a list available in the \R session.
+For networks with constant composition
+(no entering or leaving actors), this file or list is
+omitted and the current subsection can be disregarded.
 
 At these times, where the actor is not in the network, the entries
 of the adjacency matrix can be specified in two ways. First as
@@ -1618,7 +1602,7 @@ observations. This will increase the fractions of missing data and
 influence the initial values of the density parameter.
 
 A second way is by giving the entries a regular observed code,
-representing the absence or presence of an arc in the digraph (as
+representing the absence or presence of a tie (as
 if the actor was a part of the network). In this case, additional
 information on relations between joiners and other actors in the
 network before joining, or leavers and other actors after leaving
@@ -1626,11 +1610,54 @@ can be used if available. Note that this second option of
 specifying entries always supersedes the first specification: if a
 valid code number is specified this will always be used.
 
-For joiners and leavers, crucial information is contained in the
-times they join or leave the network (i.e., the times of
-composition change), which must be presented in a separate input
-file, the \emph{exogenous events file}
+The functions used to specify the times actors
+join or leave the network (i.e., the times of composition change)
+are \sfn{sienaCompositionChangeFromFile} in case a file is used,
+and \sfn{sienaCompositionChange} in case a list is used.
+How to use a separate input file,
+called the \emph{exogenous events file}, is
 described in Section~\ref{S_datform}.
+
+In the second case, a list must be given of length $n$,
+where $n$ is the number of actors in the node set.
+The $i$'th element of this list must be a vector of numbers (characters are also allowed),
+composed of an even number of elements, indicating the intervals during
+which actor $i$ was present. For example, \texttt{1 4} indicates that the actor
+was present from wave 1 to wave 4 (end points included) and
+\texttt{1 3.2 5.01 7}
+indicates that the actor was present from wave 1 to 20\% of the time between
+waves 3 and 4, and then again from just after wave 5 to wave 7.
+
+As an example, suppose we have 50 actors and 6 waves;
+almost all actors were present all the time, but actor 11 was present
+from wave 3 onward, actor 20 was present until wave 4, and
+actor 33 was present from mid-way between waves 1 and 2 until wave 3, and then
+again from just after wave 4 to wave 6.
+Then the list can be created by the following commands.
+\begin{verbatim}
+comp <- rep(list(c(1,6)), 50)
+comp[[11]] <- c(3,6)
+comp[[20]] <- c(1,4)
+comp[[33]] <- c(1.5,3,  4.01,6)
+changes <- sienaCompositionChange(comp)
+\end{verbatim}
+(The use of blanks in the line for \texttt{comp[[33]]} is only for visually
+keeping the pairs of start-end times together.)
+
+The first line, creating a list with the (default) first and
+last end point for everybody, could also be replaced by
+\begin{verbatim}
+comp <- vector("list", 50)
+comp[] <- list(c(1,6))
+\end{verbatim}
+Here it may be noted that \texttt{[]} keeps structures etc.\ unchanged
+while replicating the expression to fit.
+
+The object \texttt{changes} created by the functions
+\sfn{sienaCompositionChangeFromFile} or
+\sfn{sienaCompositionChange} is of class
+\sfn{compositionChange} and can be used in the function
+\sfn{sienaDataCreate}.
 
 
 \subsection{Centering}
@@ -1654,8 +1681,11 @@ a different moment, but the effect is exactly the same.)
 Unlike the `covariate similarity' effect,
 the `same covariate' effect is not centered but keeps its 0-1 values.
 
+For dependent behavioral variables, the effects are defined
+in Section~\ref{S_ff_b} as functions of centered variables.
+% See overallMean() in BehaviorLongitudinalData.h
 
-These means are stored as attributes on the object created by
+The means of covariates are stored as attributes on the object created by
 \sfn{SienaDataCreate}.
 If you wish to access them, the following steps can show
 where these means can be found.
@@ -1690,7 +1720,7 @@ attr(mydata$cCovars$smoke1, "simMean")
 The formula for balance is a kind of dissimilarity between rows of
 the adjacency matrix. The mean dissimilarity is subtracted in this
 formula, having been calculated according to a
-\hyperlink{T_meanbal}{formula given in Section}~\ref{S_math}.
+\hyperlink{T_meanbal}{formula given in Chapter}~\ref{S_math}.
 It is also reported in the output and available -- for the first
 dependent variable -- as \texttt{attr(mydata\$depvars[[1]], "balmean")}.
 Instead of \texttt{[[1]]} you can request a different number or
@@ -1840,6 +1870,32 @@ in all three roles: evaluation, creation, endowment.
 If one wishes to go beyond evaluation effects, then the user has to choose
 between adding an effect in either the creation or the endowment role.
 
+\subsubsection{Specification in \SI}
+
+The model specification can be defined in \SI by the functions
+\sfn{includeEffects} and \sfn{setEffects}.
+The scripts in Section~\ref{S_Rscript} give examples.
+An important ingredient here is the so-called \sfn{shortName}
+of each effect, which is used to identify it;
+effects of covariates need, in addition, the name of the covariate
+because the \sfn{shortName} does not specify the covariate.
+If there are several dependent variables (networks and/or behavioral variables),
+the variable name (\sfn{name}) also is required to specify the effect.
+The \sfn{shortName}s are part of the effects object.
+For example, the command
+\begin{verbatim}
+cbind(myeff$effectName, myeff$type, myeff$shortName)[1:20,]
+\end{verbatim}
+gives a list of the first 20 effects in the \texttt{myeff} object.
+As another example,
+\begin{verbatim}
+cbind(myeff$effectName, myeff$type, myeff$shortName)[myeff$type=="eval",]
+\end{verbatim}
+lists all evaluation effects in \texttt{myeff}.
+For the practical use of \si, the \sfn{shortName}s are important;
+they can be found in Chapter~\ref{S_math}.
+
+
 \subsubsection{Mathematical specification}
 \label{S_mathmod}
 
@@ -1900,7 +1956,7 @@ the objective function is equal to the evaluation function for the new state,
    u_i(x^0, x) \,=\, f_i(x) \ .
 \]
 Because of the properties of the exponential function one can just as
-well use define the objective function as the gain in evaluation function,
+well define the objective function as the gain in evaluation function,
 \[
    u_i(x^0, x) \,=\, f_i(x) - f_i(x^0) \ .
 \]
@@ -1940,7 +1996,7 @@ For the structural part of the model for network dynamics,
 for one-mode (or unipartite) networks,
 the most important effects are as follows.
 The mathematical formulae for these and other effects are given
-in Section~\ref{S_math}. Here we give a more qualitative description.
+in Chapter~\ref{S_math}. Here we give a more qualitative description.
 
 A default model choice could consist of (1) the out-degree and reciprocity
 effects; (2) one network closure effect,
@@ -2129,7 +2185,7 @@ for two-mode (or bipartite) networks,
 treated in \citet{KoskinenEdling2010},
 the most important effects are as follows.
 The mathematical formulae for these and other effects are given
-in Section~\ref{S_math}. Here we give a more qualitative description.
+in Chapter~\ref{S_math}. Here we give a more qualitative description.
 \begin{enumerate}
 \item The \emph{out-degree effect} which always must be included.
       \vspace{-3em}
@@ -2184,7 +2240,6 @@ in Section~\ref{S_math}. Here we give a more qualitative description.
      reflects tendencies for actors with high out-degrees
      to preferably be tied to column units with high in-degrees.
 \end{enumerate}
-
 
 \subsection{Effects for network dynamics associated with covariates}
 \label{S_eff_cov}
@@ -2757,7 +2812,7 @@ Alternatively a new version of this list can be displayed in a browser by using
 the function:
 
 \verb|effectsDocumentation()| \\
-Section~\ref{S_math} of this manual also gives the short names of all effects.
+Chapter~\ref{S_math} of this manual also gives the short names of all effects.
 
 \subsubsection{Interaction effects for network dynamics}
 
@@ -2789,6 +2844,26 @@ All effects used in interactions must be defined on the same network
 which the ``unspecified
 interaction effects'' is defined.  And either all must be
 of the same type (evaluation, endowment, or creation effects).
+
+Examples of the use of \sfn{includeInteraction} are as follows.
+\begin{verbatim}
+myeff <- includeInteraction( myeff, egoX, recip, include = FALSE,
+                                    interaction1 = c("smoke1","") )
+myeff <- includeInteraction( myeff, egoX, egoX, include = FALSE,
+                                    interaction1 = c( "smoke1", "alcohol" ) )
+\end{verbatim}
+Note the \texttt{interaction1} parameter; this parameter is used also
+when defining these effects using \sfn{includeEffects} or
+\sfn{setEffect}. In this case, however, two effects are defined,
+and accordingly the \texttt{interaction1} parameter has two components,
+combined by the \sfn{c} function.
+For effects such as \texttt{recip} that have no \texttt{interaction1}
+parameter, the corresponding string is just the empty string, \texttt{""}.
+
+Interactions between three effects are defined similarly,
+but now the \texttt{interaction1} parameter must combine three components.
+
+
 \iffalse
 
   b. Further, interaction effects are permitted
@@ -3322,8 +3397,10 @@ of some of the modeled `mechanisms' may have changed) and
 the score type test that is implemented in the \sfn{sienaTimeTest} function,
 see Section~\ref{S_timetest2}.
 
-See \citet{Lospinoso2011} for a technical presentation of how the test works,
-and \citet{Lospinoso2010b} for a walkthrough on model selection.
+See \citet{Lospinoso2011} for a technical presentation
+and examples of how the test works.
+%and \citet{Lospinoso2010b} for a walkthrough on model selection.
+% TS: seems not to be available at the indicated website!
 
 \subsection{Limiting the maximum outdegree}
 \label{S_maxdegree}
@@ -3368,11 +3445,17 @@ if there are multiple groups).
 
 There is now available in RSienaTest a function \verb!sienaGOF!
 which permits users to assess the fit of the model with respect to
-auxiliary functions of networks,
+auxiliary statistics of networks,
 e.g. geodesic distributions,
 that are not explicitly fit by a particular effect,
 but are nonetheless important features of the network to represent by the
 probability model.
+This can be used to check, when one has followed the approach to
+model specification explained in Sections~\ref{S_imp_str1}
+to~\ref{S_eff_beh} -- and explained also in \citet{SnijdersEA10b} --,
+whether the end result gives a good representation
+also of these other statistics.
+
 The following script gives a walkthrough for this functionality. The interface
 may change in the future, as this function is still in progress.
 See the working paper by \citet{Lospinoso2011b}
@@ -3861,24 +3944,17 @@ Requesting a longer summary by a command such as
 \begin{verbatim}
 summary(results1)
 \end{verbatim}
-will produce more information, including, e.g., the covariance matrix of the
-estimators.
+will produce more information, including, e.g.,
+the covariance/correlation matrix of the estimators.
 
-\subsubsection{Initial Values and Convergence Check}
+\subsubsection{Initial Values}
+\label{S_initials}
 
 The \emph{initial values} can be given in three ways.}
 \begin{enumerate}
-\item If \texttt{useStdInits = TRUE} is used in the call of
-      \textsf{sienaModelCreate}, standard initial values are used.\\
-      These consist of some reasonable values for the rate parameters and the
-      outdegree parameter, as well as for the linear shape parameter
-      for behavioral dependent variables (if any);
-      and 0 parameters for the rest.\\
-      The default is  \texttt{useStdInits = FALSE}.
-\item If \texttt{useStdInits = FALSE} and no \textsf{prevAns}
+\item The default: if \texttt{useStdInits = FALSE} and no \textsf{prevAns}
       parameter is given in the call of \textsf{siena07},
-      the initial values are taken from
-      the \textsf{sienaEffects} object,
+      the initial values are taken from the \textsf{sienaEffects} object,
       in this example called \texttt{myeff}.\\
       Requesting
 \begin{verbatim}
@@ -3891,19 +3967,22 @@ myeff
 \begin{verbatim}
 myeff$initialValue[myeff$include]
 \end{verbatim}
-      Changing these values is hardly ever necessary, because the
+      Changing these values is not often necessary, because the
       parameter \textsf{prevAns}, as explained in the next item,
-      does this behind the scenes.
-      If one does wish to change the initial values contained in
-      the effects object, this can be done by the \textsf{setEffect}
+      does this behind the scenes.\\
+       If one does wish to change the initial values contained in
+      the effects object, this can be done using the
+      function \textsf{updateTheta}, which copies the
+      estimates from earlier results, contained in a
+      \sfn{sienaFit} object, to the effects object.
+      For a single effect the initial value can be changed
+      by the \textsf{setEffect}
       function in which the \textsf{initialValue} then must be set.
-      Of course one could also operate directly on the vector
-      \texttt{myeff\$initialValue[myeff\$include]}.
 \item If \texttt{useStdInits = FALSE} and the \textsf{prevAns}
       (`previous answer')
       parameter is used, such as in
       \begin{verbatim}
-results1 <- siena07(model1, data = mydate, effects = myeff,
+results1 <- siena07(model1, data = mydata, effects = myeff,
                     prevAns = results0)
       \end{verbatim}
       the initial parameter estimates are taken from the results of
@@ -3912,16 +3991,26 @@ results1 <- siena07(model1, data = mydate, effects = myeff,
       \textsf{sienaFit} object; in this example it is given as
       \texttt{results0}.\\
       If the specification of the effects object used to obtain
-      \texttt{results0} was the same as \texttt{myeff}, then also the initial
-      values are copied, and Phase 1 of the algorithm is skipped,
+      \texttt{results0} was the same as \texttt{myeff}, then not only the initial
+      values are copied, but also Phase 1 of the algorithm is skipped,
       because information for the sensitivity of the statistics with
       respect to the parameters is taken from the results of Phase 3
       of \texttt{results0}.\\
       If the specification of the effects object used to obtain
       \texttt{results0} was not the same as \texttt{myeff}, then for those
       parameters that do match, the initial values are copied
-      from \texttt{results0}.
+      from \texttt{results0} and Phase 1 is carried out as usual.
+\item If \texttt{useStdInits = TRUE} is used in the call of
+      \textsf{sienaModelCreate}, standard initial values are used.\\
+      These consist of some reasonable values for the rate parameters and the
+      outdegree parameter, as well as for the linear shape parameter
+      for behavioral dependent variables (if any);
+      and 0 parameters for the rest.\\
+      The default is  \texttt{useStdInits = FALSE}.
 \end{enumerate}
+
+\subsubsection{Convergence Check}
+\label{S_ccheck}
 
 When parameters have been estimated, first the
 \hypertarget{T_convergence}{convergence} of the
@@ -3992,6 +4081,14 @@ of $1.1270/14.5022 = 0.0777$.
 Large values of the averages and standard deviations are
 in themselves not at all a reason for concern; only the
 $t$-ratio is important.
+\medskip
+
+If convergence is not very good even with repeated estimation with
+the \sfn{prevAns} option, sometimes it can be useful to try and use
+\sfn{updateTheta} to copy the results from the earlier estimation
+rather than \sfn{prevAns}; this will use the same starting values
+but not skip Phase 1 of the estimation algorithm, and sometimes
+this turns out to lead to faster convergence.
 
 \subsection{Some important components of the \textsf{sienaFit} object}
 \label{S_fitcomp}
@@ -4019,13 +4116,13 @@ Further details are in the help file for \textsf{siena07}
  \texttt{ans\$msf   }                 \>  covariance matrix of
                                            \texttt{ans\$sf    } \\
  \texttt{ans\$dfra  }                 \> estimated derivative of expected
-                                            statistics w.r.t.\ parameters,
-                                         for Methods of Moments estimation  \\
+                                            statistics w.r.t.\ parameters,  \\
+                                     \>   for Methods of Moments estimation  \\
  \texttt{ans\$sims }               \> simulated values of dependent variables
-                                      in Phase 3 of the algorithm
-                                         for Methods of Moments estimation  \\
-                                    \>     (see Section~\ref{S_sims}),
-                                        if \textsf{returnDeps = TRUE}
+                                      in Phase 3 of the algorithm     \\
+                                    \>     for Methods of Moments estimation
+                                        (see Section~\ref{S_sims}),    \\
+                                       \>  if \textsf{returnDeps = TRUE}
                                         in the call of \textsf{siena07}.
 \end{tabbing}
 Like for any \R object, the internal structure of the \textsf{sienaFit} object
@@ -4064,9 +4161,9 @@ stats <- ans$sf + rep(ans$targets, each=nrow(ans$sf))
 \subsection{Algorithm}
 \label{S_algorithm}
 
-The estimation algorithm
-is an implementation of the Robbins-Monro \citeyearpar{RobbinsMonro51}
- algorithm,
+The estimation algorithm is an implementation of a procedure of which
+the original version was proposed by \citet{RobbinsMonro51}.
+The algorithm is
 described in \citet{Snijders01, Snijders05}, and
 has %for both the MoM and ML method
 three phases:
@@ -4161,9 +4258,10 @@ Output can be obtained in several ways.
 
 The primary information in the output of the estimation process
 consists of the following three parts.
+
 \subsubsection{Convergence check}
 
-This was discussed \hyperlink{T_convergence}{above}.
+This was discussed in Section~\ref{S_ccheck} \hyperlink{T_convergence}{above}.
 \medskip
 
 \subsubsection{Parameter values and standard errors}
@@ -4326,18 +4424,18 @@ In this case, the three-cycle effect was not significant,
 and can be dropped for that reason.
 
 
-\iffalse
 \subsection{Maximum Likelihood and Bayesian estimation}
 \label{S_ML}
 \label{S_Bayes}
 
 \SI can estimate models by three estimation methods: the (unconditional or conditional)
-Method of Moments \citep*[`MoM', the default;][]{Snijders01; SnijdersEA07},
-the Maximum Likelihood method \citep[`ML', see][]{SnijdersEA10},
+Method of Moments \citep*[`MoM', the default; ][]{Snijders01, SnijdersEA07},
+the Maximum Likelihood method \citep*[`ML', see][]{SnijdersEA10a},
 and Bayesian methods
 \citep[see][]{Koskinen04, KoskinenSnijders07, SchweinbergerSnijders07c}.
-The maximum likelihood and Bayesian procedures are not yet
-implemented in RSiena.
+The implementation of maximum likelihood and Bayesian procedures
+in RSiena still is incomplete. Currently these methods can be used
+only for complete data sets (i.e., data without any missing values).
 In nice situations (relatively small and large network data sets,
 and large network and behavior data sets),
 the three methods tend to agree
@@ -4345,7 +4443,7 @@ and there seems not to be no reason to use the more time-consuming
 ML or Bayesian methods.
 In not-so-nice situations (very small network data sets, small network and behavior
 data sets in combination with complex models),
-however, ML and Bayesian methods tend to produce more accurate results
+however, ML and Bayesian methods tend to produce slightly more accurate results
 than MoM.
 Statistical theory suggests that ML is a more efficient estimation method
 than MoM in the sense of producing estimates with smaller standard errors.
@@ -4354,6 +4452,67 @@ Bayesian estimation is based on a different statistical paradigm, and
 assumes and requires that the uncertainty about parameters is expressed
 itself in a probability distribution.
 
+For ML and Bayesian estimation, an important parameter for tuning the
+algorithm is the so-called \textsf{Multiplication factor}. This determines
+the number of Metropolis-Hastings steps taken
+for simulating each new network.
+The number of steps (sometimes called `sampling frequency' in the literature)
+is the multiplication factor multiplied by the sum over dependent variables
+of the distances between successive waves.
+When this is too low, the
+sequentially simulated networks are too similar, which will
+lead to high autocorrelation in the generated statistics.
+This leads to poor performance of the algorithm.
+These autocorrelations are given in the output file. When some
+autocorrelations are more than 0.4, it is good to increase the
+\textsf{Multiplication factor}.
+When the \textsf{Multiplication factor} is unnecessarily high,
+on the other hand, computing time will be unnecessarily high.
+The advice is to aim at values between 0.1 and 0.3 or 0.4.
+
+A practical way to proceed is as follows.
+For initial tuning of the multiplication factor, use the model that
+is obtained as the default after creating the effects object,
+with very few effects included. The reason for using this model
+is the limited computation time and easy convergence.
+If the highest autocorrelation is more than 0.3, increase the
+multiplication factor (e.g., by making it twice as large;
+which will also lead to a twice as long computation time)
+and estimate the model again.
+If the highest autocorrelation is less than 0.1, then decrease
+the multiplication factor and estimate again.
+Tune the multiplication factor until the highest autocorrelation
+is between 0.1 and 0.3.
+Then start with estimating the models of interest.
+For other models the autocorrelations may change again, therefore
+it still can be important later on to adapt the multiplication factor
+to keep the highest autocorrelation less than 0.4.
+
+Another parameter of the algorithm that sometimes needs tuning
+(but less often than the multiplication factor)
+is the \textsf{Initial value of the gain parameter}.
+This determines the step sizes in the parameter updates in the iterative
+algorithm.
+It influences the stability and speed of moving of the algorithm.
+A too low value implies that it takes very long to attain a
+reasonable parameter estimate when starting from an initial
+parameter value that is far from the `true' parameter estimate.
+A too high value implies that the algorithm will be unstable,
+and may be thrown off course into a region of unreasonable
+(e.g., hopelessly large) parameter values.\\
+When using the Method of Moments
+(the default estimation procedure), it usually is unnecessary to change
+this. In the ML case, when the autocorrelations are smaller
+than 0.1 but the \texttt{t statistics for deviations from targets}
+are relatively small (less than, say, 0.3) but do not all become
+less than 0.1 in absolute value in repeated runs of the
+estimation algorithm, then it will be good to decrease the
+\textsf{initial value of the gain parameter}. Do this by dividing
+it by, e.g., a factor 2 or a factor 5, and then try again
+a few estimation runs.
+
+
+\iffalse
 \SI supplies three alternative MCMC algorithms for the
 Bayesian estimation of the objective function parameters:
 \begin{itemize}
@@ -4726,10 +4885,34 @@ vector is 0,
 H_0 : \ \theta_k \,=\, 0 ,
 \]
 the $t$-test is based on
-\[
-\frac{\hat\theta_k}{\se(\hat\theta_k)} \,=\, \texttt{ans\$theta[k] /sqrt(ans\$covtheta[k,k]) } \ .
-\]
+\begin{equation}
+\frac{\hat\theta_k}{\se(\hat\theta_k)} \,=\,
+   \texttt{ans\$theta[k] /sqrt(ans\$covtheta[k,k]) } \ .  \label{t-stat}
+\end{equation}
 This can be easily calculated by hand from the \RS results.
+\medskip
+
+In some cases, however, the $t$-statistic (\ref{t-stat}) does not have
+an approximate standard normal distribution under the null hypothesis,
+so that this test is not appropriate.
+This is the so-called Donner-Hauck phenomenon, named after
+\citet{HauckDonner77}, who first drew attention to this phenomenon
+in the case of logistic regression. It is discussed also in
+\citet[section 1.6]{GeyerThompson92} and \citet{AlbertAnderson84}.
+This occurs when the data indicates that the parameter
+should be very large in absolute value, but not how large.
+The parameter estimate as well as the standard error then are large,
+and the ratio (\ref{t-stat}) does not need to be large.
+The Wald test then cannot be used for significance testing.
+In Section~\ref{S_fixingparameters} we proposed that in such cases,
+it may be helpful to fix the parameter at some large value,
+without estimating it.
+One possibility that then is available to test the significance
+is to make a second estimation run in which the parameter is fixed at
+the value 0, corresponding to the null hypothesis, and test
+this null value using the score-type test of Section~\ref{Scoretest}.
+
+\subsubsection*{Multi-parameter Wald tests}
 
 Now suppose that we wish to test another null hypothesis,
 which can be represented as a linear constraint on $\theta$:
@@ -4770,7 +4953,7 @@ Wald.RSiena <- function(A, ans)
     chisq  <- drop(t(th) %*% solve(covmat) %*% th)
     d.f.   <- nrow(A)
     pval   <- 1 - pchisq(chisq, d.f.)
-    c(chisquare = chisq, df = d.f., pvalue = pval)
+    print(c(chisquare = chisq, df = d.f., pvalue = pval), digits=3)
 }
 \end{verbatim}
 
@@ -4817,65 +5000,113 @@ A       <- matrix(0, 3, 8)
 A[1, 6] <- 1
 A[2, 7] <- 1
 A[3, 8] <- 1
-as.matrix(Wald.RSiena(A, ans))
+Wald.RSiena(A, ans)
 \end{verbatim}
 \end{small}
-(The use of the \texttt{as.matrix()} function merely serves to give a
-prettier printout of the result.)
 The result is
 \begin{small}
 \begin{verbatim}
-          [,1]
-chisquare 16.55552
-df        3
-pvalue    0.0008721914
+chisquare        df    pvalue
+   16.556     3.000     0.000872
 \end{verbatim}
 \end{small}
-The $p$-value of $p < 0.001$ expresses strong evidence
+The value $p < 0.001$ expresses strong evidence
 that the network dynamics depends on sex.
+\bigskip
+
+The Wald test is frequently applied to test the null
+hypothesis that several parameters are 0.
+The extra work to define the matrix $A$ above can be automated
+by using the following function.
+\begin{verbatim}
+Multipar.RSiena <- function(ans, ...)
+   {
+    p <- length(ans$theta)
+    k <- length(c(...))
+    A <- matrix(0, nrow=k, ncol=p)
+    A[cbind(1:k,c(...))] <- 1
+    Wald.RSiena(A, ans)
+    }
+\end{verbatim}
+The test of the preceding example is then produced by the command
+\begin{verbatim}
+Multipar.RSiena(ans, 6, 7, 8)
+\end{verbatim}
+
 
 \subsection{Score-type tests}
 \label{Scoretest}
 
-A generalized Neyman-Rao score test
-is implemented for the MoM estimation method
-in \SI \citep[see][]{Schweinberger11}.
+The Wald test is based on the estimate for the parameter,
+and thereby integrates estimation and testing.
+Sometimes, however, it can be helpful to separate these two
+types of statistical evaluation.
+This is the case notably when estimation is instable, e.g.,
+when a model is considered with rather many parameters given
+the information available in the data set,
+or when the precise value of the estimate is not determined
+very well as happens under the Donner-Hauck phenomenon
+treated in the previous section.
+The score-type test gives the possibility of testing
+a parameter without estimating it.
+
+This is done using the generalized Neyman-Rao score test
+that is implemented for the Method of Moments estimation method
+in \si, following the methods of \citet{Schweinberger11}.
 For the ML estimation method,
 following the same steps produces the \citet{Rao47} efficient score test.
+Since the name of ``score test'' is associated with
+likelihood-based analysis as in \citet{Rao47}, the test
+of  \citet{Schweinberger11} that is associated with the Method of Moments
+is called ``score-type test''.
 
-Most goodness-of-fit tests will have the following form: some model
-is specified and one or more parameters are restricted to some
+When using the score-type test, some model
+is specified in which one or more parameters are restricted to some
 constant, in most cases $0$ -- these constant values
 define the null hypothesis being tested.
 This can be obtained in \RS by appropriate choices in the effects dataframe
-(called \sfn{myeff} in Section~ \ref{S_Rscript}).
+(called \sfn{myeff} in Section~\ref{S_Rscript}).
 Parameters can be restricted by
-putting 1 in the \sfn{fix} and \sfn{test} columns when editing the effects, and
+putting \texttt{TRUE} in the \sfn{fix} and \sfn{test} columns, and
 the tested value in the \sfn{initialValue} column.
-For example, to request a score test for the reciprocity evaluation effect for
-the first network: Suppose this effect has \sfn{effectNumber} equal to 10, the
-commands can be as follows.
-
+The function \sfn{setEffect} is available to do this.
+For example, a score test for the evaluation effect of transitive ties
+in a network can be requested as follows.
 \begin{verbatim}
-myeff[10, 9]              <- TRUE
-myeff[10, 'fix']          <- TRUE
-myeff[10, 'test']         <- TRUE
-myeff[10, 'initialValue'] <- ((value to be used for test))
-## or, more easily,
-myeff <- setEffect(myeff, recip, fix=TRUE, test=TRUE,
+myeff <- setEffect(myeff, transTies, fix=TRUE, test=TRUE,
                    initialValue=(value to be used for test))
 \end{verbatim}
 
-
-
-
-The goodness-of-fit test
+The score-type test then
 proceeds by simply estimating the restricted model (not the unrestricted model,
-with unrestricted parameters) by the standard \SI estimation algorithm. No more
-information needs to be communicated.%  When the model is restricted, \SI by
-% default assumes that the restricted model is to be tested against the
-% unrestricted model, and by default \SI evaluates the generalized Neyman-Rao
-% score test statistic.
+with unrestricted parameters) by the standard \SI estimation algorithm.
+The result of the score-type test is presented in the \sfn{summary}
+of the estimation results (the \sfn{sienaFit} object obtained from
+\sfn{siena07}) and also in the output file.
+
+It should be noted that using the \sfn{prevAns} option in \sfn{siena07}
+overrides the initial values in the effects object,
+so that using \sfn{siena07} for an effects object with
+\texttt{fix = TRUE} for some of the effects, jointly with
+the \sfn{prevAns} option, will lead to score-type tests
+of hypothesized values as given by the  \sfn{prevAns} option.
+Since the presentation of the results includes the
+hypothesized value, there is no reason for doubt as to what
+has been done. However, mostly this is not what is desired,
+and therefore it usually will be preferable to use the following sequence:
+first update the initial values using \sfn{updateTheta}, then
+set the hypothesized value by \sfn{setEffect}, and then
+carry out the estimation and score-type test by \sfn{siena07}.
+The following is an example, assuming that an earlier
+reasonable estimate was found in \sfn{sienaFit} object \texttt{myans0},
+and the user wishes to use this as starting values.
+\begin{verbatim}
+myeff <- updateTheta(myeff, myans0)
+myeff <- setEffect(myeff, transTies, fix=TRUE, test=TRUE,
+                   initialValue= 0)
+myans1 <- siena07(estimationSettings, data=mydata, effects=myeff)
+summary(myans1)
+\end{verbatim}
 
 \subsection{Example: one-sided tests, two-sided tests, and one-step estimates}
 \label{example}
@@ -4964,7 +5195,6 @@ freedom, additional tests with one degree of freedom that test the
 single parameters one-by-one. The goodness-of-fit table is as
 follows:
 
-\newpage
 {\footnotesize
 \begin{verbatim}
 @2
@@ -5100,8 +5330,9 @@ H_1:\delta_k^{(m)} \neq 0 & \mbox{ for some } k,m .
 \label{hyptest}
 \end{align}
 
-An application of the score test is given for the special case of parameter
-heterogeneity by \citet{Lospinoso2011} and implemented in RSiena.  To apply the
+This testing problem can be addressed by the score test in a way that
+no extra estimation is necessary. This method was elaborated and proposed by
+\citet{Lospinoso2011} and is implemented in RSiena.  To apply the
 test to your dataset, run an estimation in the usual way, e.g. as follows
 (we specify \texttt{nsub=2, n3=100} just to have an example that runs
 very quickly):
@@ -5131,8 +5362,10 @@ tt3 <- sienaTimeTest(ans3)
 \end{verbatim}
 and so on.
 
-See \citet{Lospinoso2010b} for a walkthrough of the model selection process
-for time dummy terms.
+%See \citet{Lospinoso2010b} for a walkthrough of the model selection process
+%for time dummy terms.
+% TS: seems not to be available at the indicated website!
+
 
 \newpage
 \section{Simulation}
@@ -5222,10 +5455,36 @@ containing all simulated networks
 as edge lists to the \texttt{sim\_ans} object.
 This uses rather a lot of memory.
 Since here the default \texttt{n3 = 1000} was used, \texttt{sim\_ans} will be
-a list of 1000 elements; e.g., the 568'th network generated is given by
+a list of 1000 elements; e.g., the 568'th network generated
+for wave 2 is given by
 \begin{verbatim}
 sim_ans$sims[[568]][[1]][[1]][[1]]
 \end{verbatim}
+The numbering is as follows: first the number of the simulation run (here,
+arbitrarily, 568); then the number of the group as defined in
+Section~\ref{S_multigroup} (1 in the usual case of single-group data structures);
+then the number of the dependent variable (here 1, because it is supposed
+that there only is a dependent network);
+then the number of the wave minus 1 (here 1 because there are supposed to be
+2 waves).
+This type of information can be found out by requesting
+\begin{verbatim}
+str(sim_ans$sims[[568]])
+\end{verbatim}
+
+Section \ref{S_trafos} explains how such an edgelist can be
+transformed to an adjacency matrix:
+\begin{verbatim}
+# Determine number of actors (normally the user will know this)
+n <- length(mydata$nodeSets[[1]])
+# create empty adjacency matrix
+adj <- matrix(0, n, n)
+# Make shorter notation for edge list
+edges <- sim_ans$sims[[856]][[1]][[1]][[1]]
+# put edge values in desired places
+adj[edges[, 1:2]] <- edges[, 3]
+\end{verbatim}
+
 As an example, the following commands turn this list into
 a list of edgelists according to the format of the \textsf{sna} package
 \citep{Butts08}, and then calculate the maximum $k$-core numbers
@@ -5277,6 +5536,7 @@ null means and standard deviations.)
 
 
 \subsection{Conditional and unconditional simulation}
+\label{S_conds}
 
 The distinction between conditional and unconditional simulation
 is the same for the simulation as for
@@ -5405,8 +5665,13 @@ conditionally or unconditionally.\medskip
 \section{Getting started}
 \label{S_getting}
 
-For getting a first acquaintance with the model, one may use the
-data set collected by Gerhard van de Bunt, discussed extensively in
+The best way to get started is to download the \R scripts from the
+\SI website and start reading and playing with them.
+These scripts are also included in this manual in Section~\ref{S_Rscript}.
+
+For carrying on and getting a first acquaintance with your own running
+of the model, the data set collected by Gerhard van de Bunt
+is useful; this data is discussed extensively in
 \citet*{vanBunt99, vanBuntEA99},
 and used as example also in \citet{Snijders01} and \citet{Snijders05}.
 The data files are provided with the program
@@ -5415,20 +5680,26 @@ used are the two networks {\sf vrnd32t2.dat}, {\sf vrnd32t4.dat}.
 The networks are coded as 0 = unknown, 1 = best friend, 2 = friend,
 3 = friendly relation, 4 = neutral, 5 = troubled relation, 6 = item
 non-response, 9 = actor non-response.
-Choose the values 1, 2, and 3 as the values to be coded
-as 1 for the first as well as the second network. Choose 6 and 9 as
-missing data codes.
+Recode the network so that values 1, 2, and 3 are interpreted
+as ties for the first as well as the second network, and values 6 and 9
+are missing data codes (\texttt{NA}).
 
 The actor attributes are in the file {\sf vars.dat}. Variables
 are, respectively, gender (1 = $F$, 2 = $M$), program, and smoking
-(1 = yes, 2 = no). See the references mentioned above for further
+(1 = yes, 2 = no). See the \sfn{Data sets} tab at the
+\SI website, and the references mentioned above for further
 information about this network and the actor attributes.
 
-At first, leave the specification of the rate function as
+Create the various required objects, using functions
+\sfn{sienaDataCreate}, \sfn{getEffects}, and \sfn{sienaModelCreate},
+as indicated in Chapters~\ref{S_InputData} and~\ref{S_Est}.
+At first, leave the whole model specification as
 it is by default (see Section \ref{S_modspec}):
-a constant rate function).
+a constant rate function, the out-degree effect, and
+the reciprocity effect.
 
-Then let the program estimate the parameters. You will see a
+Then let the program estimate the parameters, using function \sfn{siena07}.
+You will see a
 screen with intermediate results: current parameter values, the
 differences (`deviation values') between simulated and observed
 statistics (these should average out to 0 if the current
@@ -5437,19 +5708,40 @@ parameters are close to the correct estimated value), and the
 \ref{S_Est}.
 
 It is possible to intervene in the algorithm by clicking on the
-appropriate buttons: %the current parameter values may be altered
-%or
+appropriate buttons:
 the algorithm may be restarted or terminated. In most cases
 this is not necessary.
 
-Some patience is needed to let the machine complete its three
+A little bit of patience is needed to let the machine complete its three
 phases.
 %How this depends on the data set and the number of parameters
 %in the model is indicated in Section~\ref{S_timeuse}.
-After having obtained the outcomes of the estimation
-process, the model can be respecified: non-significant effects may
+When the algorithm has finished, look at the results in the output file
+or by the \sfn{print} or \sfn{summary} function of the
+resulting \sfn{sienaFit} object. Check
+whether the $t$-ratios for convergence are small enough
+(ideally less than .10; less than .15 is acceptable for
+provisional results).
+If not, continue estimation with the \sfn{prevAns} option
+as discussed in Section~\ref{S_ccheck}.
+When satisfactory convergence has been obtained, make sense
+of the results: for example, is the reciprocity parameter significant?
+
+As further steps, include some extra effects. First candidates
+are the transitive triplets effect or the transitive ties effect
+and the 3-cycles effect (see, e.g., Section~\ref{S_modspec});
+you can find their \sfn{shortName},
+needed to specify them, in Chapter~\ref{S_math},
+where also the mathematical specifications are given.
+When these new effects have been added, follow the same steps:
+estimate, check convergence, if this is not yet satisfactory
+estimate again with the new initial values, and interpret the
+results when converged has been obtained.
+
+To continue,  non-significant effects may
 be excluded (but it is advised always to retain the out-degree and
-the reciprocity effects) and other effects may be included.
+the reciprocity effects) and other effects may be included,
+as suggested in Section~\ref{S_modspec}.
 
 \subsection{Model choice}
 \label{S_model}
@@ -5467,7 +5759,7 @@ transitivity, etc.) to get an impression of what the network
 dynamics looks like, and later add effects of covariates.
 The most important effects are discussed in Section~\ref{S_modspec};
 the effects are defined mathematically
-in Section~\ref{S_math}.
+in Chapter~\ref{S_math}.
 
 \iffalse
 Here we give a more qualitative description.
@@ -5573,44 +5865,12 @@ Here we give a more qualitative description.
 \end{enumerate}
 \fi
 
-\subsubsection{Exploring which effects to include}
+Approaches to model specification are presented in Chapter~\ref{S_modspec}
+and in \citet*{SnijdersEA10b}.
 
-The present section describes an exploratory approach to model
-specification. A more advanced approach to testing model
-specifications is described in Section~\ref{S_test}.
-
-For an exploration of further effects to be included, the
-following steps may be followed:
-\begin{enumerate}
-\item Estimate a model which includes a number of basic effects;
-\item Simulate the model for these parameter values but
-      also include some other relevant statistics
-      among the simulated statistics;
-\item Look at the $t$-values for these other statistics;
-      effects with large $t$-values are candidates for inclusion
-      in a next model.
-\end{enumerate}
-It should be kept in mind, however, that this exploratory approach
-may lead to capitalization on chance, and also that the $t$-value
-obtained as a result of the straight simulations is conditional on
-the fixed parameter values used, without taking into account the
-fact that these parameter values are estimated themselves.
-
-It is possible that for some model specifications the data set
-will lead to divergence, e.g., because the data contains too
-little information about this effect, or because some effects are
-`collinear' with each other. In such cases one must find out which
-are the effects causing problems, and leave these out of the
-model. Simulation can be helpful to distinguish between the
-effects which should be fixed at a high positive or negative value
-and the effects which should be left out because they are
-superfluous.
-
-When the distribution of the out-degrees is fitted poorly % (which can
-% be investigated by the extra output requested
-% by selecting \hyperlink{T_modelcode}{Model Code} larger than 10
-% in the \hyperlink{T_S_options}{model options}),
-an improvement
+When the distribution of the out-degrees is fitted poorly
+(which can be inspected using the \sfn{sienaGOF} function
+of Section~\ref{S_gof}), an improvement
 usually is possible either by including non-linear effects of the
 out-degrees in the evaluation function.
 %, or by changing to Model Type 2
@@ -5618,7 +5878,8 @@ out-degrees in the evaluation function.
 
 \subsection{Convergence problems}
 
-If there are convergence problems, this may have several reasons.
+If there are persisting convergence problems even after repeated estimations
+as suggested in Section~\ref{S_ccheck}, this may have several reasons.
 \begin{itemize}
 \item The data specification was incorrect (e.g., because the coding
       was not given properly).
@@ -5629,7 +5890,7 @@ If there are convergence problems, this may have several reasons.
       or from values obtained as the estimates for a simpler model
       that gave no problems.
       The initial default parameter values can be obtained
-      by choosing the model option ``standard initial values".   \\
+      by choosing the model option ``standard initial values".
 \iffalse
       When starting estimations with Model Type 2
       (see Section~\ref{S_modeltype}), there may be some problems to
@@ -5668,6 +5929,8 @@ If there are convergence problems, this may have several reasons.
       representing one or more observational periods; these must be included
       as an ego effect to represent time trends in the tendency to make ties
       (or to display higher values of the behavior in question).
+      Further see Section~\ref{S_timetest1} for how to discover and handle
+      time heterogeneity.
 \item Too many weak effects are included. Use a smaller number of effects,
       delete non-significant ones, and increase complexity step by step.
       Retain parameter estimates from the last
@@ -5677,7 +5940,8 @@ If there are convergence problems, this may have several reasons.
 \item Two or more effects are included that are almost collinear
       in the sense that they can both explain the same observed structures.
       This will be seen in high absolute values of
-      correlations between parameter estimates.
+      correlations between parameter estimates, presented in the
+      \sfn{summary} of the results object and also in the output file.
       In this case it may be better to exclude one of these effects from the model.
 \item An effect is included that is large but of which the precise
       value is not well-determined (see above:
@@ -5835,7 +6099,9 @@ These sub-projects
 must have the same sets of variables of all kinds:
 that is, the list of dependent networks, dependent behavioral variables,
 actor covariates, and dyadic covariates must be the same
-for the various sub-projects. The number of actors
+for the various sub-projects.
+Also their names must be the same.
+The number of actors
 and the number of observations can be different, however.
 These sub-projects then are combined into one project
 where the number of actors is the largest of the number of
@@ -5853,8 +6119,8 @@ to {\tt sub3}. These switching steps do not correspond to simulations
 of the actor-based model, because that would not be meaningful.
 
 The different sub-projects are considered to be unrelated
-except that they have the same model specification and the same
-parameter values.
+except that they have the same model specification,
+the same variable names, and the same parameter values.
 It is important to check that this is a reasonable assumption.
 One aspect of this is by looking at the descriptives for change
 produced by \textsf{print01Report}, and checking that the
@@ -5897,6 +6163,9 @@ then the \emph{true parameter values} for the
 $N$ data sets are denoted $\theta_1, \theta_2, \ldots, \theta_N$,
 while their \emph{estimates} are denoted
  $\hat\theta_1, \hat\theta_2, \ldots, \hat\theta_N$.
+
+The package \sfn{metafor} can also be used for meta-analysis.
+This package is extensively documented in \citet{Viechtbauer2010}.
 
 \subsubsection{Meta-analysis directed at the mean
                and variance of the parameters}
@@ -7309,7 +7578,8 @@ if the associated parameter is denoted $\alpha_h$ for some $h$,
 and similarly for the contributions of the in-degrees and the
 reciprocated degrees.
 
- Also an exponential dependence on reciprocals of out-degrees \texttt{(outRateInv)} can be specified;
+ Also an exponential dependence on reciprocals of out-degrees
+ \texttt{(outRateInv)} can be specified;
  this can be meaningful because the rate effect of
  the out-degree becoming a value 1 higher might
  become smaller and smaller as the out-degree increases.
@@ -7317,7 +7587,7 @@ reciprocated degrees.
  (but always for different index numbers $h$),
  this effect multiplies the factor $\lambda^{\rm net}_{i3}$ by
 % \[ 1 \+ \frac{\alpha_h}{1 \+ x_{i+}} \ . \]
- \[ \exp( \alpha_h / x_{i+} ) \ . \]
+ \[ \exp( \alpha_h / (x_{i+} +1)) \ . \]
 % This function was chosen so that for a parameter $\alpha_h = 0$,
 % there is no effect (multiplication by a factor 1);
 % and no problems (division by 0) occur when $ x_{i+} = 0$.
@@ -7357,6 +7627,8 @@ Also to this exponent effects of actor covariates can be added.
 \fi
 
 \subsection{Behavioral evolution}
+\label{S_ff_b}
+
 The model of the dynamics of a dependent actor variable
 consists of a model of actors' decisions (according to {\it
 evaluation}, {\it creation}, and {\it endowment functions})
@@ -7399,9 +7671,7 @@ with the behavioral variable itself.
                                                              \texttt{(quad)},
  where the attractiveness of further steps up the behavior `ladder'
  depends on where the actor is on the ladder:\\
- $s^{\rm beh}_{i\vit}(x, z) =  z_i^2$.\\
- The position of this effect in the sequence of effects is different between
- versions 3 and 4 of \si.
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i^2$.
 \end{startenum}
 Next there is a list of effects that have to do with the influence of
 the network on the behavior.
@@ -7722,9 +7992,9 @@ beh}_m \] for $m = 1, ..., M-1$.
 
 The main `driving force' of the actor-oriented model
 is the evaluation function
-\citep[in earlier publications called objective function,
-see][]{Snijders01, Snijders05} given in formula (\ref{f_net})
-(for the network) as
+(extended with the creation and/or endowment function, if these are
+part of the model specification).
+For the network, this is given in formula (\ref{f_net}) as
 \[
 f^{\rm net}_i(x) \, = \, \sum_k \beta^{\rm net}_k \, s^{\rm net}_{ik}(x)   \ .
 \]
@@ -7754,6 +8024,12 @@ for $x_a$ and $x_b$ are $x$ itself (no change), or $x$ with one extra
 outgoing tie from $i$, or $x$ with one fewer outgoing tie from $i$.
 Explanations about log odds ratios can be found
 in texts about logistic regression and loglinear models.
+For dependent behavior variables, the interpretation is similar,
+keeping in mind that permitted changes in the behavior variable are
+--1, 0, and +1 (as far as these changes do not lead beyond the
+permitted range).
+
+\subsection{Networks}
 
 The evaluation function is a weighted sum of `effects'
 $s^{\rm net}_{ik}(x)$.
@@ -7794,6 +8070,86 @@ E.g., if $i$ currently has a tie neither to $j$ nor to $h$,
 and supposing that $\beta_k = 0.3$, the probability for $i$ to
 extend a new tie to $h$ is $e^{0.3} = 1.35$ times as high
 as the probability for $i$ to extend a new tie to $j$.
+
+\subsection{Behavior}
+
+The evaluation function for behavior is given by
+\[
+f^{\rm beh}_i(x, z) \, = \, \sum_k \beta^{\rm beh}_k s^{\rm beh}_{ik}(x, z) \ ,
+\]
+see (\ref{f_beh}).
+In many cases the effect has the form of a product
+\begin{equation}
+s^{\rm beh}_{ik}(x, z) \,=\, z_i \,s^{0}_{ik}(x, z) \ ,  \label{beh_generic}
+\end{equation}
+where $s^{0}_{ik}(x, z)$ is not dependent on $z_i$, and therefore
+would not be affected by the outcome of a behavior ministep of actor $i$.
+Examples are the main effect of an actor attribute, but also the
+average alter effect.
+For such effects, when a ministep in behavior occurs, the contribution
+on the probability distribution of the change is as follows:
+a change of $z_i $ by --1 will decrease the evaluation function by
+$\beta^{\rm beh}_k$, and a change by +1 will increase it by the same amount.
+Therefore, the log-odds-ratio of an increase in behavior compared to
+staying constant, due to a difference of 1 in the
+value of the function $s^{0}_{ik}(x, z)$, is equal to
+$\beta^{\rm beh}_k$. The odds ratio is $\exp(\beta^{\rm beh}_k)$.
+
+For example, later in this section results are presented where,
+for an analysis of drinking behavior, the
+estimated parameter for average alter is 1.1414.
+This means that when comparing two individuals who are equal in all respects
+except that the friends of the first on average are  1 higher
+on the drinking scale than those of the second individual,
+the odds of increasing drinking behavior compared to no change
+(in the event of a ministep with respect to drinking behavior)
+are $\exp(1.1414) = 3.1$ times higher for the first individual
+than for the second.
+
+The interpretations of total and average similarity are more laborious
+to explain than the interpretation of the average alter effect.
+This is because total and average similarity are not of the form
+(\ref{beh_generic}). To explain the log-odds or odds ratios due to these
+effects, it has to be understood how a change in the behavior $z_i$
+will affect the values of these effects.
+Examining their formulae leads to the following.
+
+For a given actor $i$, the out-degree (number of friends) is denoted $x_{i+}$.
+Let the number of friends whose values $z_j$ are less than, equal to,
+or greater than the value $z_i $ of $i$, be denoted by $a$, $b$, and $c$.
+Denote the range (maximum minus minimum value) of the behavior by $r$.
+Then, in the event of a ministep with respect to behavior,
+the contributions of the total similarity effect to the log-probabilities
+of changes --1, 0, or +1, are given by $\beta^{\rm beh}_k(a-b-c)/r$,
+0, and $\beta^{\rm beh}_k(c-a-b)/r$, respectively.
+The contributions for the average similarity effect are
+$\beta^{\rm beh}_k(a-b-c)/(rx_{i+})$,
+0, and $\beta^{\rm beh}_k(c-a-b)/(rx_{i+})$.
+This shows that the influence of the friends in the similarity effects
+depends only on whether they have larger or smaller values than the focal actor,
+not on how much larger the values are.
+It also shows that for the similarity effects the dispersion of the
+friends' values matters and not only their average,
+whereas for the average alter effect only the average matters.
+
+To have a compact formulation, without all this detail, one could
+say the following. We use the example on one of the following
+pages, where an average similarity effect on drinking is reported of
+$\hat\beta^{\rm beh}_k = 3.9689$, where drinking has a range of $r = 5-1 = 4$.
+For an individual all of whose friends drink more than this individual does,
+the contribution of friends' influence to the odds of an increase in drinking
+as compared to no change is a factor $\exp(3.9689/4) = 2.7$.
+(In this formulation, the condition ``in the event of a ministep
+with respect to drinking behavior" is left implicit.)
+
+In the same situation, if hypothetically a total average similarity
+effect were found of 0.82, then one could say that having \emph{one} additional
+friend who drinks more than oneself increases the odds of an increase in drinking
+as compared to no change by a factor $\exp(0.82/4) = 1.23$.
+In general, parameters for the total similarity effect will tend to be
+smaller than those for the average similarity effect, because the former
+refer to comparisons about a single friend, and the latter to comparisons
+about all friends.
 
 \subsection{Ego -- alter selection tables}
 
@@ -7927,7 +8283,7 @@ For the drinking behavior, formula (\ref{eq_sel}) yields
 \noindent
 In \R the following code can be used to construct the selection table.
 Note that the function \sfn{outer} here is very convenient.
-\newpage
+
 \begin{footnotesize}
 \begin{verbatim}
 # First define a function that incorporates the relevant part
@@ -8431,6 +8787,33 @@ for  $z_i = \bar z_{(i)}$.
 
 
 \newpage
+\section{Error messages}
+
+This chapter contains some error messages with their explanations.
+Currently it is not very filled; new error messages will be added
+as questions about them arise.
+
+\subsection{During estimation}
+
+\emph{Unlikely to terminate this epoch: more than 1000000 steps}.\\
+
+\begin{minipage}{0.05\textwidth}
+$\phantom{abcde}$
+
+\end{minipage}
+\begin{minipage}{0.94\textwidth}
+This can happen during conditional estimation in function \sfn{siena07},
+when the rate parameter provisionally has hit a value such that the
+desired number of changes will never be reached.
+See Section~\ref{S_cond}.
+
+\noindent
+Solutions. 1. Check whether your model specification is reasonable;
+for example, there might be doubts about the specification of the
+rate function. 2. Use non-conditional estimation (Section~\ref{S_cond}).
+\end{minipage}
+
+\newpage
 \part{Programmers' manual}
 
 \section{Get the source code}
@@ -8723,7 +9106,7 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
 \item To choose a template for \sfn{TruncatedOutdegreeEffect},
       we could make various
       different choices; here it is important to have a look at the various
-      effects defined in Section~\ref{S_math} that depend only on the
+      effects defined in Chapter~\ref{S_math} that depend only on the
       outdegree. Consider the effects Outdegree activity - sqrt
       (short name \texttt{outActSqrt})
       and sum of (1/(out-degree + $c$) (short name \texttt{outInv})
@@ -9423,6 +9806,11 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2012-01-17 R-forge revision 192.
+\begin{itemize}
+\item minor but extensive changes to manual
+\item minor changes to scripts
+\end{itemize}
 \item 2011-12-15 R-forge revision 191. Some of these may alter results slightly.
 \begin{itemize}
 \item Altered calculations of probabilities to avoid overflows
@@ -10016,6 +10404,7 @@ Created RSienaTest which includes user
 \nocite{Frank91}
 \nocite{JariegoFederico06}
 
+\newpage
 %\bibliographystyle{JRSS} % TS: I did not find this style so I changed it:
 \bibliographystyle{apalike}
 %\bibliographystyle{plain}
