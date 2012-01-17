@@ -169,6 +169,10 @@ private:
 	// cooperation between actor and alter
 
 	double lsymmetricProbability;
+
+	// whether this is a one mode network or not
+
+	bool loneMode;
 };
 
 

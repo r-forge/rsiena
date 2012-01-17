@@ -1,3 +1,21 @@
+2012-01-17 R-forge revision 194
+
+	* doc/RSIENAspec.tex, man/coDyadCovar.Rd, man/varDyadCovar.Rd,
+	R/effects.r, R/initializeFRAN.r, R/sienaDataCreate.r,
+	R/sienautils.r, src/data/Data.cpp,
+	src/data/NetworkLongitudinalData.cpp,
+	src/data/NetworkLongitudinalData.h,
+ 	src/data/OneModeNetworkLongitudinalData.cpp,
+	src/model/filters/LowerFilter.cpp,
+	src/model/ml/NetworkChange.cpp,
+	src/model/variables/NetworkVariable.cpp,
+	src/model/variables/NetworkVariable.h,
+	src/model/network/Network.h: make treatment of bipartite networks and
+	dyadic covariates consistent.
+	* R/globals.r: make PrtOutMat cope with null matrices
+	* R/initializeFRAN.r: fix to calculation of number of ML steps,
+	relax restrictions on behavior interactions.
+
 2012-01-17 R-forge revision 193. RSienaTest only.
 
 	* R/sienatable.r: file added with siena.table function.
@@ -5,8 +23,8 @@
 
 2012-01-17 R-forge revision 192.
 
-   * minor but extensive changes to manual
-   * minor changes to scripts
+	* minor but extensive changes to manual
+	* minor changes to scripts
 
 2011-12-15 R-forge revision 191.
 
@@ -81,8 +99,10 @@
 	src/model/Model.cpp, src/model/Model.h, src/model/State.cpp,
 	src/ml/MLSimulation.cpp, src/model/ml/MLSimulation.h: added
 	facility to return log likelihood after simulation, stopped
-	returning of chains every iteration. Bug fixes for ML. Added
-	R/algorithms.r to RSienaTest (previously in examples directory).
+	returning of chains every iteration. Bug fixes for ML.
+	* R/algorithms.r: added to RSienaTest (from examples directory).
+	* man/profileLikelihoods.Rd, man/algorithms.Rd: (RSien aTest only)
+	help files for functions in algorithms.r.
 
 2011-11-27 R-forge revision 185.
 

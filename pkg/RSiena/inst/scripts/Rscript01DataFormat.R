@@ -1,15 +1,15 @@
 ###################################################################################
 ###
-### ---- RscriptDataFormat.R: a script for the introduction to RSiena -------------
+### ---- Rscript01DataFormat.R: a script for the introduction to RSiena -------------
 ###
-###                               version: April 11, 2011
+###                               version: January 17, 2012
 ###################################################################################
 #
-# RscriptDataFormat.R is followed by
+# Rscript01DataFormat.R is followed by
 # RScriptSNADescriptives.R, code for descriptive analysis of the data, and
-# RscriptSienaVariableFormat.R, which formats data and specifies the model, and
-# RscriptSienaRunModel.R, which runs the model and estimates parameters
-# RscriptSienaBehaviour.R, which illustrates an example of analysing the
+# Rscript02SienaVariableFormat.R, which formats data and specifies the model, and
+# Rscript03SienaRunModel.R, which runs the model and estimates parameters
+# Rscript04SienaBehaviour.R, which illustrates an example of analysing the
 # coevolution of networks and behaviour
 #
 # The entire model fitting is summarised at the end of RscriptSienaRunModel.R
@@ -22,40 +22,59 @@
 # The script has a lot of explanation of R possibilities that will be
 # familiar for readers well acquainted with R, and can be skipped by them.
 #
-# A terrifically easily accessible online introduction to R is given at
+# There are various really easy online introductions to R. See, for example
 #
 #        http://www.statmethods.net/
+#        http://www.burns-stat.com/pages/Tutor/hints_R_begin.html
+#        http://data.princeton.edu/R/gettingStarted.html
+#        http://www.ats.ucla.edu/stat/R/sk/
 #
-# R is case sensitive.
+# You can go to any of these sites to learn the basics of R 
+# or refresh your knowledge.
+# There is a lot of documentation available at
+#        http://cran.xl-mirror.nl/other-docs.html
+# including some short introductions, handy reference cards,
+# and introductions in many languages besides English.
+#
+#
+# Some general points to note:
+#
+# R is case-sensitive. Be aware of capitalization!
+#
 # The left-arrow "<-" is very frequently used: it denotes an assignment,
 # "a <- b" meaning that object a gets the value b.
-# Often b is a complicated expression that has to be evaluated by R.
-
+# Often b is a complicated expression that has to be evaluated by R,
+# and computes a result that then is stored as the object a.
+#
 # Help within R can be called by typing a question mark and the name of the
-# function you need help with. For example ?library loading will bring up a
-# file titled "loading and listing of packages".
+# function you need help for. For example 
+# ?library 
+# will bring up a file titled "loading and listing of packages".
 # Comments are made at the end of commands after #,
-# or in lines staring with # telling R to ignore everything beyond it.
+# or in lines starting with # telling R to ignore everything beyond it.
+# That is why everything up to now in this file is on lines starting with #.
+#
 # This session will be using s50 data which are supposed to be
 # present in the working directory.
-# Note that any command in R is called a function;
-# in general the command syntax for calling R's functions is function(x) where
+# You can get them from
+#     http://www.stats.ox.ac.uk/~snijders/siena/siena_datasets.htm
+#
+# Any command in R is a function, and ends by parentheses
+# that enclose the arguments of the function,
+# or enclose nothing if no argument is needed, such as for the function q()
+# In general the command syntax for calling R's functions is function(x) where
 # function is a saved function and x the name of the object to be operated on.
-# For new R users:
-# note that there is a lot of documentation available at
-# http://cran.xl-mirror.nl/other-docs.html
-# including some short introductions, handy reference cards,
-# and introductions in a lot of languages besides English.
-
+#
 #################### - CALLING THE DATA AND PRELIMINARY MANIPULATIONS - ###########
 
 # The library command loads the packages needed during the session.
 
         library(RSiena)
 
-# You need to have INSTALLED the packages xtable and network,
-# and for R versions older than 2.14.0 you need snow and rlecuyer
-# if you want to use multiple processes.
+# Some additional packages are used by RSiena,
+# the so-called required packages; these will be loaded automatically.
+
+# You need to have INSTALLED all of them.
 
 	?install.packages
 
@@ -94,11 +113,11 @@
 
 # (these are .htlm HELP PAGES)
 
-# Or, for a listing of all accessible functions in RSiena:
+# At the bottom of this page, when you click on "Index",
+# a list of all the available functions is shouwn in your browser.
+# The same list is shown in the gui ('graphical user interface') by requesting
 
          library(help=RSiena)
-
-# which is very useful
 
 # Where is the manual?
 
@@ -113,28 +132,31 @@
 # dataset, or in R terminology a "data frame".
 # Here this is not what we want, therefore on reading
 # we will immediately convert it to a matrix.
-# R will read in many data formats, these are saved as .dat files, the command
-# to read them is read.table.
+# R will read in many data formats, the command to read them is read.table.
+       ?read.table
+# In the help file for read.table, look at the section "Value",
+# which is there in every help page:
+# it indicates the class of the object that is produced by the function.
+# For read.table, the value is a data frame; below we see what this is.
+#
 # If we wished to read a .csv file we would have
 # used the read.csv command.
-# The pathnames have forward slashes, or double backslashes
-# if single backslashes are used, one of the error messages will be:
+# The pathnames must have forward slashes, or double backslashes.
+# If single backslashes are used, one of the error messages will be:
 #   1: '\R' is an unrecognized escape in a character string
 
 #-----------------------------------------------------------------------------
 
 # Quick start(Data assignment).
-# Please make sure the data is in your working directory
+# Please make sure the s50 data set is in your working directory.
+# The data set is on the Siena website ("Data sets" tab) and must be
+# unzipped in your working directory.
 
         friend.data.w1 <- as.matrix(read.table("s50-network1.dat"))
         friend.data.w2 <- as.matrix(read.table("s50-network2.dat"))
         friend.data.w3 <- as.matrix(read.table("s50-network3.dat"))
         drink <- as.matrix(read.table("s50-alcohol.dat"))
         smoke <- as.matrix(read.table("s50-smoke.dat"))
-
-# You need the data to be in your working directory.
-# The data set is on ther Siena website ("Datasets" tab) and must be
-# unzipped in your working directory.
 
 # Explanation of data structures and formats below
 
@@ -175,7 +197,9 @@
 ### As an example create two vectors:
 	      height <- c( 120, 150, 180, 200, 190, 177, 170, 125, 141, 157 )
       	weight <- c( 11, 14, 17, 18, 17, 18, 11, 12, 10, 15 )
-### collect these in a data frame
+### The function c() combines its argument into a vector 
+### (or into a list, but we are not concerned with that possibility now.).
+### These two vectors can be collected as variables in a data frame
 	      data <- data.frame( height, weight )
 ### and look at the results
 		    data
@@ -187,6 +211,10 @@
 		data[1]
   	data[  , 1]
   	data[ 1,  ]
+### If you wish to see the structure of an object, such as data, then request
+      str(data)
+### Objects often have attributes:
+      attributes(data)
 
 ### ---- Matrix -------------------------------------------------------------------
 ### A "matrix" is a numeric object ordered like a matrix with dimensions
@@ -196,7 +224,9 @@
 ### If you wish to play around with a copy of the matrix, e.g. having the name "data",
 ### you can make the copy by the command
 		data <- friend.data.w1
-### the element of a matrix called data that is in row 2 and column 3 is given by
+### The earlier object that we created with the name "data" now has been lost.
+### Elements if matrices can be accessed by using square brackets.
+### For example, the element of "data" in row 2 and column 3 is given by
 		data[ 2, 3 ]
 ### the first three rows of a matrix called data are given by
 		data[ 1:3, ]
@@ -206,24 +236,48 @@
 ### ---- Converting data frame to matrix -------------------------------------------
 ###
 ### Most classes can be converted to other classes through "as.typeofclass ()", e.g.
+### if "data" would be an object with a matrix-like structure,
+### then it could be converted to the class "matrix" by the command
 	      data <- as.matrix( data )
-### converts a data frame "data" to a matrix "data"
 
 ####################################################################################
 
 
 ################## - EXAMPLE FOR ARC LIST - ########################################
 ###
-### If data (e.g. "s50e.dat") is in arclist format, with columns
+### From the Siena website you can download the data set arclistdata.dat:
+###   http://www.stats.ox.ac.uk/~snijders/siena/arclistdata.dat
+### Download this file and save it in your current directory.
+		ArcList <- read.table( "arclistdata.dat", header=FALSE ) # creates data frame
+### Note the capitalization.
+### Now ArcList is a data.frame 
+### (we saw this above in the help file for read.table).
+### What are its dimensions?
+            dim(ArcList)
+### You can get an impression of it by looking at the start of the object:
+            head(ArcList)
+### This is a data file in arclist format, with columns:
 ### sender id, receiver id, value of tie, wave.
-		ArcList <- read.table( "s50e.dat", header=FALSE ) # creates data frame
-		names(ArcList) <- c( "sid", "recid", "bff", "wid" ) # adds names to columns
+### Add names to the columns:
+		names(ArcList) <- c( "sid", "recid", "bff", "wid" ) 
+### The bff ("best friend") variable does not have much variability:
+            table(ArcList$bff)
+### It may be nice to order the rows by sender, then by receiver, then by wave.
+### The tedious way to do this is
+            ArcList <- ArcList[ order( ArcList$sid, ArcList$recid, ArcList$wid), ] 
+### To understand this, you may look at the help page for function order()
+### The rows of Arclist are ordered first by ArcList$sid, then by ArcList$recid, 
+### and then by ArcList$wid;
+### these reordered rows then are put into the object ArcList,
+### this overwriting the earlier contents of this object.
+### This way is tedious because it is repeated all the time that the names
+### sid, recid, wid refer to the ArcList object.
+### The less tedious way uses the function "with".
+### The with(a, b) function tells R that b must be calculated,
+### while the otherwise unknown names refer to data set a:
 		ArcList <- with( ArcList, ArcList[ order( sid, recid, wid), ] )
-
-### Create a separate set of records for each wave
-### (code needs to be customized for each selected wave set)
-### Select by wave, only for recievers where nominee is "best friend" (bff)
-### (NOTE: does not account for 0's, i.e. no bff's chosen. Done later.)
+### Now suppose we want to create a separate set of records for each wave.
+### Select by wave:
 
 		SAff.1 <- with(ArcList, ArcList[ wid == 1, ] ) #extracts edges in wave 1
 		SAff.2 <- with(ArcList, ArcList[ wid == 2, ] ) #extracts edges in wave 2
@@ -255,6 +309,8 @@
         adj <- matrix(0, 50, 50)
 # put edge values in desired places
         adj[edges[, 1:2]] <- edges[, 3]
+### Also see Section 4.1.1 of the Siena manual.
+
 
 ###################################################################################
 ################ - READING IN PAJEK DATA - ########################################
@@ -303,14 +359,14 @@
 # Let us do as if the missing codes for the friendship network were 6 and 9.
 # This leads to the following commands.
 # (For new R users: the c() function used here as "c(6,9)" constructs
-#  a vector [c for concatenate] consisting of the numbers 6 and 9.
+#  a vector [c for column] consisting of the numbers 6 and 9.
 #  This function is used a lot in basic R.)
 
         friend.data.w1[ friend.data.w1 %in% c(6,9) ] <- NA
         friend.data.w1[ friend.data.w2 %in% c(6,9) ] <- NA
         friend.data.w1[ friend.data.w3 %in% c(6,9) ] <- NA
 
-# Commands for descriptive analysis are in the script: RSienaSNADescriptives.R
+# Commands for descriptive analysis are in the script: RscriptSNADescriptives.R
 
 ############## - SELECTING SUBSETS OF DATA - ###################################
 

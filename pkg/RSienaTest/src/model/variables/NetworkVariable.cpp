@@ -61,7 +61,8 @@ NetworkVariable::NetworkVariable(NetworkLongitudinalData * pData,
 	this->lpermitted = new bool[this->m()];
 
 	int numberOfAlters;
-	if (this->oneModeNetwork())
+	this->loneMode = pData->oneModeNetwork();
+	if (this->loneMode)
 	{
 		this->lpNetwork = new OneModeNetwork(this->n(), false);
 		numberOfAlters = this->m();
@@ -218,12 +219,11 @@ int NetworkVariable::m() const
 
 
 /**
- * Indicates if this is a one-mode network, namely, if the senders and
- * receivers are the same set of actors.
+ * Indicates if this is a one-mode network, an atribute of the network
  */
 bool NetworkVariable::oneModeNetwork() const
 {
-	return this->pSenders() == this->pReceivers();
+	return this->loneMode;
 }
 
 

@@ -173,6 +173,10 @@ private:
 	map<int, double> lsetting;
 
 	vector<int> lalterSet;
+
+	// whether this is a one mode network or not
+
+	bool loneMode;
 };
 
 

@@ -57,7 +57,7 @@ void LowerFilter::filterPermittedChanges(int ego, bool * permitted)
 		bool tieExists2 = iter2.valid() && iter2.actor() == j;
 
 		int noChange = ego;
-		if (pNetwork1->n() != pNetwork1->m())
+		if (!this->pVariable()->oneModeNetwork())
 		{
 			noChange = pNetwork1->m();
 		}

@@ -1,22 +1,23 @@
 ################################################################################
 ###
-### ---- RscriptSienaRunModel.R: a script for the introduction to RSiena -------
 ###
-###                         version April 11, 2011
+### ---- Rscript03SienaRunModel.R: a script for the introduction to RSiena -------
+###
+###                         version January 17, 2012
 ################################################################################
 #
 # The introductory script is divided into the following script files:
-# RscriptDataFormat.R, followed by
+# Rscript01DataFormat.R, followed by
 # RScriptSNADescriptives.R, code for descriptive analysis of the data, and
-# RscriptSienaVariableFormat.R, which formats data and specifies the model, and
-# RscriptSienaRunModel.R, which runs the model and estimates parameters
-# RscriptSienaBehaviour.R, which illustrates an example of analysing the
+# Rscript02SienaVariableFormat.R, which formats data and specifies the model, and
+# Rscript03SienaRunModel.R, which runs the model and estimates parameters
+# Rscript04SienaBehaviour.R, which illustrates an example of analysing the
 # coevolution of networks and behaviour.
 # Written with contributions by Robin Gauthier, Tom Snijders, Ruth Ripley,
 # Johan Koskinen, and Paulina Preciado.
 #
-# This script, RscriptSienaRunModel.R, runs the estimation in RSiena for the
-# model set up and defined in the script RscriptSienaVariableFormat.R.
+# This script, Rscript03SienaRunModel.R, runs the estimation in RSiena for the
+# model set up and defined in the script Rscript02SienaVariableFormat.R.
 #
 # A quick version of the model fitting without comments is given at the end
 # of this script
@@ -111,6 +112,7 @@
 # slowing down the computations,
 # so it might be better to avoid using the two options together.
 
+
 ################### LOOKING AT THE RESULTS ################################
 
 # The file "s50_3.out" will contain the results of the estimation.
@@ -199,6 +201,8 @@
 # At http://cran.r-project.org/web/packages/xtable you can find
 # a set of vignettes for the xtable package, the xtable gallery,
 # which gives more options.
+# A function siena.table is available that is specially designed
+# for RSiena results. 
 
 ############## MORE ON INITIALIZING PARAMETERS FOR ESTIMATION ########
 
@@ -232,7 +236,7 @@
 # This is done as follows.
 # The option useStdInits = TRUE in sienaModelCreate, will make
 # each estimation run start with standard initial values.
-# The option useStdInits = TRUE makes the estimation start
+# The option useStdInits = FALSE makes the estimation start
 # with the initial values in the effects object.
 # You can switch between these by commands such as
 
@@ -240,23 +244,18 @@
 #       mymodel$useStdInits <- TRUE
 
 # Putting the estimates from the results object ans into the
-# effects object myeff, if ans used unconditional estimation, is done by
-#       myeff$initialValue[myeff$include] <- ans$theta
-# and if conditional estimation was used, conditioning on the first
-# dependent network, by
-#       myeff$initialValue[myeff$include] <- c(ans$rate, ans$theta)
-# Recall that the function c() combines its arguments into one column vector.
-# A check that the effects object contains the new initial values is made by
+# effects object myeff is done by
+#       myeff <- update(myeff, ans)
+# A check that the effects object contains the desired initial values is made by
 
         myeff
 
-# By using a different vector instead of ans$theta you can
-# initialise differently.
+# The initial values are in the vector
+        myeff$initialValue[myeff$include]
+# and this also can be initialised differently, if this is desired.
 # Note that this initial vector will be used until you change it again,
 # e.g., to the results of a new run,
 # or until you change the useStdInits option.
-# Also note that you should do this before changing the model,
-# because else the vectors will have incompatible lengths.
 
 ################################################################################
 ###
@@ -341,3 +340,10 @@
 
         mymodel <- sienaModelCreate( useStdInits = TRUE, projname = 's50_3' )
         ans <- siena07( mymodel, data = mydata, effects = myeff)
+
+################################################################################
+###
+### -- PROCEED TO Rscript04SienaBehaviour.R FOR 
+###                                 MODELING NETWORKS AND BEHAVIOUR BY RSIENA --
+###
+################################################################################
