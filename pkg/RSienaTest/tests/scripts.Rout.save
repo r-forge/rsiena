@@ -1,8 +1,8 @@
 
-R version 2.13.2 (2011-09-30)
+R version 2.14.1 (2011-12-22)
 Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: i386-pc-mingw32/i386 (32-bit)
+Platform: i386-apple-darwin9.8.0/i386 (32-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -16,6 +16,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
+> #print(Sys.getenv("RSIENA_TESTING"))
+> #print(.libPaths())
 > if(!nzchar(Sys.getenv("RSIENA_TESTING"))) q("no")
 > 
 > runone <- function(f)
@@ -25,7 +27,7 @@ Type 'q()' to quit R.
 +     failfile <- paste(outfile, "fail", sep=".")
 +     unlink(c(outfile, failfile))
 +     cmd <- paste(shQuote(file.path(R.home(), "bin", "R")),
-+                  "CMD BATCH --no-save",
++                  "CMD BATCH --vanilla",
 +                  shQuote(f), shQuote(outfile))
 +     res <- system(cmd)
 +     if (res) {
@@ -39,23 +41,27 @@ Type 'q()' to quit R.
 > 
 > ##library(RSienaTest)
 > ## get the data files
-> datafiles <- system.file("examples", package="RSiena")
+> datafiles <- system.file("examples", package="RSienaTest")
 > files1 <- list.files(datafiles, pattern="\\.dat$", full.names=TRUE)
 > file.copy(files1, ".", overwrite=TRUE)
  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[31] TRUE
+[31] TRUE TRUE
+> files1 <- list.files(datafiles, pattern="\\.DAT$", full.names=TRUE)
+> file.copy(files1, ".", overwrite=TRUE)
+ [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+[16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 > 
 > ## write some initialisation data
 > unlink("scriptfile.R")
 > writeLines(c("options(error=NULL)", "set.seed(1)",
-+ 			 "options(help_type='text')"), "scriptfile.R")
++ 			 "options(help_type='text')", "#print(.libPaths())"), "scriptfile.R")
 > if (.Platform$OS.type == "windows")
 + {
 + 	cat("options(pager='console')\n", file="scriptfile.R", append=TRUE)
 + }
 > ## now concatenate the scripts
-> dd <- system.file("scripts", package="RSiena")
+> dd <- system.file("scripts", package="RSienaTest")
 > files <- list.files(dd, pattern="\\.R$", full.names=TRUE)
 > for (f in files)
 + {
@@ -85,19 +91,19 @@ Type 'q()' to quit R.
 > library(tools)
 > Rdiff("scriptfile.Rout", previousFile)
 
-2262c2262
-< % Thu Oct 27 18:09:19 2011
+2685c2685
+< % Fri Jan 20 14:29:34 2012
 ---
-> % Thu Oct 27 17:41:46 2011
-2290c2290
-< <!-- Thu Oct 27 18:09:19 2011 -->
+> % Fri Jan 20 14:17:42 2012
+2713c2713
+< <!-- Fri Jan 20 14:29:34 2012 -->
 ---
-> <!-- Thu Oct 27 17:41:46 2011 -->
+> <!-- Fri Jan 20 14:17:42 2012 -->
 [1] 1
 > 
 > proc.time()
    user  system elapsed 
-   0.43    0.04  327.60 
+ 92.573   0.370  95.104 
 > 
 > if (res > 0)
 + {

@@ -1,3 +1,5 @@
+#print(Sys.getenv("RSIENA_TESTING"))
+#print(.libPaths())
 if(!nzchar(Sys.getenv("RSIENA_TESTING"))) q("no")
 
 runone <- function(f)
@@ -7,7 +9,7 @@ runone <- function(f)
     failfile <- paste(outfile, "fail", sep=".")
     unlink(c(outfile, failfile))
     cmd <- paste(shQuote(file.path(R.home(), "bin", "R")),
-                 "CMD BATCH --no-save",
+                 "CMD BATCH --vanilla",
                  shQuote(f), shQuote(outfile))
     res <- system(cmd)
     if (res) {
@@ -30,7 +32,7 @@ file.copy(files1, ".", overwrite=TRUE)
 ## write some initialisation data
 unlink("scriptfile.R")
 writeLines(c("options(error=NULL)", "set.seed(1)",
-			 "options(help_type='text')"), "scriptfile.R")
+			 "options(help_type='text')", "#print(.libPaths())"), "scriptfile.R")
 if (.Platform$OS.type == "windows")
 {
 	cat("options(pager='console')\n", file="scriptfile.R", append=TRUE)

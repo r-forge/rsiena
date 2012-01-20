@@ -612,7 +612,7 @@ void Model::clearChainStore(int keep, int groupPeriod)
 	{
 		vector<Chain *>::iterator iter = this->lchainStore[groupPeriod].begin();
 
-		for (unsigned j = 0; j < size - keep; j++)
+		for (int j = 0; j < size - keep; j++)
 		{
 			//delete the chain pointed to
 			delete this->lchainStore[groupPeriod][j];
@@ -622,7 +622,7 @@ void Model::clearChainStore(int keep, int groupPeriod)
 	}
 	else
 	{
-		for (unsigned chain = 0; chain < size; chain++)
+		for (int chain = 0; chain < size; chain++)
 		{
 			delete lchainStore[groupPeriod][chain];
 		}

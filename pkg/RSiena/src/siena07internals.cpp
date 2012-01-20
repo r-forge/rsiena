@@ -694,7 +694,7 @@ void setupConstantCovariate(SEXP COCOVAR, ConstantCovariate *
     for (int actor = 0; actor < nActors; actor++)
     {
 		double value = *start++;
-		if (ISNA(value))
+		if (ISNAN(value))
 		{
 			pConstantCovariate->value(actor, 0);
 			pConstantCovariate->missing(actor, 1);
@@ -780,7 +780,7 @@ void setupChangingCovariate(SEXP VARCOVAR,
 		for (int actor = 0; actor < nActors; actor++)
 		{
 			double value = *start++;
-			if (ISNA(value))
+			if (ISNAN(value))
 			{
 				pChangingCovariate->value(actor, period,
 					0);
