@@ -402,7 +402,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
     ses <- sqrt(diag(x$covtheta))
     ses[x$fixed] <- NA
     theta <- x$theta
-    theta[diag(x$covtheta) < 0.0 | x$fixed] <- NA
+    theta[diag(x$covtheta) < 0.0] <- NA
 
     if (nBehavs > 0)
     {

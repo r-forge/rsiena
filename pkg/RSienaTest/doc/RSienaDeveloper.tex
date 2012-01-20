@@ -1,5 +1,5 @@
 \documentclass[12pt, a4paper]{article}
-\usepackage[pdftex,dvipsnames]{color}
+%\usepackage[pdftex,dvipsnames]{color}
 \usepackage{graphicx}
 \usepackage{times}
 \usepackage{algorithm}
@@ -7,6 +7,14 @@
 \usepackage{url}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+
+\usepackage[pdfstartview={},
+            pdftex,
+            bookmarks=true,
+            bookmarksopen=true,
+            bookmarksnumbered=true,
+            ]{hyperref}
+
 \newcommand{\eps}{\varepsilon}
 \newcommand{\abso}[1]{\;\mid#1\mid\;}
 \renewcommand{\=}{\,=\,}
@@ -227,7 +235,7 @@ from \sfn{\_emacs}.
 
 Note that emacs has a nice habit of copying text as soon as you highlight it and
 then you can paste it with a right (Windows with my initialization file) or
-middle button (Linux/Mac) click.
+middle button (Linux) click.
 \subsection{General}
 \begin{enumerate}
 \item Use spaces: particularly around operators and after commas. (But
@@ -368,7 +376,8 @@ files.
   called \verb|RSiena.Rcheck|, and produce some diagnostics to the
   screen.
 \item Please set environment variables to ensure you have tested everything you
-  can. Details below. You should have no warnings at all from
+  can. On platforms other than Windows you will need to create a \sfn{Makevars}
+  file too. Details below. You should have no warnings at all from
   the tar ball version, maybe some to do with presence of object files with the
   other version.
 \item Final check of pdf: once the warnings have gone away, do a visual check on
@@ -379,7 +388,7 @@ files.
   use \\ \verb|R CMD Rd2dvi --pdf man| \\ or e.g.\ \\
   \verb|R CMD --pdf man/siena7.Rd|\\ which will create a file called Rd2.pdf.
 \end{enumerate}
-\paragraph{Environment variables}
+\paragraph{Environment variables and Makevars}
  \label{below}
  The easiest way to control building and checking is to use environment
  variables. For portability between computers I suggest you set these using
@@ -387,10 +396,7 @@ files.
  and two files in that directory:
 \begin{description}
 \item[.R directory] Create, in your home directory, a directory called .R (on
-  Windows you will have to use mkdir in a command prompt window to do this). You
-  can use this directory to provide your own version of \verb|Makevars|
-(useful
-  for \textsf{valgrind} users on linux where you need to turn off optimisation).
+  Windows you will have to use mkdir in a command prompt window to do this).
 \item[check.Renviron] This file is used in the check procedure. It should
  contain at least the following:
 {\small
@@ -402,17 +408,22 @@ _R_CHECK_SRC_MINUS_W_UNUSED_=TRUE
 }
 with no line break between the two options for CodeTools.
 
-Until R 2.14.0 appears, you need to check the install log yourself to see the
-C++ warnings, after that you should see all the warnings in the check log.
+You could also add
+\begin{verbatim}
+RSIENA_TESTING=TRUE
+\end{verbatim}
+to turn on our automated testing system (see section \ref{sec:tests}).
 
 To use your own personal library tree for the check, add to this file a line
-containing: \verb|R_LIBS=xxx|, where \verb|xxx| is the name of the directory
+containing: \verb|R_LIBS_USER=xxx|, where \verb|xxx| is the name of the directory
 containing your installed packages.
 
-You might like to add
-\verb|_R_CHECK_FORCE_SUGGESTS_=FALSE| which just stops the check failing because
-some suggested packages which are not actually used in the code are not
-installed.
+You might like to add \verb|_R_CHECK_FORCE_SUGGESTS_=FALSE| which stops the
+check failing because some suggested packages which are not actually used in the
+code are not installed. (If you do this, you will get some warnings about "no
+visible global function defintion for...". Do read them to make sure that only
+functions in the missing packages are mentioned.)
+
 \item[build.Renviron] This is the file used for the build procedure.  I suggest
   you set \verb|CYGWIN=nodosfilewarning| here. (Only necessary in Windows but
   will do no harm on Mac or Linux.). We also used to need
@@ -420,6 +431,14 @@ installed.
 _R_BUILD_RESAVE_DATE=no
 \end{verbatim}
 but I have added this to the DESCRIPTION file so it is always set.
+\item[Makevars] Currently only necessary on Mac and Linux, unless you have built
+  your own R. This file is used to over-ride the system flags for compiling. Use
+  the following line to set some warnings on for C++:
+ \begin{verbatim}
+CXXFLAGS=-g -O2 -Wall -pedantic
+\end{verbatim}
+You can also use other flags here too.
+If you want to turn off optimisation (eg for valgrind), alter the O2 to a O0.
 \end{description}
 \paragraph{Alternative methods for small changes}
 Good news: from R 2.12.0 it is often possible to update the R functions in
@@ -431,9 +450,9 @@ package.
   \verb|insert.source('d:/RSiena/R/phase1.r', package='RSiena')| will update any
   functions which you have altered which are contained in \verb|phase1.r|.
 \item Alternatively, you can make a small change to a hidden file by using
-\verb|fixInNamespace('function name', 'RSiena')|.
-\item Useful to insert a call to \sfn{browser}, as you won't mind it
-  disappearing when you exit from R.
+  \verb|fixInNamespace('function name', 'RSiena')|.  This is useful to insert a
+  call to \sfn{browser}, as you probably won't mind it disappearing when you
+  exit from R.
 \item It is likely that neither of these methods will work with S3 methods
   eg. print.sienaFit. If the function you are trying to alter does not call any
   hidden functions in RSiena, just source it and bypass the despatch mechanism
@@ -449,8 +468,12 @@ machine, use
 Remember that you should send them the source tar ball too, for compliance with
 GPL licensing.
 
-If you are lucky the same will work with Mac binaries on a Mac, but I have not
-tried this recently, and I may have forgotten some trick.
+If you are lucky the same will work with Mac binaries on a Mac but there may be
+problems with differing version of Mac OSX.
+
+There is a facility to build Windows packages on CRAN. See
+\url{http://win-builder.r-project.org/}. In the future there may be something
+similar for Macs.
 \section{Personal/private keys}
 \label{key}
 You can set up a personal/private ssh key pair so you do not need to type the
@@ -500,10 +523,11 @@ includes all examples on help pages except parts marked \sfn{\textbackslash
 
 Since the checking is done every day by other people, we are limited as to the
 amount of their time we are allowed to use up. There are now extra testing
-facilities in \sfn{RSienaTest} designed to be run by ourselves only. They should
+facilities designed to be run by ourselves only. They should
 be run every time a significant change is made.  Testing is via the check
 procedure after setting the environment variable \sfn{RSIENA\_TESTING} to any
 non-null value.
+\label{sec:tests}
 \begin{description}
 \item[scripts] There is a file \sfn{scripts.R} in the \sfn{tests} directory
   which is designed to test the scripts in the manual. Since I got different
@@ -515,10 +539,52 @@ non-null value.
   directory to the testing one. Any scripts which contain the text ``SNA'' in the
   name are ignored. Some difference output will typically be produced: check
   manually that it does not look important.
+
+  There are two sets of different output: \sfn{scriptfile.Rout.save} and
+  \sfn{scriptfile.Rout.win}, for Mac/Linux and Windows respectively. If you
+  change the scripts, you need to update the reference copies by running the
+  check, checking that nothing untoward has altered and then copying
+  \sfn{scriptfile.Rout} to the tests directroy of the r-forge source for the
+  package and renaming it as scriptfile.Rout.save or scriptfile.Rout.win as
+  appropriate. (Obviously if you have no access to one or more of the platforms
+  you cannot do this for all, so you may find that it needs doing even if you
+  have not changed the scripts but happen to be the first person checking on a
+  particular platform since the scripts have been changed.)
+
+It is worth occasionally updating the files \sfn{parallel.Rout.save} and
+\sfn{scripts.Rout.save} just to reduce the differences. But do the latter after
+you have fixed the scriptfile.Rout differences.
+
+Some notes about the testing of scripts:
+\begin{enumerate}
+\item R CMD CHECK is done using an R without any
+  environment variables or initialization files except those in
+  \textasciitilde/R/check.Renviron.
+\item When doing the examples and ``normal'' tests within R CMD check, the
+  directory containing the package under test will be prepended to the path to
+  search when loading packages,
+\item Testing the scripts is done by a subordinate R process, launched with the
+  options "--vanilla" so it has no environment variables or initialisation
+  files except the environment variables passed down from the launching process,
+  which will include the path to search when loading packages,
+\item If you have a personal library which needs to be included in the check
+  procedure (eg xtable is somewhere unusual), set the environment variable
+  \sfn{R\_LIBS\_USER} to this directory \emph{within
+    \textasciitilde/R/check.Renviron}. Do not set \sfn{R\_LIBS} here as this is
+  probably the mechanism for getting the package under test into the load path.
+\item I have added a few commented out debugging statements to \sfn{scripts.R}
+  which might help if you need to find out what is going on.
+\item If this is inadequate, more flexibility could be obtained by replacing
+ the call to \sfn{system()} in \sfn{scripts.R} by one to \sfn{system2()}.
+\item When testing the scripts within \sfn{RSienaTest} it is necessary to have a
+  package \sfn{RSiena} installed, preferably the one from R-forge or CRAN and
+  not an altered version.
+\end{enumerate}
+
 \item[other tests]
 I have begun to create test files for testing the package itself. More will
-follow. But I must ask that for any new features added by others, test data and
-results are added to the testing system somehow.
+follow. But for any new features added by others, test data and
+results will need to be added to the testing system somehow.
 \end{description}
 \section{Parallel runs}
 Most of RSiena is set up to produce the same results as Siena3, but some effects
@@ -628,13 +694,13 @@ A few notes about each:
 \begin{description}
 \item[oprofile]
 \begin{enumerate}
-\item You need root privileges to start or stop the daemon,
-  and to reset it. I suggest using it on an Ubuntu installation of your own to
-  avoid permission problems. There are instruction on CRAN about how to install
-  R on Ubuntu. Thre is a Windows Installer to create Ubuntu alongside a Windows
-  installation which is easy to use. Alternatively, install Ubuntu from the
-  download, but take care to defragment and check your disk first as it will be
-  repartitioned and this can cause problems if highly fragmented.
+\item You need root privileges to start or stop the daemon, and to reset it. I
+  suggest using it on an Ubuntu installation of your own to avoid permission
+  problems. There are instruction on CRAN about how to install R on Ubuntu. Thre
+  is a Windows Installer to create Ubuntu alongside a Windows installation which
+  is easy to use. Alternatively, install Ubuntu from the download. In either
+  case, take care to defragment and check your disk first as it will be
+  repartitioned and this can cause problems if it is highly fragmented.
 \item It is a resource hog.
 \item The callgraph option only used to work on 32 bit machines but seems to
   work ok on 64 bit now.
@@ -726,6 +792,9 @@ and the C++ library which you can ignore.
 I have failed to get valgrind to work on a Mac, although others report no
 problems. It is worth a try: get the source from the svn, and follow their
 install instructions. It may help to build your own R.
+
+I think you can use some debugger on the C, but I have never tried. See the
+manual Writing R extensions, section Debugging Compiled Code.
 \section{The R C++ interface}
 This is not easy to understand from the documentation (Writing R Extensions
 manual), but there should be examples of most functions in the code
@@ -745,14 +814,14 @@ process and then replace it in the R. The header for these is
 \item[rlecuyer]
 With multiple processes we used to use the random numbers from the \sfn{rlecuyer}
 package. The seed is set in eg \sfn{robmon} (in the R code). There is code in
-\sfn{siena07.cpp} which shows how to set and reset these if you must. The
+\sfn{siena07models.cpp} which shows how to set and reset these if you must. The
 different streams are intended to be kept apart, so for finite differencing
 where we need common random number streams I have advanced to a new substream at
 the beginning of each real iteration and reset to this point at the beginning of
 each finite difference one. The jump to the new substream ignores the current
 state so it does not matter if the streams get muddled up during the finite
 differencing stage. As from R version 2.14.0 this package can be removed as
-there will be a new type of random number within R itself, to be used with the
+there is a new type of random number within R itself, to be used with the
 new \sfn{parallel} package. For the time being the original code can be run if
 desired by replacing the 3 checks for R.version less than 14.0 by TRUE.
 \item[errors]
@@ -769,18 +838,15 @@ A few notes of problems we have had:
 \item With some compilers you need to add \sfn{<string>} if you use
   \sfn{<stdexcept>}. Often this will be included somewhere else in the path, but
   if you add \sfn{<stdexcept>} it would be good to add \sfn{<string>} also.
-  \item If you work on a Mac, currently you will find it easier to remove the
-    word \sfn{clean} from the make file \sfn{Makevars}. I suggest you do this in
-    a personal copy in a directory \sfn{.R} in your home directory, though, so
-    that when you build and check the package it will get the right one.
-\item Also remove the word \sfn{clean} from the makefile on Linux.
   \item Be careful with \sfn{abs}. The integer version is in \sfn{<cstdlib>} not
     \sfn{<cmath>}. Compilation may fail with message about ambiguity.
+\item Make sure you use the C++ version of headers, not the C ones. Even so,
+  there were warnings about anachronisms on Solaris the last time I tried it.
 \end{itemize}
 \section{Algorithms}
 This section outlines some different options available to the (expert!) user via
-the functions \sfn{algorithms} (exported, with a help page) and
-\sfn{profileLikelihoods} (not exported, no help page) The functions are in the
+the functions \sfn{algorithms} and \sfn{profileLikelihoods} (exported, help
+pages available) The functions are in the
   package \sfn{RSienaTest}.
 
   The basic outline is described here. The parameters are passed to the
@@ -859,7 +925,7 @@ sampling steps and still low variance or final loop}
 \STATE call initializeFRAN to set data up in C
 \STATE Store all the options on \sfn{z}
 \STATE create useful variables (Some of this is done automatically now in
-  \sfn{initialiseFRAN} but I have not pruned thus function.)
+  \sfn{initialiseFRAN} but I have not pruned this function.)
 \STATE set finalLoop to FALSE
 \end{algorithmic}
 \subsubsection{Get next set of samples}

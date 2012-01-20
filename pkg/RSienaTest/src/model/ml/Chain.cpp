@@ -1366,7 +1366,7 @@ void Chain::dumpChain() const
 		//PrintValue(getMiniStepDF(*iter->second));
 	}
 
-	for(int i=0; i< this->linitialStateDifferences.size(); i++)
+	for(unsigned i = 0; i < this->linitialStateDifferences.size(); i++)
  	{
  		PrintValue(getMiniStepDF(*(this->linitialStateDifferences[i])));
 }

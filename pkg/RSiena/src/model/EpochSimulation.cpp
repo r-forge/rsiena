@@ -887,17 +887,17 @@ double EpochSimulation::calculateLikelihood() const
 	}
 	if (this->lsimpleRates)
 	{
-		for (int i = 0; i < this->lvariables.size(); i++)
+		for (unsigned i = 0; i < this->lvariables.size(); i++)
 		{
 			DependentVariable * pVariable = this->lvariables[i];
 			double lambda = pVariable->basicRate();
 			loglik += counts[i] * log(lambda) - lambda * pVariable->n()
 				- this->lnFactorial(counts[i]);
-				if (!R_finite)
-			{
-				Rprintf("basic rate %f count %d log %f %f\n",lambda, counts[0],
-					log(lambda), loglik);
-			}
+			// if (!R_finite(loglik))
+			// {
+			// 	Rprintf("basic rate %f count %d log %f %f\n",lambda, counts[0],
+			// 		log(lambda), loglik);
+			// }
 		}
 	}
 	else

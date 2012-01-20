@@ -702,17 +702,9 @@ SEXP getChainDFPlus(const Chain& chain, bool sort)
 SEXP getMiniStepList(const MiniStep& miniStep, int period,
 	const EpochSimulation& epochSimulation)
 {
-	SEXP MINISTEP, EVAL, ENDOW;
-	int nEvaluationEffects, nEndowmentEffects, nRows;
-	double * reval, * rendow;
+	SEXP MINISTEP;
 	PROTECT(MINISTEP = allocVector(VECSXP, 13));
 	SET_VECTOR_ELT(MINISTEP, 3, ScalarInteger(miniStep.ego()));
-	nEvaluationEffects =
-		epochSimulation.pModel()->
-		rEvaluationEffects(miniStep.variableName()).size();
-	nEndowmentEffects =
-		epochSimulation.pModel()->
-		rEndowmentEffects(miniStep.variableName()).size();
 	if (miniStep.networkMiniStep())
 	{
 		const NetworkChange& networkChange =

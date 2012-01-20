@@ -260,7 +260,7 @@
 # The third way is most in line with the design philosophy of R,
 # and allows you to save scripts that also can be used when
 # there will be new versions of RSiena.
-# Therefore, we suggest that you skip the explanations of options 1 and 2, and 
+# Therefore, we suggest that you skip the explanations of options 1 and 2, and
 # proceed directly to option 3, ' Adding/removing effects using includeEffects'.
 
 # For identifying your effects you need the "shortName"s,
@@ -377,7 +377,7 @@
         myeff$shortName
         sink()
 
-# This will create a file in your working directory named "effectshortlist.txt" 
+# This will create a file in your working directory named "effectshortlist.txt"
 # A more general table of effect information including short names
 # is also available as a pdf file in the R directory, and can be opened by
 
@@ -434,20 +434,20 @@
 # you can see how to include endowment effects and how to exclude effects.
 # Effects that depend on other variables, such as egoX, altX, etc. above,
 # need the specification of these variables to define them.
-# This is dnoe by the interaction1 parameter 
+# This is done by the interaction1 parameter
 # when only one variable name is needed,
 # and by interaction2 if there is a second variable involved,
-# such as AltsAvAlt (see the manual). 
+# such as AltsAvAlt (see the manual).
 
 
 # ---- Creating interactions ---------------------------------------------------
 # As a special topic, let us show how interaction effects are created.
 
 # A convenient method to include an interaction is offered by the
-# includeInteraction function. 
-# This can be used to interact two or three effects 
+# includeInteraction function.
+# This can be used to interact two or three effects
 # (if the interactions are allowed; see the manual for this).
-# The interaction between smoke1 ego and reciprocity, for instance, 
+# The interaction between smoke1 ego and reciprocity, for instance,
 # can be defined by the command
 
         myeff <- includeInteraction( myeff, egoX, recip, include = FALSE,
@@ -466,8 +466,8 @@
 # refer to the interaction effect itself.
 # If at least one of the interacting effects requires the interaction1 parameter
 # for it specification, then this parameter is also required for the
-# includeInteraction function. 
-# Here the two or three interaction1 parameters must be combined using c(); 
+# includeInteraction function.
+# Here the two or three interaction1 parameters must be combined using c();
 # the same goes for interaction2.
 
 # A second special topic is how to access other characteristics of effects

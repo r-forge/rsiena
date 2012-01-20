@@ -29,7 +29,7 @@ Other arguments controlling the algorithm
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 
 \author{
-Ru8th Ripley}
+Ruth Ripley}
 \note{Not for general use}
 
 

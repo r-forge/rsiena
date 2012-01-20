@@ -571,9 +571,10 @@ void StatisticCalculator::calculateBehaviorStatistics(
 void StatisticCalculator::calculateNetworkRateStatistics(
 	NetworkLongitudinalData * pNetworkData)
 {
-	Network * pNetwork;
-	const Network * pConstNetwork;
-	Network * pDifference;
+	Network * pNetwork = 0;
+	const Network * pConstNetwork =	this->lpStateLessMissingsEtc->
+			pNetwork(pNetworkData->name());
+	Network * pDifference = 0;
 
 	// if parallel running, do processing from scratch
 	if (this->lpModel->parallelRun())
@@ -606,11 +607,6 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 
 		subtractNetwork(pNetwork,
 			pNetworkData->pStructuralTieNetwork(this->lperiod));
-	}
-	else
-	{
-		pConstNetwork =	this->lpStateLessMissingsEtc->
-			pNetwork(pNetworkData->name());
 	}
 
 	// construct a network of differences between current and start

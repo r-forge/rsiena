@@ -2136,9 +2136,9 @@ bool MLSimulation::deleteMissing()
 //	pr3=1;
 	this->calculateRates();
 	double rr0 = 1 / this->totalRate();
-	double lospr0 =
-		log(pVariable->rate(pOption->ego()) * rr0);
-	double lcpr0 = log(pVariable->probability(pMiniStepA));
+//	double lospr0 =
+//		log(pVariable->rate(pOption->ego()) * rr0);
+//	double lcpr0 = log(pVariable->probability(pMiniStepA));
 
 	//sumlprob_new += lospr0 + lcpr0;
 

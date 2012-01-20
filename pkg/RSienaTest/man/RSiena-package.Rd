@@ -30,8 +30,8 @@ Fits models to longitudinal sets of networks.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.0.12.194\cr
-Date: \tab 2012-01-17\cr
+Version: \tab 1.0.12.195\cr
+Date: \tab 2012-01-20\cr
 License: \tab GPL-2 \cr
 LazyLoad: \tab yes\cr
 }
@@ -39,7 +39,7 @@ LazyLoad: \tab yes\cr
 \author{
   Ruth Ripley, Krists Boitmanis.
 
-  Maintainer: <ruth@stats.ox.ac.uk>
+  Maintainer: RSiena developers <rsiena@stats.ox.ac.uk>
 }
 \seealso{\code{\link{siena07}}}
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}

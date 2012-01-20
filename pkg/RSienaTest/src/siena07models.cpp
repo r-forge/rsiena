@@ -547,7 +547,7 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		pMLSimulation->pChain()->pFirst()->pNext(),
 		pMLSimulation->pChain()->pLast()->pPrevious());
 
-	double loglik;
+	double loglik = 0;
 	if (returnLoglik)
 	{
 		loglik =
@@ -626,8 +626,8 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 
 
 		/* dff will hold the return values of the derivatives */
-		SEXP dff;
-		double *rdff;
+		SEXP dff = R_NilValue;
+		double *rdff = 0;
 		if (deriv)
 		{
 			PROTECT(dff = allocVector(REALSXP, dim * dim));
@@ -705,95 +705,6 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	UNPROTECT(nProtects);
 	return(ans);
 }
-
-/** Recalculates the probabilities for a single chain, corresponding to a
- * specific group and period. Optionally returns the scores and derivatives
- * also.
- *
- */
-SEXP getChainProbabilitiesList(SEXP CHAIN, SEXP DATAPTR, SEXP MODELPTR,
-	SEXP GROUP, SEXP PERIOD, SEXP EFFECTSLIST, SEXP THETA,
-	SEXP NEEDSCORES)
-{
-	/* need to make sure the parameters have been updated first */
-	/* get hold of the data vector */
-	vector<Data *> * pGroupData = (vector<Data *> *)
-		R_ExternalPtrAddr(DATAPTR);
-	int group = asInteger(GROUP) - 1;
-	int period = asInteger(PERIOD) - 1;
-	Data * pData = (*pGroupData)[group];
-
-	/* get hold of the model object */
-	Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
-
-	/* See if we need the scores too */
-	int needScores = asInteger(NEEDSCORES);
-	pModel->needScores(needScores);
-
-	/* chain is a list: aspect, varname, ego, alter, diff */
-
-	/* create a chain */
-	Chain * pChain = makeChainFromList(pData, CHAIN, period);
-
-	/* update the parameters */
-	updateParameters(EFFECTSLIST, THETA, pGroupData, pModel);
-
-	/* create an ml simulation object */
-	MLSimulation * pMLSimulation = new MLSimulation(pData, pModel);
-
-	/* calculate the probabilities: this uses runEpoch so we need to
-	   set the number of steps to zero first */
-	pModel->numberMLSteps(0);
-	pMLSimulation->runEpoch(period);
-
-	double loglik;
-	loglik = pMLSimulation->calculateLikelihood();
-
-	SEXP returnval;
-	PROTECT(returnval = allocVector(VECSXP, 2));
-
-	if (needScores)
-	{
-		/* count up the total number of parameters */
-		int dim = 0;
-		for (int i = 0; i < length(EFFECTSLIST); i++)
-		{
-			dim += length(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, i), 0));
-		}
-		/* scores will hold the return values of the scores */
-		SEXP scores;
-		double *rscores;
-		PROTECT(scores = allocVector(REALSXP, dim));
-		rscores = REAL(scores);
-
-		/* collect the scores and derivatives */
-		vector<double> derivs(dim * dim);
-		vector<double> score(dim);
-		getScores(EFFECTSLIST, 	period, group, pData, pMLSimulation,
-			&derivs, &score);
-
-		for (unsigned effectNo = 0; effectNo < score.size();
-			 effectNo++)
-		{
-			rscores[effectNo] = score[effectNo];
-		}
-		SET_VECTOR_ELT(returnval, 1, scores);
-	}
-	/* get the chain with probs */
-	SEXP ans;
-	PROTECT(ans = getChainList(*(pMLSimulation->pChain()), *pMLSimulation));
-
-	delete pMLSimulation;
-
-	SET_VECTOR_ELT(returnval, 0, ans);
-	if (needScores)
-	{
-		UNPROTECT(1);
-	}
-	UNPROTECT(2);
-	return  returnval;
-}
-
 
 /**
  * Clears the chains that have been stored on a model for a particular period

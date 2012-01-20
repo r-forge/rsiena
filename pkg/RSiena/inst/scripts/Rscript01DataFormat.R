@@ -29,7 +29,7 @@
 #        http://data.princeton.edu/R/gettingStarted.html
 #        http://www.ats.ucla.edu/stat/R/sk/
 #
-# You can go to any of these sites to learn the basics of R 
+# You can go to any of these sites to learn the basics of R
 # or refresh your knowledge.
 # There is a lot of documentation available at
 #        http://cran.xl-mirror.nl/other-docs.html
@@ -47,8 +47,8 @@
 # and computes a result that then is stored as the object a.
 #
 # Help within R can be called by typing a question mark and the name of the
-# function you need help for. For example 
-# ?library 
+# function you need help for. For example
+# ?library
 # will bring up a file titled "loading and listing of packages".
 # Comments are made at the end of commands after #,
 # or in lines starting with # telling R to ignore everything beyond it.
@@ -197,7 +197,7 @@
 ### As an example create two vectors:
 	      height <- c( 120, 150, 180, 200, 190, 177, 170, 125, 141, 157 )
       	weight <- c( 11, 14, 17, 18, 17, 18, 11, 12, 10, 15 )
-### The function c() combines its argument into a vector 
+### The function c() combines its argument into a vector
 ### (or into a list, but we are not concerned with that possibility now.).
 ### These two vectors can be collected as variables in a data frame
 	      data <- data.frame( height, weight )
@@ -250,7 +250,7 @@
 ### Download this file and save it in your current directory.
 		ArcList <- read.table( "arclistdata.dat", header=FALSE ) # creates data frame
 ### Note the capitalization.
-### Now ArcList is a data.frame 
+### Now ArcList is a data.frame
 ### (we saw this above in the help file for read.table).
 ### What are its dimensions?
             dim(ArcList)
@@ -259,14 +259,14 @@
 ### This is a data file in arclist format, with columns:
 ### sender id, receiver id, value of tie, wave.
 ### Add names to the columns:
-		names(ArcList) <- c( "sid", "recid", "bff", "wid" ) 
+		names(ArcList) <- c( "sid", "recid", "bff", "wid" )
 ### The bff ("best friend") variable does not have much variability:
             table(ArcList$bff)
 ### It may be nice to order the rows by sender, then by receiver, then by wave.
 ### The tedious way to do this is
-            ArcList <- ArcList[ order( ArcList$sid, ArcList$recid, ArcList$wid), ] 
+            ArcList <- ArcList[ order( ArcList$sid, ArcList$recid, ArcList$wid), ]
 ### To understand this, you may look at the help page for function order()
-### The rows of Arclist are ordered first by ArcList$sid, then by ArcList$recid, 
+### The rows of Arclist are ordered first by ArcList$sid, then by ArcList$recid,
 ### and then by ArcList$wid;
 ### these reordered rows then are put into the object ArcList,
 ### this overwriting the earlier contents of this object.
@@ -363,8 +363,8 @@
 #  This function is used a lot in basic R.)
 
         friend.data.w1[ friend.data.w1 %in% c(6,9) ] <- NA
-        friend.data.w1[ friend.data.w2 %in% c(6,9) ] <- NA
-        friend.data.w1[ friend.data.w3 %in% c(6,9) ] <- NA
+        friend.data.w2[ friend.data.w2 %in% c(6,9) ] <- NA
+        friend.data.w3[ friend.data.w3 %in% c(6,9) ] <- NA
 
 # Commands for descriptive analysis are in the script: RscriptSNADescriptives.R
 

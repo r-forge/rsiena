@@ -1,3 +1,28 @@
+2012-01-20 R-forge revision 195
+
+	* inst/scripts/Rscript01DataFormat.R,
+	inst/scripts/Rscript02SienaVariableFormat.R,
+	inst/scripts/Rscript03SienaRunModel.R,
+	inst/scripts/Rscript04SienaBehavior.R: new versions now in RSiena
+	too. Also one or two typos corrected.
+	* tests/scriptfile.Rout.save, tests/scriptfile.Rout.win,
+	tests/scripts.Rout.save, tests/parallel.Rout.save: updated targets for
+	checks.
+	* tests/scripts.R: Run sub process with --vanilla. Also some
+	debugging code added.
+	* src/sienaInternals.cpp: treat NaN in covariates the same as NA,
+	as is done in the R part of RSiena.
+	* src/siena07Models.cpp, src/siena07Utilities.cpp,
+	src/model/EpochSimulation.cpp, src/model/Model.cpp,
+	src/model/StatisticCalculator.cpp,
+	src/ml/MLSimulation.cpp, src/ml/Chain.cpp: minor changes to
+	remove compiler warnings.
+	* doc/RSienaDeveloper.tex: revisions, additions
+	* inst/examples/arclistdata.dat: added file
+	* man/algorithms.Rd: corrected spelling
+	* man/RSiena-package.Rd: new maintainer email address
+	* R/sienaprint.r: leave fixed values of theta in the print
+
 2012-01-17 R-forge revision 194
 
 	* doc/RSIENAspec.tex, man/coDyadCovar.Rd, man/varDyadCovar.Rd,
@@ -24,7 +49,11 @@
 2012-01-17 R-forge revision 192.
 
 	* minor but extensive changes to manual
-	* minor changes to scripts
+	* inst/scripts/Rscript01DataFormat.R,
+	inst/scripts/Rscript02SienaVariableFormat.R,
+	inst/scripts/Rscript03SienaRunModel.R,
+	inst/scripts/Rscript04SienaBehavior.R: minor changes to scripts
+	(RSienaTest only)
 
 2011-12-15 R-forge revision 191.
 

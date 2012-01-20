@@ -202,7 +202,7 @@
 # a set of vignettes for the xtable package, the xtable gallery,
 # which gives more options.
 # A function siena.table is available that is specially designed
-# for RSiena results. 
+# for RSiena results.
 
 ############## MORE ON INITIALIZING PARAMETERS FOR ESTIMATION ########
 
@@ -343,7 +343,7 @@
 
 ################################################################################
 ###
-### -- PROCEED TO Rscript04SienaBehaviour.R FOR 
+### -- PROCEED TO Rscript04SienaBehaviour.R FOR
 ###                                 MODELING NETWORKS AND BEHAVIOUR BY RSIENA --
 ###
 ################################################################################
