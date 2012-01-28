@@ -1517,7 +1517,8 @@ cancel each other's effect (see next sentence),
 have no other ministep of the same \adda{Option} in between,
 and there is at least one ministep of a
 different \adda{Option} in between
-(i.e., \textit{length}$(\ms_a, \ms_b) \geq 3$).
+(i.e., \textit{length}$(\ms_a, \ms_b) \geq 3$), and \emph{neither ministep is
+  missing at start or end of the interval}.
 Two non-diagonal ministeps $\ms_a$ and $\ms_b$ cancel each other's effect
 if the following hold: either they are both of the same \adda{Option}
 (Network, $i,\, j,\, r$) (then they cancel because they toggle the same
@@ -2267,11 +2268,14 @@ If $c \geq 2$,
 and the proposal includes permuting the ministeps in the interval
 $[\ms_a, \ms_a.\nnm{succ}^{{c-1}}]$ by \textit{perm}.
 
-If  \textit{misdat} = \nnm{True},
-the proposal is made to insert the non-diagonal ministep
+If  \textit{misdat} = \nnm{True} and \emph{the link is missing at the end of the
+period}, the proposal is made to insert the non-diagonal ministep
 $(w_0,i_0,j_0,r_0,d_0)$ before
 a random ministep $\ms_a$, and permute the $c$ ministeps starting with $\ms_a$,
 where again $c$ is $c_0$ truncated to the number of available places.
+
+If  \textit{misdat} = \nnm{True} and \emph{the link is not missing at the end of
+  the period} do nothing.
 
 According to a  probability \textit{pra},
 the proposal is put into effect (yielding \textit{accept} = \nnm{True})
@@ -2290,11 +2294,13 @@ Part \emph{A}:
        With probabilities defined by $\exp(lospr*)$ choose \textit{OptionSet} $(w_0,i_0,r_0)$,\\
        \addce{under the condition that  $(w_0,i_0,r_0) \neq
        \textit{OptionSet}(\ms_a)$.}\\
+\emph{We just choose one and if same var and actor as $\ms_a$ we exit.
+Not sure how to express it in your notation.
+I set $pr_2$ to 1 below because of this}\\
       If $i_0$ is not active, exit.\\
       \addce{
       If \nnm{uponly} or \nnm{downonly} holds for variable $(w_0, r_0)$,
       then exit.\\
-\newpage
       $pr_2 \leftarrow \ 1 - \exp(lospr\! *\! (\textit{Option}(\ms_a))) \ . $\\
       By $lospr*(\textit{Option}(\ms_a))$ is denoted the element
       of the array $lospr*$ giving the log-probability
@@ -2334,7 +2340,8 @@ Part \emph{A}:
             from $(w_0, i_0, r_0)$,
             implies that \textbf{(C2)} will be satisfied.)
       \item If \textit{misdat}:\\
-            $\textit{ChoiceLength} \leftarrow 1 $
+        If ministep is not missing at the end of the period, exit. Otherwise,
+        $\textit{ChoiceLength} \leftarrow 1 $
       \end{enumerate}
 \item \begin{enumerate}
        \item  If (not \textit{misdat}):\\
@@ -2433,6 +2440,8 @@ and therefore calculate the following.
       \]
       where $I\{A\} = 1$ if $A$ is true and 0 otherwise.
       \end{frindentation}
+\emph{We find NewCCPnumber by insertions, calculate pr1 and then
+remove the insertions}
 \item
       \begin{eqnarray*}
       \text{if (not } \textit{misdat}): & pr_1 \leftarrow &
@@ -2773,6 +2782,7 @@ Part \emph{B}:
       \[
       pr_2 \leftarrow 1 - \exp(lospr_2)
       \]
+\emph{$pr_2$ is set to 1 as for insert permute.}
       ($pr_2$ also is part of the log probability for the reverse proposal;
       the others of these numbers with subscript 2 are not used any more.)
 \item For $1 \leq s \leq \textit{ThisLength}-2$ \
@@ -2850,6 +2860,9 @@ Part \emph{B}:
                                       pr_2 \ttimes   ( \textit{TotNumber}+1)
                                            \ttimes \textit{ChoiceLength} } \ ;
     \end{align}
+\emph{TotNumber+1 replaced by positionchoice here: TotNumber -3  or -2 for
+misdat}
+
     if (\textit{pra} $ > 1$), then  \textit{pra} $ \leftarrow 1 $.
 \end{enumerate}
 \newpage
@@ -2956,7 +2969,8 @@ Part \emph{A}:
         \item     $ pr_1   \leftarrow  1 $ ,
         \item $  d_0   \leftarrow 0 $ .
         \end{enumerate}
-\item   If $w_0 = B$, and adding $d_0$ to
+\item   If $w_0 = B$, and \emph{subtracting (rather than adding), as this is
+    what is actually done.} $d_0$ to
         the current value of $B^{(r)}_{i_0}(t_{m-1})$
         (which is one of the coordinates in $y_{\text{init}}$)
          would lead to a value of this variable outside of its
@@ -3220,8 +3234,9 @@ Part \emph{B}:\\
       this variable is changed according to ministep
       $(w_0,i_0,j_0,r_0,d_0)$ \ ;\\[1em]
       \textit{ChangeStep}$(y, (w_0,i_0,j_0,r_0,d_0))$ \ ; \\[1em]
-      \textit{StepProb1}$(y,w_0,i_0,j_0,r_0;  rr_0, lospr_0)$;\\[1em]
-      If (not \textit{SimpleRates}), then
+ \textit{StepProb1}$(y,w_0,i_0,j_0,r_0;  rr_0, lospr_0)$;\\
+ \emph{Krists had added lospr0 and lcpr0 to sumlprobnew. I removed this.}\\[1em]
+     If (not \textit{SimpleRates}), then
       \begin{enumerate}
       \item \textit{mu\_new} $ \leftarrow  \textit{mu\_new} + rr_0 $ \ ,
       \item \textit{sigma2\_new} $ \leftarrow
