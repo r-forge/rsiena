@@ -1,3 +1,8 @@
+2012-01-28 R-forge revision 196 (RSienaTest only)
+
+	* doc/Debugging.pdf, doc/RSiena_R20104up.pdf: added
+	* doc/Siena_algorithms4.tex: amended maximum likelihood spec
+
 2012-01-20 R-forge revision 195
 
 	* inst/scripts/Rscript01DataFormat.R,

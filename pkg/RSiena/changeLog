@@ -1,16 +1,20 @@
+2012-01-28 R-forge revision 196 (RSienaTest only)
+
+	* doc/Debugging.pdf, doc/RSiena_R20104up.pdf: added
+	* doc/Siena_algorithms4.tex: amended maximum likelihood spec
+
 2012-01-20 R-forge revision 195
 
 	* inst/scripts/Rscript01DataFormat.R,
 	inst/scripts/Rscript02SienaVariableFormat.R,
 	inst/scripts/Rscript03SienaRunModel.R,
 	inst/scripts/Rscript04SienaBehavior.R: new versions now in RSiena
-	too.
+	too. Also one or two typos corrected.
 	* tests/scriptfile.Rout.save, tests/scriptfile.Rout.win,
 	tests/scripts.Rout.save, tests/parallel.Rout.save: updated targets for
 	checks.
-	* tests/scripts.R: sort out which library is checked. Always
-	RSiena, but if check is running on RSiena should be the one being
-	checked.
+	* tests/scripts.R: Run sub process with --vanilla. Also some
+	debugging code added.
 	* src/sienaInternals.cpp: treat NaN in covariates the same as NA,
 	as is done in the R part of RSiena.
 	* src/siena07Models.cpp, src/siena07Utilities.cpp,
