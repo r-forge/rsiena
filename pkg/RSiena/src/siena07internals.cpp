@@ -1164,13 +1164,13 @@ SEXP createEffects(SEXP EFFECTS, Model *pModel, vector<Data *> * pGroupData,
 
 				Data * pData = (*pGroupData)[group];
 
-				if (strcmp(netType, "oneMode") == 0)
+				if (strcmp(netType, "behavior") != 0)
 				{
 					NetworkLongitudinalData * pNetwork =
 						pData->pNetworkData(networkName);
 					pModel->basicRateParameter(pNetwork, period, initialValue);
 				}
-				else if (strcmp(netType, "Behavior") == 0)
+				else //if (strcmp(netType, "Behavior") == 0)
 				{
 					BehaviorLongitudinalData * pNetwork =
 						pData->pBehaviorData(networkName);
