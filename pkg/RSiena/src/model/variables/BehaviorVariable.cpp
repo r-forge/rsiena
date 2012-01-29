@@ -826,7 +826,7 @@ void BehaviorVariable::accumulateDerivatives() const
 				else
 				{
 					contribution2 =
-						this->lcreationEffectContribution[2][effect2];
+						this->lcreationEffectContribution[2][creation2];
 				}
 
 				derivative -=

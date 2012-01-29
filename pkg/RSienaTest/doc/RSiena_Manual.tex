@@ -9806,6 +9806,12 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2012-01-29 R-forge revision 197
+\begin{itemize}
+\item Fix bug in effFrom with changing covariates. The targets depended on the
+compiler. 
+\item Fix bug in creation effects in Maximum likelihood.
+\end{itemize}
 \item 2012-01-20 R-forge revision 195
 \begin{itemize}
 \item NaN's in covariates were causing problems: now treated as though NA in C++,
