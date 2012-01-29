@@ -1,3 +1,12 @@
+2012-01-29 R-forge revision 197
+
+	* src/model/effects/CovariateDependentBehaviorEffect.cpp,
+	src/model/effects/CovariateDependentBehaviorEffect.h,
+	src/model/effects/MainCovariateEffect.cpp: fix bug in changing
+	covariate in MainCovariate effect
+	* src/model/variables/BehaviorVariable.cpp: fix bug in derivatives
+	for maximum likelihood creation effects.
+
 2012-01-28 R-forge revision 196 (RSienaTest only)
 
 	* doc/Debugging.pdf, doc/RSiena_R20104up.pdf: added
