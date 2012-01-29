@@ -1,3 +1,9 @@
+2012-01-29 R-forge revision 198
+
+	* src/siena07internals.cpp: fix a bug causing initialisation of ML
+	to be done using the wrong rate parameter. Will change results
+	slightly if there was a behavior variable or a bipartite variable.
+
 2012-01-29 R-forge revision 197
 
 	* src/model/effects/CovariateDependentBehaviorEffect.cpp,
