@@ -13,6 +13,7 @@
 #include "utils/Utils.h"
 #include "data/Data.h"
 #include "data/LongitudinalData.h"
+#include "data/NetworkLongitudinalData.h"
 #include "model/EffectInfo.h"
 #include "model/variables/DependentVariable.h"
 #include "model/effects/AllEffects.h"
@@ -61,6 +62,16 @@ Model::~Model()
 		delete[] array;
 	}
 
+	// Delete the arrays of settings basic rate parameters
+
+	while (!this->lsettingRateParameters.empty())
+	{
+		double * array = this->lsettingRateParameters.begin()->second.
+			begin()->second;
+		this->lsettingRateParameters.erase(
+			this->lsettingRateParameters.begin());
+		delete[] array;
+	}
 	deallocateVector(this->leffects);
 
 	// Delete the arrays of target changes
@@ -291,6 +302,7 @@ void Model::basicRateParameter(LongitudinalData * pDependentVariableData,
 	int period,
 	double value)
 {
+//TORDO find out why we have obs here and not below
 	if (!this->lbasicRateParameters[pDependentVariableData])
 	{
 		double * array =
@@ -331,6 +343,58 @@ double Model::basicRateParameter(LongitudinalData * pDependentVariableData,
 	return value;
 }
 
+/**
+ * Stores the setting rate parameter for the given setting for the given
+ * dependent variable at the given period.
+ */
+void Model::settingRateParameter(NetworkLongitudinalData * pNetworkData,
+	string setting,
+	int period,
+	double value)
+{
+	if (!this->lsettingRateParameters[pNetworkData][setting])
+	{
+		double * array =
+			//	new double[pDependentVariableData->observationCount() - 1];
+			new double[pNetworkData->observationCount() ];
+
+		// The default basic rate is 1.
+
+		for (int i = 0;
+			i < pNetworkData->observationCount() - 1;
+			i++)
+		{
+			array[i] = 1;
+		}
+
+		this->lsettingRateParameters[pNetworkData][setting] = array;
+	}
+	this->lsettingRateParameters[pNetworkData][setting][period] =
+		value;
+}
+
+
+/**
+ * Returns the setting rate parameter for the given setting for the given
+ * network dependent variable at the given period.
+ */
+double Model::settingRateParameter(NetworkLongitudinalData * pNetworkData,
+	string setting, int period) const
+{
+	std::map<const NetworkLongitudinalData *,
+			 map<string, double *> >::const_iterator
+		iter = this->lsettingRateParameters.find(pNetworkData);
+	double value = 1;
+
+	if (iter != this->lsettingRateParameters.end())
+	{
+		std::map<string, double *>::const_iterator
+		iter1 = iter->second.find(setting);
+		value = iter1->second[period];
+	}
+
+	return value;
+}
 
 /**
  * Adds a new effect to this model and returns the parameters wrapped into
@@ -605,6 +669,9 @@ vector<Chain *> & Model::rChainStore(int periodFromStart)
 	return this->lchainStore[periodFromStart];
 }
 
+/**
+ * Reduces the stored chains for this period to the requested number.
+ */
 void Model::clearChainStore(int keep, int groupPeriod)
 {
 	int size = this->lchainStore[groupPeriod].size();
@@ -632,35 +699,58 @@ void Model::clearChainStore(int keep, int groupPeriod)
 
 }
 
+/**
+ * Creates vector of stored chains of the requested size for this period.
+ */
 void Model::setupChainStore(int numberPeriods)
 {
 	this->lchainStore.resize(numberPeriods);
 }
 
+/**
+ * Deletes final stored chain for this period.
+ */
 void Model::deleteLastChainStore(int periodFromStart)
 {
 	delete this->lchainStore[periodFromStart].back();
 	this->lchainStore[periodFromStart].pop_back();
 }
 
+/**
+ * Sets the total number of periods (across groups).
+ */
 void Model::numberOfPeriods(int numberOfPeriods)
 {
 	this->lnumberOfPeriods = numberOfPeriods;
 }
+
+/**
+ * Returns the number of periods.
+ */
 int Model::numberOfPeriods()
 {
 	return this->lnumberOfPeriods;
 }
 
+/**
+ * Sets the model type.
+ */
 void Model::modelType(int type)
 {
 	this->lmodelType = ModelType(type);
 }
 
+/**
+ * Returns the model type.
+ */
 ModelType Model::modelType() const
 {
 	return this->lmodelType;
 }
+/**
+ * Returns whether the model type is one of the symmetric type b models.
+ */
+
 bool Model::modelTypeB() const
 {
 	return this->lmodelType == BFORCE ||

@@ -170,9 +170,7 @@ private:
 
 	double lsymmetricProbability;
 
-	map<int, double> lsetting;
-
-	vector<int> lalterSet;
+	vector<int> * lsetting;
 
 	// whether this is a one mode network or not
 
