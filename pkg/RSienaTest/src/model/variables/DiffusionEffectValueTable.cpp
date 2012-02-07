@@ -78,7 +78,7 @@ void DiffusionEffectValueTable::parameter(double value)
 double DiffusionEffectValueTable::value(int numerator, int denominator)
 {
 	int arrayIndex = ((numerator - 1) * this->ldenominatorRange) +
-	  (denominator - 1);
+		(denominator - 1);
 
 	if (this->lparameterValues[arrayIndex] != this->lparameter)
 	{
@@ -86,7 +86,7 @@ double DiffusionEffectValueTable::value(int numerator, int denominator)
 		// parameter, hence we must recalculate the value.
 
 		this->lvalues[arrayIndex] = exp(this->lparameter *
-			numerator / denominator);
+			(double)numerator / (double)denominator);
 		this->lparameterValues[arrayIndex] = this->lparameter;
 	}
 

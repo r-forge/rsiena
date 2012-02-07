@@ -493,21 +493,20 @@ void DependentVariable::calculateRates()
 			sumRatesSquared += this->lrate[i] * this->lrate[i];
 
 		}
-		if (networkVariable())
-		{
-			if (this->pSimulation()->pModel()->needScores())
-			{
-				this->calculateScoreSumTerms();
-			}
-			if(this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
-			{
-				this->ltotalRate = this->totalRate() * this->totalRate() -
-					sumRatesSquared;
-			}
-		}
+		
+		if (this->pSimulation()->pModel()->needScores())
+		  {
+		    this->calculateScoreSumTerms();
+		  }
+		if(this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+		  {
+		    this->ltotalRate = this->totalRate() * this->totalRate() -
+		      sumRatesSquared;
+		  }
+		
 		this->lvalidRates = true;
 	}
-
+	
 }
 
 
@@ -594,7 +593,7 @@ void DependentVariable::updateCovariateRates()
 
 	// Add the contributions of each constant covariate with non-zero parameter
 	// for the rate functions. The contribution of a constant covariate v to
-	// the rate function of an actor i is exp(\alpha v[i]), where \alpha is
+	// the rate function of an actor i is exp(alpha v[i]), where alpha is
 	// the corresponding parameter. The calculation of the exponentials is
 	// postponed, though.
 
@@ -614,7 +613,7 @@ void DependentVariable::updateCovariateRates()
 
 	// Add the contributions of each changing covariate with non-zero parameter
 	// for the rate functions. The contribution of a changing covariate v to
-	// the rate function of an actor i is exp(\alpha v[i][h]), where \alpha is
+	// the rate function of an actor i is exp(alpha v[i][h]), where alpha is
 	// the corresponding parameter, and h is the current period.
 	// Again, the calculation of the exponentials is postponed.
 
@@ -634,7 +633,7 @@ void DependentVariable::updateCovariateRates()
 
 	// Add the contributions of each behavior variable with non-zero parameter
 	// for the rate functions. The contribution of a behavior variable v to
-	// the rate function of an actor i is exp(\alpha v[i]), where \alpha is
+	// the rate function of an actor i is exp(alpha v[i]), where alpha is
 	// the corresponding parameter.
 	// Again, the calculation of the exponentials is postponed.
 
@@ -703,7 +702,7 @@ double DependentVariable::behaviorVariableRate(int i) const
 {
 	// Add the contributions of each behavior variable with non-zero parameter
 	// for the rate functions. The contribution of a behavior variable v to
-	// the rate function of an actor i is exp(\alpha v[i]), where \alpha is
+	// the rate function of an actor i is exp(alpha v[i]), where alpha is
 	// the corresponding parameter.
 
 	double rate = 0;
@@ -879,7 +878,7 @@ void DependentVariable::accumulateRateScores(double tau,
 		pBehaviorVariable = dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
 		if (this == pSelectedVariable)
 		{
-			int totalAlterValue = 0;
+			double totalAlterValue = 0;
 			double averageAlterValue = 0;
 			if (pNetwork->outDegree(selectedActor) > 0)
 			{
@@ -1203,7 +1202,7 @@ void DependentVariable::calculateScoreSumTerms()
 		double timesRate = 0;
 		for (int i = 0; i < this->n(); i++)
 		{
-			int totalAlterValue = 0;
+			double totalAlterValue = 0;
 			double averageAlterValue = 0;
 			if (pNetwork->outDegree(i) > 0)
 			{

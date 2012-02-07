@@ -27,15 +27,12 @@ siena.table <- function(x,type='tex',
         condrates <- length(x$rate)
     }
 
-    pp <- p + condrates
-    test <- x$test
-    fixed <- x$fixed
     theta <- x$theta
     theta[diag(x$covtheta) < 0.0 | x$fixed] <- NA
     ses <- sqrt(diag(x$covtheta))
     ses[x$fixed] <- NA
     max.t1 <- max(abs(x$tstat[!x$fixed]))
-    max.t <- round(max.t1,d=d)
+    max.t <- round(max.t1, digits = d)
 
     if (max.t < max.t1)
     {
@@ -451,7 +448,6 @@ siena.table <- function(x,type='tex',
 	sections <- 0
         for (i in 1:nNetworks)
         {
-            thisNetEff <- netEffects[netEffects$name == netNames[i]]
             sections <- sections+1
             thisNetTable <- mainLatex(c(1:p)[effects$name == netNames[i]],sections)
             table <- rbind(table,thisNetTable)
@@ -470,7 +466,6 @@ siena.table <- function(x,type='tex',
 
         for (i in 1:nBehavs)
         {
-            thisBehEff <- behEffects[behEffects$name == behNames[i]]
             sections <- sections+1
             thisBehTable <- mainLatex(c(1:p)[effects$name == behNames[i]],sections)
             table <- rbind(table,thisBehTable)
