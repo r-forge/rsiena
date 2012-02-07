@@ -1,3 +1,16 @@
+2012-02-07 R-forge revision 199 (RSienaTest only)
+	* src/model/variables/DependentVariable.cpp,
+	src/model/variables/EffectValueTable.h,
+	src/model/variables/DiffusionEffectValueTable.h: removing
+	backslashes from within comments.
+	* src/model/variables/DependentVariable.cpp: removing
+	networkVariable conditions so score sum terms are calculated for
+	behaviour rate effects.
+	* src/model/variables/DependentVariable.cpp,
+	src/model/variables/DiffusionEffectValueTable.cpp: correction
+	calculation of average exposure diffusion rate effect.
+	* R/sienatable.r: removal of superfluous variables.
+
 2012-01-29 R-forge revision 198
 
 	* src/siena07internals.cpp: fix a bug causing initialisation of ML
