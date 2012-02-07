@@ -16,6 +16,7 @@
 
 #include "StatisticCalculator.h"
 #include "data/Data.h"
+#include "data/ActorSet.h"
 #include "network/NetworkUtils.h"
 #include "network/Network.h"
 #include "data/NetworkLongitudinalData.h"
@@ -24,6 +25,8 @@
 #include "network/TieIterator.h"
 #include "data/ConstantCovariate.h"
 #include "data/ChangingCovariate.h"
+#include "data/ConstantDyadicCovariate.h"
+#include "data/ChangingDyadicCovariate.h"
 #include "model/Model.h"
 #include "model/State.h"
 #include "model/Function.h"
@@ -81,6 +84,14 @@ StatisticCalculator::~StatisticCalculator()
 		delete[] array;
 	}
 
+	// Delete the arrays of simulated distances for settings
+
+	while (!this->lsettingDistances.empty())
+	{
+		int * array = this->lsettingDistances.begin()->second.begin()->second;
+		this->lsettingDistances.erase(this->lsettingDistances.begin());
+		delete[] array;
+	}
 	// The state just stores the values, but does not own them. It means that
 	// the destructor of the state won't deallocate the memory, and we must
 	// request that explicitly. The basic predictor state is now
@@ -135,6 +146,30 @@ int StatisticCalculator::distance(LongitudinalData * pData, int period)
 	return iter->second[period];
 }
 
+/**
+ * Returns the simulated setting distance for the given network and period.
+ */
+int StatisticCalculator::settingDistance(LongitudinalData * pData,
+	string setting, int period) const
+{
+	int value = 0;
+	map<LongitudinalData *, map<string, int *> >::const_iterator iter=
+ 		this->lsettingDistances.find(pData);
+
+	if (iter != this->lsettingDistances.end())
+	{
+		map<string, int *>::const_iterator iter1 =
+			iter->second.find(setting);
+		value = iter1->second[period];
+	}
+	else
+	{
+		throw invalid_argument(
+			"Unknown effect: The given setting rate is not part of the model.");
+	}
+
+	return value;
+}
 
 /**
  * Calculates the statistics for all effects of the given model. Note that
@@ -652,7 +687,102 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 
 	this->ldistances[pNetworkData][this->lperiod] = pDifference->tieCount();
 
-	//Rprintf("basic rate change %d\n", pDifference->tieCount());
+
+	// settings targets
+
+	// for each covariate-defined setting, calculate
+	// setting*difference network and sum.
+	const vector<string> & rSettingNames = pNetworkData->rSettingNames();
+	//Rprintf("basic rate change %d size %d \n", pDifference->tieCount(),
+	//	rSettingNames.size());
+	for (unsigned i = 0; i < rSettingNames.size();
+		 i++)
+	{
+		if (!this->lsettingDistances[pNetworkData][rSettingNames[i]])
+		{
+			int * array =
+				new int[pNetworkData->observationCount() - 1];
+
+			this->lsettingDistances[pNetworkData][rSettingNames[i]] = array;
+		}
+		// universal
+		int distance = pDifference->tieCount();
+		// primary
+		if (i == 1)
+		{
+			const Network * pNetwork =
+				this->lpState->pNetwork(pNetworkData->name());
+			// create a network representing primary settings
+			Network * settingNetwork = new
+				Network(pNetwork->n(), pNetwork->m());
+			for (int ego = 0; ego < pNetwork->n(); ego++)
+			{
+				vector<int> * setting = primarySetting(pNetwork, ego);
+				for (unsigned alter = 0; alter < setting->size(); alter++)
+				{
+					settingNetwork->setTieValue(ego, alter, 1);
+				}
+				delete(setting);
+			}
+			for (TieIterator iter = pDifference->ties();
+				 iter.valid();
+				 iter.next())
+			{
+
+				{
+					if (settingNetwork->tieValue(iter.ego(),
+							iter.alter()) == 0)
+					{
+						distance--;
+					}
+				}
+			}
+		}
+		// for each covariate-defined setting, calculate
+		// setting*difference network and sum.
+		if (i > 1)
+		{
+			ConstantDyadicCovariate * pConstantDyadicCovariate =
+				this->lpData->pConstantDyadicCovariate(rSettingNames[i]);
+			ChangingDyadicCovariate * pChangingDyadicCovariate =
+				this->lpData->pChangingDyadicCovariate(rSettingNames[i]);
+
+			for (TieIterator iter = pDifference->ties();
+				 iter.valid();
+				 iter.next())
+			{
+
+				if (pConstantDyadicCovariate)
+				{
+					if (pConstantDyadicCovariate->value(iter.ego(),
+							iter.alter()) == 0)
+					{
+						distance--;
+					}
+				}
+				else if (pChangingDyadicCovariate)
+				{
+					if (pChangingDyadicCovariate->value(iter.ego(),
+							iter.alter(),
+							this->lperiod) == 0)
+					{
+						distance--;
+					}
+				}
+				else
+				{
+					throw logic_error(
+						"No dyadic covariate named '" +
+						rSettingNames[i] +
+						"'.");
+				}
+			}
+		}
+		// store distance for later use
+		//	Rprintf(" cov %d %d\n", i, distance);
+		this->lsettingDistances[pNetworkData][rSettingNames[i]]
+			[this->lperiod] = distance;
+	}
 
 	// Loop through the rate effects, calculate the statistics,
 	// and store them.

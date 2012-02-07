@@ -61,6 +61,8 @@ public:
 
 	double statistic(EffectInfo * pEffectInfo) const;
 	int distance(LongitudinalData * pData, int period) const;
+	int settingDistance(LongitudinalData * pData, string setting,
+		int period) const;
 
 private:
 	void calculateStatistics();
@@ -92,6 +94,9 @@ private:
 
 	// Array of simulated distances per variable
 	map<LongitudinalData *, int *> ldistances;
+
+	// Array of simulated distances per setting per network variable
+	map<LongitudinalData *, map<std::string, int *> > lsettingDistances;
 
 	State * lpPredictorState;
 

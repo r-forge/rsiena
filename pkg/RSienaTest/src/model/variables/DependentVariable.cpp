@@ -63,6 +63,23 @@ DependentVariable::DependentVariable(string name,
 	this->lacceptances.resize(NBRTYPES, 0);
 	this->lrejections.resize(NBRTYPES, 0);
 	this->laborts.resize(NBRTYPES, 0);
+
+	NetworkLongitudinalData * pNetworkData =
+		dynamic_cast<NetworkLongitudinalData *>(
+			pSimulation->pData()->pNetworkData(name));
+	if (pNetworkData)
+	{
+	 	this->lnumberSettings = pNetworkData->rSettingNames().size();
+	 	this->lsettingRates = new double[this->lnumberSettings];
+	 	this->lsettingProbs = new double[this->lnumberSettings];
+	 }
+	 else
+	{
+		this->lnumberSettings = 0;
+		this->lsettingRates = 0;
+	 	this->lsettingProbs = 0;
+	}
+	this->lstepType = -1;
 }
 
 
@@ -75,6 +92,20 @@ void DependentVariable::initializeRateFunction()
 {
 	const Data * pData = this->lpSimulation->pData();
 	const Model * pModel = this->lpSimulation->pModel();
+
+	// initialize setting scores
+	if (this->networkVariable())
+	{
+		NetworkLongitudinalData * pNetworkData =
+			dynamic_cast<NetworkLongitudinalData *>(
+				this->pSimulation()->pData()->pNetworkData(this->name()));
+		const std::vector< string > & rSettingNames =
+			pNetworkData->rSettingNames();
+		for (unsigned i = 0 ; i < rSettingNames.size(); i++)
+		{
+			this->lsettingRateScores[rSettingNames[i]] = 0;
+		}
+	}
 
 	const vector<EffectInfo *> & rRateEffects =
 		pModel->rRateEffects(this->name());
@@ -92,15 +123,15 @@ void DependentVariable::initializeRateFunction()
 			//	Rprintf("covariate\n");
 			// Covariate-dependent rate effect
 
-			//	if (parameter != 0)
-			//	{
+			//if (parameter != 0)
+			//{
 				ConstantCovariate * pConstantCovariate =
 					pData->pConstantCovariate(interactionName);
 				ChangingCovariate * pChangingCovariate =
 					pData->pChangingCovariate(interactionName);
 				const BehaviorVariable * pBehaviorVariable =
 					(const BehaviorVariable *)
-						this->lpSimulation->pVariable(interactionName);
+					this->lpSimulation->pVariable(interactionName);
 
 				if (pConstantCovariate)
 				{
@@ -151,7 +182,7 @@ void DependentVariable::initializeRateFunction()
 						"No individual covariate named '" +
 						interactionName +
 						"'.");
-				//	}
+				//}
 		}
 		else if (rateType == "structural")
 		{
@@ -363,6 +394,7 @@ DependentVariable::~DependentVariable()
 	delete this->lpCreationFunction;
 	delete[] this->lrate;
 	delete[] this->lcovariateRates;
+	delete[] this->lsettingRates;
 
 	// Delete the structural rate effects.
 	deallocateVector(this->lstructuralRateEffects);
@@ -423,7 +455,37 @@ int DependentVariable::simulatedDistance() const
 	return this->lsimulatedDistance;
 }
 
+/**
+ * Returns the number of settings for this dependent variable (only networks)
+ */
+int DependentVariable::numberSettings() const
+{
+	return this->lnumberSettings;
+}
 
+/**
+ * Generates a random step type for the settings model. Or -1 if not relevant.
+ * Only ever relevant to networks.
+ */
+void DependentVariable::getStepType()
+{
+	if (this->lnumberSettings == 0)
+	{
+		this->lstepType = -1;
+	}
+	else
+	{
+		this->lstepType = nextIntWithProbabilities(this->lnumberSettings,
+			this->lsettingProbs);
+	}
+}
+/**
+ * Returns the step type for the settings model. -1 if not settings model..
+ */
+int DependentVariable::stepType() const
+{
+	return this->lstepType;
+}
 // ----------------------------------------------------------------------------
 // Section: Initialization
 // ----------------------------------------------------------------------------
@@ -440,7 +502,34 @@ void DependentVariable::initialize(int period)
 	this->lbasicRate =
 		this->lpSimulation->pModel()->basicRateParameter(this->pData(),
 			period);
-
+	if (this->networkVariable())
+	{
+		NetworkLongitudinalData * pNetworkData =
+			dynamic_cast<NetworkLongitudinalData *>(this->pData());
+		const std::vector< string > & rSettingNames =
+			pNetworkData->rSettingNames();
+		if (this->lnumberSettings > 0)
+		{
+			double sum = 0;
+			for (unsigned i = 0;
+				 i < rSettingNames.size();
+				 i++)
+			{
+				this->lsettingRates[i] =
+					this->pSimulation()->pModel()->
+					settingRateParameter(pNetworkData,
+						rSettingNames[i], period);
+				sum += this->lsettingRates[i];
+			}
+			for (unsigned i = 0;
+				 i < rSettingNames.size();
+				 i++)
+			{
+				this->lsettingProbs[i] = this->lsettingRates[i] / sum;
+			}
+			this->lbasicRate = 0;
+		}
+	}
 	if (!this->lchangingCovariateParameters.empty() ||
 		!this->lbehaviorVariableParameters.empty())
 	{
@@ -503,7 +592,7 @@ void DependentVariable::calculateRates()
 		    this->ltotalRate = this->totalRate() * this->totalRate() -
 		      sumRatesSquared;
 		  }
-		
+	
 		this->lvalidRates = true;
 	}
 	
@@ -551,7 +640,7 @@ double DependentVariable::calculateRate(int i)
 	// of some effects depending on the structure of certain networks. The
 	// later two components are precomputed for efficiency.
 
-	return this->basicRate() *
+	return (this->basicRate() + this->settingRate()) *
 		this->lcovariateRates[i] *
 		this->behaviorVariableRate(i) *
 		this->structuralRate(i) *
@@ -720,6 +809,20 @@ double DependentVariable::behaviorVariableRate(int i) const
 }
 
 
+/**
+ * Returns the component of the basic rate function for settings
+ * (network variables only).
+ */
+double DependentVariable::settingRate() const
+{
+	double settingRate = 0;
+	for (int i = 1; i < this->lnumberSettings; i++)
+	{
+		settingRate += this->lsettingRates[i];
+	}
+	return settingRate;
+}
+
 // ----------------------------------------------------------------------------
 // Section: Scores
 // ----------------------------------------------------------------------------
@@ -739,7 +842,8 @@ void DependentVariable::accumulateRateScores(double tau,
 {
 	// Update the score for the basic rate parameter
 
-	if (this == pSelectedVariable)
+
+	if (this == pSelectedVariable && this->lstepType == -1)
 	{
 		this->lbasicRateScore += 1.0 / this->basicRate();
 		if (this->symmetric() &&
@@ -755,6 +859,23 @@ void DependentVariable::accumulateRateScores(double tau,
 	{
 		throw logic_error("model type b");
 		this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
+	}
+
+	// Update scores for setting rates
+	NetworkLongitudinalData * pNetworkData =
+		dynamic_cast<NetworkLongitudinalData *>(this->pData());
+	const std::vector< string > & rSettingNames  =
+		pNetworkData->rSettingNames();
+
+	for (int i = 0; i < this->lnumberSettings; i++)
+	{
+		if (this == pSelectedVariable && this->lstepType == i)
+		{
+			this->lsettingRateScores[rSettingNames[i]] +=
+				1.0 / this->lsettingRates[i];
+		}
+		this->lsettingRateScores[rSettingNames[i]] -= this->totalRate() * tau /
+			this->lsettingRates[i];
 	}
 
 	// Update scores for covariate dependent rate parameters
@@ -875,7 +996,8 @@ void DependentVariable::accumulateRateScores(double tau,
 	{
 		const Network * pNetwork = iter->first->pNetwork();
 		const BehaviorVariable * pBehaviorVariable;
-		pBehaviorVariable = dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
+		pBehaviorVariable =
+			dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
 		if (this == pSelectedVariable)
 		{
 			double totalAlterValue = 0;
@@ -1260,6 +1382,18 @@ double DependentVariable::basicRateDerivative() const
 {
 	return this->lbasicRateDerivative;
 }
+double DependentVariable::settingRateScore(string setting) const
+{
+
+	map<string, double>::const_iterator iter =
+		this->lsettingRateScores.find(setting);
+	if (iter == this->lsettingRateScores.end())
+	{
+		throw invalid_argument("Unknown setting.");
+	}
+	return iter->second;
+}
+
 
 double DependentVariable::constantCovariateScore(
 	const ConstantCovariate * pCovariate) const

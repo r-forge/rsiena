@@ -94,6 +94,15 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 				effects <- updateTheta(effects, prevAns)
 			}
         }
+		## add any effects needed for settings model
+		if (!is.null(x$settings))
+		{
+			effects <- addSettingsEffects(effects, x)
+		}
+		else
+		{
+			effects$setting <- rep("", nrow(effects))
+		}
         ## find any effects not included which are needed for interactions
         tmpEffects <- effects[effects$include, ]
         interactionNos <- unique(c(tmpEffects$effect1, tmpEffects$effect2,
@@ -195,7 +204,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         }
 
         ## unpack data and put onto f anything we may need next time round.
-        f <- lapply(data, function(x) unpackData(x))
+        f <- lapply(data, function(xx, x) unpackData(xx, x), x=x)
 
         attr(f, "netnames") <- attr(data, "netnames")
         attr(f, "symmetric") <- attr(data, "symmetric")
@@ -398,7 +407,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
                                               basicEffects[[i]]$effectNumber)]
     }
     ans <- .Call("interactionEffects", PACKAGE=pkgname,
-                 pData, pModel, interactionEffects)
+                 pModel, interactionEffects)
     ## copy these pointers to the interaction effects and then insert in
     ## effects object in the same rows for later use
     for (i in 1:length(ans[[1]])) ## ans is a list of lists of
@@ -489,7 +498,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 		simpleRates <- FALSE
 	}
 	z$simpleRates <- simpleRates
-
 	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
                  profileData, z$parallelTesting, x$modelType, z$simpleRates)
@@ -541,7 +549,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         {
 			ans <- .Call("mlInitializeSubProcesses",
                          PACKAGE=pkgname, pData, pModel,
-                         simpleRates, z$probs, z$prmin, z$prmib,
+                         z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
                          x$maximumPermutationLength,
                          x$initialPermutationLength, ff$chain)
@@ -1068,6 +1076,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
     attr(edgeLists, "structmean") <- attr(depvar, "structmean")
     attr(edgeLists, "averageInDegree") <- attr(depvar, "averageInDegree")
     attr(edgeLists, "averageOutDegree") <- attr(depvar, "averageOutDegree")
+	attr(edgeLists, "settings") <- attr(depvar, "settings")
     return(edgeLists = edgeLists)
 }
 ##@unpackBipartite siena07 Reformat data for C++
@@ -1563,7 +1572,7 @@ unpackVDyad<- function(dyvCovar, observations)
 }
 
 ##@unpackData siena07 Reformat data for C++
-unpackData <- function(data)
+unpackData <- function(data, x)
 {
     f <- NULL
     observations<- data$observations
@@ -1572,7 +1581,20 @@ unpackData <- function(data)
     oneModes <- data$depvars[types == "oneMode"]
     Behaviors <- data$depvars[types == "behavior"]
     bipartites <- data$depvars[types == "bipartite"]
-    f$nets <- lapply(oneModes, function(x, n, comp) unpackOneMode(x, n, comp),
+	## add the settings
+	oneModes <- lapply(oneModes, function(depvar)
+	   {
+		   name <- attr(depvar, "name")
+		   if (name %in% names(x$settings))
+		   {
+			   attr(depvar, "settings") <- c("universal", "primary",
+											 x$settings[[name]])
+		   }
+		   depvar
+	   }
+		   )
+    f$nets <- lapply(oneModes, function(x, n, comp)
+					 unpackOneMode(x, n, comp),
                      n = observations, comp=data$compositionChange)
     names(f$nets) <- names(oneModes)
     f$bipartites <- lapply(bipartites, function(x, n, comp)
@@ -1910,3 +1932,49 @@ updateTheta <- function(effects, prevAns)
 		prevEffects$initialValue[match(efflist, oldlist)][use]
 	effects
 }
+
+##@addSettingseffects siena07 add extra rate effects for settings model
+addSettingsEffects <- function(effects, x)
+{
+	## need a list of settings (constant dyadic covariate name) for some or all
+	## dependent networks. If symmetric this is equivalent to a forcing model.
+	## The covariate actor sets should match the network actor sets.
+	## ?? would it ever make sense for bipartites? Allow it here for now and see!
+	## maybe better to add the settings pars to the data object but for now
+	## they are on the model with maxdegree. TODO write some validation
+	varNames <- names(x$settings)
+	nbrSettings <- sapply(x$settings, length)
+	tmp <-
+		lapply(1:length(x$settings), function(i)
+		   {
+			   ## find effects for this variable
+			   varEffects <- effects[effects$name == varNames[i], ]
+			   ## find relevant rate effects
+			   dupl <- varEffects[varEffects$basicRate, ]
+			   ## make extra copies
+			   newEffects <- dupl[rep(1:nrow(dupl),
+									  each = nbrSettings[i] + 2), ]
+			   newEffects <- split(newEffects, list(newEffects$group,
+								   newEffects$period))
+			   newEffects <- lapply(newEffects, function(dd)
+				  {
+					  dd$setting <- c("universal", "primary",
+											  x$settings[[i]])
+					  i1 <- regexpr("rate", dd$effectName)
+					  dd$effectName <-
+						  paste(substr(dd$effectName, 1, i1 - 2),
+											 dd$setting,
+								substring(dd$effectName, i1))
+					  dd
+				  }
+					  )
+			   newEffects <- do.call(rbind, newEffects)
+			   ## add extra column to non basic rate effects
+			   varEffects$setting <- rep("", nrow(varEffects))
+			   ## combine them
+			   rbind(newEffects, varEffects[!varEffects$basicRate, ])
+		   })
+	## join them together again
+	do.call(rbind, tmp)
+}
+
