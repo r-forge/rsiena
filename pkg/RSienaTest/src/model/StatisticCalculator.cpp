@@ -88,9 +88,15 @@ StatisticCalculator::~StatisticCalculator()
 
 	while (!this->lsettingDistances.empty())
 	{
-		int * array = this->lsettingDistances.begin()->second.begin()->second;
+		while (!(this->lsettingDistances.begin())->second.empty())
+		{
+			int * array =
+				this->lsettingDistances.begin()->second.begin()->second;
+			this->lsettingDistances.begin()->second.erase(
+				this->lsettingDistances.begin()->second.begin());
+			delete[] array;
+		}
 		this->lsettingDistances.erase(this->lsettingDistances.begin());
-		delete[] array;
 	}
 	// The state just stores the values, but does not own them. It means that
 	// the destructor of the state won't deallocate the memory, and we must
@@ -737,6 +743,7 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 					}
 				}
 			}
+			delete settingNetwork;
 		}
 		// for each covariate-defined setting, calculate
 		// setting*difference network and sum.

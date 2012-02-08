@@ -395,6 +395,7 @@ DependentVariable::~DependentVariable()
 	delete[] this->lrate;
 	delete[] this->lcovariateRates;
 	delete[] this->lsettingRates;
+	delete[] this->lsettingProbs;
 
 	// Delete the structural rate effects.
 	deallocateVector(this->lstructuralRateEffects);
@@ -595,7 +596,7 @@ void DependentVariable::calculateRates()
 	
 		this->lvalidRates = true;
 	}
-	
+
 }
 
 

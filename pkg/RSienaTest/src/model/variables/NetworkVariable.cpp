@@ -127,7 +127,7 @@ NetworkVariable::~NetworkVariable()
 	delete[] this->lactiveStructuralTieCount;
 	delete[] this->lpermitted;
 	delete[] this->lprobabilities;
-
+	delete this->lsetting;
 
 	// Delete arrays of contributions
 	int numberOfAlters;
@@ -990,6 +990,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	// TODO: correct this->lsetting for primary setting
 	if (this->stepType() == 1)
 	{
+		delete this->lsetting;
 		this->lsetting = primarySetting(this->pNetwork(), this->lego);
 	}
 	this->preprocessEgo(this->lego);
