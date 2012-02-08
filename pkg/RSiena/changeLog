@@ -1,3 +1,11 @@
+2012-02-08 R-forge revision 201 (RSienaTest only)
+
+	* R/sienatable.r: added property eol-style=native.
+	* src/model/StatisticCalculator.cpp,
+	src/model/variables/DependentVariable.cpp,
+	src/model/variables/NetworkVariable.cpp: fix some memory leaks in
+	settings model.
+
 2012-02-07 R-forge revision 200
 
 	* src/model/variables/DependentVariable.cpp: removing
