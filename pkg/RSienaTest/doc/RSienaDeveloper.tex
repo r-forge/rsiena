@@ -43,9 +43,14 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{1ex plus1ex}
 \raggedright
+\oddsidemargin 0in
+\evensidemargin 0in
+\textwidth 6.25in
+\textheight 9.9in
+\topmargin -2cm
 \begin{document}
 
-\title{Notes for Developers of RSiena}
+\title{\vspace*{-0.5cm} Notes for Developers of RSiena}
 \author{Ruth Ripley}
 \date{}
 \maketitle
@@ -55,9 +60,11 @@
 
 The introduction to the RSiena manual describes the basics of how to run the
 program, either `standalone' or within R. The help files in R describe how to
-use the R commands. Here I give some notes for developers.
+use the R commands. Here are some notes for developers. Caveat: the information
+recorded here gets out of date from time to time. Do not be surprised if things
+do not work. Consult the appropriate original documentation or google to solve
+the problem.
 
-Note that this file changes fairly frequently.
 \section{Documentation}
 \subsection{Getting the documentation: Windows Users}
 \begin{enumerate}
@@ -315,7 +322,7 @@ below.
 \begin{enumerate}
 \item If using Windows, download and install the matching
 \textsf{Rtools.exe} from
-  \url{http://www.murdoch-sutherland.com/Rtools/}.  Beware: if you later install
+  CRAN. (The link is via Download R for Windows). Beware: if you later install
   other programs containing utilities such as tar (delphi is one offender), you
   may need to uninstall and reinstall Rtools, as you need Rtools at the start of
   your path. (Or edit the path!).
@@ -421,7 +428,7 @@ containing your installed packages.
 You might like to add \verb|_R_CHECK_FORCE_SUGGESTS_=FALSE| which stops the
 check failing because some suggested packages which are not actually used in the
 code are not installed. (If you do this, you will get some warnings about "no
-visible global function defintion for...". Do read them to make sure that only
+visible global function definition for...". Do read them to make sure that only
 functions in the missing packages are mentioned.)
 
 \item[build.Renviron] This is the file used for the build procedure.  I suggest
@@ -430,7 +437,7 @@ functions in the missing packages are mentioned.)
 \begin{verbatim}
 _R_BUILD_RESAVE_DATE=no
 \end{verbatim}
-but I have added this to the DESCRIPTION file so it is always set.
+but this is now set in the DESCRIPTION file.
 \item[Makevars] Currently only necessary on Mac and Linux, unless you have built
   your own R. This file is used to over-ride the system flags for compiling. Use
   the following line to set some warnings on for C++:
@@ -469,7 +476,7 @@ Remember that you should send them the source tar ball too, for compliance with
 GPL licensing.
 
 If you are lucky the same will work with Mac binaries on a Mac but there may be
-problems with differing version of Mac OSX.
+problems with differing versions of Mac OSX.
 
 There is a facility to build Windows packages on CRAN. See
 \url{http://win-builder.r-project.org/}. In the future there may be something
@@ -530,11 +537,11 @@ non-null value.
 \label{sec:tests}
 \begin{description}
 \item[scripts] There is a file \sfn{scripts.R} in the \sfn{tests} directory
-  which is designed to test the scripts in the manual. Since I got different
-  final \sfn{.Random.Seed} on different platforms when running
-  \sfn{plot.network} I have removed the \sfn{sna}, \sfn{network} etc code to a
+  which is designed to test the scripts in the manual. Since the
+ \sfn{.Random.Seed} was altered in different ways on different platforms by
+  \sfn{plot.network} the \sfn{sna}, \sfn{network} etc code has been moved to a
   separate script file with ``SNA'' in its name.  The
-  scripts are concatenated (I added numbers to the names to make this happen in
+  scripts are concatenated (numbers added to the names make this happen in
   the correct order) and run, after copying all the files from the examples
   directory to the testing one. Any scripts which contain the text ``SNA'' in the
   name are ignored. Some difference output will typically be produced: check
@@ -654,7 +661,7 @@ Rprof(NULL)
 summaryRprof()
 \end{verbatim}
 For the C part it is a lot harder. We have an out-of-date system for running
-\sfn{gprof} which could be upuadated if desired.  An outline of the use of
+\sfn{gprof} which could be updated if desired.  An outline of the use of
 is given here:
 \begin{enumerate}
 \item Our set-up works for networks, behavior variables and the various
@@ -696,14 +703,16 @@ A few notes about each:
 \begin{enumerate}
 \item You need root privileges to start or stop the daemon, and to reset it. I
   suggest using it on an Ubuntu installation of your own to avoid permission
-  problems. There are instruction on CRAN about how to install R on Ubuntu. Thre
-  is a Windows Installer to create Ubuntu alongside a Windows installation which
-  is easy to use. Alternatively, install Ubuntu from the download. In either
-  case, take care to defragment and check your disk first as it will be
-  repartitioned and this can cause problems if it is highly fragmented.
+  problems. There are instructions on CRAN about how to install R on
+  Ubuntu. There is a Windows Installer to create Ubuntu alongside a Windows
+  installation which is easy to use. Alternatively, install Ubuntu from the
+  download. In either case, take care to defragment and check your disk first as
+  it will be repartitioned and this can cause problems if it is highly
+  fragmented.
 \item It is a resource hog.
 \item The callgraph option only used to work on 32 bit machines but seems to
-  work ok on 64 bit now.
+  work ok on 64 bit now. It will not work if you have optimization level
+  \emph{O3} on the compiler.
 \item \verb|opcontrol --start| to start it
 \item \verb|opcontrol --callgraph=5| to get a callgraph.
 \item \verb|opcontrol --reset| to start the collection again
@@ -715,7 +724,7 @@ A few notes about each:
 \item \verb|opcontrol --dump| to create a file you can get reports from.
 Follow by \verb|opcontrol --shutdown| to avoid errors due to files not being in
 the expected place.
-\item \verb|opreport -l siena.so| to get a report. (Maybe Rsiena.so now)
+\item \verb|opreport -l RSiena.so| to get a report.
 \item \verb|opannotate -d src srcdir| to get annotated output
 \item \verb|ogprof path/to/RSiena.so| to create output like \sfn{gprof}.
 Follow by
@@ -743,6 +752,8 @@ Follow by
 \item Click Record and later Stop
 \item You can get some sort of callgraph, but not the total time spent in a
   procedure.
+\item Mac Lion has started asking for permissions repeatedly. Not sure what the
+  problem is.
 \end{enumerate}
 \end{description}
 
@@ -758,10 +769,10 @@ You may find that R tends to crash when you change the C++. You can try to trap
 the error using \sfn{Rprintf} statements to print out details at intervals. The
 syntax for \sfn{Rprintf} is the same as the C function \sfn{printf}, but output
 from the R version appears in the R console where other output will not. You
-need the header file \sfn{"R\_ext/Print.h"} which may already be
-included in any file I have debugged! To print out R objects (arguments or
-objects you have created in the C++), use
-\sfn{PrintValue(SEXP xx)}: this requires the header file \sfn{Rinternals.h}.
+need the header file \sfn{"R\_ext/Print.h"} which may already be included. To
+print out R objects (arguments or objects you have created in the C++), use
+\sfn{PrintValue(xx)} for any \sfn{SEXP} \sfn{xx}: this requires the header file
+\sfn{Rinternals.h}.
 
 For debugging chains there are utility functions \textsf{getChainDF} and similar
 which create a data frame from a ministep or a chain. Within C++, you can use
@@ -816,7 +827,7 @@ With multiple processes we used to use the random numbers from the \sfn{rlecuyer
 package. The seed is set in eg \sfn{robmon} (in the R code). There is code in
 \sfn{siena07models.cpp} which shows how to set and reset these if you must. The
 different streams are intended to be kept apart, so for finite differencing
-where we need common random number streams I have advanced to a new substream at
+where we need common random number streams we advance to a new substream at
 the beginning of each real iteration and reset to this point at the beginning of
 each finite difference one. The jump to the new substream ignores the current
 state so it does not matter if the streams get muddled up during the finite
@@ -841,7 +852,7 @@ A few notes of problems we have had:
   \item Be careful with \sfn{abs}. The integer version is in \sfn{<cstdlib>} not
     \sfn{<cmath>}. Compilation may fail with message about ambiguity.
 \item Make sure you use the C++ version of headers, not the C ones. Even so,
-  there were warnings about anachronisms on Solaris the last time I tried it.
+  there are warnings about anachronisms on Solaris.
 \end{itemize}
 \section{Algorithms}
 This section outlines some different options available to the (expert!) user via
@@ -850,7 +861,7 @@ pages available) The functions are in the
   package \sfn{RSienaTest}.
 
   The basic outline is described here. The parameters are passed to the
-  initialize routine and then stored on \sfn{z}. I think their use will be
+  initialize routine and then stored on \sfn{z}. Hopefully their use will be
   fairly clear if you read what follows (and the code!)
 
 No promises about robustness, and the routine is designed to be hacked rather
@@ -925,7 +936,7 @@ sampling steps and still low variance or final loop}
 \STATE call initializeFRAN to set data up in C
 \STATE Store all the options on \sfn{z}
 \STATE create useful variables (Some of this is done automatically now in
-  \sfn{initialiseFRAN} but I have not pruned this function.)
+  \sfn{initialiseFRAN} so this function could be pruned.)
 \STATE set finalLoop to FALSE
 \end{algorithmic}
 \subsubsection{Get next set of samples}
@@ -959,7 +970,7 @@ current parameter.
 \STATE Move is restricted to distance the scale factor.
 \STATE There is a routine to fit a quadratic instead, and minimise the distance
 from targets 0, but it does not work well. Usually not positive definite. Maybe
-I coded it wrong. It uses raw orthogonal polynomials.
+code is wrong. It uses raw orthogonal polynomials.
 \end{algorithmic}
 \subsubsection{Non optim change step}
 \label{sec:algchange}

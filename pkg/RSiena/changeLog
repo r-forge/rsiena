@@ -1,3 +1,7 @@
+2012-02-10 R-forge revision 202 (RSienaTest only)
+
+	* doc/RSienaDeveloper.tex: updated various details. Reformatted pages
+
 2012-02-08 R-forge revision 201 (RSienaTest only)
 
 	* R/sienatable.r: added property eol-style=native.
