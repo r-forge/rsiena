@@ -1,3 +1,13 @@
+2012-02-19 R-forge revision 203
+
+	* src/siena07setup.cpp: initialize permutation length correctly in
+	setup phase of ML.
+	* R/robmon.r, R/zzz.r: add check for same package if using
+	multiple processes.
+	* doc/RSiena_manual.tex: 1) removed details about snow and rlecuyer
+	packages 2) amended code to make sparse matrices. (RSienaTest only)
+	* tests/scripts.Rout.save: update for reduced diffs.
+
 2012-02-10 R-forge revision 202 (RSienaTest only)
 
 	* doc/RSienaDeveloper.tex: updated various details. Reformatted pages
