@@ -726,6 +726,9 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 			pMLSimulation->
 				missingBehaviorProbability(prmib[periodFromStart]);
 
+			pMLSimulation->currentPermutationLength(
+				pModel->currentPermutationLength(period));
+
 			/* initialize the chain: this also initializes the data */
 			// does not initialise with previous period missing values yet
 			pMLSimulation->pChain()->clear();

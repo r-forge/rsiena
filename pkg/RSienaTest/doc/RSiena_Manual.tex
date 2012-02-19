@@ -361,7 +361,7 @@ More about input data can be found in Section~\ref{S_InputData}.
   Start \Rn, click on \sfn{Packages} and
   then on \sfn{Install packages(s)...}. You will be prompted to select a mirror
   for download. Then select the packages \sfn{xtable},
-  \sfn{network}, \sfn{rlecuyer}, \sfn{snow},
+  \sfn{network}
   and \rs. (There may be later zipped version of \RS available on our web
   site: to install this, use \sfn{Install package(s) from local zip files}, and
   select \sfn{RSiena.zip} (with the appropriate version number in the file
@@ -480,9 +480,7 @@ Assuming you see the data files, then you can proceed to load the
 \sfn{ library(RSiena)}\\
 The other packages will be loaded as required, but if you wish to examine them
 or use other facilities from them you can load them using:\\
-\sfn{ library(snow)}\\
 \sfn{ library(network)}\\
-\sfn{ library(rlecuyer)}\\
 The following command
 will give a review of
 the functions that \RS offers:\\
@@ -677,8 +675,7 @@ for getting started with \rs.
 \begin{enumerate}
 \item Install \Rn.
 \item Install (within \Rn) the package \rs, and
-  possibly \sfn{network} (required to read Pajek files), \sfn{snow} and
-  \sfn{rlecuyer} (required to use multiple processes).
+  possibly \sfn{network} (required to read Pajek files).
 \item Set the working directory of \R appropriately (\sfn{setwd()} within \Rn
  or via a desktop shortcut).
 \item You can get help by the command
@@ -884,9 +881,13 @@ multiple processes can speed up the estimation in \sfn{siena07}.
   directories on each, simply set \sfn{clusterString} to a character vector of
   the names of the machines.
 \item For other cases, e.g.\ using Macs alongside Linux,
-  see the documentation for the package \sfn{snow}.
+  see the documentation for the package \sfn{parallel}.
 
-\item Currently \RS uses sockets for inter-process communication.
+\item \RS uses sockets for inter-process communication.
+\item On Windows, sub processes are always started using \R scripts. On Linux
+  and Mac there is an option available in \R version 2.14.0 or later via the
+  code interface to \sfn{siena07} to ask for the sub processes to be formed by
+  forking. See the help page for details.
 \item Each process needs a copy of the data in memory. If there is insufficient
   memory available there will be no speed gain as too much time will be spent
   paging.
@@ -1194,7 +1195,7 @@ Using the \texttt{Matrix} package for sparse matrix manipulations,
 the same results can be obtained as follows.
 \begin{verbatim}
 library(Matrix)
-tmp <- as(Matrix(a), "dgTMatrix")
+tmp <- as(a, "dgTMatrix")
 edges2 <- cbind(tmp@i + 1, tmp@j + 1, tmp@x)
 \end{verbatim}
 Conversely, if \texttt{edges} is an edge list, then the following commands
@@ -9806,6 +9807,12 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2012-02-19 R-forge revision 203
+\begin{itemize}
+\item Fixed minor bug in ML initialisation: will alter results slightly.
+\item New check for updated version when using multiple processes.
+\item Amended code in manual for making sparse matrices.
+\end{itemize}
 \item 2012-02-07 R-forge revision 200
 \begin{itemize}
 \item Bug fix to scores for behavior variable rate effects.
