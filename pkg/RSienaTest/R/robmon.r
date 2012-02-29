@@ -69,6 +69,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         {
             stop("Not enough observations to use the nodes")
         }
+		unlink("cluster.out")
 		if (clusterType == "FORK")
 		{
 			cl <- makeCluster(nbrNodes, type = clusterType,

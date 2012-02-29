@@ -1388,7 +1388,6 @@ void NetworkVariable::accumulateSymmetricModelScores(int alter, bool accept)
 				score = -1 * this->lsymmetricEvaluationEffectContribution[0][i]
 					* prEgo;
 			}
-
 			this->pSimulation()->score(pEffect->pEffectInfo(),
 				this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 		}
@@ -1412,14 +1411,14 @@ void NetworkVariable::accumulateSymmetricModelScores(int alter, bool accept)
 					score =  -1  * prEgo *
 						this->lsymmetricEndowmentEffectContribution[0][i];
 				}
+				this->pSimulation()->score(pEffect->pEffectInfo(),
+					this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 			}
-			this->pSimulation()->score(pEffect->pEffectInfo(),
-				this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 		}
 
 		for (unsigned i = 0;
-			i < this->pCreationFunction()->rEffects().size();
-			i++)
+			 i < this->pCreationFunction()->rEffects().size();
+			 i++)
 		{
 			Effect * pEffect = this->pCreationFunction()->rEffects()[i];
 
@@ -1429,17 +1428,16 @@ void NetworkVariable::accumulateSymmetricModelScores(int alter, bool accept)
 				{
 					score =
 						this->lsymmetricCreationEffectContribution[0][i] *
-							(1 - prEgo);
+						(1 - prEgo);
 				}
 				else
 				{
 					score =  -prEgo *
 						this->lsymmetricCreationEffectContribution[0][i];
 				}
+				this->pSimulation()->score(pEffect->pEffectInfo(),
+					this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 			}
-
-			this->pSimulation()->score(pEffect->pEffectInfo(),
-				this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 		}
 
 		break;
@@ -1478,7 +1476,7 @@ void NetworkVariable::accumulateSymmetricModelScores(int alter, bool accept)
 					score = (1 - prEgo) * (1 - prAlter) *
 						(this->lsymmetricEvaluationEffectContribution[0][i]
 							* prEgo +
-						this->lsymmetricEvaluationEffectContribution[1][i]
+							this->lsymmetricEvaluationEffectContribution[1][i]
 							* prAlter) /
 						(prEgo + prAlter - prEgo * prAlter);
 				}
@@ -1521,10 +1519,10 @@ void NetworkVariable::accumulateSymmetricModelScores(int alter, bool accept)
 								lsymmetricEndowmentEffectContribution[1][i]
 								* prAlter));
 				}
-			}
 
-			this->pSimulation()->score(pEffect->pEffectInfo(),
-				this->pSimulation()->score(pEffect->pEffectInfo()) + score);
+				this->pSimulation()->score(pEffect->pEffectInfo(),
+					this->pSimulation()->score(pEffect->pEffectInfo()) + score);
+			}
 		}
 
 		for (unsigned i = 0;
@@ -1552,10 +1550,10 @@ void NetworkVariable::accumulateSymmetricModelScores(int alter, bool accept)
 							this->lsymmetricCreationEffectContribution[1][i] *
 							prAlter);
 				}
+				this->pSimulation()->score(pEffect->pEffectInfo(),
+					this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 			}
 
-			this->pSimulation()->score(pEffect->pEffectInfo(),
-				this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 		}
 
 		break;

@@ -1,3 +1,29 @@
+2012-02-29 R-forge revision 204
+
+	* src/model/effects/SimilarityEffect.cpp: fixed bugs in
+	endowment/creation statistics.
+	* src/model/ml/Chain.cpp: fixed bug causing failure in connect
+	with constraints
+	* src/model/EpochSimulation.cpp: allow for underflow of sigma2
+	when taking square root.
+	* src/model/variables/NetworkVariable.cpp: fix bug in creation and
+	endowment effect scores for pairwise symmetric network models.
+	* R/simstatsc.r: fix bug which stopped chains being returned
+	* R/sienaprint.r: amend model print
+	* R/sienaDataCreate.r: amend error message for incorrect dyadic
+	covariate.
+	* R/siena08.r: suppress printed NULLS at end of summary.
+	* R/robmon.r: remove cluster.out before using it again.
+	* R/phase3.r: change format of report of autocorrelations in phase
+	3.
+	* R/initializeFRAN.r: forbid maximum likelihood estimation with
+	composition change, round calculation of number of MH steps.
+	* R/bayes.r: fix incorrect condition, allow to work with non
+	constant rates if a dfra is provided, minor reformatting.
+	* doc/missingEtc.tex: minor update.
+	* po/R-RSiena.pot, po/R-RSienaTest.pot: updated error message
+	files
+
 2012-02-19 R-forge revision 203
 
 	* src/siena07setup.cpp: initialize permutation length correctly in
