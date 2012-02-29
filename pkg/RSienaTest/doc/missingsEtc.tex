@@ -165,7 +165,7 @@ Nothing yet about ML.
   \nnm{initializeFRAN}.
 \item[constant and changing covariates] When the data is read in C++: it is then
   zero'd if missing, and the fact that it is missing is stored.
- (Uses R ISNA macro in C, a convenient flag.)
+ (Uses R ISNAN macro in C++, a convenient flag.)
 \item[dyadic covariates] When making edgelists in preparation for C++, in the
   unpack functions called by\nnm{initializeFRAN}, NA's are replaced by the mean.
 \item[Composition change options]\hfill
@@ -194,12 +194,11 @@ value is carried forward.
   missing values until calculating statistics. Structural values are used
   alongside any composition change data when defining the flags indicating
   whether an actor is active or not.
-\item[behavior variables]
-  Centering is achieved when required by the relevant effect subtracting the
-  overall mean. (Which is calculated after set up in C++, not R. TODO alter this
-  as too easy to get reports and values used out of sync.)
-\item[constant and changing covariates] When the data is read in C++: it is then
-  zero'd if missing. (Uses R ISNA macro in C, a convenient flag.) The missing
+\item[behavior variables] Centering is achieved when required by the relevant
+  effect subtracting the overall mean. (Which is calculated after set up in C++,
+  not R. Might be good idea to alter this as too easy to get reports and values
+  used out of sync.)
+\item[constant and changing covariates] The missing
   flags are used when calculating distance 2 covariate effects: if all the
   values which are being averaged are missing the result is treated as missing.
 \item[dyadic covariates] The relevant effect subtracts the mean from the value
@@ -209,7 +208,7 @@ value is carried forward.
 \item We create \emph{predictor} versions of the dependent variables which are
   used in any effect of which the dependent variable is not the owner. For
   networks these have all values missing at either end of the period set to
-  zero. For behavior variable we only set to zero the values which are missing
+  zero. For behavior variables we only set to zero the values which are missing
   at the start of the period.
 \item In the simulated values data for any actors who are inactive at the end of
   the period are set to the values at the start of the period so as not to

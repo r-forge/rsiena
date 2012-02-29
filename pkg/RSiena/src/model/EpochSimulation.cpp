@@ -903,8 +903,15 @@ double EpochSimulation::calculateLikelihood() const
 	{
 		loglik +=  sumLogOptionSetProbabilities +
 			normalDensity(1, this->lpChain->mu(),
-				sqrt(this->lpChain->sigma2()), 1)
+				sqrt(std::max(0.00, this->lpChain->sigma2())), 1)
 			+ log(this->lpChain->finalReciprocalRate());
+			 // if (!R_finite(loglik))
+			 // {
+			 // 	Rprintf("mu %f sigma2 %f final %f sumop %f loglik %f\n",
+			 // 		this->lpChain->mu(), this->lpChain->sigma2(),
+			 // 		this->lpChain->finalReciprocalRate(),
+			 // 		sumLogOptionSetProbabilities, loglik);
+			 // }
 	}
 
 	delete [] counts;

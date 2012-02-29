@@ -455,7 +455,7 @@ void Chain::connect(int period, MLSimulation * pMLSimulation)
 			count < this->lpData->rDependentVariableData().size())
 		{
 			count++;
-
+			remainingMiniSteps.clear();
 			for (unsigned i = 0; i < miniSteps.size(); i++)
 			{
 				// first try random insert
