@@ -78,7 +78,7 @@ bool CovariateDistance2NetworkFunction::missingDummy(int alter) const
  */
 void CovariateDistance2NetworkFunction::preprocessEgo(int ego)
 {
-	CovariateNetworkAlterFunction::preprocessEgo(ego);
+	AlterFunction::preprocessEgo(ego);
 
 	// set up the covariate based on current values of the network
 
