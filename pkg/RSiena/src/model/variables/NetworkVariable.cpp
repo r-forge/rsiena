@@ -1634,7 +1634,7 @@ bool NetworkVariable::calculateModelTypeBProbabilities()
 		}
 	}
 
-	this->lalterProbability = this->rate(alter) / cumulativeRates[this->n()];
+	this->lalterProbability = this->rate(alter) / cumulativeRates[this->n() - 1];
 
 	delete [] cumulativeRates;
 

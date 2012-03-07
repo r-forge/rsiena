@@ -6,3 +6,4 @@ src/SienaProfile.exe
 src/RMath.dll
 src/libpgSn.a
 src/Makefile.profile
+tests/testrefs

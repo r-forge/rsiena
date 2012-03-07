@@ -1,3 +1,23 @@
+2012-03-07 R-forge revision 205
+
+	* src/model/effects/CovariateDistance2AlterEffect.cpp,
+	src/model/effects/CovariateDistance2AlterEffect.h,
+	src/model/effects/CovariateDistance2NetworkEffect.cpp,
+	src/model/effects/CovariateDistance2NetworkEffect.h,
+	src/model/effects/CovariateDistance2SimilarityEffect.cpp,
+	src/model/effects/CovariateDistance2SimilarityEffect.h: removed as
+	no longer used
+	* src/model/effects/allEffects.h: remove the .h's from previous
+	entry
+	* src/model/effects/CovariateAndNetworkBehaviorEffect.cpp: correct
+	memory leak.
+	* src/model/effects/generic/CovariateDistance2NetworkFunction.cpp:
+	adjust preprocessEgo method.
+	* src/model/effects/InteractionCovariateEffect.cpp: amend test for
+	missing as in revision 197.
+	* src/model/variables/NetworkVariable.cpp: correct calculation of
+	this->lalterProbability.
+
 2012-02-29 R-forge revision 204
 
 	* src/model/effects/SimilarityEffect.cpp: fixed bugs in
