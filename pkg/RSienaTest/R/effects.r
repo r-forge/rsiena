@@ -812,10 +812,10 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                                          netType=netType)
         }
 
-       covRateEffects <- createEffects("covarBehaviorRate", varname, covarname,
+        covRateEffects <- createEffects("covarBehaviorRate", varname, covarname,
                                         name=name,
                                         groupName=groupName, group=group,
-                                         netType=netType)
+                                        netType=netType)
         ## if we have a real covariate, need to add other effects for every
         ## approriate network
         if (!same)
@@ -825,24 +825,33 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                 if (types[j] == 'oneMode' &&
                     attr(xx$depvars[[j]], 'nodeSet') == nodeSet)
                 {
-					newEffects <-
-						createEffects("covarBehaviorNetObjective", varname,
-									  covarname, names(xx$depvars)[j],
-									  groupName=groupName, group=group,
-									  netType=netType, name=name)
+                    newEffects <-
+                        createEffects("covarBehaviorNetObjective", varname,
+                                      covarname, names(xx$depvars)[j],
+                                      groupName=groupName, group=group,
+                                      netType=netType, name=name)
 
                     covObjEffects <- rbind(covObjEffects, newEffects)
-				}
+
+                    covOneModeRateEffects <-
+                        createEffects("covarBehaviorOneModeRate", varname,
+                                      yName=names(xx$depvars)[j],
+                                      zName=covarname,
+                                      groupName=groupName, group=group,
+                                      netType=netType, name=name)
+
+                    covRateEffects <- rbind(covRateEffects,covOneModeRateEffects)
+                }
                 if ((types[j] == "bipartite" &&
-                        attr(xx$depvars[[j]], 'nodeSet')[2] == nodeSet))
+                     attr(xx$depvars[[j]], 'nodeSet')[2] == nodeSet))
                 {
-  					newEffects <-
-						createEffects("covarBehaviorBipartiteObjective", varname,
-									  covarname, names(xx$depvars)[j],
-									  groupName=groupName, group=group,
-									  netType=netType, name=name)
-                  covObjEffects <- rbind(covObjEffects, newEffects)
-				}
+                    newEffects <-
+                        createEffects("covarBehaviorBipartiteObjective", varname,
+                                      covarname, names(xx$depvars)[j],
+                                      groupName=groupName, group=group,
+                                      netType=netType, name=name)
+                    covObjEffects <- rbind(covObjEffects, newEffects)
+                }
             }
         }
 

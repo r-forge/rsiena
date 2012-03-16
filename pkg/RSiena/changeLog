@@ -1,3 +1,14 @@
+2012-03-16 R-forge revision 206 (RSienaTest only)
+
+	* R/effects.R, R/effectsDocumentation.R: added a new behavior rate
+	effectGroup covarBehaviorOneModeRate
+	* data/allEffects.csv, siena07internals.cpp,
+	StatisticCalculator.cpp, DependentVariable.cpp,
+	DependentVariable.h, DiffusionRateEffect.cpp,
+	DiffusionRateEffect.h: added new diffusion behavior rate effects
+	susceptAvIn, susceptAvCovar, infectIn, infectOut, infectCovar,
+	totExposure
+
 2012-03-07 R-forge revision 205
 
 	* src/model/effects/CovariateDistance2AlterEffect.cpp,

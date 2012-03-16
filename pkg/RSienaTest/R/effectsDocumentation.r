@@ -35,6 +35,7 @@ effectsDocumentation <- function(type="html", display=type=="html",
 
                  "behaviorRate",
                  "behaviorOneModeRate",
+                 "covarBehaviorOneModeRate",
                  "behaviorBipartiteRate",
                  "covarBehaviorRate",
 
