@@ -1006,6 +1006,7 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 		//	double parameter = pInfo->parameter();
 		string effectName = pInfo->effectName();
 		string interactionName = pInfo->interactionName1();
+		string interactionName2 = pInfo->interactionName2();
 		string rateType = pInfo->rateType();
 
 		if (rateType == "covariate")
@@ -1114,15 +1115,36 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 		}
 		else if (rateType == "diffusion")
 		{
-			NetworkLongitudinalData *pNetworkData = this->lpData->
-				pNetworkData(interactionName);
-			const Network * pStructural =
-				pNetworkData->pNetworkLessMissingStart(this->lperiod);
+		    NetworkLongitudinalData *pNetworkData = this->lpData->
+		        pNetworkData(interactionName);
+		    const Network * pStructural =
+		        pNetworkData->pNetworkLessMissingStart(this->lperiod);
 
-			double statistic = 0;
-			for (int i = 0; i < pBehaviorData->n(); i++)
-			{
-				if (effectName == "avExposure")
+		    double statistic = 0;
+		    for (int i = 0; i < pBehaviorData->n(); i++)
+		    {
+		        if (effectName == "avExposure")
+				{
+					double totalAlterValue = 0;
+					double averageAlterValue = 0;
+					if (pStructural->outDegree(i) > 0)
+					{
+						for (IncidentTieIterator iter = pStructural->outTies(i);
+							 iter.valid();
+							 iter.next())
+						{
+							double alterValue = pBehaviorData->
+								value(this->lperiod,iter.actor());
+							totalAlterValue += alterValue;
+						}
+						averageAlterValue = totalAlterValue /
+							pStructural->outDegree(i);
+					}
+
+					statistic += averageAlterValue *
+						difference[i];
+				}
+				else if (effectName == "susceptAvIn")
 				{
 					double totalAlterValue = 0;
 					double averageAlterValue = 0;
@@ -1140,9 +1162,155 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 							pStructural->outDegree(i);
 				    }
 
+					statistic += averageAlterValue * pStructural->inDegree(i) *
+						difference[i];
+				}
+				else if (effectName == "totExposure")
+				{
+					double totalAlterValue = 0;
+					double averageAlterValue = 0;
+					if (pStructural->outDegree(i) > 0)
+				    {
+						for (IncidentTieIterator iter = pStructural->outTies(i);
+							 iter.valid();
+							 iter.next())
+						{
+							double alterValue = pBehaviorData->
+								value(this->lperiod,iter.actor());
+							totalAlterValue += alterValue;
+						}
+						averageAlterValue = totalAlterValue;
+				    }
+
 					statistic += averageAlterValue *
 						difference[i];
 				}
+				else if (effectName == "susceptAvCovar")
+				{
+					ConstantCovariate * pConstantCovariate =
+						this->lpData->pConstantCovariate(interactionName2);
+					ChangingCovariate * pChangingCovariate =
+						this->lpData->pChangingCovariate(interactionName2);
+					double totalAlterValue = 0;
+					double averageAlterValue = 0;
+					if (pStructural->outDegree(i) > 0)
+					{
+					    for (IncidentTieIterator iter = pStructural->outTies(i);
+							 iter.valid();
+							 iter.next())
+						{
+							double alterValue = pBehaviorData->
+								value(this->lperiod,iter.actor());
+							totalAlterValue += alterValue;
+						}
+						averageAlterValue = totalAlterValue /
+							pStructural->outDegree(i);
+					}
+					if (pConstantCovariate)
+					{
+					    statistic += averageAlterValue *
+							pConstantCovariate->value(i) *
+					        difference[i];
+					}
+					else if (pChangingCovariate)
+					{
+					    statistic += averageAlterValue *
+							pChangingCovariate->value(i,this->lperiod) *
+							difference[i];
+					}
+					else
+					{
+						throw logic_error(
+							"No individual covariate named '" +
+							interactionName2 +
+							"'.");
+					}
+				}
+				else if (effectName == "infectIn")
+				{
+					double totalAlterValue = 0;
+					double averageAlterValue = 0;
+					if (pStructural->outDegree(i) > 0)
+				    {
+						for (IncidentTieIterator iter = pStructural->outTies(i);
+							 iter.valid();
+							 iter.next())
+						{
+							double alterValue = pBehaviorData->
+								value(this->lperiod,iter.actor()) *
+								pStructural->inDegree(iter.actor());
+							totalAlterValue += alterValue;
+						}
+						averageAlterValue = totalAlterValue;
+				    }
+
+					statistic += averageAlterValue *
+					    difference[i];
+				}
+				else if (effectName == "infectOut")
+				{
+					double totalAlterValue = 0;
+					double averageAlterValue = 0;
+					if (pStructural->outDegree(i) > 0)
+				    {
+						for (IncidentTieIterator iter = pStructural->outTies(i);
+							 iter.valid();
+							 iter.next())
+						{
+							double alterValue = pBehaviorData->
+								value(this->lperiod,iter.actor()) *
+								pStructural->outDegree(iter.actor());
+							totalAlterValue += alterValue;
+						}
+						averageAlterValue = totalAlterValue;
+				    }
+
+					statistic += averageAlterValue *
+						difference[i];
+				}
+				else if (effectName == "infectCovar")
+				{
+					ConstantCovariate * pConstantCovariate =
+						this->lpData->pConstantCovariate(interactionName2);
+					ChangingCovariate * pChangingCovariate =
+						this->lpData->pChangingCovariate(interactionName2);
+					double totalAlterValue = 0;
+					double averageAlterValue = 0;
+					if (pStructural->outDegree(i) > 0)
+					{
+					    for (IncidentTieIterator iter = pStructural->outTies(i);
+							 iter.valid();
+							 iter.next())
+						{
+							double alterValue = pBehaviorData->
+								value(this->lperiod,iter.actor());
+
+							if (pConstantCovariate)
+							{
+								alterValue *= pConstantCovariate->
+									value(iter.actor());
+							}
+							else if (pChangingCovariate)
+							{
+								alterValue *= pChangingCovariate->
+									value(iter.actor(), this->lperiod);
+							}
+							else
+							{
+								throw logic_error(
+									"No individual covariate named '" +
+									interactionName2 +
+									"'.");
+							}
+							totalAlterValue += alterValue;
+						}
+						averageAlterValue = totalAlterValue;
+					}
+
+					statistic += averageAlterValue *
+						difference[i];
+				}
+
 				else
 				{
 				    throw domain_error("Unexpected rate effect " + effectName);

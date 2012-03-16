@@ -123,6 +123,12 @@ public:
 	// Diffusion effects
 
 	double averageExposureScore(const NetworkVariable * pNetwork) const;
+	double susceptAverageIndegreeScore(const NetworkVariable * pNetwork) const;
+	double totalExposureScore(const NetworkVariable * pNetwork) const;
+	double susceptAverageCovariateScore(const NetworkVariable * pNetwork) const;
+	double infectionIndegreeScore(const NetworkVariable * pNetwork) const;
+	double infectionOutdegreeScore(const NetworkVariable * pNetwork) const;
+	double infectionCovariateScore(const NetworkVariable * pNetwork) const;
 
 	// Maximum likelihood related
 
@@ -291,6 +297,26 @@ private:
 	// Scores for rate effects depending on average exposure
 	map<const NetworkVariable *, double> laverageExposureScores;
 
+	// Scores for rate effects depending on susceptibility to average exposure
+	// by indegree
+	map<const NetworkVariable *, double> lsusceptAverageIndegreeScores;
+
+	// Scores for rate effects depending on total exposure
+	map<const NetworkVariable *, double> ltotalExposureScores;
+
+	// Scores for rate effects depending on susceptibility to average exposure
+	// by covariate
+	map<const NetworkVariable *, double> lsusceptAverageCovariateScores;
+
+	// Scores for rate effects depending on infection by indegree
+	map<const NetworkVariable *, double> linfectionIndegreeScores;
+
+	// Scores for rate effects depending on infection by outdegree
+	map<const NetworkVariable *, double> linfectionOutdegreeScores;
+
+	// Scores for rate effects depending on infection by covariate
+	map<const NetworkVariable *, double> linfectionCovariateScores;
+
 	// Sum term for scores for rate effects depending on constant covariates
 	map<const ConstantCovariate *, double> lconstantCovariateSumTerm;
 
@@ -315,6 +341,26 @@ private:
 	// Sum term for scores for rate effects depending on average exposure
 	map<const NetworkVariable *, double> laverageExposureSumTerm;
 
+	// Sum term for scores for rate effects depending on susceptibility to
+	// average exposure by indegree
+	map<const NetworkVariable *, double> lsusceptAverageIndegreeSumTerm;
+
+	// Sum term for scores for rate effects depending on total exposure
+	map<const NetworkVariable *, double> ltotalExposureSumTerm;
+
+	// Sum term for scores for rate effects depending on susceptibility to
+	// average exposure by covariate
+	map<const NetworkVariable *, double> lsusceptAverageCovariateSumTerm;
+
+	// Sum term for scores for rate effects depending on infection by indegree
+	map<const NetworkVariable *, double> linfectionIndegreeSumTerm;
+
+	// Sum term for scores for rate effects depending on infection by outdegree
+	map<const NetworkVariable *, double> linfectionOutdegreeSumTerm;
+
+	// Sum term for scores for rate effects depending on infection by covariate
+	map<const NetworkVariable *, double> linfectionCovariateSumTerm;
+
 	// Sum term for model B scores for rate effects depending on constant
 	// covariates
 	map<const ConstantCovariate *, double> lconstantCovariateModelBSumTerm;
@@ -332,6 +378,19 @@ private:
 
 	// Sum term for model B scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeModelBSumTerm;
+
+	// Covariate for scores for rate effects depending on susceptibility to
+	// average exposure
+	map<const NetworkVariable *, const ConstantCovariate *>
+		lsusceptAverageConstantCovariate;
+	map<const NetworkVariable *, const ChangingCovariate *>
+		lsusceptAverageChangingCovariate;
+
+	// Covariate for scores for rate effects depending on infection
+	map<const NetworkVariable *, const ConstantCovariate *>
+		linfectionConstantCovariate;
+	map<const NetworkVariable *, const ChangingCovariate *>
+		linfectionChangingCovariate;
 
 	// Indicates if the rates are valid and shouldn't be recalculated
 	// provided that the rates are constant during the period.

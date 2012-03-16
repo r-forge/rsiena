@@ -1548,6 +1548,36 @@ void getStatistics(SEXP EFFECTSLIST,
 							score =
 								pVariable->averageExposureScore(pNetworkVariable);
 						}
+						else if (strcmp(effectName, "susceptAvIn") == 0)
+						{
+							score = pVariable->
+								susceptAverageIndegreeScore(pNetworkVariable);
+						}
+						else if (strcmp(effectName, "totExposure") == 0)
+						{
+							score =
+								pVariable->totalExposureScore(pNetworkVariable);
+						}
+						else if (strcmp(effectName, "susceptAvCovar") == 0)
+						{
+							score = pVariable->
+								susceptAverageCovariateScore(pNetworkVariable);
+						}
+						else if (strcmp(effectName, "infectIn") == 0)
+						{
+							score = pVariable->
+								infectionIndegreeScore(pNetworkVariable);
+						}
+						else if (strcmp(effectName, "infectOut") == 0)
+						{
+							score = pVariable->
+								infectionOutdegreeScore(pNetworkVariable);
+						}
+						else if (strcmp(effectName, "infectCovar") == 0)
+						{
+							score = pVariable->
+								infectionCovariateScore(pNetworkVariable);
+						}
 						else
 						{
 

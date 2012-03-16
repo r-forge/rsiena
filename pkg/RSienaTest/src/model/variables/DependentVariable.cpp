@@ -116,6 +116,7 @@ void DependentVariable::initializeRateFunction()
 		double parameter = pEffectInfo->parameter();
 		string effectName = pEffectInfo->effectName();
 		string interactionName = pEffectInfo->interactionName1();
+		string interactionName2 = pEffectInfo->interactionName2();
 		string rateType = pEffectInfo->rateType();
 
 		if (rateType == "covariate")
@@ -305,26 +306,147 @@ void DependentVariable::initializeRateFunction()
 					" refers to a non-existing network variable " +
 					interactionName);
 			}
-
-			if (effectName == "avExposure")
+			if (interactionName2 == "")
 			{
-				if (this->lpActorSet != pVariable->pSenders())
+				if (effectName == "avExposure")
 				{
-					throw std::invalid_argument("Mismatch of actor sets");
-				}
+					if (this->lpActorSet != pVariable->pSenders())
+					{
+						throw std::invalid_argument("Mismatch of actor sets");
+					}
 
-				this->ldiffusionRateEffects.push_back(
-					new DiffusionRateEffect(pVariable,
-						pBehaviorVariable,
-						AVERAGE_EXPOSURE_RATE,
-						parameter));
-				this->laverageExposureScores[pVariable] = 0;
-				this->laverageExposureSumTerm[pVariable] = 0;
+					this->ldiffusionRateEffects.push_back(
+						new DiffusionRateEffect(pVariable,
+							pBehaviorVariable,
+							AVERAGE_EXPOSURE_RATE,
+							parameter));
+					this->laverageExposureScores[pVariable] = 0;
+					this->laverageExposureSumTerm[pVariable] = 0;
+				}
+				else if (effectName == "susceptAvIn")
+				{
+					if (this->lpActorSet != pVariable->pSenders())
+					{
+						throw std::invalid_argument("Mismatch of actor sets");
+					}
+
+					this->ldiffusionRateEffects.push_back(
+						new DiffusionRateEffect(pVariable,
+							pBehaviorVariable,
+							SUSCEPT_AVERAGE_INDEGREE_RATE,
+							parameter));
+					this->lsusceptAverageIndegreeScores[pVariable] = 0;
+					this->lsusceptAverageIndegreeSumTerm[pVariable] = 0;
+				}
+				else if (effectName == "totExposure")
+				{
+					if (this->lpActorSet != pVariable->pSenders())
+					{
+						throw std::invalid_argument("Mismatch of actor sets");
+					}
+
+					this->ldiffusionRateEffects.push_back(
+						new DiffusionRateEffect(pVariable,
+							pBehaviorVariable,
+							TOTAL_EXPOSURE_RATE,
+							parameter));
+					this->ltotalExposureScores[pVariable] = 0;
+					this->ltotalExposureSumTerm[pVariable] = 0;
+				}
+				else if (effectName == "infectIn")
+				{
+					if (this->lpActorSet != pVariable->pSenders())
+					{
+						throw std::invalid_argument("Mismatch of actor sets");
+					}
+
+					this->ldiffusionRateEffects.push_back(
+						new DiffusionRateEffect(pVariable,
+							pBehaviorVariable,
+							INFECTION_INDEGREE_RATE,
+							parameter));
+					this->linfectionIndegreeScores[pVariable] = 0;
+					this->linfectionIndegreeSumTerm[pVariable] = 0;
+				}
+				else if (effectName == "infectOut")
+				{
+					if (this->lpActorSet != pVariable->pSenders())
+					{
+						throw std::invalid_argument("Mismatch of actor sets");
+					}
+
+					this->ldiffusionRateEffects.push_back(
+						new DiffusionRateEffect(pVariable,
+							pBehaviorVariable,
+							INFECTION_OUTDEGREE_RATE,
+							parameter));
+					this->linfectionOutdegreeScores[pVariable] = 0;
+					this->linfectionOutdegreeSumTerm[pVariable] = 0;
+				}
+				else
+				{
+					throw domain_error("Unexpected rate effect " + effectName);
+				}
 			}
 			else
 			{
-				throw domain_error("Unexpected rate effect " + effectName);
+				// Covariate-dependent diffusion rate effects
+
+		   		const ConstantCovariate * pConstantCovariate =
+					pData->pConstantCovariate(interactionName2);
+				const ChangingCovariate * pChangingCovariate =
+					pData->pChangingCovariate(interactionName2);
+
+				if (effectName == "susceptAvCovar")
+				{
+					if (this->lpActorSet != pVariable->pSenders())
+					{
+						throw std::invalid_argument("Mismatch of actor sets");
+					}
+
+					this->ldiffusionRateEffects.push_back(
+						new DiffusionRateEffect(pVariable,
+							pBehaviorVariable,
+							pConstantCovariate,
+							pChangingCovariate,
+							SUSCEPT_AVERAGE_COVARIATE_RATE,
+							parameter));
+					this->lsusceptAverageCovariateScores[pVariable] = 0;
+					this->lsusceptAverageCovariateSumTerm[pVariable] = 0;
+					this->lsusceptAverageConstantCovariate
+						[pVariable] = pConstantCovariate;
+					this->lsusceptAverageChangingCovariate
+						[pVariable] = pChangingCovariate;
+
+				}
+				else if (effectName == "infectCovar")
+				{
+					if (this->lpActorSet != pVariable->pSenders())
+					{
+						throw std::invalid_argument("Mismatch of actor sets");
+					}
+
+					this->ldiffusionRateEffects.push_back(
+						new DiffusionRateEffect(pVariable,
+							pBehaviorVariable,
+							pConstantCovariate,
+							pChangingCovariate,
+							INFECTION_COVARIATE_RATE,
+							parameter));
+					this->linfectionCovariateScores[pVariable] = 0;
+					this->linfectionCovariateSumTerm[pVariable] = 0;
+					this->linfectionConstantCovariate
+						[pVariable] = pConstantCovariate;
+					this->linfectionChangingCovariate
+						[pVariable] = pChangingCovariate;
+				}
+				else
+				{
+					throw domain_error("Unexpected rate effect " + effectName);
+				}
+
 			}
+
 		}
 
 	}
@@ -583,7 +705,7 @@ void DependentVariable::calculateRates()
 			sumRatesSquared += this->lrate[i] * this->lrate[i];
 
 		}
-		
+
 		if (this->pSimulation()->pModel()->needScores())
 		  {
 		    this->calculateScoreSumTerms();
@@ -593,7 +715,7 @@ void DependentVariable::calculateRates()
 		    this->ltotalRate = this->totalRate() * this->totalRate() -
 		      sumRatesSquared;
 		  }
-	
+
 		this->lvalidRates = true;
 	}
 
@@ -779,7 +901,7 @@ double DependentVariable::diffusionRate(int i) const
 
 	for (int effectIndex = 0; effectIndex < effectCount; effectIndex++)
 	{
-		rate *= this->ldiffusionRateEffects[effectIndex]->value(i);
+		rate *= this->ldiffusionRateEffects[effectIndex]->value(i,this->lperiod);
 	}
 
 	return rate;
@@ -991,9 +1113,9 @@ void DependentVariable::accumulateRateScores(double tau,
 	// Update scores for diffusion rate parameters
 
 	for (std::map<const NetworkVariable *, double>::iterator iter =
-			this->laverageExposureScores.begin();
-		iter != this->laverageExposureScores.end();
-		iter++)
+			 this->laverageExposureScores.begin();
+		 iter != this->laverageExposureScores.end();
+		 iter++)
 	{
 		const Network * pNetwork = iter->first->pNetwork();
 		const BehaviorVariable * pBehaviorVariable;
@@ -1006,25 +1128,267 @@ void DependentVariable::accumulateRateScores(double tau,
 			if (pNetwork->outDegree(selectedActor) > 0)
 			{
 				for (IncidentTieIterator iter2 =
-				       pNetwork->outTies(selectedActor);
-					iter2.valid();
-					iter2.next())
+						 pNetwork->outTies(selectedActor);
+					 iter2.valid();
+					 iter2.next())
 				{
 					double alterValue = pBehaviorVariable->
 						value(iter2.actor());
 					totalAlterValue += alterValue;
 				}
 				averageAlterValue = totalAlterValue /
-				  pNetwork->outDegree(selectedActor);
+					pNetwork->outDegree(selectedActor);
 			}
 
 			iter->second += averageAlterValue;
 		}
 
 		iter->second -= this->laverageExposureSumTerm[iter->first] *
-		  tau;
+			tau;
 	}
 
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->lsusceptAverageIndegreeScores.begin();
+		 iter != this->lsusceptAverageIndegreeScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable =
+		    dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
+
+		if (this == pSelectedVariable)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(selectedActor) > 0)
+			{
+				for (IncidentTieIterator iter2 =
+						 pNetwork->outTies(selectedActor);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue /
+					pNetwork->outDegree(selectedActor);
+			}
+
+			iter->second += averageAlterValue *
+				pNetwork->inDegree(selectedActor);
+		}
+
+		iter->second -= this->lsusceptAverageIndegreeSumTerm[iter->first] *
+			tau;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->ltotalExposureScores.begin();
+		 iter != this->ltotalExposureScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable =
+		    dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
+
+		if (this == pSelectedVariable)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(selectedActor) > 0)
+			{
+				for (IncidentTieIterator iter2 =
+						 pNetwork->outTies(selectedActor);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue;
+			}
+
+			iter->second += averageAlterValue;
+		}
+
+		iter->second -= this->ltotalExposureSumTerm[iter->first] *
+			tau;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->lsusceptAverageCovariateScores.begin();
+		 iter != this->lsusceptAverageCovariateScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable =
+		    dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
+		const ConstantCovariate * pConstantCovariate =
+		    this->lsusceptAverageConstantCovariate[iter->first];
+		const ChangingCovariate * pChangingCovariate =
+		    this->lsusceptAverageChangingCovariate[iter->first];
+
+		if (this == pSelectedVariable)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(selectedActor) > 0)
+			{
+				for (IncidentTieIterator iter2 =
+						 pNetwork->outTies(selectedActor);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue /
+					pNetwork->outDegree(selectedActor);
+			}
+			if (pConstantCovariate)
+			{
+			iter->second += averageAlterValue *
+				pConstantCovariate->value(selectedActor);
+			}
+			else if (pChangingCovariate)
+			{
+			iter->second += averageAlterValue *
+				pChangingCovariate->value(selectedActor, this->lperiod);
+			}
+			else
+				throw logic_error(
+					"No individual covariate found.");
+		}
+
+		iter->second -= this->lsusceptAverageCovariateSumTerm[iter->first] *
+			tau;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->linfectionIndegreeScores.begin();
+		 iter != this->linfectionIndegreeScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable =
+		    dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
+
+		if (this == pSelectedVariable)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(selectedActor) > 0)
+			{
+				for (IncidentTieIterator iter2 =
+						 pNetwork->outTies(selectedActor);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor()) *
+						pNetwork->inDegree(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue;
+			}
+
+			iter->second += averageAlterValue;
+		}
+
+		iter->second -= this->linfectionIndegreeSumTerm[iter->first] *
+			tau;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->linfectionOutdegreeScores.begin();
+		 iter != this->linfectionOutdegreeScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable =
+		    dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
+
+		if (this == pSelectedVariable)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(selectedActor) > 0)
+			{
+				for (IncidentTieIterator iter2 =
+						 pNetwork->outTies(selectedActor);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor()) *
+						pNetwork->outDegree(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue;
+			}
+
+			iter->second += averageAlterValue;
+		}
+
+		iter->second -= this->linfectionOutdegreeSumTerm[iter->first] *
+			tau;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->linfectionCovariateScores.begin();
+		 iter != this->linfectionCovariateScores.end();
+		 iter++)
+	{	const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable =
+		    dynamic_cast<const BehaviorVariable *>(pSelectedVariable);
+		const ConstantCovariate * pConstantCovariate =
+		    this->linfectionConstantCovariate[iter->first];
+		const ChangingCovariate * pChangingCovariate =
+		    this->linfectionChangingCovariate[iter->first];
+
+		if (this == pSelectedVariable)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(selectedActor) > 0)
+			{
+				for (IncidentTieIterator iter2 =
+						 pNetwork->outTies(selectedActor);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor());
+					if (pConstantCovariate)
+					{
+						alterValue *=
+							pConstantCovariate->value(iter2.actor());
+					}
+					else if (pChangingCovariate)
+					{
+						alterValue *=
+							pChangingCovariate->value(iter2.actor(),
+								this->lperiod);
+					}
+					else
+						throw logic_error(
+							"No individual covariate found.");
+
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue ;
+			}
+
+			iter->second += averageAlterValue;
+		}
+
+		iter->second -= this->linfectionCovariateSumTerm[iter->first] *
+			tau;
+	}
 }
 
 /**
@@ -1330,20 +1694,249 @@ void DependentVariable::calculateScoreSumTerms()
 			if (pNetwork->outDegree(i) > 0)
 			{
 				for (IncidentTieIterator iter2 = pNetwork->outTies(i);
-					iter2.valid();
-					iter2.next())
+					 iter2.valid();
+					 iter2.next())
 				{
 					double alterValue = pBehaviorVariable->
 						value(iter2.actor());
 					totalAlterValue += alterValue;
 				}
 				averageAlterValue = totalAlterValue /
-				  pNetwork->outDegree(i);
+					pNetwork->outDegree(i);
 			}
 
 			timesRate += averageAlterValue * this->lrate[i];
 		}
 		this->laverageExposureSumTerm[iter->first] = timesRate;
+	}
+
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->lsusceptAverageIndegreeScores.begin();
+		 iter != this->lsusceptAverageIndegreeScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable = dynamic_cast<const BehaviorVariable *>(this);
+
+		double timesRate = 0;
+		for (int i = 0; i < this->n(); i++)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(i) > 0)
+			{
+				for (IncidentTieIterator iter2 = pNetwork->outTies(i);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue /
+					pNetwork->outDegree(i);
+			}
+
+			timesRate += averageAlterValue * pNetwork->inDegree(i) *
+			    this->lrate[i];
+		}
+		this->lsusceptAverageIndegreeSumTerm[iter->first] = timesRate;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->ltotalExposureScores.begin();
+		 iter != this->ltotalExposureScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable = dynamic_cast<const BehaviorVariable *>(this);
+
+		double timesRate = 0;
+		for (int i = 0; i < this->n(); i++)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(i) > 0)
+			{
+				for (IncidentTieIterator iter2 = pNetwork->outTies(i);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue;
+			}
+
+			timesRate += averageAlterValue  *
+			    this->lrate[i];
+		}
+		this->ltotalExposureSumTerm[iter->first] = timesRate;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->lsusceptAverageCovariateScores.begin();
+		 iter != this->lsusceptAverageCovariateScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable = dynamic_cast<const BehaviorVariable *>(this);
+		const ConstantCovariate * pConstantCovariate =
+		    this->lsusceptAverageConstantCovariate[iter->first];
+		const ChangingCovariate * pChangingCovariate =
+		    this->lsusceptAverageChangingCovariate[iter->first];
+		double timesRate = 0;
+		for (int i = 0; i < this->n(); i++)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(i) > 0)
+			{
+				for (IncidentTieIterator iter2 = pNetwork->outTies(i);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue /
+					pNetwork->outDegree(i);
+			}
+			if (pConstantCovariate)
+			{
+				timesRate += averageAlterValue * pConstantCovariate->
+					value(i) * this->lrate[i];
+			}
+			else if (pChangingCovariate)
+			{
+				timesRate += averageAlterValue * pChangingCovariate->
+					value(i,this->lperiod) * this->lrate[i];
+			}
+			else
+				throw logic_error(
+					"No individual covariate named found.");
+		}
+		this->lsusceptAverageCovariateSumTerm[iter->first] = timesRate;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->linfectionIndegreeScores.begin();
+		 iter != this->linfectionIndegreeScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable = dynamic_cast<const BehaviorVariable *>(this);
+
+		double timesRate = 0;
+		for (int i = 0; i < this->n(); i++)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(i) > 0)
+			{
+				for (IncidentTieIterator iter2 = pNetwork->outTies(i);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor()) *
+						pNetwork->inDegree(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue;
+			}
+
+			timesRate += averageAlterValue *
+			    this->lrate[i];
+		}
+		this->linfectionIndegreeSumTerm[iter->first] = timesRate;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->linfectionOutdegreeScores.begin();
+		 iter != this->linfectionOutdegreeScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable = dynamic_cast<const BehaviorVariable *>(this);
+
+		double timesRate = 0;
+		for (int i = 0; i < this->n(); i++)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(i) > 0)
+			{
+				for (IncidentTieIterator iter2 = pNetwork->outTies(i);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor()) *
+						pNetwork->outDegree(iter2.actor());
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue;
+			}
+
+			timesRate += averageAlterValue *
+			    this->lrate[i];
+		}
+		this->linfectionOutdegreeSumTerm[iter->first] = timesRate;
+	}
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->linfectionCovariateScores.begin();
+		 iter != this->linfectionCovariateScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+		const BehaviorVariable * pBehaviorVariable;
+		pBehaviorVariable = dynamic_cast<const BehaviorVariable *>(this);
+		const ConstantCovariate * pConstantCovariate =
+		    this->linfectionConstantCovariate[iter->first];
+		const ChangingCovariate * pChangingCovariate =
+		    this->linfectionChangingCovariate[iter->first];
+		double timesRate = 0;
+
+		for (int i = 0; i < this->n(); i++)
+		{
+			double totalAlterValue = 0;
+			double averageAlterValue = 0;
+			if (pNetwork->outDegree(i) > 0)
+			{
+				for (IncidentTieIterator iter2 = pNetwork->outTies(i);
+					 iter2.valid();
+					 iter2.next())
+				{
+					double alterValue = pBehaviorVariable->
+						value(iter2.actor());
+
+					if (pConstantCovariate)
+					{
+						alterValue *=  pConstantCovariate->
+							value(i);
+					}
+					else if (pChangingCovariate)
+					{
+						alterValue *=  pChangingCovariate->
+							value(i,this->lperiod);
+					}
+					else
+						throw logic_error(
+							"No individual covariate found.");
+
+					totalAlterValue += alterValue;
+				}
+				averageAlterValue = totalAlterValue;
+			}
+
+			timesRate += averageAlterValue *
+			    this->lrate[i];
+		}
+		this->linfectionCovariateSumTerm[iter->first] = timesRate;
 	}
 }
 
@@ -1534,6 +2127,102 @@ double DependentVariable::averageExposureScore(
 	return iter->second;
 }
 
+double DependentVariable::susceptAverageIndegreeScore(
+	const NetworkVariable * pNetworkData) const
+{
+	map<const NetworkVariable *, double>::const_iterator iter =
+		this->lsusceptAverageIndegreeScores.find(pNetworkData);
+
+	if (iter == this->lsusceptAverageIndegreeScores.end())
+	{
+		throw invalid_argument(
+			string("Unknown network: ") +
+			"The given rate effect is not " +
+			"part of the model.");
+	}
+
+	return iter->second;
+}
+double DependentVariable::totalExposureScore(
+	const NetworkVariable * pNetworkData) const
+{
+	map<const NetworkVariable *, double>::const_iterator iter =
+		this->ltotalExposureScores.find(pNetworkData);
+
+	if (iter == this->ltotalExposureScores.end())
+	{
+		throw invalid_argument(
+			string("Unknown network: ") +
+			"The given rate effect is not " +
+			"part of the model.");
+	}
+
+	return iter->second;
+}
+double DependentVariable::susceptAverageCovariateScore(
+	const NetworkVariable * pNetworkData) const
+{
+	map<const NetworkVariable *, double>::const_iterator iter =
+		this->lsusceptAverageCovariateScores.find(pNetworkData);
+
+	if (iter == this->lsusceptAverageCovariateScores.end())
+	{
+		throw invalid_argument(
+			string("Unknown network: ") +
+			"The given rate effect is not " +
+			"part of the model.");
+	}
+
+	return iter->second;
+}
+double DependentVariable::infectionIndegreeScore(
+	const NetworkVariable * pNetworkData) const
+{
+	map<const NetworkVariable *, double>::const_iterator iter =
+		this->linfectionIndegreeScores.find(pNetworkData);
+
+	if (iter == this->linfectionIndegreeScores.end())
+	{
+		throw invalid_argument(
+			string("Unknown network: ") +
+			"The given rate effect is not " +
+			"part of the model.");
+	}
+
+	return iter->second;
+}
+double DependentVariable::infectionOutdegreeScore(
+	const NetworkVariable * pNetworkData) const
+{
+	map<const NetworkVariable *, double>::const_iterator iter =
+		this->linfectionOutdegreeScores.find(pNetworkData);
+
+	if (iter == this->linfectionOutdegreeScores.end())
+	{
+		throw invalid_argument(
+			string("Unknown network: ") +
+			"The given rate effect is not " +
+			"part of the model.");
+	}
+
+	return iter->second;
+}
+double DependentVariable::infectionCovariateScore(
+	const NetworkVariable * pNetworkData) const
+{
+	map<const NetworkVariable *, double>::const_iterator iter =
+		this->linfectionCovariateScores.find(pNetworkData);
+
+	if (iter == this->linfectionCovariateScores.end())
+	{
+		throw invalid_argument(
+			string("Unknown network: ") +
+			"The given rate effect is not " +
+			"part of the model.");
+	}
+
+	return iter->second;
+}
 // ----------------------------------------------------------------------------
 // Section: Composition change
 // ----------------------------------------------------------------------------
