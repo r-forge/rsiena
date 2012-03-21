@@ -1,3 +1,12 @@
+2012-03-21 R-forge revision 207 (RSienaTest only)
+	* siena07internals.cpp, DependentVariable.h,
+	DependentVariable.cpp: changed calculation of scores for diffusion
+	rate effects
+	* StatisticCalculator.h, StatisticCalculator.cpp, DependentVariable.h,
+	DependentVariable.cpp, DiffusionRateEffect.h,
+	DiffusionRateEffect.cpp: added a function to calculate value of
+	a type of diffusion rate effect
+
 2012-03-16 R-forge revision 206 (RSienaTest only)
 
 	* R/effects.R, R/effectsDocumentation.R: added a new behavior rate

@@ -32,7 +32,8 @@ class NetworkLongitudinalData;
 class BehaviorLongitudinalData;
 class Network;
 class EffectFactory;
-
+class ConstantCovariate;
+class ChangingCovariate;
 
 // ----------------------------------------------------------------------------
 // Section: StatisticCalculator class
@@ -76,6 +77,16 @@ private:
 		NetworkLongitudinalData * pNetworkData);
 	void calculateBehaviorStatistics(BehaviorLongitudinalData * pBehaviorData);
 	void calculateBehaviorRateStatistics(BehaviorLongitudinalData * pBehaviorData);
+
+	// Functions to calculate value of diffusion rate effect
+	double calculateDiffusionRateEffect(BehaviorLongitudinalData *
+		pBehaviorData, const Network * pStructural, int i,
+		string effectName);
+	double calculateDiffusionRateEffect(BehaviorLongitudinalData *
+		pBehaviorData, const Network * pStructural,
+	const ConstantCovariate * pConstantCovariate,
+	const ChangingCovariate * pChangingCovariate,
+	int i, string effectName);
 
 	// The data to be used for calculating the statistics
 	const Data * lpData;
