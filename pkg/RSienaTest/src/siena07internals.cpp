@@ -1528,59 +1528,18 @@ void getStatistics(SEXP EFFECTSLIST,
 					statistic = pCalculator->statistic(pEffectInfo);
 					if (pEpochSimulation)
 					{
-						const DependentVariable * pVariable =
-							pEpochSimulation->pVariable(networkName);
-						const NetworkVariable * pNetworkVariable;
-						if (strcmp(interaction1, "") == 0)
+						if (strcmp(effectName, "avExposure") == 0 ||
+							strcmp(effectName, "totExposure") == 0 ||
+							strcmp(effectName, "susceptAvIn") == 0 ||
+							strcmp(effectName, "infectIn") == 0 ||
+							strcmp(effectName, "infectOut") == 0 ||
+							strcmp(effectName, "susceptAvCovar") == 0 ||
+							strcmp(effectName, "infectCovar") == 0)
 						{
-							pNetworkVariable =
-								(const NetworkVariable *)
-								pEpochSimulation->pVariable(networkName);
+							score = pEpochSimulation->score(pEffectInfo);
 						}
 						else
 						{
-							pNetworkVariable =
-								(const NetworkVariable *)
-								pEpochSimulation->pVariable(interaction1);
-						}
-						if (strcmp(effectName, "avExposure") == 0)
-						{
-							score =
-								pVariable->averageExposureScore(pNetworkVariable);
-						}
-						else if (strcmp(effectName, "susceptAvIn") == 0)
-						{
-							score = pVariable->
-								susceptAverageIndegreeScore(pNetworkVariable);
-						}
-						else if (strcmp(effectName, "totExposure") == 0)
-						{
-							score =
-								pVariable->totalExposureScore(pNetworkVariable);
-						}
-						else if (strcmp(effectName, "susceptAvCovar") == 0)
-						{
-							score = pVariable->
-								susceptAverageCovariateScore(pNetworkVariable);
-						}
-						else if (strcmp(effectName, "infectIn") == 0)
-						{
-							score = pVariable->
-								infectionIndegreeScore(pNetworkVariable);
-						}
-						else if (strcmp(effectName, "infectOut") == 0)
-						{
-							score = pVariable->
-								infectionOutdegreeScore(pNetworkVariable);
-						}
-						else if (strcmp(effectName, "infectCovar") == 0)
-						{
-							score = pVariable->
-								infectionCovariateScore(pNetworkVariable);
-						}
-						else
-						{
-
 							error("Unexpected rate effect %s\n",
 								effectName);
 						}

@@ -1119,204 +1119,55 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 		        pNetworkData(interactionName);
 		    const Network * pStructural =
 		        pNetworkData->pNetworkLessMissingStart(this->lperiod);
-
-		    double statistic = 0;
-		    for (int i = 0; i < pBehaviorData->n(); i++)
-		    {
-		        if (effectName == "avExposure")
+			double statistic = 0;
+			if (interactionName2 == "")
+			{
+				for (int i = 0; i < pBehaviorData->n(); i++)
 				{
-					double totalAlterValue = 0;
-					double averageAlterValue = 0;
-					if (pStructural->outDegree(i) > 0)
+					if (effectName == "avExposure" ||
+						effectName == "susceptAvIn" ||
+						effectName == "totExposure" ||
+						effectName == "infectIn" ||
+						effectName == "infectOut")
 					{
-						for (IncidentTieIterator iter = pStructural->outTies(i);
-							 iter.valid();
-							 iter.next())
-						{
-							double alterValue = pBehaviorData->
-								value(this->lperiod,iter.actor());
-							totalAlterValue += alterValue;
-						}
-						averageAlterValue = totalAlterValue /
-							pStructural->outDegree(i);
-					}
-
-					statistic += averageAlterValue *
-						difference[i];
-				}
-				else if (effectName == "susceptAvIn")
-				{
-					double totalAlterValue = 0;
-					double averageAlterValue = 0;
-					if (pStructural->outDegree(i) > 0)
-				    {
-						for (IncidentTieIterator iter = pStructural->outTies(i);
-							 iter.valid();
-							 iter.next())
-						{
-							double alterValue = pBehaviorData->
-								value(this->lperiod,iter.actor());
-							totalAlterValue += alterValue;
-						}
-						averageAlterValue = totalAlterValue /
-							pStructural->outDegree(i);
-				    }
-
-					statistic += averageAlterValue * pStructural->inDegree(i) *
-						difference[i];
-				}
-				else if (effectName == "totExposure")
-				{
-					double totalAlterValue = 0;
-					double averageAlterValue = 0;
-					if (pStructural->outDegree(i) > 0)
-				    {
-						for (IncidentTieIterator iter = pStructural->outTies(i);
-							 iter.valid();
-							 iter.next())
-						{
-							double alterValue = pBehaviorData->
-								value(this->lperiod,iter.actor());
-							totalAlterValue += alterValue;
-						}
-						averageAlterValue = totalAlterValue;
-				    }
-
-					statistic += averageAlterValue *
-						difference[i];
-				}
-				else if (effectName == "susceptAvCovar")
-				{
-					ConstantCovariate * pConstantCovariate =
-						this->lpData->pConstantCovariate(interactionName2);
-					ChangingCovariate * pChangingCovariate =
-						this->lpData->pChangingCovariate(interactionName2);
-					double totalAlterValue = 0;
-					double averageAlterValue = 0;
-					if (pStructural->outDegree(i) > 0)
-					{
-					    for (IncidentTieIterator iter = pStructural->outTies(i);
-							 iter.valid();
-							 iter.next())
-						{
-							double alterValue = pBehaviorData->
-								value(this->lperiod,iter.actor());
-							totalAlterValue += alterValue;
-						}
-						averageAlterValue = totalAlterValue /
-							pStructural->outDegree(i);
-					}
-					if (pConstantCovariate)
-					{
-					    statistic += averageAlterValue *
-							pConstantCovariate->value(i) *
-					        difference[i];
-					}
-					else if (pChangingCovariate)
-					{
-					    statistic += averageAlterValue *
-							pChangingCovariate->value(i,this->lperiod) *
+						statistic +=
+							this->calculateDiffusionRateEffect(pBehaviorData,
+								pStructural, i, effectName) *
 							difference[i];
 					}
 					else
 					{
-						throw logic_error(
-							"No individual covariate named '" +
-							interactionName2 +
-							"'.");
+						throw domain_error("Unexpected rate effect " +
+							effectName);
 					}
-				}
-				else if (effectName == "infectIn")
-				{
-					double totalAlterValue = 0;
-					double averageAlterValue = 0;
-					if (pStructural->outDegree(i) > 0)
-				    {
-						for (IncidentTieIterator iter = pStructural->outTies(i);
-							 iter.valid();
-							 iter.next())
-						{
-							double alterValue = pBehaviorData->
-								value(this->lperiod,iter.actor()) *
-								pStructural->inDegree(iter.actor());
-							totalAlterValue += alterValue;
-						}
-						averageAlterValue = totalAlterValue;
-				    }
-
-					statistic += averageAlterValue *
-					    difference[i];
-				}
-				else if (effectName == "infectOut")
-				{
-					double totalAlterValue = 0;
-					double averageAlterValue = 0;
-					if (pStructural->outDegree(i) > 0)
-				    {
-						for (IncidentTieIterator iter = pStructural->outTies(i);
-							 iter.valid();
-							 iter.next())
-						{
-							double alterValue = pBehaviorData->
-								value(this->lperiod,iter.actor()) *
-								pStructural->outDegree(iter.actor());
-							totalAlterValue += alterValue;
-						}
-						averageAlterValue = totalAlterValue;
-				    }
-
-					statistic += averageAlterValue *
-						difference[i];
-				}
-				else if (effectName == "infectCovar")
-				{
-					ConstantCovariate * pConstantCovariate =
-						this->lpData->pConstantCovariate(interactionName2);
-					ChangingCovariate * pChangingCovariate =
-						this->lpData->pChangingCovariate(interactionName2);
-					double totalAlterValue = 0;
-					double averageAlterValue = 0;
-					if (pStructural->outDegree(i) > 0)
-					{
-					    for (IncidentTieIterator iter = pStructural->outTies(i);
-							 iter.valid();
-							 iter.next())
-						{
-							double alterValue = pBehaviorData->
-								value(this->lperiod,iter.actor());
-
-							if (pConstantCovariate)
-							{
-								alterValue *= pConstantCovariate->
-									value(iter.actor());
-							}
-							else if (pChangingCovariate)
-							{
-								alterValue *= pChangingCovariate->
-									value(iter.actor(), this->lperiod);
-							}
-							else
-							{
-								throw logic_error(
-									"No individual covariate named '" +
-									interactionName2 +
-									"'.");
-							}
-							totalAlterValue += alterValue;
-						}
-						averageAlterValue = totalAlterValue;
-					}
-
-					statistic += averageAlterValue *
-						difference[i];
-				}
-
-				else
-				{
-				    throw domain_error("Unexpected rate effect " + effectName);
 				}
 			}
+			else
+			{
+				ConstantCovariate * pConstantCovariate =
+					this->lpData->pConstantCovariate(interactionName2);
+				ChangingCovariate * pChangingCovariate =
+					this->lpData->pChangingCovariate(interactionName2);
 
+				for (int i = 0; i < pBehaviorData->n(); i++)
+				{
+					if (effectName == "susceptAvCovar" ||
+						effectName == "infectCovar")
+					{
+						statistic +=
+							this->calculateDiffusionRateEffect(pBehaviorData,
+								pStructural,
+								pConstantCovariate,
+								pChangingCovariate, i, effectName) *
+							difference[i];
+					}
+					else
+					{
+						throw domain_error("Unexpected rate effect " +
+							effectName);
+					}
+				}
+			}
 			this->lstatistics[pInfo] = statistic;
 		}
 	}
@@ -1324,5 +1175,114 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 	delete[] difference;
 	delete[] currentValues;
 }
+
+/**
+ * Calculates the value of the diffusion rate effect for the given actor.
+ */
+double StatisticCalculator::calculateDiffusionRateEffect(
+	BehaviorLongitudinalData * pBehaviorData, const Network * pStructural,
+	int i, string effectName)
+{
+	double totalAlterValue = 0;
+	double response = 1;
+	if (pStructural->outDegree(i) > 0)
+	{
+		if (effectName == "avExposure")
+		{
+			response /= double(pStructural->outDegree(i));
+		}
+		else if (effectName == "susceptAvIn")
+		{
+			response = double(pStructural->inDegree(i)) /
+				double(pStructural->outDegree(i));
+		}
+
+		for (IncidentTieIterator iter = pStructural->outTies(i);
+			 iter.valid();
+			 iter.next())
+		{
+			double alterValue = pBehaviorData->
+				value(this->lperiod,iter.actor());
+
+			if (effectName == "infectIn")
+			{
+				alterValue *= pStructural->inDegree(iter.actor());
+			}
+			else if (effectName == "infectOut")
+			{
+				alterValue *= pStructural->outDegree(iter.actor());
+			}
+
+			totalAlterValue += alterValue;
+		}
+		totalAlterValue *= response;
+	}
+	return totalAlterValue;
+}
+/**
+ * Calculates the value of the covariate dependent diffusion rate effect for
+ * the given actor.
+ */
+double StatisticCalculator::calculateDiffusionRateEffect(
+	BehaviorLongitudinalData * pBehaviorData, const Network * pStructural,
+	const ConstantCovariate * pConstantCovariate,
+	const ChangingCovariate * pChangingCovariate,
+	int i, string effectName)
+{
+	double totalAlterValue = 0;
+	double response = 1;
+	if (pStructural->outDegree(i) > 0)
+	{
+		if (effectName == "susceptAvCovar")
+		{
+			if (pConstantCovariate)
+			{
+				response = pConstantCovariate->value(i);
+			}
+			else if (pChangingCovariate)
+			{
+				response = pChangingCovariate->value(i, this->lperiod);
+			}
+			else
+			{
+				throw logic_error(
+					"No individual covariate.");
+			}
+			response /= double(pStructural->outDegree(i));
+		}
+
+		for (IncidentTieIterator iter = pStructural->outTies(i);
+			 iter.valid();
+			 iter.next())
+		{
+			double alterValue = pBehaviorData->
+				value(this->lperiod,iter.actor());
+
+			if (effectName == "infectCovar")
+			{
+				if (pConstantCovariate)
+				{
+					alterValue *= pConstantCovariate->value(iter.actor());
+				}
+				else if (pChangingCovariate)
+				{
+					alterValue *= pChangingCovariate->value(iter.actor(),
+						this->lperiod);
+				}
+				else
+				{
+					throw logic_error(
+						"No individual covariate.");
+				}
+
+			}
+
+			totalAlterValue += alterValue;
+		}
+		totalAlterValue *= response;
+	}
+	return totalAlterValue;
+}
+
 
 }

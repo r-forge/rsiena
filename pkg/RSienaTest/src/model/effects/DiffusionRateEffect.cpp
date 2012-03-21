@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <cstring>
 #include "DiffusionRateEffect.h"
 #include "utils/Utils.h"
 #include "network/OneModeNetwork.h"
@@ -28,64 +29,43 @@ namespace siena
  * Constructor.
  * @param[in] pVariable the network variable this effect depends on
  * @param[in] pBehaviorVariable the behavior variable this effect depends on
- * @param[in] type the type of this effect
  * @param[in] parameter the statistical parameter of this effect
  */
 
 DiffusionRateEffect::DiffusionRateEffect(const NetworkVariable * pVariable,
 	const BehaviorVariable * pBehaviorVariable,
-	DiffusionRateEffectType type,
+	string effectName,
 	double parameter)
 {
 	this->lpVariable = pVariable;
 	this->lpBehaviorVariable = pBehaviorVariable;
-	this->ltype = type;
-
-	double possibleDegreeNumer = 1;
+	this->leffectName = effectName;
+	double possibleDegreeNumer = this->lpBehaviorVariable->range() *
+		max(this->lpVariable->n(),
+			this->lpVariable->m());
 	double possibleDegreeDenom = 1;
 
-	if (this->ltype == AVERAGE_EXPOSURE_RATE)
+	if (effectName == "avExposure")
 	{
-		possibleDegreeNumer = (this->lpBehaviorVariable->range()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m());
+   		possibleDegreeDenom = max(this->lpVariable->n(),
+			this->lpVariable->m());
+	}
+	if (effectName == "susceptAvIn")
+	{
+		possibleDegreeNumer *= max(this->lpVariable->n(),
+			this->lpVariable->m());
 		possibleDegreeDenom = max(this->lpVariable->n(),
 			this->lpVariable->m());
 	}
-	if (this->ltype == SUSCEPT_AVERAGE_INDEGREE_RATE)
+	if (effectName == "infectIn")
 	{
-		possibleDegreeNumer = (this->lpBehaviorVariable->range()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m());
-		possibleDegreeDenom = max(this->lpVariable->n(),
+		possibleDegreeNumer *= max(this->lpVariable->n(),
 			this->lpVariable->m());
 	}
-	if (this->ltype == TOTAL_EXPOSURE_RATE)
+	if (effectName == "infectOut")
 	{
-		possibleDegreeNumer = (this->lpBehaviorVariable->range()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m());
-		possibleDegreeDenom = 1;
-	}
-	if (this->ltype == INFECTION_INDEGREE_RATE)
-	{
-		possibleDegreeNumer = (this->lpBehaviorVariable->range()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m());
-		possibleDegreeDenom = 1;
-	}
-	if (this->ltype == INFECTION_OUTDEGREE_RATE)
-	{
-	   	possibleDegreeNumer = (this->lpBehaviorVariable->range()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m());
-		possibleDegreeDenom = 1;
+	   	possibleDegreeNumer *= max(this->lpVariable->n(),
+			this->lpVariable->m());
 	}
 	this->lpTable = new DiffusionEffectValueTable(possibleDegreeNumer,
 		possibleDegreeDenom);
@@ -96,19 +76,19 @@ DiffusionRateEffect::DiffusionRateEffect(const NetworkVariable * pVariable,
 	const BehaviorVariable * pBehaviorVariable,
 	const ConstantCovariate * pConstantCovariate,
 	const ChangingCovariate * pChangingCovariate,
-	DiffusionRateEffectType type,
+	string effectName,
 	double parameter)
 {
 	this->lpVariable = pVariable;
 	this->lpBehaviorVariable = pBehaviorVariable;
 	this->lpChangingCovariate = pChangingCovariate;
 	this->lpConstantCovariate = pConstantCovariate;
-	this->ltype = type;
+	this->leffectName = effectName;
 
 	double possibleDegreeNumer = 1;
 	double possibleDegreeDenom = 1;
 
-	if (this->ltype == SUSCEPT_AVERAGE_COVARIATE_RATE)
+	if (effectName == "susceptAvCovar")
 	{
 		possibleDegreeNumer = (this->lpBehaviorVariable->range()) *
 			max(this->lpVariable->n(),
@@ -116,11 +96,7 @@ DiffusionRateEffect::DiffusionRateEffect(const NetworkVariable * pVariable,
 		possibleDegreeDenom = max(this->lpVariable->n(),
 			this->lpVariable->m());
 	}
-	if (this->ltype == INFECTION_COVARIATE_RATE)
-	{
-		possibleDegreeNumer = 1;
-		possibleDegreeDenom = 1;
-	}
+
 	this->lpTable = new DiffusionEffectValueTable(possibleDegreeNumer,
 		possibleDegreeDenom);
 	this->lpTable->parameter(parameter);
@@ -135,221 +111,131 @@ DiffusionRateEffect::~DiffusionRateEffect()
 	this->lpTable = 0;
 }
 
+/**
+ * Returns the value of a proximity measure effect, a type of diffusion rate
+ * effect.
+ */
+double DiffusionRateEffect::proximityValue(Network * pNetwork, int i,
+	int egoNumer, int egoDenom)
+{
+	int totalAlterValue = 0;
+	if (pNetwork->outDegree(i) > 0)
+	{
+		for (IncidentTieIterator iter = pNetwork->outTies(i);
+			 iter.valid();
+			 iter.next())
+		{
+			double alterValue = this->lpBehaviorVariable->
+				value(iter.actor());
+
+			if (this->leffectName == "infectIn")
+			{
+				alterValue *= pNetwork->inDegree(iter.actor());
+			}
+			else if (this->leffectName == "infectOut")
+			{
+				alterValue *= pNetwork->outDegree(iter.actor());
+			}
+
+			totalAlterValue += alterValue;
+		}
+	}
+
+	if (totalAlterValue==0)
+	{
+		return 1;
+	}
+	else
+	{
+		return this->lpTable->value(egoNumer * totalAlterValue, egoDenom);
+	}
+}
 
 /**
  * Returns the contribution of this effect for the given actor.
  */
+
 double DiffusionRateEffect::value(int i, int period)
 {
 	Network * pNetwork = this->lpVariable->pNetwork();
-	switch (this->ltype)
+
+	if (this->leffectName == "avExposure")
 	{
-		case AVERAGE_EXPOSURE_RATE:
+		return this->proximityValue(pNetwork, i, 1, max(1,
+				pNetwork->outDegree(i)));
+	}
+	else if (this->leffectName == "susceptAvIn")
+	{
+		return this->proximityValue(pNetwork, i, pNetwork->inDegree(i),
+			max(1, pNetwork->outDegree(i)));
+	}
+	else if (this->leffectName == "totExposure" ||
+		this->leffectName == "infectIn" ||
+		this->leffectName == "infectOut")
+	{
+		return this->proximityValue(pNetwork, i, 1, 1);
+	}
+	else if (this->leffectName == "susceptAvCovar")
+	{
+		if (this->lpConstantCovariate)
 		{
-			int totalAlterValue = 0;
-			if (pNetwork->outDegree(i) > 0)
-			{
-				for (IncidentTieIterator iter = pNetwork->outTies(i);
-					 iter.valid();
-					 iter.next())
-				{
-					double alterValue = this->lpBehaviorVariable->
-						value(iter.actor());
-					totalAlterValue += alterValue;
-				}
-			}
-
-			if (totalAlterValue==0)
-			{
-				return 1;
-			}
-			if (totalAlterValue>0)
-			{
-				return this->lpTable->value(totalAlterValue,max(1,
-						pNetwork->outDegree(i)));
-			}
+			return pow(this->proximityValue(pNetwork, i, 1, max(1,
+						pNetwork->outDegree(i))),
+				this->lpConstantCovariate->value(i));
 		}
-		case SUSCEPT_AVERAGE_INDEGREE_RATE:
+		else if (this->lpChangingCovariate)
 		{
-			int totalAlterValue = 0;
-			if (pNetwork->outDegree(i) > 0)
-			{
-				for (IncidentTieIterator iter = pNetwork->outTies(i);
-					 iter.valid();
-					 iter.next())
-				{
-					double alterValue = this->lpBehaviorVariable->
-						value(iter.actor());
-					totalAlterValue += alterValue;
-				}
-			}
-
-			totalAlterValue *= pNetwork->inDegree(i);
-
-			if (totalAlterValue==0)
-			{
-			    return 1;
-			}
-			else
-			{
-			    return this->lpTable->value(totalAlterValue,max(1,
-						pNetwork->outDegree(i)));
-			}
+			return pow(this->proximityValue(pNetwork, i, 1, max(1,
+						pNetwork->outDegree(i))),
+				this->lpChangingCovariate->value(i,period));
 		}
-		case TOTAL_EXPOSURE_RATE:
+		else
+			throw logic_error(
+				"No individual covariate found.");
+	}
+	else if (this->leffectName == "infectCovar")
+	{
+		int totalAlterValue = 0;
+		if (pNetwork->outDegree(i) > 0)
 		{
-			int totalAlterValue = 0;
-			if (pNetwork->outDegree(i) > 0)
+			for (IncidentTieIterator iter = pNetwork->outTies(i);
+				 iter.valid();
+				 iter.next())
 			{
-				for (IncidentTieIterator iter = pNetwork->outTies(i);
-					 iter.valid();
-					 iter.next())
-				{
-					double alterValue = this->lpBehaviorVariable->
-						value(iter.actor());
-					totalAlterValue += alterValue;
-				}
-			}
+				double alterValue = this->lpBehaviorVariable->
+					value(iter.actor());
 
-			if (totalAlterValue==0)
-			{
-			    return 1;
-			}
-			else
-			{
-			    return this->lpTable->value(totalAlterValue, 1);
-			}
-		}
-		case SUSCEPT_AVERAGE_COVARIATE_RATE:
-		{
-			int totalAlterValue = 0;
-			if (pNetwork->outDegree(i) > 0)
-			{
-				for (IncidentTieIterator iter = pNetwork->outTies(i);
-					 iter.valid();
-					 iter.next())
-				{
-					double alterValue = this->lpBehaviorVariable->
-						value(iter.actor());
-					totalAlterValue += alterValue;
-				}
-			}
-
-			if (totalAlterValue==0)
-			{
-			    return 1;
-			}
-			else
-			{
 				if (this->lpConstantCovariate)
 				{
-					return pow(this->lpTable->value(totalAlterValue,max(1,
-								pNetwork->outDegree(i))),
-						this->lpConstantCovariate->value(i));
+					alterValue *=
+						this->lpConstantCovariate->value(iter.actor());
 				}
 				else if (this->lpChangingCovariate)
 				{
-					return pow(this->lpTable->value(totalAlterValue,max(1,
-								pNetwork->outDegree(i))),
-						this->lpChangingCovariate->value(i,period));
+					alterValue *=
+						this->lpChangingCovariate->value(iter.actor(),
+							period);
 				}
-			   	else
+				else
 					throw logic_error(
 						"No individual covariate found.");
+
+				totalAlterValue += alterValue;
 			}
 		}
-		case INFECTION_INDEGREE_RATE:
+		if (totalAlterValue==0)
 		{
-			int totalAlterValue = 0;
-			if (pNetwork->outDegree(i) > 0)
-			{
-				for (IncidentTieIterator iter = pNetwork->outTies(i);
-					 iter.valid();
-					 iter.next())
-				{
-					double alterValue = this->lpBehaviorVariable->
-						value(iter.actor()) *
-						pNetwork->inDegree(iter.actor());
-					totalAlterValue += alterValue;
-				}
-			}
-
-			if (totalAlterValue==0)
-			{
-			    return 1;
-			}
-			else
-			{
-			    return this->lpTable->value(totalAlterValue,1);
-			}
+			return 1;
 		}
-		case INFECTION_OUTDEGREE_RATE:
+		else
 		{
-			int totalAlterValue = 0;
-			if (pNetwork->outDegree(i) > 0)
-			{
-				for (IncidentTieIterator iter = pNetwork->outTies(i);
-					 iter.valid();
-					 iter.next())
-				{
-					double alterValue = this->lpBehaviorVariable->
-						value(iter.actor()) *
-						pNetwork->outDegree(iter.actor());
-					totalAlterValue += alterValue;
-				}
-			}
-
-			if (totalAlterValue==0)
-			{
-			    return 1;
-			}
-			else
-			{
-				return this->lpTable->value(totalAlterValue,1);
-			}
-		}
-		case INFECTION_COVARIATE_RATE:
-		{
-			int totalAlterValue = 0;
-			if (pNetwork->outDegree(i) > 0)
-			{
-				for (IncidentTieIterator iter = pNetwork->outTies(i);
-					 iter.valid();
-					 iter.next())
-				{
-					double alterValue = this->lpBehaviorVariable->
-						value(iter.actor());
-
-					if (this->lpConstantCovariate)
-					{
-						alterValue *=
-							this->lpConstantCovariate->value(iter.actor());
-					}
-					else if (this->lpChangingCovariate)
-					{
-						alterValue *=
-							this->lpChangingCovariate->value(iter.actor(),
-								period);
-					}
-					else
-						throw logic_error(
-							"No individual covariate found.");
-
-					totalAlterValue += alterValue;
-				}
-			}
-			if (totalAlterValue==0)
-			{
-			    return 1;
-			}
-			else
-			{
-			    return pow(this->lpTable->value(1,1), totalAlterValue);
-			}
+			return pow(this->lpTable->value(1,1), totalAlterValue);
 		}
 	}
-
-	throw new logic_error("Unexpected diffusion rate effect type");
+	else
+	{
+		throw new logic_error("Unexpected diffusion rate effect type");
+	}
 }
 /**
  * Stores the parameter for the diffusion rate effect.
