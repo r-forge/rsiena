@@ -35,6 +35,7 @@ effectsDocumentation <- function(type="html", display=type=="html",
 
                  "behaviorRate",
                  "behaviorOneModeRate",
+				 "behaviorSymmetricRate",
                  "behaviorBipartiteRate",
                  "covarBehaviorRate",
 
@@ -63,6 +64,7 @@ effectsDocumentation <- function(type="html", display=type=="html",
 
                  "behaviorObjective",
                  "behaviorOneModeObjective",
+                 "behaviorSymmetricObjective",
                  "behaviorBipartiteObjective",
                  "covarBehaviorObjective",
                  "unspecifiedBehaviorInteraction")

@@ -919,6 +919,9 @@ double EpochSimulation::calculateLikelihood() const
 	return loglik;
 
 }
+/**
+ * Calculates log factorial of its integer argument
+ */
 double EpochSimulation::lnFactorial(int a) const
 {
 	int y;
@@ -936,6 +939,9 @@ double EpochSimulation::lnFactorial(int a) const
 		return z;
 	}
 }
+/**
+ * Updates parameters. Probably legacy code and not used.
+ */
 void EpochSimulation::updateParameters(int period)
 {
 	Rprintf("ever used?\n");

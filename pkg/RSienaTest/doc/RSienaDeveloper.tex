@@ -347,19 +347,22 @@ below.
 \item You now should have a new version of the package ready for use. (If on 64
   bit Windows or Mac, you will have two versions, and you will have two copies
   of the source directories.)
-\item Alternatively, instead of the build and INSTALL, just type
-\verb|R CMD INSTALL RSiena|\\
-If you have a 64-bit Windows and R 2.12.0, or a 64-bit Mac, use
-\verb|R CMD INSTALL --no-multiarch RSiena|\\
-instead. After the first compile, where using
-\verb|R CMD INSTALL --preclean RSiena| \\is recommended,
-this will just compile the C that has changed and then do the rest.
-Quicker if you are debugging changes. Note that the \sfn{make} file is not very
-clever: if you are altering the C and your changes are not appearing, delete the
-.o's or .dll to force it, or use
-\verb|R CMD INSTALL --preclean RSiena|\\
-to clear out all the .o's and the dll. (\verb|R CMD build| used to clear out
-.o's but it does not from R 2.13.0)
+\item \emph{Experts only!} Alternatively, instead of the build and INSTALL, just
+  type
+  \verb|R CMD INSTALL RSiena|\\
+  If you have a 64-bit Windows and R 2.12.0, or a 64-bit Mac, use
+  \verb|R CMD INSTALL --no-multiarch RSiena|\\
+  instead. After the first compile, where using
+  \verb|R CMD INSTALL --preclean RSiena| \\is recommended, this will just
+  compile the C that has changed and then do the rest.  Quicker if you are
+  debugging changes. Note that the \sfn{make} file is not very clever: if you
+  are altering the C and your changes are not appearing, delete the .o's or .dll
+  to force it, or use
+  \verb|R CMD INSTALL --preclean RSiena|\\
+  to clear out all the .o's and the dll. (\verb|R CMD build| used to clear out
+  .o's but it does not from R 2.13.0) Also use \verb|--preclean| if you have
+  changed any .h files: the make file is not aware which files depend on which
+  headers.
 \item If you use \verb|R CMD INSTALL --no-multiarch RSiena|
 you get object files in the source tree. If you later want to build multi
 architectures (where the object files are created in a copy of the source tree)
@@ -367,11 +370,8 @@ you need to use \verb|--preclean| to stop confusion between the different object
 files.
 \item On linux or Mac, the same commands should work, but you don't need the
   Rtools. I have occasionally had problems with installing from a tarball or
-  from source, when I have no permission to write in the standard libraries, but
-  can't remember which one worked: one always did. The most likely to work is to
-  use, within R,\\
- \sfn{install.packages("tarball name", repos=NULL)}\\
- Or just
+  from source, when I have no permission to write in the standard libraries. In
+  that case, the easiest thing to do is
   open up R, and do \\
 \verb|install.packages('xtable')| \\which should create a
   local library directory for you.
@@ -530,10 +530,10 @@ includes all examples on help pages except parts marked \sfn{\textbackslash
 
 Since the checking is done every day by other people, we are limited as to the
 amount of their time we are allowed to use up. There are now extra testing
-facilities designed to be run by ourselves only. They should
-be run every time a significant change is made.  Testing is via the check
-procedure after setting the environment variable \sfn{RSIENA\_TESTING} to any
-non-null value.
+facilities designed to be run by ourselves only. They should be run every time a
+significant change is made.  Testing of the scripts is via the check procedure
+after setting the environment variable \sfn{RSIENA\_TESTING} to any non-null
+value. Other tests need to be run separately.
 \label{sec:tests}
 \begin{description}
 \item[scripts] There is a file \sfn{scripts.R} in the \sfn{tests} directory
@@ -588,10 +588,44 @@ Some notes about the testing of scripts:
   not an altered version.
 \end{enumerate}
 
+
 \item[other tests]
-I have begun to create test files for testing the package itself. More will
-follow. But for any new features added by others, test data and
-results will need to be added to the testing system somehow.
+There is a file \sfn{effectsTest.R} in the \sfn{tests} directory. It is
+deliberately excluded from the tar ball, using \sfn{.Rbuildignore}, along with
+the test output references: \sfn{test\textbackslash testrefs} and a subsidiary R
+files \sfn{sampson.r}. It takes a
+long time, but does a lot of tests. To run it, navigate to the \sfn{tests}
+directory of your source and use
+\begin{verbatim}
+R CMD BATCH --no-save "--args startNo=1 endNo=65 doRun=1
+useMult=1 useRSiena=1"  effectsTest.R
+\end{verbatim}
+(with no carriage return.)  You might find that single quotes work: it depends
+on the shell. There are some notes about the arguments at the start of the
+file. The output is a set of files named Compare.. or compare... which are
+automatically checked against the files in the directory \sfn{testrefs}. There
+are 65 tests. To run just test 22, use \verb|startNo=22| and \verb|endNo=22|. To
+run under \sfn{valgrind} (very slow!) use
+\begin{verbatim}
+R -d "valgrind --tool=memcheck --track-origins=yes
+--leak-check=full" --nosave --args startNo=1 endNo=65 doRun=1
+useMult=0 useRSiena=1 < effectsTest.R
+\end{verbatim}
+But remove the carriage return.  The tests tend to fail for no reason,
+particularly on laptops. Usually in ML runs, so there may be some bug there, but
+it is hard to find as it is intermittent. It is wise to run them on a desktop or
+server and
+be prepared to restart from any failure point. Check the existing results by
+hand first as they will be deleted on restart:
+\begin{verbatim}
+diff testdir/*ompare* testrefs | more
+\end{verbatim}
+If new features are added, more tests will be needed. Many bugs were uncovered
+by these tests, so it is important to keep the suite up to date and run it from
+time to time. There maybe some rounding differences between platforms. These are
+in general caused by printing after using the \sfn{round} function: the rounding
+in the printing is done by the operating system, not \sfn{R}.
+
 \end{description}
 \section{Parallel runs}
 Most of RSiena is set up to produce the same results as Siena3, but some effects

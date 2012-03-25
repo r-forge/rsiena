@@ -84,9 +84,9 @@ private:
 		string effectName);
 	double calculateDiffusionRateEffect(BehaviorLongitudinalData *
 		pBehaviorData, const Network * pStructural,
-	const ConstantCovariate * pConstantCovariate,
-	const ChangingCovariate * pChangingCovariate,
-	int i, string effectName);
+		const ConstantCovariate * pConstantCovariate,
+		const ChangingCovariate * pChangingCovariate,
+		int i, string effectName);
 
 	// The data to be used for calculating the statistics
 	const Data * lpData;
