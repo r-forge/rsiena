@@ -141,7 +141,7 @@ double DiffusionRateEffect::proximityValue(Network * pNetwork, int i,
 		}
 	}
 
-	if (totalAlterValue==0)
+	if (egoNumer * totalAlterValue==0)
 	{
 		return 1;
 	}

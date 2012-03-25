@@ -826,7 +826,7 @@ void NetworkVariable::calculateTieFlipContributions()
 				{
 					contribution = -contribution;
 				}
-				//	Rprintf("cc %d %d %d %d %f %x\n", m, this->lstepType, alter, i, contribution , pEffect);
+
 				this->levaluationEffectContribution[alter][i] = contribution;
 			}
 		}
@@ -837,12 +837,10 @@ void NetworkVariable::calculateTieFlipContributions()
 				if (!this->lpermitted[alter])
 				{
 					this->levaluationEffectContribution[alter][i] = R_NaN;
-					//	Rprintf("not perm\n");
-			}
+				}
 				else
 				{
 					this->levaluationEffectContribution[alter][i] = 0;
-					//	Rprintf("zero\n");
 				}
 			}
 		}
@@ -1183,71 +1181,75 @@ void NetworkVariable::accumulateScores(int alter) const
 		this->pSimulation()->score(pEffect->pEffectInfo(),
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 	}
-
-	for (unsigned i = 0;
-		 i < this->pEndowmentFunction()->rEffects().size();
-		 i++)
+	if (alter < this->m())
 	{
-		Effect * pEffect = this->pEndowmentFunction()->rEffects()[i];
-
-		double score = 0;
-		if (this->lpNetworkCache->outTieExists(alter))
+		for (unsigned i = 0;
+			 i < this->pEndowmentFunction()->rEffects().size();
+			 i++)
 		{
-			score += this->lendowmentEffectContribution[alter][i];
+			Effect * pEffect = this->pEndowmentFunction()->rEffects()[i];
+
+			double score = 0;
+
+			if (this->lpNetworkCache->outTieExists(alter))
+			{
+				score += this->lendowmentEffectContribution[alter][i];
+			}
+
+			int j = 0;
+			for (int alteri = 0; alteri < m; alteri++)
+			{
+				j = alteri;
+				if (this->stepType() > 0)
+				{
+					j = (*this->lsetting)[alteri];
+				}
+				if (this->lpNetworkCache->outTieExists(j) &&
+					this->lpermitted[j])
+				{
+					score -=
+						this->lendowmentEffectContribution[j][i] *
+						this->lprobabilities[alteri];
+				}
+			}
+
+			this->pSimulation()->score(pEffect->pEffectInfo(),
+				this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 		}
 
-		int j = 0;
-		for (int alteri = 0; alteri < m; alteri++)
+
+		for (unsigned i = 0;
+			 i < this->pCreationFunction()->rEffects().size();
+			 i++)
 		{
-			j = alteri;
-			if (this->stepType() > 0)
+			Effect * pEffect = this->pCreationFunction()->rEffects()[i];
+
+			double score = 0;
+
+			if (!this->lpNetworkCache->outTieExists(alter))
 			{
-				j = (*this->lsetting)[alteri];
+				score += this->lcreationEffectContribution[alter][i];
 			}
-			if (this->lpNetworkCache->outTieExists(j) &&
-				this->lpermitted[j])
+
+			int j = 0;
+			for (int alteri = 0; alteri < m; alteri++)
 			{
-				score -=
-					this->lendowmentEffectContribution[j][i] *
-					this->lprobabilities[alteri];
+				j = alteri;
+				if (this->stepType() > 0)
+				{
+					j = (*this->lsetting)[alteri];
+				}
+				if (!this->lpNetworkCache->outTieExists(j) &&
+					this->lpermitted[j])
+				{
+					score -=
+						this->lcreationEffectContribution[j][i] *
+						this->lprobabilities[alteri];
+				}
 			}
+			this->pSimulation()->score(pEffect->pEffectInfo(),
+				this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 		}
-
-		this->pSimulation()->score(pEffect->pEffectInfo(),
-			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
-	}
-
-	for (unsigned i = 0;
-		 i < this->pCreationFunction()->rEffects().size();
-		 i++)
-	{
-		Effect * pEffect = this->pCreationFunction()->rEffects()[i];
-
-		double score = 0;
-
-		if (!this->lpNetworkCache->outTieExists(alter))
-		{
-			score += this->lcreationEffectContribution[alter][i];
-		}
-
-		int j = 0;
-		for (int alteri = 0; alteri < m; alteri++)
-		{
-			j = alteri;
-			if (this->stepType() > 0)
-			{
-				j = (*this->lsetting)[alteri];
-			}
-			if (!this->lpNetworkCache->outTieExists(j) &&
-				this->lpermitted[j])
-			{
-				score -=
-					this->lcreationEffectContribution[j][i] *
-					this->lprobabilities[alteri];
-			}
-		}
-		this->pSimulation()->score(pEffect->pEffectInfo(),
-			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 	}
 }
 

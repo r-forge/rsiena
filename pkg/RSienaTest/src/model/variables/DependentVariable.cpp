@@ -615,14 +615,14 @@ void DependentVariable::calculateRates()
 		}
 
 		if (this->pSimulation()->pModel()->needScores())
-		  {
+		{
 		    this->calculateScoreSumTerms();
-		  }
+		}
 		if(this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
-		  {
+		{
 		    this->ltotalRate = this->totalRate() * this->totalRate() -
-		      sumRatesSquared;
-		  }
+				sumRatesSquared;
+		}
 
 		this->lvalidRates = true;
 	}

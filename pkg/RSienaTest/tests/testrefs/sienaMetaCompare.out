@@ -1,0 +1,775 @@
+Estimates, standard errors and convergence t-ratios
+
+                                        Estimate   Standard   Convergence 
+                                                     Error      t-ratio   
+
+Rate parameters: 
+  0        Rate parameter                5.6875  ( 0.8312   )             
+  1. eval  outdegree (density)          -1.4096  ( 0.6115   )    1.2214   
+  2. eval  reciprocity                   1.2954  ( 0.2705   )    0.3547   
+  3. endow reciprocity                   0.0000  (     NA   )    0.0823   
+  4. eval  transitive triplets           0.3800  ( 0.1557   )    0.4172   
+  5. eval  3-cycles                      0.3140  ( 0.3716   )    0.5608   
+  6. eval  transitive ties               0.0000  (     NA   )    0.1865   
+  7. eval  indegree - popularity (sqrt) -0.0965  ( 0.2125   )    1.2167   
+  8. eval  indegree - activity (sqrt)   -0.2304  ( 0.2281   )    1.2040   
+  9. eval  1/(outdegree + 1)             1.3256  ( 1.9440   )   -1.4409   
+
+Total of 124 iteration steps.
+
+Generalised score test <c>
+
+Testing the goodness-of-fit of the model restricted by
+ (1)   endow:  reciprocity                                =   0.0000
+ (2)   eval:  transitive ties                             =   0.0000
+_________________________________________________
+                   
+Joint test:
+-----------
+   c =   4.5686   d.f. = 2   p-value =   0.1018
+
+
+(1) tested separately:
+-----------------------
+ - two-sided:
+  c =   0.1199   d.f. = 1  p-value =   0.7291
+ - one-sided (normal variate):  -0.3463
+
+(2) tested separately:
+-----------------------
+ - two-sided:
+  c =   4.2229   d.f. = 1  p-value =   0.0399
+ - one-sided (normal variate):   2.0550    
+_________________________________________________
+
+One-step estimates: 
+
+eval:  outdegree (density)                         -2.2654
+eval:  reciprocity                                  2.2794
+endow:  reciprocity                                -1.1580
+eval:  transitive triplets                          0.6956
+eval:  3-cycles                                    -0.4778
+eval:  transitive ties                              0.5423
+eval:  indegree - popularity (sqrt)                 0.0592
+eval:  indegree - activity (sqrt)                  -0.2932
+eval:  1/(outdegree + 1)                            1.9348
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.374       -0.034       20.178       -0.043        0.134       20.178       -0.071       -0.101        0.185
+      -0.204        0.073        8.926        0.015       -0.031        8.926        0.004       -0.002       -0.048
+       1.044      382.140      999.000        7.011       64.151      115.563        5.138     3267.000        7.526
+      -0.451        0.367        1.044        0.024       -0.043        5.138        0.011        0.003        0.075
+       0.588       -0.304        1.044       -0.741        0.138       12.263       -0.054       -0.027       -0.355
+       0.462        0.601        1.888        1.529        1.718      999.000       12.263        7.011       64.151
+      -0.543        0.061        1.044        0.342       -0.681        1.044        0.045        0.003        0.251
+      -0.722       -0.034        1.044        0.084       -0.321        1.044        0.056        0.052       -0.147
+       0.156       -0.092        1.044        0.247       -0.491        1.044        0.609       -0.331        3.779
+
+Derivative matrix of expected statistics X by parameters:
+
+     101.154       64.238       21.394      427.401      118.069       99.615      353.318      315.828       -6.833
+      46.552       59.342       16.742      271.925       88.236       50.382      167.748      158.852       -1.707
+      28.572       30.964       10.532      173.388       55.144       33.851      107.100      100.880       -1.813
+     186.021      145.736       46.945     1317.623      401.135      246.815      734.336      673.786       -2.672
+      84.401       84.950       22.094      615.427      208.231      113.778      346.447      327.613        1.017
+      85.422       64.886       22.655      454.752      138.309      120.358      309.287      291.292       -3.337
+     237.312      164.389       51.344     1099.998      313.102      244.720      899.538      766.303      -14.789
+     204.410      165.170       51.729     1072.591      328.008      224.373      737.442      718.863       -8.153
+      -9.502       -2.921       -1.152      -30.714       -5.604       -9.016      -34.569      -24.189        1.566
+
+Covariance matrix of X (correlations below diagonal):
+
+     201.079      181.158       58.549     1096.485      342.634      232.929      723.454      688.581      -10.254
+       0.892      205.096       58.316     1173.825      376.786      223.691      678.436      664.008       -5.912
+       0.895        0.882       21.302      338.282      106.290       71.912      210.692      202.783       -3.294
+       0.835        0.885        0.791     8576.439     2719.738     1419.613     4324.973     4200.081      -24.883
+       0.815        0.888        0.777        0.991      878.444      445.721     1356.138     1332.375       -5.844
+       0.934        0.888        0.886        0.872        0.855      309.349      863.769      831.917       -9.818
+       0.978        0.908        0.875        0.895        0.877        0.941     2721.934     2547.843      -32.999
+       0.972        0.928        0.879        0.908        0.900        0.947        0.977     2496.178      -26.079
+      -0.528       -0.302       -0.522       -0.196       -0.144       -0.408       -0.462       -0.382        1.872
+Estimates, standard errors and convergence t-ratios
+
+                                        Estimate   Standard   Convergence 
+                                                     Error      t-ratio   
+
+Rate parameters: 
+  0        Rate parameter                3.7058  ( 0.6142   )             
+  1. eval  outdegree (density)          -1.0804  ( 0.8604   )    0.3062   
+  2. eval  reciprocity                   2.3967  ( 0.6650   )   -0.4433   
+  3. endow reciprocity                   0.0000  (     NA   )   -0.1590   
+  4. eval  transitive triplets           1.1345  ( 0.3015   )   -0.0597   
+  5. eval  3-cycles                     -0.2962  ( 0.7007   )   -0.0341   
+  6. eval  transitive ties               0.0000  (     NA   )   -0.9348   
+  7. eval  indegree - popularity (sqrt) -0.2884  ( 0.3448   )    0.1642   
+  8. eval  indegree - activity (sqrt)   -0.0419  ( 0.4273   )    0.0808   
+  9. eval  1/(outdegree + 1)             3.2232  ( 2.3673   )   -0.5626   
+
+Total of 124 iteration steps.
+
+Generalised score test <c>
+
+Testing the goodness-of-fit of the model restricted by
+ (1)   endow:  reciprocity                                =   0.0000
+ (2)   eval:  transitive ties                             =   0.0000
+_________________________________________________
+                   
+Joint test:
+-----------
+   c =   6.7009   d.f. = 2   p-value =   0.0351
+
+
+(1) tested separately:
+-----------------------
+ - two-sided:
+  c =   0.8855   d.f. = 1  p-value =   0.3467
+ - one-sided (normal variate):   0.9410
+
+(2) tested separately:
+-----------------------
+ - two-sided:
+  c =   5.6309   d.f. = 1  p-value =   0.0176
+ - one-sided (normal variate):   2.3730    
+_________________________________________________
+
+One-step estimates: 
+
+eval:  outdegree (density)                         -0.9336
+eval:  reciprocity                                  3.7455
+endow:  reciprocity                                 2.5863
+eval:  transitive triplets                         -1.1122
+eval:  3-cycles                                     0.4996
+eval:  transitive ties                              3.5655
+eval:  indegree - popularity (sqrt)                -0.0747
+eval:  indegree - activity (sqrt)                  -1.0802
+eval:  1/(outdegree + 1)                            5.5115
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.740        0.255       28.392        0.061        0.100       28.392       -0.177       -0.255        1.392
+       0.446        0.442       21.944        0.066       -0.064       21.944        0.005       -0.186        1.014
+       1.044      155.441      999.000       11.378       78.122      158.687        9.950     3267.000       14.101
+       0.235        0.328        1.044        0.091       -0.135        9.950       -0.045       -0.019        0.017
+       0.165       -0.138        1.044       -0.640        0.491       23.124        0.039       -0.049        0.431
+       0.807        0.473        1.888        1.480        1.282      999.000       23.124       11.378       78.122
+      -0.598        0.020        1.044       -0.437        0.163        1.044        0.119        0.012        0.025
+      -0.692       -0.655        1.044       -0.144       -0.163        1.044        0.083        0.183       -0.551
+       0.684        0.644        1.044        0.024        0.260        1.044        0.031       -0.544        5.604
+
+Derivative matrix of expected statistics X by parameters:
+
+      57.095       37.114       11.594       45.663       10.860       29.314      125.477      118.872      -10.312
+      17.683       22.340        2.954       10.961        4.393        7.373       37.010       42.590       -3.488
+       5.502        7.023        1.828        0.460        0.406        1.268       10.471       12.126       -1.352
+      21.770       20.411        1.371      117.189       34.297       38.422       72.491       67.001       -2.167
+       7.468       10.909        0.647       29.887       11.687        9.707       21.176       22.676       -1.451
+      18.236       11.965        1.461       76.827       21.287       31.337       56.981       52.708       -1.712
+      84.593       55.256       17.447       95.287       22.991       50.610      204.710      177.578      -15.217
+      58.198       44.287        9.401       54.724       15.729       38.778      133.486      138.267       -9.659
+     -12.534       -9.462       -2.939       -8.417       -2.208       -5.721      -26.668      -25.210        2.741
+
+Covariance matrix of X (correlations below diagonal):
+
+      67.724       49.559       10.608      102.161       28.903       48.921      156.927      154.574      -11.111
+       0.785       58.816        7.408      110.151       35.820       44.686      121.282      129.455       -7.513
+       0.683        0.512        3.561       11.476        3.131        5.392       24.058       22.402       -2.081
+       0.537        0.622        0.263      533.914      157.172      176.076      328.627      323.592       -5.747
+       0.500        0.664        0.236        0.968       49.411       51.032       93.354       95.545       -1.798
+       0.684        0.671        0.329        0.877        0.836       75.455      140.573      141.569       -4.091
+       0.947        0.785        0.633        0.706        0.659        0.803      405.853      382.220      -23.226
+       0.944        0.848        0.597        0.704        0.683        0.819        0.953      395.948      -21.113
+      -0.805       -0.584       -0.658       -0.148       -0.153       -0.281       -0.688       -0.633        2.810
+Estimates, standard errors and convergence t-ratios
+
+                                        Estimate   Standard   Convergence 
+                                                     Error      t-ratio   
+
+Rate parameters: 
+  0        Rate parameter                2.8571  ( 0.7736   )             
+  1. eval  outdegree (density)          -1.9427  ( 1.2753   )   -0.0900   
+  2. eval  reciprocity                   2.5481  ( 1.3854   )   -0.3591   
+  3. endow reciprocity                   0.0000  (     NA   )   -0.5736   
+  4. eval  transitive triplets           1.1359  ( 0.7509   )   -0.3082   
+  5. eval  3-cycles                     -0.8029  ( 1.3343   )    0.1900   
+  6. eval  transitive ties               0.0000  (     NA   )   -0.5476   
+  7. eval  indegree - popularity (sqrt)  0.0057  ( 0.8174   )   -0.0166   
+  8. eval  indegree - activity (sqrt)   -0.6050  ( 0.6896   )    0.3624   
+  9. eval  1/(outdegree + 1)             2.8406  ( 2.6635   )   -0.0379   
+
+Total of 130 iteration steps.
+
+Generalised score test <c>
+
+Testing the goodness-of-fit of the model restricted by
+ (1)   endow:  reciprocity                                =   0.0000
+ (2)   eval:  transitive ties                             =   0.0000
+_________________________________________________
+                   
+Joint test:
+-----------
+   c =   3.5188   d.f. = 2   p-value =   0.1721
+
+
+(1) tested separately:
+-----------------------
+ - two-sided:
+  c =   1.9093   d.f. = 1  p-value =   0.1670
+ - one-sided (normal variate):   1.3818
+
+(2) tested separately:
+-----------------------
+ - two-sided:
+  c =   0.4069   d.f. = 1  p-value =   0.5235
+ - one-sided (normal variate):  -0.6379    
+_________________________________________________
+
+One-step estimates: 
+
+eval:  outdegree (density)                          1.4406
+eval:  reciprocity                                  7.0410
+endow:  reciprocity                                 7.9383
+eval:  transitive triplets                          5.8518
+eval:  3-cycles                                    -6.8020
+eval:  transitive ties                             -3.1883
+eval:  indegree - popularity (sqrt)                -0.3951
+eval:  indegree - activity (sqrt)                  -4.2690
+eval:  1/(outdegree + 1)                            9.9174
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       1.626        0.525       42.085        0.386       -0.884       42.085       -0.727       -0.298        1.312
+       0.297        1.919       45.717        0.225       -0.814       45.717        0.139       -0.725        1.645
+       1.044       74.611      999.000       26.976       87.894      218.977       24.779     3267.000       22.756
+       0.403        0.216        1.044        0.564       -0.779       24.779       -0.404       -0.075       -0.546
+      -0.520       -0.441        1.044       -0.777        1.780       44.032        0.599        0.105       -0.835
+       1.134        0.566        1.888        0.959        0.998      999.000       44.032       26.976       87.894
+      -0.697        0.123        1.044       -0.659        0.549        1.044        0.668       -0.133        0.339
+      -0.339       -0.758        1.044       -0.144        0.114        1.044       -0.236        0.476       -0.543
+       0.386        0.446        1.044       -0.273       -0.235        1.044        0.156       -0.296        7.094
+
+Derivative matrix of expected statistics X by parameters:
+
+      26.569       19.178       11.985       38.501       10.808       24.859       52.806       50.733       -4.927
+       8.079       10.580        4.613       15.698        4.897       11.744       16.312       19.276       -1.517
+       7.286        7.702        4.437       13.172        3.832        9.504       14.915       16.635       -1.265
+      34.570       31.690       14.686       78.725       21.719       47.188       75.153       77.155       -4.501
+      12.759       14.200        5.694       31.854        9.988       19.011       26.871       31.108       -1.397
+      26.242       24.534       12.390       57.828       15.532       37.147       56.734       58.061       -3.507
+      45.588       32.930       19.950       73.856       19.606       45.834       96.573       88.252       -8.179
+      42.291       37.962       19.772       74.653       20.886       48.968       88.275       92.043       -6.974
+      -1.839       -0.750       -1.388        0.824        0.247       -0.055       -2.868       -2.065        0.907
+
+Covariance matrix of X (correlations below diagonal):
+
+      44.449       30.776       18.396       69.812       18.241       42.665       90.023       84.836       -8.394
+       0.829       31.020       14.327       59.592       16.694       37.102       63.747       66.590       -5.699
+       0.870        0.811       10.069       28.971        7.491       19.278       37.003       34.822       -3.953
+       0.840        0.859        0.733      155.239       41.260       91.458      155.719      150.076      -10.489
+       0.788        0.863        0.680        0.953       12.066       24.060       39.724       39.993       -2.667
+       0.838        0.873        0.796        0.962        0.907       58.273       94.342       90.554       -6.650
+       0.971        0.823        0.839        0.899        0.823        0.889      193.320      176.293      -16.081
+       0.958        0.900        0.826        0.907        0.867        0.893        0.955      176.384      -14.761
+      -0.822       -0.668       -0.813       -0.549       -0.501       -0.568       -0.755       -0.725        2.349
+Estimates, standard errors and convergence t-ratios
+
+                                        Estimate   Standard   Convergence 
+                                                     Error      t-ratio   
+
+Rate parameters: 
+  0        Rate parameter                5.5468  ( 1.0501   )             
+  1. eval  outdegree (density)          -1.7469  ( 0.9738   )    0.7105   
+  2. eval  reciprocity                   1.8267  ( 0.4338   )   -0.2394   
+  3. endow reciprocity                   0.0000  (     NA   )    0.9059   
+  4. eval  transitive triplets           0.7220  ( 0.2082   )   -0.0580   
+  5. eval  3-cycles                     -0.7146  ( 0.3534   )    0.1003   
+  6. eval  transitive ties               0.0000  (     NA   )   -0.9845   
+  7. eval  indegree - popularity (sqrt)  0.0264  ( 0.3236   )    0.5258   
+  8. eval  indegree - activity (sqrt)   -0.0347  ( 0.3863   )    0.5233   
+  9. eval  1/(outdegree + 1)             1.4198  ( 1.5102   )   -0.4441   
+
+Total of 124 iteration steps.
+
+Generalised score test <c>
+
+Testing the goodness-of-fit of the model restricted by
+ (1)   endow:  reciprocity                                =   0.0000
+ (2)   eval:  transitive ties                             =   0.0000
+_________________________________________________
+                   
+Joint test:
+-----------
+   c =  12.9011   d.f. = 2   p-value =   0.0016
+
+
+(1) tested separately:
+-----------------------
+ - two-sided:
+  c =   0.3453   d.f. = 1  p-value =   0.5568
+ - one-sided (normal variate):  -0.5876
+
+(2) tested separately:
+-----------------------
+ - two-sided:
+  c =  12.1018   d.f. = 1  p-value =   0.0005
+ - one-sided (normal variate):   3.4788    
+_________________________________________________
+
+One-step estimates: 
+
+eval:  outdegree (density)                         -0.4434
+eval:  reciprocity                                  1.9040
+endow:  reciprocity                                 0.1787
+eval:  transitive triplets                          0.1526
+eval:  3-cycles                                    -0.4645
+eval:  transitive ties                              1.8563
+eval:  indegree - popularity (sqrt)                -0.8726
+eval:  indegree - activity (sqrt)                  -0.4573
+eval:  1/(outdegree + 1)                           -0.1008
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.948        0.006       32.134        0.026        0.139       32.134       -0.244       -0.298        1.072
+       0.015        0.188       14.315        0.065       -0.106       14.315        0.019       -0.055        0.172
+       1.044      238.282      999.000       10.677       49.838      112.687        6.871     3267.000       12.750
+       0.130        0.721        1.044        0.043       -0.053        6.871       -0.007       -0.031        0.053
+       0.405       -0.690        1.044       -0.716        0.125       11.661       -0.042       -0.013        0.079
+       0.465        0.501        1.888        1.937        2.877      999.000       11.661       10.677       49.838
+      -0.776        0.135        1.044       -0.110       -0.369        1.044        0.105        0.043       -0.115
+      -0.793       -0.330        1.044       -0.384       -0.097        1.044        0.341        0.149       -0.429
+       0.729        0.263        1.044        0.168        0.149        1.044       -0.236       -0.736        2.281
+
+Derivative matrix of expected statistics X by parameters:
+
+      77.383       23.131       21.825       97.740       10.856       52.393      191.602      161.290      -11.236
+      18.536       30.254        8.043       26.723       15.504       10.657       46.389       54.134       -2.921
+      16.404       15.904        7.156       22.878        9.223        8.834       40.587       39.485       -2.565
+      82.034       27.522       16.769      423.632       92.271      128.531      274.265      237.271       -3.293
+      26.124       30.545        6.309      179.946       61.563       44.876       98.734      101.211       -0.807
+      39.833       11.562        8.515      179.670       35.348       66.752      133.437      109.481       -1.458
+     141.600       44.458       39.393      239.440       38.051      111.211      380.239      303.740      -19.488
+      97.775       36.900       27.896      190.498       35.217       82.712      254.200      239.526       -9.940
+     -15.448       -5.679       -4.034      -17.770       -1.748       -8.311      -38.559      -31.030        3.110
+
+Covariance matrix of X (correlations below diagonal):
+
+      74.189       39.980       19.647      206.915       40.331       70.452      215.451      186.340       -7.795
+       0.604       59.076       14.346      139.411       46.864       39.732      122.601      126.622       -3.877
+       0.717        0.587       10.108       39.289        8.199       16.466       53.388       46.151       -2.361
+       0.651        0.492        0.335     1361.511      307.851      348.132      771.565      680.109       -2.423
+       0.489        0.637        0.269        0.872       91.590       73.189      158.111      156.621        0.408
+       0.777        0.491        0.492        0.897        0.727      110.725      240.125      208.137       -2.111
+       0.954        0.609        0.641        0.798        0.630        0.871      687.135      573.676      -19.284
+       0.931        0.709        0.625        0.793        0.704        0.851        0.942      540.077      -14.470
+      -0.643       -0.358       -0.528       -0.047        0.030       -0.143       -0.523       -0.442        1.982
+================================= SIENA08 ================================================
+Multilevel use of Siena algorithms according to Snijders & Baerveldt (2003) with extension
+==========================================================================================
+
+Number of projects in the list is 4.
+The names of these projects are :
+project1: <sienaMeta(fit1)>
+project2: <sienaMeta(fit3)>
+project3: <sienaMeta(fit4)>
+project4: <sienaMeta(fit6)>
+
+Options for running Siena08:
+-> Parameters are excluded from the meta-analysis when their standard
+   error exceeds an upper bound of 5.
+-> Extra output requested
+
+The RSiena Version of the first fit object is 1.
+
+Object <1> contains estimates of 9 parameters.
+The number of valid score tests found was 7.
+Object <2> contains estimates of 9 parameters.
+The number of valid score tests found was 7.
+Object <3> contains estimates of 9 parameters.
+The number of valid score tests found was 7.
+Object <4> contains estimates of 9 parameters.
+The number of valid score tests found was 7.
+
+A total of 9 parameters in 4 projects :
+1. eval : outdegree (density)
+2. eval : reciprocity
+3. endow: reciprocity
+4. eval : transitive triplets
+5. eval : 3-cycles
+6. eval : transitive ties
+7. eval : indegree - popularity (sqrt)
+8. eval : indegree - activity (sqrt)
+9. eval : 1/(outdegree + 1)
+
+The projects contain the parameters as follows (1=present, 0=absent):
+
+Project  |    1  2  3  4  5  6  7  8  9
+---------+-----------------------------
+   1     |    1  1  1  1  1  1  1  1  1
+   2     |    1  1  1  1  1  1  1  1  1
+   3     |    1  1  1  1  1  1  1  1  1
+   4     |    1  1  1  1  1  1  1  1  1
+
+Project 1 
+par. 1 estimate      -1.4096 (s.e.       0.6115 ) (conv_t    1.2214 )
+par. 2 estimate       1.2954 (s.e.       0.2705 ) (conv_t    0.3547 )
+par. 3 estimate       0.0000 (s.e.      31.6070 ) (conv_t    0.0823 )
+par. 4 estimate       0.3800 (s.e.       0.1557 ) (conv_t    0.4172 )
+par. 5 estimate       0.3140 (s.e.       0.3716 ) (conv_t    0.5608 )
+par. 6 estimate       0.0000 (s.e.      31.6070 ) (conv_t    0.1865 )
+par. 7 estimate      -0.0965 (s.e.       0.2125 ) (conv_t    1.2167 )
+par. 8 estimate      -0.2304 (s.e.       0.2281 ) (conv_t    1.2040 )
+par. 9 estimate       1.3256 (s.e.       1.9440 ) (conv_t   -1.4409 )
+
+Maximal absolute convergence t-statistic =     1.4409 
+
+Project 2 
+par. 1 estimate      -1.0804 (s.e.       0.8604 ) (conv_t    0.3062 )
+par. 2 estimate       2.3967 (s.e.       0.6650 ) (conv_t   -0.4433 )
+par. 3 estimate       0.0000 (s.e.      31.6070 ) (conv_t   -0.1590 )
+par. 4 estimate       1.1345 (s.e.       0.3015 ) (conv_t   -0.0597 )
+par. 5 estimate      -0.2962 (s.e.       0.7007 ) (conv_t   -0.0341 )
+par. 6 estimate       0.0000 (s.e.      31.6070 ) (conv_t   -0.9348 )
+par. 7 estimate      -0.2884 (s.e.       0.3448 ) (conv_t    0.1642 )
+par. 8 estimate      -0.0419 (s.e.       0.4273 ) (conv_t    0.0808 )
+par. 9 estimate       3.2232 (s.e.       2.3673 ) (conv_t   -0.5626 )
+
+Maximal absolute convergence t-statistic =     0.9348 
+
+Project 3 
+par. 1 estimate      -1.9427 (s.e.       1.2753 ) (conv_t   -0.0900 )
+par. 2 estimate       2.5481 (s.e.       1.3854 ) (conv_t   -0.3591 )
+par. 3 estimate       0.0000 (s.e.      31.6070 ) (conv_t   -0.5736 )
+par. 4 estimate       1.1359 (s.e.       0.7509 ) (conv_t   -0.3082 )
+par. 5 estimate      -0.8029 (s.e.       1.3343 ) (conv_t    0.1900 )
+par. 6 estimate       0.0000 (s.e.      31.6070 ) (conv_t   -0.5476 )
+par. 7 estimate       0.0057 (s.e.       0.8174 ) (conv_t   -0.0166 )
+par. 8 estimate      -0.6050 (s.e.       0.6896 ) (conv_t    0.3624 )
+par. 9 estimate       2.8406 (s.e.       2.6635 ) (conv_t   -0.0379 )
+
+Maximal absolute convergence t-statistic =     0.5736 
+
+Project 4 
+par. 1 estimate      -1.7469 (s.e.       0.9738 ) (conv_t    0.7105 )
+par. 2 estimate       1.8267 (s.e.       0.4338 ) (conv_t   -0.2394 )
+par. 3 estimate       0.0000 (s.e.      31.6070 ) (conv_t    0.9059 )
+par. 4 estimate       0.7220 (s.e.       0.2082 ) (conv_t   -0.0580 )
+par. 5 estimate      -0.7146 (s.e.       0.3534 ) (conv_t    0.1003 )
+par. 6 estimate       0.0000 (s.e.      31.6070 ) (conv_t   -0.9845 )
+par. 7 estimate       0.0264 (s.e.       0.3236 ) (conv_t    0.5258 )
+par. 8 estimate      -0.0347 (s.e.       0.3863 ) (conv_t    0.5233 )
+par. 9 estimate       1.4198 (s.e.       1.5102 ) (conv_t   -0.4441 )
+
+Maximal absolute convergence t-statistic =     0.9845 
+
+
+=============================
+Results of the meta-analysis:
+=============================
+
+Upper bound used for standard error is     5.00.
+
+--------------------------------------------------------------------------------
+Parameter 1: eval : outdegree (density)
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate      -1.4096 (standard error        0.61)
+Data set 2, sienaMeta(fit3) :  Estimate      -1.0804 (standard error        0.86)
+Data set 3, sienaMeta(fit4) :  Estimate      -1.9427 (standard error        1.28)
+Data set 4, sienaMeta(fit6) :  Estimate      -1.7469 (standard error        0.97)
+
+ 4 datasets used.
+
+IWLS modification of Snijders-Baerveldt (2003) method  of combining estimates
+-----------------------------------------------------------------------------
+This method assumes that true parameters and standard errors are uncorrelated.
+This can be checked by the plot method and the test below.
+
+Test that estimates and standard errors are uncorrelated: 
+Spearman's rank correlation rho =     -0.8, two-sided p = 0.333
+
+Test that all parameters are 0 : 
+chi-squared =    12.43, d.f. = 4, p = 0.006
+
+Estimated mean parameter  -1.4515 (s.e.   0.1672), two-sided p = 0.002
+based on IWLS modification of Snijders & Baerveldt (2003). 
+
+Residual standard error    0.3344
+Test that variance of parameter is 0 :
+Chi-squared =    0.4312 (d.f. = 3), p = 0.934
+based on IWLS modification of Snijders & Baerveldt (2003).
+
+Fisher's combination of one-sided tests
+----------------------------------------
+Combination of right one-sided p-values:
+Chi-squared =    0.4484 (d.f. = 8), p = 1.000
+Combination of left one-sided p-values:
+Chi-squared =    25.742 (d.f. = 8), p = 0.001
+
+--------------------------------------------------------------------------------
+Parameter 2: eval : reciprocity
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate       1.2954 (standard error        0.27)
+Data set 2, sienaMeta(fit3) :  Estimate       2.3967 (standard error        0.66)
+Data set 3, sienaMeta(fit4) :  Estimate       2.5481 (standard error        1.39)
+Data set 4, sienaMeta(fit6) :  Estimate       1.8267 (standard error        0.43)
+
+ 4 datasets used.
+
+IWLS modification of Snijders-Baerveldt (2003) method  of combining estimates
+-----------------------------------------------------------------------------
+This method assumes that true parameters and standard errors are uncorrelated.
+This can be checked by the plot method and the test below.
+
+Test that estimates and standard errors are uncorrelated: 
+Spearman's rank correlation rho =        1, two-sided p = 0.083
+
+Test that all parameters are 0 : 
+chi-squared =   57.043, d.f. = 4, p < 0.001
+
+Estimated mean parameter   1.6606 (s.e.   0.2754), two-sided p = 0.995
+based on IWLS modification of Snijders & Baerveldt (2003). 
+
+Residual standard error    0.5509
+Test that variance of parameter is 0 :
+Chi-squared =    3.4245 (d.f. = 3), p = 0.331
+based on IWLS modification of Snijders & Baerveldt (2003).
+
+Fisher's combination of one-sided tests
+----------------------------------------
+Combination of right one-sided p-values:
+Chi-squared =    74.883 (d.f. = 8), p < 0.001
+Combination of left one-sided p-values:
+Chi-squared =    0.0673 (d.f. = 8), p = 1.000
+
+--------------------------------------------------------------------------------
+Parameter 3: endow: reciprocity
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate            0 (standard error       31.61) EXCLUDED from meta-analysis
+Data set 2, sienaMeta(fit3) :  Estimate            0 (standard error       31.61) EXCLUDED from meta-analysis
+Data set 3, sienaMeta(fit4) :  Estimate            0 (standard error       31.61) EXCLUDED from meta-analysis
+Data set 4, sienaMeta(fit6) :  Estimate            0 (standard error       31.61) EXCLUDED from meta-analysis
+
+ 0 datasets used.
+
+There were no data sets satisfying the bounds for this parameter.
+ No combined output is given.
+
+--------------------------------------------------------------------------------
+Parameter 4: eval : transitive triplets
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate       0.3800 (standard error        0.16)
+Data set 2, sienaMeta(fit3) :  Estimate       1.1345 (standard error        0.30)
+Data set 3, sienaMeta(fit4) :  Estimate       1.1359 (standard error        0.75)
+Data set 4, sienaMeta(fit6) :  Estimate       0.7220 (standard error        0.21)
+
+ 4 datasets used.
+
+IWLS modification of Snijders-Baerveldt (2003) method  of combining estimates
+-----------------------------------------------------------------------------
+This method assumes that true parameters and standard errors are uncorrelated.
+This can be checked by the plot method and the test below.
+
+Test that estimates and standard errors are uncorrelated: 
+Spearman's rank correlation rho =        1, two-sided p = 0.083
+
+Test that all parameters are 0 : 
+chi-squared =   34.431, d.f. = 4, p < 0.001
+
+Estimated mean parameter   0.7011 (s.e.   0.1848), two-sided p = 0.984
+based on IWLS modification of Snijders & Baerveldt (2003). 
+
+Residual standard error    0.3695
+Test that variance of parameter is 0 :
+Chi-squared =    5.9872 (d.f. = 3), p = 0.112
+based on IWLS modification of Snijders & Baerveldt (2003).
+
+Fisher's combination of one-sided tests
+----------------------------------------
+Combination of right one-sided p-values:
+Chi-squared =    50.555 (d.f. = 8), p < 0.001
+Combination of left one-sided p-values:
+Chi-squared =    0.1502 (d.f. = 8), p = 1.000
+
+--------------------------------------------------------------------------------
+Parameter 5: eval : 3-cycles
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate       0.3140 (standard error        0.37)
+Data set 2, sienaMeta(fit3) :  Estimate      -0.2962 (standard error        0.70)
+Data set 3, sienaMeta(fit4) :  Estimate      -0.8029 (standard error        1.33)
+Data set 4, sienaMeta(fit6) :  Estimate      -0.7146 (standard error        0.35)
+
+ 4 datasets used.
+
+IWLS modification of Snijders-Baerveldt (2003) method  of combining estimates
+-----------------------------------------------------------------------------
+This method assumes that true parameters and standard errors are uncorrelated.
+This can be checked by the plot method and the test below.
+
+Test that estimates and standard errors are uncorrelated: 
+Spearman's rank correlation rho =     -0.4, two-sided p = 0.750
+
+Test that all parameters are 0 : 
+chi-squared =   5.3443, d.f. = 4, p = 0.148
+
+Estimated mean parameter  -0.2555 (s.e.   0.2951), two-sided p = 0.225
+based on IWLS modification of Snijders & Baerveldt (2003). 
+
+Residual standard error    0.5903
+Test that variance of parameter is 0 :
+Chi-squared =    4.2078 (d.f. = 3), p = 0.240
+based on IWLS modification of Snijders & Baerveldt (2003).
+
+Fisher's combination of one-sided tests
+----------------------------------------
+Combination of right one-sided p-values:
+Chi-squared =    4.7309 (d.f. = 8), p = 0.786
+Combination of left one-sided p-values:
+Chi-squared =    12.888 (d.f. = 8), p = 0.116
+
+--------------------------------------------------------------------------------
+Parameter 6: eval : transitive ties
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate            0 (standard error       31.61) EXCLUDED from meta-analysis
+Data set 2, sienaMeta(fit3) :  Estimate            0 (standard error       31.61) EXCLUDED from meta-analysis
+Data set 3, sienaMeta(fit4) :  Estimate            0 (standard error       31.61) EXCLUDED from meta-analysis
+Data set 4, sienaMeta(fit6) :  Estimate            0 (standard error       31.61) EXCLUDED from meta-analysis
+
+ 0 datasets used.
+
+There were no data sets satisfying the bounds for this parameter.
+ No combined output is given.
+
+--------------------------------------------------------------------------------
+Parameter 7: eval : indegree - popularity (sqrt)
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate      -0.0965 (standard error        0.21)
+Data set 2, sienaMeta(fit3) :  Estimate      -0.2884 (standard error        0.34)
+Data set 3, sienaMeta(fit4) :  Estimate       0.0057 (standard error        0.82)
+Data set 4, sienaMeta(fit6) :  Estimate       0.0264 (standard error        0.32)
+
+ 4 datasets used.
+
+IWLS modification of Snijders-Baerveldt (2003) method  of combining estimates
+-----------------------------------------------------------------------------
+This method assumes that true parameters and standard errors are uncorrelated.
+This can be checked by the plot method and the test below.
+
+Test that estimates and standard errors are uncorrelated: 
+Spearman's rank correlation rho =        0, two-sided p = 1.000
+
+Test that all parameters are 0 : 
+chi-squared =   0.9129, d.f. = 4, p = 0.822
+
+Estimated mean parameter  -0.1034 (s.e.   0.0672), two-sided p = 0.111
+based on IWLS modification of Snijders & Baerveldt (2003). 
+
+Residual standard error    0.1344
+Test that variance of parameter is 0 :
+Chi-squared =    0.4677 (d.f. = 3), p = 0.926
+based on IWLS modification of Snijders & Baerveldt (2003).
+
+Fisher's combination of one-sided tests
+----------------------------------------
+Combination of right one-sided p-values:
+Chi-squared =    4.1533 (d.f. = 8), p = 0.843
+Combination of left one-sided p-values:
+Chi-squared =    8.0895 (d.f. = 8), p = 0.425
+
+--------------------------------------------------------------------------------
+Parameter 8: eval : indegree - activity (sqrt)
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate      -0.2304 (standard error        0.23)
+Data set 2, sienaMeta(fit3) :  Estimate      -0.0419 (standard error        0.43)
+Data set 3, sienaMeta(fit4) :  Estimate      -0.6050 (standard error        0.69)
+Data set 4, sienaMeta(fit6) :  Estimate      -0.0347 (standard error        0.39)
+
+ 4 datasets used.
+
+IWLS modification of Snijders-Baerveldt (2003) method  of combining estimates
+-----------------------------------------------------------------------------
+This method assumes that true parameters and standard errors are uncorrelated.
+This can be checked by the plot method and the test below.
+
+Test that estimates and standard errors are uncorrelated: 
+Spearman's rank correlation rho =     -0.4, two-sided p = 0.750
+
+Test that all parameters are 0 : 
+chi-squared =    1.808, d.f. = 4, p = 0.613
+
+Estimated mean parameter   -0.184 (s.e.   0.0915), two-sided p = 0.069
+based on IWLS modification of Snijders & Baerveldt (2003). 
+
+Residual standard error    0.1831
+Test that variance of parameter is 0 :
+Chi-squared =     0.674 (d.f. = 3), p = 0.879
+based on IWLS modification of Snijders & Baerveldt (2003).
+
+Fisher's combination of one-sided tests
+----------------------------------------
+Combination of right one-sided p-values:
+Chi-squared =    3.2455 (d.f. = 8), p = 0.918
+Combination of left one-sided p-values:
+Chi-squared =    10.117 (d.f. = 8), p = 0.257
+
+--------------------------------------------------------------------------------
+Parameter 9: eval : 1/(outdegree + 1)
+--------------------------------------------------------------------------------
+Data set 1, sienaMeta(fit1) :  Estimate       1.3256 (standard error        1.94)
+Data set 2, sienaMeta(fit3) :  Estimate       3.2232 (standard error        2.37)
+Data set 3, sienaMeta(fit4) :  Estimate       2.8406 (standard error        2.66)
+Data set 4, sienaMeta(fit6) :  Estimate       1.4198 (standard error        1.51)
+
+ 4 datasets used.
+
+IWLS modification of Snijders-Baerveldt (2003) method  of combining estimates
+-----------------------------------------------------------------------------
+This method assumes that true parameters and standard errors are uncorrelated.
+This can be checked by the plot method and the test below.
+
+Test that estimates and standard errors are uncorrelated: 
+Spearman's rank correlation rho =      0.6, two-sided p = 0.417
+
+Test that all parameters are 0 : 
+chi-squared =     4.34, d.f. = 4, p = 0.227
+
+Estimated mean parameter    1.906 (s.e.   0.4675), two-sided p = 0.987
+based on IWLS modification of Snijders & Baerveldt (2003). 
+
+Residual standard error    0.9351
+Test that variance of parameter is 0 :
+Chi-squared =    0.6255 (d.f. = 3), p = 0.891
+based on IWLS modification of Snijders & Baerveldt (2003).
+
+Fisher's combination of one-sided tests
+----------------------------------------
+Combination of right one-sided p-values:
+Chi-squared =    15.073 (d.f. = 8), p = 0.058
+Combination of left one-sided p-values:
+Chi-squared =    1.4406 (d.f. = 8), p = 0.994
+
+
+-----------------------------------------------------------------
+Score tests:
+Fisher combination
+-----------------------------------------------------------------
+
+(3)   endow: reciprocity
+Data set 1, sienaMeta(fit1) : z =      -0.3463
+Data set 2, sienaMeta(fit3) : z =       0.9410
+Data set 3, sienaMeta(fit4) : z =       1.3818
+Data set 4, sienaMeta(fit6) : z =      -0.5876
+
+Combination of right one-sided p-values:
+Chi-squared =     10.03 (d.f. = 8), p = 0.263
+Combination of left one-sided p-values:
+Chi-squared =    5.1308 (d.f. = 8), p = 0.744
+
+(6)   eval : transitive ties
+Data set 1, sienaMeta(fit1) : z =       2.0550
+Data set 2, sienaMeta(fit3) : z =       2.3730
+Data set 3, sienaMeta(fit4) : z =      -0.6379
+Data set 4, sienaMeta(fit6) : z =       3.4788
+
+Combination of right one-sided p-values:
+Chi-squared =    34.471 (d.f. = 8), p < 0.001
+Combination of left one-sided p-values:
+Chi-squared =    2.7391 (d.f. = 8), p = 0.950

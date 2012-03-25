@@ -384,16 +384,32 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                 attr(xx$depvars[[j]], "nodeSet") == nodeSet)
             {
 				depvarname <- names(xx$depvars)[j]
-                tmpObjEffects <-
-					createEffects("behaviorOneModeObjective",
-								  varname, depvarname, name=varname,
-								  groupName=groupName, group=group,
-								  netType=netType)
-				tmpRateEffects <-
-					createEffects("behaviorOneModeRate",
-								  varname, depvarname, name=varname,
-								  groupName=groupName, group=group,
-								  netType=netType)
+				if (attr(xx$depvars[[j]], "symmetric"))
+				{
+					tmpObjEffects <-
+						createEffects("behaviorSymmetricObjective",
+									  varname, depvarname, name=varname,
+									  groupName=groupName, group=group,
+									  netType=netType)
+					tmpRateEffects <-
+						createEffects("behaviorSymmetricRate",
+									  varname, depvarname, name=varname,
+									  groupName=groupName, group=group,
+									  netType=netType)
+				}
+				else
+				{
+					tmpObjEffects <-
+						createEffects("behaviorOneModeObjective",
+									  varname, depvarname, name=varname,
+									  groupName=groupName, group=group,
+									  netType=netType)
+					tmpRateEffects <-
+						createEffects("behaviorOneModeRate",
+									  varname, depvarname, name=varname,
+									  groupName=groupName, group=group,
+									  netType=netType)
+				}
 				if ((nOneModes + nBipartites) > 1) ## add the network name
 				{
 					tmpObjEffects$functionName <-
@@ -817,7 +833,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                                         groupName=groupName, group=group,
                                         netType=netType)
         ## if we have a real covariate, need to add other effects for every
-        ## approriate network
+        ## appropriate network
         if (!same)
         {
             for (j in seq(along=xx$depvars))
@@ -832,15 +848,18 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                                       netType=netType, name=name)
 
                     covObjEffects <- rbind(covObjEffects, newEffects)
+					if (!attr(xx$depvars[[j]], "symmetric"))
+					{
+						covOneModeRateEffects <-
+							createEffects("covarBehaviorOneModeRate", varname,
+										  yName=names(xx$depvars)[j],
+										  zName=covarname,
+										  groupName=groupName, group=group,
+										  netType=netType, name=name)
 
-                    covOneModeRateEffects <-
-                        createEffects("covarBehaviorOneModeRate", varname,
-                                      yName=names(xx$depvars)[j],
-                                      zName=covarname,
-                                      groupName=groupName, group=group,
-                                      netType=netType, name=name)
-
-                    covRateEffects <- rbind(covRateEffects,covOneModeRateEffects)
+						covRateEffects <- rbind(covRateEffects,
+												covOneModeRateEffects)
+					}
                 }
                 if ((types[j] == "bipartite" &&
                      attr(xx$depvars[[j]], 'nodeSet')[2] == nodeSet))
@@ -1256,6 +1275,10 @@ getNetworkStartingVals <- function(depvar)
             mydif <- mymat2 - mymat1
             matdiff[i] <- sum(abs(mydif), na.rm=TRUE)
             tmp <- table(mydif@x)
+			dummy <- factor(NA, levels=c(-1,0,1))
+			dummy <- table(dummy)
+			dummy[names(tmp)] <- tmp
+			tmp <- dummy
             tmp00 <- nactors * nactors - length(mydif@x)
             tmp <- c(tmp00, tmp[c(3, 1, 2)])
             matchange[, i] <- tmp

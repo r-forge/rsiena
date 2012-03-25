@@ -1,3 +1,34 @@
+2012-03-25 R-forge revision 208
+
+	* src/data/BehaviorLongitudinalData.cpp: fix memory leak
+	* src/model/effects/generic/CovariateDistance2NetworkFunction.cpp:
+	fix memory leak
+	* src/model/variables/NetworkVariable.cpp: fix bug in endowment
+	and creation effect scores for no change.
+	* data/allEffects.csv, R/effects.r, R/effectsDocumentation.r:
+	split behavior network effects between symmetric and other networks.
+	* src/model/model.cpp (RSiena only),
+	src/model/variables/DependentVariable.cpp,
+	src/model/variables/EffectValueTable.h (RSiena only): added
+	comments, formatting
+	* src/model/effects/DiffusionRateEffect.cpp: bug fix (RSienaTest
+	only)
+	* doc/RSienaDeveloper.tex: updated doc (RSienaTest only)
+	* doc/MCMCandRM.pdf: added
+	* tests/effectsTest.R, tests/sampson.r, testrefs/*,
+	.Rbuildignore: new testing files added, not to be included in tar
+	ball. (RSienaTest only)
+	* inst/examples/Sampson_t2.txt, inst/examples/Sampson_t3.txt,
+	inst/examples/Sampson_t4.txt, inst/examples/vtextexoreal.dat:
+	added.
+	* src/effects.r: correct bug causing crash with sparse matrices
+	with changes all in one direction.
+	* src/model/EpochSimulation.cpp: added comments
+	* src/model/ml/MLSimulation.cpp: correct test when storing
+	rejection numbers.
+	* src/model/StatisticCalculator.h: formatting (RSienaTest only)
+	* src/model/ml/chain.cpp: initialize finalReciprocalRate explicitly.
+
 2012-03-21 R-forge revision 207 (RSienaTest only)
 	* siena07internals.cpp, DependentVariable.h,
 	DependentVariable.cpp: changed calculation of scores for diffusion

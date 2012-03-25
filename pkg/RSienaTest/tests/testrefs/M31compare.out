@@ -1,0 +1,3342 @@
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.0712  ( 0.2912   )             
+  0.2      Rate parameter cond. variable period 2  1.0676  ( 0.2755   )             
+  0.3      Rate parameter cond. variable period 3  1.1437  ( 0.2579   )             
+
+Other parameters: 
+  1.  rate outdegree effect on rate mynetb1        0.0801  ( 0.0261   )   -0.2769   
+  2.  eval mynetb1: outdegree (density)           -0.9743  ( 0.1564   )    0.2272   
+  3.  rate constant mynetb2 rate (period 1)        1.5962  ( 0.4308   )   -0.2398   
+  4.  rate constant mynetb2 rate (period 3)        1.5354  ( 0.7275   )   -0.2671   
+  5.  rate constant mynetb2 rate (period 5)        1.6403  ( 0.5257   )   -0.2649   
+  6.  eval mynetb2: outdegree (density)           -0.5803  ( 0.1397   )   -0.2268   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.001       -0.001        0.003        0.014        0.007        0.000
+      -0.145        0.024        0.004       -0.041        0.018        0.000
+       0.282        0.053        0.186        0.047        0.057       -0.005
+       0.738       -0.363        0.139        0.529        0.098       -0.014
+       0.523        0.229        0.252        0.273        0.276        0.029
+       0.022        0.000       -0.096       -0.146        0.388        0.020
+
+Derivative matrix of expected statistics X by parameters:
+
+    1698.761      -91.039     -243.716     -199.172     -111.839     -134.272
+     -36.933       50.514       -4.189       12.583       -8.292       -1.565
+      42.614       -6.464       21.397        0.000        0.000        7.962
+     -15.340        2.945        0.000       15.640        0.000        4.855
+     -30.495       -0.232        0.000        0.000       18.644        2.407
+     -29.517       -4.253        7.211       -3.091       -8.217       70.485
+
+Covariance matrix of X (correlations below diagonal):
+
+    1707.109     -177.215      -19.882       51.913      -20.048      -44.318
+      -0.530       65.607       -7.976       -1.620        0.509      -16.171
+      -0.055       -0.112       76.663      -15.012        2.257       21.500
+       0.175       -0.028       -0.239       51.667        0.868       -6.363
+      -0.068        0.009        0.036        0.017       50.353       29.241
+      -0.106       -0.197        0.242       -0.087        0.406      102.827
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  4.9714  ( 1.2860   )             
+  0.2      Rate parameter cond. variable period 2  5.1525  ( 0.9716   )             
+  0.3      Rate parameter cond. variable period 3  5.0834  ( 1.2097   )             
+
+Other parameters: 
+  1.  rate effect 1/outdegree on rate mynetb1     -5.2775  ( 2.5320   )    0.0494   
+  2.  eval mynetb1: outdegree (density)           -0.9075  ( 0.1746   )   -0.0793   
+  3.  rate constant mynetb2 rate (period 1)        1.8208  ( 0.8827   )    0.2217   
+  4.  rate constant mynetb2 rate (period 3)        2.2900  ( 0.7982   )    0.9392   
+  5.  rate constant mynetb2 rate (period 5)        1.7880  ( 1.0191   )    0.0854   
+  6.  eval mynetb2: outdegree (density)           -0.5996  ( 0.1323   )    0.1626   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       6.411        0.026        1.813        1.389        2.147       -0.106
+       0.060        0.030        0.020        0.030       -0.027       -0.005
+       0.811        0.124        0.779        0.417        0.617       -0.045
+       0.712        0.215        0.600        0.637        0.387       -0.022
+       0.851       -0.148        0.711        0.486        1.039       -0.017
+      -0.318       -0.195       -0.396       -0.203       -0.125        0.018
+
+Derivative matrix of expected statistics X by parameters:
+
+       0.394        0.466       -4.920       -3.646       -5.539       -1.730
+       1.036       47.850       -6.840        4.178        6.568        9.315
+       0.408        1.899       86.677        0.000        0.000       30.095
+      -0.329      -13.910        0.000       74.171        0.000       16.232
+      -0.781       15.358        0.000        0.000       83.392        6.845
+      -0.122       11.865        2.121        5.693       -0.286       94.149
+
+Covariance matrix of X (correlations below diagonal):
+
+       0.869        3.662        0.197       -0.748       -0.736       -1.337
+       0.486       65.215       -1.412        1.982        2.743       14.846
+       0.025       -0.020       73.480        0.588        3.541        7.114
+      -0.092        0.028        0.008       75.484      -21.012       29.972
+      -0.096        0.041        0.050       -0.295       67.112       24.812
+      -0.121        0.156        0.070        0.292        0.257      139.381
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  2.0745  ( 0.4619   )             
+  0.2      Rate parameter cond. variable period 2  1.9535  ( 0.3938   )             
+  0.3      Rate parameter cond. variable period 3  1.9012  ( 0.5295   )             
+
+Other parameters: 
+  1.  rate effect bcov20 on rate                   0.5421  ( 0.2615   )   -0.2017   
+  2.  eval mynetb1: outdegree (density)           -1.0952  ( 0.1214   )    0.1340   
+  3.  rate constant mynetb2 rate (period 1)        1.8179  ( 0.4652   )    0.4056   
+  4.  rate constant mynetb2 rate (period 3)        1.6581  ( 0.4320   )   -0.0608   
+  5.  rate constant mynetb2 rate (period 5)        1.5855  ( 0.6526   )   -0.2957   
+  6.  eval mynetb2: outdegree (density)           -0.5841  ( 0.1339   )   -0.0730   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.068       -0.002       -0.020        0.012       -0.046       -0.005
+      -0.071        0.015       -0.007       -0.003        0.001       -0.001
+      -0.163       -0.129        0.216       -0.011        0.069        0.002
+       0.104       -0.052       -0.057        0.187        0.011       -0.001
+      -0.246        0.013        0.214        0.037        0.426        0.034
+      -0.144       -0.057        0.034       -0.025        0.388        0.018
+
+Derivative matrix of expected statistics X by parameters:
+
+      12.789       -4.139        2.887       -4.349        3.199       -0.695
+       1.953       54.190       -3.041       -7.519        5.175       -0.343
+       2.111        7.045       33.274        0.000        0.000        0.886
+      -0.667        2.857        0.000       31.822        0.000       10.882
+      -1.280       -6.652        0.000        0.000       28.045       -2.696
+       2.647       -8.638        6.430        1.939      -12.028       76.442
+
+Covariance matrix of X (correlations below diagonal):
+
+      11.247       -1.582        1.250       -2.738       -6.520       -2.310
+      -0.066       51.304       -1.687       -5.344      -11.882      -20.908
+       0.048       -0.030       61.457       -0.249       14.604       10.013
+      -0.118       -0.108       -0.005       47.718        4.469       18.295
+      -0.219       -0.187        0.210        0.073       78.485       13.858
+      -0.068       -0.288        0.126        0.261        0.154      102.809
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9457  ( 0.4451   )             
+  0.2      Rate parameter cond. variable period 2  1.8666  ( 0.4639   )             
+  0.3      Rate parameter cond. variable period 3  1.9547  ( 0.4414   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1555  ( 0.1876   )    0.0437   
+  2.  rate constant mynetb2 rate (period 1)        1.1574  ( 0.4197   )    0.1150   
+  3.  rate constant mynetb2 rate (period 3)        1.1981  ( 0.4723   )    0.1286   
+  4.  rate constant mynetb2 rate (period 5)        1.1408  ( 0.7060   )   -0.1516   
+  5.  rate outdegree effect on rate mynetb2        0.0975  ( 0.0511   )   -0.2795   
+  6.  eval mynetb2: outdegree (density)           -0.4756  ( 0.1571   )   -0.0432   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.035        0.030       -0.009       -0.051       -0.002        0.015
+       0.386        0.176        0.066        0.009       -0.016        0.032
+      -0.100        0.337        0.223        0.042       -0.013        0.010
+      -0.388        0.032        0.132        0.498       -0.007       -0.020
+      -0.228       -0.706       -0.552       -0.196        0.003       -0.004
+       0.506        0.490        0.135       -0.181       -0.530        0.025
+
+Derivative matrix of expected statistics X by parameters:
+
+      53.263       -9.816        6.396        3.987       41.123      -10.536
+     -14.341       62.858        0.000        0.000      252.188       11.119
+       0.081        0.000       41.948        0.000      173.808       22.829
+       6.755        0.000        0.000       21.505       72.859       15.829
+     -31.400      182.167      134.605       64.586     2023.086      161.884
+      -8.601        1.523        3.148        7.543       75.682       73.215
+
+Covariance matrix of X (correlations below diagonal):
+
+      67.868       -9.532       -9.859       -3.277      -57.273       -4.736
+      -0.126       84.956       -4.473       -5.220      309.999       14.864
+      -0.145       -0.059       67.976       -5.485      243.040       23.619
+      -0.056       -0.080       -0.093       50.728      125.981       24.311
+      -0.122        0.588        0.516        0.309     3268.061      182.315
+      -0.056        0.158        0.281        0.335        0.313      103.762
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9666  ( 0.4900   )             
+  0.2      Rate parameter cond. variable period 2  1.9753  ( 0.4954   )             
+  0.3      Rate parameter cond. variable period 3  1.8628  ( 0.4145   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1648  ( 0.1234   )   -0.0742   
+  2.  rate constant mynetb2 rate (period 1)        3.7017  ( 1.5061   )   -0.0072   
+  3.  rate constant mynetb2 rate (period 3)        3.8593  ( 1.4548   )   -0.1673   
+  4.  rate constant mynetb2 rate (period 5)        3.6686  ( 1.4828   )   -0.1596   
+  5.  rate effect 1/outdegree on rate mynetb2     -3.2845  ( 1.5712   )   -0.2218   
+  6.  eval mynetb2: outdegree (density)           -0.3760  ( 0.1323   )   -0.2728   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.015        0.029       -0.017        0.014       -0.033       -0.005
+       0.155        2.268        0.103        0.954       -1.390       -0.003
+      -0.097        0.044        2.116        0.350       -0.646       -0.102
+       0.073        0.403        0.162        2.199       -1.764       -0.026
+      -0.170       -0.590       -0.283       -0.803        2.469        0.055
+      -0.316       -0.014       -0.501       -0.131        0.262        0.017
+
+Derivative matrix of expected statistics X by parameters:
+
+      52.986        0.497        2.258        6.130        1.594        8.585
+      -1.917       13.449        0.000        0.000        3.032        1.548
+      -0.556        0.000       12.609        0.000        2.628        7.298
+       1.571        0.000        0.000       16.848        3.777        2.839
+       1.022        3.638        2.795        6.544        3.663        3.632
+       2.452       -0.470       18.020       -3.194        2.842       85.051
+
+Covariance matrix of X (correlations below diagonal):
+
+      41.887       -5.417      -13.073        8.057       -1.629      -14.145
+      -0.101       69.037       -8.619       -5.916       11.946       14.864
+      -0.235       -0.121       74.047       -5.135       15.374       26.380
+       0.153       -0.087       -0.073       66.337       12.323       10.282
+      -0.077        0.439        0.546        0.462       10.717       16.884
+      -0.207        0.169        0.290        0.120        0.489      111.414
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9600  ( 0.4866   )             
+  0.2      Rate parameter cond. variable period 2  2.0865  ( 0.4911   )             
+  0.3      Rate parameter cond. variable period 3  1.9932  ( 0.4325   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.6240  ( 0.2007   )    0.0536   
+  2.  eval mynetb1: 4-cycles                       0.1197  ( 0.0262   )   -0.0438   
+  3.  rate constant mynetb2 rate (period 1)        1.7167  ( 0.6477   )   -0.1123   
+  4.  rate constant mynetb2 rate (period 3)        1.7109  ( 0.4504   )    0.1826   
+  5.  rate constant mynetb2 rate (period 5)        1.6670  ( 0.5330   )   -0.0813   
+  6.  eval mynetb2: outdegree (density)           -0.5797  ( 0.1298   )    0.0000   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.040       -0.004        0.048       -0.006        0.004       -0.001
+      -0.742        0.001       -0.005       -0.001       -0.001        0.000
+       0.367       -0.301        0.420        0.009        0.025       -0.010
+      -0.065       -0.113        0.032        0.203       -0.022       -0.018
+       0.042       -0.071        0.076       -0.095        0.284        0.007
+      -0.033       -0.014       -0.123       -0.289        0.104        0.017
+
+Derivative matrix of expected statistics X by parameters:
+
+      62.310      223.112        5.550        4.676        3.829        3.142
+     372.366     2345.078       57.709       41.040       -6.386       24.186
+      -6.716      -12.264       26.259        0.000        0.000       10.921
+       4.069       14.385        0.000       36.983        0.000       13.062
+      -3.516        3.385        0.000        0.000       27.042        0.778
+      -2.212      -18.048        7.754        6.058        8.931       81.506
+
+Covariance matrix of X (correlations below diagonal):
+
+      67.313      263.951        1.002       -2.442       -7.567      -11.020
+       0.783     1688.939      -12.335      -23.396      -30.143      -73.939
+       0.014       -0.035       73.060       -1.365        7.453       29.265
+      -0.038       -0.072       -0.020       62.211       -7.322        4.939
+      -0.125       -0.099        0.118       -0.126       54.449       20.939
+      -0.130       -0.175        0.332        0.061        0.275      106.286
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  2.0289  ( 0.4643   )             
+  0.2      Rate parameter cond. variable period 2  1.8837  ( 0.4335   )             
+  0.3      Rate parameter cond. variable period 3  1.8878  ( 0.3825   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -2.4507  ( 0.9751   )    0.0198   
+  2.  eval mynetb1: 4-cycles                       2.1638  ( 1.4672   )   -0.0893   
+  3.  rate constant mynetb2 rate (period 1)        1.7347  ( 0.5965   )    0.1699   
+  4.  rate constant mynetb2 rate (period 3)        1.6983  ( 1.0042   )   -0.0821   
+  5.  rate constant mynetb2 rate (period 5)        1.6480  ( 0.6255   )   -0.1788   
+  6.  eval mynetb2: outdegree (density)           -0.5881  ( 0.1323   )   -0.0533   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.951       -1.410       -0.415        0.464       -0.255        0.046
+      -0.986        2.153        0.562       -0.677        0.424       -0.067
+      -0.713        0.691        0.356       -0.154        0.005       -0.034
+       0.440       -0.460       -0.256        1.008       -0.185        0.040
+      -0.388        0.463        0.012       -0.274        0.391        0.004
+       0.353       -0.347       -0.399        0.303        0.054        0.018
+
+Derivative matrix of expected statistics X by parameters:
+
+      63.618      190.525        8.464       -7.382       -3.299       -0.232
+      42.093      140.255        1.361       -3.700       -4.458        0.270
+       2.796        6.957       40.394        0.000        0.000       12.954
+      -0.685        2.888        0.000       13.236        0.000        4.466
+      -3.143       -6.865        0.000        0.000       25.087        2.700
+      -9.670       -9.791       11.099       -2.569       -5.069       74.832
+
+Covariance matrix of X (correlations below diagonal):
+
+     101.918      327.461        3.449      -21.527       20.135      -13.567
+       0.862     1416.562       34.673      -78.028       81.333      -25.375
+       0.039        0.104       77.929        4.776      -20.969       14.551
+      -0.337       -0.327        0.085       40.091       -8.730       21.602
+       0.283        0.307       -0.337       -0.196       49.666        6.066
+      -0.138       -0.069        0.169        0.349        0.088       95.357
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9972  ( 0.3950   )             
+  0.2      Rate parameter cond. variable period 2  1.9018  ( 0.4559   )             
+  0.3      Rate parameter cond. variable period 3  1.9388  ( 0.4925   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.0618  ( 0.7220   )   -0.0127   
+  2.  eval mynetb1: indegree - popularity         -0.0301  ( 0.1770   )    0.0941   
+  3.  rate constant mynetb2 rate (period 1)        1.7584  ( 0.4991   )   -0.0328   
+  4.  rate constant mynetb2 rate (period 3)        1.6806  ( 1.4140   )   -0.1361   
+  5.  rate constant mynetb2 rate (period 5)        1.6336  ( 0.4058   )   -0.0456   
+  6.  eval mynetb2: outdegree (density)           -0.5901  ( 0.1556   )   -0.1811   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.521       -0.124        0.075       -0.243        0.075       -0.014
+      -0.967        0.031       -0.016        0.021       -0.014        0.007
+       0.207       -0.194        0.249        0.084        0.013       -0.020
+      -0.227        0.084        0.116        1.999       -0.151       -0.127
+       0.249       -0.202        0.061       -0.255        0.165        0.014
+      -0.126        0.242       -0.249       -0.590        0.216        0.024
+
+Derivative matrix of expected statistics X by parameters:
+
+      41.654     4261.531        5.176        5.015       -1.896       -6.008
+     159.918    17957.619       27.207        7.308       -3.491      -43.367
+      -5.935     -807.803       28.664        0.000        0.000        8.529
+       2.808      295.842        0.000       11.552        0.000       11.450
+      -4.426     -198.515        0.000        0.000       42.646       11.492
+     -10.470    -1223.840       -1.516        5.141       -2.000       90.359
+
+Covariance matrix of X (correlations below diagonal):
+
+      39.667     3895.837        3.246       -5.920       -3.992      -11.998
+       0.909   462824.490      -46.367     -961.959     -346.939    -1295.184
+       0.070       -0.009       53.533        5.260        2.963        0.780
+      -0.125       -0.189        0.096       56.183      -10.620        6.898
+      -0.072       -0.058        0.046       -0.162       76.898       32.253
+      -0.174       -0.174        0.010        0.084        0.336      119.489
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  2.0195  ( 0.4862   )             
+  0.2      Rate parameter cond. variable period 2  1.9550  ( 0.4219   )             
+  0.3      Rate parameter cond. variable period 3  1.8542  ( 0.4120   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1215  ( 1.1413   )    0.2593   
+  2.  eval mynetb1: indegree - popularity (sqrt)  -0.0208  ( 0.5984   )    0.3738   
+  3.  rate constant mynetb2 rate (period 1)        1.8218  ( 0.5624   )    0.2632   
+  4.  rate constant mynetb2 rate (period 3)        1.7398  ( 0.6938   )   -0.0521   
+  5.  rate constant mynetb2 rate (period 5)        1.5068  ( 0.6484   )   -0.3582   
+  6.  eval mynetb2: outdegree (density)           -0.5848  ( 0.1157   )   -0.0874   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       1.303       -0.678        0.179       -0.092       -0.151       -0.011
+      -0.993        0.358       -0.095        0.044        0.076        0.006
+       0.278       -0.290        0.316        0.018       -0.044       -0.018
+      -0.112        0.107        0.048        0.481       -0.045        0.007
+      -0.187        0.186       -0.117       -0.092        0.420       -0.010
+      -0.087        0.088       -0.252        0.079       -0.138        0.013
+
+Derivative matrix of expected statistics X by parameters:
+
+      56.196      125.806        0.166        2.253       -1.256      -10.259
+     105.933      243.680        2.307        4.538       -4.236      -19.102
+      -6.405      -10.826       30.896        0.000        0.000       12.897
+      -1.651       -6.509        0.000       21.962        0.000       -1.610
+      -0.658       -2.150        0.000        0.000       22.945       11.348
+     -12.823      -28.208        5.071       -0.689        8.919       95.075
+
+Covariance matrix of X (correlations below diagonal):
+
+      66.842      148.697      -18.358       -6.645       -2.320      -29.191
+       0.980      344.616      -37.795      -18.036       -5.225      -61.993
+      -0.261       -0.237       73.747        4.310       -7.442       10.270
+      -0.106       -0.127        0.065       58.857       -5.988        0.861
+      -0.037       -0.037       -0.114       -0.103       57.675       24.718
+      -0.332       -0.311        0.111        0.010        0.303      115.649
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  2.0155  ( 0.4761   )             
+  0.2      Rate parameter cond. variable period 2  1.9357  ( 0.3965   )             
+  0.3      Rate parameter cond. variable period 3  2.0099  ( 0.4691   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.5258  ( 0.2716   )    0.1825   
+  2.  eval mynetb1: outdegree - activity           0.0333  ( 0.0205   )    0.1062   
+  3.  rate constant mynetb2 rate (period 1)        1.7368  ( 0.5294   )   -0.0255   
+  4.  rate constant mynetb2 rate (period 3)        1.6756  ( 0.4255   )    0.0838   
+  5.  rate constant mynetb2 rate (period 5)        1.7168  ( 0.8290   )   -0.0486   
+  6.  eval mynetb2: outdegree (density)           -0.5858  ( 0.1298   )    0.0038   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.074       -0.005       -0.016        0.010        0.076       -0.005
+      -0.889        0.000        0.002        0.000       -0.006        0.000
+      -0.115        0.222        0.280       -0.017        0.012       -0.001
+       0.081       -0.052       -0.073        0.181       -0.006       -0.011
+       0.336       -0.373        0.027       -0.018        0.687       -0.009
+      -0.145        0.114       -0.020       -0.200       -0.088        0.017
+
+Derivative matrix of expected statistics X by parameters:
+
+      60.662      722.910       -1.284      -11.547        8.566       -5.398
+     747.852    12793.532     -124.704     -155.820      141.807      -86.124
+      -5.583      -60.992       30.671        0.000        0.000        0.356
+      -8.095      -63.184        0.000       35.793        0.000       16.002
+      -0.876       60.676        0.000        0.000       19.913        5.212
+     -10.805     -143.823        0.135       12.590       -3.289       81.635
+
+Covariance matrix of X (correlations below diagonal):
+
+      58.816      720.604       -0.571      -19.486        5.184      -26.139
+       0.785    14335.308       -3.935     -236.225      126.294     -298.111
+      -0.009       -0.004       61.633       -6.155        9.857       -3.482
+      -0.333       -0.258       -0.103       58.317       -2.902       27.953
+       0.082        0.128        0.153       -0.046       67.714        5.731
+      -0.323       -0.236       -0.042        0.346        0.066      111.631
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  2.0195  ( 0.4195   )             
+  0.2      Rate parameter cond. variable period 2  2.0032  ( 0.4535   )             
+  0.3      Rate parameter cond. variable period 3  1.9337  ( 0.5036   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.9746  ( 0.3506   )    0.1835   
+  2.  eval mynetb1: outdegree - activity (sqrt)    0.2540  ( 0.0985   )    0.0235   
+  3.  rate constant mynetb2 rate (period 1)        1.8221  ( 0.4925   )    0.1962   
+  4.  rate constant mynetb2 rate (period 3)        1.6811  ( 0.4465   )    0.0245   
+  5.  rate constant mynetb2 rate (period 5)        1.5872  ( 1.1737   )   -0.3408   
+  6.  eval mynetb2: outdegree (density)           -0.5894  ( 0.1217   )   -0.1181   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.123       -0.033        0.063       -0.011       -0.073        0.004
+      -0.948        0.010       -0.015        0.002        0.024       -0.001
+       0.368       -0.303        0.243        0.000        0.042       -0.004
+      -0.071        0.056        0.002        0.199       -0.026       -0.002
+      -0.169        0.201        0.072       -0.047        1.378       -0.005
+       0.092       -0.051       -0.069       -0.036       -0.037        0.015
+
+Derivative matrix of expected statistics X by parameters:
+
+      69.139      227.302        2.873       -3.568        0.532      -10.594
+     230.125      856.589        8.453      -14.900       -7.476      -32.487
+      -8.549      -27.575       29.516        0.000        0.000       13.354
+      -0.367        0.246        0.000       32.946        0.000       11.504
+      -0.403       -6.280        0.000        0.000       12.087        1.958
+     -16.096      -69.354       -5.114        6.231       10.617       87.917
+
+Covariance matrix of X (correlations below diagonal):
+
+      54.929      185.237        2.518       -6.862        0.162      -17.012
+       0.929      723.666      -12.546      -18.865      -17.424      -85.989
+       0.045       -0.062       56.908       -0.904        4.746       10.841
+      -0.126       -0.095       -0.016       53.947       -2.899       23.545
+       0.003       -0.090        0.088       -0.055       51.272       20.151
+      -0.209       -0.290        0.131        0.291        0.256      121.194
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9622  ( 0.4266   )             
+  0.2      Rate parameter cond. variable period 2  1.9903  ( 0.4743   )             
+  0.3      Rate parameter cond. variable period 3  2.0350  ( 0.5359   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -0.5657  ( 0.2222   )    0.0572   
+  2.  eval mynetb1: outdegree-trunc(5)            -1.1307  ( 0.3675   )    0.2853   
+  3.  rate constant mynetb2 rate (period 1)        1.7090  ( 0.6515   )    0.0447   
+  4.  rate constant mynetb2 rate (period 3)        1.7371  ( 0.5855   )   -0.0693   
+  5.  rate constant mynetb2 rate (period 5)        1.7323  ( 0.4692   )    0.0989   
+  6.  eval mynetb2: outdegree (density)           -0.5846  ( 0.1189   )    0.0071   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.049       -0.072       -0.043        0.012        0.034        0.007
+      -0.878        0.135        0.098        0.007       -0.085       -0.014
+      -0.297        0.404        0.424        0.018       -0.052       -0.005
+       0.093        0.034        0.046        0.343       -0.040        0.008
+       0.338       -0.504       -0.171       -0.151        0.220        0.005
+       0.264       -0.315       -0.067        0.124        0.088        0.014
+
+Derivative matrix of expected statistics X by parameters:
+
+      71.546       38.781       -4.847        1.083        3.546       -0.255
+      35.147       33.233       -5.346       -2.373        2.804        1.431
+      -6.118       -9.621       24.544        0.000        0.000        4.881
+      -5.844       -1.524        0.000       27.365        0.000        8.356
+       4.665        8.576        0.000        0.000       38.359        4.710
+     -10.912       -2.433        5.514       -6.917       -0.590       89.728
+
+Covariance matrix of X (correlations below diagonal):
+
+      59.149       24.805      -15.418        1.925        5.940      -16.526
+       0.622       26.908      -13.575        1.193       -3.523      -16.856
+      -0.264       -0.344       57.780       -0.275       -5.278       18.013
+       0.031        0.028       -0.004       65.313       -6.182       23.842
+       0.089       -0.078       -0.080       -0.088       75.674        8.379
+      -0.192       -0.290        0.212        0.263        0.086      125.504
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9636  ( 0.4394   )             
+  0.2      Rate parameter cond. variable period 2  1.9785  ( 0.4967   )             
+  0.3      Rate parameter cond. variable period 3  2.0781  ( 0.4147   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -0.7035  ( 0.1647   )    0.0000   
+  2.  eval mynetb1: outdegree-trunc(4)            -1.2208  ( 0.3385   )    0.0714   
+  3.  rate constant mynetb2 rate (period 1)        1.7116  ( 0.4786   )    0.0902   
+  4.  rate constant mynetb2 rate (period 3)        1.6466  ( 0.7846   )   -0.1143   
+  5.  rate constant mynetb2 rate (period 5)        1.7825  ( 0.4854   )    0.0492   
+  6.  eval mynetb2: outdegree (density)           -0.5771  ( 0.1460   )    0.1006   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.027       -0.030       -0.014        0.038        0.003       -0.004
+      -0.532        0.115        0.028       -0.003        0.010        0.000
+      -0.183        0.172        0.229       -0.047       -0.030       -0.008
+       0.298       -0.010       -0.118        0.616        0.005       -0.040
+       0.037        0.064       -0.131        0.013        0.236        0.005
+      -0.172       -0.010       -0.120       -0.364        0.070        0.021
+
+Derivative matrix of expected statistics X by parameters:
+
+      54.777       20.004        2.227       -7.104       -3.295        0.269
+      12.916       16.046       -1.034       -2.604       -3.460       -2.565
+       1.201       -2.476       31.589        0.000        0.000        6.509
+      -6.167       -2.365        0.000       22.601        0.000       12.299
+      -7.325       -3.540        0.000        0.000       30.568       -1.602
+       0.073        0.570        6.570       17.429       -9.662       73.087
+
+Covariance matrix of X (correlations below diagonal):
+
+      52.571       17.673        0.612       -7.592      -10.327       -7.918
+       0.544       20.059       -1.583       -3.713       -6.281       -5.061
+       0.012       -0.048       53.576       -9.530       -7.120        5.612
+      -0.127       -0.101       -0.158       67.609        1.488       32.571
+      -0.195       -0.192       -0.133        0.025       53.460      -10.224
+      -0.110       -0.114        0.077        0.399       -0.141       98.735
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  2.0302  ( 0.4128   )             
+  0.2      Rate parameter cond. variable period 2  2.0475  ( 0.4126   )             
+  0.3      Rate parameter cond. variable period 3  1.9238  ( 0.4819   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -0.8657  ( 0.1675   )    0.1367   
+  2.  eval mynetb1: 1/(outdegree + 1)              4.0116  ( 1.4817   )   -0.0296   
+  3.  rate constant mynetb2 rate (period 1)        1.7042  ( 0.4586   )    0.0212   
+  4.  rate constant mynetb2 rate (period 3)        1.7313  ( 0.3597   )    0.1067   
+  5.  rate constant mynetb2 rate (period 5)        1.6282  ( 1.4795   )   -0.2129   
+  6.  eval mynetb2: outdegree (density)           -0.5848  ( 0.1561   )   -0.0531   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.028        0.189       -0.008        0.011        0.081       -0.009
+       0.761        2.196       -0.039        0.060        1.060       -0.123
+      -0.106       -0.057        0.210        0.008       -0.078       -0.003
+       0.183        0.113        0.053        0.129       -0.051       -0.004
+       0.309        0.454       -0.116       -0.090        2.189       -0.123
+      -0.346       -0.531       -0.044       -0.061       -0.532        0.024
+
+Derivative matrix of expected statistics X by parameters:
+
+      73.116       -5.854        1.810        0.519        8.120        4.585
+      -6.877        1.048        1.294        0.298       -0.580        2.273
+      -0.683       -1.388       31.479        0.000        0.000       11.075
+      -6.154        0.359        0.000       40.621        0.000       11.154
+       1.465       -0.533        0.000        0.000       10.142       11.090
+      -0.760        0.141       -1.839       -2.967        6.522       80.094
+
+Covariance matrix of X (correlations below diagonal):
+
+      62.402       -5.073       -6.993       -0.737       10.369        9.371
+      -0.661        0.943       -0.583        0.960       -0.356       -0.916
+      -0.117       -0.080       56.913        6.485        0.432        7.741
+      -0.013        0.135        0.118       53.440       -1.321        5.552
+       0.184       -0.051        0.008       -0.025       50.989       27.795
+       0.117       -0.093        0.101        0.075        0.383      103.519
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  2.0507  ( 0.4930   )             
+  0.2      Rate parameter cond. variable period 2  2.0154  ( 0.4264   )             
+  0.3      Rate parameter cond. variable period 3  2.0043  ( 0.4531   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -0.7433  ( 0.2212   )    0.0619   
+  2.  eval mynetb1: 1/(outdegree + 2)             11.3547  ( 4.8879   )   -0.1080   
+  3.  rate constant mynetb2 rate (period 1)        1.7786  ( 0.4638   )    0.1366   
+  4.  rate constant mynetb2 rate (period 3)        1.7693  ( 0.3983   )    0.1803   
+  5.  rate constant mynetb2 rate (period 5)        1.6712  ( 0.4439   )   -0.0580   
+  6.  eval mynetb2: outdegree (density)           -0.5932  ( 0.1207   )   -0.1463   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.049        0.909       -0.006       -0.015       -0.005       -0.007
+       0.841       23.891        0.105       -0.240       -0.238       -0.115
+      -0.060        0.047        0.215       -0.014       -0.017        0.000
+      -0.167       -0.123       -0.079        0.159        0.008        0.000
+      -0.054       -0.109       -0.081        0.045        0.197        0.007
+      -0.247       -0.196        0.001       -0.006        0.137        0.015
+
+Derivative matrix of expected statistics X by parameters:
+
+      73.089       -2.778        6.503       -0.165       -3.297       -1.093
+      -2.703        0.165       -0.620        0.309        0.541        0.173
+       2.664       -0.149       35.518        0.000        0.000       -1.974
+      -4.077        0.247        0.000       42.685        0.000        7.084
+       4.362       -0.144        0.000        0.000       29.353        8.905
+      -6.481        0.086      -10.553        6.934       -1.833       82.214
+
+Covariance matrix of X (correlations below diagonal):
+
+      81.966       -2.921        0.544      -16.816        6.707      -20.805
+      -0.725        0.198       -0.463        0.869        0.192        0.123
+       0.007       -0.127       67.251       -6.776       -5.811      -16.304
+      -0.223        0.235       -0.099       69.235        3.071       17.571
+       0.113        0.066       -0.108        0.056       42.893       16.656
+      -0.221        0.027       -0.191        0.203        0.245      107.928
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1   2.1104  ( 0.4678   )             
+  0.2      Rate parameter cond. variable period 2   2.0179  ( 0.4171   )             
+  0.3      Rate parameter cond. variable period 3   1.9661  ( 0.3999   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)            -0.9362  ( 0.1729   )    0.0612   
+  2.  eval mynetb1: 1/(outdegree+1)(outdegree+1+1)  5.9586  ( 1.8229   )   -0.1521   
+  3.  rate constant mynetb2 rate (period 1)         1.8275  ( 0.5198   )    0.2326   
+  4.  rate constant mynetb2 rate (period 3)         1.7481  ( 0.4665   )    0.1538   
+  5.  rate constant mynetb2 rate (period 5)         1.6752  ( 0.4040   )   -0.0395   
+  6.  eval mynetb2: outdegree (density)            -0.5812  ( 0.1308   )    0.0357   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.030        0.166        0.007        0.010        0.015        0.003
+       0.527        3.323       -0.071       -0.052        0.146        0.067
+       0.076       -0.078        0.270       -0.003        0.020       -0.014
+       0.122       -0.061       -0.013        0.218       -0.014        0.003
+       0.196        0.193        0.092       -0.067        0.163        0.012
+       0.112        0.282       -0.189        0.050        0.222        0.017
+
+Derivative matrix of expected statistics X by parameters:
+
+      63.390       -2.188        6.087      -11.331        2.802       -8.998
+      -2.714        0.327       -1.011        1.402       -0.679       -0.883
+      -7.175        0.405       33.136        0.000        0.000       13.217
+      -6.645        0.227        0.000       34.999        0.000        2.995
+      -3.954        0.414        0.000        0.000       35.719        3.874
+      -7.746        0.131       -1.434        4.941       -4.130       78.103
+
+Covariance matrix of X (correlations below diagonal):
+
+      83.598       -2.618        2.904      -12.738        4.405      -25.634
+      -0.551        0.270       -0.517        0.883        0.383        1.063
+       0.036       -0.112       78.425       -6.850        8.364        9.162
+      -0.176        0.214       -0.098       62.910       -4.264       16.266
+       0.068        0.104        0.133       -0.076       50.369       14.123
+      -0.278        0.203        0.103        0.203        0.197      101.786
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1   2.0282  (  0.3983  )             
+  0.2      Rate parameter cond. variable period 2   1.9514  (  0.4167  )             
+  0.3      Rate parameter cond. variable period 3   2.0306  (  0.4868  )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)            -0.8615  (  0.2140  )    0.1770   
+  2.  eval mynetb1: 1/(outdegree+2)(outdegree+1+2) 22.2515  ( 10.7158  )   -0.2145   
+  3.  rate constant mynetb2 rate (period 1)         1.7720  (  0.5980  )    0.1544   
+  4.  rate constant mynetb2 rate (period 3)         1.6361  (  0.4586  )   -0.2321   
+  5.  rate constant mynetb2 rate (period 5)         1.7274  (  0.4610  )    0.1222   
+  6.  eval mynetb2: outdegree (density)            -0.5766  (  0.1188  )    0.0020   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.046        1.783        0.021       -0.033        0.029       -0.001
+       0.777      114.829        0.992       -1.443        1.670       -0.161
+       0.163        0.161        0.358       -0.017       -0.005        0.010
+      -0.321       -0.294       -0.058        0.210       -0.026        0.003
+       0.298        0.352       -0.016       -0.121        0.213        0.000
+      -0.041       -0.127        0.141        0.056       -0.003        0.014
+
+Derivative matrix of expected statistics X by parameters:
+
+      64.228       -0.845        1.839       -2.996       10.236        4.169
+      -0.975        0.028       -0.064        0.314       -0.239        0.233
+      -2.473       -0.095       25.423        0.000        0.000        3.132
+       1.079       -0.024        0.000       34.376        0.000        7.677
+      -1.137       -0.174        0.000        0.000       37.821        2.335
+     -10.497        0.303       -6.126        4.148       -5.739       80.913
+
+Covariance matrix of X (correlations below diagonal):
+
+      73.724       -0.954       -0.136      -12.260       13.131       -2.725
+      -0.588        0.036       -0.101        0.226       -0.169        0.352
+      -0.002       -0.072       54.531       -0.644       -2.274       13.018
+      -0.186        0.156       -0.011       58.828       -2.769       18.281
+       0.176       -0.103       -0.035       -0.042       75.282        6.060
+      -0.031        0.183        0.174        0.235        0.069      102.836
+Estimates, standard errors and convergence t-ratios
+
+                                                      Estimate   Standard   Convergence 
+                                                                   Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1      2.0286  ( 0.4495   )             
+  0.2      Rate parameter cond. variable period 2      1.9383  ( 0.4182   )             
+  0.3      Rate parameter cond. variable period 3      1.8905  ( 0.4305   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)               -1.8672  ( 0.3949   )    0.1701   
+  2.  eval mynetb1: out-in degree^(1/2) assortativity  0.1150  ( 0.0608   )    0.1171   
+  3.  rate constant mynetb2 rate (period 1)            1.7924  ( 0.4329   )    0.3049   
+  4.  rate constant mynetb2 rate (period 3)            1.6294  ( 1.0018   )   -0.3527   
+  5.  rate constant mynetb2 rate (period 5)            1.6647  ( 0.3946   )   -0.0916   
+  6.  eval mynetb2: outdegree (density)               -0.5796  ( 0.1226   )   -0.0259   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.156       -0.023       -0.050       -0.110       -0.021        0.008
+      -0.952        0.004        0.008        0.014        0.006       -0.002
+      -0.292        0.326        0.187        0.042       -0.001       -0.002
+      -0.265        0.236        0.098        1.004       -0.055       -0.008
+      -0.126        0.245       -0.008       -0.130        0.156       -0.009
+       0.161       -0.249       -0.029       -0.060       -0.192        0.015
+
+Derivative matrix of expected statistics X by parameters:
+
+      67.546      482.755       -0.616        3.824      -10.740        5.770
+     437.262     3485.462      -21.136       18.669      -93.462       57.695
+      -8.716      -72.089       37.098        0.000        0.000        1.471
+      -3.683      -36.392        0.000       13.370        0.000       -0.315
+     -12.222      -93.221        0.000        0.000       42.998       13.784
+       1.151      -11.931       -3.118        6.928       -4.205       78.273
+
+Covariance matrix of X (correlations below diagonal):
+
+      63.909      463.263       -9.522      -14.916        0.157       -7.504
+       0.940     3802.835      -51.297     -116.564       18.467      -79.304
+      -0.150       -0.105       62.983        3.350       -5.633        0.878
+      -0.281       -0.285        0.064       44.025       -9.876        1.080
+       0.002        0.036       -0.086       -0.179       68.839       10.855
+      -0.101       -0.139        0.012        0.018        0.141       85.900
+Estimates, standard errors and convergence t-ratios
+
+                                                      Estimate   Standard   Convergence 
+                                                                   Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1      1.9523  ( 0.4058   )             
+  0.2      Rate parameter cond. variable period 2      2.0345  ( 0.5301   )             
+  0.3      Rate parameter cond. variable period 3      1.9576  ( 0.4407   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)               -1.5000  ( 0.2311   )    0.1839   
+  2.  eval mynetb1: out-in degree^(1/2) assortativity  0.0086  ( 0.0052   )    0.2275   
+  3.  rate constant mynetb2 rate (period 1)            1.7136  ( 1.7660   )   -0.1397   
+  4.  rate constant mynetb2 rate (period 3)            1.7710  ( 0.6129   )    0.2368   
+  5.  rate constant mynetb2 rate (period 5)            1.6171  ( 0.6080   )   -0.2461   
+  6.  eval mynetb2: outdegree (density)               -0.5821  ( 0.1323   )    0.0396   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.053       -0.001       -0.033       -0.036       -0.040        0.001
+      -0.723        0.000        0.005        0.002        0.001        0.000
+      -0.082        0.553        3.119        0.115        0.310        0.016
+      -0.262        0.502        0.111        0.376        0.086       -0.002
+      -0.288        0.434        0.301        0.233        0.370       -0.004
+       0.033       -0.014        0.067       -0.018       -0.055        0.017
+
+Derivative matrix of expected statistics X by parameters:
+
+      60.057     3207.304       -0.595       -7.430       -2.559       -3.211
+    2822.458   206213.554     -213.224     -659.305     -385.667     -594.853
+      -6.486     -484.905        8.056        0.000        0.000        3.759
+      -8.344     -698.147        0.000       30.757        0.000        0.970
+      -6.235     -421.604        0.000        0.000       26.178       10.198
+     -15.931    -1162.427        0.219       -4.482       11.486       77.998
+
+Covariance matrix of X (correlations below diagonal):
+
+      64.785     3358.083        0.848       -4.642      -18.323      -27.767
+       0.895   217503.136      -11.658      -78.471     -912.503    -2183.546
+       0.016       -0.004       45.282       -8.062        8.256       24.096
+      -0.068       -0.020       -0.140       72.796        4.650      -10.764
+      -0.305       -0.262        0.164        0.073       55.892       33.581
+      -0.310       -0.421        0.322       -0.113        0.404      123.558
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9683  ( 0.4123   )             
+  0.2      Rate parameter cond. variable period 2  2.0208  ( 0.4238   )             
+  0.3      Rate parameter cond. variable period 3  1.9453  ( 0.4688   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1955  ( 0.1800   )   -0.0591   
+  2.  eval mynetb1: bdycov2032                    -0.5684  ( 0.4020   )    0.2076   
+  3.  rate constant mynetb2 rate (period 1)        1.8339  ( 0.6565   )    0.3005   
+  4.  rate constant mynetb2 rate (period 3)        1.7369  ( 0.6226   )    0.0298   
+  5.  rate constant mynetb2 rate (period 5)        1.5889  ( 0.5891   )   -0.2651   
+  6.  eval mynetb2: outdegree (density)           -0.5831  ( 0.1329   )    0.0781   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.032        0.029       -0.007       -0.028       -0.050        0.001
+       0.407        0.162       -0.060       -0.101       -0.051       -0.006
+      -0.062       -0.221        0.431        0.014        0.051       -0.028
+      -0.257       -0.405        0.037        0.388        0.036        0.021
+      -0.463       -0.207        0.135        0.096        0.347        0.000
+       0.032       -0.118       -0.315        0.242       -0.005        0.018
+
+Derivative matrix of expected statistics X by parameters:
+
+      54.426       -7.261        0.007        6.879        6.484       -0.083
+      -8.894        9.915        2.051        0.001       -1.038        2.960
+      -5.254        1.591       24.606        0.000        0.000       15.152
+       1.917        3.391        0.000       29.090        0.000        3.684
+       8.052       -0.527        0.000        0.000       27.394        2.729
+      -9.144       -1.132       23.191       -4.215       -5.835       85.052
+
+Covariance matrix of X (correlations below diagonal):
+
+      66.051       -9.376       -6.220        3.311       -5.376       -3.783
+      -0.341       11.472       -0.931       -1.717       -2.373       -4.325
+      -0.100       -0.036       58.582        6.369        7.590       40.186
+       0.047       -0.058        0.095       76.033        1.057       28.343
+      -0.085       -0.090        0.128        0.016       60.384        3.542
+      -0.042       -0.116        0.477        0.295        0.041      121.347
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9630  ( 0.4112   )             
+  0.2      Rate parameter cond. variable period 2  1.9540  ( 0.4323   )             
+  0.3      Rate parameter cond. variable period 3  2.0480  ( 0.5330   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1214  ( 0.1655   )    0.2276   
+  2.  eval mynetb1: bcov20 ego                     0.3056  ( 0.3600   )   -0.0564   
+  3.  rate constant mynetb2 rate (period 1)        1.7369  ( 0.7055   )   -0.0362   
+  4.  rate constant mynetb2 rate (period 3)        1.6750  ( 0.4148   )   -0.0944   
+  5.  rate constant mynetb2 rate (period 5)        1.7011  ( 0.5020   )    0.0521   
+  6.  eval mynetb2: outdegree (density)           -0.5839  ( 0.1403   )   -0.0401   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.027        0.015       -0.012       -0.005       -0.004       -0.001
+       0.251        0.130        0.004       -0.014       -0.037       -0.011
+      -0.101        0.014        0.498       -0.027       -0.046       -0.026
+      -0.072       -0.093       -0.088        0.172       -0.017       -0.016
+      -0.056       -0.213       -0.129       -0.084        0.252        0.020
+      -0.033       -0.227       -0.279       -0.285        0.281        0.020
+
+Derivative matrix of expected statistics X by parameters:
+
+      48.430       -7.522        3.583        0.906       -2.527        0.890
+      -6.876       10.330       -1.867        2.666        5.889        3.712
+      -0.852       -0.002       21.190        0.000        0.000        5.264
+      -5.428        0.787        0.000       42.551        0.000       20.878
+      -0.523        2.114        0.000        0.000       34.593        5.115
+      -4.365        0.337       11.211        1.793       -1.954       79.774
+
+Covariance matrix of X (correlations below diagonal):
+
+      62.571      -10.350       -1.849      -10.661       -4.318       -6.086
+      -0.371       12.449       -2.807        1.582        5.729       -3.739
+      -0.033       -0.111       51.625      -10.631       -5.047        2.746
+      -0.152        0.050       -0.166       79.117       -6.684        9.273
+      -0.065        0.192       -0.083       -0.089       71.353       23.842
+      -0.074       -0.101        0.037        0.100        0.270      109.555
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9338  ( 0.4495   )             
+  0.2      Rate parameter cond. variable period 2  1.9868  ( 0.4455   )             
+  0.3      Rate parameter cond. variable period 3  1.9736  ( 0.4560   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1654  ( 0.1492   )    0.1729   
+  2.  eval mynetb1: bcov32 alter                  -0.0874  ( 0.3344   )   -0.0973   
+  3.  rate constant mynetb2 rate (period 1)        1.6436  ( 0.7143   )   -0.2564   
+  4.  rate constant mynetb2 rate (period 3)        1.7675  ( 0.6521   )    0.0000   
+  5.  rate constant mynetb2 rate (period 5)        1.7233  ( 0.3955   )    0.1430   
+  6.  eval mynetb2: outdegree (density)           -0.5858  ( 0.1287   )   -0.0676   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.022        0.012       -0.042        0.007        0.005        0.003
+       0.247        0.112       -0.033       -0.066        0.032        0.009
+      -0.392       -0.133        0.510       -0.180       -0.022        0.011
+       0.075       -0.303       -0.388        0.425       -0.036       -0.021
+       0.083        0.238       -0.081       -0.143        0.156        0.004
+       0.158        0.201        0.121       -0.249        0.082        0.017
+
+Derivative matrix of expected statistics X by parameters:
+
+      50.995       -5.056       11.378        2.069       -4.835       -2.492
+      -3.597       12.462       -2.997       -3.982       -1.312       -2.207
+       1.831        1.519       20.026        0.000        0.000        1.766
+      -7.582        3.221        0.000       21.602        0.000       15.247
+      -1.987        2.052        0.000        0.000       43.325       10.644
+     -12.639        1.191        1.802       -6.427       -7.606       84.821
+
+Covariance matrix of X (correlations below diagonal):
+
+      51.411       -3.315        0.196       -9.265       -4.115      -10.778
+      -0.118       15.261       -4.208       -9.367        7.575        4.509
+       0.004       -0.153       49.265      -17.102       -5.208        4.988
+      -0.162       -0.301       -0.306       63.347       -7.837        6.571
+      -0.067        0.227       -0.087       -0.115       72.828        7.084
+      -0.137        0.105        0.065        0.075        0.076      119.788
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9698  ( 0.4354   )             
+  0.2      Rate parameter cond. variable period 2  1.9857  ( 0.4899   )             
+  0.3      Rate parameter cond. variable period 3  1.9803  ( 0.4169   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1571  ( 0.1807   )    0.1049   
+  2.  rate constant mynetb2 rate (period 1)        1.7901  ( 0.7597   )    0.0843   
+  3.  rate constant mynetb2 rate (period 3)        1.7696  ( 0.5076   )    0.0758   
+  4.  rate constant mynetb2 rate (period 5)        1.7476  ( 0.4443   )   -0.0891   
+  5.  eval mynetb2: outdegree (density)           -1.1880  ( 0.2139   )   -0.1571   
+  6.  eval mynetb2: 4-cycles                       0.1226  ( 0.0378   )   -0.5518   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.033       -0.053        0.007        0.011        0.005        0.000
+      -0.388        0.577        0.102       -0.007       -0.048        0.003
+       0.078        0.266        0.258        0.010       -0.043        0.007
+       0.132       -0.022        0.044        0.197       -0.019        0.006
+       0.127       -0.298       -0.399       -0.202        0.046       -0.006
+      -0.025        0.090        0.359        0.334       -0.788        0.001
+
+Derivative matrix of expected statistics X by parameters:
+
+      42.434        3.953        2.669        0.415       -3.497       -4.116
+       6.395       22.779        0.000        0.000       14.133       62.235
+      -8.825        0.000       39.273        0.000       15.314       64.175
+      -5.438        0.000        0.000       33.709        9.158       32.224
+      -3.585       10.482        7.602       -2.515       90.350      437.936
+      11.693       33.934       -9.984       -6.579      486.244     3553.516
+
+Covariance matrix of X (correlations below diagonal):
+
+      47.144       -2.377       -2.529       -0.113       -8.379      -29.025
+      -0.043       65.079       16.194       -0.487       32.497      140.927
+      -0.039        0.211       90.247        1.112       43.131      271.832
+      -0.002       -0.008        0.015       58.181       30.278      249.358
+      -0.094        0.310        0.350        0.306      168.570     1049.157
+      -0.047        0.194        0.318        0.363        0.898     8100.392
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.8562  ( 0.3969   )             
+  0.2      Rate parameter cond. variable period 2  1.9964  ( 0.3817   )             
+  0.3      Rate parameter cond. variable period 3  1.9898  ( 0.3749   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1659  ( 0.1707   )    0.1848   
+  2.  rate constant mynetb2 rate (period 1)        1.6712  ( 0.9129   )   -0.1486   
+  3.  rate constant mynetb2 rate (period 3)        1.7809  ( 0.4532   )    0.0924   
+  4.  rate constant mynetb2 rate (period 5)        1.6909  ( 0.4014   )   -0.1242   
+  5.  eval mynetb2: outdegree (density)           -1.8308  ( 0.5797   )    0.3768   
+  6.  eval mynetb2: 4-cycles                       1.6656  ( 0.7140   )   -0.8043   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.029       -0.025       -0.007        0.026        0.017       -0.013
+      -0.158        0.833       -0.013       -0.018        0.235       -0.314
+      -0.102       -0.034        0.205        0.002        0.036       -0.049
+       0.403       -0.049        0.010        0.161        0.012       -0.019
+       0.176        0.478        0.139        0.054        0.336       -0.402
+      -0.103       -0.516       -0.150       -0.068       -0.972        0.510
+
+Derivative matrix of expected statistics X by parameters:
+
+      47.799       -0.804        3.624       -8.250      -11.623      -48.568
+       3.751       17.324        0.000        0.000        7.084       45.578
+      -2.420        0.000       33.861        0.000        9.466       41.720
+      -9.250        0.000        0.000       34.640       20.248      118.588
+      -9.099        1.258        1.829        6.657       82.928      376.123
+      -5.416        6.629        2.733        6.271       70.042      364.671
+
+Covariance matrix of X (correlations below diagonal):
+
+      51.038       -1.266       -8.208       -0.134        2.439       14.207
+      -0.025       50.874       -8.018       -3.419       10.956       81.909
+      -0.152       -0.148       57.357        2.008       16.167       57.198
+      -0.003       -0.071        0.039       45.770       25.138      161.603
+       0.030        0.135        0.188        0.327      129.022      644.765
+       0.031        0.178        0.117        0.371        0.881     4150.681
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9578  ( 0.3833   )             
+  0.2      Rate parameter cond. variable period 2  1.9451  ( 0.3985   )             
+  0.3      Rate parameter cond. variable period 3  1.9343  ( 0.4851   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1564  ( 0.1402   )    0.0896   
+  2.  rate constant mynetb2 rate (period 1)        1.7834  ( 0.7830   )    0.1162   
+  3.  rate constant mynetb2 rate (period 3)        1.6560  ( 0.7351   )   -0.1283   
+  4.  rate constant mynetb2 rate (period 5)        1.6537  ( 0.3797   )   -0.0069   
+  5.  eval mynetb2: outdegree (density)           -0.6739  ( 0.3790   )   -0.0287   
+  6.  eval mynetb2: indegree - popularity          0.0145  ( 0.0570   )   -0.0061   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.020       -0.005       -0.033        0.003       -0.007        0.001
+      -0.045        0.613        0.037       -0.026       -0.016        0.002
+      -0.316        0.063        0.540       -0.049       -0.020       -0.001
+       0.060       -0.086       -0.176        0.144        0.010        0.000
+      -0.123       -0.053       -0.072        0.068        0.144       -0.020
+       0.147        0.047       -0.026        0.012       -0.943        0.003
+
+Derivative matrix of expected statistics X by parameters:
+
+      52.228        7.787        1.472       -1.845       -0.573     -345.723
+      -0.627       18.383        0.000        0.000        3.531     1126.260
+       1.883        0.000       19.212        0.000        9.580     2883.630
+       0.253        0.000        0.000       43.510        4.561     1329.096
+      -8.771       -1.315        8.190        6.016       89.671    26027.733
+     -66.831      -22.480       82.521       37.356      564.659   179565.301
+
+Covariance matrix of X (correlations below diagonal):
+
+  5.1011e+01   3.4380e+00  -8.2160e+00  -1.5930e+00  -1.6771e+01  -4.7827e+03
+  6.5000e-02   5.4776e+01   6.8500e-01  -5.6410e+00   7.0160e+00   2.0555e+03
+ -1.6000e-01   1.3000e-02   5.1422e+01  -8.8110e+00   1.3067e+01   5.5664e+03
+ -2.6000e-02  -8.8000e-02  -1.4100e-01   7.5527e+01   3.2287e+01   9.3186e+03
+ -2.1100e-01   8.5000e-02   1.6400e-01   3.3300e-01   1.2414e+02   3.6202e+04
+ -1.9900e-01   8.2000e-02   2.3000e-01   3.1800e-01   9.6400e-01   1.1353e+07
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9431  ( 0.4259   )             
+  0.2      Rate parameter cond. variable period 2  1.9267  ( 0.4037   )             
+  0.3      Rate parameter cond. variable period 3  2.0062  ( 0.5204   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1489  ( 0.1680   )    0.2218   
+  2.  rate constant mynetb2 rate (period 1)        1.6854  ( 0.6441   )   -0.0707   
+  3.  rate constant mynetb2 rate (period 3)        1.7250  ( 1.3550   )   -0.0630   
+  4.  rate constant mynetb2 rate (period 5)        1.7032  ( 0.5185   )    0.0835   
+  5.  eval mynetb2: outdegree (density)           -0.8209  ( 0.8570   )   -0.1767   
+  6.  eval mynetb2: indegree - popularity (sqrt)   0.0928  ( 0.3139   )   -0.1922   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.028        0.013       -0.021       -0.017        0.029       -0.010
+       0.124        0.415       -0.195       -0.053        0.176       -0.068
+      -0.092       -0.231        1.836       -0.089       -0.732        0.259
+      -0.201       -0.166       -0.128        0.269       -0.018        0.008
+       0.204        0.316       -0.630       -0.038        0.734       -0.266
+      -0.192       -0.345        0.633        0.046       -0.987        0.099
+
+Derivative matrix of expected statistics X by parameters:
+
+      41.961        5.660       -3.513        6.345       -6.614      -19.301
+      -2.015       23.032        0.000        0.000        2.904       12.585
+      -1.636        0.000       10.938        0.000        9.679       27.020
+       1.332        0.000        0.000       36.090       10.155       29.452
+     -10.472        6.345       -3.726       -9.051       75.747      240.649
+     -21.141       24.788      -16.508      -24.250      192.389      632.089
+
+Covariance matrix of X (correlations below diagonal):
+
+      46.949        4.847       -4.573        0.382      -16.003      -45.950
+       0.096       54.132       -4.284      -11.137        3.820       20.476
+      -0.100       -0.087       44.493       -7.441        9.273       30.209
+       0.006       -0.162       -0.119       87.318        8.607       23.239
+      -0.224        0.050        0.133        0.088      108.464      340.279
+      -0.203        0.084        0.137        0.075        0.988     1093.242
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9001  ( 0.4528   )             
+  0.2      Rate parameter cond. variable period 2  1.9223  ( 0.4150   )             
+  0.3      Rate parameter cond. variable period 3  2.0268  ( 0.4694   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1567  ( 0.1714   )    0.2693   
+  2.  rate constant mynetb2 rate (period 1)        1.6328  ( 0.6666   )   -0.2170   
+  3.  rate constant mynetb2 rate (period 3)        1.7205  ( 0.7092   )   -0.0505   
+  4.  rate constant mynetb2 rate (period 5)        1.7431  ( 0.6023   )    0.1434   
+  5.  eval mynetb2: outdegree (density)           -0.7176  ( 0.2667   )   -0.0038   
+  6.  eval mynetb2: outdegree - activity           0.0166  ( 0.0255   )   -0.2226   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.029        0.001        0.023       -0.034        0.012        0.000
+       0.006        0.444       -0.082        0.002        0.000       -0.002
+       0.189       -0.185        0.503       -0.097        0.035       -0.002
+      -0.351        0.004       -0.225        0.363       -0.064        0.004
+       0.253        0.000        0.183       -0.375        0.071       -0.006
+      -0.093       -0.139       -0.142        0.274       -0.879        0.001
+
+Derivative matrix of expected statistics X by parameters:
+
+      44.662       -3.897       -1.879        5.926       -5.833      -79.277
+      -3.232       21.892        0.000        0.000        9.592       75.393
+      -5.655        0.000       21.063        0.000       -0.496      -21.585
+       2.327        0.000        0.000       29.450       12.891       82.366
+     -13.974        9.605       -2.633       -1.555       91.314      832.968
+    -133.649      141.619      -35.238      -91.082      795.933     8817.250
+
+Covariance matrix of X (correlations below diagonal):
+
+      48.720       -5.665       -7.802       -1.442       -1.842      -38.702
+      -0.110       54.367      -11.212        1.176       14.894      130.388
+      -0.149       -0.202       56.567      -10.690       -4.362     -119.767
+      -0.024        0.019       -0.167       72.338        4.580      -16.604
+      -0.025        0.194       -0.056        0.052      108.937      962.800
+      -0.055        0.176       -0.158       -0.019        0.917    10123.878
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  2.0050  ( 0.3448   )             
+  0.2      Rate parameter cond. variable period 2  1.8980  ( 0.4199   )             
+  0.3      Rate parameter cond. variable period 3  1.9686  ( 0.5310   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1542  ( 0.1884   )    0.0631   
+  2.  rate constant mynetb2 rate (period 1)        1.7602  ( 0.5859   )    0.1313   
+  3.  rate constant mynetb2 rate (period 3)        1.6686  ( 1.1612   )   -0.2163   
+  4.  rate constant mynetb2 rate (period 5)        1.7047  ( 0.3814   )    0.0660   
+  5.  eval mynetb2: outdegree (density)           -0.8043  ( 0.6416   )    0.0604   
+  6.  eval mynetb2: outdegree - activity (sqrt)    0.0811  ( 0.2178   )   -0.3190   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.035       -0.006       -0.144        0.020       -0.064        0.023
+      -0.059        0.343       -0.012       -0.024       -0.109        0.034
+      -0.624       -0.017        1.348       -0.118        0.510       -0.183
+       0.279       -0.113       -0.282        0.145       -0.036        0.015
+      -0.528       -0.276        0.684       -0.143        0.412       -0.138
+       0.557        0.261       -0.752        0.182       -0.986        0.047
+
+Derivative matrix of expected statistics X by parameters:
+
+      43.963        7.427        1.697        6.629       -3.220      -13.929
+       0.759       25.659        0.000        0.000        5.977       10.999
+       4.682        0.000       16.027        0.000        9.753       34.852
+      -4.040        0.000        0.000       46.635       11.378       32.254
+      -9.615       -2.407        2.818        7.973       90.186      272.357
+     -34.872      -12.223       25.861        6.290      269.371      856.230
+
+Covariance matrix of X (correlations below diagonal):
+
+      40.163        3.233       -3.869        5.135      -13.837      -39.458
+       0.068       55.734        4.683      -13.232        0.053       -0.626
+      -0.087        0.089       49.398      -10.467       18.869       51.479
+       0.086       -0.189       -0.159       88.200       34.049       87.707
+      -0.220        0.001        0.270        0.365       98.694      285.964
+      -0.211       -0.003        0.248        0.317        0.976      869.247
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9771  ( 0.4342   )             
+  0.2      Rate parameter cond. variable period 2  1.9560  ( 0.4449   )             
+  0.3      Rate parameter cond. variable period 3  1.9426  ( 0.4188   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1613  ( 0.1607   )    0.0594   
+  2.  rate constant mynetb2 rate (period 1)        1.6932  ( 0.5063   )   -0.1020   
+  3.  rate constant mynetb2 rate (period 3)        1.7470  ( 0.3833   )    0.1235   
+  4.  rate constant mynetb2 rate (period 5)        1.6933  ( 1.0090   )   -0.1058   
+  5.  eval mynetb2: outdegree (density)           -0.5232  ( 0.3386   )   -0.2785   
+  6.  eval mynetb2: outdegree-trunc(5)            -0.1086  ( 0.4872   )   -0.2630   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.026       -0.030        0.004       -0.033        0.023       -0.029
+      -0.373        0.256       -0.016        0.047       -0.021       -0.005
+       0.059       -0.079        0.147        0.013        0.018       -0.023
+      -0.202        0.091        0.035        1.018       -0.174        0.304
+       0.419       -0.123        0.139       -0.513        0.115       -0.151
+      -0.367       -0.021       -0.124        0.619       -0.913        0.237
+
+Derivative matrix of expected statistics X by parameters:
+
+      49.782        6.277       -5.186        8.669       -7.969       -1.642
+       6.225       31.145        0.000        0.000       19.343       14.797
+      -0.071        0.000       41.971        0.000        8.245        6.980
+      -1.016        0.000        0.000       17.829        1.245       -1.400
+      -7.249        1.407       -8.690        3.452       81.052       51.428
+      -3.613        3.332       -3.674       -5.786       52.154       41.452
+
+Covariance matrix of X (correlations below diagonal):
+
+      54.904       -4.752       -6.866        3.910      -16.227      -16.390
+      -0.084       58.461       -0.433        4.955       13.540       13.131
+      -0.112       -0.007       68.183        5.445        5.164        5.307
+       0.070        0.086        0.087       57.184       28.661       17.314
+      -0.201        0.162        0.057        0.347      119.141       76.794
+      -0.285        0.221        0.083        0.295        0.907       60.162
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9576  ( 0.4446   )             
+  0.2      Rate parameter cond. variable period 2  1.9403  ( 0.4198   )             
+  0.3      Rate parameter cond. variable period 3  2.0335  ( 0.4632   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1623  ( 0.1920   )    0.0892   
+  2.  rate constant mynetb2 rate (period 1)        1.6978  ( 0.4534   )   -0.0598   
+  3.  rate constant mynetb2 rate (period 3)        1.7384  ( 0.5066   )   -0.2032   
+  4.  rate constant mynetb2 rate (period 5)        1.7909  ( 0.5438   )    0.1649   
+  5.  eval mynetb2: outdegree (density)           -0.3217  ( 0.1544   )   -0.2372   
+  6.  eval mynetb2: outdegree-trunc(4)            -0.5543  ( 0.2203   )   -0.0732   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.037        0.023       -0.002       -0.013        0.004       -0.010
+       0.270        0.206        0.036        0.003       -0.011       -0.008
+      -0.016        0.161        0.257       -0.049        0.002       -0.013
+      -0.133        0.014       -0.178        0.296        0.008       -0.018
+       0.132       -0.160        0.027        0.091        0.024       -0.022
+      -0.234       -0.079       -0.118       -0.149       -0.644        0.049
+
+Derivative matrix of expected statistics X by parameters:
+
+      46.162       -7.568       -3.996       -0.182       -9.482       -2.929
+     -12.198       36.934        0.000        0.000       16.704        8.603
+      -2.998        0.000       26.342        0.000        5.315        1.186
+       3.856        0.000        0.000       27.751        2.754        0.744
+      -8.784       14.474       -1.624       -2.689       84.362       44.961
+      -3.150       10.192       -0.872        1.179       43.812       39.174
+
+Covariance matrix of X (correlations below diagonal):
+
+      72.635      -16.240      -16.073       -1.329      -24.226      -15.097
+      -0.237       64.377        7.569        1.852       24.997       14.234
+      -0.278        0.139       46.118       -8.336        6.848       -1.574
+      -0.021        0.031       -0.163       56.513        2.451       -2.046
+      -0.288        0.316        0.102        0.033       97.290       54.548
+      -0.270        0.271       -0.035       -0.042        0.844       42.949
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9763  ( 0.4895   )             
+  0.2      Rate parameter cond. variable period 2  1.9755  ( 0.4428   )             
+  0.3      Rate parameter cond. variable period 3  1.9295  ( 0.4492   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1602  ( 0.1439   )    0.1464   
+  2.  rate constant mynetb2 rate (period 1)        1.9076  ( 0.5372   )    0.3329   
+  3.  rate constant mynetb2 rate (period 3)        1.8590  ( 0.4864   )    0.0986   
+  4.  rate constant mynetb2 rate (period 5)        1.7564  ( 0.4244   )   -0.1239   
+  5.  eval mynetb2: outdegree (density)           -0.2140  ( 0.1369   )    0.0545   
+  6.  eval mynetb2: 1/(outdegree + 1)              4.6841  ( 1.2609   )   -0.3021   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.021        0.016       -0.007       -0.015        0.003        0.027
+       0.205        0.289       -0.032       -0.030        0.021        0.111
+      -0.097       -0.121        0.237       -0.007        0.004        0.093
+      -0.247       -0.129       -0.034        0.180       -0.007       -0.006
+       0.177        0.287        0.066       -0.117        0.019        0.118
+       0.150        0.160        0.148       -0.011        0.687        1.590
+
+Derivative matrix of expected statistics X by parameters:
+
+      52.013      -11.213        1.183        8.803       -5.397       -0.766
+      -1.024       33.908        0.000        0.000       -4.561        0.514
+       3.825        0.000       34.531        0.000       11.862        0.093
+       4.879        0.000        0.000       33.687        4.047        0.817
+      -4.890       -5.151       13.007        1.836      106.020       -9.014
+      -0.893       -1.773       -0.532       -1.977      -10.474        1.676
+
+Covariance matrix of X (correlations below diagonal):
+
+      50.488       -4.142        1.128        4.242       -5.371       -1.267
+      -0.065       80.142      -10.493       -1.672        6.094       -2.184
+       0.018       -0.134       76.082       -8.601       29.188        1.647
+       0.080       -0.025       -0.133       55.136        4.971       -0.922
+      -0.069        0.062        0.304        0.061      121.020      -12.740
+      -0.113       -0.154        0.119       -0.079       -0.733        2.498
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9977  ( 0.4856   )             
+  0.2      Rate parameter cond. variable period 2  1.8718  ( 0.4615   )             
+  0.3      Rate parameter cond. variable period 3  2.0248  ( 0.3466   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1633  ( 0.1564   )    0.2072   
+  2.  rate constant mynetb2 rate (period 1)        1.7972  ( 0.5205   )    0.0771   
+  3.  rate constant mynetb2 rate (period 3)        1.7658  ( 0.5216   )    0.0471   
+  4.  rate constant mynetb2 rate (period 5)        1.8095  ( 0.6246   )    0.2011   
+  5.  eval mynetb2: outdegree (density)           -0.1157  ( 0.1175   )   -0.0431   
+  6.  eval mynetb2: 1/(outdegree + 2)             11.6220  ( 2.2049   )   -0.2416   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.024       -0.017       -0.010       -0.030       -0.003       -0.063
+      -0.208        0.271        0.021       -0.016       -0.007        0.098
+      -0.115        0.080        0.272        0.008        0.008        0.250
+      -0.311       -0.054        0.026        0.390        0.011       -0.031
+      -0.150       -0.108        0.128        0.136        0.014        0.164
+      -0.181        0.087        0.235       -0.022        0.633        4.862
+
+Derivative matrix of expected statistics X by parameters:
+
+      49.671       -1.033        3.027        3.668       -6.493        0.116
+      -2.800       31.345        0.000        0.000        7.106       -0.218
+       2.701        0.000       32.578        0.000       -0.593        0.141
+       7.129        0.000        0.000       18.870        0.923        0.371
+     -13.262        9.508       -1.223        0.137      109.998       -4.584
+       0.661       -0.746       -0.550       -0.280       -4.781        0.346
+
+Covariance matrix of X (correlations below diagonal):
+
+      56.700      -18.692        3.853        2.317      -18.769        0.227
+      -0.299       68.929        3.616       -1.962        8.634       -0.221
+       0.060        0.051       72.245       -0.065       -3.861        0.640
+       0.053       -0.041       -0.001       33.280       15.847       -0.192
+      -0.244        0.102       -0.045        0.269      104.007       -4.654
+       0.052       -0.046        0.129       -0.057       -0.784        0.339
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1   2.0012  ( 0.5178   )             
+  0.2      Rate parameter cond. variable period 2   1.9544  ( 0.4388   )             
+  0.3      Rate parameter cond. variable period 3   1.9002  ( 0.4046   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)            -1.1688  ( 0.1363   )    0.2217   
+  2.  rate constant mynetb2 rate (period 1)         1.9850  ( 0.5242   )    0.3989   
+  3.  rate constant mynetb2 rate (period 3)         1.8742  ( 0.3960   )    0.0939   
+  4.  rate constant mynetb2 rate (period 5)         1.6962  ( 0.4792   )   -0.3561   
+  5.  eval mynetb2: outdegree (density)            -0.2882  ( 0.1286   )   -0.0458   
+  6.  eval mynetb2: 1/(outdegree+1)(outdegree+1+1)  7.7392  ( 1.5635   )   -0.3511   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.019       -0.016       -0.004        0.006       -0.004       -0.028
+      -0.220        0.275       -0.046       -0.032        0.012        0.116
+      -0.071       -0.211        0.157       -0.022        0.003        0.175
+       0.091       -0.122       -0.119        0.230        0.007       -0.055
+      -0.204        0.169        0.051        0.116        0.017        0.118
+      -0.131        0.134        0.275       -0.074        0.588        2.444
+
+Derivative matrix of expected statistics X by parameters:
+
+      43.233       -3.113        1.644        1.031       -2.560        0.203
+       0.024       33.347        0.000        0.000       -7.190        0.936
+      -1.345        0.000       43.432        0.000       11.553        0.015
+      -0.461        0.000        0.000       24.938        0.116        0.485
+       4.906       -1.020       18.919       -2.188      103.117       -4.672
+      -1.315       -2.968       -2.095       -0.271       -6.441        0.630
+
+Covariance matrix of X (correlations below diagonal):
+
+      39.878       -2.829       -5.673        6.694       -0.878       -1.496
+      -0.047       89.808      -20.657       -3.331       -4.949       -0.720
+      -0.105       -0.256       72.531       -3.673       29.163       -0.490
+       0.172       -0.057       -0.070       38.163       12.286       -0.613
+      -0.013       -0.048        0.314        0.182      119.194       -6.286
+      -0.286       -0.092       -0.069       -0.120       -0.695        0.686
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1   1.9248  ( 0.4718   )             
+  0.2      Rate parameter cond. variable period 2   1.9712  ( 0.3955   )             
+  0.3      Rate parameter cond. variable period 3   1.9861  ( 0.4857   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)            -1.1578  ( 0.1512   )    0.1860   
+  2.  rate constant mynetb2 rate (period 1)         1.8167  ( 0.4113   )   -0.0143   
+  3.  rate constant mynetb2 rate (period 3)         1.8401  ( 0.4489   )    0.2667   
+  4.  rate constant mynetb2 rate (period 5)         1.7852  ( 0.5656   )    0.0474   
+  5.  eval mynetb2: outdegree (density)            -0.2071  ( 0.1346   )    0.0655   
+  6.  eval mynetb2: 1/(outdegree+2)(outdegree+1+2) 26.3161  ( 5.3410   )   -0.2641   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.023       -0.008       -0.002        0.011       -0.003       -0.003
+      -0.136        0.169       -0.024       -0.046       -0.010       -0.285
+      -0.031       -0.136        0.202        0.019        0.024        0.859
+       0.130       -0.201        0.073        0.320        0.009        0.557
+      -0.158       -0.179        0.394        0.122        0.018        0.414
+      -0.003       -0.134        0.361        0.184        0.575       28.526
+
+Derivative matrix of expected statistics X by parameters:
+
+      41.197        3.525        2.469        0.801        3.836       -0.193
+       1.677       39.085        0.000        0.000        3.941       -0.031
+       6.204        0.000       34.992        0.000        0.103        0.171
+      -0.097        0.000        0.000       27.248        6.220       -0.091
+      -2.509       -5.993       -1.911       16.689       99.703       -1.815
+      -0.286       -0.026       -0.321       -0.586       -1.613        0.057
+
+Covariance matrix of X (correlations below diagonal):
+
+      41.633        1.371        8.800        4.759       -7.698       -0.150
+       0.025       70.761       -8.451      -13.668      -14.524        0.023
+       0.184       -0.135       55.122        3.355       16.158        0.128
+       0.092       -0.202        0.056       64.404       34.884       -0.661
+      -0.109       -0.157        0.198        0.395      120.859       -2.183
+      -0.089        0.010        0.066       -0.316       -0.761        0.068
+Estimates, standard errors and convergence t-ratios
+
+                                                      Estimate   Standard   Convergence 
+                                                                   Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1      1.9151  ( 0.4223   )             
+  0.2      Rate parameter cond. variable period 2      2.0029  ( 0.4507   )             
+  0.3      Rate parameter cond. variable period 3      1.9687  ( 0.4142   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)               -1.1629  ( 0.1830   )    0.1373   
+  2.  rate constant mynetb2 rate (period 1)            1.7270  ( 1.2410   )    0.0328   
+  3.  rate constant mynetb2 rate (period 3)            1.7802  ( 0.6483   )    0.0407   
+  4.  rate constant mynetb2 rate (period 5)            1.6496  ( 0.5588   )    0.0000   
+  5.  eval mynetb2: outdegree (density)               -0.8721  ( 0.6179   )    0.0408   
+  6.  eval mynetb2: out-in degree^(1/2) assortativity  0.0428  ( 0.0827   )   -0.1836   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.033       -0.141        0.042        0.026       -0.044        0.007
+      -0.623        1.540       -0.261       -0.319        0.517       -0.072
+       0.367       -0.333        0.420        0.091       -0.070        0.009
+       0.264       -0.452        0.239        0.312       -0.203        0.025
+      -0.388        0.705       -0.175       -0.597        0.382       -0.050
+       0.441       -0.718        0.162        0.544       -0.979        0.007
+
+Derivative matrix of expected statistics X by parameters:
+
+      50.920        5.194        2.397       -7.580      -11.951     -113.678
+       5.823       14.756        0.000        0.000        3.439       54.347
+      -5.680        0.000       21.660        0.000        6.058       61.992
+      -4.570        0.000        0.000       32.052       23.670      193.099
+      -9.119        0.171       -9.060       10.694       94.408      817.454
+     -70.976       28.882      -97.865       56.321      687.736     6284.748
+
+Covariance matrix of X (correlations below diagonal):
+
+      48.856       -1.256        1.053      -14.857       -6.736      -73.801
+      -0.025       53.615       -7.767      -13.388       -1.358        0.253
+       0.020       -0.144       54.418        4.796       -4.243      -65.881
+      -0.269       -0.231        0.082       62.449       31.694      288.260
+      -0.085       -0.016       -0.051        0.356      127.151     1117.560
+      -0.105        0.000       -0.089        0.362        0.983    10154.967
+Estimates, standard errors and convergence t-ratios
+
+                                                      Estimate   Standard   Convergence 
+                                                                   Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1      1.9966  ( 0.4539   )             
+  0.2      Rate parameter cond. variable period 2      1.9551  ( 0.4325   )             
+  0.3      Rate parameter cond. variable period 3      1.8983  ( 0.3775   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)               -1.1522  ( 0.1818   )    0.0317   
+  2.  rate constant mynetb2 rate (period 1)            1.8195  ( 0.7982   )    0.0670   
+  3.  rate constant mynetb2 rate (period 3)            1.6965  ( 0.3861   )    0.0852   
+  4.  rate constant mynetb2 rate (period 5)            1.6180  ( 0.5723   )   -0.2697   
+  5.  eval mynetb2: outdegree (density)               -0.7226  ( 0.2708   )   -0.0837   
+  6.  eval mynetb2: out-in degree^(1/2) assortativity  0.0027  ( 0.0049   )   -0.1785   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.033       -0.020        0.010       -0.011       -0.015        0.000
+      -0.139        0.637       -0.034        0.136        0.015       -0.001
+       0.141       -0.105        0.149       -0.015       -0.029        0.001
+      -0.099        0.290       -0.071        0.327        0.034       -0.001
+      -0.296        0.070       -0.277        0.224        0.073       -0.001
+       0.322       -0.262        0.296       -0.198       -0.900        0.000
+
+Derivative matrix of expected statistics X by parameters:
+
+      41.443        6.793       -1.269        3.160       -0.136     -179.536
+      -4.068       18.689        0.000        0.000       17.277     1261.251
+      -0.577        0.000       42.894        0.000       10.938      633.221
+       4.577        0.000        0.000       23.815        4.044      315.769
+      -2.671       -5.225        2.954        4.915      100.832     6650.606
+    -287.999     -481.579     -252.373      644.653     5320.490   397585.466
+
+Covariance matrix of X (correlations below diagonal):
+
+      57.411       -7.724        1.624        9.603       -4.500     -217.855
+      -0.126       64.947       -4.120        8.179        7.835      328.102
+       0.026       -0.062       67.480        0.384       18.298     1155.288
+       0.182        0.146        0.007       48.598       32.301     2435.134
+      -0.052        0.085        0.194        0.404      131.427     8821.133
+      -0.036        0.051        0.176        0.438        0.965   635188.727
+Estimates, standard errors and convergence t-ratios
+
+                                                  Estimate   Standard   Convergence 
+                                                               Error      t-ratio   
+
+Rate parameters: 
+  0.1      Rate parameter cond. variable period 1  1.9481  ( 0.3767   )             
+  0.2      Rate parameter cond. variable period 2  1.9570  ( 0.4468   )             
+  0.3      Rate parameter cond. variable period 3  1.9331  ( 0.4652   )             
+
+Other parameters: 
+  1.  eval mynetb1: outdegree (density)           -1.1607  ( 0.1704   )    0.0232   
+  2.  rate constant mynetb2 rate (period 1)        1.7048  ( 0.5595   )   -0.0352   
+  3.  rate constant mynetb2 rate (period 3)        1.6739  ( 0.6713   )   -0.1094   
+  4.  rate constant mynetb2 rate (period 5)        1.6259  ( 0.4426   )    0.0229   
+  5.  eval mynetb2: outdegree (density)           -0.5792  ( 0.1585   )   -0.3610   
+  6.  eval mynetb2: bdycov3220                     0.4669  ( 0.2979   )   -0.4558   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.029       -0.004       -0.017       -0.004        0.004        0.009
+      -0.046        0.313       -0.020       -0.002        0.004        0.049
+      -0.150       -0.053        0.451       -0.008       -0.022       -0.023
+      -0.048       -0.008       -0.026        0.196       -0.009       -0.059
+       0.148        0.050       -0.206       -0.129        0.025        0.020
+       0.180        0.289       -0.114       -0.448        0.425        0.089
+
+Derivative matrix of expected statistics X by parameters:
+
+      40.071        9.818        2.227        0.932       -3.896        1.671
+      -4.050       25.356        0.000        0.000        0.678       -0.028
+       1.566        0.000       23.755        0.000        9.190        3.339
+       1.898        0.000        0.000       35.059        4.815        8.498
+      -6.417       -3.630        8.677        8.516       62.644       -6.184
+       0.909        0.425       -2.281        0.704       -9.735       16.841
+
+Covariance matrix of X (correlations below diagonal):
+
+      47.484        0.573        0.021        1.848       -7.873        4.293
+       0.011       54.686       -5.315       -0.197       -7.074       10.938
+       0.000       -0.089       64.720       -1.859       22.932        4.397
+       0.034       -0.003       -0.029       61.742       19.215       -0.043
+      -0.126       -0.105        0.314        0.269       82.573       -1.878
+       0.146        0.347        0.128       -0.001       -0.049       18.134
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.8483  ( 0.4366   )             
+  0.2       Rate parameter cond. variable period 2  1.8813  ( 0.4568   )             
+  0.3       Rate parameter cond. variable period 3  1.8235  ( 0.4574   )             
+
+Other parameters: 
+  1.  endow mynetb1: outdegree (density)           -2.3161  ( 0.2751   )    0.0596   
+  2.  rate  constant mynetb2 rate (period 1)        1.6060  ( 0.6692   )   -0.2786   
+  3.  rate  constant mynetb2 rate (period 3)        1.6476  ( 0.9587   )   -0.1962   
+  4.  rate  constant mynetb2 rate (period 5)        1.6657  ( 0.3373   )   -0.0282   
+  5.  eval  mynetb2: outdegree (density)           -0.5862  ( 0.1331   )   -0.2295   
+
+Total of 302 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.076       -0.033        0.051       -0.003        0.003
+      -0.177        0.448       -0.141       -0.082        0.032
+       0.200       -0.220        0.919       -0.014        0.002
+      -0.029       -0.365       -0.040        0.114       -0.004
+       0.092        0.367        0.013       -0.097        0.018
+
+Derivative matrix of expected statistics X by parameters:
+
+      14.894        1.466       -0.635        1.889       -2.128
+       0.724       18.958        0.000        0.000        2.007
+      -2.923        0.000       14.461        0.000        4.187
+      -0.091        0.000        0.000       50.882       18.450
+      -4.126       -6.754       -9.942        8.474       72.900
+
+Covariance matrix of X (correlations below diagonal):
+
+      16.227       -0.661       -5.928        0.717       -5.300
+      -0.025       41.755      -12.763      -21.539        9.380
+      -0.198       -0.265       55.356       -2.428        0.749
+       0.019       -0.361       -0.035       85.176       30.211
+      -0.128        0.141        0.010        0.318      105.745
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9181  ( 0.4818   )             
+  0.2       Rate parameter cond. variable period 2  2.0369  ( 0.4835   )             
+  0.3       Rate parameter cond. variable period 3  1.9437  ( 0.4302   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.2814  ( 0.1832   )    0.0462   
+  2.  endow mynetb1: 4-cycles                       0.0788  ( 0.0727   )    0.1657   
+  3.  rate  constant mynetb2 rate (period 1)        1.6499  ( 0.7654   )   -0.2563   
+  4.  rate  constant mynetb2 rate (period 3)        1.7688  ( 0.3785   )    0.2884   
+  5.  rate  constant mynetb2 rate (period 5)        1.6442  ( 0.4856   )   -0.3640   
+  6.  eval  mynetb2: outdegree (density)           -0.5883  ( 0.1330   )   -0.1627   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.034       -0.009        0.045       -0.020        0.003       -0.004
+      -0.661        0.005       -0.005        0.011       -0.006        0.003
+       0.319       -0.078        0.586       -0.084        0.013        0.001
+      -0.311        0.417       -0.304        0.143        0.005        0.001
+       0.029       -0.165        0.037        0.027        0.236       -0.008
+      -0.162        0.296        0.011        0.011       -0.121        0.018
+
+Derivative matrix of expected statistics X by parameters:
+
+      54.226       22.751       -9.952        5.694       11.482        1.979
+      97.397      132.101      -11.477       -2.991       -5.962      -35.121
+      -7.752       -3.305       19.898        0.000        0.000        7.642
+      -5.427       -7.257        0.000       47.317        0.000       12.667
+       1.381        3.717        0.000        0.000       25.656        8.006
+      -4.624       -5.320       -3.522       -1.770        4.038       72.247
+
+Covariance matrix of X (correlations below diagonal):
+
+      47.896       20.633       -9.536        2.606        5.824       -2.831
+       0.439       46.075       -4.214       11.179       -9.855       -1.467
+      -0.184       -0.083       56.116      -17.777        5.466       16.231
+       0.043        0.188       -0.272       76.336       -2.409        3.634
+       0.125       -0.215        0.108       -0.041       45.682       14.707
+      -0.042       -0.022        0.223        0.043        0.224       94.330
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  2.0474  ( 0.4458   )             
+  0.2       Rate parameter cond. variable period 2  1.8919  ( 0.4325   )             
+  0.3       Rate parameter cond. variable period 3  1.9503  ( 0.5355   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.4497  ( 0.3600   )   -0.0715   
+  2.  endow mynetb1: 4-cycles                       1.1027  ( 1.2498   )   -0.1733   
+  3.  rate  constant mynetb2 rate (period 1)        1.6625  ( 0.4478   )    0.0860   
+  4.  rate  constant mynetb2 rate (period 3)        1.6146  ( 1.1955   )   -0.0445   
+  5.  rate  constant mynetb2 rate (period 5)        1.5757  ( 1.4018   )   -0.1320   
+  6.  eval  mynetb2: outdegree (density)           -0.5891  ( 0.1249   )   -0.0449   
+
+Total of 251 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.130       -0.404       -0.059       -0.165        0.215        0.001
+      -0.898        1.562        0.126        0.449       -0.468       -0.007
+      -0.366        0.243        0.200       -0.078       -0.053       -0.008
+      -0.355        0.300       -0.141        1.429       -0.283        0.030
+       0.405       -0.275       -0.079       -0.161        1.965       -0.041
+       0.027       -0.045       -0.134        0.207       -0.235        0.016
+
+Derivative matrix of expected statistics X by parameters:
+
+      57.821       22.309        6.174       -2.520        1.910       -2.986
+      14.312       11.560        0.559       -0.588        0.434        0.114
+       9.752        2.484       34.465        0.000        0.000        7.023
+       4.416       -0.429        0.000        9.873        0.000       -2.015
+      -5.134        1.715        0.000        0.000        9.376        6.231
+      -4.479       10.619       13.836        5.399      -11.220       73.687
+
+Covariance matrix of X (correlations below diagonal):
+
+      61.394       33.369       -2.870        2.330       -3.907       -4.392
+       0.531       64.296        2.318        7.001        1.554       11.060
+      -0.051        0.040       51.996       -6.945       -3.788       18.620
+       0.047        0.139       -0.153       39.553      -12.300        5.845
+      -0.067        0.026       -0.071       -0.264       55.081        3.355
+      -0.063        0.155        0.290        0.104        0.051       79.265
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9464  ( 0.4699   )             
+  0.2       Rate parameter cond. variable period 2  1.9331  ( 0.4672   )             
+  0.3       Rate parameter cond. variable period 3  1.9904  ( 0.3880   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1184  ( 0.3625   )    0.0000   
+  2.  endow mynetb1: indegree - popularity         -0.0210  ( 0.1971   )    0.0376   
+  3.  rate  constant mynetb2 rate (period 1)        1.7711  ( 0.8836   )    0.0055   
+  4.  rate  constant mynetb2 rate (period 3)        1.6689  ( 0.4181   )    0.0171   
+  5.  rate  constant mynetb2 rate (period 5)        1.6536  ( 0.4483   )   -0.1690   
+  6.  eval  mynetb2: outdegree (density)           -0.5904  ( 0.1222   )   -0.2325   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.131       -0.062       -0.099       -0.035       -0.018       -0.006
+      -0.869        0.039        0.047        0.014        0.021        0.005
+      -0.310        0.271        0.781       -0.017        0.029       -0.006
+      -0.227        0.175       -0.044        0.175        0.021        0.000
+      -0.112        0.244        0.073        0.115        0.201        0.008
+      -0.125        0.219       -0.056        0.000        0.151        0.015
+
+Derivative matrix of expected statistics X by parameters:
+
+      49.248     1729.394        0.960       -0.776        0.792       -8.622
+      90.678     3818.823       -7.414       -9.244        1.320      -31.500
+      -0.085       -8.768       16.988        0.000        0.000        7.431
+       0.485       47.325        0.000       38.063        0.000       11.631
+      -0.614      -45.068        0.000        0.000       29.714        7.735
+     -10.204     -475.021        0.322       -8.333       -7.291       79.743
+
+Covariance matrix of X (correlations below diagonal):
+
+      80.327     3057.959       -7.347      -11.837       14.571      -17.265
+       0.944   130652.082     -229.127     -389.290      658.678     -684.800
+      -0.112       -0.087       53.468       -5.189        1.700       15.423
+      -0.161       -0.131       -0.086       67.388        3.530        8.337
+       0.241        0.270        0.034        0.064       45.511        9.642
+      -0.190       -0.187        0.208        0.100        0.141      103.011
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  2.0141  ( 0.4747   )             
+  0.2       Rate parameter cond. variable period 2  1.9246  ( 0.4002   )             
+  0.3       Rate parameter cond. variable period 3  1.8992  ( 0.4342   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1150  ( 0.7284   )    0.2286   
+  2.  endow mynetb1: indegree - popularity (sqrt)  -0.0498  ( 0.7241   )    0.2085   
+  3.  rate  constant mynetb2 rate (period 1)        1.7655  ( 0.9170   )    0.0117   
+  4.  rate  constant mynetb2 rate (period 3)        1.6708  ( 0.4933   )   -0.0993   
+  5.  rate  constant mynetb2 rate (period 5)        1.6144  ( 0.4578   )   -0.0556   
+  6.  eval  mynetb2: outdegree (density)           -0.5807  ( 0.1456   )   -0.0596   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.531       -0.519       -0.427       -0.076       -0.061        0.018
+      -0.983        0.524        0.397        0.060        0.067       -0.016
+      -0.640        0.625        0.841        0.107        0.046       -0.022
+      -0.203        0.167        0.240        0.243       -0.033       -0.023
+      -0.173        0.200        0.104       -0.139        0.210        0.019
+       0.173       -0.149       -0.158       -0.309        0.279        0.021
+
+Derivative matrix of expected statistics X by parameters:
+
+      46.899       43.921       14.923       -3.073       -7.875      -11.713
+      44.338       44.441        9.486       -5.305       -9.628      -13.800
+      -0.679       -2.896       21.724        0.000        0.000        5.046
+      -1.089       -0.993        0.000       29.688        0.000       12.987
+       2.757        3.759        0.000        0.000       33.656        1.705
+     -10.837      -11.290       -7.345        5.196        1.732       73.647
+
+Covariance matrix of X (correlations below diagonal):
+
+      41.928       38.508       -0.763      -11.811        1.277      -17.676
+       0.958       38.528       -3.222      -12.893        3.315      -20.442
+      -0.014       -0.061       72.459        6.849       -2.098       -0.835
+      -0.252       -0.286        0.111       52.573       -7.691       12.218
+       0.025        0.068       -0.031       -0.134       62.537       26.456
+      -0.262       -0.317       -0.009        0.162        0.322      108.240
+Estimates, standard errors and convergence t-ratios
+
+                                                       Estimate   Standard   Convergence 
+                                                                    Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1      1.8451  ( 0.3506   )             
+  0.2       Rate parameter cond. variable period 2      1.8846  ( 0.4149   )             
+  0.3       Rate parameter cond. variable period 3      1.9000  ( 0.5011   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)               -0.5275  ( 1.0194   )    0.0510   
+  2.  endow mynetb1: out-in degree^(1/2) assortativity -0.2387  ( 0.4153   )    0.3019   
+  3.  rate  constant mynetb2 rate (period 1)            1.6826  ( 0.6945   )   -0.0991   
+  4.  rate  constant mynetb2 rate (period 3)            1.6689  ( 0.5193   )   -0.2131   
+  5.  rate  constant mynetb2 rate (period 5)            1.6601  ( 0.7343   )    0.0279   
+  6.  eval  mynetb2: outdegree (density)               -0.5802  ( 0.1167   )   -0.0612   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       1.039       -0.417       -0.217       -0.014       -0.430        0.022
+      -0.986        0.172        0.078       -0.005        0.200       -0.009
+      -0.307        0.264        0.482       -0.067        0.067        0.006
+      -0.027       -0.022       -0.185        0.270       -0.060       -0.011
+      -0.592        0.661        0.135       -0.162        0.539       -0.004
+       0.181       -0.185        0.080       -0.183       -0.047        0.014
+
+Derivative matrix of expected statistics X by parameters:
+
+      40.314       83.769       -0.908        0.947       -3.205        3.349
+     112.206      257.953      -11.992        0.434      -20.957        9.157
+       4.269       12.161       20.178        0.000        0.000        2.172
+       4.011       16.547        0.000       26.846        0.000       10.656
+      -8.630      -20.260        0.000        0.000       28.872        2.817
+      -0.474       -6.088       -4.715       -1.013       12.057       88.060
+
+Covariance matrix of X (correlations below diagonal):
+
+      49.909      144.817      -13.238       -7.943        7.259       -5.405
+       0.921      495.719      -41.529       -8.550       20.413      -20.910
+      -0.251       -0.250       55.788       -7.637       -5.962        5.838
+      -0.150       -0.051       -0.136       56.367      -14.139        3.906
+       0.119        0.107       -0.093       -0.219       74.064       25.233
+      -0.076       -0.093        0.077        0.051        0.289      102.608
+Estimates, standard errors and convergence t-ratios
+
+                                                       Estimate   Standard   Convergence 
+                                                                    Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1      1.9107  ( 0.3831   )             
+  0.2       Rate parameter cond. variable period 2      1.8485  ( 0.5185   )             
+  0.3       Rate parameter cond. variable period 3      1.8553  ( 0.3746   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)               -0.5018  ( 0.7531   )    0.0585   
+  2.  endow mynetb1: out-in degree^(1/2) assortativity -0.0454  ( 0.0695   )    0.2618   
+  3.  rate  constant mynetb2 rate (period 1)            1.6913  ( 0.6134   )   -0.1188   
+  4.  rate  constant mynetb2 rate (period 3)            1.6892  ( 0.6215   )    0.0086   
+  5.  rate  constant mynetb2 rate (period 5)            1.6555  ( 0.4306   )   -0.1706   
+  6.  eval  mynetb2: outdegree (density)               -0.5856  ( 0.1225   )   -0.2103   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.567       -0.051        0.007       -0.123        0.010       -0.027
+      -0.974        0.005       -0.006        0.015       -0.002        0.003
+       0.015       -0.137        0.376       -0.126        0.050       -0.029
+      -0.254        0.340       -0.330        0.386       -0.050        0.020
+       0.030       -0.073        0.182       -0.183        0.185        0.006
+      -0.292        0.321       -0.379        0.259        0.118        0.015
+
+Derivative matrix of expected statistics X by parameters:
+
+      38.257      356.168       11.480       -2.633       -2.506       -0.027
+     471.587     6306.970      153.793      -98.578      -21.279      -54.339
+       2.523       59.673       21.959        0.000        0.000       16.652
+      -4.762       31.208        0.000       29.752        0.000        8.656
+       3.287      117.944        0.000        0.000       31.704       -4.644
+      -7.125     -106.961       -3.566        4.918       -9.042       84.183
+
+Covariance matrix of X (correlations below diagonal):
+
+      46.694      932.155        2.931       -3.706       -4.833      -14.245
+       0.751    32952.908      253.149      -71.879       13.607      -90.122
+       0.065        0.212       43.114      -16.242        9.201        1.020
+      -0.058       -0.043       -0.267       86.157      -13.183       31.714
+      -0.096        0.010        0.190       -0.192       54.564       -1.755
+      -0.219       -0.052        0.016        0.359       -0.025       90.408
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9314  ( 0.3927   )             
+  0.2       Rate parameter cond. variable period 2  1.8539  ( 0.4314   )             
+  0.3       Rate parameter cond. variable period 3  2.0599  ( 0.5050   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1540  ( 0.1352   )    0.1234   
+  2.  endow mynetb1: bdycov2032                    -0.2566  ( 0.5966   )   -0.1721   
+  3.  rate  constant mynetb2 rate (period 1)        1.7000  ( 0.6664   )   -0.1184   
+  4.  rate  constant mynetb2 rate (period 3)        1.6072  ( 1.5222   )   -0.3930   
+  5.  rate  constant mynetb2 rate (period 5)        1.7434  ( 0.4039   )    0.1851   
+  6.  eval  mynetb2: outdegree (density)           -0.5816  ( 0.1095   )   -0.1752   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.018        0.003       -0.029        0.014       -0.001        0.000
+       0.039        0.356       -0.090       -0.436       -0.035        0.007
+      -0.326       -0.235        0.444       -0.038        0.029       -0.014
+       0.067       -0.480       -0.034        2.317       -0.092       -0.041
+      -0.015       -0.163        0.104       -0.160        0.163        0.009
+      -0.004        0.113       -0.199       -0.276        0.207        0.012
+
+Derivative matrix of expected statistics X by parameters:
+
+      53.657        0.941        8.271        3.377        1.313      -13.712
+      -0.244        5.973        2.092        1.002        2.618       -1.327
+      -0.186        0.836       23.517        0.000        0.000        3.682
+      -1.502        1.160        0.000        9.045        0.000        3.966
+      -2.472        1.524        0.000        0.000       43.082        5.577
+     -16.053       -2.310        5.153        1.036        2.397       96.483
+
+Covariance matrix of X (correlations below diagonal):
+
+      55.544        2.589       -8.907        2.673       -4.887      -34.417
+       0.112        9.589       -0.641       -3.930        1.086       -7.347
+      -0.165       -0.029       52.735       -8.075        5.235        1.102
+       0.051       -0.181       -0.158       49.329      -15.544        3.068
+      -0.074        0.040        0.081       -0.250       78.521       26.337
+      -0.435       -0.224        0.014        0.041        0.280      112.694
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  2.0224  ( 0.4586   )             
+  0.2       Rate parameter cond. variable period 2  1.8770  ( 0.4339   )             
+  0.3       Rate parameter cond. variable period 3  1.8806  ( 0.4197   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.2126  ( 0.2542   )    0.2388   
+  2.  endow mynetb1: bcov20 ego                    -0.7284  ( 1.2921   )   -0.1704   
+  3.  rate  constant mynetb2 rate (period 1)        1.8101  ( 0.4988   )    0.2749   
+  4.  rate  constant mynetb2 rate (period 3)        1.6587  ( 0.7953   )   -0.1174   
+  5.  rate  constant mynetb2 rate (period 5)        1.6375  ( 1.2982   )   -0.1760   
+  6.  eval  mynetb2: outdegree (density)           -0.5830  ( 0.1214   )   -0.0657   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.065        0.242        0.012       -0.006       -0.011        0.005
+       0.738        1.670        0.046        0.261       -0.017        0.026
+       0.097        0.076        0.249        0.071       -0.157       -0.012
+      -0.026        0.254        0.178        0.632       -0.084       -0.022
+      -0.031       -0.010       -0.225       -0.076        1.685        0.028
+       0.154        0.163       -0.179       -0.224        0.175        0.015
+
+Derivative matrix of expected statistics X by parameters:
+
+      47.748       -3.395        7.851        3.027       -1.849       -0.740
+      -5.314        2.302       -0.482       -1.199        0.367        0.330
+      -3.499        1.284       36.544        0.000        0.000       14.553
+       4.269       -1.433        0.000       17.471        0.000        5.143
+      -0.748       -0.844        0.000        0.000       10.834        1.609
+     -10.910       -1.178        0.847        5.109      -11.572       84.696
+
+Covariance matrix of X (correlations below diagonal):
+
+      67.345        1.868       15.863       -0.318       -8.176       -9.497
+       0.096        5.639        6.294        0.338       -4.669        4.527
+       0.201        0.276       92.235        8.734      -14.988       21.281
+      -0.006        0.021        0.137       44.134       -1.116        5.867
+      -0.135       -0.266       -0.211       -0.023       54.582        1.322
+      -0.112        0.184        0.214        0.085        0.017      106.998
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9577  ( 0.3962   )             
+  0.2       Rate parameter cond. variable period 2  1.8739  ( 0.4470   )             
+  0.3       Rate parameter cond. variable period 3  1.9950  ( 0.4509   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1563  ( 0.1602   )    0.1433   
+  2.  endow mynetb1: bcov32 alter                   0.2285  ( 0.4040   )   -0.0183   
+  3.  rate  constant mynetb2 rate (period 1)        1.7551  ( 0.9327   )    0.0731   
+  4.  rate  constant mynetb2 rate (period 3)        1.6534  ( 0.3354   )   -0.0305   
+  5.  rate  constant mynetb2 rate (period 5)        1.6704  ( 1.2713   )   -0.1167   
+  6.  eval  mynetb2: outdegree (density)           -0.5877  ( 0.1250   )   -0.1118   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.026        0.018        0.053       -0.001       -0.082       -0.003
+       0.283        0.163       -0.036       -0.014       -0.157       -0.009
+       0.355       -0.101        0.870        0.001       -0.067       -0.024
+      -0.016       -0.106        0.003        0.112       -0.042        0.005
+      -0.408       -0.326       -0.054       -0.099        1.616       -0.007
+      -0.142       -0.170       -0.206        0.124       -0.044        0.016
+
+Derivative matrix of expected statistics X by parameters:
+
+      50.660       -3.308        1.972       -0.413        3.460       -6.675
+      -1.795        7.221       -1.435        0.651        1.494        4.657
+      -5.733        0.178       14.635        0.000        0.000       11.168
+       1.525        2.636        0.000       49.016        0.000        9.058
+       2.894        2.097        0.000        0.000       11.492        4.230
+      -6.894        1.717       -0.486       -2.536       -0.368       81.471
+
+Covariance matrix of X (correlations below diagonal):
+
+      48.694       -0.949        3.673       -0.388       -2.571      -19.163
+      -0.050        7.431       -4.963        1.048        5.814        1.195
+       0.074       -0.256       50.581        0.607       -1.636       17.096
+      -0.007        0.045        0.010       72.727       -7.182       17.013
+      -0.051        0.296       -0.032       -0.117       51.811       10.927
+      -0.260        0.042        0.228        0.189        0.144      111.334
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9821  ( 0.3729   )             
+  0.2       Rate parameter cond. variable period 2  1.9053  ( 0.4836   )             
+  0.3       Rate parameter cond. variable period 3  1.8937  ( 0.4543   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1580  ( 0.1917   )   -0.0229   
+  2.  rate  constant mynetb2 rate (period 1)        1.6705  ( 0.6269   )    0.0393   
+  3.  rate  constant mynetb2 rate (period 3)        1.6024  ( 0.3848   )   -0.0207   
+  4.  rate  constant mynetb2 rate (period 5)        1.5860  ( 0.7071   )   -0.1668   
+  5.  endow mynetb2: outdegree (density)           -1.1091  ( 0.2784   )    0.1352   
+
+Total of 302 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.037        0.027       -0.019       -0.041        0.015
+       0.226        0.393       -0.019        0.023        0.002
+      -0.258       -0.073        0.148       -0.005       -0.029
+      -0.298        0.052       -0.016        0.500        0.030
+       0.276        0.009       -0.286        0.153        0.077
+
+Derivative matrix of expected statistics X by parameters:
+
+      40.933        0.452        0.344        2.253       -8.266
+      -5.328       20.418        0.000        0.000       -7.246
+      -3.161        0.000       44.268        0.000      -13.083
+       5.974        0.000        0.000       19.677      -10.739
+      -7.006        0.655        3.611        1.848       16.536
+
+Covariance matrix of X (correlations below diagonal):
+
+      48.953        1.757      -17.009       -0.526        0.106
+       0.038       43.707       -4.667        3.324      -16.606
+      -0.279       -0.081       75.742       -1.653      -24.814
+      -0.010        0.069       -0.026       53.481      -18.573
+       0.002       -0.377       -0.428       -0.381       44.337
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.8819  ( 0.3907   )             
+  0.2       Rate parameter cond. variable period 2  2.0499  ( 0.4417   )             
+  0.3       Rate parameter cond. variable period 3  1.9548  ( 0.4180   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1562  ( 0.1550   )    0.0552   
+  2.  rate  constant mynetb2 rate (period 1)        1.7010  ( 0.8574   )   -0.1090   
+  3.  rate  constant mynetb2 rate (period 3)        1.8041  ( 0.6028   )    0.1767   
+  4.  rate  constant mynetb2 rate (period 5)        1.6324  ( 0.5045   )   -0.0592   
+  5.  eval  mynetb2: outdegree (density)           -0.6225  ( 0.2241   )    0.0918   
+  6.  endow mynetb2: 4-cycles                       0.0318  ( 0.0914   )   -0.0411   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.024       -0.027        0.026        0.006        0.003        0.000
+      -0.201        0.735       -0.091       -0.007       -0.010       -0.004
+       0.306       -0.183        0.363        0.019       -0.009        0.003
+       0.085       -0.016        0.056        0.254       -0.053        0.017
+       0.096       -0.059       -0.070       -0.496        0.050       -0.017
+      -0.034       -0.049        0.059        0.368       -0.851        0.008
+
+Derivative matrix of expected statistics X by parameters:
+
+      49.004       -1.091       -1.957       -3.697       -8.968       -0.233
+       1.650       16.078        0.000        0.000        3.909       -6.331
+      -7.748        0.000       23.827        0.000        8.000       -9.779
+      -5.503        0.000        0.000       29.638       22.587       -4.179
+     -11.944        9.670      -10.033        3.843       87.406       47.239
+       5.305       14.705      -32.828      -20.236      158.440      164.734
+
+Covariance matrix of X (correlations below diagonal):
+
+      52.571       -4.180       -4.278       -4.767      -11.429       10.820
+      -0.083       48.635       -8.293       -2.142        6.412      -20.329
+      -0.081       -0.164       52.491        2.773        1.600      -30.502
+      -0.093       -0.043        0.054       50.412       19.141      -17.073
+      -0.161        0.094        0.023        0.275       96.214       38.736
+       0.159       -0.312       -0.450       -0.257        0.422       87.546
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9108  ( 0.4276   )             
+  0.2       Rate parameter cond. variable period 2  1.9769  ( 0.4089   )             
+  0.3       Rate parameter cond. variable period 3  2.0008  ( 0.5001   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1605  ( 0.1805   )    0.1268   
+  2.  rate  constant mynetb2 rate (period 1)        1.7673  ( 0.5070   )   -0.0362   
+  3.  rate  constant mynetb2 rate (period 3)        1.7817  ( 0.6498   )    0.1785   
+  4.  rate  constant mynetb2 rate (period 5)        1.8245  ( 0.4918   )    0.1087   
+  5.  eval  mynetb2: outdegree (density)           -0.9230  ( 0.3527   )   -0.2130   
+  6.  endow mynetb2: 4-cycles                       0.8450  ( 0.8511   )   -0.1390   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.033       -0.012       -0.043       -0.004        0.019       -0.037
+      -0.135        0.257       -0.017       -0.064        0.006       -0.051
+      -0.382       -0.054        0.422        0.035        0.018       -0.040
+      -0.043       -0.259        0.105        0.242       -0.073        0.228
+       0.306        0.034        0.080       -0.418        0.124       -0.283
+      -0.240       -0.124       -0.073        0.544       -0.944        0.724
+
+Derivative matrix of expected statistics X by parameters:
+
+      41.530        3.522        4.308        4.895       -9.748      -13.650
+       5.819       28.621        0.000        0.000        6.953       -9.175
+       8.858        0.000       20.047        0.000        4.681       -7.338
+      -2.898        0.000        0.000       40.095       -1.173      -26.374
+     -12.021       -1.811       -0.220       -6.099       88.761       54.559
+      -0.794       -2.192        0.122       -8.423       36.575       32.877
+
+Covariance matrix of X (correlations below diagonal):
+
+      39.837        5.780        1.249        3.412       -8.318       -7.476
+       0.118       59.838       -4.088      -13.921       -9.127      -33.357
+       0.032       -0.084       39.373        8.214       14.918      -16.691
+       0.064       -0.213        0.155       71.585       16.007      -34.973
+      -0.130       -0.116        0.234        0.187      102.831       52.019
+      -0.111       -0.405       -0.250       -0.388        0.482      113.334
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9997  ( 0.4003   )             
+  0.2       Rate parameter cond. variable period 2  1.9362  ( 0.5172   )             
+  0.3       Rate parameter cond. variable period 3  1.8767  ( 0.4080   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1510  ( 0.1692   )    0.1418   
+  2.  rate  constant mynetb2 rate (period 1)        1.7569  ( 0.4749   )    0.1426   
+  3.  rate  constant mynetb2 rate (period 3)        1.7273  ( 0.7755   )    0.0434   
+  4.  rate  constant mynetb2 rate (period 5)        1.5486  ( 0.8348   )   -0.3077   
+  5.  eval  mynetb2: outdegree (density)           -0.3881  ( 0.4730   )   -0.1270   
+  6.  endow mynetb2: indegree - popularity         -0.0707  ( 0.1453   )    0.1958   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.029        0.013       -0.048       -0.031        0.002        0.000
+       0.161        0.226        0.035        0.029       -0.096        0.026
+      -0.358        0.089        0.601        0.050       -0.197        0.060
+      -0.209        0.071        0.080        0.697       -0.083        0.024
+       0.030       -0.414       -0.538       -0.216        0.224       -0.066
+      -0.020        0.356        0.513        0.201       -0.968        0.021
+
+Derivative matrix of expected statistics X by parameters:
+
+      49.590       -2.236        5.427        3.761       -2.819     -795.261
+      -9.254       34.250        0.000        0.000       15.095    -1710.241
+       4.740        0.000       24.596        0.000        6.928    -1724.250
+       2.190        0.000        0.000       16.346        2.786    -1282.575
+      -4.969       -2.920       -2.511        1.579       78.692     7419.515
+     -16.091      -27.877      -23.632        5.858      240.238    27117.836
+
+Covariance matrix of X (correlations below diagonal):
+
+      57.993       -7.620       -5.113       -1.438       -9.271      653.244
+      -0.130       59.520       -4.202        1.218        2.835    -4690.873
+      -0.077       -0.062       76.608       -0.558       11.478    -5335.784
+      -0.027        0.023       -0.009       48.368        8.342    -3553.789
+      -0.131        0.040        0.141        0.129       86.314     5990.936
+       0.064       -0.455       -0.456       -0.382        0.482  1787264.104
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9535  ( 0.4603   )             
+  0.2       Rate parameter cond. variable period 2  1.9739  ( 0.4782   )             
+  0.3       Rate parameter cond. variable period 3  1.9266  ( 0.3924   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1477  ( 0.1733   )    0.0662   
+  2.  rate  constant mynetb2 rate (period 1)        1.6838  ( 0.4834   )    0.0115   
+  3.  rate  constant mynetb2 rate (period 3)        1.6975  ( 0.9445   )    0.0071   
+  4.  rate  constant mynetb2 rate (period 5)        1.6397  ( 0.7393   )   -0.1593   
+  5.  eval  mynetb2: outdegree (density)           -0.3854  ( 0.9716   )   -0.0631   
+  6.  endow mynetb2: indegree - popularity (sqrt)  -0.1590  ( 0.8020   )    0.1604   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.030        0.000       -0.012       -0.047        0.003       -0.001
+       0.002        0.234        0.086        0.080       -0.274        0.235
+      -0.074        0.185        0.892        0.195       -0.343        0.258
+      -0.361        0.219        0.276        0.547       -0.286        0.212
+       0.017       -0.589       -0.374       -0.409        0.944       -0.772
+      -0.008        0.597        0.332        0.358       -0.990        0.643
+
+Derivative matrix of expected statistics X by parameters:
+
+      49.844       -9.218        6.618        5.648        3.423        2.295
+      -2.861       43.481        0.000        0.000       -1.627      -52.254
+      -2.259        0.000       18.744        0.000        8.463      -11.407
+       2.729        0.000        0.000       21.153       13.149       -9.700
+      -1.914       -0.948        3.892       10.575       87.414       87.201
+      -0.953      -10.811        0.887       11.162      101.627      119.926
+
+Covariance matrix of X (correlations below diagonal):
+
+      71.517      -18.220       -2.483       -9.197       -9.979       26.658
+      -0.248       75.724       -1.618        3.155       11.600      -78.169
+      -0.035       -0.022       70.833        4.762       15.674      -65.964
+      -0.155        0.052        0.080       49.414       20.713      -41.728
+      -0.109        0.124        0.173        0.273      116.304       81.457
+       0.178       -0.507       -0.442       -0.335        0.426      314.357
+Estimates, standard errors and convergence t-ratios
+
+                                                       Estimate   Standard   Convergence 
+                                                                    Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1      1.9993  ( 0.4188   )             
+  0.2       Rate parameter cond. variable period 2      1.9922  ( 0.4301   )             
+  0.3       Rate parameter cond. variable period 3      1.9837  ( 0.4871   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)               -1.1583  ( 0.2115   )    0.1631   
+  2.  rate  constant mynetb2 rate (period 1)            1.7860  ( 0.4793   )    0.1484   
+  3.  rate  constant mynetb2 rate (period 3)            1.8127  ( 0.6840   )    0.2680   
+  4.  rate  constant mynetb2 rate (period 5)            1.7443  ( 1.0324   )    0.1562   
+  5.  eval  mynetb2: outdegree (density)               -0.6171  ( 1.5058   )   -0.3999   
+  6.  endow mynetb2: out-in degree^(1/2) assortativity -0.0042  ( 0.4726   )    0.1047   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.045        0.023        0.048        0.137       -0.189        0.060
+       0.229        0.230       -0.041       -0.063        0.042       -0.015
+       0.329       -0.125        0.468        0.496       -0.744        0.235
+       0.621       -0.128        0.705        1.066       -1.421        0.446
+      -0.594        0.058       -0.723       -0.918        2.267       -0.709
+       0.596       -0.068        0.725        0.915       -0.997        0.223
+
+Derivative matrix of expected statistics X by parameters:
+
+      38.267       -3.229        0.007        4.649        0.490       -4.256
+      -2.186       30.126        0.000        0.000        8.316      -47.432
+       4.482        0.000       31.205        0.000        4.790      -69.681
+      -8.526        0.000        0.000       43.752       12.965      -80.379
+      -2.436       -3.046       -5.185        6.827       76.110      186.833
+      -8.875      -11.085      -30.364      -21.687      229.572      732.680
+
+Covariance matrix of X (correlations below diagonal):
+
+      37.592        8.245       -0.857        6.163        4.980       -8.750
+       0.185       52.973       -6.490      -12.628       -3.594      -92.147
+      -0.019       -0.120       55.673        8.959       10.224     -117.643
+       0.109       -0.188        0.130       84.945       26.731     -139.673
+       0.087       -0.053        0.147        0.312       86.532      135.439
+      -0.040       -0.353       -0.439       -0.422        0.406     1287.054
+Estimates, standard errors and convergence t-ratios
+
+                                                       Estimate   Standard   Convergence 
+                                                                    Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1      1.9385  ( 0.3824   )             
+  0.2       Rate parameter cond. variable period 2      1.9783  ( 0.4815   )             
+  0.3       Rate parameter cond. variable period 3      1.9949  ( 0.4848   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)               -1.1491  ( 0.1782   )    0.1351   
+  2.  rate  constant mynetb2 rate (period 1)            1.7228  ( 0.6944   )    0.1862   
+  3.  rate  constant mynetb2 rate (period 3)            1.7011  ( 0.6589   )   -0.0535   
+  4.  rate  constant mynetb2 rate (period 5)            1.6896  ( 0.5230   )    0.0423   
+  5.  eval  mynetb2: outdegree (density)               -0.3466  ( 0.4541   )   -0.4496   
+  6.  endow mynetb2: out-in degree^(1/2) assortativity -0.0140  ( 0.0221   )    0.4264   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.032       -0.021       -0.018        0.012       -0.024        0.001
+      -0.170        0.482       -0.061       -0.122        0.151       -0.008
+      -0.154       -0.138        0.434        0.019       -0.091        0.003
+       0.132       -0.338        0.053        0.274       -0.148        0.008
+      -0.295        0.490       -0.304       -0.620        0.206       -0.009
+       0.370       -0.526        0.194        0.684       -0.933        0.000
+
+Derivative matrix of expected statistics X by parameters:
+
+      43.480        3.637        5.093       -2.564       -5.305     -242.448
+      -0.736       22.289        0.000        0.000       -1.701     -359.899
+       0.982        0.000       26.131        0.000       11.833     -190.417
+       2.350        0.000        0.000       40.855        3.950     -609.356
+      -7.486        3.056       -2.648        0.937       59.298      629.819
+    -243.625      201.138     -202.519     -189.727     1227.909    21069.220
+
+Covariance matrix of X (correlations below diagonal):
+
+      50.488        2.664       -4.978       -6.802       -8.730       43.763
+       0.055       47.267       -3.889       -1.715       -2.585     -762.976
+      -0.081       -0.066       73.968      -11.933       -3.648     -815.794
+      -0.112       -0.029       -0.163       72.521       18.221     -487.992
+      -0.126       -0.039       -0.044        0.220       94.893     1206.149
+       0.026       -0.470       -0.402       -0.243        0.524    55779.398
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9652  ( 0.3946   )             
+  0.2       Rate parameter cond. variable period 2  1.9965  ( 0.3847   )             
+  0.3       Rate parameter cond. variable period 3  1.8705  ( 0.3595   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1528  ( 0.1815   )    0.1347   
+  2.  rate  constant mynetb2 rate (period 1)        1.7355  ( 0.3766   )    0.0296   
+  3.  rate  constant mynetb2 rate (period 3)        1.7592  ( 0.4066   )    0.1531   
+  4.  rate  constant mynetb2 rate (period 5)        1.5537  ( 0.6829   )   -0.2823   
+  5.  eval  mynetb2: outdegree (density)           -0.5514  ( 0.1307   )   -0.1778   
+  6.  endow mynetb2: bdycov3220                     0.5639  ( 0.5019   )   -0.0230   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.033       -0.003        0.012        0.015        0.000       -0.018
+      -0.041        0.142        0.013        0.003       -0.007       -0.001
+       0.172        0.078        0.165        0.031        0.011        0.015
+       0.115        0.011        0.110        0.466        0.012       -0.006
+      -0.010       -0.147        0.213        0.143        0.017        0.013
+      -0.192       -0.007        0.069       -0.017        0.203        0.252
+
+Derivative matrix of expected statistics X by parameters:
+
+      38.792       -1.140       -1.133       -1.959       -3.901        2.137
+      -8.454       42.931        0.000        0.000       19.222       -0.238
+      -0.951        0.000       36.192        0.000        5.472        3.879
+      -3.581        0.000        0.000       18.736        0.968        2.969
+      -1.981        5.092       -6.794        0.795       69.920       -5.093
+       1.630       -1.154       -0.182       -0.371       -5.469        5.326
+
+Covariance matrix of X (correlations below diagonal):
+
+      50.815      -16.643        4.149       -5.913      -10.865        1.290
+      -0.288       65.860        6.149        1.318       26.110       -0.587
+       0.078        0.102       55.429        4.309       15.978        7.544
+      -0.125        0.024        0.087       44.353       12.657        6.550
+      -0.159        0.337        0.224        0.199       91.398       -3.293
+       0.062       -0.025        0.346        0.336       -0.118        8.586
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  2.1680  ( 0.5023   )             
+  0.2       Rate parameter cond. variable period 2  2.0497  ( 0.4416   )             
+  0.3       Rate parameter cond. variable period 3  2.1833  ( 0.5493   )             
+
+Other parameters: 
+  1.  creat mynetb1: outdegree (density)           -2.2781  ( 0.3038   )    0.1039   
+  2.  rate  constant mynetb2 rate (period 1)        1.7288  ( 0.3726   )    0.0641   
+  3.  rate  constant mynetb2 rate (period 3)        1.6866  ( 0.6356   )    0.0508   
+  4.  rate  constant mynetb2 rate (period 5)        1.6661  ( 0.5664   )   -0.1558   
+  5.  eval  mynetb2: outdegree (density)           -0.5843  ( 0.1136   )   -0.0306   
+
+Total of 302 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.092       -0.015       -0.034        0.039       -0.008
+      -0.133        0.139        0.013       -0.002       -0.011
+      -0.163        0.051        0.404       -0.061       -0.012
+       0.243       -0.008       -0.183        0.321       -0.010
+      -0.224       -0.240       -0.177       -0.162        0.013
+
+Derivative matrix of expected statistics X by parameters:
+
+      12.779        4.002        2.618       -1.409        6.861
+       2.339       51.220        0.000        0.000       22.761
+       3.159        0.000       23.562        0.000        9.176
+      -3.904        0.000        0.000       32.770        7.416
+       4.480        9.375        8.741        6.995       94.406
+
+Covariance matrix of X (correlations below diagonal):
+
+      13.383        2.089        5.493       -5.093        1.831
+       0.065       76.374       -1.104       -0.581       19.192
+       0.212       -0.018       50.317      -10.447       11.947
+      -0.162       -0.008       -0.171       73.984        9.610
+       0.051        0.224        0.172        0.114       96.337
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  2.0026  ( 0.4542   )             
+  0.2       Rate parameter cond. variable period 2  1.9225  ( 0.4599   )             
+  0.3       Rate parameter cond. variable period 3  2.0295  ( 0.5002   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.7532  ( 0.2310   )   -0.1093   
+  2.  creat mynetb1: 4-cycles                       0.2338  ( 0.0483   )   -0.6778   
+  3.  rate  constant mynetb2 rate (period 1)        1.7220  ( 0.6281   )    0.3166   
+  4.  rate  constant mynetb2 rate (period 3)        1.6832  ( 1.4501   )   -0.2793   
+  5.  rate  constant mynetb2 rate (period 5)        1.7046  ( 0.5472   )   -0.1227   
+  6.  eval  mynetb2: outdegree (density)           -0.5840  ( 0.1199   )   -0.0752   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.053       -0.009       -0.034        0.023       -0.051        0.006
+      -0.802        0.002        0.009        0.006        0.003       -0.001
+      -0.232        0.311        0.394        0.015        0.002       -0.019
+       0.066        0.093        0.016        2.103       -0.215       -0.030
+      -0.410        0.140        0.004       -0.274        0.299       -0.015
+       0.203       -0.188       -0.262       -0.185       -0.223        0.014
+
+Derivative matrix of expected statistics X by parameters:
+
+      62.926       45.321       -3.831       -1.130       -5.196       -4.529
+     235.226      287.841      -32.702       12.290      -51.535      -18.261
+      -8.663       -9.279       26.472        0.000        0.000       12.336
+      -2.639       -3.682        0.000        8.501        0.000        5.166
+       7.229        3.721        0.000        0.000       30.201       17.278
+      -9.122       -6.386        7.856        3.574       -5.133       95.796
+
+Covariance matrix of X (correlations below diagonal):
+
+      64.842       44.918      -21.406       -3.458      -16.439      -17.371
+       0.715       60.791      -13.616       -2.767      -13.421      -14.197
+      -0.339       -0.223       61.357       -0.730       -1.777       16.127
+      -0.068       -0.056       -0.015       39.696      -16.021        6.196
+      -0.232       -0.196       -0.026       -0.289       77.504        8.404
+      -0.203       -0.171        0.194        0.092        0.090      113.143
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.8959  (  0.5126  )             
+  0.2       Rate parameter cond. variable period 2  2.0341  (  0.5035  )             
+  0.3       Rate parameter cond. variable period 3  1.9800  (  0.4586  )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -3.5461  ( 21.6109  )    0.4579   
+  2.  creat mynetb1: 4-cycles                       5.7497  ( 39.3939  )   -0.1710   
+  3.  rate  constant mynetb2 rate (period 1)        1.6497  (  1.0488  )   -0.0791   
+  4.  rate  constant mynetb2 rate (period 3)        1.7956  (  2.7397  )    0.2202   
+  5.  rate  constant mynetb2 rate (period 5)        1.7109  (  7.2992  )   -0.0932   
+  6.  eval  mynetb2: outdegree (density)           -0.5858  (  0.1775  )    0.0254   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+     467.033     -851.303      -14.782       56.113     -148.491       -2.896
+      -1.000     1551.876       28.773     -109.694      290.404        5.279
+      -0.652        0.649        1.100       -1.800        4.884        0.089
+       1.017       -1.016       -0.643        7.506      -19.109       -0.353
+      -0.983        0.983        0.684       -0.998       53.278        0.954
+      -0.755        0.755        0.498       -0.707        0.737        0.032
+
+Derivative matrix of expected statistics X by parameters:
+
+      47.883       48.765        8.795        8.397       -3.980        4.506
+      25.975       27.176        4.639        5.674       -4.237        1.574
+      10.083        9.330       22.117        0.000        0.000        8.418
+      -6.316       -6.139        0.000       29.810        0.000        2.545
+      -0.372       -6.847        0.000        0.000       23.027        7.510
+     -10.738      -13.713       -4.830       -5.216        7.318       79.875
+
+Covariance matrix of X (correlations below diagonal):
+
+      70.341       65.373        9.688       17.610      -17.427      -18.243
+       0.874       79.539        7.157       18.894      -17.896      -16.738
+       0.138        0.096       69.576        6.579        0.951       18.889
+       0.249        0.251        0.093       71.347        5.160       29.751
+      -0.262       -0.253        0.014        0.077       63.013       25.584
+      -0.212       -0.183        0.221        0.344        0.315      104.972
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9692  ( 0.4292   )             
+  0.2       Rate parameter cond. variable period 2  1.9540  ( 0.4366   )             
+  0.3       Rate parameter cond. variable period 3  1.9495  ( 0.4590   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.3087  ( 0.4482   )    0.0120   
+  2.  creat mynetb1: indegree - popularity          0.0783  ( 0.2237   )   -0.1365   
+  3.  rate  constant mynetb2 rate (period 1)        1.7064  ( 1.2051   )   -0.0418   
+  4.  rate  constant mynetb2 rate (period 3)        1.7132  ( 0.7867   )   -0.0086   
+  5.  rate  constant mynetb2 rate (period 5)        1.6787  ( 0.5084   )    0.0334   
+  6.  eval  mynetb2: outdegree (density)           -0.5869  ( 0.1147   )   -0.0694   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.201       -0.091        0.146       -0.088       -0.091       -0.004
+      -0.905        0.050       -0.143        0.060        0.067        0.005
+       0.270       -0.536        1.452       -0.317       -0.299       -0.022
+      -0.247        0.340       -0.335        0.619        0.058       -0.011
+      -0.395        0.590       -0.484        0.144        0.258        0.012
+      -0.084        0.179       -0.159       -0.118        0.202        0.013
+
+Derivative matrix of expected statistics X by parameters:
+
+      46.153     1692.097        8.469        3.037       -8.144      -12.305
+     102.511     4446.249       26.117       -0.520      -26.496      -20.900
+       8.602      377.790       14.447        0.000        0.000        3.040
+      -2.679     -130.598        0.000       18.080        0.000        2.982
+      -4.415     -234.614        0.000        0.000       38.701       10.191
+     -11.264     -440.690       -5.812        2.928        2.416       76.779
+
+Covariance matrix of X (correlations below diagonal):
+
+      44.565     1617.731        6.433        1.801        3.855       -8.764
+       0.889    74285.878      198.408       73.233      393.894       30.400
+       0.134        0.101       51.439      -12.222      -14.506       -1.665
+       0.039        0.038       -0.244       48.711       -0.779       -3.672
+       0.069        0.172       -0.241       -0.013       70.206       27.203
+      -0.142        0.012       -0.025       -0.057        0.352       84.970
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.8976  ( 0.3922   )             
+  0.2       Rate parameter cond. variable period 2  1.9492  ( 0.4368   )             
+  0.3       Rate parameter cond. variable period 3  2.0141  ( 0.4396   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.4210  ( 0.6812   )    0.2644   
+  2.  creat mynetb1: indegree - popularity (sqrt)   0.2836  ( 0.6668   )    0.1071   
+  3.  rate  constant mynetb2 rate (period 1)        1.6899  ( 0.7102   )   -0.1398   
+  4.  rate  constant mynetb2 rate (period 3)        1.7131  ( 0.6382   )   -0.0026   
+  5.  rate  constant mynetb2 rate (period 5)        1.7283  ( 0.4456   )    0.1445   
+  6.  eval  mynetb2: outdegree (density)           -0.5862  ( 0.1269   )   -0.1259   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.464       -0.442        0.123       -0.090        0.027        0.012
+      -0.973        0.445       -0.156        0.110       -0.015       -0.012
+       0.254       -0.321        0.504       -0.142        0.026       -0.008
+      -0.212        0.258       -0.303        0.407        0.011       -0.029
+       0.095       -0.054        0.085        0.042        0.199       -0.006
+       0.134       -0.143       -0.089       -0.372       -0.101        0.016
+
+Derivative matrix of expected statistics X by parameters:
+
+      50.613       47.829       -0.064       -3.077       -3.685       -9.149
+      51.964       52.209        4.119       -3.662       -6.794       -5.086
+       1.118        1.528       21.464        0.000        0.000        4.422
+      -6.374       -5.836        0.000       22.777        0.000       13.259
+      -2.523       -1.772        0.000        0.000       32.487        8.145
+     -11.365      -10.114       11.681       -4.406        4.865       84.957
+
+Covariance matrix of X (correlations below diagonal):
+
+      59.509       57.389       -9.877       -4.489        0.649      -20.847
+       0.965       59.408       -8.241       -1.017       -3.464      -15.717
+      -0.175       -0.147       53.244      -16.041        4.063        9.076
+      -0.076       -0.017       -0.289       58.020       -3.610       -0.475
+       0.011       -0.059        0.073       -0.062       57.969        7.373
+      -0.270       -0.204        0.124       -0.006        0.097      100.196
+Estimates, standard errors and convergence t-ratios
+
+                                                       Estimate   Standard   Convergence 
+                                                                    Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1      1.9910  ( 0.4587   )             
+  0.2       Rate parameter cond. variable period 2      1.8287  ( 0.4392   )             
+  0.3       Rate parameter cond. variable period 3      2.0193  ( 0.5758   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)               -2.8172  ( 0.6706   )   -0.0273   
+  2.  creat mynetb1: out-in degree^(1/2) assortativity  0.4823  ( 0.1816   )   -0.4610   
+  3.  rate  constant mynetb2 rate (period 1)            1.7743  ( 1.0812   )    0.1050   
+  4.  rate  constant mynetb2 rate (period 3)            1.6181  ( 2.2778   )   -0.3063   
+  5.  rate  constant mynetb2 rate (period 5)            1.7163  ( 0.4211   )    0.1059   
+  6.  eval  mynetb2: outdegree (density)               -0.5913  ( 0.1683   )   -0.1080   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.450       -0.120       -0.285        0.741       -0.083       -0.038
+      -0.986        0.033        0.078       -0.201        0.021        0.012
+      -0.393        0.431        1.169       -0.446        0.000        0.052
+       0.446       -0.487       -0.164        5.188       -0.121       -0.244
+      -0.299        0.304        0.000       -0.128        0.177       -0.002
+      -0.338        0.380        0.291       -0.702       -0.035        0.028
+
+Derivative matrix of expected statistics X by parameters:
+
+      77.793      194.530       -3.605        4.837        0.376      -14.988
+     292.259      797.262      -12.325       11.073        3.937      -64.588
+      -6.320      -21.880       13.400        0.000        0.000        0.679
+       1.046        5.695        0.000        4.501        0.000        7.266
+       0.174       -4.962        0.000        0.000       44.066       17.400
+     -21.031      -60.521       -4.434       -5.258        4.202       88.894
+
+Covariance matrix of X (correlations below diagonal):
+
+      77.492      187.960      -17.247       16.403        2.091      -37.355
+       0.916      542.804      -34.395       26.180       26.931     -106.337
+      -0.278       -0.209       49.666       -8.230        3.031        9.151
+       0.283        0.170       -0.177       43.489      -14.999      -10.943
+       0.024        0.118        0.044       -0.232       96.366       22.355
+      -0.382       -0.411        0.117       -0.149        0.205      123.551
+Estimates, standard errors and convergence t-ratios
+
+                                                       Estimate   Standard   Convergence 
+                                                                    Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1      1.9816  ( 0.4522   )             
+  0.2       Rate parameter cond. variable period 2      1.9704  ( 0.4866   )             
+  0.3       Rate parameter cond. variable period 3      1.9970  ( 0.4749   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)               -1.9488  ( 0.4325   )   -0.1320   
+  2.  creat mynetb1: out-in degree^(1/2) assortativity  0.0327  ( 0.0148   )   -0.3900   
+  3.  rate  constant mynetb2 rate (period 1)            1.7130  ( 0.5842   )   -0.0246   
+  4.  rate  constant mynetb2 rate (period 3)            1.6623  ( 0.5910   )   -0.2249   
+  5.  rate  constant mynetb2 rate (period 5)            1.7491  ( 0.4964   )    0.1744   
+  6.  eval  mynetb2: outdegree (density)               -0.5895  ( 0.1449   )   -0.0421   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.187       -0.006        0.038        0.023       -0.069       -0.002
+      -0.967        0.000       -0.001       -0.001        0.003        0.000
+       0.150       -0.143        0.341        0.001       -0.077       -0.017
+       0.091       -0.061        0.003        0.349       -0.066        0.022
+      -0.323        0.388       -0.264       -0.226        0.246        0.008
+      -0.030        0.044       -0.202        0.256        0.107        0.021
+
+Derivative matrix of expected statistics X by parameters:
+
+      73.843     1157.561      -14.746        5.780       11.229      -11.556
+    2132.343    41675.942     -339.167      301.564      232.251     -389.585
+      -5.833      -55.333       28.218        0.000        0.000        6.051
+      -6.704     -154.567        0.000       27.679        0.000        3.721
+      -2.151     -206.339        0.000        0.000       32.397       -1.227
+     -10.190     -191.909       13.583       -4.571       -4.105       71.039
+
+Covariance matrix of X (correlations below diagonal):
+
+      66.973     1066.149      -22.180       -3.337       26.482      -27.097
+       0.754    29890.167     -184.800       48.847      307.865     -616.066
+      -0.334       -0.132       65.837        1.269      -16.837       18.645
+      -0.049        0.034        0.019       69.904       -9.029       21.666
+       0.403        0.222       -0.259       -0.135       64.408      -10.045
+      -0.317       -0.341        0.220        0.248       -0.120      109.353
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9204  ( 0.4778   )             
+  0.2       Rate parameter cond. variable period 2  2.0013  ( 0.4261   )             
+  0.3       Rate parameter cond. variable period 3  1.9964  ( 0.4659   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.2496  ( 0.2391   )    0.0454   
+  2.  creat mynetb1: bdycov2032                    -1.1758  ( 0.8536   )    0.1468   
+  3.  rate  constant mynetb2 rate (period 1)        1.7136  ( 1.8215   )   -0.0379   
+  4.  rate  constant mynetb2 rate (period 3)        1.6843  ( 0.8000   )   -0.0788   
+  5.  rate  constant mynetb2 rate (period 5)        1.7339  ( 0.4057   )    0.1419   
+  6.  eval  mynetb2: outdegree (density)           -0.5859  ( 0.1319   )   -0.0453   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.057        0.155       -0.299        0.023        0.001        0.012
+       0.760        0.729       -0.671        0.187       -0.033        0.033
+      -0.687       -0.414        3.318        0.172       -0.017       -0.070
+       0.124        0.274        0.118        0.640       -0.029       -0.006
+       0.011       -0.094       -0.024       -0.092        0.165       -0.004
+       0.378        0.289       -0.302       -0.058       -0.079        0.017
+
+Derivative matrix of expected statistics X by parameters:
+
+      68.525      -10.181        7.439        5.397       -4.737      -12.242
+      -8.416        4.284       -1.333       -1.158        1.917        0.714
+       4.889        0.047        8.719        0.000        0.000        2.955
+      -3.090       -0.940        0.000       17.459        0.000        3.864
+     -11.414        2.564        0.000        0.000       42.117       17.530
+     -18.075        0.137        0.137       -4.254       -0.734       75.645
+
+Covariance matrix of X (correlations below diagonal):
+
+      77.714       -7.606      -17.763        3.453      -14.204      -25.576
+      -0.374        5.327       -0.194        0.520        3.893        2.855
+      -0.273       -0.011       54.655        4.350       -0.167       12.976
+       0.055        0.032        0.083       50.456       -2.620        0.708
+      -0.191        0.200       -0.003       -0.044       71.469       21.131
+      -0.298        0.127        0.181        0.010        0.257       94.496
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9720  ( 0.3703   )             
+  0.2       Rate parameter cond. variable period 2  2.0966  ( 0.4989   )             
+  0.3       Rate parameter cond. variable period 3  1.9929  ( 0.5221   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1079  ( 0.1514   )   -0.0154   
+  2.  creat mynetb1: bcov20 ego                     1.8551  ( 0.7540   )    0.0088   
+  3.  rate  constant mynetb2 rate (period 1)        1.7375  ( 0.5415   )   -0.0341   
+  4.  rate  constant mynetb2 rate (period 3)        1.7588  ( 0.3916   )    0.2057   
+  5.  rate  constant mynetb2 rate (period 5)        1.7081  ( 0.3622   )    0.0406   
+  6.  eval  mynetb2: outdegree (density)           -0.5812  ( 0.1276   )    0.0762   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.023       -0.008        0.005       -0.023        0.015       -0.005
+      -0.072        0.568        0.179       -0.035       -0.094       -0.009
+       0.060        0.413        0.293       -0.067       -0.019       -0.013
+      -0.417       -0.119       -0.332        0.153       -0.042        0.007
+       0.280       -0.329       -0.103       -0.298        0.131       -0.005
+      -0.233       -0.094       -0.184        0.129       -0.100        0.016
+
+Derivative matrix of expected statistics X by parameters:
+
+      54.022        0.193       -0.055        0.931      -11.926       -8.140
+       0.644        3.100       -2.542       -0.994        0.189       -0.496
+      -0.766       -1.835       28.146        0.000        0.000        8.878
+       6.557        1.553        0.000       42.446        0.000        4.329
+     -10.534        1.006        0.000        0.000       63.736       17.521
+      -8.247       -1.277        4.562       -7.017        8.606       84.719
+
+Covariance matrix of X (correlations below diagonal):
+
+      60.638        0.862        1.154      -10.162      -15.211      -37.407
+       0.052        4.552       -1.118       -0.457       -6.688       -4.423
+       0.021       -0.075       49.451      -18.180       -3.443        6.104
+      -0.160       -0.026       -0.317       66.712      -17.775        0.172
+      -0.180       -0.289       -0.045       -0.201      117.639       31.215
+      -0.436       -0.188        0.079        0.002        0.261      121.647
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9169  ( 0.4154   )             
+  0.2       Rate parameter cond. variable period 2  1.9812  ( 0.4687   )             
+  0.3       Rate parameter cond. variable period 3  1.9804  ( 0.4625   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1816  ( 0.2013   )    0.0733   
+  2.  creat mynetb1: bcov32 alter                  -0.5105  ( 0.5566   )   -0.1697   
+  3.  rate  constant mynetb2 rate (period 1)        1.7385  ( 1.0204   )    0.0058   
+  4.  rate  constant mynetb2 rate (period 3)        1.6609  ( 0.6612   )   -0.1314   
+  5.  rate  constant mynetb2 rate (period 5)        1.7113  ( 0.4618   )    0.0785   
+  6.  eval  mynetb2: outdegree (density)           -0.5820  ( 0.1328   )   -0.0703   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.041        0.044       -0.114        0.035        0.017        0.008
+       0.395        0.310       -0.098        0.040        0.070        0.019
+      -0.556       -0.167        1.041       -0.196       -0.065       -0.019
+       0.274        0.110       -0.291        0.437        0.001       -0.021
+       0.184        0.270       -0.143        0.003        0.213        0.010
+       0.291        0.251       -0.146       -0.244        0.167        0.018
+
+Derivative matrix of expected statistics X by parameters:
+
+      50.723       -3.483        6.486       -2.810       -3.566      -15.498
+      -5.468        5.300       -0.677       -1.786       -2.980       -3.320
+       6.640       -0.089       14.373        0.000        0.000        0.908
+      -6.643        1.007        0.000       23.893        0.000       11.951
+      -1.600       -3.660        0.000        0.000       38.636        8.734
+     -13.673       -0.186        4.265       -2.757        0.486       86.552
+
+Covariance matrix of X (correlations below diagonal):
+
+      58.292       -5.288        1.855       -6.374       -4.552      -15.455
+      -0.256        7.345       -1.165        1.145       -6.028       -0.949
+       0.035       -0.062       47.386      -13.589       -3.722        1.765
+      -0.103        0.052       -0.245       65.119       -3.918       -3.556
+      -0.069       -0.257       -0.062       -0.056       74.998       24.411
+      -0.192       -0.033        0.024       -0.042        0.268      110.809
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9355  ( 0.4312   )             
+  0.2       Rate parameter cond. variable period 2  1.9284  ( 0.3835   )             
+  0.3       Rate parameter cond. variable period 3  1.9652  ( 0.4780   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1463  ( 0.1455   )    0.2017   
+  2.  rate  constant mynetb2 rate (period 1)        1.7692  ( 0.6510   )    0.1878   
+  3.  rate  constant mynetb2 rate (period 3)        1.7565  ( 0.8870   )   -0.0955   
+  4.  rate  constant mynetb2 rate (period 5)        1.6942  ( 0.8459   )   -0.1185   
+  5.  creat mynetb2: outdegree (density)           -1.1016  ( 0.3220   )    0.0075   
+
+Total of 302 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.021        0.011       -0.016        0.002       -0.003
+       0.120        0.424        0.140        0.031       -0.122
+      -0.125        0.245        0.787       -0.055       -0.113
+       0.015        0.057       -0.076        0.716       -0.027
+      -0.072       -0.581       -0.397       -0.097        0.104
+
+Derivative matrix of expected statistics X by parameters:
+
+      50.715       -4.677        4.249        2.718       -0.660
+      -7.128       21.911        0.000        0.000       19.064
+       2.303        0.000       16.465        0.000       10.086
+      -0.689        0.000        0.000       19.335       10.251
+      -1.448        3.728        3.697        5.786       23.465
+
+Covariance matrix of X (correlations below diagonal):
+
+      53.847      -12.189        2.578       -0.204       -9.723
+      -0.248       45.013        6.956       -3.204       27.107
+       0.049        0.146       50.753       -9.184       23.450
+      -0.003       -0.057       -0.153       71.184       34.204
+      -0.166        0.507        0.413        0.508       63.609
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  2.0028  ( 0.3763   )             
+  0.2       Rate parameter cond. variable period 2  1.9654  ( 0.4008   )             
+  0.3       Rate parameter cond. variable period 3  1.9784  ( 0.3848   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1534  ( 0.1556   )    0.0203   
+  2.  rate  constant mynetb2 rate (period 1)        1.8113  ( 0.7916   )    0.1124   
+  3.  rate  constant mynetb2 rate (period 3)        1.7352  ( 0.3890   )    0.0920   
+  4.  rate  constant mynetb2 rate (period 5)        1.6821  ( 0.4948   )   -0.1762   
+  5.  eval  mynetb2: outdegree (density)           -1.2012  ( 0.2311   )   -0.1715   
+  6.  creat mynetb2: 4-cycles                       0.2160  ( 0.0537   )   -0.8448   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.024        0.003       -0.005        0.001       -0.008        0.001
+       0.026        0.627        0.007        0.024        0.052       -0.011
+      -0.074        0.021        0.151       -0.007       -0.008        0.001
+       0.016        0.062       -0.035        0.245        0.043       -0.012
+      -0.214        0.281       -0.090        0.374        0.053       -0.011
+       0.080       -0.256        0.061       -0.441       -0.865        0.003
+
+Derivative matrix of expected statistics X by parameters:
+
+      51.164        8.503       -1.712        1.459        6.881       29.406
+      -1.565       17.094        0.000        0.000        3.593       26.095
+       0.914        0.000       37.153        0.000       13.522       56.154
+       2.037        0.000        0.000       32.780       22.536       77.990
+       2.949       -0.627        2.201        7.967      100.444      179.965
+      -7.757        0.950      -17.444       53.200      408.265     1026.416
+
+Covariance matrix of X (correlations below diagonal):
+
+      62.015        9.791       -5.866        7.773      -12.011       -1.797
+       0.179       48.134        2.173        1.817       15.327       65.435
+      -0.101        0.042       54.630        1.189       16.594       65.053
+       0.128        0.034        0.021       59.582       46.934      118.966
+      -0.120        0.174        0.177        0.478      161.498      347.251
+      -0.007        0.298        0.278        0.487        0.863     1002.238
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9760  ( 0.4469   )             
+  0.2       Rate parameter cond. variable period 2  1.9926  ( 0.3668   )             
+  0.3       Rate parameter cond. variable period 3  1.8790  ( 0.4224   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1559  ( 0.1580   )    0.0761   
+  2.  rate  constant mynetb2 rate (period 1)        1.7349  ( 0.4030   )    0.1614   
+  3.  rate  constant mynetb2 rate (period 3)        1.7580  ( 0.5353   )    0.0193   
+  4.  rate  constant mynetb2 rate (period 5)        1.5807  ( 1.0071   )   -0.2875   
+  5.  eval  mynetb2: outdegree (density)           -1.7585  ( 0.3537   )    0.2745   
+  6.  creat mynetb2: 4-cycles                       2.8949  ( 0.6654   )   -1.2300   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.025       -0.011        0.016       -0.015       -0.020        0.040
+      -0.173        0.162        0.009       -0.011       -0.012       -0.006
+       0.187        0.039        0.287       -0.005       -0.080        0.152
+      -0.087       -0.025       -0.009        1.014       -0.108        0.175
+      -0.363       -0.084       -0.423       -0.321        0.125       -0.217
+       0.385       -0.020        0.402        0.261       -0.920        0.443
+
+Derivative matrix of expected statistics X by parameters:
+
+      54.870        3.779       -1.209        6.199        3.665        0.453
+       3.374       39.135        0.000        0.000       17.611       63.360
+      -1.805        0.000       28.855        0.000       12.814       34.039
+       2.390        0.000        0.000       14.830       11.771       26.363
+       2.366        0.447        1.530       -3.137       73.224      114.108
+      -1.680       -1.575       -4.431       -6.162       29.318       58.177
+
+Covariance matrix of X (correlations below diagonal):
+
+      62.082       -4.661       -4.576        2.004       -7.396      -10.922
+      -0.075       62.900        3.164       -1.389        7.647       58.081
+      -0.080        0.055       52.613       -7.082       15.119       45.625
+       0.034       -0.024       -0.131       55.388       22.534       53.804
+      -0.089        0.092        0.199        0.289      110.067      188.343
+      -0.061        0.323        0.277        0.319        0.791      514.908
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9653  ( 0.4708   )             
+  0.2       Rate parameter cond. variable period 2  1.9544  ( 0.4059   )             
+  0.3       Rate parameter cond. variable period 3  1.9270  ( 0.4371   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1509  ( 0.1377   )    0.1484   
+  2.  rate  constant mynetb2 rate (period 1)        1.6373  ( 0.6334   )   -0.0627   
+  3.  rate  constant mynetb2 rate (period 3)        1.7446  ( 0.5410   )    0.0560   
+  4.  rate  constant mynetb2 rate (period 5)        1.5917  ( 0.4490   )   -0.0712   
+  5.  eval  mynetb2: outdegree (density)           -0.7540  ( 0.4101   )    0.0100   
+  6.  creat mynetb2: indegree - popularity          0.0571  ( 0.1070   )   -0.3362   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.019       -0.011        0.007        0.002        0.013       -0.003
+      -0.130        0.401       -0.067        0.007       -0.091        0.013
+       0.096       -0.192        0.293       -0.033        0.023       -0.008
+       0.025        0.025       -0.135        0.202        0.061       -0.016
+       0.224       -0.348        0.106        0.336        0.168       -0.041
+      -0.199        0.190       -0.133       -0.339       -0.938        0.011
+
+Derivative matrix of expected statistics X by parameters:
+
+      49.840        5.578       -3.965        5.943      -11.182     -782.564
+      -1.459       24.121        0.000        0.000       17.830     3605.197
+      -3.016        0.000       28.111        0.000       13.262     4002.364
+      -2.001        0.000        0.000       34.861        4.728     3384.363
+      -8.849        1.011        5.842        0.522       79.668     9978.314
+     -24.725       15.227       55.590       23.903      275.658    44491.502
+
+Covariance matrix of X (correlations below diagonal):
+
+      45.429        0.918       -5.857        0.347      -15.898    -2450.939
+       0.017       63.684       -5.684        3.847       -3.153     4642.939
+      -0.106       -0.087       67.437      -12.379       18.729     7990.191
+       0.007        0.064       -0.199       57.600       11.239     4903.824
+      -0.236       -0.039        0.228        0.148      100.133    13838.563
+      -0.198        0.317        0.531        0.352        0.754  3361303.406
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9388  ( 0.4724   )             
+  0.2       Rate parameter cond. variable period 2  1.9283  ( 0.4731   )             
+  0.3       Rate parameter cond. variable period 3  1.9427  ( 0.4190   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1554  ( 0.2295   )    0.0431   
+  2.  rate  constant mynetb2 rate (period 1)        1.7117  ( 0.4491   )    0.0849   
+  3.  rate  constant mynetb2 rate (period 3)        1.6213  ( 0.6854   )   -0.1828   
+  4.  rate  constant mynetb2 rate (period 5)        1.5996  ( 0.5836   )   -0.1232   
+  5.  eval  mynetb2: outdegree (density)           -0.7913  ( 0.7172   )    0.0568   
+  6.  creat mynetb2: indegree - popularity (sqrt)   0.1824  ( 0.5460   )   -0.2690   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.053       -0.001        0.045       -0.051        0.061       -0.042
+      -0.009        0.202        0.081        0.008        0.168       -0.132
+       0.288        0.263        0.470       -0.051        0.232       -0.170
+      -0.378        0.030       -0.128        0.341        0.023       -0.027
+       0.370        0.520        0.471        0.054        0.514       -0.387
+      -0.337       -0.538       -0.456       -0.086       -0.987        0.298
+
+Derivative matrix of expected statistics X by parameters:
+
+      36.611        1.994       -1.822        8.051       -5.939        2.488
+      -2.598       41.712        0.000        0.000       15.310       67.262
+      -3.236        0.000       22.909        0.000        2.278       28.057
+       4.698        0.000        0.000       28.591        7.811       42.622
+     -14.257       11.720       -5.515        0.913       84.014      122.229
+     -16.860       29.373       -1.379        3.512      113.976      196.121
+
+Covariance matrix of X (correlations below diagonal):
+
+      55.242      -19.378       -4.310       -0.864      -21.489      -58.461
+      -0.307       71.961        2.547       -7.382       35.568      130.385
+      -0.082        0.042       50.582       -7.973        7.233       57.753
+      -0.015       -0.109       -0.141       63.244        7.070       62.656
+      -0.293        0.425        0.103        0.090       97.190      189.703
+      -0.334        0.652        0.344        0.334        0.816      555.696
+Estimates, standard errors and convergence t-ratios
+
+                                                       Estimate   Standard   Convergence 
+                                                                    Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1      1.9421  ( 0.4155   )             
+  0.2       Rate parameter cond. variable period 2      2.0434  ( 0.4357   )             
+  0.3       Rate parameter cond. variable period 3      1.9224  ( 0.4193   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)               -1.1534  ( 0.1774   )    0.0623   
+  2.  rate  constant mynetb2 rate (period 1)            1.7320  ( 0.7418   )    0.0528   
+  3.  rate  constant mynetb2 rate (period 3)            1.8342  ( 0.6035   )    0.2399   
+  4.  rate  constant mynetb2 rate (period 5)            1.6137  ( 0.4286   )    0.0000   
+  5.  eval  mynetb2: outdegree (density)               -0.7973  ( 0.6946   )    0.2571   
+  6.  creat mynetb2: out-in degree^(1/2) assortativity  0.0662  ( 0.1602   )   -0.6897   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.031       -0.068        0.008        0.001       -0.026        0.007
+      -0.515        0.550        0.001        0.005        0.232       -0.055
+       0.082        0.002        0.364        0.013        0.117       -0.031
+       0.014        0.016        0.046        0.184        0.078       -0.021
+      -0.209        0.473        0.280        0.277        0.482       -0.109
+       0.246       -0.456       -0.298       -0.313       -0.984        0.026
+
+Derivative matrix of expected statistics X by parameters:
+
+      46.775        5.828        0.497       -1.477      -12.127      -46.256
+       6.235       22.540        0.000        0.000        0.946       56.264
+      -7.713        0.000       24.837        0.000       12.131      106.572
+      -6.306        0.000        0.000       39.808       20.120      163.833
+     -13.199        3.820       -6.321       16.795      103.752      395.294
+     -63.321       50.219      -23.249       88.642      449.000     1902.902
+
+Covariance matrix of X (correlations below diagonal):
+
+      49.843       -0.660       -7.878       -2.612      -11.283      -74.313
+      -0.013       51.832      -12.053       -8.592        0.699       96.291
+      -0.147       -0.221       57.538       -5.776       -0.380       85.662
+      -0.046       -0.149       -0.095       64.286       23.551      194.419
+      -0.135        0.008       -0.004        0.248      139.835      520.457
+      -0.201        0.256        0.216        0.464        0.842     2735.248
+Estimates, standard errors and convergence t-ratios
+
+                                                       Estimate   Standard   Convergence 
+                                                                    Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1      1.8949  ( 0.3879   )             
+  0.2       Rate parameter cond. variable period 2      2.0180  ( 0.4052   )             
+  0.3       Rate parameter cond. variable period 3      1.9845  ( 0.4182   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)               -1.1495  ( 0.1857   )    0.1740   
+  2.  rate  constant mynetb2 rate (period 1)            1.6809  ( 0.7484   )   -0.0396   
+  3.  rate  constant mynetb2 rate (period 3)            1.7922  ( 0.5969   )    0.0872   
+  4.  rate  constant mynetb2 rate (period 5)            1.6968  ( 0.3613   )    0.1157   
+  5.  eval  mynetb2: outdegree (density)               -0.8799  ( 0.3441   )    0.1141   
+  6.  creat mynetb2: out-in degree^(1/2) assortativity  0.0114  ( 0.0097   )   -0.7814   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.034       -0.044        0.037       -0.003        0.009        0.000
+      -0.315        0.560       -0.039       -0.080        0.109       -0.003
+       0.356       -0.090        0.356       -0.013        0.050       -0.002
+      -0.043       -0.291       -0.057        0.131       -0.021        0.001
+       0.144        0.453        0.243       -0.172        0.118       -0.003
+      -0.182       -0.476       -0.325        0.172       -0.943        0.000
+
+Derivative matrix of expected statistics X by parameters:
+
+      44.005        9.815       -0.061       -3.783       -0.350       22.892
+       5.915       24.026        0.000        0.000        5.912      531.886
+      -7.736        0.000       26.127        0.000       16.986      847.229
+       1.212        0.000        0.000       46.118       20.728      944.074
+      -6.572        8.381       -4.603        5.305      114.857     2870.896
+    -107.964      624.015       -5.004      165.890     3870.093   116931.561
+
+Covariance matrix of X (correlations below diagonal):
+
+      50.758        1.645        0.716       -8.939      -16.331     -629.579
+       0.030       57.520      -13.614      -17.327        8.751      624.882
+       0.013       -0.237       57.331       -4.653        5.446      654.056
+      -0.145       -0.264       -0.071       74.735       30.878     1298.714
+      -0.172        0.087        0.054        0.268      177.602     4609.566
+      -0.227        0.211        0.221        0.385        0.887   152089.634
+Estimates, standard errors and convergence t-ratios
+
+                                                   Estimate   Standard   Convergence 
+                                                                Error      t-ratio   
+
+Rate parameters: 
+  0.1       Rate parameter cond. variable period 1  1.9584  ( 0.4480   )             
+  0.2       Rate parameter cond. variable period 2  1.9509  ( 0.4482   )             
+  0.3       Rate parameter cond. variable period 3  1.9779  ( 0.4157   )             
+
+Other parameters: 
+  1.  eval  mynetb1: outdegree (density)           -1.1426  ( 0.1681   )    0.1886   
+  2.  rate  constant mynetb2 rate (period 1)        1.7363  ( 0.7710   )   -0.0634   
+  3.  rate  constant mynetb2 rate (period 3)        1.6798  ( 0.4249   )    0.1094   
+  4.  rate  constant mynetb2 rate (period 5)        1.6969  ( 1.1093   )    0.0343   
+  5.  eval  mynetb2: outdegree (density)           -0.5890  ( 0.1424   )   -0.0948   
+  6.  creat mynetb2: bdycov3220                     0.5297  ( 0.3701   )   -0.4333   
+
+Total of 307 iteration steps.
+
+Covariance matrix of estimates (correlations below diagonal)
+
+       0.028        0.005        0.019       -0.014       -0.004        0.006
+       0.042        0.594       -0.018        0.185       -0.014        0.006
+       0.263       -0.054        0.181       -0.004       -0.004        0.060
+      -0.075        0.219       -0.008        1.231        0.064        0.065
+      -0.157       -0.124       -0.060        0.400        0.020       -0.007
+       0.096        0.022        0.390        0.159       -0.133        0.137
+
+Derivative matrix of expected statistics X by parameters:
+
+      51.531        6.954       -4.625        4.491       -3.743       -2.935
+      -4.478       20.388        0.000        0.000       12.583        2.798
+      -6.005        0.000       40.397        0.000        5.615        1.134
+       1.426        0.000        0.000       10.705       -5.135       -0.734
+      -2.261       -7.879       -3.351        5.530       78.403        5.547
+      -2.653       -5.068       -5.234        0.757        1.479        8.943
+
+Covariance matrix of X (correlations below diagonal):
+
+      72.000        2.351        1.420        2.253      -19.102       -7.343
+       0.033       72.621       -4.229        4.611       12.388        1.345
+       0.021       -0.062       64.679       -2.075        1.408        5.130
+       0.041        0.084       -0.040       41.155       22.857        5.097
+      -0.213        0.138        0.017        0.338      111.184        7.332
+      -0.251        0.046        0.185        0.231        0.202       11.870

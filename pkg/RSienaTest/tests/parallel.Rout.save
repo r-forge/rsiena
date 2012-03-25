@@ -1,6 +1,6 @@
 
-R version 2.14.0 (2011-10-31)
-Copyright (C) 2011 The R Foundation for Statistical Computing
+R version 2.14.2 (2012-02-29)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
 
@@ -160,14 +160,15 @@ Total of 371 iteration steps.
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 > data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj")
 Loading required package: network
-     Classes for Relational Data
-Version      1.7 created on      July 7, 2011.
+network: Classes for Relational Data
+Version 1.7-1 created on March 1, 2012.
 copyright (c) 2005, Carter T. Butts, University of California-Irvine
                     Mark S. Handcock, University of Washington
                     David R. Hunter, Penn State University
                     Martina Morris, University of Washington
-For citation information, type citation("network").
-Type help("network-package") to get started.
+ For citation information, type citation("network").
+ Type help("network-package") to get started.
+
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
 <sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient

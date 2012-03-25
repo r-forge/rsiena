@@ -7,3 +7,5 @@ src/RMath.dll
 src/libpgSn.a
 src/Makefile.profile
 tests/testrefs
+tests/effectsTest.R
+tests/sampson.r
