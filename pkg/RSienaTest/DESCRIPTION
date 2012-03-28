@@ -1,8 +1,8 @@
 Package: RSienaTest
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.0.12.208
-Date: 2012-03-25
+Version: 1.0.12.209
+Date: 2012-03-28
 Author: Various
 Depends: R (>= 2.10.0)
 Imports: Matrix
