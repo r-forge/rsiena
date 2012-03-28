@@ -1,3 +1,7 @@
+2012-03-28 R-forge revision 209 (RSienaTest only)
+
+	* src/model/effects/DiffusionRateEffect.cpp: bug fix
+
 2012-03-25 R-forge revision 208
 
 	* src/data/BehaviorLongitudinalData.cpp: fix memory leak

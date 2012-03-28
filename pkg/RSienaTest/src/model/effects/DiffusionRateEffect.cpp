@@ -141,13 +141,15 @@ double DiffusionRateEffect::proximityValue(Network * pNetwork, int i,
 		}
 	}
 
-	if (egoNumer * totalAlterValue==0)
+	totalAlterValue *= egoNumer;
+
+	if (totalAlterValue == 0)
 	{
 		return 1;
 	}
 	else
 	{
-		return this->lpTable->value(egoNumer * totalAlterValue, egoDenom);
+		return this->lpTable->value(totalAlterValue, egoDenom);
 	}
 }
 
@@ -195,7 +197,7 @@ double DiffusionRateEffect::value(int i, int period)
 	}
 	else if (this->leffectName == "infectCovar")
 	{
-		int totalAlterValue = 0;
+		double totalAlterValue = 0;
 		if (pNetwork->outDegree(i) > 0)
 		{
 			for (IncidentTieIterator iter = pNetwork->outTies(i);
@@ -223,7 +225,7 @@ double DiffusionRateEffect::value(int i, int period)
 				totalAlterValue += alterValue;
 			}
 		}
-		if (totalAlterValue==0)
+		if (fabs(totalAlterValue) < 1e-6)
 		{
 			return 1;
 		}
