@@ -1,0 +1,6 @@
+inst/.*[.]log
+inst/.*[.]bbl
+inst/.*[.]blg
+inst/.*[.]aux
+inst/.*[.]out
+inst/.*[.]toc

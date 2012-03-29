@@ -1,5 +1,4 @@
 ^doc
-inst/*.txt
 src/SienaProfile.cpp
 src/SienaProfile.o
 src/SienaProfile.exe
@@ -9,3 +8,9 @@ src/Makefile.profile
 tests/testrefs
 tests/effectsTest.R
 tests/sampson.r
+inst/.*[.]log
+inst/.*[.]bbl
+inst/.*[.]blg
+inst/.*[.]aux
+inst/.*[.]out
+inst/.*[.]toc
