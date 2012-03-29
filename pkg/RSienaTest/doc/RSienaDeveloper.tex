@@ -558,9 +558,12 @@ value. Other tests need to be run separately.
   have not changed the scripts but happen to be the first person checking on a
   particular platform since the scripts have been changed.)
 
-It is worth occasionally updating the files \sfn{parallel.Rout.save} and
-\sfn{scripts.Rout.save} just to reduce the differences. But do the latter after
-you have fixed the scriptfile.Rout differences.
+  It is worth occasionally updating the files \sfn{parallel.Rout.save} and
+  \sfn{scripts.Rout.save} just to reduce the differences. But do the latter
+  after you have fixed the scriptfile.Rout differences. It would be appreciated
+  if the differences in \sfn{scripts.Rout.save} are a minimum when \emph{not}
+  running the tests of the scripts, as this is what appears every time the
+  package is checked on CRAN.
 
 Some notes about the testing of scripts:
 \begin{enumerate}
@@ -611,10 +614,10 @@ R -d "valgrind --tool=memcheck --track-origins=yes
 --leak-check=full" --nosave --args startNo=1 endNo=65 doRun=1
 useMult=0 useRSiena=1 < effectsTest.R
 \end{verbatim}
-But remove the carriage return.  The tests tend to fail for no reason,
-particularly on laptops. Usually in ML runs, so there may be some bug there, but
-it is hard to find as it is intermittent. It is wise to run them on a desktop or
-server and
+But remove the carriage return.  You will get different results on 32 bit
+Windows, which have not so far been stored for comparison. The tests have
+frequently failed for no apparent reason, although the most recent bug fix may
+have sorted this. It is wise to
 be prepared to restart from any failure point. Check the existing results by
 hand first as they will be deleted on restart:
 \begin{verbatim}
@@ -834,12 +837,18 @@ If \sfn{valgrind} reports use of uninitialised variables, use the option
 surprisingly difficult to track these down! But it usually reports some from R,
 and the C++ library which you can ignore.
 
-I have failed to get valgrind to work on a Mac, although others report no
-problems. It is worth a try: get the source from the svn, and follow their
-install instructions. It may help to build your own R.
+\sfn{valgrind} should work on a Mac, but may not. It is worth a try: get the
+source from the svn, and follow their install instructions. It may help to build
+your own R.
 
-I think you can use some debugger on the C, but I have never tried. See the
-manual Writing R extensions, section Debugging Compiled Code.
+\sfn{valgrind} does not find everything: it may help to use a specially built
+version of R with instrumentation for \sfn{valgrind}, with or without
+\sfn{gctorture} if the problem may be in the interface between R and C++. More
+details in the manual Writing R extensions.
+
+It is possible to use a debugger on the C: Details of
+this are also in the Writing R extensions manual.
+
 \section{The R C++ interface}
 This is not easy to understand from the documentation (Writing R Extensions
 manual), but there should be examples of most functions in the code

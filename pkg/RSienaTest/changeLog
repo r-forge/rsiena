@@ -1,3 +1,15 @@
+2012-03-29 R-forge revision 210 NB new version number sequence. 1.1.210
+
+	* src.siena07utilities.cpp, siena07setup.cpp: changes to R/C++
+	interface code. Moved a call to PutRNGstate to _before_ the
+	UNPROTECT to fix an intermittent error.
+	* tests/effectsTest.R: changes to comments only
+	* doc/RSienaDeveloper.tex, tests/scripts.Rout.save: updated output
+	file, minor additions to documentation.
+	* tests/testrefs/M44compare.out, tests/testrefs/M45compare.out:
+	updated test outputs. (RSienaTest only)
+	* tests/testrefs/*compare.out: some files got missed last time 
+
 2012-03-28 R-forge revision 209 (RSienaTest only)
 
 	* src/model/effects/DiffusionRateEffect.cpp: bug fix

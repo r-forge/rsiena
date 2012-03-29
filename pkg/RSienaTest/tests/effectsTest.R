@@ -110,7 +110,7 @@ mydata <- sienaDataCreate(mynet, alcohol=mybeh, myccov, myvcov, mydyccov,
 myeff <- getEffects(mydata)
 print01Report(mydata, myeff, "Siena01")
 
-## crate data set to use for ml (could be different size)
+## create data set to use for ml (could be different size)
 use <- 1:20
 mynetml <- sienaNet(array(c(s501[use, use], s502[use, use], s503[use, use]),
 						  dim=c(20, 20, 3)))
@@ -425,7 +425,7 @@ effectTestFn <- function(model, type, modelNo, effects, data, bayes, useCluster,
 					dfra <- diag(1, sum(effects$include))
 					rate <- effects$type == "rate"
 					rate <- rate[effects$include]
-					dfra[rate, rate] <- 0.1
+					diag(dfra)[rate] <- 0.1
 					ans <- try(bayes(data, effects, model, dfra=dfra, nwarm=10,
 									 nmain=10))
 				}
