@@ -2,7 +2,7 @@
 R version 2.14.2 (2012-02-29)
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: x86_64-apple-darwin9.8.0/x86_64 (64-bit)
+Platform: i386-apple-darwin9.8.0/i386 (32-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -80,32 +80,3 @@ Type 'q()' to quit R.
 + }}
 > library(tools)
 > if(!nzchar(Sys.getenv("RSIENA_TESTING"))) q("no")
-> 
-> ## now run it
-> res <- 0L
-> runone("scriptfile.R")
-  Running 'scriptfile.R'
-[1] 0
-> 
-> ## now look at the differences
-> Rdiff("scriptfile.Rout", previousFile)
-
-509c509
-<                       20:44:24 UTC; unix
----
->                       20:19:54 UTC; unix
-2709c2709
-< % Sat Mar 24 20:51:24 2012
----
-> % Sat Mar 24 20:34:33 2012
-2737c2737
-< <!-- Sat Mar 24 20:51:24 2012 -->
----
-> <!-- Sat Mar 24 20:34:33 2012 -->
-[1] 1
-> 
-> if (res > 0)
-+ {
-+ 	stop("scripts failed")
-+ }
-> 

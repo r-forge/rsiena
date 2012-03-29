@@ -735,7 +735,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 			pMLSimulation->connect(period);
 			SEXP ch;
 			PROTECT(ch =
-				duplicate(getChainDFPlus(*(pMLSimulation->pChain()), true)));
+				getChainDFPlus(*(pMLSimulation->pChain()), true));
 			SET_VECTOR_ELT(minimalChains, periodFromStart, ch);
 
 			/* get the chain up to a reasonable length */
@@ -761,7 +761,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 
 			/* return chain as a list */
  			SEXP ch1;
- 			PROTECT(ch1 = duplicate(getChainList(*pChain)));
+ 			PROTECT(ch1 = getChainList(*pChain));
   			//PROTECT(ch1 = getChainDFPlus(*pChain, true));
 			SET_VECTOR_ELT(currentChains, periodFromStart, ch1);
 
@@ -806,9 +806,10 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	SET_VECTOR_ELT(ans, 3, rejects);
 	SET_VECTOR_ELT(ans, 4, aborts);
 
+	PutRNGstate();
+
 	int nbrProtects = 6 + 5 * totObservations;
 	UNPROTECT(nbrProtects);
-	PutRNGstate();
 	return ans;
 }
 
