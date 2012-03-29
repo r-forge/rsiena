@@ -1,3 +1,15 @@
+2012-03-29 R-forge revision 211
+
+	* doc/RSiena_Manual.tex, doc/siena1.png, doc/siena2.png,
+	doc/siena3.png, doc/ilcampo.jpg, doc/RSiena.bib moved to inst/doc/
+	and copied to RSiena to comply with GPL. Both packages now include
+	these files in the tarball but not the binary.
+	* .Rinstignore: added
+	* .Rbuildignore: added to RSiena and updated in RSienaTest to
+	exclude temporary latex files from the tar ball.
+	* R/effectsDocumentation.r: bug fix for newly added groups.
+	* inst/doc/effects.pdf: updated
+
 2012-03-29 R-forge revision 210 NB new version number sequence. 1.1.210
 
 	* src.siena07utilities.cpp, siena07setup.cpp: changes to R/C++
@@ -8,7 +20,7 @@
 	file, minor additions to documentation.
 	* tests/testrefs/M44compare.out, tests/testrefs/M45compare.out:
 	updated test outputs. (RSienaTest only)
-	* tests/testrefs/*compare.out: some files got missed last time 
+	* tests/testrefs/*compare.out: some files got missed last time
 
 2012-03-28 R-forge revision 209 (RSienaTest only)
 
