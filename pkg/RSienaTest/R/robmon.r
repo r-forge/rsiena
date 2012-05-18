@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: robmon.r
 # *
@@ -324,11 +324,14 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     z <- terminateFRAN(z, x)
     ## #####################################################
     ## call to FRAN changes covariance matrix for conditional estimation
-    z$diver<- (z$fixed | z$diver | diag(z$covtheta) < 1e-9) & (!z$AllUserFixed)
-    z$covtheta[z$diver, ] <- Root(diag(z$covtheta)) * 33
-    ##not sure this does not use very small vals
-    z$covtheta[, z$diver] <- Root(diag(z$covtheta)) * 33
-    diag(z$covtheta)[z$diver] <- 999
+	if (!x$simOnly)
+	{
+		z$diver<- (z$fixed | z$diver | diag(z$covtheta) < 1e-9) & (!z$AllUserFixed)
+		z$covtheta[z$diver, ] <- Root(diag(z$covtheta)) * 33
+		##not sure this does not use very small vals
+		z$covtheta[, z$diver] <- Root(diag(z$covtheta)) * 33
+		diag(z$covtheta)[z$diver] <- 999
+	}	
     z$termination <- 'OK'
     z
 }

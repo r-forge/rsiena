@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: initializeFRAN.r
 # *
@@ -717,6 +717,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
     ## sort out composition change
     ##      convertToStructuralZeros()?
     sparse <- attr(depvar, "sparse")
+	allowOnly <- attr(depvar, "allowOnly")
     if (sparse)
     {
         ## require(Matrix)
@@ -932,13 +933,16 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                 mydiff <- mymat2 - mymat1
                 attr(depvar, "distance")[i] <- sum(mydiff != 0,
                                                    na.rm = TRUE)
-                if (all(mydiff@x >= 0, na.rm=TRUE))
+				if (allowOnly)
 				{
-                    attr(depvar, "uponly")[i] <- TRUE
-				}
-                if (all(mydiff@x <= 0, na.rm=TRUE))
-				{
-                    attr(depvar, "downonly")[i] <- TRUE
+					if (all(mydiff@x >= 0, na.rm=TRUE))
+					{
+						attr(depvar, "uponly")[i] <- TRUE
+					}
+					if (all(mydiff@x <= 0, na.rm=TRUE))
+					{
+						attr(depvar, "downonly")[i] <- TRUE
+					}
 				}
             }
             edgeLists[[i]] <- list(mat1 = t(mat1), mat2 = t(mat2),
@@ -1049,13 +1053,16 @@ unpackOneMode <- function(depvar, observations, compositionChange)
                 mydiff <- mymat2 - mymat1
                 attr(depvar, "distance")[i] <- sum(mydiff != 0,
                                                    na.rm = TRUE)
-                if (all(mydiff >= 0, na.rm=TRUE))
+				if (allowOnly)
 				{
-                    attr(depvar, "uponly")[i] <- TRUE
-				}
-                if (all(mydiff <= 0, na.rm=TRUE))
-				{
-                    attr(depvar, "downonly")[i] <- TRUE
+					if (all(mydiff >= 0, na.rm=TRUE))
+					{
+						attr(depvar, "uponly")[i] <- TRUE
+					}
+					if (all(mydiff <= 0, na.rm=TRUE))
+					{
+						attr(depvar, "downonly")[i] <- TRUE
+					}
 				}
             }
             diag(networks[[i]]) <- 0
@@ -1104,6 +1111,7 @@ unpackBipartite <- function(depvar, observations, compositionChange)
         action <- matrix(0, nrow=attr(depvar, "netdims")[1], ncol=observations)
     }
     sparse <- attr(depvar, "sparse")
+	allowOnly <- attr(depvar, "allowOnly")
     if (sparse)
     {
         ## require(Matrix)
@@ -1284,13 +1292,16 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                 mydiff <- mymat2 - mymat1
                 attr(depvar, "distance")[i] <- sum(mydiff != 0,
                                                    na.rm = TRUE)
-                if (all(mydiff@x >= 0, na.rm=TRUE))
+				if (allowOnly)
 				{
-                    attr(depvar, "uponly")[i] <- TRUE
-				}
-                if (all(mydiff@x <= 0, na.rm=TRUE))
-				{
-                    attr(depvar, "downonly")[i] <- TRUE
+					if (all(mydiff@x >= 0, na.rm=TRUE))
+					{
+						attr(depvar, "uponly")[i] <- TRUE
+					}
+					if (all(mydiff@x <= 0, na.rm=TRUE))
+					{
+						attr(depvar, "downonly")[i] <- TRUE
+					}
 				}
             }
             edgeLists[[i]] <- list(mat1 = t(mat1), mat2 = t(mat2),
@@ -1384,13 +1395,16 @@ unpackBipartite <- function(depvar, observations, compositionChange)
                 mydiff <- mymat2 - mymat1
                 attr(depvar, "distance")[i] <- sum(mydiff != 0,
                                                          na.rm = TRUE)
-                if (all(mydiff >= 0, na.rm=TRUE))
+				if (allowOnly)
 				{
-                    attr(depvar, "uponly")[i] <- TRUE
-				}
-                if (all(mydiff <= 0, na.rm=TRUE))
-				{
-                    attr(depvar, "downonly")[i] <- TRUE
+					if (all(mydiff >= 0, na.rm=TRUE))
+					{
+						attr(depvar, "uponly")[i] <- TRUE
+					}
+					if (all(mydiff <= 0, na.rm=TRUE))
+					{
+						attr(depvar, "downonly")[i] <- TRUE
+					}
 				}
             }
 

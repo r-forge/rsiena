@@ -130,7 +130,6 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			}
 			cat(tmp1[i], '\n')
 		}
-
 		cat("\nTotal of", x$n, "iteration steps.\n\n")
 		if (x$termination == "UserInterrupt")
 			cat(" \n*** Warning ***",
@@ -246,7 +245,7 @@ print.summary.sienaFit <- function(x, ...)
         }
         cat('\n')
    }
-   if (x$OK)
+   if ((x$OK)&(!is.null(x$covtheta)))
    {
        cat("Covariance matrix of estimates (correlations below diagonal)\n\n")
        covcor <- x$covtheta
@@ -399,11 +398,16 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
         addtorow$pos[[addsub]] <- nrates + 2
         addsub <- addsub + 1
     }
-
-    ses <- sqrt(diag(x$covtheta))
-    ses[x$fixed] <- NA
+	if (!is.null(x$covtheta))
+	{
+		ses <- sqrt(diag(x$covtheta))
+		ses[x$fixed] <- NA
+	}	
     theta <- x$theta
-    theta[diag(x$covtheta) < 0.0] <- NA
+	if (!is.null(x$covtheta))
+	{
+		theta[diag(x$covtheta) < 0.0] <- NA
+	}	
 
     if (nBehavs > 0)
     {
@@ -425,7 +429,10 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
                                                "creat", effects$type)
     mydf[nrates + (1:x$pp), 'text' ] <- effects$effectName
     mydf[nrates + (1:x$pp), 'value' ] <- theta
-    mydf[nrates + (1:x$pp), 'se' ] <- ses
+	if (exists("ses"))
+	{
+		mydf[nrates + (1:x$pp), 'se' ] <- ses
+	}	
     if (!is.null(x$tstat))
     {
         mydf[1:nrates, "tstat"] <- NA

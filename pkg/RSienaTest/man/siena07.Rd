@@ -71,7 +71,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 	"UserInterrupt". "UserInterrupt" indicates that the user asked for early
   termination before phase 3. }
   \item{theta}{Fitted value of theta.}
-  \item{covtheta}{Estimated covariance matrix of theta.}
+  \item{covtheta}{Estimated covariance matrix of theta; this is not available
+    if the sienaModel object x was produced with simOnly=TRUE.}
   \item{dfra}{Matrix of estimated derivatives.}
   \item{sf}{Matrix of deviations from target in phase 3.}
   \item{sf2}{Array of statistics from simulations in phase 3.}

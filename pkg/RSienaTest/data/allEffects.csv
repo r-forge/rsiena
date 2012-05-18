@@ -95,13 +95,17 @@ covarSymmetricObjective,xxxxxx similarity at distance 2,xxxxxx similarity at dis
 covarBipartiteObjective,xxxxxx alter,Sum of indegrees x xxxxxx,altX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarBipartiteObjective,xxxxxx squared alter,Sum of indegrees x squared xxxxxx,altSqX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarBipartiteObjective,xxxxxx ego,Sum of outdegrees x xxxxxx,egoX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
+covarBipartiteObjective,xxxxxx alter at distance 2,xxxxxx alter at distance 2,altDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic
+covarBipartiteObjective,xxxxxx similarity at distance 2,xxxxxx similarity at distance 2,simDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNonSymmetricObjective,xxxxxx alter,Sum of indegrees x xxxxxx,altX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNonSymmetricObjective,xxxxxx squared alter,Sum of indegrees x squared xxxxxx,altSqX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNonSymmetricObjective,xxxxxx ego,Sum of outdegrees x xxxxxx,egoX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
 covarNonSymmetricObjective,xxxxxx similarity,Similarity on xxxxxx,simX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNonSymmetricObjective,xxxxxx similarity x reciprocity,Similarity x reciprocity on xxxxxx,simRecipX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
+covarNonSymmetricObjective,transitive triplets xxxxxx similarity,Number of trans trip similar on xxxxxx,simXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNonSymmetricObjective,same xxxxxx,Same values on xxxxxx,sameX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNonSymmetricObjective,same xxxxxx x reciprocity,Same values x reciprocity on xxxxxx,sameXRecip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
+covarNonSymmetricObjective,transitive triplets same xxxxxx,Number of transitive triplets same on xxxxxx,sameXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 covarNonSymmetricObjective,xxxxxx ego x xxxxxx alter,Sum xxxxxx ego x xxxxxx alter,egoXaltX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNonSymmetricObjective,xxxxxx ego x xxxxxx alter x recipr.,Sum xxxxxx ego x xxxxxx rec.alter,egoXaltXRecip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNonSymmetricObjective,higher xxxxxx,ego > alter for xxxxxx,higher,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
@@ -126,6 +130,7 @@ nonSymmetricObjective,outdegree (density),Number of ties,density,TRUE,,,eval,FAL
 nonSymmetricObjective,reciprocity,Number of reciprocated ties,recip,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 nonSymmetricObjective,transitive triplets,Number of transitive triplets,transTrip,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,transitive mediated triplets,Number of transitive triplets,transMedTrip,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
+nonSymmetricObjective,transitive reciprocated triplets,Number of transitive reciprocated triplets,transRecTrip,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,3-cycles,3-cycles,cycle3,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,transitive ties,Number of ties with transitive closure,transTies,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,betweenness,betweenness count,between,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,

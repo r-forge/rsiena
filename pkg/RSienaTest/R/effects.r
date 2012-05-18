@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: effects.r
 # *
@@ -1244,9 +1244,17 @@ getNetworkStartingVals <- function(depvar)
             diag(z[ , , x]) <- NA
             diag(z[, , x + 1]) <- NA
             matdiff <- sum(z[, , x + 1] != z[, , x], na.rm=TRUE)
-            matchange <- table(z[, , x + 1], z[, , x])
+#            matchange0 <- table(z[, , x + 1], z[, , x])
+# Changed to protect against zero rows or columns
+            mc00 <- sum((1 - z[ , , x+1])*(1 - z[ , , x]), na.rm=TRUE)
+            mc01 <- sum(z[ , , x+1]*(1 - z[ , , x]), na.rm=TRUE)
+            mc10 <- sum((1 - z[ , , x+1])*z[ , , x], na.rm=TRUE)
+            mc11 <- sum(z[ , , x+1]*z[ , , x], na.rm=TRUE)
+			matchange <- matrix(c(mc00, mc01, mc10, mc11), 2, 2)
+#cat(matchange0,'\n',matchange,'\n')
             matcnt <- nactors * nactors -
                 sum(is.na(z[, , x + 1]) | is.na(z[, , x]))
+#browser()
             tmp <- c(matcnt=matcnt, matdiff=matdiff, matchange=matchange)
             names(tmp) <- c("matcnt", "matdiff", "matchangeFrom0To0",
                             "matchangeFrom0To1",
@@ -1357,7 +1365,14 @@ getBipartiteStartingVals <- function(depvar)
             depvar[use] <- depvar[use] - 10  ## remove structural values
         tmp <- sapply(1:noPeriods, function(x, z){
             matdiff <- sum(z[, , x + 1] != z[, , x], na.rm=TRUE)
-            matchange <- table(z[, , x + 1], z[, , x])
+#            matchange0 <- table(z[, , x + 1], z[, , x])
+            # Changed to protect against zero rows or columns
+			mc00 <- sum((1 - z[ , , x+1])*(1 - z[ , , x]), na.rm=TRUE)
+            mc01 <- sum(z[ , , x+1]*(1 - z[ , , x]), na.rm=TRUE)
+            mc10 <- sum((1 - z[ , , x+1])*z[ , , x], na.rm=TRUE)
+            mc11 <- sum(z[ , , x+1]*z[ , , x], na.rm=TRUE)
+			matchange <- matrix(c(mc00, mc01, mc10, mc11), 2, 2)
+#cat(matchange0,'\n',matchange,'\n')
             matcnt <- nsenders * nreceivers -
                 sum(is.na(z[, , x + 1]) | is.na(z[, , x]))
             tmp <- c(matcnt=matcnt, matdiff=matdiff, matchange=matchange)
