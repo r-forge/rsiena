@@ -135,6 +135,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new TransitiveMediatedTripletsEffect(pEffectInfo);
 	}
+	else if (effectName == "transRecTrip")
+	{
+		pEffect = new TransitiveReciprocatedTripletsEffect(pEffectInfo);
+	}
 	else if (effectName == "cycle3")
 	{
 		pEffect = new ThreeCyclesEffect(pEffectInfo);
@@ -263,6 +267,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new CovariateSimilarityEffect(pEffectInfo, true);
 	}
+	else if (effectName == "simXTransTrip")
+	{
+		pEffect = new SimilarityTransitiveTripletsEffect(pEffectInfo, false);
+	}
 	else if (effectName == "sameX")
 	{
 		pEffect = new SameCovariateEffect(pEffectInfo, false);
@@ -274,6 +282,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "sameXRecip")
 	{
 		pEffect = new SameCovariateEffect(pEffectInfo, true);
+	}
+	else if (effectName == "sameXTransTrip")
+	{
+		pEffect = new SameCovariateTransitiveTripletsEffect(pEffectInfo, false);
 	}
 	else if (effectName == "egoXaltX")
 	{

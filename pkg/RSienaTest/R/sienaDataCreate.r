@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: sienaDataCreate.r
 # *
@@ -593,10 +593,13 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     sum(is.na(myvector2) | is.na(myvector1))
                 attr(depvars[[i]], 'nonMissingEither')[j] <-
                     sum(!(is.na(myvector2) | is.na(myvector1)))
-            if (all(mydiff >= 0, na.rm=TRUE))
-                attr(depvars[[i]], 'downonly')[j] <- TRUE
-            if (all(mydiff <= 0, na.rm=TRUE))
-                attr(depvars[[i]], 'uponly')[j] <- TRUE
+				if (attr(depvars[[i]], 'allowOnly'))
+					{
+					if (all(mydiff >= 0, na.rm=TRUE))
+						attr(depvars[[i]], 'downonly')[j] <- TRUE
+					if (all(mydiff <= 0, na.rm=TRUE))
+						attr(depvars[[i]], 'uponly')[j] <- TRUE
+					}
             }
             rr <- range(depvars[[i]], na.rm=TRUE)
             if (rr[2] == rr[1] && !any(is.na(depvars[[i]])))
@@ -659,10 +662,13 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     mydiff <- mymat2 - mymat1
                     attr(depvars[[i]], 'distance')[j] <- sum(mydiff != 0,
                                                              na.rm = TRUE)
-                    if (all(mydiff@x >= 0, na.rm=TRUE))
-                        attr(depvars[[i]], 'uponly')[j] <- TRUE
-                    if (all(mydiff@x <= 0, na.rm=TRUE))
-                        attr(depvars[[i]], 'downonly')[j] <- TRUE
+					if (attr(depvars[[i]], 'allowOnly'))
+						{
+							if (all(mydiff@x >= 0, na.rm=TRUE))
+								attr(depvars[[i]], 'uponly')[j] <- TRUE
+							if (all(mydiff@x <= 0, na.rm=TRUE))
+								attr(depvars[[i]], 'downonly')[j] <- TRUE
+						}
                 }
                 else
                 {
@@ -691,10 +697,13 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                     mydiff <- mymat2 - mymat1
                     attr(depvars[[i]], 'distance')[j] <- sum(mydiff != 0,
                                                              na.rm = TRUE)
-                    if (all(mydiff >= 0, na.rm=TRUE))
-                        attr(depvars[[i]], 'uponly')[j] <- TRUE
-                    if (all(mydiff <= 0, na.rm=TRUE))
-                        attr(depvars[[i]], 'downonly')[j] <- TRUE
+					if (attr(depvars[[i]], 'allowOnly'))
+						{
+							if (all(mydiff >= 0, na.rm=TRUE))
+								attr(depvars[[i]], 'uponly')[j] <- TRUE
+							if (all(mydiff <= 0, na.rm=TRUE))
+								attr(depvars[[i]], 'downonly')[j] <- TRUE
+						}
                 }
             }
             if (type == 'oneMode')
@@ -772,7 +781,12 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
                            {
                                if (is.na(x["11"]))
                                {
-                                   x["1"]
+									if (is.na(x["1"]))
+									{
+										0
+									}
+									else
+									x["1"]
                                }
                                else
                                {

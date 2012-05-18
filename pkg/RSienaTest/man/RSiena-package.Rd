@@ -30,14 +30,14 @@ Fits models to longitudinal sets of networks.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.1-212\cr
-Date: \tab 2012-03-29\cr
+Version: \tab 1.1-213\cr
+Date: \tab 2012-05-07\cr
 License: \tab GPL-2 \cr
 LazyLoad: \tab yes\cr
 }
 }
 \author{
-  Ruth Ripley, Krists Boitmanis.
+  Ruth Ripley, Krists Boitmanis, Tom Snijders.
 
   Maintainer: RSiena developers <rsiena@stats.ox.ac.uk>
 }

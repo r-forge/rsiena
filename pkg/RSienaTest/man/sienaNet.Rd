@@ -7,7 +7,7 @@
 }
 \usage{
 sienaNet(netarray, type=c("oneMode", "bipartite", "behavior"),
-nodeSet="Actors", sparse=is.list(netarray))
+nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
 }
 \arguments{
   \item{netarray}{matrix (type="behavior" only)
@@ -18,6 +18,15 @@ nodeSet="Actors", sparse=is.list(netarray))
 	"rows" first, then "columns".}
   \item{sparse}{logical: set to TRUE if the data is in sparse matrix
     format, FALSE otherwise }
+  \item{allowOnly}{logical: If TRUE, it will be detected when between any
+    two consecutive waves the changes are non-decreasing or non-increasing,
+    and if this is the case, this will also be a constraint for the
+    simulations between these two waves.
+    This is done by means of the internal parameters uponly and downonly.
+    If FALSE, the parameters uponly and downonly always are
+    set to FALSE, and changes in dependent variables will not be constrained
+    to be non-decreasing or non-increasing.
+    For normal operation, TRUE is the appropriate option.}
 }
 \details{
   Adds attributes so that the array or list of matrices can be used in a
@@ -27,13 +36,14 @@ nodeSet="Actors", sparse=is.list(netarray))
 An object of class "sienaNet". An array or (networks only) a list of sparse
 matrices with attributes:
   \item{netdims}{Dimensions of the network or behavior
-	variable. Senders, receivers (1 for behavior), periods}
+	variable: senders, receivers (1 for behavior), periods}
   \item{type}{oneMode, bipartite or behavior}
-  \item{sparse}{Boolean: whether a list of sparse matrices or not}
+  \item{sparse}{Boolean: whether the network is given as a list of sparse matrices or not}
   \item{nodeSet}{Character string with name(s) of node set(s)}
+  \item{allowOnly}{The value of the allowOnly parameter}
 }
 \references{See \url{http://www.stats.ox.ac.uk/siena/}}
-\author{Ruth Ripley}
+\author{Ruth Ripley and Tom A.B. Snijders}
 \seealso{\code{\link{sienaDataCreate}}}
 \examples{
 

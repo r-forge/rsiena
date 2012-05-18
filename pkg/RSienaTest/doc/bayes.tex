@@ -58,7 +58,7 @@
 \begin{document}
 
 \title{RSiena: Bayesian models}
-\author{Ruth Ripley}
+\author{Ruth Ripley \& Tom Snijders}
 \date{}
 \maketitle
 
@@ -83,17 +83,29 @@ via prevAns.
   \item Create minimal chain and do burnin
   \item Do $n$ groups of \nnm{nrunMH} (as calculated by siena07 using the
     multiplication factor and the observed distance) steps to
-  estimate \nnm{dfra} as in siena07.
+  estimate \nnm{dfra} as in siena07. \label{item2}
   \item Transform \nnm{dfra} so can use basic rate parameters on log scale:
 Multiply rows and columns for basic rate parameters by the value. Diagonal
 entries for basic rate parameters should be
-$$ \textrm{deriv} * \textrm{value} + \textrm{score} * \textrm{value}^2 $$
-  \item Get scalefactors such that about 40 out of 100 Bayesian proposals after
-  single MH steps are accepted. See below for details of generation and
-  probabilities for Bayesian proposals. Keep theta unchanged throughout this
-  step.
+$$ \nnm{deriv} \times \nnm{value} + \nnm{score} \times \nnm{value}^2 $$
+Tom: I think Ruth made an error here.\\
+Note that \nnm{deriv} = element of \nnm{dfra}; \nnm{value} = basic rate parameter
+on the $\lambda$ (not log) scale.
+ Working with the derivatives shows that the equation should be
+$$ \nnm{deriv} \times \nnm{value}^2 + \nnm{score} \times \nnm{value} $$
+and that for the Poisson distribution, working with expected Fisher information,
+this is equal to
+$$  \nnm{value} \ . $$
+(Check: if $X \sim \textrm{Poisson}(\lambda)$, then $\text{var}_\lambda \log(\hat\lambda)
+=\text{var}_\lambda \log(X) \approx 1/\lambda $.)
+
+  \item Get scalefactors such that about 40 out of 100 Bayesian proposals
+      after single MH steps are accepted. See below for details of
+      generation and probabilities for Bayesian proposals. Keep theta
+      unchanged throughout this step. \label{item5}
 \item Do a warming phase of \nnm{nwarm} iterations of some number (hard-coded to
   4 at the moment) of MH steps.
+\item Added by Tom: repeat steps \ref{item2}-\ref{item5}.
 \item Do requested number of Bayesian iterations. The
   length of the ML ones are determined by the multiplication factor and the
   observed distance.
@@ -105,7 +117,7 @@ $$ \textrm{deriv} * \textrm{value} + \textrm{score} * \textrm{value}^2 $$
 \STATE Create a mask to exclude basic rate effects for other periods than this
 group.
 \STATE Get a multivariate normal with mean 0 and covariance masked inverse of
-\nnm{dfra} * scale factor for this group
+\nnm{dfra} $\times$ scale factor for this group
 \STATE Calculate the proposal probability:
 \begin{description}
 \item[prior] Multivariate normal density for the parameters with mean 0

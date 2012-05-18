@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: sienaModelCreate.r
 # *
@@ -26,7 +26,7 @@ sienaModelCreate <-
              pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
              prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
              minimumPermutationLength=2, initialPermutationLength=20,
-             modelType=1, mult=5)
+             modelType=1, mult=5, simOnly=FALSE)
 {
     model <- NULL
     model$projname <- projname
@@ -37,6 +37,7 @@ sienaModelCreate <-
     model$maxrat <- 1.0
     model$maxmaxrat <- 10.0
     model$maxlike <-  maxlike
+	model$simOnly <- simOnly
     model$FRANname <- deparse(substitute(fn))
     if (maxlike)
     {

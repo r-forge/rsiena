@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: phase3.r
 # *
@@ -88,8 +88,11 @@ phase3.2 <- function(z, x, ...)
         Report(c('Time per iteration in phase 3   = ',
                  format(z$timePhase3, nsmall=4, digits=4), '\n'), lf)
 	}
-    z <- CalculateDerivative3(z, x)
-    z <- PotentialNR(z, x, FALSE)
+	z <- CalculateDerivative3(z, x)
+	if (!x$simOnly)
+	{
+		z <- PotentialNR(z, x, FALSE)
+	}	
     if (any(z$newfixed))
     {
         Report('There was a problem in obtaining convergence.\n', outf)
@@ -218,61 +221,64 @@ phase3.2 <- function(z, x, ...)
 			}
 		}
 	}
-    if (x$maxlike)
-    {
-        Report('Estimated complete data information matrix: \n', cf)
-        PrtOutMat(z$dfra, cf)
-        Report(c('Estimated conditional covariance matrix score function ',
-               '(unobserved information):\n'), cf)
-        PrtOutMat(z$msf, cf)
-        Report('\n', cf)
-        dfrac <- z$dfra - z$msf
-		## dfrac[z$fixed[row(dfrac)] | z$fixed[col(dfrac)]] <- 0
-		## a clever way to do it
-        dfrac[z$fixed, ] <- 0
-        dfrac[ ,z$fixed] <- 0
-        diag(dfrac)[z$fixed] <- 1
-        if (inherits(try(cov <- solve(dfrac)),"try-error"))
-        {
-            Report('Noninvertible estimated covariance matrix : \n', outf)
-            cov <- NULL
-        }
-    }
-    else
+	if (!x$simOnly)
 	{
-        cov <- z$dinv %*% z$msfc %*% t(z$dinv)
-	}
-    error <- FALSE
-    if (inherits(try(msfinv <- solve(z$msfc)), "try-error"))
-    {
-        Report('Covariance matrix not positive definite: \n', outf)
-        if (any(z$fixed || any(z$newfixed)))
+		if (x$maxlike)
 		{
-            Report(c('(This may be unimportant, and related to the fact\n',
-                   'that some parameters are fixed.)\n'), outf)
+			Report('Estimated complete data information matrix: \n', cf)
+			PrtOutMat(z$dfra, cf)
+			Report(c('Estimated conditional covariance matrix score function ',
+				'(unobserved information):\n'), cf)
+			PrtOutMat(z$msf, cf)
+			Report('\n', cf)
+			dfrac <- z$dfra - z$msf
+			## dfrac[z$fixed[row(dfrac)] | z$fixed[col(dfrac)]] <- 0
+			## a clever way to do it
+			dfrac[z$fixed, ] <- 0
+			dfrac[ ,z$fixed] <- 0
+			diag(dfrac)[z$fixed] <- 1
+			if (inherits(try(cov <- solve(dfrac)),"try-error"))
+			{
+				Report('Noninvertible estimated covariance matrix : \n', outf)
+				cov <- NULL
+			}
 		}
-        else
+		else
 		{
-            Report(c('This may mean that the reported standard errors ',
-                     'are invalid.\n'), outf)
+			cov <- z$dinv %*% z$msfc %*% t(z$dinv)
 		}
-        z$msfinv <- NULL
-    }
-    else
-	{
-        z$msfinv <- msfinv
-	}
-    if (!is.null(cov))
-    {
-        z$diver <- (z$fixed | z$diver | diag(cov) < 1e-9) & (!z$AllUserFixed)
-		## beware: recycling works for one direction but not the other
-        diag(cov)[z$diver] <- 99 * 99
-        cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
-		diag(cov)[z$diver] <- 99 * 99
-		cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
-        diag(cov)[z$diver] <- 99 * 99
-    }
-    z$covtheta <- cov
+		error <- FALSE
+		if (inherits(try(msfinv <- solve(z$msfc)), "try-error"))
+		{
+			Report('Covariance matrix not positive definite: \n', outf)
+			if (any(z$fixed || any(z$newfixed)))
+			{
+				Report(c('(This may be unimportant, and related to the fact\n',
+					'that some parameters are fixed.)\n'), outf)
+			}
+			else
+			{
+				Report(c('This may mean that the reported standard errors ',
+						'are invalid.\n'), outf)
+			}
+			z$msfinv <- NULL
+		}
+		else
+		{
+			z$msfinv <- msfinv
+		}
+		if (!is.null(cov))
+		{
+			z$diver <- (z$fixed | z$diver | diag(cov) < 1e-9) & (!z$AllUserFixed)
+			## beware: recycling works for one direction but not the other
+			diag(cov)[z$diver] <- 99 * 99
+			cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
+			diag(cov)[z$diver] <- 99 * 99
+			cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
+			diag(cov)[z$diver] <- 99 * 99
+		}
+		z$covtheta <- cov
+	}	
 	## ans<-InstabilityAnalysis(z)
 	z
 }

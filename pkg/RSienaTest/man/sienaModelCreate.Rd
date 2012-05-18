@@ -17,7 +17,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
      prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
      prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
-     modelType=1, mult=5)
+     modelType=1, mult=5, simOnly=FALSE)
 }
 \arguments{
   \item{fn}{Function to do one simulation in the Robbins-Monro
@@ -78,6 +78,11 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{mult}{Multiplication factor for maximum likelihood. Number of
 	steps per iteration is set to this multiple of the total distance
 	between the observations at start and finish of the wave.}
+  \item{simOnly}{Logical: If TRUE, then the calculation of the covariance
+    matrix and standard errors of the estimates at the end of
+    Phase 3 of the estimation algorithm in function siena07 is skipped. 
+	This is suitable if nsub=0 and siena07 is used only for the purpose
+    of simulation.}
 }
 \details{Model specification is done via this object for
   \code{\link{siena07}}.
@@ -134,9 +139,11 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{mult}{Multiplication factor for maximum likelihood. Number of
 	steps per iteration is set to this multiple of the total distance
 	between the observations at start and finish of the wave.}
+  \item{simOnly}{Logical, indicating whether output of covariance matrix
+   by \code{\link{siena07}} is to be skipped.}
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
-\author{Ruth Ripley }
+\author{Ruth Ripley and Tom A.B. Snijders}
 \seealso{This is for use in \code{\link{siena07}}.}
 \examples{
 
