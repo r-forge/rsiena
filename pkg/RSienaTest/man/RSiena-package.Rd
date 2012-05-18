@@ -31,7 +31,7 @@ Fits models to longitudinal sets of networks.
 Package: \tab RSiena\cr
 Type: \tab Package\cr
 Version: \tab 1.1-213\cr
-Date: \tab 2012-05-07\cr
+Date: \tab 2012-05-18\cr
 License: \tab GPL-2 \cr
 LazyLoad: \tab yes\cr
 }

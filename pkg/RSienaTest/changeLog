@@ -1,6 +1,5 @@
 2012-05-18 R-forge revision 213
    All for RSienaTest only.
-   * R\bayes.r modified - still a test version.
 	* R\effects.r and R\printInitialDescription.r:
 	  protect against situations where matrix matchange has zero rows or columns
 	  (i.e., minor bug fix)
@@ -10,7 +9,7 @@
 	  simulation without estimation.
    * R\initializeFRAN.r, R\sienaDataCreate.r, R\sienautils.r, man\sienaNet.Rd:
      incorporate argument allowOnly in sienaNet() to permit 
-	  ignoring monotonicity in dataand its consequences ofr upOnly and downOnly.
+	  ignoring monotonicity in data and its consequences for upOnly and downOnly.
    * data/allEffects.csv,
 	  src/model/effects/allEffects.h, src/model/effects/effectFactory.cpp,
      src/model/effects/SameCovariateTransitiveTripletsEffect.cpp,
