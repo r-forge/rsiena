@@ -5458,7 +5458,7 @@ the restriction that simulations follow monotonicity patterns
 in the data (see Section~\ref{S_monotone}) can be undesirable.
 This restriction can be lifted by using \texttt{allowOnly = FALSE}
 in the call of \sfn{sienaNet} (see the help file for this function).
-This parameter will then set any \textt{uponly} and \texttt{downonly}
+This parameter will then set any \texttt{uponly} and \texttt{downonly}
 flags to \texttt{FALSE}, precluding monotonicity constraints.
 
 \iffalse
@@ -6348,7 +6348,7 @@ between the true deviations $\theta_j - \theta$
 and the random errors $E_j$,
 is based on Fisher's method for combining independent $p$-values;
 the principle of this combination method of \citet{Fisher32} is described in
-\citet{HedgesOlkin85}    and (briefly) in \citet[Chapter 3]{SnijdersBosker99}.
+\citet{HedgesOlkin85}    and (briefly) in \citet[Chapter 3]{SnijdersBosker12}.
 
 This principle here is applied in a double test:
 \begin{enumerate}
@@ -9996,9 +9996,20 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
-\item 2012-03-29 R-forge revision 211
+\item 2012-05-18 R-forge revision 213, for RSienaTest only:
+    \begin{itemize}
+     \item Corrected bugs that occurred when observed networks have density 0 or 1
+     (not that it is generally advisable to use such data sets).
+     \item Incorporated argument simOnly in sienaModelCreate() to facilitate
+	  simulation without estimation.
+     \item Incorporated argument allowOnly in sienaNet() to permit
+	  ignoring monotonicity in data and its consequences for upOnly and downOnly.
+     \item Some new effects: interactions between reciprocity and
+       transitivity.
+    \end{itemize}
+\item 2012-03-29 R-forge revision 211\\
 Fixed bug in effectsDocumentation.
-\item 2012-03-29 R-forge revision 210
+\item 2012-03-29 R-forge revision 210\\
 Altered ML code in hope of fixing intermittent ML bug. Just might cause
 different answers.
 \item 2012-03-25 R-forge revision 208

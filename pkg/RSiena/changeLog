@@ -1,3 +1,25 @@
+2012-05-18 R-forge revision 213
+   All for RSienaTest only.
+	* R\effects.r and R\printInitialDescription.r:
+	  protect against situations where matrix matchange has zero rows or columns
+	  (i.e., minor bug fix)
+	* R\sienaprint.r, R\print07Report.r, R\phase3.r, R\terminateFRAN.r, 
+	  R\robmon.r, R\sienaModelcreate.r, man\siena07.Rd, man\sienaModelCreate.r:	
+	  incorporate argument simOnly in sienaModelCreate() to facilitate
+	  simulation without estimation.
+   * R\initializeFRAN.r, R\sienaDataCreate.r, R\sienautils.r, man\sienaNet.Rd:
+     incorporate argument allowOnly in sienaNet() to permit 
+	  ignoring monotonicity in data and its consequences for upOnly and downOnly.
+   * data/allEffects.csv,
+	  src/model/effects/allEffects.h, src/model/effects/effectFactory.cpp,
+     src/model/effects/SameCovariateTransitiveTripletsEffect.cpp,
+     src/model/effects/SameCovariateTransitiveTripletsEffect.h,
+     src/model/effects/TransitiveReciprocatedTripletsEffect.h,
+     src/model/effects/TransitiveReciprocatedTripletsEffect.cpp,
+     src/model/effects/SimilarityTransitiveTripletsEffect.h,
+     src/model/effects/SimilarityTransitiveTripletsEffect.cpp:
+     new effects
+
 2012-03-29 R-forge revision 212
    * update of RSiena_Manual.tex, RSiena.bib (both packages)
 

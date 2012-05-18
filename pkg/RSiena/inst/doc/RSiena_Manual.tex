@@ -11,10 +11,10 @@
 %\usepackage[top=2.5cm, bottom=2.5cm, left=2cm , right=1.8cm]{geometry}
 \usepackage[pdftex,svgnames]{xcolor}
 \usepackage{verbatim}
-
 \usepackage{pictexwd}
 %\usepackage{supertabular}
 %\usepackage{tabls}
+%\usepackage{url}
 
 \usepackage{enumitem}
 
@@ -954,7 +954,7 @@ are \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
 A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
 and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
 
-More specific references are \citet{Schweinberger11} for the score-type goodness
+More specific references are \citet{Schweinberger12} for the score-type goodness
 of fit tests and \citet{SchweinbergerSnijders07a} for the calculation of
 standard errors of the Method of Moments estimators. For assessing and
 correcting time heterogeneity, and associated model selection considerations,
@@ -1585,7 +1585,7 @@ or the actor variable, respectively,
 must provide valid data both at the beginning and at the end of a
 period for being counted in the respective target statistics.
 
-\subsection{Composition change}
+\subsection{Composition change: joiners and leavers}
 \label{S_comp}
 
 \SI can also be used to analyze networks of which the composition
@@ -1760,7 +1760,8 @@ the name of the variable.
 
 %The dependent network variable is not centered.
 
-\subsection{Monotone dependent variables}
+\subsection{Monotonic dependent variables}
+\label{S_monotone}
 
 In some data sets, a dependent variable only increases, or only decreases.
 For a network, this means that ties can be created but not terminated,
@@ -1777,6 +1778,9 @@ internally by a variable called \texttt{uponly} indicating that the
 dependent variable cannot decrease,
 and a variable \texttt{downonly} indicating that the
 dependent variable cannot increase.
+The constraints signaled by the  \texttt{uponly} and  \texttt{downonly}
+variables can be lifted by using \texttt{allowOnly = FALSE}
+in the call of \sfn{sienaNet} (see the help file for this function).
 
 If a dependent variable is only increasing or only decreasing
 for all periods, then two of the basic effects defined below
@@ -5094,12 +5098,12 @@ a parameter without estimating it.
 
 This is done using the generalized Neyman-Rao score test
 that is implemented for the Method of Moments estimation method
-in \si, following the methods of \citet{Schweinberger11}.
+in \si, following the methods of \citet{Schweinberger12}.
 For the ML estimation method,
 following the same steps produces the \citet{Rao47} efficient score test.
 Since the name of ``score test'' is associated with
 likelihood-based analysis as in \citet{Rao47}, the test
-of  \citet{Schweinberger11} that is associated with the Method of Moments
+of  \citet{Schweinberger12} that is associated with the Method of Moments
 is called ``score-type test''.
 
 When using the score-type test, some model
@@ -5448,6 +5452,14 @@ desired value to the vector
 \begin{verbatim}
 myeff$initialValue[myeff$include]
 \end{verbatim}
+
+When artificial data sets are generated that have close link to observed data,
+the restriction that simulations follow monotonicity patterns
+in the data (see Section~\ref{S_monotone}) can be undesirable.
+This restriction can be lifted by using \texttt{allowOnly = FALSE}
+in the call of \sfn{sienaNet} (see the help file for this function).
+This parameter will then set any \texttt{uponly} and \texttt{downonly}
+flags to \texttt{FALSE}, precluding monotonicity constraints.
 
 \iffalse
 When only 1 run is requested, an entire data set is generated
@@ -6023,8 +6035,8 @@ too little information about their value).
 \fi
 
 \iffalse
-\subsection{Composition change}
-
+\subsection{Composition change: joiners and leavers}
+(Siena 3 text).
 Example data files for a network of changing composition are also
 provided with the program. These files are called {\sf
 vtest2.dat}, {\sf vtest3.dat}, and {\sf vtest4.dat}. They contain
@@ -6336,7 +6348,7 @@ between the true deviations $\theta_j - \theta$
 and the random errors $E_j$,
 is based on Fisher's method for combining independent $p$-values;
 the principle of this combination method of \citet{Fisher32} is described in
-\citet{HedgesOlkin85}    and (briefly) in \citet[Chapter 3]{SnijdersBosker99}.
+\citet{HedgesOlkin85}    and (briefly) in \citet[Chapter 3]{SnijdersBosker12}.
 
 This principle here is applied in a double test:
 \begin{enumerate}
@@ -6535,7 +6547,8 @@ Structural effects are the effects depending on the network only.
 
 
 \begin{enumerate}
- \item  \hypertarget{T_density}{{\em out-degree effect}} or \emph{density effect} \texttt{(density)},
+ \item  \hypertarget{T_density}{{\em out-degree effect}} or
+ \emph{density effect} \texttt{(density)},
  defined by the out-degree\\
  $s^{\rm net}_{i\vit}(x) = x_{i+} = \sum_j x_{ij}$,\\
  where $x_{ij}=1$ indicates presence of a tie from $i$ to $j$
@@ -6545,7 +6558,8 @@ Structural effects are the effects depending on the network only.
  defined by the number of reciprocated ties\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\,x_{ji}$;
 
- \item \hypertarget{T_transtrip}{{\em transitive triplets effect}} \texttt{(transTrip)},
+ \item \hypertarget{T_transtrip}{{\em transitive triplets effect}}
+ \texttt{(transTrip)},
    defined by the number of transitive
  patterns in $i$'s relations (ordered pairs of actors
  $(j,h)$ to both of whom $i$ is tied, while also $j$ is tied to $h$),\\
@@ -6561,14 +6575,25 @@ Structural effects are the effects depending on the network only.
  defined by the number of transitive patterns in $i$'s
  relations where $i$ has the mediating position
  (ordered pairs of actors
- $(j,h)$ for which $j$ is tied to $i$ and $i$ to $h$, while also $j$ is tied to $h$),
- which is different from the transitive triplets effect only for directed networks,\\
+ $(j,h)$ for which $j$ is tied to $i$ and $i$ to $h$, while also $j$ is tied
+ to $h$),  which is different from the transitive triplets effect
+ only for directed networks,\\
   $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ji}\, x_{ih}\, x_{jh}\,$;\\
  this cannot be used together with the transitive triplets effect in
  Method of Moments estimation, because of perfect collinearity
  of the fit statistics;
 
- \item \hypertarget{T_cycle3}{{\em number of three-cycles}} \texttt{(cycle3)}, \\
+
+ \item \hypertarget{T_transtrip}
+ {{\em transitive reciprocated triplets effect}}  \texttt{(transRecTrip)},
+ which can be regarded as an interaction between the transitive triplets
+ effect and reciprocity, where the reciprocated tie is the tie
+ $i \leftrightarrow j$  that  closes the two-path
+ $i \rightarrow h \rightarrow j$,\\
+  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{ji}\, x_{ih}\, x_{jh}\,$;
+
+ \item \hypertarget{T_cycle3}{{\em number of three-cycles}}
+ \texttt{(cycle3)}, \\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{jh}\, x_{hi}\,$;
 
 
@@ -6578,7 +6603,8 @@ Structural effects are the effects depending on the network only.
             x_{i_1 j_1}\, x_{i_1 j_2}\, x_{i_2 j_1}\, x_{i_2 j_2}\,$;\\
  for parameter $p=2$ the square root is taken;
 
- \item {\em transitive ties effect} \texttt{(transTies)} (earlier called \emph{(direct and indirect ties) effect}),
+ \item {\em transitive ties effect} \texttt{(transTies)}
+ (earlier called \emph{(direct and indirect ties) effect}),
  defined by
  the number of actors to whom $i$ is directly as well as indirectly tied, \\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij} \, \max_h (x_{ih}\, x_{hj}) $;
@@ -6599,14 +6625,15 @@ Structural effects are the effects depending on the network only.
  \mid x_{ih}(t_m) - x_{jh}(t_m) \mid \,.\]
  This may also be regarded as \emph{structural equivalence
  with respect to outgoing ties}.
- (In \SI versions before 3.324, this was divided by $n-2$, which for larger networks
- tended to lead to quite large estimates and standard errors.
+ (In \SI versions before 3.324, this was divided by $n-2$, which for larger
+ networks tended to lead to quite large estimates and standard errors.
  Therefore in version 3.324, the division by $n-2$
  -- which had not always been there -- was dropped.)
 
 \item {\em structural equivalence effect with respect to
-      incoming ties} \texttt{(inStructEq)}, which is an analogue to the balance effect
-      but now considering similarity with respect to incoming ties,
+      incoming ties} \texttt{(inStructEq)}, which is an analogue to the
+      balance effect but now considering similarity with respect to incoming
+      ties,
       \begin{subequations}
       \begin{equation}
       s^{\rm net}_{i\vit}(x) = \sum x_{ij} d_{ij}
@@ -7035,6 +7062,13 @@ the following effects are available:
  reciprocal dyads in which $i$ is situated,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}x_{ji} ({\rm sim}^v_{ij} - \widehat{{\rm sim}^v}) $;
 
+ \item {\em covariate-related similarity $\times$ transitive triplets}
+ \texttt{(simXTransTrip)}, defined by the sum of transitive triplets
+ $i \rightarrow h \rightarrow j \leftarrow i$
+ weighted by the centered similarity scores between $i$ and $j$,\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, x_{ih} \, x_{hj}
+         ({\rm sim}^v_{ij} - \widehat{{\rm sim}^v}) $;
+
  \item \emph{same covariate}, which can also be called {\em covariate-related identity} \texttt{(sameX)},
  defined by the
  number of ties of $i$ to all other actors $j$ who have
@@ -7048,6 +7082,13 @@ the following effects are available:
  number of reciprocated ties between $i$ and all other actors $j$ who have
  exactly the same value on the covariate,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} x_{ji}\, I\{v_i = v_j \} $;
+
+ \item {\em same covariate $\times$ transitive triplets}
+ \texttt{(sameXTransTrip)}, defined by the number of transitive triplets
+ $i \rightarrow h \rightarrow j \leftarrow i$
+ that have the same covariate value for $i$ and $j$,\\
+ $s^{\rm net}_{i\vit}(x) =
+ \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i = v_j\}$;
 
  \item {\em covariate-ego $\times$ alter} \texttt{(egoXaltX)},
  defined by the product of $i$'s covariate and the sum of those of his alters,\\
@@ -9955,9 +9996,20 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
-\item 2012-03-29 R-forge revision 211
+\item 2012-05-18 R-forge revision 213, for RSienaTest only:
+    \begin{itemize}
+     \item Corrected bugs that occurred when observed networks have density 0 or 1
+     (not that it is generally advisable to use such data sets).
+     \item Incorporated argument simOnly in sienaModelCreate() to facilitate
+	  simulation without estimation.
+     \item Incorporated argument allowOnly in sienaNet() to permit
+	  ignoring monotonicity in data and its consequences for upOnly and downOnly.
+     \item Some new effects: interactions between reciprocity and
+       transitivity.
+    \end{itemize}
+\item 2012-03-29 R-forge revision 211\\
 Fixed bug in effectsDocumentation.
-\item 2012-03-29 R-forge revision 210
+\item 2012-03-29 R-forge revision 210\\
 Altered ML code in hope of fixing intermittent ML bug. Just might cause
 different answers.
 \item 2012-03-25 R-forge revision 208
