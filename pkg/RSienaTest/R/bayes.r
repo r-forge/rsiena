@@ -1,7 +1,7 @@
 ##/*****************************************************************************
 ## * SIENA: Simulation Investigation for Empirical Network Analysis
 ## *
-## * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+## * Web: http://www.stats.ox.ac.uk/~snijders/siena
 ## *
 ## * File: bayes.r
 ## *
@@ -9,9 +9,10 @@
 ## * Many functions are defined within others to reduce copying of objects.
 ## *
 ## ****************************************************************************/
-##@bayes Bayesian fit a Bayesian model
+##@bayes Bayesian fit a Bayesian model, allowing a hierarchical structure
 bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
-                  plotit=FALSE, nbrNodes=1, dfra=NULL, n=10,
+                  plotit=FALSE, nbrNodes=1, dfra=NULL, nderiv=10,
+				  storeAll = FALSE,
                   priorSigma=NULL, prevAns=NULL, clusterType=c("PSOCK", "FORK"),
 				  getDocumentation=FALSE)
 {
@@ -19,54 +20,116 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     createStores <- function()
     {
         npar <- length(z$theta)
-        numberRows <- nmain * nrunMHBatches
+
+		numberRows <- nmain * nrunMHBatches
         z$posteriorTot <<- matrix(0, nrow=z$nGroup, ncol=npar)
         z$posteriorMII <<- array(0, dim=c(z$nGroup, npar, npar))
         z$candidates <<- array(NA, dim=c(numberRows, z$nGroup, npar))
         z$acceptances <<- matrix(NA, ncol=z$nGroup, nrow=numberRows)
-        z$MHacceptances <<- array(NA, dim=c(numberRows, z$nGroup,
+		if (storeAll)
+		{
+			z$MHacceptances <<- array(NA, dim=c(numberRows, z$nGroup,
 									 z$nDependentVariables, 9))
-        z$MHrejections <<- array(NA, dim=c(numberRows, z$nGroup,
+			z$MHrejections <<- array(NA, dim=c(numberRows, z$nGroup,
 									 z$nDependentVariables, 9))
-        z$MHproportions <<- array(NA, dim=c(numberRows, z$nGroup,
+			z$MHproportions <<- array(NA, dim=c(numberRows, z$nGroup,
 									 z$nDependentVariables, 9))
-    }
-    ##@storeData internal bayes Bayesian put data in stores
+		}
+		# johan's new stores with default values
+		z$mu0 <<- matrix( c(0), z$TruNumPars, 1 )
+		z$kappa0 <<- 1
+		z$vzero <<- c(1)
+		z$varianceCovMatrPrior <<- diag(z$TruNumPars)
+		if (storeAll)
+		{
+			z$StorePosteriorMu <<- matrix(0, nrow=numberRows, ncol=z$TruNumPars)
+			z$StorePosteriorSigma <<-
+					array( NA, dim=c(numberRows, z$TruNumPars, z$TruNumPars) )
+			# tom's additional stores
+			z$StoreLoglik <<- rep(NA, numberRows)
+		}
+		# tom's additional thinned and warming stores
+		z$ThinPosteriorMu <<- matrix(NA, nrow=nmain, ncol=z$TruNumPars)
+		z$ThinPosteriorSigma <<-
+					array( NA, dim=c(nmain, z$TruNumPars, z$TruNumPars) )
+		z$ThinLoglik <<- rep(NA, nmain)
+		z$ThinParameters <<- array(NA, dim=c(nmain, z$nGroup, z$TruNumPars))
+		z$ThinBayesAcceptances <<- matrix(NA, nrow=nmain, ncol=z$nGroup)
+		z$warmingMu <<- matrix(NA, nrow=nwarm, ncol=z$TruNumPars)
+		z$warmingBasicRates <<- matrix(NA, nrow=nwarm, ncol=sum(z$basicRate))
+	}
+
+    ##@storeData internal bayes; put data in stores
     storeData <- function()
     {
         start <- z$sub + 1
         nrun <- nrow(z$parameters)
         end <- start + nrun - 1
-        z$acceptances[start:end, ] <<- z$accepts
-        z$candidates[start:end,, ] <<- z$parameters
         z$posteriorTot <<- z$posteriorTot + colSums(z$parameters)
+		if (storeAll)
+		{
+			z$acceptances[start:end, ] <<- z$accepts
+			z$candidates[start:end,, ] <<- z$parameters
+			z$StorePosteriorMu[start:end, ] <<- z$posteriorMu
+			z$StorePosteriorSigma[start:end, , ] <<-  z$PosteriorSigma
+			z$StoreLoglik[start:end] <<- z$loglikVec
+		}
+		# Tom: Also store a thinned version of the process,
+		# containing only the final values in the main steps:
+        z$ThinPosteriorMu[z$iimain, ] <<- z$posteriorMu[nrun,]
+		z$ThinPosteriorSigma[z$iimain, , ] <<-  z$PosteriorSigma[nrun,,]
+        z$ThinLoglik[z$iimain] <<- z$loglikVec[nrun]
+		z$ThinBayesAcceptances[z$iimain, ] <<- z$BayesAcceptances
+
         for (group in 1:z$nGroup)
         {
+			# Drop those elements of the parameters array
+			# that are NA because for a given group they refer
+			# to rate parameters of other groups.
+			z$ThinParameters[z$iimain, group, ] <<-
+				z$parameters[nrun, group,!is.na(z$parameters[nrun, group, ])]
             for (i in dim(z$parameters)[1])
             {
                 z$posteriorMII[group, , ] <<- z$posteriorMII[group, ,] +
                     outer(z$parameters[i, group, ], z$parameters[i, group, ])
             }
         }
-        z$MHacceptances[start:end, , , ] <<- z$MHaccepts
-        z$MHrejections[start:end, , , ] <<- z$MHrejects
-        z$MHproportions[start:end, , , ] <<- z$MHaccepts /
-            (z$MHaccepts + z$MHrejects)
+		if (storeAll)
+		{
+			z$MHacceptances[start:end, , , ] <<- z$MHaccepts
+			z$MHrejections[start:end, , , ] <<- z$MHrejects
+			z$MHproportions[start:end, , , ] <<- z$MHaccepts /
+				(z$MHaccepts + z$MHrejects)
+        }
         z$sub <<- z$sub + nrun
-
     }
-	##@improveMH internal bayes Bayesian find scale factors
+
+    ##@storeWarmingData internal bayes; put data in stores during warmup
+    storeWarmingData <- function()
+    {
+		z$warmingMu[z$iiwarm,] <<- colMeans(z$posteriorMu)
+        for (group in 1:z$nGroup)
+        {
+		# Stores only the first basic rate parameters
+			groupStart <- (group-1)*length(z$ratePositions[[1]]) + 1
+			groupEnd <- group*length(z$ratePositions[[1]])
+			z$warmingBasicRates[z$iiwarm, groupStart:groupEnd] <<-
+			    mean(z$parameters[, group, z$ratePositions[[group]]])
+        }
+    }
+
+	##@improveMH internal bayes; find scale factors
     improveMH <- function(tiny=1.0e-15, desired=40, maxiter=100,
-                          tolerance=15, getDocumentation=FALSE)
+							tolerance=15, getDocumentation=FALSE)
     {
 		##@rescaleCGD internal improveMH Bayesian
         rescaleCGD <- function(iter)
         {
 			u <- ifelse (actual > desired,
-                         2 - ((iter - actual) / (iter - desired)),
-                         1 / (2 - (actual / desired)))
+							2 - ((iter - actual) / (iter - desired)),
+							1 / (2 - (actual / desired)))
             number <<- ifelse(abs(actual - desired) <= tolerance,
-                               number + 1, 0 )
+								number + 1, 0 )
             success <<- number >= 2
             u
         }
@@ -78,6 +141,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
         iter <- 0
         number <- rep(0, z$nGroup)
         success <- rep(FALSE, z$nGroup)
+		cat('improveMH\n')
         repeat
         {
             iter <- iter + 1
@@ -86,7 +150,9 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             ans <- rescaleCGD(100)
             update <- number < 3
             z$scaleFactors[update] <<- z$scaleFactors[update] * ans[update]
-            cat(actual, ans, z$scaleFactors, '\n')
+            cat(iter, '.', actual, '\n    ', ans, '\n')
+			cat(' ', z$scaleFactors, '\n')
+			flush.console()
             if (all(success) || iter == maxiter)
             {
                 break
@@ -94,13 +160,15 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             if (any(z$scaleFactors < tiny))
             {
                 cat('scalefactor < tiny\n')
+				flush.console()
                 browser()
             }
         }
-        cat('fine tuning took ', iter, ' iterations. Scalefactor:',
-            z$scaleFactors, '\n')
+        cat('fine tuning took ', iter, ' iterations.\n')
+		cat('Scalefactor:', z$scaleFactors, '\n')
+		flush.console()
     }
-	##@MCMCcycle internal Bayes do some loops of (MH steps and sample parameters)
+	##@MCMCcycle internal bayes; some loops of (MH steps and sample parameters)
 	MCMCcycle <- function(nrunMH, nrunMHBatches, change=TRUE)
 	{
 		z$accepts <<- matrix(NA, nrow=z$nGroup, nrunMHBatches)
@@ -111,8 +179,12 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 								  z$nDependentVariables, 9))
 		z$MHaborts <<- array(NA, dim=c(nrunMHBatches, z$nGroup,
 								 z$nDependentVariables, 9))
+		z$posteriorMu <<- matrix(0, nrow=nrunMHBatches, ncol=z$TruNumPars)
+		z$PosteriorSigma <<- array( NA,
+							dim=c(nrunMHBatches, z$TruNumPars, z$TruNumPars) )
 		storeNrunMH <- z$nrunMH
 		z$nrunMH <<- nrunMH
+		z$loglikVec <<- rep(NA, nrunMHBatches)
 		for (i in 1:nrunMHBatches)
 		{
 		#	cc <- proc.time()[1]
@@ -125,6 +197,17 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 			sampleParameters(change)
 										#	cc1 <- proc.time()[1]
 										#	cat('samp',cc1-cc, '\n')
+			# update grand means and covariance
+			# do we need to check that there are more than one group?
+			if ( z$nGroup > 1)
+			{
+				sampleMu()
+				#print(z$muTemp)
+				z$posteriorMu[i, ] <<- z$muTemp
+				z$PosteriorSigma[i, ,] <<- z$SigmaTemp
+			}
+			z$loglikVec[i] <<- z$loglik
+			# back to Ruth
 			z$accepts[, i] <<- z$accept
 			z$parameters[i, , ] <<- z$thetaMat
 			z$MHaccepts[i, , , ] <<-
@@ -142,46 +225,56 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 		z$BayesAcceptances <<- rowSums(z$accepts)
 		z$nrunMH <<- storeNrunMH
 	}
-	##@sampleParameters algorithms propose new parameters and accept them or not
+
+	##@sampleParameters internal bayes; propose new parameters and accept them or not
 	sampleParameters <- function(change=TRUE)
 	{
 		## get a multivariate normal with covariance matrix dfra multiplied by a
 		## scale factor which varies between groups
 		require(MASS)
-		thetaChanges <- t(sapply(1:z$nGroup, function(i)
-							 {
-								 tmp <- z$thetaMat[i, ]
-								 use <- !is.na(z$thetaMat[i, ])
-								 tmp[use] <-
-									 mvrnorm(1, mu=rep(0, sum(use)),
-											 Sigma=z$scaleFactors[i] *
-											 z$dfra[use, use])
-								 tmp
-							 }
-								 ))
+
+		 	# do the fandango
+
+			# this is only for developing purposes so that we
+			# may play around with custom made proposal variances
+				thetaChanges <- t(sapply(1:z$nGroup, function(i)
+							{
+								tmp <- z$thetaMat[i, ]
+								use <- !is.na(z$thetaMat[i, ])
+								tmp[use] <-
+									mvrnorm(1, mu=rep(0, sum(use)),
+											Sigma=z$scaleFactors[i] *
+											z$dfra[use, use])
+								tmp
+							}
+							))
 
 		thetaOld <- z$thetaMat
 		thetaOld[, z$basicRate] <- log(thetaOld[, z$basicRate])
 		thetaNew <- thetaOld + thetaChanges
-
-		priorOld <- sapply(1:z$nGroup, function(i)
-					   {
-						   tmp <- thetaOld[i, ]
-						   use <- !is.na(tmp)
-						   dmvnorm(tmp[use],  mean=rep(0, sum(use)),
-								   sigma=z$priorSigma[use, use])
-					   }
-						   )
+ 		priorOld <- sapply(1:z$nGroup, function(i)
+				{
+				tmp <- thetaOld[i, ]
+				   use <- !is.na(tmp)
+				   dmvnorm(tmp[use],  mean=z$muTemp,
+				   sigma=z$SigmaTemp)
+				}
+				)
 		priorNew <- sapply(1:z$nGroup, function(i)
-					   {
-						   tmp <- thetaNew[i, ]
-						   use <- !is.na(tmp)
-						   dmvnorm(tmp[use],  mean=rep(0, sum(use)),
-								   sigma=z$priorSigma[use, use])
-					   }
-						   )
+					{
+					tmp <- thetaNew[i, ]
+					use <- !is.na(tmp)
+					dmvnorm(tmp[use],  mean=z$muTemp,
+					sigma=z$SigmaTemp)
+					}
+					)
+
+   	#stop("hierachial Bayes does not handle NA (possibly fixed) parameters and i want to get off")
+
 		logpOld <- z$loglik
 
+# check that logpOld and getProbabilitiesFromC(z)[[1]]
+# give same results; what is z[[1]]
 		thetaNew[, z$basicRate] <- exp(thetaNew[, z$basicRate])
 		z$thetaMat <<- thetaNew
 		logpNew <- getProbabilitiesFromC(z)[[1]]
@@ -201,8 +294,73 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 		}
 ##		print(thetaNew)
 	}
+
+	#### to draw the top-level means
+
+	# johans new function for drawing thetas
+	##@sampleMu internal bayes; algorithm to propose new Mu parameter
+	sampleMu <- function()
+	{
+		require(MCMCpack)
+		Thetas <- matrix( c(0), z$TruNumPars, z$nGroup)
+		muhat <- matrix( c(0), z$TruNumPars, 1)
+		for ( groupiterator in c(1:z$nGroup) )
+		{
+			tmp <- z$thetaMat[groupiterator, ]
+					use <- !is.na(tmp)
+					Thetas[,groupiterator] <- tmp[use]
+		}
+		muhat <- rowMeans( Thetas )# the average across g
+		Q <- matrix( c(0), z$TruNumPars, z$TruNumPars)
+
+		for ( groupiterator in c(1:z$nGroup) )
+		{
+			Q <- Q + tcrossprod( Thetas[,groupiterator] - muhat)
+		}
+		z$SigmaTemp <<- riwish(z$vzero + z$TruNumPars,
+				z$vzero*z$varianceCovMatrPrior + Q +
+				z$kappa0*z$nGroup/(z$kappa0 + z$nGroup)*
+				tcrossprod( muhat - z$mu0, muhat - z$mu0 ) )
+		invvarianceCovMatr <- solve( z$SigmaTemp )
+		z$muTemp <<-  chol( ( z$kappa0 + z$nGroup )^(-1)*z$SigmaTemp ) %*%
+		rnorm( z$TruNumPars , 0 , 1 ) +
+			z$nGroup/( z$kappa0 + z$nGroup )*muhat +
+			z$kappa0/( z$kappa0 + z$nGroup )*z$mu0
+	}
+
+	# Toms new function for averaging thetas
+	##@averageTheta internal bayes; algorithm to average past theta values
+	averageTheta <- function(lukewarm = TRUE)
+	{
+		thetaMean <- rep(NA, z$pp)
+		if (lukewarm)
+		{
+			start <- ceiling(dim(z$warmingMu)[1]*0.8)
+			if (start < 10){start <- ceiling(dim(z$warmingMu)[1]*0.5)}
+			end <- dim(z$warmingMu)[1]
+			thetaMean[z$basicRate] <-
+						colMeans(z$warmingBasicRates[start:end, ])
+			thetaMean[!z$basicRate] <- colMeans(z$warmingMu[start:end,
+										z$generalParametersInGroup])
+		}
+		else
+		{
+			for (group in 1:z$nGroup)
+			{
+				thetaMean[z$ratePositions[[group]]] <- 	colMeans(
+					z$ThinParameters[, group, !z$generalParametersInGroup])
+			}
+			thetaMean[!z$basicRate] <-
+				colMeans(z$ThinPosteriorMu[,z$generalParametersInGroup])
+		}
+		thetaMean
+	}
+	#### i have inserted the drawing of the top level parameters here
+	#### to get them on the same level b the program
+	#### as the other functions called by b yes - why though?
+
     ## ################################
-    ## start of function proper
+    ## start of function bayes() proper
     ## ################################
 	if (getDocumentation != FALSE)
 	{
@@ -223,17 +381,18 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 			return(do.call(getDocumentation[1], targs))
 		}
 	}
+	cat('\n')
+	ctime1 <- proc.time()[1]
 	ctime <- proc.time()[1]
 
 	z <- initializeBayes(data, effects, model, nbrNodes, priorSigma,
                          prevAns=prevAns, clusterType=clusterType)
     createStores()
-
     z$sub <- 0
 
     if (is.null(z$dfra) && is.null(dfra))
     {
-        z <- getDFRA(z, n)
+        z <- getDFRA(z, nderiv, first=TRUE)
     }
     else
     {
@@ -249,14 +408,14 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 			}
 			z$dfra <- scaleDfra(z)
 		}
-
     }
 	ctime1 <- proc.time()[1]
 	cat(ctime1-ctime,'\n')
 	improveMH()
 	ctime2<- proc.time()[1]
 
-	cat('improvMh', ctime2-ctime1,'\n')
+	cat('improveMH', ctime2-ctime1,'seconds.\n')
+	flush.console()
 
     if (plotit)
     {
@@ -274,17 +433,39 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
     for (ii in 1:nwarm)
     {
         MCMCcycle(nrunMH=4, nrunMHBatches=20)
+		z$iiwarm <- ii
+		storeWarmingData()
+		cat('Warming step',ii,'(',nwarm,')\n')
+		flush.console()
     }
-	print('endof warm')
+	print('end of warming')
 	ctime3<- proc.time()[1]
 
- 	cat('warm', ctime3-ctime2,'\n')
+ 	cat('warming took', ctime3-ctime2,'seconds.\n')
+	flush.console()
+
+	# Tom added averageTheta, getDFRA, and improveMH after warming up
+	z$theta <- averageTheta(lukewarm = TRUE)
+	cat('Parameter value after warming up\n')
+    WriteOutTheta(z)
+	z <- getDFRA(z, nderiv, first=TRUE)
+	ctime1 <- proc.time()[1]
+	cat('Second ')
+	improveMH()
+	ctime2<- proc.time()[1]
+
+	cat('Second improveMH', ctime2-ctime1,'seconds.\n')
+	flush.console()
+	ctime3 <- ctime2
+
     for (ii in 1:nmain)
     {
 		MCMCcycle(nrunMH=z$nrunMH, nrunMHBatches=nrunMHBatches)
+		z$iimain <- ii
 		storeData()
 		ctime4<- proc.time()[1]
-		cat('main', ii, ctime4-ctime3,'\n')
+		cat('main', ii, '(', nmain, ')', ctime4-ctime3, 'seconds.\n')
+		flush.console()
 		ctime3 <- ctime4
 
         if (ii %% 10 == 0 && plotit) ## do some plots
@@ -328,7 +509,6 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 			else
 			{
 				varcall <- paste("~ ", varnames,  sep="", collapse="")
-
 			}
             print(histogram(as.formula(varcall), data=thetadf, scales="free",
                             outer=TRUE, breaks=NULL, type="density",
@@ -344,10 +524,10 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             print(histogram(as.formula(varcall), data=ratesdf, scales="free",
                             outer=TRUE, breaks=NULL, type="density",
                             panel=function(x, ...)
-                        {
-                            panel.histogram(x, ...)
-                            panel.densityplot(x, darg=list(na.rm=TRUE), ...)
-                        }
+								{
+								panel.histogram(x, ...)
+								panel.densityplot(x, darg=list(na.rm=TRUE), ...)
+								}
                             ))
             varnames <- paste(names(thetadf)[-1], sep="", collapse= " + ")
 			if (z$nGroup > 1)
@@ -384,6 +564,8 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
             ##             }))
         }
     }
+	cat('Total duration',ctime4-ctime,'seconds.\n')
+	z$theta <- averageTheta(lukewarm = FALSE)
     z$FRAN <- NULL
     z
 }
@@ -421,12 +603,14 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
 		##seed <- NULL
 	}
    	z$FRAN <- getFromNamespace(model$FRANname, pkgname)
+
     z <- initializeFRAN(z, model, data=data, effects=effects,
                 prevAns=prevAns, initC=FALSE, onlyLoglik=TRUE)
 	z$basicRate <- z$effects$basicRate
     z$nGroup <- z$f$nGroup
 	is.batch(TRUE)
 
+	cat('Initial parameter value ')
     WriteOutTheta(z)
 
     if (nbrNodes > 1 && z$observations > 1)
@@ -466,6 +650,7 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
     }
   	groupPeriods <- attr(z$f, "groupPeriods")
     netnames <- z$f$depNames
+	# Prepare some objects used for bookkeeping:
 	z$rateParameterPosition <-
         lapply(1:z$nGroup, function(i, periods, data)
            {
@@ -486,26 +671,51 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
            }, periods=groupPeriods - 1, data=z$f[1:z$nGroup]
                )
 	z$ratePositions <- lapply(z$rateParameterPosition, unlist)
+	# Number of parameters in each group:
+	z$TruNumPars <- sum( !z$basicRate ) + length(z$ratePositions[[1]])
+	# Indicator of parameters in the parameter vector of length pp,
+	# for which the hierarchical model applies,
+	# which is the set of all parameters without the basic rate parameters:
+	z$generalParameters <- (z$effects$group == 1) & (!z$basicRate)
+	# Construction of indicator of parameters of the hierarchical model
+	# within the groupwise parameters:
+	vec <- rep(1,z$pp)
+	vec[!z$basicRate] <- 2
+	vec[z$ratePositions[[1]]] <- 3
+	z$generalParametersInGroup <- vec[vec!= 1] == 2
+	# Now generalParametersInGroup is a logical vector of length TruNumPars,
+	# indicating the non-basicRate parameters.
+
+	if (sum(z$basicRate) != z$nGroup*length(z$ratePositions[[1]]))
+		{
+		stop("Function bayes does not allow non-basic rate parameters.")
+		}
+
+	z$muTemp <- matrix(c(0), z$TruNumPars, 1)
+	# Tom wonders about the deeper meaning of the next 10 or so lines.
+	z$SigmaTemp <- matrix(c(0), z$TruNumPars, z$TruNumPars)
+	z$SigmaTemp <- diag(z$TruNumPars)
     for (i in 1:z$nGroup)
     {
         use <- rep(FALSE, z$pp)
         use[z$ratePositions[[i]]] <- TRUE
         use[!z$basicRate] <- TRUE
         z$thetaMat[i, !use] <- NA
+       # z$SigmaTemp <- z$SigmaTemp + z$dfra[use, use]
     }
     z
 }
+
 ##@getDFRA algorithms do a few ML iterations and calculate a derivative matrix
-getDFRA <- function(z, n)
+getDFRA <- function(z, nd, first=TRUE)
 {
-    ## do n MLmodelsteps with the initial thetas and get
-    ## derivs
-    z$sdf <- vector("list", n)
-    z$sf <- matrix(0, nrow=n, ncol=z$pp)
+    ## do nd MLmodelsteps with the current thetas and get derivs
+    z$sdf <- vector("list", nd)
+    z$sf <- matrix(0, nrow=nd, ncol=z$pp)
     z$Deriv <- TRUE
-    for (i in 1:n)
+    for (i in 1:nd)
     {
-        ans <- z$FRAN(z)
+        ans <- z$FRAN(z, byGroup=!first)
         z$sdf[[i]] <- ans$dff
         z$sf[i,  ] <- colSums(ans$fra)
     }
@@ -515,15 +725,20 @@ getDFRA <- function(z, n)
 	z$Deriv <- FALSE
     z
 }
+
+##@scaleDfra transforms dfra to use basic rate parameters on log scale
 scaleDfra <- function(z)
 {
     lambda <- z$theta[z$basicRate]
 	dfra <- z$dfra
     z$dfra[z$basicRate, ] <- z$dfra[z$basicRate,] * lambda
     z$dfra[, z$basicRate] <- z$dfra[, z$basicRate] * lambda
-    diag(z$dfra)[z$basicRate] <- lambda *
-		diag(dfra)[z$basicRate] + lambda * lambda *
-			colMeans(z$sf)[z$basicRate]
+    #diag(z$dfra)[z$basicRate] <- lambda *
+	#	diag(dfra)[z$basicRate] + lambda * lambda *
+	#		colMeans(z$sf)[z$basicRate]
+	# Tom thinks that Ruth was in error here, and replaced this by simply:
+	diag(z$dfra)[z$basicRate] <- lambda
+	# see bayes.tex.
 	chol2inv(chol(z$dfra))
 }
 
@@ -541,7 +756,8 @@ flattenChains <- function(zz)
     zz <- do.call(c, zz)
     zz
 }
-##@dmvnorm algorithms calculated multivariate normal density:
+
+##@dmvnorm algorithms calculates multivariate normal density
 ##inefficient: should not call mahalanobis and eigen with same sigma repeatedly
 dmvnorm <- function(x, mean , sigma)
 {

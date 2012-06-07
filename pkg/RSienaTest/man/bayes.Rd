@@ -7,7 +7,7 @@
 }
 \usage{
 bayes(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
-      plotit=FALSE, nbrNodes=1, dfra=NULL, n=10,
+      plotit=FALSE, nbrNodes=1, dfra=NULL, nderiv=10, storeAll=FALSE,
       priorSigma=NULL, prevAns=NULL, clusterType=c("PSOCK", "FORK"),
       getDocumentation=FALSE)
 }
@@ -26,7 +26,8 @@ bayes(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
   \item{nbrNodes}{Number of processes to be used. Cannot be more than
 	the number of waves.}
   \item{dfra}{Hessian matrix. Optional}
-  \item{n}{Number of iterations used to estimate Hessian}
+  \item{nderiv}{Number of iterations used to estimate Hessian}
+  \item{storeAll}{Boolean: whether to store parameters for all MCMC iterations}
   \item{priorSigma}{Covariance matrix to use for the prior distribution
 	of the thetas.}
   \item{prevAns}{An object of class "sienaFit" as returned by
@@ -75,7 +76,7 @@ bayes(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
   \item{MHproportions}{array of proportions of the MH steps accepted}
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
-\author{Ruth Ripley }
+\author{Ruth Ripley, Johan Koskinen, Tom Snijders }
 \seealso{\code{\link{siena07}} }
 \examples{
 \donttest{

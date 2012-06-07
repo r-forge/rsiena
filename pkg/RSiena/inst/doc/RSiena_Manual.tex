@@ -230,7 +230,9 @@ the reader is referred
 to the corresponding manual. If desired, \SI can be operated \emph{apparently}
 independently of \Rn, as is explained in Section~\ref{Gui}.
 
-\RS was programmed by Ruth Ripley and Krists Boitmanis, in collaboration with Tom Snijders.
+\RS was originally programmed by Ruth Ripley and Krists Boitmanis,
+in collaboration with Tom Snijders.
+Since May 2012 the maintainer is Tom Snijders.
 
 In addition to the `official' \R distribution of \rs, there is
 an additional distribution at R-Forge, which is
@@ -241,14 +243,12 @@ Sometimes latest versions of \RS are available at\\
 before being incorporated into the R package that can be downloaded from CRAN.
 In addition, at R-Forge there is a package RSienaTest which may include
 additional options that are still in the testing stage.
+Some of the options described in this manual may apply to
+RSienaTest only, with the plan to transfer this to \RS
+in the future.
 
 
 \iffalse
-The manual focuses on the use of \SI for analysing the dynamics
-of directed networks. The case of non-directed networks is very similar,
-and at various points this case is described more in particular.
-\bigskip
-
 \framebox[0.9\textwidth]{\begin{minipage}[t]{0.84\textwidth}
 \vspace*{0.5ex}
 For getting started, there are various options:
@@ -2218,7 +2218,7 @@ The basic list of these and other effects is as follows.
 
 For the structural part of the model for network dynamics,
 for two-mode (or bipartite) networks,
-treated in \citet{KoskinenEdling2010},
+treated in \citet{KoskinenEdling2012},
 the most important effects are as follows.
 The mathematical formulae for these and other effects are given
 in Chapter~\ref{S_math}. Here we give a more qualitative description.
@@ -3494,6 +3494,7 @@ also of these other statistics.
 
 The following script gives a walkthrough for this functionality. The interface
 may change in the future, as this function is still in progress.
+Also see the script on the \SI website.
 See \citet{Lospinoso2011b} for technical information about the test.
 
 \begin{footnotesize}
@@ -4226,6 +4227,17 @@ initial value.
       are negative (or positive but close to 0),
       because this means the generated values are jumping
       around the observed values.
+      When estimating by the Method of Moments, it is usual for the
+      quasi-auto\-correlations to become close to 0.
+      For estimation by Maximum Likelihood, they will usually
+      eventually tend to fluctuate about some positive values
+      determined by the multiplication factor (see Section~\ref{S_ML}).
+      Large quasi-auto\-correlations (larger than .5), when using the Method of
+      Maximum Likelihood, suggest that either the estimation process
+      is still far from its eventual limit (the final estimate), \underline{or}
+      the multiplication factor may be too small.
+      But in this case, the auto\-correlations given in the output file
+      are more important information than those given on the screen.
 \item In phase 3, the parameter vector is held constant again,
       now at its final value.
       This phase is for estimating the covariance matrix and the
@@ -5427,9 +5439,12 @@ such a way that only Phase 3 is carried out
 (see section~\ref{S_algorithm}).
 This is done by requesting \texttt{nsub = 0} in
 the model specification in function \textsf{sienaModelCreate}.
+By also requesting \texttt{simOnly = TRUE} the calculation
+of standard errors, which usually is not meaningful when
+simulating without estimating, is suppressed.
 \begin{verbatim}
 sim_model  <-  sienaModelCreate( projname = 'sim_model', cond = FALSE,
-                                 useStdInits = FALSE, nsub = 0 )
+                      useStdInits = FALSE, nsub = 0 , simOnly = TRUE)
 sim_ans    <-  siena07( sim_model, data = mydata, effects = myeff )
 \end{verbatim}
 Mostly it is more meaningful to do this for non-conditional simulation
@@ -6434,7 +6449,7 @@ and the Fisher approach for combining independent tests, the following
 may be helpful.
 Inferring about a population always adds some uncertainty;
 this is more serious when the sample size (here: number of combined networks)
-is larger.
+is smaller.
 In the extreme case, consider the combination of $N=2$ networks,
 with estimates $\hat\theta_1 = 1$, standard error $s_1 = 0.1$,
 and $\hat\theta_2 = 5, s_2 = 0.1$.
@@ -6443,7 +6458,7 @@ leading to the conclusion that parameters $\theta_1$ and $\theta_2$
 are very likely to be positive.
 This will lead to a significant result for Fisher's combination of tests.
 On the other hand, the mean in the population of networks, given that
-there is available a sample of size $N=2$, cannot be determined with
+there is available a sample of size as low as $N=2$, cannot be determined with
 any degree of precision, so the confidence interval for this mean $\mu_\theta$
 will be huge, and the result for testing the null hypothesis
 $H_0^{(1)}$ will not be significant.
@@ -6794,6 +6809,7 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  this often works better in practice than the raw activity effect
  for the same reasons as mentioned above for the sqrt measure of the popularity effect;
 
+
  \item[{\hspace*{-1ex}$\bigodot$}] for non-directed networks, the popularity and activity
  effects are taken together as ``degree effects'',
  since in-degrees and out-degrees are the same in this case;
@@ -6806,6 +6822,12 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  \item {\em in-degree related activity (sqrt) effect}, \texttt{(inActSqrt)}
  defined by  \\
  $s^{\rm net}_{i\vit}(x) = x_{i+}\,\sqrt{x_{+i}}$ ;
+
+\item \emph{in-isolate Outdegree effect}, (\texttt{inIsDegree}), the
+      (additional) out-degree (or activity)
+      effect for actors with in-degree zero, defined as the out-degree
+      but only if the actor has in-degree zero,
+ $s^{\rm net}_{i\vit}(x, z) =   I\{x_{+i} = 0 \}\, \sum_j x_{ij}   $ ;\\
 
  \item {\em out-degree related activity effect} \texttt{(outAct)},
  	 defined as the squared out-degree of the actor,
@@ -6872,6 +6894,25 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{+i}^{1/c}} {x_{+j}^{1/c}} $;\\
  $c$ can be 1 or 2 (the latter value is the default);
 
+\item \emph{network-isolate effect}, (\texttt{isolateNet}), the effect of having
+      in-degree as well as out-degree zero, i.e., being a total isolate,
+ $s^{\rm net}_{i\vit}(x, z) =   I\{x_{+i} = x_{i+} = 0 \}  $ ;
+
+\item \emph{isolate popularity effect}, (\texttt{isolatePop}), the effect of
+      being tied to actors who further are isolates
+      (the fact that such a tie does exist will give the other actor
+      an in-degree of 1),
+$s^{\rm net}_{i\vit}(x, z) = \sum_j x_{ij}\, I\{x_{+j} = 1, x_{j+} = 0 \} $ .
+
+      Note that the network-isolate effect expresses the tendency for ego
+      to be an isolate (not sending ties if ego has indegree 0),
+      whereas the isolate popularity effect expressed the tendency for ego
+      to connect to others who, without this connection, would be isolates.
+      Thus, in modeling the number of isolates, for the network-isolate
+      effect the agency is in the isolate (see the $i$ in the formula),
+      whereas for the isolate popularity effect the agency is in others not
+      connecting to the isolate (see the $j$ in the formula).
+
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 \medskip
@@ -6893,7 +6934,7 @@ The effects for a dyadic covariate $w_{ij}$ are
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} x_{ji} \, (w_{ij} - \bar{w}) $.
 
  \item[{\hspace*{-1ex}$\bigodot$}]
- Three different ways can be modeled in which
+Various different ways can be modeled in which
  a triadic combination can be made between
  the dyadic covariate and the network.
  In the explanation, the dyadic covariate
@@ -6934,6 +6975,7 @@ The effects for a dyadic covariate $w_{ij}$ are
 \put{$h$} at 3 3.4
 \put{{\small $W$}} at 2.1 1.9
 \put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
 \arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
 \arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
 \arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
@@ -6944,8 +6986,108 @@ The effects for a dyadic covariate $w_{ij}$ are
 \smallskip
 
  Since the dyadic covariates are represented by square arrays
- and not by edgelists, this will be a relatively time-consuming effect
- if the number of nodes is large.
+ and not by edgelists, this and the following effects will be relatively
+ time-consuming if the number of nodes is large.
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em mixed cyclic $WW=>X$ closure}, ($X$: cyclic closure of $W$) \texttt{(cyWWX)}  \\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{jh}\, w_{hi}\,$;\\
+ this refers to the cyclic closure of $W-W$ two-paths (weighted if the
+ dyadic covariate $W$ does not only have 0 and 1 values);
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of product of weights of $W-W$ two-paths
+ $j \stackrel{W_{jh}}{\longrightarrow} h \stackrel{W_{hi}}{\longrightarrow} i$;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from  2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from 3.9 1.1732 to  3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em incoming shared $WWX$}, ($X$: incoming shared $W$) \texttt{(InWWX)}  \\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{hi}\, w_{hj}\,$;\\
+ this refers to shared incoming $W$ ties contributing
+ to the tie $i \stackrel{X}{\rightarrow} j$;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from  2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from   3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em incoming shared $WWX$}, ($X$: incoming shared $W$) \texttt{(OutWWX)}  \\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{jh}\,$;\\
+ this refers to shared outgoing $W$ ties contributing
+ to the tie $i \stackrel{X}{\rightarrow} j$;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from  2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from  3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
 
 \begin{minipage}[t]{.7\textwidth}
  \item {\em $WX=>X$ closure of covariate} \texttt{(WXX)},\\
@@ -6972,6 +7114,8 @@ The effects for a dyadic covariate $w_{ij}$ are
 \put{$j$} at 4 0.4
 \put{$h$} at 3 3.4
 \put{{\small $W$}} at 2.1 2.0
+\put{{\small $X$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
 \arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
 \arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
 \arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
@@ -7005,6 +7149,8 @@ The effects for a dyadic covariate $w_{ij}$ are
 \put{$j$} at 4 0.4
 \put{$h$} at 3 3.4
 \put{{\small $W$}} at 3.9 2.0
+\put{{\small $X$}} at 2.1 1.9
+\put{{\small $X$}} at 3   0.6
 \arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
 \arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
 \arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
@@ -7351,7 +7497,8 @@ but that are connected through $i$:
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 \smallskip
-Further there are four mixed triadic effects.
+Further there are a number of mixed triadic effects.
+
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
 \item
@@ -7471,7 +7618,7 @@ Further there are four mixed triadic effects.
 \end{minipage}
  \item
 \begin{minipage}[t]{.7\textwidth}
- {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\ % \texttt{(WClosure)}\\
+ {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{hj}\,$;\\
  this refers to the closure of $W-W$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
@@ -7480,7 +7627,7 @@ Further there are four mixed triadic effects.
  $i \stackrel{W}{\rightarrow} h \stackrel{W}{\rightarrow} j$.\\
  The interpretation is that actors have the tendency to make
  and maintain $X$-ties to those to whom they have an indirect
- (distance 2) $W$-tie: `$W$-ties of $W$-ties tend to become $X$-ties'.
+ (distance 2) $W$-tie: `$W$-ties of $W$-ties tend to become $X$-ties';
       \end{minipage}
 \hfill
 \begin{minipage}[t]{.15\textwidth}
@@ -7506,6 +7653,110 @@ Further there are four mixed triadic effects.
 \end{center}
 \vfill
 \end{minipage}
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em mixed cyclic $WW=>X$ closure}, ($X$: cyclic closure of $W$) \texttt{(cyClosure)}  \\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{jh}\, w_{hi}\,$;\\
+ this refers to the cyclic closure of $W-W$ two-paths;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of $W-W$ two-paths
+ $j \stackrel{W}{\rightarrow} h \stackrel{W}{\rightarrow} i$.\\
+ The interpretation is that actors have the tendency to make
+ and maintain $X$-ties to those from whom they receive an indirect
+ (distance 2) $W$-tie: `$W$-ties of $W$-ties tend to become
+ reciprocated by $X$-ties'.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from  2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from 3.9 1.1732 to  3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em closure of shared incoming $WW=>X$}, ($X$: shared incoming $W$) \texttt{(sharedIn)}  \\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{hi}\, w_{hj}\,$;\\
+ this refers to shared incoming $W$ ties contributing
+ to the tie $i \stackrel{X}{\rightarrow} j$;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from  2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from   3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em closure of shared outgoing $WW=>X$}, ($X$: shared outgoing $W$) \texttt{(sharedOut)}  \\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{jh}\,$;\\
+ this refers to shared outgoing $W$ ties contributing
+ to the tie $i \stackrel{X}{\rightarrow} j$.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from  2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from   3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
@@ -9307,8 +9558,8 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
       and \textsf{InverseOutdegreeEffect}, respectively.
       Therefore look at the files \textsf{OutdegreeActivitySqrtEffect.cpp}
       and \textsf{InverseOutdegreeEffect.cpp} where these functions
-      are defined.
-      The former defines the effect through a\\
+      are defined.\\
+      The former defines the effect through a
       `\sfn{calculateContribution}' function, which defines the
       tie flip contribution
       (the function called $\Delta_{ij}(x)$ above)
@@ -9320,7 +9571,10 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
       The latter defines the effect through  a
       \sfn{calculateContribution} function and an\\
       \sfn{egoStatistic} function, which is the effect
-      as defined in (\ref{outTrunc}).
+      as defined in (\ref{outTrunc}). It should be noted that
+      generally effects can be defined either by the one or the other
+      combination.
+
 
       Since our new effect cannot be expressed in a straightforward way
       by an equation of the type (\ref{tiestat}), we chose to use
@@ -9996,9 +10250,18 @@ This begins at end October 2009, and only details changes which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2012-06-07 R-forge revision 216, for RSienaTest only:
+\begin{itemize}
+  \item New effects connected with isolates; and with mixed WWX triadic closure
+      (in various patterns) for dyadic covariates as well as multiple
+      dependent networks.
+  \item Modifications to bayes() (seems to run OK now, except that multiple
+      groups option does not work for dyadic covariates;
+      still not documented for general use).
+\end{itemize}
 \item 2012-05-18 R-forge revision 213, for RSienaTest only:
     \begin{itemize}
-     \item Corrected bugs that occurred when observed networks have density 0 or 1
+     \item Allow observed networks to have density 0 or 1
      (not that it is generally advisable to use such data sets).
      \item Incorporated argument simOnly in sienaModelCreate() to facilitate
 	  simulation without estimation.

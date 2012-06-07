@@ -308,12 +308,13 @@ printInitialDescription <- function(data, effects, modelName="Siena",
                             mymat[mymat == 10] <- 0
                             mymat[mymat == 11] <- 1
                             diag(mymat) <- NA
+							tmymat <- t(mymat)
                             # dyadTable <- table(mymat, t(mymat))
 							# Changed to protect against zero rows or columns
-							nulls <- sum((1 - mymat)*(1 - t(mymat)), na.rm=TRUE)
-							asymm <- sum(mymat*(1 - t(mymat)), na.rm=TRUE) +
-										sum((1 - mymat)*t(mymat), na.rm=TRUE)
-							mutual <- sum(mymat*t(mymat), na.rm=TRUE)
+							nulls <- sum((1 - mymat)*(1 - tmymat), na.rm=TRUE)
+							asymm <- sum(mymat*(1 - tmymat), na.rm=TRUE) +
+										sum((1 - mymat)*tmymat, na.rm=TRUE)
+							mutual <- sum(mymat*tmymat, na.rm=TRUE)
                             # diag(dyadTable) <- diag(dyadTable) / 2
                             #if (valmin == 0 && valmax ==1)
                             #{

@@ -13,13 +13,13 @@ PrintReport <- function(z, x)
 {
     types <- attr(z$f, "types")
     Report('\n\n', outf)
-	if ((x$nsub == 0)&(!x$simOnly))
+	if ((x$nsub == 0)&(x$simOnly))
 	{
-		Heading(2, outf, "Estimation Results.")
+		Heading(2, outf, "Simulation Results.")
 	}
 		else
     {
-		Heading(2, outf, "Simulation Results.")
+		Heading(2, outf, "Estimation Results.")
 	}
 	if (!z$OK)
    {

@@ -1,17 +1,39 @@
+2012-06-07 R-forge revision 216
+   All for RSienaTest only.
+	* R/bayes.r: considerable update (no known errors now,
+		except multigroup does not work for dyadic covariates.)
+	* R/print07report.r: small cosmetic change
+   * data/allEffects.csv,
+	  src/model/effects/AllEffects.h, src/model/effects/effectFactory.cpp,
+	  src/model/effects/InIsolateDegreeEffect.h,
+	  src/model/effects/InIsolateDegreeEffect.cpp,
+	  src/model/effects/IsolateNetEffect.h,
+	  src/model/effects/IsolateNetEffect.cpp,
+	  src/model/effects/IsolatePopEffect.h,
+	  src/model/effects/IsolatePopEffect.cpp,
+	  src/model/effects/WWXClosureEffect.h,
+	  src/model/effects/WWXClosureEffect.cpp,
+	  src/model/effects/generic/OutStarFunction.h,
+	  src/model/effects/generic/OutStarFunction.cpp,
+	  src/model/effects/generic/ReverseTwoPathFunction.h,
+	  src/model/effects/generic/ReverseTwoPathFunction.cpp:
+	  new effects.
+	* R/printInitialDescription.r: minor rewriting.
+	* Manual correspondingly updated.
 2012-05-18 R-forge revision 213
    All for RSienaTest only.
-	* R\effects.r and R\printInitialDescription.r:
+	* R/effects.r and R/printInitialDescription.r:
 	  protect against situations where matrix matchange has zero rows or columns
-	  (i.e., minor bug fix)
-	* R\sienaprint.r, R\print07Report.r, R\phase3.r, R\terminateFRAN.r, 
-	  R\robmon.r, R\sienaModelcreate.r, man\siena07.Rd, man\sienaModelCreate.r:	
+	  (i.e., prevent runtime error)
+	* R/sienaprint.r, R/print07Report.r, R/phase3.r, R/terminateFRAN.r, 
+	  R/robmon.r, R/sienaModelcreate.r, man/siena07.Rd, man/sienaModelCreate.r:	
 	  incorporate argument simOnly in sienaModelCreate() to facilitate
 	  simulation without estimation.
-   * R\initializeFRAN.r, R\sienaDataCreate.r, R\sienautils.r, man\sienaNet.Rd:
+   * R/initializeFRAN.r, R/sienaDataCreate.r, R/sienautils.r, man/sienaNet.Rd:
      incorporate argument allowOnly in sienaNet() to permit 
 	  ignoring monotonicity in data and its consequences for upOnly and downOnly.
    * data/allEffects.csv,
-	  src/model/effects/allEffects.h, src/model/effects/effectFactory.cpp,
+	  src/model/effects/AllEffects.h, src/model/effects/effectFactory.cpp,
      src/model/effects/SameCovariateTransitiveTripletsEffect.cpp,
      src/model/effects/SameCovariateTransitiveTripletsEffect.h,
      src/model/effects/TransitiveReciprocatedTripletsEffect.h,
