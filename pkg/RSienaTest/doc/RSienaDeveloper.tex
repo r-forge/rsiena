@@ -340,7 +340,14 @@ below.
   variable \verb|CYGWIN| to the value \verb|nodosfilewarning|. (CYGWIN may also
   give you messages if you try to use tar to unpack the tar ball. If so,
   set the environment variable \verb|TAR_OPTIONS| to
-\verb|--no-same-owner --no-same-permissions|.)
+\verb|--no-same-owner --no-same-permissions|.)\\
+  To set environment variables in Windows:\\
+  Open System Properties (e.g., right-click My Computer and select Properties);
+    select the Advanced tab, then click Environment Variables;
+    under the System Variables section, click New;
+    in the Variable name field, enter \verb|CYGWIN|;
+    In the Variable value field, enter \verb|nodosfilewarning|;
+    Click OK on each of the dialogs to save your settings.
 \item When this one is OK, type\\
 \verb|R CMD INSTALL RSiena_1.0.n.tar.gz|\\
 (where \verb|n| is adjusted to match the file you have just created.)

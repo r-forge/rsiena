@@ -31,8 +31,10 @@
 #include "model/effects/generic/BetweennessFunction.h"
 #include "model/effects/generic/GwespFunction.h"
 #include "model/effects/generic/InStarFunction.h"
+#include "model/effects/generic/OutStarFunction.h"
 #include "model/effects/generic/ReciprocatedTwoPathFunction.h"
 #include "model/effects/generic/TwoPathFunction.h"
+#include "model/effects/generic/ReverseTwoPathFunction.h"
 #include "model/effects/generic/MixedTwoPathFunction.h"
 #include "model/effects/generic/ConditionalFunction.h"
 #include "model/effects/generic/EqualCovariatePredicate.h"
@@ -237,7 +239,19 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "WWX")
 	{
-		pEffect = new WWXClosureEffect(pEffectInfo);
+		pEffect = new WWXClosureEffect(pEffectInfo, true, true);
+	}
+	else if (effectName == "cyWWX")
+	{
+		pEffect = new WWXClosureEffect(pEffectInfo, false, false);
+	}
+	else if (effectName == "InWWX")
+	{
+		pEffect = new WWXClosureEffect(pEffectInfo, false, true);
+	}
+	else if (effectName == "OutWWX")
+	{
+		pEffect = new WWXClosureEffect(pEffectInfo, true, false);
 	}
 	else if (effectName == "WXX")
 	{
@@ -523,6 +537,21 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			new TwoPathFunction(pEffectInfo->interactionName1()));
 	}
+	else if (effectName == "cyClosure")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new ReverseTwoPathFunction(pEffectInfo->interactionName1()));
+	}
+	else if (effectName == "sharedIn")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new OutStarFunction(pEffectInfo->interactionName1()));
+	}
+	else if (effectName == "sharedOut")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new InStarFunction(pEffectInfo->interactionName1()));
+	}
 	else if (effectName == "linear")
 	{
 		pEffect = new LinearShapeEffect(pEffectInfo);
@@ -550,6 +579,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "isolate")
 	{
 		pEffect = new IsolateEffect(pEffectInfo);
+	}
+	else if (effectName == "isolateNet")
+	{
+		pEffect = new IsolateNetEffect(pEffectInfo);
+	}
+	else if (effectName == "isolatePop")
+	{
+		pEffect = new IsolatePopEffect(pEffectInfo);
+	}
+	else if (effectName == "inIsDegree")
+	{
+		pEffect = new InIsolateDegreeEffect(pEffectInfo);
 	}
 	else if (effectName == "avSimRecip")
 	{

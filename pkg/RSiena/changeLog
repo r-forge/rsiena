@@ -1,3 +1,25 @@
+2012-06-07 R-forge revision 216
+   All for RSienaTest only.
+	* R/bayes.r: considerable update (no known errors now,
+		except multigroup does not work for dyadic covariates.)
+	* R/print07report.r: small cosmetic change
+   * data/allEffects.csv,
+	  src/model/effects/AllEffects.h, src/model/effects/effectFactory.cpp,
+	  src/model/effects/InIsolateDegreeEffect.h,
+	  src/model/effects/InIsolateDegreeEffect.cpp,
+	  src/model/effects/IsolateNetEffect.h,
+	  src/model/effects/IsolateNetEffect.cpp,
+	  src/model/effects/IsolatePopEffect.h,
+	  src/model/effects/IsolatePopEffect.cpp,
+	  src/model/effects/WWXClosureEffect.h,
+	  src/model/effects/WWXClosureEffect.cpp,
+	  src/model/effects/generic/OutStarFunction.h,
+	  src/model/effects/generic/OutStarFunction.cpp,
+	  src/model/effects/generic/ReverseTwoPathFunction.h,
+	  src/model/effects/generic/ReverseTwoPathFunction.cpp:
+	  new effects.
+	* R/printInitialDescription.r: minor rewriting.
+	* Manual correspondingly updated.
 2012-05-18 R-forge revision 213
    All for RSienaTest only.
 	* R\effects.r and R\printInitialDescription.r:
