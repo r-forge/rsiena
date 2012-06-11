@@ -8,12 +8,11 @@
 ##  * Description: This file contains the code to assess goodness of fit
 ##  *
 ##  ****************************************************************************/
+
 ##@sienaGOF siena07 Does test for goodness of fit
 sienaGOF <- function(
 		sienaFitObject,
 		auxiliaryFunction,
-		groupName=NULL,
-		varName=NULL,
 		wave=NULL,
 		verbose=FALSE, join=TRUE,
 		twoTailed=FALSE,
@@ -34,60 +33,16 @@ sienaGOF <- function(
 	groups <- length(sienaFitObject$f$groupNames)
 	if (verbose) cat("Detected", iterations, "iterations and", groups,
 				"groups.\n")
-	if (! is.null(groupName) ) {
-		groupNumber <- match( groupName, sienaFitObject$f$groupNames)
-	}
-	else
-	{
-		groupName <- sienaFitObject$f$groupNames[1]
-		groupNumber <- 1
-	}
-	if (is.na(groupNumber))
-	{
-		stop("Invalid group name.")
-	}
-	if (verbose) cat("Group", groupName, "corresponds to index",
-				groupNumber,".\n")
-	if(! is.null(varName)) {
-		varNumber <- match( varName, sienaFitObject$f$depNames )
-	}
-	else
-	{
-		varNumber<-1
-		varName <- sienaFitObject$f$depNames[1]
-	}
-
-	if (varNumber < 1 || varNumber > length(sienaFitObject$f$depNames))
-	{
-		stop("Invalid variable number -- out of bounds.")
-	}
-	if (verbose)
-	{
-		cat("Variable", varName,
-				"corresponds to index",varNumber,".\n")
-	}
 	if (is.null(wave) )
 	{
-		wave <- 1:(attr(sienaFitObject$f[[groupName]]$depvars[[varName]],
-						"netdims")[3] - 1)
-	}
-	if (varNumber < 1 || varNumber >
-			length(sienaFitObject$sims[[1]][[groupNumber]]))
-	{
-		stop("Invalid variable number -- out of bounds.")
-	}
-	if (min(wave) < 1 || max(wave) >
-			attr(sienaFitObject$f[[groupName]]$depvars[[varName]],
-							"netdims")[3] - 1)
-	{
-		stop("Invalid wave index -- out of bounds")
+		wave <- 1:(attr(sienaFitObject$f[[1]]$depvars[[1]], "netdims")[3] - 1)
 	}
 
 	 obsStatsByWave <- lapply(wave, function (j) {
 						matrix(
 						auxiliaryFunction(NULL,
-								sienaFitObject$f, sienaFitObject$sims,
-								groupName, varName, j)
+								sienaFitObject$f, 
+                sienaFitObject$sims, j)
 						, nrow=1)
 				})
 	if (join)
@@ -98,7 +53,7 @@ sienaGOF <- function(
 	else
 	{
 		obsStats <- obsStatsByWave
-		names(obsStats) <- paste("Wave",wave)
+		names(obsStats) <- paste("Wave", wave)
 	}
 	class(obsStats) <- "observedAuxiliaryStatistics"
 	attr(obsStats,"auxiliaryStatisticName") <-
@@ -106,7 +61,7 @@ sienaGOF <- function(
 	attr(obsStats,"joint") <- join
 
 	##  Calculate the simulated auxiliary statistics
-	if (verbose) cat("Calculating auxiliary statistics for waves",wave,".\n")
+	if (verbose) cat("Calculating auxiliary statistics for waves", wave, ".\n")
 
 	if (!is.null(cluster)) {
 		ttcSimulation <- system.time(simStatsByWave <- lapply(wave,
@@ -115,8 +70,7 @@ sienaGOF <- function(
 					function (i)
 						{ auxiliaryFunction(i,
 									sienaFitObject$f,
-									sienaFitObject$sims,
-									groupName, varName, j)
+									sienaFitObject$sims, j)
 							if (verbose && (i %% 100 == 0) )
 								cat("  > Completed ", i,
 									" calculations\n")
@@ -129,7 +83,7 @@ sienaGOF <- function(
 	}
 	else
 	{
-		ttcSimulation <- system.time(simStatsByWave <- lapply(wave,
+		ttcSimulation <- system.time( simStatsByWave <- lapply(wave,
 						function (j) {
 							simStatsByWave <- sapply(1:iterations, function (i)
 									{
@@ -140,14 +94,14 @@ sienaGOF <- function(
 											}
 											auxiliaryFunction(i,
 													sienaFitObject$f,
-													sienaFitObject$sims,
-													groupName, varName, j)
+													sienaFitObject$sims, j)
 									})
 							simStatsByWave <-
 									matrix(simStatsByWave, ncol=iterations)
 							dimnames(simStatsByWave)[[2]] <-  1:iterations
 							t(simStatsByWave)
-						}))
+						})
+      )
 	}
 
 	## Aggregate by wave if necessary to produce simStats
@@ -417,6 +371,7 @@ sienaGOF <- function(
 	attr(res, "joined") <- join
 	res
 }
+
 ##@print.sienaGOF siena07 Print method for sienaGOF
 print.sienaGOF <- function (x, ...) {
 	## require(Matrix)
@@ -468,6 +423,7 @@ print.sienaGOF <- function (x, ...) {
 		}
 	}
 }
+
 ##@summary.sienaGOF siena07 Summary method for sienaGOF
 summary.sienaGOF <- function(object, ...) {
 	x <- object
@@ -485,17 +441,13 @@ summary.sienaGOF <- function(object, ...) {
 		joinedGmmMhd <- attr(x, "joinedGmmOneStepMahalanobisDistances")
 		if (attr(x, "joined")) {
 			for (i in 1:ncol(oneStepSpecs)) {
-				a <- cbind(oneStepSpecs[,i, drop=FALSE],
-						partialOneStepSpecs[,i, drop=FALSE],
-						gmmOneStepSpecs[,i, drop=FALSE] )
-				b <- matrix( c(joinedOneStepMhd[i],
-								joinedPartialOneStepMhd[i],
-								joinedGmmMhd[i]), ncol=3)
+				a <- cbind(oneStepSpecs[,i, drop=FALSE] )
+				b <- matrix( c(joinedOneStepMhd[i] ), ncol=1)
 				rownames(b) <- c("MHD")
 				a <- rbind(a, b)
 				a <- round(a, 3)
 				cat("\n**Model", colnames(a)[1], "\n")
-				colnames(a) <- c("MM(Full)","MM(Par.)", "GMM")
+				colnames(a) <- "MMD"
 				print(a)
 			}
 		}
@@ -503,17 +455,13 @@ summary.sienaGOF <- function(object, ...) {
 		{
 			for (j in 1:length(oneStepMhd)) {
 				for (i in 1:ncol(oneStepSpecs)) {
-					a <- cbind(oneStepSpecs[,i, drop=FALSE],
-							partialOneStepSpecs[,i, drop=FALSE],
-							gmmOneStepSpecs[,i, drop=FALSE] )
-					b <- matrix( c(oneStepMhd[[j]][i],
-									partialOneStepMhd[[j]][i],
-									gmmMhd[[j]][i]), ncol=3)
+					a <- cbind( oneStepSpecs[,i, drop=FALSE] )
+					b <- matrix( c(oneStepMhd[[j]][i], ncol=1) )
 					rownames(b) <- c("MHD")
 					a <- rbind(a, b)
 					a <- round(a, 3)
 					cat("\n**Model", colnames(a)[1], "\n")
-					colnames(a) <- c("MM(Full)","MM(Par.)", "GMM")
+					colnames(a) <- c("MMD")
 					print(a)
 				}
 			}
@@ -523,6 +471,7 @@ summary.sienaGOF <- function(object, ...) {
 	cat("\nComputation time for auxiliary statistic calculations on simulations: ",
 			attr(x, "simTime")["elapsed"] , "seconds.")
 }
+
 ##@plot.sienaGOF siena07 Plot method for sienaGOF
 plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 		key=NULL, perc=.05, wave=1, main=main, ylab=ylab,  ...)
@@ -666,103 +615,4 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 			panel = panelFunction, xlab=xlabel, ylab=ylabel,
 			scales=list(x=list(labels=key), y=list(draw=FALSE)),
 			main=main, ...)
-}
-
-sparseMatrixExtraction <- function (i, data, sims, groupName, varName, wave) {
-	#require(Matrix)
-	dimsOfDepVar<-
-			attr(data[[groupName]]$depvars[[varName]],
-					"netdims")
-	missing <- Matrix(is.na(data[[groupName]]$depvars[[varName]][,,wave+1])*1)
-	if (is.null(i)) {
-		# sienaGOF wants the observation:
-		returnValue <- Matrix(data[[groupName]]$depvars[[varName]][,,wave+1])
-		returnValue[is.na(returnValue)] <- 0
-	}
-	else
-	{
-		#sienaGOF wants the i-th simulation:
-		returnValue <- sparseMatrix(
-				sims[[i]][[groupName]][[varName]][[wave]][,1],
-				sims[[i]][[groupName]][[varName]][[wave]][,2],
-				x=sims[[i]][[groupName]][[varName]][[wave]][,3],
-				dims=dimsOfDepVar )
-	}
-	## Zero missings:
-	1*((returnValue - missing) > 0)
-}
-
-snaEdgelistExtraction <- function (i, data, sims, groupName, varName, wave) {
-	require(sna)
-	returnValue <- snaSociomatrixExtraction(i, data, sims, groupName, varName,
-			wave)
-	as.edgelist.sna(returnValue)
-}
-
-snaSociomatrixExtraction <- function (i, data, sims, groupName, varName, wave) {
-	require(sna)
-	actors <- attr(data[[groupName]]$nets[[varName]][[wave+1]]$mat1,
-			"nActors")
-	missing <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat1)
-	attr(missing, "n") <- actors
-	missing <- 1*is.na( as.sociomatrix.sna( missing ) )
-
-	if (is.null(i)) {
-		# sienaGOF wants the observation:
-		returnValue <- t(data[[groupName]]$nets[[varName]][[wave+1]]$mat1)
-	}
-	else
-	{
-		#sienaGOF wants the i-th simulation:
-		returnValue <- sims[[i]][[groupName]][[varName]][[wave]]
-	}
-	attr(returnValue, "n") <- actors
-	returnValue <- as.sociomatrix.sna( returnValue )
-	returnValue = 1*((returnValue - missing) > 0)
-	returnValue
-}
-
-igraphEdgelistExtraction <- function (i, data, sims, groupName, varName, wave) {
-	require(igraph)
-	returnValue <- snaSociomatrixExtraction(i, data, sims, groupName, varName,
-			wave)
-	graph.adjacency(returnValue)
-}
-
-OutdegreeDistribution <- function (i, data, sims, groupName, varName, wave,
-		levels=0:8, extractor=snaSociomatrixExtraction) {
-	x <- extractor(i, data, sims, groupName, varName, wave)
-	a <- apply(x, 1, sum)
-	sapply(levels, function(i){ sum(a<=i) })
-}
-
-IndegreeDistribution <- function (i, data, sims, groupName, varName, wave,
-		levels=0:8, extractor=snaSociomatrixExtraction) {
-	x <- extractor(i, data, sims, groupName, varName, wave)
-	a <- apply(x, 2, sum)
-	sapply(levels, function(i){ sum(a<=i) })
-}
-
-GeodesicDistribution <- function (i, data, sims, groupName, varName, wave,
-		extractor=snaEdgelistExtraction, levels=1:8) {
-	require(sna)
-	x <- extractor(i, data, sims, groupName, varName, wave)
-	a <- geodist(x)$gdist
-	sapply(levels, function(i){ sum(a<=i) })
-}
-
-TriadCensus <- function (i, data, sims, groupName, varName, wave,
-		extractor=snaEdgelistExtraction) {
-	require(sna)
-	x <- extractor(i, data, sims, groupName, varName, wave)
-	triad.census(x)
-}
-
-KnnDistribution <- function (i, data, sims, groupName, varName, wave,
-		extractor=igraphEdgelistExtraction, levels=0:25) {
-	require(igraph)
-	x <- extractor(i, data, sims, groupName, varName, wave)
-	a <- graph.knn(x)$knn
-	a[is.nan(a)] <- 0
-	sapply(levels, function(i){ sum(a<=i) })
 }
