@@ -13,25 +13,23 @@
  }
 
 \usage{
-sienaGOF(sienaFitObject, auxiliaryFunction, groupName=NULL, 
-		varName=NULL, wave=NULL, verbose=FALSE, join=TRUE, twoTailed=FALSE, 
+sienaGOF(sienaFitObject, auxiliaryFunction,
+		wave=NULL, verbose=FALSE, join=TRUE, twoTailed=FALSE, 
 		cluster=NULL, robust=FALSE, \dots)
 \method{plot}{sienaGOF}(x,  center=FALSE, scale=FALSE, violin=TRUE, 
 		key=NULL, perc=.05, wave=1, main=main, ylab=ylab, \dots)
 }
 \arguments{
   \item{sienaFitObject}{Results from a call to \code{siena07}.}
-  \item{groupName}{The name of the sienaGroup to be used.}
-  \item{varName}{The value of the variable to be used, whether a 
-  network, behavior, etc.}
   \item{join}{Boolean: should sienaGOF do tests on all of the waves 
   individually, or sum across waves?}
   \item{auxiliaryFunction}{Function to be used to calculate statistics, 
   e.g. one implementing the \code{sna} or \code{igraph} packages.
-  	There functions \code{IndegreeDistribution}, \code{OutdegreeDistribution},
-  	\code{GeodesicDistribution}, \code{TriadCensus}, and \code{KnnDistribution}
-  	are already available with \code{RSiena}. The user can write custom functions
-  	fairly easily, however. See \code{Examples} for more information.}
+  	See \code{Examples} for more information on the method signature. The method signature
+    is \code{function(index, data, sims, wave)}, where the \code{index} is the index
+    of the simulated network, or \code{NULL} if the observed variable is needed. \code{data}
+    is the observed data object that you must extract the relevant variables from. \code{sims} is the
+    list of simulations returned from \code{siena07}. \code{wave} is the index of the wave.}
   \item{verbose}{Whether to print intermediate results. Calculations can 
   take some time, and user feedback may be useful.}
   \item{twoTailed}{Whether to use two tails for calculating p values on the
@@ -92,17 +90,8 @@ We recommend the following heuristic approach to fitting your model:
  The \code{print} function will display some useful information to help with
  model selection if some effects are set to FIX and TEST on the effects
  object. A rough estimator for the Mahalanobis distance at each proposed
- specification is given in the output. There are three headings for various
- estimators of this specification:
- 
- --MM(Full) gives the one step estimator
- which will correspond with the estimator available on the \code{siena07}
- object
- 
- --MM(Par.) only adds the candidate effect coordinate to the current estimate
- 
- --GMM, for "Generalized Method of moments", gives the approximate global
- minimum Mahalanobis distance that could be achieved under the specification.
+ specification is given in the output. This estimator is called the
+ modified model distance (MMD). See Lospinoso (2012) for more information.
  
  For these specifications, Mahalanobis distances as well as parameter estimates
  are given to help guide model selection. See the manual, or the citations for
@@ -152,15 +141,14 @@ See the manual for instructions on how to implement these extractor functions.
 }
 
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}
-  for general information on RSiena and \url{http://www.stats.ox.ac.uk/~lospinos/}
- for information on the following presentation and working paper:
+  for general information on RSiena.:
  
-Lospinoso, J.A. and Snijders, T.A.B, "Goodness of fit for
+Lospinoso, J.A.  and Snijders, T.A.B., "Goodness of fit for
 Stochastic Actor Oriented Models." Presentation given at Sunbelt XXXI,
  St. Pete's Beach, Fl. 2011.
 
-Lospinoso, J.A. and Snijders, T.A.B, "Goodness of fit for
-Stochastic Actor Oriented Models." Working Paper.
+Lospinoso, J.A., "Statistical Models for Social
+Network Dynamics." Ph.D. Thesis. University of Oxford: U.K.
 }
 \author{Josh Lospinoso}
 \seealso{\code{\link{siena07}}, \code{\link{sienaTimeTest}} }
@@ -175,18 +163,93 @@ Stochastic Actor Oriented Models." Working Paper.
 	myeff[myeff$shortName=='cycle3', c('fix', 'test')] <-TRUE
 	myeff[myeff$shortName=='balance', c('fix', 'test')] <-TRUE
 	ans <- siena07(mymodel, data=mydata, effects=myeff, returnDeps=TRUE, batch=TRUE)
-	( res <- sienaGOF(ans, KnnDistribution) )
+  
+  # An example function:
+  sparseMatrixExtraction <- function (i, data, sims, wave, groupName="Data1", varName="mynet1") {
+    #require(Matrix)
+    dimsOfDepVar<-
+      attr(data[[groupName]]$depvars[[varName]],
+           "netdims")
+    missing <- Matrix(is.na(data[[groupName]]$depvars[[varName]][,,wave+1])*1)
+    if (is.null(i)) {
+      # sienaGOF wants the observation:
+      returnValue <- Matrix(data[[groupName]]$depvars[[varName]][,,wave+1])
+      returnValue[is.na(returnValue)] <- 0
+    }
+    else
+    {
+      #sienaGOF wants the i-th simulation:
+      returnValue <- sparseMatrix(
+        sims[[i]][[groupName]][[varName]][[wave]][,1],
+        sims[[i]][[groupName]][[varName]][[wave]][,2],
+        x=sims[[i]][[groupName]][[varName]][[wave]][,3],
+        dims=dimsOfDepVar[1:2] )
+    }
+    ## Zero missings:
+    1*((returnValue - missing) > 0)
+  }
+  
+  IndegreeDistribution <- function (i, data, sims, wave,
+                                    levels=0:6, extractor=sparseMatrixExtraction) {
+    x <- extractor(i, data, sims, wave)
+    a <- apply(x, 2, sum)
+    sapply(levels, function(i){ sum(a<=i) })
+  }
+
+  ( res <- sienaGOF(ans, IndegreeDistribution) )
 	plot(res)
-	
-	## We can also make a custom function:
-	#
-	CustomTriadCensus <- function(...) {
-		require(sna)
-		x <- snaEdgelistExtraction(...)
-		triad.census(x)[6:16]
-	}
-	# Execute the test:
-	( res <- sienaGOF(ans, CustomTriadCensus) )	
+
+  # Here are some useful functions for building your own auxiliary statistics:
+  snaEdgelistExtraction <- function (i, data, sims, groupName, varName, wave) {
+    require(sna)
+    returnValue <- snaSociomatrixExtraction(i, data, sims, groupName, varName, wave)
+    as.edgelist.sna(returnValue)
+  }
+  
+  igraphEdgelistExtraction <- function (i, data, sims, groupName, varName, wave) {
+    require(igraph)
+    returnValue <- snaSociomatrixExtraction(i, data, sims, groupName, varName,
+                                            wave)
+    graph.adjacency(returnValue)
+  }
+  
+  OutdegreeDistribution <- function (i, data, sims, groupName, varName, wave,
+                                     levels=0:8, extractor=snaSociomatrixExtraction) {
+    x <- extractor(i, data, sims, groupName, varName, wave)
+    a <- apply(x, 1, sum)
+    sapply(levels, function(i){ sum(a<=i) })
+  }
+  
+  IndegreeDistribution <- function (i, data, sims, groupName, varName, wave,
+                                    levels=0:8, extractor=snaSociomatrixExtraction) {
+    x <- extractor(i, data, sims, groupName, varName, wave)
+    a <- apply(x, 2, sum)
+    sapply(levels, function(i){ sum(a<=i) })
+  }
+  
+  GeodesicDistribution <- function (i, data, sims, groupName, varName, wave,
+                                    extractor=snaEdgelistExtraction, levels=1:8) {
+    require(sna)
+    x <- extractor(i, data, sims, groupName, varName, wave)
+    a <- geodist(x)$gdist
+    sapply(levels, function(i){ sum(a<=i) })
+  }
+  
+  TriadCensus <- function (i, data, sims, groupName, varName, wave,
+                           extractor=snaEdgelistExtraction) {
+    require(sna)
+    x <- extractor(i, data, sims, groupName, varName, wave)
+    triad.census(x)
+  }
+  
+  KnnDistribution <- function (i, data, sims, groupName, varName, wave,
+                               extractor=igraphEdgelistExtraction, levels=0:25) {
+    require(igraph)
+    x <- extractor(i, data, sims, groupName, varName, wave)
+    a <- graph.knn(x)$knn
+    a[is.nan(a)] <- 0
+    sapply(levels, function(i){ sum(a<=i) })
+  }
 }
 }
 \keyword{models}

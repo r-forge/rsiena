@@ -6,9 +6,7 @@ sienaGroupCreate,  sienaModelCreate, sienaNet, sienaNodeSet, xtable.sienaFit,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, print.xtable.sienaFit,
        installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy, sienaGOF,
-       sparseMatrixExtraction, snaEdgelistExtraction, snaSociomatrixExtraction,
-       igraphEdgelistExtraction, OutdegreeDistribution, IndegreeDistribution,
-       GeodesicDistribution, TriadCensus, KnnDistribution, xtable, algorithms,
+       xtable, algorithms,
 	   profileLikelihoods, siena.table)
 
 import(Matrix)
