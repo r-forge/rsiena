@@ -67,7 +67,7 @@ double SameCovariateTransitiveTripletsEffect::calculateContribution(
 		// Get the receiver of the outgoing tie.
 		int h = iter.actor();
 		if (fabs(this->value(h) - this->value(this->ego())) < EPSILON &&
-            pNetwork->tieValue(h, alter) >= 1)
+            pNetwork->tieValue(alter, h) >= 1)
 		{
 		 contribution1++ ;
 		}

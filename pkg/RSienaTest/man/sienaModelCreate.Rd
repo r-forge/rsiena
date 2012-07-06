@@ -3,8 +3,7 @@
 \alias{sienaModel}
 \alias{model.create}
 \title{Function to create an object containing the algorithm
-  specifications
-  for parameter estimation in RSiena}
+  specifications for parameter estimation in RSiena}
 \description{
   Creates an object with specifications for the algorithm for parameter
   estimation in RSiena.
@@ -75,12 +74,13 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{modelType}{Type of model to be fitted: 1=directed, 2:6 for
 	symmetric networks: 2=forcing, 3=Initiative model,
 	4=Pairwise forcing model, 5=Pairwise mutual model, 6=Pairwise joint model}
-  \item{mult}{Multiplication factor for maximum likelihood. Number of
+  \item{mult}{Multiplication factor for maximum likelihood and Bayes. Number of
 	steps per iteration is set to this multiple of the total distance
-	between the observations at start and finish of the wave.}
+	between the observations at start and finish of the wave.
+	Decreasing \code{mult} below a certain value has no further effect.}
   \item{simOnly}{Logical: If TRUE, then the calculation of the covariance
     matrix and standard errors of the estimates at the end of
-    Phase 3 of the estimation algorithm in function siena07 is skipped. 
+    Phase 3 of the estimation algorithm in function siena07 is skipped.
 	This is suitable if nsub=0 and siena07 is used only for the purpose
     of simulation.}
 }

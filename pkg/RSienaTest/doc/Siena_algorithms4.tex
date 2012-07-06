@@ -661,11 +661,20 @@ not identical to those obtained without the disturbance.
 Symbols given \nnm{in italic sf font} refer to the names
 of variables used in the \R code.
 
+The standard initial value is calculated in function
+\nnm{getNetworkStartingVals()} in file \nnm{effects.r}.
+This uses an adapted version of (11.41) in \citet{Snijders05}.
+The adaptation is a precision-based weighting of multiple periods
+in case $M \geq 3$ (the vector \nnm{prec} used in the function
+is a measure of precision).
+
+
 The algorithm consists of three phases.
 
 \begin{enumerate}
 \item In this phase a small number $n_1$ of steps are made to estimate\\
-      \nnm{dfra} = $D(\theta_1) = \big(\partial \E_\theta(S) / \partial \theta\big)
+      \nnm{dfra} = $D(\theta_1) =
+                \big(\partial \E_\theta(S) / \partial \theta\big)
                        \mid_{\theta = \theta_1} $.\\
       The diagonal elements of this
       estimate are used to define $D_0$.
@@ -5204,7 +5213,8 @@ approximation, it is natural indeed that this should be the linear approximation
 \end{appendices}
 
 \bibliographystyle{Chicago}
-\bibliography{RSiena}
+%\bibliography{C:/Users/tom.snijders/Documents/RForgeSecure/pkg/RSienaTest/inst/doc/RSiena}
+\bibliography{../inst/doc/RSiena}
 
 \end{document}
 

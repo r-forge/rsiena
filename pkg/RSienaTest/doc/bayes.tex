@@ -64,48 +64,28 @@
 
 \centerline{\emph{\today}}
 \bigskip
+\emph{Initialization}
 \begin{enumerate}
-\item I inverted dfra on advice from Brian.
-\item I use log scale for basic rate parameters: I struggled with transforming
-  the derivatives. What I currently have is due to Brian, but I may well have
-  misunderstood.
-\item Input of a covariance matrix for the prior is mandatory: default the
-  identity times 10000.
-\item Input of a covariance matrix for the Bayesian proposal is optional: if
-  null it will be calculated from a few iterations of the MH step.
-\item Default $n$, number of iterations for this step if performed is 10.
-\item dfra may be extracted along with theta from a previous result of siena07
-via prevAns.
+\item Estimate using MoM with multigroup option, i.e., under assumption
+    of common parameter values, using only 2 subphases: \nnm{startupGlobal}
+\item Using this as a starting value, for each group separately
+    do 0 or 2 subphases to get initial values \nnm{initialEstimates} per group,
+    and covariance matrices \nnm{proposalCov} for proposal distributions
+    per group.
+\item Basic rate parameters are now on sqrt scale. This can be easily modified
+    by changing functions \nnm{trafo}, \nnm{antitrafo}, \nnm{devtrafo}.
 \end{enumerate}
 \paragraph{Main algorithm}
 \begin{enumerate}
   \item Set up data in C as usual
   \item Create minimal chain and do burnin
-  \item Do $n$ groups of \nnm{nrunMH} (as calculated by siena07 using the
-    multiplication factor and the observed distance) steps to
-  estimate \nnm{dfra} as in siena07. \label{item2}
-  \item Transform \nnm{dfra} so can use basic rate parameters on log scale:
-Multiply rows and columns for basic rate parameters by the value. Diagonal
-entries for basic rate parameters should be
-$$ \nnm{deriv} \times \nnm{value} + \nnm{score} \times \nnm{value}^2 $$
-Tom: I think Ruth made an error here.\\
-Note that \nnm{deriv} = element of \nnm{dfra}; \nnm{value} = basic rate parameter
-on the $\lambda$ (not log) scale.
- Working with the derivatives shows that the equation should be
-$$ \nnm{deriv} \times \nnm{value}^2 + \nnm{score} \times \nnm{value} $$
-and that for the Poisson distribution, working with expected Fisher information,
-this is equal to
-$$  \nnm{value} \ . $$
-(Check: if $X \sim \textrm{Poisson}(\lambda)$, then $\text{var}_\lambda \log(\hat\lambda)
-=\text{var}_\lambda \log(X) \approx 1/\lambda $.)
-
-  \item Get scalefactors such that about 40 out of 100 Bayesian proposals
-      after single MH steps are accepted. See below for details of
+  \item \nnm{improveMH}: Get scalefactors such that about 40 out of 100
+  Bayesian proposals after single MH steps are accepted.
+  See below for details of
       generation and probabilities for Bayesian proposals. Keep theta
       unchanged throughout this step. \label{item5}
-\item Do a warming phase of \nnm{nwarm} iterations of some number (hard-coded to
-  4 at the moment) of MH steps.
-\item Added by Tom: repeat steps \ref{item2}-\ref{item5}.
+\item Do a warming phase of \nnm{nwarm} iterations of some number of MH steps.
+\item Repeat step \ref{item5}.
 \item Do requested number of Bayesian iterations. The
   length of the ML ones are determined by the multiplication factor and the
   observed distance.
@@ -116,8 +96,8 @@ $$  \nnm{value} \ . $$
 \FORALL {groups}
 \STATE Create a mask to exclude basic rate effects for other periods than this
 group.
-\STATE Get a multivariate normal with mean 0 and covariance masked inverse of
-\nnm{dfra} $\times$ scale factor for this group
+\STATE Get a multivariate normal with mean 0 and  \nnm{proposalCov}
+ $\times$ scale factor for this group
 \STATE Calculate the proposal probability:
 \begin{description}
 \item[prior] Multivariate normal density for the parameters with mean 0

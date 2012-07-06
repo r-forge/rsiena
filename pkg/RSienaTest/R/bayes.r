@@ -9,12 +9,17 @@
 ## * Many functions are defined within others to reduce copying of objects.
 ## *
 ## ****************************************************************************/
+
+# see functions trafo, antitrafo, devtrafo; these should be consistent.
+# antitrafo is inverse, devtrafo is derivative of trafo.
+
 ##@bayes Bayesian fit a Bayesian model, allowing a hierarchical structure
 bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
-                  plotit=FALSE, nbrNodes=1, dfra=NULL, nderiv=10,
-				  storeAll = FALSE,
-                  priorSigma=NULL, prevAns=NULL, clusterType=c("PSOCK", "FORK"),
-				  getDocumentation=FALSE)
+				plotit=FALSE, nbrNodes=1,
+				initgain=0.1, storeAll = FALSE,
+				priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
+				prevAns=NULL, clusterType=c("PSOCK", "FORK"),
+				getDocumentation=FALSE)
 {
     ##@createStores internal bayes Bayesian set up stores
     createStores <- function()
@@ -36,10 +41,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 									 z$nDependentVariables, 9))
 		}
 		# johan's new stores with default values
-		z$mu0 <<- matrix( c(0), z$TruNumPars, 1 )
-		z$kappa0 <<- 1
-		z$vzero <<- c(1)
-		z$varianceCovMatrPrior <<- diag(z$TruNumPars)
+
 		if (storeAll)
 		{
 			z$StorePosteriorMu <<- matrix(0, nrow=numberRows, ncol=z$TruNumPars)
@@ -218,39 +220,38 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 				t(do.call(cbind, tapply(ans$rejects, factor(z$callGrid[, 1]),
 										function(x)Reduce("+", x))))
 			z$MHaborts[i, , , ] <<- t(do.call(cbind,
-											  tapply(ans$aborts,
-													 factor(z$callGrid[, 1]),
-													 function(x)Reduce("+", x))))
+										tapply(ans$aborts,
+												factor(z$callGrid[, 1]),
+												function(x)Reduce("+", x))))
 		}
 		z$BayesAcceptances <<- rowSums(z$accepts)
 		z$nrunMH <<- storeNrunMH
 	}
 
-	##@sampleParameters internal bayes; propose new parameters and accept them or not
+	##@sampleParameters internal bayes; propose new parameters
+	## and accept them or not
+	## Replace accepted new parameters only if change.
 	sampleParameters <- function(change=TRUE)
 	{
-		## get a multivariate normal with covariance matrix dfra multiplied by a
-		## scale factor which varies between groups
+		## get a multivariate normal with covariance matrix proposalCov
+		## multiplied by a scale factor which varies between groups
 		require(MASS)
 
-		 	# do the fandango
-
-			# this is only for developing purposes so that we
-			# may play around with custom made proposal variances
-				thetaChanges <- t(sapply(1:z$nGroup, function(i)
-							{
-								tmp <- z$thetaMat[i, ]
-								use <- !is.na(z$thetaMat[i, ])
-								tmp[use] <-
-									mvrnorm(1, mu=rep(0, sum(use)),
-											Sigma=z$scaleFactors[i] *
-											z$dfra[use, use])
-								tmp
-							}
-							))
+	 	# do the fandango
+		thetaChanges <- t(sapply(1:z$nGroup, function(i)
+			{
+				tmp <- z$thetaMat[i, ]
+				use <- !is.na(z$thetaMat[i, ])
+				tmp[use] <-
+					mvrnorm(1, mu=rep(0, sum(use)),
+							Sigma=z$scaleFactors[i] *
+							z$proposalCov[[i]])
+				tmp
+			}
+			))
 
 		thetaOld <- z$thetaMat
-		thetaOld[, z$basicRate] <- log(thetaOld[, z$basicRate])
+		thetaOld[, z$basicRate] <- trafo(thetaOld[, z$basicRate])
 		thetaNew <- thetaOld + thetaChanges
  		priorOld <- sapply(1:z$nGroup, function(i)
 				{
@@ -269,20 +270,18 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 					}
 					)
 
-   	#stop("hierachial Bayes does not handle NA (possibly fixed) parameters and i want to get off")
-
 		logpOld <- z$loglik
 
 # check that logpOld and getProbabilitiesFromC(z)[[1]]
 # give same results; what is z[[1]]
-		thetaNew[, z$basicRate] <- exp(thetaNew[, z$basicRate])
+		thetaNew[, z$basicRate] <- antitrafo(thetaNew[, z$basicRate])
 		z$thetaMat <<- thetaNew
 		logpNew <- getProbabilitiesFromC(z)[[1]]
 		proposalProbability <- priorNew - priorOld + logpNew - logpOld
 		##cat(proposalProbability, priorNew, priorOld, logpNew, logpOld, '\n')
 		z$accept <<- log(runif(length(proposalProbability))) <
 			proposalProbability
-		thetaOld[, z$basicRate] <- exp(thetaOld[, z$basicRate])
+		thetaOld[, z$basicRate] <- antitrafo(thetaOld[, z$basicRate])
 		if (!change)
 		{
 			z$thetaMat <<- thetaOld
@@ -298,10 +297,17 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 	#### to draw the top-level means
 
 	# johans new function for drawing thetas
+	# tom changed riwish to rWishart - available from R 2.15.0
 	##@sampleMu internal bayes; algorithm to propose new Mu parameter
 	sampleMu <- function()
-	{
-		require(MCMCpack)
+		{
+		invWish <- function(v,S){
+		# Draw from the inverse Wishart distribution with df v
+		# and scale matrix S
+		# inefficient if drawn multiply for the same S
+			chol2inv(chol(rWishart(1,v,chol2inv(chol(S)))[,,1]))
+		}
+#		require(MCMCpack)
 		Thetas <- matrix( c(0), z$TruNumPars, z$nGroup)
 		muhat <- matrix( c(0), z$TruNumPars, 1)
 		for ( groupiterator in c(1:z$nGroup) )
@@ -317,18 +323,18 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 		{
 			Q <- Q + tcrossprod( Thetas[,groupiterator] - muhat)
 		}
-		z$SigmaTemp <<- riwish(z$vzero + z$TruNumPars,
-				z$vzero*z$varianceCovMatrPrior + Q +
-				z$kappa0*z$nGroup/(z$kappa0 + z$nGroup)*
-				tcrossprod( muhat - z$mu0, muhat - z$mu0 ) )
-		invvarianceCovMatr <- solve( z$SigmaTemp )
-		z$muTemp <<-  chol( ( z$kappa0 + z$nGroup )^(-1)*z$SigmaTemp ) %*%
-		rnorm( z$TruNumPars , 0 , 1 ) +
-			z$nGroup/( z$kappa0 + z$nGroup )*muhat +
-			z$kappa0/( z$kappa0 + z$nGroup )*z$mu0
+# riwish replaced by invWish
+# prior Lambda = z$priorDf*z$priorSigma
+		z$SigmaTemp <<- invWish(z$priorDf + z$nGroup,
+				z$priorDf*z$priorSigma + Q +
+				(z$priorKappa*z$nGroup/(z$priorKappa + z$nGroup))*
+				tcrossprod( muhat - z$priorMu, muhat - z$priorMu ) )
+		z$muTemp <<-  t(chol( ( z$priorKappa + z$nGroup )^(-1)*z$SigmaTemp )) %*%
+			rnorm( z$TruNumPars , 0 , 1 ) +
+			(z$nGroup/( z$priorKappa + z$nGroup ))*muhat +
+			(z$priorKappa/( z$priorKappa + z$nGroup ))*z$priorMu
 	}
 
-	# Toms new function for averaging thetas
 	##@averageTheta internal bayes; algorithm to average past theta values
 	averageTheta <- function(lukewarm = TRUE)
 	{
@@ -339,25 +345,22 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 			if (start < 10){start <- ceiling(dim(z$warmingMu)[1]*0.5)}
 			end <- dim(z$warmingMu)[1]
 			thetaMean[z$basicRate] <-
-						colMeans(z$warmingBasicRates[start:end, ])
-			thetaMean[!z$basicRate] <- colMeans(z$warmingMu[start:end,
-										z$generalParametersInGroup])
+						colMeans(z$warmingBasicRates[start:end, , drop=FALSE])
+			thetaMean[!z$basicRate] <- colMeans(
+				z$warmingMu[start:end, z$generalParametersInGroup, drop=FALSE])
 		}
 		else
 		{
 			for (group in 1:z$nGroup)
 			{
 				thetaMean[z$ratePositions[[group]]] <- 	colMeans(
-					z$ThinParameters[, group, !z$generalParametersInGroup])
+			z$ThinParameters[, group, !z$generalParametersInGroup, drop=FALSE])
 			}
-			thetaMean[!z$basicRate] <-
-				colMeans(z$ThinPosteriorMu[,z$generalParametersInGroup])
+			thetaMean[!z$basicRate] <- colMeans(
+				z$ThinPosteriorMu[,z$generalParametersInGroup, drop=FALSE])
 		}
 		thetaMean
 	}
-	#### i have inserted the drawing of the top level parameters here
-	#### to get them on the same level b the program
-	#### as the other functions called by b yes - why though?
 
     ## ################################
     ## start of function bayes() proper
@@ -385,30 +388,15 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 	ctime1 <- proc.time()[1]
 	ctime <- proc.time()[1]
 
-	z <- initializeBayes(data, effects, model, nbrNodes, priorSigma,
-                         prevAns=prevAns, clusterType=clusterType)
+	z <- initializeBayes(data, effects, model, nbrNodes,
+						initgain=initgain,
+						priorMu=priorMu, priorSigma=priorSigma,
+						priorDf=priorDf, priorKappa=priorKappa,
+						prevAns=prevAns, clusterType=clusterType)
+
     createStores()
     z$sub <- 0
 
-    if (is.null(z$dfra) && is.null(dfra))
-    {
-        z <- getDFRA(z, nderiv, first=TRUE)
-    }
-    else
-    {
-        if (!is.null(dfra))
-        {
-            z$dfra <- dfra
-        }
-		else
-		{
-			if (is.null(z$sf))
-			{
-				stop("need some scores to scale dfra")
-			}
-			z$dfra <- scaleDfra(z)
-		}
-    }
 	ctime1 <- proc.time()[1]
 	cat(ctime1-ctime,'\n')
 	improveMH()
@@ -432,7 +420,7 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 
     for (ii in 1:nwarm)
     {
-        MCMCcycle(nrunMH=4, nrunMHBatches=20)
+		MCMCcycle(nrunMH=z$nrunMH, nrunMHBatches=nrunMHBatches)
 		z$iiwarm <- ii
 		storeWarmingData()
 		cat('Warming step',ii,'(',nwarm,')\n')
@@ -444,11 +432,11 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
  	cat('warming took', ctime3-ctime2,'seconds.\n')
 	flush.console()
 
-	# Tom added averageTheta, getDFRA, and improveMH after warming up
+	# Tom added averageTheta, and improveMH after warming up
 	z$theta <- averageTheta(lukewarm = TRUE)
 	cat('Parameter value after warming up\n')
-    WriteOutTheta(z)
-	z <- getDFRA(z, nderiv, first=TRUE)
+	print(z$theta)
+	cat('\n')
 	ctime1 <- proc.time()[1]
 	cat('Second ')
 	improveMH()
@@ -467,7 +455,6 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 		cat('main', ii, '(', nmain, ')', ctime4-ctime3, 'seconds.\n')
 		flush.console()
 		ctime3 <- ctime4
-
         if (ii %% 10 == 0 && plotit) ## do some plots
         {
             cat('main after ii', ii, '\n')
@@ -567,16 +554,56 @@ bayes <- function(data, effects, model, nwarm=100, nmain=100, nrunMHBatches=20,
 	cat('Total duration',ctime4-ctime,'seconds.\n')
 	z$theta <- averageTheta(lukewarm = FALSE)
     z$FRAN <- NULL
+    class(z) <- "sienaBayesFit"
+	if (!storeAll)
+	{
+		z$acceptances <- NULL
+		z$candidates <- NULL
+	}
+	z$OK <- TRUE
     z
 }
 
 ##@initializeBayes algorithms do set up for Bayesian model
-initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
-                            prevAns, clusterType=c("PSOCK", "FORK"))
+initializeBayes <- function(data, effects, model, nbrNodes, initgain,
+						priorMu, priorSigma, priorDf, priorKappa,
+						prevAns, clusterType=c("PSOCK", "FORK"))
 {
-    ## initialise
-    Report(openfiles=TRUE, type="n") #initialise with no file
+	##@precision get inverse of z$covtheta, avoiding some inversion problems
+	# for MoM estimates only
+	precision <- function(z){
+		require(MASS)
+		t(z$dfrac) %*% ginv(z$msfc) %*% z$dfrac
+	}
+
+	##@projectEffects function to project model specification
+	# modified version of updateTheta
+	# model specification of prevAns is transferred to effects
+	projectEffects <- function(effects, prevAns){
+		prevEffects <- prevAns$requestedEffects
+		prevEffects$initialValue <- prevAns$theta
+		oldlist <- apply(prevEffects, 1, function(x)
+						paste(x[c("name", "shortName",
+								"type",
+								"interaction1", "interaction2",
+								"period")],
+							collapse="|"))
+		efflist <- apply(effects, 1, function(x)
+						paste(x[c("name", "shortName",
+								"type",
+								"interaction1", "interaction2",
+								"period")],
+							collapse="|"))
+		use <- efflist %in% oldlist
+		effects$include[use] <-
+			prevEffects$include[match(efflist, oldlist)][use]
+		effects
+	}
+	## start initializeBayes
+    ## initialize
+    Report(openfiles=TRUE, type="n") #initialize with no file
     z  <-  NULL
+
     z$Phase <- 1
     z$Deriv <- FALSE
     z$FinDiff.method <- FALSE
@@ -602,16 +629,100 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
 		set.seed(newseed)  ## get R to create a random number seed for me.
 		##seed <- NULL
 	}
-   	z$FRAN <- getFromNamespace(model$FRANname, pkgname)
 
+	## Determine starting values and covariance matrices
+	## for proposal distributions.
+	# Starting values are obtained from MoM estimates.
+	# First under the assumption that all parameters are the same.
+	startupModel <- sienaModelCreate(n3=500, nsub=2, cond=FALSE)
+	startupGlobal <- siena07(startupModel, data=data, effects=effects)
+	cat("Initial global estimates\n")
+	z$initialResults <- print(startupGlobal)
+	cat('\n')
+	effects <- updateTheta(effects, startupGlobal)
+	z$initialGlobalEstimates <- effects[effects$include,]
+	z$initialSE <- sqrt(diag(startupGlobal$covtheta))
+	# Now per group.
+	# Largest acceptable variance for proposal distribution rate parameters
+	# on the trafo scale; note that this is before scaling by scaleFactors
+	rateVarScale <- 0.25
+	# weight for groupwise precision, relative to global precision:
+	w <- 0.8
+	# number of parameters per group, number of groups:
+	npars <- sum(startupGlobal$effects$group==1)
+	ngroups <- length(data)
+	if ((startupGlobal$pp - npars)%%(ngroups-1) != 0)
+	{
+		stop("Not all groups have the same number of periods.")
+	}
+	# number of rate parameters per group:
+	nrates <- (startupGlobal$pp - npars)%/%(ngroups-1)
+	rateParameters <- matrix(NA, nrates, ngroups)
+	# compute covariance matrices for random walk proposals for all groups:
+	initialEstimates <- matrix(0, ngroups, startupGlobal$pp)
+	z$proposalCov <- list()
+	if (initgain <= 0)
+	{
+		startup1Model <- sienaModelCreate(n3=500, nsub=0, cond=FALSE)
+	}
+	else
+	{
+		startup1Model <- sienaModelCreate(n3=500, nsub=1, firstg=initgain,
+										cond=FALSE)
+	}
+    for (i in 1:ngroups)
+    {
+		# coordinates of the global parameters used for this group:
+		use <- rep(FALSE, startupGlobal$pp)
+        use[!startupGlobal$effects$basicRate] <- TRUE
+		rates <- !use
+        use[startupGlobal$effects$group==i] <- TRUE
+		# project model specification to the single group:
+		rates <- rates[use]
+		effects0 <- getEffects(data[[i]])
+		effects0 <- projectEffects(effects0,startupGlobal)
+		# get the parameter values from the global fit:
+		effects0$initialValue[effects0$include] <-
+			startupGlobal$theta[use]
+		# estimate uncertainties for this group:
+		startup1 <- siena07(startup1Model, data=data[[i]],
+			effects=effects0)
+		initialEstimates[i,use] <- startup1$theta
+		rateParameters[,i] <- trafo(startup1$theta[rates])
+		covmati <- chol2inv(chol(
+			w*precision(startup1) +
+			((1-w)/ngroups)*precision(startupGlobal)[use,use]))
+		# now covmati is the roughly estimated covariance matrix
+		# of the parameter estimate for group i.
+		# Transform this to the trafo scale for the rate parameters:
+        # double t() in view of recycling rule for matrix arithmetic
+		covmati[,rates] <- t(t(covmati[,rates])*devtrafo(startup1$theta[rates]))
+		covmati[rates,] <- covmati[rates,]*devtrafo(startup1$theta[rates])
+		# truncate in case rate parameters have a too large variance
+		largeRates <- rates & (diag(covmati) > rateVarScale)
+		if (any(largeRates))
+		{
+			factor <- sqrt(rateVarScale/(diag(covmati)[largeRates]))
+        # double t() in view of recycling rule for matrix arithmetic
+			covmati[,largeRates] <- t(t(covmati[,largeRates])*factor)
+			covmati[largeRates,] <- covmati[largeRates,]*factor
+		}
+		z$proposalCov[[i]] <- covmati
+	}
+	z$effectName <- effects0$effectName[effects0$include]
+	z$requestedEffects <- startup1$requestedEffects
+	z$initialGroupwiseEstimates <- initialEstimates
+
+   	z$FRAN <- getFromNamespace(model$FRANname, pkgname)
     z <- initializeFRAN(z, model, data=data, effects=effects,
                 prevAns=prevAns, initC=FALSE, onlyLoglik=TRUE)
+	z$thetaMat <- initialEstimates
 	z$basicRate <- z$effects$basicRate
     z$nGroup <- z$f$nGroup
 	is.batch(TRUE)
 
-	cat('Initial parameter value ')
-    WriteOutTheta(z)
+	cat('Initial global parameter value ')
+    print(z$theta)
 
     if (nbrNodes > 1 && z$observations > 1)
     {
@@ -640,14 +751,6 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
     z$scaleFactors <- rep(1, z$nGroup)
     ## z$returnDataFrame <- TRUE # chains come back as data frames not lists
     z$returnChains <- FALSE
-    if (is.null(priorSigma))
-    {
-        z$priorSigma <- diag(z$pp) * 10000
-    }
-    else
-    {
-        z$priorSigma <- priorSigma
-    }
   	groupPeriods <- attr(z$f, "groupPeriods")
     netnames <- z$f$depNames
 	# Prepare some objects used for bookkeeping:
@@ -677,6 +780,61 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
 	# for which the hierarchical model applies,
 	# which is the set of all parameters without the basic rate parameters:
 	z$generalParameters <- (z$effects$group == 1) & (!z$basicRate)
+
+	# Determination parameters of prior distribution;
+	# this specifies the defaults!
+	if (is.null(priorMu))
+	{
+		z$priorMu <- matrix( c(0), z$TruNumPars, 1 )
+	}
+	else
+	{
+		if (length(priorMu) != z$TruNumPars)
+		{
+			stop(paste("priorMu must have length ",z$TruNumPars))
+		}
+		z$priorMu <- matrix(priorMu, z$TruNumPars, 1 )
+	}
+	z$priorKappa <- 1
+	if (!is.null(priorKappa))
+	{
+		if (priorKappa > 0)
+		{
+			z$priorKappa <- priorKappa
+		}
+	}
+	z$priorDf <- z$TruNumPars + 2
+	if (!is.null(priorDf))
+	{
+		if (priorDf > 0)
+		{
+			z$priorDf <- priorDf
+		}
+	}
+	if (z$priorDf + z$nGroup <= z$TruNumPars)
+	{
+		z$priorDf <- z$TruNumPars - z$nGroup + 2
+	}
+	z$priorSigma <- diag(z$TruNumPars)
+	if (!is.null(priorSigma))
+	{
+		if ((class(priorSigma)=="matrix") &
+			all(dim(priorSigma)==c(z$TruNumPars,z$TruNumPars)))
+		{
+		z$priorSigma <- priorSigma
+		}
+		else
+		{
+		stop(paste("priorSigma is not a matrix of dimensions",z$TruNumPars))
+		}
+	}
+	# Rate parameters are nuisance parameters, and get a data-induced prior;
+	# observed covariance matrix on the trafo scale plus a small ridge.
+	z$priorMu[rates] <- rowMeans(rateParameters)
+	z$priorSigma[rates,] <- 0
+	z$priorSigma[,rates] <- 0
+	z$priorSigma[rates,rates] <- cov(t(rateParameters))
+	diag(z$priorSigma[rates,rates]) <- diag(z$priorSigma[rates,rates]) + 0.1
 	# Construction of indicator of parameters of the hierarchical model
 	# within the groupwise parameters:
 	vec <- rep(1,z$pp)
@@ -690,7 +848,6 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
 		{
 		stop("Function bayes does not allow non-basic rate parameters.")
 		}
-
 	z$muTemp <- matrix(c(0), z$TruNumPars, 1)
 	# Tom wonders about the deeper meaning of the next 10 or so lines.
 	z$SigmaTemp <- matrix(c(0), z$TruNumPars, z$TruNumPars)
@@ -701,45 +858,9 @@ initializeBayes <- function(data, effects, model, nbrNodes, priorSigma,
         use[z$ratePositions[[i]]] <- TRUE
         use[!z$basicRate] <- TRUE
         z$thetaMat[i, !use] <- NA
-       # z$SigmaTemp <- z$SigmaTemp + z$dfra[use, use]
+       # z$SigmaTemp <- z$SigmaTemp + z$proposalCov[use, use]
     }
     z
-}
-
-##@getDFRA algorithms do a few ML iterations and calculate a derivative matrix
-getDFRA <- function(z, nd, first=TRUE)
-{
-    ## do nd MLmodelsteps with the current thetas and get derivs
-    z$sdf <- vector("list", nd)
-    z$sf <- matrix(0, nrow=nd, ncol=z$pp)
-    z$Deriv <- TRUE
-    for (i in 1:nd)
-    {
-        ans <- z$FRAN(z, byGroup=!first)
-        z$sdf[[i]] <- ans$dff
-        z$sf[i,  ] <- colSums(ans$fra)
-    }
-	dfra <- t(as.matrix(Reduce("+", z$sdf) / length(z$sdf)))
-    z$dfra <- dfra
-	z$dfra <- scaleDfra(z)
-	z$Deriv <- FALSE
-    z
-}
-
-##@scaleDfra transforms dfra to use basic rate parameters on log scale
-scaleDfra <- function(z)
-{
-    lambda <- z$theta[z$basicRate]
-	dfra <- z$dfra
-    z$dfra[z$basicRate, ] <- z$dfra[z$basicRate,] * lambda
-    z$dfra[, z$basicRate] <- z$dfra[, z$basicRate] * lambda
-    #diag(z$dfra)[z$basicRate] <- lambda *
-	#	diag(dfra)[z$basicRate] + lambda * lambda *
-	#		colMeans(z$sf)[z$basicRate]
-	# Tom thinks that Ruth was in error here, and replaced this by simply:
-	diag(z$dfra)[z$basicRate] <- lambda
-	# see bayes.tex.
-	chol2inv(chol(z$dfra))
 }
 
 ##@flattenChains algorithms converts a nested list of chains to a single list
@@ -822,3 +943,11 @@ doGetProbabilitiesFromC <- function(x, thetaMat, index, getScores)
 		  as.integer(index), f$myeffects, theta, getScores)
 
 }
+
+##@trafo link function rates
+# the log link is too strong!
+trafo <- function(x){ifelse(x<0.01, 0.1, sqrt(x))}
+##@antitrafo inverse link function rates
+antitrafo <- function(x){x^2}
+##@devtrafo derivative link function rates
+devtrafo <- function(x){ifelse(x<0.01, 0.05, 1/(2*sqrt(x)))}

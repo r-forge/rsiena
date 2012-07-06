@@ -74,7 +74,7 @@ myeff <- includeEffects(myeff, transTrip, balance)
 myeff <- includeTimeDummy(myeff, recip, timeDummy="2,3,5")
 myeff <- includeTimeDummy(myeff, balance, timeDummy="4")
 myeff <- includeTimeDummy(myeff, density, timeDummy="all")
-ansp <- siena07(mymodel, data=mydata, effects=myeff, batch=FALSE)
+ansp <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
 ttp <- sienaTimeTest(ansp)
 
 ## Pairwise plots show

@@ -45,6 +45,7 @@
 #include "IsolateEffect.h"
 #include "IsolateNetEffect.h"
 #include "IsolatePopEffect.h"
+#include "JumpCovariateTransitiveTripletsEffect.h"
 #include "LinearShapeEffect.h"
 #include "MainCovariateEffect.h"
 #include "NetworkInteractionEffect.h"
