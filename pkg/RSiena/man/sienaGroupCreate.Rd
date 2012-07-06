@@ -15,16 +15,17 @@ sienaGroupCreate(objlist, singleOK = FALSE, getDocumentation=FALSE)
   functions, not for use by users.}
 }
 \details{
-
 This function creates a Siena group object from several Siena data
-objects, all of which use the same networks, covariates and actor sets
-(although possibly different subsets of the actor set in each
-object). It can be used as data input to \command{siena07} for the
-multigroup option.  Also used internally for convenience with a single
-Siena data object.}
-
+objects, all of which use networks, covariates and actor sets
+with the same names. The variables must correspond exactly
+between all data objects; the numbers of waves may differ.
+It can be used as data input to \command{siena07} for the
+multigroup option and to \command{bayes} for the hierarchical
+random effects multigroup option.
+Also used internally for convenience with a single Siena data object.}
 \value{
-  \item{... }{List containing the input objects, with attributes:}
+An object of class "sienaGroup"; this is a list
+containing the input objects, with attributes:
   \item{netnames}{names of the dependent variables in each set}
   \item{symmetric}{vector of booleans, one for each dependent
 	variable. TRUE if all occurrences of the network are symmetric.}
@@ -103,9 +104,14 @@ Siena data object.}
 \author{ Ruth Ripley }
 \seealso{\code{\link{sienaDataCreate}} }
 \examples{
-## not very useful, but will work
-mynet1 <- sienaNet(array(c(s501,s502),dim=c(50,50,2)))
-mydata <- sienaDataCreate(mynet1)
-mygroup <- sienaGroupCreate(list(mydata, mydata))
+Group1 <- sienaNet(array(c(N3401, HN3401), dim=c(45, 45, 2)))
+Group3 <- sienaNet(array(c(N3403, HN3403), dim=c(37, 37, 2)))
+Group4 <- sienaNet(array(c(N3404, HN3404), dim=c(33, 33, 2)))
+Group6 <- sienaNet(array(c(N3406, HN3406), dim=c(36, 36, 2)))
+dataset.1 <- sienaDataCreate(Friends = Group1)
+dataset.3 <- sienaDataCreate(Friends = Group3)
+dataset.4 <- sienaDataCreate(Friends = Group4)
+dataset.6 <- sienaDataCreate(Friends = Group6)
+FourGroups <- sienaGroupCreate(list(dataset.1, dataset.3, dataset.4, dataset.6))
 }
 \keyword{ classes }

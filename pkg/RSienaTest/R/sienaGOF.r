@@ -41,7 +41,7 @@ sienaGOF <- function(
 	 obsStatsByWave <- lapply(wave, function (j) {
 						matrix(
 						auxiliaryFunction(NULL,
-								sienaFitObject$f, 
+								sienaFitObject$f,
                 sienaFitObject$sims, j)
 						, nrow=1)
 				})
@@ -431,14 +431,16 @@ summary.sienaGOF <- function(object, ...) {
 	if (attr(x, "scoreTest")) {
 		oneStepSpecs <- attr(x, "oneStepSpecs")
 		oneStepMhd <- attr(x, "oneStepMahalanobisDistances")
-		gmmMhd <- attr(x, "gmmOneStepMahalanobisDistances")
-		gmmOneStepSpecs <- attr(x, "gmmOneStepSpecs")
-		partialOneStepSpecs <- attr(x, "partialOneStepSpecs")
-		partialOneStepMhd <- attr(x, "partialOneStepMahalanobisDistances")
-		joinedPartialOneStepMhd <-
-				attr(x, "joinedPartialOneStepMahalanobisDistances")
+# Tom deleted the following statements, because they lead to warnings
+# when checking. In the current code they are superfluous.
+#		gmmMhd <- attr(x, "gmmOneStepMahalanobisDistances")
+#		gmmOneStepSpecs <- attr(x, "gmmOneStepSpecs")
+#		partialOneStepSpecs <- attr(x, "partialOneStepSpecs")
+#		partialOneStepMhd <- attr(x, "partialOneStepMahalanobisDistances")
+#		joinedPartialOneStepMhd <-
+#				attr(x, "joinedPartialOneStepMahalanobisDistances")
 		joinedOneStepMhd <- attr(x, "joinedOneStepMahalanobisDistances")
-		joinedGmmMhd <- attr(x, "joinedGmmOneStepMahalanobisDistances")
+#		joinedGmmMhd <- attr(x, "joinedGmmOneStepMahalanobisDistances")
 		if (attr(x, "joined")) {
 			for (i in 1:ncol(oneStepSpecs)) {
 				a <- cbind(oneStepSpecs[,i, drop=FALSE] )

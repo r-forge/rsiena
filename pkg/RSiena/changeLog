@@ -1,3 +1,31 @@
+2012-07-05 R-forge revision 219
+	For RSiena and RSienaTest:
+	* Added matrices N3401, N3403, N3404, N3406, and HN3401, HN3403, HN3404, 
+		HN3406 to RSiena.Rda, with associated documentation files
+		N3401.Rd and HN3401.Rd.
+	* Updates to manual and RSiena.bib.
+   For RSienaTest only:
+	* Further serious changes in bayes.r and documentation bayes.tex.
+	* Added function print.sienaBayesFit to sienaprint.r, with 
+		new documentation file printsienaBayesFit.Rd
+	* Small changes to sienaGOF: commented out some superfluous lines.
+	* Made all siena07 calls in tests and examples to batch=TRUE:
+		this affected tests\effectsTest.R, man\plot.sienaTimeTest.Rd,
+		man\sienaTimetest.Rd.
+	* Changed documentation files bayes.Rd, sienaGroupCreate.Rd,
+		siena08.Rd, siena07.Rd, sienaDataCreate.Rd, sienaModelCreate.Rd.
+	* Updated tests\scriptfile.Rout.win to current version (scriptfile.Rout.save
+		still needs to be done!)
+	* New and changed effects: changes to 
+		\src\AllEffects.h, \data\allEffects.csv,
+		in \src\model\effects : \EffectFactory.cpp, AllEffects.h, 
+			SameCovariateTransitiveTripletsEffect.cpp, 
+			new files JumpCovariateTransitiveTripletsEffect.cpp and .h
+		in \src\model\effects\generic : MixedNetworkAlterFunction.cpp and .h,
+			SameCovariateMixedTwoPathFunction.cpp and .h, 
+			SameCovariateTwoPathFunction.cpp and .h,
+			CovariateMixedNetworkAlterFunction.cpp and .h.
+   * Removed some extra documentation producing a warning in R CMD check.
 2012-06-07 R-forge revision 216
    All for RSienaTest only.
 	* R/bayes.r: considerable update (no known errors now,
@@ -22,18 +50,18 @@
 	* Manual correspondingly updated.
 2012-05-18 R-forge revision 213
    All for RSienaTest only.
-	* R\effects.r and R\printInitialDescription.r:
+	* R/effects.r and R/printInitialDescription.r:
 	  protect against situations where matrix matchange has zero rows or columns
-	  (i.e., minor bug fix)
-	* R\sienaprint.r, R\print07Report.r, R\phase3.r, R\terminateFRAN.r, 
-	  R\robmon.r, R\sienaModelcreate.r, man\siena07.Rd, man\sienaModelCreate.r:	
+	  (i.e., prevent runtime error)
+	* R/sienaprint.r, R/print07Report.r, R/phase3.r, R/terminateFRAN.r, 
+	  R/robmon.r, R/sienaModelcreate.r, man/siena07.Rd, man/sienaModelCreate.r:	
 	  incorporate argument simOnly in sienaModelCreate() to facilitate
 	  simulation without estimation.
-   * R\initializeFRAN.r, R\sienaDataCreate.r, R\sienautils.r, man\sienaNet.Rd:
+   * R/initializeFRAN.r, R/sienaDataCreate.r, R/sienautils.r, man/sienaNet.Rd:
      incorporate argument allowOnly in sienaNet() to permit 
 	  ignoring monotonicity in data and its consequences for upOnly and downOnly.
    * data/allEffects.csv,
-	  src/model/effects/allEffects.h, src/model/effects/effectFactory.cpp,
+	  src/model/effects/AllEffects.h, src/model/effects/effectFactory.cpp,
      src/model/effects/SameCovariateTransitiveTripletsEffect.cpp,
      src/model/effects/SameCovariateTransitiveTripletsEffect.h,
      src/model/effects/TransitiveReciprocatedTripletsEffect.h,

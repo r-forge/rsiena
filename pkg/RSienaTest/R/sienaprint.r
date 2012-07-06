@@ -6,7 +6,7 @@
 ## * File: sienaprint.r
 ## *
 ## * Description: This file contains the print and summary modules for the
-## * classes siena, sienaFit and sienaModel
+## * classes siena, sienaFit, sienaModel, and sienaBayesFit
 ## *
 ## ****************************************************************************/
 ##@print.siena Methods
@@ -73,7 +73,7 @@ print.sienaGroup <- function(x, ...)
 	cat('Dependent variables: \n')
 	cat(paste(att$netnames, ":", att$types),'\n')
 	cat('Total number of periods:', att$observations)
-	cat("\nmore to be added!\n")
+	cat("\n")
 	invisible(x)
 }
 
@@ -402,12 +402,12 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
 	{
 		ses <- sqrt(diag(x$covtheta))
 		ses[x$fixed] <- NA
-	}	
+	}
     theta <- x$theta
 	if (!is.null(x$covtheta))
 	{
 		theta[diag(x$covtheta) < 0.0] <- NA
-	}	
+	}
 
     if (nBehavs > 0)
     {
@@ -432,7 +432,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
 	if (exists("ses"))
 	{
 		mydf[nrates + (1:x$pp), 'se' ] <- ses
-	}	
+	}
     if (!is.null(x$tstat))
     {
         mydf[1:nrates, "tstat"] <- NA
@@ -534,6 +534,7 @@ print.xtable.sienaFit <- function(x, ...)
     invisible(x)
 }
 
+##@print.chains.data.frame Methods
 print.chains.data.frame <- function(x, ...)
 {
     NextMethod(x)
@@ -549,4 +550,96 @@ print.chains.data.frame <- function(x, ...)
 		cat("\n End State Differences:\n")
 		print(endState)
 	}
+}
+
+##@print.sienaBayesFit Methods
+print.sienaBayesFit <- function(x, ...)
+{
+	printmat <- function(mat)
+	{
+		cat(sprintf("%8.4f",mat), sep=c(rep.int(' ', ncol(mat) - 1), '\n'))
+	}
+	if (!inherits(x, "sienaBayesFit"))
+	{
+        stop("not a legitimate Siena Bayes model fit")
+	}
+	else
+	{
+		cat("Note: this summary does not contain a convergence check.\n\n")
+		if (length(x$f$groupNames) > 1)
+		{
+			cat("Groups:\n")
+			s <- ""
+			ml <- max(nchar(x$f$groupNames))
+			fmt <- paste("%-", ml+2, "s", sep="")
+			for (i in 1:dim(x$ThinParameters)[2])
+			{
+				s <- paste(s, gettextf(fmt,x$f$groupNames[i]))
+				if ((nchar(s) + ml > 80) | (i == dim(x$ThinParameters)[2]))
+				{
+					cat(paste(s,"\n"))
+					s <- ""
+				}
+			}
+			cat("\n")
+		}
+
+		cat("Posterior means and standard deviations ")
+		cat("for global mean parameters\n\n")
+		# Make temporary changes to make x look like a sienaFit object
+		# so that sienaFitThetaTable can be applied.
+		x$theta <- colMeans(x$ThinPosteriorMu)
+		x$covtheta <- cov(x$ThinPosteriorMu)
+		name1 <- x$requestedEffects$groupName[1]
+		x$requestedEffects <-
+			x$requestedEffects[x$requestedEffects$groupName==name1,]
+		x$pp <- length(x$theta)
+		x$fixed <- x$fixed[x$effects$groupName==name1]
+		tmp <- sienaFitThetaTable(x)
+		mydf <- tmp$mydf
+		mymat <- as.matrix(mydf[,names(mydf)!="tstat"])
+		mymat[, 'value'] <- format(round(mydf$value, digits=4))
+		mymat[, 'se'] <- format(round(mydf$se, digits=4))
+		mymat[, 'type'] <- format(mymat[, 'type'])
+		mymat[, 'text'] <- format(mymat[, 'text'])
+		mymat[mydf$row < 1, 'row'] <-
+			format(mydf[mydf$row < 1, 'row'])
+		mymat[mydf[,'row'] >= 1, 'row'] <-
+			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
+		mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post.   ", ""),
+					   c(rep("", 4),  "mean    ", "", "s.d.    ", ""),
+						mymat)
+		mymat <- apply(mymat, 2, format)
+		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
+		addtorow <- tmp$addtorow
+		for (i in 1:length(tmp1))
+		{
+			if (length(addtorow$command) > 0)
+			{
+				for (j in 1:length(addtorow$command))
+				{
+					ii <- match(i-1, addtorow$pos[[j]])
+					if (!is.na(ii))
+						if (i == 2 | addtorow$command[j] == 'Network Dynamics')
+							cat( addtorow$command[j], '\n')
+						else
+							cat('\n', addtorow$command[j], '\n', sep='')
+				}
+			}
+			cat(tmp1[i], '\n')
+		}
+		if (length(x$f$groupNames) > 1)
+		{
+			cat("\n")
+			mean.Sigma <- apply(x$ThinPosteriorSigma, c(2,3), mean)
+			sd.Sigma <- apply(x$ThinPosteriorSigma, c(2,3), sd)
+			cat("Posterior mean of covariance matrix\n")
+			printmat(mean.Sigma)
+			cat("\nPosterior standard deviations of ")
+			cat("elements of covariance matrix\n")
+			printmat(sd.Sigma)
+		}
+		cat("\nTotal of", dim(x$ThinPosteriorMu)[1], "samples.\n\n")
+	}
+	invisible(x)
 }

@@ -410,7 +410,7 @@ effectTestFn <- function(model, type, modelNo, effects, data, bayes, useCluster,
 			if (!bayes)
 			{
 				ans <- try(siena07(model, verbose=TRUE, effects=effects,
-								   data=data, useCluster=cluster, ...))
+								   data=data, batch=TRUE, useCluster=cluster, ...))
 				if (!inherits(ans, "try-error"))
 				{
 					sink()
@@ -483,7 +483,8 @@ interactionTestFn <- function(model, effectDetails, effects,  name, type,
 	print(effects,  expand=TRUE)
 
 
-	ans <- try(siena07(model, verbose=TRUE, effects=effects, data=data, ...))
+	ans <- try(siena07(model, verbose=TRUE, batch=TRUE, effects=effects,
+					data=data, ...))
 	if (!inherits(ans, "try-error"))
 	{
 		sink()

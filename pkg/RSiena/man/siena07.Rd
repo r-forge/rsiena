@@ -48,7 +48,9 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     \code{\link{simstats0c}}:
 	usually, \code{data} and \code{effects}; possibly also
     \code{prevAns} if a previous reasonable provisional estimate was
-	obtained for a similar model.}
+	obtained for a similar model; possibly also \code{returnDeps} if
+	the simulated dependent variables (networks, behaviour) should
+	be returned.}
 }
 \details{
  Runs a Robbins-Monro algorithm for parameter estimation using the three-phase
@@ -71,7 +73,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 	"UserInterrupt". "UserInterrupt" indicates that the user asked for early
   termination before phase 3. }
   \item{theta}{Fitted value of theta.}
-  \item{covtheta}{Estimated covariance matrix of theta.}
+  \item{covtheta}{Estimated covariance matrix of theta; this is not available
+    if the sienaModel object x was produced with simOnly=TRUE.}
   \item{dfra}{Matrix of estimated derivatives.}
   \item{sf}{Matrix of deviations from target in phase 3.}
   \item{sf2}{Array of statistics from simulations in phase 3.}
@@ -79,25 +82,26 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{targets2}{Observed statistics for each wave.}
   \item{ssc}{Score function contributions for each wave for each
 	simulation in phase 3. Zero if finite difference method is used}
- \item{sims}{List of simulated networks. Each a list of edgelists, one
-   for each period.}
+  \item{sims}{If \code{returnDeps} is \code{TRUE}:
+	list of simulated dependent variables (networks, behaviour).
+	Networks are given as a list of edgelists, one for each period.}
    \item{Phase3nits}{Number of iterations actually performed in phase 3.}
   Writes text output to the file named "projname.out", where projname is defined
   in the sienaModel object x.
 }
-\references{\itemize{\item Schweinberger, M., and Snijders, T.A.B., (2007).
-       Markov models for digraph panel data: Monte Carlo-based
-       derivative estimation.
-       Computational Statistics and Data Analysis 51, 4465-4483.
-	   \item Snijders, Tom A.B.,
-	   The statistical evaluation of social network dynamics.
-       Pp.  361-395 in Sociological Methodology - 2001,  edited by
-       M.E. Sobel and M.P. Becker. Boston and London: Basil Blackwell.
-   \item Snijders, Tom A.B., Steglich, Christian E.G., and Schweinberger, Michael,
-       Modeling the co-evolution of networks and behavior.
-       Pp. 41-71 in Longitudinal models in the behavioral and related sciences,
-       edited by Kees van Montfort, Han Oud and Albert Satorra;
-	   Lawrence Erlbaum, 2007.
+\references{\itemize{\item Schweinberger, Michael, and Snijders,
+	Tom A.B., (2007). Markov models for digraph panel data:
+	Monte Carlo-based derivative estimation.
+    \emph{Computational Statistics and Data Analysis} 51, 4465-4483.
+	\item Snijders, Tom A.B.,
+	The statistical evaluation of social network dynamics.
+    Pp.  361-395 in \emph{Sociological Methodology - 2001},  edited by
+    M.E. Sobel and M.P. Becker. Boston and London: Basil Blackwell.
+   \item Snijders, Tom A.B., Steglich, Christian E.G., and Schweinberger,
+	Michael, Modeling the co-evolution of networks and behavior.
+    Pp. 41-71 in \emph{Longitudinal models in the behavioral and related sciences},
+    edited by Kees van Montfort, Han Oud and Albert Satorra;
+	Lawrence Erlbaum, 2007.
    \item Further see \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
            }
 }

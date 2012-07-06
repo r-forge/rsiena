@@ -407,10 +407,25 @@ files.
  The easiest way to control building and checking is to use environment
  variables. For portability between computers I suggest you set these using
  files as described here. You need a directory \verb|.R| in your home directory
- and two files in that directory:
+ and two files in that directory.
+ To find out what is your home directory:
+\begin{description}
+\item on Unix/Linux, open a terminal and type the command \verb|echo $HOME|
+\item on Windows, open a command-prompt and type the command
+    \verb|echo %USERPROFILE%| \\
+    Alternatively, in the Start menu in the ``Search programs and files'' box,
+    type \verb|command.com| and this will open a command prompt in
+    the home directory.
+    If these two ways give different directories,
+    then you may try out both of them.
+\item on a Mac, the home directory can be accessed by
+    choosing \verb|Home| from the \verb|Go| menu in the Finder
+    or by clicking on the \verb|Home| icon in a Finder window.
+\end{description}
+ Knowing how to get to your home directory, do the following:
 \begin{description}
 \item[.R directory] Create, in your home directory, a directory called .R (on
-  Windows you will have to use mkdir in a command prompt window to do this).
+  Windows you can use mkdir in a command prompt window to do this).
 \item[check.Renviron] This file is used in the check procedure. It should
  contain at least the following:
 {\small

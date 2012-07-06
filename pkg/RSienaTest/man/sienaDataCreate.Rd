@@ -3,7 +3,7 @@
 \alias{siena}
 \title{Function to create a Siena data object}
 \description{
-Creates a Siena data object from input networks, covariates and
+Creates a Siena data object from input networks, covariates, and
 composition change objects.}
 \usage{
 sienaDataCreate(..., nodeSets=NULL, getDocumentation=FALSE)
@@ -41,7 +41,7 @@ model fit. The components of the object are.
 \seealso{
 \code{\link{sienaNet}}, \code{\link{coCovar}}, \code{\link{varCovar}},
 \code{\link{coDyadCovar}}, \code{\link{varDyadCovar}},\cr
-\code{\link{sienaCompositionChange}}}
+\code{\link{sienaCompositionChange}}, \code{\link{sienaGroupCreate}}}
 \examples{
 mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mynet2 <- sienaNet(s50a, type='behavior')
