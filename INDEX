@@ -1,0 +1,82 @@
+GeodesicDistribution    Supplemental functions to sienaGOF
+RSiena-package          Simulation Investigation for Empirical Network
+                        Analysis
+algorithms              Function to fit 'Siena' model using alternative
+                        algorithms.
+allEffects              Internal data frame used to construct effect
+                        objects.
+bayes                   A function for fitting Bayesian models
+coCovar                 Function to create a constant covariate object
+coDyadCovar             Function to create a constant dyadic covariate
+                        object.
+edit.sienaEffects       Allow editing of a sienaEffects object if a gui
+                        is available.
+effectsDocumentation    Function to create a table of documentation of
+                        effect names, short names etc.
+getEffects              Function to create a Siena effects object
+includeEffects          Function to include effects in a Siena model
+includeInteraction      Function to create user-specified interactions
+                        for a Siena model.
+includeTimeDummy        Functions to include time dummy effects in a
+                        Siena model
+installGui              Obsolete function to start up the installer for
+                        the standalone Gui.
+iwlsm                   Function to fit an iterated weighted least
+                        squares model.
+maxlikefn               A ML version of FRAN
+plot.sienaTimeTest      Functions to plot assessment of time
+                        heterogeneity of parameters
+print.sienaEffects      Print methods for Siena effects objects
+print.sienaMeta         Methods for processing sienaMeta objects
+print01Report           Function to produce the Siena01 report from R
+                        objects
+profileLikelihoods      Function to calculate profile likelihood for a
+                        Siena model
+s50                     Network data: excerpt from 'Teenage Friends and
+                        Lifestyle Study' data.
+s501                    Network 1 data: excerpt from 'Teenage Friends
+                        and Lifestyle Study' data.
+s502                    Network 2 data: excerpt from 'Teenage Friends
+                        and Lifestyle Study' data.
+s503                    Network 3 data: excerpt from 'Teenage Friends
+                        and Lifestyle Study' data.
+s50a                    Alcohol use data: excerpt from 'Teenage Friends
+                        and Lifestyle Study' data
+setEffect               Function to set various columns in an effects
+                        object in a Siena model
+siena01Gui              User interface
+siena07                 Function to estimate parameters in a Siena
+                        model
+siena08                 Function to perform a meta analysis of a
+                        collection of Siena fits.
+sienaCompositionChange
+                        Functions to create a Siena composition change
+                        object
+sienaDataConstraint     Function to change the values of the
+                        constraints between networks.
+sienaDataCreate         Function to create a Siena data object
+sienaDataCreateFromSession
+                        Creates a Siena data object from a Siena
+                        session file
+sienaFit.methods        Methods for processing sienaFit objects
+sienaGOF                Functions to assess goodness of fit for SAOMs
+sienaGroupCreate        Function to group together several Siena data
+                        objects
+sienaModelCreate        Function to create an object containing the
+                        algorithm specifications for parameter
+                        estimation in RSiena
+sienaModelOptions       Function to allow entry of model options
+sienaNet                Function to create a Siena network object
+sienaNodeSet            Function to create a node set
+sienaTimeTest           Functions to assess and account for time
+                        heterogeneity of parameters
+simstats0c              Versions of FRAN
+summary.iwlsm           Summary method for Iterative Weighted Least
+                        Squares Models
+tmp3                    van de Bunt's Freshman dataset, time point 3
+tmp4                    van de Bunt's Freshman dataset, time point 4
+updateTheta             Function to update the initial values of theta.
+varCovar                Function to create a changing covariate object.
+varDyadCovar            Function to create a changing dyadic covariate
+                        object.
+xtable                  Access xtable in package xtable
