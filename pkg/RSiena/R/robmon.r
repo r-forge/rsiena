@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: robmon.r
 # *
@@ -83,8 +83,9 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         clusterCall(cl, library, pkgname, character.only = TRUE)
 		##parLapply(cl, c('f1','f2'), sink)
 		z$oldRandomNumbers <- .Random.seed
-		if (R.version$minor < 14.0) ## fake this to recreate old results
-	##	if (TRUE)
+		if (getRversion() < "2.14.0")
+			## fake this to recreate old results
+			##	if (TRUE)
 		{
 			clusterSetupRNG(cl, seed = as.integer(runif(6,
 								max=.Machine$integer.max)))

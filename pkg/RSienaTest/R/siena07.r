@@ -46,8 +46,9 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 		{
 			stop("cannot use forking processes on Windows")
 		}
-		if (R.version$minor < 14.0) ## fake this to recreate old results
-	##	if (TRUE)
+		if (getRversion() < "2.14.0")
+		## fake this to recreate old results
+		## if (TRUE)
 		{
 			require(snow, warn.conflicts=FALSE)
 			require(rlecuyer)

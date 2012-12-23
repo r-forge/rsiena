@@ -58,7 +58,7 @@ simstats0c <- function(z, x, data=NULL, effects=NULL, fromFiniteDiff=FALSE,
         }
         ## cat(randomseed2, '\n')
     }
-	if (R.version$minor < 14.0) ##fake this to repeat old results
+	if (getRversion() < "2.14.0") ##fake this to repeat old results
 		##	if (TRUE)
 	{
 		useStreams <- TRUE
