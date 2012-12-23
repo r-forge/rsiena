@@ -83,8 +83,9 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         clusterCall(cl, library, pkgname, character.only = TRUE)
 		##parLapply(cl, c('f1','f2'), sink)
 		z$oldRandomNumbers <- .Random.seed
-		if (R.version$minor < 14.0) ## fake this to recreate old results
-	##	if (TRUE)
+		if (getRversion() < "2.14.0")
+			## fake this to recreate old results
+			##	if (TRUE)
 		{
 			clusterSetupRNG(cl, seed = as.integer(runif(6,
 								max=.Machine$integer.max)))
@@ -331,8 +332,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
 		##not sure this does not use very small vals
 		z$covtheta[, z$diver] <- Root(diag(z$covtheta)) * 33
 		diag(z$covtheta)[z$diver] <- 999
-	}	
+	}
     z$termination <- 'OK'
     z
 }
-
