@@ -44,12 +44,12 @@ mynet3 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)),
 type="bipartite", nodeSet=c("senders", "receivers"))
 ## sparse matrix input - create some RSiena edgelists first
 library(Matrix)
-tmp1 <- as(Matrix(s501), "dgTMatrix")
-tmp2 <- as(Matrix(s502), "dgTMatrix")
-tmp3 <- as(Matrix(s503), "dgTMatrix")
-mymat1 <- cbind(tmp1@i + 1, tmp1@j + 1, 1, 1)
-mymat2 <- cbind(tmp2@i + 1, tmp2@j + 1, 1, 2)
-mymat3 <- cbind(tmp3@i + 1, tmp3@j + 1, 1, 3)
+tmps501 <- as(Matrix(s501), "dgTMatrix")
+tmps502 <- as(Matrix(s502), "dgTMatrix")
+tmps503 <- as(Matrix(s503), "dgTMatrix")
+mymat1 <- cbind(tmps501@i + 1, tmps501@j + 1, 1, 1)
+mymat2 <- cbind(tmps502@i + 1, tmps502@j + 1, 1, 2)
+mymat3 <- cbind(tmps503@i + 1, tmps503@j + 1, 1, 3)
 mymat <- rbind(mymat1, mymat2, mymat3)
 library(Matrix)
 ## mymat includes all 3 waves

@@ -834,7 +834,7 @@ initializeBayes <- function(data, effects, model, nbrNodes, initgain,
 	z$priorSigma[rates,] <- 0
 	z$priorSigma[,rates] <- 0
 	z$priorSigma[rates,rates] <- cov(t(rateParameters))
-	diag(z$priorSigma[rates,rates]) <- diag(z$priorSigma[rates,rates]) + 0.1
+	diag(z$priorSigma)[rates] <- diag(z$priorSigma)[rates] + 0.1
 	# Construction of indicator of parameters of the hierarchical model
 	# within the groupwise parameters:
 	vec <- rep(1,z$pp)
