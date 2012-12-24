@@ -14,26 +14,26 @@
 
 \usage{
 sienaGOF(sienaFitObject, auxiliaryFunction,
-		wave=NULL, verbose=FALSE, join=TRUE, twoTailed=FALSE, 
+		wave=NULL, verbose=FALSE, join=TRUE, twoTailed=FALSE,
 		cluster=NULL, robust=FALSE, \dots)
-\method{plot}{sienaGOF}(x,  center=FALSE, scale=FALSE, violin=TRUE, 
+\method{plot}{sienaGOF}(x,  center=FALSE, scale=FALSE, violin=TRUE,
 		key=NULL, perc=.05, wave=1, main=main, ylab=ylab, \dots)
 }
 \arguments{
   \item{sienaFitObject}{Results from a call to \code{siena07}.}
-  \item{join}{Boolean: should sienaGOF do tests on all of the waves 
+  \item{join}{Boolean: should sienaGOF do tests on all of the waves
   individually, or sum across waves?}
-  \item{auxiliaryFunction}{Function to be used to calculate statistics, 
+  \item{auxiliaryFunction}{Function to be used to calculate statistics,
   e.g. one implementing the \code{sna} or \code{igraph} packages.
   	See \code{Examples} for more information on the method signature. The method signature
     is \code{function(index, data, sims, wave)}, where the \code{index} is the index
     of the simulated network, or \code{NULL} if the observed variable is needed. \code{data}
     is the observed data object that you must extract the relevant variables from. \code{sims} is the
     list of simulations returned from \code{siena07}. \code{wave} is the index of the wave.}
-  \item{verbose}{Whether to print intermediate results. Calculations can 
+  \item{verbose}{Whether to print intermediate results. Calculations can
   take some time, and user feedback may be useful.}
   \item{twoTailed}{Whether to use two tails for calculating p values on the
-   Monte Carlo test. Recommended for 
+   Monte Carlo test. Recommended for
   advanced users only, as it is probably only applicable in rare cases.}
   \item{x}{ Object from a call to sienaGOF. }
   \item{ylab}{ The y-axis label for the plot. }
@@ -50,30 +50,30 @@ sienaGOF(sienaFitObject, auxiliaryFunction,
   \item{\dots}{Other arguments.}
 }
 \details{
- This function is used to assess the goodness of fit of a stochastic actor 
+ This function is used to assess the goodness of fit of a stochastic actor
  oriented model
  for an arbitrarily defined auxiliary statistic. These statistics should be
   chosen to
- represent features of the network that are not explicitly fit but can be 
+ represent features of the network that are not explicitly fit but can be
  considered
- important properties that the model at hand should represent well. Some 
+ important properties that the model at hand should represent well. Some
  examples are:
- 
+
  -Geodesic distances
- 
+
  -Triad census
- 
+
  -Outdegree distribution
- 
+
  -Indegree distribution
- 
+
  -Behavioral distribution
- 
+
  -Edgewise homophily counts
- 
+
  -Edgewise shared partners
 
-The function is written so that the user can easily define a function to 
+The function is written so that the user can easily define a function to
 capture some
 other relevant aspects of the network, behaviors, etc.
 
@@ -86,20 +86,20 @@ We recommend the following heuristic approach to fitting your model:
 
 3. Assess goodness of fit (i.e. using join=TRUE) on auxiliary statistics,
  and refine the model.
- 
+
  The \code{print} function will display some useful information to help with
  model selection if some effects are set to FIX and TEST on the effects
  object. A rough estimator for the Mahalanobis distance at each proposed
  specification is given in the output. This estimator is called the
  modified model distance (MMD). See Lospinoso (2012) for more information.
- 
+
  For these specifications, Mahalanobis distances as well as parameter estimates
  are given to help guide model selection. See the manual, or the citations for
  more information.
 
 These functions are pre-fabricated for ease of use, and can be passed in as the
 \code{auxiliaryFunction} with no extra effort:
- 
+
 \code{ GeodesicDistribution(\dots)}
 
 \code{ IndegreeDistribution(\dots)}
@@ -130,19 +130,19 @@ See the manual for instructions on how to implement these extractor functions.
    includes the following:
   \item{SimulatedMhd}{ Mahalanobis distances for the simulations. }
   \item{ObservedMhd}{ Mahalanobis distances for the observation. }
-  \item{TwoTailed}{ Whether the p value corresponds to a one or two 
+  \item{TwoTailed}{ Whether the p value corresponds to a one or two
   tailed Monte Carlo test. }
-  \item{Simulations}{ A copy of the statistics from the auxiliaryFunction 
+  \item{Simulations}{ A copy of the statistics from the auxiliaryFunction
   for simulations. }
-  \item{Observations}{ A copy of the statistics from the auxiliaryFunction 
+  \item{Observations}{ A copy of the statistics from the auxiliaryFunction
   for observations. }
-  \item{Rank}{ Rank of the covariance matrix of the simulated auxiliary 
+  \item{Rank}{ Rank of the covariance matrix of the simulated auxiliary
   statistics. }
 }
 
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}
   for general information on RSiena.:
- 
+
 Lospinoso, J.A.  and Snijders, T.A.B., "Goodness of fit for
 Stochastic Actor Oriented Models." Presentation given at Sunbelt XXXI,
  St. Pete's Beach, Fl. 2011.
@@ -163,10 +163,10 @@ Network Dynamics." Ph.D. Thesis. University of Oxford: U.K.
 	myeff[myeff$shortName=='cycle3', c('fix', 'test')] <-TRUE
 	myeff[myeff$shortName=='balance', c('fix', 'test')] <-TRUE
 	ans <- siena07(mymodel, data=mydata, effects=myeff, returnDeps=TRUE, batch=TRUE)
-  
+
   # An example function:
   sparseMatrixExtraction <- function (i, data, sims, wave, groupName="Data1", varName="mynet1") {
-    #require(Matrix)
+    require(Matrix)
     dimsOfDepVar<-
       attr(data[[groupName]]$depvars[[varName]],
            "netdims")
@@ -188,7 +188,7 @@ Network Dynamics." Ph.D. Thesis. University of Oxford: U.K.
     ## Zero missings:
     1*((returnValue - missing) > 0)
   }
-  
+
   IndegreeDistribution <- function (i, data, sims, wave,
                                     levels=0:6, extractor=sparseMatrixExtraction) {
     x <- extractor(i, data, sims, wave)
@@ -205,28 +205,28 @@ Network Dynamics." Ph.D. Thesis. University of Oxford: U.K.
     returnValue <- snaSociomatrixExtraction(i, data, sims, groupName, varName, wave)
     as.edgelist.sna(returnValue)
   }
-  
+
   igraphEdgelistExtraction <- function (i, data, sims, groupName, varName, wave) {
     require(igraph)
     returnValue <- snaSociomatrixExtraction(i, data, sims, groupName, varName,
                                             wave)
     graph.adjacency(returnValue)
   }
-  
+
   OutdegreeDistribution <- function (i, data, sims, groupName, varName, wave,
                                      levels=0:8, extractor=snaSociomatrixExtraction) {
     x <- extractor(i, data, sims, groupName, varName, wave)
     a <- apply(x, 1, sum)
     sapply(levels, function(i){ sum(a<=i) })
   }
-  
+
   IndegreeDistribution <- function (i, data, sims, groupName, varName, wave,
                                     levels=0:8, extractor=snaSociomatrixExtraction) {
     x <- extractor(i, data, sims, groupName, varName, wave)
     a <- apply(x, 2, sum)
     sapply(levels, function(i){ sum(a<=i) })
   }
-  
+
   GeodesicDistribution <- function (i, data, sims, groupName, varName, wave,
                                     extractor=snaEdgelistExtraction, levels=1:8) {
     require(sna)
@@ -234,14 +234,14 @@ Network Dynamics." Ph.D. Thesis. University of Oxford: U.K.
     a <- geodist(x)$gdist
     sapply(levels, function(i){ sum(a<=i) })
   }
-  
+
   TriadCensus <- function (i, data, sims, groupName, varName, wave,
                            extractor=snaEdgelistExtraction) {
     require(sna)
     x <- extractor(i, data, sims, groupName, varName, wave)
     triad.census(x)
   }
-  
+
   KnnDistribution <- function (i, data, sims, groupName, varName, wave,
                                extractor=igraphEdgelistExtraction, levels=0:25) {
     require(igraph)

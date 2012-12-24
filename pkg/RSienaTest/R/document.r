@@ -169,3 +169,43 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 				quote=FALSE)
 	## now run LaTeX on auto.tex in the doc directory.
 }
+##@RSienaSlowTest Tests Combine all examples on help pages and run them
+RSienaSlowTest <- function(RSienaDir="../RSiena/", lib="library(RSiena)")
+{
+	helpdir <- dir(paste(RSienaDir, "/man", sep=""), pattern="Rd$",
+				   full.names=TRUE)
+	tmp <- lapply(helpdir, function(x)
+			  {
+				  if (!grepl("maxlikefn", x)) ## obsolete, not-working function
+				  {
+					  tf <- tempfile("RSiena")
+					  tools::Rd2ex(x, tf)
+					  if (file.exists(tf))
+					  {
+						  on.exit(unlink(tf))
+						  tmpa <- readLines(tf)
+						  tmpb <- sub("##D", "", tmpa)
+						  tmpb <- ifelse (grepl("fix(", tmpb, fixed=TRUE),
+										  paste("#", tmpb), tmpb)
+						  if (basename(x) == "sienaDataCreateFromSession.Rd")
+						  {
+							  chnewdir <- paste("setwd(\"",
+												RSienaDir,
+												"/inst/examples\")", sep="")
+							  tmpb <- c("curdir <- getwd()",
+										chnewdir, tmpb, "setwd(curdir)")
+						  }
+						  unlink(tf)
+						  c(paste("#", x), tmpb)
+					  }
+				  }
+			  }
+				  )
+	tmp1 <- do.call(c, tmp)
+	tmp1 <- c(lib, tmp1)
+	tf <- tempfile("RSiena")
+
+	write(tmp1, tf)
+	source(tf, echo=TRUE)
+	unlink(tf)
+}

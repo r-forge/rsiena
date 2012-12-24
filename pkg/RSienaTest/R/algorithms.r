@@ -992,7 +992,7 @@ profileLikelihoods <- function(resp, x, data, effects,
 		stopCluster(z$cl)
 	}
     z$zz <- zz
-	z
+	invisible(z)
 }
 
 ##@profOptimFn algorithms Function for optimizing profile likelihoods
@@ -1052,4 +1052,3 @@ doChangeStep <- function(z, x, fra)
     }
     z
 }
-
