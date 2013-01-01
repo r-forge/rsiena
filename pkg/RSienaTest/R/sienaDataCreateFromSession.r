@@ -233,8 +233,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
     {
         return(getInternals())
     }
-    ActorSets <- NULL
-    ActorSetsSize <- NULL
+	env <- sys.frame(sys.nframe())
     if (!is.null(filename))
     {
         session <- sessionFromFile(filename)
@@ -395,7 +394,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                            tmp <- sienaNet(mylist, nodeSet=namesession[1,
                                            "ActorSet"])
                        }
-                       assign(objnames[j], tmp, .GlobalEnv)
+                       assign(objnames[j], tmp)
                    },
                    'bipartite' = {
                        nodesets <-
@@ -483,7 +482,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        {
                            stop("Two-mode pajek nets not supported")
                        }
-                   assign(objnames[j], tmp, .GlobalEnv)
+                   assign(objnames[j], tmp)
                    },
                    'behavior' = {
                        ##miss <- gsub(" ", "|",
@@ -496,8 +495,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        ##  namefiles[[1]][grep(miss, namefiles[[1]])] <-  NA
                        assign(objnames[j],
                               sienaNet(namefiles[[1]], type = 'behavior',
-                                       nodeSet=namesession[1, "ActorSet"]),
-                              .GlobalEnv)
+                                       nodeSet=namesession[1, "ActorSet"]))
                    },
                    'constant covariate' = {
                        ##  miss <- gsub(" ", "|",
@@ -509,11 +507,10 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
                        varnames <- strsplit(objnames[j], ' ')[[1]]
                        tmp <- sapply(1: ncol(namefiles[[1]]), function(x){
-                           assign(varnames[x],
+                           assign(varnames[x], pos=env,
                                   coCovar(namefiles[[1]][, x],
                                           nodeSet=namesession[1,
-                                          "ActorSet"]),
-                                  .GlobalEnv)})
+                                          "ActorSet"]))})
                    },
                    'changing covariate' = {
                      ##  miss <- gsub(" ", "|",
@@ -525,8 +522,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
                        assign(objnames[j],
                               varCovar (namefiles[[1]],
-                                        nodeSet=namesession[1, "ActorSet"]),
-                              .GlobalEnv)
+                                        nodeSet=namesession[1, "ActorSet"]))
                    },
                    'constant dyadic covariate' = {
                        miss <- namesession$MissingValues
@@ -564,7 +560,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                              x=myedgelist[, 3])
                            tmp <- coDyadCovar(myval, nodeSets=nodesets)
                        }
-                       assign(objnames[j], tmp, .GlobalEnv)
+                       assign(objnames[j], tmp)
                    },
                    'changing dyadic covariate' = {
                        if (namesession[1, "ActorSet"] == "Actors")
@@ -643,7 +639,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                       )
                          tmp <- varDyadCovar(mylist, nodeSets=nodesets)
                        }
-                       assign(objnames[j], tmp, .GlobalEnv)
+                       assign(objnames[j], tmp)
                    },
                    'exogenous event' = {
                        tmp <- namefiles[[1]]
@@ -668,7 +664,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                   })
                        tmp <- sienaCompositionChange(clist,
                                                      namesession$ActorSet[[1]])
-                       assign(objnames[j], tmp, .GlobalEnv)
+                       assign(objnames[j], tmp)
                    },
                {
                    if (is.null(filename))
@@ -687,9 +683,8 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
         }
         ## create the node sets
         tmp <- lapply(1:length(ActorSets), function(x){
-            assign(ActorSets[x], sienaNodeSet(ActorSetsSize[x],
-                                              nodeSetName=ActorSets[x]),
-                   .GlobalEnv)
+            assign(ActorSets[x], pos=env, sienaNodeSet(ActorSetsSize[x],
+								 nodeSetName=ActorSets[x]))
         })
         ## create the group object
         obj <- unlist(lapply(objnames, strsplit, split=" "))
@@ -704,18 +699,17 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                 stop(paste('Duplicate names',
                              obj[duplicated(obj)]))
         }
-        objlist <- mget(obj, .GlobalEnv)
-        nodeSetList <- mget(ActorSets,.GlobalEnv)
+        objlist <- mget(obj, as.environment(-1))
+        nodeSetList <- mget(ActorSets, as.environment(-1))
         names(nodeSetList) <- NULL
        ## arglist <- c(objlist, nodeSets=nodeSetList)
         assign(gps[i], do.call(sienaDataCreate,
-                               c(objlist, nodeSets=list(nodeSetList))),
-               .GlobalEnv)
+                               c(objlist, nodeSets=list(nodeSetList))))
     }
     ##join the groups
     if (length(gps) > 1)
     {
-        mydata <- sienaGroupCreate(mget(gps, .GlobalEnv))
+        mydata <- sienaGroupCreate(mget(gps, as.environment(-1)))
     }
     else
     {
