@@ -1,6 +1,6 @@
 \name{print.sienaBayesFit}
 \alias{print.sienaBayesFit}
-\alias{sienaBayes}
+\alias{summary.sienaBayesFit}
 \title{Methods for processing sienaBayes objects}
 \usage{
 \method{print}{sienaBayesFit}(x, ...)
@@ -14,9 +14,9 @@
 }
 \value{
  The function \code{print.sienaBayesFit} prints results
- of a Bayesian analysis, as resulting from function \code{\link{bayes}}.
+ of a Bayesian analysis, as resulting from function \code{\link{sienaBayes}}.
 }
-\seealso{\code{\link{bayes}}}
+\seealso{\code{\link{sienaBayes}}}
 \references{
   See also \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }

@@ -6,25 +6,57 @@
 ## * File: sienaprint.r
 ## *
 ## * Description: This file contains the print and summary modules for the
-## * classes siena, sienaFit, sienaModel, and sienaBayesFit
+## * classes siena, sienaFit, sienaAlgorithm, and sienaBayesFit
 ## *
 ## ****************************************************************************/
 ##@print.siena Methods
 print.siena <- function(x, ...)
 {
+    ##@onlys internal print.siena; prints matrix attributes of x$depvar
+	onlys <- function(x, attrib){
+	# function to print the attribute attrib (character string)
+	# of object x$depvars
+	# This attribute must be a logical matrix
+	# with named columns, and rows indicating periods.
+		textattr <- deparse(substitute(attrib),  backtick=FALSE)
+		uponlys <- sapply(x$depvars, function(y){attr(y,attrib)})
+		for (j in 1:dim(uponlys)[2])
+		{
+			if (any(uponlys[,j]))
+			{
+				cat(textattr)
+				cat(":  ", colnames(uponlys)[j], ":    ", sep="")
+				if (all(uponlys[,j]))
+				{
+					cat("all periods\n")
+				}
+				else
+				{
+					word <-
+						ifelse((sum(uponlys[,j]) <= 1), "period ", "periods ")
+					cat(word)
+					cat(which(uponlys[,j]), sep=", ")
+					cat("\n")
+				}
+			}
+		}
+	}
+# begin main method siena.print proper
 	if (!inherits(x, "siena"))
 	{
         stop("not a legitimate Siena data object")
 	}
 	cat('Dependent variables: ', paste(names(x$depvars), collapse=", "), "\n")
 	cat('Number of waves:', x$observations, "\n")
-	if (!is.null(x$nodesets))
+	if (!is.null(x$nodeSet))
 	{
-		tmp <- cbind(c('Nodesets',
-					   paste(names(x$nodesets), collapse=", ")),
-					 c('Number of nodes', sapply(x$nodesets, length)))
-		print(tmp)
+		tmp <- cbind(c('Nodesets      ',
+					   paste(names(x$nodeSet), collapse=", ")),
+					 c('Number of nodes', sapply(x$nodeSet, length)))
+		dimnames(tmp) <-list(rep("", dim(tmp)[1]), rep("", dim(tmp)[2]))
+		print(tmp, quote=FALSE, print.gap=0)
 	}
+	cat("\n")
 	if (length(x$cCovars) > 0)
 	{
 		cat('Constant covariates: ', paste(names(x$cCovars), collapse=", "), "\n")
@@ -44,21 +76,25 @@ print.siena <- function(x, ...)
 		cat('Changing dyadic covariates: ',
 			paste(names(x$dyvCovars), collapse=", "), "\n")
 	}
+
+	onlys(x, 'uponly')
+	onlys(x, 'downonly')
+
 	attrs <- attributes(x)
 	highers <- attrs[["higher"]]
 	disjoints <- attrs[["disjoint"]]
 	atleastones <- attrs[["atLeastOne"]]
 	if (any(highers))
 	{
-		cat("Higher: ", names(highers)[highers], "\n")
+		cat("Higher: ", names(highers)[highers], sep="", "\n")
 	}
 	if (any(disjoints))
 	{
-		cat("Disjoint: ", names(disjoints)[disjoints], "\n")
+		cat("Disjoint: ", names(disjoints)[disjoints], sep="",  "\n")
 	}
 	if (any(atleastones))
 	{
-		cat("atLeatOne: ", names(atleastones)[atleastones], "\n")
+		cat("atLeastOne: ", names(atleastones)[atleastones], sep="",  "\n")
 	}
 	invisible(x)
 }
@@ -73,7 +109,7 @@ print.sienaGroup <- function(x, ...)
 	cat('Dependent variables: \n')
 	cat(paste(att$netnames, ":", att$types),'\n')
 	cat('Total number of periods:', att$observations)
-	cat("\n")
+	cat("\nmore to be added!\n")
 	invisible(x)
 }
 
@@ -130,6 +166,7 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			}
 			cat(tmp1[i], '\n')
 		}
+
 		cat("\nTotal of", x$n, "iteration steps.\n\n")
 		if (x$termination == "UserInterrupt")
 			cat(" \n*** Warning ***",
@@ -156,6 +193,8 @@ print.summary.sienaFit <- function(x, ...)
         stop("not a legitimate summary of a Siena model fit")
 	}
 	print.sienaFit(x)
+	cat(c("Overall maximum convergence ratio: ",
+		sprintf("%8.4f", x$tconv.max), "\n\n"))
 	if (sum(x$test) > 0) ## we have some score tests
 	{
 		testn <- sum(x$test)
@@ -270,13 +309,15 @@ printMatrix <- function(mat)
 {
     cat(mat, sep=c(rep.int(' ', ncol(mat) - 1), '\n'))
 }
-##@print.sienaModel Methods
-print.sienaModel <- function(x, ...)
+##@print.sienaAlgorithm Methods
+print.sienaAlgorithm <- function(x, ...)
 {
-    cat('\n Project name:', x$projname, '\n')
-    cat('\n Use standard initial values:', x$useStdInits, '\n')
+    cat(' Project name:', x$projname, '\n')
+    cat(' Use standard initial values:', x$useStdInits, '\n')
     cat(' Random seed:', x$randomSeed,'\n')
-    cat(' Starting value of gain parameter', x$firstg, '\n')
+    cat(' Starting value of gain parameter:', x$firstg, '\n')
+	cat(' Diagonalization parameter:', x$diagonalize, '\n')
+	cat(' Dolby noise reduction:', x$dolby, '\n')
     if (any(x$MaxDegree > 0))
     {
         cat(' Restrictions on degree in simulations:')
@@ -316,7 +357,6 @@ print.sienaModel <- function(x, ...)
 	}
     cat(" Model Type:", ModelTypeStrings[x$modelType], "\n")
     invisible(x)
-
 }
 ##@sienaFitThetaTable Miscellaneous
 sienaFitThetaTable <- function(x, tstat=FALSE)
@@ -552,6 +592,35 @@ print.chains.data.frame <- function(x, ...)
 	}
 }
 
+##@maketemp Methods
+makeTemp <- function(x, ...)
+{
+# This reproduces a part of sienaFit but with Bayesian headings;
+# for use in print.sienaBayesFit and summary.sienaBayesFit
+		name1 <- x$requestedEffects$groupName[1]
+		x$requestedEffects <-
+			x$requestedEffects[x$requestedEffects$groupName==name1,]
+		x$pp <- length(x$theta)
+		x$fixed <- x$fixed[x$effects$groupName==name1]
+		tmp <- sienaFitThetaTable(x)
+		mydf <- tmp$mydf
+		mymat <- as.matrix(mydf[,names(mydf)!="tstat"])
+		mymat[, 'value'] <- format(round(mydf$value, digits=4))
+		mymat[, 'se'] <- format(round(mydf$se, digits=4))
+		mymat[, 'type'] <- format(mymat[, 'type'])
+		mymat[, 'text'] <- format(mymat[, 'text'])
+		mymat[mydf$row < 1, 'row'] <-
+			format(mydf[mydf$row < 1, 'row'])
+		mymat[mydf[,'row'] >= 1, 'row'] <-
+			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
+		mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post.   ", ""),
+					   c(rep("", 4),  "mean    ", "", "s.d.    ", ""),
+						mymat)
+		mymat <- apply(mymat, 2, format)
+		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
+		list(tmp, tmp1)
+}
+
 ##@print.sienaBayesFit Methods
 print.sienaBayesFit <- function(x, ...)
 {
@@ -585,32 +654,33 @@ print.sienaBayesFit <- function(x, ...)
 		}
 
 		cat("Posterior means and standard deviations ")
-		cat("for global mean parameters\n\n")
 		# Make temporary changes to make x look like a sienaFit object
 		# so that sienaFitThetaTable can be applied.
-		x$theta <- colMeans(x$ThinPosteriorMu)
-		x$covtheta <- cov(x$ThinPosteriorMu)
-		name1 <- x$requestedEffects$groupName[1]
-		x$requestedEffects <-
-			x$requestedEffects[x$requestedEffects$groupName==name1,]
-		x$pp <- length(x$theta)
-		x$fixed <- x$fixed[x$effects$groupName==name1]
-		tmp <- sienaFitThetaTable(x)
-		mydf <- tmp$mydf
-		mymat <- as.matrix(mydf[,names(mydf)!="tstat"])
-		mymat[, 'value'] <- format(round(mydf$value, digits=4))
-		mymat[, 'se'] <- format(round(mydf$se, digits=4))
-		mymat[, 'type'] <- format(mymat[, 'type'])
-		mymat[, 'text'] <- format(mymat[, 'text'])
-		mymat[mydf$row < 1, 'row'] <-
-			format(mydf[mydf$row < 1, 'row'])
-		mymat[mydf[,'row'] >= 1, 'row'] <-
-			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
-		mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post.   ", ""),
-					   c(rep("", 4),  "mean    ", "", "s.d.    ", ""),
-						mymat)
-		mymat <- apply(mymat, 2, format)
-		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
+		# This is done in function makeTemp.
+		if (length(x$f$groupNames) <= 1)
+		{
+			cat("\n\n")
+			x$theta <- colMeans(x$ThinParameters[,1,])
+			x$covtheta <- cov(x$ThinParameters[,1,])
+		}
+		else
+		{
+			cat("for global mean parameters\n\n")
+			nmain <- dim(x$ThinPosteriorMu)[1]
+			if (x$frequentist)
+			{
+			first <- nmain - x$lengthPhase3 + 1
+			}
+			else
+			{
+			first <- 1
+			}
+			x$theta <- colMeans(x$ThinPosteriorMu[first:nmain,])
+			x$covtheta <- cov(x$ThinPosteriorMu)
+		}
+		tmps <- makeTemp(x)
+		tmp <- tmps[[1]]
+		tmp1 <- tmps[[2]]
 		addtorow <- tmp$addtorow
 		for (i in 1:length(tmp1))
 		{
@@ -631,15 +701,97 @@ print.sienaBayesFit <- function(x, ...)
 		if (length(x$f$groupNames) > 1)
 		{
 			cat("\n")
-			mean.Sigma <- apply(x$ThinPosteriorSigma, c(2,3), mean)
-			sd.Sigma <- apply(x$ThinPosteriorSigma, c(2,3), sd)
-			cat("Posterior mean of covariance matrix\n")
+			mean.Sigma <-
+				apply(x$ThinPosteriorSigma[first:nmain,,], c(2,3), mean)
+			sd.Sigma <- apply(x$ThinPosteriorSigma[first:nmain,,], c(2,3), sd)
+			cat("Posterior mean of global covariance matrix\n")
 			printmat(mean.Sigma)
 			cat("\nPosterior standard deviations of ")
-			cat("elements of covariance matrix\n")
+			cat("elements of global covariance matrix\n")
 			printmat(sd.Sigma)
 		}
 		cat("\nTotal of", dim(x$ThinPosteriorMu)[1], "samples.\n\n")
 	}
 	invisible(x)
 }
+
+##@summary.sienaBayesFit Methods
+summary.sienaBayesFit <- function(object, ...)
+{
+    if (!inherits(object, "sienaBayesFit"))
+	{
+        stop("not a legitimate Siena Bayes model fit")
+	}
+    class(object) <- c("summary.sienaBayesFit", class(object))
+    object
+}
+##@print.summary.sienaBayesFit Methods
+print.summary.sienaBayesFit <- function(x, ...)
+{
+	if (!inherits(x, "summary.sienaBayesFit"))
+	{
+        stop("not a legitimate summary of a Siena Bayes model fit")
+	}
+	nmain <- dim(x$ThinPosteriorMu)[1]
+	if (x$frequentist)
+	{
+		cat("Frequentist estimation.\n")
+		first <- nmain - x$lengthPhase3 + 1
+	}
+	else
+	{
+		first <- 1
+		cat("Prior distribution:\n")
+		cat("\nMu      ")
+		for (i in seq(along=x$priorMu))
+		{
+			cat(sprintf("%8.4f", x$priorMu[i,1]),"\n        ")
+		}
+		cat("\nSigma   ")
+		for (i in seq(along=x$priorMu))
+		{
+			cat(sprintf("%8.4f", x$priorSigma[i,]),"\n        ")
+		}
+		cat("\nDf       ",sprintf("%1d", x$priorDf),"\n")
+		if (length(x$f$groupNames) >= 2)
+		{
+			cat("\nKappa  ",sprintf("%8.4f", x$priorKappa),"\n")
+		}
+		cat("\nFor the basic rate parameters, ")
+		cat("the prior is on the square root scale.\n\n")
+	}
+	print.sienaBayesFit(x)
+
+	cat("Posterior means and standard deviations per group\n")
+	for (i in 1:length(x$f$groupNames))
+	{
+		cat("\n", x$f$groupNames[i], "\n")
+		# Make temporary changes to make x look like a sienaFit object
+		# so that sienaFitThetaTable can be applied.
+		# This is done in function makeTemp.
+		x$theta <- colMeans(x$ThinParameters[first:nmain,i,])
+		x$covtheta <- cov(x$ThinParameters[first:nmain,i,])
+		tmps <- makeTemp(x)
+		tmp <- tmps[[1]]
+		tmp1 <- tmps[[2]]
+		addtorow <- tmp$addtorow
+		for (i in 1:length(tmp1))
+		{
+			if (length(addtorow$command) > 0)
+			{
+				for (j in 1:length(addtorow$command))
+				{
+					ii <- match(i-1, addtorow$pos[[j]])
+					if (!is.na(ii))
+						if (i == 2 | addtorow$command[j] == 'Network Dynamics')
+							cat( addtorow$command[j], '\n')
+						else
+							cat('\n', addtorow$command[j], '\n', sep='')
+				}
+			}
+			cat(tmp1[i], '\n')
+		}
+	}
+	invisible(x)
+}
+

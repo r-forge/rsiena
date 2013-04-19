@@ -15,7 +15,7 @@ Calculates the profile likelihood for a Siena model for one or two parameters}
 	  containing a set of parameter values, in a vector called \code{theta}.
 }
   \item{x}{
-A \code{\link{sienaModel}} object}
+A \code{\link{sienaAlgorithm}} object}
   \item{data}{
 A \code{\link{siena}} data object
 }
@@ -48,7 +48,7 @@ Other arguments to be passed to the initialize call.
 }
 }
 \value{
-  A \code{link{sienaFit}} object, with added component \code{zz}
+  A \code{\link{sienaFit}} object, with added component \code{zz}
   containing the points used for the plot.
   Produces a plot.
 }
@@ -63,11 +63,11 @@ Ruth Ripley}
 }
 \examples{
 \dontrun{
-mynet1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32,32,2)))
+mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32,32,2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 profileLikelihoods(list(theta=c(5,-2, 2)), sienaModelCreate(maxlike=TRUE),
-mydata, myeff, i=1)
+   mydata, myeff, i=1)
 }
 }
 \keyword{ models }

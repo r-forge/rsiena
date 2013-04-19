@@ -17,8 +17,8 @@
 \usepackage{rotating}
 \usepackage{longtable, lscape}
 \usepackage{threeparttablex}
-\usepackage{amsmath}
-\usepackage[top=2.5cm, bottom=2.5cm, left=2cm , right=1.8cm]{geometry}
+%\usepackage[top=2.5cm, bottom=2.5cm, left=2cm , right=1.8cm]{geometry}
+% geometry may have difficulties combining with hyperref
 \usepackage[pdftex,dvipsnames]{color}
 
 \usepackage{enumitem}
@@ -30,13 +30,18 @@
 \usepackage[T1]{fontenc}
 % Or whatever. Note that the encoding and the font should match. If T1
 % does not look nice, try deleting the line with the fontenc.
+% The following redefines of amsmath are suggested by the hyperref README file.
 \usepackage{amsmath}
+\let\equation\gather
+\let\endequation\endgather
 \usepackage{amssymb}
 %\usepackage[bookmarksopen=false]{hyperref}
 % in the newer version of pdfscreen, hyperref can be loaded first with its own parameters
 %\usepackage{hyperref}
 %\usepackage[pdfstartview={},pdftex,bookmarksopen]{hyperref}  % ,colorlinks
-\usepackage[pdfstartview={},pdftex]{hyperref}  % ,colorlinks
+\usepackage[pdfstartview={},
+            pdftex,
+            plainpages=false]{hyperref}  % ,colorlinks
 
 
 
@@ -185,15 +190,12 @@
 \tableofcontents
 \newpage
 
-\remark{Compilation of this Latex file leads to warning messages.
-       These disappear when hyperref is not loaded.
-       I suppose they are due to a bug in hyperref.}
-
 This paper gives a sketch of the main algorithms used in RSiena.
 It is meant as background material for understanding the code of
 RSiena. It is intended to be included later on as part of the
 programmer's manual of RSiena.
 
+\iffalse
 Changes in the version of May 17, 2011:\\
 the \emph{Connect} procedure now avoids the creation of
 incompatibilities due to  \nnm{higher},
@@ -259,7 +261,7 @@ following issues.
       \nnm{disjoint}, and \nnm{atleastone} were added,
       which earlier had been overlooked.
 \end{enumerate}
-
+\fi
 
 \section{Notation}
 
@@ -688,10 +690,10 @@ The algorithm consists of three phases.
      For $N = 1$ to $n_1$, do the following.
      \begin{description}
      \item[(FD)] Generate
-     \begin{eqnarray*}
-       \nnm{fra} &=& S \sim \theta_1  \\
-        && S_{j} \sim \theta_1 + \epsilon_j e_j \ (j = 1, \ldots, p),
-     \end{eqnarray*}
+     \begin{align*}
+       \nnm{fra} = S & \sim  \theta_1  \\
+        S_{j} & \sim  \theta_1 + \epsilon_j e_j \ (j = 1, \ldots, p),
+     \end{align*}
       where all these $p+1$ random vectors
       use a common random number stream to make them strongly positively
       dependent and where $\epsilon_j$ are suitable constants.\\
@@ -704,10 +706,10 @@ The algorithm consists of three phases.
       However, $\epsilon_j$ must be chosen not too small because otherwise
       the variances of the $d_{j}$ become too large.\\
       Update
-            \begin{eqnarray*}
-            {\rm{Sum}}_{S}  &=& {\rm{Sum}}_{S} + S \\
-            {\rm{Sum}}_{d}  &=& {\rm{Sum}}_{d} + d \\
-            \end{eqnarray*}
+            \begin{align*}
+            {\rm{Sum}}_{S}  &= {\rm{Sum}}_{S} + S \\
+            {\rm{Sum}}_{d}  &= {\rm{Sum}}_{d} + d \\
+            \end{align*}
 
 \newpage
 
@@ -719,14 +721,14 @@ The algorithm consists of three phases.
                (see `Score Function' above),
                the complete-data score functions
                $J_{m}$ ($m = 2, \ldots, M$),\\
-               and $d = <\!SJ\!>$ according to (\ref{SJ}).
+               and $d = <\!SJ\!>$ according to (\ref{SJ}).\\
                Update
-               \begin{eqnarray*}
-               {\rm{Sum}}_{S}  &=& {\rm{Sum}}_{S} + S \\
-               {\rm{Sum}}_{d}  &=& {\rm{Sum}}_{d} + d \\
-               {\rm{Sum}}_{Sm}  &=& {\rm{Sum}}_{Sm} + S_m, \ m = 2, \ldots, M \\
-               {\rm{Sum}}_{Jm}  &=& {\rm{Sum}}_{Jm} + J_m, \ m = 2, \ldots, M \\
-               \end{eqnarray*}
+               \begin{align*}
+               {\rm{Sum}}_{S}  &= {\rm{Sum}}_{S} + S \\
+               {\rm{Sum}}_{d}  &= {\rm{Sum}}_{d} + d \\
+               {\rm{Sum}}_{Sm}  &= {\rm{Sum}}_{Sm} + S_m, \ m = 2, \ldots, M \\
+               {\rm{Sum}}_{Jm}  &= {\rm{Sum}}_{Jm} + J_m, \ m = 2, \ldots, M \\
+               \end{align*}
      \end{description}
 
      At the end of Phase 1, calculate the following results:
@@ -738,12 +740,21 @@ The algorithm consists of three phases.
       \]
       \item
       Estimate $D(\theta_1)$ by
-      \begin{eqnarray*}
-      \text{FD:    }   \hat{D} &=& \frac{{\rm{Sum}}_{d}}{n_1} \\
-      \text{SF:     }  \hat{D} &=& \frac{{\rm{Sum}}_{d}}{n_1} -
+      \begin{align*}
+      \text{FD:    }   \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_1} \\
+      \text{SF:     }  \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_1} -
                          \frac{\sum_{m=2}^M {\rm{Sum}}_{Sm}{\rm{Sum}}_{Jm}}{n_1^2} \ .
-      \end{eqnarray*}
+      \end{align*}
       \item Diagonal matrix $\tilde{D} = \mbox{diag}(\hat{D})$.
+      \item Componentwise regression coefficients of statistics $S$ on scores
+            $\sum_m J_m$, i.e., for each coordinate $j$,
+            \[
+            \nnm{RegrCoef}_j \,=\, \frac{\widehat{\text{cov}}(S_j, \sum_m J_{mj})}
+                                   {\widehat{\text{var}}(S_j)}
+            \]
+            from the values generated in Phase 1.\\
+            (For purely descriptive purposes, the corresponding correlation
+            coefficients are also calculated.)
       \item Make one partial estimated Newton-Raphson step,
       \[
        {\hat{\theta}} = \theta_1 - a_1 {\hat{D}}^{-1} \left( \bar{s} - s \right)\, .
@@ -755,30 +766,63 @@ The algorithm consists of three phases.
       \end{enumerate}
 
 \item[Phase 2.]
-     Repeat for $k = 1, \ldots, k_{\rm{max}}$ (subphases):
+    The boolean variable \nnm{phase2.0} differentiates between having or not
+    having a subphase 2.0.
+    Such a subphase was introduced in version R-Forge 1.1-220 (August 2012).\\
+    If \nnm{phase2.0} then $k_{\rm{min}} = 0$, else $k_{\rm{min}} = 1$.\\
+     Repeat for $k = k_{\rm{min}}, \ldots, k_{\rm{max}}$ (subphases):\\
+     function \nnm{proc2subphase}
      \begin{enumerate}
-     \item Initialise \nnm{nit} = $N = 0$, ${\rm{Sum}}_{\hat\theta} = 0_{p \times 1}$,
-          $S_{\rm{prev}} = 0_{p \times 1}$, \\
-          \nnm{ac} = $\rm{AC} = 0_{p \times p}$.
+     \item Initialise \nnm{nit} = $N = 0$,
+        ${\rm{Sum}}_{\hat\theta} = 0_{p \times 1}$,
+        $S_{\rm{prev}} = 0_{p \times 1}$, \\
+        \nnm{ac} = $\rm{AC} = 0_{p \times p},
+        \nnm{observedPos = observedNeg}  = \text{FALSE}_{p \times 1}$.
      \item Generate
            \[
            \nnm{fra} = S \sim \theta
            \]
-           or, for multiple processors, as the average of \nnm{int}
-           independent replicates of such variables, and update
-            \begin{eqnarray*}
-             \hat{\theta} &\,=\,&
+           or, for multiple processes, as the average of \nnm{int}
+           independent replicates of such variables;\\
+           if \nnm{dolby}, then also generate the sum of scores $\sum_m J_m$
+           and calculate
+           \[
+           \nnm{fra} \,=\, \nnm{fra} - \nnm{regrCoef}*\Big(\sum_m J_m)
+           \]
+           (componentwise multiplication); this serves for reducing the
+           variance while not affecting the expected value.
+    \item  Update
+            \begin{align*}
+             \hat{\theta} &\,=\,
                \hat{\theta} \,-\, a_N\, \tilde{D}^{-1} \, (S - s) \\
-             N & = & N+1 \\
-            {\rm{Sum}}_{\hat\theta} & = & {\rm{Sum}}_{\hat\theta} + \hat\theta \\
-            \text{if $N \geq 2$, then }  \rm{AC} & = & \rm{AC} + (S - s)(S_{\rm{prev}} - s)' \\
-            S_{\rm{prev}} &=& S \ .
-            \end{eqnarray*}
-     \item  If $N >= n_{2k}^+$ or
+             N & =  N+1 \\
+            {\rm{Sum}}_{\hat\theta} & =  {\rm{Sum}}_{\hat\theta} + \hat\theta \\
+            \text{if $N \geq 2$, then }
+            \rm{AC} & =  \rm{AC} + (S - s)(S_{\rm{prev}} - s)' \\
+            \nnm{observedPos}_j &=
+                \nnm{observedPos}_j \text{ or } \nnm{fra}_j \geq 0 \
+                    \text{ (for all } j)\\
+            \nnm{observedNeg}_j &=
+                \nnm{observedNeg}_j \text{ or } \nnm{fra}_j \leq 0 \
+                    \text{ (for all } j)\\
+            S_{\rm{prev}} &= S \ .
+            \end{align*}
+            (updates for \nnm{observedPos} and \nnm{observedNeg}
+            relevant for $k=0$ only)
+     \item  Stopping rule for subphase $k=0$:\\
+            If $N >= n_{2k}^+$ or
+            $\nnm{observedPos = observedNeg}  = \text{TRUE}_{p \times 1}$
+            then goto (b).
+            \medskip
+
+            Stopping rule for subphase $k \geq 1$:\\
+            If $N >= n_{2k}^+$ or
             ($N >= n_{2k}^-$ and $\max_k \rm{AC}_{kk} \leq 0$), then\\
             $\big\{$ update $\hat\theta \,=\, N^{-1} {\rm{Sum}}_{\hat\theta}$ ;
                    set $a_k = a_k/2 \big\}$ ;
-            else goto 2.
+            else goto (b).\\
+            (But if \nnm{phase2.0} then the update to $\hat\theta$ is done
+            only for $k \geq 2$.  )
      \end{enumerate}
      In the code, \nnm{theta} = $\theta$, \nnm{gain} = $a_N$, \nnm{ac} = AC,
      \nnm{thav} = ${\rm{Sum}}_{\hat\theta}$, \nnm{nit} = $N$,\\
@@ -800,10 +844,10 @@ The algorithm consists of three phases.
      For $N = 1$ to $n_3$, do the following.
      \begin{description}
      \item[(FD)] Generate
-     \begin{eqnarray*}
-       \nnm{fra} &=& S \sim \theta  \\
-        && S_{j} \sim \theta + \epsilon_j e_j \ (j = 1, \ldots, p),
-     \end{eqnarray*}
+     \begin{align*}
+       \nnm{fra} {} = S & \sim \theta  \\
+         S_{j} & \sim \theta + \epsilon_j e_j \ (j = 1, \ldots, p),
+     \end{align*}
       where all the $p+1$ random vectors
       use a common random number stream to make them strongly positively
       dependent and where $\epsilon_j$ are suitable constants.
@@ -812,11 +856,11 @@ The algorithm consists of three phases.
       \nnm{sdf} = d_{j} = \epsilon_j^{-1} (S_{j} - S) \ .
       \]
       Update
-            \begin{eqnarray*}
-            {\rm{Sum}}_{S}  \phantom{Sq} &=& {\rm{Sum}}_{S} + S \\
-            {\rm{SumSq}}_{S}  &=& {\rm{SumSq}}_{S} + S\,S' \\
-            {\rm{Sum}}_{d}  \phantom{Sq} &=& {\rm{Sum}}_{d} + d \\
-            \end{eqnarray*}
+            \begin{align*}
+            {\rm{Sum}}_{S}  \phantom{Sq} &= {\rm{Sum}}_{S} + S \\
+            {\rm{SumSq}}_{S}  &= {\rm{SumSq}}_{S} + S\,S' \\
+            {\rm{Sum}}_{d}  \phantom{Sq} &= {\rm{Sum}}_{d} + d \\
+            \end{align*}
       \item[(SF)] Generate
            \[
            \nnm{fra} = S \sim \theta  \\
@@ -825,18 +869,16 @@ The algorithm consists of three phases.
                (see `Score Function' above),
                the complete-data score functions
                $J_{m}$ ($m = 2, \ldots, M$),\\
-               and $d = <\!SJ\!>$ according to (\ref{SJ}).
+               and $d = <\!SJ\!>$ according to (\ref{SJ}).\\
                Update
-               \begin{eqnarray*}
-               {\rm{Sum}}_{S} \phantom{Sq}  &=& {\rm{Sum}}_{S} + S \\
-               {\rm{SumSq}}_{S}  &=& {\rm{SumSq}}_{S} + S\,S' \\
-               {\rm{Sum}}_{d} \phantom{Sq}  &=& {\rm{Sum}}_{d} + d \\
-               {\rm{Sum}}_{Sm} \phantom{Sq}  &=& {\rm{Sum}}_{Sm} + S_m, \ m = 2, \ldots, M \\
-               {\rm{Sum}}_{Jm} \phantom{Sq}  &=& {\rm{Sum}}_{Jm} + J_m, \ m = 2, \ldots, M \\
-               \end{eqnarray*}
+               \begin{align*}
+                {\rm{Sum}}_{S}   &= \ {\rm{Sum}}_{S} + S \\
+                {\rm{SumSq}}_{S} &= \ {\rm{SumSq}}_{S} + S\,S' \\
+                {\rm{Sum}}_{d}   &= \ {\rm{Sum}}_{d} + d \\
+                {\rm{Sum}}_{Sm}  &= \ {\rm{Sum}}_{Sm} + S_m, \ m = 2, \ldots, M \\
+                {\rm{Sum}}_{Jm}  &= \ {\rm{Sum}}_{Jm} + J_m, \ m = 2, \ldots, M \\
+               \end{align*}
      \end{description}
-
-\newpage
 
      At the end of Phase 3, calculate the following results:
       \begin{enumerate}
@@ -856,11 +898,11 @@ The algorithm consists of three phases.
            of $\Sigma$.
       \item
            Estimate $D(\hat\theta)$ by
-      \begin{eqnarray*}
-      \text{FD:    }   \hat{D} &=& \frac{{\rm{Sum}}_{d}}{n_3} \\
-      \text{SF:     }  \hat{D} &=& \frac{{\rm{Sum}}_{d}}{n_3} -
+      \begin{align*}
+      \text{FD:    }   \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_3} \\
+      \text{SF:     }  \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_3} -
                          \frac{\sum_{m=2}^M {\rm{Sum}}_{Sm}{\rm{Sum}}_{Jm}}{n_3^2} \ .
-      \end{eqnarray*}
+      \end{align*}
       \item Estimate the covariance matrix of $\hat\theta$ by
             \begin{equation}
             \Cov (\hat\theta) \,=\,  {\hat D}^{-1}  \Sigma {\hat D }^{' -1} \ .
@@ -868,6 +910,13 @@ The algorithm consists of three phases.
             \end{equation}
             The standard errors are the square roots of the diagonal elements
             of $\Cov (\hat\theta)$.
+      \item For possible later use with the \nnm{prevAns} option, recalculate the
+            componentwise regression coefficients
+            \[
+            \nnm{RegrCoef}_j \,=\, \frac{\widehat{\text{cov}}(S_j, \sum_m J_{mj})}
+                                   {\widehat{\text{var}}(S_j)}
+            \]
+            (all $j$) from the values generated in Phase 3.
       \end{enumerate}
 
 \end{enumerate}
@@ -877,10 +926,11 @@ This algorithm contains various constants that can be adapted so as to achieve
 favorable convergence properties.
 Experience with various data sets led to the following values.
 
-The number of steps in phase 1 is
+The number of steps in Phase 1 is
 \[
 \nnm{n1} =  n_1 = 7 + 3p \ .
 \]
+In the \nnm{dolby} option, at least 50 steps are taken in Phase 1.\\
 The minimum number of steps in subphase $2.k$ is
 \[
 \nnm{n2minimum[1]} = n_{2k}^- = ((2.52)^k)\ttimes(7+p)
@@ -891,11 +941,11 @@ the maximum number is
 \[
 \nnm{n2maximum[1]} = n_{2k}^+ = n_{2k}^- + 200 \ .
 \]
-For multiple processors, we use
+For multiple processes, we use
 \[
   n_{2k}^- = ((2.52)^{k-1})\ttimes \max \{5, (7+p)\ttimes 2.52/\nnm{int}\}
 \]
-where \nnm{int} is the number of processors.
+where \nnm{int} is the number of processes.
 These bounds $n_{2k}^-$ and $n_{2k}^+$ are determined so that
 $N^{3/4} a_N$ tends to a finite positive limit.\\
 For large $p$ they are rather conservative (i.e., unnecessarily large).\\
@@ -906,7 +956,7 @@ The default number of subphases is \nnm{nsub} = 4;
 more or fewer subphases could be used
 to obtain smaller or larger precision, but 4 seems really a good number.\\
 The initial value of $a_N$ in phase 2 is \nnm{firstg} = 0.2,
-and for multiple processors $0.2 \ttimes \sqrt{\nnm{int}}$.
+and for multiple processes $0.2 \ttimes \sqrt{\nnm{int}}$.
 
 The values of \nnm{epsilon} = $\epsilon_j$ in the FD option
 are chosen initially as 0.1,
@@ -1027,10 +1077,10 @@ The interaction between two dyadic effects is defined by
  s_{a \times b,i}^X(x,z) = \sum_j x_{ij}\, c_{aij}(x,z)\, c_{bij}(x,z)   \ .  \label{dyadic_inter}
 \end{equation}
 We then have
-\begin{eqnarray*}
- \Delta_{a \times b,ij}^X(x,z) &=& c_{aij}(x,z)\, c_{bij}(x,z)   \\
-   s_{a \times b}^X(x,z) &=& \sum_{i} x_{ij}\, c_{aij}(x,z)\, c_{bij}(x,z) \ .
-\end{eqnarray*}
+\begin{align*}
+ \Delta_{a \times b,ij}^X(x,z) &= c_{aij}(x,z)\, c_{bij}(x,z)   \\
+   s_{a \times b}^X(x,z) &= \sum_{i} x_{ij}\, c_{aij}(x,z)\, c_{bij}(x,z) \ .
+\end{align*}
 This indeed satisfies (\ref{Delta}) and (\ref{fitstat}).
 The same holds for interactions between three (or more) dyadic effects.
 One could say that the interaction between two dyadic effects is again
@@ -1059,10 +1109,10 @@ An interaction between an ego effect $a$ and any effect $b$ is defined by
  s_{a \times b,i}^X(x,z) =  c_{ai}(x,z) \, s_{ib}^X(x,z)  \ .        \label{ego_inter}
 \end{equation}
 This definition implies
-\begin{eqnarray*}
- \Delta_{a \times b,ij}^X(x,z) &=& c_{ai}(x,z)\, \Delta_{bij}^X(x,z)   \\
-   s_{a \times b}^X(x,z) &=& \sum_{ij}  c_{ai}(x,z)\, s_{ib}^X(x,z) \ .
-\end{eqnarray*}
+\begin{align*}
+ \Delta_{a \times b,ij}^X(x,z) &= c_{ai}(x,z)\, \Delta_{bij}^X(x,z)   \\
+   s_{a \times b}^X(x,z) &= \sum_{ij}  c_{ai}(x,z)\, s_{ib}^X(x,z) \ .
+\end{align*}
 Given that effect $b$ satisfies (\ref{Delta}) and (\ref{fitstat}),
 this interaction also satisfies (\ref{Delta}) and (\ref{fitstat}).
 The same holds for interactions between two ego effects and
@@ -1382,12 +1432,13 @@ N^{(r)}_{ij}(t_{m-1}) = 1 - N^{(r)}_{ij}(t_m) \ \Leftrightarrow \
 \end{subequations}
 \emph{Behavior} : (since changes are defined as increments)\\
 For all $i, r$ with $1 \leq r \leq R_B$,
-\begin{eqnarray}
-B^{(r)}_{i}(t_{m-1}) \! &+&  \! \text{ \textit{BehSum}}(i,B,r,T) = B^{(r)}_{i}(t_m)  \label{behrec1} \\
-\text{and} &&  \nonumber \\
-1 \leq B^{(r)}_{i}(t_{m-1}) \!  &+&  \! \text{ \textit{BehSum}}(i,B,r,S) \leq
-                             \maxr   \text{ for all } 1 \leq S < T.   \label{behrec2}
-\end{eqnarray}
+\begin{align}
+B^{(r)}_{i}(t_{m-1})  {} &
++  \! \text{ \textit{BehSum}}(i,B,r,T) = B^{(r)}_{i}(t_m)  \label{behrec1} \\
+\text{and} &  \nonumber \\
+1 \leq B^{(r)}_{i}(t_{m-1})   {} &+  \! \text{ \textit{BehSum}}(i,B,r,S)
+       \leq  \maxr   \text{ for all } 1 \leq S < T.   \label{behrec2}
+\end{align}
 
 
 \addaa{For each option there is a missingness indicator
@@ -1688,9 +1739,8 @@ is treated separately (when it is needed), see Section~\ref{S_prob}.
                 with $ N^{(r')}_{ij}(t_{m})$;\\
           \> \> therefore the following requires the change in option ($N,i,j,0,r$) to \\
           \> \> take place   before the changes in options ($N,i,j,0,r'$) for $r' \in \mathcal R$.)\\
-          \> \> Let \ms \ be \\
-          \> \> the first ministep among all inserted ministeps of option
-            ($N, i,\, j,\, r'$) for $r' \in \mathcal R$;\\
+          \> \> Let \ms \ be the first ministep among all inserted ministeps \\
+          \> \> of option ($N, i,\, j,\, r'$) for $r' \in \mathcal R$;\\
             \> \> then \textit{InsertBefore}
                           (\textit{RandomElementNotAfter(\ms)}, $N,i,j,0,r$).
       \end{tabbing}
@@ -2081,7 +2131,7 @@ Part \emph{B}:
                   \ttimes \exp\left( \frac{\left(1 - \textit{mu} \right)^2}{2\ttimes\textit{sigma2}}
                    - \frac{\left(1 - \textit{mu}  + rr \right)^2}{2\,(\textit{sigma2} - rr^2)}  \right) \ .
       \end{equation}
-\item  \addcf{
+\item
      \begin{align}
      \textit{pra}  \leftarrow \  & \textit{KappaFactor} \ttimes
                     \exp(-\, \ms.\nnm{lChoiceProb} )
@@ -2089,15 +2139,15 @@ Part \emph{B}:
               \frac{\textit{DiagNumber}\ttimes \textit{pridg}}
                                     {(\textit{TotNumber}-1)\ttimes\textit{prcdg}} \ .
     \end{align}
-        (The earlier formula was, erroneously,)
-     \begin{align}
-     \textit{pra}  \leftarrow \  & \textit{KappaFactor} \ttimes
-                    \exp(-\, \ms.\nnm{lChoiceProb} )
-                    \ttimes
-              \frac{\textit{DiagNumber}\ttimes \textit{pridg}}
-                                    {(\textit{TotNumber}+1)\ttimes\textit{prcdg}} \ .
-    \end{align}
-}\\
+%        (The earlier formula was, erroneously,)
+%     \begin{align}
+%     \textit{pra}  \leftarrow \  & \textit{KappaFactor} \ttimes
+%                    \exp(-\, \ms.\nnm{lChoiceProb} )
+%                    \ttimes
+%              \frac{\textit{DiagNumber}\ttimes \textit{pridg}}
+%                                    {(\textit{TotNumber}+1)\ttimes\textit{prcdg}} \ .
+%    \end{align}
+\\
     Note: the proposal probability and the new chain probability both include
     factors $\exp(\ms.\nnm{lOptionSetProb})$ which cancel out.\\
     if (\textit{pra} $ > 1$), then  \textit{pra} $ \leftarrow 1 $.
@@ -2370,7 +2420,6 @@ I set $pr_2$ to 1 below because of this}\\
       \item If $\textit{ThisLength} \leq c_0$, \\
             then $\ms_g \leftarrow  \ms_b.\nnm{pred}$,\\
              else $\ms_g \leftarrow \ms_a.\nnm{succ}^{c}$ .
-\newpage
       \item
       If the interval $[\ms_a, \ms_g]$ contains
       any pair of two non-diagonal ministeps of the same \textit{Option}:
@@ -2387,8 +2436,8 @@ I set $pr_2$ to 1 below because of this}\\
       }
       \item $\ms_e \leftarrow \ms_a.\nnm{succ}^{(c-1)}$
       \end{enumerate}
-\item \remark{At this place the erroneous change in the version of November 17, 2010
-      is dropped again.}
+%\item \remark{At this place the erroneous change in the version of November 17, 2010
+%      is dropped again.}
 \item Let \textit{perm} be a random permutation of the numbers $1$ to $c$.
 \item \addce{
       For all variables $(w,r)$ involved in a condition of the kind
@@ -2434,7 +2483,7 @@ and therefore calculate the following.
            \]
       \end{enumerate}
       if $\textit{NumberOption}(w_0,i_0,j_0,r_0) \geq 1$  and $w_0 = B$ :
-      \begin{frindentation}{2em}{1em}
+      \begin{frindentation}{2em}{2em}
       if \{ there is a ministep of option $(w_0,i_0,j_0,r_0)$
       before $\ms_a$, and the last such ministep is not $\ms_a.\nnm{pred}$ \}, \\
       define $d_-$ as the $d$-coordinate of the last such ministep,
@@ -2442,24 +2491,25 @@ and therefore calculate the following.
       if there is a ministep of option $(w_0,i_0,j_0,r_0)$
       after $\ms_b$, \\
       define $d_+$ as the $d$-coordinate of the first such ministep,
-      and $d_+ \leftarrow 0$  otherwise; and let\\
-      \[
-             \textit{NewCCPNumber} \leftarrow \textit{CCPNumber} + I\{d_- \times d_0 = -1\}
+      and $d_+ \leftarrow 0$  otherwise; and let
+      \begin{multline*}
+             \textit{NewCCPNumber}  \leftarrow  \\
+         \hspace{2em}     \textit{CCPNumber} + I\{d_- \times d_0 = -1\}
                         +  I\{d_+ \times d_0 = +1 \}
-      \]
+      \end{multline*}
       where $I\{A\} = 1$ if $A$ is true and 0 otherwise.
       \end{frindentation}
 \emph{We find NewCCPnumber by insertions, calculate pr1 and then
 remove the insertions}
 \item
-      \begin{eqnarray*}
-      \text{if (not } \textit{misdat}): & pr_1 \leftarrow &
+      \begin{align*}
+     & \text{if (not } \textit{misdat}): && \ pr_1 \leftarrow
                 \frac{1 - \textit{prmin} - \textit{prmib}}{\textit{NewCCPNumber} } \ ; \\[1em]
-       \text{if } \textit{misdat} \text{ and } w_0 = N:   & pr_1 \leftarrow &
+     &  \text{if } \textit{misdat} \text{ and } w_0 = N:   && \ pr_1 \leftarrow
                               \frac{\textit{prmin}}{\textit{ChainNumMisNet}+1 } \ ; \\[1em]
-       \text{if } \textit{misdat} \text{ and } w_0 = B:  & pr_1 \leftarrow  &
+     &  \text{if } \textit{misdat} \text{ and } w_0 = B:  && \ pr_1 \leftarrow
                  \frac{\textit{prmib}}{\textit{ChainNumMisBeh}+1 } \ .
-      \end{eqnarray*}
+      \end{align*}
 (only the non-\textit{misdat} case was changed).
 \end{enumerate}
 
@@ -2484,7 +2534,6 @@ Part \emph{B}:
       \textit{sigma2\_new}  \leftarrow \textit{sigma2} -  \sum_{s=1}^{\textit{ThisLength}}
              (\ms_a.\nnm{succ}^{s-1}).(\nnm{rRate})^2 \ ;
       \]
-\newpage
 \item Note that still $y =  \textit{StateBefore}(\ms_a)$ as was assigned above.\\
       \textit{StepProb2}$(y,w_0,i_0,j_0,r_0,d_0;  rr_0, lospr_0, lcpr_0)$;\\
         \textit{sumlprob\_new} $ \leftarrow \textit{sumlprob\_new} + lcpr_0 + lospr_0 $ ;\\
@@ -2512,8 +2561,8 @@ Part \emph{B}:
       \item\textit{ChangeStep}$(y,
          \textit{Coordinates}_{\textit{perm}(s)})$ \ .
       \end{enumerate}
-\item \remark{(Here also an erroneous change in version 17 Nov 2010
-      was dropped, January 3, 2011.)} \\
+\item %\remark{(Here also an erroneous change in version 17 Nov 2010
+      %was dropped, January 3, 2011.)} \\
       For $s$ running from $c+1$ to \textit{ThisLength} do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y, \textit{Coordinates}_{s}; rr_s, lospr_s, lcpr_s)$
@@ -2538,7 +2587,6 @@ Part \emph{B}:
             Note that at this point, $y$ has been transformed to
             \textit{StateBefore}$(\ms_b)$ of the current (`old') chain.
       \end{enumerate}
-\newpage
 \item If \textit{SimpleRates}, then
       \begin{enumerate}
       \item if (not \textit{misdat}):
@@ -2642,7 +2690,6 @@ or not (yielding \textit{accept} = \nnm{False}).
 
 The steps taken in the function are as follows.
 
-\newpage
 Part \emph{A}:
 \begin{enumerate}
 \item With probability \textit{prmin} + \textit{prmib}
@@ -2680,18 +2727,18 @@ Part \emph{A}:
                     \end{enumerate}
             \item $\textit{ThisLength} \leftarrow \textit{length}(\ms_a, \nnm{last})$
             \item If $\ms_a.\nnm{succ} = \nnm{last}$ (i.e., \textit{ThisLength} = 2), exit.\\
-            \remark{This condition was added in the version of November 17, 2010,
-                    and corrected with the addition of \nnm{succ}
-                    in the version of November 18, 2010,
-                    and is needed in view of the requirement $\ms_a < \nnm{last}$
-                    in step 1.\ of procedure \textit{MH\_InsPermute}.}
+%            \remark{This condition was added in the version of November 17, 2010,
+%                    and corrected with the addition of \nnm{succ}
+%                    in the version of November 18, 2010,
+%                    and is needed in view of the requirement $\ms_a < \nnm{last}$
+%                    in step 1.\ of procedure \textit{MH\_InsPermute}.}
             \end{enumerate}
       \end{enumerate}
 \vspace*{-1em}
 \item  $c \leftarrow \min\{c_0, \textit{ThisLength} - 2\}$.\\
        Note that in the case (not \textit{misdat}) the definition of a CCP implies $c \geq 1$.\\
       If \textit{misdat}, the `exit' in the preceding step implies that $c \geq 1$.\\
-      \remark{This was not so in the version before November 17, 2010.}
+%      \remark{This was not so in the version before November 17, 2010.}
       \item If (($\textit{ThisLength}-2 \leq c_0$) and (not \textit{misdat})), \\
             then $\ms_g \leftarrow  \ms_b.\nnm{pred}$,\\
              else $\ms_g \leftarrow \ms_a.\nnm{succ}^{(c+1)}$ .\\
@@ -2720,18 +2767,18 @@ Part \emph{A}:
       here only for ministeps from $\ms_a.\nnm{succ}$ to $\ms_b.\nnm{pred}$.\\
       If at least one of these conditions are not satisfied, exit.
 \end{enumerate}
-To calculate the proposal probabilities of this proposal and the inverse proposal,
-used in $pra$ below,
-we need to calculate the following.
+To calculate the proposal probabilities of this proposal and the
+inverse proposal, used in $pra$ below, we need to calculate the following.
 \begin{enumerate}[resume]
 \item
-      \begin{eqnarray*}
-      \text{if (not } \textit{misdat}): & pr_1 \leftarrow &  \frac{1 - \textit{prmin} - \textit{prmib}}{\textit{CCPNumber} } \ ; \\[1em]
-       \text{if } \textit{misdat} \text{ and } w_0 = N:   & pr_1 \leftarrow &
-                              \frac{\textit{prmin}}{\textit{ChainNumMisNet} } \ ; \\[1em]
-       \text{if } \textit{misdat} \text{ and } w_0 = B:  & pr_1 \leftarrow  &
+      \begin{align*}
+      \text{if (not } \textit{misdat}):\ \ & pr_1 \leftarrow
+   \frac{1 - \textit{prmin} - \textit{prmib}}{\textit{CCPNumber} } \ ; \\[1em]
+       \text{if } \textit{misdat} \text{ and } w_0 = N:\  \ & pr_1 \leftarrow
+                   \frac{\textit{prmin}}{\textit{ChainNumMisNet} } \ ; \\[1em]
+       \text{if } \textit{misdat} \text{ and } w_0 = B:\ \ & pr_1 \leftarrow
                  \frac{\textit{prmib}}{\textit{ChainNumMisBeh} } \ .
-      \end{eqnarray*}
+      \end{align*}
  \item If (not \textit{misdat}):
       \begin{enumerate}
       \item let $\ms_d$ be \\
@@ -2752,14 +2799,13 @@ The probability of this proposal is
 \frac{pr_1}{c!} \ .
 \]
 
-\newpage
 Part \emph{B}:
 \begin{enumerate}[resume]
 \item If \textit{misdat} then $ \textit{MaxLength} \leftarrow c$, else
       $ \textit{MaxLength} \leftarrow \textit{ThisLength}$.\\
-      \remark{This is new in the version of November 17, 2010. The earlier version
-       could for \textit{misdat} request the
-      (\nnm{lChoiceProb} + \nnm{lOptionSetProb}) of the \nnm{last} ministep.}
+%      \remark{This is new in the version of November 17, 2010. The earlier version
+%       could for \textit{misdat} request the
+%      (\nnm{lChoiceProb} + \nnm{lOptionSetProb}) of the \nnm{last} ministep.}
 \item \[ \textit{sumlprob} \leftarrow \sum_{s=1}^{\textit{MaxLength}}
              (\ms_a.\nnm{succ}^{s-1}).(\nnm{lChoiceProb} + \nnm{lOptionSetProb}) \ ;
       \]
@@ -2797,7 +2843,7 @@ Part \emph{B}:
 \item For $1 \leq s \leq \textit{ThisLength}-2$ \
       denote by $\textit{Coordinates}_s$ the values
       $(w,i,j,r,d)$ of $\ms_a.\nnm{succ}^{s}$.\\
-      \remark{Erroneous change in version 17 Nov 2010 dropped, 3 Jan 2011.}
+%      \remark{Erroneous change in version 17 Nov 2010 dropped, 3 Jan 2011.}
 \item Note that still $y =  \textit{StateBefore}(\ms_a)$ as was assigned above.\\
       For $s$ running from 1 to $c$, do:
       \begin{enumerate}
@@ -2812,8 +2858,8 @@ Part \emph{B}:
          \end{enumerate}
       \item \textit{ChangeStep}$(y, \textit{Coordinates}_{\textit{perm}(s)})$
       \end{enumerate}
-\newpage
-\item  \remark{Erroneous change in version 17 Nov 2010 dropped, 3 Jan 2011.}\\
+
+\item  % \remark{Erroneous change in version 17 Nov 2010 dropped, 3 Jan 2011.}\\
       For $s$ running from $c+1$ to $\textit{ThisLength} -2$ do:
       \begin{enumerate}
       \item \textit{StepProb2}$(y, \textit{Coordinates}_{s};
@@ -2861,6 +2907,7 @@ Part \emph{B}:
                   \ttimes \exp\left( \frac{\left(1 - \textit{mu} \right)^2}{2\ttimes\textit{sigma2}}
                    - \frac{\left(1 - \textit{mu\_new} \right)^2}{2\ttimes\textit{sigma2\_new}}  \right) \ .
       \end{equation}
+\iffalse
 \item \begin{align}
      \textit{pra}  \leftarrow \ &
         \textit{KappaFactor} \ttimes \exp(\textit{sumlprob\_new} - \textit{sumlprob}) \\
@@ -2873,8 +2920,9 @@ Part \emph{B}:
 misdat}
 
     if (\textit{pra} $ > 1$), then  \textit{pra} $ \leftarrow 1 $.
+\fi
 \end{enumerate}
-\newpage
+
 Part \emph{C}:
 \begin{enumerate}[resume]
 \item With probability \textit{pra} let \textit{accept} $\leftarrow$ \nnm{True}, else
@@ -2916,12 +2964,12 @@ a simple specification of these prior distributions is as follows
 \end{itemize}
 The simplest and presumably very adequate way is to let this depend
 only on the dependent variable, $N^{(r)}$ or $B^{(r)}$:
-\begin{eqnarray*}
- \textit{net\_prior}(r,i,j) &=&
+\begin{align*}
+ \textit{net\_prior}(r,i,j) &=
    \text{ observed density of network } r, \text{ observation } m-1, \\
- \textit{beh\_prior}(r,i,.) &=&
+ \textit{beh\_prior}(r,i,.) &=
    \text{ observed distribution of behavior } r, \text{ observation } m-1,
-\end{eqnarray*}
+\end{align*}
 
 For $m \geq 3$ the best solution would be to do the simulations of the $m-1$
 chains in sequence, and utilize the simulated last version of the preceding
@@ -2963,7 +3011,6 @@ so that from $\ms_a$ onward, the chain is the same as it used to be.
 
 The steps taken in the function are as follows.
 
-\newpage
 Part \emph{A}:
 \begin{enumerate}
 \item If \textit{ChainNumInitMis} $ = 0$, then exit.
@@ -3017,10 +3064,10 @@ Part \emph{A}:
       \begin{frindentation}{2em}{1em}
         \begin{enumerate}
         \item if \textit{reversed} or ($w_0 = N$) then exit, else
-         \begin{eqnarray*}
-          d_0 & \leftarrow & -d_0 \\
-          pr_1 & \leftarrow & 1 \ ;
-         \end{eqnarray*}
+         \begin{align*}
+          d_0 & \leftarrow  -d_0 \\
+          pr_1 & \leftarrow  1 \ ;
+         \end{align*}
         \item If for this opposite value of $d_0$, changing $y_{\text{init}}$
            by $(w_0,i_0,j_0,r_0,-d_0)$ while  inserting a ministep
            of option $(w_0,i_0,j_0,r_0,d_0)$ immediately before $\ms_a$ would also violate
@@ -3038,19 +3085,18 @@ This is used in \textit{pra} below.
 Part \emph{B}:
 \begin{enumerate}[resume]
 \item
-   \begin{eqnarray*}
-       \textit{sumlprob} & \leftarrow & \sum_{\ms = \nnm{first.succ}}^{\ms_a.\nnm{pred}}
+   \begin{align*}
+       \textit{sumlprob} \ & \leftarrow \ \sum_{\ms = \nnm{first.succ}}^{\ms_a.\nnm{pred}}
              (\ms.(\nnm{lChoiceProb} + \nnm{lOptionSetProb}) \ ; \\[1em]
-       \textit{sumlprob\_new}  & \leftarrow & 0 \ ;   \\[1em]
-      \textit{mu\_new}   & \leftarrow & \textit{mu} \ -
+       \textit{sumlprob\_new} \ & \leftarrow  \ 0 \ ;   \\[1em]
+      \textit{mu\_new} \  & \leftarrow \ \textit{mu} \ -
                 \sum_{\ms = \nnm{first.succ}}^{ \ms_a.\nnm{pred}}
                         (\ms.\nnm{rRate}) \ ; \\[1em]
-      \textit{sigma2\_new} & \leftarrow & \textit{sigma2} \ -
+      \textit{sigma2\_new} \ & \leftarrow \ \textit{sigma2} \ -
                 \sum_{\ms = \nnm{first.succ}}^{\ms_a.\nnm{pred}}
                           (\ms.\nnm{rRate})^2 \ .
-      \end{eqnarray*}
-\newpage
-\item \remark{here an error was corrected in items 9 and 11, version 30/10/2010.}\\[1em]
+      \end{align*}
+\item % \remark{here an error was corrected in items 9 and 11, version 30/10/2010.}\\[1em]
       $y \leftarrow y_{\text{init}}$ ;\\[1em]
       Let $pr_2$ be the prior probability
       (see \textit{net\_prior} and \textit{beh\_prior} discussed above)
@@ -3220,20 +3266,20 @@ This is used in \textit{pra} below.
 
 \newpage
 Part \emph{B}:\\
-\remark{here an error was corrected in items 8 and 9, version 30/10/2010.}
+%\remark{here an error was corrected in items 8 and 9, version 30/10/2010.}
 \begin{enumerate}[resume]
 \item \label{item7}
-   \begin{eqnarray*}
-       \textit{sumlprob} & \leftarrow & \sum_{\ms = \nnm{first.succ}}^{\ms_a}
+   \begin{align*}
+       \textit{sumlprob} \ & \leftarrow \ \sum_{\ms = \nnm{first.succ}}^{\ms_a}
              (\ms.(\nnm{lChoiceProb} + \nnm{lOptionSetProb}) \ ; \\[1em]
-       \textit{sumlprob\_new}  & \leftarrow & 0 \ ;   \\[1em]
-      \textit{mu\_new}   & \leftarrow & \textit{mu} \ -
+       \textit{sumlprob\_new} \ & \leftarrow \ 0 \ ;   \\[1em]
+      \textit{mu\_new}  \ & \leftarrow \ \textit{mu} \ -
                 \sum_{\ms = \nnm{first.succ}}^{ \ms_a}
                         (\ms.\nnm{rRate}) \ ; \\[1em]
-      \textit{sigma2\_new} & \leftarrow & \textit{sigma2} \ -
+      \textit{sigma2\_new} \ & \leftarrow \ \textit{sigma2} \ -
                 \sum_{\ms = \nnm{first.succ}}^{\ms_a}
                           (\ms.\nnm{rRate})^2 \ .
-      \end{eqnarray*}
+      \end{align*}
 \vspace*{-1em}
 \item  $y \leftarrow y_{\text{init}}$ \ ;\\[1em]
       Let $pr_2$ be the prior probability
@@ -3451,10 +3497,12 @@ recorded complete-data log-likelihood (with a Robbins-Monro step,
 or for a Bayesian random update of the parameters)
 for period $m-1$ is
 \begin{equation}
-  \textit{NumStep} =
-\textit{MultiplicationFactor} \ttimes
-   \big(\textit{TotalDistance(Network)} + \textit{TotalDistance(Behavior)} \big)
+\begin{split}
+  \textit{NumStep} = &
+\textit{MultiplicationFactor} \ttimes \\
+   & \big(\textit{TotalDistance(Network)} + \textit{TotalDistance(Behavior)} \big)
           \label{NumStep}
+\end{split}
 \end{equation}
 where
       \[
@@ -3515,7 +3563,7 @@ approximation to this function.
 \fi
 
 The score function for the parameters of the rate function
-here is different from what is specified in \\
+here is different from what is specified in
 \textsf{simstats0c}.
 The reason is that for the likelihood-based calculations,
 the `complete data' is the embedded chain (without the time increments),
@@ -3556,11 +3604,11 @@ All sums over actors $i$ in the following are over the active actors.
 Denote the number of ministeps of \textit{OptionSet} $(w,i,r)$
 by $T^w_{ri}$ and $T^w_r = \sum_i T^w_{ri}$.
 Note that $\sum_{w,r} T^w_r = \textit{TotNumber}-1$.
-The score functions are given
-for the basic rate parameters by
+The score functions are given for the basic rate parameters by
 \begin{equation}
-\frac{\partial\, \text{complete data log-likelihood}}{\partial \rho^w_r} =
-    \frac{T^w_r}{\rho^w_r} - \sum_{\text{active } i}  \exp(\alpha^w_{r} s^w_{ri}) \  , \label{tscore2}
+ \frac{\partial\, \text{complete data log-likelihood}}{\partial \rho^w_r} =
+ \hspace{3em}   \frac{T^w_r}{\rho^w_r} - \sum_{\text{active } i}
+             \exp(\alpha^w_{r} s^w_{ri}) \  , \label{tscore2}
 \end{equation}
 which for cases with \emph{only} a basic rate parameter
 $ \lambda^w(\theta, r,i, y) = \rho^w_r $,
@@ -3572,14 +3620,14 @@ and constant number of active actors $n_{\text{act}}$, reduces to
 and, denoting
 the index number of the covariate for the rate function
 by $h$, the score functions for the other rate parameters are
-\begin{eqnarray}
+\begin{align}
   \frac{\partial \, \text{complete data log-likelihood}}{\partial \alpha^w_{rh}}
-  &=&                                                         \label{tscore4}
+  &=                                                        \label{tscore4}
    \sum_{\text{active } i} s^w_{rih} \big(T^w_{ri} -  \rho^w_r \,
                    \exp(\alpha^w_{r} s^w_{ri} )  \big) \\
-   &=& \sum_{\text{active } i}  s^w_{rih} \big(T^w_{ri} -  \lambda^w(\theta, r,i, y)   \big)
+   &= \sum_{\text{active } i}  s^w_{rih} \big(T^w_{ri} -  \lambda^w(\theta, r,i, y)   \big)
                \ . \nonumber
-\end{eqnarray}
+\end{align}
 More background is given in Appendix~\ref{S_A1}.
 \vspace{\parskip} \\
 \hspace{\parindent}  % Just a \par does not agree with addce.
@@ -3608,14 +3656,15 @@ The state before ministep $m$ is denoted $y_m$.
 \medskip
 \\
 \hspace*{\parindent}
-The score functions now are given
-for the basic rate parameters by
+The score functions now are given for the basic rate parameters by
 \begin{equation}
-\frac{\partial\, \text{complete data log-likelihood}}{\partial \rho^w_r} =
-    \frac{T^w_r}{\rho^w_r} -
+\begin{split}
+& \frac{\partial\, \text{complete data log-likelihood}}{\partial \rho^w_r} \ =\\
+& \hspace{3em}    \frac{T^w_r}{\rho^w_r} -
    \frac{1}{\textit{TotNumber}-1} \sum_{m=1}^{\textit{TotNumber}-1}
      \sum_{\text{active } i}
         \exp(\alpha^w_{r} s^w_{ri}(y_m)) \  , \label{tscore5}
+\end{split}
 \end{equation}
 and for the other rate parameters they are
 \begin{multline}
@@ -3943,16 +3992,16 @@ in the derivative
 so forgetting this might still yield the correct answer. Further it is
 convenient to work with the function $c_j(\sigma^2) = 1/(\sigma^2 + s_j^2)$
 and note that $dc_j/d\sigma^2 = - c_j^2$. The result is
-\begin{eqnarray}
-\frac{d\, p(\sigma^2)}{d\,\sigma^2} &=&
+\begin{align}
+\frac{d\, p(\sigma^2)}{d\,\sigma^2} \ &= \
      - \, \frac12 \sum_j \frac{1}{\sigma^2 + s_j^2} \,+\,
      \frac12 \sum_j \frac{(\hat\theta_j - \hat\mu)^2}{(\sigma^2 + s_j^2)^2}
                                      \label{dpf} \\
-\frac{d^2\, p(\sigma^2)}{d\,(\sigma^2)^2} &=&
+\frac{d^2\, p(\sigma^2)}{d\,(\sigma^2)^2} \ &= \
      - \, \frac12 \sum_j \frac{1}{\big(\sigma^2 + s_j^2\big)^2} \,-\,
            \sum_j \frac{(\hat\theta_j - \hat\mu)^2}{(\sigma^2 + s_j^2)^3} \ .
                      \label{dpf2}
-\end{eqnarray}
+\end{align}
 Thus, one way to compute the MLE is to iterate the two steps:
 \begin{enumerate}
 \item Compute $\hat\mu$ by (\ref{mu2})
@@ -4025,22 +4074,20 @@ which has under the null hypothesis approximately a chi-squared distribution
 with $N-1$ degrees of freedom.
 
 \subsection{Fisher combination of $p$-values}
-
-
 Fisher's (1932) procedure for combination of independent $p$-values
 is applied both to left-sided and right-sided $p$-values. In this way,
 we are able to report tests for both the following testing problems:
-\begin{eqnarray*}
- H_0^{(R)}: \ &\theta_j \leq 0 & \mbox{ for all } j; \\
- H_1^{(R)}: \ &\theta_j > 0 & \mbox{ for at least one } j .
-\end{eqnarray*}
+\begin{align*}
+ H_0^{(R)}: \ \ & \theta_j \leq 0 \ \ \mbox{ for all } j; \\
+ H_1^{(R)}: \ \ & \theta_j > 0 \ \ \mbox{ for at least one } j .
+\end{align*}
 Significance is interpreted here,
 that there is evidence that in \emph{some} (at least one) data set,
 parameter $\theta_j$ is positive.
-\begin{eqnarray*}
- H_0^{(L)}:\ &\theta_j \geq 0& \mbox{ for all } j; \\
- H_1^{(L)}:\ &\theta_j < 0& \mbox{ for at least one } j .
-\end{eqnarray*}
+\begin{align*}
+ H_0^{(L)}:\ \ & \theta_j \geq 0 \ \ \mbox{ for all } j; \\
+ H_1^{(L)}:\ \ & \theta_j < 0 \ \ \mbox{ for at least one } j .
+\end{align*}
 Significance is interpreted here,
 that there is evidence that in \emph{some} (at least one) data set,
 parameter $\theta_j$ is negative.
@@ -4052,16 +4099,16 @@ some positive and some negative effects.
 The procedure operates as follows.
 Calculate $p_j^+$ and $p_j^-$, being the right and left one-sided
 $p$-values:
-\begin{eqnarray*}
-   p_j^+ &=& 1 - \Phi\left(\frac{\hat\theta_j}{s_j}\right) \\
-   p_j^- &=&  \Phi\left(\frac{\hat\theta_j}{s_j}\right) \ ,
-\end{eqnarray*}
+\begin{align*}
+   p_j^+ & = 1 - \Phi\left(\frac{\hat\theta_j}{s_j}\right) \\
+   p_j^- & =  \Phi\left(\frac{\hat\theta_j}{s_j}\right) \ ,
+\end{align*}
 where $\Phi$ is the c.d.f.\ of the standard normal distribution.
 The Fisher combination statistic is defined as
-\begin{eqnarray*}
-  C^+_j &=& - 2\, \sum_{j=1}^N \ln\big(p_j^+\big) \\
-  C^-_j &=& - 2\, \sum_{j=1}^N \ln\big(p_j^-\big) \ .
-\end{eqnarray*}
+\begin{align*}
+  C^+_j & = - 2\, \sum_{j=1}^N \ln\big(p_j^+\big) \\
+  C^-_j & = - 2\, \sum_{j=1}^N \ln\big(p_j^-\big) \ .
+\end{align*}
 Both of these must be tested in a $\chi^2$ distribution with
 $2\,N$ degrees of freedom.
 
@@ -4242,12 +4289,15 @@ and assumption (8.) is replaced as indicated below.
       Jointly these rules lead to the following probability
       that the current network $x$ changes into $x^{(\pm ij)}$:
       \begin{equation}
-        p_{ij}(x, \beta) = \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+      \begin{split}
+      &  p_{ij}(x, \beta) = \\
+      & \hspace{1em} \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
          {\sum_{h=1}^n \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}
         \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
           {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)}
                          \right)^{1-x_{ij}}
           \ .   \label{eq:acbM}
+      \end{split}
       \end{equation}
       (Note that the second factor comes into play only if $x_{ij} = 0$,
       which implies $x^{(+ ij)} = x^{(\pm ij)}$.)
@@ -4259,26 +4309,26 @@ and assumption (8.) is replaced as indicated below.
       If currently there is no tie, $x_{ij} = 0$, then the tie is created
       if this is proposed by both actors, which has probability
       \begin{subequations}
-      \begin{align}
+      \begin{flalign}
         & p_{ij}(x, \beta) =   \label{eq:pM2}         \\
-        &  \frac{\exp\big(f_i(x^{(+ ij)}; \beta)\big)}
-         {\Big(\exp\big(f_i(x; \beta)\big) +
-                           \exp\big(f_i(x^{(+ ij)}; \beta)\big)\Big)}
-        \frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
+        & \ \frac{\exp\big(f_i(x^{(+ ij)}; \beta)\big)}
+         {\Big(\exp\big(f_i(x; \beta)\big) + \nonumber
+                           \exp\big(f_i(x^{(+ ij)}; \beta)\big)\Big)} \times\\
+        & \hspace{4em} \frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
          {\Big(\exp\big(f_j(x; \beta)\big) +
                                 \exp\big(f_j(x^{(+ ij)}; \beta)\big)\Big)}  \ .
             \nonumber
-      \end{align}
+      \end{flalign}
       If currently there is a tie, $x_{ij} = 1$, then the tie is terminated
       if one or both actors wish to do this, which has probability
       \begin{align}
-        & p_{ij}(x, \beta) =          \label{eq:qM2} \\
-        &     1 \, - \, \frac{\exp\big(f_i(x; \beta)\big)}
+        & p_{ij}(x, \beta) =    1 \, -      \label{eq:qM2} \\
+        &      \ \Biggl\{ \frac{\exp\big(f_i(x; \beta)\big)}
          {\Big(\exp\big(f_i(x; \beta)\big) +
-                             \exp\big(f_i(x^{(\pm ij)}; \beta)\big)\Big)}
-        \frac{\exp\big(f_j(x; \beta)\big)}
+                       \exp\big(f_i(x^{(\pm ij)}; \beta)\big)\Big)} \times \\
+        &  \hspace{4em}  \frac{\exp\big(f_j(x; \beta)\big)}
          {\Big(\exp\big(f_j(x; \beta)\big) +
-                             \exp\big(f_j(x^{(\pm ij)}; \beta)\big)\Big)}  \ .
+                       \exp\big(f_j(x^{(\pm ij)}; \beta)\big)\Big)} \Biggr\} \ .
           \nonumber
       \end{align}
       \end{subequations}
@@ -4487,11 +4537,13 @@ for no change:
 The probability of change is
       \begin{align}
         p_{ij}(x, \beta) &= \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
-         {\sum_{h \in \mathcal A} \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}  \nonumber \\
+ {\sum_{h \in \mathcal A} \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}  \nonumber \\
        & \hspace{2em} \times \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
-                        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)} \right)^{1-x_{ij}} \nonumber \\
-       &= p_{1ij}(x, \beta) \, \big( p_{0ji}(x, \beta)  \big)^{(1-x_{ij})}
-         =   p_{1ij}(x, \beta)\, \big(x_{ij} + (1-x_{ij})p_{0ji}(x, \beta) \big)\ ,   \label{eq:cM}
+                        {\exp\big(f_j(x; \beta)\big) +
+    \exp\big(f_j(x^{(+ ij)}; \beta)\big)} \right)^{1-x_{ij}} \nonumber \\[1em]
+       &= p_{1ij}(x, \beta) \, \big( p_{0ji}(x, \beta)  \big)^{(1-x_{ij})} \\
+    & =  p_{1ij}(x, \beta)\, \big(x_{ij} + (1-x_{ij})p_{0ji}(x, \beta) \big)\ ,
+          \label{eq:cM}
       \end{align}
 where it may be noted that $x_{ij}$ is the current state (before the possible
 change).
@@ -4588,11 +4640,13 @@ This gives the following four cases:
       \end{equation}
 \item $x_{ij} = 0$, no change:
       \begin{equation}
-        \frac{\partial \log\, (1 - p_{ij}(x, \beta))}{\partial \beta_k} =
-        - \, \frac{p_{ij}(x, \beta)}{1 - p_{ij}(x, \beta)} \,
+      \begin{split}
+     &   \frac{\partial \log\, (1 - p_{ij}(x, \beta))}{\partial \beta_k} = \\
+     & \ \   - \, \frac{p_{ij}(x, \beta)}{1 - p_{ij}(x, \beta)} \,
 %             \left(  p_{0ij}(x, \beta) \frac{\partial (\Delta\, f_{ij}(x, \beta))}{\partial \beta_k}
 %               + p_{0ji}(x, \beta) \frac{\partial (\Delta\, f_{ji}(x, \beta))}{\partial \beta_k} \right) \ ;
-            \big\{   \big(1- p_{0ij}(x, \beta)\big) s_{ijk} + \big(1-p_{0ji}(x, \beta)\big) s_{jik}\big\} \ ;
+        \big\{   \big(1- p_{0ij}(x, \beta)\big) s_{ijk} + \big(1-p_{0ji}(x, \beta)\big) s_{jik}\big\} \ ;
+      \end{split}
       \end{equation}
 \item $x_{ij} = 1$, change:
       \begin{equation}
@@ -4784,7 +4838,7 @@ to the probability density of the entire process a factor
 where $\lambda_+ = \sum_i \lambda_i$ is the total rate of change.
 
 Calculus shows that the score function with respect to any parameter
-$\theta_k$ ($alpha_k$ as well as $\rho$) is given by
+$\theta_k$ ($\alpha_k$ as well as $\rho$) is given by
 \begin{equation}
     \frac{\partial }{\partial \theta_k} \log \Big( \lambda_i e^{-t\,\lambda_+} \Big)
   = \frac{1}{\lambda_i} \frac{\partial \lambda_i}{\partial \theta_k} \, - \,
@@ -4823,13 +4877,10 @@ For the two-sided opportunity (D.2, M.1 and C) the pairwise rate of change is
 the product of two actor-dependent rates,
 \begin{equation}
 \lambda_{ij} = \lambda_{0i}\lambda_{0j} =
-   \rho^2\exp\Big(\sum_k \alpha_k (z_{ik} + z_{jk})\Big) \ .\label{eq:lambda2}
+   \rho^2\exp\Big(\sum_k \alpha_k (z_{ik} + z_{jk})\Big) \ . \label{eq:lambda2}
 \end{equation}
 (This may be extended later -- this is how it was implemented in Siena 3.)
 
-\remark{This section is changed in the version of November 19, 2010.}
-
-\remark{
 To avoid double summations over actors in the case where some variables $X_{ij}$
 are not allowed to change because of structurally missing values or
 having reached an absorbing state,
@@ -4839,7 +4890,7 @@ of actors subject to the conditions that $i$ and $j$ are active, and $i \neq j$.
 If a pair $(i,j)$ meets  which is not allowed to change anything,
 then time will advance, so
 there will be a contribution to the score function for the parameters of the
-rate function, but further nothing happens.}
+rate function, but further nothing happens.
 
 Ministep are made by all pairs of active actors $i$ and $j$ ($i \neq j$).
 When the elapsed waiting time for a ministep is $t$, the meeting event contributes
@@ -4850,19 +4901,20 @@ to the probability density of the entire process a factor
 where
 \begin{equation}
 \lambda_{++} = \sum_{i,j} \lambda_{ij} =
-       \sum_{\text{active }i} \ \sum_{\text{active }j, j \neq i} \lambda_{0i}\lambda_{0j}   \label{eq: lambda++}
+       \sum_{\text{active }i} \ \sum_{\text{active }j, j \neq i}
+                     \lambda_{0i}\lambda_{0j}         \label{eq:lambda++}
 \end{equation}
+
 is the total rate of change,
-\remark{
 the summation being over all pairs $(i,j)$ of active actors, $i \neq j$.
-}
+
 
 The pairwise meeting process accordingly proceeds as follows.
 \begin{enumerate}
 \item Define
-      \[
+      \begin{equation}
           \lambda_{0+} =   \sum_{\text{active }i} \lambda_{0i} \ .
-      \]
+      \end{equation}
 \item Repeat
       \begin{enumerate}
        \item Choose $i$ among the active $i$ with probabilities
@@ -4876,7 +4928,7 @@ The pairwise meeting process accordingly proceeds as follows.
        \end{enumerate}
        until $i \neq j$.
 \item Increase time by a value drawn from an exponential distribution with parameter
-      (\ref{eq: lambda++}).
+      (\ref{eq:lambda++}).
 \item If $X_{ij}$ is allowed to change, then determine the new value according
       to its distribution; if $X_{ij}$ is not allowed to change, continue
       (one could say that $i$ and $j$ meet but do not change how they are related).
@@ -4898,12 +4950,10 @@ in the choice of $i$ and $j$.)
 
 See below for a remark about the calculation of $\lambda_{++}$.
 
-\remark{
 The rates $\lambda_{ij}$ may depend on variables changing during the simulations, like
 in- or outdegrees or behavioral dependent variables. Then also $\lambda_{++}$ will change
 as a consequence. In addition,  $\lambda_{++}$ can change during the simulations
 even if the $\lambda_{ij}$ remain constant, namely,  by a composition change.
-}
 
 The development further is analogous to the case of one-sided opportunity.
 The score function with respect to any parameter
@@ -4927,13 +4977,12 @@ Since $\partial \lambda_{ij}/\partial \alpha_k = (z_{ik}+z_{jk})\,\lambda_{ij}$,
     \frac{\partial }{\partial \alpha_k} \log \Big( \lambda_{ij} e^{-t\,\lambda_{++}} \Big)
   = (z_{ik}+z_{jk}) \,-\, t \sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh}  \ ,   \label{eq:scorelambda2ak}
 \end{equation}
-\remark{
 where the $\sum_{g,h}$ is taken over
 all pairs $(g,h)$ where $g$ as well as $h$ are active and $g \neq h$.
 This can change because of a composition change, but also because of a change in $z_{gk}+z_{hk}$
 or in $\lambda_{gh}$,
 which is possible if and only if  $\lambda_{gh}$ depends on endogenously changing variables.
-}
+
 
 
 \subsubsection{Remark about calculation of the double summations}
@@ -4943,31 +4992,31 @@ $\sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh} $,
 as these are defined as summations over $n(n-1)$ terms,
 where $n$ is the number of active actors.
 We have
-\begin{eqnarray*}
- \lambda_{++} &=&  \sum_{\text{active } i} \ \sum_{\text{active } j, j \neq i} \lambda_{0i}\lambda_{0j} \\
-              &=&  \sum_{\text{active } i} \lambda_{0i} \ \sum_{\text{active } j, j \neq i} \lambda_{0j}
+\begin{align*}
+ \lambda_{++} &=  \sum_{\text{active } i} \ \sum_{\text{active } j, j \neq i} \lambda_{0i}\lambda_{0j} \\
+              &=  \sum_{\text{active } i} \lambda_{0i} \ \sum_{\text{active } j, j \neq i} \lambda_{0j}
                   \,=\,   \sum_{\text{active } i} \lambda_{0i} \
                               \Bigg( \Big( \sum_{\text{active } j} \lambda_{0j} \Big) \ - \lambda_{0i} \Bigg) \\
-              &=&  \Big(\sum_{\text{active } i} \lambda_{0i} \Big)^2
+              &=  \Big(\sum_{\text{active } i} \lambda_{0i} \Big)^2
                      \,-\,  \Big(\sum_{\text{active } i} \lambda_{0i}^2 \Big)
-\end{eqnarray*}
+\end{align*}
 and
-\begin{eqnarray*}
-\sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh} &=&
+\begin{align*}
+\sum_{g,h} (z_{gk}+z_{hk})\lambda_{gh} \, &= \,
             \sum_{\text{active } i} \ \sum_{\text{active } j, j \neq i} (z_{ik}+z_{jk})\lambda_{0i} \lambda_{0j}\\
-              &=& \Big( \sum_{\text{active } i,j}   (z_{ik}+z_{jk})\lambda_{0i} \lambda_{0j} \Big)
+           \,   &= \, \Big( \sum_{\text{active } i,j}   (z_{ik}+z_{jk})\lambda_{0i} \lambda_{0j} \Big)
                \,-\, \Big(  \sum_{\text{active } i}   2 \, z_{ik} \lambda_{0i}^2   \Big)  \\
-              &=&   2 \,  \Big(\sum_{\text{active } i} \lambda_{0i} \Big)
+           \,   &= \,   2 \,  \Big(\sum_{\text{active } i} \lambda_{0i} \Big)
                          \Big(\sum_{\text{active } i} z_{ik} \lambda_{0i} \Big)
                      \,-\, 2\, \Big(\sum_{\text{active } i} z_{ik} \lambda_{0i}^2 \Big) \ .
-\end{eqnarray*}
+\end{align*}
 Thus, everything can be expressed as a combination of single summations.
 
 The remark at the end of Section  \ref{S_14.1} applies here, too:
-\remark{if the functions $\lambda_{0i}$
+if the functions $\lambda_{0i}$
 are not changing during the simulations,
 i.e., either they do not depend on $i$ or only through
-actor covariates that are not dependent behavior variables,}
+actor covariates that are not dependent behavior variables,
 these sums do not change during the simulations, unless there is composition change
 and the set of active actors changes.
 For such model specifications, it is efficient to calculate the sums
@@ -5082,12 +5131,12 @@ $ \lambda^w(\theta, r,i, y) = \rho^w_r $ reduces to
   \frac{T^w_r}{\rho^w_r}  - n_{\text{act}}  \  ; \label{score3}
 \end{equation}
 and the score functions for the other rate parameters are
-\begin{equation}
-\frac{\partial \, \text{complete data log-likelihood}}{\partial \alpha^w_{rh}} =
-   \sum_i s_{rih} \big(T^w_{ri} - \rho^w_r \, \exp(\alpha^w_{r} s_{ri} )  \big)
-   = \sum_i s_{rih} \big(T^w_{ri} -  \lambda^w(\theta, r,i, y) )  \big)
+\begin{align}
+\frac{\partial \, \text{complete data log-likelihood}}{\partial \alpha^w_{rh}}  & =
+   \sum_i s_{rih} \big(T^w_{ri} - \rho^w_r \, \exp(\alpha^w_{r} s_{ri} )  \big)\\
+  & = \sum_i s_{rih} \big(T^w_{ri} -  \lambda^w(\theta, r,i, y) )  \big)
                \  . \label{score4}
-\end{equation}
+\end{align}
 
 \iffalse
 \subsection{$\kappa$ in the general case}

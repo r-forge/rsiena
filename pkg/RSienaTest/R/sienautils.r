@@ -298,8 +298,8 @@ varDyadCovar<- function(val, nodeSets=c("Actors","Actors"), sparse=is.list(val),
     attr(out, "vardims") <- vardims
     out
 }
-##@sienaNet Create
-sienaNet<- function(netarray, type=c("oneMode","bipartite","behavior"),
+##@sienaDependent Create
+sienaDependent <- function(netarray, type=c("oneMode","bipartite","behavior"),
                     nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
 {
 	if (!sparse)
@@ -431,7 +431,7 @@ sienaNet<- function(netarray, type=c("oneMode","bipartite","behavior"),
         }
     }
     obj <- netarray
-    class(obj) <- ("sienaNet")
+    class(obj) <- ("sienaDependent")
     attr(obj, "type") <- type
     attr(obj, "sparse") <- sparse
     attr(obj, "nodeSet") <- nodeSet
@@ -439,12 +439,16 @@ sienaNet<- function(netarray, type=c("oneMode","bipartite","behavior"),
 	attr(obj, "allowOnly") <- allowOnly
     obj
 }
-##@validateSienaNet Miscellaneous not used yet
-validateSienaNet <- function(net)
+
+##@sienaNet Create
+sienaNet <- sienaDependent
+
+##@validateSienaDependent Miscellaneous not used yet
+validateSienaDependent <- function(net)
 {
-    if (!inherits(net,"sienaNet"))
+    if (!inherits(net,"sienaDependent"))
 	{
-        stop ("Not a siena Net")
+        stop ("Not a sienaDependent object")
 	}
     if (!attr(net, "type") %in% c("oneMode", "bipartite", "behavior"))
 	{

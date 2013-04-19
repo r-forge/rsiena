@@ -87,6 +87,17 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         }
         tmp
     }
+
+##@addSettingseffects internal getEffects add effects for settings model
+addSettingsEffects <- function(effects)
+{
+depvar <- attr(effects, "depvar")
+	## This processes the settings (constant dyadic covariate) structure.
+	## Only for one-mode network.
+	nbrSettings <- length(attr(depvar,"settings"))
+	## This leads to a warning in R CMD Check.
+	## Not important since this is just a stub, to be developed later.
+}
     ##@networkRateEffects internal getEffects create a set of rate effects
     networkRateEffects <- function(depvar, varname, symmetric, bipartite)
     {
@@ -350,7 +361,38 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                        objEffects$type == 'eval', 'include'] <- TRUE
         }
         rateEffects$basicRate[1:observations] <- TRUE
-        list(effects=rbind(rateEffects = rateEffects, objEffects = objEffects),
+		## The following adding of settings effects should perhaps have been
+		## placed earlier; but for the moment it is here.
+		## This uses the results of addSettings
+		## which adds the settings to the sienaDependent object.
+		if (!is.null(attr(depvar,"settings")))
+		{
+		## add settings effects
+			nbrSettings <- ifelse(attr(depvar,"settings") == "", 0,
+									length(attr(depvar,"settings")))
+			dupl <- rateEffects[1:observations, ]
+		## make extra copies
+			newEffects <- dupl[rep(1:nrow(dupl), each = nbrSettings[i] + 2), ]
+			newEffects <- split(newEffects,
+								list(newEffects$group, newEffects$period))
+			newEffects <- lapply(newEffects, function(dd)
+				{
+					dd$setting <- c("universal", "primary", 
+							names(attr(depvar,"settings")))
+					i1 <- regexpr("rate", dd$effectName)
+					dd$effectName <-
+						  paste(substr(dd$effectName, 1, i1 - 2),
+								dd$setting, substring(dd$effectName, i1))
+					dd
+				})
+			newEffects <- do.call(rbind, newEffects)
+			## add the extra column also to the other effects
+			rateEffects$setting <- rep("", nrow(rateEffects))
+			objEffects$setting <- rep("", nrow(objEffects))
+			rateEffects <- 
+				rbind(newEffects, rateEffects[!rateEffects$basicRate, ])
+		}
+		list(effects=rbind(rateEffects = rateEffects, objEffects = objEffects),
              starts=starts)
     }
 
@@ -1254,7 +1296,6 @@ getNetworkStartingVals <- function(depvar)
 #cat(matchange0,'\n',matchange,'\n')
             matcnt <- nactors * nactors -
                 sum(is.na(z[, , x + 1]) | is.na(z[, , x]))
-#browser()
             tmp <- c(matcnt=matcnt, matdiff=matdiff, matchange=matchange)
             names(tmp) <- c("matcnt", "matdiff", "matchangeFrom0To0",
                             "matchangeFrom0To1",
@@ -1385,7 +1426,7 @@ getBipartiteStartingVals <- function(depvar)
     else
     {
         nsenders <- nrow(depvar[[1]])
-        nreceivers <- ncol(depvar[[2]])
+        nreceivers <- ncol(depvar[[1]]) # CS: Was 2, but why?
         matdiff<- rep(NA, noPeriods)
         matcnt<- rep(NA, noPeriods)
         matchange<- matrix(NA, nrow=4, ncol=noPeriods)
@@ -1415,7 +1456,12 @@ getBipartiteStartingVals <- function(depvar)
                             "matchangeFrom1To0", "matchangeFrom1To1")
     }
     distance <- attr(depvar, "distance" )
-    startRate <- nsenders * (0.2 + 2 * distance)/(tmp['matcnt',] + 1)
+    startRate <- nreceivers * (0.2 + 2 * distance)/(tmp['matcnt',] + 1)
+		# CS: the above used to be 'nsenders' instead of 'nreceivers';
+		#     this was a wrong calculation and led to extremely high
+		#     rate parameters for comparatively small receiver nodesets
+		#     slowing down estimation and prohibiting identification
+		#     of parameters.
     startRate <- pmax(0.1, startRate)
     startRate <- pmin(100, startRate)
     ##degree

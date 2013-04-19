@@ -37,7 +37,7 @@
 ## tests 25 to 29, multi groups no missings
 ## tests 30 to 36, mult groups bipartite, missings (only one dep var so fewer)
 ## tests 37 to 43, multiple network effects, constraints.
-## tests 44, 45, bayes (normal, multigroup)
+## tests 44, 45, sienaBayes (normal, multigroup)
 ## tests 46 to 65 composition change with different options,
 ## uncond, cond, fd uncond, fd cond, ml
 ## siena08 gets tested at start,
@@ -96,9 +96,9 @@ file.copy(files1, ".", overwrite=TRUE)
 
 ## create basic data object
 use <- 1:20
-mynet <- sienaNet(array(c(s501[use, use], s502[use, use], s503[use, use]),
+mynet <- sienaDependent(array(c(s501[use, use], s502[use, use], s503[use, use]),
 						dim=c(length(use), length(use), 3)))
-mybeh <- sienaNet(s50a[use, ], type='behavior')
+mybeh <- sienaDependent(s50a[use, ], type='behavior')
 myccov <- coCovar(rnorm(50)[use])
 myvcov <- varCovar(matrix(rnorm(100)[1:(2 * length(use))], nrow=length(use)))
 mydyccov <- coDyadCovar(matrix(rnorm(2500)[1:(length(use) * length(use))],
@@ -112,9 +112,9 @@ print01Report(mydata, myeff, "Siena01")
 
 ## create data set to use for ml (could be different size)
 use <- 1:20
-mynetml <- sienaNet(array(c(s501[use, use], s502[use, use], s503[use, use]),
+mynetml <- sienaDependent(array(c(s501[use, use], s502[use, use], s503[use, use]),
 						  dim=c(20, 20, 3)))
-mybehml <- sienaNet(s50a[use, ])
+mybehml <- sienaDependent(s50a[use, ])
 myccovml <- coCovar(rnorm(20))
 myvcovml <- varCovar(matrix(rnorm(40), nrow=20))
 mydyccovml <- coDyadCovar(matrix(rnorm(400), nrow=20))
@@ -187,7 +187,7 @@ s503s <- s503[use, use]
 s501s <- pmin(s501s + t(s501s), 1)
 s502s <- pmin(s502s + t(s502s), 1)
 s503s <- pmin(s503s + t(s503s), 1)
-mynets <- sienaNet(array(c(s501s, s502s, s503s),dim=c(length(use), length(use),
+mynets <- sienaDependent(array(c(s501s, s502s, s503s),dim=c(length(use), length(use),
 												3)))
 mydatas <- sienaDataCreate(mynets, mybeh, myccov, myvcov, mydyccov, mydyvcov)
 myeffs <- getEffects(mydatas)
@@ -216,9 +216,9 @@ tmp3a <- tmp3[1:20, ]
 tmp4a <- tmp4[1:20, ]
 tmp3b <- tmp3[, 13:32 ]
 tmp4b <- tmp4[, 13:32]
-mynetb1 <- sienaNet(array(c(tmp3a, tmp4a), dim=c(20, 32, 2)),
+mynetb1 <- sienaDependent(array(c(tmp3a, tmp4a), dim=c(20, 32, 2)),
 					type="bipartite", nodeSet=c("senders20", "receivers32"))
-mynetb2 <-  sienaNet(array(c(tmp3b, tmp4b), dim=c(32, 20, 2)),
+mynetb2 <-  sienaDependent(array(c(tmp3b, tmp4b), dim=c(32, 20, 2)),
 					 type="bipartite", nodeSet=c("senders32", "receivers20"))
 senders20 <- sienaNodeSet(20, "senders20")
 senders32 <- sienaNodeSet(32, "senders32")
@@ -260,7 +260,7 @@ tmp2 <- as.matrix(read.table("VRND32T2.DAT"))
 tmp2[tmp2==9] <- NA
 tmp2[tmp2 %in% c(4,5)] <- 0
 tmp2[tmp2 > 0] <- 1
-mynet3 <- sienaNet(array(c(tmp2, tmp3, tmp4), dim=c(32, 32, 3)))
+mynet3 <- sienaDependent(array(c(tmp2, tmp3, tmp4), dim=c(32, 32, 3)))
 comp1 <- sienaCompositionChangeFromFile("vtextexoreal.dat")
 comp2 <- sienaCompositionChangeFromFile("vtextexoreal.dat", option=2)
 comp3 <- sienaCompositionChangeFromFile("vtextexoreal.dat", option=3)
@@ -299,7 +299,7 @@ tmp40[is.na(tmp4)] <- 10
 diag(tmp20) <- 0
 diag(tmp30) <- 0
 diag(tmp40) <- 0
-mynet30 <- sienaNet(array(c(tmp20, tmp30, tmp40), dim=c(32, 32, 3)))
+mynet30 <- sienaDependent(array(c(tmp20, tmp30, tmp40), dim=c(32, 32, 3)))
 
 mydatacc5 <- sienaDataCreate(mynet30, cccov, cvcov, cccov1, cccov2, ccdyad,
 							 cvdyad)
@@ -315,10 +315,10 @@ hn341 <- as.matrix(read.table("HN34_1.DAT"))
 hn343 <- as.matrix(read.table("HN34_3.DAT"))
 hn344 <- as.matrix(read.table("HN34_4.DAT"))
 hn346 <- as.matrix(read.table("HN34_6.DAT"))
-net1 <- sienaNet(array(c(n341, hn341), dim=c(45, 45, 2)))
-net3 <- sienaNet(array(c(n343, hn343), dim=c(37, 37, 2)))
-net4 <- sienaNet(array(c(n344, hn344), dim=c(33, 33, 2)))
-net6 <- sienaNet(array(c(n346, hn346), dim=c(36, 36, 2)))
+net1 <- sienaDependent(array(c(n341, hn341), dim=c(45, 45, 2)))
+net3 <- sienaDependent(array(c(n343, hn343), dim=c(37, 37, 2)))
+net4 <- sienaDependent(array(c(n344, hn344), dim=c(33, 33, 2)))
+net6 <- sienaDependent(array(c(n346, hn346), dim=c(36, 36, 2)))
 
 data1 <- sienaDataCreate(net1)
 data3 <- sienaDataCreate(net3)
@@ -426,12 +426,12 @@ effectTestFn <- function(model, type, modelNo, effects, data, bayes, useCluster,
 					rate <- effects$type == "rate"
 					rate <- rate[effects$include]
 					diag(dfra)[rate] <- 0.1
-					ans <- try(bayes(data, effects, model, dfra=dfra, nwarm=10,
+					ans <- try(sienaBayes(data, effects, model, dfra=dfra, nwarm=10,
 									 nmain=10))
 				}
 				else
 				{
-					ans <- try(bayes(data, effects, model, nwarm=10, nmain=10))
+					ans <- try(sienaBayes(data, effects, model, nwarm=10, nmain=10))
 				}
 
 				if (!inherits(ans, "try-error"))
@@ -755,10 +755,10 @@ hn341 <- as.matrix(read.table("HN34_1.DAT"))
 hn343 <- as.matrix(read.table("HN34_3.DAT"))
 hn344 <- as.matrix(read.table("HN34_4.DAT"))
 hn346 <- as.matrix(read.table("HN34_6.DAT"))
-net1 <- sienaNet(array(c(n341, hn341), dim=c(45, 45, 2)))
-net3 <- sienaNet(array(c(n343, hn343), dim=c(37, 37, 2)))
-net4 <- sienaNet(array(c(n344, hn344), dim=c(33, 33, 2)))
-net6 <- sienaNet(array(c(n346, hn346), dim=c(36, 36, 2)))
+net1 <- sienaDependent(array(c(n341, hn341), dim=c(45, 45, 2)))
+net3 <- sienaDependent(array(c(n343, hn343), dim=c(37, 37, 2)))
+net4 <- sienaDependent(array(c(n344, hn344), dim=c(33, 33, 2)))
+net6 <- sienaDependent(array(c(n346, hn346), dim=c(36, 36, 2)))
 
 data1 <- sienaDataCreate(net1)
 data3 <- sienaDataCreate(net3)

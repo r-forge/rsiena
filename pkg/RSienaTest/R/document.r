@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: RSienaAutoHelpTable.r
 # *
@@ -21,7 +21,7 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 	RSienaRequiredFunctions <- data.frame(functionName=c("installGui",
 										  "siena01Gui",
 										  "sienaNodeSet",
-										  "sienaNet",
+										  "sienaDependent",
 										  "coCovar",
 										  "varCovar",
 										  "coDyadCovar",
@@ -37,7 +37,8 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 										  "includeInteraction",
 										  "setEffect",
 										  "print01Report",
-										  "sienaModelCreate",
+										  "`",
+										  "sienaAlgorithmCreate",
 										  "siena07",
 										  "sienaFit",
 										  "sienaTimeTest"),

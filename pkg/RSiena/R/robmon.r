@@ -136,6 +136,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     z$anyposj <- any(z$posj)
     z$resist <- rep(1, z$pp)
     z$n1 <- 7 + 3 * z$pp
+	if (x$dolby){z$n1 <- max(z$n1, 50)}
     if (any(!z$fixed))
     {
         z$AllUserFixed<- FALSE
@@ -325,11 +326,14 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     z <- terminateFRAN(z, x)
     ## #####################################################
     ## call to FRAN changes covariance matrix for conditional estimation
-    z$diver<- (z$fixed | z$diver | diag(z$covtheta) < 1e-9) & (!z$AllUserFixed)
-    z$covtheta[z$diver, ] <- Root(diag(z$covtheta)) * 33
-    ##not sure this does not use very small vals
-    z$covtheta[, z$diver] <- Root(diag(z$covtheta)) * 33
-    diag(z$covtheta)[z$diver] <- 999
+	if (!x$simOnly)
+	{
+		z$diver<- (z$fixed | z$diver | diag(z$covtheta) < 1e-9) & (!z$AllUserFixed)
+		z$covtheta[z$diver, ] <- Root(diag(z$covtheta)) * 33
+		##not sure this does not use very small vals
+		z$covtheta[, z$diver] <- Root(diag(z$covtheta)) * 33
+		diag(z$covtheta)[z$diver] <- 999
+	}
     z$termination <- 'OK'
     z
 }

@@ -1,22 +1,31 @@
-\name{sienaNet}
+\name{sienaDependent}
+\alias{sienaDependent}
 \alias{sienaNet}
-\title{Function to create a Siena network object }
+\title{Function to create a dependent variable for a Siena model}
 \description{
-  Creates a Siena network object from a matrix or array or list of sparse matrix
-  of triples.
+  Creates a Siena dependent variable: either a network, created from a matrix
+  or array or list of sparse matrix of triples; or a behavior variable,
+  created from a matrix.
+  \code{sienaDependent()} and \code{sienaNet()} are identical functions;
+  the second name was used from the start of the \code{RSiena} package,
+  but the first name indicates more precisely the purpose of this function.
 }
 \usage{
+sienaDependent(netarray, type=c("oneMode", "bipartite", "behavior"),
+nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
+
 sienaNet(netarray, type=c("oneMode", "bipartite", "behavior"),
 nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
 }
 \arguments{
   \item{netarray}{matrix (type="behavior" only)
-    or array of values or list of sparse matrices of type "dgTMatrix"}
+    or (for the other types) array of values or list of sparse matrices
+	of type "dgTMatrix"}
   \item{type}{type of network, default "oneMode"}
   \item{nodeSet}{character string naming the appropriate node set. A
 	vector containing 2 character strings for a bipartite network:
 	"rows" first, then "columns".}
-  \item{sparse}{logical: set to TRUE if the data is in sparse matrix
+  \item{sparse}{logical: TRUE indicates the data is in sparse matrix
     format, FALSE otherwise }
   \item{allowOnly}{logical: If TRUE, it will be detected when between any
     two consecutive waves the changes are non-decreasing or non-increasing,
@@ -33,7 +42,7 @@ nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
   Siena model fit.
 }
 \value{
-An object of class "sienaNet". An array or (networks only) a list of sparse
+An object of class "sienaDependent". An array or (networks only) a list of sparse
 matrices with attributes:
   \item{netdims}{Dimensions of the network or behavior
 	variable: senders, receivers (1 for behavior), periods}
@@ -44,14 +53,13 @@ matrices with attributes:
 }
 \references{See \url{http://www.stats.ox.ac.uk/siena/}}
 \author{Ruth Ripley and Tom A.B. Snijders}
-\seealso{\code{\link{sienaDataCreate}}}
+\seealso{\code{\link{sienaDataCreate}}, \code{\link{sienaDataConstraint}}}
 \examples{
-
-mynet1 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mynet2 <- sienaNet(s50a, type="behavior")
-## note that the following example works although the node sets do not exist!
-mynet3 <- sienaNet(array(c(s501, s502, s503), dim=c(50, 50, 3)),
-type="bipartite", nodeSet=c("senders", "receivers"))
+mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mybeh <- sienaDependent(s50a, type="behavior")
+## note that the following example works although the node sets do not yet exist!
+mynet3 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)),
+       type="bipartite", nodeSet=c("senders", "receivers"))
 ## sparse matrix input - create some RSiena edgelists first
 library(Matrix)
 tmps501 <- as(Matrix(s501), "dgTMatrix")
@@ -65,7 +73,7 @@ library(Matrix)
 ## mymat includes all 3 waves
 mymatlist <- by(mymat, mymat[, 4], function(x)
     spMatrix(50, 50, x[, 1], x[, 2], x[, 3]))
-mynet4 <- sienaNet(mymatlist)
+mynet4 <- sienaDependent(mymatlist)
 ## or alternatively
 mymat1 <- mymat[mymat[, 4] == 1, ]
 mymat2 <- mymat[mymat[, 4] == 2, ]
@@ -73,6 +81,6 @@ mymat3 <- mymat[mymat[, 4] == 3, ]
 mymat1s <- spMatrix(50, 50, mymat1[, 1], mymat1[, 2], mymat1[, 3])
 mymat2s <- spMatrix(50, 50, mymat2[, 1], mymat2[, 2], mymat2[, 3])
 mymat3s <- spMatrix(50, 50, mymat3[, 1], mymat3[, 2], mymat3[, 3])
-mynet4 <- sienaNet(list(mymat1s, mymat2s, mymat3s))
+mynet4 <- sienaDependent(list(mymat1s, mymat2s, mymat3s))
 }
 \keyword{classes}

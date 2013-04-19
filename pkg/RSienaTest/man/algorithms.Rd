@@ -1,10 +1,10 @@
 \name{algorithms}
 \alias{algorithms}
 \title{
-  Function to fit \code{Siena} model using alternative algorithms.
+  Function to estimate \code{Siena} model using alternative algorithms.
 }
 \description{
- Estimates a longitudinal netowrk model using different methods to that
+ Estimates a longitudinal network model using different methods from those
  in \code{\link{siena07}}.
 }
 \usage{
@@ -35,7 +35,7 @@ Ruth Ripley}
 
 \examples{
 \dontrun{
-mynet1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32,32,2)))
+mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32,32,2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 ans <- algorithms(mydata, myeff, sienaModelCreate())

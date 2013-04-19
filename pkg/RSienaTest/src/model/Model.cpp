@@ -302,7 +302,7 @@ void Model::basicRateParameter(LongitudinalData * pDependentVariableData,
 	int period,
 	double value)
 {
-//TORDO find out why we have obs here and not below
+//TODO find out why we have obs here and not below
 	if (!this->lbasicRateParameters[pDependentVariableData])
 	{
 		double * array =
