@@ -51,7 +51,7 @@
 \begin{document}
 
 \title{\vspace*{-0.5cm} Notes for Developers of RSiena}
-\author{Ruth Ripley}
+\author{Ruth Ripley (with some additions by Tom Snijders)}
 \date{}
 \maketitle
 
@@ -254,8 +254,12 @@ middle button (Linux) click.
 \item Align braces under each other (so put the first one on a new line). (I
   break this rule for \sfn{switch} statements in R as emacs does not do the
   alignment sensibly!)
-\item Set tabs at intervals of 4 columns
-\item Indent by 4
+\item Remove trailing spaces and tabs. (Emacs and Notepad++ have special
+  commands for this).
+\item Use tabs for indenting code and spaces for indenting \sfn{.Rd}
+  documentation files (in view of how the latter are represented in html).
+\item Set tabs at intervals of 4 columns.
+\item Indent by 4.
 \item Align comments in the body of the code with the surrounding code.
 \item Do not use lines longer than 80 characters in any file, even
   documentation.
@@ -266,7 +270,9 @@ middle button (Linux) click.
   endings. Otherwise a tarball built on Windows will not produce a usable
   \sfn{sienascript} for Mac or Linux. There may be others in the future.)
 \item Copy a file header from an existing source file, and adapt it.
-\item Ensure your editor removes all trailing spaces.
+\item Ensure your editor removes all trailing spaces.\\
+  Note that in Notepad++ there is a command Edit/Blank Operations/Trim trailing
+  space and also a macro Trim Trailing and Save (Alt+Shift+S).
 \end{enumerate}
 \subsection{R}
 \begin{enumerate}
@@ -475,8 +481,8 @@ RSiena without re-installing the
 package.
 \begin{enumerate}
 \item If you make a change to an R source file, you can override the package
-  simply by using the R command \verb|insert.source|. For example,
-  \verb|insert.source('d:/RSiena/R/phase1.r', package='RSiena')| will update any
+  simply by using the R command \verb|insertSource|. For example,
+  \verb|insertSource('d:/RSiena/R/phase1.r', package='RSiena')| will update any
   functions which you have altered which are contained in \verb|phase1.r|.
 \item Alternatively, you can make a small change to a hidden file by using
   \verb|fixInNamespace('function name', 'RSiena')|.  This is useful to insert a

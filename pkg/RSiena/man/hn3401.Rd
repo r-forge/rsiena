@@ -1,4 +1,5 @@
-\name{HN3401}
+\name{hn3401}
+\alias{hn3401}
 \alias{HN3401}
 \alias{HN3403}
 \alias{HN3404}
@@ -37,7 +38,7 @@ on Friendship Evolution.
 See \url{http://www.stats.ox.ac.uk/~snijders/siena/BaerveldtData.html}
 }
 \examples{
-mynet <- sienaNet(array(c(N3401, HN3401), dim=c(45, 45, 2)))
+mynet <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))
 mydata <- sienaDataCreate(mynet)
 }
 \keyword{datasets}

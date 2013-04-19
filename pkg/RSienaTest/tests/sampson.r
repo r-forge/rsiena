@@ -44,17 +44,17 @@ mmin2 <- mmin2[!absent,!absent]
 mmin3 <- mmin3[!absent,!absent]
 mmin4 <- mmin4[!absent,!absent]
 
-plus234 <- sienaNet(array(c(mplus2, mplus3, mplus4),
+plus234 <- sienaDependent(array(c(mplus2, mplus3, mplus4),
                                dim=c(18, 18, 3)))
-min234 <- sienaNet(array(c(mmin2, mmin3, mmin4),
+min234 <- sienaDependent(array(c(mmin2, mmin3, mmin4),
                                dim=c(18, 18, 3)))
 sampson234 <- sienaDataCreate(plus234, min234)
 sampson.eff234 <- getEffects(sampson234)
 s.model234 <- sienaModelCreate(projname = "sampson234")
 print01Report(sampson234, sampson.eff234, "sampson234")
-plus23 <- sienaNet(array(c(mplus2, mplus3),
+plus23 <- sienaDependent(array(c(mplus2, mplus3),
                                dim=c(18, 18, 2)))
-min23 <- sienaNet(array(c(mmin2, mmin3),
+min23 <- sienaDependent(array(c(mmin2, mmin3),
                                dim=c(18, 18, 2)))
 sampson23 <- sienaDataCreate(plus23, min23)
 sampson.eff23 <- getEffects(sampson23)

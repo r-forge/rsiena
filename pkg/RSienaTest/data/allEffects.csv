@@ -13,8 +13,8 @@ behaviorOneModeObjective,behavior xxxxxx ave. sim. x rec. x pop. (alter),beh. xx
 behaviorOneModeObjective,behavior xxxxxx tot. sim. x rec. x pop. (alter),beh. xxxxxx tot. sim. x rec. x i.d.(one-sided),totSimRecPop,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 behaviorOneModeObjective,behavior xxxxxx average alter,beh. xxxxxx average alters,avAlt,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
 behaviorOneModeObjective,behavior xxxxxx average rec. alters,beh. xxxxxx average rec. alters,avRecAlt,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
-behaviorOneModeObjective,behavior xxxxxx dense triads <maybe wrong>,beh. xxxxxx dense triads <<<maybe wrong>>>,behDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,OK
-behaviorOneModeObjective,behavior xxxxxx similarity in dense triads <maybe wrong>,beh. xxxxxx homogeneity of dense triads <<<maybe wrong>>>,simDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,OK
+behaviorOneModeObjective,behavior xxxxxx dense triads,beh. xxxxxx dense triads ,behDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,OK
+behaviorOneModeObjective,behavior xxxxxx similarity in dense triads,beh. xxxxxx homogeneity of dense triads ,simDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,OK
 behaviorOneModeObjective,behavior xxxxxx reciprocated degree,beh. xxxxxx reciprocated degrees,recipDeg,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
 behaviorOneModeObjective,behavior xxxxxx ave. sim. x popularity ego,beh. xxxxxx ave. sim. x indegrees ego,avSimPopEgo,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 behaviorSymmetricObjective,behavior xxxxxx average similarity,beh. xxxxxx average similarity,avSim,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
@@ -30,8 +30,8 @@ behaviorSymmetricObjective,behavior xxxxxx ave. sim. x rec. x pop. (alter),beh. 
 behaviorSymmetricObjective,behavior xxxxxx tot. sim. x rec. x pop. (alter),beh. xxxxxx tot. sim. x rec. x i.d.(one-sided),totSimRecPop,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 behaviorSymmetricObjective,behavior xxxxxx average alter,beh. xxxxxx average alters,avAlt,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
 behaviorSymmetricObjective,behavior xxxxxx average rec. alters,beh. xxxxxx average rec. alters,avRecAlt,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
-behaviorSymmetricObjective,behavior xxxxxx dense triads <maybe wrong>,beh. xxxxxx dense triads <<<maybe wrong>>>,behDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,OK
-behaviorSymmetricObjective,behavior xxxxxx similarity in dense triads <maybe wrong>,beh. xxxxxx homogeneity of dense triads <<<maybe wrong>>>,simDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,OK
+behaviorSymmetricObjective,behavior xxxxxx dense triads,beh. xxxxxx dense triads ,behDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,OK
+behaviorSymmetricObjective,behavior xxxxxx similarity in dense triads,beh. xxxxxx homogeneity of dense triads ,simDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,OK
 behaviorSymmetricObjective,behavior xxxxxx ave. sim. x popularity ego,beh. xxxxxx ave. sim. x indegrees ego,avSimPopEgo,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 behaviorBipartiteObjective,behavior xxxxxx average similarity,beh. xxxxxx average similarity,avSim,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 behaviorBipartiteObjective,behavior xxxxxx total similarity,beh. xxxxxx total similarity,totSim,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
@@ -41,8 +41,8 @@ behaviorBipartiteObjective,behavior xxxxxx ave. sim. x popularity alter,beh. xxx
 behaviorBipartiteObjective,behavior xxxxxx tot. sim. x popularity alter,beh. xxxxxx tot. sim. x indegrees(one-sided),totSimPopAlt,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 behaviorBipartiteObjective,behavior xxxxxx x popularity alter,beh. xxxxxx x indegrees(one-sided),popAlt,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
 behaviorBipartiteObjective,behavior xxxxxx average alter,beh. xxxxxx average alters,avAlt,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
-behaviorBipartiteObjective,behavior xxxxxx dense triads <maybe wrong>,beh. xxxxxx dense triads <<<maybe wrong>>>,behDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
-behaviorBipartiteObjective,behavior xxxxxx similarity in dense triads <maybe wrong>,beh. xxxxxx homogeneity of dense triads <<<maybe wrong>>>,simDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
+behaviorBipartiteObjective,behavior xxxxxx dense triads,beh. xxxxxx dense triads ,behDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
+behaviorBipartiteObjective,behavior xxxxxx similarity in dense triads,beh. xxxxxx homogeneity of dense triads ,simDenseTriads,FALSE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
 behaviorBipartiteObjective,behavior xxxxxx ave. sim. x popularity ego,beh. xxxxxx ave. sim. x indegrees ego,avSimPopEgo,TRUE,yyyyyy,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 behaviorObjective,behavior xxxxxx linear shape,beh. xxxxxx cent. sum,linear,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,OK
 behaviorObjective,behavior xxxxxx quadratic shape,beh. xxxxxx sum of cent. squares,quad,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
@@ -142,11 +142,11 @@ nonSymmetricObjective,balance,Amount of balance,balance,TRUE,,,eval,FALSE,FALSE,
 nonSymmetricObjective,number of actors at distance 2,Number of directed distances equal to 2,nbrDist2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,number pairs at doubly achieved distance 2,Number of doubly achieved distances 2,nbrDist2twice,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,dense triads,Sum of triads with # or more ties,denseTriads,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
-nonSymmetricObjective,GWESP I -> K -> J (#),Number of edgewise shared partners by two path (#),gwespFF,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,25,objective,NA,NA,0,0,0,0,
-nonSymmetricObjective,GWESP I <- K <- J (#),Number of edgewise shared partners by reverse two path (#),gwespBB,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,25,objective,NA,NA,0,0,0,0,
-nonSymmetricObjective,GWESP I <- K -> J (#),Number of edgewise shared partners by out two stars (#),gwespFB,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,25,objective,NA,NA,0,0,0,0,
-nonSymmetricObjective,GWESP I -> K <- J (#),Number of edgewise shared partners by in two stars (#),gwespBF,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,25,objective,NA,NA,0,0,0,0,
-nonSymmetricObjective,GWESP I <> K <> J (#),Number of edgewise shared partners both in AND out two stars (#),gwespRR,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,25,objective,NA,NA,0,0,0,0,
+nonSymmetricObjective,GWESP I -> K -> J (#),Number of edgewise shared partners by two path (#),gwespFF,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,
+nonSymmetricObjective,GWESP I <- K <- J (#),Number of edgewise shared partners by reverse two path (#),gwespBB,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,
+nonSymmetricObjective,GWESP I <- K -> J (#),Number of edgewise shared partners by out two stars (#),gwespFB,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,
+nonSymmetricObjective,GWESP I -> K <- J (#),Number of edgewise shared partners by in two stars (#),gwespBF,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,
+nonSymmetricObjective,GWESP I <> K <> J (#),Number of edgewise shared partners both in AND out two stars (#),gwespRR,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,indegree - popularity,Sum of squared indegrees,inPop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,indegree - popularity (sqrt),Sum of indegrees x sqrt(indegree),inPopSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,outdegree - popularity,Sum of crossproducts indegree x outdegree,outPop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
@@ -214,6 +214,7 @@ bipartiteNonSymmetricObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degre
 bipartiteNonSymmetricObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx",to,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 bipartiteSymmetricObjective,degree^(1/#) xxxxxx activity,sum outd. x degre.^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
 bipartiteSymmetricObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx",to,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
+nonSymmetricBipartiteObjective,outdegree^(1/#) xxxxxx popularity,sum ind. x degree^(1/#) xxxxxx,outPopIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
 nonSymmetricBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
 nonSymmetricBipartiteObjective,from xxxxxx agreement,"mixed triplets XWW, W = xxxxxx",from,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 bipartiteBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic

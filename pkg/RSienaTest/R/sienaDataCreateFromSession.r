@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: sienaDataCreateFromSession.r
 # *
@@ -284,14 +284,14 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                namefiles[[x]][namefiles[[x]] %in% miss] <- NA
                                namefiles[[x]][!(is.na(namefiles[[x]]))
                                               & !(namefiles[[x]] %in%
-                                                  c(nonzero[[x]], 10, 11))] <- 0
+                                               c(nonzero[[x]], 10, 11))] <- 0
                                namefiles[[x]][namefiles[[x]] %in%
                                               nonzero[[x]]] <- 1
                                myarray[ , ,
                                        as.numeric(namesession$Period[x])] <-
                                            namefiles[[x]]
-                               tmp <- sienaNet(myarray, nodeSet=namesession[1,
-                                                        "ActorSet"])
+                               tmp <- sienaDependent(myarray, 
+									nodeSet=namesession[1, "ActorSet"])
                            }
                        }
                        else if (namesession$Format[1] == "Siena net")
@@ -344,8 +344,8 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                         j=y[, 2],
                                         x=y[, 3])
                            } )
-                           tmp <- sienaNet(mylist, nodeSet=namesession[1,
-                                                   "ActorSet"])
+                           tmp <- sienaDependent(mylist, 
+						          nodeSet=namesession[1, "ActorSet"])
                        }
                        else ## pajek net
                        {
@@ -382,16 +382,19 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                if (!is.directed(namefiles[[x]]))
                                {
                                    perm <- c(2, 1, 3)
-                                   myedgelist <- rbind(myedgelist, myedgelist[, perm])
+                                   myedgelist <- rbind(myedgelist, 
+												myedgelist[, perm])
                                }
 
                                if (network.size(namefiles[[x]]) != nActors)
                                    stop("number of actors inconsistent")
 
                                mylist[[x]] <-
-                                   spMatrix(nrow=nActors, ncol=nActors, i= myedgelist[,1], j=myedgelist[,2], x=myedgelist[,3])
+                                   spMatrix(nrow=nActors, ncol=nActors, 
+								   i=myedgelist[,1], j=myedgelist[,2], 
+								   x=myedgelist[,3])
                            }
-                           tmp <- sienaNet(mylist, nodeSet=namesession[1,
+                           tmp <- sienaDependent(mylist, nodeSet=namesession[1,
                                            "ActorSet"])
                        }
                        assign(objnames[j], tmp)
@@ -421,7 +424,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                        as.numeric(namesession$Period[x])] <-
                                            namefiles[[x]]
                            }
-                           tmp <- sienaNet(myarray, type='bipartite',
+                           tmp <- sienaDependent(myarray, type='bipartite',
                                            nodeSet=nodesets)
                        }
                        else if (namesession$Format[1] == "Siena net")
@@ -475,7 +478,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                         j=y[, 2],
                                         x=y[, 3])
                            } )
-                           tmp <- sienaNet(mylist, nodeSet=nodesets)
+                           tmp <- sienaDependent(mylist, nodeSet=nodesets)
 
                        }
                        else
@@ -494,7 +497,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                            namefiles[[1]][namefiles[[1]] %in% miss] <-  NA
                        ##  namefiles[[1]][grep(miss, namefiles[[1]])] <-  NA
                        assign(objnames[j],
-                              sienaNet(namefiles[[1]], type = 'behavior',
+                              sienaDependent(namefiles[[1]], type = 'behavior',
                                        nodeSet=namesession[1, "ActorSet"]))
                    },
                    'constant covariate' = {

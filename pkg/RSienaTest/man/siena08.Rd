@@ -4,7 +4,7 @@
 Function to perform a meta analysis of a collection of Siena fits.
 }
 \description{
-Estimates a meta analysis based on  a collection of Siena fits.
+Estimates a meta analysis based on a collection of Siena fits.
 }
 \usage{
 siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
@@ -35,6 +35,7 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
   maximum likelihood estimates and confidence intervals based on
   profile likelihoods under normality assumptions;
   and Fisher combinations of left-sided and right-sided p-values.
+  These are produced for all effects separately.
 
   Note that the corresponding effects must have the same effect name in each
   model fit. This implies that at least covariates and behavior variables must
@@ -91,7 +92,7 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
   of delinquent behavior on friendship
   evolution. \emph{Journal of Mathematical Sociology}, 27: 123--151, 2003.
 
-  See also \url{http://www.stats.ox.ac.uk/~snijders/siena/}
+  See also the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
 \author{Ruth Ripley, Tom Snijders}
 
@@ -99,13 +100,18 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
 }
 \examples{
 \dontrun{
-Group1 <- sienaNet(array(c(N3401, HN3401), dim=c(45, 45, 2)))
-Group3 <- sienaNet(array(c(N3403, HN3403), dim=c(37, 37, 2)))
-Group4 <- sienaNet(array(c(N3404, HN3404), dim=c(33, 33, 2)))
+# A meta-analysis for three groups does not make much sense
+# for generalizing to a population of networks,
+# but it the Fisher combinations of p-values are meaningful.
+# But using three groups shows the idea.
+
+Group1 <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))
+Group3 <- sienaDependent(array(c(N3403, HN3403), dim=c(37, 37, 2)))
+Group4 <- sienaDependent(array(c(N3404, HN3404), dim=c(33, 33, 2)))
 dataset.1 <- sienaDataCreate(Friends = Group1)
 dataset.3 <- sienaDataCreate(Friends = Group3)
 dataset.4 <- sienaDataCreate(Friends = Group4)
-OneModel <- sienaModelCreate(projname = 'SingleGroups')
+OneAlgorithm <- sienaAlgorithmCreate(projname = 'SingleGroups')
 effects.1 <- getEffects(dataset.1)
 effects.3 <- getEffects(dataset.3)
 effects.4 <- getEffects(dataset.4)
@@ -115,10 +121,13 @@ effects.3 <- includeEffects(effects.3, transTrip)
 effects.3 <- setEffect(effects.3, cycle3, fix=TRUE, test=TRUE)
 effects.4 <- includeEffects(effects.4, transTrip)
 effects.4 <- setEffect(effects.4, cycle3, fix=TRUE, test=TRUE)
-ans.1 <- siena07(OneModel, data=dataset.1, effects=effects.1, batch=TRUE)
-ans.3 <- siena07(OneModel, data=dataset.3, effects=effects.3, batch=TRUE)
-ans.4 <- siena07(OneModel, data=dataset.4, effects=effects.4, batch=TRUE)
-meta <- siena08(ans.1, ans.3, ans.4)
+ans.1 <- siena07(OneAlgorithm, data=dataset.1, effects=effects.1, batch=TRUE)
+ans.3 <- siena07(OneAlgorithm, data=dataset.3, effects=effects.3, batch=TRUE)
+ans.4 <- siena07(OneAlgorithm, data=dataset.4, effects=effects.4, batch=TRUE)
+ans.1
+ans.3
+ans.4
+(meta <- siena08(ans.1, ans.3, ans.4))
 }
 }
 \keyword{models}

@@ -95,6 +95,13 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 			}
         }
 		## add any effects needed for settings model
+# this now is replaced by adding the settings in getEffects,
+# which is the more logical place.		
+# If all works, this can be deleted,
+# and also the function addSettingsEffects can be deleted.
+# I used this function as a template for the change to getEffects.
+# I wonder why the next 8 lines cannot be dropped;
+# gives error message "cannot find setting col". 
 		if (!is.null(x$settings))
 		{
 			effects <- addSettingsEffects(effects, x)
@@ -285,13 +292,26 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         {
             if (!is.null(prevAns$dfra) &&
 				 nrow(prevAns$dfra) == nrow(requestedEffects) &&
-                all(rownames(prevAns$dfra) == requestedEffects$shortName)
-                && !is.null(prevAns$sf))
+                 all(rownames(prevAns$dfra) == requestedEffects$shortName) &&
+				 all(prevAns$fix == requestedEffects$fix) &&
+				 !is.null(prevAns$sf))
             {
                 z$haveDfra <- TRUE
                 z$dfra <- prevAns$dfra
                 z$dinv <- prevAns$dinv
+                z$dinvv <- prevAns$dinvv
                 z$sf <- prevAns$sf
+				# check for backward compatibility with pre-1.1-220 versions:
+				if (is.null(prevAns$regrCoef))
+				{
+					z$regrCoef <- rep(0, z$pp)
+					z$regrCor <- rep(0, z$pp)
+				}
+				else
+				{
+					z$regrCoef <- prevAns$regrCoef
+					z$regrCor <- prevAns$regrCor
+				}
             }
         }
         z$effects <- effects

@@ -1,9 +1,9 @@
 library(RSienaTest)
 
-mynet1 <- sienaNet(array(c(s501,s502,s503), dim=c(50, 50, 3)))
-mynet2 <- sienaNet(s50a, type='behavior')
+mynet1 <- sienaDependent(array(c(s501,s502,s503), dim=c(50, 50, 3)))
+mynet2 <- sienaDependent(s50a, type='behavior')
 mydata <- sienaDataCreate(mynet1, mynet2)
-#mynet1 <- sienaNet(array(c(s501,s502), dim=c(50, 50,2)))
+#mynet1 <- sienaDependent(array(c(s501,s502), dim=c(50, 50,2)))
 #mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, recip, include=TRUE)
@@ -11,7 +11,7 @@ myeff <- includeEffects(myeff, transTrip, inPopSqrt)
 myeff <- includeEffects(myeff, altX, interaction1='mynet2')
 myeff <- includeEffects(myeff, outRateInv, type="rate", include=TRUE)
 
-mynetm1 <- sienaNet(array(c(tmp3, tmp4), dim=c(32,32,2)))
+mynetm1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32,32,2)))
 mydatam <- sienaDataCreate(mynetm1)
 myeffm <- getEffects(mydatam)
 myeffm <- includeEffects(myeffm, transTrip, inPopSqrt)
@@ -85,7 +85,7 @@ MLmodel, mydata, myeff,
 
 ##bayes
 print("resp9")
-system.time(resp9 <- bayes(mydata, myeff, MLmodel, nwarm=100,nmain=100, nbrNodes=2))
+system.time(resp9 <- sienaBayes(mydata, myeff, MLmodel, nwarm=100,nmain=100, nbrNodes=2))
 
 
 system.time(resp1 <- algorithms(mydatam, myeffm, MOMmodel, nIter=20, numiter=20,
@@ -141,5 +141,5 @@ system.time(RSienaTest:::profileLikelihoods(resp8,
 
 ##bayes
 print("resp9")
-system.time(resp9 <- bayes(mydatam, myeffm, MLmodel,nwarm=10,nmain=10, nbrNodes=1, plot=TRUE))
+system.time(resp9 <- sienaBayes(mydatam, myeffm, MLmodel,nwarm=10,nmain=10, nbrNodes=1, plot=TRUE))
 

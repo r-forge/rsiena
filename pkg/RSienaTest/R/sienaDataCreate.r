@@ -238,7 +238,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
     v1 <- 0; v2 <- 0; v3 <- 0; v4 <- 0; v5 <- 0; v6 <- 0
     for (i in seq(along = dots))
         switch(class(dots[[i]]),
-               sienaNet = {
+               sienaDependent = {
                    if (attr(dots[[i]],'sparse'))
                    {
                        ##  require(Matrix)

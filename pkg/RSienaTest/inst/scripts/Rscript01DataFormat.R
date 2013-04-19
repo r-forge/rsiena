@@ -2,7 +2,7 @@
 ###
 ### ---- Rscript01DataFormat.R: a script for the introduction to RSiena -------------
 ###
-###                               version: January 17, 2012
+###                               version: April 14, 2013
 ###################################################################################
 #
 # Rscript01DataFormat.R is followed by
@@ -69,7 +69,7 @@
 
 # The library command loads the packages needed during the session.
 
-        library(RSiena)
+		library(RSienaTest)
 
 # Some additional packages are used by RSiena,
 # the so-called required packages; these will be loaded automatically.
@@ -103,7 +103,7 @@
 #
 # but note that "\" has to be changed; both '/' and '\\' work!!!
 
-# What is there?
+# What is in this directory?
 
          list.files()
 
@@ -114,8 +114,8 @@
 # (these are .htlm HELP PAGES)
 
 # At the bottom of this page, when you click on "Index",
-# a list of all the available functions is shouwn in your browser.
-# The same list is shown in the gui ('graphical user interface') by requesting
+# a list of all the available functions is shown in your browser.
+# The same list is shown in the graphical user interface for R by requesting
 
          library(help=RSiena)
 
@@ -147,7 +147,7 @@
 
 #-----------------------------------------------------------------------------
 
-# Quick start(Data assignment).
+# Quick start (Data assignment).
 # Please make sure the s50 data set is in your working directory.
 # The data set is on the Siena website ("Data sets" tab) and must be
 # unzipped in your working directory.
@@ -232,6 +232,7 @@
 		data[ 1:3, ]
 ### columns 2, 5, and 6 are given by
 		data[ , c( 2, 5, 6) ]
+### Indeed there are a lot of zeros - networks tend to be sparse.
 
 ### ---- Converting data frame to matrix -------------------------------------------
 ###
@@ -416,6 +417,6 @@
 
 ################################################################################
 ###
-### ---- PROCEED TO RscriptSNADescriptives.R FOR DESCRIPTIVE ANAYLSIS ----------
+### ---- PROCEED TO RscriptSNADescriptives.R FOR DESCRIPTIVE ANALYSIS ----------
 ###
 ################################################################################

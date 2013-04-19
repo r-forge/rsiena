@@ -287,7 +287,7 @@ AnnouncePhase <- function(z, x, subphase=NULL)
    }
     if (z$Phase==2)
     {
-        propo <- z$n1pos + z$n2partsum[subphase]
+        propo <- z$n1pos + z$n2partsum[max(subphase,1)]
         if (propo> getProgressBar(z$pb))
             z$pb <-setProgressBar(z$pb,propo)
     }

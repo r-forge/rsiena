@@ -960,7 +960,7 @@ profileLikelihoods <- function(resp, x, data, effects,
     }
     else # contour for 2
     {
-        grid2 <- sort(seq(thetaFix[j]*gridl[1], thetaFix[j] * gridl[2],
+       grid2 <- sort(seq(thetaFix[j]*gridl[1], thetaFix[j] * gridl[2],
                           len=seqlen))
         fix[j] <- TRUE
         xy <- expand.grid(grid1, grid2)

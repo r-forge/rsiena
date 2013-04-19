@@ -6,25 +6,57 @@
 ## * File: sienaprint.r
 ## *
 ## * Description: This file contains the print and summary modules for the
-## * classes siena, sienaFit and sienaModel
+## * classes siena, sienaFit and sienaAlgorithm.
 ## *
 ## ****************************************************************************/
 ##@print.siena Methods
 print.siena <- function(x, ...)
 {
+    ##@onlys internal print.siena; prints matrix attributes of x$depvar
+	onlys <- function(x, attrib){
+	# function to print the attribute attrib (character string)
+	# of object x$depvars
+	# This attribute must be a logical matrix
+	# with named columns, and rows indicating periods.
+		textattr <- deparse(substitute(attrib),  backtick=FALSE)
+		uponlys <- sapply(x$depvars, function(y){attr(y,attrib)})
+		for (j in 1:dim(uponlys)[2])
+		{
+			if (any(uponlys[,j]))
+			{
+				cat(textattr)
+				cat(":  ", colnames(uponlys)[j], ":    ", sep="")
+				if (all(uponlys[,j]))
+				{
+					cat("all periods\n")
+				}
+				else
+				{
+					word <-
+						ifelse((sum(uponlys[,j]) <= 1), "period ", "periods ")
+					cat(word)
+					cat(which(uponlys[,j]), sep=", ")
+					cat("\n")
+				}
+			}
+		}
+	}
+# begin main method siena.print proper
 	if (!inherits(x, "siena"))
 	{
         stop("not a legitimate Siena data object")
 	}
 	cat('Dependent variables: ', paste(names(x$depvars), collapse=", "), "\n")
 	cat('Number of waves:', x$observations, "\n")
-	if (!is.null(x$nodesets))
+	if (!is.null(x$nodeSet))
 	{
-		tmp <- cbind(c('Nodesets',
-					   paste(names(x$nodesets), collapse=", ")),
-					 c('Number of nodes', sapply(x$nodesets, length)))
-		print(tmp)
+		tmp <- cbind(c('Nodesets      ',
+					   paste(names(x$nodeSet), collapse=", ")),
+					 c('Number of nodes', sapply(x$nodeSet, length)))
+		dimnames(tmp) <-list(rep("", dim(tmp)[1]), rep("", dim(tmp)[2]))
+		print(tmp, quote=FALSE, print.gap=0)
 	}
+	cat("\n")
 	if (length(x$cCovars) > 0)
 	{
 		cat('Constant covariates: ', paste(names(x$cCovars), collapse=", "), "\n")
@@ -44,21 +76,25 @@ print.siena <- function(x, ...)
 		cat('Changing dyadic covariates: ',
 			paste(names(x$dyvCovars), collapse=", "), "\n")
 	}
+
+	onlys(x, 'uponly')
+	onlys(x, 'downonly')
+
 	attrs <- attributes(x)
 	highers <- attrs[["higher"]]
 	disjoints <- attrs[["disjoint"]]
 	atleastones <- attrs[["atLeastOne"]]
 	if (any(highers))
 	{
-		cat("Higher: ", names(highers)[highers], "\n")
+		cat("Higher: ", names(highers)[highers], sep="", "\n")
 	}
 	if (any(disjoints))
 	{
-		cat("Disjoint: ", names(disjoints)[disjoints], "\n")
+		cat("Disjoint: ", names(disjoints)[disjoints], sep="",  "\n")
 	}
 	if (any(atleastones))
 	{
-		cat("atLeatOne: ", names(atleastones)[atleastones], "\n")
+		cat("atLeastOne: ", names(atleastones)[atleastones], sep="",  "\n")
 	}
 	invisible(x)
 }
@@ -157,6 +193,8 @@ print.summary.sienaFit <- function(x, ...)
         stop("not a legitimate summary of a Siena model fit")
 	}
 	print.sienaFit(x)
+	cat(c("Overall maximum convergence ratio: ",
+		sprintf("%8.4f", x$tconv.max), "\n\n"))
 	if (sum(x$test) > 0) ## we have some score tests
 	{
 		testn <- sum(x$test)
@@ -246,7 +284,7 @@ print.summary.sienaFit <- function(x, ...)
         }
         cat('\n')
    }
-   if (x$OK)
+   if ((x$OK)&(!is.null(x$covtheta)))
    {
        cat("Covariance matrix of estimates (correlations below diagonal)\n\n")
        covcor <- x$covtheta
@@ -271,13 +309,15 @@ printMatrix <- function(mat)
 {
     cat(mat, sep=c(rep.int(' ', ncol(mat) - 1), '\n'))
 }
-##@print.sienaModel Methods
-print.sienaModel <- function(x, ...)
+##@print.sienaAlgorithm Methods
+print.sienaAlgorithm <- function(x, ...)
 {
-    cat('\n Project name:', x$projname, '\n')
-    cat('\n Use standard initial values:', x$useStdInits, '\n')
+    cat(' Project name:', x$projname, '\n')
+    cat(' Use standard initial values:', x$useStdInits, '\n')
     cat(' Random seed:', x$randomSeed,'\n')
-    cat(' Starting value of gain parameter', x$firstg, '\n')
+    cat(' Starting value of gain parameter:', x$firstg, '\n')
+	cat(' Diagonalization parameter:', x$diagonalize, '\n')
+	cat(' Dolby noise reduction:', x$dolby, '\n')
     if (any(x$MaxDegree > 0))
     {
         cat(' Restrictions on degree in simulations:')
@@ -317,7 +357,6 @@ print.sienaModel <- function(x, ...)
 	}
     cat(" Model Type:", ModelTypeStrings[x$modelType], "\n")
     invisible(x)
-
 }
 ##@sienaFitThetaTable Miscellaneous
 sienaFitThetaTable <- function(x, tstat=FALSE)
@@ -399,11 +438,16 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
         addtorow$pos[[addsub]] <- nrates + 2
         addsub <- addsub + 1
     }
-
-    ses <- sqrt(diag(x$covtheta))
-    ses[x$fixed] <- NA
+	if (!is.null(x$covtheta))
+	{
+		ses <- sqrt(diag(x$covtheta))
+		ses[x$fixed] <- NA
+	}
     theta <- x$theta
-    theta[diag(x$covtheta) < 0.0] <- NA
+	if (!is.null(x$covtheta))
+	{
+		theta[diag(x$covtheta) < 0.0] <- NA
+	}
 
     if (nBehavs > 0)
     {
@@ -425,7 +469,10 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
                                                "creat", effects$type)
     mydf[nrates + (1:x$pp), 'text' ] <- effects$effectName
     mydf[nrates + (1:x$pp), 'value' ] <- theta
-    mydf[nrates + (1:x$pp), 'se' ] <- ses
+	if (exists("ses"))
+	{
+		mydf[nrates + (1:x$pp), 'se' ] <- ses
+	}
     if (!is.null(x$tstat))
     {
         mydf[1:nrates, "tstat"] <- NA
@@ -527,6 +574,7 @@ print.xtable.sienaFit <- function(x, ...)
     invisible(x)
 }
 
+##@print.chains.data.frame Methods
 print.chains.data.frame <- function(x, ...)
 {
     NextMethod(x)
@@ -542,4 +590,33 @@ print.chains.data.frame <- function(x, ...)
 		cat("\n End State Differences:\n")
 		print(endState)
 	}
+}
+
+##@maketemp Methods
+makeTemp <- function(x, ...)
+{
+# This reproduces a part of sienaFit but with Bayesian headings;
+# for use in print.sienaBayesFit and summary.sienaBayesFit
+		name1 <- x$requestedEffects$groupName[1]
+		x$requestedEffects <-
+			x$requestedEffects[x$requestedEffects$groupName==name1,]
+		x$pp <- length(x$theta)
+		x$fixed <- x$fixed[x$effects$groupName==name1]
+		tmp <- sienaFitThetaTable(x)
+		mydf <- tmp$mydf
+		mymat <- as.matrix(mydf[,names(mydf)!="tstat"])
+		mymat[, 'value'] <- format(round(mydf$value, digits=4))
+		mymat[, 'se'] <- format(round(mydf$se, digits=4))
+		mymat[, 'type'] <- format(mymat[, 'type'])
+		mymat[, 'text'] <- format(mymat[, 'text'])
+		mymat[mydf$row < 1, 'row'] <-
+			format(mydf[mydf$row < 1, 'row'])
+		mymat[mydf[,'row'] >= 1, 'row'] <-
+			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
+		mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post.   ", ""),
+					   c(rep("", 4),  "mean    ", "", "s.d.    ", ""),
+						mymat)
+		mymat <- apply(mymat, 2, format)
+		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
+		list(tmp, tmp1)
 }
