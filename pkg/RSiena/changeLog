@@ -1,3 +1,15 @@
+2013-04-20 R-forge revision 228
+Changes only in RSiena:
+Files
+\pkg\RSiena\src\model\variables\DiffusionEffectValueTable.cpp
+\pkg\RSiena\src\model\variables\DiffusionEffectValueTable.h
+\pkg\RSiena\man\sienaGOF-auxiliary.Rd
+\pkg\RSiena\man\sienaGOF.Rd
+were erroneously not committed in revision 227.
+Therefore this was done now. Also, file
+\pkg\RSiena\inst\doc\effects.pdf
+was updated.
+
 2013-04-19 R-forge revision 227
 Changes in RSiena as well as RSienaTest;
 both now are very similar; sienaBayes, algorithms, and profileLikelihoods
