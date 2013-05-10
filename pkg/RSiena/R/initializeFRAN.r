@@ -96,12 +96,12 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         }
 		## add any effects needed for settings model
 # this now is replaced by adding the settings in getEffects,
-# which is the more logical place.		
+# which is the more logical place.
 # If all works, this can be deleted,
 # and also the function addSettingsEffects can be deleted.
 # I used this function as a template for the change to getEffects.
 # I wonder why the next 8 lines cannot be dropped;
-# gives error message "cannot find setting col". 
+# gives error message "cannot find setting col".
 		if (!is.null(x$settings))
 		{
 			effects <- addSettingsEffects(effects, x)
@@ -504,7 +504,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
     }
     else
     {
-        MAXDEGREE <- as.integer(x$MaxDegree)
+        MAXDEGREE <- x$MaxDegree
         storage.mode(MAXDEGREE) <- "integer"
     }
     if (z$cconditional)
@@ -529,7 +529,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
                  profileData, z$parallelTesting, x$modelType, z$simpleRates)
-
     if (x$maxlike)
     {
         if (!initC)

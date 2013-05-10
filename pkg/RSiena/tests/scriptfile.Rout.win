@@ -521,8 +521,8 @@ _D_e_t_a_i_l_s:
 
        Package:             RSiena                                                    
        Type:                Package                                                   
-       Version:             1.1-227                                                   
-       Date:                2013-04-19                                                
+       Version:             1.1-230                                                   
+       Date:                2013-05-10                                                
        Depends:             R (>= 2.15.0)                                             
        Imports:             Matrix                                                    
        Suggests:            tcltk, snow, rlecuyer, network, codetools, lattice, MASS, 
@@ -537,7 +537,7 @@ _A_u_t_h_o_r(_s):
 
      Ruth Ripley, Krists Boitmanis, Tom Snijders.  Contributions by
      Josh Lospinoso, Charlotte Greenan, Christian Steglich, Johan
-     Koskinen, and Mark Ortmann.
+     Koskinen, Mark Ortmann, and Nynke Niezink.
 
      Maintainer: RSiena developers <rsiena@stats.ox.ac.uk>
 
@@ -599,8 +599,8 @@ Package:              RSiena
 Type:                 Package
 Title:                Siena - Simulation Investigation for Empirical
                       Network Analysis
-Version:              1.1-227
-Date:                 2013-04-19
+Version:              1.1-230
+Date:                 2013-05-10
 Author:               Various
 Depends:              R (>= 2.15.0)
 Imports:              Matrix
@@ -614,8 +614,8 @@ LazyLoad:             yes
 LazyData:             yes
 BuildResaveData:      no
 URL:                  http://www.stats.ox.ac.uk/~snijders/siena
-Packaged:             2013-04-19 15:17:09 UTC; Tom.Snijders
-Built:                R 3.0.0; i386-w64-mingw32; 2013-04-19 15:17:37
+Packaged:             2013-05-10 14:08:57 UTC; Tom.Snijders
+Built:                R 3.0.0; i386-w64-mingw32; 2013-05-10 14:13:09
                       UTC; windows
 
 Index:
@@ -1908,10 +1908,16 @@ $nodeSet
 > 
 > 		mydata
 Dependent variables:  friendship 
-Number of waves: 3 
-                             
-Nodesets      Number of nodes
-Actors        50             
+Number of observations: 3 
+
+Nodeset                  Actors 
+Number of nodes              50 
+
+Dependent variable friendship      
+Type               oneMode         
+Observations       3               
+Nodeset            Actors          
+Densities          0.046 0.047 0.05
 
 Constant covariates:  smoke1 
 Changing covariates:  alcohol 
@@ -2238,7 +2244,8 @@ _R_e_f_e_r_e_n_c_e_s:
 
 _S_e_e _A_l_s_o:
 
-     'getEffects', 'setEffect', 'effectsDocumentation',
+     'getEffects', 'setEffect', 'includeInteraction',
+     'effectsDocumentation'
 
 _E_x_a_m_p_l_e_s:
 
@@ -2794,7 +2801,7 @@ Covariance matrix of X (correlations below diagonal):
 > 
 > 		xtable( ans )
 % latex table generated in R 3.0.0 by xtable 1.7-1 package
-% Fri Apr 19 16:27:26 2013
+% Fri May 10 15:26:44 2013
 \begin{table}[ht]
 \centering
 \begin{tabular}{llllrlrlr}
@@ -2821,7 +2828,7 @@ Covariance matrix of X (correlations below diagonal):
 > 
 > 		xtable( ans, type = 'html' )
 <!-- html table generated in R 3.0.0 by xtable 1.7-1 package -->
-<!-- Fri Apr 19 16:27:26 2013 -->
+<!-- Fri May 10 15:26:44 2013 -->
 <TABLE border=1>
   <TR> <TD colspan=9 align=left> Rate parameters:  </TD> </TR> <TR> </TR> 
  <TR> <TD>   </TD> <TD> 0.1 </TD> <TD>  </TD> <TD> Rate parameter period 1 </TD> <TD align="right"> 6.60 </TD> <TD> ( </TD> <TD align="right"> 1.14 </TD> <TD> ) </TD> <TD align="right">  </TD> </TR>
@@ -3563,4 +3570,4 @@ drinkingbeh.obj.eval.6   FALSE
 > 
 > proc.time()
    user  system elapsed 
- 429.82    5.19  477.20 
+ 478.29    6.39  525.09 

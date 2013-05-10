@@ -43,8 +43,8 @@ short names to identify the effects which should be included or excluded.
   The names \code{interaction1} and \code{interaction2} do not refer
   to interactions between effects, but to dependence of effects on
   other variables in the data set.
-  The arguments should identify the effects completely. 
-  
+  The arguments should identify the effects completely.
+
   A list of all effects available in a given effects object (e.g.,
   \code{myeff}), including their names of dependent variables,
   effect names, short names,
@@ -63,7 +63,8 @@ short names to identify the effects which should be included or excluded.
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
 \seealso{
-  \code{\link{getEffects}}, \code{\link{setEffect}}, \code{\link{effectsDocumentation}},
+  \code{\link{getEffects}}, \code{\link{setEffect}},
+  \code{\link{includeInteraction}}, \code{\link{effectsDocumentation}}
 }
 
 \examples{

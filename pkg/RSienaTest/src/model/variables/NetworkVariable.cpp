@@ -713,6 +713,7 @@ void NetworkVariable::calculatePermissibleChanges()
 	{
 		m = this->lsetting->size();
 	}
+// Rprintf("MaxDegree %d \n", pData->maxDegree());
 
 	for (int ii = 0; ii < m; ii++)
 	{
@@ -722,6 +723,8 @@ void NetworkVariable::calculatePermissibleChanges()
 			i = (*this->lsetting)[ii];
 		}
 
+ 
+		
 		if (this->lpNetworkCache->outTieExists(i))
 		{
 			this->lpermitted[i] = !pData->upOnly(this->period());
@@ -760,10 +763,10 @@ void NetworkVariable::calculatePermissibleChanges()
 		pFilter->filterPermittedChanges(this->lego, this->lpermitted);
 		//Rprintf(" filtered %d %d\n ", i, this->lpermitted[10]);
 	}
-	//if (this->id() > 0)
+//	if (this->id() > 0)
 //	for (int i = 0; i < m; i++)
 //	 {
-		 //	 Rprintf("permitted %d %d %d\n", i, this->lpermitted[i], m);
+//		 	 Rprintf("permitted %d %d %d\n", i, this->lpermitted[i], m);
 //	 }
 
 

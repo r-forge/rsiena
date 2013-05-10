@@ -6,7 +6,7 @@
 ## * File: sienaprint.r
 ## *
 ## * Description: This file contains the print and summary modules for the
-## * classes siena, sienaFit, sienaAlgorithm, and sienaBayesFit
+## * classes siena, sienaFit, sienaDependent, sienaAlgorithm, and sienaBayesFit
 ## *
 ## ****************************************************************************/
 ##@print.siena Methods
@@ -19,7 +19,7 @@ print.siena <- function(x, ...)
 	# This attribute must be a logical matrix
 	# with named columns, and rows indicating periods.
 		textattr <- deparse(substitute(attrib),  backtick=FALSE)
-		uponlys <- sapply(x$depvars, function(y){attr(y,attrib)})
+		uponlys <- t(as.matrix(sapply(x$depvars, function(y){attr(y,attrib)})))
 		for (j in 1:dim(uponlys)[2])
 		{
 			if (any(uponlys[,j]))
@@ -47,16 +47,55 @@ print.siena <- function(x, ...)
         stop("not a legitimate Siena data object")
 	}
 	cat('Dependent variables: ', paste(names(x$depvars), collapse=", "), "\n")
-	cat('Number of waves:', x$observations, "\n")
+	cat('Number of observations:', x$observations, "\n\n")
 	if (!is.null(x$nodeSet))
 	{
-		tmp <- cbind(c('Nodesets      ',
-					   paste(names(x$nodeSet), collapse=", ")),
-					 c('Number of nodes', sapply(x$nodeSet, length)))
-		dimnames(tmp) <-list(rep("", dim(tmp)[1]), rep("", dim(tmp)[2]))
-		print(tmp, quote=FALSE, print.gap=0)
+		tmp <- sapply(x$nodeSet, length)
+		if (length(x$nodeSet) <= 1)
+		{
+			tmp <- c('Nodeset        ' = 'Number of nodes', tmp)
+		}
+		else
+		{
+			tmp <- c('Nodesets       ' = 'Number of nodes', tmp)
+		}
+		print(tmp, quote=FALSE)
+		cat("\n")
 	}
-	cat("\n")
+	
+	for (j in (1:length(x$depvars)))
+	{
+		xj <- x$depvars[[j]]
+		mymat <- matrix("", 7, 2)
+		mymat[1,] <- c("Dependent variable", attr(xj, "name"))
+		mymat[2,] <- c("Type",               attr(xj, "type"))
+		mymat[3,] <- c("Observations",       attr(xj,  "netdims")[3])
+		if (attr(xj, "type") == "bipartite")
+		{	
+			mymat[4,] <- c("First nodeset ", attr(xj, "nodeSet")[1])
+			mymat[5,] <- c("Second nodeset ",attr(xj, "nodeSet")[2])
+			nrows <- 5
+		}
+		else
+		{
+			mymat[4,] <- c("Nodeset ", attr(xj, "nodeSet"))
+			nrows <- 4
+		}	
+		if (attr(xj, "type") == "behavior")
+		{
+			mymat[nrows+1,] <- c("Range", 
+				paste(attr(xj, "range2"),  collapse=" - "))
+		}
+		else
+		{
+			mymat[nrows+1,] <- c("Densities", 
+				paste(signif(attr(xj, "density"), 2),  collapse=" "))
+		}
+		mymat2 <- apply(mymat[0:nrows+1,], 2, format)
+		write.table(mymat2, row.names=FALSE, col.names=FALSE, quote=FALSE)
+		cat("\n")
+	}
+	
 	if (length(x$cCovars) > 0)
 	{
 		cat('Constant covariates: ', paste(names(x$cCovars), collapse=", "), "\n")
@@ -110,6 +149,39 @@ print.sienaGroup <- function(x, ...)
 	cat(paste(att$netnames, ":", att$types),'\n')
 	cat('Total number of periods:', att$observations)
 	cat("\nmore to be added!\n")
+	invisible(x)
+}
+
+print.sienaDependent <- function(x, ...)
+{
+	if (!inherits(x, "sienaDependent"))
+	{
+        stop("not a legitimate Siena dependent variable object")
+	}
+	mymat <- matrix("", 4, 2)
+	mymat[1,] <- c("Type",               attr(x, "type"))
+	mymat[2,] <- c("Observations",       attr(x,  "netdims")[3])
+	if (attr(x, "type") == "bipartite")
+	{
+		mymat[3,] <- c("First nodeset ",
+						paste(attr(x, "nodeSet")[1], " (", attr(x, "netdims")[1],
+							" elements)", sep=""))
+		mymat[4,] <- c("Second nodeset ",
+						paste(attr(x, "nodeSet")[2], " (", attr(x, "netdims")[2],
+							" elements)", sep=""))
+		nrows <- 4
+	}
+	else
+	{
+		mymat[3,] <- c("Nodeset ",
+						paste(attr(x, "nodeSet"), " (", attr(x, "netdims")[1],
+							" elements)", sep=""))
+		nrows <- 3
+	}
+
+	mymat <- apply(mymat, 2, format)
+	write.table(mymat[1:nrows,], row.names=FALSE, col.names=FALSE, quote=FALSE)
+	cat("\n")
 	invisible(x)
 }
 
