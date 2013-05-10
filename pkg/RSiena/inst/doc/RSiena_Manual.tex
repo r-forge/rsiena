@@ -704,7 +704,8 @@ RShowDoc("RSiena_Manual", package="RSiena")
 \item Use \sfn{getEffects()} to create an effects object.
 \item Use \sfn{fix()} to edit the effects object and select the required
   effects, by altering the \sfn{Include} column to \sfn{TRUE}.
-\item Use \sfn{sienaModelCreate()} to create a model object.
+\item Use \sfn{sienaAlgorithmCreate()} to create a \sfn{sienaAlgorithm} object, containing
+  the specifications for the estimation algorithm.
 \item Use \sfn{siena07()} to run the estimation procedure.
 \end{enumerate}
 Basic output will be written to a file. Further output can be obtained by using
@@ -728,8 +729,9 @@ the\\ \sfn{verbose=TRUE} option of \sfn{siena07}.
 \item Create a \SI data object using \sfn{SienaDataCreate()}.
 \item Use \sfn{getEffects()} to create an effects object.
 \item Use functions such as \sfn{includeEffects()}, \sfn{setEffect()},
- and \sfn{includeInteraction()} to further specify the model.
-\item Use \sfn{sienaModelCreate()} to create a model object.
+  and \sfn{includeInteraction()} to further specify the model.
+\item Use \sfn{sienaAlgorithmCreate()} to create a a \sfn{sienaAlgorithm} object, containing
+  the specifications for the estimation algorithm.
 \item Use \sfn{siena07()} to run the estimation procedure.
 \item Note that it is possible to use multiple processes in \sfn{siena07}. For
   details see section~\ref{S_multipleProcesses}.
@@ -763,7 +765,7 @@ menu, and entering this file name. It can also be done by entering the command
 \begin{verbatim}
 load("trans.RData")
 \end{verbatim}
-This will make available three objects, for data, model, and effects.
+This will make available three objects, for data, algorithm, and effects.
 What is currently in your workspace is shown by the command
 \begin{verbatim}
 ls()
@@ -771,7 +773,7 @@ ls()
 This will probably show that the loaded objects have the names
 \sfn{mydata}, \sfn{mymodel}, and \sfn{myeff}.
 These are the type of objects created by the functions \sfn{sienaDataCreate},
-\sfn{sienaModelCreate}, and \sfn{getEffects},
+\sfn{sienaAlgorithmCreate}, and \sfn{getEffects},
 and discussed in the \SI script in Section~\ref{S_Rscript}.
 
 Now attach the package \RS and subsequently ask for the descriptions of these
@@ -923,7 +925,7 @@ multiple processes can speed up the estimation in \sfn{siena07}.
       step sizes in the parameter updates in the iterative
       algorithm.
       This is the parameter called \textsf{firstg}
-      in function \textsf{sienaModelCreate}.
+      in function \textsf{sienaAlgorithmCreate}.
       A too low value implies that it takes very long to attain a
       reasonable parameter estimate when starting from an initial
       parameter value that is far from the `true' parameter estimate.
@@ -1033,7 +1035,7 @@ model specifications followed by estimation or simulation.
 
 The main output is written to a text file named
 \textsf{\textsl{pname}.out}, where \textsf{\textsl{pname}} is the name
-specified in the call of \textsf{sienaModelCreate()}.
+specified in the call of \textsf{sienaAlgorithmCreate()}.
 
 \newpage
 
@@ -2780,7 +2782,7 @@ and then employs a model for this special case.
 For non-directed networks, the Model Type has five possible values,
 as described in \citet{Snijders07}.
 This is specified by the parameter \sfn{modelType} in function
-\sfn{sienaModelCreate}.
+\sfn{sienaAlgorithmCreate}.
 Value \texttt{modelType = 1} is for directed networks, values
 \texttt{2-6} for non-directed networks.
 
@@ -3470,7 +3472,7 @@ This is meaningful only if the observed networks also do
 not have a larger outdegree than this number, for any actor at any wave.
 
 This is carried out by specifying the maximum allowed value
-in the \textsf{MaxDegree} parameter of the \textsf{sienaModelCreate}
+in the \textsf{MaxDegree} parameter of the \textsf{sienaAlgorithmCreate}
 function, which determines the settings of the algorithm.
 
 \textsf{MaxDegree} is a named vector, which means that its elements
@@ -3596,24 +3598,24 @@ and how to go on if this is not satisfactory.
 The estimation algorithm is determined by a call of functions
 such as
 \begin{verbatim}
-model1    <-  sienaModelCreate(projname = "trypro", useStdInits = FALSE)
-results1  <-  siena07(model1, data = mydata, effects = myeff)
+algorithm1    <-  sienaAlgorithmCreate(projname = "trypro", useStdInits = FALSE)
+results1      <-  siena07(algorithm1, data = mydata, effects = myeff)
 \end{verbatim}
-The function \textsf{sienaModelCreate} defines a model object with
-options for the algorithm, and the function  \textsf{siena07}
+The function \textsf{sienaAlgorithmCreate} defines an algorithm specification
+object with options for the algorithm, and the function  \textsf{siena07}
 carries out the estimation.
 If you do not want to see the graphical interface with intermediate
 results, or if your computer has problems showing this, then add
 the option \texttt{batch = TRUE}, as in
 \begin{verbatim}
-results1  <-  siena07(model1, data = mydata, effects = myeff,
+results1  <-  siena07(algorithm1, data = mydata, effects = myeff,
                       batch = TRUE)
 \end{verbatim}
 If you wish to have detailed information at the console about the intermediate
 steps taken by the algorithm, then add
 the option \texttt{verbose = TRUE}, as in
 \begin{verbatim}
-results1  <-  siena07(model1, data = mydata, effects = myeff,
+results1  <-  siena07(algorithm1, data = mydata, effects = myeff,
                       verbose = TRUE)
 \end{verbatim}
 
@@ -3656,7 +3658,7 @@ the covariance/correlation matrix of the estimators.
 If the estimation procedures diverges, i.e., the parameter values obtained
 are very large (e.g., larger than 50 except for covariates that have
 a very small standard deviation), then try running it with
-\sfn{diagonalize = 1} in the call of \sfn{sienaModelCreate};
+\sfn{diagonalize = 1} in the call of \sfn{sienaAlgorithmCreate};
 see the help file for further information.
 
 \subsubsection{Initial Values}
@@ -3694,7 +3696,7 @@ myeff$initialValue[myeff$include]
       (`previous answer')
       parameter is used, such as in
       \begin{verbatim}
-results1 <- siena07(model1, data = mydata, effects = myeff,
+results1 <- siena07(algorithm1, data = mydata, effects = myeff,
                     prevAns = results0)
       \end{verbatim}
       the initial parameter estimates are taken from the results of
@@ -3713,7 +3715,7 @@ results1 <- siena07(model1, data = mydata, effects = myeff,
       parameters that do match, the initial values are copied
       from \texttt{results0} and Phase 1 is carried out as usual.
 \item If \texttt{useStdInits = TRUE} is used in the call of
-      \textsf{sienaModelCreate}, standard initial values are used.\\
+      \textsf{sienaAlgorithmCreate}, standard initial values are used.\\
       These consist of some reasonable values for the rate parameters and the
       outdegree parameter, as well as for the linear shape parameter
       for behavioral dependent variables (if any);
@@ -3756,7 +3758,7 @@ using this result in the \textsf{prevAns} (`previous answer')
 parameter, while taking care that  \texttt{useStdInits = FALSE}
 has been specified. An example is
 \begin{verbatim}
-results1 <- siena07(model1, data = mydata, effects = myeff,
+results1 <- siena07(algorithm1, data = mydata, effects = myeff,
                     prevAns = results1)
 \end{verbatim}
 In this case, this second estimation run produced good results, with a
@@ -3936,7 +3938,7 @@ initial value.
 
 The number of subphases in phase 2, and the number of runs in
 phase 3, are determined by parameters \textsf{nsub} and \textsf{n3}
-in the call of \textsf{sienaModelCreate}.
+in the call of \textsf{sienaAlgorithmCreate}.
 
 During the estimation process, if the graphical user interface
 is used (the default \\
@@ -3989,7 +3991,7 @@ Output can be obtained in several ways.
         read by any text editor.
         It is called \textsf{\textsl{pname}.out},
         where \textsf{\textsl{pname}} is the name
-        specified in the call of \textsf{sienaModelCreate()}.
+        specified in the call of \textsf{sienaAlgorithmCreate()}.
 
         This output file is divided into sections
         indicated by a line {\tt @1},
@@ -4192,7 +4194,7 @@ assumes and requires that the uncertainty about parameters is expressed
 itself in a probability distribution.
 
 ML estimation is done by the function \sfn{siena07()}, using a set of options
-created by \sfn{sienaModelCreate()} with \sfn{maxlike=TRUE}.
+created by \sfn{sienaAlgorithmCreate()} with \sfn{maxlike=TRUE}.
 Bayesian estimation is done by the function \sfn{sienaBayes()}.
 The following further information in this section is about ML estimation;
 Bayesian estimation is a very new option (summer 2012) and further documentation
@@ -4396,7 +4398,7 @@ parameters estimated by this algorithm.
 
 The choice between
 unconditional and the different types of conditional estimation is
-made in the \textsf{sienaModelCreate} function by setting the
+made in the \textsf{sienaAlgorithmCreate} function by setting the
 \textsf{cond} parameter.
 For data specifications with multiple dependent variables,
 at most one dependent variable can be used for conditioning.
@@ -4518,7 +4520,7 @@ published results, it is recommended to have 2000 or 4000 iterations in phase 3.
 
 The method for estimating derivatives is set
 by the \sfn{findiff} parameter and the number of iterations in phase 3
-by the \sfn{n3} parameter, both in function \sfn{sienaModelCreate()}
+by the \sfn{n3} parameter, both in function \sfn{sienaAlgorithmCreate()}
 that creates the object with specifications for the algorithm.
 
 \subsection{Multicollinearity}
@@ -5088,12 +5090,12 @@ test to your dataset, run an estimation in the usual way, e.g. as follows
 (we specify \texttt{nsub=2, n3=100} just to have an example that runs
 very quickly):
 \begin{verbatim}
-mymodel <- sienaModelCreate(fn=simstats0c, nsub=2, n3=100)
-mynet1  <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mydata  <- sienaDataCreate(mynet1)
-myeff   <- getEffects(mydata)
-myeff   <- includeEffects(myeff, transTrip, balance)
-ans2    <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+myalgorithm <- sienaAlgorithmCreate(fn=simstats0c, nsub=2, n3=100)
+mynet1      <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mydata      <- sienaDataCreate(mynet1)
+myeff       <- getEffects(mydata)
+myeff       <- includeEffects(myeff, transTrip, balance)
+ans2        <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 \end{verbatim}
 and conduct the timetest through
 \begin{verbatim}
@@ -5105,7 +5107,7 @@ If as a consequence of this analysis you wish to add time dummy terms,
 this may be done via
 \begin{verbatim}
 myeff <- includeTimeDummy(myeff, recip, balance, timeDummy="2")
-ans3  <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE)
+ans3  <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 \end{verbatim}
 and testing again,
 \begin{verbatim}
@@ -5130,12 +5132,12 @@ also used for parameter estimation, but by calling it in
 such a way that only Phase 3 is carried out
 (see section~\ref{S_algorithm}).
 This is done by requesting \texttt{nsub = 0} in
-the model specification in function \textsf{sienaModelCreate}.
+the model specification in function \textsf{sienaAlgorithmCreate}.
 By also requesting \texttt{simOnly = TRUE} the calculation
 of standard errors, which usually is not meaningful when
 simulating without estimating, is suppressed.
 \begin{verbatim}
-sim_model  <-  sienaModelCreate( projname = 'sim_model', cond = FALSE,
+sim_model  <-  sienaAlgorithmCreate( projname = 'sim_model', cond = FALSE,
                       useStdInits = FALSE, nsub = 0 , simOnly = TRUE)
 sim_ans    <-  siena07( sim_model, data = mydata, effects = myeff )
 \end{verbatim}
@@ -5208,7 +5210,7 @@ in the statistics internally calculated,
 then the entire networks can be accessed.
 This is done by using the \textsf{returnDeps} option, as follows.
 \begin{verbatim}
-sim_ans <- siena07( mymodel, data = mydata, effects = myeff,
+sim_ans <- siena07( myalgorithm, data = mydata, effects = myeff,
                     returnDeps = TRUE )
 \end{verbatim}
 The \texttt{returnDeps = TRUE} option attaches a list \texttt{sim\_ans\$sims}
@@ -5308,7 +5310,7 @@ is the same for the simulation as for
 of \si, described in Section~\ref{S_cond}.
 The choice between conditional and
 unconditional simulation is
-made in the \textsf{sienaModelCreate} function by setting the
+made in the \textsf{sienaAlgorithmCreate} function by setting the
 \textsf{cond} parameter, possibly also the
 \textsf{condvarno} and \textsf{condname} parameters.
 
@@ -5455,7 +5457,7 @@ are, respectively, gender (1 = $F$, 2 = $M$), program, and smoking
 information about this network and the actor attributes.
 
 Create the various required objects, using functions
-\sfn{sienaDataCreate}, \sfn{getEffects}, and \sfn{sienaModelCreate},
+\sfn{sienaDataCreate}, \sfn{getEffects}, and \sfn{sienaAlgorithmCreate},
 as indicated in Chapters~\ref{S_InputData} and~\ref{S_Est}.
 At first, leave the whole model specification as
 it is by default (see Section \ref{S_modspec}):
@@ -5723,7 +5725,7 @@ suddenly seeming stuck and not moving forward, the a solution may be
 to simplify the model (perhaps later on making it more complex again
 in forward parameter estimation steps); another solution may be
 to decrease the initial gain parameter (parameter \textsf{firstg}
-in function \textsf{sienaModelCreate()}).
+in function \textsf{sienaAlgorithmCreate()}).
 
 \iffalse
 If there are problems you don't understand, but you do know
@@ -5927,7 +5929,7 @@ These \textsf{sienaFit} objects must have exactly the same model
 specification and the same names of all variables; but it is allowed
 that there are differences with respect to parameters being fixed
 and perhaps tested. To get the same names of variables, the
-variables must be renamed in the call of \textsf{sienaModelCreate};
+variables must be renamed in the call of \textsf{sienaAlgorithmCreate};
 an example is in script \textsf{RscriptMultipleGroups.R} at the \SN website.
 If in some but not all groups a dependent variable has only upward or
 only downward changes, the automatic restriction to follow this pattern also
@@ -8263,11 +8265,11 @@ reciprocated degrees.
   This holds if they are part of the rate function,
   but not if they are included in the evaluation function.
   This also holds for effects depending on actor covariates.
-  For all these effects, the rate function is multiplied by 
+  For all these effects, the rate function is multiplied by
  \[ \exp\big( \alpha_h \, a_{ih}(x)\big)\,, \]
  if the associated parameter is denoted $\alpha_h$ for some $h$,
  and the effect is $a_i(x)$.
-  
+
   \begin{enumerate}
   \item the \emph{average exposure effect}
   (\texttt{avExposure}) which expresses the average exposure to the innovation,
@@ -8275,14 +8277,14 @@ reciprocated degrees.
   Using this effect, to which effects depending on actor covariates may be added,
   in the rate function  leads to a
   proportional hazards model. See \citet{Greenan12}.
-  
-  
+
+
 \item \emph{average exposure effect} (\verb|avExposure|),
   defined as the proportion of $i$'s alters who have adopted the innovation,
 \[
 a_{i\vit}(y) = \frac{\sum_{j=1}^n z_j x_{ij} }{\sum_{j=1}^n x_{ij}};
 \]
-\item \emph{total exposure effect} (\verb|totExposure|), defined as the 
+\item \emph{total exposure effect} (\verb|totExposure|), defined as the
  number of $i$'s alters who have adopted the innovation,
 \[
 a_{i\vit}(y) = \sum_{j=1}^n z_j x_{ij} ;
@@ -8292,17 +8294,17 @@ a_{i\vit}(y) = \sum_{j=1}^n z_j x_{ij} ;
 \[
 a_{i\vit}(y)=\sum_{j=1}^n z_j x_{ij}x_{+j};
 \]
-\item \emph{infection by outdegree effect} (\verb|infectOut|), 
+\item \emph{infection by outdegree effect} (\verb|infectOut|),
  defined as the sum of outdegrees of $i$'s alters who are also adopters of the innovation,
 \[
 a_{i\vit}(y)=\sum_{j=1}^n z_j x_{ij}x_{j+};
 \]
-\item \emph{infection by covariate effect} (\verb|infectCovar|), 
+\item \emph{infection by covariate effect} (\verb|infectCovar|),
  defined as the sum of covariate values of $i$'s alters who are also adopters of the innovation,
 \[
 a_{i\vit}(y)=\sum_{j=1}^n z_j x_{ij} v_j;
 \]
-\item \emph{susceptibility to average exposure by indegree effect} (\verb|susceptAvIn|), 
+\item \emph{susceptibility to average exposure by indegree effect} (\verb|susceptAvIn|),
  defined as the interaction between $i$'s indegree and $i$'s average exposure,
 \[
 a_{i\vit}(y)=x_{+i} \frac{\sum_{j=1}^n z_j x_{ij}}{\sum_{j=1}^n x_{ij}};
@@ -9242,7 +9244,7 @@ that can be called,
 the source code is listed by writing the function name.
 Thus, if \RS is loaded, the command
 \begin{verbatim}
-sienaModelCreate
+sienaAlgorithmCreate
 \end{verbatim}
 will list the code for the function with this name.
 
@@ -9667,12 +9669,12 @@ double TruncatedOutdegreeEffect::egoStatistic(int ego,
       were used.
 {\small
 \begin{verbatim}
-mynet   <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
-mydata  <- sienaDataCreate(mynet)
-mymodel <- sienaModelCreate(projname="s50_12")
-myeff   <- getEffects(mydata)
-myeff   <- setEffect(myeff, outTrunc, parameter = 3)
-ans     <- siena07(mymodel, data=mydata, effects=myeff)
+mynet       <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
+mydata      <- sienaDataCreate(mynet)
+myalgorithm <- sienaAlgorithmCreate(projname="s50_12")
+myeff       <- getEffects(mydata)
+myeff       <- setEffect(myeff, outTrunc, parameter = 3)
+ans         <- siena07(myalgorithm, data=mydata, effects=myeff)
 summary(ans)
 \end{verbatim}
 }
@@ -10088,7 +10090,7 @@ named ``modelname.out'' (Siena.out) that contains preliminary information
 on the data.\\
 \hline
 
-5 & sienaModelCreate & sienaModelCreate(\newline
+5 & sienaAlgorithmCreate & sienaAlgorithmCreate(\newline
 fn=simstats0c,\newline
 %usesimstats0c = \newline deparse(substitute(fn)) == \newline "simstats0c",
 % \newline
@@ -10102,9 +10104,9 @@ condname=``'', firstg=0.2, \newline
 cond=NA, findiff=FALSE, \newline
 seed=NULL) &
 \newline
-MyModel $<$-- model.create \newline
+MyAlgorithm $<$-- sienaAlgorithmCreate \newline
 (projname = \newline
-``MyProject'') & Creates a siena model
+``MyProject'') & Creates a siena algorithm
 object that can be used to call siena07. ``fn'' is function to do one
 simulation in the Robbins-Monro algorithm.
 %``usesimstats0c'' is boolean, if true the standard algorithm
@@ -10132,7 +10134,7 @@ seed. Not used if parallel
 testing.\\
 \hline
 
-5   & model.create  & & &       See sienaModelCreate\\
+5   & model.create  & & &       See sienaAlgorithmCreate\\
 \hline
 
 5 & siena07 & siena07(x, batch=FALSE, \newline
@@ -10153,9 +10155,9 @@ nbrNodes=2
 )
 & Estimates parameters using Robbins-Monro algorithm.
  Note that the particular
-model to be used is passed on as the model object, and data for the model must
-be passed by using named arguments. ``x'' is a model object; ``batch'' is a
-boolean variable to indicate if it is desired to open the GUI of Siena
+model to be used is passed on as the algorithm object, and data for the model
+must be passed by using named arguments. ``x'' is a model object; ``batch'' is
+a boolean variable to indicate if it is desired to open the GUI of Siena
 simulation; ``verbose'' is a boolean variable to produce output on the console;
 ``silent'' is also a boolean variable, if true, no output is printed to the
 console; ``useCluster'' is a boolean variable to indicate if it is desired to
@@ -10225,29 +10227,39 @@ The argument is a sienaFit object ``x''. \\
 
 \section{Changes compared to earlier versions}
 
-This begins (in reverse order) at end October 2009, and only details changes
+This begins (in reverse order) at end October 2009, and only presents changes
 which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2013-05-10 R-forge revision 230
+
+Changes in RSiena as well as RSienaTest:
+  \begin{itemize}
+   \item Check whether the maximum observed degree is not higher than 
+     \sfn{maxDegree}.
+	\item Fix error in implementation of \sfn{maxDegree}.
+	\item Fix bug in \sfn{print.siena} and extend \sfn{print.siena}.
+	\item Make print method for class \sfn{sienaDependent}.
+  \end{itemize}
 \item 2013-04-19 R-forge revision 227
 
   Changes in RSiena as well as RSienaTest;
-  both now are very similar; \sfn{sienaBayes}, \sfn{algorithms}, and 
+  both now are very similar; \sfn{sienaBayes}, \sfn{algorithms}, and
   \sfn{profileLikelihoods}
   are the only functions in RSienaTest not in RSiena.
   Available effects now are the same in both packages.
-  
+
   Main changes visible to users:
 
 For Siena only:
   \begin{itemize}
 	\item function \sfn{bayes()} was removed (still under development in
         RSienaTest).
-	\item Attributes \sfn{allowOnly} and \sfn{simOnly} ported from 
+	\item Attributes \sfn{allowOnly} and \sfn{simOnly} ported from
         RSienaTest.
-	\item Improved error messages in  \sfn{includeEffects} ported from 
+	\item Improved error messages in  \sfn{includeEffects} ported from
         RSienaTest.
 	\item \sfn{sienaGOF()} ported from RSienaTest.
 	\item \sfn{siena.table()} ported from RSienaTest.
@@ -10262,7 +10274,7 @@ For RSienaTest only:
 For RSiena and RSienaTest:
   \begin{itemize}
 	\item Changes to \sfn{sienaGOF}: new use structure with extraction functions
-		\sfn{sparseMatrixExtraction}, \sfn{networkExtraction}, 
+		\sfn{sparseMatrixExtraction}, \sfn{networkExtraction},
         \sfn{behaviorExtraction},
 		allowing the testing of any dependent variable;
 		commented out some superfluous lines.
@@ -10344,7 +10356,7 @@ For RSiena and RSienaTest:
 	\item Outdegree-popularity effect: multiplication by $n$ dropped.
 	\item GWESP effects: default parameter changed from 25 to 69
 		(corresponding to $\alpha = \log(2)$.) See earlier in this the manual.
-	\item Added to \sfn{siena07}:
+	\item Added to \sfn{siena07} (defined by \sfn{sienaAlgorithmCreate}:
 		option \sfn{Dolby} for variance reduction.
 		Correlations between scores and statistics are reported in output file;
 		this is a measure for the amount of variance reduction.
@@ -10360,7 +10372,7 @@ For RSiena and RSienaTest:
 		added to result of \sfn{siena07}.\\
         This is a very severe convergence criterion, and not meant as a default
         criterion to judge convergence in practical cases.
-	\item The \sfn{print} method for objects of class \sfn{siena} (created by 
+	\item The \sfn{print} method for objects of class \sfn{siena} (created by
         \sfn{sienaDataCreate})
 		has been extended with printing \sfn{uponly} and \sfn{downly} attributes,
 		if these are TRUE.
@@ -10369,7 +10381,7 @@ For RSiena and RSienaTest:
         and \sfn{downonly},
 		in the case where this does not affect all periods.
 	\item Changed almost all \sfn{.Rd} documentation files: sometimes to make them
-		better understandable or complete, sometimes to make more appropriate 
+		better understandable or complete, sometimes to make more appropriate
 		examples, sometimes only minor prettifications.
 	\item Updated scripts:\\
 		Rscript01DataFormat.R, Rscript02VariableFormat.R,
@@ -10484,7 +10496,7 @@ compiler.
 \end{itemize}
 \item 2012-01-20 R-forge revision 195
 \begin{itemize}
-\item NaN's in covariates were causing problems: now treated as though NA 
+\item NaN's in covariates were causing problems: now treated as though NA
     in C++, as they always were in R.
 \item New file ``arclistdata.dat'' added to examples directory
 \item New maintainers address: rsiena@stats.ox.ac.uk

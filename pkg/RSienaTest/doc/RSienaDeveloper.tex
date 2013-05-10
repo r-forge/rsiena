@@ -27,6 +27,7 @@
 \newcommand{\nnm}[1]{\textsf{\small\textit{#1}}}
 \newcommand{\nmm}[1]{\nnm{#1}}
 \newcommand{\sfn}[1]{\textbf{\texttt{#1}}}
+\newcommand{\bs}{\backslash}
 
 % no labels in list of references:
 \makeatletter
@@ -155,6 +156,7 @@ the problem.
 \end{enumerate}
 \end{description}
 \subsection{Other documentation}
+\label{S_otherDoc}
 There are other documentation files:
 \begin{description}
 \item[RSienaSpec] Specification of the R side.  Details of creation of objects
@@ -222,6 +224,22 @@ may help.
   change log at the end of the manual. Create a new pdf and copy to the inst/doc
   directory of each package.
 \end{enumerate}
+
+And for changes in documentation files:
+\begin{enumerate}
+\item If you changed the manual \textsf{RSiena\_Manual.tex}, then include the
+  changed .tex file as \textsf{$\bs$pkg$\bs$RSienaTest$\bs$inst$\bs$doc$\bs$RSiena\_Manual.tex} and
+  \textsf{$\bs$pkg$\bs$RSiena$\bs$inst$\bs$doc$\bs$RSiena\_Manual.tex},
+  and the changed .pdf file as
+  \textsf{$\bs$pkg$\bs$RSienaTest$\bs$inst$\bs$doc$\bs$RSiena\_Manual.pdf} as well as
+  \textsf{$\bs$pkg$\bs$RSiena$\bs$inst$\bs$doc$\bs$RSiena\_Manual.pdf}. The same for \textsf{RSiena.bib}.
+  These three files should be identical for \textsf{RSiena} and \textsf{RSienaTest}.
+\item For both packages separately:\\
+  If the set of effects was changed, make a new \textsf{effects.pdf} file by
+  calling the function \textsf{effectsDocumentation(type = "latex")} and compiling
+  this by \LaTeX, and include this as \textsf{$\bs$pkg$\bs$RSienaTest$\bs$inst$\bs$doc$\bs$effects.pdf}.
+\end{enumerate}
+
 \section{Coding standards etc}
 
 I describe below the main details of our current practice: for other points
@@ -245,6 +263,16 @@ then you can paste it with a right (Windows with my initialization file) or
 middle button (Linux) click.
 \subsection{General}
 \begin{enumerate}
+\item Don't forget that data may be arrays but also sparse matrices.
+\item When you modify the program or add to it, please try to modify 
+      correspondingly
+      the documentation files mentioned in Section~\ref{S_otherDoc}:
+      RSienaSpec, simstats0c, maxlikec, bayes, sienaTimeFix, classdesign, 
+      missingsEtc.
+      It is of course very useful to consult this documentation before making
+      a change.
+      I (TS) realize that I have not always modified this documentation
+      and it would be better if I had.      
 \item Use spaces: particularly around operators and after commas. (But
   not after the end of your lines!)
 \item Do not use underscores: use variable names made up of several (possibly

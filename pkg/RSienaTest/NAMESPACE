@@ -15,6 +15,7 @@ import(Matrix)
 
 S3method(print, siena)
 S3method(print, sienaGroup)
+S3method(print, sienaDependent)
 S3method(print, sienaFit)
 S3method(print, summary.sienaFit)
 S3method(print, sienaAlgorithm)

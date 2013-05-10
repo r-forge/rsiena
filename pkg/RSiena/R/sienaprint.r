@@ -6,7 +6,7 @@
 ## * File: sienaprint.r
 ## *
 ## * Description: This file contains the print and summary modules for the
-## * classes siena, sienaFit and sienaAlgorithm.
+## * classes siena, sienaFit, sienaDependent, sienaAlgorithm, and sienaBayesFit
 ## *
 ## ****************************************************************************/
 ##@print.siena Methods
@@ -19,7 +19,7 @@ print.siena <- function(x, ...)
 	# This attribute must be a logical matrix
 	# with named columns, and rows indicating periods.
 		textattr <- deparse(substitute(attrib),  backtick=FALSE)
-		uponlys <- sapply(x$depvars, function(y){attr(y,attrib)})
+		uponlys <- t(as.matrix(sapply(x$depvars, function(y){attr(y,attrib)})))
 		for (j in 1:dim(uponlys)[2])
 		{
 			if (any(uponlys[,j]))
@@ -47,16 +47,55 @@ print.siena <- function(x, ...)
         stop("not a legitimate Siena data object")
 	}
 	cat('Dependent variables: ', paste(names(x$depvars), collapse=", "), "\n")
-	cat('Number of waves:', x$observations, "\n")
+	cat('Number of observations:', x$observations, "\n\n")
 	if (!is.null(x$nodeSet))
 	{
-		tmp <- cbind(c('Nodesets      ',
-					   paste(names(x$nodeSet), collapse=", ")),
-					 c('Number of nodes', sapply(x$nodeSet, length)))
-		dimnames(tmp) <-list(rep("", dim(tmp)[1]), rep("", dim(tmp)[2]))
-		print(tmp, quote=FALSE, print.gap=0)
+		tmp <- sapply(x$nodeSet, length)
+		if (length(x$nodeSet) <= 1)
+		{
+			tmp <- c('Nodeset        ' = 'Number of nodes', tmp)
+		}
+		else
+		{
+			tmp <- c('Nodesets       ' = 'Number of nodes', tmp)
+		}
+		print(tmp, quote=FALSE)
+		cat("\n")
 	}
-	cat("\n")
+	
+	for (j in (1:length(x$depvars)))
+	{
+		xj <- x$depvars[[j]]
+		mymat <- matrix("", 7, 2)
+		mymat[1,] <- c("Dependent variable", attr(xj, "name"))
+		mymat[2,] <- c("Type",               attr(xj, "type"))
+		mymat[3,] <- c("Observations",       attr(xj,  "netdims")[3])
+		if (attr(xj, "type") == "bipartite")
+		{	
+			mymat[4,] <- c("First nodeset ", attr(xj, "nodeSet")[1])
+			mymat[5,] <- c("Second nodeset ",attr(xj, "nodeSet")[2])
+			nrows <- 5
+		}
+		else
+		{
+			mymat[4,] <- c("Nodeset ", attr(xj, "nodeSet"))
+			nrows <- 4
+		}	
+		if (attr(xj, "type") == "behavior")
+		{
+			mymat[nrows+1,] <- c("Range", 
+				paste(attr(xj, "range2"),  collapse=" - "))
+		}
+		else
+		{
+			mymat[nrows+1,] <- c("Densities", 
+				paste(signif(attr(xj, "density"), 2),  collapse=" "))
+		}
+		mymat2 <- apply(mymat[0:nrows+1,], 2, format)
+		write.table(mymat2, row.names=FALSE, col.names=FALSE, quote=FALSE)
+		cat("\n")
+	}
+	
 	if (length(x$cCovars) > 0)
 	{
 		cat('Constant covariates: ', paste(names(x$cCovars), collapse=", "), "\n")
@@ -110,6 +149,39 @@ print.sienaGroup <- function(x, ...)
 	cat(paste(att$netnames, ":", att$types),'\n')
 	cat('Total number of periods:', att$observations)
 	cat("\nmore to be added!\n")
+	invisible(x)
+}
+
+print.sienaDependent <- function(x, ...)
+{
+	if (!inherits(x, "sienaDependent"))
+	{
+        stop("not a legitimate Siena dependent variable object")
+	}
+	mymat <- matrix("", 4, 2)
+	mymat[1,] <- c("Type",               attr(x, "type"))
+	mymat[2,] <- c("Observations",       attr(x,  "netdims")[3])
+	if (attr(x, "type") == "bipartite")
+	{
+		mymat[3,] <- c("First nodeset ",
+						paste(attr(x, "nodeSet")[1], " (", attr(x, "netdims")[1],
+							" elements)", sep=""))
+		mymat[4,] <- c("Second nodeset ",
+						paste(attr(x, "nodeSet")[2], " (", attr(x, "netdims")[2],
+							" elements)", sep=""))
+		nrows <- 4
+	}
+	else
+	{
+		mymat[3,] <- c("Nodeset ",
+						paste(attr(x, "nodeSet"), " (", attr(x, "netdims")[1],
+							" elements)", sep=""))
+		nrows <- 3
+	}
+
+	mymat <- apply(mymat, 2, format)
+	write.table(mymat[1:nrows,], row.names=FALSE, col.names=FALSE, quote=FALSE)
+	cat("\n")
 	invisible(x)
 }
 
@@ -620,3 +692,178 @@ makeTemp <- function(x, ...)
 		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
 		list(tmp, tmp1)
 }
+
+##@print.sienaBayesFit Methods
+print.sienaBayesFit <- function(x, ...)
+{
+	printmat <- function(mat)
+	{
+		cat(sprintf("%8.4f",mat), sep=c(rep.int(' ', ncol(mat) - 1), '\n'))
+	}
+	if (!inherits(x, "sienaBayesFit"))
+	{
+        stop("not a legitimate Siena Bayes model fit")
+	}
+	else
+	{
+		cat("Note: this summary does not contain a convergence check.\n\n")
+		if (length(x$f$groupNames) > 1)
+		{
+			cat("Groups:\n")
+			s <- ""
+			ml <- max(nchar(x$f$groupNames))
+			fmt <- paste("%-", ml+2, "s", sep="")
+			for (i in 1:dim(x$ThinParameters)[2])
+			{
+				s <- paste(s, gettextf(fmt,x$f$groupNames[i]))
+				if ((nchar(s) + ml > 80) | (i == dim(x$ThinParameters)[2]))
+				{
+					cat(paste(s,"\n"))
+					s <- ""
+				}
+			}
+			cat("\n")
+		}
+
+		cat("Posterior means and standard deviations ")
+		# Make temporary changes to make x look like a sienaFit object
+		# so that sienaFitThetaTable can be applied.
+		# This is done in function makeTemp.
+		if (length(x$f$groupNames) <= 1)
+		{
+			cat("\n\n")
+			x$theta <- colMeans(x$ThinParameters[,1,])
+			x$covtheta <- cov(x$ThinParameters[,1,])
+		}
+		else
+		{
+			cat("for global mean parameters\n\n")
+			nmain <- dim(x$ThinPosteriorMu)[1]
+			if (x$frequentist)
+			{
+			first <- nmain - x$lengthPhase3 + 1
+			}
+			else
+			{
+			first <- 1
+			}
+			x$theta <- colMeans(x$ThinPosteriorMu[first:nmain,])
+			x$covtheta <- cov(x$ThinPosteriorMu)
+		}
+		tmps <- makeTemp(x)
+		tmp <- tmps[[1]]
+		tmp1 <- tmps[[2]]
+		addtorow <- tmp$addtorow
+		for (i in 1:length(tmp1))
+		{
+			if (length(addtorow$command) > 0)
+			{
+				for (j in 1:length(addtorow$command))
+				{
+					ii <- match(i-1, addtorow$pos[[j]])
+					if (!is.na(ii))
+						if (i == 2 | addtorow$command[j] == 'Network Dynamics')
+							cat( addtorow$command[j], '\n')
+						else
+							cat('\n', addtorow$command[j], '\n', sep='')
+				}
+			}
+			cat(tmp1[i], '\n')
+		}
+		if (length(x$f$groupNames) > 1)
+		{
+			cat("\n")
+			mean.Sigma <-
+				apply(x$ThinPosteriorSigma[first:nmain,,], c(2,3), mean)
+			sd.Sigma <- apply(x$ThinPosteriorSigma[first:nmain,,], c(2,3), sd)
+			cat("Posterior mean of global covariance matrix\n")
+			printmat(mean.Sigma)
+			cat("\nPosterior standard deviations of ")
+			cat("elements of global covariance matrix\n")
+			printmat(sd.Sigma)
+		}
+		cat("\nTotal of", dim(x$ThinPosteriorMu)[1], "samples.\n\n")
+	}
+	invisible(x)
+}
+
+##@summary.sienaBayesFit Methods
+summary.sienaBayesFit <- function(object, ...)
+{
+    if (!inherits(object, "sienaBayesFit"))
+	{
+        stop("not a legitimate Siena Bayes model fit")
+	}
+    class(object) <- c("summary.sienaBayesFit", class(object))
+    object
+}
+##@print.summary.sienaBayesFit Methods
+print.summary.sienaBayesFit <- function(x, ...)
+{
+	if (!inherits(x, "summary.sienaBayesFit"))
+	{
+        stop("not a legitimate summary of a Siena Bayes model fit")
+	}
+	nmain <- dim(x$ThinPosteriorMu)[1]
+	if (x$frequentist)
+	{
+		cat("Frequentist estimation.\n")
+		first <- nmain - x$lengthPhase3 + 1
+	}
+	else
+	{
+		first <- 1
+		cat("Prior distribution:\n")
+		cat("\nMu      ")
+		for (i in seq(along=x$priorMu))
+		{
+			cat(sprintf("%8.4f", x$priorMu[i,1]),"\n        ")
+		}
+		cat("\nSigma   ")
+		for (i in seq(along=x$priorMu))
+		{
+			cat(sprintf("%8.4f", x$priorSigma[i,]),"\n        ")
+		}
+		cat("\nDf       ",sprintf("%1d", x$priorDf),"\n")
+		if (length(x$f$groupNames) >= 2)
+		{
+			cat("\nKappa  ",sprintf("%8.4f", x$priorKappa),"\n")
+		}
+		cat("\nFor the basic rate parameters, ")
+		cat("the prior is on the square root scale.\n\n")
+	}
+	print.sienaBayesFit(x)
+
+	cat("Posterior means and standard deviations per group\n")
+	for (i in 1:length(x$f$groupNames))
+	{
+		cat("\n", x$f$groupNames[i], "\n")
+		# Make temporary changes to make x look like a sienaFit object
+		# so that sienaFitThetaTable can be applied.
+		# This is done in function makeTemp.
+		x$theta <- colMeans(x$ThinParameters[first:nmain,i,])
+		x$covtheta <- cov(x$ThinParameters[first:nmain,i,])
+		tmps <- makeTemp(x)
+		tmp <- tmps[[1]]
+		tmp1 <- tmps[[2]]
+		addtorow <- tmp$addtorow
+		for (i in 1:length(tmp1))
+		{
+			if (length(addtorow$command) > 0)
+			{
+				for (j in 1:length(addtorow$command))
+				{
+					ii <- match(i-1, addtorow$pos[[j]])
+					if (!is.na(ii))
+						if (i == 2 | addtorow$command[j] == 'Network Dynamics')
+							cat( addtorow$command[j], '\n')
+						else
+							cat('\n', addtorow$command[j], '\n', sep='')
+				}
+			}
+			cat(tmp1[i], '\n')
+		}
+	}
+	invisible(x)
+}
+

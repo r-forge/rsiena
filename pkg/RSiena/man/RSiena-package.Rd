@@ -43,8 +43,8 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.1-227\cr
-Date: \tab 2013-04-19\cr
+Version: \tab 1.1-230\cr
+Date: \tab 2013-05-10\cr
 Depends: \tab R (>= 2.15.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, snow, rlecuyer, network, codetools, lattice, MASS,
@@ -57,9 +57,9 @@ BuildResaveData: \tab no\cr
 }
 }
 \author{
-  Ruth Ripley, Krists Boitmanis, Tom Snijders.  
+  Ruth Ripley, Krists Boitmanis, Tom Snijders.
   Contributions by Josh Lospinoso, Charlotte Greenan, Christian Steglich,
-  Johan Koskinen, and Mark Ortmann.
+  Johan Koskinen, Mark Ortmann, and Nynke Niezink.
 
   Maintainer: RSiena developers <rsiena@stats.ox.ac.uk>
 }

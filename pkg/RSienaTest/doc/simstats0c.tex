@@ -230,7 +230,7 @@ selected rate effects multiplied by relevant theta value
 \STATE add \{0\} to  alters
 \ENDIF
 \FOR[calculate deltas and effects]{$j \in \text{alters}$ }
-\IF{out-degree of actor = \nm{maxdegree}}
+\IF{out-degree of actor >= \nm{maxdegree}} (changed from = to >=, ts, 6-5-13)
 \STATE change is only permissible if there is a link to this alter, to
 change its value
 \ELSIF{link from actor to $j$ is structurally determined}

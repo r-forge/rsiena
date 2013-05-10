@@ -121,7 +121,7 @@
 
 # Where is the manual?
 
-         RShowDoc("RSiena_Manual", package="RSiena")
+         RShowDoc("RSiena_Manual", package="RSienaTest")
 
 # (Note, however, that it is possible that the Siena website
 # at http://www.stats.ox.ac.uk/~snijders/siena/ contains a more recent version.)

@@ -1,14 +1,34 @@
+2013-05-10 R-forge revision 230
+Changes in RSiena as well as RSienaTest:
+	* Add attribute maxObsOutDegree to <object of class siena>$depvars[[.]]
+     (sienaDataCreate.r).
+   * Check whether this maximum observed degree is not higher than maxDegree
+	  (printDataReport.r).
+	* Fix bug in implementation of maxDegree (initializeFRAN.r)
+	* Fix bug in print.siena and extend print.siena (sienaprint.r).
+	* Make print method for sienaDependent (sienaprint.r).
+Changes only in RSienaTest:
+	* File
+	  \pkg\RSienaTest\inst\doc\effects.pdf
+	  was updated.
+
+2013-05-10 R-forge revision 229
+Changes only in RSiena:
+   * Korean translation of R messages is updated: changed file
+     \pkg\RSiena\po\R-RSiena.pot
+
 2013-04-20 R-forge revision 228
 Changes only in RSiena:
-Files
-\pkg\RSiena\src\model\variables\DiffusionEffectValueTable.cpp
-\pkg\RSiena\src\model\variables\DiffusionEffectValueTable.h
-\pkg\RSiena\man\sienaGOF-auxiliary.Rd
-\pkg\RSiena\man\sienaGOF.Rd
-were erroneously not committed in revision 227.
-Therefore this was done now. Also, file
-\pkg\RSiena\inst\doc\effects.pdf
-was updated.
+	* Files
+	  \pkg\RSiena\src\model\variables\DiffusionEffectValueTable.cpp
+	  \pkg\RSiena\src\model\variables\DiffusionEffectValueTable.h
+	  \pkg\RSiena\man\sienaGOF-auxiliary.Rd
+	  \pkg\RSiena\man\sienaGOF.Rd
+	  were erroneously not committed in revision 227.
+	  Therefore this was done now. 
+	* Also, file
+	  \pkg\RSiena\inst\doc\effects.pdf
+	  was updated.
 
 2013-04-19 R-forge revision 227
 Changes in RSiena as well as RSienaTest;
