@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: RSiena\n"
 "Report-Msgid-Bugs-To: bugs@r-project.org\n"
 "POT-Creation-Date: 2012-02-29 17:29\n"
-"PO-Revision-Date: 2013-02-14 01:23-0600\n"
-"Last-Translator: Chel Hee Lee <gnustats@gmail.com>\n"
+"PO-Revision-Date: 2013-05-09 20:51-0600\n"
+"Last-Translator: Chel Hee Lee <gnustats@korea.gnu.org>\n"
 "Language-Team: Korean <gnustats@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,7 +30,7 @@ msgid "Not a valid siena data object or group"
 msgstr ""
 
 msgid "error type"
-msgstr ""
+msgstr "에러 유형"
 
 msgid "depvars don't match"
 msgstr ""
@@ -66,16 +66,16 @@ msgid "Conditional estimation is not possible with"
 msgstr ""
 
 msgid "maximum likelihood method"
-msgstr ""
+msgstr "최우추정법"
 
 msgid "Finite difference method for derivatives not available"
 msgstr ""
 
 msgid "with Maximum likelihood method"
-msgstr ""
+msgstr "최우추정법을 이용하여"
 
 msgid "Maximum likelihood method not implemented"
-msgstr ""
+msgstr "구현되지 않은 최우추정법입니다"
 
 msgid "for symmetric networks"
 msgstr ""
@@ -168,7 +168,7 @@ msgid "'x' is singular: singular fits are not implemented in iwlsm"
 msgstr ""
 
 msgid "invalid 'test.vec'"
-msgstr ""
+msgstr "유효하지 않은 'test.vec'입니다"
 
 msgid "length of 'weights' must equal number of observations"
 msgstr ""
@@ -180,13 +180,13 @@ msgid "some of ... do not match"
 msgstr ""
 
 msgid "'init' method is unknown"
-msgstr ""
+msgstr "알수없는 'init' 메소드입니다"
 
 msgid "'c' must be at least 1.548 and has been ignored"
-msgstr ""
+msgstr "'c'는 반드시 최소한 1.548이어야 하므로 무시되었습니다"
 
 msgid "'method' is unknown"
-msgstr ""
+msgstr "'method'를 알 수 없습니다"
 
 msgid "iwlsm failed to converge in %d steps"
 msgstr ""
@@ -195,7 +195,7 @@ msgid "'coef' must define a contrast, i.e., sum to 0"
 msgstr ""
 
 msgid "'coef' must have same length as 'contrast.obj'"
-msgstr ""
+msgstr "'coef'의 길이는 반드시 'contrast.obj'의 길이와 같아야 합니다"
 
 msgid "each element of %s must be logical"
 msgstr ""
@@ -237,7 +237,7 @@ msgid "Incompatible RSiena versions for sub process: exit R"
 msgstr ""
 
 msgid "and restart"
-msgstr ""
+msgstr "그리고 재시작"
 
 msgid "Not enough observations to use the nodes"
 msgstr ""
@@ -246,10 +246,10 @@ msgid "The standalone gui is no longer available."
 msgstr ""
 
 msgid "To run the gui within R:"
-msgstr ""
+msgstr "R내에서 gui를 실행하기:"
 
 msgid "Start R, load RSiena using Packages menu"
-msgstr ""
+msgstr "R을 시작하고, 패키지 메뉴를 이용하여 RSiena를 불러오세요"
 
 msgid "then type siena01Gui() (and <ENTER>)"
 msgstr ""
@@ -273,7 +273,7 @@ msgid "need some sienafits"
 msgstr ""
 
 msgid "names must be unique"
-msgstr ""
+msgstr "이름은 중복되지 않아야 합니다"
 
 msgid "node set not found"
 msgstr ""
@@ -351,10 +351,10 @@ msgid "error in dyadic constant covariate, group create"
 msgstr ""
 
 msgid "Need a list of objects"
-msgstr ""
+msgstr "객체들의 리스트가 필요합니다"
 
 msgid "Not a list of valid siena objects"
-msgstr ""
+msgstr "유효한 siena 객체들의 리스트가 아닙니다"
 
 msgid "Need more than one siena object"
 msgstr ""
@@ -438,10 +438,10 @@ msgid "of exogenous event file"
 msgstr ""
 
 msgid "File of unknown type:"
-msgstr ""
+msgstr "알수없는 유형의 파일:"
 
 msgid "Duplicate names"
-msgstr ""
+msgstr "중복된 이름입니다"
 
 msgid "need some effect short names"
 msgstr ""
@@ -480,16 +480,16 @@ msgid "You need at least one iteration."
 msgstr ""
 
 msgid "Invalid group name."
-msgstr ""
+msgstr "유효하지 않은 그룹명입니다."
 
 msgid "Invalid variable number -- out of bounds."
-msgstr ""
+msgstr "유효하지 않은 변수번호입니다 -- 범위를 넘어섰습니다."
 
 msgid "Invalid wave index -- out of bounds"
 msgstr ""
 
 msgid "Invalid input."
-msgstr ""
+msgstr "유효하지 않은 입력입니다."
 
 msgid "Observation must be a matrix."
 msgstr ""
@@ -501,25 +501,25 @@ msgid "Key length does not match the number of variates."
 msgstr ""
 
 msgid "maximum likelihood estimation"
-msgstr ""
+msgstr "최우추정법"
 
 msgid "Finite differences estimation of derivatives"
 msgstr ""
 
 msgid "is not possible with maximum likelihood estimation"
-msgstr ""
+msgstr "최우추정법을 사용할 수 없습니다"
 
 msgid "not a legitimate Siena data object"
-msgstr ""
+msgstr "올바른 Siena 데이터 객체가 아닙니다"
 
 msgid "not a legitimate Siena group data object"
-msgstr ""
+msgstr "올바른 Siena 그룹데이터 객체가 아닙니다"
 
 msgid "not a legitimate Siena model fit"
-msgstr ""
+msgstr "올바른 Siena 모델적합이 아닙니다"
 
 msgid "not a legitimate summary of a Siena model fit"
-msgstr ""
+msgstr "Siena 모델적합에 올바른 요약이 아닙니다"
 
 msgid "not a legitimate sienaFit object"
 msgstr ""
@@ -581,10 +581,10 @@ msgid "Invalid input in timeDummy column"
 msgstr ""
 
 msgid ":"
-msgstr ""
+msgstr ":"
 
 msgid "and"
-msgstr ""
+msgstr "그리고"
 
 msgid "Having trouble finding the covariate for your rate"
 msgstr ""
@@ -602,7 +602,7 @@ msgid "changelist must be a list"
 msgstr ""
 
 msgid "Non numeric data"
-msgstr ""
+msgstr "수치형이 아닌 데이터입니다"
 
 msgid "only one node set relevant"
 msgstr ""
@@ -611,13 +611,13 @@ msgid "nodeset should be a character string"
 msgstr ""
 
 msgid "option should be numeric"
-msgstr ""
+msgstr "option은 수치형이어야 합니다"
 
 msgid "option should be between 1 and 4"
 msgstr ""
 
 msgid "n must be numeric"
-msgstr ""
+msgstr "n은 반드시 수치형이어야 합니다"
 
 msgid "node set name must be a character string"
 msgstr ""
@@ -626,13 +626,13 @@ msgid "node names incorrect length"
 msgstr ""
 
 msgid "val must be a vector"
-msgstr ""
+msgstr "val은 반드시 벡터이어야 합니다"
 
 msgid "val must be numeric or a factor"
-msgstr ""
+msgstr "val은 반드시 수치형 또는 요인이어야 합니다"
 
 msgid "val must be a matrix"
-msgstr ""
+msgstr "val은 반드시 행렬이어야 합니다"
 
 msgid "not a sparse triples matrices"
 msgstr ""
@@ -659,19 +659,19 @@ msgid "not a list of sparse triples matrices"
 msgstr ""
 
 msgid "all matrices must have the same dimension"
-msgstr ""
+msgstr "모든 행렬의 크기가 동일해야만 합니다"
 
 msgid "netarray must be an array or a list of sparse matrices"
 msgstr ""
 
 msgid "entries must be numeric"
-msgstr ""
+msgstr "엔트리는 반드시 수치형이어야 합니다"
 
 msgid "netarray must have at least two observations"
 msgstr ""
 
 msgid "incorrect type"
-msgstr ""
+msgstr "잘못된 유형입니다"
 
 msgid "need 2 node sets for a bipartite network"
 msgstr ""
@@ -692,11 +692,11 @@ msgid "Not a siena Net"
 msgstr ""
 
 msgid "invalid type in net"
-msgstr ""
+msgstr "net에 부적절한 유형입니다"
 
 msgid "No constraints calculated: Need to recreate data object"
 msgstr ""
 
 msgid "No such constraint found"
-msgstr ""
+msgstr "그러한 제약조건을 찾을 수 없습니다"
 
