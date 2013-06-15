@@ -62,7 +62,7 @@ print.siena <- function(x, ...)
 		print(tmp, quote=FALSE)
 		cat("\n")
 	}
-	
+
 	for (j in (1:length(x$depvars)))
 	{
 		xj <- x$depvars[[j]]
@@ -71,7 +71,7 @@ print.siena <- function(x, ...)
 		mymat[2,] <- c("Type",               attr(xj, "type"))
 		mymat[3,] <- c("Observations",       attr(xj,  "netdims")[3])
 		if (attr(xj, "type") == "bipartite")
-		{	
+		{
 			mymat[4,] <- c("First nodeset ", attr(xj, "nodeSet")[1])
 			mymat[5,] <- c("Second nodeset ",attr(xj, "nodeSet")[2])
 			nrows <- 5
@@ -80,22 +80,22 @@ print.siena <- function(x, ...)
 		{
 			mymat[4,] <- c("Nodeset ", attr(xj, "nodeSet"))
 			nrows <- 4
-		}	
+		}
 		if (attr(xj, "type") == "behavior")
 		{
-			mymat[nrows+1,] <- c("Range", 
+			mymat[nrows+1,] <- c("Range",
 				paste(attr(xj, "range2"),  collapse=" - "))
 		}
 		else
 		{
-			mymat[nrows+1,] <- c("Densities", 
+			mymat[nrows+1,] <- c("Densities",
 				paste(signif(attr(xj, "density"), 2),  collapse=" "))
 		}
 		mymat2 <- apply(mymat[0:nrows+1,], 2, format)
 		write.table(mymat2, row.names=FALSE, col.names=FALSE, quote=FALSE)
 		cat("\n")
 	}
-	
+
 	if (length(x$cCovars) > 0)
 	{
 		cat('Constant covariates: ', paste(names(x$cCovars), collapse=", "), "\n")
@@ -406,24 +406,31 @@ print.sienaAlgorithm <- function(x, ...)
 	}
 	else
 	{
-		if (is.na(x$cconditional) || !x$cconditional)
+		if (is.na(x$cconditional))
 		{
 			cat(" Unconditional simulation if more than one dependent",
 				"variable\n")
 		}
 		else
 		{
-			cat(" Conditional simulation:")
-			if (x$condname != '')
+			if (x$cconditional)
 			{
-				cat('conditioned on', x$condname, '\n')
+				cat(" Conditional simulation:")
+				if (x$condname != '')
+				{
+					cat('conditioned on', x$condname, '\n')
+				}
+				else
+				{
+					if (x$condvarno > 0)
+					{
+						cat('conditioned on variable number', x$condvarno, '\n')
+					}
+				}
 			}
 			else
 			{
-				if (x$condvarno > 0)
-				{
-					cat('conditioned on variable number', x$condvarno, '\n')
-				}
+				cat(" Unconditional simulation\n")
 			}
 		}
 	}

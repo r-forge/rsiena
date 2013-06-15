@@ -94,7 +94,9 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
   \code{Matrix} package. See the help file for \code{\link{dgCMatrix-class}}.
   Tie variables for ordered pairs with a missing value for wave=period or
   period+1 are zeroed;
-  note that this also is done in RSiena for calculation of target statistics.
+  note that this also is done in RSiena for calculation of target statistics.\cr
+  To treat the objects returned by this function as regular matrices,
+  it is necessary to attach the \code{Matrix} package in your session.
 
 \code{networkExtraction} returns the network as an edge list of class "network"
   according to the network package (used for package sna).
@@ -130,7 +132,8 @@ Ph.D. Thesis. University of Oxford: U.K.
    mydata <- sienaDataCreate(mynet1, mybeh)
    myeff <- getEffects(mydata)
    myeff <- includeEffects(myeff, transTies, cycle3)
-   myalgorithm <- sienaAlgorithmCreate(n3=500) # Shorter phase 3, just for example.
+   # Shorter phases 2 and 3, just for example:
+   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=300)
    ans <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE)
 
    OutdegreeDistribution(NULL, ans$f, ans$sims, period=1, groupName="Data1",
@@ -146,8 +149,8 @@ Ph.D. Thesis. University of Oxford: U.K.
    behaviorExtraction(200, ans$f, ans$sims, period=1, groupName="Data1",
                     varName="mybeh")
 
-   (gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
-                    varName="mynet1"))
+   gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
+                    varName="mynet1")
    gofi
    plot(gofi)
 
@@ -157,7 +160,7 @@ Ph.D. Thesis. University of Oxford: U.K.
    plot(gofo)
 
    (gofb <- sienaGOF(ans, BehaviorDistribution, varName = "mybeh",
-                    verbose=TRUE, join=TRUE))
+                    verbose=TRUE, join=TRUE, cumulative=FALSE))
    plot(gofb)
 
    ### Here come some useful functions for building your own auxiliary statistics:
@@ -261,8 +264,8 @@ Ph.D. Thesis. University of Oxford: U.K.
             interaction1="mynet1")
    myeff <- includeEffects(myeff,  outdeg, name="mybeh",
             interaction1="mynet1")
-   myalgorithm <- sienaAlgorithmCreate(n3=500)
-   # Short phase 3, just for example.
+   # Shorter phases 2 and 3, just for example:
+   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=300)
    (ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE))
 
    gofc <- sienaGOF(ans2, ConstraintDistribution, varName="mynet1",
@@ -271,7 +274,8 @@ Ph.D. Thesis. University of Oxford: U.K.
 
    goftc <- sienaGOF(ans2, TriadCensus, varName="mynet1", verbose=TRUE, join=TRUE)
    plot(goftc, center=TRUE, scale=TRUE)
-   # For this type of auxiliary statistics it is advisable to center and scale.
+   # For this type of auxiliary statistics
+   # it is advisable in the plot to center and scale.
    # note the keys at the x-axis; these names are given by sna::triad.census
 
    gofgd <- sienaGOF(ans2, GeodesicDistribution, varName="mynet1",

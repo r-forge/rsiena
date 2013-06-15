@@ -152,7 +152,7 @@ We recommend the following heuristic approach to model checking:
 \item Lospinoso, J.A. and Snijders, T.A.B., \dQuote{Goodness of fit for
   Stochastic Actor Oriented Models.} Presentation given at Sunbelt XXXI,
   St. Pete's Beach, Fl. 2011.
-\item Lospinoso, J.A. (2012). 
+\item Lospinoso, J.A. (2012).
   \dQuote{Statistical Models for Social Network Dynamics.}
   Ph.D. Thesis. University of Oxford: U.K.
 }

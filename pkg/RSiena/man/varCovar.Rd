@@ -24,7 +24,8 @@ varCovar(val, nodeSet='Actors')
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley}
-\seealso{\code{\link{sienaDataCreate}}, \code{\link{coCovar}}}
+\seealso{\code{\link{sienaDataCreate}}, \code{\link{coCovar}},
+\code{\link{coDyadCovar}}, \code{\link{varDyadCovar}}}
 \examples{
 
 myvarCovar <- varCovar(s50a)

@@ -47,7 +47,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{n3}{Number of iterations in phase 3.}
   \item{nsub}{Number of subphases in phase 2.}
   \item{dolby}{Boolean. Should there be noise reduction by regression
-    on augmented data score.}
+    on augmented data score. In most cases dolby=TRUE yields better
+	convergence; if convergence is problematic, however, dolby=FALSE
+	may be tried. Just use whatever works best.}
   \item{maxlike}{Whether to use maximum likelihood method or
     Method of Moments estimation.}
   \item{diagonalize}{Number between 0 and 1 (bounds included),
@@ -62,19 +64,22 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     Higher values are more stable, lower values potentially more efficient.
     Default: for ML estimation, diagonalize=0; for MoM estimation,
     diagonalize = 0.5.}
-\item{condvarno}{If \code{cond} (conditional simulation), the
-  sequential number of the network
-  or behavior variable on which to condition.}
+  \item{condvarno}{If \code{cond} (conditional simulation), the
+    sequential number of the network
+    or behavior variable on which to condition.}
   \item{condname}{If conditional, the name of the dependent variable on
-  which to condition. Use one or other of \code{condname} or
-  \code{condvarno} to specify the variable.}
-\item{firstg}{Initial value of scaling ('gain') parameter for updates
-  in the Robbins-Monro procedure.}
-  \item{cond}{Boolean. If TRUE, use conditional simulation. If missing,
-    decision is deferred until \code{\link{siena07}}, when it is set to
-    TRUE if there is only one dependent variable, FALSE otherwise.}
+    which to condition. Use one or other of \code{condname} or
+    \code{condvarno} to specify the variable.}
+  \item{firstg}{Initial value of scaling ('gain') parameter for updates
+    in the Robbins-Monro procedure.}
+  \item{cond}{Boolean. Only relevant for Method of Moments
+    simulation/estimation.
+    If TRUE, use conditional simulation; if FALSE, unconditional simulation.
+	If missing, decision is deferred until \code{\link{siena07}},
+	when it is set to TRUE if there is only one dependent variable,
+	FALSE otherwise.}
   \item{findiff}{ Boolean: If TRUE, estimate derivatives using finite
-  differences. If FALSE use scores.}
+    differences. If FALSE, use scores.}
   \item{seed}{Integer. Starting value of random seed. Not used if
     parallel testing.}
   \item{pridg}{Real number. Probability used in Metropolis-Hastings

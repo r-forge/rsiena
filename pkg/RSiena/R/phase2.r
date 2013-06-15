@@ -145,7 +145,7 @@ proc2subphase <- function(z, x, subphase, useAverage=TRUE, ...)
     }
     if (useAverage)
     {
-		z$theta <- z$thav / z$thavn   #(z$nit + 1)
+		z$theta <- z$thav / z$thavn   # z$thavn = (z$nit + 1)
     }
     else
 	{
@@ -302,9 +302,7 @@ doIterations<- function(z, x, subphase,...)
                 z$OK <- FALSE
                 break
             }
-			
-			
-			
+
         }
 		## setup check for end of phase. either store or calculate
         if (z$nit %% 2 == 1)

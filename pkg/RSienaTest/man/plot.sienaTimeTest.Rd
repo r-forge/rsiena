@@ -44,7 +44,7 @@
  opposed to including both outdegree and reciprocity.
 
  The \code{pairwise=FALSE} plot displays the most of the information
- garnered from \code{sienaTimeTest} in a graphical fashion.  For a each
+ garnered from \code{sienaTimeTest} in a graphical fashion.  For each
  effect, the method of moments parameter estimate for the base period
  (i.e. wave 1) is given as a blue, horizontal reference line. One step
  estimates are given for all of the parameters by dots at each wave. The

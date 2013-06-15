@@ -1,3 +1,27 @@
+2013-06-15 R-forge revision 231
+Changes in RSiena as well as RSienaTest:
+   * Make the "cumulative" option operational in BehaviorDistribution()
+     (sienaGOF.r).
+   * Correct bug in treatment of missing values in sparseMatrixExtraction()
+     (sienaGOF.r).
+   * Allow sparse observed data matrices, and structural zeros and ones, in
+     sparseMatrixExtraction() and networkExtraction(),
+     and bipartite networks in networkExtraction() (sienaGOF.r).
+   * In case prevAns exists, recalculate z$dinvv instead of taking it
+     from prevAns (initializeFRAN.r) (parameter diag may have changed)
+   * Report correct centering (by overall means) of individual
+     covariates for multi-group objects (print01Report.r).
+   * in sienaTimeTest: string in toTest$effectName set to "chisq="
+     instead of "p=" (sienaTimeTest.r)
+   * In print method for sienaAlgorithm, report of conditional corrected
+     in case !x$cconditional (sienaprint.r)
+   * If there is a composition change object, MoM estimation is forced
+     to be non-conditional (initializeFRAN.r). This is reported in the help file
+     (sienaCompositionChange.Rd).
+     
+   * Small changes in help files sienaAlgorithm.Rd, plot.sienaTimeTest.Rd,
+
+
 2013-05-10 R-forge revision 230
 Changes in RSiena as well as RSienaTest:
 	* Add attribute maxObsOutDegree to <object of class siena>$depvars[[.]]

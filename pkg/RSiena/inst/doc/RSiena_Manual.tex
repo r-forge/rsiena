@@ -1629,6 +1629,9 @@ For networks with constant composition
 (no entering or leaving actors), this file or list is
 omitted and the current subsection can be disregarded.
 
+If there is composition change, estimation by the Method of Moments
+is forced to be unconditional (see Section~\ref{S_cond}).
+
 At these times, where the actor is not in the network, the entries
 of the adjacency matrix can be specified in two ways. First as
 missing values using missing value code(s). In the estimation
@@ -1707,19 +1710,32 @@ Individual as well as dyadic covariates are centered
 by the program in the following way.
 
 For individual covariates, the mean value is subtracted
-by function \sfn{SienaDataCreate}. For the changing
+by function \sfn{SienaDataCreate}. The centered values then are stored,
+and all calculations use these centered variables.
+For the changing
 covariates, this is the global mean (averaged over all periods).
 The values of these subtracted means are reported in the output.
+For the multi-group option (section \ref{S_multigroup}),
+the subtracted values are the global means across all groups.
 
 For the dyadic covariates and the similarity variables derived
 from the individual covariates, the grand mean is calculated
 and stored by function \sfn{SienaDataCreate},
-and subtracted during the program calculations. (Thus,
+the stored values of the variables are not centered, but the means
+are subtracted during the program calculations. (Thus,
 dyadic covariates are treated internally by the program differently than
 individual covariates in the sense that the mean is subtracted at
-a different moment, but the effect is exactly the same.)
+a different moment, but the effect is the same; except for multi-group
+projects, see below.)
 Unlike the `covariate similarity' effect,
 the `same covariate' effect is not centered but keeps its 0-1 values.
+
+For the multi-group option (section \ref{S_multigroup}),
+dyadic covariates are treated \underline{differently} from
+individual covariates: here the subtracted values are
+the within-group means.
+the subtracted values are the global means across all groups.
+
 
 For dependent behavioral variables, the effects are defined
 in Section~\ref{S_ff_b} as functions of centered variables.
@@ -1766,7 +1782,7 @@ dependent variable -- as \texttt{attr(mydata\$depvars[[1]], "balmean")}.
 Instead of \texttt{[[1]]} you can request a different number or
 the name of the variable.
 
-%The dependent network variable is not centered.
+%The dependent behavior variable is not centered.
 
 \subsection{Monotonic dependent variables}
 \label{S_monotone}
@@ -5909,6 +5925,10 @@ by the multi-group option, it probably is advisable,
 when using Method of Moments estimation, to use
 the conditional estimation option.
 
+In multi-group projects, individual covariates are centered by subtracting
+the overall mean (across all groups), but dyadic covariates are centered
+by subtracting the within-group means.
+
 
 
 \subsection{Meta-analysis of Siena results}
@@ -9168,7 +9188,7 @@ This requires allowOnly=FALSE in startup1Model
 
 \fi
 
-
+\noindent
 \emph{Error in solve.default(z\$dfra) : \\
 system is computationally singular: reciprocal condition number = 2.34809e-35
 }\\
@@ -9231,6 +9251,47 @@ For \sfn{sienaTimeTest}: exclude some of the requested
 time heterogeneity tests by the \sfn{excludeEffects} parameter.
 \end{minipage}
 
+\subsection{In sienaGOF}
+
+
+\emph{Error in if (attr(obsData[[groupName]]\$depvars[[varName]], "sparse")) \{ :\\
+  argument is of length zero }
+\smallskip
+
+\begin{minipage}{0.05\textwidth}
+$\phantom{abcde}$
+
+\end{minipage}
+\begin{minipage}{0.94\textwidth}
+This can happen directly when calling \sfn{sienaGOF}.
+It indicates that you used a wrong name for \sfn{groupName} or \sfn{varName}.
+See the help file for \sfn{sienaGOF}.
+\smallskip
+
+\noindent
+\emph{Solutions.} \\
+Use a correct \sfn{groupName} and \sfn{varName}.
+\end{minipage}
+\bigskip
+
+\noindent
+\emph{Error in if (isbipartite) \{ : argument is of length zero }
+\smallskip
+
+\begin{minipage}{0.05\textwidth}
+$\phantom{abcde}$
+
+\end{minipage}
+\begin{minipage}{0.94\textwidth}
+This can happen directly when calling \sfn{sienaGOF}.
+It indicates that you used a wrong name for \sfn{groupName} or \sfn{varName}.
+See the help file for \sfn{sienaGOF}.
+\smallskip
+
+\noindent
+\emph{Solutions.} \\
+Use a correct \sfn{groupName} and \sfn{varName}.
+\end{minipage}
 
 \newpage
 \part{Programmers' manual}
@@ -10233,11 +10294,33 @@ which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2013-06-15 R-forge revision 231
+
+Changes in RSiena as well as RSienaTest:
+  \begin{itemize}
+  \item  
+   Make the "cumulative" option operational in \sfn{BehaviorDistribution()}
+   for \sfn{sienaGOF()}.
+  \item
+   Correct bug in treatment of missing values in  \sfn{sparseMatrixExtraction()}
+   for  \sfn{sienaGOF()}.
+  \item
+    Allow sparse observed data matrices, and structural zeros and ones, in
+      \sfn{sparseMatrixExtraction()} and  \sfn{networkExtraction()},
+     and bipartite networks in  \sfn{networkExtraction()} for  \sfn{sienaGOF()}.
+  \item
+   Report correct centering (by overall means) of individual
+     covariates for multi-group objects in  \sfn{print01Report()}.
+  \item
+   If there is a composition change object, MoM estimation is forced
+     to be non-conditional. This is reported in the help file
+     for  \sfn{sienaCompositionChange()}.
+  \end{itemize}
 \item 2013-05-10 R-forge revision 230
 
 Changes in RSiena as well as RSienaTest:
   \begin{itemize}
-   \item Check whether the maximum observed degree is not higher than 
+   \item Check whether the maximum observed degree is not higher than
      \sfn{maxDegree}.
 	\item Fix error in implementation of \sfn{maxDegree}.
 	\item Fix bug in \sfn{print.siena} and extend \sfn{print.siena}.

@@ -421,7 +421,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
                    as.character(toTest$type), ")", sep=""))
     toTest$effectName <-
         factor(paste(toTest$effectName, type,
-                     " \n(p=", toTest$effectTest, ")", sep=""))
+                     " \n(chisq=", toTest$effectTest, ")", sep=""))
     toTest$valsplus <- toTest$OneStepEst +
         ifelse(toTest$period == 1, 0, toTest$OneStepEst[toTest$baseEffect])
     toTest$dummysd <- abs(toTest$OneStepEst / qnorm(1 - toTest$p.value / 2))

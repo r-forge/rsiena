@@ -79,12 +79,3 @@ Type 'q()' to quit R.
 + }}
 > library(tools)
 > if(!nzchar(Sys.getenv("RSIENA_TESTING"))) q("no")
-> 
-> ## now run it
-> res <- 0L
-> runone("scriptfile.R")
-  Running 'scriptfile.R'
-[1] 0
-> 
-> ## now look at the differences
-> Rdiff("scriptfile.Rout", previousFile)

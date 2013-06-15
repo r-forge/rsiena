@@ -47,7 +47,10 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
 }
 }
 \details{
-  Intervals are treated as closed at each end.
+  Intervals are treated as closed at each end.\cr
+  For data sets including a composition change object, estimation
+  by Method of Moments is forced to be unconditional, overriding
+  the specification in the \code{\link{sienaAlgorithm}} object.
 }
 \value{
   An object of class "compositionChange", a list of numeric vectors,

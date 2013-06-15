@@ -176,7 +176,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         types <- sapply(data[[1]]$depvars, function(x) attr(x, "type"))
         ## now check if conditional estimation is OK and copy to z if so
         z$cconditional <- FALSE
-        if (x$cconditional)
+        if ((x$cconditional) & (!(attr(data, "compositionChange"))))
         {
             if (x$maxlike)
             {
@@ -299,8 +299,24 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
                 z$haveDfra <- TRUE
                 z$dfra <- prevAns$dfra
                 z$dinv <- prevAns$dinv
-                z$dinvv <- prevAns$dinvv
-                z$sf <- prevAns$sf
+				# z$dinvv must not be taken from prevAns,
+				# because the value of diagonalize
+				# is defined in x and may have changed.
+				# Therefore here we copy the corresponding lines
+				# from phase1.r.
+				if (!x$diagg)
+				{
+					# Partial diagonalization of derivative matrix
+					# for use if 0 < x$diagonalize < 1.
+					temp <- (1-x$diagonalize)*z$dfra +
+							x$diagonalize*diag(diag(z$dfra))
+					temp[z$fixed, ] <- 0.0
+					temp[, z$fixed] <- 0.0
+					diag(temp)[z$fixed] <- 1.0
+					# Invert this matrix
+					z$dinvv <- solve(temp)
+				}
+				z$sf <- prevAns$sf
 				# check for backward compatibility with pre-1.1-220 versions:
 				if (is.null(prevAns$regrCoef))
 				{

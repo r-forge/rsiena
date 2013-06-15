@@ -142,6 +142,8 @@ phase3.2 <- function(z, x, ...)
     ##calculate t-ratios
     dmsf <- diag(z$msf)
     sf <- colMeans(z$sf)
+	# TS: I wonder why "use" and "use2" are the names in the following lines;
+	# the coordinates with "use" are <<not>> used.
     use <- dmsf < 1e-20 * z$scale * z$scale
     use2 <- abs(sf) < 1e-10 * z$scale
     dmsf[use] <- 1e-20 * z$scale[use] * z$scale[use]
@@ -150,13 +152,13 @@ phase3.2 <- function(z, x, ...)
     tstat[use & use2] <- 0
     tstat[use & !use2] <- 999
     z$tstat <- tstat
-	# tconv.max = Maximum value of t-ratio for convergence, 
+	# tconv.max = Maximum value of t-ratio for convergence,
 	# for any linear combination.
 	z$tconv.max <- NA
 	if (sum(!z$fixed) > 0)
 	{
 		mean.dev <- colSums(z$sf)[!z$fixed]/dim(z$sf)[1]
-		cov.dev <- z$msf[!z$fixed,!z$fixed]		
+		cov.dev <- z$msf[!z$fixed,!z$fixed]
 		if (inherits(try(thisproduct <- solve(cov.dev, mean.dev)),"try-error"))
 		{
 			Report('Maximum t-ratio for convergence not computable.\n', outf)
@@ -192,7 +194,7 @@ phase3.2 <- function(z, x, ...)
 	{
         Report(c('(Since the diagnostic checks now are based only on ',
                  z$Phase3nits,
-                 ' iterations', '\nThey are not reliable.)'), sep='', outf)
+                 ' iterations,', '\nthey are not reliable.)\n'), sep='', outf)
 	}
     if (error) ## also test subphase here but not relevant to phase 3, I think
     {
@@ -204,7 +206,7 @@ phase3.2 <- function(z, x, ...)
 		## removed repfortotal loop possibility here as not functioning now
         if (z$Phase3nits <= 50)
 		{
-            Report(c('However, the standard deviations are based on',
+            Report(c('Note that the standard deviations are based on',
                      'few simulations.\n'), outf)
 		}
 	}
@@ -387,6 +389,7 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
         fchange <- dinv%*%colMeans(z$sf)
         z$dinv <- dinv
     }
+	z$fchange <- fchange
     Report('dfrac :\n', cf)
     PrtOutMat(z$dfrac, cf)
     Report('inverse of dfra :\n', cf)

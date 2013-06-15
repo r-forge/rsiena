@@ -40,8 +40,18 @@ sienaGOF <- function(
 		stop("You need to supply the parameter <<auxiliaryFunction>>.")
 	}
 	groups <- length(sienaFitObject$f$groupNames)
-	if (verbose) cat("Detected", iterations, "iterations and", groups,
-				"groups.\n")
+	if (verbose)
+	{
+		if (groups <= 1)
+		{
+			cat("Detected", iterations, "iterations and", groups, "group.\n")
+		}
+		else
+		{
+			cat("Detected", iterations, "iterations and", groups, "groups.\n")
+		}
+	}
+
 	if (is.null(period) )
 	{
 		period <- 1:(attr(sienaFitObject$f[[1]]$depvars[[1]], "netdims")[3] - 1)
@@ -72,7 +82,17 @@ sienaGOF <- function(
 	attr(obsStats,"joint") <- join
 
 	##	Calculate the simulated auxiliary statistics
-	if (verbose) cat("Calculating auxiliary statistics for periods", period, ".\n")
+	if (verbose)
+	{
+		if (length(period) <= 1)
+		{
+			cat("Calculating auxiliary statistics for period", period, ".\n")
+		}
+		else
+		{
+			cat("Calculating auxiliary statistics for periods", period, ".\n")
+		}
+	}
 
 	if (!is.null(cluster)) {
 		ttcSimulation <- system.time(simStatsByPeriod <- lapply(period,
@@ -662,31 +682,50 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 # Ties for ordered pairs with a missing value for wave=period or period+1
 #  are zeroed;
 # note that this also is done in RSiena for calculation of target statistics.
-sparseMatrixExtraction <- function(i, obsData, sims, period, groupName, varName)
-{
+sparseMatrixExtraction <-
+	function(i, obsData, sims, period, groupName, varName){
 	# require(Matrix)
-	dimsOfDepVar<-
-	attr(obsData[[groupName]]$depvars[[varName]], "netdims")
-	missing <- Matrix((is.na(obsData[[groupName]]$depvars[[varName]][,,period+1]) |
-				is.na(obsData[[groupName]]$depvars[[varName]][,,period+1]))*1)
+	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
+	if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
+	{
+		missings <-
+			(is.na(obsData[[groupName]]$depvars[[varName]][[period]]) |
+			is.na(obsData[[groupName]]$depvars[[varName]][[period+1]]))*1
+	}
+	else
+	{
+		missings <- Matrix(
+			(is.na(obsData[[groupName]]$depvars[[varName]][,,period]) |
+			is.na(obsData[[groupName]]$depvars[[varName]][,,period+1]))*1)
+	}
 	if (is.null(i))
 	{
-		# sienaGOF wants the observation:
-		returnValue <-
-			Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1])
+		# sienaGOF wants the observation;
+		# transform structurally fixed values into regular values
+		# by "modulo 10" operation
+		if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
+		{
+			returnValue <- drop0(
+			 Matrix(obsData[[groupName]]$depvars[[varName]][[period+1]] %% 10))
+		}
+		else
+		{
+			returnValue <-
+			 Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1] %% 10)
+		}
 		returnValue[is.na(returnValue)] <- 0
 	}
 	else
 	{
 		# sienaGOF wants the i-th simulation:
 		returnValue <- sparseMatrix(
-					sims[[i]][[groupName]][[varName]][[period]][,1],
-					sims[[i]][[groupName]][[varName]][[period]][,2],
-					x=sims[[i]][[groupName]][[varName]][[period]][,3],
-					dims=dimsOfDepVar[1:2] )
+				sims[[i]][[groupName]][[varName]][[period]][,1],
+				sims[[i]][[groupName]][[varName]][[period]][,2],
+				x=sims[[i]][[groupName]][[varName]][[period]][,3],
+				dims=dimsOfDepVar[1:2] )
 	}
 	## Zero missings:
-	1*((returnValue - missing) > 0)
+	1*((returnValue - missings) > 0)
 }
 
 ##@networkExtraction sienaGOF Extracts simulated networks
@@ -694,67 +733,126 @@ sparseMatrixExtraction <- function(i, obsData, sims, period, groupName, varName)
 # networks from the results of a siena07 run.
 # It returns the network as an edge list of class "network"
 # according to the <network> package (used for package sna).
-# Ties for ordered pairs with a missing value for wave=period or period+1 are zeroed;
+# Ties for ordered pairs with a missing value for wave=period or period+1
+# are zeroed;
 # note that this also is done in RSiena for calculation of target statistics.
-networkExtraction <- function (i, obsData, sims, period, groupName, varName)
-{
+networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	require(network)
 	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
-	missings <- is.na(obsData[[groupName]]$depvars[[varName]][,,period]) |
-					is.na(obsData[[groupName]]$depvars[[varName]][,,period+1])
 	isbipartite <- (attr(obsData[[groupName]]$depvars[[varName]], "type")
 						=="bipartite")
-	if (is.null(i))
-		{
-		# sienaGOF wants the observation:
-		original <- obsData[[groupName]]$depvars[[varName]][,,period+1]
-		if (isbipartite)
-			{
-				# This will not go well if original is an edge list. TODO
-				if (dim(original)[2] < dimsOfDepVar[2]){
-				stop(
-	"networkExtraction() does not allow edge lists for bipartite networks.")}
-				returnValue <- network(original, bipartite=dimsOfDepVar[1]) -
-								network(missings, matrix.type="adjacency",
+	sparseData <- (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
+	# For bipartite networks in package <network>,
+	# the number of nodes is equal to
+	# the number of actors (rows) plus the number of events (columns)
+	# with all actors preceeding all events.
+	# Therefore the bipartiteOffset will come in handy:
+	bipartiteOffset <- ifelse (isbipartite, 1 + dimsOfDepVar[1], 1)
+
+	# Initialize empty networks:
+	if (isbipartite)
+	{
+		# for bipartite networks, package <<network>> numbers
+		# the second mode vertices consecutively to the first mode.
+		emptyNetwork <- network.initialize(dimsOfDepVar[1]+dimsOfDepVar[2],
 											bipartite=dimsOfDepVar[1])
-			}
-			else
-			{
-				returnValue <- network(original, bipartite=FALSE) -
-								network(missings, bipartite=FALSE)
-			}
+	}
+	else
+	{
+		emptyNetwork <- network.initialize(dimsOfDepVar[1],	bipartite=NULL)
+	}
+	if (sparseData)
+	{
+		# Which tie variables are regarded as missings:
+		missings <- as(
+			is.na(obsData[[groupName]]$depvars[[varName]][[period]]) |
+			is.na(obsData[[groupName]]$depvars[[varName]][[period+1]]),
+			"lgTMatrix")
+		# For lgTMatrix, slots i and j are the rows and columns,
+		# numbered from 0 to dimension - 1.
+		# Actors in class network are numbered starting from 1.
+		# Hence 1 must be added to missings@i and missings@j.
+		# Put the missings into network shape:
+		if (length(missings@i) <= 0)
+		{
+			missings <- emptyNetwork
 		}
 		else
 		{
-			#sienaGOF wants the i-th simulation:
+			missings <- network.edgelist(
+			  cbind(missings@i + 1, missings@j + bipartiteOffset, 1), emptyNetwork)
+		}
+	}
+	else # not sparse
+	{
+		# For adjacency matrices the size is evident.
+		if (isbipartite)
+		{
+			missings <- network(
+				(is.na(obsData[[groupName]]$depvars[[varName]][,,period]) |
+				is.na(obsData[[groupName]]$depvars[[varName]][,,period+1]))*1,
+				matrix.type="adjacency", bipartite=dimsOfDepVar[1])
+		}
+		else
+		{
+			missings <- network(
+				(is.na(obsData[[groupName]]$depvars[[varName]][,,period]) |
+				is.na(obsData[[groupName]]$depvars[[varName]][,,period+1]))*1,
+				matrix.type="adjacency")
+		}
+	}
+
+	if (is.null(i))
+	{
+		# sienaGOF wants the observation;
+		if (sparseData)
+		{
+		# transform structurally fixed values into regular values
+		# by "modulo 10" operation;
+		# drop NAs and 0 values
+			original <-
+				obsData[[groupName]]$depvars[[varName]][[period+1]] %% 10
+			original[is.na(original)] <- 0
+			original <- as(drop0(original), "dgTMatrix")
+		# now original@x is a column of ones;
+		# the 1 here is redundant because of the default ignore.eval=TRUE
+		# in network.edgelist
+			returnValue <- network.edgelist(
+					cbind(original@i + 1, original@j + bipartiteOffset, 1),
+					emptyNetwork) - missings
+
+		}
+		else # not sparse: deal with adjacency matrices
+		{
+			original <-
+				obsData[[groupName]]$depvars[[varName]][,,period+1] %% 10
+			original[is.na(original)] <- 0
 			if (isbipartite)
 			{
-				# for bipartite networks, package <<network>> numbers
-				# the second mode vertices consecutively to the first mode.
-				returnValue <- network(
-					cbind(sims[[i]][[groupName]][[varName]][[period]][,1],
-							(sims[[i]][[groupName]][[varName]][[period]][,2] +
-								dimsOfDepVar[1])),
-					matrix.type="edgelist", bipartite=dimsOfDepVar[1])
-				# There seems to be no function in package network to change n.
-				returnValue$gal$n <- dimsOfDepVar[1] + dimsOfDepVar[2]
-				returnValue <- 	returnValue -
-					network(missings, matrix.type="adjacency",
-							bipartite=dimsOfDepVar[1])
+				returnValue <- network(original, matrix.type="adjacency",
+									bipartite=dimsOfDepVar[1]) - missings
 			}
 			else
 			{
-				returnValue <- network(
-					cbind(sims[[i]][[groupName]][[varName]][[period]][,1],
-							sims[[i]][[groupName]][[varName]][[period]][,2]),
-				matrix.type="edgelist", bipartite=FALSE)
-				returnValue$gal$n <- dimsOfDepVar[1]
-				returnValue <- returnValue - network(missings, bipartite=FALSE)
+				returnValue <- network(original, matrix.type="adjacency",
+									bipartite=FALSE) -	missings
 			}
 		}
+	}
+	else
+	{
+		# sienaGOF wants the i-th simulation;
+		# the 1 in cbind is redundant because of the default ignore.eval=TRUE
+		# in network.edgelist
+		bipartiteOffset <- ifelse (isbipartite, dimsOfDepVar[1], 0)
+		returnValue <- network.edgelist(
+			cbind(
+			 sims[[i]][[groupName]][[varName]][[period]][,1],
+			(sims[[i]][[groupName]][[varName]][[period]][,2] + bipartiteOffset),
+						1), emptyNetwork) - missings
+	}
   returnValue
 }
-
 
 ##@behaviorExtraction sienaGOF Extracts simulated behavioral variables.
 # This function provides a standard way of extracting simulated and observed
@@ -765,36 +863,37 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName)
 behaviorExtraction <- function (i, obsData, sims, period, groupName, varName) {
   missings <- is.na(obsData[[groupName]]$depvars[[varName]][,,period]) |
 	is.na(obsData[[groupName]]$depvars[[varName]][,,period+1])
-  if (is.null(i)) {
-	# sienaGOF wants the observation:
-	original <- obsData[[groupName]]$depvars[[varName]][,,period+1]
-	original[missings] <- NA
-	returnValue <- original
-  }
-  else
-  {
-	#sienaGOF wants the i-th simulation:
-	returnValue <- sims[[i]][[groupName]][[varName]][[period]]
-	returnValue[missings] <- NA
-  }
-  returnValue
+  if (is.null(i))
+	{
+		# sienaGOF wants the observation:
+		original <- obsData[[groupName]]$depvars[[varName]][,,period+1]
+		original[missings] <- NA
+		returnValue <- original
+	}
+	else
+	{
+		#sienaGOF wants the i-th simulation:
+		returnValue <- sims[[i]][[groupName]][[varName]][[period]]
+		returnValue[missings] <- NA
+	}
+	returnValue
 }
 
 ##@OutdegreeDistribution sienaGOF Calculates Outdegree distribution
 OutdegreeDistribution <- function(i, obsData, sims, period, groupName, varName,
 						levls=0:8, cumulative=TRUE) {
-  x <- sparseMatrixExtraction(i, obsData, sims, period, groupName, varName)
-  a <- apply(x, 1, sum)
-  if (cumulative)
-  {
-	oddi <- sapply(levls, function(i){ sum(a<=i) })
-  }
-  else
-  {
-	oddi <- sapply(levls, function(i){ sum(a==i) })
-  }
-  names(oddi) <- as.character(levls)
-  oddi
+	x <- sparseMatrixExtraction(i, obsData, sims, period, groupName, varName)
+	a <- apply(x, 1, sum)
+	if (cumulative)
+	{
+		oddi <- sapply(levls, function(i){ sum(a<=i) })
+	}
+	else
+	{
+		oddi <- sapply(levls, function(i){ sum(a==i) })
+	}
+	names(oddi) <- as.character(levls)
+	oddi
 }
 
 ##@IndegreeDistribution sienaGOF Calculates Indegree distribution
@@ -823,8 +922,14 @@ BehaviorDistribution <- function (i, obsData, sims, period, groupName, varName,
 		levls <- attr(obsData[[groupName]]$depvars[[varName]],"behRange")[1]:
 					attr(obsData[[groupName]]$depvars[[varName]],"behRange")[2]
 	}
+	if (cumulative)
+	{
+		bdi <- sapply(levls, function(i){ sum(x<=i, na.rm=TRUE) })
+	}
+	else
+	{
 	bdi <- sapply(levls, function(i){ sum(x==i, na.rm=TRUE) })
-  names(bdi) <- as.character(levls)
-  bdi
+	}
+	names(bdi) <- as.character(levls)
+	bdi
 }
-
