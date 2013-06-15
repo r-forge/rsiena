@@ -31,8 +31,9 @@ nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
     two consecutive waves the changes are non-decreasing or non-increasing,
     and if this is the case, this will also be a constraint for the
     simulations between these two waves.
-    This is done by means of the internal parameters uponly and downonly.
-    If FALSE, the parameters uponly and downonly always are
+    This is done by means of the internal parameters \code{uponly} and
+	\code{downonly}.
+    If FALSE, the parameters \code{uponly} and \code{downonly} always are
     set to FALSE, and changes in dependent variables will not be constrained
     to be non-decreasing or non-increasing.
     For normal operation, TRUE is the appropriate option.}

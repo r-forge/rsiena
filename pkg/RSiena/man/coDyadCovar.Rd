@@ -29,7 +29,8 @@ coDyadCovar(val, nodeSets=c("Actors", "Actors"),
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley}
-\seealso{\code{\link{sienaDataCreate}}, \code{\link{varDyadCovar}}}
+\seealso{\code{\link{sienaDataCreate}}, \code{\link{varDyadCovar}},
+ \code{\link{coCovar}}, \code{\link{varCovar}}}
 \examples{
 
 mydyadvar <- coDyadCovar(s503)

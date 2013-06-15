@@ -185,6 +185,7 @@ phase1.2 <- function(z, x, ...)
         z$mnfra[z$fixed] <- 0.0
         z$sf[ , z$fixed] <- 0
     }
+	# Manage derivative matrix
     if (any(diag(z$dfra) < 1e-8))
     {
         sml <- (1 : z$pp)[diag(z$dfra) < 1e-8]
@@ -192,6 +193,7 @@ phase1.2 <- function(z, x, ...)
         Report(c('Diagonal elements(s)', sml,
                  'of derivative matrix amended in phase 1.'), cf, fill=80)
     }
+	# Invert derivative matrix and define step fchange that will not be made.
     if (inherits(try(dinv <- solve(z$dfra)), "try-error"))
     {
         Report('Error message for inversion of dfra: \n', cf)
@@ -217,10 +219,13 @@ phase1.2 <- function(z, x, ...)
     }
 	if (!x$diagg) 
 	{
+		# Partial diagonalization of derivative matrix
+		# for use if 0 < x$diagonalize < 1.
 		temp <- (1-x$diagonalize)*z$dfra + x$diagonalize*diag(diag(z$dfra))
 		temp[z$fixed, ] <- 0.0
 		temp[, z$fixed] <- 0.0
 		diag(temp)[z$fixed] <- 1.0
+		# Invert this matrix
 		z$dinvv <- solve(temp)
 	}
     Report('dfra :\n', cf)

@@ -738,7 +738,7 @@ The algorithm consists of three phases.
       \[
       \bar{s} = \frac{{\rm{Sum}}_{S}}{n_1} \ .
       \]
-      \item
+      \item In \nnm{CalculateDerivative} : \ 
       Estimate $D(\theta_1)$ by
       \begin{align*}
       \text{FD:    }   \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_1} \\
@@ -766,6 +766,7 @@ The algorithm consists of three phases.
       \end{enumerate}
 
 \item[Phase 2.]
+    \emph{Note: I cannot find anything about phase2.0 in the current code -- ts 23-05-13.}\\
     The boolean variable \nnm{phase2.0} differentiates between having or not
     having a subphase 2.0.
     Such a subphase was introduced in version R-Forge 1.1-220 (August 2012).\\
@@ -896,7 +897,7 @@ The algorithm consists of three phases.
            \]
            where $\sigma_j$ is the square root of the $j'$th diagonal element
            of $\Sigma$.
-      \item
+      \item In \nnm{CalculateDerivative3} : \ 
            Estimate $D(\hat\theta)$ by
       \begin{align*}
       \text{FD:    }   \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_3} \\
