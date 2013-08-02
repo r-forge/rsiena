@@ -5,7 +5,7 @@ RHOME = d:/R/R-2.9.0
 
 .PHONY: all libs
 
-SOURCES=$(wildcard data/*.cpp utils/*.cpp utils/random.h model/*.cpp model/effects/*.cpp model/tables/*.cpp model/variables/*.cpp network/*.cpp)
+SOURCES=$(wildcard data/*.cpp utils/*.cpp utils/random.h model/*.cpp model/effects/*.cpp model/tables/*.cpp model/variables/*.cpp network/*.cpp network/*/*.cpp)
 EXTRAS=$(foreach i,$(SOURCES),$(basename $i).o)
 
 PKG_LIBS=-L. -lpgSn -lRMath
