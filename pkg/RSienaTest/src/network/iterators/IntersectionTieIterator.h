@@ -12,59 +12,25 @@
 
 namespace siena {
 
-template<class __iter1, class __iter2>
-class IntersectionTieIterator: public CombinedTieIterator<__iter1, __iter2 > {
-
+class IntersectionTieIterator: public CombinedTieIterator {
 public:
-	IntersectionTieIterator(__iter1 iter1, __iter2 iter2) :
-			CombinedTieIterator<__iter1, __iter2 >(iter1, iter2) {
-		// move to the first common position
-		if (valid() && !isCommon()) {
-			skip();
-		}
-	}
+	IntersectionTieIterator(const ITieIterator& iter1,
+			const ITieIterator& iter2);
 
-	~IntersectionTieIterator() {
-	}
+	virtual ~IntersectionTieIterator();
 
-	inline int actor() const {
-		// we only have to check whether iter2 is valid cause
-		// iter1 will throw anyway
-		if (this->m_iter2.valid()) {
-			return this->m_iter1.actor();
-		}
-		throw InvalidIteratorException();
-	}
+	virtual void next();
+	virtual int actor() const;
+	virtual bool valid() const;
+	virtual IntersectionTieIterator * clone() const;
+	void skip();
 
-	inline void next() {
-		this->m_iter1.next();
-		this->m_iter2.next();
-		skip();
-	}
-
-	inline void skip() {
-		while (valid() && !this->isCommon()) {
-			while (this->m_iter1.valid()
-					&& this->m_iter1.actor() < this->m_iter2.actor()) {
-				this->m_iter1.next();
-			}
-			if (!this->m_iter1.valid()) {
-				return;
-			}
-			while (this->m_iter2.valid()
-					&& this->m_iter2.actor() < this->m_iter1.actor()) {
-				this->m_iter2.next();
-			}
-		}
-	}
-
-	inline bool valid() const {
-		return this->m_iter1.valid() && this->m_iter2.valid();
-	}
+protected:
+	IntersectionTieIterator(const IntersectionTieIterator& rhs);
+private:
+	IntersectionTieIterator& operator=(const IntersectionTieIterator&);
 
 };
-
-//typedef IntersectionTieIterator<IncidentTieIterator, IncidentTieIterator> CommonNeighborIterator;
 
 } /* namespace siena */
 

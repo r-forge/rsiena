@@ -26,9 +26,11 @@ namespace siena {
 class IncidentTieIterator: public ITieIterator {
 	// The class Network needs access to the private constructor.
 	friend class Network;
+	friend class DistanceTwoView;
 
 public:
 	IncidentTieIterator();
+	IncidentTieIterator(const IncidentTieIterator& rhs);
 
 	/**
 	 * Returns the neighbor incident to the current tie.
@@ -64,9 +66,11 @@ public:
 		++lcurrent;
 	}
 
+	IncidentTieIterator* clone() const;
+
 private:
-	IncidentTieIterator(std::map<int, int> & ties);
-	IncidentTieIterator(std::map<int, int> & ties, int lowerBound);
+	IncidentTieIterator(const std::map<int, int> & ties);
+	IncidentTieIterator(const std::map<int, int> & ties, int lowerBound);
 
 	// Points to the current element in the underlying map
 	std::map<int, int>::const_iterator lcurrent;

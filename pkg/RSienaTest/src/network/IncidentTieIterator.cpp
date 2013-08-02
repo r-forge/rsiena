@@ -27,10 +27,20 @@ IncidentTieIterator::IncidentTieIterator() :
 // given map. The values of the pairs in the map represent the values
 // of ties, and the keys represent the corresponding neighbors.
 //
-IncidentTieIterator::IncidentTieIterator(std::map<int, int> & ties) :
+IncidentTieIterator::IncidentTieIterator(const std::map<int, int> & ties) :
 		ITieIterator(), //
 		lcurrent(ties.begin()), //
 		lend(ties.end()) {
+}
+
+IncidentTieIterator::IncidentTieIterator(const IncidentTieIterator& rhs) :
+		ITieIterator(rhs), //
+		lcurrent(rhs.lcurrent), //
+		lend(rhs.lend) {
+}
+
+IncidentTieIterator* IncidentTieIterator::clone() const {
+	return new IncidentTieIterator(*this);
 }
 
 //
@@ -39,7 +49,7 @@ IncidentTieIterator::IncidentTieIterator(std::map<int, int> & ties) :
 // of ties, and the keys represent the corresponding neighbors. Only
 // neighbors that are greater or equal with the given bound are returned.
 //
-IncidentTieIterator::IncidentTieIterator(std::map<int, int> & ties,
+IncidentTieIterator::IncidentTieIterator(const std::map<int, int> & ties,
 		int lowerBound) :
 		ITieIterator(), //
 		lcurrent(ties.lower_bound(lowerBound)), //

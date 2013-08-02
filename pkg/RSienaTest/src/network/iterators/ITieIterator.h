@@ -16,13 +16,11 @@ class ITieIterator {
 public:
 	virtual ~ITieIterator() {
 	}
-
-	virtual int actor() const = 0;
 	virtual void next() = 0;
+	virtual int actor() const = 0;
 	virtual bool valid() const = 0;
-
+	virtual ITieIterator* clone() const = 0;
 protected:
-
 	ITieIterator() {
 	}
 

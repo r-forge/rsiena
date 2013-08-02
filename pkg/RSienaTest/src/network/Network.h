@@ -14,8 +14,7 @@
 
 #include <map>
 
-namespace siena
-{
+namespace siena {
 
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
@@ -24,13 +23,13 @@ namespace siena
 class TieIterator;
 class IncidentTieIterator;
 
-
 // ----------------------------------------------------------------------------
 // Section: Enums
 // ----------------------------------------------------------------------------
 
-enum ChangeType {REPLACE, INCREASE};
-
+enum ChangeType {
+	REPLACE, INCREASE
+};
 
 // ----------------------------------------------------------------------------
 // Section: Network class
@@ -43,8 +42,7 @@ enum ChangeType {REPLACE, INCREASE};
  * OneModeNetwork is recommended. The ties are valued and multiple ties between
  * the same pair of actors are forbiden.
  */
-class Network
-{
+class Network {
 public:
 	Network(int n, int m);
 	Network(const Network & rNetwork);
@@ -76,6 +74,8 @@ public:
 	int maxTieValue() const;
 
 	bool complete() const;
+	bool hasEdge(int ego, int alter) const;
+	virtual bool isOneMode();
 
 	int outTwoStarCount(int i, int j) const;
 	int inTwoStarCount(int i, int j) const;
@@ -117,12 +117,7 @@ private:
 	// is changed.
 
 	int lmodificationCount;
-
-	// whether this network is one mode or not;
-
-	bool loneMode;
 };
-
 
 // ----------------------------------------------------------------------------
 // Section: Inline methods
@@ -131,8 +126,7 @@ private:
 /**
  * Returns the number of times this network has been changed.
  */
-int Network::modificationCount() const
-{
+int Network::modificationCount() const {
 	return this->lmodificationCount;
 }
 
