@@ -12,27 +12,18 @@
 
 namespace siena {
 
-template<class __iter1, class __iter2>
-class SymDiffTieIterator: public UnionTieIterator<__iter1, __iter2 > {
-
+class SymDiffTieIterator: public UnionTieIterator {
 public:
-	SymDiffTieIterator(__iter1 iter1, __iter2 iter2) :
-			UnionTieIterator<__iter1, __iter2 >(iter1, iter2) {
-		if (this->m_iter1.valid() && this->m_iter2.valid()
-				&& this->isCommon()) {
-			next();
-		}
-	}
-
-	~SymDiffTieIterator() {
-	}
-
-	inline void next() {
-		do {
-			UnionTieIterator<__iter1, __iter2 >::next();
-		} while (this->m_iter1.valid() && this->m_iter2.valid()
-				&& this->isCommon());
-	}
+	SymDiffTieIterator(const ITieIterator& iter1, const ITieIterator& iter2);
+	SymDiffTieIterator(const ITieIterator& iter1, const ITieIterator& iter2,
+			int idIter1, int idIter2);
+	virtual ~SymDiffTieIterator();
+	virtual SymDiffTieIterator* clone() const;
+	virtual void next();
+protected:
+	SymDiffTieIterator(const SymDiffTieIterator& rhs);
+private:
+	void init();
 };
 
 } /* namespace siena */

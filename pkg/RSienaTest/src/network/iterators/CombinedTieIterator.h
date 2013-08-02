@@ -12,23 +12,23 @@
 
 namespace siena {
 
-// currently not save ... will be solved once concepts become a standard
-template<class __iter1, class __iter2>
 class CombinedTieIterator: public ITieIterator {
 public:
-	virtual ~CombinedTieIterator() {
+	virtual ~CombinedTieIterator();
+
+protected:
+	CombinedTieIterator(const ITieIterator& iter1, const ITieIterator& iter2);
+	CombinedTieIterator(const CombinedTieIterator& rhs);
+
+	inline bool isCommon() const {
+		return lpIter1->actor() == lpIter2->actor();
 	}
 
 protected:
-	CombinedTieIterator(__iter1 iter1, __iter2 iter2) :
-			ITieIterator(), m_iter1(iter1), m_iter2(iter2) {
-	}
-
-	inline bool isCommon() {
-		return m_iter1.actor() == m_iter2.actor();
-	}
-	__iter1 m_iter1;
-	__iter2 m_iter2;
+	ITieIterator* const lpIter1;
+	ITieIterator* const lpIter2;
+private:
+	CombinedTieIterator& operator=(const CombinedTieIterator&);
 };
 
 } /* namespace siena */
