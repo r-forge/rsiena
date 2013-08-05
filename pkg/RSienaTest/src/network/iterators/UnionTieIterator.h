@@ -50,12 +50,15 @@ protected:
 
 private:
 
+	// The ID of the first iterator.
 	int lIdIter1;
 
+	// The ID of the second iterator.
 	int lIdIter2;
 
 	void init(int idIter1, int idIter2);
 
+	// Disable assignment operator.
 	UnionTieIterator& operator=(const UnionTieIterator&);
 };
 
