@@ -26,7 +26,7 @@ namespace siena {
 class IncidentTieIterator: public ITieIterator {
 	// The class Network needs access to the private constructor.
 	friend class Network;
-	friend class DistanceTwoView;
+	friend class DistanceTwoLayer;
 
 public:
 	IncidentTieIterator();
