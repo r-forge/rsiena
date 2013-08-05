@@ -13,6 +13,7 @@
 #define NETWORK_H_
 
 #include <map>
+#include <list>
 
 namespace siena {
 
@@ -22,6 +23,7 @@ namespace siena {
 
 class TieIterator;
 class IncidentTieIterator;
+class INetworkChangeListener;
 
 // ----------------------------------------------------------------------------
 // Section: Enums
@@ -75,10 +77,14 @@ public:
 
 	bool complete() const;
 	bool hasEdge(int ego, int alter) const;
-	virtual bool isOneMode();
+	virtual bool isOneMode() const;
 
 	int outTwoStarCount(int i, int j) const;
 	int inTwoStarCount(int i, int j) const;
+
+	void addNetworkChangeListener(INetworkChangeListener* const listener);
+
+	void removeNetworkChangeListener(INetworkChangeListener* const listener);
 
 	inline int modificationCount() const;
 
@@ -93,6 +99,9 @@ protected:
 private:
 	void allocateArrays();
 	void deleteArrays();
+	void fireNetworkClearEvent() const;
+	void fireIntroductionEvent(int ego, int alter) const;
+	void fireWithdrawalEvent(int ego, int alter) const;
 
 	// The number of senders
 	int ln;
@@ -117,6 +126,9 @@ private:
 	// is changed.
 
 	int lmodificationCount;
+
+	// set of network change listener
+	std::list<INetworkChangeListener*> lNetworkChangeListener;
 };
 
 // ----------------------------------------------------------------------------

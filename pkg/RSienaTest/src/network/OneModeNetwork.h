@@ -45,7 +45,7 @@ public:
 	int reciprocalDegree(int i) const;
 	bool symmetric() const;
 	virtual void clear();
-	virtual bool isOneMode();
+	virtual bool isOneMode() const;
 
 	CommonNeighborIterator reciprocatedTies(int i) const;
 	CommonNeighborIterator reciprocatedTies(int i,
