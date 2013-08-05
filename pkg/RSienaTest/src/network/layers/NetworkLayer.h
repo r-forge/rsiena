@@ -1,9 +1,14 @@
-/*
- * NetworkLayer.h
+/******************************************************************************
+ * SIENA: Simulation Investigation for Empirical Network Analysis
  *
- *  Created on: 05.08.2013
- *      Author: ortmann
- */
+ * Web: http://www.stats.ox.ac.uk/~snijders/siena/
+ *
+ * File: NetworkLayer.h
+ *
+ * Description: This module defines the abstract NetworkLayer implementing
+ * the INetworkChangeListener class. It serves as the base class for any
+ * network layer.
+ *****************************************************************************/
 
 #ifndef NETWORKLAYER_H_
 #define NETWORKLAYER_H_
@@ -11,15 +16,34 @@
 #include "../INetworkChangeListener.h"
 
 namespace siena {
+
+// ----------------------------------------------------------------------------
+// Section: NetworkLayer abstract class
+// ----------------------------------------------------------------------------
+
 class NetworkLayer: public INetworkChangeListener {
 public:
+
+	/**
+	 * Destructor.
+	 */
 	virtual ~NetworkLayer() {
 	}
+
 protected:
-	virtual void initializeOneMode(const Network& rNetwork) = 0;
+
+	/**
+	 * Constructor.
+	 */
 	NetworkLayer() :
 			INetworkChangeListener() {
 	}
+
+	/**
+	 * Initializes the network layer.
+	 */
+	virtual void initialize(const Network& rNetwork) = 0;
+
 private:
 	// disable copy constructor and copy assignment
 	NetworkLayer& operator=(const NetworkLayer& rhs);

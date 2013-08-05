@@ -591,6 +591,11 @@ void Network::fireIntroductionEvent(int ego, int alter) const {
 	}
 }
 
+/**
+ * Tells whether the network is a one mode network or not.
+ * @return <code>True</code> if the network is a one mode network,
+ * <code>False</code> otherwise.
+ */
 bool Network::isOneMode() const {
 	return false;
 }

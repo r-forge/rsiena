@@ -442,6 +442,9 @@ void OneModeNetwork::neighborCensus(int i, int j, int & n3, int & n4) const {
 	}
 }
 
+/**
+ * @copydoc Network::isOneMode()
+ */
 bool OneModeNetwork::isOneMode() const {
 	return true;
 }
