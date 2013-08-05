@@ -10,14 +10,17 @@
  *****************************************************************************/
 
 #include "Network.h"
-#include "TieIterator.h"
-#include "IncidentTieIterator.h"
-#include "NetworkUtils.h"
-#include "../utils/Utils.h"
+
 #include <map>
 #include <stdexcept>
 #include <limits>
 #include <algorithm>
+
+#include "TieIterator.h"
+#include "IncidentTieIterator.h"
+#include "NetworkUtils.h"
+#include "INetworkChangeListener.h"
+#include "../utils/Utils.h"
 
 namespace siena {
 
@@ -62,12 +65,12 @@ Network::Network(const Network & rNetwork) {
 
 	// Copy everything from rNetwork
 
-	for (int i = 0; i < this->ln; ++i) {
+	for (int i = 0; i < this->ln; i++) {
 		this->lpOutTies[i].insert(rNetwork.lpOutTies[i].begin(),
 				rNetwork.lpOutTies[i].end());
 	}
 
-	for (int i = 0; i < this->lm; ++i) {
+	for (int i = 0; i < this->lm; i++) {
 		this->lpInTies[i].insert(rNetwork.lpInTies[i].begin(),
 				rNetwork.lpInTies[i].end());
 	}
@@ -83,11 +86,11 @@ Network & Network::operator=(const Network & rNetwork) {
 	if (this != &rNetwork) {
 		// Empty the current network structure.
 
-		for (int i = 0; i < this->ln; ++i) {
+		for (int i = 0; i < this->ln; i++) {
 			this->lpOutTies[i].clear();
 		}
 
-		for (int i = 0; i < this->lm; ++i) {
+		for (int i = 0; i < this->lm; i++) {
 			this->lpInTies[i].clear();
 		}
 
@@ -103,18 +106,18 @@ Network & Network::operator=(const Network & rNetwork) {
 
 		// Copy everything from rNetwork
 
-		for (int i = 0; i < this->ln; ++i) {
+		for (int i = 0; i < this->ln; i++) {
 			this->lpOutTies[i].insert(rNetwork.lpOutTies[i].begin(),
 					rNetwork.lpOutTies[i].end());
 		}
 
-		for (int i = 0; i < this->lm; ++i) {
+		for (int i = 0; i < this->lm; i++) {
 			this->lpInTies[i].insert(rNetwork.lpInTies[i].begin(),
 					rNetwork.lpInTies[i].end());
 		}
 
 		this->ltieCount = rNetwork.ltieCount;
-		++this->lmodificationCount;
+		this->lmodificationCount++;
 	}
 
 	return *this;
@@ -248,7 +251,7 @@ int Network::changeTieValue(int i, int j, int v, ChangeType type) {
 		lpInTies[j].insert(std::map<int, int>::value_type(i, v));
 	}
 	// Remember that the network has changed
-	++this->lmodificationCount;
+	this->lmodificationCount++;
 
 	// Act on tie withdrawal or introduction.
 	if (oldValue && !v) {
@@ -266,7 +269,9 @@ int Network::changeTieValue(int i, int j, int v, ChangeType type) {
  * from actor <i>i</i> to actor <i>j</i>.
  */
 void Network::onTieWithdrawal(int i, int j) {
-	--this->ltieCount;
+	this->ltieCount--;
+	// fire the withdrawal event
+	fireWithdrawalEvent(i, j);
 }
 
 /**
@@ -274,7 +279,9 @@ void Network::onTieWithdrawal(int i, int j) {
  * from actor <i>i</i> to actor <i>j</i>.
  */
 void Network::onTieIntroduction(int i, int j) {
-	++this->ltieCount;
+	this->ltieCount++;
+	// fire the introduction even
+	fireIntroductionEvent(i, j);
 }
 
 /**
@@ -304,11 +311,11 @@ int Network::tieValue(int i, int j) const {
 void Network::clear() {
 	// Clear the maps and reset the various degree counters.
 
-	for (int i = 0; i < this->ln; ++i) {
+	for (int i = 0; i < this->ln; i++) {
 		this->lpOutTies[i].clear();
 	}
 
-	for (int i = 0; i < this->lm; ++i) {
+	for (int i = 0; i < this->lm; i++) {
 		this->lpInTies[i].clear();
 	}
 
@@ -316,7 +323,10 @@ void Network::clear() {
 	this->ltieCount = 0;
 
 	// The network has changed
-	++this->lmodificationCount;
+	this->lmodificationCount++;
+
+	// fire network clear event
+	fireNetworkClearEvent();
 }
 
 /**
@@ -533,4 +543,67 @@ void Network::checkReceiverRange(int i) const {
 						+ ") of actors acting as receivers of ties");
 	}
 }
+
+/**
+ * Adds the given <i>listener</i> from the network, if it is not yet attached.
+ */
+void siena::Network::addNetworkChangeListener(
+		INetworkChangeListener* const listener) {
+	// ensure that the list is a set (no duplicates)
+	std::list<INetworkChangeListener*>::iterator tmp = std::find(
+			lNetworkChangeListener.begin(), lNetworkChangeListener.end(),
+			listener);
+	if (tmp == lNetworkChangeListener.end()) {
+		lNetworkChangeListener.push_back(listener);
+	}
+}
+
+/**
+ * Removes the given <i>listener</i> from the network.
+ */
+void siena::Network::removeNetworkChangeListener(
+		INetworkChangeListener* const listener) {
+	std::list<INetworkChangeListener*>::iterator tmp = std::find(
+			lNetworkChangeListener.begin(), lNetworkChangeListener.end(),
+			listener);
+	if (tmp != lNetworkChangeListener.end()) {
+		// no need for erase remove since add ensures that the element is unique
+		lNetworkChangeListener.erase(tmp);
+	}
+}
+
+void Network::fireNetworkClearEvent() const {
+	for (std::list<INetworkChangeListener*>::const_iterator iter =
+			lNetworkChangeListener.begin();
+			iter != lNetworkChangeListener.end(); ++iter) {
+		(*iter)->onNetworkClearEvent(*this);
+	}
+}
+
+/**
+ * Inform all listeners that edge (ego,alter) has been inserted to the network.
+ */
+void Network::fireIntroductionEvent(int ego, int alter) const {
+	for (std::list<INetworkChangeListener*>::const_iterator iter =
+			lNetworkChangeListener.begin();
+			iter != lNetworkChangeListener.end(); ++iter) {
+		(*iter)->onTieIntroductionEvent(*this, ego, alter);
+	}
+}
+
+bool Network::isOneMode() const {
+	return false;
+}
+
+/**
+ * Inform all listeners that edge (ego,alter) has been removed to the network.
+ */
+void Network::fireWithdrawalEvent(int ego, int alter) const {
+	for (std::list<INetworkChangeListener*>::const_iterator iter =
+			lNetworkChangeListener.begin();
+			iter != lNetworkChangeListener.end(); ++iter) {
+		(*iter)->onTieWithdrawalEvent(*this, ego, alter);
+	}
+}
+
 }
