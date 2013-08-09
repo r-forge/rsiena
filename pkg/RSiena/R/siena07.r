@@ -46,18 +46,21 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 		{
 			stop("cannot use forking processes on Windows")
 		}
-		if (getRversion() < "2.14.0")
+		# The possibility to use snow now has been dropped
+		# because RSiena requires R >= 2.15.0
+		# and snow is superseded.
+		# if (getRversion() < "2.14.0")
 		## fake this to recreate old results
 		## if (TRUE)
-		{
-			require(snow, warn.conflicts=FALSE)
-			require(rlecuyer)
-			clusterType <- "SOCK"
-		}
-		else
-		{
-			require(parallel)
-		}
+		#{
+		#	require(snow, warn.conflicts=FALSE)
+		#	require(rlecuyer)
+		#	clusterType <- "SOCK"
+		#}
+		#else
+		#{
+		require(parallel)
+		#}
         if (clusterIter)
         {
             x$firstg <- x$firstg * sqrt(nbrNodes)

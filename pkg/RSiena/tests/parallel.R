@@ -1,5 +1,5 @@
 library(RSiena)
-print(packageDescription("RSiena",fields="Repository/R-Forge/Revision"))
+
 
 ##test3
 mynet1 <- sienaDependent(array(c(tmp3, tmp4),dim=c(32, 32, 2)))

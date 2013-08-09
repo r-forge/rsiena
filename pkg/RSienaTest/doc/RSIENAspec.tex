@@ -119,9 +119,16 @@ With this design, we have introduced parallel processing by using multiple \R
 processes. In \nnm{simstats0c} we run some of the simulations in each process:
 this was trivial to introduce into Phase 1 and Phase 3, but to use it in Phase2
 we have altered the algorithm to use the average of more than one simulation at
-a time. For \nnm{maxlikec} we use different processes for each wave.  We use the
-\R package \verb|snow| to create and control the multiple processes, and the
-package \verb|rlecuyer| to provide multiple random number streams.  The term
+a time.
+
+For \nnm{maxlikec} we use different processes for each wave.
+This is because the chains are carried from one simulation to the next,
+and organizing the parallel processes by simulations (update steps of the Robbins
+Monro algorithm) wuold require too much passing of information.
+
+We use the
+\R package \verb|parallel| to create and control the multiple processes, and
+to provide multiple random number streams.  The term
 `cluster' below refers to the cluster of multiple processors. (I vary between
 using \emph{processors} and \emph{processes} as it is possible to run \RS with
 multiple \emph{processes} on a machine with only one processor.)

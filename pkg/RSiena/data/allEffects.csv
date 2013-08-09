@@ -174,7 +174,7 @@ symmetricObjective,balance,Amount of balance,balance,TRUE,,,eval,FALSE,FALSE,FAL
 symmetricObjective,number of actor pairs at distance 2,Number of distances equal to 2,nbrDist2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 symmetricObjective,number pairs at doubly achieved distance 2,Number of doubly achieved distances 2,nbrDist2twice,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 symmetricObjective,degree of alter,Sum of squared degrees,inPop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
-symmetricObjective,sqrt degree of alter,Sum of degrees ,inPopSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
+symmetricObjective,sqrt degree of alter,Sum of degrees x sqrt(degree),inPopSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 symmetricObjective,degree^(1.5),Sum of degrees^(1.5),outActSqrt,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 symmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
 symmetricObjective,1/(degree + #),Sum 1/(degrees + #),outInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
@@ -217,7 +217,9 @@ bipartiteSymmetricObjective,xxxxxx to agreement,"mixed triplets XWW, W = xxxxxx"
 nonSymmetricBipartiteObjective,outdegree^(1/#) xxxxxx popularity,sum ind. x degree^(1/#) xxxxxx,outPopIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
 nonSymmetricBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
 nonSymmetricBipartiteObjective,from xxxxxx agreement,"mixed triplets XWW, W = xxxxxx",from,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
-bipartiteBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x degree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
+bipartiteBipartiteObjective,xxxxxx,sum crprod. with xxxxxx,crprod,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
+bipartiteBipartiteObjective,indegree^(1/#) xxxxxx popularity,sum ind. x ind.^(1/#) xxxxxx,inPopIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
+bipartiteBipartiteObjective,outdegree^(1/#) xxxxxx activity,sum outd. x outdegree^(1/#) xxxxxx,outActIntn,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,dyadic
 covarNetNetObjective,from xxxxxx agr. x same yyyyyy,"m.tr. XWW, W = xxxxxx, same yyyyyy",covNetNet,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNetNetObjective,xxxxxx closure jumping yyyyyy,"m.tr. W->W=>X, W = xxxxxx, jump yyyyyy",jumpWWClosure,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 covarNetNetObjective,mixed xxxxxx closure jumping yyyyyy,"m.tr. W->X=>X, W = xxxxxx, jump yyyyyy",jumpWXClosure,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic

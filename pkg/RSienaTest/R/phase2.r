@@ -40,6 +40,7 @@ phase2.1<- function(z, x, ...)
     z$sd[z$fixed] <- 0
     Report(paste('\nPhase 2 has', x$nsub, 'subphases.\n'), cf)
     z$gain <- x$firstg
+    z$reduceg <- x$reduceg
     if (x$nsub <= 0)
     {
         Report('With 0 subphases, there is no phase 2.\n', cf)
@@ -199,7 +200,7 @@ proc2subphase <- function(z, x, subphase, useAverage=TRUE, ...)
 	}
 	else
 	{
-		z$gain <- z$gain * 0.5
+		z$gain <- z$gain * z$reduceg
 	}
     z
 } ##end of this subphase

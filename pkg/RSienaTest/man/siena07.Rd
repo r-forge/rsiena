@@ -80,6 +80,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{dfra}{Matrix of estimated derivatives.}
   \item{sf}{Matrix of deviations from target in phase 3.}
   \item{sf2}{Array of statistics from simulations in phase 3.}
+  \item{tstat}{t-statistics for convergence.}
   \item{targets}{Observed statistics.}
   \item{targets2}{Observed statistics by wave, starting with the second wave .}
   \item{ssc}{Score function contributions for each wave for each

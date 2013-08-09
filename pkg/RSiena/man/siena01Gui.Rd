@@ -29,7 +29,7 @@ siena01Gui(getDocumentation=FALSE)
   \code{\link{sienaModelOptions}} screen.
 
   The required format for the column entries is described on the help
-  page  for
+  page  for\cr
   \code{\link{sienaDataCreateFromSession}}, as this function can also be
   called directly.
 

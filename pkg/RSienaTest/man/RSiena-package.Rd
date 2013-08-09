@@ -35,8 +35,8 @@ Package \code{"RSiena"} is the official release.
 
   Control of the estimation algorithm requires a
   \code{sienaAlgorithm} object that
-  defines the settings (parameters) of the algorithm, and which can be
-  created by \code{\link{sienaAlgorithmCreate}}
+  defines the settings (parameters) of the algorithm,\cr
+  and which can be created by \code{\link{sienaAlgorithmCreate}}
   (alias \code{\link{sienaModelCreate}}).
 
   More detailed help is available in the manual which you can display
@@ -45,16 +45,16 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSienaTest\cr
 Type: \tab Package\cr
-Version: \tab 1.1-231\cr
-Date: \tab 2013-06-15\cr
+Version: \tab 1.1-240\cr
+Date: \tab 2013-08-08\cr
 Depends: \tab R (>= 2.15.0)\cr
 Imports: \tab Matrix\cr
-Suggests: \tab tcltk, snow, rlecuyer, network, codetools, lattice, MASS,
-parallel, xtable, tools\cr
+Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
+		  xtable, tools\cr
 SystemRequirements: \tab GNU make, tcl/tk 8.5, Tktable\cr
 License: \tab GPL-2 \cr
-LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
+NeedsCompilation: yes\cr
 BuildResaveData: \tab no\cr
 }
 }
@@ -63,7 +63,7 @@ BuildResaveData: \tab no\cr
   Contributions by Josh Lospinoso, Charlotte Greenan, Christian Steglich,
   Johan Koskinen, Mark Ortmann, and Nynke Niezink.
 
-  Maintainer: RSiena developers <rsiena@stats.ox.ac.uk>
+  Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>
 }
 \references{
   \itemize{
@@ -83,9 +83,9 @@ BuildResaveData: \tab no\cr
    \item Steglich, Christian E. G., Snijders, Tom A. B., and
     Pearson, Michael A. (2010). Dynamic networks and behavior:
     Separating selection from influence. Sociological Methodology, 40, 329-393.
-   \item Further see the extensive manual accessible by the command
-    \code{RShowDoc("RSiena_Manual", package="RSiena")} and the website
-        \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
+   \item Further see the extensive manual accessible by the command\cr
+    \code{RShowDoc("RSiena_Manual", package="RSienaTest")}\cr
+	and the website \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
            }
 }
 \seealso{\code{\link{siena07}}}

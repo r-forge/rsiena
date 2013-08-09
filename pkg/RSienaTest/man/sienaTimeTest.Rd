@@ -103,6 +103,7 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 ## Conduct the score-type test to assess whether heterogeneity is present.
 tt <- sienaTimeTest(ans)
+summary(tt)
 
 ## Suppose that we wish to include two time dummies.
 ## Add them in the following way:

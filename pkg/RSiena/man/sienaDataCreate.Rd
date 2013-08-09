@@ -9,9 +9,9 @@ composition change objects.}
 sienaDataCreate(..., nodeSets=NULL, getDocumentation=FALSE)
 }
 \arguments{
-  \item{\dots}{objects of class "sienaDependent",
-    "coCovar","varCovar","coDyadCovar",
-  "varDyadCovar", "compositionChange"}
+  \item{\dots}{objects of class \code{\link{sienaDependent}},
+    \code{\link{coCovar}},\code{\link{varCovar}},\code{\link{coDyadCovar}},\cr
+  \code{\link{varDyadCovar}}, \code{\link{sienaCompositionChange}}}
   \item{nodeSets}{list of Siena node sets. Default is the single node
     set named 'Actors', length equal to the number of rows in the first
     object of class "sienaDependent". If the entire data set contains more than

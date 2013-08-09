@@ -1601,8 +1601,12 @@ changes over time, because actors join or leave the network
 between the observations.
 This can be done in two ways: using the method of \citet{HuismanSnijders03},
 or using structural zeros.
-(For the maximum likelihood estimation option, the Huisman-Snijders method
-is not implemented, and only the structural zeros method can be used.)
+
+For bipartite networks the Huisman-Snijders method can be used
+only for the actors (the first node set), not for the second node set.
+For the maximum likelihood estimation option, the Huisman-Snijders method
+is not implemented. In these cases only the structural zeros method can be used.
+
 Structural zeros can specified for all elements of the tie variables
 toward and from actors who are absent at a given observation moment.
 How to do this is described in subsection~\ref{S_struct}.
@@ -6247,6 +6251,10 @@ by $c$, and called in this manual an \emph{internal effect parameter}.
 }
 (These are totally different from the statistical parameters which are
 the weights of the effects in the objective function.)
+These are set or modified by the \texttt{setEffect} function, e.g.,
+\begin{verbatim}
+myeffects <- setEffect(myeffects, gwespFF, parameter=69)
+\end{verbatim}
 %These numbers can be determined by the user
 %by changing the \textsf{{\em pname}.mo} file
 %described in Section~\ref{S_mo3file}.
@@ -6288,7 +6296,8 @@ evaluation function}
 are the following. Note that in all
 effects where a constants $c$ occurs, this constant can be chosen
 and changed by the user;
-this is the internal effect parameter mentioned above.
+this is the internal effect parameter mentioned above,
+which can be modified by the function \texttt{setEffect(..., parameter=..., ...)}.
 \iffalse
 Also note that the evaluation effects which
 are a function only of the out-degree of actor $i$ are excluded for
@@ -6597,7 +6606,9 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  where $c$ is some constant
  (internal effect parameter, see above),  \texttt{(outTrunc)},
  defined by  \\
- $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;
+ $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;\\
+ note that for $c=0$ this represents the tendency to be an isolate
+ with respect to outgoing ties, i.e., have out-degree equal to 0;
 
  \item {\em square root out-degree}, defined by  \\
  $s^{\rm net}_{i\vit}(x) = \sqrt{x_{i+}}$;\\
@@ -9442,7 +9453,12 @@ and read the code of this function.
       \Delta_{kij} (x) =  s_{ki}(x^{+ij}) -     s_{ki}(x^{-ij})  \label{changestat}
       \end{equation}
       where $x^{+ij}$ is the network with the tie $i \rightarrow j$
-      and $x^{-ij}$ is the network without this tie.\\
+      and $x^{-ij}$ is the network without this tie.
+\item The list of all defined effects is in the file effects.pdf which is available
+      in the help files (click on "Index" on the last line of each help page, then go to
+      "User guides, package vignettes and other documentation") and also in the source
+      code ({\textbackslash}inst{\textbackslash}doc{\textbackslash}effects.pdf). 
+      All effects are also listed, with their definitions, in the manual (Section~\ref{S_math}). \\
       Determine an existing effect that is most similar
       to this effect (or perhaps more than one).
 \item Open the file \textsf{allEffects.csv} located in
@@ -9454,13 +9470,15 @@ and read the code of this function.
               The names of the groups are determined by the type of dependent
               variable and the type of explanatory variable (if any).
               Determine which is which by considering some examples
-              in this file.
+              in this file or in effects.pdf.
     	\item Insert a new row in that group.
               Copy a row that corresponds best to your new effect
               and modify effectName, functionName, shortName,
-              and more if this seems necessary. Assume
-              our new effect has shortName
-              \textit{newEf}.
+              and more if this seems necessary.
+              Perhaps your new effect is suitable in more than one group;
+              then a new row can be made for all these groups, differing only
+              in the name of the effect group.
+              Assume our new effect has shortName \textit{newEf}.
 
               In some cases, the new function will have extra parameters,
               as you can see from other examples;
@@ -10294,11 +10312,21 @@ which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2013-06-18 R-forge revision 232
+
+Changes in RSiena:
+  \begin{itemize}
+  \item The possibility to use the obsolete packages \sfn{snow} and \sfn{rlecuyer}
+     for R versions older than 2.14.0 was dropped; their functionality was replaced by
+     package \sfn{parallel}.
+   \item The DESCRIPTION file was corrected to satisfy CRAN requirements.
+  \end{itemize}
+
 \item 2013-06-15 R-forge revision 231
 
 Changes in RSiena as well as RSienaTest:
   \begin{itemize}
-  \item  
+  \item
    Make the "cumulative" option operational in \sfn{BehaviorDistribution()}
    for \sfn{sienaGOF()}.
   \item

@@ -83,18 +83,22 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         clusterCall(cl, library, pkgname, character.only = TRUE)
 		##parLapply(cl, c('f1','f2'), sink)
 		z$oldRandomNumbers <- .Random.seed
-		if (getRversion() < "2.14.0")
+		## The possibility to use snow now has been dropped
+		## because RSiena requires R >= 2.15.0
+		## and snow is superseded.
+		## Therefore the call to clusterSetupRNG was dropped.
+		#if (getRversion() < "2.14.0")
 			## fake this to recreate old results
 			##	if (TRUE)
-		{
-			clusterSetupRNG(cl, seed = as.integer(runif(6,
-								max=.Machine$integer.max)))
-		}
-		else
-		{
-			clusterSetRNGStream(cl, iseed = as.integer(runif(1,
-								max=.Machine$integer.max)))
-		}
+		#{
+		#	clusterSetupRNG(cl, seed = as.integer(runif(6,
+		#						max=.Machine$integer.max)))
+		#}
+		#else
+		#{
+		clusterSetRNGStream(cl, iseed = as.integer(runif(1,
+							max=.Machine$integer.max)))
+		#}
         clusterCall(cl, storeinFRANstore,  FRANstore())
         if (initC)
         {
@@ -122,7 +126,15 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         Report('This is not allowed; changed to 0.0001.\n', outf)
         z$gain <- 0.0001
     }
+    if (x$reduceg <= 0)
+    {
+        Report(c('Reduction factor for the gain parameter is ', x$reduceg,
+                 '.\n'), outf)
+        Report('This is not allowed; changed to 0.2.\n', outf)
+        z$reduceg <- 0.2
+    }
     Report(c('Initial value for gain parameter = ', format(z$gain),
+				 'Reduction factor for gain parameter = ', format(z$reduceg),
              '.\nStart of the algorithm.\n'), cf, sep='')
     Report('Observed function values are \n', cf)
 	targets <- if (!z$maxlike) z$targets else z$maxlikeTargets

@@ -183,6 +183,8 @@ DataReport <- function(z, x, f)
     }
     Report(sprintf("Initial value of gain parameter is %10.7f.\n", x$firstg),
            outf)
+    Report(sprintf("Reduction factor for gain parameter is %10.7f.\n", x$reduceg),
+           outf)
     Report(sprintf("Number of subphases in Phase 2 is %d.\n\n", x$nsub), outf)
     Report('Initial parameter values are \n', outf)
     if (z$cconditional)

@@ -1,5 +1,5 @@
 
-R version 3.0.0 (2013-04-03) -- "Masked Marvel"
+R version 3.0.1 (2013-05-16) -- "Good Sport"
 Copyright (C) 2013 The R Foundation for Statistical Computing
 Platform: i386-w64-mingw32/i386 (32-bit)
 
@@ -192,8 +192,8 @@ dependencies: logical indicating to also install uninstalled packages
           but not installed on other platforms.
 
           The default is the appropriate binary type on Windows and on
-          the CRAN binary Mac OS X distribution, otherwise '"source"'.
-          For the platforms where binary packages are the default, an
+          the CRAN binary OS X distribution, otherwise '"source"'.  For
+          the platforms where binary packages are the default, an
           alternative is '"both"' which means 'try binary if available,
           otherwise try source'.  (This will only choose the binary
           package if its version number is no older than the source
@@ -258,7 +258,7 @@ keep_outputs: a logical: if true, keep the outputs from installing
           from local files.
 
      ...: Arguments to be passed to 'download.file' or to the functions
-          for binary installs on Mac OS X and Windows (which accept an
+          for binary installs on OS X and Windows (which accept an
           argument '"lock"': see the section on 'Locking').
 
 _D_e_t_a_i_l_s:
@@ -266,11 +266,11 @@ _D_e_t_a_i_l_s:
      R packages are primarily distributed as _source_ packages, but
      _binary_ packages (a packaging up of the installed package) are
      also supported, and the type most commonly used on Windows and
-     from the CRAN distribution for Mac OS X.  This function can
-     install either type where supported, either by downloading a file
-     from a repository or from a local file.  The default type is given
-     by 'getOption("pkgType")': this defaults to '"source"' apart from
-     under Windows or a CRAN binary distribution for Mac OS X.
+     from the CRAN distribution for OS X.  This function can install
+     either type where supported, either by downloading a file from a
+     repository or from a local file.  The default type is given by
+     'getOption("pkgType")': this defaults to '"source"' apart from
+     under Windows or a CRAN binary distribution for OS X.
 
      This is the main function to install packages.  It takes a vector
      of names and a destination library, downloads the packages from
@@ -338,7 +338,7 @@ _L_o_c_k_i_n_g:
      Finally locking (and restoration on error) can be suppressed by
      '--no-lock'.
 
-     For a Mac OS X or Windows binary install, no locking is done by
+     For an OS X or Windows binary install, no locking is done by
      default.  Setting argument 'lock' to 'TRUE' (it defaults to the
      value of 'getOption("install.lock", FALSE)') will use
      per-directory locking as described for source installs: if the
@@ -412,7 +412,7 @@ _E_x_a_m_p_l_e_s:
 > # Where are you?
 > 
 > 	getwd()
-[1] "C:/Users/tom.snijders/Documents/RSienaRForge/pkg/RSiena.Rcheck/tests"
+[1] "C:/Users/tom.snijders/Documents/RSienaRForge/pkg/RSiena.Rcheck/tests_i386"
 > 
 > # By something like
 > 	# setwd('C:/SienaTest')
@@ -519,19 +519,19 @@ _D_e_t_a_i_l_s:
      display using
      'RShowDoc("RSiena_Manual", package="RSiena")'
 
-       Package:             RSiena                                                    
-       Type:                Package                                                   
-       Version:             1.1-230                                                   
-       Date:                2013-05-10                                                
-       Depends:             R (>= 2.15.0)                                             
-       Imports:             Matrix                                                    
-       Suggests:            tcltk, snow, rlecuyer, network, codetools, lattice, MASS, 
-                            parallel, xtable, tools 
-       SystemRequirements:  GNU make, tcl/tk 8.5, Tktable                             
-       License:             GPL-2                                                     
-       LazyLoad:            yes                                                       
-       LazyData:            yes                                                       
-       BuildResaveData:     no                                                        
+       Package:               RSiena                                              
+       Type:                  Package
+       Version:               1.1-232                                             
+       Date:                  2013-06-18                                          
+       Depends:               R (>= 2.15.0)                                       
+       Imports:               Matrix                                              
+       Suggests:              tcltk, network, codetools, lattice, MASS, parallel, 
+                              xtable, tools 
+       SystemRequirements:    GNU make, tcl/tk 8.5, Tktable                       
+       License:               GPL-2                                               
+       LazyData:              yes                                                 
+       NeedsCompilation: yes                                                      
+       BuildResaveData:       no                                                  
       
 _A_u_t_h_o_r(_s):
 
@@ -539,7 +539,7 @@ _A_u_t_h_o_r(_s):
      Josh Lospinoso, Charlotte Greenan, Christian Steglich, Johan
      Koskinen, Mark Ortmann, and Nynke Niezink.
 
-     Maintainer: RSiena developers <rsiena@stats.ox.ac.uk>
+     Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>
 
 _R_e_f_e_r_e_n_c_e_s:
 
@@ -599,23 +599,25 @@ Package:              RSiena
 Type:                 Package
 Title:                Siena - Simulation Investigation for Empirical
                       Network Analysis
-Version:              1.1-230
-Date:                 2013-05-10
-Author:               Various
+Version:              1.1-232
+Date:                 2013-06-18
+Author:               Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders
 Depends:              R (>= 2.15.0)
 Imports:              Matrix
-Suggests:             tcltk, snow, rlecuyer, network, codetools,
-                      lattice, MASS, parallel, xtable, tools
+Suggests:             tcltk, network, codetools, lattice, MASS,
+                      parallel, xtable, tools
 SystemRequirements:   GNU make, tcl/tk 8.5, Tktable
-Maintainer:           RSiena developers <rsiena@stats.ox.ac.uk>
-Description:          Fits models to longitudinal networks
-License:              GPL (>=2)
+Maintainer:           Tom A.B. Snijders
+                      <tom.snijders@nuffield.ox.ac.uk>
+Description:          Fits models to longitudinal network data
+License:              GPL-2
 LazyLoad:             yes
 LazyData:             yes
+NeedsCompilation:     yes
 BuildResaveData:      no
 URL:                  http://www.stats.ox.ac.uk/~snijders/siena
-Packaged:             2013-05-10 14:08:57 UTC; Tom.Snijders
-Built:                R 3.0.0; i386-w64-mingw32; 2013-05-10 14:13:09
+Packaged:             2013-06-18 09:25:43 UTC; Tom.Snijders
+Built:                R 3.0.1; i386-w64-mingw32; 2013-06-18 09:25:56
                       UTC; windows
 
 Index:
@@ -1736,8 +1738,8 @@ allowOnly: logical: If TRUE, it will be detected when between any two
           consecutive waves the changes are non-decreasing or
           non-increasing, and if this is the case, this will also be a
           constraint for the simulations between these two waves.  This
-          is done by means of the internal parameters uponly and
-          downonly.  If FALSE, the parameters uponly and downonly
+          is done by means of the internal parameters 'uponly' and
+          'downonly'.  If FALSE, the parameters 'uponly' and 'downonly'
           always are set to FALSE, and changes in dependent variables
           will not be constrained to be non-decreasing or
           non-increasing.  For normal operation, TRUE is the
@@ -2009,7 +2011,7 @@ Changing covariates:  alcohol
 > # The set of available effects and their most used columns
 > # can be inspected as follows:
 > 
->         effectsDocumentation(myeff)
+> #       effectsDocumentation(myeff)
 > 
 > # This gives a long list of effects: all defined in Section 12 of the manual,
 > # as far as they are meaningful for dataset mydata.
@@ -2078,7 +2080,7 @@ Changing covariates:  alcohol
 > # that covers effects available for whatever data sets,
 > # is available as a pdf file in the R directory, and can be opened by
 > 
->         RShowDoc("effects", package="RSiena")
+> #        RShowDoc("effects", package="RSiena")
 > 
 > # For illustration, let us start from scratch with a new sienaEffects object,
 > # and add the transitive triples and 3-cycles effects
@@ -2800,8 +2802,8 @@ Covariance matrix of X (correlations below diagonal):
 > # The command
 > 
 > 		xtable( ans )
-% latex table generated in R 3.0.0 by xtable 1.7-1 package
-% Fri May 10 15:26:44 2013
+% latex table generated in R 3.0.1 by xtable 1.7-1 package
+% Tue Jun 18 10:30:35 2013
 \begin{table}[ht]
 \centering
 \begin{tabular}{llllrlrlr}
@@ -2827,8 +2829,8 @@ Covariance matrix of X (correlations below diagonal):
 > # or formatted in html. Use e.g.
 > 
 > 		xtable( ans, type = 'html' )
-<!-- html table generated in R 3.0.0 by xtable 1.7-1 package -->
-<!-- Fri May 10 15:26:44 2013 -->
+<!-- html table generated in R 3.0.1 by xtable 1.7-1 package -->
+<!-- Tue Jun 18 10:30:35 2013 -->
 <TABLE border=1>
   <TR> <TD colspan=9 align=left> Rate parameters:  </TD> </TR> <TR> </TR> 
  <TR> <TD>   </TD> <TD> 0.1 </TD> <TD>  </TD> <TD> Rate parameter period 1 </TD> <TD align="right"> 6.60 </TD> <TD> ( </TD> <TD align="right"> 1.14 </TD> <TD> ) </TD> <TD align="right">  </TD> </TR>
@@ -3570,4 +3572,4 @@ drinkingbeh.obj.eval.6   FALSE
 > 
 > proc.time()
    user  system elapsed 
- 478.29    6.39  525.09 
+ 113.22    0.90  114.92 
