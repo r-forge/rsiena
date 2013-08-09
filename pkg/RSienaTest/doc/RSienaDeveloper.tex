@@ -366,7 +366,19 @@ below.
   CRAN. (The link is via Download R for Windows). Beware: if you later install
   other programs containing utilities such as tar (delphi is one offender), you
   may need to uninstall and reinstall Rtools, as you need Rtools at the start of
-  your path. (Or edit the path!).
+  your path. (Or edit the path!).\\
+  The path must start with 
+  \verb|C:\Rtools\bin;C:\Rtools\gcc-4.6.3\bin;|
+  (if 4.6.3 is the correct version number);
+  after that must follow the path to the R executable.\\
+  To change the path in Windows 7:\\
+  Open System Properties (e.g., right-click My Computer and select Properties);
+   go to Advanced System Settings;
+    select the Advanced tab, then click Environment Variables;
+    under the System Variables section, select Path;
+    edit the Path, taking care that what is previously there is left intact;
+    click OK on each of the dialogs to save your settings.
+    Restart your computer.  
 \item If using a Mac, you will need the Xcode tools installed.
 \item Obtain the current source using a developer secure checkout.
 \item In a command prompt window, navigate to the directory above the siena
@@ -382,13 +394,15 @@ below.
   give you messages if you try to use tar to unpack the tar ball. If so,
   set the environment variable \verb|TAR_OPTIONS| to
 \verb|--no-same-owner --no-same-permissions|.)\\
-  To set environment variables in Windows:\\
+  To set environment variables in Windows 7:\\
   Open System Properties (e.g., right-click My Computer and select Properties);
+   go to Advanced System Settings;
     select the Advanced tab, then click Environment Variables;
     under the System Variables section, click New;
     in the Variable name field, enter \verb|CYGWIN|;
-    In the Variable value field, enter \verb|nodosfilewarning|;
-    Click OK on each of the dialogs to save your settings.
+    in the Variable value field, enter \verb|nodosfilewarning|;
+    click OK on each of the dialogs to save your settings.
+    Restart your computer.
 \item When this one is OK, type\\
 \verb|R CMD INSTALL RSiena_1.0.n.tar.gz|\\
 (where \verb|n| is adjusted to match the file you have just created.)

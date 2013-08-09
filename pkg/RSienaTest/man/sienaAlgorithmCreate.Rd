@@ -8,8 +8,9 @@
   specifications for parameter estimation in RSiena}
 \description{
   Creates an object with specifications for the algorithm for parameter
-  estimation in RSiena. \code{sienaAlgorithmCreate()} and
-  \code{sienaModelCreate()} are identical functions; the second name was
+  estimation in RSiena.\cr
+  \code{sienaAlgorithmCreate()} and \code{sienaModelCreate()}
+  are identical functions; the second name was
   used from the start of the \code{RSiena} package, but the first name
   indicates more precisely the purpose of this function.
 }
@@ -17,7 +18,7 @@
 sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0,
      useStdInits = FALSE, n3 = 1000, nsub = 4,
      dolby=TRUE, maxlike = FALSE, diagonalize=1.0*!maxlike,
-     condvarno = 0, condname = "", firstg = 0.2,
+     condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
      cond = NA, findiff = FALSE, seed = NULL, pridg=0.05,
      prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
      prdrms=0.05, maximumPermutationLength=40,
@@ -27,7 +28,7 @@ sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0,
 sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
      useStdInits = FALSE, n3 = 1000, nsub = 4,
      dolby=TRUE, maxlike = FALSE, diagonalize=1.0*!maxlike,
-     condvarno = 0, condname = "", firstg = 0.2,
+     condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
      cond = NA, findiff = FALSE, seed = NULL, pridg=0.05,
      prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
      prdrms=0.05, maximumPermutationLength=40,
@@ -59,11 +60,10 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     for diagonalize=1 only the diagonal entries will be used;
     for values between 0 and 1, the weighted average will be used
     with weight diagonalize for the diagonalized matrix.
-    Has no effect for ML estimation.
-
+    Has no effect for ML estimation.\cr
     Higher values are more stable, lower values potentially more efficient.
     Default: for ML estimation, diagonalize=0; for MoM estimation,
-    diagonalize = 0.5.}
+    diagonalize = 1.0.}
   \item{condvarno}{If \code{cond} (conditional simulation), the
     sequential number of the network
     or behavior variable on which to condition.}
@@ -72,6 +72,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     \code{condvarno} to specify the variable.}
   \item{firstg}{Initial value of scaling ('gain') parameter for updates
     in the Robbins-Monro procedure.}
+  \item{reduceg}{Reduction factor for scaling ('gain') parameter for updates
+    in the Robbins-Monro procedure (MoM only).}
   \item{cond}{Boolean. Only relevant for Method of Moments
     simulation/estimation.
     If TRUE, use conditional simulation; if FALSE, unconditional simulation.
@@ -128,6 +130,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{n3}{number of iterations in Phase 3}
   \item{firstg}{Initial value of the scaling ('gain') parameter in the
     Robbins-Monro algorithm.}
+  \item{reduceg}{Reduction factor for the scaling ('gain') parameter in the
+    Robbins-Monro algorithm (MoM only).}
   \item{maxrat}{Value used to control the maximum size of the jumps.}
   \item{maxmaxrat}{Value used to control the maximum size of the jumps.}
   \item{maxlike}{Boolean: is FRAN using maximum likelihood?}

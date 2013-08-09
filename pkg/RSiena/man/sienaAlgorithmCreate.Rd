@@ -8,8 +8,9 @@
   specifications for parameter estimation in RSiena}
 \description{
   Creates an object with specifications for the algorithm for parameter
-  estimation in RSiena. \code{sienaAlgorithmCreate()} and
-  \code{sienaModelCreate()} are identical functions; the second name was
+  estimation in RSiena.\cr
+  \code{sienaAlgorithmCreate()} and \code{sienaModelCreate()}
+  are identical functions; the second name was
   used from the start of the \code{RSiena} package, but the first name
   indicates more precisely the purpose of this function.
 }
@@ -62,7 +63,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     Has no effect for ML estimation.\cr
     Higher values are more stable, lower values potentially more efficient.
     Default: for ML estimation, diagonalize=0; for MoM estimation,
-    diagonalize = 0.5.}
+    diagonalize = 1.0.}
   \item{condvarno}{If \code{cond} (conditional simulation), the
     sequential number of the network
     or behavior variable on which to condition.}

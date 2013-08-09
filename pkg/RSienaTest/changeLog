@@ -1,3 +1,26 @@
+2013-08-08 R-forge revision 240
+Changes in RSienaTest:
+   * Added the parameter reduceg to siena07()
+     (sienaModelCreate.r, phase2.r, robmon.r, printDataReport.r, sienaprint.r)
+   * Added effects crprod and inPopIntn to bipartiteBipartiteObjective group
+     (allEffects.csv, effects.pdf).
+Changes in RSienaTest and RSiena:
+   * Added tstat (t-statistic for convergence) to sienaFit objects.
+   * Clarification in sienaCompositionChange.Rd.
+   * Small change to siena07.Rd.
+
+2013 July 26 - August 2 R-Forge revisions 232-239
+Various changes by Mark Ortmann to RSienaTest.
+
+2013-06-18 CRAN version 1.1-232
+Changes in RSiena:
+   * Drop the possibility to use obsolete package snow and rlecuyer
+     if Rversion < 2.14.0; functionality replaced by
+     package parallel (siena07.r).
+   * Correct DESCRIPTION file to satisfy CRAN requirements.
+   * Correct lines in various help pages that were too long
+     in the pdf version.
+
 2013-06-15 R-forge revision 231
 Changes in RSiena as well as RSienaTest:
    * Make the "cumulative" option operational in BehaviorDistribution()
@@ -18,7 +41,7 @@ Changes in RSiena as well as RSienaTest:
    * If there is a composition change object, MoM estimation is forced
      to be non-conditional (initializeFRAN.r). This is reported in the help file
      (sienaCompositionChange.Rd).
-     
+
    * Small changes in help files sienaAlgorithm.Rd, plot.sienaTimeTest.Rd,
 
 
@@ -49,7 +72,7 @@ Changes only in RSiena:
 	  \pkg\RSiena\man\sienaGOF-auxiliary.Rd
 	  \pkg\RSiena\man\sienaGOF.Rd
 	  were erroneously not committed in revision 227.
-	  Therefore this was done now. 
+	  Therefore this was done now.
 	* Also, file
 	  \pkg\RSiena\inst\doc\effects.pdf
 	  was updated.
@@ -151,10 +174,10 @@ For RSiena and RSienaTest:
 	* Small bug fixed in print01Report() for reporting of uponly and downonly,
 		in the case where this does not affect all periods.
 	* Changed almost all .Rd documentation files: sometimes to make them
-		better understandable or complete, sometimes to make more appropriate 
+		better understandable or complete, sometimes to make more appropriate
 		examples, sometimes only minor prettifications.
 	* Updated:
-		pkg\RSiena(Test)\inst\scripts\Rscript01DataFormat.R, 
+		pkg\RSiena(Test)\inst\scripts\Rscript01DataFormat.R,
 	 	pkg\RSiena(Test)\inst\scripts\Rscript02VariableFormat.R,
  	 	pkg\RSiena(Test)\inst\scripts\Rscript03SienaRunModel.R,
  	 	pkg\RSiena(Test)\inst\scripts\Rscript04SienaBehaviour.R.

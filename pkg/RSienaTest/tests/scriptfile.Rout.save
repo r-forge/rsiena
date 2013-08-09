@@ -125,11 +125,12 @@ _A_r_g_u_m_e_n_t_s:
     pkgs: character vector of the names of packages whose current
           versions should be downloaded from the repositories.
 
-          If 'repos = NULL', a character vector of file paths of '.zip'
-          files containing binary builds of packages. Source
-          directories or '.tar.gz' archives may also be installed, but
-          some packages need suitable tools installed (see the
-          'Details' section).
+          If 'repos = NULL', a character vector of file paths of
+          '.tar.gz' files.  These can be source archives or binary
+          package archive files (as created by 'R CMD build --binary').
+          On a CRAN build of R for Mac OS X these can be '.tgz' files
+          containing binary package archives.  Tilde-expansion will be
+          done on the file paths.
 
           If this is missing or a zero-length character vector, a
           listbox of available packages is presented where possible in

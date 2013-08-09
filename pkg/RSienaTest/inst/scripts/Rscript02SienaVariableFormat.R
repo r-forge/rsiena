@@ -245,7 +245,7 @@
 # The set of available effects and their most used columns
 # can be inspected as follows:
 
-        effectsDocumentation(myeff)
+#       effectsDocumentation(myeff)
 
 # This gives a long list of effects: all defined in Section 12 of the manual,
 # as far as they are meaningful for dataset mydata.
@@ -297,7 +297,7 @@
 # that covers effects available for whatever data sets,
 # is available as a pdf file in the R directory, and can be opened by
 
-        RShowDoc("effects", package="RSiena")
+#        RShowDoc("effects", package="RSiena")
 
 # For illustration, let us start from scratch with a new sienaEffects object,
 # and add the transitive triples and 3-cycles effects

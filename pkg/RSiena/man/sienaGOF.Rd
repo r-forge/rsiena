@@ -36,7 +36,7 @@ sienaGOF(sienaFitObject, auxiliaryFunction,
 
     See \code{Examples} and \code{\link{sienaGOF-auxiliary}}
     for more information on the signature of this function.
-    The basic signature is
+    The basic signature is\cr
     \code{function(index, data, sims, period, groupName, varName, \dots)},
     where \code{index} is the index of the simulated network,
     or \code{NULL} if the observed variable is needed;
@@ -94,7 +94,8 @@ sienaGOF(sienaFitObject, auxiliaryFunction,
 }
 The function is written so that the user can easily define other functions to
 capture some other relevant aspects of the network, behaviors, etc.
-This is further illustrated in the help page \code{\link{sienaGOF-auxiliary}}.
+This is further illustrated in the help page\cr
+\code{\link{sienaGOF-auxiliary}}.
 
 We recommend the following heuristic approach to model checking:
 \enumerate{
@@ -115,7 +116,8 @@ We recommend the following heuristic approach to model checking:
  See Lospinoso (2012), the manual, or the references for more information.
 
  The following functions are pre-fabricated for ease of use, and can
- be passed in as the \code{auxiliaryFunction} with no extra effort;
+ be passed in as the \cr
+ \code{auxiliaryFunction} with no extra effort;
  see \code{\link{sienaGOF-auxiliary}} and the examples below.
 \itemize{
  \item \code{\link{IndegreeDistribution}}
@@ -139,7 +141,8 @@ We recommend the following heuristic approach to model checking:
     \item{* TwoTailed}{Whether the \eqn{p}-value corresponds to a one- or
                      two-tailed Monte Carlo test.}
     \item{* p}{The \eqn{p}-value for the observed Mahalanobis distance in the
-             permutation distribution of the simulated Mahalanobis distances.}
+             permutation distribution of the\cr
+			 simulated Mahalanobis distances.}
     \item{* Rank}{ Rank of the covariance matrix of the simulated auxiliary
               statistics.}
     }

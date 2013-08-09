@@ -88,16 +88,6 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         tmp
     }
 
-##@addSettingseffects internal getEffects add effects for settings model
-addSettingsEffects <- function(effects)
-{
-depvar <- attr(effects, "depvar")
-	## This processes the settings (constant dyadic covariate) structure.
-	## Only for one-mode network.
-	nbrSettings <- length(attr(depvar,"settings"))
-	## This leads to a warning in R CMD Check.
-	## Not important since this is just a stub, to be developed later.
-}
     ##@networkRateEffects internal getEffects create a set of rate effects
     networkRateEffects <- function(depvar, varname, symmetric, bipartite)
     {
@@ -377,7 +367,7 @@ depvar <- attr(effects, "depvar")
 								list(newEffects$group, newEffects$period))
 			newEffects <- lapply(newEffects, function(dd)
 				{
-					dd$setting <- c("universal", "primary", 
+					dd$setting <- c("universal", "primary",
 							names(attr(depvar,"settings")))
 					i1 <- regexpr("rate", dd$effectName)
 					dd$effectName <-
@@ -389,7 +379,7 @@ depvar <- attr(effects, "depvar")
 			## add the extra column also to the other effects
 			rateEffects$setting <- rep("", nrow(rateEffects))
 			objEffects$setting <- rep("", nrow(objEffects))
-			rateEffects <- 
+			rateEffects <-
 				rbind(newEffects, rateEffects[!rateEffects$basicRate, ])
 		}
 		list(effects=rbind(rateEffects = rateEffects, objEffects = objEffects),

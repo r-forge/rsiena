@@ -47,6 +47,15 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
 }
 }
 \details{
+  If there is a composition change object for the first node set in the
+  data object, then this will be used in estimation by the Method of Moments
+  to make actors active
+  (able to send and receive ties) only for the time intervals
+  when this is indicated in the composition change object.
+  This is done according to the procedure of Huisman and Snijders (2003).
+  See the manual for further details.\cr
+  For bipartite networks, composition change objects for the second node set
+  have no effect and will lead to an error message.\cr
   Intervals are treated as closed at each end.\cr
   For data sets including a composition change object, estimation
   by Method of Moments is forced to be unconditional, overriding
@@ -58,10 +67,17 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
   \item{NodeSet}{Name of node set}
   \item{Option}{Option}
 }
-\references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
+\references{\itemize{
+   \item Huisman, M. E. and Snijders, T. A. B. (2003).
+   Statistical analysis of longitudinal network data with changing composition.
+   \emph{Sociological Methods & Research}, 32, 253-287.
+   \item The manual: \url{http://www.stats.ox.ac.uk/~snijders/siena/RSiena_Manual.pdf}
+   \item Further see \url{http://www.stats.ox.ac.uk/~snijders/siena/}
+   }}
 \author{Ruth Ripley }
 \seealso{
- \code{\link{sienaNodeSet}}
+ \code{\link{sienaNodeSet}},
+ \code{\link{sienaDataCreate}}
 }
 \examples{
   clist <- list(c(1, 3), c(1.4, 2.5))

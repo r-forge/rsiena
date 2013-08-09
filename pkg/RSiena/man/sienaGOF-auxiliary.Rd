@@ -71,7 +71,7 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
  they will be supplemented in due time by statistics depending on networks and
  behavior jointly.
 
- The method signature for the auxiliary statistics generally is
+ The method signature for the auxiliary statistics generally is\cr
  \code{function(i, obsData, sims, period, groupName, varName, \dots)}.
  For constructing new auxiliary statistics, it is helpful to
  study the code of \code{OutdegreeDistribution}, \code{IndegreeDistribution},
