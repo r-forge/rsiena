@@ -10,7 +10,7 @@ This data frame is used internally to construct effect objects.
 }
 \usage{data(allEffects)}
 \format{
-  A data frame with 169 observations on the following 23 variables.
+  A data frame with values for the following 23 variables.
   \describe{
     \item{\code{effectGroup}}{a character vector}
     \item{\code{effectName}}{a character vector}
@@ -39,6 +39,6 @@ This data frame is used internally to construct effect objects.
   }
 }
 \details{
-Not for general user use.}
+Used to define effects. Not for general user use.}
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \keyword{datasets}

@@ -35,12 +35,15 @@ namespace siena
 class IsolatePopEffect : public NetworkEffect
 {
 public:
-	IsolatePopEffect(const EffectInfo * pEffectInfo);
+	IsolatePopEffect(const EffectInfo * pEffectInfo, bool outgoing);
 	virtual double calculateContribution(int alter) const;
 
 protected:
 	virtual double tieStatistic(int alter);
-
+	
+private:
+	// Indicates whether the outdegree=0 of alter also is taken into account
+	bool loutgoing;
 };
 
 }

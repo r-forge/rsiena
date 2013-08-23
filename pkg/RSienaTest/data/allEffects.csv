@@ -129,6 +129,9 @@ bipartiteObjective,outdegree - activity (sqrt),Sum of outdegrees^(1.5),outActSqr
 bipartiteObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
 bipartiteObjective,1/(outdegree + #),Sum 1/(outdegrees + #),outInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 bipartiteObjective,1/(outdegree+#)(outdegree+1+#),Sum 1/(outdegrees + #)(outdegrees + 1 + #),outSqInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
+bipartiteObjective,in-isolate - popularity,Number of indegrees equal to 1,inIsolatePop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
+bipartiteObjective,1/(outdegree + #),Sum 1/(outdegrees + #),outInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
+bipartiteObjective,1/(outdegree+#)(outdegree+1+#),Sum 1/(outdegrees + #)(outdegrees + 1 + #),outSqInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 bipartiteObjective,out-in degree^(1/2) assortativity,Sum of out-in degree^(1/2) products,outInAss,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,outdegree (density),Number of ties,density,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 nonSymmetricObjective,reciprocity,Number of reciprocated ties,recip,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
@@ -160,7 +163,8 @@ nonSymmetricObjective,1/(outdegree + #),Sum 1/(outdegrees + #),outInv,FALSE,,,ev
 nonSymmetricObjective,1/(outdegree+#)(outdegree+1+#),Sum 1/(outdegrees + #)(outdegrees + 1 + #),outSqInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,in-isolate Outdegree,Sum outdegrees for in-isolates,inIsDegree,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
 nonSymmetricObjective,network-isolate,Number of isolates,isolateNet,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
-nonSymmetricObjective,isolate - popularity,Number of ties to otherwise isolates,isolatePop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
+nonSymmetricObjective,in-isolate - popularity,Number of indegrees equal to 1,inIsolatePop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
+nonSymmetricObjective,isolate - popularity,N. actors (ind.=1 and outd.=0),isolatePop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
 nonSymmetricObjective,out-out degree^(1/#) assortativity,Sum of out-out degree^(1/#) products,outOutAss,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,out-in degree^(1/#) assortativity,Sum of out-in degree^(1/#) products,outInAss,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,in-out degree^(1/#) assortativity,Sum of in-out degree^(1/#) products,inOutAss,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,2,objective,NA,NA,0,0,0,0,

@@ -19,7 +19,7 @@ print.siena <- function(x, ...)
 	# This attribute must be a logical matrix
 	# with named columns, and rows indicating periods.
 		textattr <- deparse(substitute(attrib),  backtick=FALSE)
-		uponlys <- t(as.matrix(sapply(x$depvars, function(y){attr(y,attrib)})))
+		uponlys <- as.matrix(sapply(x$depvars, function(y){attr(y,attrib)}))
 		for (j in 1:dim(uponlys)[2])
 		{
 			if (any(uponlys[,j]))
@@ -239,6 +239,9 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			cat(tmp1[i], '\n')
 		}
 
+		try(if (x$errorMessage.cov > '')
+				{cat('\nWarning:', x$errorMessage.cov, '\n')}, silent=TRUE)
+			# "Try" for downward compatilibity
 		cat("\nTotal of", x$n, "iteration steps.\n\n")
 		if (x$termination == "UserInterrupt")
 			cat(" \n*** Warning ***",

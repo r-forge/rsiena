@@ -159,7 +159,8 @@ phase3.2 <- function(z, x, ...)
 	{
 		mean.dev <- colSums(z$sf)[!z$fixed]/dim(z$sf)[1]
 		cov.dev <- z$msf[!z$fixed,!z$fixed]
-		if (inherits(try(thisproduct <- solve(cov.dev, mean.dev)),"try-error"))
+		if (inherits(try(thisproduct <- solve(cov.dev, mean.dev), silent=TRUE),
+					"try-error"))
 		{
 			Report('Maximum t-ratio for convergence not computable.\n', outf)
 		}
@@ -239,6 +240,7 @@ phase3.2 <- function(z, x, ...)
 			}
 		}
 	}
+	errorMessage.cov <- ''
 	if (!x$simOnly)
 	{
 		if (x$maxlike)
@@ -255,9 +257,10 @@ phase3.2 <- function(z, x, ...)
 			dfrac[z$fixed, ] <- 0
 			dfrac[ ,z$fixed] <- 0
 			diag(dfrac)[z$fixed] <- 1
-			if (inherits(try(cov <- solve(dfrac)),"try-error"))
+			if (inherits(try(cov <- solve(dfrac), silent=TRUE),"try-error"))
 			{
 				Report('Noninvertible estimated covariance matrix : \n', outf)
+				errorMessage.cov <- 'Noninvertible estimated covariance matrix'
 				cov <- NULL
 			}
 		}
@@ -266,7 +269,7 @@ phase3.2 <- function(z, x, ...)
 			cov <- z$dinv %*% z$msfc %*% t(z$dinv)
 		}
 		error <- FALSE
-		if (inherits(try(msfinv <- solve(z$msfc)), "try-error"))
+		if (inherits(try(msfinv <- solve(z$msfc), silent=TRUE), "try-error"))
 		{
 			Report('Covariance matrix not positive definite: \n', outf)
 			if (any(z$fixed || any(z$newfixed)))
@@ -278,6 +281,7 @@ phase3.2 <- function(z, x, ...)
 			{
 				Report(c('This may mean that the reported standard errors ',
 						'are invalid.\n'), outf)
+				errorMessage.cov <- 'Noninvertible estimated covariance matrix'
 			}
 			z$msfinv <- NULL
 		}
@@ -297,6 +301,7 @@ phase3.2 <- function(z, x, ...)
 		}
 		z$covtheta <- cov
 	}
+	z$errorMessage.cov <- errorMessage.cov
 	## ans<-InstabilityAnalysis(z)
 	z
 }
@@ -365,15 +370,16 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
         z$msfc[, z$fixed] <- 0
         diag(z$msfc)[z$fixed] <- 1
     }
-    if (inherits(try(dinv <- solve(z$dfrac)), "try-error"))
+    if (inherits(try(dinv <- solve(z$dfrac), silent=TRUE), "try-error"))
     {
         Report('Error message from inversion of dfra: \n', cf)
         diag(z$dfrac) <- diag(z$dfrac)+0.1*z$scale
         Report('Intervention 3.4: ridge added after phase 3.\n', cf)
-        if (inherits(try(dinv <- solve(z$dfrac)), "try-error"))
+        if (inherits(try(dinv <- solve(z$dfrac), silent=TRUE), "try-error"))
         {
             Report(c('Warning. After phase 3, derivative matrix non-invertible',
                      'even with a ridge.\n'), cf)
+			z$errorMessage.cov <- 'Noninvertible derivative matrix'
             fchange <- 0
             z$dinv <- z$dfrac
 			z$dinv[,] <- 999
@@ -394,6 +400,8 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
     PrtOutMat(z$dfrac, cf)
     Report('inverse of dfra :\n', cf)
     PrtOutMat(z$dinv, cf)
+	try(if (x$errorMessage.cov > '') {Report(z$errorMessage.cov, cf)}, silent=TRUE)
+			# "Try" for downward compatilibity
     Report(c('A full Quasi-Newton-Raphson step after phase 3\n',
              'would add the following numbers to the parameters, yielding ',
              'the following results:\n'), sep='', cf)
@@ -407,6 +415,7 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
         Report(c('\nAt the end of phase ', z$phase,
 				 ', parameter values are \n'), outf)
         Report(paste(1:z$pp,'. ',format(z$theta,width=18,digits=6)),outf)
+		try(Report(z$errorMessage.cov, outf), silent=TRUE)
         Report(c('A full Quasi-Newton-Raphson step after phase 3\n',
 				 'would add the ',
                  'following numbers to the parameters:\n'), outf)

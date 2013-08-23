@@ -1,10 +1,23 @@
+2013-08-23 R-forge revision 241
+Changes in RSiena and RSienaTest:
+   * Corrected bug that occurred if there was only one option
+     for choice of alter.
+   * Dropped scripts.r from \tests.
+   * Added "silent=TRUE" to various try statements (mainly associated with
+     inversion of singular matrices) to avoid execution errors.
+   * Added various degree-related effects to bipartite networks.
+   * New effect inIsolatePop.
+   * Drop multiplication of the target statistic for the inPop effect by n.
+Changes in RSienaTest:
+   * Small unimportant changes in sienaeffects.r, robmon.r, sienaprint.r
+
 2013-08-08 R-forge revision 240
 Changes in RSienaTest:
    * Added the parameter reduceg to siena07()
      (sienaModelCreate.r, phase2.r, robmon.r, printDataReport.r, sienaprint.r)
+Changes in RSienaTest and RSiena:
    * Added effects crprod and inPopIntn to bipartiteBipartiteObjective group
      (allEffects.csv, effects.pdf).
-Changes in RSienaTest and RSiena:
    * Added tstat (t-statistic for convergence) to sienaFit objects.
    * Clarification in sienaCompositionChange.Rd.
    * Small change to siena07.Rd.

@@ -194,12 +194,12 @@ phase1.2 <- function(z, x, ...)
                  'of derivative matrix amended in phase 1.'), cf, fill=80)
     }
 	# Invert derivative matrix and define step fchange that will not be made.
-    if (inherits(try(dinv <- solve(z$dfra)), "try-error"))
+    if (inherits(try(dinv <- solve(z$dfra), silent=TRUE), "try-error"))
     {
         Report('Error message for inversion of dfra: \n', cf)
         diag(z$dfra) <- diag(z$dfra) + 1
         Report('Intervention 1.4.1: ridge added after phase 1.\n', cf)
-        if (inherits(try(dinv <- solve(z$dfra)), "try-error"))
+        if (inherits(try(dinv <- solve(z$dfra), silent=TRUE), "try-error"))
         {
             Report(c('Error. After phase 1, derivative matrix non-invertible',
                      'even with a ridge.\n'), cf)

@@ -1522,8 +1522,7 @@ and the values will be truncated towards zero.
 
 \SI allows that there are some missing data on network variables,
 on covariates, and on dependent action
-variables. Missing data in changing dyadic covariates are not yet
-implemented. Missing data must be indicated by missing data codes,
+variables. Missing data must be indicated by missing data codes,
 {\em not} by blanks in the data set.
 
 Missingness of data is treated as non-informative.
@@ -1537,12 +1536,14 @@ or distortions, provided missingness is indeed non-informative
 When one has more than $20\%$ missing data on any variable, however,
 one may expect problems in getting good estimates.
 
-In the current implementation of \si, missing data are treated in
-a simple way, trying to minimize their influence on the estimation
-results.
-%This method is further explained in \citet{HuismanSteglich08},
-%where comparisons are also made with other ways of dealings with the missing
-%information.
+Missings in the covariates are replaced by the global mean.
+
+In the current implementation of \si, missing data
+in the dependent variables are treated in a simple but meaningful way,
+trying to minimize their influence on the estimation results.
+This method is further explained in \citet{HuismanSteglich08},
+where comparisons are also made with other ways of dealings with the missing
+information.
 
 The basic idea is the following.
 \medskip
@@ -6543,7 +6544,8 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, x_{+j} =
  \sum_j x_{ij} \sum_h x_{hj} $;\\
  in \SI 3 until version 3.313, this effect was multiplied by a factor $1/n$;\\
- in \RS this effect has had a bug until version 1.1-219;
+ in \RS this effect has had a bug until version 1.1-219;\\
+ in \RS the target statistic for this effect was multiplied by a factor $n$ until version 1.1-241;
 
  \item {\em in-degree related popularity (sqrt) effect} \texttt{(inPopSqrt)}
  (earlier called {\em popularity of alter (sqrt measure) effect}), defined by the sum of
@@ -6607,8 +6609,10 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  (internal effect parameter, see above),  \texttt{(outTrunc)},
  defined by  \\
  $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;\\
- note that for $c=0$ this represents the tendency to be an isolate
- with respect to outgoing ties, i.e., have out-degree equal to 0;
+ note that for $c=1$ this represents --inversely-- the tendency to be an isolate
+ with respect to outgoing ties, i.e., have out-degree equal to 0:
+ $ \text{min}(x_{i+}\,,\, 1) = 0$ if $x_{i+} = 0$, and 
+ $ \text{min}(x_{i+}\,,\, 1) = 1$ if $x_{i+} \geq 1$. 
 
  \item {\em square root out-degree}, defined by  \\
  $s^{\rm net}_{i\vit}(x) = \sqrt{x_{i+}}$;\\
@@ -6659,23 +6663,32 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{+i}^{1/c}} {x_{+j}^{1/c}} $;\\
  $c$ can be 1 or 2 (the latter value is the default);
 
-\item \emph{network-isolate effect}, (\texttt{isolateNet}), the effect of having
-      in-degree as well as out-degree zero, i.e., being a total isolate,
+\item \emph{network-isolate effect}, (\texttt{isolateNet}), the effect of ego having
+      in-degree as well as out-degree zero, i.e., being a total isolate,\\
  $s^{\rm net}_{i\vit}(x, z) =   I\{x_{+i} = x_{i+} = 0 \}  $ ;
+
+\item \emph{in-isolate popularity effect}, (\texttt{inIsolatePop}), the effect of
+      being tied to actors who further have no incoming ties
+      (the fact that such a tie does exist will give the other actor
+      an in-degree of 1),\\
+$s^{\rm net}_{i\vit}(x, z) = \sum_j x_{ij}\, I\{x_{+j} = 1 \} $ .
 
 \item \emph{isolate popularity effect}, (\texttt{isolatePop}), the effect of
       being tied to actors who further are isolates
       (the fact that such a tie does exist will give the other actor
-      an in-degree of 1),
+      an in-degree of 1),\\
 $s^{\rm net}_{i\vit}(x, z) = \sum_j x_{ij}\, I\{x_{+j} = 1, x_{j+} = 0 \} $ .
 
       Note that the network-isolate effect expresses the tendency for ego
       to be an isolate (not sending ties if ego has indegree 0),
-      whereas the isolate popularity effect expressed the tendency for ego
-      to connect to others who, without this connection, would be isolates.
+      whereas the in-isolate and
+      isolate popularity effect expressed the tendency for ego
+      to connect to others who, without this connection, would 
+      have an indegree of 0, or be total isolates, respectively.
       Thus, in modeling the number of isolates, for the network-isolate
       effect the agency is in the isolate (see the $i$ in the formula),
-      whereas for the isolate popularity effect the agency is in others not
+      whereas for the in-isolate and isolate popularity effect the agency
+      is in others not
       connecting to the isolate (see the $j$ in the formula).
 
 \setcounter{savenumi}{\value{enumi}}
@@ -9457,7 +9470,7 @@ and read the code of this function.
 \item The list of all defined effects is in the file effects.pdf which is available
       in the help files (click on "Index" on the last line of each help page, then go to
       "User guides, package vignettes and other documentation") and also in the source
-      code ({\textbackslash}inst{\textbackslash}doc{\textbackslash}effects.pdf). 
+      code ({\textbackslash}inst{\textbackslash}doc{\textbackslash}effects.pdf).
       All effects are also listed, with their definitions, in the manual (Section~\ref{S_math}). \\
       Determine an existing effect that is most similar
       to this effect (or perhaps more than one).
@@ -10312,6 +10325,36 @@ which affect the user.
 repository.)
 \begin{small}
 \begin{itemize}
+\item 2013-08-22 R-forge revision 241
+
+Changes in RSiena as well as RSienaTest:
+  \begin{itemize}
+  \item Corrected bug (leading to error message)
+     that occurred if there was only one option
+     for choice of alter. It appeared mainly in cases where all changes
+     were upward only (or downward only); in practice, it only was observed
+     yet for two-mode networks with upward changes only.
+  \item  Drop the unintended multiplication of the target statistic
+     for the \texttt{inPop} effect by $n$.
+  \item Trapped some execution errors (mainly associated with inversion of 
+    singular matrices) and allowed the functions to end properly
+    with a message.
+  \item Added various degree-related effects to bipartite networks.
+  \item New effect \texttt{inIsolatePop}.
+  \end{itemize}
+
+\item 2013-08-08 R-forge revision 240
+
+Changes in RSienaTest:
+  \begin{itemize}
+  \item Added the parameter reduceg to siena07.
+  \end{itemize}
+
+Changes in RSiena and RSienaTest:
+  \begin{itemize}
+  \item Added effects crprod and inPopIntn for two-mode networks.
+  \end{itemize}
+
 \item 2013-06-18 R-forge revision 232
 
 Changes in RSiena:

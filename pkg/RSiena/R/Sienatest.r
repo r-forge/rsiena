@@ -198,7 +198,7 @@ ScoreTest<- function(pp, dfra, msf, fra, test, maxlike)
         dfra2 <- dfra + msf
     else
         dfra2 <- dfra
-    if (inherits(try(dinv2 <- solve(dfra2)), "try-error"))
+    if (inherits(try(dinv2 <- solve(dfra2), silent=TRUE), "try-error"))
     {
         Report("Error message for inversion to get onestep estimator: \n", cf)
         dinv2 <- dfra2
@@ -227,7 +227,7 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
     sigma21<- t(sigma12)
     z1 <- fra[!test]
     z2 <- fra[test]
-    if (inherits(try(id11 <- solve(d11)), "try-error"))
+    if (inherits(try(id11 <- solve(d11), silent=TRUE), "try-error"))
     {
         Report('Error message for inversion of d11: \n', cf)
         oneSided <- NA
@@ -254,7 +254,7 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
             ov <- -z2
             v9 <- d22 - rg %*% d12
         }
-        if (inherits(try(vav <- solve(v9)), "try-error"))
+        if (inherits(try(vav <- solve(v9), silent=TRUE), "try-error"))
             ## vav is the inverse variance matrix of ov
         {
             Report('Error message for inversion of v9: \n', cf)

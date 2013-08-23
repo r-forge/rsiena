@@ -46,11 +46,11 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   formed using \R scripts.}
   \item{\dots}{Arguments for the simulation function, see
     \code{\link{simstats0c}}:
-    usually, \code{data} and \code{effects}; possibly also
-    \code{prevAns} if a previous reasonable provisional estimate was
-    obtained for a similar model; possibly also \code{returnDeps} if
-    the simulated dependent variables (networks, behaviour) should
-    be returned.}
+    usually, \code{data} and \code{effects}, as in the examples below;
+	possibly also \code{prevAns} if a previous reasonable
+	provisional estimate was obtained for a similar model;
+	possibly also \code{returnDeps} if the simulated dependent variables
+	(networks, behaviour) should be returned.}
 }
 \details{
  Runs a Robbins-Monro algorithm for parameter estimation using the three-phase

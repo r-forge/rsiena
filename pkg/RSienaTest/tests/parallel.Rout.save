@@ -16,8 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(RSienaTest)
-> print(packageDescription("RSienaTest",fields="Repository/R-Forge/Revision"))
-[1] NA
+> 
 > 
 > ##test3
 > mynet1 <- sienaDependent(array(c(tmp3, tmp4),dim=c(32, 32, 2)))
