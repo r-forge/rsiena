@@ -239,6 +239,9 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			cat(tmp1[i], '\n')
 		}
 
+		try(if (x$errorMessage.cov > '')
+				{cat('\nWarning:', x$errorMessage.cov, '\n')}, silent=TRUE)
+			# "Try" for downward compatilibity
 		cat("\nTotal of", x$n, "iteration steps.\n\n")
 		if (x$termination == "UserInterrupt")
 			cat(" \n*** Warning ***",

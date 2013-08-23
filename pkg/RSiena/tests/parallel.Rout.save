@@ -17,6 +17,7 @@ Type 'q()' to quit R.
 
 > library(RSiena)
 > 
+> 
 > ##test3
 > mynet1 <- sienaDependent(array(c(tmp3, tmp4),dim=c(32, 32, 2)))
 > mydata <- sienaDataCreate(mynet1)

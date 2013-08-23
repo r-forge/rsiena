@@ -761,7 +761,7 @@ getSamples <- function(z, x, nIter, thetas=NULL)
         {
 			z$dfra <- t(as.matrix(Reduce("+", z$sdf) / length(z$sdf)))
         }
-        if (inherits(try(z$dinv <- solve(z$dfra)), 'try-error'))
+        if (inherits(try(z$dinv <- solve(z$dfra), silent=TRUE), 'try-error'))
         {
             z$dinv <- NULL
         }

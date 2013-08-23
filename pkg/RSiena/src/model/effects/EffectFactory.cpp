@@ -626,9 +626,13 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new IsolateNetEffect(pEffectInfo);
 	}
+	else if (effectName == "inIsolatePop")
+	{
+		pEffect = new IsolatePopEffect(pEffectInfo, false);
+	}
 	else if (effectName == "isolatePop")
 	{
-		pEffect = new IsolatePopEffect(pEffectInfo);
+		pEffect = new IsolatePopEffect(pEffectInfo, true);
 	}
 	else if (effectName == "inIsDegree")
 	{

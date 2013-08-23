@@ -12,6 +12,10 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
                            type="eval", interaction1="", interaction2="",
                            character=FALSE)
 {
+	if (!inherits(myeff, 'sienaEffects'))
+	{
+		stop("The first argument is not of class <sienaEffects>.")
+	}
     if (character)
     {
         dots <- sapply(list(...), function(x)x)

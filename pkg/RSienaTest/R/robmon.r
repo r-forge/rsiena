@@ -131,10 +131,10 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         Report(c('Reduction factor for the gain parameter is ', x$reduceg,
                  '.\n'), outf)
         Report('This is not allowed; changed to 0.2.\n', outf)
-        z$reduceg <- 0.2
+        x$reduceg <- 0.2
     }
     Report(c('Initial value for gain parameter = ', format(z$gain),
-				 'Reduction factor for gain parameter = ', format(z$reduceg),
+			 '.\nReduction factor for gain parameter = ', format(x$reduceg),
              '.\nStart of the algorithm.\n'), cf, sep='')
     Report('Observed function values are \n', cf)
 	targets <- if (!z$maxlike) z$targets else z$maxlikeTargets
