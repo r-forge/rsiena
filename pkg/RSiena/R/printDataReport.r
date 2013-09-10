@@ -132,8 +132,16 @@ DataReport <- function(z, x, f)
         }
     if (z$FinDiff.method)
     {
+		if ((x$nsub == 0)&(x$simOnly))
+		{
+        Report(c('Derivatives are estimated with the finite difference',
+                 'method.\n'), outf)
+		}
+		else
+		{
         Report(c('Standard errors are estimated with the finite difference',
                  'method.\n'), outf)
+		}
         if (!x$FinDiff.method)
         {
             Report("Note that the option requested has been over-ridden\n",
@@ -142,9 +150,21 @@ DataReport <- function(z, x, f)
     }
     else
     {
-        Report(c('Standard errors are estimated with the likelihood ratio',
+		if ((x$nsub == 0)&(x$simOnly))
+		{
+         Report(c('Derivatives are estimated with the likelihood ratio',
                'method.\n'), outf)
+		}
+		else
+		{
+         Report(c('Standard errors are estimated with the likelihood ratio',
+               'method.\n'), outf)
+		}
     }
+	if (x$dolby)
+	{
+		Report('Dolby method (regression on scores) is used.\n', outf)
+	}
     ## any max degree restrictions?
     if (any(x$MaxDegree > 0))
     {
@@ -181,10 +201,20 @@ DataReport <- function(z, x, f)
             }
         }
     }
-    Report(sprintf("Initial value of gain parameter is %10.7f.\n", x$firstg),
-           outf)
-    Report(sprintf("Number of subphases in Phase 2 is %d.\n\n", x$nsub), outf)
-    Report('Initial parameter values are \n', outf)
+	if ((x$nsub == 0)&(x$simOnly))
+	{
+		Report('Parameter values are \n', outf)
+	}
+	else
+	{
+		Report(sprintf("Initial value of gain parameter is %10.7f.\n",
+						x$firstg), outf)
+		Report(sprintf("Reduction factor for gain parameter is %10.7f.\n",
+						x$reduceg), outf)
+		Report(sprintf("Number of subphases in Phase 2 is %d.\n\n", x$nsub),
+						outf)
+		Report('Initial parameter values are \n', outf)
+	}
     if (z$cconditional)
     {
         if (observations == 1)

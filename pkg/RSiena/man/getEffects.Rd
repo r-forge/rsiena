@@ -11,7 +11,7 @@
 getEffects(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 }
 \arguments{
-  \item{x}{an object of class `siena' or `sienaGroup'}
+  \item{x}{an object of class `siena" or `sienaGroup"}
   \item{nintn}{Number of user-defined network interaction
        that can later be created.}
   \item{behNintn}{Number of user-defined behavior interactions
@@ -41,7 +41,7 @@ variable in the input object, with columns
   \item{fix}{boolean: fix parameter value or not}
   \item{test}{boolean: test parameter value or not}
   \item{timeDummy}{comma separated list of periods, or "all", 
-        or ',' for none --
+        or "," for none --
 	    which time dummy interacted parameters should be included?}
   \item{initialValue}{starting value for estimation, also used for
         \code{fix} and \code{test}.}
@@ -79,13 +79,13 @@ variable in the input object, with columns
 \seealso{\code{\link{sienaDataCreate}}, \code{\link{effectsDocumentation}}}
 \examples{
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mybeh <- sienaDependent(s50a, type='behavior')
+mybeh <- sienaDependent(s50a, type="behavior")
 mycovar <- coCovar(rnorm(50))
 mydyadcovar <- coDyadCovar(matrix(as.numeric(rnorm(2500) > 2), nrow=50))
 mydata <- sienaDataCreate(mynet1, mybeh, mycovar, mydyadcovar)
 myeff <- getEffects(mydata)
 }
 
-% Add one or more standard keywords, see file 'KEYWORDS' in the
+% Add one or more standard keywords, see file "KEYWORDS" in the
 % R documentation directory.
 \keyword{classes}

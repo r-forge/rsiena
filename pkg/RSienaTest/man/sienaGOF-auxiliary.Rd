@@ -116,7 +116,7 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
   for general information on RSiena.
 \item Lospinoso, J.A. and Snijders, T.A.B., \dQuote{Goodness of fit for
 Stochastic Actor Oriented Models.} Presentation given at Sunbelt XXXI,
- St. Pete's Beach, Fl. 2011.
+ St. Pete"s Beach, Fl. 2011.
 \item Lospinoso, J.A. (2012). \dQuote{Statistical Models for Social Network Dynamics.}
 Ph.D. Thesis. University of Oxford: U.K.
 }
@@ -128,7 +128,7 @@ Ph.D. Thesis. University of Oxford: U.K.
    ### For use out of the box:
 
    mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-   mybeh <- sienaDependent(s50a, type='behavior')
+   mybeh <- sienaDependent(s50a, type="behavior")
    mydata <- sienaDataCreate(mynet1, mybeh)
    myeff <- getEffects(mydata)
    myeff <- includeEffects(myeff, transTies, cycle3)
@@ -231,7 +231,7 @@ Ph.D. Thesis. University of Oxford: U.K.
        tc
    }
 
-  # Distribution of Burt's constraint values; see ?igraph::constraint
+  # Distribution of Burt"s constraint values; see ?igraph::constraint
   # the maximum finite value is 9/8 (see Buskens and van de Rijt, AJS 2008).
   ConstraintDistribution <- function (i, data, sims, period, groupName, varName,
                            levls=c(seq(0,1.125,by=0.125)), cumulative=TRUE){
@@ -256,7 +256,7 @@ Ph.D. Thesis. University of Oxford: U.K.
   ## Finally some examples of the three auxiliary statistics constructed above.
 
    mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-   mybeh <- sienaDependent(s50a, type='behavior')
+   mybeh <- sienaDependent(s50a, type="behavior")
    mydata <- sienaDataCreate(mynet1, mybeh)
    myeff <- getEffects(mydata)
    myeff <- includeEffects(myeff, transTrip, cycle3, nbrDist2)

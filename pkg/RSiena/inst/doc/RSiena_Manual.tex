@@ -176,11 +176,13 @@ Network Analysis}) is a computer program that carries out the
 statistical estimation of models for the evolution of social
 networks according to the dynamic actor-oriented model of \citet{Snijders01,
 Snijders05}, \citet*{SnijdersEA07}, and \citet*{SnijdersEA10a}.
-This is the manual for \rs, which also may be called \SI version 4,
+This is the manual for \rs,
 a contributed package to the statistical system \Rn.
-The manual is based on the earlier manual for \SI version 3,
-and also contains contributions written for that manual by
-Mark Huisman, Michael Schweinberger, and Christian Steglich.
+It also contains contributions written earlier, for the manual for \SI version 3,
+by Mark Huisman, Michael Schweinberger, and Christian Steglich.
+
+This manual is frequently updated, mostly only in a minor way.
+This version was renewed for \RS version 1.1-242.
 \end{abstract}
 
 
@@ -2018,10 +2020,10 @@ Then the probability of the network obtained from this step depends on
 something called the objective function $u_i(x^0, x)$ which will be defined
 in a moment.
 The probability that the next network is $x$ is given by
-\[
+\begin{equation}
      \frac{\exp(u_i(x^0, x)\big)}
-          {\sum_{x' \in \mathcal C} \exp\big(u_i(x^0, x')\big)} \ .
-\]
+          {\sum_{x' \in \mathcal C} \exp\big(u_i(x^0, x')\big)} \ . \label{probab}
+\end{equation}
 The numerator is required to make all probabilities for this step sum to 1.
 
 The objective function is defined as follows.
@@ -3863,7 +3865,10 @@ Further details are in the help file for \textsf{siena07}
                                     \>     for Methods of Moments estimation
                                         (see Section~\ref{S_sims}),    \\
                                        \>  if \textsf{returnDeps = TRUE}
-                                        in the call of \textsf{siena07}.
+                                        in the call of \textsf{siena07} \\
+ \texttt{ans\$estMeans }               \> estimated expected values of the target statistics\\
+                                     \> (if the Dolby option was chosen, this is \\
+                                     \> not equal to the average of the simulations!).
 \end{tabbing}
 Like for any \R object, the internal structure of the \textsf{sienaFit} object
 can be requested by requesting
@@ -6611,8 +6616,8 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;\\
  note that for $c=1$ this represents --inversely-- the tendency to be an isolate
  with respect to outgoing ties, i.e., have out-degree equal to 0:
- $ \text{min}(x_{i+}\,,\, 1) = 0$ if $x_{i+} = 0$, and 
- $ \text{min}(x_{i+}\,,\, 1) = 1$ if $x_{i+} \geq 1$. 
+ $ \text{min}(x_{i+}\,,\, 1) = 0$ if $x_{i+} = 0$, and
+ $ \text{min}(x_{i+}\,,\, 1) = 1$ if $x_{i+} \geq 1$.
 
  \item {\em square root out-degree}, defined by  \\
  $s^{\rm net}_{i\vit}(x) = \sqrt{x_{i+}}$;\\
@@ -6667,32 +6672,94 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
       in-degree as well as out-degree zero, i.e., being a total isolate,\\
  $s^{\rm net}_{i\vit}(x, z) =   I\{x_{+i} = x_{i+} = 0 \}  $ ;
 
-\item \emph{in-isolate popularity effect}, (\texttt{inIsolatePop}), the effect of
-      being tied to actors who further have no incoming ties
-      (the fact that such a tie does exist will give the other actor
-      an in-degree of 1),\\
-$s^{\rm net}_{i\vit}(x, z) = \sum_j x_{ij}\, I\{x_{+j} = 1 \} $ .
+%\setcounter{savenumi}{\value{enumi}}
+%\end{enumerate}
+
+\iffalse
+The next three effects, `anti isolates', `anti in-isolates',
+and `anti in-near-isolates',
+are not regular effects in the evaluation function tradition.
+They are gratification effects as defined in \citet{Snijders01},
+which can be defined as components of the function $u_i(x^0, x)$ in
+(\ref{probab}) in Section~\ref{S_mathmod}.
+In the operation of \rs, specifying the `endowment' or `creation'
+types in the effects object will mean that these effects operate
+only for maintaining existing or for creating new ties -- as usual.
+
+For these three effects, the method implemented in \RS for dealing with
+missing data will not work well if
+(for the anti isolates and anti in-isolates effects),
+for some actors $j$ with true indegree 1 or more, missing tie variables
+might decrease the observed indegree to 0;
+and (in the case of the anti in-near-isolates effect),
+for some actors $j$ with true indegree 2 or more, missing tie variables
+might decrease the observed indegree to 0 or 1.
+\fi
+
+%\begin{enumerate}
+%\setcounter{enumi}{\value{savenumi}}
+\item \emph{anti isolates effect}, (\texttt{antiIso}), the effect of
+      wishing to connect to others who otherwise would
+      be a total isolate, i.e., have no incoming or outgoing
+      ties, and wishing not to sever connections to
+      others who thereby would become a total isolate,\\
+$s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1, x_{j+} = 0\} $;\\
+
+ %      This is defined not by an evaluation statistic but only by a
+%      change statistic (contribution to the function (\ref{probab})
+%      in Section~\ref{S_mathmod}).
+%      The value of the change statistic is +1 when making a
+%      new connection to an isolate,
+%      and --1 when terminating a connection to an actor who subsequently
+%      would be an isolate:\\
+%$g^{\rm net}_{i\vit}(x^0, x) =  I\{x^0_{+j} = x^0_{j+} = 0,\, x_{ij} = 1 \} -
+%                  I\{x^0_{+j}  = 1,\, x^0_{j+} = 0,\, x_{ij} = 0 \} $ .\\
+%      The target statistic is the number of
+%      actors with outdegrees 0 and indegrees of value at least 1,
+%      multiplied by the number of actors.\\
+%      Note: perhaps this effect is of limited use, as it would be
+%      better to define the target statistic by posing the requirement
+%      of an outdegree 0 at the starting rather than the end wave
+%      of the period;
+%      but this is not straightforward in the architecture of  \rs.\\
+%      Note the remark above concerning missing data.
+
+\item \emph{anti in-isolates effect}, (\texttt{antiInIso}), the effect of
+      wishing to connect to others who otherwise would have
+      no incoming ties, and wishing not to sever connections to
+      others who thereby would lose their last incoming connection: \\
+$s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1 \} $;
+\item \emph{anti in-near-isolates effect}, (\texttt{antiInIso2}),
+      the effect of
+      wishing to make a new connection to others who currently have
+      an indegree equal to 1, and wishing not to sever connections to
+      others who currently have an indegree equal to 2:\\
+$s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 2 \} $;
 
 \item \emph{isolate popularity effect}, (\texttt{isolatePop}), the effect of
       being tied to actors who further are isolates
       (the fact that such a tie does exist will give the other actor
       an in-degree of 1),\\
-$s^{\rm net}_{i\vit}(x, z) = \sum_j x_{ij}\, I\{x_{+j} = 1, x_{j+} = 0 \} $ .
+$s^{\rm net}_{i\vit}(x, z) = \sum_j x_{ij}\, I\{x_{+j} = 1, x_{j+} = 0 \} $ .\\
+     Note that perhaps this effect is of limited use, as other (third) actors
+     might increase the indegree of $j$ to more than 1, and then the ex-isolate
+     does not contribute any more to $i$'s evaluation of the network;
+     the three effects above ( `anti isolates', `anti in-isolates',
+     and `anti in-near-isolates') may be more useful instead.
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
 
       Note that the network-isolate effect expresses the tendency for ego
       to be an isolate (not sending ties if ego has indegree 0),
       whereas the in-isolate and
-      isolate popularity effect expressed the tendency for ego
-      to connect to others who, without this connection, would 
+      isolate popularity effect express the tendency for ego
+      to connect to others who, without this connection, would
       have an indegree of 0, or be total isolates, respectively.
       Thus, in modeling the number of isolates, for the network-isolate
       effect the agency is in the isolate (see the $i$ in the formula),
-      whereas for the in-isolate and isolate popularity effect the agency
-      is in others not
-      connecting to the isolate (see the $j$ in the formula).
-
-\setcounter{savenumi}{\value{enumi}}
-\end{enumerate}
+      whereas for the various anti isolates and the isolate popularity
+      effects the agency is in others connecting (or not)
+      to the isolate (see the $j$ in the formulaee).
 \medskip
 
 \noindent
@@ -10324,8 +10391,27 @@ which affect the user.
 (Programmers should consult the changeLog file on CRAN or in the R-forge
 repository.)
 \begin{small}
-\begin{itemize}
-\item 2013-08-22 R-forge revision 241
+\begin{itemize} % Also update version number in abstract
+\item 2013-08-27 R-forge revision 242
+
+Changes in RSiena as well as RSienaTest:
+  \begin{itemize}
+  \item Correction to Dolby option for the case of more than 2 waves:
+     in phase1.r and phase3.r, scores are added (instead of averaged)
+	 over waves. (Averaging was wrong, because in phase 2 they are added.)
+  \item New effects: \texttt{anti isolates}, \texttt{anti in-isolates},
+   and \texttt{anti in-near-isolates}.
+  \item Effect \texttt{inIsolatePop} dropped (it was shortlived).
+  \item Improved printing of results of siena07() in the case simOnly.
+  \item Prettier response printed to console for includeEffects() and setEffect().
+  \item \sfn{z\$estMeans} added to sienaFit objects \sfn{z}:
+     vector of estimated expected values of statistics;
+	 this is \sfn{colMeans(z\$sf) + z\$targets}  but if dolby,
+	 the regression on the scores is subtracted.
+  \end{itemize}  
+  
+
+\item 2013-08-23 R-forge revision 241
 
 Changes in RSiena as well as RSienaTest:
   \begin{itemize}
@@ -10336,9 +10422,9 @@ Changes in RSiena as well as RSienaTest:
      yet for two-mode networks with upward changes only.
   \item  Drop the unintended multiplication of the target statistic
      for the \texttt{inPop} effect by $n$.
-  \item Trapped some execution errors (mainly associated with inversion of 
+  \item Trapped some execution errors (mainly associated with inversion of
     singular matrices) and allowed the functions to end properly
-    with a message.
+    with a warning message.
   \item Added various degree-related effects to bipartite networks.
   \item New effect \texttt{inIsolatePop}.
   \end{itemize}

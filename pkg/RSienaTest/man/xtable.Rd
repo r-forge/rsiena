@@ -39,8 +39,8 @@ myeff <- getEffects(mydata)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 ans
 summary(ans)
-xtable(ans, type='html', file='ans.html')}
+xtable(ans, type="html", file="ans.html")}
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
+% Add one or more standard keywords, see file "KEYWORDS" in the
 % R documentation directory.
 \keyword{ method }

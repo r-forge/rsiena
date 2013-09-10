@@ -154,7 +154,7 @@ We recommend the following heuristic approach to model checking:
   for general information on RSiena.
 \item Lospinoso, J.A. and Snijders, T.A.B., \dQuote{Goodness of fit for
   Stochastic Actor Oriented Models.} Presentation given at Sunbelt XXXI,
-  St. Pete's Beach, Fl. 2011.
+  St. Pete"s Beach, Fl. 2011.
 \item Lospinoso, J.A. (2012).
   \dQuote{Statistical Models for Social Network Dynamics.}
   Ph.D. Thesis. University of Oxford: U.K.
@@ -167,7 +167,7 @@ We recommend the following heuristic approach to model checking:
 \dontrun{
    mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
    mynet2 <- sienaDependent(array(c(s503, s502, s501), dim=c(50, 50, 3)))
-   mybeh <- sienaDependent(s50a, type='behavior')
+   mybeh <- sienaDependent(s50a, type="behavior")
    mydata <- sienaDataCreate(mynet1, mynet2, mybeh)
    myeff <- getEffects(mydata)
    myeff <- includeEffects(myeff, transTrip)

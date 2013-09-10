@@ -145,7 +145,7 @@ phase1.2 <- function(z, x, ...)
 	z$regrCor <- rep(0, z$pp)
 	if (!is.null(z$ssc))
 	{
-		scores <- apply(z$ssc, c(1,3), mean)
+		scores <- apply(z$ssc, c(1,3), sum)
 		for (i in 1:z$pp)
 		{
 			if (var(scores[,i]) > 0)
@@ -217,7 +217,7 @@ phase1.2 <- function(z, x, ...)
         fchange <- as.vector(dinv %*% z$mnfra)
         z$dinv <- dinv
     }
-	if (!x$diagg) 
+	if (!x$diagg)
 	{
 		# Partial diagonalization of derivative matrix
 		# for use if 0 < x$diagonalize < 1.

@@ -232,7 +232,7 @@ printInitialDescription <- function(data, effects, modelName="Siena",
             }
             if (!bipartite)
             {
-                Report("Dyad Counts:\n", outf)
+                Report("Directed dyad Counts:\n", outf)
                 if (valmin == 0 & valmax == 1)
                 {
                     Report(" observation    total    mutual    asymm.     null\n",

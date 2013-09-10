@@ -5,7 +5,7 @@
   This function creates a changing covariate object from a matrix.
 }
 \usage{
-varCovar(val, nodeSet='Actors')
+varCovar(val, nodeSet="Actors")
 }
 \arguments{
   \item{val}{ Matrix of covariate values, one row for each actor, one
@@ -19,7 +19,7 @@ varCovar(val, nodeSet='Actors')
   associated with node set nodeSet of the Siena data object.
 }
 \value{
-  Returns the covariate as an object of class 'varCovar', in which
+  Returns the covariate as an object of class "varCovar", in which
   form it can be used as an argument to SienaData.create.
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}

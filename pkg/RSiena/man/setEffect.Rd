@@ -13,7 +13,7 @@ test = FALSE, initialValue = 0, timeDummy = ",", include = TRUE,
 name = myeff$name[1], type = "eval", interaction1 = "",
 interaction2 = "", period=1, group=1, character=FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
+%- maybe also "usage" for other objects documented here.
 \arguments{
   \item{myeff}{a Siena effects object as created by \code{\link{getEffects}}
 }
@@ -81,6 +81,6 @@ myeff <- setEffect(myeff, Rate, initialValue=1.5, name="mybeh",
 myeff <- setEffect(myeff, outInv, 3) ## parameter
 myeff
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
+% Add one or more standard keywords, see file "KEYWORDS" in the
 % R documentation directory.
 \keyword{ classes }

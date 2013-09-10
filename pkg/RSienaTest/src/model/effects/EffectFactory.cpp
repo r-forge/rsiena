@@ -626,13 +626,21 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new IsolateNetEffect(pEffectInfo);
 	}
-	else if (effectName == "inIsolatePop")
+	else if (effectName == "antiIso")
 	{
-		pEffect = new IsolatePopEffect(pEffectInfo, false);
+		pEffect = new AntiIsolateEffect(pEffectInfo, true, 1);
+	}
+	else if (effectName == "antiInIso")
+	{
+		pEffect = new AntiIsolateEffect(pEffectInfo, false, 1);
+	}
+	else if (effectName == "antiInIso2")
+	{
+		pEffect = new AntiIsolateEffect(pEffectInfo, false, 2);
 	}
 	else if (effectName == "isolatePop")
 	{
-		pEffect = new IsolatePopEffect(pEffectInfo, true);
+		pEffect = new IsolatePopEffect(pEffectInfo);
 	}
 	else if (effectName == "inIsDegree")
 	{

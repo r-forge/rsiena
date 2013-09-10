@@ -114,7 +114,7 @@ sienaBayes(data, effects, model,  saveFreq=100,
   Finally \code{nmain - nwarm} repeats (of \code{nrunMHBatches} of a
   number of MH steps plus Bayesian proposals) are performed.
   In the warming as well as the final phase, the number of MH steps is
-  determined by parameter \code{mult} ('multiplication factor')
+  determined by parameter \code{mult} ("multiplication factor")
   in the call of \code{sienaAlgorithmCreate} that created the algorithm object.
   If \code{plotit} is TRUE,
   plots are produced at intervals during the run showing progress. They
@@ -176,7 +176,7 @@ sienaBayes(data, effects, model,  saveFreq=100,
   FourGroups <- sienaGroupCreate(
         list(dataset.1, dataset.3, dataset.4, dataset.6))
   FourEffects <- getEffects(FourGroups)
-  FourModel <- sienaModelCreate(projname = 'FourGroups', maxlike=TRUE)
+  FourModel <- sienaModelCreate(projname = "FourGroups", maxlike=TRUE)
   bayes.model <- sienaBayes(FourModel, data = FourGroups,
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)
 }

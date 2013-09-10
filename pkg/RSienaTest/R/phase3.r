@@ -103,113 +103,120 @@ phase3.2 <- function(z, x, ...)
                  'with better initial values or a reduced model.\n',
                  '(Check that you entered the data properly!)\n'), outf)
     }
-    Heading(2, outf, c('End of stochastic approximation algorithm, phase ',
-                       z$Phase, '.'))
-    Report(c('Total of', z$n,'iterations.\n'), outf)
-    Report(c('Parameter estimates based on', z$n - z$Phase3nits,
-             'iterations,\n'), outf)
-    if (!x$maxlike && z$cconditional)
+	if ((x$nsub == 0)&(x$simOnly))
 	{
-        Report(c('basic rate parameter',
-                 c('', 's')[as.integer(z$f$observations > 2) + 1],
-                 ' as well as \n'), sep='', outf)
+	# nothing
 	}
-	Report(c('convergence diagnostics, covariance and derivative matrices ',
-			 'based on ', z$Phase3nits, ' iterations.\n\n'), sep='', outf)
-    Report('Information for convergence diagnosis.\n', outf)
-    Report(c('Averages, standard deviations, ',
-           'and t-ratios for deviations from targets:\n'), sep='', outf)
-  #  Report(c(date(),'\n'),bof)
-    if (x$maxlike)
+	else
 	{
-        Report('\nMaximum Likelihood estimation.', bof)
-	}
-    else
-	{
-		if (z$cconditional)
-		{
-			Report('\nconditional moment estimation.', bof)
+        Heading(2, outf, c('End of stochastic approximation algorithm, phase ',
+                           z$Phase, '.'))
+        Report(c('Total of', z$n,'iterations.\n'), outf)
+        Report(c('Parameter estimates based on', z$n - z$Phase3nits,
+                 'iterations,\n'), outf)
+        if (!x$maxlike && z$cconditional)
+ 		{
+            Report(c('basic rate parameter',
+                     c('', 's')[as.integer(z$f$observations > 2) + 1],
+                     ' as well as \n'), sep='', outf)
+ 		}
+ 		Report(c('convergence diagnostics, covariance and derivative matrices ',
+ 				 'based on ', z$Phase3nits, ' iterations.\n\n'), sep='', outf)
+        Report('Information for convergence diagnosis.\n', outf)
+        Report(c('Averages, standard deviations, ',
+               'and t-ratios for deviations from targets:\n'), sep='', outf)
+   #  #  Report(c(date(),'\n'),bof)
+        if (x$maxlike)
+ 		{
+            Report('\nMaximum Likelihood estimation.', bof)
+ 		}
+        else
+ 		{
+ 			if (z$cconditional)
+ 			{
+ 				Report('\nconditional moment estimation.', bof)
 
-		}
-		else
-		{
-			Report('\nunconditional moment estimation.', bof)
-		}
-	}
-    Report('\nInformation for convergence diagnosis.\n', bof)
-    Report(c('Averages, standard deviations, ',
-        'and t-ratios for deviations from targets:\n'), bof, sep='')
-    ##calculate t-ratios
-    dmsf <- diag(z$msf)
-    sf <- colMeans(z$sf)
-	# TS: I wonder why "use" and "use2" are the names in the following lines;
-	# the coordinates with "use" are <<not>> used.
-    use <- dmsf < 1e-20 * z$scale * z$scale
-    use2 <- abs(sf) < 1e-10 * z$scale
-    dmsf[use] <- 1e-20 * z$scale[use] * z$scale[use]
-    tstat <- rep(NA, z$pp)
-    tstat[!use]<- sf[!use] / sqrt(dmsf[!use])
-    tstat[use & use2] <- 0
-    tstat[use & !use2] <- 999
-    z$tstat <- tstat
-	# tconv.max = Maximum value of t-ratio for convergence,
-	# for any linear combination.
-	z$tconv.max <- NA
-	if (sum(!z$fixed) > 0)
-	{
-		mean.dev <- colSums(z$sf)[!z$fixed]/dim(z$sf)[1]
-		cov.dev <- z$msf[!z$fixed,!z$fixed]
-		if (inherits(try(thisproduct <- solve(cov.dev, mean.dev), silent=TRUE),
-					"try-error"))
-		{
-			Report('Maximum t-ratio for convergence not computable.\n', outf)
-		}
-		else
-		{
-			z$tconv.max <- sqrt(t(mean.dev) %*% thisproduct)
-		}
-	}
-    mymess1 <- paste(format(1:z$pp,width=3), '. ',
-                    format(round(sf, 4), width=8, nsmall=4), ' ',
-                    format(round(sqrt(dmsf), 4) ,width=8, nsmall=4), ' ',
-                    format(round(tstat, 4), width=8, nsmall=3), sep='')
-    mymess2 <- c('', '    (fixed parameter)')[as.numeric(z$fixed) + 1]
-    mymess <- paste(mymess1, mymess2)
-    PrtOutMat(as.matrix(mymess), outf)
-    PrtOutMat(as.matrix(mymess1), bof)
-    ##  Report(mymess1, bof, fill=80)
-    tmax <- max(abs(tstat)[!z$fixed & !z$BasicRateFunction & z$resist > 0.9])
-    z$tconv <- tstat
-    error <- (abs(tmax) > 4.0 / sqrt(z$Phase3nits)) && (abs(tmax) > 0.3)
-    if (tmax >= 0.4 & !z$error)
-	{
-        z$error <- TRUE
-	}
-	Report('Good convergence is indicated by the t-ratios ', outf)
-    if (any(z$fixed))
-	{
-		Report('of non-fixed parameters ', outf)
-	}
-    Report('being close to zero.\n', outf)
-    if (z$Phase3nits < 100)
-	{
-        Report(c('(Since the diagnostic checks now are based only on ',
-                 z$Phase3nits,
-                 ' iterations,', '\nthey are not reliable.)\n'), sep='', outf)
-	}
-    if (error) ## also test subphase here but not relevant to phase 3, I think
-    {
-        Report('One or more of the t-statistics are rather large.\n', outf)
-        if (tmax > 0.5)
-		{
-            Report('Convergence of the algorithm is doubtful.\n', outf)
-		}
-		## removed repfortotal loop possibility here as not functioning now
-        if (z$Phase3nits <= 50)
-		{
-            Report(c('Note that the standard deviations are based on',
-                     'few simulations.\n'), outf)
-		}
+ 			}
+ 			else
+ 			{
+ 				Report('\nunconditional moment estimation.', bof)
+ 			}
+ 		}
+        Report('\nInformation for convergence diagnosis.\n', bof)
+        Report(c('Averages, standard deviations, ',
+            'and t-ratios for deviations from targets:\n'), bof, sep='')
+        ##calculate t-ratios
+        dmsf <- diag(z$msf)
+        sf <- colMeans(z$sf)
+ 		# TS: I wonder why "use" and "use2" are the names in the following lines;
+ 		# the coordinates with "use" are <<not>> used.
+        use <- dmsf < 1e-20 * z$scale * z$scale
+        use2 <- abs(sf) < 1e-10 * z$scale
+        dmsf[use] <- 1e-20 * z$scale[use] * z$scale[use]
+        tstat <- rep(NA, z$pp)
+        tstat[!use]<- sf[!use] / sqrt(dmsf[!use])
+        tstat[use & use2] <- 0
+        tstat[use & !use2] <- 999
+        z$tstat <- tstat
+ 		# tconv.max = Maximum value of t-ratio for convergence,
+ 		# for any linear combination.
+ 		z$tconv.max <- NA
+ 		if (sum(!z$fixed) > 0)
+ 		{
+ 			mean.dev <- colSums(z$sf)[!z$fixed]/dim(z$sf)[1]
+ 			cov.dev <- z$msf[!z$fixed,!z$fixed]
+ 			if (inherits(try(thisproduct <- solve(cov.dev, mean.dev), silent=TRUE),
+ 						"try-error"))
+ 			{
+ 				Report('Maximum t-ratio for convergence not computable.\n', outf)
+ 			}
+ 			else
+ 			{
+ 				z$tconv.max <- sqrt(t(mean.dev) %*% thisproduct)
+ 			}
+ 		}
+        mymess1 <- paste(format(1:z$pp,width=3), '. ',
+                        format(round(sf, 4), width=8, nsmall=4), ' ',
+                        format(round(sqrt(dmsf), 4) ,width=8, nsmall=4), ' ',
+                        format(round(tstat, 4), width=8, nsmall=3), sep='')
+        mymess2 <- c('', '    (fixed parameter)')[as.numeric(z$fixed) + 1]
+        mymess <- paste(mymess1, mymess2)
+        PrtOutMat(as.matrix(mymess), outf)
+        PrtOutMat(as.matrix(mymess1), bof)
+        ##  Report(mymess1, bof, fill=80)
+        tmax <- max(abs(tstat)[!z$fixed & !z$BasicRateFunction & z$resist > 0.9])
+        z$tconv <- tstat
+        error <- (abs(tmax) > 4.0 / sqrt(z$Phase3nits)) && (abs(tmax) > 0.3)
+        if (tmax >= 0.4 & !z$error)
+ 		{
+            z$error <- TRUE
+ 		}
+ 		Report('Good convergence is indicated by the t-ratios ', outf)
+        if (any(z$fixed))
+ 		{
+ 			Report('of non-fixed parameters ', outf)
+ 		}
+        Report('being close to zero.\n', outf)
+        if (z$Phase3nits < 100)
+ 		{
+            Report(c('(Since the diagnostic checks now are based only on ',
+                     z$Phase3nits,
+                     ' iterations,', '\nthey are not reliable.)\n'), sep='', outf)
+ 		}
+        if (error) ## also test subphase here but not relevant to phase 3, I think
+        {
+            Report('One or more of the t-statistics are rather large.\n', outf)
+            if (tmax > 0.5)
+ 			{
+                Report('Convergence of the algorithm is doubtful.\n', outf)
+ 			}
+ 			## removed repfortotal loop possibility here as not functioning now
+            if (z$Phase3nits <= 50)
+ 			{
+                Report(c('Note that the standard deviations are based on',
+                         'few simulations.\n'), outf)
+ 			}
+ 		}
 	}
     if (x$maxlike)
     {
@@ -260,7 +267,7 @@ phase3.2 <- function(z, x, ...)
 			if (inherits(try(cov <- solve(dfrac), silent=TRUE),"try-error"))
 			{
 				Report('Noninvertible estimated covariance matrix : \n', outf)
-				errorMessage.cov <- 'Noninvertible estimated covariance matrix'
+				errorMessage.cov <- '***Warning: Noninvertible estimated covariance matrix ***'
 				cov <- NULL
 			}
 		}
@@ -271,7 +278,7 @@ phase3.2 <- function(z, x, ...)
 		error <- FALSE
 		if (inherits(try(msfinv <- solve(z$msfc), silent=TRUE), "try-error"))
 		{
-			Report('Covariance matrix not positive definite: \n', outf)
+			Report('*** Warning: Covariance matrix not positive definite *** \n', outf)
 			if (any(z$fixed || any(z$newfixed)))
 			{
 				Report(c('(This may be unimportant, and related to the fact\n',
@@ -281,7 +288,7 @@ phase3.2 <- function(z, x, ...)
 			{
 				Report(c('This may mean that the reported standard errors ',
 						'are invalid.\n'), outf)
-				errorMessage.cov <- 'Noninvertible estimated covariance matrix'
+				errorMessage.cov <- '*** Warning: Noninvertible estimated covariance matrix ***'
 			}
 			z$msfinv <- NULL
 		}
@@ -310,6 +317,7 @@ phase3.2 <- function(z, x, ...)
 CalculateDerivative3<- function(z,x)
 {
     z$mnfra <- colMeans(z$sf)
+	estMeans <- z$mnfra + z$targets	
     if (z$FinDiff.method || x$maxlike)
     {
 		dfra <- t(as.matrix(Reduce("+", z$sdf) / length(z$sdf)))
@@ -328,18 +336,24 @@ CalculateDerivative3<- function(z,x)
             Report(c("Warning: diagonal element(s)", sub,
                      " of derivative matrix < 0\n"), cf)
         }
-		scores <- apply(z$ssc, c(1,3), mean)
+		scores <- apply(z$ssc, c(1,3), sum)  # z$nit by z$pp matrix
 		for (i in 1:z$pp)
 		{
-			if (var(scores[,i]) > 0)
+			if ((var(scores[,i]) > 0)&(var(z$sf[,i]) > 0))
 			{
 				z$regrCoef[i] <- cov(z$sf[,i], scores[,i])/var(scores[,i])
 				z$regrCor[i] <- cor(z$sf[,i], scores[,i])
 			}
+		}		
+		if (x$dolby)
+		{
+			mean.scores <- colMeans(scores)
+			estMeans <- estMeans - (z$regrCoef * colMeans(scores))
 		}
 		Report('Correlations between scores and statistics:\n', cf)
 		PrtOutMat(format(as.matrix(t(z$regrCor)), digits = 2, nsmall = 2), cf)
     }
+	z$estMeans <- estMeans
     z$diver <- rep(FALSE, z$pp)
     if (z$AllUserFixed & any(abs(diag(dfra)) < 1e-6))
 	{
@@ -379,7 +393,7 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
         {
             Report(c('Warning. After phase 3, derivative matrix non-invertible',
                      'even with a ridge.\n'), cf)
-			z$errorMessage.cov <- 'Noninvertible derivative matrix'
+			z$errorMessage.cov <- '*** Warning: Noninvertible derivative matrix ***'
             fchange <- 0
             z$dinv <- z$dfrac
 			z$dinv[,] <- 999

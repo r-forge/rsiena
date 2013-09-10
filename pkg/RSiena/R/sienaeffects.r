@@ -12,6 +12,10 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
                            type="eval", interaction1="", interaction2="",
                            character=FALSE)
 {
+	if (!inherits(myeff, 'sienaEffects'))
+	{
+		stop("The first argument is not of class <sienaEffects>.")
+	}
     if (character)
     {
         dots <- sapply(list(...), function(x)x)
@@ -48,8 +52,9 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 	}
 	else
 	{
-		print.data.frame(myeff[use, c("name", "shortName", "type",
-			"interaction1", "interaction2", "include")])
+#		print.data.frame(myeff[use, c("name", "shortName", "type",
+#			"interaction1", "interaction2", "include")])
+		print.sienaEffects(myeff[use,])
 	}
     myeff
 }
@@ -244,8 +249,10 @@ setEffect <- function(myeff, shortName, parameter=0,
     myeff[use, "test"] <- test
     myeff[use, "initialValue"] <- initialValue
     myeff[use, "timeDummy"] <- timeDummy
-    print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
-                       "interaction2", "include", "parm", "fix", "test",
-                       "initialValue", "timeDummy", "period", "group")])
+#    print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
+#                       "interaction2", "include", "parm", "fix", "test",
+#                       "initialValue", "timeDummy", "period", "group")])
+	print.sienaEffects(myeff[use,])
+
     myeff
 }

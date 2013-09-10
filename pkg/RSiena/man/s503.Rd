@@ -1,7 +1,7 @@
 \name{s503}
 \alias{s503}
 \docType{data}
-\title{Network 3 data: excerpt from 'Teenage Friends and Lifestyle Study' data.}
+\title{Network 3 data: excerpt from "Teenage Friends and Lifestyle Study" data.}
 \description{
 Second timepoint network data from an excerpt of 50 girls from the
 Teenage Friends and Lifestyle Study data set. Useful as a small example
@@ -24,7 +24,7 @@ See \url{http://www.stats.ox.ac.uk/~snijders/siena/s50_data.htm}
 }
 \examples{
 mynet <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mybeh <- sienaDependent(s50a, type='behavior')
+mybeh <- sienaDependent(s50a, type="behavior")
 mydata <- sienaDataCreate(mynet, mybeh)
 }
 \keyword{datasets}

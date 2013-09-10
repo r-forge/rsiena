@@ -5,7 +5,7 @@
   This function creates a constant covariate object from a vector.
   }
 \usage{
-coCovar(val, nodeSet='Actors')
+coCovar(val, nodeSet="Actors")
 }
 \arguments{
   \item{val}{Vector of covariate values}

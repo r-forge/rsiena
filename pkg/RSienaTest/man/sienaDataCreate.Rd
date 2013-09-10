@@ -13,7 +13,7 @@ sienaDataCreate(..., nodeSets=NULL, getDocumentation=FALSE)
     \code{\link{coCovar}},\code{\link{varCovar}},\code{\link{coDyadCovar}},\cr
   \code{\link{varDyadCovar}}, \code{\link{sienaCompositionChange}}}
   \item{nodeSets}{list of Siena node sets. Default is the single node
-    set named 'Actors', length equal to the number of rows in the first
+    set named "Actors", length equal to the number of rows in the first
     object of class "sienaDependent". If the entire data set contains more than
     one node set, then the node sets must have been specified in
     the creation of all data objects.}
@@ -46,7 +46,7 @@ model fit. The components of the object are.
 \code{\link{sienaCompositionChange}}, \code{\link{sienaGroupCreate}}}
 \examples{
 mynet <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mybeh <- sienaDependent(s50a, type='behavior')
+mybeh <- sienaDependent(s50a, type="behavior")
 mydata <- sienaDataCreate(mynet, mybeh)}
 
 \keyword{ classes }
