@@ -126,12 +126,12 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 # or for conditional estimation
 \dontrun{
-myalgorithm$condname <- 'mynet1'
+myalgorithm$condname <- "mynet1"
 myalgorithm$cconditional <- TRUE
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
         }
 
-# or if a previous 'on track' result ans was obtained
+# or if a previous "on track" result ans was obtained
 \dontrun{
 ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans)
          }

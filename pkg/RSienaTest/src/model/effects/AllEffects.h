@@ -13,6 +13,7 @@
 #define ALLEFFECTS_H_
 
 #include "AltersCovariateAverageEffect.h"
+#include "AntiIsolateEffect.h"
 #include "AverageAlterEffect.h"
 #include "AverageReciprocatedAlterEffect.h"
 #include "BalanceEffect.h"

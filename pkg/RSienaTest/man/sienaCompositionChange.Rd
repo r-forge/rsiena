@@ -82,7 +82,7 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
 \examples{
   clist <- list(c(1, 3), c(1.4, 2.5))
   #or
-  clist <- list(c('1', '3'), c('1.4', '2.5'))
+  clist <- list(c("1", "3"), c("1.4", "2.5"))
 
   compChange <- sienaCompositionChange(clist)
 
@@ -96,6 +96,6 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
   compChange <- sienaCompositionChangeFromFile("cc.dat")
   }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
+% Add one or more standard keywords, see file "KEYWORDS" in the
 % R documentation directory.
 \keyword{ classes }

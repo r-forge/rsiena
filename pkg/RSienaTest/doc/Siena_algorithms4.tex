@@ -268,7 +268,7 @@ following issues.
 \adda{Logarithms (denoted $\log$) are natural logarithms.}
 
 Symbols given \nnm{in italic sf font} refer to the names
-of variables used in the \R code.
+of variables used in the \R or C++ code.
 
 \emph{Generic symbols for variables}
 
@@ -738,7 +738,7 @@ The algorithm consists of three phases.
       \[
       \bar{s} = \frac{{\rm{Sum}}_{S}}{n_1} \ .
       \]
-      \item In \nnm{CalculateDerivative} : \ 
+      \item In \nnm{CalculateDerivative} : \
       Estimate $D(\theta_1)$ by
       \begin{align*}
       \text{FD:    }   \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_1} \\
@@ -897,7 +897,7 @@ The algorithm consists of three phases.
            \]
            where $\sigma_j$ is the square root of the $j'$th diagonal element
            of $\Sigma$.
-      \item In \nnm{CalculateDerivative3} : \ 
+      \item In \nnm{CalculateDerivative3} : \
            Estimate $D(\hat\theta)$ by
       \begin{align*}
       \text{FD:    }   \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_3} \\
@@ -986,10 +986,6 @@ where $x^{(+ij)}$ is $x$ to which the tie $i \rightarrow j$ has been added, and
  $x^{(-ij)}$ is $x$ from which the tie $i \rightarrow j$ has been deleted.
  (Note that this definition implies that (\ref{Delta}) is not affected by the value
  of $x_{ij}$ in  $x$ as used in the left hand side.)
-The statistic used for estimation is defined by
-\begin{equation}
- s_{k}^X(x,z) = \sum_i s_{ik}^X(x,z) \ .        \label{fitstat}
-\end{equation}
 
 The quantity introduced in the beginning, called $\Delta f^N(r,i,j,x,z)$,
 is a linear combination of the change statistics:
@@ -999,6 +995,38 @@ is a linear combination of the change statistics:
 where $\beta^{X(r)}_k$ is the appropriate element of the parameter vector $\theta$,
 and where $\pm = +1$ if the toggle means that tie  $i \rightarrow j$ is added,
 while $\pm = -1$ if the toggle means that this tie is dropped.
+
+In the C++ code, the change contribution is the function
+\nnm{calculateContribution()},
+of which the basic instance is defined in \nnm{NetworkEffect()}
+and specific instances in all functions defining specific effects.
+
+The statistic used for estimation, also called the target statistic,
+is defined by the sum over the waves from 2 to $M$ of
+\begin{equation}
+ s_{k}^X(x,z) = \sum_i s_{ik}^X(x,z) \ .        \label{fitstat}
+\end{equation}
+If the number of  dependent variables is more than one, like in studies
+of networks and behavior, for wave $m \in \{2, \ldots, M\}$, 
+the dependent variable is taken as in wave $m$ and the 
+explanatory as in wave $m-1$. This is explained for 
+the case of networks and behavior in \citet{SnijdersEA07}.
+
+In the C++ code, (\ref{fitstat}) is the function \nnm{evaluationStatistic()}.
+The terms in (\ref{fitstat}) are the function \nnm{egoStatistic()},
+and these are computed for some (not all) effects as
+\begin{equation}
+ \text{egoStatistic}(i) = \sum_j x_{ij}\,\text{tieStatistic}(i,j) \ .
+\end{equation}
+The "number of distances equal to 2" effect is an example of an effect
+where such decomposition is not straightforward, and the effect
+is defined using \nnm{egoStatistic()} rather than \nnm{tieStatistic()}.
+The basic instances of all these functions also are defined in \nnm{NetworkEffect()},
+and specific instances of \nnm{egoStatistic()}
+or \nnm{tieStatistic()} are defined in all functions defining specific effects.
+
+A special case of the construction is given by so-called generic effects,
+see the documentation in \nnm{classdesign}.
 
 
 \subsection{Interaction effects for networks}
@@ -1218,7 +1246,7 @@ in the manual).
 
  \item {\em weighted indegree effect}, \\
  by an exception to the rule this could be defined as
- $s^{\rm beh}_{i\vit \circ V}(x) = z_i \sum_j v_j\,x_{ji} $ ;
+ $s^{\rm beh}_{i\vit \circ V}(x) = z_i \sum_j v_j\,x_{ji}\,$;
 
  \item {\em weighted outdegree effect}, \\
  $s^{\rm beh}_{i\vit \circ V}(x) = z_i \sum_j v_j \,x_{ij} $ ;
@@ -1275,7 +1303,7 @@ Let us omit the popularity-interaction effects,
 
 \end{enumerate}
 
-
+\newpage
 \section{Likelihood-based calculations:
          \protect\newline Chain structures}
 

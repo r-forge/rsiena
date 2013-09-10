@@ -1,3 +1,22 @@
+2013-09-10 R-forge revision 242
+Changes in RSiena and RSienaTest:
+   * New effects: anti isolates, anti in-isolates, anti in-near-isolates.
+   * Effect inIsolatePop dropped (it was shortlived).
+   * Improved printing of results of siena07() in the case simOnly.
+   * Prettier response printed to console for includeEffects() and setEffect().
+   * z$estMeans added to siena objects z: 
+     vector of estimated expected values of statistics; 
+	 this is colMeans(z$sf) + z$targets but if dolby, 
+	 the regression on the scores is subtracted.
+   * Correction to Dolby option for the case of more than 2 waves:
+     in phase1.r and phase3.r, scores are added (instead of averaged)
+	 over waves. (Averaging was wrong, because in phase 2 they are added.)
+   * All single quotes in .Rd files replaced by double quotes
+     (first seemed required by the disappearance of inconsolata.sty,
+     probably superfluous).
+Changes in RSienaTest:
+   * Small additions to Siena_algorithms4.
+
 2013-08-23 R-forge revision 241
 Changes in RSiena and RSienaTest:
    * Corrected bug that occurred if there was only one option

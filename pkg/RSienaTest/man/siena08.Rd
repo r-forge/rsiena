@@ -29,7 +29,7 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
 }
 \details{
   A meta analysis is performed as described
-  in the Siena manual, section `Meta-analysis of Siena results'. This
+  in the Siena manual, section `Meta-analysis of Siena results". This
   consists of three parts: an iterated weighted least squares
   modification of the method described in the reference below;
   maximum likelihood estimates and confidence intervals based on
@@ -111,7 +111,7 @@ Group4 <- sienaDependent(array(c(N3404, HN3404), dim=c(33, 33, 2)))
 dataset.1 <- sienaDataCreate(Friends = Group1)
 dataset.3 <- sienaDataCreate(Friends = Group3)
 dataset.4 <- sienaDataCreate(Friends = Group4)
-OneAlgorithm <- sienaAlgorithmCreate(projname = 'SingleGroups')
+OneAlgorithm <- sienaAlgorithmCreate(projname = "SingleGroups")
 effects.1 <- getEffects(dataset.1)
 effects.3 <- getEffects(dataset.3)
 effects.4 <- getEffects(dataset.4)

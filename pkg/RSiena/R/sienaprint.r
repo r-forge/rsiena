@@ -202,23 +202,47 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 	}
 	else
 	{
+		if(x$x$simOnly)
+		{
+		cat("Parameter values\n\n")
+		}
+		else
+		{
 		cat("Estimates, standard errors and convergence t-ratios\n\n")
+		}
 		tmp <- sienaFitThetaTable(x, tstat=tstat)
 		mydf <- tmp$mydf
 		mymat <- as.matrix(mydf)
 		mymat[, 'value'] <- format(round(mydf$value, digits=4))
-		mymat[, 'se'] <- format(round(mydf$se, digits=4))
-		mymat[, 'tstat'] <- paste(" ", format(round(mydf$tstat, digits=4)))
-		mymat[is.na(mydf$tstat), 'tstat'] <- ' '
+		if(x$x$simOnly)
+		{
+			mymat[, 'se'] <- ' '
+			mymat[, 'tstat'] <- ' '
+		}
+		else
+		{
+			mymat[, 'se'] <- format(round(mydf$se, digits=4))
+			mymat[, 'tstat'] <- paste(" ", format(round(mydf$tstat, digits=4)))
+			mymat[is.na(mydf$tstat), 'tstat'] <- ' '
+		}
 		mymat[, 'type'] <- format(mymat[, 'type'])
 		mymat[, 'text'] <- format(mymat[, 'text'])
 		mymat[mydf$row < 1, 'row'] <-
 			format(mydf[mydf$row < 1, 'row'])
 		mymat[mydf[,'row'] >= 1, 'row'] <-
 			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
-		mymat <- rbind(c(rep("", 4), "Estimate", "", "Standard", "",
+		if(x$x$simOnly)
+		{
+			mymat <- rbind(c(rep("", 4), "Parameter", "", "", "",
+						 ""),
+					   c(rep("", 4), "  value",rep("", 4)), mymat)
+		}
+		else
+		{
+			mymat <- rbind(c(rep("", 4), "Estimate", "", "Standard", "",
 						 "Convergence"),
 					   c(rep("", 6),  "  Error", "", "  t-ratio"), mymat)
+		}
 		mymat <- apply(mymat, 2, format)
 		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
 		addtorow <- tmp$addtorow
@@ -239,10 +263,39 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			cat(tmp1[i], '\n')
 		}
 
+		if(x$x$simOnly)
+		{
+	cat('\nEstimated means and standard deviations, standard errors of the mean \n')
+			dmsf <- diag(x$msf)
+			mean.stats <- colMeans(x$sf) + x$targets
+			cov.dev <- x$msf
+			sem <- sqrt(dmsf/dim(x$sf)[1])
+			if (x$x$dolby)
+			{
+				scores <- apply(x$ssc, c(1,3), sum)  # z$nit by z$pp matrix
+				mean.scores <- colMeans(scores)
+				mean.stats <- mean.stats - (x$regrCoef * mean.scores)
+				sem <- sem*sqrt(1 - (x$regrCor)^2)
+			}
+			mymess1 <- paste(format(1:x$pp,width=3), '. ',
+					format(x$requestedEffects$functionName, width = 56),
+					format(round(mean.stats, 3), width=8, nsmall=3), ' ',
+					format(round(sqrt(dmsf), 3) ,width=8, nsmall=3), ' ',
+					format(round(sem, 4) ,width=8, nsmall=4),
+					rep('\n',x$pp), sep='')
+			cat(as.matrix(mymess1),'\n', sep='')
+		}
+
 		try(if (x$errorMessage.cov > '')
 				{cat('\nWarning:', x$errorMessage.cov, '\n')}, silent=TRUE)
-			# "Try" for downward compatilibity
+			# "Try" for downward compatibility
 		cat("\nTotal of", x$n, "iteration steps.\n\n")
+		if ((x$x$dolby)&(x$x$simOnly))
+		{
+		cat('(Standard errors of the mean are less than s.d./', x$n,' \n',
+				sep='')
+		cat('because of regression on scores (Dolby option).) \n')
+		}
 		if (x$termination == "UserInterrupt")
 			cat(" \n*** Warning ***",
 				"Estimation terminated early at user request.\n")

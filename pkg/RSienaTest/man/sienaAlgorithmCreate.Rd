@@ -70,9 +70,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{condname}{If conditional, the name of the dependent variable on
     which to condition. Use one or other of \code{condname} or
     \code{condvarno} to specify the variable.}
-  \item{firstg}{Initial value of scaling ('gain') parameter for updates
+  \item{firstg}{Initial value of scaling ("gain") parameter for updates
     in the Robbins-Monro procedure.}
-  \item{reduceg}{Reduction factor for scaling ('gain') parameter for updates
+  \item{reduceg}{Reduction factor for scaling ("gain") parameter for updates
     in the Robbins-Monro procedure (MoM only).}
   \item{cond}{Boolean. Only relevant for Method of Moments
     simulation/estimation.
@@ -128,9 +128,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{useStdInits}{Boolean, see above.}
   \item{checktime}{Boolean, set to TRUE: report time in the phases or not.}
   \item{n3}{number of iterations in Phase 3}
-  \item{firstg}{Initial value of the scaling ('gain') parameter in the
+  \item{firstg}{Initial value of the scaling ("gain") parameter in the
     Robbins-Monro algorithm.}
-  \item{reduceg}{Reduction factor for the scaling ('gain') parameter in the
+  \item{reduceg}{Reduction factor for the scaling ("gain") parameter in the
     Robbins-Monro algorithm (MoM only).}
   \item{maxrat}{Value used to control the maximum size of the jumps.}
   \item{maxmaxrat}{Value used to control the maximum size of the jumps.}
@@ -188,6 +188,6 @@ Max10Algorithm <- sienaAlgorithmCreate(projname="NetworkDyn", MaxDegree=c(mynet=
 # where mynet is the name of the network object created by sienaDependent().
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
+% Add one or more standard keywords, see file "KEYWORDS" in the
 % R documentation directory.
 \keyword{ classes }

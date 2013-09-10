@@ -19,7 +19,7 @@
 \method{xtable}{sienaFit}(x, caption = NULL, label = NULL, align = NULL,
                 digits = NULL, display = NULL, ...)
 
-siena.table(x, type='tex', file=paste(deparse(substitute(x)), '.', type,sep=""),
+siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
             vertLine=TRUE, tstatPrint=FALSE, sig=FALSE, d=3)
 }
 \arguments{
@@ -28,8 +28,8 @@ siena.table(x, type='tex', file=paste(deparse(substitute(x)), '.', type,sep=""),
   \item{x}{An object of class \code{sienaFit}, or
     \code{summary.sienaFit} as appropriate}
   \item{tstat}{Boolean: add the t-statistics for convergence to the report}
-  \item{type}{Type of output to produce; must be either \code{'tex'} or
-    \code{'html'}}
+  \item{type}{Type of output to produce; must be either \code{"tex"} or
+    \code{"html"}}
   \item{file}{Name of the file; defaults to the name of the \code{sienaFit}
     object}
   \item{vertLine}{Boolean: add vertical lines separating the columns in
@@ -92,7 +92,7 @@ myeff <- getEffects(mydata)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 ans
 summary(ans)
-\donttest{xtable(ans, type='html', file='ans.html')}
-\donttest{siena.table(ans, type='html', tstat=TRUE, d=2)}
+\donttest{xtable(ans, type="html", file="ans.html")}
+\donttest{siena.table(ans, type="html", tstat=TRUE, d=2)}
 }
 \keyword{method}

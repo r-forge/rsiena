@@ -1,7 +1,7 @@
 \name{s50}
 \alias{s50}
 \docType{data}
-\title{Network data: excerpt from 'Teenage Friends and Lifestyle Study' data.
+\title{Network data: excerpt from "Teenage Friends and Lifestyle Study" data.
 }
 \description{
 An excerpt of the network and alcohol consumption data for
@@ -29,7 +29,7 @@ See \url{http://www.stats.ox.ac.uk/~snijders/siena/s50_data.htm}
 }
 \examples{
 mynet <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mybeh <- sienaDependent(s50a, type='behavior')
+mybeh <- sienaDependent(s50a, type="behavior")
 mydata <- sienaDataCreate(mynet, mybeh)
 }
 \keyword{datasets}

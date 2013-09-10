@@ -1,9 +1,9 @@
 \name{tmp4}
 \alias{tmp4}
 \docType{data}
-\title{van de Bunt's Freshman dataset, time point 4}
+\title{van de Bunt"s Freshman dataset, time point 4}
 \description{
-Fourth timepoint of van de Bunt's freshman dataset
+Fourth timepoint of van de Bunt"s freshman dataset
 }
 \format{
   Adjacency matrix for the network at time point 4.

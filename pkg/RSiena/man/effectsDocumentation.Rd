@@ -11,7 +11,7 @@ Function to create a table of documentation of effect names, short names etc.
 effectsDocumentation(effects = NULL, type = "html", display = (type=="html"),
      filename = ifelse(is.null(effects), "effects", deparse(substitute(effects))))
 }
-%- maybe also 'usage' for other objects documented here.
+%- maybe also "usage" for other objects documented here.
 \arguments{
   \item{effects}{
     A Siena effects object, or NULL.
@@ -61,6 +61,6 @@ effectsDocumentation(effects = NULL, type = "html", display = (type=="html"),
 \examples{
 \dontrun{effectsDocumentation()}
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
+% Add one or more standard keywords, see file "KEYWORDS" in the
 % R documentation directory.
 \keyword{ misc }

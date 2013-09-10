@@ -200,7 +200,14 @@ InitReports <- function(z, seed, newseed)
              format(as.Date(packageDescription(pkgname, fields = "Date")),
                     "%d %b %y"), ")",
              revision, "\n\n"), sep = '',  outf )
+	if (z$x$simOnly)
+	{
+    Heading(1, outf, "Simulations.")
+	}
+	else
+	{
     Heading(1, outf, "Estimation by stochastic approximation algorithm.")
+	}
     if (is.null(seed))
     {
         Report("Random initialization of random number stream.\n", outf)

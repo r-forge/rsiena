@@ -1,9 +1,9 @@
 \name{tmp3}
 \alias{tmp3}
 \docType{data}
-\title{van de Bunt's Freshman dataset, time point 3}
+\title{van de Bunt"s Freshman dataset, time point 3}
 \description{
-Third timepoint of van de Bunt's freshman dataset.
+Third timepoint of van de Bunt"s freshman dataset.
 }
 \format{
  Adjacency matrix for the network at time point 3.

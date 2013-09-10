@@ -48,7 +48,7 @@ includeOnly=TRUE, expandDummies = FALSE, ...)
 \seealso{\code{\link{sienaTimeTest}}, \code{\link{effectsDocumentation}}}
 \examples{
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mybeh <- sienaDependent(s50a, type='behavior')
+mybeh <- sienaDependent(s50a, type="behavior")
 mycovar <- coCovar(rnorm(50))
 mydyadcovar <- coDyadCovar(matrix(as.numeric(rnorm(2500) > 2), nrow=50))
 mydata <- sienaDataCreate(mynet1, mybeh, mycovar, mydyadcovar)
