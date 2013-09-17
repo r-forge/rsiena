@@ -91,18 +91,23 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
  \code{sparseMatrixExtraction} returns the simulated network as a
   \code{dgCMatrix};
   this is the "standard" class for sparse numeric matrices in the
-  \code{Matrix} package. See the help file for \code{\link{dgCMatrix-class}}.
+  \code{Matrix} package. See the help file for \code{\link{dgCMatrix-class}}.\cr
   Tie variables for ordered pairs with a missing value for wave=period or
   period+1 are zeroed;
-  note that this also is done in RSiena for calculation of target statistics.\cr
+  note that this also is done in RSiena for calculation of target statistics.
+  Tie variables that are structurally determined at the beginning of a period
+  are used to replace observed values at the end of the period;
+  tie variables that are structurally determined at the end, but not
+  the beginning, of a period are used to replace
+  simulated values at the end of the period.
+  \cr
   To treat the objects returned by this function as regular matrices,
   it is necessary to attach the \code{Matrix} package in your session.
 
 \code{networkExtraction} returns the network as an edge list of class "network"
   according to the network package (used for package sna).
-  Tie variables for ordered pairs with a missing value for wave=period or
-  period+1 are zeroed;
-  note that this also is done in RSiena for calculation of target statistics.
+  Missing values and structural values are treated as in
+  \code{sparseMatrixExtraction}, see above.
 
 \code{behaviorExtraction} returns the dependent behavior
   variable as an integer vector.

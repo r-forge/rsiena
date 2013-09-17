@@ -1,3 +1,15 @@
+2013-09-17 R-forge revision 243
+Changes in RSiena and RSienaTest:
+   * Correct bug in EffectFactory for isolatePop effect.
+   * Improved plotting of sienaGOF objects so that observed values
+     outside of the range of simulated values don't run off the chart.
+   * Improve treatment of structural values in sienaGOF by
+     modifying sparseMatrixExtraction(); and simplify
+     networkExtraction() by building it directly on sparseMatrixExtraction().
+Changes in RSiena:
+   * Add functions AntiIsolateEffect.h and AntiIsolateEffect.cpp
+     which were forgotten to include in revision 242.
+
 2013-09-10 R-forge revision 242
 Changes in RSiena and RSienaTest:
    * New effects: anti isolates, anti in-isolates, anti in-near-isolates.

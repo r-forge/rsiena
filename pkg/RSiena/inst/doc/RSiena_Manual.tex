@@ -182,7 +182,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-242.
+This version was renewed for \RS version 1.1-243.
 \end{abstract}
 
 
@@ -3540,6 +3540,13 @@ to~\ref{S_eff_beh} -- and explained also in \citet{SnijdersEA10b} --,
 whether the end result gives a good representation
 also of these other statistics.
 
+The \sfn{sienaGOF} function, proposed and elaborated by
+\citet{Lospinoso2012}, operates basically by comparing
+the observed values, at the ends of the periods, with the
+simulated values for the ends of the periods.
+The differences are assessed by combining the auxiliary statistics
+using the Mahalanobis distance.
+
 The results of \verb!sienaGOF! can be plotted which then produces
 \emph{violin plots} \citep{HintzeNelson1998}, which present
 the distribution of the statistic as a combination
@@ -3561,6 +3568,30 @@ plotting with \sfn{center = TRUE}, \sfn{scale = TRUE}.
 The examples in the help pages for \sfn{sienaGOF} and \sfn{sienaGOF-auxiliary}
 give ample help for how to use this function.
 Also see the script on the \SI website.
+
+\subsubsection{Treatment of missing data and structural values in \sfn{sienaGOF} }
+
+Missing tie values and structurally determined tie values are treated
+in the estimation in such a way that they do not contribute directly
+to the target statistics. This behavior is mirrored in their treatment
+in \sfn{sienaGOF}. The aim is that such values do not contribute
+to any differences between observed and simulated values.
+
+Tie variables that are missing at either the beginning or the end of the period
+are replaced by 0, both in the observed and in the simulated networks.
+For behavioral variables they are replaced by missings (NA).
+
+If there are any differences between structural values at the beginning and
+at the end of a period, these are dealt with as follows.
+For tie variables that have a structural value at the start of the period,
+this value replaces the observed value at the end of the period
+(for the goodness of fit assessment only).
+For tie variables that have a structural value at the end of the period
+but a free value value at the start of the period, the reference value for
+the simulated values is lacking; therefore, the simulated values at the end
+of the period then are replaced by the structural value at the end of the period
+(again, for the goodness of fit assessment only).
+
 
 \newpage
 
@@ -10392,6 +10423,21 @@ which affect the user.
 repository.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+\item 2013-09-17 R-forge revision 243
+
+Changes in RSiena and RSienaTest:
+  \begin{itemize}
+   \item Correct bug in EffectFactory for \texttt{isolatePop} effect.
+   \item Improved plotting of sienaGOF objects so that observed values
+     outside of the range of simulated values don't run off the chart.
+   \item Improve treatment of structural values in sienaGOF.
+  \end{itemize}
+Changes in RSiena:
+  \begin{itemize}
+   \item Add functions AntiIsolateEffect.h and AntiIsolateEffect.cpp
+     which were forgotten to include in revision 242.
+  \end{itemize}
+
 \item 2013-08-27 R-forge revision 242
 
 Changes in RSiena as well as RSienaTest:

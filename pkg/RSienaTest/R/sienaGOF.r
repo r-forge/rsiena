@@ -553,6 +553,13 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 	## Need to check for useless statistics here:
 	n.obs <- nrow(obs)
 
+# Added version 1.1-243 by ts:
+	sims.min <- apply(sims, 2, min)
+	sims.max <- apply(sims, 2, max)
+	sims.min <- pmin(sims.min, obs)
+	sims.max <- pmax(sims.max, obs)
+# Also further use of ymin, ymax was added.
+
 	if (center)
 	{
 		sims.median <- apply(sims, 2, median)
@@ -560,17 +567,24 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 					(sims[,i] - sims.median[i]) )
 		obs <- matrix(sapply(1:ncol(sims), function(i)
 							(obs[,i] - sims.median[i])), nrow=n.obs )
+		sims.min <- sims.min - sims.median
+		sims.max <- sims.max - sims.median
 	}
+
 	if (scale)
 	{
-		sims.min <- apply(sims, 2, min)
-		sims.max <- apply(sims, 2, max)
-		sims <- sapply(1:ncol(sims), function(i) sims[,i]/(sims.max[i] -
-								sims.min[i] ) )
-		obs <- matrix(sapply(1:ncol(sims), function(i) obs[,i] /(sims.max[i] -
-										sims.min[i] )
-				), nrow=n.obs )
+#		sims.min <- apply(sims, 2, min)
+#		sims.max <- apply(sims, 2, max)
+		sims.range <- sims.max - sims.min + 1e-6
+		sims <- sapply(1:ncol(sims), function(i) sims[,i]/(sims.range[i]))
+		obs <- matrix(sapply(1:ncol(sims), function(i) obs[,i]/(sims.range[i]))
+				, nrow=n.obs )
+		sims.min <- sims.min/sims.range
+		sims.max <- sims.max/sims.range
 	}
+
+	ymin <- 1.05*min(sims.min) - 0.05*max(sims.max)
+	ymax <- -0.05*min(sims.min) + 1.05*max(sims.max)
 
 	if (is.null(args$ylab))
 	{
@@ -670,18 +684,82 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 		}
 	}
 	bwplot(as.numeric(sims)~rep(xAxis, each=itns), horizontal=FALSE,
-			panel = panelFunction, xlab=xlabel, ylab=ylabel,
+			panel = panelFunction, xlab=xlabel, ylab=ylabel, ylim=c(ymin,ymax),
 			scales=list(x=list(labels=key), y=list(draw=FALSE)),
-			main=main, ...)
+			main=main)
+
 }
+
+##@changeToStructural sienaGOF Utility to change
+# values in X to structural values in S
+# X must have values 0, 1.
+# NA values in X will be 0 in the result.
+changeToStructural <- function(X, S)
+	{if (any(S >= 10, na.rm=TRUE))
+		{
+			S[is.na(S)] <- 0
+			S0 <- Matrix(S==10)
+			S1 <- Matrix(S==11)
+# the 1* turns the logical into numeric
+			X <- 1*((X - S0 + S1)>=1)
+		}
+	X[is.na(X)] <- 0
+	drop0(X)
+	}
+
+##@changeToNewStructural sienaGOF Utility to change
+# values in X to structural values in SAfter
+# for tie variables that have no structural values in SBefore.
+# X must have values 0, 1.
+# NA values in X or SBefore or SAfter will be 0 in the result.
+changeToNewStructural <- function(X, SBefore, SAfter)
+	{
+		SB <- Matrix(SBefore>=10)
+		SA <- Matrix(SAfter>=10)
+		if (any(SA>SB, na.rm=TRUE))
+		{
+			S0 <- (SA>SB)*Matrix(SAfter==10)
+			S1 <- (SA>SB)*Matrix(SAfter==11)
+# the 1* turns the logical into numeric
+			X <- 1*((X - S0 + S1)>=1)
+		}
+	X[is.na(X)] <- 0
+	drop0(X)
+	}
+
 
 ##@sparseMatrixExtraction sienaGOF Extracts simulated networks
 # This function returns the simulated network as a dgCMatrix;
 # this is the "standard" class for sparse numeric matrices
 # in the Matrix package. See the help file for "dgCMatrix-class".
 # Ties for ordered pairs with a missing value for wave=period or period+1
-#  are zeroed;
+# are zeroed;
 # note that this also is done in RSiena for calculation of target statistics.
+# To obtain equality between observed and simulated tie values
+# in the case of structurally determined values, the following is done.
+# The difficulty lies in the possibility
+# that there is change in structural values.
+# The reasoning is as follows:
+# structural values affect the following period.
+# Therefore the simulated values at the end of the period
+# should be compared with an observation containing the structural values
+# present at the beginning of the period.
+# This implies that observations (wave=period+1) should be modified to contain
+# the structural values of the preceding observation (wave=period).
+# But if there are any tie variables with
+# structural values for wave=period+1 and free values for wave=period,
+# then there is no valid reference value for the simulations in this period,
+# and the simulated tie values should be set to
+# the observed (structural) values for wave=period+1.
+# Concluding:
+# For ties that have a structurally determined value at wave=period,
+# this value is used for the observation at the end of the period.
+# For ties that have a structurally determined value at the end of the period
+# and a free value at the start,
+# the structurally determined value at wave=period+1 is used
+# for the simulations at the end of the period.
+# TODO: Calculate the matrix of structurals and of missings outside
+# of this procedure, doing it only once. Perhaps in sienaGOF.
 sparseMatrixExtraction <-
 	function(i, obsData, sims, period, groupName, varName){
 	# require(Matrix)
@@ -702,18 +780,25 @@ sparseMatrixExtraction <-
 	{
 		# sienaGOF wants the observation;
 		# transform structurally fixed values into regular values
-		# by "modulo 10" operation
+		# by "modulo 10" (%%10) operation
+		# If preceding observation contains structural values
+		# use these to replace the observations at period+1.
 		if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
 		{
-			returnValue <- drop0(
-			 Matrix(obsData[[groupName]]$depvars[[varName]][[period+1]] %% 10))
+			returnValue <- drop0(Matrix(
+				obsData[[groupName]]$depvars[[varName]][[period+1]] %% 10))
+			returnValue[is.na(returnValue)] <- 0
+			returnValue <- changeToStructural(returnValue,
+				Matrix(obsData[[groupName]]$depvars[[varName]][[period]]))
 		}
-		else
+		else # not sparse
 		{
 			returnValue <-
 			 Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1] %% 10)
+			returnValue[is.na(returnValue)] <- 0
+			returnValue <- changeToStructural(returnValue,
+				Matrix(obsData[[groupName]]$depvars[[varName]][,,period]))
 		}
-		returnValue[is.na(returnValue)] <- 0
 	}
 	else
 	{
@@ -723,9 +808,23 @@ sparseMatrixExtraction <-
 				sims[[i]][[groupName]][[varName]][[period]][,2],
 				x=sims[[i]][[groupName]][[varName]][[period]][,3],
 				dims=dimsOfDepVar[1:2] )
+		# If observation at end of period contains structural values
+		# use these to replace the simulations.
+		if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
+		{
+			returnValue <- changeToNewStructural(returnValue,
+				Matrix(obsData[[groupName]]$depvars[[varName]][[period]]),
+				Matrix(obsData[[groupName]]$depvars[[varName]][[period+1]]))
+		}
+		else # not sparse
+		{
+			returnValue <- changeToNewStructural(returnValue,
+				Matrix(obsData[[groupName]]$depvars[[varName]][,,period]),
+				Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1]))
+		}
 	}
-	## Zero missings:
-	1*((returnValue - missings) > 0)
+	## Zero missings (the 1* turns the logical into numeric):
+	1*drop0((returnValue - missings) > 0)
 }
 
 ##@networkExtraction sienaGOF Extracts simulated networks
@@ -736,6 +835,7 @@ sparseMatrixExtraction <-
 # Ties for ordered pairs with a missing value for wave=period or period+1
 # are zeroed;
 # note that this also is done in RSiena for calculation of target statistics.
+# Structural values are treated as in sparseMatrixExtraction.
 networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	require(network)
 	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
@@ -748,12 +848,9 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	# with all actors preceeding all events.
 	# Therefore the bipartiteOffset will come in handy:
 	bipartiteOffset <- ifelse (isbipartite, 1 + dimsOfDepVar[1], 1)
-
 	# Initialize empty networks:
 	if (isbipartite)
 	{
-		# for bipartite networks, package <<network>> numbers
-		# the second mode vertices consecutively to the first mode.
 		emptyNetwork <- network.initialize(dimsOfDepVar[1]+dimsOfDepVar[2],
 											bipartite=dimsOfDepVar[1])
 	}
@@ -761,97 +858,23 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	{
 		emptyNetwork <- network.initialize(dimsOfDepVar[1],	bipartite=NULL)
 	}
-	if (sparseData)
-	{
-		# Which tie variables are regarded as missings:
-		missings <- as(
-			is.na(obsData[[groupName]]$depvars[[varName]][[period]]) |
-			is.na(obsData[[groupName]]$depvars[[varName]][[period+1]]),
-			"lgTMatrix")
-		# For lgTMatrix, slots i and j are the rows and columns,
-		# numbered from 0 to dimension - 1.
-		# Actors in class network are numbered starting from 1.
-		# Hence 1 must be added to missings@i and missings@j.
-		# Put the missings into network shape:
-		if (length(missings@i) <= 0)
-		{
-			missings <- emptyNetwork
-		}
-		else
-		{
-			missings <- network.edgelist(
-			  cbind(missings@i + 1, missings@j + bipartiteOffset, 1), emptyNetwork)
-		}
-	}
-	else # not sparse
-	{
-		# For adjacency matrices the size is evident.
-		if (isbipartite)
-		{
-			missings <- network(
-				(is.na(obsData[[groupName]]$depvars[[varName]][,,period]) |
-				is.na(obsData[[groupName]]$depvars[[varName]][,,period+1]))*1,
-				matrix.type="adjacency", bipartite=dimsOfDepVar[1])
-		}
-		else
-		{
-			missings <- network(
-				(is.na(obsData[[groupName]]$depvars[[varName]][,,period]) |
-				is.na(obsData[[groupName]]$depvars[[varName]][,,period+1]))*1,
-				matrix.type="adjacency")
-		}
-	}
-
-	if (is.null(i))
-	{
-		# sienaGOF wants the observation;
-		if (sparseData)
-		{
-		# transform structurally fixed values into regular values
-		# by "modulo 10" operation;
-		# drop NAs and 0 values
-			original <-
-				obsData[[groupName]]$depvars[[varName]][[period+1]] %% 10
-			original[is.na(original)] <- 0
-			original <- as(drop0(original), "dgTMatrix")
-		# now original@x is a column of ones;
-		# the 1 here is redundant because of the default ignore.eval=TRUE
-		# in network.edgelist
-			returnValue <- network.edgelist(
-					cbind(original@i + 1, original@j + bipartiteOffset, 1),
-					emptyNetwork) - missings
-
-		}
-		else # not sparse: deal with adjacency matrices
-		{
-			original <-
-				obsData[[groupName]]$depvars[[varName]][,,period+1] %% 10
-			original[is.na(original)] <- 0
-			if (isbipartite)
-			{
-				returnValue <- network(original, matrix.type="adjacency",
-									bipartite=dimsOfDepVar[1]) - missings
-			}
-			else
-			{
-				returnValue <- network(original, matrix.type="adjacency",
-									bipartite=FALSE) -	missings
-			}
-		}
-	}
-	else
-	{
-		# sienaGOF wants the i-th simulation;
-		# the 1 in cbind is redundant because of the default ignore.eval=TRUE
-		# in network.edgelist
-		bipartiteOffset <- ifelse (isbipartite, dimsOfDepVar[1], 0)
-		returnValue <- network.edgelist(
-			cbind(
-			 sims[[i]][[groupName]][[varName]][[period]][,1],
-			(sims[[i]][[groupName]][[varName]][[period]][,2] + bipartiteOffset),
-						1), emptyNetwork) - missings
-	}
-  returnValue
+	# Use what was defined in the function above:
+	matrixNetwork <- sparseMatrixExtraction(i, obsData, sims,
+						period, groupName, varName)
+	sparseMatrixNetwork <- as(matrixNetwork, "dgTMatrix")
+# For dgTMatrix, slots i and j are the rows and columns,
+# numbered from 0 to dimension - 1. Slot x are the values.
+# Actors in class network are numbered starting from 1.
+# Hence 1 must be added to missings@i and missings@j.
+# sparseMatrixNetwork@x is a column of ones;
+# the 1 in the 3d column of cbind below is redundant
+# because of the default ignore.eval=TRUE in network.edgelist.
+# But it is good to be explicit.
+	returnValue <- network.edgelist(
+					cbind(sparseMatrixNetwork@i + 1,
+					sparseMatrixNetwork@j + bipartiteOffset, 1),
+					emptyNetwork)
+	returnValue
 }
 
 ##@behaviorExtraction sienaGOF Extracts simulated behavioral variables.

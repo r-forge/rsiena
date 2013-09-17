@@ -61,7 +61,8 @@ sienaGOF(sienaFitObject, auxiliaryFunction,
   \item{varName}{ Name of dependent variable.}
   \item{x}{ Result from a call to sienaGOF. }
   \item{center}{ Whether to center the statistics by median during plotting.}
-  \item{scale}{ Whether to scale the statistics by range during plotting.}
+  \item{scale}{ Whether to scale the statistics by range during plotting.
+                scale=TRUE makes little sense without also center=TRUE.}
   \item{violin}{ Use violin plots (vs. box plots only)? }
   \item{key}{ Keys in the plot for the levels of the auxiliary statistic
         (as given by parameter \code{levls} in the examples). }
@@ -73,7 +74,22 @@ sienaGOF(sienaFitObject, auxiliaryFunction,
 \details{
  This function is used to assess the goodness of fit of a stochastic actor
  oriented model for an arbitrarily defined multidimensional auxiliary statistic.
- The auxiliary statistics are calculated for the simulated dependent
+ It operates basically by comparing the observed values, at the ends of 
+ the periods, with the simulated values for the ends of the periods.
+ The differences are assessed by combining the components of the auxiliary 
+ statistic using the Mahalanobis distance.
+ 
+ To achieve comparability between simulated and observed dependent variables,
+ variables that are missing in the data at the start or end of a period
+ are replaced by 0 (for tie variables) or NA (for behavior variables).
+ Tie variables that are structurally determined at the beginning of a period
+ are used to replace observed values at the end of the period;
+ tie variables that are structurally determined at the end, but not
+ the beginning, of a period are used to replace 
+ simulated values at the end of the period.
+ 
+ The auxiliary statistics documented in \code{\link{sienaGOF-auxiliary}}
+ are calculated for the simulated dependent
  variables in Phase 3 of the estimation algorithm,
  returned in \code{sienaFitObject} because of having used
  \code{returnDeps = TRUE} in the call to \code{\link{siena07}}.
@@ -136,8 +152,8 @@ We recommend the following heuristic approach to model checking:
     \describe{
     \item{* Observations}{The observed values for the auxiliary statistics.}
     \item{* Simulations}{The simulated auxiliary statistics.}
-    \item{* ObservedTestStat}{The observed Mahalobis distance in the data.}
-    \item{* SimulatedTestStat}{The Mahalobis distance for the simulations.}
+    \item{* ObservedTestStat}{The observed Mahalanobis distance in the data.}
+    \item{* SimulatedTestStat}{The Mahalanobis distance for the simulations.}
     \item{* TwoTailed}{Whether the \eqn{p}-value corresponds to a one- or
                      two-tailed Monte Carlo test.}
     \item{* p}{The \eqn{p}-value for the observed Mahalanobis distance in the
