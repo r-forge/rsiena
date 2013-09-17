@@ -640,7 +640,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "isolatePop")
 	{
-		pEffect = new IsolatePopEffect(pEffectInfo);
+		pEffect = new IsolatePopEffect(pEffectInfo, true);
 	}
 	else if (effectName == "inIsDegree")
 	{

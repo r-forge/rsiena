@@ -45,8 +45,8 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSienaTest\cr
 Type: \tab Package\cr
-Version: \tab 1.1-242\cr
-Date: \tab 2013-09-10\cr
+Version: \tab 1.1-243\cr
+Date: \tab 2013-09-17\cr
 Depends: \tab R (>= 2.15.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -80,9 +80,10 @@ BuildResaveData: \tab no\cr
     Pp. 41-71 in \emph{Longitudinal models in the behavioral
     and related sciences},
     edited by Kees van Montfort, Han Oud and Albert Satorra; Lawrence Erlbaum.
-   \item Steglich, Christian E. G., Snijders, Tom A. B., and
+   \item Steglich, Christian E.G., Snijders, Tom A.B., and
     Pearson, Michael A. (2010). Dynamic networks and behavior:
-    Separating selection from influence. Sociological Methodology, 40, 329-393.
+    Separating selection from influence. \emph{Sociological Methodology}, 
+	40, 329-393.
    \item Further see the extensive manual accessible by the command\cr
     \code{RShowDoc("RSiena_Manual", package="RSienaTest")}\cr
 	and the website \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
