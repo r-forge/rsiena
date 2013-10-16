@@ -158,10 +158,10 @@ void DistanceTwoLayer::modify2PathCountOneMode(const Network& rNetwork, int ego,
 	if (ego == alter || rNetwork.hasEdge(alter, ego)) {
 		return;
 	}
-	for (UnionTieIterator iter(
-			UnionTieIterator(rNetwork.outTies(ego), rNetwork.inTies(ego)),
-			UnionTieIterator(rNetwork.outTies(alter), rNetwork.inTies(alter)),
-			ego, alter); iter.valid(); iter.next()) {
+	UnionTieIterator egoIter(rNetwork.outTies(ego), rNetwork.inTies(ego));
+	UnionTieIterator alterIter(rNetwork.outTies(alter), rNetwork.inTies(alter));
+	for (UnionTieIterator iter(egoIter, alterIter, ego, alter); iter.valid();
+			iter.next()) {
 		int curNeighbor = iter.actor();
 		// check whether the current neighbor is ego or alter itself
 		if (curNeighbor != ego && curNeighbor != alter) {
