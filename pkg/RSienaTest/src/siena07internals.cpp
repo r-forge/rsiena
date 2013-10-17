@@ -1507,6 +1507,11 @@ void getStatistics(SEXP EFFECTSLIST,
 							score =
 								pVariable->inverseOutDegreeScore(pNetworkVariable);
 						}
+						else if (strcmp(effectName, "outRateLog") == 0)
+						{
+							score =
+								pVariable->logOutDegreeScore(pNetworkVariable);
+						}
 						else
 						{
 

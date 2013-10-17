@@ -266,8 +266,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             ##     z$FinDiffBecauseSymmetric <- TRUE
             if (x$maxlike)
             {
-                stop("Maximum likelihood method not implemented",
-                     "for symmetric networks")
+#                stop("Maximum likelihood method not implemented",
+#                     "for symmetric networks")
             }
             if (x$modelType == 1)
             {

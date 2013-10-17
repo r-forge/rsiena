@@ -12,7 +12,7 @@ getEffects(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 }
 \arguments{
   \item{x}{an object of class `siena" or `sienaGroup"}
-  \item{nintn}{Number of user-defined network interaction
+  \item{nintn}{Number of user-defined network interactions
        that can later be created.}
   \item{behNintn}{Number of user-defined behavior interactions
        that can later be created.}
@@ -20,7 +20,7 @@ getEffects(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
   functions, not for use by users.}
 }
 \details{
-Creates a data frame of effects for use in siena model fits. 
+Creates a data frame of effects for use in siena model fits.
 Note that the class of the return object may be lost if the data.frame
 is edited using \command{fix}.
 See \code{\link{fix}} and \code{\link{edit.data.frame}}.
@@ -40,7 +40,7 @@ variable in the input object, with columns
   \item{randomEffects}{boolean: random or fixed effect. Currently not used.}
   \item{fix}{boolean: fix parameter value or not}
   \item{test}{boolean: test parameter value or not}
-  \item{timeDummy}{comma separated list of periods, or "all", 
+  \item{timeDummy}{comma separated list of periods, or "all",
         or "," for none --
 	    which time dummy interacted parameters should be included?}
   \item{initialValue}{starting value for estimation, also used for
@@ -58,19 +58,19 @@ variable in the input object, with columns
   \item{effectFn}{here NULL, but could be replaced by a function later}
   \item{statisticFn}{here NULL, but could be replaced by a function
 	later}
-  \item{netType}{Type of dependent variable: 
+  \item{netType}{Type of dependent variable:
     "oneMode", "behavior", or "bipartite"}
   \item{groupName}{name of relevant group data object}
   \item{group}{sequential number of relevant group data object in total}
   \item{effectNumber}{a unique identifier of the row}
   The combination of \code{name}, \code{shortName}, \code{interaction1},
   \code{interaction2}, and \code{type} uniquely identifies any effect
-  other than basic rate effects.The combination \code{name},
+  other than basic rate effects. The combination \code{name},
   \code{shortName}, \code{period} and \code{group} uniquely identifies a
   basic rate effect.
-  
+
   A list of all effects in a given effects object (e.g., \code{myeff}),
-  including their names of dependent variables, effect names, short names, 
+  including their names of dependent variables, effect names, short names,
   and values of interaction1 and interaction2 (if any),
   is obtained by executing \code{\link{effectsDocumentation}(myeff)}.
 }

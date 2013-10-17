@@ -67,14 +67,17 @@ nonSymmetricRate,outdegree effect on rate xxxxxx,Amount of change x outdegrees,o
 nonSymmetricRate,indegree effect on rate xxxxxx,Amount of change x indegrees,inRate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,NA,structural,0,0,0,0,
 nonSymmetricRate,reciprocity effect on rate xxxxxx,Amount of change x reciprocity,recipRate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,NA,structural,0,0,0,0,
 nonSymmetricRate,effect 1/outdegree on rate xxxxxx,Amount of change x (1/outdegrees),outRateInv,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,NA,structural,0,0,0,0,
+nonSymmetricRate,effect ln(outdegree+1) on rate xxxxxx,Amount of change x ln(outdegrees+1),outRateLog,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,rate,NA,structural,0,0,0,0,
 bipartiteRate,basic rate parameter xxxxxx,Amount of network change,Rate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,1,NA,0,0,0,0,
 bipartiteRate,constant xxxxxx rate (period nnnnnn),Amount of network change in period nnnnnn,Rate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,nnnnnn,NA,0,0,0,0,
 bipartiteRate,outdegree effect on rate xxxxxx,Amount of change x outdegrees,outRate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,NA,structural,0,0,0,0,
 bipartiteRate,effect 1/outdegree on rate xxxxxx,Amount of change x (1/outdegrees),outRateInv,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,NA,structural,0,0,0,0,
+bipartiteRate,effect ln(outdegree+1) on rate xxxxxx,Amount of change x ln(outdegrees+1),outRateLog,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,rate,NA,structural,0,0,0,0,
 symmetricRate,basic rate parameter xxxxxx,Amount of network change,Rate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,1,NA,0,0,0,0,
 symmetricRate,constant xxxxxx rate (period nnnnnn),Amount of network change in period nnnnnn,Rate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,nnnnnn,NA,0,0,0,0,
 symmetricRate,degree effect on rate xxxxxx,Amount of change x outdegrees,outRate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,NA,structural,0,0,0,0,
 symmetricRate,effect 1/degree on rate xxxxxx,Amount of change x (1/outdegrees),outRateInv,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,NA,structural,0,0,0,0,
+symmetricRate,effect ln(degree+1) on rate xxxxxx,Amount of change x ln(outdegrees+1),outRateLog,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,rate,NA,structural,0,0,0,0,
 dyadObjective,xxxxxx,Sum of ties x xxxxxx,X,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 dyadObjective,xxxxxx x reciprocity,Sum reciprocated  ties x xxxxxx,XRecip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
 dyadObjective,WW=>X closure of xxxxxx,WW=>X closure of xxxxxx,WWX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic
@@ -126,7 +129,8 @@ bipartiteObjective,indegree - popularity,Sum of squared indegrees,inPop,TRUE,,,e
 bipartiteObjective,indegree - popularity (sqrt),Sum of indegrees x sqrt(indegree),inPopSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 bipartiteObjective,outdegree - activity,Sum of squared outdegrees,outAct,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 bipartiteObjective,outdegree - activity (sqrt),Sum of outdegrees^(1.5),outActSqrt,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
-bipartiteObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
+bipartiteObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
+bipartiteObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
 bipartiteObjective,1/(outdegree + #),Sum 1/(outdegrees + #),outInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 bipartiteObjective,1/(outdegree+#)(outdegree+1+#),Sum 1/(outdegrees + #)(outdegrees + 1 + #),outSqInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 bipartiteObjective,anti in-isolates,Number of indegrees at least 1,antiInIso,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
@@ -159,7 +163,8 @@ nonSymmetricObjective,indegree - activity,Sum of crossproducts indegree x outdeg
 nonSymmetricObjective,indegree - activity (sqrt),Sum of outdegrees x sqrt(indegree),inActSqrt,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
 nonSymmetricObjective,outdegree - activity,Sum of squared outdegrees,outAct,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,outdegree - activity (sqrt),Sum of outdegrees^(1.5),outActSqrt,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
-nonSymmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
+nonSymmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
+nonSymmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,1/(outdegree + #),Sum 1/(outdegrees + #),outInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,1/(outdegree+#)(outdegree+1+#),Sum 1/(outdegrees + #)(outdegrees + 1 + #),outSqInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 nonSymmetricObjective,in-isolate Outdegree,Sum outdegrees for in-isolates,inIsDegree,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego
@@ -183,7 +188,8 @@ symmetricObjective,number pairs at doubly achieved distance 2,Number of doubly a
 symmetricObjective,degree of alter,Sum of squared degrees,inPop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 symmetricObjective,sqrt degree of alter,Sum of degrees x sqrt(degree),inPopSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
 symmetricObjective,degree^(1.5),Sum of degrees^(1.5),outActSqrt,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,
-symmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
+symmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
+symmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,
 symmetricObjective,1/(degree + #),Sum 1/(degrees + #),outInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 symmetricObjective,1/(degree+#)(degree+1+#),Sum 1/(degrees + #)(degrees + 1 + #),outSqInv,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,
 symmetricObjective,network-isolate,Number of isolates,isolateNet,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego

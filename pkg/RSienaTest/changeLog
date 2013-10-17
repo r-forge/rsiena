@@ -1,3 +1,31 @@
+2013-10-16 R-Forge Revision 245
+Changes in RSienaTest:
+   * New structural rate effect outRateLog
+     (allEffects.csv, StatisticCalculator.cpp, DependentVariable.cpp, 
+     siena07Internals.cpp, StructuralRateEffect.cpp, Utils.h, Utils.cpp, 
+     RSiena_Manual.tex).
+   * In siena08, also report Bonferroni combination
+     of the two Fisher combinations.
+   * In phase2.r, rolled back change in truncation from version 1.1-227
+     to the earlier procedure.
+   * descriptives.sienaGOF added.
+   * outTrunc2 effect added.
+   * Minor changes of output in siena.table, print07Report.r, print.siena,
+     printInitialDescription.r, and in error message for includeEffects.
+   * Change artificial results from 999 to NA (robmon.r, phase3.r)
+   * For ML estimation: added autocorrelations during phase 3 
+     to print.summary.sienaFit (sienaprint.r)
+   * Small addition to siena_Algorithms4.tex (statistics for rate effects).
+   * Bit of cleaning up (phase3.r)
+   * Start of the manual reorganized and partially rewritten (with help from
+     Zsofia Boda and Andras Voros); instructions for siena01Gui separated
+     in siena01gui.pdf.
+   * Larger example for sienaCompositionChange.Rd.
+
+2013-10-16 R-forge revision 244
+Changes in RSienaTest:
+   * Corrected DistanceTwoLayer.cpp
+
 2013-09-17 R-forge revision 243
 Changes in RSiena and RSienaTest:
    * Correct bug in EffectFactory for isolatePop effect.
@@ -16,9 +44,9 @@ Changes in RSiena and RSienaTest:
    * Effect inIsolatePop dropped (it was shortlived).
    * Improved printing of results of siena07() in the case simOnly.
    * Prettier response printed to console for includeEffects() and setEffect().
-   * z$estMeans added to siena objects z: 
-     vector of estimated expected values of statistics; 
-	 this is colMeans(z$sf) + z$targets but if dolby, 
+   * z$estMeans added to siena objects z:
+     vector of estimated expected values of statistics;
+	 this is colMeans(z$sf) + z$targets but if dolby,
 	 the regression on the scores is subtracted.
    * Correction to Dolby option for the case of more than 2 waves:
      in phase1.r and phase3.r, scores are added (instead of averaged)
@@ -85,7 +113,6 @@ Changes in RSiena as well as RSienaTest:
    * If there is a composition change object, MoM estimation is forced
      to be non-conditional (initializeFRAN.r). This is reported in the help file
      (sienaCompositionChange.Rd).
-
    * Small changes in help files sienaAlgorithm.Rd, plot.sienaTimeTest.Rd,
 
 

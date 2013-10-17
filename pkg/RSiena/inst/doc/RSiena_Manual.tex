@@ -15,7 +15,8 @@
 %\usepackage{supertabular}
 %\usepackage{tabls}
 %\usepackage{url}
-
+\usepackage{colortbl}
+\usepackage{scrextend}
 \usepackage{enumitem}
 
 \usepackage[pdfstartview={},
@@ -81,6 +82,8 @@
 \newcommand{\SN}{{\sf StOCNET }}
 \newcommand{\si}{{\sf SIENA}}
 \newcommand{\sn}{{\sf StOCNET}}
+\newcommand{\SAOM}{{Stochastic Actor-Oriented Model }}
+\newcommand{\saom}{{Stochastic Actor-Oriented Model}}
 
 \newcommand{\mcc}[2]{\multicolumn{#1}{c}{#2}}
 \newcommand{\mcp}[2]{\multicolumn{#1}{c|}{#2}}
@@ -116,7 +119,8 @@
 \newcommand{\startno}{\setcounter{thisno}{0}}
 \newcommand{\nextno}{\addtocounter{thisno}{1}\thethisno .\ }
 
-\hyphenation{Snij-ders Duijn Huis-man Steg-lich Schwein-ber-ger siena-Data-Create-From-Session}
+\hyphenation{Snij-ders Duijn Huis-man Steg-lich Schwein-ber-ger siena-Data-Create-From-Session
+             siena-Data-Create siena-Com-position-Change}
 
 \newcommand{\interruptenum}{
       \setcounter{savenumi}{\value{enumi}}
@@ -148,6 +152,8 @@
 %\protect\newline \normalsize } }
 \author{\Large Ruth M.\ Ripley\\[1ex]
         \Large Tom A.B.\ Snijders\\[1ex]
+        \Large Zsofia B\'{o}da\\[1ex]
+        \Large Andr\'{a}s V\"{o}r\"{o}s\\[1ex]
         \Large Paulina Preciado  \\[4ex]
        {\large University of Oxford: Department of Statistics; Nuffield College}\\[1ex]
     }
@@ -178,11 +184,13 @@ networks according to the dynamic actor-oriented model of \citet{Snijders01,
 Snijders05}, \citet*{SnijdersEA07}, and \citet*{SnijdersEA10a}.
 This is the manual for \rs,
 a contributed package to the statistical system \Rn.
+It complements, but does not replace the help pages
+for the \RS functions!
 It also contains contributions written earlier, for the manual for \SI version 3,
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-243.
+This version was renewed for \RS version 1.1-245.
 \end{abstract}
 
 
@@ -208,30 +216,33 @@ International Conference for Computer Simulation and the Social
 Sciences, Cortona (Italy), September 1997, which originally was
 scheduled to be held in Siena. See \citet{SnijdersDuijn97}.},
 shorthand for {\sf Simulation Investigation for Empirical
-Network Analysis}, is a computer program that carries out the
+Network Analysis}, is a set of methods
+implemented in a computer program that carries out the
 statistical estimation of models for repeated measures of social
-networks according to the dynamic actor-oriented model of \citet{SnijdersDuijn97}, \citet{Snijders01},
-\citet*{SnijdersEA07}, and \citet*{SnijdersEA10a}; also see
-\citet*{SteglichEA10}.
-A tutorial for these models is in \citet*{SnijdersEA10b}.
-Some examples are
-presented, e.g., in \citet*{vanBunt99, vanBuntEA99} and \citet*{vanDuijnEA03};
-and \citet*{SteglichEA06}.
+networks according to the Stochastic Actor-oriented Model
+ (`SAOM') of \citet{SnijdersDuijn97}, \citet{Snijders01},
+\citet{SnijdersEA07},  \citet{SnijdersEA10a},
+and \citet{Greenan14}; also see \citet{SteglichEA10}.
+A tutorial for these models is in \citet{SnijdersEA10b}.
 
 A website for \SI is maintained at
 {\small\url{http://www.stats.ox.ac.uk/~snijders/siena/}~}.
 At this website (`publications' tab)
 you shall also find references to introductions in various other languages.
+It further contains references to many published examples,
+example scripts illustrating various possibilities of the package,
+course announcements, etc.
 
 This is a manual for \rs, which also may be called \SI version 4.0;
 the manual is provisional in the sense
-that it still is continually being updated.
+that it is continually being updated, taking account of
+updates in the package.
 \RS is a contributed package for the \R statistical system
-which can be downloaded from\\
+which can be downloaded from
 \url{http://cran.r-project.org}. For the operation of \Rn,
-the reader is referred
-to the corresponding manual. If desired, \SI can be operated \emph{apparently}
-independently of \Rn, as is explained in Section~\ref{Gui}.
+the reader is referred to the corresponding literature and help pages.
+%If desired, \SI can be operated \emph{apparently}
+%independently of \Rn, as is explained in Section~\ref{Gui}.
 
 \RS was originally programmed by Ruth Ripley and Krists Boitmanis,
 in collaboration with Tom Snijders.
@@ -246,39 +257,16 @@ offering facilities for source code management.
 Sometimes latest versions of \RS are available at\\
 \url{http://r-forge.r-project.org/R/?group_id=461}
 before being incorporated into the R package that can be downloaded from CRAN.
-In addition, at R-Forge there is a package RSienaTest which may include
+In addition, at R-Forge there is a package {\sf RSienaTest} which may include
 additional options that are still in the testing stage.
 Some of the options described in this manual may apply to
-RSienaTest only, with the plan to transfer this to \RS
+{\sf RSienaTest} only, with the plan to transfer this to \RS
 in the future.
 
 
-\iffalse
-\framebox[0.9\textwidth]{\begin{minipage}[t]{0.84\textwidth}
-\vspace*{0.5ex}
-For getting started, there are various options:
-\begin{enumerate}
-\item One excellent option is to read the User's Manual
-from start to finish (leaving aside the Programmer's Manual).
-\item A second option is to read the Minimal Introduction contained
-     in Section \ref{S_minsi1}, together with the
-     table of contents to have an idea of what can be looked up later.
-\item Another option is first to read the Minimal Introduction and further
-to focus on Sections
-\ref{S_modspec} for the model specification,
-\ref{S_Est} to get a basic insight in what happens in the parameter estimation,
-\ref{S_output} to understand the output file (which is meant to be
-as self-explanatory as possible),
-and \ref{S_getting} for the basis of getting started.
-\end{enumerate}
-\vspace*{0.5ex}
-\end{minipage}}
-\bigskip
-\fi
-
 %\newpage
 
-We are grateful to NIH (National Institutes of Health)
+We are grateful to NIH (National Institutes of Health, USA)
 for their funding of programming \rs.
 This is done
 as part of the project \emph{Adolescent Peer Social Network Dynamics
@@ -304,537 +292,457 @@ which all contributed to the work on \si.
 
 
 
+\subsection{Giving references}
+
+When using \si, it is appreciated that you refer to this manual and to one or
+more relevant references of the methods implemented in the program.  The
+reference to this manual is the following.  \smallskip
+
+\noindent
+Ruth M. Ripley, Tom A.B. Snijders, Zsofia B\'{o}da,
+ Andr\'{a}s V\"{o}r\"{o}s, and Paulina Preciado, 2013.
+Manual for SIENA version 4.0 (version \today).
+Oxford: University of Oxford, Department of Statistics; Nuffield College.
+\textsf{http://www.stats.ox.ac.uk/siena/}
+
+\smallskip
+
+
+A tutorial is \citet*{SnijdersEA10b}.
+A basic reference for the network dynamics model is \citet{Snijders01}
+or \citet{Snijders05}.
+Basic references for the model of network-behavior co-evolution
+are \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
+A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
+and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
+
+More specific references are \citet{Schweinberger12} for the score-type goodness
+of fit tests and \citet{SchweinbergerSnijders07a} for the calculation of
+standard errors of the Method of Moments estimators.
+For the model for diffusion of innovations in dynamic networks,
+please refer to \citet{Greenan14}.
+For assessing and
+correcting time heterogeneity, and goodness of fit assement and associated model
+selection considerations, refer to \citet*{Lospinoso2011} and \citet{Lospinoso2012}.
+
+\newpage
+%\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
+\part{Minimal Intro}
+
+
+
 \section{Getting started with \SI}
 \label{S_minsi1}
 
-There are two ways of getting started with \si:
-by using the  graphical user interface (\emph{GUI}) via \textsf{siena01Gui}
-or by using \R commands in the regular \R way.
-As a preliminary, we start with section
-\ref{S_datform} on data formats.
-Then we give a minimal cookbook-style
-introduction for getting started with \SI using
-the graphical user interface via \textsf{siena01Gui}.
-In Section~\ref{S_SR}
-we explain how to run \SI
-as the package \RS from within \Rn.
+There may be various strategies for getting acquainted with \rs.
+In any case, it is a good idea to study the tutorial  \citet{SnijdersEA10b}.
+Two recommended options for learning the `how to' are the following:
+\begin{enumerate}
+\item One excellent option is to read the User's Manual
+from start to finish (leaving aside the Programmer's Manual).
+\item A second option is to read this Minimal Introduction, to get a sense
+ of the rest by looking at the table of contents, and then follow
+			the references to specific sections of your interest.
+  The searchable pdf file makes it easy to look for the relevant words.
+\end{enumerate}
+
+\noindent
+This Minimal Introduction explains the basics of {\saom}s
+and gives practical information on running \rs.
+We start with section \ref{S_logic} which gives a brief and non-technical
+introduction to the types of {\saom}s, to the most important concepts related
+to them, to the data required to apply \si, and to further features of the program.
+In Section~\ref{S_use} we explain how to install and run \SI
+as the package \RS from within \Rn. Section~\ref{R_scripts} and
+Section~\ref{S_exec} provide example \R scripts and guidance for
+understanding the results.
 If you are looking for help with a specific problem, read
 Section~\ref{sec:problems}.
 
 
-\subsection{Data formats}
-\label{S_datform}
+\subsection{The logic of {\saom}s}
+\label{S_logic}
 
+\SI (Simulation Investigation for Empirical Network Analysis) is a
+statistical tool developed for the analysis of longitudinal network data,
+collected in a network panel study with two or more `waves' of observations.
+It incorporates different variants of a dynamic network model family:
+the \SAOM (SAOM). In this section, we give
+a very concise introduction to how these models work in principle and what
+type of data they are suitable to analyze. For sake of simplicity,
+SAOMs implemented in \SI are often referred to as `\SI models'.
+In this subsection, we only consider the case of network evolution;
+see below for the more complex cases of coevolution.
+For a further introduction, consult  \citet{SnijdersEA10b}.
+
+The defining characteristic of {\saom}s
+is their `actor-oriented' nature which means that they model
+change from the perspective of the actors (nodes).
+That is, {\saom}s always ``imagine" network evolution
+as individual actors creating, maintaining or terminating ties to other actors.
+When thinking about network dynamics, researchers usually assume that these
+decisions (conscious or subconscious) of actors are influenced by the structure
+of the network itself and the characteristics and behaviors of the focal actor
+(ego) who is making a decision and those of other actors in the network (alters).
+{\saom}s provide a means to quantify the ways, the
+extent and the uncertainty with which these factors are associated with
+network evolution between observations.
+
+The \saom can be regarded as an agent-based (`actor-based') simulation
+model of the network evolution; where all network changes are decomposed into
+very small steps, so-called \emph{ministeps}, in which
+one actor creates or terminates one outgoing tie.
+These ministeps are probabilistic and made sequentially.
+The transition from the observation
+at one wave to the next is done by means of normally a large number of ministeps.
+The actors respond to the network in the sense that the probabilities
+of these changes depend on the current (unobserved) state of the network.
+Each further ministep changes the network state and therefore the actors
+are each others' ever changing context  \citep{Zeg94}.
+This allows the model to represent the feedback process
+that is typical for network dynamics. These changes are not
+individually observed, but they are simulated;
+what is observed is the state obtained at the next observation wave.
+
+This simulation model implements the statistical model
+for the network dynamics. The statistical procedures utilize
+a large number of repeated simulations of the network evolution
+from each wave to the next. They estimate and test the parameters
+producing a probabilistic network evolution
+that `could have' brought these observations to follow one another.
+
+To avoid misunderstandings, two notes have to be made about the
+meaning of actor ``decisions" and the role of {\saom}s in causal inference.
+First, the fact that \SI models are actor-oriented does not imply the assumption
+that the actors take
+decisions in any real sense. It means that the changes in the network are
+organized, so to say, by the nodes in the network. This aligns very well
+with a substantive standpoint where the nodes have agency \citep{Snijders96}
+but it does not necessarily reflect a commitment to or belief in any particular
+theory of action elaborated in
+the scientific disciplines. In fact, the purpose of \SI in this matter is
+to assist substantive researchers in further developing their theories
+of action by e.g.\ exploring the relative importance of individual,
+contextual, and social factors in network change. The second, and related,
+point is that, like other generalized regression models, \SI does not
+by itself solve all causal questions. When inferring causality from model
+results, one has to face difficulties very similar to those with other
+statistical methods; see, e.g., \citet{LSST11} and \citet{Goldthorpe2001}.
+In any case, causal interpretations should be backed by further results
+from the discipline the explanations originate in. However, {\saom}s do allow research to profit from a longitudinal
+design -- therefore, they may be helpful in tackling some issues related
+to causality, like the selection-influence problem \citep{SteglichEA10, LSST11}.
+
+\subsubsection[Types of {\saom}s: \protect\newline
+     evolution of one-mode networks, two-mode networks and behaviors]
+     {Types of {\saom}s: \protect\newline
+     evolution of one-mode networks, two-mode networks and behaviors}
+\label{S_types}
+
+So far, we have mostly talked about \SI as a tool to analyze the evolution
+of a single network. However, there are different variants of {\saom}s that
+can be applied to more complex data structures.
+The availability of these options depends on the research question and the
+quantity and type of data one has. In this section, we briefly discuss the
+currently implemented model types, which will help researchers determine what
+kind of analyses they are able to carry out with {\saom}s
+given the data at hand.
+
+A minimal dataset suitable for analysis with \SI consists of two observations of
+a single network defined on the same set of nodes. In this case, one is able to
+test how the structure of the network contributes to its own evolution.
+However, depending on the data available, further modeling options may be
+applicable. Currently, the implemented {\saom}s
+are suitable for the analysis of
 \begin{enumerate}
-\item
-Network and covariate files should be text files with a row for each node. The
-numbers should be separated by spaces or tabs.
-\item
-An exogenous events file can be given, indicating change of composition of the
-network in the sense that some actors are not part of the network during
-all the observations.
-This will trigger treatment of such change of composition
-according to \citet{HuismanSnijders03}.
-This file must have one row for each node.
-Each row should be
-consist of a set of pairs of numbers which indicate the periods
-during which the corresponding actor
-was present. For example,
-\begin{verbatim}
-1 3
-1.5 3
-1 1.4 2.3 3
-2.4 3
-\end{verbatim}
-would describe a network with 4 nodes, and 3 observations. Actor 1 is present
-all the time, actor 2 joins at time 1.5, actor 3 leaves and time 1.4 then
-rejoins at time 2.3, actor 4 joins at time 2.4. All intervals are treated as
-closed.
-\item If you use software such as Excel or SPSS to create input files to use
-  with \RS on a Mac, try to ensure that you do not create Unicode\footnote{Unicode
-  is one of the standards for encoding text, an alternative to ASCII.
-  Unicode formats are denoted by symbols such as UTF-8 and UCS-2.} files. This
-  is an option in SPSS, and will depend on the file type with Excel.
+	\item	the evolution of a directed or undirected one-mode network
+        (e.g., friendships in a classroom) \citep{Snijders01};
+	\item	the evolution of a two-mode network
+        (e.g., club memberships in a classroom: the first mode
+        is constituted by the students, the second mode by the clubs)
+        \citep{KoskinenEdling2012};
+	\item	the evolution of an individual behavior (e.g., smoking), and
+	\item	the co-evolution of one-mode networks, two-mode networks and
+        individual behaviors (e.g., the joint evolution friendship and smoking;
+        or of friendship and club membership) \citep{SteglichEA10, SLT2013}.
 \end{enumerate}
+In all these cases, the data can also include covariates: observed variables
+that influence the dynamics, but of which the values are not themselves
+modeled.
 
-More about input data can be found in Section~\ref{S_InputData}.
+In the first two cases, one can assess with \SI the ways and the extent
+to which changes in a given one- or two-mode network depend on the network
+structure itself and on covariates. The third option, modeling changes in
+an individual behavior on its own, without reference to its embeddedness
+in a network, is rarely used.
+For this type of data numerous alternative longitudinal modeling techniques
+exist.
 
-\subsection{Installation and running the graphical user interface under Windows}
-\label{Gui}
-\begin{enumerate}
-\item % Install the \RS version of \Rn.
-  Install \R (most recent version). Note that if this leads to any
-  problems or questions, \R has an extensive list of `frequently asked
-  questions' which may contain adequate help for you.\\
-  Start \Rn, click on \sfn{Packages} and
-  then on \sfn{Install packages(s)...}. You will be prompted to select a mirror
-  for download. Then select the packages \sfn{xtable},
-  \sfn{network}
-  and \rs. (There may be later zipped version of \RS available on our web
-  site: to install this, use \sfn{Install package(s) from local zip files}, and
-  select \sfn{RSiena.zip} (with the appropriate version number in the file
-  name).\\
-  If you are using Windows Vista and get an error of denied permission
-  when trying to install the packages,
-  you may get around this by right-clicking the \R icon and selecting
-  `Run as administrator'.
-\item If you want to get the latest beta version of \rs, before installing the
-  packages, select \sfn{Packages/Select repositories...} and select
-  \sfn{R-forge}. Then install the packages in the normal way. \\
-\item Start up \R from the start menu or by (double-)clicking a shortcut on
-  the taskbar (or desktop).
-\item By right-clicking the shortcut and clicking `Properties'
-      you can change the startup working directory, given in the
-      `Start in' field. Data files will be searched for in the first instance
-      in this directory.
-\item Load the \RS package via the menu \texttt{Packages}
-\item Type\\
-\verb|siena01Gui()|
-\item You should see a screen like that shown in \hyperlink{siena1}{Figure
-    \ref{fig:siena1}}
-  \begin{figure}[ht]
-    \begin{center}
-      \includegraphics[width=\textwidth]{siena1.png}
-\hypertarget{siena1}{}
-    \end{center}
-\caption{Siena Data Entry Screen}
-\label{fig:siena1}
-  \end{figure}
-\item If the initial screen appears correctly, then check your working directory
-  or folder. This is the directory that is opened immediately when clicking the
-  \textsf{Add} button.  Various problems can be avoided by making sure that the
-  working directory is the directory that also contains the data files and the
-  saved session file
-  (see below)!\\
-  You need to have permission to write files in the working directory, and the
-  data files you want to use need to be in the same directory. To change the
-  directory:
-\begin{enumerate}
-\item Right click on the shortcut, and select Properties. (if somehow you don't
-  have permission to do this, try copying the shortcut and pasting to create
-  another with fewer restrictions. (This may not work in Windows 7: you may need
-  to copy it from the visible desktop and then paste it in Windows Explorer in
-  your personal Desktop area.))  In the \textsf{Start in:} field type the name
-  of the directory in which you wish to work, i.e., a directory in which you can
-  both read and write files. Then click OK.
+Accordingly, the fourth model type has been becoming widely used.
+Analyzing the joint evolution of networks and behavior allows researchers
+to address questions related to selection and influence processes, for
+example, whether smokers tend to become friends with each other or friends
+ tend to become similar in their smoking habits. The strength of the \SI
+co-evolution models is that one can simultaneously take into account
+the impact of network structure on network evolution, the actual level
+of a behavior on behavior change, the network structure on behavior change,
+and the actual level of behavior on network evolution. Besides network and
+behavior co-evolution, this class of {\saom}s
+also allow for the joint analysis of multiple networks (e.g. friendship
+and advice, friendship and dislike, or all three of them), and the
+analysis of ordered multiple networks (where the presence of a tie
+in one network presumes the existence of a tie in the other network,
+like in the case of friendships and best friend relations).
 
-\item To run the examples, put the session file and the data files in
-the chosen directory before starting \rs.
 
-\item To use your own data, put that data in the chosen directory before
-starting \rs.
-\end{enumerate}
-\end{enumerate}
+\subsubsection{Data, variables and effects}
+\label{S_datvareff}
 
-\subsubsection{Using the graphical user interface from Mac or Linux}
-\begin{enumerate}
-\item Install \R (most recent version) as appropriate for your computer.
-\item Within \Rn, type\\
-  \sfn{install.packages("RSiena")}\\
-To use the latest beta version, use\\
- \sfn{install.packages("RSiena", repos="http://R-Forge.R-project.org")}
+Now that we have discussed some core features of {\saom}s and introduced
+the different implemented model types,
+we turn our attention, still just presenting an outline, to
+data types and the specification of a model. In general, the
+number of waves must be at least two in order to analyze a
+data set with {\saom}s. In case of modeling
+ evolution across more than two observations in time, estimated
+parameter values are assumed to be equal in all periods (unless time
+heterogeneity is specifically represented by changing parameters --
+see Section~\ref{S_timetest1} for further details).
 
-%  \sfn{install.packages("RSiena", repos="http://www.stats.ox.ac.uk/pub/RWin")}
-
-%\item It is possible that Mac users on `Tiger' will need\\
-%  \sfn{install.packages("RSiena", repos="http://www.stats.ox.ac.uk/pub/RWin",
-%    type="source")}
-\item Navigate to the directory RSiena package, (which you can find from within
-  R by running \sfn{system.file(package="RSiena")}) and find a file called
-  \sfn{sienascript}.  Run this to produce the Siena GUI screen.(You will
-  probably have to change the permissions first (e.g.\ \\ \textsf{chmod u+x
-    sienascript})).
-\item If you want to use the GUI, you need tcl/tk installed. This is an
-  (optional) part of the R installation on Mac. On Linux, you may need to
-  install Tcl/tk and the extra Tcl/tk package \sfn{tktable}. On
-  Ubuntu Linux, the following commands will do what is
-  necessary (perhaps version numbers must be adapted):\protect\footnote{Thanks
-  to Michael Schweinberger and Krists Boitmanis for supplying these commands.}
-\begin{verbatim}
-sudo apt-get install tk8.5
-sudo apt-get install libtktable2.9
-\end{verbatim}
-\end{enumerate}
-
-\subsubsection{Running  the graphical user interface: more details}
-\label{S_guiinR}
-
-Originally \RS provided access to the GUI interface direct from Windows. This is
-not now possible. This section details some helpful notes about starting \RS
-within R\protect\footnote{We are
-grateful to Paul Johnson for supplying
-these ideas.}.
-This is done by starting up \R and working with the following commands.
-Note that \R is case-sensitive, so you must use upper and lower
-case letters as indicated.
-
-First, set the `working directory' of the \R session
-to the same directory that holds the data files;
-for example,\\
-\sfn{setwd('C:/SienaTest')}
-
-\noindent (Note the forward slash\protect\footnote{You can use backward ones but they
- must be doubled: \sfn{setwd('C:\textbackslash\textbackslash SienaTest')}.},
- and the quotes are necessary\protect{\footnote{Single or double, as long as they match.}.)
-Windows users can use the \sfn{Change dir...} option on the \sfn{File} menu.
-
-You can use the following commands to make sure the working directory is
-what you intend and see which files are included in it:\\
-\sfn{ getwd()}\\
-\sfn{ list.files()}
-
-Assuming you see the data files, then you can proceed to load the
-\RS package, with the library function:\\
-\sfn{ library(RSiena)}\\
-The other packages will be loaded as required, but if you wish to examine them
-or use other facilities from them you can load them using:\\
-\sfn{ library(network)}\\
-The following command
-will give a review of
-the functions that \RS offers:\\
-\sfn{ library(help=RSiena)}\\
-After that, you can use the \RS GUI. It will `launch' out
-of the \R session.\\
-\sfn{ siena01Gui()}\\
-You can monitor the \R window for error messages -- sometimes they are
-informative.
-
-When you are done, quit \R in the polite way:\\
-\sfn{q()} \\(Windows users may quit from the \sfn{File} menu or by closing the
-window.)
-
-\subsubsection{Entering Data.}
-\label{thegui}
-There are two ways to enter the data.
-\begin{enumerate}
-\item Enter each of your data files using \sfn{Add}.\\
-      Fill in the various columns as described in Section~\ref{S_de_screen}.
-\item If you have earlier saved the specification
-      of data files, e.g., using \sfn{Save to file}, then you can
-      use \sfn{Load new session from File}.\\
-      This requires a file in the format described
-      at the end of  Section~\ref{S_de_screen};
-      such a file can be created and read in an editor or spreadsheet program,
-      and it is created in .csv (comma separated) format
-      by the \sfn{ siena01Gui()} when you request
-      \sfn{Save to file}.
-\item If you wish to remove files, use the \sfn{Remove} option rather than
-  blanking out the entries.
-\end{enumerate}
-Once you have done this, check that the \sfn{Format},
-\sfn{Period}, \sfn{Type}, etc., are correct, and enter any
-values which indicate missingness in the \sfn{Missing Values} column.
-A (minimal) complete screen is shown in \hyperlink{siena2}
-{Figure~\ref{fig:siena2}}.
-The details of this screen are explained in Section~\ref{S_de_screen}.
-  \begin{figure}[ht]
-\hypertarget{siena2}{}
-    \begin{center}
-      \includegraphics[width=\textwidth]{siena2.png}
-    \end{center}
- \caption{Example of a Completed Data Entry Screen}
- \label{fig:siena2}
-\end{figure}
-
-\subsubsection{Running the Estimation Program}
-\label{estgui}
-\begin{enumerate}
-\item Click \sfn{Apply}: you will be prompted to save your work. Then you should
-  see the \sfn{Model Options} screen shown in \hyperlink{options}{Figure
-    \ref{fig:options}}.
-  \begin{figure}[ht]
-      \hypertarget{options}{}
-    \begin{center}
-      \includegraphics[width=\textwidth]{siena3.png}
-    \end{center}
-\caption{Model options screen}
-\label{fig:options}
-  \end{figure}
-    If this does not happen, then one possible source of error is that the
-    program cannot find your files; e.g.,
-    the files are not in the working directory (see above) but in a different
-    directory.\\
-    If errors occur at this moment and the options screen does not appear,
-    then you can obtain diagnostic error messages
-    working not through the \sfn{siena01Gui}, but directly  within \R
-    as described in Section~\ref{S_slightlyR}.
-    This will hopefully help you solving this problem; later on
-    you can then work through the \sfn{siena01Gui} again.
-\item Select the options you require.
-\item Use \sfn{Edit Effects} to choose the effects you wish to include. Note you
-  can edit the effects for just one dependent variable at a time if you wish
-  by selecting one dependent variable in `Effects dependent variable'.
-\item Click \sfn{Estimate}.
-\item You should see the \SI screen of the estimation program.
-\item When the program has finished, you should see the results. If not, click
-  \sfn{Display Results} to see the results.  The output file which you will see
-  is stored, with extension \texttt{.out} in the directory in which you start
-  \sfn{siena.exe}.
-\item You may restart your estimation session at a later date using the
-  \sfn{Continue session from file} on the \sfn{Data Entry Screen}.\\
-  The restart needs a saved version of the data, effects and model as R
-  objects. This will be created automatically when you first enter the
-  \sfn{Model Options Screen}, using the default effects and model. You may save
-  the current version at any time using the \sfn{Save to file} button, and will
-  be prompted to do so when you leave this screen.
-\end{enumerate}
-
-\subsubsection{Details of The Data Entry Screen}
-\label{S_de_screen}
-
-\begin{description}
-\item[\sfn{Group}] May be left blank unless you wish to use the
-  \sfn{multi-group} option described in Section~\ref{S_multigroup}. Should not
-  contain embedded blanks.
-\item[\sfn{Name}] Network files or dyadic covariates should use the same name
-  for each file of the set. Other files should have unique names, a list of
-  space separated ones for constant covariates.
-\item[\sfn{File Name}] Usually entered by using a file selection box, after
-  clicking \sfn{Add}.
-\item[\sfn{Format}] Only relevant for networks or dyadic covariates. Can be
-  a matrix; a single
-  Pajek network (\sfn{.net}) (not for two-mode networks);
-  or a \sfn{Siena network file} (an edgelist,
-  containing three or four columns: (from, to, value, wave (optional)), not yet
-  tested for dyadic covariates!).
-  By specifying the waves in the fourth column in the \sfn{Siena} format,
-  one file can be used to contain data for all the waves.
-%(\sfn{.paj} file support will be added
-  %later, with a specific button to load a complete project.)
-\item[\sfn{Period(s)}] Only relevant for networks and dyadic covariates. All
-  other files cover all the relevant periods. Indicates the order of the network
-  and dyadic covariate files. Should range from 1 to \sfn{M} within each
-  \sfn{group}, where \sfn{M} is the number of time points (waves).
-  Use multiple numbers separated by spaces for multi-wave Siena
-  network files.
-\item[\sfn{ActorSet}] If you have more than one set of nodes, use this column to
-  indicate which is relevant to each file. Should not contain embedded blanks.
-\item[\sfn{Type}] Indicate here what type of data the file contains. Options
-  are:
-\begin{description}
-\item[\sfn{network}] (i.e., a one-mode network, which is the
-     usual type)
-\item[\sfn{bipartite}] (i.e., a two-mode network, which is a network with two
-    node sets, and all ties are between the first and the second node set)
-\item[\sfn{behavior}]
-\item[\sfn{constant covariate}]
-\item[\sfn{changing covariate}]
-\item[\sfn{constant dyadic covariate}]
-\item[\sfn{changing dyadic covariate}]
-\item[\sfn{exogenous event}] (for changing composition of the actor set)
-\end{description}
-\item[\sfn{Selected}] Yes or No. Files with \sfn{Yes} \emph{or blank} will be
-included in the model. Use this field to remove any networks or behavior
-variables that are not required in the model.
-\item[\sfn{Missing Values}] Enter any values which indicate missingness, with
-  spaces between different entries.
-\item[\sfn{Nonzero Codes}] Enter any values which indicate ties, with spaces
-  between different entries.
-\item[\sfn{NbrOfActors}] For \sfn{Siena network files}, enter the number of
-  actors. For \sfn{Siena net bipartite files}, enter the two dimensions
-  (number of rows, number of columns) of the network, separated by a blank space.
- \end{description}
-
- The details of the screen can be saved to a \emph{session} file, from which
- they can be reloaded. But you can create a session file directly: it should
- have columns with exactly the same names and in exactly the same order as those
- of the \sfn{Data Entry} screen, and be of any of the following types:
-\begin{center}
-\begin{tabular}{lll}\\
-Extension&Type\\
-\texttt{.csv}&Comma separated\\
-\texttt{.dat} or \texttt{.prn}&Space delimited\\
-\texttt{.txt}&Tab delimited\\
-\end{tabular}
-\end{center}
+This section focuses on three related topics: the type of network and
+behavioral data \SI works with, the meaning of explanatory variables,
+or so called effects, in {\saom}s, and the
+different dependent variables with which \SI captures network and
+behavior evolution.\\
 
 \noindent
-The root name of this input file will also be the root name of the output file.
+\textbf{Network data}\\
 
-\subsubsection{Continuing the estimation}
-\begin{enumerate}
-\item Below you will see some points about how to evaluate the reliability of
-  the results.  If the convergence of the algorithm is not quite satisfactory
-  but not extremely poor, then you can continue just by \textsf{Apply}ing the
-  estimation algorithm again.
-\item If the parameter estimates obtained are very poor (not in a reasonable
-  range), then it usually is best to start again, with a simpler model, and from
-  a standardized starting value.  The latter option must be selected in the
-  \textsf{Model Options} screen.
-\end{enumerate}
+{\saom}s operate on binary networks,
+that is, on relations on a given set of actors,
+where tie variables between actors have two states:
+existent (1) or non-existent (0).
+Weighted networks are not allowed, but as mentioned above, it is
+possible to define multiple networks representing discrete levels
+of relationships. It is possible to specify that some ties in the
+network are impossible ("structural zeros") or necessary (``structural ones")
+(see Section~\ref{S_struct} for more details).
+For the network evolution, {\saom}s how ties
+are being created, maintained or terminated by actors.\\
 
+\noindent
+\textbf{Behavioral data}\\
 
-\subsection{Using \SI within \Rn}
-\label{S_SR}
+Behavioral variables in {\saom}s can be
+thought of as indicating the presence or intensity of a behavior.
+For example, behavioral data can represent whether an actor is a
+smoker or not, as well as a number of ordered categories
+expressing the number of cigarettes usually smoked.
+The term ``behavior" should not be taken literally here, it is
+possible to model changes in attitudes or other actor attributes.
+In the models, behavioral variables can be binary or ordinal discrete
+(the extension for continuous behavioral data is currently being
+developed). The number of categories should be small
+(mostly 2 to 5; larger ranges are possible).
+In the case of behaviors, {\saom}s express
+how actors increase, decrease, or maintain the level of their behavior.\\
 
-There are two alternatives, depending on your familiarity with \Rn,
-treated in Sections~\ref{S_slightlyR} and~\ref{S_fullyR}.
-Section~\ref{S_guiToR} explains how to make the step from the use of the
-GUI to the use of \R commands in the regular \R way.
+A special case of the fourth type is the
+\emph{diffusion of innovations in dynamic networks}
+\citep{Greenan14}:
+here the behavior variable representing
+having adopted the innovation is binary, coded 0 or 1, and
+once an actor has the value 1 s/he is stuck with it.
+The only possible transitions are $0 \Rightarrow 1$, representing
+that the actor adopts the innovation.\\
 
-Section \ref{S_Rscript} presents an example of an \R script
-for getting started with \rs.
+\noindent
+\textbf{Covariates}\\
 
-\smallskip
+In every model type, it is possible to define and use covariates,
+which are variables that are exogenous in the sense that
+their values are not modeled, but used to explain network or behavior
+change. Covariates can be dummy variables (e.g., sex)
+or continuous (e.g., attitudes or age).
+Also, they may have constant values across all observations or their
+value may change across time periods -- this is the
+distinction between constant and varying covariates
+(e.g., sex and salary). Finally, there are
+individual (monadic) and dyadic covariates that refer, respectively, to
+characteristics of individual actors (e.g., sex) and to attributes
+of pairs of actors (e.g., living in the same neighborhood or kinship).\\
 
-\subsubsection{For those who are slightly familiar with \Rn}
-\label{S_slightlyR}
+\noindent
+\textbf{Missing data and composition change}\\
 
-\begin{enumerate}
-\item Install \Rn.
-\item Install (within \Rn) the package \rs, and
-  possibly \sfn{network} (required to read Pajek files).
-\item Set the working directory of \R appropriately (\sfn{setwd()} within \Rn
- or via a desktop shortcut).
-\item You can get help by the command
-\begin{verbatim}
-help(RSiena)
-\end{verbatim}
-      This will open a browser window with help information;
-      by clicking on the `Index' link in the bottom line of this window,
-      you get a window with all  \RS commands.\\
-      The command
-\begin{verbatim}
-RShowDoc("RSiena_Manual", package="RSiena")
-\end{verbatim}
-      opens the official \RS manual.
-\item Create a session file using \sfn{siena01Gui()} within \Rn, or using an
-  external program.
-\item Then, within \Rn,
-\begin{enumerate}
-\item Use \sfn{sienaDataCreateFromSession()} to create your data objects.
-\item Use \sfn{getEffects()} to create an effects object.
-\item Use \sfn{fix()} to edit the effects object and select the required
-  effects, by altering the \sfn{Include} column to \sfn{TRUE}.
-\item Use \sfn{sienaAlgorithmCreate()} to create a \sfn{sienaAlgorithm} object, containing
-  the specifications for the estimation algorithm.
-\item Use \sfn{siena07()} to run the estimation procedure.
-\end{enumerate}
-Basic output will be written to a file. Further output can be obtained by using
-the\\ \sfn{verbose=TRUE} option of \sfn{siena07}.
-\end{enumerate}
+{\saom}s distinguish between two types
+of missing values: absence of actors from the network and
+random missingness. The first case refers to changing composition:
+it is possible to specify that some actors leave or join the
+network between two observations (during the simulation process).
+This then applies to all dependent variables (networks, behaviors)
+simultaneously (see Section~\ref{S_comp} for more details).
+In the second case, missing values are treated as randomly missing
+(see Section~\ref{S_missing} for more details).
+{\saom}s can deal with some, but not too much,
+randomly missing data (as a rule of thumb, more than 20\% is
+considered to be too much). With too many missing values,
+the simulation can become unstable, and also the estimated
+parameters may not be substantively reliable anymore.
+And of course, missing data are likely to are caused by
+processes that are not totally random, and therefore risk
+to bias the resuls.\\
 
-\subsubsection{For those fully conversant with \Rn}
-\label{S_fullyR}
+\noindent
+\textbf{Explanatory variables: the effects}\\
 
-\begin{enumerate}
-\item Add the package \RS
-\item Get your network data (including dyadic covariates)
-   into matrices, or sparse matrices of type
-  \sfn{dgTMatrix}. \sfn{spMatrix()} (in package \sfn{Matrix}) is useful to
-  create the latter.
-\item Covariate data should be in vectors or matrices.
-\item All missing data should be set to NA.
-\item Create \SI objects for each network, behavior variable and covariate,
-  using the functions \sfn{sienaDependent()} (for both networks and behavior
-  variables), \sfn{coCovar()} etc.
-\item Create a \SI data object using \sfn{SienaDataCreate()}.
-\item Use \sfn{getEffects()} to create an effects object.
-\item Use functions such as \sfn{includeEffects()}, \sfn{setEffect()},
-  and \sfn{includeInteraction()} to further specify the model.
-\item Use \sfn{sienaAlgorithmCreate()} to create a a \sfn{sienaAlgorithm} object, containing
-  the specifications for the estimation algorithm.
-\item Use \sfn{siena07()} to run the estimation procedure.
-\item Note that it is possible to use multiple processes in \sfn{siena07}. For
-  details see section~\ref{S_multipleProcesses}.
-\item Also note the availability of the parameter \sfn{prevAns} to reuse
-  estimates and derivatives from a previous run with similar effects.
-\end{enumerate}
-Basic output will be written to a file. Further output can be obtained by using
-the \sfn{verbose=TRUE} option of \sfn{siena07}.
-The scripts on the scripts page of the \RS website give many examples of
-how to use \rs.
+When defining {\saom}s, we have to specify
+the exact ways in which current network structure or covariates may affect
+network or behavior change. This is defined
+by combinations of configurations (or situations) which
+are called ``effects" in {\saom}s.
+Effects can be treated as the explanatory variables of the models.
+Effects can be structural (depending on the network structure itself,
+also called endogenous), or covariate-related; also various combinations
+between structure and covariates are possible. Some examples for effects:
+\begin{itemize}
+	\item \emph{structural effects:} reciprocity, transitivity;
+	\item \emph{covariate effects:} sex of the tie sender, sex of the receiver,
+                same sex, similarity in salary;
+	\item \emph{combinations:} average level of smoking of friends,
+                interaction between sex of the sender and reciprocity.\\
+\end{itemize}
 
-\subsubsection{The transition from using the graphical user interface to commands}
-\label{S_guiToR}
+\noindent
+\textbf{Dependent variables: network evaluation, creation and endowment functions}\\
 
-At some moment, for users who started learning the use of \RS through the GUI,
-it can be desirable to make the transition to using commands in the regular \R way.
-This will make available more options and integration with other \R features.
-The transition can easily be made as follows.
+As we discussed earlier, \SI is capable of analyzing and modeling the
+evolution of networks and behavior, jointly or separately.
+Consequently, a model may have more than one dependent variable.
+Here we introduce the ways network and behavior dependent variables
+can be defined in {\saom}s. We start with network evolution.
 
-After having made at least one estimation run
-in the GUI (which could be with the default
-model specification, without having made any further additions to the model;
-but it could also be with a more complicated model), click the button
-\sfn{Save to file}. You will be prompted for a file name with extension \sfn{.RData}.
-Make sure that you do give a non-empty name before the dot in \sfn{.RData};
-for the moment, let us choose the name  \sfn{trans.RData}.
+\def\Fspace{\space\space\space\space}
+\begin{table}[h]
+	\centering
+	\caption{Possible tie change patterns for two observations ($t_1$ and $t_2$)}
+	\label{tab:TCpat}
+	\vspace{\baselineskip}
+	\begin{tabular}{c | c | l}
+		$t_{1}$ 				& $t_{2}$ 				&														\\ \hline
+		$i$ \Fspace $j$ & $i  \to 		 j$	& creation of a tie 				\\
+		$i  \to			 j$	& $i  \to 		 j$	& maintenance of a tie 			\\
+		$i  \to			 j$	& $i$ \Fspace $j$ & termination of a tie 			\\
+		$i$ \Fspace $j$	& $i$ \Fspace $j$ & maintenance of a 'no-tie' \\
+	\end{tabular}
+\end{table}
 
-Then later in an \R session you can load the  \sfn{trans.RData}.
-This can be done in Windows by selecting \sfn{File -- Load Workspace} from the drop down
-menu, and entering this file name. It can also be done by entering the command
-\begin{verbatim}
-load("trans.RData")
-\end{verbatim}
-This will make available three objects, for data, algorithm, and effects.
-What is currently in your workspace is shown by the command
-\begin{verbatim}
-ls()
-\end{verbatim}
-This will probably show that the loaded objects have the names
-\sfn{mydata}, \sfn{mymodel}, and \sfn{myeff}.
-These are the type of objects created by the functions \sfn{sienaDataCreate},
-\sfn{sienaAlgorithmCreate}, and \sfn{getEffects},
-and discussed in the \SI script in Section~\ref{S_Rscript}.
+Given two observations of a binary network, a single network tie variable
+can follow four patterns, as shown in Table \ref{tab:TCpat}.
+In {\saom}s, however, tie change can be
+defined in three ways: we can model the creation of previously not
+existing ties (creation), the maintenance of existing ties (endowment),
+or the presence of ties regardless of whether they were newly created
+or maintained (evaluation). These are the three possible values of the
+change in tie variables, constituting the dependent
+variables of the network evolution model.
+The effects model the odds
+(more precisely: they are components of the linear
+predictor for the log-odds)
+for the creation, maintenance or
+presence of network ties. Table~\ref{tab:TCece} helps to imagine
+what the odds refer to in each case: we compare the probability of
+green cases to that of blue cases.
 
-Now attach the package \RS and subsequently ask for the descriptions of these
-three objects:
-\begin{verbatim}
-library(RSiena)
-mydata
-mymodel
-myeff
-\end{verbatim}
-This will give short descriptions and thereby a confirmation of what has been
-imported from the GUI session to the regular \R session.
-From here on you can continue and work with \R commands,
-as in the script, to further specify the model by working
-on the effects object, and then estimate the parameters by the \sfn{siena07}
-function.
+\begin{table}[h]
+\centering
+	\caption{Tie changes considered by the evaluation, creation and endowment functions}
+	\label{tab:TCece}
+	\vspace{\baselineskip}
+	\parbox{.30\linewidth}{
+		\centering
+		\begin{tabular}{c | c}
+			\multicolumn{2}{c}{$a)$ $evaluation$}\\
+			$t_{1}$ 				& $t_{2}$ 					 \\
+			\hline
+			\rowcolor{LimeGreen}
+			$i$ \Fspace $j$ & $i \to j$ 				 \\
+			\rowcolor{LimeGreen}
+			$i  \to	j$			& $i \to j$ 				 \\
+			\rowcolor{RoyalBlue}
+			$i  \to	j$			& $i$ \Fspace $j$		 \\
+			\rowcolor{RoyalBlue}
+			$i$ \Fspace $j$	& $i$ \Fspace $j$		 \\
+		\end{tabular}
+	}
+	\parbox{.30\linewidth}{
+		\centering
+		\begin{tabular}{c | c}
+			\multicolumn{2}{c}{$b)$ $creation$}															\\
+			$t_{1}$ 										& $t_{2}$ 												  \\
+			\hline
+			\rowcolor{LimeGreen}
+			$i$ \Fspace $j$ 						& $i \to j$			  								  \\
+			\textcolor{Grey}{$i \to j$} & \textcolor{Grey}{$i \to j$} 			\\
+			\textcolor{Grey}{$i \to j$} & \textcolor{Grey}{$i$ \Fspace $j$} \\
+			\rowcolor{RoyalBlue}
+			$i$ \Fspace $j$							& $i$ \Fspace $j$ 								  \\
+		\end{tabular}
+	}
+	\parbox{.30\linewidth}{
+		\centering
+		\begin{tabular}{c | c}
+			\multicolumn{2}{c}{$c)$ $endowment$}																	\\
+			$t_{1}$ 				& $t_{2}$ 																						\\
+			\hline
+			\textcolor{Grey}{$i$ \Fspace $j$} & \textcolor{Grey}{$i \to j$} 			\\
+			\rowcolor{LimeGreen}
+			$i \to j$													& $i \to j$ 												\\
+			\rowcolor{RoyalBlue}
+			$i \to j$													& $i$ \Fspace $j$ 									\\
+			\textcolor{Grey}{$i$ \Fspace $j$}	& \textcolor{Grey}{$i$ \Fspace $j$} \\
+		\end{tabular}
+	}
+\end{table}
 
-The precise point to continue from here, using the scripts
-in the next section and also on the \RS website,
-is to use
-script \sfn{Rscript02SienaVariableFormat.R},
-starting with section~D (\emph{Defining Effects}),
-part~3 (\emph{Adding/removing effects using includeEffects}).
-After this, you are advised to continue with script
-\sfn{Rscript03SienaRunModel.R}.
-
-
-\subsection{An example \R script for getting started}
-\label{S_Rscript}
-
-The best way to get acquainted with \RS is perhaps
-going through some existing scripts.
-The script  below is useful for this purpose.
-At the `RSiena scripts' page
-\url{http://www.stats.ox.ac.uk/~snijders/siena/siena_scripts.htm}
- of the \RS website
-it is available divided into smaller pieces.
-The script is written so as to be useful for novice
-as well as experienced \R users.
-The `RSiena scripts' page of the \RS website
-also contains some other scripts that may be useful.
-The appendix of this manual contains a list of \RS functions which may be consulted
-in addition to this script.
-
+According to this distinction, network evolution may be modeled
+in \SI by three functions: the evaluation, creation and endowment functions.
+Effects can appear as components of one or two of these functions in a single model,
+but never in all three (this would lead to perfect collinearity).
+Using only the evaluation effect assumes that the creation and endowment
+effects are equal (and equal to the evaluation effect). The estimated
+parameters for each effect should be interpreted as log-odds ratios.
+From a practical point of view, it is meaningful to start modeling with
+evaluation effects, unless one has a clear idea about how tie creation
+and endowment may be different in the analyzed data set.
+Separating the contribution of an effect into two functions requires
+more of the data, and if a given effect is similarly strong for the
+creation and maintenance of ties the statistical power will
+decrease by this split.
+ For these reasons, most  \SI studies limit their
+ attention to evaluation effects. However, if there is enough data,
+ the distinction between creation and maintenance of ties can
+ produce powerful insights \citep[e.g.,][]{Cheadle_etal2013}.\\
 \newpage
-{\footnotesize
-\verbatiminput{../scripts/Rscript01DataFormat.R}
-\newpage
-\verbatiminput{../scripts/RSienaSNADescriptives.R}
-\verbatiminput{../scripts/Rscript02SienaVariableFormat.R}
-\verbatiminput{../scripts/Rscript03SienaRunModel.R}
-\verbatiminput{../scripts/Rscript04SienaBehaviour.R}
-}
 
-\subsection{Outline of estimation procedure}
+\noindent
+\textbf{Dependent variables: behavior evaluation, creation and endowment functions}\\
+
+The distinction between the different behavior evolution functions follows
+a logic similar to the case of network evolution. The three possibilities
+for change in behavior are increasing or decreasing the level of behavior
+by one unit, or maintaining its actual level. In case of the evaluation
+function, the model does not distinguish between upward and downward changes,
+only looks at the resulting level of behavior. By using the creation and
+endowment functions, we can obtain separate parameters (and assess the
+different impact) of effects for the increase and the decrease of behavior.
+
+\subsubsection{Outline of estimation procedure}
+\label{S_estim}
 \noindent
 \SI estimates parameters by the following procedure:
 \begin{enumerate}
-\item  Certain statistics are chosen that should reflect the parameter values;\\
+\item  Certain statistics are used that reflect the parameter values;\\
   the finally obtained parameters should be such that the \emph{expected
     values}
   of the statistics are equal to the \emph{observed values}.\\
@@ -844,85 +752,158 @@ in addition to this script.
   \emph{target values}.
 \item To find these parameter values, an \emph{iterative stochastic simulation
     algorithm}
-  is applied.\\
+  is applied.
   This works as follows:
 \begin{enumerate}
 \item In Phase 1, the sensitivity of the statistics to the parameters is roughly
   determined.
-\item In Phase 2, provisional parameter values are updated:\\
+\item In Phase 2, provisional parameter values are updated iteratively:\\
   this is done by simulating a network according to the provisional parameter
   values, calculating the statistics and the deviations between these simulated
   statistics and the \emph{target values}, and making a little change (the
   `update') in the parameter values
-  that hopefully goes into the right direction.\\
+  that hopefully goes into the right direction. A lot of such updating steps
+  are taken, each using the parameter that was produced in the preceding step.\\
   (Only a `hopefully' good update is possible, because the simulated network is
   only a random draw from the distribution of networks, and not the expected
   value itself.)
 \item In Phase 3, the final result of Phase 2 is used, and it is checked if the
   average statistics of many simulated networks are indeed close to the target
   values. This is reflected in the so-called \texttt{t statistics for deviations
-    from targets}.
+  from targets}. If some of these are too high (a threshold of 0.1 is
+  used for the absolute value), the estimation must be repeated.
+   Standard errors for the parameters are also estimated in this
+  phase.
 \end{enumerate}
 \end{enumerate}
 
-\subsection{Using multiple processes}
-\label{S_multipleProcesses}
+\newpage
+\subsubsection{Further useful options in \RS}
+\label{S_etc}
+\begin{itemize}
+	\item	Checking for time heterogeneity (Sections~\ref{S_timetest1}
+            and \ref{S_timetest2})
+	\item	Goodness of fit (Section~\ref{S_gof})
+	\item	Meta-analysis of \SI results (Section~\ref{S_Siena08})
+	\item	Simulation without estimation (Section~\ref{S_sim})
+\end{itemize}
+
+\subsection{Installing and using \SI within \Rn}
+\label{S_use}
+\noindent
+This section gives an overview of steps one needs to go through from
+installing \R to running models in \rs.
+
 \begin{enumerate}
-\item
-If multiple processors are available, then using
-multiple processes can speed up the estimation in \sfn{siena07}.
-
-\item In Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
-  multiple simulations are done with the same parameters, and the resulting
-  statistics are averaged. The gain parameter is increased and the
-  number of iterations in phase 2 reduced to take advantage of
-  the increased accuracy.
-
-\item The parameters required to run all processes on one computer are fairly
-  simple: in your call to \sfn{siena07}, set \sfn{nbrNodes} to the number of
-  processes and \sfn{useCluster} and \sfn{initC} to TRUE. The \sfn{Model
-    Options} screen also allows you to specify the number of processes, and
-  will automatically set the other required parameters for you.
-
-\item To use more than one machine is more complicated, but it can be done by
-  using, in addition, the \sfn{clusterString} parameter.  The computers need to
-  be running incoming \sfn{ssh}.
-\item For machines with exactly the same layout of \R
-  directories on each, simply set \sfn{clusterString} to a character vector of
-  the names of the machines.
-\item For other cases, e.g.\ using Macs alongside Linux,
-  see the documentation for the package \sfn{parallel}.
-
-\item \RS uses sockets for inter-process communication.
-\item On Windows, sub processes are always started using \R scripts. On Linux
-  and Mac there is an option available in \R version 2.14.0 or later via the
-  code interface to \sfn{siena07} to ask for the sub processes to be formed by
-  forking. See the help page for details.
-\item Each process needs a copy of the data in memory. If there is insufficient
-  memory available there will be no speed gain as too much time will be spent
-  paging.
-\item In each iteration the main process waits until all the other processes
-  have finished. The overall speed is therefore that of the slowest process, and
-  there should be enough processors to allow them all to run at speed.
+	\item	Install \Rn.
+	\item	Install the package \RS or \sfn{RSienaTest}, with dependencies.
+            The other packages used are \sfn{tcltk}, \sfn{network}, \sfn{codetools},
+            \sfn{lattice}, \sfn{MASS}, \sfn{parallel}, \sfn{xtable}, and \sfn{tools}.
+            For goodness of fit testing it will be useful also to
+            install \sfn{sna} and \sfn{igraph}.
+	\item	Load data (networks, behavior, covariates) into \R
+            (see Section~\ref{S_datatypes}):
+	\begin{enumerate}
+		\item Network data should be in objects of class matrix or
+            sparse matrix (edgelist);
+		\item	Behavioral data should be in objects of class matrix;
+		\item	Individual constant covariates should be in objects of
+            class vector or should be in columns or rows of a matrix;
+		\item	Individual varying covariates should be in objects of class matrix;
+		\item	Dyadic covariates should be in objects of class matrix.
+	\end{enumerate}
+	\item	All missing data should be set to NA (see Section~\ref{S_missing}).
+	\item Check whether your data objects meet the following criteria:
+	\begin{enumerate}
+		\item	Each object contains the same nodes/actors;
+		\item	Nodes are in the same order in each object;
+		\item	Nodes are in the same order in rows and columns of matrix
+                objects (in case of one-mode networks)\footnote{For
+		directions on how to handle composition change, see Section~\ref{S_comp}}.
+	\end{enumerate}
+   If a two-mode network is studied, then of course there will
+   be two node sets.
+	\item	Create \SI objects for each data object using the appropriate
+                functions (see Section~\ref{S_datatypes}):
+	\begin{enumerate}
+		\item	\sfn{sienaDependent()} for networks and behavior variables;
+		\item	only for two-mode networks, \sfn{sienaNodeSet()} for defining nodesets;
+		\item	\sfn{coCovar()} and \sfn{varCovar()} for constant and
+                changing/varying individual covariates respectively;
+		\item	\sfn{coDyadCovar()} and \sfn{varDyadCovar()} for
+                constant and changing/varying dyadic covariates respectively;
+		\item	In case of two-mode networks, for each object it should
+                be specified which nodeset it is defined on, using the
+                \sfn{nodeSets} argument in the above functions.
+	\end{enumerate}
+	\item	Create a \SI data object containing all the \SI objects
+            specified above using the function \sfn{sienaDataCreate()}
+            (see Section~\ref{S_datatypes}).
+	\item	Use \sfn{getEffects()} to create an effects object.
+            This already gives a very simple model specification
+            containing the outdegree and a reciprocity effects
+            (see Section~\ref{S_imp_str1} - for two-mode networks see
+            Section~\ref{S_imp_str2}).
+	\item	Use \sfn{sienaAlgorithmCreate()} to create an algorithm object
+                (see Section~\ref{S_modspec}).
+	\item	Use \sfn{print01Report()} to produce an output file
+                 presenting some descriptive statistics
+                for the objects included in the model.
+	\item	Use functions \sfn{inludeEffects()}, \sfn{setEffect()} and
+            \sfn{includeInteraction()} to further specify the model
+            (see Sections~\ref{S_imp_str1}~--~\ref{S_eff_beh}).
+	\item	Use \sfn{siena07()} to run the estimation procedure.\footnote{The
+            use of multiple processes can speed up the estimation in \sfn{siena07()}.
+            For directions on how to utilize multiple processors,
+            see Section~\ref{S_multipleProcesses}.}
+	\item	Basic output is written to a log file in the actual working directory.
+             The filename is the project name specified in the
+             \sfn{sienaAlgorithmCreate()} function. Results can also be
+             inspected in \R using various functions.
 \end{enumerate}
+
+\subsection{Example \R scripts for getting started}
+\label{R_scripts}
+The following scripts on the \RS website go through the steps
+outlined in the previous section, providing additional details and options: \\
+\begin{itemize}
+	\item \sfn{Rscript01DataFormat.R}: gives a brief overview of \R functions
+            and data formats that are essential for using \rs.
+	\item \sfn{Rscript02SienaVariableFormat.R}: shows how to prepare data
+            for a \SI analysis, including the creation of \RS objects;
+            and how to specify effects for \RS models.
+	\item \sfn{Rscript03SienaRunModel.R}:
+           shows how to carry out the estimation and look at the results;
+	\item \sfn{Rscript04SienaBehaviour.R}: illustrates
+      how to specify models for dynamics of networks and behaviour.
+\end{itemize}
+The website contains a lot of other scripts illustrating other functionalities
+of \rs.
+
 
 \subsection{Steps for looking at results: Executing \si .}
 \label{S_exec}
 
 \begin{enumerate}
-\item Look at the start of the output file for general data
-      description (degrees, etc.), to check your data input.
+\item Look at the start of the output file obtained from
+       \sfn{print01Report} for general data
+      description (degrees, etc.), to check your data input.\\
+      If Jaccard indices are very low while the average
+      degree is not strongly increasing, this indicates
+      that the turnover in the network may be too high to consider
+      the data as an evolving network, and perhaps the \SI method
+      is not suitable for the data set. Jaccard values of .3 and higher
+      are good; lower than .2 indicates that there might be difficulties
+      in estimation; lower than .1 is quite low indeed.
     \item When parameters have been estimated, first look at the \texttt{t
-        ratios for deviations from targets}.  These are good if they are all
-      smaller than 0.1 in absolute
-      value, and reasonably good if they are all smaller than 0.2.\\
+      ratios for deviations from targets}.
       We say that the algorithm has converged if they are all smaller than 0.1
       in absolute value, and that it has nearly converged if they are all
-      smaller than 0.2.\\
-      These bounds are indications only, and may be taken with a grain of
-      salt.
+      smaller than 0.15. Results obtained for non-converged estimation
+      runs may be misleading. (Very small deviations from these
+      values are of course immaterial.) See Section~\ref{S_ccheck}.
 \item In rare circumstances, when the data set leads to instability
-      of the algorithm, the following may be of use.\\
+      of the algorithm, the following may be of use.
       The \textsf{Initial value of the gain parameter} determines the
       step sizes in the parameter updates in the iterative
       algorithm.
@@ -933,70 +914,40 @@ multiple processes can speed up the estimation in \sfn{siena07}.
       parameter value that is far from the `true' parameter estimate.
       A too high value implies that the algorithm will be unstable,
       and may be thrown off course into a region of unreasonable
-      (e.g., hopelessly large) parameter values.\\
-      It usually is unnecessary to change
-      this.
-    \item If all this is of no avail, then the conclusion may be that the model
+      (e.g., hopelessly large) parameter values. It usually is unnecessary
+      to change this, but in some cases it may be useful.
+\item If all this is to no avail, then the conclusion may be that the model
       specification is incorrect for the given data set.
     \item Further help in interpreting output is in Section~\ref{S_output} of
       this manual.
 \end{enumerate}
 
-\subsection{Giving references}
-
-When using \si, it is appreciated that you refer to this manual and to one or
-more relevant references of the methods implemented in the program.  The
-reference to this manual is the following.  \smallskip
-
-\noindent
-Ripley, Ruth M., Snijders, Tom A.B., and Preciado, Paulina.
-2011.
-Manual for SIENA version 4.0 (version \today).
-Oxford: University of Oxford, Department of Statistics; Nuffield College.
-\textsf{http://www.stats.ox.ac.uk/siena/}
-
-\smallskip
-
-A basic reference for the network dynamics model is \citet{Snijders01}
-or \citet{Snijders05}.
-Basic references for the model of network-behavior co-evolution
-are \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
-A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
-and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
-
-More specific references are \citet{Schweinberger12} for the score-type goodness
-of fit tests and \citet{SchweinbergerSnijders07a} for the calculation of
-standard errors of the Method of Moments estimators. For assessing and
-correcting time heterogeneity, and goodness of fit assement and associated model
-selection considerations, refer to \citet*{Lospinoso2010b} and \citet{Lospinoso2012}.
-
-A tutorial is \citet*{SnijdersEA10b}.
-
 
 \subsection{Getting help with problems}
 \label{sec:problems}
-If you have a problem running \rs, please read through the following hints to
-see if any of them help. If not, please send an email to
-rsiena-help@lists.r-forge.r-project.org, or post in the help forum for \RS in
-R-forge. You need to be a registered member of R-forge (and possibly of \rs)
-to post to a forum, but anyone can send emails (at present!). In your message,
-please tell us which operating system , which version of \Rn, and which version
-of \RS you are using.
 
-For queries about the modelling aspects of \si, or interpretation, please
-continue to use the \SN/ \RS mailing list.
+For methodological help, consult the tutorial  \citet{SnijdersEA10b} or this manual.
+The website, {\small\url{http://www.stats.ox.ac.uk/~snijders/siena/}~}, contains
+various further publications (also in other languages than English) that may
+be helpful, as well as example scripts.
+There is a users' group for \SI to exchange information and seek technical
+advice; the address is {\small\url{http://groups.yahoo.com/groups/stocnet/}~}.
 
-
+For technical problems running \rs, follow the following points.
 \begin{description}
-\item[Check your version of \RS] Details of the latest version available can
+\item[Help pages] Study the \R help page for the function you are using and that seems to give
+      the problems. This manual complements the help pages,
+      but does not replace them!
+\item[Check your version of \RS]
+  The `News' page of the \SI website gives information about new versions
+  of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.0.9) and an R-forge revision
-  number. You can find both the numbers of your current installed version by
+  identified by a version number (e.g.\ 1.1-244) and an R-forge revision
+  number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
   near the top, the revision number near the end. Both are also displayed at the
-  start of \SI output files (use \sfn{print01Report} to get the relevant output
-  file if you are not using the GUI.)
+  start of \SI output files produced by \sfn{print01Report()}.
 \item[Check your version of \Rn] When there is a new version or revision of \RS
   it will only be available to you automatically if you are running the most
   recent major version of \Rn. (You can force an installation if
@@ -1008,25 +959,37 @@ continue to use the \SN/ \RS mailing list.
   appear first on R-forge.)
 \item[Installation] When using the repository at R-forge, \emph{install} the
   package rather than updating it. Then check the version and revision numbers.
+\item[Users' group] Consult the archives of the Users' Group mentioned above, or post
+     a message to the Users' Group. In your message,
+     please tell which operating system, which version of \Rn, and which version
+     of \RS you are using.
+\item[R-forge help list]
+     For technical questions about the \RS code (as distinct from the
+     methodology), you can send an email to
+     rsiena-help@lists.r-forge.r-project.org, or post in the help forum for \RS in
+     R-forge. You need to be a registered member of R-forge (and possibly of \rs)
+     to post to a forum, but anyone can send emails (at present!). In your message,
+     please tell us which operating system, which version of \Rn, and which version
+     of \RS you are using.
 \end{description}
-
-
-\newpage
-
 %\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
 
+\newpage
 \part{Users' manual}
 
-\section[Program parts]{Parts of the program}
+\section{Steps of modelling}
 \label{S_parts}
 
 The operation of the \SI program is comprised of five main parts:
 \begin{enumerate}
- \item input of basic data description,
- \item model specification,
- \item estimation of parameter values using stochastic simulation,
- \item testing parameters and assessing goodness of fit,
- \item simulation of the model with given and fixed parameter values.
+ \item input of basic data description (see Section~\ref{S_InputData}),
+ \item model specification (see Section~\ref{S_modspec}),
+ \item estimation of parameter values using stochastic simulation
+        (see Section~\ref{S_Est}),
+ \item testing parameters and assessing goodness of fit
+        (see Sections~\ref{S_se} and \ref{S_test}),
+ \item simulation of the model with given and fixed parameter values
+        (see Section~\ref{S_sim}).
 \end{enumerate}
 
 The normal operation is to start with data input, then specify a
@@ -1035,7 +998,8 @@ assess goodness of fit and the significance of the parameters,
 and then possibly continue with new
 model specifications followed by estimation or simulation.
 
-The main output is written to a text file named
+The main output of the estimation procedure
+is written to a text file named
 \textsf{\textsl{pname}.out}, where \textsf{\textsl{pname}} is the name
 specified in the call of \textsf{sienaAlgorithmCreate()}.
 
@@ -1045,60 +1009,56 @@ specified in the call of \textsf{sienaAlgorithmCreate()}.
 \label{S_InputData}
 
 \SI  is a program for the statistical analysis
-of repeated measures of social networks, and requires network data
-collected at two or more time points. It is possible to include
-changing actor variables (representing behavior, attitudes,
-outcomes, etc.) which also develop in a dynamic process, together
-with the social networks.
-As repeated measures data on social networks, at the very least,
-{\em two or more repeated observations of a network}
-are required. The number of time points is denoted $M$.
+of repeated measures of social networks, and requires, at the very
+least, network data collected at two or more time points. It is also possible
+to include other types of variables in the models -- these are discussed in
+Section~\ref{S_datatypes}. Section~\ref{S_internal} describes the most
+commonly occuring
+data transformations that are done internally by \si.
+Finally, Section~\ref{S_usertrans}
+shows further options for users to define their data.
 
-In addition, various kinds of variables are allowed:
 
-\begin{enumerate}
-\item {\em actor-bound} or {\em individual variables},
-      also called {\em actor attributes},
-      which can be symbolized as $v_i$ for each actor $i$;
-      these can be constant over time or changing; \\
-      the changing individual variables can be dependent variables
-      (changing dynamically in mutual dependence with the changing network;
-      then they are also called dependent behavior variables)
-      or independent variables (exogenously changing variables;
-      then they are also called individual covariates).
-\item {\em dyadic covariates}, which can be symbolized as $w_{ij}$
-      for each ordered pair of actors $(i,j)$;
-     these likewise can be constant over time or changing.
-\end{enumerate}
+\subsection{Data types}
+\label{S_datatypes}
 
-Dependent variables (which can be networks or behavior variables)
-all must be available for the same set of time points.
+As we discussed in Section~\ref{S_datvareff}, dependent variables in {\saom}s are defined from
+network or behavioral data. Independent variables (effects) are defined
+from individual or dyadic covariate data, which can be constant or varying.
+\SI requires each of these data types to have a specific format -- this is
+presented in the current section.
 
-It is advisable to use names of variables consisting of at most 12 characters.
-This is because they are used as parts of the names of effects which
-can be included in the model, and the effect names should not be too long.
-
-The data specification in \RS consists of two steps.
+In general, data specification in \RS consists of two steps.
 First, the role of each variable to be used must be defined using
 the functions \sfn{sienaDependent}, \sfn{coCovar}, \sfn{varCovar},
 \sfn{coDyadCovar}, \sfn{varDyadCovar}, or \sfn{sienaCompositionChange}.
 Second, the variables must be combined into one \RS data set by the function
-\sfn{sienaDataCreate}.
+\sfn{sienaDataCreate}.\footnote{It is advisable to use names of variables
+consisting of at most 12 characters. This is because they are used as parts
+of the names of effects which can be included in the model, and the effect
+names should not be too long.}
 
-\subsection{Digraph data}
+It is also useful to note here that in case of co-evolution models (those with
+more than one dependent networks and/or behaviors), data for all dependent
+variables must be available for the same set of time points.
+
+
+\subsubsection{Network data}
 
 For data specification by the \textsf{sienaDependent} function, the network
 must be specified as a matrix or array or list of sparse matrix of triples.
-The help file for \sfn{sienaDependent} shows by examples how the
-specification can be given by sparse matrices.
-Here we only discuss the specification by matrices.
 
 For data specification by the graphical interface \textsf{siena01Gui}
+(documented separately)
 or by the function \textsf{sienaDataCreateFromSession},
 edge list formats are also allowed. This can be either the
 format of the Pajek program, or a raw edge list, here called Siena format.
 For large number of nodes (say, larger than 100), the edge list
 format is more efficient in use of computer memory.
+
+Sparse matrices, which can be used by input via
+\sfn{sienaDependent()}, have the same efficiency as Pajek or
+Siena format.
 %Data input as edge lists will also be made available by means of the
 %\textsf{sienaDependent} function (in some future version of \sn).
 The three possible formats for digraph input are as follows.
@@ -1106,9 +1066,9 @@ The three possible formats for digraph input are as follows.
 \item \emph{Adjacency matrices}.\\
       These can be used in  \sfn{sienaDependent} and in
       \sfn{sienaDataCreateFromSession}.\\
-      In the usual case of a one-mode network the adjacency matrix consists of
-      $n$ lines each with $n$ integer numbers,
-      separated by blanks or tabs, each line ended by a hard return.
+      In the usual case of a one-mode network the adjacency matrix
+      is given in a matrix of $n$ rows and $n$ columns
+      containing integer numbers.
       The diagonal values are meaningless but must be present.
       In the case of a two-mode network (which is a network with two
       node sets, and all ties are between the first and the second node set)
@@ -1126,6 +1086,9 @@ The three possible formats for digraph input are as follows.
       The values of the ties must be 0, 1, or \texttt{NA}
       (not available = missing);
       or 10 or 11 for structurally determined values (see below).
+
+      The help file for \sfn{sienaDependent} shows by examples how the
+      specification can be given by sparse matrices.
     \item \emph{Pajek format}.\\
       These can be used in \sfn{sienaDataCreateFromSession}.\\
       If the digraph data file has extension name \texttt{.net}, then the
@@ -1179,6 +1142,8 @@ the actors have only the option to create new ties or to retain
 the status quo, not to delete existing ties.)
 Similarly if ties never are created (but only terminated),
 then this will be respected in the simulations.
+See Section~\ref{S_monotone} and note the possibility
+of using \sfn{allowOnly=TRUE}.
 
 \subsubsection{Transformation between matrix and edge list formats}
 \label{S_trafos}
@@ -1246,6 +1211,294 @@ the adjacency matrix. \verb|tmp| above is a sparse matrix which is in edge list
 format but includes information on the size of the adjacency matrix, and can be
 used in a similar way to the original matrix \verb|a| while saving memory space.
 
+
+\subsubsection{Behavioral data}
+
+\SI also allows dependent behavior variables. This can be used in studies
+of the co-evolution of networks and behavior, as described
+in \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
+These behavior (or `action') variables represent
+the actors' behavior, attitudes, beliefs, etc.
+The difference between dependent behavior variables and changing actor
+covariates (see below) is that the latter
+have values determined by the input data and are assumed to
+change exogenously, i.e., according
+to mechanisms not included in the model, while the dependent
+action variables change endogenously, i.e.,
+depending on their own values and on the changing network.
+In the current implementation only one dependent network variable is
+allowed, but the number of dependent action variable can be larger than one.
+Unlike the changing individual covariates,
+the values of dependent action variables are not assumed to be
+constant between observations.
+
+Dependent behavioral variables must have nonnegative integer values;
+e.g., 0 and 1, or a range of integers like 0,1,2 or 1,2,3,4,5.
+Each dependent action variable must be given in one
+matrix, containing $k = M$ columns, corresponding to the $M$
+observation moments.
+
+If any values are not integers, a warning will be printed on the initial report
+given by \sfn{print01Report()} and the values will be truncated towards zero.
+
+\subsubsection{Individual covariates}
+
+Individual (i.e., actor-bound, or monadic) variables
+are defined by the functions
+\sfn{coCovar} in the case they are constant over time,
+and \sfn{varCovar} if they are changing over time.
+
+Each constant actor covariate has one value per actor
+valid for all observation moments, and has the role of an
+independent variable.
+
+Changing variables can change between observation moments;
+then they are called `changing individual covariates',
+and have the role of independent variables.
+
+Changing individual covariates are assumed to have constant values from one
+observation moment to the next. If observation moments for the
+network are $t_1, t_2, ..., t_M$, then the changing covariates
+should refer to the $M-1$ moments $t_1$ through $t_{M-1}\,$, and
+the $m$-th value of the changing covariates is assumed to be valid
+for the period from moment $t_m$ to moment $t_{m+1}\,$.
+The value at $t_M$, the last moment, does not play a role.
+Changing covariates, as independent variables, are meaningful
+only if there are 3 or more observation moments,
+because for 2 observation moments the distinction between
+constant and changing covariates is not meaningful.
+
+Each changing individual covariate must be specified
+in a separate call of \sfn{varCovar}, using for input
+an $n \times (M-1)$ matrix where the columns correspond to the $M-1$ periods
+between observations.
+
+The mean is always subtracted from the covariates.
+See Section~\ref{S_center} on centering.
+
+When an actor covariate is constant within waves, i.e.,
+within each wave it has the same value for all actors;
+or, more generally, when within each wave it has the same value for
+all actors
+within components separated by structural zeros (which means that
+ties between such components are not allowed), then only the ego effect
+of the actor covariate is made available.
+This is because the other effects then are meaningless.
+This may cause problems for combining several data sets
+in a multi-group project (see Section~\ref{S_mulev}).
+If at least one case is missing (i.e., has the missing value data code),
+then the other covariate effects are made available.
+When analysing multiple data sets in parallel,
+for which the same set of effects is desired to be included,
+it is therefore advisable to give data sets in which
+a given covariate has the same value for all actors
+one missing value in this covariate; purely to make
+the total list of effects independent of the observed data.
+
+
+
+\subsubsection{Dyadic covariates}
+
+Like the digraph data, also each measurement of a dyadic covariate
+must be contained in a separate matrix.
+For one-mode data this is a square data matrix,
+and the diagonal values are meaningless.
+%Pajek input format is currently not possible for dyadic covariates.
+
+A distinction is made between constant and changing dyadic
+covariates, where change refers to changes over time. Each constant
+covariate has one value for each pair of actors, which is valid for
+all observation moments, and has the role of an independent
+variable. Changing covariates, on the other hand, have one such
+value for each period between measurement points. If there are $M$
+waves (i.e., observation moments) of network data,
+this covers $M-1$ periods, and accordingly,
+for specifying a single changing dyadic covariate,
+a $n \times n \times (M-1)$ array is needed.
+
+Like is the case for monadic  covariates,
+changing dyadic covariates are assumed to have constant values from one
+observation moment to the next. If observation moments for the
+network are $t_1, t_2, ..., t_M$, then the changing covariates
+refer to the $M-1$ moments $t_1$ through $t_{M-1}\,$, and
+the $m$-th value of the changing covariates is assumed to be valid
+for the period from moment $t_m$ to moment $t_{m+1}\,$.
+The value at $t_M$, the last moment, does not play a role.
+
+Constant dyadic covariates are specified using function
+\sfn{coDyadCovar}, and changing dyadic covariates by \sfn{varDyadCovar}.
+
+The mean is always subtracted from the covariates.
+See Section~\ref{S_center} on centering.
+
+\subsection{Internal data treatment}
+\label{S_internal}
+
+\subsubsection{Interactions and dyadic transformations of covariates}
+
+For actor covariates (also called monadic covariates),
+two kinds of transformations to dyadic covariates
+are made internally in \si. Denote the actor covariate by $v_i$,
+and the two actors in the dyad by $i$ and $j$.
+Suppose that the range of $v_i$ (i.e., the difference between the
+highest and the lowest values) is given by $r_V$.
+The two transformations are the following:
+\begin{enumerate}
+\item \emph{dyadic similarity}, defined by
+      $ 1 - \big( \vert v_i - v_j \vert / r_V \big) $,
+      and centered so the mean of this similarity variable becomes 0;\\
+      note that before centering, the similarity variable is 1 if
+      the two actors have the same value, and 0 if one has the highest and the
+      other the lowest possible value;
+      the mean of the similarity variable is calculated by function
+      \sfn{sienaDataCreate} and stored as the \sfn{simMean} attribute
+      of \texttt{mydata\$cCovars\$myvar}, where \texttt{mydata} is the name
+      of the object created by \sfn{sienaDataCreate}, and \texttt{myvar}
+      is the name of the variable used as the argument for
+      \sfn{sienaDataCreate}, while the name \texttt{cCovars} applies for
+      constant monadic covariates, and is to be replaced by \texttt{vCovars}
+      for changing (varying) monadic covariates;\\
+      for centering issues, further see Section~\ref{S_center}.
+\item \emph{same $V$}, defined by 1 if $v_i = v_j$,
+      and 0 otherwise (not centered) ($V$ is the name of the variable).
+      This can also be referred to as \emph{dyadic identity}
+      with respect to $V$.
+\end{enumerate}
+Dyadic similarity is relevant for variables that can be treated as
+interval-level variables; dyadic identity is relevant for categorical variables.
+
+In addition, \SI offers the possibility of user-defined two- and three-variable
+interactions between covariates; see Section~\ref{S_int_eff}.
+
+
+\subsubsection{Centering}
+\label{S_center}
+
+Individual as well as dyadic covariates are centered
+by the program in the following way.
+
+For individual covariates, the mean value is subtracted
+by function \sfn{SienaDataCreate}. The centered values then are stored
+(see below),
+and all calculations use these centered variables.
+For the changing covariates, the mean
+value used is the global mean (averaged over all periods).
+The values of these subtracted means are reported in the output
+of \sfn{print01Report()}.
+For the multi-group option (section \ref{S_multigroup}),
+the subtracted values are the global means across all groups.
+
+For the dyadic covariates and the similarity variables derived
+from the individual covariates, the grand mean is calculated
+and stored by function \sfn{SienaDataCreate()};
+the stored values of the variables are not centered, but the means
+are subtracted during the program calculations. (Thus,
+dyadic covariates are treated internally by the program differently than
+individual covariates in the sense that the mean is subtracted at
+a different moment, but the effect is the same; except for multi-group
+projects, see below.)
+Unlike the `covariate similarity' effect,
+the `same covariate' effect is not centered but keeps its 0-1 values.
+
+For the multi-group option (section \ref{S_multigroup}),
+dyadic covariates are treated \underline{differently} from
+individual covariates:
+for dyadic covariates in multi-group projects, centering is done by the
+within-group mean;
+actor covariates in multi-group projects
+are centered by the overall mean.
+
+For dependent behavioral variables, the effects are defined
+in Section~\ref{S_ff_b} as functions of centered variables.
+% See overallMean() in BehaviorLongitudinalData.h
+
+The means of covariates are stored as attributes on the object created by
+\sfn{SienaDataCreate}.
+If you wish to access them, the following steps can show
+where these means can be found.
+For example, suppose that the command given was
+\begin{verbatim}
+mydata <- sienaDataCreate( friendship, smoke1, alcohol )
+\end{verbatim}
+The structure of this object is obtained by requesting
+\begin{verbatim}
+str(mydata, 1)
+\end{verbatim}
+Looking at the response, you
+will see that this object contains (among other things):
+\begin{enumerate}
+\item the constant actor covariates as \texttt{mydata\$cCovars}
+\item the varying actor covariates as \texttt{mydata\$vCovars}
+\item the constant dyadic covariates as \texttt{mydata\$dycCovars}
+\item the varying dyadic covariates as \texttt{mydata\$dyvCovars}
+\end{enumerate}
+Since \texttt{smoke1} is a constant covariate and \texttt{alcohol}
+a changing covariate, their means can be requested by
+\begin{verbatim}
+attr(mydata$cCovars$smoke1, "mean")
+attr(mydata$vCovars$alcohol, "mean")
+\end{verbatim}
+and the centered values for, e.g, the variable \texttt{alcohol} by
+\begin{verbatim}
+mydata$vCovars$alcohol
+\end{verbatim}
+The mean of the similarity variable is stored as the \sfn{simMean} attribute,
+and is obtained by, e.g.,
+\begin{verbatim}
+attr(mydata$cCovars$smoke1, "simMean")
+\end{verbatim}
+
+The formula for balance is a kind of dissimilarity between rows of
+the adjacency matrix. The mean dissimilarity is subtracted in this
+formula, having been calculated according to a
+\hyperlink{T_meanbal}{formula given in Chapter}~\ref{S_math}.
+It is also reported in the output and available -- for the first
+dependent variable -- as \texttt{attr(mydata\$depvars[[1]], "balmean")}.
+Instead of \texttt{[[1]]} you can request a different number or
+the name of the variable.
+
+%The dependent behavior variable is not centered.
+
+\subsubsection{Monotonic dependent variables}
+\label{S_monotone}
+
+
+In some data sets, a dependent variable only increases, or only decreases.
+For a network, this means that ties can be created but not terminated,
+or the other way around.
+This may be the case for all periods (a period is defined by the
+two consecutive observation waves at its start and end points)
+or just in some of the periods.
+\RS will note when a dependent variable only increases or only decreases
+in any given period,
+and mention this in the output file generated by \textsf{print01Report}.
+This constraint then is also respected in the simulations, in the periods
+where it is observed.
+This is represented
+internally by a variable called \texttt{uponly} indicating that the
+dependent variable cannot decrease,
+and a variable \texttt{downonly} indicating that the
+dependent variable cannot increase.
+The constraints signaled by the  \texttt{uponly} and  \texttt{downonly}
+variables can be lifted by using \texttt{allowOnly = FALSE}
+in the call of \sfn{sienaDependent} (see the help file for this function).
+
+If a dependent variable is only increasing or only decreasing
+for all periods and \sfn{sienaDependent} was called with
+\sfn{allowOnly=TRUE} (the default),
+then two basic effects are not identified.
+These are the outdegree effect for a dependent network variable,
+and the linear shape effect for a dependent behavior variable;
+these effects define the balance between the probabilities of
+going up and going down.
+These effects then are dropped automatically from the effects object.
+If this is not desired, this can be prevented
+by calling \sfn{sienaDependent} with \sfn{allowOnly=FALSE}.
+
+
+\subsection{Further data specification options}
+\label{S_usertrans}
+
 \subsubsection{Structurally determined values}
 \label{S_struct}
 
@@ -1268,7 +1521,7 @@ take part of the simulations only starting at the observation moment
 where they are not totally structurally zero;
 therefore, this way of representing partially absent actors
 is not meaningful for actors who are present only at the very last wave.
-Note that this always includes the case where there are two waves only
+In particular, this includes the case where there are two waves only
 for actors who join the network after the first wave.
 
 Another way (more complicated but more flexible,
@@ -1287,7 +1540,7 @@ always is composed of structural
 zeros, but this does not have to be indicated in the data matrix
 by special codes.) The correct definition of the structurally
 determined values can be checked from the brief report of this in
-the output file.
+the output file of \sfn{print01Report}.
 
 If there are a lot of structurally determined values
 then unconditional estimation  (see Section~\ref{S_cond})
@@ -1296,7 +1549,7 @@ is preferable.
 Structural zeros offer the possibility of analyzing several
 networks simultaneously under the assumption that the parameters
 are identical.
-Another option to do this is given in Section~\ref{S_mulev}.
+However, a preferable option to do this is given in Section~\ref{S_mulev}.
 E.g., if there are three networks with 12, 20 and
 15 actors, respectively, then these can be integrated into one
 network of 12 + 20 + 15 = 47 actors, by specifying that ties
@@ -1322,15 +1575,14 @@ represent that the rate of change and the out-degree effect are
 different between the components, while all other parameters are
 the same.
 
-It will be automatically discovered by \SI when functions
+It will be automatically discovered by \SI when monadic covariates
 depend only on these components defined by structural zeros,
 between which tie values are not allowed.
 For such variables, only the ego effects are defined
 and not the other effects defined for the regular
 actor covariates and described in Section ~\ref{S_eff_cov}.
 This is because the other effects then are meaningless.
-If at least one case is missing (i.e., has the missing value data code
-for this covariate),
+If at least one case is missing,
 then the other covariate effects are made available.
 
 When \SI simulates networks including some structurally determined values,
@@ -1364,168 +1616,14 @@ is replaced by the structurally fixed value  $x_{ij}(t_{m})$.
 This gives the best possible correspondence between target values
 and simulated values in the case of changing structural fixation.
 
-\subsection{Dependent behavioral variables}
 
-Dependent actor-level variables, also called dependent
-behavior variables, are changing variables at the actor level,
-analysed according to the ``networks and behavior" actor-oriented
-model of \citet{SnijdersEA07, SteglichEA10}.
-This means they change dynamically in
-mutual dependence with the changing network.
-These variables also are defined using the \sfn{sienaDependent} function,
-now requiring the \texttt{type = behavior} parameter.
-
-\subsection{Dyadic covariates}
-
-Like the digraph data, also each measurement of a dyadic covariate
-must be contained in a separate matrix.
-For one-mode data this is a square data matrix,
-and the diagonal values are meaningless.
-%Pajek input format is currently not possible for dyadic covariates.
-
-A distinction is made between constant and changing dyadic
-covariates, where change refers to changes over time. Each constant
-covariate has one value for each pair of actors, which is valid for
-all observation moments, and has the role of an independent
-variable. Changing covariates, on the other hand, have one such
-value for each period between measurement points. If there are $M$
-waves (i.e., observation moments) of network data,
-this covers $M-1$ periods, and accordingly,
-for specifying a single changing dyadic covariate, $M-1$
-covariate matrices are needed.
-
-Constant dyadic covariates are specified using function
-\sfn{coDyadCovar}, and changing dyadic covariates by \sfn{varDyadCovar}.
-
-The mean is always subtracted from the covariates.
-See Section~\ref{S_center} on centering.
-
-\subsection{Individual covariates}
-
-Individual (i.e., actor-bound, or monadic) variables
-are defined by the functions
-\sfn{coCovar} in the case they are constant over time,
-and \sfn{varCovar} if they are changing over time.
-
-Each constant actor covariate has one value per actor
-valid for all observation moments, and has the role of an
-independent variable.
-
-Changing variables can change between observation moments;
-then they are called `changing individual covariates',
-and have the role of independent variables.
-
-Changing individual covariates are assumed to have constant values from one
-observation moment to the next. If observation moments for the
-network are $t_1, t_2, ..., t_M$, then the changing covariates
-should refer to the $M-1$ moments $t_1$ through $t_{M-1}\,$, and
-the $m$-th value of the changing covariates is assumed to be valid
-for the period from moment $t_m$ to moment $t_{m+1}\,$.
-The value at $t_M$, the last moment, does not play a role.
-Changing covariates, as independent variables, are meaningful
-only if there are 3 or more observation moments,
-because for 2 observation moments the distinction between
-constant and changing covariates is not meaningful.
-
-Each changing individual covariate must be specified
-in a separate call fo \sfn{varCovar}, using for input
-an $n \times M-1$ matrix where the columns correspond to the $M-1$ periods
-between observations.
-
-The mean is always subtracted from the covariates.
-See Section~\ref{S_center} on centering.
-
-When an actor covariate is constant within waves, i.e.,
-within each wave it has the same value for all actors;
-or, more generally, when within each wave it has the same value for
-all actors
-within components separated by structural zeros (which means that
-ties between such components are not allowed), then only the ego effect
-of the actor covariate is made available.
-This is because the other effects then are meaningless.
-This may cause problems for combining several data sets
-in a multi-group project (see Section ~\ref{S_mulev}).
-If at least one case is missing (i.e., has the missing value data code),
-then the other covariate effects are made available.
-When analysing multiple data sets in parallel,
-for which the same set of effects is desired to be included,
-it is therefore advisable to give data sets in which
-a given covariate has the same value for all actors
-one missing value in this covariate; purely to make
-the total list of effects independent of the observed data.
-
-
-\subsection{Interactions and dyadic transformations of covariates}
-
-For actor covariates (also called monadic covariates),
-two kinds of transformations to dyadic covariates
-are made internally in \si. Denote the actor covariate by $v_i$,
-and the two actors in the dyad by $i$ and $j$.
-Suppose that the range of $v_i$ (i.e., the difference between the
-highest and the lowest values) is given by $r_V$.
-The two transformations are the following:
-\begin{enumerate}
-\item \emph{dyadic similarity}, defined by
-      $ 1 - \big( \vert v_i - v_j \vert / r_V \big) $,
-      and centered so the the mean of this similarity variable becomes 0;\\
-      note that before centering, the similarity variable is 1 if
-      the two actors have the same value, and 0 if one has the highest and the
-      other the lowest possible value;
-      the mean of the similarity variable is calculated by function
-      \sfn{sienaDataCreate} and stored as the \sfn{simMean} attribute
-      of \texttt{mydata\$cCovars\$myvar}, where \texttt{mydata} is the name
-      of the object created by \sfn{sienaDataCreate}, and \texttt{myvar}
-      is the name of the variable used as the argument for
-      \sfn{sienaDataCreate}, while the name \texttt{cCovars} applies for
-      constant monadic covariates, and is to be replaced by \texttt{vCovars}
-      for changing (varying) monadic covariates;
-\item \emph{same $V$}, defined by 1 if $v_i = v_j$,
-      and 0 otherwise (not centered) ($V$ is the name of the variable).
-      This can also be referred to as \emph{dyadic identity}
-      with respect to $V$.
-\end{enumerate}
-Dyadic similarity is relevant for variables that can be treated as
-interval-level variables; dyadic identity is relevant for categorical variables.
-
-In addition, \SI offers the possibility of user-defined two- and three-variable
-interactions between covariates; see Section~\ref{S_int_eff}.
-
-
-\subsection{Dependent action variables}
-\label{S_depaction}
-
-\SI also allows dependent action variables,
-also called dependent behavior variables. This can be used in studies
-of the co-evolution of networks and behavior, as described
-in \citet*{SnijdersEA07} and \citet*{SteglichEA10}.
-These action variables represent the actors' behavior, attitudes, beliefs, etc.
-The difference between dependent action variables and changing actor
-covariates is that the latter change exogenously, i.e., according
-to mechanisms not included in the model, while the dependent
-action variables change endogenously, i.e.,
-depending on their own values and on the changing network.
-In the current implementation only one dependent network variable is
-allowed, but the number of dependent action variable can be larger than one.
-Unlike the changing individual covariates,
-the values of dependent action variables are not assumed to be
-constant between observations.
-
-Dependent action variables must have nonnegative integer values;
-e.g., 0 and 1, or a range of integers like 0,1,2 or 1,2,3,4,5.
-Each dependent action variable must be given in one
-matrix, containing $k = M$ columns, corresponding to the $M$
-observation moments.
-
-If any values are not integers, a warning will be printed on the initial report
-and the values will be truncated towards zero.
-
-
-\subsection{Missing data}
+\subsubsection{Missing data}
+\label{S_missing}
 
 \SI allows that there are some missing data on network variables,
 on covariates, and on dependent action
-variables. Missing data must be indicated by missing data codes,
-{\em not} by blanks in the data set.
+variables.  Missing data must be indicated by
+the usual missing data code for \Rn, \texttt{NA}.
 
 Missingness of data is treated as non-informative.
 One should be aware that having many missing data can seriously
@@ -1538,19 +1636,14 @@ or distortions, provided missingness is indeed non-informative
 When one has more than $20\%$ missing data on any variable, however,
 one may expect problems in getting good estimates.
 
-Missings in the covariates are replaced by the global mean.
-
-In the current implementation of \si, missing data
-in the dependent variables are treated in a simple but meaningful way,
-trying to minimize their influence on the estimation results.
-This method is further explained in \citet{HuismanSteglich08},
-where comparisons are also made with other ways of dealings with the missing
-information.
+In the current implementation of \si, missing data are treated in
+a simple way, trying to minimize their influence on the estimation
+results.
+%This method is further explained in \citet{HuismanSteglich08},
+%where comparisons are also made with other ways of dealings with the missing
+%information.
 
 The basic idea is the following.
-\medskip
-
-NOTE: This may not be a correct representation. To be modified.
 \medskip
 
 A brief sketch of the procedure is that
@@ -1580,23 +1673,24 @@ then this value is imputed, if there is none then the
 observationwise mode of the variable is imputed.
 Missing covariate data are replaced by the
 variable's average score at this observation moment. In the course
-of the simulations, however, the adjusted values of the dependent
-action variables and of the network variables are allowed to
+of the simulations, however, the imputed values of the dependent
+behavior variables and of the network variables are allowed to
 change.
 
 In order to ensure a minimal impact of missing data treatment on
 the results of parameter estimation (method of moments estimation)
-and/or simulation runs, the calculation of the target statistics
-used for these procedures uses only non-missing data. When
-for an actor in a given period, any variable is missing that is
+and/or simulation runs, the calculation of the statistics
+used for fitting and reporting in these procedures uses only
+non-missing data.
+When for an actor in a given period, any variable is missing that is
 required for calculating a contribution to such a statistic, this
 actor in this period does not contribute to the statistic in
-question. For network and dependent action variables, the tie variable
+question. For network and dependent behavior variables, the tie variable
 or the actor variable, respectively,
 must provide valid data both at the beginning and at the end of a
-period for being counted in the respective target statistics.
+period for being counted in the respective statistics.
 
-\subsection{Composition change: joiners and leavers}
+\subsubsection{Composition change: joiners and leavers}
 \label{S_comp}
 
 \SI can also be used to analyze networks of which the composition
@@ -1604,12 +1698,8 @@ changes over time, because actors join or leave the network
 between the observations.
 This can be done in two ways: using the method of \citet{HuismanSnijders03},
 or using structural zeros.
-
-For bipartite networks the Huisman-Snijders method can be used
-only for the actors (the first node set), not for the second node set.
-For the maximum likelihood estimation option, the Huisman-Snijders method
-is not implemented. In these cases only the structural zeros method can be used.
-
+(For the maximum likelihood estimation option, the Huisman-Snijders method
+is not implemented, and only the structural zeros method can be used.)
 Structural zeros can specified for all elements of the tie variables
 toward and from actors who are absent at a given observation moment.
 How to do this is described in subsection~\ref{S_struct}.
@@ -1621,10 +1711,10 @@ in a somewhat more efficient way.
 
 Network composition change, due to actors joining or leaving the
 network, is handled separately from the treatment of missing data.
-The digraph data matrices must contain all actors who are part of the
+The data matrices must contain all actors who are part of the
 network at any observation time.
 If adjacency matrices are used as data input, they must therefore
-all have the same number of $n$ lines, each actor
+all have the same number of $n$ rows, each actor
 having a separate (and fixed) line in these matrices, even for
 observation times where the actor is not a part of the network
 (e.g., when the actor did not yet join or the actor already left
@@ -1639,9 +1729,9 @@ omitted and the current subsection can be disregarded.
 If there is composition change, estimation by the Method of Moments
 is forced to be unconditional (see Section~\ref{S_cond}).
 
-At these times, where the actor is not in the network, the entries
+For these waves, where the actor is not in the network, the entries
 of the adjacency matrix can be specified in two ways. First as
-missing values using missing value code(s). In the estimation
+missing values using missing value code \texttt{NA}. In the estimation
 procedure, these missing values of the joiners before they joined
 the network are regarded as 0 entries, and the missing entries of
 the leavers after they left the network are fixed at the last
@@ -1662,11 +1752,11 @@ valid code number is specified this will always be used.
 
 The functions used to specify the times actors
 join or leave the network (i.e., the times of composition change)
-are \sfn{sienaCompositionChangeFromFile} in case a file is used,
-and \sfn{sienaCompositionChange} in case a list is used.
+are \sfn{sienaCompositionChangeFromFile()} in case a file is used,
+and \sfn{sienaCompositionChange()} in case a list is used.
 How to use a separate input file,
 called the \emph{exogenous events file}, is
-described in Section~\ref{S_datform}.
+described in the help page for \sfn{sienaCompositionChangeFromFile()}.
 
 In the second case, a list must be given of length $n$,
 where $n$ is the number of actors in the node set.
@@ -1709,120 +1799,46 @@ The object \texttt{changes} created by the functions
 \sfn{compositionChange} and can be used in the function
 \sfn{sienaDataCreate}.
 
-
-\subsection{Centering}
-\label{S_center}
-
-Individual as well as dyadic covariates are centered
-by the program in the following way.
-
-For individual covariates, the mean value is subtracted
-by function \sfn{SienaDataCreate}. The centered values then are stored,
-and all calculations use these centered variables.
-For the changing
-covariates, this is the global mean (averaged over all periods).
-The values of these subtracted means are reported in the output.
-For the multi-group option (section \ref{S_multigroup}),
-the subtracted values are the global means across all groups.
-
-For the dyadic covariates and the similarity variables derived
-from the individual covariates, the grand mean is calculated
-and stored by function \sfn{SienaDataCreate},
-the stored values of the variables are not centered, but the means
-are subtracted during the program calculations. (Thus,
-dyadic covariates are treated internally by the program differently than
-individual covariates in the sense that the mean is subtracted at
-a different moment, but the effect is the same; except for multi-group
-projects, see below.)
-Unlike the `covariate similarity' effect,
-the `same covariate' effect is not centered but keeps its 0-1 values.
-
-For the multi-group option (section \ref{S_multigroup}),
-dyadic covariates are treated \underline{differently} from
-individual covariates: here the subtracted values are
-the within-group means.
-the subtracted values are the global means across all groups.
-
-
-For dependent behavioral variables, the effects are defined
-in Section~\ref{S_ff_b} as functions of centered variables.
-% See overallMean() in BehaviorLongitudinalData.h
-
-The means of covariates are stored as attributes on the object created by
-\sfn{SienaDataCreate}.
-If you wish to access them, the following steps can show
-where these means can be found.
-For example, suppose that the command given was
-\begin{verbatim}
-mydata <- sienaDataCreate( friendship, smoke1, alcohol )
-\end{verbatim}
-The structure of this object is obtained by requesting
-\begin{verbatim}
-str(mydata, 1)
-\end{verbatim}
-Looking at the response, you
-will see that this object contains (among other things):
+\subsection{Using multiple processes}
+\label{S_multipleProcesses}
 \begin{enumerate}
-\item the constant actor covariates as \texttt{mydata\$cCovars}
-\item the varying actor covariates as \texttt{mydata\$vCovars}
-\item the constant dyadic covariates as \texttt{mydata\$dycCovars}
-\item the varying dyadic covariates as \texttt{mydata\$dyvCovars}
+\item
+If multiple processors are available, then using
+multiple processes can speed up the estimation in \sfn{siena07}.
+
+\item In Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
+  multiple simulations are done with the same parameters, and the resulting
+  statistics are averaged. The gain parameter is increased and the
+  number of iterations in phase 2 reduced to take advantage of
+  the increased accuracy.
+
+\item The parameters required to run all processes on one computer are fairly
+  simple: in your call to \sfn{siena07}, set \sfn{nbrNodes} to the number of
+  processes and \sfn{useCluster} and \sfn{initC} to TRUE. The \sfn{Model
+    Options} screen also allows you to specify the number of processes, and
+  will automatically set the other required parameters for you.
+
+\item To use more than one machine is more complicated, but it can be done by
+  using, in addition, the \sfn{clusterString} parameter.  The computers need to
+  be running incoming \sfn{ssh}.
+\item For machines with exactly the same layout of \R
+  directories on each, simply set \sfn{clusterString} to a character vector of
+  the names of the machines.
+\item For other cases, e.g.\ using Macs alongside Linux,
+  see the documentation for the package \sfn{parallel}.
+
+\item \RS uses sockets for inter-process communication.
+\item On Windows, sub processes are always started using \R scripts. On Linux
+  and Mac there is an option available in \R version 2.14.0 or later via the
+  code interface to \sfn{siena07} to ask for the sub processes to be formed by
+  forking. See the help page for details.
+\item Each process needs a copy of the data in memory. If there is insufficient
+  memory available there will be no speed gain as too much time will be spent
+  paging.
+\item In each iteration the main process waits until all the other processes
+  have finished. The overall speed is therefore that of the slowest process, and
+  there should be enough processors to allow them all to run at speed.
 \end{enumerate}
-Since \texttt{smoke1} is a constant covariate and \texttt{alcohol}
-a changing covariate, their means can be requested by
-\begin{verbatim}
-attr(mydata$cCovars$smoke1, "mean")
-attr(mydata$vCovars$alocohol, "mean")
-\end{verbatim}
-The mean of the similarity variable is stored as the \sfn{simMean} attribute,
-and is obtained, e.g., by
-\begin{verbatim}
-attr(mydata$cCovars$smoke1, "simMean")
-\end{verbatim}
-
-The formula for balance is a kind of dissimilarity between rows of
-the adjacency matrix. The mean dissimilarity is subtracted in this
-formula, having been calculated according to a
-\hyperlink{T_meanbal}{formula given in Chapter}~\ref{S_math}.
-It is also reported in the output and available -- for the first
-dependent variable -- as \texttt{attr(mydata\$depvars[[1]], "balmean")}.
-Instead of \texttt{[[1]]} you can request a different number or
-the name of the variable.
-
-%The dependent behavior variable is not centered.
-
-\subsection{Monotonic dependent variables}
-\label{S_monotone}
-
-
-In some data sets, a dependent variable only increases, or only decreases.
-For a network, this means that ties can be created but not terminated,
-or the other way around.
-This may be the case for all periods (a period is defined by the
-two consecutive observation waves at its start and end points)
-or just in some of the periods.
-\RS will note when a dependent variable only increases or only decreases,
-and mention this in the output file generated by \textsf{print01Report}.
-This constraint then is also respected in the simulations, in the periods
-where it is observed.
-This is represented
-internally by a variable called \texttt{uponly} indicating that the
-dependent variable cannot decrease,
-and a variable \texttt{downonly} indicating that the
-dependent variable cannot increase.
-The constraints signaled by the  \texttt{uponly} and  \texttt{downonly}
-variables can be lifted by using \texttt{allowOnly = FALSE}
-in the call of \sfn{sienaDependent} (see the help file for this function).
-
-If a dependent variable is only increasing or only decreasing
-for all periods, then two of the basic effects defined below
-are not identified.
-These are the outdegree effect for a dependent network variable,
-and the linear shape effect for a dependent behavior variable;
-these effects define the balance between the probabilities of
-going up and going down.
-These effects then are dropped automatically from the effects object,
-\bigskip
 
 
 
@@ -1949,7 +1965,7 @@ of class \sfn{sienaGroupEffects}.
 This object is originally created by the function \sfn{getEffects} and
 subsequently modified by the functions \sfn{includeEffects} and/or
 \sfn{setEffects}.
-The scripts in Section~\ref{S_Rscript} give examples.
+The scripts on the \SI website give examples.
 An important ingredient here is the so-called \sfn{shortName}
 of each effect, which is used to identify it;
 effects of covariates need, in addition, the name of the covariate
@@ -1957,6 +1973,12 @@ because the \sfn{shortName} does not specify the covariate.
 If there are several dependent variables (networks and/or behavioral variables),
 the variable name (\sfn{name}) also is required to specify the effect.
 The \sfn{shortName}s are part of the effects object.
+For the practical use of \si, the \sfn{shortName}s are important.
+A list of effects with their \sfn{shortName}s can be displayed in a browser
+by using the function:
+
+\verb|effectsDocumentation()| \\
+
 For example, the command
 \begin{verbatim}
 cbind(myeff$effectName, myeff$type, myeff$shortName)[1:20,]
@@ -1967,11 +1989,6 @@ As another example,
 cbind(myeff$effectName, myeff$type, myeff$shortName)[myeff$type=="eval",]
 \end{verbatim}
 lists all evaluation effects in \texttt{myeff}.
-For the practical use of \si, the \sfn{shortName}s are important.
-A list of effects with their \sfn{shortName}s can be displayed in a browser
-by using the function:
-
-\verb|effectsDocumentation()| \\
 
 
 \subsubsection{Mathematical specification}
@@ -2258,7 +2275,7 @@ The basic list of these and other effects is as follows.
             two-mode networks}
 \label{S_imp_str2}
 
-The Stochastic Actor-Oriented Model for two-mode (or bipartite) networks
+The \SAOM for two-mode (or bipartite) networks
 is treated in \citet{KoskinenEdling2012}.
 The co-evolution of one-mode and two-mode networks is treated in
 \citet{SLT2012}.
@@ -2699,8 +2716,7 @@ the model of \citet{Snijders01} (Model Type 1),
 that of \citet{Snijders03} (Model Type 2),
 and the tie-based model described in \citet{Snijders06} (Model Type 3).
 Model Type 1 is the default model and is
-described in the basic publications on Stochastic Actor-Oriented
-Models for network dynamics.
+described in the basic publications on {\saom}s for network dynamics.
 
 Model type 2 is at this moment not implemented in \SI version 3.
 \medskip
@@ -2818,6 +2834,7 @@ Value \texttt{modelType = 1} is for directed networks, values
 % 4=Pairwise forcing model, 5=Pairwise mutual model, 6=Pairwise joint model
 
 \begin{enumerate}
+\item Directed networks option \texttt{modelType = 1} is not used for non-directed networks.
 \item Forcing model, \texttt{modelType = 2}: \\ % AFORCE
       one actor takes the initiative and unilaterally
       imposes that a tie is created or dissolved.
@@ -3718,7 +3735,7 @@ see the help file for further information.
 \subsubsection{Initial Values}
 \label{S_initials}
 
-The \emph{initial values} can be given in three ways.}
+The \emph{initial values} can be given in three ways.
 \begin{enumerate}
 \item The default: if \texttt{useStdInits = FALSE} and no \textsf{prevAns}
       parameter is given in the call of \textsf{siena07},
@@ -3796,8 +3813,7 @@ The program calculates the averages and standard deviations of the
 deviations and combines these in a $t$-ratio (in this case,
 average divided by standard deviation).
 Convergence is excellent when these $t$-ratios are less than 0.1
-in absolute value, reasonable when they are less than 0.2, and
-moderate when they are less than 0.3.
+in absolute value, and reasonable when they are less than 0.15.
 For published results, it is suggested that estimates presented come from runs
 in which all $t$-ratios for convergence are less than 0.1 in absolute value
 -- or nearly so.
@@ -5178,7 +5194,7 @@ for time dummy terms.
 
 \newpage
 \section{Simulation}
-
+\label{S_sim}
 
 The simulation option simulates the network evolution for fixed
 parameter values. This is meaningful, e.g., for theoretical
@@ -6642,7 +6658,9 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
 
  \item {\em out-degree up to $c$} (\emph{truncated out-degree}),
  where $c$ is some constant
- (internal effect parameter, see above),  \texttt{(outTrunc)},
+ (internal effect parameter, see above),  there are two implementations here:
+ \texttt{outTrunc} and \texttt{outTrunc2}, to enable the simultaneous use of this
+ effect with 2 different internal effect parameters; the effect is
  defined by  \\
  $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;\\
  note that for $c=1$ this represents --inversely-- the tendency to be an isolate
@@ -7889,6 +7907,9 @@ For further explication, consult \citet{Snijders01, Snijders05};
 (here, the `gratification function' is used rather than the endowment function),
 \citet*{SnijdersEA07}, and \citet*{SteglichEA10}.
 
+A better term than endowment is perhaps \emph{maintenance}.
+
+
 These functions are combined in the following way.
 For the creation of ties, the objective function used is
 \begin{equation}
@@ -7909,6 +7930,9 @@ has exactly the same consequences as a model for which this
 evaluation effect is excluded, and that includes a creation as well as
 an endowment effect, both with the same parameter value
 $\zeta_k = \beta_k$ and $\gamma_k = \beta_k$.
+
+Of the three types of effect --- evaluation, creation, and endowment ---,
+one therefore should use one or two, not all three, because this leads to collinearity.
 
 
 \subsubsection{Network rate function} \label{S_r}
@@ -7961,19 +7985,25 @@ if the associated parameter is denoted $\alpha_h$ for some $h$,
 and similarly for the contributions of the in-degrees and the
 reciprocated degrees.
 
- Also an exponential dependence on reciprocals of out-degrees
- \texttt{(outRateInv)} can be specified;
- this can be meaningful because the rate effect of
- the out-degree becoming a value 1 higher might
- become smaller and smaller as the out-degree increases.
+ Nonlinear dependence of the exponent on out-degrees
+ can also be specified;
+ \begin{itemize}
+ \item inverse outdegree effect  \texttt{(outRateInv)} \\
  Denoting again the corresponding parameter by $\alpha_h$
  (but always for different index numbers $h$),
  this effect multiplies the factor $\lambda^{\rm net}_{i3}$ by
-% \[ 1 \+ \frac{\alpha_h}{1 \+ x_{i+}} \ . \]
- \[ \exp( \alpha_h / (x_{i+} +1)) \ . \]
-% This function was chosen so that for a parameter $\alpha_h = 0$,
-% there is no effect (multiplication by a factor 1);
-% and no problems (division by 0) occur when $ x_{i+} = 0$.
+ \[ \exp\big( \alpha_h / (x_{i+} +1)\big) \ . \]
+ \item logarithmic outdegree effect  \texttt{(outRateLog)} \\
+ This effect multiplies the factor $\lambda^{\rm net}_{i3}$ by
+ \[ \exp\Big( \ln\big(\alpha_h (x_{i+} +1)\big)\Big) \,=\,
+                 \big(x_{i+} +1\big)^{\alpha_h} \ . \]
+ The exponential link function and logarithmic transformation collaborate
+ to produce direct proportionality to the outdegree + 1, in case
+ the parameter is $\alpha_h=1$.
+ \end{itemize}
+ For the two latter effects, the addition of 1 to the outdegrees avoids
+ problems (division by 0, logarithm of 0) that otherwise would occur
+ when $ x_{i+} = 0$.
 \end{enumerate}
 
 \iffalse
@@ -8403,7 +8433,7 @@ reciprocated degrees.
   is a non-decreasing variable with values 0 and 1,
   there are various contagion effects that render a model that
   would reduce to a proportional hazards model if the network
-  were constant; see \citet{Greenan12}.
+  were constant; see \citet{Greenan14}.
   This holds if they are part of the rate function,
   but not if they are included in the evaluation function.
   This also holds for effects depending on actor covariates.
@@ -8418,7 +8448,7 @@ reciprocated degrees.
  \[ \exp\Big( \alpha_h \, \big( \sum_j z_j \, x_{ij}\big)/\big(\sum_j x_{ij} \big) \Big)\, . \]
   Using this effect, to which effects depending on actor covariates may be added,
   in the rate function  leads to a
-  proportional hazards model. See \citet{Greenan12}.
+  proportional hazards model. See \citet{Greenan14}.
 
 
 \item \emph{average exposure effect} (\verb|avExposure|),
@@ -10419,22 +10449,54 @@ The argument is a sienaFit object ``x''. \\
 
 This begins (in reverse order) at end October 2009, and only presents changes
 which affect the user.
-(Programmers should consult the changeLog file on CRAN or in the R-forge
-repository.)
+(Programmers should consult the changeLog file in the source code on CRAN or in
+the R-forge repository.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+\item 2013-10-09 R-Forge Revision 245
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item New structural rate effect \sfn{outRateLog}.
+   \item Duplication of \sfn{outTrunc} effect: \sfn{outTrunc2}, allowing use
+    with two different parameters.
+   \item In \sfn{siena08()}, also report Bonferroni combination
+     of the two Fisher combinations.
+   \item In phase2 of \sfn{siena07()}, rolled back change in truncation
+     from version 1.1-227 to the earlier procedure.
+   \item Added function \sfn{descriptives.sienaGOF()} with numerical results
+   of \sfn{plot.sienaGOF()}.
+   \item Minor changes of output in \sfn{siena.table()} and various reports,
+    and in error message for \sfn{includeEffects()}.
+   \item  Change artificial (`missing') results of \sfn{siena07()} from 999
+    to NA.
+   \item Added autocorrelations during phase 3 to \sfn{print.summary.sienaFit}
+   for ML estimation.
+   \item Start of the manual reorganized and partially rewritten (with help from
+     Zsofia B\'{o}da and Andr\'{a}s V\"{o}r\"{o}s); instructions for
+     \sfn{siena01Gui()} separated in siena01gui.pdf.
+  \end{itemize}
+
+\item 2013-10-09 R-Forge Revision 244
+
+Changes in RSienaTest:
+
+\begin{itemize}
+\item Repair bug that prevented compilation for Mac.
+\end{itemize}
+
 \item 2013-09-17 R-forge revision 243
 
 Changes in RSiena and RSienaTest:
   \begin{itemize}
-   \item Correct bug in EffectFactory for \texttt{isolatePop} effect.
-   \item Improved plotting of sienaGOF objects so that observed values
+   \item Correct bug in \sfn{EffectFactory} for \texttt{isolatePop} effect.
+   \item Improved plotting of \sfn{sienaGOF} objects so that observed values
      outside of the range of simulated values don't run off the chart.
-   \item Improve treatment of structural values in sienaGOF.
+   \item Improve treatment of structural values in \sfn{sienaGOF}.
   \end{itemize}
 Changes in RSiena:
   \begin{itemize}
-   \item Add functions AntiIsolateEffect.h and AntiIsolateEffect.cpp
+   \item Add functions \sfn{AntiIsolateEffect.h} and \sfn{AntiIsolateEffect.cpp}
      which were forgotten to include in revision 242.
   \end{itemize}
 
@@ -10443,13 +10505,16 @@ Changes in RSiena:
 Changes in RSiena as well as RSienaTest:
   \begin{itemize}
   \item Correction to Dolby option for the case of more than 2 waves:
-     in phase1.r and phase3.r, scores are added (instead of averaged)
-	 over waves. (Averaging was wrong, because in phase 2 they are added.)
+     in \sfn{phase1.r} and \sfn{phase3.r}, scores are added
+     (instead of averaged) over waves.
+     (Averaging was wrong, because in phase 2 they are added.)
   \item New effects: \texttt{anti isolates}, \texttt{anti in-isolates},
    and \texttt{anti in-near-isolates}.
   \item Effect \texttt{inIsolatePop} dropped (it was shortlived).
-  \item Improved printing of results of siena07() in the case simOnly.
-  \item Prettier response printed to console for includeEffects() and setEffect().
+  \item Improved printing of results of \sfn{siena07()} in the case
+    \sfn{simOnly}.
+  \item Prettier response printed to console for \sfn{includeEffects()} and
+        \sfn{setEffect()}.
   \item \sfn{z\$estMeans} added to sienaFit objects \sfn{z}:
      vector of estimated expected values of statistics;
 	 this is \sfn{colMeans(z\$sf) + z\$targets}  but if dolby,
@@ -10491,9 +10556,9 @@ Changes in RSiena and RSienaTest:
 
 Changes in RSiena:
   \begin{itemize}
-  \item The possibility to use the obsolete packages \sfn{snow} and \sfn{rlecuyer}
-     for R versions older than 2.14.0 was dropped; their functionality was replaced by
-     package \sfn{parallel}.
+  \item The possibility to use the obsolete packages \sfn{snow} and
+     \sfn{rlecuyer} for R versions older than 2.14.0 was dropped;
+     their functionality was replaced by package \sfn{parallel}.
    \item The DESCRIPTION file was corrected to satisfy CRAN requirements.
   \end{itemize}
 
@@ -10641,8 +10706,8 @@ For RSiena and RSienaTest:
 		shared incoming xxxxxx, \sfn{sharedIn}
 	\item Outdegree-popularity effect: multiplication by $n$ dropped.
 	\item GWESP effects: default parameter changed from 25 to 69
-		(corresponding to $\alpha = \log(2)$.) See earlier in this the manual.
-	\item Added to \sfn{siena07} (defined by \sfn{sienaAlgorithmCreate}:
+		(corresponding to $\alpha = \log(2)$.) See earlier in this manual.
+	\item Added to \sfn{siena07} (defined by \sfn{sienaAlgorithmCreate}):
 		option \sfn{Dolby} for variance reduction.
 		Correlations between scores and statistics are reported in output file;
 		this is a measure for the amount of variance reduction.

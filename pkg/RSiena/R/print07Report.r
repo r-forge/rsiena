@@ -176,9 +176,9 @@ PrintReport <- function(z, x)
 			Report('Estimated means and standard deviations, standard errors of the mean \n', bof)
 			Report('Estimated means and standard deviations, standard errors of the mean \n', outf)
 			dmsf <- diag(z$msf)
-			sf <- colMeans(z$sf)
+#			sf <- colMeans(z$sf)
 			mean.stats <- colMeans(z$sf) + z$targets
-			cov.dev <- z$msf
+#			cov.dev <- z$msf
 			sem <- sqrt(dmsf/dim(z$sf)[1])
 			if (x$dolby)
 			{

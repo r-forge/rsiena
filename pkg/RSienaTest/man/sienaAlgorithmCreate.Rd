@@ -45,12 +45,15 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{useStdInits}{Boolean. If TRUE, the initial values in the effects
     object will be ignored and default values used instead.
     If FALSE, the initial values in the effects object will be used.}
-  \item{n3}{Number of iterations in phase 3.}
+  \item{n3}{Number of iterations in phase 3. For regular use with the
+    Method of Moments, n3=1000 mostly suffices.
+    For use in publications and for maximum Likelihood, n3=3000 is advised.}
   \item{nsub}{Number of subphases in phase 2.}
   \item{dolby}{Boolean. Should there be noise reduction by regression
     on augmented data score. In most cases dolby=TRUE yields better
-	convergence; if convergence is problematic, however, dolby=FALSE
-	may be tried. Just use whatever works best.}
+	convergence, but takes some extra computing time;
+	if convergence is problematic, however, dolby=FALSE	may be tried.
+	Just use whatever works best.}
   \item{maxlike}{Whether to use maximum likelihood method or
     Method of Moments estimation.}
   \item{diagonalize}{Number between 0 and 1 (bounds included),

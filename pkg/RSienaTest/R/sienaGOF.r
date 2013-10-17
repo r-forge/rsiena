@@ -465,6 +465,7 @@ print.sienaGOF <- function (x, ...) {
 					originalMhd[j],") for current model.\n")
 		}
 	}
+	invisible(x)
 }
 
 ##@summary.sienaGOF siena07 Summary method for sienaGOF
@@ -516,6 +517,7 @@ summary.sienaGOF <- function(object, ...) {
 	}
 	cat("\nComputation time for auxiliary statistic calculations on simulations: ",
 			attr(x, "simTime")["elapsed"] , "seconds.\n")
+	invisible(x)
 }
 
 ##@plot.sienaGOF siena07 Plot method for sienaGOF
@@ -637,11 +639,12 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 		}
 		else
 		{
-			key <- attr(x,"key")
+			key <- attr(x,"key")[screen]
 		}
 	}
 	else
 	{
+		key <- key[screen] ## added 1.1-244
 		if (length(key) != ncol(obs))
 		{
 			stop("Key length does not match the number of variates.")
@@ -688,6 +691,109 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 			scales=list(x=list(labels=key), y=list(draw=FALSE)),
 			main=main)
 
+}
+
+##@descriptives.sienaGOF siena07 Gives numerical values in the plot.
+descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
+			perc=.05, key=NULL, period=1)
+{
+# adapted excerpt from plot.sienaGOF
+	if (attr(x,"joined"))
+	{
+		x <- x[[1]]
+	}
+	else
+	{
+		x <- x[[period]]
+	}
+
+	sims <- x$Simulations
+	obs <- x$Observations
+	itns <- nrow(sims)
+
+	screen <- sapply(1:ncol(obs),function(i){
+						(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
+			(diag(var(rbind(sims,obs)))!=0)
+	sims <- sims[,screen, drop=FALSE]
+	obs <- obs[,screen, drop=FALSE]
+	## Need to check for useless statistics here:
+	n.obs <- nrow(obs)
+
+	if (is.null(key))
+	{
+		if (is.null(attr(x, "key")))
+		{
+			key=(1:sum(screen))
+		}
+		else
+		{
+			key <- attr(x,"key")[screen]
+		}
+	}
+	else
+	{
+		if (length(key) != ncol(obs))
+		{
+			stop("Key length does not match the number of variates.")
+		}
+		key <- key[screen]
+	}
+
+	sims.themin <- apply(sims, 2, min)
+	sims.themax <- apply(sims, 2, max)
+	sims.min <- pmin(sims.themin, obs)
+	sims.max <- pmax(sims.themax, obs)
+
+	if (center)
+	{
+		sims.median <- apply(sims, 2, median)
+		sims <- sapply(1:ncol(sims), function(i)
+					(sims[,i] - sims.median[i]) )
+		obs <- matrix(sapply(1:ncol(sims), function(i)
+							(obs[,i] - sims.median[i])), nrow=n.obs )
+		sims.min <- sims.min - sims.median
+		sims.max <- sims.max - sims.median
+	}
+
+	if (scale)
+	{
+		sims.range <- sims.max - sims.min + 1e-6
+		sims <- sapply(1:ncol(sims), function(i) sims[,i]/(sims.range[i]))
+		obs <- matrix(sapply(1:ncol(sims), function(i) obs[,i]/(sims.range[i]))
+				, nrow=n.obs )
+		sims.min <- sims.min/sims.range
+		sims.max <- sims.max/sims.range
+	}
+
+	ymin <- 1.05*min(sims.min) - 0.05*max(sims.max)
+	ymax <- -0.05*min(sims.min) + 1.05*max(sims.max)
+	screen <- sapply(1:ncol(obs),function(i){
+						(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
+			(diag(var(rbind(sims,obs)))!=0)
+	sims <- sims[,screen, drop=FALSE]
+	obs <- obs[,screen, drop=FALSE]
+	sims.themin <- sims.themin[screen, drop=FALSE]
+	sims.themax <- sims.themax[screen, drop=FALSE]
+
+	ind.lower = max( round(itns * perc/2), 1)
+	ind.upper = round(itns * (1-perc/2))
+	ind.median = round(itns * 0.5)
+	yperc.mid = sapply(1:ncol(sims), function(i)
+				sort(sims[,i])[ind.median])
+	yperc.lower = sapply(1:ncol(sims), function(i)
+				sort(sims[,i])[ind.lower]  )
+	yperc.upper = sapply(1:ncol(sims), function(i)
+				sort(sims[,i])[ind.upper]  )
+	violins <- matrix(NA, 6, ncol(sims))
+	violins[1,] <- sims.themax
+	violins[2,] <- yperc.upper
+	violins[3,] <- yperc.mid
+	violins[4,] <- yperc.lower
+	violins[5,] <- sims.themin
+	violins[6,] <- obs
+	rownames(violins) <- c('max', 'perc.upper', 'median', 'perc.lower', 'min', 'obs')
+	colnames(violins) <- key
+	violins
 }
 
 ##@changeToStructural sienaGOF Utility to change
@@ -841,7 +947,8 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
 	isbipartite <- (attr(obsData[[groupName]]$depvars[[varName]], "type")
 						=="bipartite")
-	sparseData <- (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
+# sparseData may be dropped - if that's OK
+#	sparseData <- (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
 	# For bipartite networks in package <network>,
 	# the number of nodes is equal to
 	# the number of actors (rows) plus the number of events (columns)
