@@ -182,21 +182,21 @@ printInitialDescription <- function(data, effects, modelName="Siena",
 
                         Report(c(format(per + periodFromStart, width=3),
                                  " ==> ",
-                                 format(per + 1 + periodFromStart, width=2),
+                                 format(per + 1 + periodFromStart, width=3),
                                  format(matchange[, per], width=10),
                                  format(attr(depvar, "distance")[per],
                                         width=10),
-                                 jaccard, format(misd, width=6), " (",
+                                 jaccard, format(misd, width=10), " (",
                                  round(100 * misd/(ntot + misd)), "%)\n"),
                                sep="", outf)
                      }
                     else
                     {
                           Report(c(per + periodFromStart, " ==> ",
-                                 format(per + 1 + periodFromStart, width=2),
+                                 format(per + 1 + periodFromStart, width=3),
                                  format(matchange[, per], width=10),
                                  format(attr(depvar,"distance")[per], width=10),
-                                 format(misd, width=7), " (",
+                                 format(misd, width=10), " (",
                                    round(100 * misd/(ntot + misd)), "%)\n"),
                                  sep="", outf)
 

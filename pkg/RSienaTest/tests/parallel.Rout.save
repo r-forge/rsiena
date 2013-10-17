@@ -32,11 +32,11 @@ Estimates, standard errors and convergence t-ratios
 
                                       Estimate   Standard   Convergence 
                                                    Error      t-ratio   
-  1. rate basic rate parameter mynet1  2.9953  ( 0.5597   )   -0.0277   
-  2. eval outdegree (density)         -1.1126  ( 0.2222   )   -0.1278   
-  3. eval reciprocity                  1.7219  ( 0.5378   )   -0.4073   
+  1. rate basic rate parameter mynet1  3.0410  ( 0.5497   )   -0.0194   
+  2. eval outdegree (density)         -1.1448  ( 0.1526   )   -0.3005   
+  3. eval reciprocity                  1.7264  ( 0.3477   )   -0.3356   
 
-Total of 467 iteration steps.
+Total of 477 iteration steps.
 
 > ##test4
 > mymodel$projname <- 'test4'
@@ -130,19 +130,19 @@ Estimates, standard errors and convergence t-ratios
                                                                Error      t-ratio   
 
 Rate parameters: 
-  0.1      Rate parameter cond. variable period 1  5.8112  ( 0.9309   )             
-  0.2      Rate parameter cond. variable period 2  4.5662  ( 0.7826   )             
+  0.1      Rate parameter cond. variable period 1  5.9099  ( 0.9851   )             
+  0.2      Rate parameter cond. variable period 2  4.5401  ( 0.7071   )             
 
 Other parameters: 
 Network Dynamics 
-  1.  eval outdegree (density)                    -2.3503  ( 0.1070   )   -0.0659   
-  2.  eval reciprocity                             2.8136  ( 0.1685   )   -0.2415   
+  1.  eval outdegree (density)                    -2.3548  ( 0.1197   )   -0.2690   
+  2.  eval reciprocity                             2.8052  ( 0.2180   )   -0.3810   
 
 Behavior Dynamics
-  3.  rate rate mynet2 (period 1)                  1.2067  ( 0.3577   )   -0.1250   
-  4.  rate rate mynet2 (period 2)                  1.6537  ( 0.4357   )   -0.1184   
-  5.  eval behavior mynet2 linear shape            0.3688  ( 0.1873   )   -0.0770   
-  6.  eval behavior mynet2 quadratic shape        -0.2014  ( 0.1013   )    0.0740   
+  3.  rate rate mynet2 (period 1)                  1.2154  ( 0.2477   )    0.1018   
+  4.  rate rate mynet2 (period 2)                  1.6843  ( 0.5636   )    0.1436   
+  5.  eval behavior mynet2 linear shape            0.3717  ( 0.1787   )    0.1043   
+  6.  eval behavior mynet2 quadratic shape        -0.2070  ( 0.1152   )    0.1333   
 
 Total of 464 iteration steps.
 
@@ -178,10 +178,10 @@ Estimates, standard errors and convergence t-ratios
 
                                         Estimate   Standard   Convergence 
                                                      Error      t-ratio   
-  1. rate constant Var1 rate (period 1)  5.6877  ( 1.0672   )    0.0777   
-  2. rate constant Var1 rate (period 2)  4.4846  ( 0.8696   )   -0.1855   
-  3. eval outdegree (density)           -2.3281  ( 0.1206   )    0.0747   
-  4. eval reciprocity                    2.7659  ( 0.1794   )    0.0308   
+  1. rate constant Var1 rate (period 1)  5.6753  ( 0.7182   )    0.0706   
+  2. rate constant Var1 rate (period 2)  4.5023  ( 0.6715   )    0.0733   
+  3. eval outdegree (density)           -2.3195  ( 0.1175   )    0.0881   
+  4. eval reciprocity                    2.7516  ( 0.2025   )   -0.0422   
 
 Total of 645 iteration steps.
 
@@ -222,4 +222,4 @@ Total of 375 iteration steps.
 > 
 > proc.time()
    user  system elapsed 
-  12.44    0.10   12.60 
+  13.15    0.14   13.29 

@@ -276,6 +276,21 @@ void DependentVariable::initializeRateFunction()
 				this->linverseOutDegreeSumTerm[pVariable] = 0;
 				this->linverseOutDegreeModelBSumTerm[pVariable] = 0;
 			}
+			else if (effectName == "outRateLog")
+			{
+				if (this->lpActorSet != pVariable->pSenders())
+				{
+					throw std::invalid_argument("Mismatch of actor sets");
+				}
+
+				this->lstructuralRateEffects.push_back(
+					new StructuralRateEffect(pVariable,
+						LOG_OUT_DEGREE_RATE,
+						parameter));
+				this->llogOutDegreeScores[pVariable] = 0;
+				this->llogOutDegreeSumTerm[pVariable] = 0;
+				this->llogOutDegreeModelBSumTerm[pVariable] = 0;
+			}
 			else
 			{
 				throw domain_error("Unexpected rate effect " + effectName);
@@ -1018,6 +1033,22 @@ void DependentVariable::accumulateRateScores(double tau,
 		iter->second -= this->linverseOutDegreeSumTerm[iter->first] * tau;
 	}
 
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			this->llogOutDegreeScores.begin();
+		iter != this->llogOutDegreeScores.end();
+		iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+
+		if (this == pSelectedVariable)
+		{
+			iter->second += logarithmer(pNetwork->outDegree(selectedActor));
+		}
+
+		iter->second -= this->llogOutDegreeSumTerm[iter->first] * tau;
+	}
+
+
 	// Update scores for diffusion rate parameters
 
 	const vector<EffectInfo *> & rRateEffects =
@@ -1215,7 +1246,6 @@ void DependentVariable::accumulateRateScores(double tau,
 			 iter->second -= tau * this->loutDegreeModelBSumTerm[iter->first];
 		 }
 
-
 		 for (std::map<const NetworkVariable *, double>::iterator iter =
 				  this->linverseOutDegreeScores.begin();
 			  iter != this->linverseOutDegreeScores.end();
@@ -1230,6 +1260,22 @@ void DependentVariable::accumulateRateScores(double tau,
 			 }
 			 iter->second -= tau *
 				 this->linverseOutDegreeModelBSumTerm[iter->first];
+		 }
+
+		 for (std::map<const NetworkVariable *, double>::iterator iter =
+				  this->llogOutDegreeScores.begin();
+			  iter != this->llogOutDegreeScores.end();
+			  iter++)
+		 {
+			 const Network * pNetwork = iter->first->pNetwork();
+
+			 if (this == pSelectedVariable && this->successfulChange())
+			 {
+				 iter->second += logarithmer(pNetwork->outDegree(selectedActor))
+					 + logarithmer(pNetwork->outDegree(alter));
+			 }
+			 iter->second -= tau *
+				 this->llogOutDegreeModelBSumTerm[iter->first];
 		 }
 	 }
 }
@@ -1386,6 +1432,30 @@ void DependentVariable::calculateScoreSumTerms()
 		}
 		this->linverseOutDegreeSumTerm[iter->first] = timesRate;
 		this->linverseOutDegreeModelBSumTerm[iter->first] = 2 *
+			(this->ltotalRate * timesRate - timesRateSquared);
+
+	}
+
+	for (std::map<const NetworkVariable *, double>::iterator iter =
+			 this->llogOutDegreeScores.begin();
+		 iter != this->llogOutDegreeScores.end();
+		 iter++)
+	{
+		const Network * pNetwork = iter->first->pNetwork();
+
+		double timesRate = 0;
+		double timesRateSquared = 0;
+		for (int i = 0; i < this->n(); i++)
+		{
+			timesRate += logarithmer(pNetwork->outDegree(i)) * this->lrate[i];
+			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+			{
+				timesRateSquared += logarithmer(pNetwork->outDegree(i)) *
+					this->lrate[i] * this->lrate[i];
+			}
+		}
+		this->llogOutDegreeSumTerm[iter->first] = timesRate;
+		this->llogOutDegreeModelBSumTerm[iter->first] = 2 *
 			(this->ltotalRate * timesRate - timesRateSquared);
 
 	}
@@ -1621,6 +1691,23 @@ double DependentVariable::inverseOutDegreeScore(
 		throw invalid_argument(
 			string("Unknown network: ") +
 			"The given inverse outdegree rate effect is not " +
+			"part of the model.");
+	}
+
+	return iter->second;
+}
+
+double DependentVariable::logOutDegreeScore(
+	const NetworkVariable * pNetworkData) const
+{
+	map<const NetworkVariable *, double>::const_iterator iter =
+		this->llogOutDegreeScores.find(pNetworkData);
+
+	if (iter == this->llogOutDegreeScores.end())
+	{
+		throw invalid_argument(
+			string("Unknown network: ") +
+			"The given log outdegree rate effect is not " +
 			"part of the model.");
 	}
 

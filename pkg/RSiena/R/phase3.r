@@ -347,7 +347,7 @@ CalculateDerivative3<- function(z,x)
 		}		
 		if (x$dolby)
 		{
-			mean.scores <- colMeans(scores)
+#			mean.scores <- colMeans(scores)
 			estMeans <- estMeans - (z$regrCoef * colMeans(scores))
 		}
 		Report('Correlations between scores and statistics:\n', cf)

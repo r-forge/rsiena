@@ -840,7 +840,6 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
 	isbipartite <- (attr(obsData[[groupName]]$depvars[[varName]], "type")
 						=="bipartite")
-	sparseData <- (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
 	# For bipartite networks in package <network>,
 	# the number of nodes is equal to
 	# the number of actors (rows) plus the number of events (columns)

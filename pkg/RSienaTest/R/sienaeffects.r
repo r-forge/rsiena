@@ -46,8 +46,9 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 	{
 		cat(paste("There is no effect with short name "))
 		cat(paste(effectNames,", \n", sep=""))
-		cat(paste("and with interaction1 = <",interaction1,">", sep=""))
-		cat(paste(" and interaction2 = <",interaction2,">,\n", sep=""))
+		cat(paste("and with interaction1 = <",interaction1,">, ", sep=""))
+		cat(paste("interaction2 = <",interaction2,">, ", sep=""))
+		cat(paste("and type = <",type,">, \n", sep=""))
 		cat(paste("for dependent variable",name,".\n"))
 	}
 	else

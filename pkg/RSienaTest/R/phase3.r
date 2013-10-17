@@ -156,7 +156,7 @@ phase3.2 <- function(z, x, ...)
         tstat <- rep(NA, z$pp)
         tstat[!use]<- sf[!use] / sqrt(dmsf[!use])
         tstat[use & use2] <- 0
-        tstat[use & !use2] <- 999
+        tstat[use & !use2] <- NA # was 999
         z$tstat <- tstat
  		# tconv.max = Maximum value of t-ratio for convergence,
  		# for any linear combination.
@@ -267,7 +267,7 @@ phase3.2 <- function(z, x, ...)
 			if (inherits(try(cov <- solve(dfrac), silent=TRUE),"try-error"))
 			{
 				Report('Noninvertible estimated covariance matrix : \n', outf)
-				errorMessage.cov <- '***Warning: Noninvertible estimated covariance matrix ***'
+	errorMessage.cov <- '***Warning: linear dependencies between statistics ***'
 				cov <- NULL
 			}
 		}
@@ -396,7 +396,7 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
 			z$errorMessage.cov <- '*** Warning: Noninvertible derivative matrix ***'
             fchange <- 0
             z$dinv <- z$dfrac
-			z$dinv[,] <- 999
+			z$dinv[,] <- NA # 999
         }
         else
         {

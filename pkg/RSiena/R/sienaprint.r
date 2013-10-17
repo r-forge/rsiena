@@ -268,7 +268,7 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 	cat('\nEstimated means and standard deviations, standard errors of the mean \n')
 			dmsf <- diag(x$msf)
 			mean.stats <- colMeans(x$sf) + x$targets
-			cov.dev <- x$msf
+#			cov.dev <- x$msf
 			sem <- sqrt(dmsf/dim(x$sf)[1])
 			if (x$x$dolby)
 			{

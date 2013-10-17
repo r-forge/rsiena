@@ -978,7 +978,27 @@ from them might be used for this purpose.)
 The statistics used for the MoM are proposed in
 \citet{Snijders01} and \citet{SnijdersEA07}.
 
-For an effect $s_{ik}^X(x,z)$, the change statistic or change contribution is defined by
+
+\subsection{Rate function for networks}
+
+For an effect in the rate function 
+\begin{equation}
+ \lambda^X(\alpha^X, i, y) \,=\, \rho^X_m \, 
+      \exp\Big(\sum_k \alpha^X_k s^X_{ki}(y) \Big) \ ,
+               \label{ratef}
+\end{equation}
+the statistic for the method of moments to estimate $\alpha_k^X$ is
+\begin{equation}
+\sum_{m=2}^M  \sum_i \bigg\{ s^X_{ki}\big(y(t_{m-1})\big) \,
+         \sum_j \mid x_{ij}(t_m) - x_{ij}(t_{m-1}) \mid  \bigg\} \ .
+               \label{ratestat}
+\end{equation}
+
+
+\subsection{Evaluation function for networks}
+
+For an effect in the evaluation function
+$s_{ik}^X(x,z)$, the change statistic or change contribution is defined by
 \begin{equation}
 \Delta_{kij}^X(x,z) = s_{ik}^X(x^{(+ij)},z) - s_{ik}^X(x^{(-ij)},z) \label{Delta}
 \end{equation}
@@ -1007,9 +1027,9 @@ is defined by the sum over the waves from 2 to $M$ of
  s_{k}^X(x,z) = \sum_i s_{ik}^X(x,z) \ .        \label{fitstat}
 \end{equation}
 If the number of  dependent variables is more than one, like in studies
-of networks and behavior, for wave $m \in \{2, \ldots, M\}$, 
-the dependent variable is taken as in wave $m$ and the 
-explanatory as in wave $m-1$. This is explained for 
+of networks and behavior, for wave $m \in \{2, \ldots, M\}$,
+the dependent variable is taken as in wave $m$ and the
+explanatory as in wave $m-1$. This is explained for
 the case of networks and behavior in \citet{SnijdersEA07}.
 
 In the C++ code, (\ref{fitstat}) is the function \nnm{evaluationStatistic()}.
