@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-245.
+This version was renewed for \RS version 1.1-246.
 \end{abstract}
 
 
@@ -895,7 +895,7 @@ of \rs.
       is not suitable for the data set. Jaccard values of .3 and higher
       are good; lower than .2 indicates that there might be difficulties
       in estimation; lower than .1 is quite low indeed.
-    \item When parameters have been estimated, first look at the \texttt{t
+\item When parameters have been estimated, first look at the \texttt{t
       ratios for deviations from targets}.
       We say that the algorithm has converged if they are all smaller than 0.1
       in absolute value, and that it has nearly converged if they are all
@@ -918,7 +918,7 @@ of \rs.
       to change this, but in some cases it may be useful.
 \item If all this is to no avail, then the conclusion may be that the model
       specification is incorrect for the given data set.
-    \item Further help in interpreting output is in Section~\ref{S_output} of
+\item Further help in interpreting output is in Section~\ref{S_output} of
       this manual.
 \end{enumerate}
 
@@ -1008,7 +1008,7 @@ specified in the call of \textsf{sienaAlgorithmCreate()}.
 \section{Input data}
 \label{S_InputData}
 
-\SI  is a program for the statistical analysis
+\SI is a program for the statistical analysis
 of repeated measures of social networks, and requires, at the very
 least, network data collected at two or more time points. It is also possible
 to include other types of variables in the models -- these are discussed in
@@ -8265,27 +8265,43 @@ and \texttt{interaction2} for the network, e.g.,
 myCoevolutionEff <- includeEffects(myCoevolutionEff, avAltEgoX,
         name="smoking",  interaction1 = "sex", interaction2="friendship")
 \end{verbatim}
-Between parentheses: the functionality of these effects is duplicated by
+Between parentheses: the functionality of the `ego'-variant of these effects is duplicated by
 interaction effects created, for example, as follows:
 \begin{verbatim}
 myCoevolutionEff <- includeInteraction(myCoevolutionEff, effFrom, avAlt,
         name="smoking", interaction1 = c("sex", "friendship"))
 \end{verbatim}
+For the `alter'-variant, this way of construction will not work because the
+effect statistic cannot be decomposed into a product of two ego-level statistics.
 The available effects of this type are the following.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
-\item {\em interaction of actor variable with average similarity},
+\item {\em interaction of ego (tie sender) variable with average similarity},
                        \texttt{(avSimEgoX)} \\
  $s^{\rm beh}_{i\vit}(x, z) = (v_i / x_{i+}) \,
          \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and the mean behavior, i.e. $0$, if $x_{i+} = 0$) ;
-\item {\em interaction of actor variable with total similarity},
+\item {\em interaction of ego (tie sender) variable with total similarity},
                        \texttt{(totSimEgoX)} \\
  $s^{\rm beh}_{i\vit}(x, z) = v_i \,
          \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
-\item {\em interaction of actor variable with average alter},
+\item {\em interaction of ego (tie sender) variable with average alter},
                        \texttt{(avAltEgoX)} \\
  $s^{\rm beh}_{i\vit}(x, z) =  v_i \, z_i \big( \sum_j x_{ij}\, z_j \big)
+                                / \big (\sum_j x_{ij}\big)  $\\
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
+\item {\em interaction of alter (tie receiver) variable with average similarity},
+                       \texttt{(avSimAltX)} \\
+ $s^{\rm beh}_{i\vit}(x, z) = (1 / x_{i+}) \,
+         \sum_j x_{ij} \, v_j ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
+ (and the mean behavior, i.e. $0$, if $x_{i+} = 0$) ;
+\item {\em interaction of alter (tie receiver) variable with total similarity},
+                       \texttt{(totSimAltX)} \\
+ $s^{\rm beh}_{i\vit}(x, z) =
+         \sum_j x_{ij} \, v_j ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
+\item {\em interaction of alter (tie receiver) variable with average alter},
+                       \texttt{(avAltAltX)} \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij} \, v_j \, z_j \big)
                                 / \big (\sum_j x_{ij}\big)  $\\
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 \setcounter{savenumi}{\value{enumi}}
@@ -10453,6 +10469,17 @@ which affect the user.
 the R-forge repository.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+\item 2013-10-31 R-Forge Revision 246
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item New behavior objective function effects \sfn{avSimAltX}, \sfn{totSimAltX} and
+    \sfn{avAltAltX} to differentiate sources of peer influence in directed networks.
+   \item Added effect class \sfn{covarBehaviorNetObjective} to \sfn{effectsDocumentation.R}.
+   \item Fix of a bug that occurred in the case of on average decreasing behavior variables.
+
+  \end{itemize}
+
 \item 2013-10-09 R-Forge Revision 245
 
 Changes in RSienaTest:
@@ -10519,8 +10546,8 @@ Changes in RSiena as well as RSienaTest:
      vector of estimated expected values of statistics;
 	 this is \sfn{colMeans(z\$sf) + z\$targets}  but if dolby,
 	 the regression on the scores is subtracted.
-  \end{itemize}  
-  
+  \end{itemize}
+
 
 \item 2013-08-23 R-forge revision 241
 

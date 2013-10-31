@@ -43,8 +43,8 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.1-245\cr
-Date: \tab 2013-10-16\cr
+Version: \tab 1.1-246\cr
+Date: \tab 2013-10-31\cr
 Depends: \tab R (>= 2.15.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -78,7 +78,7 @@ BuildResaveData: \tab no\cr
     Pp. 41-71 in \emph{Longitudinal models in the behavioral
     and related sciences},
     edited by Kees van Montfort, Han Oud and Albert Satorra; Lawrence Erlbaum.
-   \item Steglich, Christian E. G., Snijders, Tom A. B., and
+   \item Steglich, Christian E.G., Snijders, Tom A.B., and
     Pearson, Michael A. (2010). Dynamic networks and behavior:
     Separating selection from influence. \emph{Sociological Methodology}, 
 	40, 329-393.

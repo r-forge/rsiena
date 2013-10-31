@@ -1,3 +1,11 @@
+2013-10-31 R-Forge Revision 246
+Changes in RSiena and RSienaTest:
+   * New behavior objective function effects avSimAltX, totSimAltX and
+     avAltAltX to differentiate sources of peer influence in directed networks.
+   * Added effect class covarBehaviorNetObjective to effectsDocumentation.R.
+   * Fix of a bug that occurred in the case of on average decreasing behavior
+	 variables.
+
 2013-10-16 R-Forge Revision 245
 Changes in RSienaTest:
    * New structural rate effect outRateLog

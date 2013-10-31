@@ -540,7 +540,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 					new EqualCovariatePredicate(covariateName),
 					new InStarFunction(networkName),
 					0)));
-	}				
+	}
 	else if (effectName == "jumpWWClosure")
 	{
 		string networkName = pEffectInfo->interactionName1();
@@ -548,7 +548,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			new ConditionalFunction(new EqualCovariatePredicate(covariateName),
 				0,
-				new SameCovariateTwoPathFunction(networkName, 
+				new SameCovariateTwoPathFunction(networkName,
 										covariateName, false)),
 			new ConditionalFunction(
 				new MissingCovariatePredicate(covariateName),
@@ -556,7 +556,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 				new ConditionalFunction(
 					new EqualCovariatePredicate(covariateName),
 					0,
-					new SameCovariateTwoPathFunction(networkName, 
+					new SameCovariateTwoPathFunction(networkName,
 										covariateName, true))));
 	}
 	else if (effectName == "jumpWXClosure")
@@ -576,7 +576,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 					new EqualCovariatePredicate(covariateName),
 					0,
 					new SameCovariateMixedTwoPathFunction(
-							pEffectInfo->variableName(), 
+							pEffectInfo->variableName(),
 							networkName, covariateName, true))));
 	}
 	else if (effectName == "closure")
@@ -718,6 +718,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "avAltEgoX")
 	{
 		pEffect = new InteractionCovariateEffect(pEffectInfo, false, false, true);
+	}
+	else if (effectName == "totSimAltX")
+	{
+		pEffect = new AltersCovariateTotSimEffect(pEffectInfo);
+	}
+	else if (effectName == "avSimAltX")
+	{
+		pEffect = new AltersCovariateAvSimEffect(pEffectInfo);
+	}
+	else if (effectName == "avAltAltX")
+	{
+		pEffect = new AltersCovariateAvAltEffect(pEffectInfo);
 	}
 	else if (effectName == "AltsAvAlt")
 	{
