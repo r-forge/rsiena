@@ -84,6 +84,7 @@ effectsDocumentation <- function(effects= NULL, type="html", display=(type=="htm
                  "behaviorSymmetricObjective",
                  "behaviorBipartiteObjective",
                  "covarBehaviorObjective",
+				 "covarBehaviorNetObjective",
                  "unspecifiedBehaviorInteraction")
 
     mytab <- table(allEffects[,1])

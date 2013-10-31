@@ -1,3 +1,11 @@
+2013-10-31 R-Forge Revision 246
+Changes in RSiena and RSienaTest:
+   * New behavior objective function effects avSimAltX, totSimAltX and
+     avAltAltX to differentiate sources of peer influence in directed networks.
+   * Added effect class covarBehaviorNetObjective to effectsDocumentation.R.
+   * Fix of a bug that occurred in the case of on average decreasing behavior
+	 variables.
+
 2013-10-16 R-Forge Revision 245
 Changes in RSienaTest:
    * New structural rate effect outRateLog
@@ -44,9 +52,9 @@ Changes in RSiena and RSienaTest:
    * Effect inIsolatePop dropped (it was shortlived).
    * Improved printing of results of siena07() in the case simOnly.
    * Prettier response printed to console for includeEffects() and setEffect().
-   * z$estMeans added to siena objects z: 
-     vector of estimated expected values of statistics; 
-	 this is colMeans(z$sf) + z$targets but if dolby, 
+   * z$estMeans added to siena objects z:
+     vector of estimated expected values of statistics;
+	 this is colMeans(z$sf) + z$targets but if dolby,
 	 the regression on the scores is subtracted.
    * Correction to Dolby option for the case of more than 2 waves:
      in phase1.r and phase3.r, scores are added (instead of averaged)
@@ -113,7 +121,6 @@ Changes in RSiena as well as RSienaTest:
    * If there is a composition change object, MoM estimation is forced
      to be non-conditional (initializeFRAN.r). This is reported in the help file
      (sienaCompositionChange.Rd).
-
    * Small changes in help files sienaAlgorithm.Rd, plot.sienaTimeTest.Rd,
 
 

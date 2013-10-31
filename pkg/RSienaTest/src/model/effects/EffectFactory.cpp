@@ -723,6 +723,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new InteractionCovariateEffect(pEffectInfo, false, false, true);
 	}
+	else if (effectName == "totSimAltX")
+	{
+		pEffect = new AltersCovariateTotSimEffect(pEffectInfo);
+	}
+	else if (effectName == "avSimAltX")
+	{
+		pEffect = new AltersCovariateAvSimEffect(pEffectInfo);
+	}
+	else if (effectName == "avAltAltX")
+	{
+		pEffect = new AltersCovariateAvAltEffect(pEffectInfo);
+	}
 	else if (effectName == "AltsAvAlt")
 	{
 		pEffect = new AltersCovariateAverageEffect(pEffectInfo);

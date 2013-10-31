@@ -88,6 +88,16 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         tmp
     }
 
+##@addSettingseffects internal getEffects add effects for settings model
+addSettingsEffects <- function(effects)
+{
+depvar <- attr(effects, "depvar")
+	## This processes the settings (constant dyadic covariate) structure.
+	## Only for one-mode network.
+	nbrSettings <- length(attr(depvar,"settings"))
+	## This leads to a warning in R CMD Check.
+	## Not important since this is just a stub, to be developed later.
+}
     ##@networkRateEffects internal getEffects create a set of rate effects
     networkRateEffects <- function(depvar, varname, symmetric, bipartite)
     {
@@ -1247,9 +1257,9 @@ getBehaviorStartingVals <- function(depvar)
       ##  dif2<- nactors/(nactors-1)*(sum(sqrdif,na.rm=TRUE)/nactors-dif^2)
         dif1 <- mean(dif, na.rm=TRUE)
         dif2 <- var(as.vector(dif), na.rm=TRUE)
-        if (dif1 < 0.9 * dif2)
+        if (abs(dif1) < 0.9 * dif2)
         {
-            tendency <- 0.5 * log((dif1+dif2)/(dif2-dif1))
+            tendency <- 0.5 * sign(dif1) * log((abs(dif1)+dif2)/(dif2-abs(dif1)))
         }
         else
         {

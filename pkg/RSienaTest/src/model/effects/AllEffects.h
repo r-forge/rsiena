@@ -12,7 +12,10 @@
 #ifndef ALLEFFECTS_H_
 #define ALLEFFECTS_H_
 
+#include "AltersCovariateAvAltEffect.h"
 #include "AltersCovariateAverageEffect.h"
+#include "AltersCovariateAvSimEffect.h"
+#include "AltersCovariateTotSimEffect.h"
 #include "AntiIsolateEffect.h"
 #include "AverageAlterEffect.h"
 #include "AverageReciprocatedAlterEffect.h"
