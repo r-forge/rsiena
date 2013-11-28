@@ -1,3 +1,12 @@
+2013-11-28 R-Forge Revision 247
+Changes in RSiena and RSienaTest:
+	* Fix problem with std::map<int,int>::const_iterator constructor
+	  call in IncidentTieIterator.cpp
+	* Fix ambiguous call of abs in AlterCovariateAv/TotSimEffect by
+	  replacing cmath by cstdlib
+	* Fix problem with using namespace std in DiffusionEffectValueTable
+	  and EffectValueTable
+
 2013-10-31 R-Forge Revision 246
 Changes in RSiena and RSienaTest:
    * New behavior objective function effects avSimAltX, totSimAltX and
