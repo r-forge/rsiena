@@ -18,8 +18,8 @@ namespace siena {
  */
 IncidentTieIterator::IncidentTieIterator() :
 		ITieIterator(), //
-		lcurrent(0), //
-		lend(0) {
+		lcurrent(), //
+		lend(lcurrent) {
 }
 
 //

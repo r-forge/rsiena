@@ -72,6 +72,10 @@ private:
 	IncidentTieIterator(const std::map<int, int> & ties);
 	IncidentTieIterator(const std::map<int, int> & ties, int lowerBound);
 
+
+	/////////////////////////////////////////////////////////
+	//NEVER CHANGE THIS ORDERING!!! CHECK INITIALIZATION LIST
+	/////////////////////////////////////////////////////////
 	// Points to the current element in the underlying map
 	std::map<int, int>::const_iterator lcurrent;
 
