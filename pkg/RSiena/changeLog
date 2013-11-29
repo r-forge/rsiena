@@ -1,3 +1,8 @@
+2013-11-29 R-Forge Revision 249
+Changes in RSiena and RSienaTest:
+	* Fix warning in EpochSimulation regarding String-plus-int.
+	  Once RSiena moves to C++11 this can be replaced by std::to_string
+
 2013-11-28 R-Forge Revision 247
 Changes in RSiena and RSienaTest:
 	* Fix problem with std::map<int,int>::const_iterator constructor
