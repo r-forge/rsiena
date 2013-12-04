@@ -1,0 +1,69 @@
+\name{Wald}
+\alias{Wald.RSiena}
+\alias{Multipar.RSiena}
+\title{
+  Wald tests for RSiena results
+}
+\description{
+  These functions compute Wald-type test statistics for results estimated
+  by siena07.
+}
+\usage{
+Wald.RSiena(A, ans)
+
+Multipar.RSiena(ans, \ldots)
+}
+%- maybe also "usage" for other objects documented here.
+\arguments{
+  \item{A}{A \code{k} \eqn{\times} \code{p} matrix, where \code{p = ans$pp},
+  the number of parameters in \code{ans} excluding the basic rate parameters
+  used for conditional estimation.}
+  \item{ans}{An object of class \code{\link{sienaFit}},
+    resulting from a call to \code{\link{siena07}.}}
+  \item{\dots}{One or more integer numbers between 1 and p, specifying
+    the numbers of the tested effects
+	(candidates are the numbers	of 'Other parameters'
+	given in \code{print(ans)}).}
+}
+
+\details{The hypothesis tested by \code{Wald.RSiena}
+   is \eqn{A\theta = 0}, where \eqn{\theta} is
+   the parameter estimated in the process leading to \code{ans}.
+
+   The hypothesis tested by \code{Multipar.RSiena} is that all
+   parameters given in \eqn{\ldots} are 0. This is a special case of
+   the preceding.
+
+   This test should be carried out only when convergence is adequate
+   (all t-ratios for convergence less than 0.1 in absolute value).
+}
+\value{A list of three elements:
+\itemize{
+  \item{chisquare }{ The test statistic, assumed to have a chi-squared null
+    distribution.}
+  \item{df }{ The degrees of freedom.}
+  \item{pvalue }{ The associated \emph{p}-value.}
+}
+}
+\references{See the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
+\author{Tom Snijders}
+\seealso{ \code{\link{siena07}}}
+
+\examples{
+mynet <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mydata <- sienaDataCreate(mynet)
+myeff <- getEffects(mydata)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
+# nsub=2 and n3=100 is used here for having a brief computation, not for practice.
+myeff <- includeEffects(myeff, transTrip, transTies)
+(ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE))
+A <- matrix(0, 2, 4)
+A[1, 3] <- 1
+A[2, 4] <- 1
+Wald.RSiena(A, ans)
+# A shortcut for the above is:
+(Multipar.RSiena(ans, 3, 4))
+}
+% Add one or more standard keywords, see file "KEYWORDS" in the
+% R documentation directory.
+\keyword{ htest }

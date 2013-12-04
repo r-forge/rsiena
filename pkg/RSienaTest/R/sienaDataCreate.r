@@ -14,18 +14,30 @@ addAttributes <- function(x, name, ...) UseMethod("addAttributes")
 ##@addAttributes.coCovar DataCreate
 addAttributes.coCovar <- function(x, name, ...)
 {
+	storage.mode(x) <- 'double'
 	varmean <- mean(x, na.rm=TRUE)
 	range2 <- range(x, na.rm=TRUE)
 	attr(x, 'moreThan2') <- length(table(x)) > 2
 	vartotal <- sum(x, na.rm=TRUE)
 	nonMissingCount <- sum(!is.na(x))
-	x <- x - varmean
+	if (attr(x, "centered"))
+	{
+		x <- x - varmean
+	}
+	else
+	{
+		x <- x - 0.0
+	}
 	attr(x, 'mean') <- varmean
 	rr <- rangeAndSimilarity(x, range2)
 	if (rr$range[2] == rr$range[1] && !any(is.na(x)))
+	{
 		attr(x, 'poszvar') <- FALSE
+	}
 	else
+	{
 		attr(x, 'poszvar') <- TRUE
+	}
 	attr(x, 'range') <- rr$range[2] - rr$range[1]
 	storage.mode(attr(x, 'range')) <- 'double'
 	attr(x, 'range2') <- range2
@@ -36,7 +48,6 @@ addAttributes.coCovar <- function(x, name, ...)
 	attr(x, "vartotal") <- vartotal
 	attr(x, "nonMissingCount") <- nonMissingCount
 	x
-
 }
 ##@addAttributes.varCovar DataCreate
 addAttributes.varCovar <- function(x, name, ...)
@@ -51,12 +62,23 @@ addAttributes.varCovar <- function(x, name, ...)
 	attr(x, 'range') <- cr[2] - cr[1]
 	storage.mode(attr(x, 'range')) <- 'double'
 	attr(x, 'mean') <- varmean
-	x <- x - varmean
+	if (attr(x, "centered"))
+	{
+		x <- x - varmean
+	}
+	else
+	{
+		x <- x - 0.0
+	}
 	rr <- rangeAndSimilarity(tmpmat, cr)
 	if (rr$range[2] == rr$range[1] && !any(is.na(tmpmat)))
+	{
 		attr(x, 'poszvar') <- FALSE
+	}
 	else
+	{
 		attr(x, 'poszvar') <- TRUE
+	}
 	attr(x, 'simMean') <- rr$simMean
 	attr(x, 'moreThan2') <- length(unique(x)) > 2
 	attr(x, 'name') <- name
@@ -914,6 +936,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 	z <- checkConstraints(z)
 	z <- covarDist2(z)
 	class(z) <- 'siena'
+
 	z
 }
 ##@checkConstraints DataCreate
@@ -1193,16 +1216,20 @@ groupRangeAndSimilarityAndMean <- function(group)
 					attr(group[[i]]$vCovars[[j]], "nonMissingCount")
 		}
 		varmean <- vartotal / nonMissingCount
-		for (i in 1:length(group))
+#browser() # Hier kijken hoe je moet centreren in de groep.	
+		j <- match(atts$vCovars[covar], names(group[[1]]$vCovars))	
+		if (attr(group[[1]]$vCovars[[j]],"centered"))
 		{
-			j <- match(atts$vCovars[covar], names(group[[i]]$vCovars))
-			if (is.na(j))
+			for (i in 1:length(group))
 			{
-				stop("inconsistent covariate names")
+				j <- match(atts$vCovars[covar], names(group[[i]]$vCovars))
+				if (is.na(j))
+				{
+					stop("inconsistent covariate names")
+				}
+				group[[i]]$vCovars[[j]] <- group[[i]]$vCovars[[j]] -
+					varmean
 			}
-
-			group[[i]]$vCovars[[j]] <- group[[i]]$vCovars[[j]] -
-				varmean
 		}
 		simTotal <- 0
 		simCnt <- 0
@@ -1356,6 +1383,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 		attr(x, "meanp") <- rep(atts$mean, ncol(x))
 		attr(x, "range") <- atts$range
 		attr(x, 'mean') <- atts$mean
+		attr(x, 'centered') <- atts$centered
 		attr(x, 'vartotal') <- atts$vartotal
 		attr(x, 'nonMissingCount') <- atts$nonMissingCount
 		attr(x, 'simMeans') <- atts$simMeans

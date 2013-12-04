@@ -511,24 +511,49 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 								width=3, nsmall=1), '%)\n'), outf)
 			}
 			Report("\nInformation about covariates:\n", outf)
-			Report(c(format("minimum  maximum	  mean", width=38,
+			Report(c(format("minimum  maximum	  mean  centered", width=48,
 							justify="right"), "\n"), outf)
+			any.cent <- 0
+			any.noncent <- 0
 			for (i in seq(along=covars))
 			{
 				atts <- attributes(x$cCovars[[i]])
+				if (atts$centered)
+				{
+					cent <- "   Y"
+					any.cent <- any.cent+1
+				}
+				else
+				{
+					cent <- "   N"
+					any.noncent <- any.noncent+1
+				}
 				Report(c(format(covars[i], width=10),
 						 format(round(atts$range2[1], 1),
 								nsmall=1, width=8),
 						 format(round(atts$range2[2], 1),
 								nsmall=1, width=7),
 						 format(round(atts$mean, 3),
-								nsmall=3, width=10), "\n"), outf)
+								nsmall=3, width=10), cent, "\n"), outf)
 			}
 			if (nData <= 1)
 			{
-				Report(c("The mean value", ifelse(nCovars == 1, " is", "s are"),
-					 " subtracted from the covariate",
-					 ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+				if (any.noncent <= 0)
+				{
+					Report(c("The mean value", ifelse(nCovars == 1, " is", "s are"),
+						" subtracted from the",
+						ifelse(nCovars == 1, " centered", ""), " covariate",
+						ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+				}
+				else if (any.cent >= 1)
+				{
+					s.plural <- ""
+					if (any.cent >= 2){s.plural <- "s"}
+					Report(c("For the centered variable", s.plural,
+					", the mean value", ifelse(any.cent == 1, " is", "s are"),
+						" subtracted from the covariate", s.plural,
+						".\n"), sep="", outf)
+				}
 			}
 		}
 		##@reportChangingCovariates internal print01Report
@@ -600,13 +625,25 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				}
 			}
 			Report("\nInformation about changing covariates:\n", outf)
-			Report(c(format("minimum  maximum	  mean", width=38,
+			Report(c(format("minimum  maximum	  mean  centered", width=48,
 							justify="right"), "\n"), outf)
+			any.cent <- 0
+			any.noncent <- 0
 			for (i in seq(along=covars))
 			{
 				if (use[i])
 				{
 					atts <- attributes(x$vCovars[[i]])
+					if (atts$centered)
+					{
+						cent <- "   Y"
+						any.cent <- any.cent+1
+					}
+					else
+					{
+						cent <- "   N"
+						any.noncent <- any.noncent+1
+					}
 					Report(c(covars[i], '\n'), outf) # name
 					for (j in 1:(ncol(x$vCovars[[i]])))
 					{
@@ -621,15 +658,27 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 					}
 					Report(c(format("Overall", width=29),
 							 format(round(atts$mean, 3), width=10, nsmall=3),
-							 "\n"), outf)
-
+							 cent, "\n"), outf)
 				}
 			}
 			if (nData <= 1)
 			{
-				Report("\nThe overall mean value", outf)
-				Report(c(ifelse(nCovars	 == 1, " is", "s are"),
-					 "subtracted from the covariate.\n\n"),	 outf)
+				if (any.noncent <= 0)
+				{
+					Report(c("The mean value", ifelse(nCovars == 1, " is", "s are"),
+						" subtracted from the",
+						ifelse(nCovars == 1, " centered", ""), " covariate",
+						ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+				}
+				else if (any.cent >= 1)
+				{
+					s.plural <- ""
+					if (any.cent >= 2){s.plural <- "s"}
+					Report(c("For the centered variable", s.plural,
+					", the mean value", ifelse(any.cent == 1, " is", "s are"),
+						" subtracted from the covariate", s.plural,
+						".\n"), sep="", outf)
+				}
 			}
 		}
 		##@reportConstantDyadicCovariates internal print01Report
@@ -892,22 +941,22 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 			periodFromStart <- periodFromStart + data[[i]]$observations
 		}
 		Report("\n", outf)
-		if (length(atts$vCovars) == 1) 
+		if (length(atts$vCovars) == 1)
 		{
 			Report(c("The overall mean value ",
-				format(round(atts$vCovarMean, 4), nsmall=3, width=12), 
-					 " is subtracted from covariate ", atts$vCovars, 
+				format(round(atts$vCovarMean, 4), nsmall=3, width=12),
+					 " is subtracted from covariate ", atts$vCovars,
 					  ".\n\n"), sep="", outf)
 		}
-		else if (length(atts$vCovars) >= 2) 
+		else if (length(atts$vCovars) >= 2)
 		{
 			Report(c("The mean values are subtracted from the covariates:\n"), outf)
 			for (i in seq(along=atts$vCovars))
 			{
-				Report(c(format(atts$vCovars[i], width=15), 
+				Report(c(format(atts$vCovars[i], width=15),
 				format(round(atts$vCovarMean[i], 4), nsmall=3, width=12), '\n'), outf)
 			}
-		}		
+		}
 	}
 	periodNos <- attr(data, "periodNos")
 	if (any(atts$anyUpOnly[nets]))
@@ -1061,7 +1110,6 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 					 netnames[i], ".\n"), sep = "", outf)
 		}
 	}
-   Report("\n", outf)
 
 	if (sum(atts$types == 'oneMode') > 0)
 	{

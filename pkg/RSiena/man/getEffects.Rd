@@ -12,7 +12,7 @@ getEffects(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 }
 \arguments{
   \item{x}{an object of class `siena" or `sienaGroup"}
-  \item{nintn}{Number of user-defined network interaction
+  \item{nintn}{Number of user-defined network interactions
        that can later be created.}
   \item{behNintn}{Number of user-defined behavior interactions
        that can later be created.}

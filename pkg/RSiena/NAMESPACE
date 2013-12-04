@@ -7,9 +7,11 @@ sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, print.xtable.sienaFit,
        installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy, 
-       sienaGOF, sparseMatrixExtraction, networkExtraction, behaviorExtraction,
+       sienaGOF, descriptives.sienaGOF, sparseMatrixExtraction,
+       networkExtraction, behaviorExtraction,
        OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
-       siena.table, xtable)
+       siena.table, xtable,
+       Wald.RSiena, Multipar.RSiena)
 
 import(Matrix)
 

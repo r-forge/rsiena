@@ -1,4 +1,4 @@
-## /*****************************************************************************
+## /***************************************************************************
 ##  * SIENA: Simulation Investigation for Empirical Network Analysis
 ##  *
 ##  * Web: http://www.stats.ox.ac.uk/~snijders/siena
@@ -7,10 +7,12 @@
 ##  *
 ##  * Description: This file contains the code to save a latex or html table of
 ##  * estimates for a sienaFit object
+##  * Written by Charlotte Greenan.
 ##  *
-##  ****************************************************************************/
+##  ***************************************************************************/
 
-##@siena.table siena07 Saves latex or html table of estimates for a sienaFit object
+##@siena.table siena07 Saves latex or html table of estimates
+## for a sienaFit object
 siena.table <- function(x,type='tex',
                         file=paste(deparse(substitute(x)),'.',type,sep=""),
                         vertLine=TRUE,tstatPrint=FALSE,
@@ -37,12 +39,12 @@ siena.table <- function(x,type='tex',
     {
         max.t <- max.t + 10^{-d} #needs to be rounded up
     }
-    maxlincomb.t1 <- x$tconv.max
-    maxlincomb.t <- round(maxlincomb.t1, digits = d)
-    if (maxlincomb.t < maxlincomb.t1)
-    {
-        maxlincomb.t <- maxlincomb.t + 10^{-d} #needs to be rounded up
-    }
+#    maxlincomb.t1 <- x$tconv.max
+#    maxlincomb.t <- round(maxlincomb.t1, digits = d)
+#    if (maxlincomb.t < maxlincomb.t1)
+#    {
+#        maxlincomb.t <- maxlincomb.t + 10^{-d} #needs to be rounded up
+#    }
     if (length(x$condvarno) == 0)
     {
         condvarno <- 0
@@ -294,7 +296,7 @@ siena.table <- function(x,type='tex',
             linesep=""
         }
         startTable <- tableSection(c(paste("% Table based on sienaFit object",
-                                           deparse(substitute(x))),
+                                           deparse(substitute(x)), ',', date()),
                                      paste("\\begin{tabular}{l",
                                            linesep,
                                            "r@{.}l r@{.}l",start.tstat,
@@ -312,9 +314,11 @@ siena.table <- function(x,type='tex',
         ruleTable <- tableSection("\\hline")
         footnote <- c(paste("\\multicolumn{5}{l}\n   ",
 			"{\\footnotesize{convergence $t$ ratios all $<$ ", max.t,
-			",}}\\\\\n", "\\multicolumn{5}{l}",
-			"{\\footnotesize{overall maximum convergence ratio ", 
-			maxlincomb.t,".}}",	sep="",collapse=""),
+			".}}\\\\\n", 
+#			"\\multicolumn{5}{l}",
+#			"{\\footnotesize{Overall maximum convergence ratio ",
+#			maxlincomb.t,".}}",	
+			sep="",collapse=""),
 			"\\end{tabular}")
 
         if (sig == TRUE)

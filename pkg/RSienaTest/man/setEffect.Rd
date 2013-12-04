@@ -11,7 +11,8 @@
 setEffect(myeff, shortName, parameter = 0, fix = FALSE,
 test = FALSE, initialValue = 0, timeDummy = ",", include = TRUE,
 name = myeff$name[1], type = "eval", interaction1 = "",
-interaction2 = "", period=1, group=1, character=FALSE)
+interaction2 = "", effect1=0, effect2=0, effect3=0,
+period=1, group=1, character=FALSE)
 }
 %- maybe also "usage" for other objects documented here.
 \arguments{
@@ -48,6 +49,20 @@ dummy. Alternatively, use \code{\link{includeTimeDummy}}.
   Name of siena object where needed to completely identify the
   effect e.g. covariate name or behavior variable name.
 }
+\item{effect1}{
+  Only for \code{shortName=unspInt}, which means this is a
+  user-defined interaction effect: \code{effect1} is
+  a natural number indicating the first component of the interaction effect;
+  the number is the one listed when applying \code{print()} to \code{myeff}.
+}
+\item{effect2}{
+  Only for \code{shortName=unspInt}: second component of interaction effect
+  (see \code{effect1}).
+}
+\item{effect3}{
+  Only for \code{shortName=unspInt}: third component of interaction effect,
+  if any (see \code{effect1}).
+}
 \item{period}{
   Number of period if basic rate. Use numbering within groups.
 }
@@ -68,7 +83,8 @@ will be set to the parameter value requested. The
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
 \seealso{
-  \code{\link{getEffects}}
+  \code{\link{getEffects}}, \code{\link{includeEffects}},
+  \code{\link{includeInteraction}}.
 }
 
 \examples{
@@ -76,9 +92,23 @@ mynet <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mybeh <- sienaDependent(s50a, type="behavior")
 mydata <- sienaDataCreate(mynet, mybeh)
 myeff <- getEffects(mydata)
+# Set the initial rate parameter for one period:
 myeff <- setEffect(myeff, Rate, initialValue=1.5, name="mybeh",
                    type="rate", period=2)
-myeff <- setEffect(myeff, outInv, 3) ## parameter
+# Specify an effect parameter:
+myeff <- setEffect(myeff, outTrunc, parameter=1)
+myeff
+# Now request the interaction between reciprocity and alcohol similarity
+# to be tested without estimation.
+myeff <- includeInteraction(myeff, recip, simX, interaction1=c("", "mybeh"))
+myeff
+# The following code uses the fact that the interaction effect is number 6.
+# In practice one would just look up the numbers of effect1 and effect2
+# from the response to \code{myeff} and fill them in.
+(eff1 <- myeff[myeff$include,]$effect1[6])
+(eff2 <- myeff[myeff$include,]$effect2[6])
+myeff <- setEffect(myeff, unspInt, fix=TRUE, test=TRUE,
+									effect1=eff1, effect2=eff2)
 myeff
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the

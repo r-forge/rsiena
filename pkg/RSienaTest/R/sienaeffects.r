@@ -61,10 +61,9 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 }
 ##@includeInteraction DataCreate
 includeInteraction <- function(myeff, ...,
-                               include=TRUE, name=myeff$name[1],
-                        type="eval", interaction1=rep("", 3),
-                               interaction2=rep("", 3), character=FALSE,
-                               verbose=TRUE)
+				include=TRUE, name=myeff$name[1],
+				type="eval", interaction1=rep("", 3), interaction2=rep("", 3),
+				character=FALSE, verbose=TRUE)
 {
     if (character)
     {
@@ -219,11 +218,12 @@ includeInteraction <- function(myeff, ...,
 
 ##@setEffect DataCreate
 setEffect <- function(myeff, shortName, parameter=0,
-                      fix=FALSE, test=FALSE, initialValue=0,
-                      timeDummy=",",
-                      include=TRUE, name=myeff$name[1],
-                      type="eval", interaction1="", interaction2="",
-                       period=1, group=1, character=FALSE)
+					fix=FALSE, test=FALSE, initialValue=0,
+					timeDummy=",",
+					include=TRUE, name=myeff$name[1],
+					type="eval", interaction1="", interaction2="",
+					effect1=0, effect2=0, effect3=0,
+					period=1, group=1, character=FALSE)
 {
     if (!character)
     {
@@ -236,8 +236,25 @@ setEffect <- function(myeff, shortName, parameter=0,
     myeff$interaction2 == interaction2 &
     (is.na(myeff$period) | myeff$period == period) &
     myeff$group == group
+	if (shortName == "unspInt")
+	{
+		use <- use & (myeff$include) & (myeff$effect1 == effect1) &
+			(myeff$effect2 == effect2) & (myeff$effect3 == effect3)
+	}
     if (sum(use) == 0)
     {
+		cat(paste("There is no effect with short name "))
+		cat(paste(shortName,", \n", sep=""))
+		cat(paste("and with interaction1 = <",interaction1,">, ", sep=""))
+		cat(paste("interaction2 = <",interaction2,">, ", sep=""))
+		cat(paste("type = <",type,">, ", sep=""))
+		cat(paste("period = <",period,">, ", sep=""))
+		if (shortName == "unspInt")
+		{
+		cat(paste("effects1-2-3 = <",effect1, effect2, effect3,">,", sep=" "))
+		}
+		cat(paste("and group = <",group,">, \n ", sep=""))
+		cat(paste("for dependent variable",name,".\n"))
         stop("Effect not found")
     }
     if (sum(use) > 1)
@@ -254,6 +271,5 @@ setEffect <- function(myeff, shortName, parameter=0,
 #                       "interaction2", "include", "parm", "fix", "test",
 #                       "initialValue", "timeDummy", "period", "group")])
 	print.sienaEffects(myeff[use,])
-
     myeff
 }

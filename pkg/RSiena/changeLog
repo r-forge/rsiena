@@ -1,3 +1,26 @@
+2013-12-04 R-Forge Revision 250
+Changes in RSiena and RSienaTest:
+   * New option "centered" in coCovar and varCovar (sienautils.r,
+     sienaDataCreate.r, print01Report.r, sienaprint.r).
+   * setEffect, updateTheta, and prevAns in siena07() now also cater
+     for unspecified interactions (sienaeffects.r, initializeFRAN.r).
+   * Wald.RSiena and Multipar.RSiena added (Sienatest.r).
+   * Error occurrence with message about cvalue in EvaluateTestStatistic
+     corrected (Sienatest.r).
+   * Divergent parameters in siena07() get NA for their rows and columns
+     in the covariance matrix (function phase3.2 in phase3.r).   
+The following changes in revision 244 were ported from RSienaTest to RSiena:
+   * In siena08, also report Bonferroni combination
+     of the two Fisher combinations.
+   * In phase2.r, rolled back change in truncation from version 1.1-227
+     to the earlier procedure.
+   * descriptives.sienaGOF added.
+   * Minor changes of output in siena.table, print07Report.r, print.siena,
+     printInitialDescription.r, and in error message for includeEffects.
+   * Change artificial results from 999 to NA (robmon.r, phase3.r)
+   * For ML estimation: added autocorrelations during phase 3 
+     to print.summary.sienaFit (sienaprint.r)	 
+
 2013-11-29 R-Forge Revision 249
 Changes in RSiena and RSienaTest:
 	* Fix warning in EpochSimulation regarding String-plus-int.

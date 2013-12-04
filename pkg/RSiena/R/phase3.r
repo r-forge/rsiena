@@ -156,7 +156,7 @@ phase3.2 <- function(z, x, ...)
         tstat <- rep(NA, z$pp)
         tstat[!use]<- sf[!use] / sqrt(dmsf[!use])
         tstat[use & use2] <- 0
-        tstat[use & !use2] <- 999
+        tstat[use & !use2] <- NA # was 999
         z$tstat <- tstat
  		# tconv.max = Maximum value of t-ratio for convergence,
  		# for any linear combination.
@@ -267,7 +267,7 @@ phase3.2 <- function(z, x, ...)
 			if (inherits(try(cov <- solve(dfrac), silent=TRUE),"try-error"))
 			{
 				Report('Noninvertible estimated covariance matrix : \n', outf)
-				errorMessage.cov <- '***Warning: Noninvertible estimated covariance matrix ***'
+	errorMessage.cov <- '***Warning: linear dependencies between statistics ***'
 				cov <- NULL
 			}
 		}
@@ -300,11 +300,13 @@ phase3.2 <- function(z, x, ...)
 		{
 			z$diver <- (z$fixed | z$diver | diag(cov) < 1e-9) & (!z$AllUserFixed)
 			## beware: recycling works for one direction but not the other
-			diag(cov)[z$diver] <- 99 * 99
-			cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
-			diag(cov)[z$diver] <- 99 * 99
-			cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
-			diag(cov)[z$diver] <- 99 * 99
+			diag(cov)[z$diver] <- NA
+#			cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
+#			diag(cov)[z$diver] <- 99 * 99
+#			cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
+			cov[z$diver, ] <- NA
+			cov[, z$diver] <- NA
+			diag(cov)[z$diver] <- NA
 		}
 		z$covtheta <- cov
 	}
@@ -396,7 +398,7 @@ PotentialNR <-function(z,x,MakeStep=FALSE)
 			z$errorMessage.cov <- '*** Warning: Noninvertible derivative matrix ***'
             fchange <- 0
             z$dinv <- z$dfrac
-			z$dinv[,] <- 999
+			z$dinv[,] <- NA # 999
         }
         else
         {

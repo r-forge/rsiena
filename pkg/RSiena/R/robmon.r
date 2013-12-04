@@ -6,7 +6,7 @@
 # * File: robmon.r
 # *
 # * Description: This module contains the function robmon which controls
-# * the phases of the robbins-munro stochastic approximation algorithm.
+# * the phases of the robbins-monro stochastic approximation algorithm.
 # *****************************************************************************/
 ##args:x: model object - intended to be read only
 ##     z: model fitting object
@@ -333,10 +333,10 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
 	if (!x$simOnly)
 	{
 		z$diver<- (z$fixed | z$diver | diag(z$covtheta) < 1e-9) & (!z$AllUserFixed)
-		z$covtheta[z$diver, ] <- Root(diag(z$covtheta)) * 33
+		z$covtheta[z$diver, ] <- NA # was Root(diag(z$covtheta)) * 33
 		##not sure this does not use very small vals
-		z$covtheta[, z$diver] <- Root(diag(z$covtheta)) * 33
-		diag(z$covtheta)[z$diver] <- 999
+		z$covtheta[, z$diver] <- NA # was Root(diag(z$covtheta)) * 33
+		diag(z$covtheta)[z$diver] <- NA # was 999
 	}
     z$termination <- 'OK'
     z
