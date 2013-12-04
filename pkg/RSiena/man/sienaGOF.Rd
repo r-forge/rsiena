@@ -1,6 +1,7 @@
 \name{sienaGOF}
 \alias{sienaGOF}
 \alias{plot.sienaGOF}
+\alias{descriptives.sienaGOF}
 \title{Functions to assess goodness of fit for SAOMs}
 \description{
  The function \code{sienaGOF} assesses goodness of fit
@@ -25,6 +26,7 @@ sienaGOF(sienaFitObject, auxiliaryFunction,
          varName, \dots)
 \method{plot}{sienaGOF}(x, center=FALSE, scale=FALSE, violin=TRUE, key=NULL,
           perc=.05, period=1, main=main, ylab=ylab, \dots)
+descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL, period=1)
 }
 \arguments{
   \item{sienaFitObject}{Results from a call to \code{\link{siena07}}
@@ -162,6 +164,17 @@ We recommend the following heuristic approach to model checking:
     \item{* Rank}{ Rank of the covariance matrix of the simulated auxiliary
               statistics.}
     }
+	The \code{plot} method makes violin plots or box plots, with superimposed
+    confidence bands, for the simulated distributions of all elements
+	of the \code{auxiliaryFunction},
+	with the observed values indicated by red dots.
+
+    \code{descriptives.sienaGOF} returns a matrix with the numbers plotted in
+	the \code{plot} method: maximum, upper percentile, median, lower
+	percentile, minimum, of the simulated distributions of the auxiliary
+	statistics, and the observed values.\cr
+	Auxiliary functions with all simulated values equal to
+	the observed value will be dropped.
 }
 
 \references{
@@ -170,7 +183,7 @@ We recommend the following heuristic approach to model checking:
   for general information on RSiena.
 \item Lospinoso, J.A. and Snijders, T.A.B., \dQuote{Goodness of fit for
   Stochastic Actor Oriented Models.} Presentation given at Sunbelt XXXI,
-  St. Pete"s Beach, Fl. 2011.
+  St. Pete's Beach, Fl. 2011.
 \item Lospinoso, J.A. (2012).
   \dQuote{Statistical Models for Social Network Dynamics.}
   Ph.D. Thesis. University of Oxford: U.K.
@@ -197,6 +210,12 @@ We recommend the following heuristic approach to model checking:
                     varName="mynet1")
    gofi
    plot(gofi)
+   gofi.nc <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
+                    cumulative=FALSE, varName="mynet1")
+   # cumulative is an example of "...".
+   gofi.nc
+   plot(gofi.nc)
+   descriptives.sienaGOF(gofi.nc)
 
    gofi2 <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
                      varName="mynet2")
@@ -209,7 +228,6 @@ We recommend the following heuristic approach to model checking:
 
    gofo <- sienaGOF(ans, OutdegreeDistribution, verbose=TRUE, join=TRUE,
 	                varName="mynet1", cumulative=FALSE)
-   # cumulative is an example of "...".
    gofo
    plot(gofo)
 }

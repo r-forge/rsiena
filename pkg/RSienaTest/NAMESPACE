@@ -2,15 +2,16 @@ useDynLib(RSienaTest)
 export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
 siena01Gui, siena07, sienaCompositionChange, sienaBayes, updateTheta,
 sienaCompositionChangeFromFile, sienaDataCreate, sienaDataCreateFromSession,
-sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet, 
+sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
        sienaDependent, sienaNodeSet, xtable.sienaFit,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, print.xtable.sienaFit,
-       installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy, 
-       sienaGOF, descriptives.sienaGOF, sparseMatrixExtraction, 
+       installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy,
+       sienaGOF, descriptives.sienaGOF, sparseMatrixExtraction,
        networkExtraction, behaviorExtraction,
        OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
-       xtable, algorithms, profileLikelihoods, siena.table)
+       xtable, algorithms, profileLikelihoods, siena.table,
+	   Wald.RSiena, Multipar.RSiena)
 
 import(Matrix)
 

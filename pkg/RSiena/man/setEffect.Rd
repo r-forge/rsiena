@@ -11,7 +11,8 @@
 setEffect(myeff, shortName, parameter = 0, fix = FALSE,
 test = FALSE, initialValue = 0, timeDummy = ",", include = TRUE,
 name = myeff$name[1], type = "eval", interaction1 = "",
-interaction2 = "", period=1, group=1, character=FALSE)
+interaction2 = "", effect1=0, effect2=0, effect3=0,
+period=1, group=1, character=FALSE)
 }
 %- maybe also "usage" for other objects documented here.
 \arguments{
@@ -48,6 +49,20 @@ dummy. Alternatively, use \code{\link{includeTimeDummy}}.
   Name of siena object where needed to completely identify the
   effect e.g. covariate name or behavior variable name.
 }
+\item{effect1}{
+  Only for \code{shortName=unspInt}, which means this is a
+  user-defined interaction effect: \code{effect1} is
+  a natural number indicating the first component of the interaction effect; 
+  the number is the one listed when applying \code{print()} to \code{myeff}.
+}
+\item{effect2}{
+  Only for \code{shortName=unspInt}: second component of interaction effect
+  (see \code{effect1}).
+}
+\item{effect3}{
+  Only for \code{shortName=unspInt}: third component of interaction effect,
+  if any (see \code{effect1}).
+}
 \item{period}{
   Number of period if basic rate. Use numbering within groups.
 }
@@ -68,7 +83,8 @@ will be set to the parameter value requested. The
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
 \seealso{
-  \code{\link{getEffects}}
+  \code{\link{getEffects}}, \code{\link{includeEffects}}, 
+  \code{\link{includeInteraction}}.
 }
 
 \examples{
@@ -78,7 +94,7 @@ mydata <- sienaDataCreate(mynet, mybeh)
 myeff <- getEffects(mydata)
 myeff <- setEffect(myeff, Rate, initialValue=1.5, name="mybeh",
                    type="rate", period=2)
-myeff <- setEffect(myeff, outInv, 3) ## parameter
+myeff <- setEffect(myeff, outInv, 3) ## effect parameter
 myeff
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the

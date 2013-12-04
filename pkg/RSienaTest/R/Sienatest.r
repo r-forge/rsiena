@@ -260,22 +260,61 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
             Report('Error message for inversion of v9: \n', cf)
             vav <- v9
             vav[] <- NA
+			cvalue <- NA
+			oneSided <- NA
         }
-        cvalue <- t(ov) %*% vav %*% ov
-        if (cvalue < 0) cvalue <- 0
-        if (sum(test) == 1)
-        {
-            if (vav > 0)
-                oneSided <- ov * sqrt(vav)
-            else
-                oneSided <- 0
-            if (!maxlike) oneSided <- - oneSided
-            ## change the sign for intuition for users
-        }
-        else
-        {
-            oneSided <- 0
-        }
+		else
+		{
+			cvalue <- t(ov) %*% vav %*% ov
+			if (cvalue < 0) cvalue <- 0
+			if (sum(test) == 1)
+			{
+				if (vav > 0)
+					oneSided <- ov * sqrt(vav)
+				else
+					oneSided <- 0
+				if (!maxlike) oneSided <- - oneSided
+				## change the sign for intuition for users
+			}
+			else
+			{
+				oneSided <- 0
+			}
+		}
     }
     list(cvalue=cvalue, oneSided=oneSided, covMatrix=v9)
+}
+
+##@Wald.RSiena  Calculate Wald test statistics
+Wald.RSiena <- function(A, ans)
+{
+	if (is.vector(A)){A <- matrix(A, nrow=1)}
+	if (dim(A)[2] != ans$pp){stop(paste('A must have', ans$pp, 'columns.'))}
+	sigma <- ans$covtheta
+	if (any(is.na(sigma))){ # happens when some coordinates were fixed
+	                        # in the call of siena07 leading to ans;
+	                        # then the non-used part of sigma,
+							# which partially consists of NA,
+							# is replaced by the identity matrix.
+		zero.cols <- apply(A, 2, function(colum){all(colum==0)})
+		sigma[zero.cols, ] <- 0
+		sigma[, zero.cols] <- 0
+		diag(sigma)[zero.cols] <- 1
+		}
+	th <- A %*% ans$theta
+	covmat <- A %*% sigma %*% t(A)
+	chisq <- drop(t(th) %*% solve(covmat) %*% th)
+	d.f. <- nrow(A)
+	pval <- 1 - pchisq(chisq, d.f.)
+	list(chisquare = chisq, df = d.f., pvalue = pval)
+}
+
+##@Multipar.RSiena  Calculate Wald test statistic for hypothesis that subvector = 0.
+Multipar.RSiena <- function(ans, ...)
+{
+	p <- length(ans$theta)
+	k <- length(c(...))
+	A <- matrix(0, nrow=k, ncol=p)
+	A[cbind(1:k,c(...))] <- 1
+	Wald.RSiena(A, ans)
 }

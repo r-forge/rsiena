@@ -670,11 +670,10 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
                                                  width=9),
                         " (d.f. = ", 2 * y$ns, "), ",
                         reportp(y$scoreplusp, 3), "\n"), sep="", outf)
-               Report("Combination of left one-sided p-values:\n", outf)
-               Report(c("Chi-squared = ",
-                        format(round(y$scoreminus, 4), width=9),
-                        " (d.f. = ", 2 * y$ns, "), ",
-                        reportp(y$scoreminusp, 3), "\n"), sep="", outf)
+        Report("Bonferroni combination of left and right one-sided p-values:\n",
+						outf)
+               Report(c(reportp(2*min(y$scoreminusp, y$scoreplusp), 3), "\n"),
+						sep="", outf)
            }
        }, y=x))
     }

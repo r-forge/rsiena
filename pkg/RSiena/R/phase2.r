@@ -323,12 +323,13 @@ doIterations<- function(z, x, subphase,...)
             }
         }
         ## limit change.  Reporting is delayed to end of phase.
-# The old version had a numerical ifelse condition:
-#          maxrat<- max(ifelse(z$sd, abs(fra)/ z$sd, 1.0))
-# But ifelse with a numerical first argument only tests the value 0,
-# which here has probability 0... So this really has no effect.
-# I (TS) do not understand this.
-# Therefore I changed it.
+# The truncation has been different from version 1.1-227 to 1.1-243,
+# due to a misunderstanding.
+# In version 1.1-244 it was changed back to the old Siena 3 way.
+# Except now the threshold is 5 instead of 10.
+# For the case !x$diagg it might be better
+# to base truncation on some multivariate norm of z$dfra.
+        maxRatio <- max(ifelse(z$fixed, 1.0, abs(fra)/ z$sd))
         if (x$diagg)
 		{
             changestep <- fra / diag(z$dfra)
@@ -338,10 +339,9 @@ doIterations<- function(z, x, subphase,...)
 			changestep <- as.vector(fra %*% z$dinvv)
 		}
 		changestep[z$fixed] <- 0.0
-		maxratt <- max(abs(changestep))
-		if (maxratt > 5)
+		if (maxRatio > 5)
 		{
-			changestep <- 5*changestep/maxratt
+			changestep <- 5*changestep/maxRatio
            	z$truncated[z$nit] <- TRUE
 		}
         fchange <- as.vector(z$gain * changestep)

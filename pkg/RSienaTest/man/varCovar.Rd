@@ -5,11 +5,12 @@
   This function creates a changing covariate object from a matrix.
 }
 \usage{
-varCovar(val, nodeSet="Actors")
+varCovar(val, centered=TRUE, nodeSet="Actors")
 }
 \arguments{
   \item{val}{ Matrix of covariate values, one row for each actor, one
     column for each period. }
+  \item{centered}{Boolean: if TRUE, then the overall mean value is subtracted.}
   \item{nodeSet}{Character string containing the name of the associated
     node set. If the entire data set contains more than one node set,
     then the node sets must be specified in all data objects.}
@@ -20,7 +21,7 @@ varCovar(val, nodeSet="Actors")
 }
 \value{
   Returns the covariate as an object of class "varCovar", in which
-  form it can be used as an argument to SienaData.create.
+  form it can be used as an argument to \code{\link{sienaDataCreate}}.
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley}

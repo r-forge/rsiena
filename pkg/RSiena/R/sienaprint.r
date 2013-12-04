@@ -48,6 +48,10 @@ print.siena <- function(x, ...)
 	}
 	cat('Dependent variables: ', paste(names(x$depvars), collapse=", "), "\n")
 	cat('Number of observations:', x$observations, "\n\n")
+	if (length(x$compositionChange) > 0)
+	{
+		cat('With composition change.\n')
+	}
 	if (!is.null(x$nodeSet))
 	{
 		tmp <- sapply(x$nodeSet, length)
@@ -69,6 +73,10 @@ print.siena <- function(x, ...)
 		mymat <- matrix("", 7, 2)
 		mymat[1,] <- c("Dependent variable", attr(xj, "name"))
 		mymat[2,] <- c("Type",               attr(xj, "type"))
+		if (attr(xj,"symmetric"))
+		{
+			mymat[2,2] <- c(mymat[2,2],", symmetric")
+		}
 		mymat[3,] <- c("Observations",       attr(xj,  "netdims")[3])
 		if (attr(xj, "type") == "bipartite")
 		{
@@ -268,6 +276,7 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 	cat('\nEstimated means and standard deviations, standard errors of the mean \n')
 			dmsf <- diag(x$msf)
 			mean.stats <- colMeans(x$sf) + x$targets
+#  cov.dev may be droppec - just for now (07-10-13) I keep it in
 #			cov.dev <- x$msf
 			sem <- sqrt(dmsf/dim(x$sf)[1])
 			if (x$x$dolby)
@@ -292,7 +301,7 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 		cat("\nTotal of", x$n, "iteration steps.\n\n")
 		if ((x$x$dolby)&(x$x$simOnly))
 		{
-		cat('(Standard errors of the mean are less than s.d./', x$n,' \n',
+		cat('(Standard errors of the mean are less than s.d./', sqrt(x$n),' \n',
 				sep='')
 		cat('because of regression on scores (Dolby option).) \n')
 		}
@@ -323,6 +332,16 @@ print.summary.sienaFit <- function(x, ...)
 	print.sienaFit(x)
 	cat(c("Overall maximum convergence ratio: ",
 		sprintf("%8.4f", x$tconv.max), "\n\n"))
+
+    if (x$maxlike)
+    {
+        cat('Autocorrelations during phase 3 : \n')
+        cat(paste(format(1:x$pp, width=3), '. ',
+                     format(x$sfl, width=8, digits=4),
+                     '\n', collapse="", sep=""))
+        cat ('\n')
+    }
+
 	if (sum(x$test) > 0) ## we have some score tests
 	{
 		testn <- sum(x$test)
@@ -440,10 +459,12 @@ printMatrix <- function(mat)
 ##@print.sienaAlgorithm Methods
 print.sienaAlgorithm <- function(x, ...)
 {
+	cat(' Siena Algorithm specification.\n')
     cat(' Project name:', x$projname, '\n')
     cat(' Use standard initial values:', x$useStdInits, '\n')
     cat(' Random seed:', x$randomSeed,'\n')
     cat(' Starting value of gain parameter:', x$firstg, '\n')
+    cat(' Reduction factor for gain parameter:', x$reduceg, '\n')
 	cat(' Diagonalization parameter:', x$diagonalize, '\n')
 	cat(' Dolby noise reduction:', x$dolby, '\n')
     if (any(x$MaxDegree > 0))

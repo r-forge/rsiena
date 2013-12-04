@@ -300,11 +300,13 @@ phase3.2 <- function(z, x, ...)
 		{
 			z$diver <- (z$fixed | z$diver | diag(cov) < 1e-9) & (!z$AllUserFixed)
 			## beware: recycling works for one direction but not the other
-			diag(cov)[z$diver] <- 99 * 99
-			cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
-			diag(cov)[z$diver] <- 99 * 99
-			cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
-			diag(cov)[z$diver] <- 99 * 99
+			diag(cov)[z$diver] <- NA
+#			cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
+#			diag(cov)[z$diver] <- 99 * 99
+#			cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
+			cov[z$diver, ] <- NA
+			cov[, z$diver] <- NA
+			diag(cov)[z$diver] <- NA
 		}
 		z$covtheta <- cov
 	}
@@ -347,7 +349,7 @@ CalculateDerivative3<- function(z,x)
 		}		
 		if (x$dolby)
 		{
-			mean.scores <- colMeans(scores)
+#			mean.scores <- colMeans(scores)
 			estMeans <- estMeans - (z$regrCoef * colMeans(scores))
 		}
 		Report('Correlations between scores and statistics:\n', cf)

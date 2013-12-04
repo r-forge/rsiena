@@ -122,7 +122,7 @@ sienaNodeSet <- function(n, nodeSetName="Actors", names=NULL)
 }
 
 ##@coCovar Create
-coCovar <- function(val, nodeSet="Actors")
+coCovar <- function(val, centered=TRUE, nodeSet="Actors")
 {
     ##vector, numeric or factor
     if (!is.vector(val))
@@ -135,11 +135,12 @@ coCovar <- function(val, nodeSet="Actors")
 	}
     out <- val
     class(out) <- "coCovar"
+    attr(out, "centered") <- centered
     attr(out, "nodeSet") <- nodeSet
     out
 }
 ##@varCovar Create
-varCovar<- function(val, nodeSet="Actors")
+varCovar<- function(val, centered=TRUE, nodeSet="Actors")
 {
     ##matrix, numeric or factor, nrow = nactors and cols = observations-1
     if (!is.matrix(val))
@@ -152,6 +153,7 @@ varCovar<- function(val, nodeSet="Actors")
 	}
     out <- val
     class(out) <- "varCovar"
+    attr(out, "centered") <- centered
     attr(out, "nodeSet") <- nodeSet
     out
 }

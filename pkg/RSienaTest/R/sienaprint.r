@@ -884,6 +884,8 @@ summary.sienaBayesFit <- function(object, ...)
 ##@print.summary.sienaBayesFit Methods
 print.summary.sienaBayesFit <- function(x, ...)
 {
+# Still to do: quantile(x$ThinPosteriorSigma, probs=c(0.025, 0.5, 0.975))
+# etcetera
 	if (!inherits(x, "summary.sienaBayesFit"))
 	{
         stop("not a legitimate summary of a Siena Bayes model fit")

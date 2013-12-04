@@ -1971,13 +1971,13 @@ updateTheta <- function(effects, prevAns)
 					 paste(x[c("name", "shortName",
 							   "type", "groupName",
 							   "interaction1", "interaction2",
-							   "period")],
+							   "period", "effect1", "effect2", "effect3")],
 						   collapse="|"))
 	efflist <- apply(effects, 1, function(x)
 					 paste(x[c("name", "shortName",
 							   "type", "groupName",
 							   "interaction1", "interaction2",
-							   "period")],
+							   "period", "effect1", "effect2", "effect3")],
 						   collapse="|"))
 	use <- efflist %in% oldlist
 	effects$initialValue[use] <-

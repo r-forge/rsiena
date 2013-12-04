@@ -53,8 +53,13 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   corresponding main effects. This is however not enforced
   by \code{includeInteraction()}.
 
+  The number of possible user-specified interaction effects is limited
+  by the parameters \code{nintn} (for dependent network variables)
+  and \code{behNintn} (for dependent behavior variables)
+  in the call of \code{\link{getEffects}}.
+
   The input names \code{interaction1} and \code{interaction2} do not themselves
-  refer to a created interactions, but to dependence of the base effects on
+  refer to created interactions, but to dependence of the base effects on
   other variables in the data set.
   They are used to completely identify the effects.
 
@@ -73,18 +78,27 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
 \seealso{
-  \code{\link{getEffects}}, \code{\link{includeEffects}},
-  \code{\link{effectsDocumentation}
+  \code{\link{getEffects}}, \code{\link{setEffect}},
+  \code{\link{includeEffects}}, \code{\link{effectsDocumentation}
 }}
 \examples{
-mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mybeh  <- sienaDependent(s50a, type="behavior")
-mydata <- sienaDataCreate(mynet1, mybeh)
+mynet <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+alc <- varCovar(s50a)
+mydata <- sienaDataCreate(mynet, alc)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip)
-myeff <- includeEffects(myeff, egoX, interaction1="mybeh")
-myeff <- includeInteraction(myeff, transTrip, egoX,
-         interaction1=c("", "mybeh"))
+myeff <- includeEffects(myeff, egoX, altX, simX, interaction1="alc")
+myeff <- includeInteraction(myeff, recip, simX, interaction1=c("", "alc"))
+myeff <- includeInteraction(myeff, transTrip, egoX, interaction1=c("", "alc"))
+myeff
+# Now request the interaction between transitive triplets and alcohol ego
+# to be tested without estimation.
+# In practice one would just look up the numbers of effect1 and effect2
+# from the response to \code{myeff} and fill them in.
+(eff1 <- myeff[myeff$include,]$effect1[10])
+(eff2 <- myeff[myeff$include,]$effect2[10])
+myeff <- setEffect(myeff, unspInt, fix=TRUE, test=TRUE,
+									effect1=eff1, effect2=eff2)
 myeff
 }
 \keyword{ classes }

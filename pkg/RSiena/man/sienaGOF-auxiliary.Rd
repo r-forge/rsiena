@@ -178,6 +178,7 @@ Ph.D. Thesis. University of Oxford: U.K.
    # Ties for ordered pairs with a missing value for wave=period or period+1
    # are zeroed;
    # note that this also is done in RSiena for calculation of target statistics.
+   # However, changing structurally fixed values are not taken into account.
    igraphNetworkExtraction <- function(i, data, sims, period, groupName, varName){
      require(igraph)
      dimsOfDepVar<- attr(data[[groupName]]$depvars[[varName]], "netdims")
@@ -236,7 +237,7 @@ Ph.D. Thesis. University of Oxford: U.K.
        tc
    }
 
-  # Distribution of Burt"s constraint values; see ?igraph::constraint
+  # Distribution of Burt's constraint values; see ?igraph::constraint
   # the maximum finite value is 9/8 (see Buskens and van de Rijt, AJS 2008).
   ConstraintDistribution <- function (i, data, sims, period, groupName, varName,
                            levls=c(seq(0,1.125,by=0.125)), cumulative=TRUE){
@@ -282,6 +283,8 @@ Ph.D. Thesis. University of Oxford: U.K.
    # For this type of auxiliary statistics
    # it is advisable in the plot to center and scale.
    # note the keys at the x-axis; these names are given by sna::triad.census
+   descriptives.sienaGOF(goftc)
+   round(descriptives.sienaGOF(goftc, center=TRUE, scale=TRUE), 3)
 
    gofgd <- sienaGOF(ans2, GeodesicDistribution, varName="mynet1",
             verbose=TRUE, join=TRUE, cumulative=FALSE)

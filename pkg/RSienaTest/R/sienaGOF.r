@@ -765,8 +765,8 @@ descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
 		sims.max <- sims.max/sims.range
 	}
 
-	ymin <- 1.05*min(sims.min) - 0.05*max(sims.max)
-	ymax <- -0.05*min(sims.min) + 1.05*max(sims.max)
+#	ymin <- 1.05*min(sims.min) - 0.05*max(sims.max)
+#	ymax <- -0.05*min(sims.min) + 1.05*max(sims.max)
 	screen <- sapply(1:ncol(obs),function(i){
 						(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
 			(diag(var(rbind(sims,obs)))!=0)
