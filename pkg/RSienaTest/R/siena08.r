@@ -472,7 +472,7 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
             revision <- paste(" R-forge revision: ", rforgeRevision,
                               " ", sep="")
         }
-        Report(c("SIENA version ", packageValues[[1]], " (",
+        Report(c("RSienaTest version ", packageValues[[1]], " (",
                  format(as.Date(packageValues[[2]]), "%d %m %Y"), ")",
                  revision, "\n\n"), sep="", outf)
     }

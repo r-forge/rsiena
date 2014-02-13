@@ -76,7 +76,9 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
   The function \code{siena.table} outputs a latex or html table of
   the estimates and standards errors of a \code{sienaFit} object.
   The table will be written to the current directory and
-  has a footnote reporting the maximum of the convergence t ratios.
+  has a footnote reporting the maximum of the convergence t-ratios.
+
+  See the manual for how to import these tables easily into MS-Word.
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }

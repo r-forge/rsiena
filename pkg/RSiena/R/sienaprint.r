@@ -73,9 +73,12 @@ print.siena <- function(x, ...)
 		mymat <- matrix("", 7, 2)
 		mymat[1,] <- c("Dependent variable", attr(xj, "name"))
 		mymat[2,] <- c("Type",               attr(xj, "type"))
+		if (attr(xj,"type") == "oneMode")
+		{
 		if (attr(xj,"symmetric"))
 		{
 			mymat[2,2] <- c(mymat[2,2],", symmetric")
+		}
 		}
 		mymat[3,] <- c("Observations",       attr(xj,  "netdims")[3])
 		if (attr(xj, "type") == "bipartite")
@@ -276,12 +279,12 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 	cat('\nEstimated means and standard deviations, standard errors of the mean \n')
 			dmsf <- diag(x$msf)
 			mean.stats <- colMeans(x$sf) + x$targets
-#  cov.dev may be droppec - just for now (07-10-13) I keep it in
+#  cov.dev may be dropped - just for now (07-10-13) I keep it in
 #			cov.dev <- x$msf
 			sem <- sqrt(dmsf/dim(x$sf)[1])
 			if (x$x$dolby)
 			{
-				scores <- apply(x$ssc, c(1,3), sum)  # z$nit by z$pp matrix
+				scores <- apply(x$ssc, c(1,3), sum)  # x$nit by x$pp matrix
 				mean.scores <- colMeans(scores)
 				mean.stats <- mean.stats - (x$regrCoef * mean.scores)
 				sem <- sem*sqrt(1 - (x$regrCor)^2)
@@ -515,10 +518,17 @@ print.sienaAlgorithm <- function(x, ...)
     invisible(x)
 }
 ##@sienaFitThetaTable Miscellaneous
-sienaFitThetaTable <- function(x, tstat=FALSE)
+sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE)
 {
-    effects <- x$requestedEffects
+    theEffects <- x$requestedEffects
+    if (fromBayes)
+	{
+		pp <- x$TruNumPars
+	}
+	else
+{
     pp <- x$pp
+	}
     if (x$cconditional)
     {
         nrates <- length(x$rate)
@@ -527,6 +537,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
     {
         nrates <- 0
     }
+	xp <- pp
     pp <- pp + nrates
     ## mydf stores the data before formatting
     mydf <- data.frame(dummy=rep(" ", pp),
@@ -607,7 +618,7 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
 
     if (nBehavs > 0)
     {
-        behEffects <- effects[effects$netType == 'behavior',]
+        behEffects <- theEffects[theEffects$netType == 'behavior',]
         behNames <- unique(behEffects$name)
     }
     if (nBehavs > 1)
@@ -617,27 +628,27 @@ sienaFitThetaTable <- function(x, tstat=FALSE)
                                                          behNames)],
                                        '> ', behEffects$effectName,
                                        sep='')
-        effects$effectName[effects$netType=='behavior'] <-
+        theEffects$effectName[theEffects$netType=='behavior'] <-
             behEffects$effectName
     }
-    mydf[nrates + (1:x$pp), 'row'] <-  1:x$pp
-    mydf[nrates + (1:x$pp), 'type' ] <- ifelse(effects$type == "creation",
-                                               "creat", effects$type)
-    mydf[nrates + (1:x$pp), 'text' ] <- effects$effectName
-    mydf[nrates + (1:x$pp), 'value' ] <- theta
+    mydf[nrates + (1:xp), 'row'] <-  1:xp
+    mydf[nrates + (1:xp), 'type' ] <- ifelse(theEffects$type == "creation",
+                                               "creat", theEffects$type)
+    mydf[nrates + (1:xp), 'text' ] <- theEffects$effectName
+    mydf[nrates + (1:xp), 'value' ] <- theta
 	if (exists("ses"))
 	{
-		mydf[nrates + (1:x$pp), 'se' ] <- ses
+		mydf[nrates + (1:xp), 'se' ] <- ses
 	}
     if (!is.null(x$tstat))
     {
         mydf[1:nrates, "tstat"] <- NA
-        mydf[nrates + (1:x$pp), 'tstat' ] <- x$tstat
+        mydf[nrates + (1:xp), 'tstat' ] <- x$tstat
     }
 
     if (nBehavs > 0 && nNetworks > 0)
     {
-        nNetworkEff <- nrow(effects) - nrow(behEffects)
+        nNetworkEff <- nrow(theEffects) - nrow(behEffects)
         addtorow$command[addsub] <-
             'Behavior Dynamics'
         addtorow$pos[[addsub]] <- nrates + 2 + nNetworkEff
@@ -758,19 +769,24 @@ makeTemp <- function(x, ...)
 			x$requestedEffects[x$requestedEffects$groupName==name1,]
 		x$pp <- length(x$theta)
 		x$fixed <- x$fixed[x$effects$groupName==name1]
-		tmp <- sienaFitThetaTable(x)
+		tmp <- sienaFitThetaTable(x, fromBayes=TRUE)
 		mydf <- tmp$mydf
 		mymat <- as.matrix(mydf[,names(mydf)!="tstat"])
+		mynames <- colnames(mymat)
+		mymat <- cbind(mymat, rep.int(NA, dim(mymat)[1]))
+		colnames(mymat) <- c(mynames, 'random')
 		mymat[, 'value'] <- format(round(mydf$value, digits=4))
 		mymat[, 'se'] <- format(round(mydf$se, digits=4))
+		mymat[, 'random'] <-
+				ifelse(x$requestedEffects$randomEffects, "   +   ", "   -   ")
 		mymat[, 'type'] <- format(mymat[, 'type'])
 		mymat[, 'text'] <- format(mymat[, 'text'])
 		mymat[mydf$row < 1, 'row'] <-
 			format(mydf[mydf$row < 1, 'row'])
 		mymat[mydf[,'row'] >= 1, 'row'] <-
 			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
-		mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post.   ", ""),
-					   c(rep("", 4),  "mean    ", "", "s.d.    ", ""),
+		mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post.   ", "", "varying"),
+					   c(rep("", 4),  "mean    ", "", "s.d.    ", "", ""),
 						mymat)
 		mymat <- apply(mymat, 2, format)
 		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
@@ -822,17 +838,34 @@ print.sienaBayesFit <- function(x, ...)
 		else
 		{
 			cat("for global mean parameters\n\n")
-			nmain <- dim(x$ThinPosteriorMu)[1]
+			ntot <- dim(x$ThinPosteriorMu)[1]
 			if (x$frequentist)
 			{
-			first <- nmain - x$lengthPhase3 + 1
+				first <- x$nwarm + x$nmain - x$lengthPhase3 + 1
 			}
 			else
 			{
-			first <- 1
+				first <- x$nwarm + 1
 			}
-			x$theta <- colMeans(x$ThinPosteriorMu[first:nmain,])
-			x$covtheta <- cov(x$ThinPosteriorMu)
+
+			if (ntot < x$nwarm + x$nmain)
+			{
+				cat("This object resulted from an intermediate save, after",
+					ntot, "MCMC runs.\n")
+			}
+			if (ntot > first+2)
+			{
+				cat("Posterior means and standard deviations are averages over",
+					ntot - first + 1, "MCMC runs (counted after thinning).\n\n")
+#				x$theta <- c(colMeans(x$ThinPosteriorMu[first:ntot,]),
+#						colMeans(x$ThinPosteriorEta[first:ntot,, drop=FALSE]))
+#				x$covtheta <- cov(cbind(x$ThinPosteriorMu[first:ntot,],
+#									x$ThinPosteriorEta[first:ntot,]))
+			}
+			else
+			{
+				stop("This object did not come beyond the warming phase.\n")
+			}
 		}
 		tmps <- makeTemp(x)
 		tmp <- tmps[[1]]
@@ -857,16 +890,29 @@ print.sienaBayesFit <- function(x, ...)
 		if (length(x$f$groupNames) > 1)
 		{
 			cat("\n")
+			if (x$frequentist)
+			{
+				mean.Sigma <- x$Sigma
+				cat("Estimated covariance matrix (varying parameters)\n")
+			}
+			else
+			{
 			mean.Sigma <-
-				apply(x$ThinPosteriorSigma[first:nmain,,], c(2,3), mean)
-			sd.Sigma <- apply(x$ThinPosteriorSigma[first:nmain,,], c(2,3), sd)
-			cat("Posterior mean of global covariance matrix\n")
+					apply(x$ThinPosteriorSigma[first:ntot,,], c(2,3), mean)
+				sd.Sigma <-
+					apply(x$ThinPosteriorSigma[first:ntot,,], c(2,3), sd)
+		cat("Posterior mean of global covariance matrix (varying parameters)\n")
+			}
 			printmat(mean.Sigma)
+			if (!x$frequentist)
+			{
 			cat("\nPosterior standard deviations of ")
 			cat("elements of global covariance matrix\n")
 			printmat(sd.Sigma)
 		}
-		cat("\nTotal of", dim(x$ThinPosteriorMu)[1], "samples.\n\n")
+		}
+#		cat("\nTotal of", ntot-nfirst+1, "samples.\n\n")
+		cat("\n")
 	}
 	invisible(x)
 }
@@ -884,19 +930,23 @@ summary.sienaBayesFit <- function(object, ...)
 ##@print.summary.sienaBayesFit Methods
 print.summary.sienaBayesFit <- function(x, ...)
 {
+# Still to do: quantile(x$ThinPosteriorSigma, probs=c(0.025, 0.5, 0.975))
+# etcetera
 	if (!inherits(x, "summary.sienaBayesFit"))
 	{
         stop("not a legitimate summary of a Siena Bayes model fit")
 	}
-	nmain <- dim(x$ThinPosteriorMu)[1]
+	ntot <- dim(x$ThinPosteriorMu)[1]
+
 	if (x$frequentist)
 	{
 		cat("Frequentist estimation.\n")
-		first <- nmain - x$lengthPhase3 + 1
+		first <- x$nwarm + x$nmain - x$lengthPhase3 + 1
 	}
 	else
 	{
-		first <- 1
+		cat("Bayesian estimation.\n")
+		first <- x$nwarm + 1
 		cat("Prior distribution:\n")
 		cat("\nMu      ")
 		for (i in seq(along=x$priorMu))
@@ -913,11 +963,46 @@ print.summary.sienaBayesFit <- function(x, ...)
 		{
 			cat("\nKappa  ",sprintf("%8.4f", x$priorKappa),"\n")
 		}
-		cat("\nFor the basic rate parameters, ")
-		cat("the prior is on the square root scale.\n\n")
+#		cat("\nFor the basic rate parameters, ")
+#		cat("the prior is on the square root scale.\n\n")
+	}
+	if (x$incidentalBasicRates)
+	{
+		cat("\nBasic rates parameters are treated as incidental parameters.\n\n")
+	}
+	cat("\nAlgorithm specifications were nwarm =",x$nwarm,", nmain =", x$nmain,
+	    ", nrunMHBatches =", x$nrunMHBatches, ".\n")
+	if (ntot < x$nwarm + x$nmain)
+	{
+		cat("This object resulted from an intermediate save, after",
+			ntot, " MCMC runs.")
+	}
+	if (x$frequentist)
+	{
+		cat("Lengths of phases were:\n")
+		cat("Phase 1:", x$lengthPhase1, ", phase 2:",
+			x$nmain - x$lengthPhase3 - x$lengthPhase1,
+			", phase 3:", x$lengthPhase1, ".\n")
+		cat("Posterior means and standard deviations are")
+		cat(" averages over phase 3.\n\n")
+	}
+	else
+	{
+		cat("Posterior means and standard deviations are averages over")
+		cat(" the last", ntot - first + 1, "runs.\n\n")
+	}
+	if (ntot > first+2)
+	{
+		cat("Proportion of acceptances in MCMC proposals after warming up:\n")
+		cat(sprintf("%4.2f",
+			colMeans(x$ThinBayesAcceptances[first:ntot,])/x$nrunMHBatches),
+			fill=TRUE,"\n")
+		cat("This should ideally be close to 0.25.\n")
 	}
 	print.sienaBayesFit(x)
 
+	if (ntot > first+2)
+	{
 	cat("Posterior means and standard deviations per group\n")
 	for (i in 1:length(x$f$groupNames))
 	{
@@ -925,8 +1010,8 @@ print.summary.sienaBayesFit <- function(x, ...)
 		# Make temporary changes to make x look like a sienaFit object
 		# so that sienaFitThetaTable can be applied.
 		# This is done in function makeTemp.
-		x$theta <- colMeans(x$ThinParameters[first:nmain,i,])
-		x$covtheta <- cov(x$ThinParameters[first:nmain,i,])
+			x$theta <- colMeans(x$ThinParameters[first:ntot,i,])
+			x$covtheta <- cov(x$ThinParameters[first:ntot,i,])
 		tmps <- makeTemp(x)
 		tmp <- tmps[[1]]
 		tmp1 <- tmps[[2]]
@@ -946,6 +1031,7 @@ print.summary.sienaBayesFit <- function(x, ...)
 				}
 			}
 			cat(tmp1[i], '\n')
+			}
 		}
 	}
 	invisible(x)

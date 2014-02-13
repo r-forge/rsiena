@@ -37,6 +37,10 @@ StructuralRateEffect::StructuralRateEffect(const NetworkVariable * pVariable,
 	{
 		this->lpTable = new EffectValueTable(possibleDegree, invertor);
 	}
+	else if (this->ltype == LOG_OUT_DEGREE_RATE)
+	{
+		this->lpTable = new EffectValueTable(possibleDegree, logarithmer);
+	}
 	else
 	{
 		this->lpTable = new EffectValueTable(possibleDegree, identity);
@@ -67,6 +71,7 @@ double StructuralRateEffect::value(int i)
 	{
 		case OUT_DEGREE_RATE:
 		case INVERSE_OUT_DEGREE_RATE:
+		case LOG_OUT_DEGREE_RATE:
 			return this->lpTable->value(pNetwork->outDegree(i));
 
 		case IN_DEGREE_RATE:

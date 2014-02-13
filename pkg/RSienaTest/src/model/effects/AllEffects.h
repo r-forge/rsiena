@@ -66,6 +66,7 @@
 #include "ReciprocityEffect.h"
 #include "SameCovariateEffect.h"
 #include "SameCovariateTransitiveTripletsEffect.h"
+#include "HomCovariateTransitiveTripletsEffect.h"
 #include "SimilarityEffect.h"
 #include "SimilarityTransitiveTripletsEffect.h"
 #include "ThreeCyclesEffect.h"

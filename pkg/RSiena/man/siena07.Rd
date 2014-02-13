@@ -124,10 +124,9 @@ mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
-# or for conditional estimation
+# or for non-conditional estimation
 \dontrun{
-myalgorithm$condname <- "mynet1"
-myalgorithm$cconditional <- TRUE
+myalgorithm$cconditional <- FALSE
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
         }
 

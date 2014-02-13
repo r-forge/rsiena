@@ -20,6 +20,8 @@ namespace siena
 
 /**
  * Constructs a  twonetwork cache for the given networks.
+ * Note that first network = W (explanatory network),
+ * second network = X (dependent network)
  */
 TwoNetworkCache::TwoNetworkCache(const Network * pFirstNetwork,
 	const Network * pSecondNetwork)
@@ -55,6 +57,9 @@ TwoNetworkCache::TwoNetworkCache(const Network * pFirstNetwork,
 		this->lpTwoPathTable = 0;
 	}
 
+	this->lpInStarTable =
+		new MixedTwoPathTable(this, FORWARD, BACKWARD);
+
 	this->initialize(-1);
 }
 
@@ -67,10 +72,12 @@ TwoNetworkCache::~TwoNetworkCache()
 	delete[] this->lfirstOutTieValues;
 	delete[] this->lsecondOutTieValues;
 	delete this->lpTwoPathTable;
+	delete this->lpInStarTable;
 
 	this->lfirstOutTieValues = 0;
 	this->lsecondOutTieValues = 0;
 	this->lpTwoPathTable = 0;
+	this->lpInStarTable = 0;
 }
 
 
@@ -100,6 +107,8 @@ void TwoNetworkCache::initialize(int ego)
 	{
 		this->lpTwoPathTable->initialize(ego);
 	}
+
+	this->lpInStarTable->initialize(ego);
 
 }
 

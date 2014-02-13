@@ -13,9 +13,9 @@
 #define NETWORK_H_
 
 #include <map>
+#include <list>
 
-namespace siena
-{
+namespace siena {
 
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
@@ -23,14 +23,15 @@ namespace siena
 
 class TieIterator;
 class IncidentTieIterator;
-
+class INetworkChangeListener;
 
 // ----------------------------------------------------------------------------
 // Section: Enums
 // ----------------------------------------------------------------------------
 
-enum ChangeType {REPLACE, INCREASE};
-
+enum ChangeType {
+	REPLACE, INCREASE
+};
 
 // ----------------------------------------------------------------------------
 // Section: Network class
@@ -43,8 +44,7 @@ enum ChangeType {REPLACE, INCREASE};
  * OneModeNetwork is recommended. The ties are valued and multiple ties between
  * the same pair of actors are forbiden.
  */
-class Network
-{
+class Network {
 public:
 	Network(int n, int m);
 	Network(const Network & rNetwork);
@@ -76,9 +76,15 @@ public:
 	int maxTieValue() const;
 
 	bool complete() const;
+	bool hasEdge(int ego, int alter) const;
+	virtual bool isOneMode() const;
 
 	int outTwoStarCount(int i, int j) const;
 	int inTwoStarCount(int i, int j) const;
+
+	void addNetworkChangeListener(INetworkChangeListener* const listener);
+
+	void removeNetworkChangeListener(INetworkChangeListener* const listener);
 
 	inline int modificationCount() const;
 
@@ -93,6 +99,9 @@ protected:
 private:
 	void allocateArrays();
 	void deleteArrays();
+	void fireNetworkClearEvent() const;
+	void fireIntroductionEvent(int ego, int alter) const;
+	void fireWithdrawalEvent(int ego, int alter) const;
 
 	// The number of senders
 	int ln;
@@ -118,9 +127,8 @@ private:
 
 	int lmodificationCount;
 
-	// whether this network is one mode or not;
-
-	bool loneMode;
+	// set of network change listener
+	std::list<INetworkChangeListener*> lNetworkChangeListener;
 };
 
 
@@ -131,8 +139,7 @@ private:
 /**
  * Returns the number of times this network has been changed.
  */
-int Network::modificationCount() const
-{
+int Network::modificationCount() const {
 	return this->lmodificationCount;
 }
 

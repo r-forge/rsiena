@@ -119,6 +119,7 @@ public:
 	double inDegreeScore(const NetworkVariable * pNetwork) const;
 	double reciprocalDegreeScore(const NetworkVariable * pNetwork) const;
 	double inverseOutDegreeScore(const NetworkVariable * pNetwork) const;
+	double logOutDegreeScore(const NetworkVariable * pNetwork) const;
 
 	// Diffusion effects
 
@@ -299,6 +300,9 @@ private:
 	// Scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeScores;
 
+	// Scores for rate effects depending on log degree
+	map<const NetworkVariable *, double> llogOutDegreeScores;
+
 	// Sum term for scores for rate effects depending on constant covariates
 	map<const ConstantCovariate *, double> lconstantCovariateSumTerm;
 
@@ -320,6 +324,9 @@ private:
 	// Sum term for scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeSumTerm;
 
+	// Sum term for scores for rate effects depending on log degree
+	map<const NetworkVariable *, double> llogOutDegreeSumTerm;
+
 	// Sum term for model B scores for rate effects depending on constant
 	// covariates
 	map<const ConstantCovariate *, double> lconstantCovariateModelBSumTerm;
@@ -337,6 +344,9 @@ private:
 
 	// Sum term for model B scores for rate effects depending on inverse degree
 	map<const NetworkVariable *, double> linverseOutDegreeModelBSumTerm;
+
+	// Sum term for model B scores for rate effects depending on log degree
+	map<const NetworkVariable *, double> llogOutDegreeModelBSumTerm;
 
 	// Indicates if the rates are valid and shouldn't be recalculated
 	// provided that the rates are constant during the period.

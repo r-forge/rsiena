@@ -11,7 +11,7 @@
 ## ****************************************************************************/
 ##@print.sienaEffects Methods
 print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
-                               expandDummies=FALSE, ...)
+                               expandDummies=FALSE, includeRandoms = FALSE, ...)
 {
     if (!inherits(x, "sienaEffects"))
         stop("not a legitimate Siena effects object")
@@ -44,6 +44,7 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
         nDependents <- length(unique(x$name))
         userSpecifieds <- x$shortName[x$include] %in% c("unspInt", "behUnspInt")
         endowments <- !x$type[x$include] %in% c("rate", "eval")
+											# includes creations
         timeDummies <- !x$timeDummy[x$include] == ","
         specs <- x[, c("name", "effectName", "include", "fix", "test",
                        "initialValue", "parm")]
@@ -71,6 +72,10 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
                 specs <- cbind(specs, effect3=x[x$include, "effect3"])
             }
         }
+		if (includeRandoms)
+		{
+		     specs <- cbind(specs, randomEffects=x[x$include, "randomEffects"])
+   		}
         specs[, "initialValue"] <- format(round(specs$initialValue,digits=5),
                                           width=10)
         if (nrow(specs) > 0)

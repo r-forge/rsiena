@@ -333,6 +333,11 @@ depvar <- attr(effects, "depvar")
         rateEffects[1:noPeriods, "initialValue"] <-  starts$startRate
         rateEffects$basicRate[1:observations] <- TRUE
 
+		objEffects[objEffects$shortName == "density" &
+                       objEffects$type == "eval",'randomEffects'] <- TRUE # added dec2013
+		objEffects[objEffects$shortName == "linear" &
+                       objEffects$type == "eval",'randomEffects'] <- TRUE # added dec2013
+
         objEffects$untrimmedValue <- rep(0, nrow(objEffects))
         if (attr(depvar,'symmetric'))
         {

@@ -37,7 +37,7 @@ variable in the input object, with columns
   \item{type}{"eval", "endow", "creation", or "rate"}
   \item{basicRate}{boolean: whether a basic rate parameter}
   \item{include}{boolean: include in the model to be fitted or not}
-  \item{randomEffects}{boolean: random or fixed effect. Currently not used.}
+  \item{randomEffects}{boolean: random or fixed effect. Only used in \code{\link{sienaBayes}}}
   \item{fix}{boolean: fix parameter value or not}
   \item{test}{boolean: test parameter value or not}
   \item{timeDummy}{comma separated list of periods, or "all",
@@ -65,7 +65,9 @@ variable in the input object, with columns
   \item{effectNumber}{a unique identifier of the row}
   The combination of \code{name}, \code{shortName}, \code{interaction1},
   \code{interaction2}, and \code{type} uniquely identifies any effect
-  other than basic rate effects. The combination \code{name},
+  other than basic rate effects and user-specified interaction effects.
+  For the latter, \code{effect1}, \code{effect2} and \code{effect3}
+  are also required for the identification. The combination \code{name},
   \code{shortName}, \code{period} and \code{group} uniquely identifies a
   basic rate effect.
 
@@ -84,6 +86,7 @@ mycovar <- coCovar(rnorm(50))
 mydyadcovar <- coDyadCovar(matrix(as.numeric(rnorm(2500) > 2), nrow=50))
 mydata <- sienaDataCreate(mynet1, mybeh, mycovar, mydyadcovar)
 myeff <- getEffects(mydata)
+myeff
 }
 
 % Add one or more standard keywords, see file "KEYWORDS" in the
