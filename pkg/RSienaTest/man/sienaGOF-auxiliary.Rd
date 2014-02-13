@@ -71,6 +71,14 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
  they will be supplemented in due time by statistics depending on networks and
  behavior jointly.
 
+ The \code{levls} parameter must be adapted to the range of values that is
+ considered important. For indegrees and outdegrees, the whole range should 
+ usually be covered. If the range is large, which could be the case, e.g.,
+ for indegrees of two-mode networks where the second mode has few nodes,
+ think about the possibility of making a selection such as
+ \code{levls=5*(0:20)} or \code{levls=c(0:4,5*(1:20))};
+ which in most cases will make sense only if \code{cumulative=TRUE}.
+
  The method signature for the auxiliary statistics generally is\cr
  \code{function(i, obsData, sims, period, groupName, varName, \dots)}.
  For constructing new auxiliary statistics, it is helpful to
@@ -121,7 +129,7 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
   for general information on RSiena.
 \item Lospinoso, J.A. and Snijders, T.A.B., \dQuote{Goodness of fit for
 Stochastic Actor Oriented Models.} Presentation given at Sunbelt XXXI,
- St. Pete"s Beach, Fl. 2011.
+ St. Pete's Beach, Fl. 2011.
 \item Lospinoso, J.A. (2012). \dQuote{Statistical Models for Social Network Dynamics.}
 Ph.D. Thesis. University of Oxford: U.K.
 }
@@ -203,7 +211,7 @@ Ph.D. Thesis. University of Oxford: U.K.
 
    ### Then some auxiliary statistics.
 
-   # GeodesicDistribution calculates the distribution of directed
+   # GeodesicDistribution calculates the distribution of non-directed
    # geodesic distances; see ?sna::geodist
    # The default for \code{levls} reflects that geodesic distances larger than 5
    # do not differ appreciably with respect to interpretation.
@@ -213,7 +221,7 @@ Ph.D. Thesis. University of Oxford: U.K.
                            varName, levls=c(1:5,Inf), cumulative=TRUE, ...) {
      x <- networkExtraction(i, data, sims, period, groupName, varName)
      require(sna)
-     a <- sna::geodist(x)$gdist
+     a <- sna::geodist(symmetrize(x))$gdist
      if (cumulative)
      {
        gdi <- sapply(levls, function(i){ sum(a<=i) })
@@ -232,6 +240,8 @@ Ph.D. Thesis. University of Oxford: U.K.
        require(sna)
        require(network)
        x <- networkExtraction(i, data, sims, wave, groupName, varName)
+	   if (network.edgecount(x) <= 0){x <- symmetrize(x)}
+       # because else triad.census(x) will lead to an error
        tc <- sna::triad.census(x)[1,levls]
        # names are transferred automatically
        tc

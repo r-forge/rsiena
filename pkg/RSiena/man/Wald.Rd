@@ -15,15 +15,14 @@ Multipar.RSiena(ans, \ldots)
 }
 %- maybe also "usage" for other objects documented here.
 \arguments{
-  \item{A}{A \code{k} \eqn{\times} \code{p} matrix, where \code{p = ans$pp},
+  \item{A}{A \code{k} * \code{p} matrix, where \code{p = ans$pp},
   the number of parameters in \code{ans} excluding the basic rate parameters
   used for conditional estimation.}
   \item{ans}{An object of class \code{\link{sienaFit}},
     resulting from a call to \code{\link{siena07}.}}
   \item{\dots}{One or more integer numbers between 1 and p, specifying
-    the numbers of the tested effects
-	(candidates are the numbers	of 'Other parameters'
-	given in \code{print(ans)}).}
+    the tested effects
+	(numbered as in 'Other parameters' given in \code{print(ans)}).}
 }
 
 \details{The hypothesis tested by \code{Wald.RSiena}
@@ -39,10 +38,10 @@ Multipar.RSiena(ans, \ldots)
 }
 \value{A list of three elements:
 \itemize{
-  \item{chisquare }{ The test statistic, assumed to have a chi-squared null
+  \item{chisquare: }{ The test statistic, assumed to have a chi-squared null
     distribution.}
-  \item{df }{ The degrees of freedom.}
-  \item{pvalue }{ The associated \emph{p}-value.}
+  \item{df: }{ The degrees of freedom.}
+  \item{pvalue: }{ The associated \emph{p}-value.}
 }
 }
 \references{See the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}}

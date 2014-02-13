@@ -1,9 +1,42 @@
+2014-02-13 R-Forge Revision 251
+Changes in RSiena and RSienaTest:
+   * Also cater for behavior user-specified interactions in includeInteraction
+     and setEffect (sienaeffects.r).
+   * New effects: "cl.XWX", "homXTransTrip", "homWXClosure", and "sharedPop".
+   * Effect "cycle4" extended to non-directed one-mode networks
+   * (for directed one-mode networks it is "sharedPop").
+   * Effects "gwesp.." modified; extended to non-directed networks.
+   * Correction: Effect "to" is not a dyadic effect (allEffects.csv)
+   * sienaGOF: added the name of the siena fit object
+     as attribute "sienaFitName" to each of the sienaGofTest objects.
+   * Manual: added paragraph about how to import results from
+     xtable() and siena.table() into MS-Word.
+   * Correction in sparseNetworkExtraction() to avoid errors occurring
+     when the extracted network has no edges (sienaGOF.r).
+   * In the help page for sienaGOF-auxiliary, geodesic distances
+     changed to non-directed; which avoids a further error
+     when the extracted network has no edges.
+   * Correction of an error in print.siena for data sets including
+     other types than "oneMode".
+   * Changed bandwidth selector for violin plots in plot.sienaGOF to "nrd",
+     to avoid long violins in cases where all simulations have the same outcome.
+   * Added parameter "includeRandoms" to print.sienaEffects.
+   * sienaGOF checks that the sienaFitObject object was not made
+     by maximum likelihood estimation.
+Changes in RSiena:
+   * Ported effects outRateLog and outTrunc2 from RSienaTest.
+   * Ported changes (new folders and files) in \src\network\ from RSienaTest.
+Changes in RSienaTest:
+   * Major changes to sienaBayes and print.sienaBayes,
+     to permit estimation of multilevel stochastic actor-oriented model with
+     effects varying between groups for only a subset of the effects.
+
 2013-12-04 R-Forge Revision 250
 Changes in RSiena and RSienaTest:
    * New option "centered" in coCovar and varCovar (sienautils.r,
      sienaDataCreate.r, print01Report.r, sienaprint.r).
    * setEffect, updateTheta, and prevAns in siena07() now also cater
-     for unspecified interactions (sienaeffects.r, initializeFRAN.r).
+     for user-specified interactions (sienaeffects.r, initializeFRAN.r).
    * Wald.RSiena and Multipar.RSiena added (Sienatest.r).
    * Error occurrence with message about cvalue in EvaluateTestStatistic
      corrected (Sienatest.r).

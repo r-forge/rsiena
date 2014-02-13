@@ -88,16 +88,6 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         tmp
     }
 
-##@addSettingseffects internal getEffects add effects for settings model
-addSettingsEffects <- function(effects)
-{
-depvar <- attr(effects, "depvar")
-	## This processes the settings (constant dyadic covariate) structure.
-	## Only for one-mode network.
-	nbrSettings <- length(attr(depvar,"settings"))
-	## This leads to a warning in R CMD Check.
-	## Not important since this is just a stub, to be developed later.
-}
     ##@networkRateEffects internal getEffects create a set of rate effects
     networkRateEffects <- function(depvar, varname, symmetric, bipartite)
     {
@@ -332,6 +322,11 @@ depvar <- attr(effects, "depvar")
         rateEffects[1:noPeriods, "include"] <- TRUE
         rateEffects[1:noPeriods, "initialValue"] <-  starts$startRate
         rateEffects$basicRate[1:observations] <- TRUE
+
+		objEffects[objEffects$shortName == "density" &
+                       objEffects$type == "eval",'randomEffects'] <- TRUE # added dec2013
+		objEffects[objEffects$shortName == "linear" &
+                       objEffects$type == "eval",'randomEffects'] <- TRUE # added dec2013
 
         objEffects$untrimmedValue <- rep(0, nrow(objEffects))
         if (attr(depvar,'symmetric'))

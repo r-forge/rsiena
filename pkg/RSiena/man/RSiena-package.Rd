@@ -24,7 +24,8 @@ Package \code{"RSiena"} is the official release.
   Data objects can be created from matrices and
   vectors using \code{\link{sienaDependent}}, \code{\link{coCovar}} etc.,
   and finally \code{\link{sienaDataCreate}}.
-  Another possibility (but with less flexibility) is via the
+  Another possibility (but our advice is not to use this,
+  because of the lesser flexibility) is via the
   Gui displayed by \code{\link{siena01Gui}}, or via
   \code{\link{sienaDataCreateFromSession}}.
 
@@ -43,8 +44,8 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.1-250\cr
-Date: \tab 2013-12-03\cr
+Version: \tab 1.1-251\cr
+Date: \tab 2014-02-13\cr
 Depends: \tab R (>= 2.15.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -59,7 +60,7 @@ BuildResaveData: \tab no\cr
 \author{
   Ruth Ripley, Krists Boitmanis, Tom Snijders.
   Contributions by Josh Lospinoso, Charlotte Greenan, Christian Steglich,
-  Johan Koskinen, Mark Ortmann, and Nynke Niezink.
+  Johan Koskinen, Mark Ortmann, Nynke Niezink, and Robert Hellpap.
 
   Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>
 }

@@ -11,7 +11,7 @@
 }
 \usage{
 \method{print}{sienaEffects}(x, fileName = NULL, includeOnly=TRUE,
-expandDummies = FALSE, ...)
+expandDummies = FALSE, includeRandoms = FALSE, ...)
 \method{summary}{sienaEffects}(object, fileName = NULL,
 includeOnly=TRUE, expandDummies = FALSE, ...)
 \method{print}{summary.sienaEffects}(x, fileName = NULL, ...)
@@ -27,6 +27,8 @@ includeOnly=TRUE, expandDummies = FALSE, ...)
 	flag TRUE will be printed.}
   \item{expandDummies}{Interpret the \code{timeDummy} column and show
 	any effects which would be added by \code{sienaTimeFix}}
+  \item{includeRandoms}{Boolean. If TRUE, also the
+	\code{randomEffects} column will be printed.}
   \item{\dots}{For extra arguments (none used at present)}
 }
 \value{

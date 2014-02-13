@@ -196,7 +196,7 @@ InitReports <- function(z, seed, newseed)
         revision <- paste(" R-forge revision: ", rforgeRevision, " ", sep="")
     }
     version <- packageDescription(pkgname, fields = "Version")
-    Report(c("\nSiena version ", version, " (",
+    Report(c("\nRSienaTest version ", version, " (",
              format(as.Date(packageDescription(pkgname, fields = "Date")),
                     "%d %b %y"), ")",
              revision, "\n\n"), sep = '',  outf )

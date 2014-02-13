@@ -918,6 +918,12 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 						1.0 / (pStructural->outDegree(iter.ego()) + 1) *
 						iter.value();
 				}
+				else if (effectName == "outRateLog")
+				{
+					statistic +=
+						log(pStructural->outDegree(iter.ego()) + 1) *
+						iter.value();
+				}
 				else
 				{
 					throw domain_error("Unexpected rate effect " + effectName);
@@ -1103,6 +1109,12 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 				{
 					statistic +=
 						1.0 / (pStructural->outDegree(i) + 1) *
+						difference[i];
+				}
+				else if (effectName == "outRateLog")
+				{
+					statistic +=
+						log(pStructural->outDegree(i) + 1) *
 						difference[i];
 				}
 				else

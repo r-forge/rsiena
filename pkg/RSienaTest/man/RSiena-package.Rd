@@ -26,7 +26,8 @@ Package \code{"RSiena"} is the official release.
   Data objects can be created from matrices and
   vectors using \code{\link{sienaDependent}}, \code{\link{coCovar}} etc.,
   and finally \code{\link{sienaDataCreate}}.
-  Another possibility (but with less flexibility) is via the
+  Another possibility (but our advice is not to use this,
+  because of the lesser flexibility) is via the
   Gui displayed by \code{\link{siena01Gui}}, or via
   \code{\link{sienaDataCreateFromSession}}.
 
@@ -41,12 +42,12 @@ Package \code{"RSiena"} is the official release.
 
   More detailed help is available in the manual which you can display
   using \cr
-  \code{RShowDoc("RSiena_Manual", package="RSiena")}
+  \code{RShowDoc("RSiena_Manual", package="RSienaTest")}
 \tabular{ll}{
 Package: \tab RSienaTest\cr
 Type: \tab Package\cr
-Version: \tab 1.1-250\cr
-Date: \tab 2013-12-04\cr
+Version: \tab 1.1-251\cr
+Date: \tab 2014-02-13\cr
 Depends: \tab R (>= 2.15.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -61,7 +62,7 @@ BuildResaveData: \tab no\cr
 \author{
   Ruth Ripley, Krists Boitmanis, Tom Snijders.
   Contributions by Josh Lospinoso, Charlotte Greenan, Christian Steglich,
-  Johan Koskinen, Mark Ortmann, and Nynke Niezink.
+  Johan Koskinen, Mark Ortmann, Nynke Niezink, and Robert Hellpap.
 
   Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>
 }
@@ -82,7 +83,7 @@ BuildResaveData: \tab no\cr
     edited by Kees van Montfort, Han Oud and Albert Satorra; Lawrence Erlbaum.
    \item Steglich, Christian E.G., Snijders, Tom A.B., and
     Pearson, Michael A. (2010). Dynamic networks and behavior:
-    Separating selection from influence. \emph{Sociological Methodology}, 
+    Separating selection from influence. \emph{Sociological Methodology},
 	40, 329-393.
    \item Further see the extensive manual accessible by the command\cr
     \code{RShowDoc("RSiena_Manual", package="RSienaTest")}\cr

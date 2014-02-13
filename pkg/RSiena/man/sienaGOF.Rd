@@ -152,6 +152,8 @@ We recommend the following heuristic approach to model checking:
     the list elements are themselves lists again, including the
     following elements:
     \describe{
+    \item{* sienaFitName}{The name of sienaFitObject.}
+    \item{* auxiliaryStatisticName}{The name of auxiliaryFunction.}
     \item{* Observations}{The observed values for the auxiliary statistics.}
     \item{* Simulations}{The simulated auxiliary statistics.}
     \item{* ObservedTestStat}{The observed Mahalanobis distance in the data.}

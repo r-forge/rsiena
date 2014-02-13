@@ -34,7 +34,7 @@ class SqrtTable;
 class FourCyclesEffect : public NetworkEffect
 {
 public:
-	FourCyclesEffect(const EffectInfo * pEffectInfo);
+	FourCyclesEffect(const EffectInfo * pEffectInfo, bool TwoMode);
 	virtual ~FourCyclesEffect();
 
 	virtual void initialize(const Data * pData,
@@ -49,6 +49,9 @@ protected:
 	virtual double tieStatistic(int alter);
 
 private:
+	// Indicates if the effect is used for a two-mode or one-mode network
+	bool lTwoMode;
+
 	void countThreePaths(int i, const Network * pNetwork, int * counters)
 		const;
 

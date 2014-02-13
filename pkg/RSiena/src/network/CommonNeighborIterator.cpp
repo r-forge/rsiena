@@ -1,8 +1,7 @@
 #include "CommonNeighborIterator.h"
 #include "../utils/Utils.h"
 
-namespace siena
-{
+namespace siena {
 
 // ----------------------------------------------------------------------------
 // Section: Construction area
@@ -12,14 +11,11 @@ namespace siena
  * Creates an iterator over actors common to both of the given incident
  * tie iterators.
  */
-CommonNeighborIterator::CommonNeighborIterator(IncidentTieIterator iter1,
-	IncidentTieIterator iter2)
-{
-	// Store the iterators.
-	
-	this->liter1 = iter1;
-	this->liter2 = iter2;
-	
+CommonNeighborIterator::CommonNeighborIterator(const IncidentTieIterator& iter1,
+		const IncidentTieIterator& iter2) :
+		ITieIterator(), //
+		liter1(iter1), //
+		liter2(iter2) {
 	// Make sure they point to the first common actor.
 	this->skipMismatches();
 }
@@ -32,8 +28,7 @@ CommonNeighborIterator::CommonNeighborIterator(IncidentTieIterator iter1,
 /**
  * Indicates if there are still some common actors to be reported.
  */
-bool CommonNeighborIterator::valid() const
-{
+bool CommonNeighborIterator::valid() const {
 	return this->liter1.valid() && this->liter2.valid();
 }
 
@@ -41,10 +36,8 @@ bool CommonNeighborIterator::valid() const
 /**
  * Returns the current common actor.
  */
-int CommonNeighborIterator::actor() const
-{
-	if (!this->valid())
-	{
+int CommonNeighborIterator::actor() const {
+	if (!this->valid()) {
 		throw InvalidIteratorException();
 	}
 
@@ -56,10 +49,8 @@ int CommonNeighborIterator::actor() const
 /**
  * Moves on to the next common actor if any.
  */
-void CommonNeighborIterator::next()
-{
-	if (!this->valid())
-	{
+void CommonNeighborIterator::next() {
+	if (!this->valid()) {
 		throw InvalidIteratorException();
 	}
 
@@ -71,6 +62,9 @@ void CommonNeighborIterator::next()
 	this->skipMismatches();
 }
 
+CommonNeighborIterator* CommonNeighborIterator::clone() const {
+	return new CommonNeighborIterator(*this);
+}
 
 // ----------------------------------------------------------------------------
 // Section: Private methods
@@ -80,21 +74,27 @@ void CommonNeighborIterator::next()
  * Advances both iterators until they point to the same actor. If there is
  * no such an actor, one of the iterators becomes invalid and we stop.
  */
-void CommonNeighborIterator::skipMismatches()
-{
-	while (this->liter1.valid() &&
-		this->liter2.valid() &&
-		this->liter1.actor() != this->liter2.actor())
-	{
-		if (this->liter1.actor() < this->liter2.actor())
-		{
-			this->liter1.next();
+void CommonNeighborIterator::skipMismatches() {
+	while (this->liter1.valid() && this->liter2.valid()
+			&& this->liter1.actor() != this->liter2.actor()) {
+		while (liter1.valid() && liter1.actor() < liter2.actor()) {
+			liter1.next();
 		}
-		else
-		{
-			this->liter2.next();
+		if (!liter1.valid()) {
+			return;
 		}
+		while (liter2.valid() && liter2.actor() < liter1.actor()) {
+			liter2.next();
 	}
+	}
+}
+
+CommonNeighborIterator::CommonNeighborIterator(
+		const CommonNeighborIterator& rhs) :
+		ITieIterator(rhs), //
+		liter1(rhs.liter1), //
+		liter2(rhs.liter2) {
+	// note there is no need to skip matches this has been down by rhs
 }
 
 }

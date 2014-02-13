@@ -218,7 +218,8 @@ includeInteraction <- function(myeff, ...,
 
 ##@setEffect DataCreate
 setEffect <- function(myeff, shortName, parameter=0,
-                      fix=FALSE, test=FALSE, initialValue=0,
+					fix=FALSE, test=FALSE, random=FALSE,
+					initialValue=0,
                       timeDummy=",",
                       include=TRUE, name=myeff$name[1],
                       type="eval", interaction1="", interaction2="",
@@ -236,7 +237,7 @@ setEffect <- function(myeff, shortName, parameter=0,
     myeff$interaction2 == interaction2 &
     (is.na(myeff$period) | myeff$period == period) &
     myeff$group == group
-	if (shortName == "unspInt")
+	if (shortName %in% c("unspInt", "behUnspInt"))
 	{
 		use <- use & (myeff$include) & (myeff$effect1 == effect1) &
 			(myeff$effect2 == effect2) & (myeff$effect3 == effect3)
@@ -249,7 +250,7 @@ setEffect <- function(myeff, shortName, parameter=0,
 		cat(paste("interaction2 = <",interaction2,">, ", sep=""))
 		cat(paste("type = <",type,">, ", sep=""))
 		cat(paste("period = <",period,">, ", sep=""))
-		if (shortName == "unspInt")
+		if (shortName %in% c("unspInt", "behUnspInt"))
 		{
 		cat(paste("effects1-2-3 = <",effect1, effect2, effect3,">,", sep=" "))
 		}
@@ -267,10 +268,10 @@ setEffect <- function(myeff, shortName, parameter=0,
     myeff[use, "test"] <- test
     myeff[use, "initialValue"] <- initialValue
     myeff[use, "timeDummy"] <- timeDummy
+	myeff[use, "randomEffects"] <- random
 #    print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
 #                       "interaction2", "include", "parm", "fix", "test",
 #                       "initialValue", "timeDummy", "period", "group")])
-	print.sienaEffects(myeff[use,])
-
+	print.sienaEffects(myeff[use,], includeRandoms = random)
     myeff
 }

@@ -24,9 +24,10 @@ namespace siena
 /**
  * Constructor.
  */
-FourCyclesEffect::FourCyclesEffect(const EffectInfo * pEffectInfo) :
+FourCyclesEffect::FourCyclesEffect(const EffectInfo * pEffectInfo, bool TwoMode) :
 	NetworkEffect(pEffectInfo)
 {
+	this->lTwoMode = TwoMode;
 	this->lcounters = 0;
 
 	if (pEffectInfo->internalEffectParameter() != 1 &&
@@ -66,7 +67,14 @@ void FourCyclesEffect::initialize(const Data * pData,
 	NetworkEffect::initialize(pData, pState, period, pCache);
 
 	delete[] this->lcounters;
+	if (this->lTwoMode)
+	{
 	this->lcounters = new int[this->pNetwork()->m()];
+}
+	else
+	{
+		this->lcounters = new int[this->pNetwork()->n()];
+	}
 }
 
 
@@ -113,11 +121,17 @@ void FourCyclesEffect::countThreePaths(int i,
 	const Network * pNetwork,
 	int * counters) const
 {
-	int m = pNetwork->m();
+
 
 	// Initialize
 
-	for (int j = 0; j < m; j++)
+	int nm = pNetwork->n();
+	if (this->lTwoMode)
+	{
+		nm = pNetwork->m();
+	}
+
+	for (int j = 0; j < nm; j++)
 	{
 		counters[j] = 0;
 	}

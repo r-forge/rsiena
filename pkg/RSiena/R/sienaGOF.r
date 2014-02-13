@@ -22,6 +22,11 @@ sienaGOF <- function(
 	require(MASS)
 	## require(Matrix)
 	##	Check input
+	if (sienaFitObject$maxlike)
+	{
+		stop(
+	"sienaGOF can only operate on results from Method of Moments estimation.")
+	}
 	if (! sienaFitObject$returnDeps)
 	{
 		stop("You must instruct siena07 to return the simulated networks")
@@ -219,6 +224,7 @@ sienaGOF <- function(
 				InvCovSimStats=a,
 				Rank=arank)
 		class(ret) <- "sienaGofTest"
+		attr(ret,"sienaFitName") <- deparse(substitute(sienaFitObject))
 		attr(ret,"auxiliaryStatisticName") <-
 				attr(obsStats,"auxiliaryStatisticName")
 		attr(ret, "key") <- plotKey
@@ -663,14 +669,15 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 	trellis.par.set("plot.symbol", plot.symbol)
 
 	panelFunction <- function(..., x=x, y=y, box.ratio){
-		ind.lower = max( round(itns * perc/2), 1)
-		ind.upper = round(itns * (1-perc/2))
-		yperc.lower = sapply(1:ncol(sims), function(i)
+		ind.lower <- max( round(itns * perc/2), 1)
+		ind.upper <- round(itns * (1-perc/2))
+		yperc.lower <- sapply(1:ncol(sims), function(i)
 					sort(sims[,i])[ind.lower]  )
-		yperc.upper = sapply(1:ncol(sims), function(i)
+		yperc.upper <- sapply(1:ncol(sims), function(i)
 					sort(sims[,i])[ind.upper]  )
 		if (violin) {
-			panel.violin(x, y, box.ratio=box.ratio, col = "transparent", ...)
+			panel.violin(x, y, box.ratio=box.ratio, col = "transparent",
+					bw="nrd", ...)
 		}
 		panel.bwplot(x, y, box.ratio=.1, fill = "gray", ...)
 		panel.xyplot(xAxis, yperc.lower, lty=3, col = "gray", lwd=3, type="l",
@@ -799,8 +806,8 @@ descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
 # values in X to structural values in S
 # X must have values 0, 1.
 # NA values in X will be 0 in the result.
-changeToStructural <- function(X, S)
-	{if (any(S >= 10, na.rm=TRUE))
+changeToStructural <- function(X, S) {
+	if (any(S >= 10, na.rm=TRUE))
 		{
 			S[is.na(S)] <- 0
 			S0 <- Matrix(S==10)
@@ -817,8 +824,7 @@ changeToStructural <- function(X, S)
 # for tie variables that have no structural values in SBefore.
 # X must have values 0, 1.
 # NA values in X or SBefore or SAfter will be 0 in the result.
-changeToNewStructural <- function(X, SBefore, SAfter)
-	{
+changeToNewStructural <- function(X, SBefore, SAfter) {
 		SB <- Matrix(SBefore>=10)
 		SA <- Matrix(SAfter>=10)
 		if (any(SA>SB, na.rm=TRUE))
@@ -946,12 +952,10 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
 	isbipartite <- (attr(obsData[[groupName]]$depvars[[varName]], "type")
 						=="bipartite")
-# sparseData may be dropped - if that's OK
-#	sparseData <- (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
 	# For bipartite networks in package <network>,
 	# the number of nodes is equal to
 	# the number of actors (rows) plus the number of events (columns)
-	# with all actors preceeding all events.
+	# with all actors preceding all events.
 	# Therefore the bipartiteOffset will come in handy:
 	bipartiteOffset <- ifelse (isbipartite, 1 + dimsOfDepVar[1], 1)
 
@@ -977,10 +981,17 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 # the 1 in the 3d column of cbind below is redundant
 # because of the default ignore.eval=TRUE in network.edgelist.
 # But it is good to be explicit.
+	if (sum(matrixNetwork) <= 0) # else network.edgelist() below will not work
+	{
+		returnValue <- emptyNetwork
+	}
+	else
+	{
 		returnValue <- network.edgelist(
 					cbind(sparseMatrixNetwork@i + 1,
 					sparseMatrixNetwork@j + bipartiteOffset, 1),
 					emptyNetwork)
+	}
   returnValue
 }
 

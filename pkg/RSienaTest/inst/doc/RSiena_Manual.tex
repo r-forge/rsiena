@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-250.
+This version was renewed for \RS version 1.1-251.
 \end{abstract}
 
 
@@ -374,6 +374,8 @@ SAOMs implemented in \SI are often referred to as `\SI models'.
 In this subsection, we only consider the case of network evolution;
 see below for the more complex cases of coevolution.
 For a further introduction, consult  \citet{SnijdersEA10b}.
+An introduction for applications in the context of adolescent
+development is \citet{VeenstraEtAl2013}.
 
 The defining characteristic of {\saom}s
 is their `actor-oriented' nature which means that they model
@@ -885,8 +887,30 @@ of \rs.
 
 \begin{enumerate}
 \item Look at the start of the output file obtained from
-       \sfn{print01Report} for general data
-      description (degrees, etc.), to check your data input.\\
+       \sfn{print01Report()} for general data
+      description (degrees, etc.), to check your data input
+      and get a general overview of the data set.
+
+      In this file, there is a section ``Change in networks'' which contains
+      some basic descriptives. Some of these refer to the \emph{periods}:
+      these are the combinations of two successive waves.
+      For example, a two-wave data set has one period, and a
+      three-wave data sets has periods $1 \Rightarrow 2$ and $2 \Rightarrow 3$.
+      The \texttt{Distance} mentioned there
+      is the Hamming distance between successively observed networks, i.e.,
+      the number of tie variables that differ.
+      The \texttt{Jaccard} index is the Jaccard distance between the
+      successive networks:
+      \[
+         \frac{N_{11}}{N_{01}+N_{10}+N_{11}} \ ,
+      \]
+      where $N_{hk}$ is the number of tie variables with value $h$ in one
+      wave and value $k$ in the next wave. The Jaccard index is a measure for
+      stability; see \citet{SnijdersEA10b}.
+      Both for the Hamming distance and the Jaccard index, only those cells
+      in the adjacency matrix are counted that have available data in the wave
+      at the start \underline{and} the wave at the end of the period concerned.
+
       If Jaccard indices are very low while the average
       degree is not strongly increasing, this indicates
       that the turnover in the network may be too high to consider
@@ -894,6 +918,15 @@ of \rs.
       is not suitable for the data set. Jaccard values of .3 and higher
       are good; lower than .2 indicates that there might be difficulties
       in estimation; lower than .1 is quite low indeed.
+      Using the \SI method for two waves with an extremely low Jaccard
+      index and average degrees that remain more or less constant
+      will mean that the first wave hardly plays a role in the results, and
+      for non-conditional estimation it will be close to treating the second wave as
+      a sample from the stationary distribution of the network dynamics.
+
+      If Jaccard indices are low because the network is mainly increasing
+      (creation of new ties) or decreasing (termination of ties),
+      this is no problem for the \SI method.
 \item When parameters have been estimated, first look at the \texttt{t
       ratios for deviations from targets}.
       We say that the algorithm has converged if they are all smaller than 0.1
@@ -941,7 +974,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-250) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-251) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -2084,7 +2117,7 @@ the possible new values for the behavior variable are the current
 value, this value + 1, and this value --1, as long as these changes
 do not take the value out of the permitted range.
 More elaborate explanations are in
-\citep*{SnijdersEA07, SnijdersEA10b, SteglichEA10}.
+\citep*{SnijdersEA07, SnijdersEA10b, SteglichEA10, VeenstraEtAl2013}.
 
 \subsection{Important structural effects for network dynamics:
            \protect\newline one-mode networks}
@@ -4100,6 +4133,26 @@ Output can be obtained in several ways.
         \sfn{sienaFit} object.
         The choice between \textsf{xtable.sienaFit} and \sfn{siena.table}
         depends on the preference for the tables produced.
+
+        For importing the results of \sfn{xtable} or \sfn{siena.table} into
+        MS-Word, the following steps can be used.
+
+        Request \texttt{siena.table(ans)} for some \sfn{sienaFit} object,
+        called \texttt{ans} in this example. This will produce,
+        under the default settings, the file \texttt{ans.htm} in the current
+        working directory.
+        Copy-paste this into the MS-Word file.
+        In MS-Word then select this table, but
+        only the lines of the header and the parameters, not any
+        preceding blank line nor the footnote.
+        In the MS-Word menu choose ``Insert –- Convert text to table -–
+        Autofit to contents''.
+        This will produce the table in your MS-Word file.
+        You can then further modify the table; e.g., change the double minus
+        sign \texttt{--} to the MS-Word minus sign $ - $
+        (available under ``insert -– symbol'') and replace the dots for the
+        `t stat.' of the rate parameters by blanks.
+
   \item The function \textsf{siena07}
         writes an output file which is an ASCII (`text') file that can be
         read by any text editor.
@@ -4804,9 +4857,11 @@ if $p$ = 5, we would use the matrix
                                    0, 0, 1, 0, 0
                   \end{array} \right) \ .
 \]
-Then the following function can be used to produce
+Then the function \sfn{Wald.RSiena()}
+can be used to produce
 the Wald-type test: the chi-squared value of the
 test statistic, the number of degrees of freedom, and the $p$-value.
+\iffalse
 \begin{verbatim}
 Wald.RSiena <- function(A, ans)
 {
@@ -4822,6 +4877,8 @@ Wald.RSiena <- function(A, ans)
     print(c(chisquare = chisq, df = d.f., pvalue = pval), digits=3)
 }
 \end{verbatim}
+This is available as function \sfn{Wald.RSiena()}.
+\fi
 
 As an example, for the first two waves of the \textsf{klas12b} data
 the following results were obtained,
@@ -4883,7 +4940,8 @@ that the network dynamics depends on sex.
 The Wald test is frequently applied to test the null
 hypothesis that several parameters are 0.
 The extra work to define the matrix $A$ above can be automated
-by using the following function.
+by using the following function \sfn{Multipar.RSiena()}.
+\iffalse
 \begin{verbatim}
 Multipar.RSiena <- function(ans, ...)
    {
@@ -4894,10 +4952,35 @@ Multipar.RSiena <- function(ans, ...)
     Wald.RSiena(A, ans)
     }
 \end{verbatim}
+\fi
 The test of the preceding example is then produced by the command
 \begin{verbatim}
 Multipar.RSiena(ans, 6, 7, 8)
 \end{verbatim}
+
+\subsubsection{Standard errors of linear combinations}
+
+Sometimes there can be interest in a linear combination of parameters.
+Suppose this is for a \sfn{sienaFit} object called \texttt{ans}.
+The number of parameters is
+\texttt{ans\$pp} which is the same as \texttt{length(ans\$theta)}.
+This is the number of estimated parameters, excepting (if any) the rate
+parameters used for conditioning in conditional estimation.
+Let \texttt{a} be the vector with the coefficients of the linear combination.
+Then
+\begin{verbatim}
+sum(a*ans$theta)
+\end{verbatim}
+ is the linear combination;
+\begin{verbatim}
+t(a) %*% ans$covtheta %*% a
+\end{verbatim}
+is the variance, and
+\begin{verbatim}
+sqrt(t(a) %*% ans$covtheta %*% a)
+\end{verbatim}
+is the standard error.
+
 
 
 \subsection{Score-type tests}
@@ -6463,11 +6546,49 @@ Structural effects are the effects depending on the network only.
  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{jh}\, x_{hi}\,$;
 
 
- \item for two-mode networks: the {\em number of four-cycles}
- \texttt{(cycle4)}, \\
- $s^{\rm net}_{i\vit}(x) =  \sum_{i_1, i_2, j_1, j_2}
-            x_{i_1 j_1}\, x_{i_1 j_2}\, x_{i_2 j_1}\, x_{i_2 j_2}\,$;\\
- for parameter $p=2$ the square root is taken;
+ \item
+\begin{minipage}[t]{.7\textwidth}
+ {\em shared popularity} \texttt{sharedPop},\\
+ $s^{\rm net}_{i\vit}(x) =
+        \sum_{j,k,h; \text{all different}} x_{ij}\, x_{hj} \, x_{ik}\, x_{hk}$;\\
+ this is like a 4-cycle but in a special orientation, like the 2PU (`two-paths up')
+ effect (for $k$=2) for directed ERGMs proposed in \citet{RPW2009}.
+ Therefore the statistic is called the `number of 2-2PU' configurations;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 4.5
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.5
+\put{\large$\bullet$} at  3 4.0
+\put{$i$} at 2 0.4
+\put{$h$} at 4 0.4
+\put{$j$} at 3 2.0
+\put{$k$} at 3 4.4
+\arrow <2mm> [.2,.6]  from 2.1 1.1 to 2.9 2.4
+\arrow <2mm> [.2,.6]  from 2.05 1.2 to 2.9 3.85
+\arrow <2mm> [.2,.6]  from 3.9 1.1 to 3.1 2.4
+\arrow <2mm> [.2,.6]  from 3.95 1.2 to 3.1 3.85
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+ \item for two-mode networks and for non-directed networks: the {\em number of four-cycles}
+   with shortName \texttt{(cycle4)} for the two-mode and \texttt{(cycle4ND)} for the
+   non-directed case,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_{j,k,h; \text{all different}}
+            x_{ij}\, x_{ik}\, x_{hj}\, x_{hk}\,$;\\
+ for parameter $p=2$ the square root is taken;\\
+ note that this is like the \texttt{sharedPop} effect above, but for the two-mode
+ and non-directed cases the directionality plays no role;
 
  \item {\em transitive ties effect} \texttt{(transTies)}
  (earlier called \emph{(direct and indirect ties) effect}),
@@ -6541,7 +6662,10 @@ Structural effects are the effects depending on the network only.
   (this effect is superfluous and undefined for symmetric networks);
 
  \item five variations of the \emph{GWESP (geometrically weighted edgewise
-  shared partners)} effects: \texttt{gwespFF, gwespBB, gwespFB, gwespBF, gwespRR}.\\
+  shared partners)} effects: \texttt{gwespFF, gwespBB, gwespFB, gwespBF, gwespRR},
+  and for non-directed networks the sixth version \texttt{gwesp}. \\
+  \emph{Note that there is a difference since version 1.1-251; see at the end
+  of this item.}\\
   These are effects like those developed for exponential random graph models (`ERGMs')
   by \citet{SPRH06}, in the parametrisation of \citet{Hunter2007}.
   The \texttt{gwespFF} effect is an alternative expression for transitivity.
@@ -6601,6 +6725,14 @@ myeffects <- setEffect(myeffects, gwespFF, parameter=69)
 but it is worthwhile to try out different values of $\alpha$
 to see which one gives the best fit.
 
+Although the fit statistics of the GWESP effects approximate those
+for transitive ties for $\alpha=0$ and for transitive triplets
+for large $\alpha$, the estimates are not the same because some other
+calculations are done differently. This is still open to further
+developments.
+% Now implemented as generic network effect.
+% Perhaps the change statistic is not correct.
+
 It should be noted that although the GWESP statistic is not triadic but
 depends on higher-order configurations, still it is actor-oriented
 because only those configurations are considered that are part of the
@@ -6620,7 +6752,16 @@ with $i \rightarrow j$ and there are exactly $k$ other
 nodes $h$ for which there is the two-in-star $i \rightarrow h \leftarrow j$;\\
 \texttt{gwespRR}: uses $\text{EPRR}_{ik}$, counting the number of nodes $j$
 with $i \rightarrow j$ and there are exactly $k$ other
-nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightleftarrows j$;
+nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightleftarrows j$.
+
+In version 1-1.251 this was changed (thanks to Nynke Niezink), because earlier versions
+were not quite according to what is described above. The effect was earlier
+implemented as\\
+$c_1 + c_2 \times \text{GWESPFF}(i, \alpha')$\\
+for values $c_1(\alpha)$ and $c_2(\alpha)$ not dependent on $x$, and with 
+positive parameters $\alpha$, $\alpha'$ depending according to 
+$\exp(-\alpha) + \exp(-\alpha') = 1$. Note that for the default value
+$\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha = \alpha'$.
 
  \item {\em number of (unilateral) peripheral relations to dense triads},\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
@@ -6629,6 +6770,8 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  for symmetric networks, the `unilateral' condition is dropped, and the definition is\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
  I\{ (x_{jh}\,  + x_{hj}\, + x_{jk}\, + x_{kj}\, + x_{hk}\, + x_{kh}\,)\geq c \} \,$;
+
+
 
  \item {\em in-degree related popularity effect} \texttt{(inPop)}
  (earlier called {\em popularity} or {\em popularity of alter effect}), defined by
@@ -6707,7 +6850,11 @@ nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightle
  note that for $c=1$ this represents --inversely-- the tendency to be an isolate
  with respect to outgoing ties, i.e., have out-degree equal to 0:
  $ \text{min}(x_{i+}\,,\, 1) = 0$ if $x_{i+} = 0$, and
- $ \text{min}(x_{i+}\,,\, 1) = 1$ if $x_{i+} \geq 1$.
+ $ \text{min}(x_{i+}\,,\, 1) = 1$ if $x_{i+} \geq 1$.\\
+ Since the representation is inverse, a result like a negative coefficient
+ $ -1.2$ for \texttt{outTrunc} (internal effect parameter $c=1$) is interpreted
+ as a positive tendency $+1.2$ toward outdegrees equal to 0; the standard
+ error is unchanged.
 
  \item {\em square root out-degree}, defined by  \\
  $s^{\rm net}_{i\vit}(x) = \sqrt{x_{i+}}$;\\
@@ -7171,6 +7318,13 @@ the following effects are available:
  $s^{\rm net}_{i\vit}(x) =
  \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i = v_j\}$;
 
+ \item {\em homogeneous covariate $\times$ transitive triplets}
+ \texttt{(homXTransTrip)}, defined by the number of transitive triplets
+ $i \rightarrow h \rightarrow j \leftarrow i$
+ that have the same covariate value for $i$, $j$, and $h$,\\
+ $s^{\rm net}_{i\vit}(x) =
+ \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i = v_j = v_h\}$;
+
 \item
 \begin{minipage}[t]{.7\textwidth}
  {\em transitive triplets jumping to different V}
@@ -7600,6 +7754,48 @@ Further there are a number of mixed triadic effects.
 \end{minipage}
  \item
 \begin{minipage}[t]{.7\textwidth}
+ {\em  XWX closure of $W$}, \texttt{(cl.XWX)} \\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, x_{ih}\, w_{hj}\,$;\\
+ this refers to the closure of mixed $X-W$ two-paths;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of mixed $X-W$ two-paths
+ $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$
+ plus the number of mixed $X-W$ two-in-stars
+ $i \stackrel{X}{\rightarrow} h $,
+ $j \stackrel{W}{\rightarrow} h $.\\
+ The interpretation is the closure of $X \rightarrow W$ paths:
+ if there is a tie $h \stackrel{W}{\rightarrow} j$, then ties
+  $i \stackrel{X}{\rightarrow} j $ and  $i \stackrel{X}{\rightarrow} h $
+  will tend to entrain each other.\\
+  (The reported target statistic is multiplied by 2.)
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $X$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+ \item
+\begin{minipage}[t]{.7\textwidth}
  {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{hj}\,$;\\
  this refers to the closure of $W-W$ two-paths;
@@ -7818,6 +8014,44 @@ restricted to triples with the same or different values on a covariate.
 \put{\large$\bullet$} at  2 1
 \put{\large$\diamond$} at  4 1
 \put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $X$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em mixed WX $\Rightarrow$ X closure, homogeneous on V}
+($X$: mixed $W$ closure homog. $V$),
+  \texttt{(homWXClosure)}   \\
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\,
+            w_{ih}\, x_{hj}\,I\{v_i = v_j = v_h\}$;\\
+ this refers to the closure of $W-X$ paths, restricted to
+ triples that are homogeneous with respect to $V$.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\diamond$} at  2 1
+\put{\large$\diamond$} at  4 1
+\put{\large$\diamond$} at  3 2.732
 \put{$i$} at 2 0.4
 \put{$j$} at 4 0.4
 \put{$h$} at 3 3.4
@@ -10502,6 +10736,57 @@ the R-forge repository.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
+\item 2014-02-13 R-Forge Revision 251
+
+It should be noted that two changes were made that potentially
+have an influence on some results obtained.
+
+First, the effects \texttt{gwespFF, gwespBB, gwespFB, gwespBF, gwespRR}
+were modified in RSienaTest to bring them in accordance with the literature.
+This means that the `old' parameter $\alpha'$ was effectively replaced by
+$\alpha = -\log\big(1-\exp(\alpha')\big)$; here $\alpha$ is the internal
+effect parameter divided by 100. For the default $\alpha = \log(2)$
+this means no difference.
+
+Second, in the help page for \sfn{sienaGOF-auxiliary}, geodesic distances
+were changed to non-directed. This makes more sense usually and was done to 
+avoid runtime errors that occurred very rarely.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+\item New effects \texttt{cl.XWX}, \texttt{homXTransTrip},
+    \texttt{homWXClosure}, and \texttt{sharedPop}.
+ \item Effect \texttt{cycle4} extended to non-directed one-mode networks
+    (for directed one-mode networks this is \texttt{sharedPop}).
+ \item Effect \texttt{jumpXTransTrip} ported to non-directed networks.
+ \item \texttt{gwesp..}  effects modified and ported to nondirected networks.
+ \item Also take account of behavior user-specified interactions in
+     \sfn{includeInteraction} and \sfn{setEffect}.
+ \item Correction: Effect \texttt{to} is not a dyadic effect.
+ \item Manual: added paragraph about how to import results from
+     \sfn{xtable()} and \sfn{siena.table()} into MS-Word.
+ \item \sfn{sienaGOF}: added the name of the \sfn{sienaFit} object
+     as attribute \sfn{sienaFitName} to each of the \sfn{sienaGofTest} objects.
+ \item Correction in \sfn{sparseNetworkExtraction()} to avoid errors occurring
+     when the extracted network has no edges.
+ \item In the help page for \sfn{sienaGOF-auxiliary}, geodesic distances
+     changed to non-directed; which avoids a further error
+     when the extracted network has no edges.
+ \item Correction of an error in \sfn{print.siena} for data sets including
+     other types than \texttt{oneMode}.
+ \item Changed bandwidth selector for violin plots in \sfn{plot.sienaGOF} to ``nrd",
+     to avoid long violins in cases where all simulations have the same outcome.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+\item Further work on \sfn{SienaBayes()}.
+\end{itemize}
+
+Changes in RSiena:
+\begin{itemize}
+  \item Ported effects \texttt{outRateLog} and \texttt{outTrunc2} from RSienaTest.
+\end{itemize}
 
 \item 2013-12-04 R-Forge Revision 250
 
@@ -10509,9 +10794,9 @@ Changes in RSiena and RSienaTest:
 \begin{itemize}
 \item New option \texttt{centered} in \sfn{coCovar()} and \sfn{varCovar()}.
 \item \sfn{setEffect()}, \sfn{updateTheta()}, and \sfn{prevAns} in \sfn{siena07()}
-     now also work properly for unspecified interactions.
+     now also work properly for user-specified interactions.
 \item Tests \sfn{Wald.RSiena} and \sfn{Multipar.RSiena} added.
-\item Error occurrence with message about \texttt{cvalue} in 
+\item Error occurrence with message about \texttt{cvalue} in
       \sfn{EvaluateTestStatistic()} corrected.
 \item Divergent parameters in \sfn{siena07()} get \texttt{NA} for their rows and columns
      in the resulting covariance matrix.

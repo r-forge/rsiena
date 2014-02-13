@@ -51,6 +51,7 @@ public:
 	inline int secondOutTieValue(int alter) const;
 
 	inline MixedEgocentricConfigurationTable * pTwoPathTable() const;
+	inline MixedEgocentricConfigurationTable * pInStarTable() const;
 
 private:
 	// The first network this cache object is associated with
@@ -72,6 +73,9 @@ private:
 
 	// The number of two-paths from the ego to each of the alters
 	MixedEgocentricConfigurationTable * lpTwoPathTable;
+
+	// The number of in-two-stars from ego and alter to the middle actor.
+	MixedEgocentricConfigurationTable * lpInStarTable;
 };
 
 
@@ -131,6 +135,15 @@ int TwoNetworkCache::secondOutTieValue(int alter) const
 MixedEgocentricConfigurationTable * TwoNetworkCache::pTwoPathTable() const
 {
 	return this->lpTwoPathTable;
+}
+
+/**
+ * Returns the table storing the number of in-two-stars from ego
+ * and alter to the middle actor.
+ */
+MixedEgocentricConfigurationTable * TwoNetworkCache::pInStarTable() const
+{
+	return this->lpInStarTable;
 }
 
 }

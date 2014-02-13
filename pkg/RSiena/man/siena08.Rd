@@ -90,7 +90,7 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
   T. A. B. Snijders and Chris Baerveldt.
   Multilevel network study of the effects
   of delinquent behavior on friendship
-  evolution. \emph{Journal of Mathematical Sociology}, 27: 123--151, 2003.
+  evolution. \emph{Journal of Mathematical Sociology}, 27: 123-151, 2003.
 
   See also the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
