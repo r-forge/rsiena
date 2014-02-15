@@ -164,7 +164,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
             mustUpdate <- (number < 3)
 			if (any(is.na(mustUpdate)))
 			{
-				stop("is.na(mustUpdate) in improveMH")
+				cat("is.na(mustUpdate) in improveMH\n")
+				mustUpdate[is.na(mustUpdate)] <- FALSE
 # Can happen in case of divergence: logLik = -Infty
 			}
             z$scaleFactors[mustUpdate[groups]] <<-

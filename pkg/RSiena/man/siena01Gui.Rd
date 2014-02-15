@@ -13,9 +13,12 @@ siena01Gui(getDocumentation=FALSE)
 }
 \details{
 
-  This function provides a graphical user interface for fitting Siena
+  This function provides a graphical user interface (gui) for fitting Siena
   models.
-  Note that this is less flexible and has fewer possibilities than
+  More documentation can be obtained by requesting 
+  \code{RShowDoc("rsiena01gui", package="RSiena")}.
+  
+  Note that this gui is less flexible and has fewer possibilities than
   creating data objects from matrices and
   vectors using \code{\link{sienaDependent}}, \code{\link{coCovar}} etc.,
   and finally \code{\link{sienaDataCreate}}.
@@ -58,7 +61,8 @@ siena01Gui(getDocumentation=FALSE)
   None, although various objects made will still be in the directory if you
   are using this within an R session.
 }
-\references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
+\references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}
+ or \code{RShowDoc("rsiena01gui", package="RSiena")}.}
 \author{Ruth Ripley}
 \seealso{    \code{\link{sienaDataCreateFromSession}},
     \code{\link{sienaDataCreate}}.}
