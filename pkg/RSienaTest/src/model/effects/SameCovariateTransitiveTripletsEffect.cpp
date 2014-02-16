@@ -45,7 +45,7 @@ double SameCovariateTransitiveTripletsEffect::calculateContribution(
 {
 	// If we are introducing a tie from the ego i to the alter j, then each
 	// two-path from i to j with v_i = v_j contributes one unit;
-   // in addition, each in-star i -> h <- j with v_i = v_h 
+   // in addition, each in-star i -> h <- j with v_i = v_h
    // also contributes one unit.
    // This number is not stored in a table and is calculated from scratch.
 
@@ -57,7 +57,7 @@ double SameCovariateTransitiveTripletsEffect::calculateContribution(
 		contribution1 = this->pTwoPathTable()->get(alter);
 	}
 
-	// The following probably can be done more efficiently 
+	// The following probably can be done more efficiently
 	// using CommonNeighborIterator.
 	// Iterate over ego's outgoing ties
 	for (IncidentTieIterator iter = pNetwork->outTies(this->ego());
@@ -83,7 +83,7 @@ double SameCovariateTransitiveTripletsEffect::calculateContribution(
  */
 double SameCovariateTransitiveTripletsEffect::tieStatistic(int alter)
 {
-	
+
 	double statistic = 0;
 
 	if (!this->missing(this->ego()) && !this->missing(alter) &&
@@ -91,7 +91,7 @@ double SameCovariateTransitiveTripletsEffect::tieStatistic(int alter)
 	{
 		statistic = this->pTwoPathTable()->get(alter);
 	}
-	
+
 	return statistic;
 }
 
