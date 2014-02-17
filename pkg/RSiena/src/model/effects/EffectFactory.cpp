@@ -46,7 +46,7 @@
 #include "model/effects/generic/CovariateMixedNetworkAlterFunction.h"
 #include "model/effects/generic/SameCovariateTwoPathFunction.h"
 #include "model/effects/generic/SameCovariateMixedTwoPathFunction.h"
-#include "model/effects/generic/HomCovariateMixedTwopathFunction.h"
+#include "model/effects/generic/HomCovariateMixedTwoPathFunction.h"
 #include "model/tables/EgocentricConfigurationTable.h"
 #include "model/tables/NetworkCache.h"
 

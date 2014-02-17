@@ -1,3 +1,8 @@
+2014-02-17 R-Forge Revision 254
+Changes in RSiena and RSienaTest:
+   * Give the capital P to HomCovariateMixedTwoPathFunction.cpp
+     and HomCovariateMixedTwopathFunction.h.
+
 2014-02-16 R-Forge Revision 253
 Changes in RSiena and RSienaTest:
    * Give the capital E to HomCovariateTransitiveTripletsEffect.h

@@ -120,7 +120,7 @@
 \newcommand{\nextno}{\addtocounter{thisno}{1}\thethisno .\ }
 
 \hyphenation{Snij-ders Duijn Huis-man Steg-lich Schwein-ber-ger siena-Data-Create-From-Session
-             siena-Data-Create siena-Com-position-Change}
+             siena-Data-Create siena-Com-position-Change RSiena-Test}
 
 \newcommand{\interruptenum}{
       \setcounter{savenumi}{\value{enumi}}
@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-251.
+This version was renewed for \RS version 1.1-254.
 \end{abstract}
 
 
@@ -974,7 +974,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-251) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-254) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -6725,11 +6725,15 @@ myeffects <- setEffect(myeffects, gwespFF, parameter=69)
 but it is worthwhile to try out different values of $\alpha$
 to see which one gives the best fit.
 
-Although the fit statistics of the GWESP effects approximate those
-for transitive ties for $\alpha=0$ and for transitive triplets
+Although the fit statistic of the GWESP effect is identical to that
+for transitive ties for $\alpha=0$ and approximates the fit
+statistic for transitive triplets
 for large $\alpha$, the estimates are not the same because some other
-calculations are done differently. This is still open to further
-developments.
+calculations are done differently. The issue is that the GWESP effects are
+not implemented as a true evaluation effect, but as a generic effect, 
+where for the change statistic only changes of the tie $i \rightarrow j$ in
+(\ref{GWESP2}) are considered, and not of the tie $i \rightarrow h$.
+
 % Now implemented as generic network effect.
 % Perhaps the change statistic is not correct.
 
@@ -10732,6 +10736,8 @@ which affect the user.
 the R-forge repository.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+
+\item No noticeable changes from version 1.1-251 to 1.1-254.
 
 \item 2014-02-13 R-Forge Revision 251
 
