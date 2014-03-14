@@ -479,7 +479,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
     if (!initC)
     {
         ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
-					 z$parallelTesting)
+					 z$parallelTesting, returnActorStatistics=FALSE, returnStaticChangeContributions=FALSE)
 		##stop("done")
 		## create a grid of periods with group names in case want to
 		## parallelize using this or to access chains easily

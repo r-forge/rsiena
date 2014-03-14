@@ -13,6 +13,8 @@
 #define MINISTEP_H_
 
 #include <string>
+#include <vector>
+#include <map>
 
 using namespace std;
 
@@ -27,6 +29,7 @@ class LongitudinalData;
 class DependentVariable;
 class Chain;
 class Option;
+class EffectInfo;
 
 
 // ----------------------------------------------------------------------------
@@ -100,6 +103,9 @@ public:
 
 	virtual bool firstOfConsecutiveCancelingPair() const;
 
+	map<const EffectInfo *, vector<double> >* changeContributions() const;
+	void changeContributions(map<const EffectInfo *, vector<double> > * contributions);
+
 protected:
 	void pOption(const Option * pOption);
     void diagonal(bool value);
@@ -172,6 +178,9 @@ private:
 	// of the same chain and x precedes y in the chain.
 
 	double lorderingKey;
+
+	// Stores for each effect its contributions to the tie flip probabilities or behavior change probabilities
+	map<const EffectInfo *, vector<double> > * lpChangeContributions;
 };
 
 

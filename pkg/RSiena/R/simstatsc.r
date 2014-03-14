@@ -33,6 +33,14 @@ simstats0c <- function(z, x, data=NULL, effects=NULL, fromFiniteDiff=FALSE,
     {
         returnDeps <- z$returnDeps
     }
+	if (is.null(z$returnActorStatistics))
+	{
+		z$returnActorStatistics <- FALSE
+	}
+	if (is.null(z$returnChangeContributions))
+	{
+		z$returnChangeContributions <- FALSE
+	}
     if (is.null(f$seeds))
     {
         seeds <- NULL
@@ -77,7 +85,8 @@ simstats0c <- function(z, x, data=NULL, effects=NULL, fromFiniteDiff=FALSE,
 				 fromFiniteDiff, f$pModel, f$myeffects, z$theta,
 				 randomseed2, returnDeps, z$FinDiff.method,
 				 !is.null(z$cl) && useStreams, z$addChainToStore,
-				  z$returnChains, returnLoglik)
+				  z$returnChains, returnLoglik, 
+				  z$returnActorStatistics, z$returnChangeContributions)
     if (!fromFiniteDiff)
     {
         if (z$FinDiff.method)
@@ -119,6 +128,22 @@ simstats0c <- function(z, x, data=NULL, effects=NULL, fromFiniteDiff=FALSE,
 	{
 		loglik <- NULL
 	}
+	if(z$returnChangeContributions)
+	{	
+		changeContributions <- ans[[9]]
+	}
+	else
+	{
+		changeContributions <- NULL
+	}
+	if(z$returnActorStatistics)
+	{
+		actorStatistics <- ans[[10]]
+	}
+	else
+	{
+		actorStatistics <- NULL
+	}
     if (returnDeps)
     {
         ## attach the names
@@ -137,7 +162,8 @@ simstats0c <- function(z, x, data=NULL, effects=NULL, fromFiniteDiff=FALSE,
     }
 		 ## browser()
     list(sc = sc, fra = fra, ntim0 = ntim, feasible = TRUE, OK = TRUE,
-         sims=sims, f$seeds, chain=chain, loglik=loglik)
+         sims=sims, f$seeds, chain=chain, loglik=loglik,
+		 actorStatistics = actorStatistics, changeContributions = changeContributions)
 }
 
 ##@clearData siena07 Finalizer to clear Data object in C++
