@@ -185,6 +185,8 @@ protected:
 	int stepType() const;
 	void getStepType();
 	double settingRate() const;
+	// A two-dimensional array of tie flip and behavior change contributions to effects.
+	map<const EffectInfo *, vector<double> > * lpChangeContribution;
 
 private:
 	void initializeFunction(Function * pFunction,

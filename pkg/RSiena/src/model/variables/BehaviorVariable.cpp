@@ -90,6 +90,11 @@ BehaviorVariable::~BehaviorVariable()
 	this->lendowmentEffectContribution = 0;
 	this->lcreationEffectContribution = 0;
 	this->lprobabilities = 0;
+
+	if(this->lpChangeContribution != 0)
+	{
+		delete this->lpChangeContribution;
+	}
 }
 
 
@@ -268,6 +273,10 @@ void BehaviorVariable::makeChange(int actor)
 		// insert ministep in chain
 		BehaviorChange * pMiniStep =
 			new BehaviorChange(this->lpData, actor, difference);
+		if (this->pSimulation()->pModel()->needChangeContributions())
+		{
+			pMiniStep->changeContributions(lpChangeContribution);
+		}
 		this->pSimulation()->pChain()->insertBefore(pMiniStep,
 			this->pSimulation()->pChain()->pLast());
 		pMiniStep->logChoiceProbability(log(this->lprobabilities[difference
@@ -310,22 +319,46 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	this->lupPossible = true;
 	this->ldownPossible = true;
 
+	int evaluationEffectCount = this->pEvaluationFunction()->rEffects().size();
+	int endowmentEffectCount = this->pEndowmentFunction()->rEffects().size();
+	int creationEffectCount = this->pCreationFunction()->rEffects().size();
+
 	// initialize for later use!
-	for (unsigned i = 0; i < pEvaluationFunction()->rEffects().size(); i++)
+	for (unsigned i = 0; i < evaluationEffectCount; i++)
 	{
 		this->levaluationEffectContribution[1][i] =	0;
 	}
-	for (unsigned i = 0; i < pEndowmentFunction()->rEffects().size(); i++)
+	for (unsigned i = 0; i < endowmentEffectCount; i++)
 	{
 		this->lendowmentEffectContribution[1][i] =	0;
 		this->lendowmentEffectContribution[2][i] = 	0;
 	}
 
-	for (unsigned i = 0; i < this->pCreationFunction()->rEffects().size(); i++)
+	for (unsigned i = 0; i < creationEffectCount; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
 			this->lcreationEffectContribution[j][i] = 0;
+		}
+	}
+
+	if (this->pSimulation()->pModel()->needChangeContributions())
+	{
+		this->lpChangeContribution = new map<const EffectInfo *, vector<double> >[evaluationEffectCount+endowmentEffectCount+creationEffectCount];
+		for (int i = 0; i < evaluationEffectCount; i++)
+		{
+			vector<double> vec(3,0);
+			this->lpChangeContribution->insert(make_pair(this->pEvaluationFunction()->rEffects()[i]->pEffectInfo(), vec));
+		}
+		for (int i = 0; i < endowmentEffectCount; i++)
+		{
+			vector<double> vec(3,0);
+			this->lpChangeContribution->insert(make_pair(this->pEndowmentFunction()->rEffects()[i]->pEffectInfo(), vec));
+		}
+		for (int i = 0; i < creationEffectCount; i++)
+		{
+			vector<double> vec(3,0);
+			this->lpChangeContribution->insert(make_pair(this->pCreationFunction()->rEffects()[i]->pEffectInfo(), vec));
 		}
 	}
 
@@ -432,6 +465,10 @@ double BehaviorVariable::totalEvaluationContribution(int actor,
 			(BehaviorEffect *) pFunction->rEffects()[i];
 		double thisContribution =
 			pEffect->calculateChangeContribution(actor, difference);
+		if (this->pSimulation()->pModel()->needChangeContributions())
+		{
+			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) = thisContribution;
+		}
 		this->levaluationEffectContribution[difference + 1][i] =
 			thisContribution;
 		contribution += pEffect->parameter() * thisContribution;
@@ -451,6 +488,10 @@ double BehaviorVariable::totalEndowmentContribution(int actor,
 			(BehaviorEffect *) pFunction->rEffects()[i];
 		double thisContribution =
 			pEffect->calculateChangeContribution(actor, difference);
+		if (this->pSimulation()->pModel()->needChangeContributions())
+		{
+			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) = thisContribution;
+		}
 		this->lendowmentEffectContribution[difference + 1][i] =
 			thisContribution;
 		contribution += pEffect->parameter() * thisContribution;
@@ -476,6 +517,10 @@ double BehaviorVariable::totalCreationContribution(int actor,
 			(BehaviorEffect *) pFunction->rEffects()[i];
 		double thisContribution =
 			pEffect->calculateChangeContribution(actor, difference);
+		if (this->pSimulation()->pModel()->needChangeContributions())
+		{
+			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) = thisContribution;
+		}
 		this->lcreationEffectContribution[difference + 1][i] =
 			thisContribution;
 		contribution += pEffect->parameter() * thisContribution;

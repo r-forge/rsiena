@@ -41,6 +41,7 @@ MiniStep::MiniStep(LongitudinalData * pData, int ego)
 	this->lmissingIndex = -1;
 	this->lorderingKey = 0;
 	this->ldiagonal = false;
+	this->lpChangeContributions = 0;
 }
 
 
@@ -55,6 +56,10 @@ MiniStep::~MiniStep()
 	}
 
 	this->lpOption = 0;
+	if (this->lpChangeContributions)
+	{
+		delete this->lpChangeContributions;
+	}
 }
 
 
@@ -279,6 +284,24 @@ bool MiniStep::firstOfConsecutiveCancelingPair() const
 		this->lpNextWithSameOption &&
 		this->lpNextWithSameOption != this->lpNext &&
 		!missing;
+}
+
+/**
+ * Stores the contributions of each effect to possible
+ * tie flips or behavior changes before this ministep.
+ */
+void MiniStep::changeContributions(map<const EffectInfo *, vector<double> > * contributions)
+{
+	this->lpChangeContributions = contributions;
+}
+
+/**
+ * Returns the contributions of each effect to possible
+ * tie flips or behavior changes before this ministep.
+ */
+map<const EffectInfo *, vector<double> > * MiniStep::changeContributions() const
+{
+	return this->lpChangeContributions;
 }
 
 }

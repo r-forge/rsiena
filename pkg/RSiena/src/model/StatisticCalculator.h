@@ -58,9 +58,17 @@ public:
 		const Model * pModel,
 		State * pState,
 		int period);
+	StatisticCalculator(const Data * pData,
+		const Model * pModel, State * pState,
+		int period, bool returnActorStatistics);
+	StatisticCalculator(const Data * pData,
+		const Model * pModel, State * pState,
+		int period, bool returnActorStatistics, bool returnStaticChangeContributions);
 	virtual ~StatisticCalculator();
 
 	double statistic(EffectInfo * pEffectInfo) const;
+	vector<double *> staticChangeContributions(EffectInfo * pEffect) const;
+	double * actorStatistics(EffectInfo * pEffect) const;
 	int distance(LongitudinalData * pData, int period) const;
 	int settingDistance(LongitudinalData * pData, string setting,
 		int period) const;
@@ -100,8 +108,20 @@ private:
 	// The period of the evolution we are interested in
 	int lperiod;
 
+	// indicates whether actor statistics are needed
+	bool lneedActorStatistics;
+
+	// indicates whether change contributions are needed
+	bool lcountStaticChangeContributions;
+
 	// The resulting map of statistic values
 	map<EffectInfo *, double> lstatistics;
+
+	// The resulting map of actor statistic values
+	map<EffectInfo *, double * > lactorStatistics;
+
+	// The change contributions of all effects
+	map<EffectInfo *, vector<double *> > lstaticChangeContributions;
 
 	// Array of simulated distances per variable
 	map<LongitudinalData *, int *> ldistances;
