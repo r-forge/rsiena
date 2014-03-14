@@ -1,3 +1,54 @@
+2014-03-14 R-Forge Revision 255
+Changes in RSienaTest:
+   * Modified getTargets(...) such that it is possible to return target statistics of individual actors 
+     as well as change contributions necessary for calculating relative importances of effects (siena07setup.cpp).
+   * Call of getTargets(...) is correspondingly adapted (initializeFRAN.r).
+   * Modified simstats0c(...) such that it is possible to return 
+     statistics of individual actors in simulated networks 
+     as well as statistic contributions of all potential tie flips or behavior changes
+     for all simulated micro-steps (simstatsc.r).
+   * Modified model(...) such that it calculates and returns the statistics newly needed in
+   	 simstats0c(...) (siena07model.cpp)
+   * Added methods, functions, constructors, and fields needed due to changes in getTargets(...) and model(...):
+   			public void needChangeContributions(bool flag) (Model.h, Model.cpp)
+			public bool needChangeContributions()	       (Model.h, Model.cpp)	
+			private bool lneedChangeContributions2		   (Model.h)
+			SEXP getChangeContributionsList(...)           (siena07utilities.h, siena07utilities.cpp)
+			SEXP createRObjectAttributes(...)              (siena07utilities.h, siena07utilities.cpp)
+			void getChangeContributionStatistics(...)      (siena07internals.h, siena07internals.cpp)
+			void getActorStatistics(...)                   (siena07internals.h, siena07internals.cpp)
+			public StatisticCalculator(..., bool)		   (StatisticCalculator.h, StatisticCalculator.cpp)
+	        public StatisticCalculator(..., bool, bool)    (StatisticCalculator.h, StatisticCalculator.cpp)
+			public vector<double *> staticChangeContributions(...) (StatisticCalculator.h, StatisticCalculator.cpp)
+	        public double * actorStatistics(...)		   (StatisticCalculator.h, StatisticCalculator.cpp)	
+	     	private bool lneedActorStatistics              (StatisticCalculator.h, StatisticCalculator.cpp)
+		    private bool lcountStaticChangeContributions   (StatisticCalculator.h, StatisticCalculator.cpp)
+		    private map<EffectInfo *, double * > lactorStatistics (StatisticCalculator.h, StatisticCalculator.cpp)
+	        private map<EffectInfo *, vector<double *> > lstaticChangeContributions (StatisticCalculator.h, StatisticCalculator.cpp)
+   * Modifications of functions
+   		calculateNetworkEvaluationStatistics(...) (StatisticCalculator.cpp)
+		calculateBehaviorStatistics(...)          (StatisticCalculator.cpp)
+	Specifically, assignments of form "this->lstatistics[pInfo] = pEffect->evaluationStatistic()"
+	are extended in order to also store actor statistics and change contributions.
+   * Added a field and corresponding get-and set-methods to class MiniStep
+   	 for storing potential statistic contributions of changes in micro-steps
+   	 		private map<const EffectInfo *, vector<double> > * lpChangeContributions				  (MiniStep.h, MiniStep.cpp)
+   	  		public map<const EffectInfo *, vector<double> >* changeContributions()					  (MiniStep.h, MiniStep.cpp)
+			public void changeContributions(map<const EffectInfo *, vector<double> > * contributions) (MiniStep.h, MiniStep.cpp)
+	* Added field to class DependentVariable (DependentVariable.h, DependentVariable.cpp) 
+		protected map<const EffectInfo *, vector<double> > * lpChangeContribution;
+   * Modifications of functions makeChange() and calculateTieFlipProbabilities() 
+   	 	in class NetworkVariable (NetworkVariable.cpp) 
+   	 	calculateProbabilities(), totalEvaluationContribution(), totalEndowmentContribution(), and totalCreationContribution()
+   	 	in class BehaviorVariable (BehaviorVariable.cpp)
+   	 	in order to store statistic contributions of effects to all possible choices od an actor in the current micro-step
+   * Added functions to classes NetworkEffect and BehaviorEffect (NetworkEffect.h, NetworkEffect.cpp, BehaviorEffect.h, BehaviorEffect.cpp)
+   		such that, in addition to the sum of statistics ovar all actors, individual actor statistics can be returned
+   			public virtual pair <double, double * > statistic(..., bool needActorStatistics)
+			public virtual pair <double, double * > evaluationStatistic(...,bool needActorStatistics)
+			public virtual pair <double, double * > endowmentStatistic(..., bool needActorStatistics)
+			public virtual pair <double, double * > creationStatistic(..., bool needActorStatistics)
+			
 2014-02-17 R-Forge Revision 254
 Changes in RSiena and RSienaTest:
    * Give the capital P to HomCovariateMixedTwoPathFunction.cpp
