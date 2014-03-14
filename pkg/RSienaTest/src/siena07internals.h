@@ -195,6 +195,22 @@ SEXP createInteractionEffects(SEXP EFFECTS, Model *pModel,
 	int typeCol, int intptr1Col, int intptr2Col, int intptr3Col);
 
 /**
+ *  Retrieves the contributions to all possible tie flips or behavior changes for each of the effects,
+ *  for one period. The call will relate to one group only, although all effects
+ *  are the same apart from the basic rates. Not used in maximum likelihood.
+ */
+void getChangeContributionStatistics(SEXP EFFECTSLIST,
+	const StatisticCalculator * pCalculator, vector<vector<double * > > *rChangeContributions);
+
+/**
+ *  Retrieves the statistics of individual actors for each of the effects,
+ *  for one period. The call will relate to one group only, although all effects
+ *  are the same apart from the basic rates. Not used in maximum likelihood.
+ */
+void getActorStatistics(SEXP EFFECTSLIST,
+	const StatisticCalculator * pCalculator, vector<double *> *rActorStatistics);
+
+/**
  *  Retrieves the values of the statistics and scores for each of the effects,
  *  for one period. The call will relate to one group only, although all effects
  *  are the same apart from the basic rates. Not used in maximum likelihood.

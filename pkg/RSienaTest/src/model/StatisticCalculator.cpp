@@ -13,6 +13,8 @@
 #include <stdexcept>
 #include <vector>
 #include <cmath>
+#include <R_ext/Arith.h>
+#include <R_ext/Print.h>
 
 #include "StatisticCalculator.h"
 #include "data/Data.h"
@@ -65,10 +67,56 @@ StatisticCalculator::StatisticCalculator(const Data * pData,
 	this->lperiod = period;
 	this->lpPredictorState = new State();
 	this->lpStateLessMissingsEtc = new State();
+	this->lneedActorStatistics = 0;
+	this->lcountStaticChangeContributions = 0;
 
 	this->calculateStatistics();
 }
 
+/**
+ * Constructor.
+ * @param[in] pData the observed data
+ * @param[in] pModel the model whose effect statistics are to be calculated
+ * @param[in] pState the current state of the dependent variables
+ * @param[in] period the period under consideration
+ * @param[in] returnActorStatistics whether individual actor statistics should be returned
+ */
+StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pModel, State * pState, int period, bool returnActorStatistics)
+{
+	this->lpData = pData;
+	this->lpModel = pModel;
+	this->lpState = pState;
+	this->lperiod = period;
+	this->lpPredictorState = new State();
+	this->lpStateLessMissingsEtc = new State();
+	this->lneedActorStatistics = returnActorStatistics;
+	this->lcountStaticChangeContributions = 0;
+	
+	this->calculateStatistics();
+}
+
+/**
+ * Constructor.
+ * @param[in] pData the observed data
+ * @param[in] pModel the model whose effect statistics are to be calculated
+ * @param[in] pState the current state of the dependent variables
+ * @param[in] period the period under consideration
+ * @param[in] returnActorStatistics whether individual actor statistics should be returned
+ * @param[in] returnStaticChangeContributions whether contributions of effects on possible next tie flips or behavior changes are needed
+ */
+StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pModel, State * pState, int period, bool returnActorStatistics, bool returnStaticChangeContributions)
+{
+	this->lpData = pData;
+	this->lpModel = pModel;
+	this->lpState = pState;
+	this->lperiod = period;
+	this->lpPredictorState = new State();
+	this->lpStateLessMissingsEtc = new State();
+	this->lneedActorStatistics = returnActorStatistics;
+	this->lcountStaticChangeContributions = returnStaticChangeContributions;
+	
+	this->calculateStatistics();
+}
 
 /**
  * Deallocates this model.
@@ -109,6 +157,24 @@ StatisticCalculator::~StatisticCalculator()
 	this->lpStateLessMissingsEtc->deleteValues();
 	delete this->lpStateLessMissingsEtc;
 	this->lpStateLessMissingsEtc = 0;
+
+	while (!this->lstaticChangeContributions.empty())
+	{
+		vector<double *> vec = this->lstaticChangeContributions.begin()->second;
+		while (!vec.empty())
+		{
+			double * array = *(vec.begin());
+			vec.erase(vec.begin());
+			delete array;
+		}
+		this->lstaticChangeContributions.erase(this->lstaticChangeContributions.begin());
+	}
+	while (!this->lactorStatistics.empty())
+	{
+		double * array = this->lactorStatistics.begin()->second;
+		this->lactorStatistics.erase(this->lactorStatistics.begin());
+		delete[] array;
+	}
 }
 
 
@@ -130,6 +196,37 @@ double StatisticCalculator::statistic(EffectInfo * pEffect) const
 			"Unknown effect: The given effect is not part of the model.");
 	}
 
+	return iter->second;
+}
+
+/**
+ * Returns the tie flip contributions or the behavior change contributions of the given effect.
+ */
+vector<double *> StatisticCalculator::staticChangeContributions(EffectInfo * pEffect) const
+{
+	map<EffectInfo *, vector<double *> >::const_iterator iter =
+		this->lstaticChangeContributions.find(pEffect);
+	if (iter == this->lstaticChangeContributions.end())
+	{
+		throw invalid_argument(
+			"Unknown effect: The given effect is not part of the model.");
+	}
+	return iter->second;
+}
+
+/**
+ * Returns the actor statistics of the given effect.
+ */
+double * StatisticCalculator::actorStatistics(EffectInfo * pEffect) const
+{
+	map<EffectInfo *, double * >::const_iterator iter =
+		this->lactorStatistics.find(pEffect);
+
+	if (iter == this->lactorStatistics.end())
+	{
+		throw invalid_argument(
+			"Unknown effect: The given effect is not part of the model.");
+	}
 	return iter->second;
 }
 
@@ -312,7 +409,51 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 			this->lperiod,
 			&cache);
 
-		this->lstatistics[pInfo] = pEffect->evaluationStatistic();
+		if(this->lneedActorStatistics)
+		{
+			pair<double, double * > p = pEffect->evaluationStatistic(this->lneedActorStatistics);
+			this->lstatistics[pInfo] = p.first;
+			this->lactorStatistics[pInfo] = p.second;
+		}
+		else
+		{
+			this->lstatistics[pInfo] = pEffect->evaluationStatistic();
+		}
+		if(this->lcountStaticChangeContributions)
+		{
+			int egos =  pCurrentLessMissingsEtc->n();
+			int alters =  pCurrentLessMissingsEtc->m();
+			vector<double *> egosMap(egos);
+			this->lstaticChangeContributions.insert(make_pair(pInfo,egosMap));
+			for (int e = 0; e < egos ; e++)
+			{
+				cache.initialize(e);
+				pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+				double * contributions = new double[egos];
+				this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
+				pEffect->preprocessEgo(e);
+				//TODO determine permissible changes (see: NetworkVariable::calculatePermissibleChanges())
+				for (int a = 0; a < alters ; a++)
+				{
+					if(a == e)
+					{
+						this->lstaticChangeContributions.at(pInfo).at(e)[a] = 0;
+					}
+					else
+					{
+						// Tie withdrawal contributes the opposite of tie creating
+						if (pCurrentLessMissingsEtc->tieValue(e,a))
+						{
+							this->lstaticChangeContributions.at(pInfo).at(e)[a] = -pEffect->calculateContribution(a);
+						}
+						else
+						{
+							this->lstaticChangeContributions.at(pInfo).at(e)[a] = pEffect->calculateContribution(a);
+						}
+					}
+				}
+			}
+		}
 		delete pEffect;
 	}
 
@@ -396,9 +537,49 @@ void StatisticCalculator::calculateNetworkEndowmentStatistics(
 				this->lpPredictorState,
 				this->lperiod,
 				&cache);
-
-			this->lstatistics[pInfo] =
-				pEffect->endowmentStatistic(pLostTieNetwork);
+			if(this->lneedActorStatistics)
+			{
+				pair<double, double * > p = pEffect->endowmentStatistic(pLostTieNetwork, this->lneedActorStatistics);
+				this->lstatistics[pInfo] = p.first;
+				this->lactorStatistics[pInfo] = p.second;
+			}
+			else
+			{
+				this->lstatistics[pInfo] =
+					pEffect->endowmentStatistic(pLostTieNetwork);
+			}
+//			if(this->lcountStaticChangeContributions)
+//			{
+//				int egos = pPredictor->n();
+//				int alters = pPredictor->m();
+//				vector<double *> egosMap(egos);
+//				this->lstaticChangeContributions.insert(make_pair(pInfo,egosMap));
+//				for (int e = 0; e < egos ; e++)
+//				{
+//					cache.initialize(e);
+//					pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+//					double * contributions = new double[egos];
+//					this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
+//					pEffect->preprocessEgo(e);
+//					//TODO determine permissible changes (see: NetworkVariable::calculatePermissibleChanges())
+//					for (int a = 0; a < alters ; a++)
+//					{
+//						if(a == e)
+//						{
+//							this->lstaticChangeContributions.at(pInfo).at(e)[a] = 0;
+//						}
+//						else
+//						{
+//							// The endowment effects have non-zero contributions on tie withdrawals only
+//							if (pPredictor->tieValue(e,a))
+//							{
+//								this->lstaticChangeContributions.at(pInfo).at(e)[a] = -pEffect->calculateContribution(a);
+//                                //Rprintf("%\n",this->lstaticChangeContributions.at(pInfo).at(e)[a]);
+//							}
+//						}
+//					}
+//				}
+//			}
 			delete pEffect;
 		}
 
@@ -467,9 +648,49 @@ void StatisticCalculator::calculateNetworkCreationStatistics(
 				this->lperiod,
 				&cache);
 
-			this->lstatistics[pInfo] =
-				pEffect->creationStatistic(pGainedTieNetwork);
-
+			if(this->lneedActorStatistics)
+			{
+				pair<double, double * > p = pEffect->creationStatistic(pGainedTieNetwork, this->lneedActorStatistics);
+				this->lstatistics[pInfo] = p.first;
+				this->lactorStatistics[pInfo] = p.second;
+			}
+			else
+			{
+				this->lstatistics[pInfo] =
+					pEffect->creationStatistic(pGainedTieNetwork);
+			}
+//			if(this->lcountStaticChangeContributions)
+//			{
+//				int egos =  pCurrentLessMissingsEtc->n();
+//				int alters =  pCurrentLessMissingsEtc->m();
+//				vector<double *> egosMap(egos);
+//				this->lstaticChangeContributions.insert(make_pair(pInfo,egosMap));
+//				for (int e = 0; e < egos ; e++)
+//				{
+//					cache.initialize(e);
+//					pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+//					double * contributions = new double[egos];
+//					this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
+//					pEffect->preprocessEgo(e);
+//					//TODO determine permissible changes (see: NetworkVariable::calculatePermissibleChanges())
+//					for (int a = 0; a < alters ; a++)
+//					{
+//						if(a == e)
+//						{
+//							this->lstaticChangeContributions.at(pInfo).at(e)[a] = 0;
+//						}
+//						else
+//						{
+//							// The tie creation effects have non-zero contributions on tie creation only
+//							if (! pCurrentLessMissingsEtc->tieValue(e,a))
+//							{
+//								this->lstaticChangeContributions.at(pInfo).at(e)[a] = pEffect->calculateContribution(a);
+//							}
+//						}
+//					}
+//				}
+//			}
+			
 			delete pEffect;
 		}
 
@@ -543,10 +764,52 @@ void StatisticCalculator::calculateBehaviorStatistics(
 			this->lpPredictorState,
 			this->lperiod,
 			&cache);
-
-		this->lstatistics[pInfo] =
-			pEffect->evaluationStatistic(currentValues);
-
+		if(this->lneedActorStatistics)
+		{
+			pair<double, double * > p = pEffect->evaluationStatistic(currentValues,this->lneedActorStatistics);
+			this->lstatistics[pInfo] = p.first;
+			this->lactorStatistics[pInfo] = p.second;
+		}
+		else
+		{
+			this->lstatistics[pInfo] =
+				pEffect->evaluationStatistic(currentValues);
+		}
+		if(this->lcountStaticChangeContributions)
+		{
+			int  choices = 3;
+			vector<double *> egosMap(pBehaviorData->n());
+			this->lstaticChangeContributions.insert(make_pair(pInfo,egosMap));
+			for (int e = 0; e < pBehaviorData->n(); e++)
+			{
+				cache.initialize(e);
+			    pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+				double * contributions = new double[choices];
+				this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
+				pEffect->preprocessEgo(e);
+				// no change gives no contribution
+				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
+				// calculate the contribution of downward change
+				if (currentValues[e] > pBehaviorData->min() && !pBehaviorData->upOnly(this->lperiod))
+				{
+					this->lstaticChangeContributions.at(pInfo).at(e)[0] = pEffect->calculateChangeContribution(e,-1);
+				}
+				else
+				{
+					this->lstaticChangeContributions.at(pInfo).at(e)[0] = R_NaN;
+				}
+				// calculate the contribution of upward change
+				if (currentValues[e] < pBehaviorData->max() && !pBehaviorData->downOnly(this->lperiod))
+				{
+					this->lstaticChangeContributions.at(pInfo).at(e)[2] = pEffect->calculateChangeContribution(e,1);
+				}
+				else
+				{
+					this->lstaticChangeContributions.at(pInfo).at(e)[2] = R_NaN;
+				}
+			}
+		}
+		
 		delete pEffect;
 	}
 
@@ -569,8 +832,47 @@ void StatisticCalculator::calculateBehaviorStatistics(
 			this->lperiod,
 			&cache);
 
-		this->lstatistics[pInfo] =
-			pEffect->endowmentStatistic(difference, currentValues);
+		if(this->lneedActorStatistics)
+		{
+			pair<double, double * > p = pEffect->endowmentStatistic(difference, currentValues,this->lneedActorStatistics);
+			this->lstatistics[pInfo] = p.first;
+			this->lactorStatistics[pInfo] = p.second;
+		}
+		else
+		{
+			this->lstatistics[pInfo] =
+				pEffect->endowmentStatistic(difference, currentValues);
+		}
+
+//		if(this->lcountStaticChangeContributions)
+//		{
+//			int  choices = 3;
+//			vector<double *> egosMap(pBehaviorData->n());
+//			this->lstaticChangeContributions.insert(make_pair(pInfo,egosMap));
+//			for (int e = 0; e < pBehaviorData->n(); e++)
+//			{
+//				cache.initialize(e);
+//				pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+//
+//				double * contributions = new double[choices];
+//				this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
+//				pEffect->preprocessEgo(e);
+//
+//				// no change gives no contribution
+//				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
+//				// upward change gives no contribution
+//				this->lstaticChangeContributions.at(pInfo).at(e)[2] = 0;
+//				// calculate the contribution of downward change
+//				if (currentValues[e] > pBehaviorData->min() && !pBehaviorData->upOnly(this->lperiod))
+//				{
+//					this->lstaticChangeContributions.at(pInfo).at(e)[0] = pEffect->calculateChangeContribution(e,-1);
+//				}
+//				else
+//				{
+//					this->lstaticChangeContributions.at(pInfo).at(e)[0] = R_NaN;
+//				}
+//			}
+//		}
 
 		delete pEffect;
 	}
@@ -593,10 +895,44 @@ void StatisticCalculator::calculateBehaviorStatistics(
 			this->lpPredictorState,
 			this->lperiod,
 			&cache);
-
-		this->lstatistics[pInfo] =
-			pEffect->creationStatistic(difference, currentValues);
-
+		if(this->lneedActorStatistics)
+		{
+			pair<double, double * > p =  pEffect->creationStatistic(difference, currentValues, this->lneedActorStatistics);
+			this->lstatistics[pInfo] = p.first;
+			this->lactorStatistics[pInfo] = p.second;
+		}
+		else
+		{
+			this->lstatistics[pInfo] =
+				pEffect->creationStatistic(difference, currentValues);
+		}
+//		if(this->lcountStaticChangeContributions)
+//		{
+//			int  choices = 3;
+//			vector<double *> egosMap(pBehaviorData->n());
+//			this->lstaticChangeContributions.insert(make_pair(pInfo,egosMap));
+//			for (int e = 0; e < pBehaviorData->n(); e++)
+//			{
+//				cache.initialize(e);
+//				pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+//				double * contributions = new double[choices];
+//				this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
+//				pEffect->preprocessEgo(e);
+//				// no change gives no contribution
+//				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
+//				// downward change gives no contribution
+//				this->lstaticChangeContributions.at(pInfo).at(e)[0] = 0;
+//				// calculate the contribution of upward change
+//				if (currentValues[e] > pBehaviorData->min() && !pBehaviorData->upOnly(this->lperiod))
+//				{
+//					this->lstaticChangeContributions.at(pInfo).at(e)[2] = pEffect->calculateChangeContribution(e,1);
+//				}
+//				else
+//				{
+//					this->lstaticChangeContributions.at(pInfo).at(e)[2] = R_NaN;
+//				}
+//			}
+//		}
 		delete pEffect;
 	}
 
