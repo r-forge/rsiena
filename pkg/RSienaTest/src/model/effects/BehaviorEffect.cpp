@@ -134,8 +134,19 @@ double BehaviorEffect::similarityMean() const
  */
 double BehaviorEffect::evaluationStatistic(double * currentValues)
 {
+	return this->evaluationStatistic(currentValues, false).first;
+}
+
+pair<double,double *> BehaviorEffect::evaluationStatistic(double * currentValues, bool needActorStatistics)
+{
 	double statistic = 0;
 	int n = this->n();
+
+	double * actorStatistics = 0;
+	if(needActorStatistics)
+	{
+		 actorStatistics = new double[n];
+	}
 
 	for (int i = 0; i < n; i++)
 	{
@@ -143,11 +154,18 @@ double BehaviorEffect::evaluationStatistic(double * currentValues)
 		if (!this->missing(this->period(), i) &&
 			!this->missing(this->period() + 1, i))
 		{
-			statistic += this->egoStatistic(i, currentValues);
+			if(needActorStatistics)
+			{
+				actorStatistics[i] = this->egoStatistic(i, currentValues);
+				statistic += actorStatistics[i];
+			}
+			else
+			{
+				statistic += this->egoStatistic(i, currentValues);
+			}
 		}
 	}
-
-	return statistic;
+	return make_pair(statistic,actorStatistics);
 }
 
 
@@ -170,21 +188,40 @@ double BehaviorEffect::egoStatistic(int ego, double * currentValues)
 double BehaviorEffect::endowmentStatistic(const int * difference,
 	double * currentValues)
 {
+	return endowmentStatistic(difference, currentValues, false).first;
+}
+
+pair<double, double * > BehaviorEffect::endowmentStatistic(const int * difference, double * currentValues, bool needActorStatistics)
+{
 	double statistic = 0;
 	int n = this->n();
+
+	double * actorStatistics = 0;
+	if(needActorStatistics)
+	{
+		actorStatistics = new double[n];
+	}
 
 	for (int i = 0; i < n; i++)
 	{
 		this->preprocessEgo(i);
 		if (!this->missing(this->period(), i))
 		{
-			statistic += this->egoEndowmentStatistic(i, difference,
-				currentValues);
+			if(needActorStatistics)
+			{
+				actorStatistics[i] = this->egoEndowmentStatistic(i, difference, currentValues);
+				statistic += actorStatistics[i];
+			}
+			else
+			{
+				statistic += this->egoEndowmentStatistic(i, difference, currentValues);
+			}
 		}
 	}
-
-	return statistic;
+	return make_pair(statistic, actorStatistics);
 }
+
+
 /**
  * Returns the statistic corresponding the given ego as part of
  * the endowment function with respect to an initial behavior
@@ -197,7 +234,6 @@ double BehaviorEffect::egoEndowmentStatistic(int i, const int * difference,
 		this->pEffectInfo()->effectName());
 }
 
-
 /**
  * Returns the statistic corresponding to this effect as part of
  * the creation function.
@@ -207,8 +243,13 @@ double BehaviorEffect::egoEndowmentStatistic(int i, const int * difference,
  * indicate an increase of actors' behavior.
  * @param[in] currentValues the current state of the behavior variable
  */
-double BehaviorEffect::creationStatistic(int * difference,
-	double *currentValues)
+double BehaviorEffect::creationStatistic(int * difference, double * currentValues)
+{
+	return creationStatistic(difference, currentValues, false).first;
+}
+
+pair<double, double * > BehaviorEffect::creationStatistic(int * difference,
+	double *currentValues, bool needActorStatistics)
 {
 	// Here we use a trick. The creation statistics are very similar to the
 	// endowmnent statistics, but instead of summing over all actors with
@@ -217,20 +258,34 @@ double BehaviorEffect::creationStatistic(int * difference,
 	// statistic.
 
 	int n = this->n();
+	double statistic = 0;
+	double * actorStatistics = 0;
+	for (int i = 0; i < n; i++)
+	{
+		difference[i]  = -difference[i];
+	}
+
+	if(needActorStatistics)
+	{
+		pair<double, double *> p = this->endowmentStatistic(difference, currentValues, needActorStatistics);
+		statistic = p.first;
+		actorStatistics = p.second;
+		for (int i = 0; i < n; i++)
+		{
+			actorStatistics[i]  = -actorStatistics[i];
+		}
+	}
+	else
+	{
+		statistic = this->endowmentStatistic(difference, currentValues);
+	}
 
 	for (int i = 0; i < n; i++)
 	{
 		difference[i]  = -difference[i];
 	}
 
-	double statistic = this->endowmentStatistic(difference, currentValues);
-
-	for (int i = 0; i < n; i++)
-	{
-		difference[i]  = -difference[i];
-	}
-
-	return -statistic;
+	return make_pair(-statistic, actorStatistics);
 }
 
 

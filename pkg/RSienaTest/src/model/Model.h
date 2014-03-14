@@ -130,6 +130,9 @@ public:
 	void parallelRun(bool flag);
 	bool parallelRun() const;
 
+	void needChangeContributions(bool flag);
+	bool needChangeContributions() const;
+
 	void modelType(int type);
 	ModelType modelType() const;
 	bool modelTypeB() const;
@@ -243,6 +246,9 @@ private:
 	// indicates whether we need to match Siena3 in use of random variables
 	// and score calculations
 	bool lparallelRun;
+
+	//indicates whether change contributions are needed
+	bool lneedChangeContributions2;
 
 	// number of steps in a run for ML
 	int lnumberMLSteps;

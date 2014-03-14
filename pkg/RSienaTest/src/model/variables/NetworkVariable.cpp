@@ -177,6 +177,11 @@ NetworkVariable::~NetworkVariable()
 	this->lpermitted = 0;
 	this->lprobabilities = 0;
 
+	if(this->lpChangeContribution != 0)
+	{
+		delete this->lpChangeContribution;
+	}
+
 	deallocateVector(this->lpermittedChangeFilters);
 }
 
@@ -591,6 +596,10 @@ void NetworkVariable::makeChange(int actor)
 		{
 			pMiniStep =
 				new NetworkChange(this->lpData, actor, alter, true);
+		}
+		if (this->pSimulation()->pModel()->needChangeContributions())
+		{
+			pMiniStep->changeContributions(lpChangeContribution);
 		}
 		this->pSimulation()->pChain()->insertBefore(pMiniStep,
 			this->pSimulation()->pChain()->pLast());
@@ -1073,6 +1082,26 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	int endowmentEffectCount = this->pEndowmentFunction()->rEffects().size();
 	int creationEffectCount = this->pCreationFunction()->rEffects().size();
 
+	if (this->pSimulation()->pModel()->needChangeContributions())
+	{
+		this->lpChangeContribution = new map<const EffectInfo *, vector<double> >[evaluationEffectCount+endowmentEffectCount+creationEffectCount];
+		for (int i = 0; i < evaluationEffectCount; i++)
+		{
+			vector<double> vec(this->m(),0);
+			this->lpChangeContribution->insert(make_pair(this->pEvaluationFunction()->rEffects()[i]->pEffectInfo(), vec));
+		}
+		for (int i = 0; i < endowmentEffectCount; i++)
+		{
+			vector<double> vec(this->m(),0);
+			this->lpChangeContribution->insert(make_pair(this->pEndowmentFunction()->rEffects()[i]->pEffectInfo(), vec));
+		}
+		for (int i = 0; i < creationEffectCount; i++)
+		{
+			vector<double> vec(this->m(),0);
+			this->lpChangeContribution->insert(make_pair(this->pCreationFunction()->rEffects()[i]->pEffectInfo(), vec));
+		}
+	}
+
 	double total = 0;
 	double maxValue = 0; // the maximum never can be less than 0 
 					// because there always is the no-change option
@@ -1105,6 +1134,10 @@ void NetworkVariable::calculateTieFlipProbabilities()
 				contribution +=
 					pEffect->parameter() *
 					this->levaluationEffectContribution[alter][i];
+				if (this->pSimulation()->pModel()->needChangeContributions())
+				{
+					(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) = this->levaluationEffectContribution[alter][i];
+				}
 			}
 
 			if (this->lpNetworkCache->outTieExists(alter))
@@ -1116,6 +1149,10 @@ void NetworkVariable::calculateTieFlipProbabilities()
 					contribution +=
 						pEffect->parameter() *
 						this->lendowmentEffectContribution[alter][i];
+					if (this->pSimulation()->pModel()->needChangeContributions())
+					{
+						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) = this->lendowmentEffectContribution[alter][i];
+					}
 				}
 			}
 			else
@@ -1127,6 +1164,10 @@ void NetworkVariable::calculateTieFlipProbabilities()
 					contribution +=
 						pEffect->parameter() *
 						this->lcreationEffectContribution[alter][i];
+					if (this->pSimulation()->pModel()->needChangeContributions())
+					{
+						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) = this->lcreationEffectContribution[alter][i];
+					}
 				}
 			}
 

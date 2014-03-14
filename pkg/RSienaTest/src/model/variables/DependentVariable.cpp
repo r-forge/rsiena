@@ -81,6 +81,7 @@ DependentVariable::DependentVariable(string name,
 	 	this->lsettingProbs = 0;
 	}
 	this->lstepType = -1;
+	this->lpChangeContribution = 0;
 }
 
 

@@ -1312,6 +1312,133 @@ SEXP createInteractionEffects(SEXP EFFECTS, Model *pModel,
 }
 
 /**
+ *  Retrieves the contributions to all possible tie flips or behavior changes for each of the effects,
+ *  for one period. The call will relate to one group only, although all effects
+ *  are the same apart from the basic rates. Not used in maximum likelihood.
+ */
+void getChangeContributionStatistics(SEXP EFFECTSLIST,
+	const StatisticCalculator * pCalculator, vector<vector<double *> > *rChangeContributions)
+{
+
+	// get the column names from the names attribute
+	SEXP cols;
+	PROTECT(cols = install("names"));
+	SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
+
+	int netTypeCol; /* net type */
+	int nameCol; /* network name */
+	int effectCol;  /* short name of effect */
+	int parmCol;
+	int int1Col;
+	int int2Col;
+	int initValCol;
+	int typeCol;
+	int groupCol;
+	int periodCol;
+	int pointerCol;
+	int rateTypeCol;
+	int intptr1Col;
+	int intptr2Col;
+	int intptr3Col;
+	int settingCol;
+
+	getColNos(Names, &netTypeCol, &nameCol, &effectCol,
+			&parmCol, &int1Col, &int2Col, &initValCol,
+			&typeCol, &groupCol, &periodCol, &pointerCol,
+			&rateTypeCol, &intptr1Col, &intptr2Col, &intptr3Col,
+			&settingCol);
+
+	for (int ii = 0; ii < length(EFFECTSLIST); ii++)
+	{
+		SEXP EFFECTS = VECTOR_ELT(EFFECTSLIST, ii);
+
+		for (int i = 0; i < length(VECTOR_ELT(EFFECTS,0)); i++)
+		{
+			const char * effectType = CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), i));
+			const char * netType = CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, netTypeCol), i));
+			if(strcmp(netType, "oneMode") == 0 || strcmp(netType, "behavior") == 0)
+			{
+				// todo At the moment, change contributions cannot be calculated for endowment or creation effects
+				// modifications in the corresponding methods (calculateNetworkEndowmentStatistics, calculateNetworkCreationStatistics,
+				// and calculateBehaviorStatistics) in StatisticCalculator.cpp would be necessary!!!
+				//if (strcmp(effectType, "eval") == 0 || strcmp(effectType, "endow") == 0 || strcmp(effectType, "creation") == 0)
+				if (strcmp(effectType, "eval") == 0)
+				{
+					EffectInfo * pEffectInfo = (EffectInfo *) R_ExternalPtrAddr(VECTOR_ELT(VECTOR_ELT(EFFECTS,pointerCol), i));
+					if(rChangeContributions != 0)
+					{
+						rChangeContributions->push_back(pCalculator->staticChangeContributions(pEffectInfo));
+					}
+				}
+			}
+		}
+	}
+	UNPROTECT(1);
+}
+
+/**
+ *  Retrieves the statistics of individual actors for each of the effects,
+ *  for one period. The call will relate to one group only, although all effects
+ *  are the same apart from the basic rates. Not used in maximum likelihood.
+ */
+void getActorStatistics(SEXP EFFECTSLIST,
+	const StatisticCalculator * pCalculator, vector<double *> *rActorStatistics)
+{
+
+	// get the column names from the names attribute
+	SEXP cols;
+	PROTECT(cols = install("names"));
+	SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
+
+	int netTypeCol; /* net type */
+	int nameCol; /* network name */
+	int effectCol;  /* short name of effect */
+	int parmCol;
+	int int1Col;
+	int int2Col;
+	int initValCol;
+	int typeCol;
+	int groupCol;
+	int periodCol;
+	int pointerCol;
+	int rateTypeCol;
+	int intptr1Col;
+	int intptr2Col;
+	int intptr3Col;
+	int settingCol;
+
+	getColNos(Names, &netTypeCol, &nameCol, &effectCol,
+			&parmCol, &int1Col, &int2Col, &initValCol,
+			&typeCol, &groupCol, &periodCol, &pointerCol,
+			&rateTypeCol, &intptr1Col, &intptr2Col, &intptr3Col,
+			&settingCol);
+
+	for (int ii = 0; ii < length(EFFECTSLIST); ii++)
+	{
+		SEXP EFFECTS = VECTOR_ELT(EFFECTSLIST, ii);
+
+		for (int i = 0; i < length(VECTOR_ELT(EFFECTS,0)); i++)
+		{
+			const char * effectType = CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), i));
+			const char * netType = CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, netTypeCol), i));
+			if(strcmp(netType, "oneMode") == 0 || strcmp(netType, "behavior") == 0)
+			{
+				if (strcmp(effectType, "eval") == 0 || strcmp(effectType, "endow") == 0 || strcmp(effectType, "creation") == 0)
+				{
+					EffectInfo * pEffectInfo = (EffectInfo *) R_ExternalPtrAddr(VECTOR_ELT(VECTOR_ELT(EFFECTS,pointerCol), i));
+					if(rActorStatistics != 0)
+					{
+						rActorStatistics->push_back(pCalculator->actorStatistics(pEffectInfo));
+					}
+				}
+			}
+		}
+	}
+	UNPROTECT(1);
+}
+
+
+/**
  *  Retrieves the values of the statistics and scores for each of the effects,
  *  for one period. The call will relate to one group only, although all effects
  *  are the same apart from the basic rates. Not used in maximum likelihood.

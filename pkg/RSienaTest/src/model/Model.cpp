@@ -195,6 +195,22 @@ bool Model::parallelRun() const
 }
 
 /**
+ * Stores if change contribution are needed in the current simulation
+ */
+void Model::needChangeContributions(bool flag)
+{
+	this->lneedChangeContributions2 = flag;
+}
+
+/**
+ * Returns if change contribution are needed in the current simulation
+ */
+bool Model::needChangeContributions() const
+{
+	return this->lneedChangeContributions2;
+}
+
+/**
  * Stores the number of ML steps
  */
 void Model::numberMLSteps(int value)
