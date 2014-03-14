@@ -1,3 +1,7 @@
+2014-03-14 R-Forge Revision 256
+Changes in RSiena: Included exactly the same changes in RSiena 
+as have been included in RSienaTest in Revision 255
+
 2014-03-14 R-Forge Revision 255
 Changes in RSienaTest:
    * Modified getTargets(...) such that it is possible to return target statistics of individual actors 
