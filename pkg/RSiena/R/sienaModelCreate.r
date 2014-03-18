@@ -27,7 +27,7 @@ sienaModelCreate <-
              pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
              prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
              minimumPermutationLength=2, initialPermutationLength=20,
-             modelType=1, mult=5, simOnly=FALSE)
+             modelType=1, mult=5, simOnly=FALSE, localML=FALSE)
 {
     model <- NULL
     model$projname <- projname
@@ -39,6 +39,7 @@ sienaModelCreate <-
 #    model$maxmaxrat <- 10.0
     model$maxlike <-  maxlike
 	model$simOnly <- simOnly
+	model$localML <- localML
     model$FRANname <- deparse(substitute(fn))
     if (maxlike)
     {

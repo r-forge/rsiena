@@ -23,7 +23,7 @@ sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0,
      prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
      prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
-     modelType=1, mult=5, simOnly=FALSE)
+     modelType=1, mult=5, simOnly=FALSE, localML=FALSE)
 
 sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
      useStdInits = FALSE, n3 = 1000, nsub = 4,
@@ -33,7 +33,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
      prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
      prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
-     modelType=1, mult=5, simOnly=FALSE)}
+     modelType=1, mult=5, simOnly=FALSE, localML=FALSE)}
 \arguments{
   \item{fn}{Function to do one simulation in the Robbins-Monro
     algorithm. Not to be touched.}
@@ -117,6 +117,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     Phase 3 of the estimation algorithm in function siena07 is skipped.
     This is suitable if nsub=0 and siena07 is used only for the purpose
     of simulation.}
+  \item{localML}{Logical: If TRUE, and \code{maxlike}, then calculations are
+  	sped up for models with all local effects.}
 }
 \details{Model specification is done via this object for
   \code{\link{siena07}}.
@@ -173,7 +175,10 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     steps per iteration is set to this multiple of the total distance
     between the observations at start and finish of the wave.}
   \item{simOnly}{Logical, indicating whether output of covariance matrix
-   by \code{\link{siena07}} is to be skipped.}
+    by \code{\link{siena07}} is to be skipped.}
+  \item{localML}{Logical, indicating if a local model was used, allowing 
+    faster calculations in ML estimation.}
+
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley and Tom A.B. Snijders}

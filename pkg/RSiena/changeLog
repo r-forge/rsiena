@@ -1,8 +1,16 @@
-2014-03-14 R-Forge Revision 256
+2014-03-17 R-Forge Revision 266
+Changes in RSiena and RSienaTest:
+   * getTargets.r: Added actorTargets function for use with multiple imputation 
+	   of behaviour variable.
+   * sienaModelCreate.r, initializeFRAN.r, setup07setup.cpp, Model.cpp, Model.h,
+	   MLSimulation.cpp, MLSimulation.h: added localML option to sienaAlgorithm.
+   * allEffects.csv: added ‘local’ column for use with localML option.
+
+2014-03-14 R-Forge Revisions 261-265
 Changes in RSiena: Included exactly the same changes in RSiena 
 as have been included in RSienaTest in Revision 255
 
-2014-03-14 R-Forge Revision 255
+2014-03-14 R-Forge Revisions 255-260
 Changes in RSienaTest:
    * Modified getTargets(...) such that it is possible to return target statistics of individual actors 
      as well as change contributions necessary for calculating relative importances of effects (siena07setup.cpp).
