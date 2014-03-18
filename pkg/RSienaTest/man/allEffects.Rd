@@ -36,6 +36,7 @@ This data frame is used internally to construct effect objects.
     \item{\code{effect2}}{a logical vector}
     \item{\code{effect3}}{a logical vector}
     \item{\code{interactionType}}{a character vector}
+    \item{\code{local}}{a logical vector}
   }
 }
 \details{

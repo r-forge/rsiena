@@ -43,6 +43,7 @@ Model::Model()
 	this->ldeletePermuteProbability = 0;
 	this->linsertRandomMissingProbability = 0;
 	this->ldeleteRandomMissingProbability = 0;
+    this->llocalML = false;
 	this->lsimpleRates = 0;
 	this->lmodelType = NORMAL;
 }
@@ -949,6 +950,24 @@ double Model::missingBehaviorProbability(int periodFromStart) const
 {
 	return this->lmissingBehaviorProbability[periodFromStart];
 }
+    
+/**
+ * Stores whether the model is a local model (localML option)
+ */
+void Model::localML(bool flag)
+{
+    this->llocalML = flag;
+}
+    
+    
+/**
+ * Returns whether the model is a local model (localML option)
+ */
+bool Model::localML() const
+{
+    return this->llocalML;
+}
+    
 /**
  * Stores the simpleRates flag for the ML model.
  */

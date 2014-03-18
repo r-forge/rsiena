@@ -568,7 +568,7 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 	}
 
 	pModel->simpleRates(asInteger(SIMPLERATES));
-
+    
 	return R_NilValue;
 
 }
@@ -819,7 +819,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
  */
 SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
-	SEXP MAXIMUMPERM, SEXP INITIALPERM)
+    SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -866,6 +866,14 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	PROTECT(aborts = allocVector(VECSXP, totObservations));
 	GetRNGstate();
 
+    /* localML */
+    int localML = 0;
+    if (!isNull(LOCALML))
+    {
+        localML = asInteger(LOCALML);
+    }
+    pModel->localML(localML);
+    
 	int periodFromStart = 0;
 
 	for (int group = 0; group < nGroups; group++)
@@ -877,7 +885,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 		MLSimulation * pMLSimulation = new MLSimulation(pData, pModel);
 
 		pMLSimulation->simpleRates(pModel->simpleRates());
-
+        
 		for (int period = 0; period < observations; period ++)
 		{
 			// store for later on model
@@ -907,7 +915,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 
 			/* do some more steps */
 			pMLSimulation->setUpProbabilityArray();
-
+            
 			int numSteps = 500;
 			for (int i = 0; i < numSteps; i++)
 			{
@@ -982,7 +990,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
  */
 SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
 	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
-	SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP CHAINS)
+	SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP CHAINS, SEXP LOCALML)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -1016,9 +1024,17 @@ SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
 
 	double * prmin = REAL(PRMIN);
 	double * prmib = REAL(PRMIB);
-
+    
 	int periodFromStart = 0;
-
+    
+    /* localML */
+    int localML = 0;
+    if (!isNull(LOCALML))
+    {
+        localML = asInteger(LOCALML);
+    }
+    pModel->localML(localML);
+    
 	for (int group = 0; group < nGroups; group++)
 	{
 		Data * pData = (*pGroupData)[group];

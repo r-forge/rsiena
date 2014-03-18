@@ -568,7 +568,7 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 	}
 
 	pModel->simpleRates(asInteger(SIMPLERATES));
-
+    
 	return R_NilValue;
 
 }
@@ -590,13 +590,12 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	{
 		//TODO is this correct?
 		pModel->parallelRun(true);
-		//  Shouldn't it be:
+		// Or shouldn't it be:
 		// 	if(asInteger(PARALLELRUN)==1)
 		//  {
 		//		pModel->parallelRun(true);
 		//  }
 	}
-
 	int nGroups = pGroupData->size();
 
 	int totObservations = totalPeriods(*pGroupData);
@@ -620,41 +619,26 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	{
 		rfra[i] = 0;
 	}
-
-
-	/* actorStats will contain the target statistics of individual actors */
-	SEXP actorStats;
-	PROTECT(actorStats =  allocVector(VECSXP,nGroups));
+	
 	int returnActorStatistics = 0;
 	if (!isNull(RETURNACTORSTATISTICS))
 	{
 		returnActorStatistics = asInteger(RETURNACTORSTATISTICS);
 	}
-	SEXP NETWORKTYPES = 0;
-	if(returnActorStatistics)
-	{
-		NETWORKTYPES =  createRObjectAttributes(EFFECTSLIST, actorStats);
-		int objEffects = length(NETWORKTYPES);
-
-		for (int group = 0; group < nGroups; group++)
-		{
-			SET_VECTOR_ELT(actorStats, group, allocVector(VECSXP, (*pGroupData)[group]->observationCount()));
-			for (int p = 0; p < (*pGroupData)[group]->observationCount(); p++)
-			{
-				SET_VECTOR_ELT(VECTOR_ELT(actorStats,group), p, allocVector(VECSXP,objEffects));
-			}
-		}
-	}
-
-	/* changeStats will contain the tie flip contributions or the bahavior change contributions of each effect on the decisions of all actors */
-	SEXP changeStats;
-	PROTECT(changeStats =  allocVector(VECSXP,nGroups));
+	/* changeStats will contain the target statistics of individual actors */
+	SEXP actorStats;
+	PROTECT(actorStats =  allocVector(VECSXP,nGroups));
+	
 	int returnStaticChangeContributions = 0;
 	if (!isNull(RETURNSTATICCHANGECONTRIBUTIONS))
 	{
 		returnStaticChangeContributions = asInteger(RETURNSTATICCHANGECONTRIBUTIONS);
 	}
+	/* changeStats will contain the tie flip contributions or the bahavior change contributions of each effect on the decisions of all actors */
+	SEXP changeStats;
+	PROTECT(changeStats =  allocVector(VECSXP,nGroups));
 
+	SEXP NETWORKTYPES = 0;
 	if(returnStaticChangeContributions)
 	{
 		 NETWORKTYPES =  createRObjectAttributes(EFFECTSLIST, changeStats);
@@ -669,7 +653,20 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 			}
 		}
 	}
-
+	if(returnActorStatistics)
+	{
+		NETWORKTYPES =  createRObjectAttributes(EFFECTSLIST, actorStats);
+		int objEffects = length(NETWORKTYPES);
+		
+		for (int group = 0; group < nGroups; group++)
+		{
+			SET_VECTOR_ELT(actorStats, group, allocVector(VECSXP, (*pGroupData)[group]->observationCount()));
+			for (int p = 0; p < (*pGroupData)[group]->observationCount(); p++)
+			{
+				SET_VECTOR_ELT(VECTOR_ELT(actorStats,group), p, allocVector(VECSXP,objEffects));
+			}
+		}
+	}
 	/* find the targets: for each data object separately:
 	   add them up on return to R (easier to check!) */
 	int periodFromStart = 0;
@@ -799,6 +796,12 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	}
 	else if(returnActorStatistics)
 	{
+//		SEXP ans;
+//		PROTECT(ans = allocVector(VECSXP, 2));
+//		SET_VECTOR_ELT(ans, 0, fra);
+//		SET_VECTOR_ELT(ans, 1, actorStats);
+//		UNPROTECT(4);
+//		return ans;
 		UNPROTECT(3);
 		return actorStats;
 	}
@@ -816,7 +819,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
  */
 SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
-	SEXP MAXIMUMPERM, SEXP INITIALPERM)
+    SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -863,6 +866,14 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	PROTECT(aborts = allocVector(VECSXP, totObservations));
 	GetRNGstate();
 
+    /* localML */
+    int localML = 0;
+    if (!isNull(LOCALML))
+    {
+        localML = asInteger(LOCALML);
+    }
+    pModel->localML(localML);
+    
 	int periodFromStart = 0;
 
 	for (int group = 0; group < nGroups; group++)
@@ -874,7 +885,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 		MLSimulation * pMLSimulation = new MLSimulation(pData, pModel);
 
 		pMLSimulation->simpleRates(pModel->simpleRates());
-
+        
 		for (int period = 0; period < observations; period ++)
 		{
 			// store for later on model
@@ -904,7 +915,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 
 			/* do some more steps */
 			pMLSimulation->setUpProbabilityArray();
-
+            
 			int numSteps = 500;
 			for (int i = 0; i < numSteps; i++)
 			{
@@ -979,7 +990,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
  */
 SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
 	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
-	SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP CHAINS)
+	SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP CHAINS, SEXP LOCALML)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -1013,9 +1024,17 @@ SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
 
 	double * prmin = REAL(PRMIN);
 	double * prmib = REAL(PRMIB);
-
+    
 	int periodFromStart = 0;
-
+    
+    /* localML */
+    int localML = 0;
+    if (!isNull(LOCALML))
+    {
+        localML = asInteger(LOCALML);
+    }
+    pModel->localML(localML);
+    
 	for (int group = 0; group < nGroups; group++)
 	{
 		Data * pData = (*pGroupData)[group];

@@ -182,6 +182,10 @@ public:
 	void missingBehaviorProbability(double probability);
 	double missingBehaviorProbability(int periodFromStart) const;
 
+    // localML
+    void localML(bool flag);
+	bool localML() const;
+    
 	// simple rates flag for ML
 	bool simpleRates() const;
 	void simpleRates(bool simpleRates);
@@ -274,6 +278,9 @@ private:
 	double linsertRandomMissingProbability;
 	double ldeleteRandomMissingProbability;
 
+    // localML
+    bool llocalML;
+    
 	bool lsimpleRates;
 
 	vector <double> lmissingNetworkProbability;

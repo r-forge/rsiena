@@ -542,6 +542,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 		simpleRates <- FALSE
 	}
 	z$simpleRates <- simpleRates
+
 	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
                  profileData, z$parallelTesting, x$modelType, z$simpleRates)
@@ -573,13 +574,32 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             {
                 z$prmib <- rep(0, length(nbrMissBeh))
             }
+
+            ## localML
+
+            if (is.null(x$localML))
+            {
+                z$localML <- FALSE
+            } else {
+                z$localML <- x$localML
+            }
+
+            local <- ifelse(is.na(effects$local[effects$include]),
+									FALSE, effects$local[effects$include])
+
+            if (z$localML & any(!local))
+            {
+                stop("Non-local effect chosen.")
+            }
+
             z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms,
                          x$prdrms)
             ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
                          z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
                          x$maximumPermutationLength,
-                         x$initialPermutationLength)
+                         x$initialPermutationLength,
+                         z$localML)
             f$minimalChain <- ans[[1]]
             f$chain <- ans[[2]]
         }
@@ -590,7 +610,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
                          z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
                          x$maximumPermutationLength,
-                         x$initialPermutationLength, ff$chain)
+                         x$initialPermutationLength, ff$chain,
+                         z$localML)
             f$chain <- ff$chain
        }
     }
@@ -2029,4 +2050,3 @@ addSettingsEffects <- function(effects, x)
 	## join them together again
 	do.call(rbind, tmp)
 }
-
