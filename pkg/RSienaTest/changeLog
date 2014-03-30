@@ -1,3 +1,11 @@
+2014-03-30 R-Forge Revision 267
+Changes in RSiena:
+Added R-files that contain functionalities to calculate, print and plot relative importances of effects
+   * sienaRI.r: new
+   * sienaRIDynamics.r: new
+Changes in RSiena and RSienaTest:
+   * Model.cpp: bugfix
+   
 2014-03-17 R-Forge Revision 266
 Changes in RSiena and RSienaTest:
    * getTargets.r: Added actorTargets function for use with multiple imputation 

@@ -46,6 +46,7 @@ Model::Model()
     this->llocalML = false;
 	this->lsimpleRates = 0;
 	this->lmodelType = NORMAL;
+	this->lneedChangeContributions2 =false;
 }
 
 
