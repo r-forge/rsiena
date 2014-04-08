@@ -1,3 +1,9 @@
+2014-04-08 R-Forge Revision 268
+Changes in RSiena:
+   * sienaRI.Rr: added
+   * sienaRIDynamics.r: bugfix
+   * NAMESPACE: added entries sienaRI and sienaRIDynamics with the corresponding print, summary, and plot methods
+
 2014-03-30 R-Forge Revision 267
 Changes in RSiena:
 Added R-files that contain functionalities to calculate, print and plot relative importances of effects
