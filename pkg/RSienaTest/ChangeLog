@@ -1,3 +1,8 @@
+2014-04-13 R-Forge Revision 270
+Changes in RSiena and RSienaTest:
+   * Moved plot(RI) in sienaRI.Rd to dontrun{...}.
+   * File changeLog renamed ChangeLog.
+
 2014-04-13 R-Forge Revision 269
 Changes in RSienaTest:
    * In one line in sienaRIDynamics.r, "intervalsPerPeriods"
