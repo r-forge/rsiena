@@ -5,13 +5,14 @@
   This function creates a changing dyadic covariate object from an array.
 }
 \usage{
-varDyadCovar(val, nodeSets=c("Actors", "Actors"),
+varDyadCovar(val, centered=TRUE, nodeSets=c("Actors", "Actors"),
     sparse=is.list(val), type=c("oneMode", "bipartite"))
 }
 %- maybe also "usage" for other objects documented here.
 \arguments{
   \item{val}{Array of covariate values, third dimension is the
     time. Alternatively, a list of sparse matrices of type "dgTMatrix".}
+  \item{centered}{Boolean: if TRUE, then the overall mean value is subtracted.}
   \item{nodeSets}{Names (character string) of the associated node sets.
    If the entire data set contains more than one node set,
    then the node sets must be specified in all data objects.}

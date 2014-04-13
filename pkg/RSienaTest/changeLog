@@ -1,8 +1,31 @@
+2014-04-13 R-Forge Revision 269
+Changes in RSienaTest:
+   * In one line in sienaRIDynamics.r, "intervalsPerPeriods"
+     CHANGED TO "intervalsPerPeriod" (this was a misprint).
+   * Changes of version 1.1.268 in sienaRIDynamics ported from RSiena to RSienaTest.
+   * Small changes in sienaRI.r.
+   * sienaRI.Rd ported from RSiena to RSienaTest, with small changes.
+   * NAMESPACE: added entry sienaRI with the corresponding 
+     print, summary, and plot methods.
+   * sienaBayes.r, sienaprint.r: updates to let sienaBayes.r accept
+     a wider range of data and models (e.g., user-defined interactions).
+Changes in RSiena:
+   * sienaRIDynamics with plot and print methods temporarily left out.
+   * Small changes in sienaRI.r and sienaRI.Rd.
+Changes in RSiena and RSienaTest:
+   * sienaDataCreate.r, sienautils.r, print01Report.r:
+     In coDyadCovar() and varDyadCovar(), centering now also is optional by the 
+     new option "centered" (like it was done for coCovar() and varCovar() 
+     in revision 1.1-251).
+   * sienaprint.r: correct bug when printing siena object with symmetric network.
+   * varDyadCovar: repaired bug occurring when calling it with a named list.
+
 2014-04-08 R-Forge Revision 268
 Changes in RSiena:
-   * sienaRI.Rr: added
+   * sienaRI.Rd: added
    * sienaRIDynamics.r: bugfix
-   * NAMESPACE: added entries sienaRI and sienaRIDynamics with the corresponding print, summary, and plot methods
+   * NAMESPACE: added entries sienaRI and sienaRIDynamics with the corresponding 
+     print, summary, and plot methods.
 
 2014-03-30 R-Forge Revision 267
 Changes in RSiena:
@@ -18,7 +41,7 @@ Changes in RSiena and RSienaTest:
 	   of behaviour variable.
    * sienaModelCreate.r, initializeFRAN.r, setup07setup.cpp, Model.cpp, Model.h,
 	   MLSimulation.cpp, MLSimulation.h: added localML option to sienaAlgorithm.
-   * allEffects.csv: added ‘local’ column for use with localML option.
+   * allEffects.csv: added "local" column for use with localML option.
 
 2014-03-14 R-Forge Revisions 261-265
 Changes in RSiena: Included exactly the same changes in RSiena 

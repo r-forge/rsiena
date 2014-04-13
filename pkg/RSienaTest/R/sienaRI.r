@@ -9,7 +9,7 @@
 # * in for potential desicions of actors at observation moments. 
 # *****************************************************************************/
 
-##@sienaRI. Use as RSiena:::sienaRI()
+##@sienaRI. Use as RSienaTest:::sienaRI()
 sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 {
 	if (!inherits(data, "siena"))

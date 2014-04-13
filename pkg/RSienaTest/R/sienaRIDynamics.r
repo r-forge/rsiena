@@ -46,10 +46,10 @@ sienaRIDynamics <- function(data, ans=NULL, effects=NULL, algorithm=NULL, theta=
 			}
 			effs <- effects
 		}else{
-			if(!is.null(algorithm)||!is.null(theta)||!is.null(effects))
-			{
-				warning("some information are multiply defined \n results will be based on 'theta', 'algorithm', and 'effects' stored in 'ans' (as 'ans$theta', 'ans$x', 'ans$effects')")
-			}
+		if(!is.null(algorithm)||!is.null(theta)||!is.null(effects))
+		{
+			warning("some information are multiply defined \n results will be based on 'theta', 'algorithm', and 'effects' stored in 'ans' (as 'ans$theta', 'ans$x', 'ans$effects')")
+		}
 			effs <- ans$effects
 		}	
 		if(!is.null(intervalsPerPeriod))

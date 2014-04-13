@@ -78,7 +78,7 @@ print.siena <- function(x, ...)
 		{
 			if (attr(xj,"symmetric"))
 			{
-				mymat[2,2] <- c(mymat[2,2],", symmetric")
+				mymat[2,2] <- paste(mymat[2,2],", symmetric", sep="")
 			}
 		}
 		mymat[3,] <- c("Observations",       attr(xj,  "netdims")[3])
@@ -160,7 +160,7 @@ print.sienaGroup <- function(x, ...)
 	cat('Dependent variables: \n')
 	cat(paste(att$netnames, ":", att$types),'\n')
 	cat('Total number of periods:', att$observations)
-	cat("\nmore to be added!\n")
+	cat("\n")
 	invisible(x)
 }
 
@@ -518,13 +518,58 @@ print.sienaAlgorithm <- function(x, ...)
     cat(" Model Type:", ModelTypeStrings[x$modelType], "\n")
     invisible(x)
 }
+
+##@averageTheta.last Miscellaneous
+averageTheta.last <- function(z)
+{
+	thetaMean <- rep(NA, z$pp)
+	for (group in 1:z$nGroup)
+	{
+		thetaMean[z$ratePositions[[group]]] <- 	colMeans(
+			z$ThinParameters[(z$nwarm+1):(z$nwarm+z$nmain), 
+					group, !z$generalParametersInGroup, drop=FALSE], na.rm=TRUE)
+	}
+	thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
+			z$ThinPosteriorMu[(z$nwarm+1):(z$nwarm+z$nmain),z$objectiveInVarying,
+					drop=FALSE], na.rm=TRUE)
+	if (any(z$set2))
+	{
+		thetaMean[z$set2] <- 
+			colMeans(z$ThinPosteriorEta[(z$nwarm+1):(z$nwarm+z$nmain),, drop=FALSE]
+			, na.rm=TRUE)
+	}
+	thetaMean
+}
+	
+##@sdTheta.last Miscellaneous
+sdTheta.last <- function(z)
+{
+	sdTheta<- rep(NA, z$pp)
+	for (group in 1:z$nGroup)
+	{
+		sdTheta[z$ratePositions[[group]]] <- apply(
+			z$ThinParameters[(z$nwarm+1):(z$nwarm+z$nmain), 
+					group, !z$generalParametersInGroup, drop=FALSE], 2, sd)
+	}
+	sdTheta[(z$set1)&(!z$basicRate)] <- apply(
+			z$ThinPosteriorMu[(z$nwarm+1):(z$nwarm+z$nmain),z$objectiveInVarying,
+					drop=FALSE], 2, sd)
+	if (any(z$set2))
+	{
+		sdTheta[z$set2] <- 
+			apply(z$ThinPosteriorEta[(z$nwarm+1):(z$nwarm+z$nmain),, drop=FALSE],
+			   2, sd)
+	}
+	sdTheta
+}
+
 ##@sienaFitThetaTable Miscellaneous
 sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE)
 {
-    theEffects <- x$requestedEffects
-    if (fromBayes)
+    theEffects <- x$effects
+	if (fromBayes)
 	{
-		pp <- x$TruNumPars
+		pp <- dim(theEffects)[1]	
 	}
 	else
 	{
@@ -611,7 +656,14 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE)
 		ses <- sqrt(diag(x$covtheta))
 		ses[x$fixed] <- NA
 	}
-    theta <- x$theta
+	if (fromBayes)
+	{
+		theta <- averageTheta.last(x)
+	}
+	else
+	{
+		theta <- x$theta
+	}
 	if (!is.null(x$covtheta))
 	{
 		theta[diag(x$covtheta) < 0.0] <- NA
@@ -635,10 +687,18 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE)
     mydf[nrates + (1:xp), 'type' ] <- ifelse(theEffects$type == "creation",
                                                "creat", theEffects$type)
     mydf[nrates + (1:xp), 'text' ] <- theEffects$effectName
-    mydf[nrates + (1:xp), 'value' ] <- theta
-	if (exists("ses"))
+    mydf[nrates + (1:xp), 'value' ] <- theta 
+	
+	if (fromBayes)
 	{
-		mydf[nrates + (1:xp), 'se' ] <- ses
+		mydf[nrates + (1:xp), 'se' ] <- sdTheta.last(x)
+	}
+	else
+	{
+		if (exists("ses"))
+		{
+			mydf[nrates + (1:xp), 'se' ] <- ses
+		}
 	}
     if (!is.null(x$tstat))
     {
@@ -654,7 +714,7 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE)
         addsub <- addsub + 1
     }
     return(list(mydf=mydf, addtorow=addtorow))
-}
+} # end sienaFitThetaTable
 
 ##@sienaFitCovarianceCorrelation Miscellaneous
 sienaFitCovarianceCorrelation <- function(x)
@@ -776,8 +836,10 @@ makeTemp <- function(x, ...)
 		colnames(mymat) <- c(mynames, 'random')
 		mymat[, 'value'] <- format(round(mydf$value, digits=4))
 		mymat[, 'se'] <- format(round(mydf$se, digits=4))
-		mymat[, 'random'] <-
-				ifelse(x$requestedEffects$randomEffects, "   +   ", "   -   ")
+		x$basicRate
+		mymat[x$set1, 'random']      <- "   +   "
+		mymat[x$set2, 'random']      <- "   -   "
+		mymat[x$basicRate, 'random'] <- "       "
 		mymat[, 'type'] <- format(mymat[, 'type'])
 		mymat[, 'text'] <- format(mymat[, 'text'])
 		mymat[mydf$row < 1, 'row'] <-

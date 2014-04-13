@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-254.
+This version was renewed for \RS version 1.1-269.
 \end{abstract}
 
 
@@ -300,7 +300,7 @@ reference to this manual is the following.  \smallskip
 
 \noindent
 Ruth M. Ripley, Tom A.B. Snijders, Zs\'{o}fia Boda,
- Andr\'{a}s V\"{o}r\"{o}s, and Paulina Preciado, 2013.
+ Andr\'{a}s V\"{o}r\"{o}s, and Paulina Preciado, 2014.
 Manual for SIENA version 4.0 (version \today).
 Oxford: University of Oxford, Department of Statistics; Nuffield College.
 \textsf{http://www.stats.ox.ac.uk/siena/}
@@ -974,7 +974,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-254) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-269) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1421,8 +1421,8 @@ For the multi-group option (section \ref{S_multigroup}),
 the subtracted values are the global means across all groups.
 
 Centering of covariates can be turned off by specifying
-\texttt{centered=FALSE} in the call of \sfn{coCovar()}
-or \sfn{varCovar()}, respectively.
+\texttt{centered=FALSE} in the call of \sfn{coCovar()},
+\sfn{varCovar()}, \sfn{coDyadCovar()}, or \sfn{varDyadCovar()}, respectively.
 
 For the dyadic covariates and the similarity variables derived
 from the individual covariates, the grand mean is calculated
@@ -6730,7 +6730,7 @@ for transitive ties for $\alpha=0$ and approximates the fit
 statistic for transitive triplets
 for large $\alpha$, the estimates are not the same because some other
 calculations are done differently. The issue is that the GWESP effects are
-not implemented as a true evaluation effect, but as a generic effect, 
+not implemented as a true evaluation effect, but as a generic effect,
 where for the change statistic only changes of the tie $i \rightarrow j$ in
 (\ref{GWESP2}) are considered, and not of the tie $i \rightarrow h$.
 
@@ -6858,7 +6858,8 @@ $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha
  Since the representation is inverse, a result like a negative coefficient
  $ -1.2$ for \texttt{outTrunc} (internal effect parameter $c=1$) is interpreted
  as a positive tendency $+1.2$ toward outdegrees equal to 0; the standard
- error is unchanged.
+ error is unchanged. In the case of $c=1$, an alternative and mode directly
+ comprehensible name is \emph{outdegree at least 1} effect.
 
  \item {\em square root out-degree}, defined by  \\
  $s^{\rm net}_{i\vit}(x) = \sqrt{x_{i+}}$;\\
@@ -7328,7 +7329,7 @@ the following effects are available:
  that have the same covariate value for $i$, $j$, and $h$,\\
  $s^{\rm net}_{i\vit}(x) =
  \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i = v_j = v_h\}$;
- 
+
 \item
 \begin{minipage}[t]{.7\textwidth}
  {\em transitive triplets jumping to different V}
@@ -10739,6 +10740,30 @@ which affect the user.
 the R-forge repository.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+
+\item 2014-04-13 R-Forge Revisions 267-269.
+
+Changes in RSienaTest:
+\begin{itemize}
+ \item Updates to let \sfn{sienaBayes()} accept
+     a wider range of data and models (e.g., user-defined interactions);
+     and various corrections to \sfn{sienaBayes()}.
+\end{itemize}
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+\item Added function sienaRI() for assessment of relative importance of effects,
+      with print and plot methods.
+\item In \sfn{coDyadCovar()} and \sfn{varDyadCovar()}, centering now also is
+      optional by the new option \texttt{centered} (like it was done for
+      \sfn{coCovar()} and \sfn{varCovar()} in revision 1.1-251).
+\item Corrected bug when printing siena object with a symmetric network;
+     and in \sfn{varDyadCovar()} corrected a bug occurring when calling it 
+     with a named list.      
+\end{itemize}
+
+
+\item Internal changes in the code version 1.1-255 to 1.1-267 (see changeLog).
 
 \item No noticeable changes from version 1.1-251 to 1.1-254.
 

@@ -114,7 +114,7 @@ addAttributes.coDyadCovar <- function(x, name, bipartite, ...)
 		rr <-  range(x, na.rm=TRUE)
 		nonMissingCount <- sum(!is.na(x))
 	}
-	attr(x,'mean') <- varmean
+	attr(x,'mean') <- ifelse(attr(x,'centered'), varmean, 0)
 	attr(x,'range') <- rr[2] - rr[1]
 	storage.mode(attr(x, 'range')) <- 'double'
 	attr(x,'range2') <- rr
@@ -177,7 +177,7 @@ addAttributes.varDyadCovar <- function(x, name, bipartite, ...)
 		attr(x, "meanp") <- colMeans(x, dims=2, na.rm=TRUE)
 		nonMissingCounts <- colSums(!is.na(x), dims=2)
 	}
-	attr(x, "mean") <- varmean
+	attr(x, "mean") <- ifelse(attr(x, "centered"), varmean, 0)
 	attr(x, "range") <- rr[2] - rr[1]
 	storage.mode(attr(x, "range")) <- "double"
 	attr(x, "name") <- name
@@ -1161,7 +1161,7 @@ groupRangeAndSimilarityAndMean <- function(group)
 			j <- match(atts$cCovars[covar], names(group[[i]]$cCovars))
 			if (is.na(j))
 			{
-				stop("inconsistent covariate names")
+				stop("inconsistent actor covariate names")
 			}
 			thisrange[, i] <- range(group[[i]]$cCovars[[j]],
 								   na.rm=TRUE)
@@ -1206,7 +1206,7 @@ groupRangeAndSimilarityAndMean <- function(group)
 			j <- match(atts$vCovars[covar], names(group[[i]]$vCovars))
 			if (is.na(j))
 			{
-				stop("inconsistent covariate names")
+				stop("inconsistent actor covariate names")
 			}
 			vartotal <- vartotal + attr(group[[i]]$vCovars[[j]], "vartotal")
 			nonMissingCount <- nonMissingCount +
@@ -1216,8 +1216,8 @@ groupRangeAndSimilarityAndMean <- function(group)
 					attr(group[[i]]$vCovars[[j]], "nonMissingCount")
 		}
 		varmean <- vartotal / nonMissingCount
-#browser() # Hier kijken hoe je moet centreren in de groep.	
-		j <- match(atts$vCovars[covar], names(group[[1]]$vCovars))	
+#browser() # Hier kijken hoe je moet centreren in de groep.
+		j <- match(atts$vCovars[covar], names(group[[1]]$vCovars))
 		if (attr(group[[1]]$vCovars[[j]],"centered"))
 		{
 			for (i in 1:length(group))
@@ -1225,7 +1225,7 @@ groupRangeAndSimilarityAndMean <- function(group)
 				j <- match(atts$vCovars[covar], names(group[[i]]$vCovars))
 				if (is.na(j))
 				{
-					stop("inconsistent covariate names")
+					stop("inconsistent actor covariate names")
 				}
 				group[[i]]$vCovars[[j]] <- group[[i]]$vCovars[[j]] -
 					varmean
@@ -1243,7 +1243,7 @@ groupRangeAndSimilarityAndMean <- function(group)
 			j <- match(atts$vCovars[covar], names(group[[i]]$vCovars))
 			if (is.na(j))
 			{
-				stop("inconsistent covariate names")
+				stop("inconsistent actor covariate names")
 			}
 			thisrange[, i] <- range(group[[i]]$vCovars[[j]],
 									na.rm=TRUE)
@@ -1286,7 +1286,7 @@ groupRangeAndSimilarityAndMean <- function(group)
 		j <- match(atts$dycCovars[covar], names(group[[1]]$dycCovars))
 		if (is.na(j))
 		{
-			stop("inconsistent covariate names")
+			stop("inconsistent dyadic covariate names")
 		}
 		dycCovarMean[covar] <- attr(group[[1]]$dycCovars[[j]], "mean")
 		dycCovarRange[covar] <- attr(group[[1]]$dycCovars[[j]], "range")
@@ -1304,7 +1304,7 @@ groupRangeAndSimilarityAndMean <- function(group)
 			j <- match(atts$dyvCovars[covar], names(group[[i]]$dyvCovars))
 			if (is.na(j))
 			{
-				stop("inconsistent covariate names")
+				stop("inconsistent dyadic covariate names")
 			}
 			sparse <- attr(group[[i]]$dyvCovars[[j]], "sparse")
 			vardims <- attr(group[[i]]$dyvCovars[[j]], "vardims")
@@ -1329,8 +1329,14 @@ groupRangeAndSimilarityAndMean <- function(group)
 				thisrange[, i] <- range(group[[i]]$dyvCovars[[j]],
 										na.rm=TRUE)
 			}
+			centered <- attr(group[[i]]$dyvCovars[[j]], "centered")
+			if (i <= 1) {centered1 <- centered}
+			if (centered != centered1)
+			{
+				stop("inconsistent centering of dyadic covariates")
+			}
 		}
-		dyvCovarMean[covar] <- vartotal / nonMissingCount
+		dyvCovarMean[covar] <- ifelse(centered, vartotal / nonMissingCount, 0)
 		rr <- range(thisrange, na.rm=TRUE)
 		dyvCovarRange[covar] <- rr[2] - rr[1]
    }
@@ -1568,7 +1574,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 			covarsub <- match(varname, cCovars)
 			if (is.na(covarsub))
 			{
-				stop('covariate names inconsistent')
+				stop('actor covariate names inconsistent')
 			}
 			attribs <- attributes(objlist[[i]]$cCovars[[j]])
 			if (is.na(ccnodeSets[covarsub]))
@@ -1605,7 +1611,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 			covarsub <- match(varname, dycCovars)
 			if (is.na(covarsub))
 			{
-				stop('covariate names inconsistent')
+				stop('dyadic covariate names inconsistent')
 			}
 			attribs <- attributes(objlist[[i]]$dycCovars[[j]])
 			if (is.null(dycnodeSets[[covarsub]]))
@@ -1631,7 +1637,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 			covarsub <- match(varname, dyvCovars)
 			if (is.na(covarsub))
 			{
-				stop('covariate names inconsistent')
+				stop('dyadic covariate names inconsistent')
 			}
 			attribs <- attributes(objlist[[i]]$dyvCovars[[j]])
 			if (is.null(dyvnodeSets[[covarsub]]))
@@ -1697,6 +1703,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 				attr(newcovar, "nonMissingCount") <-
 					 attr(const[[j]], "nonMissingCount")
 				attr(newcovar, "mean") <- attr(const[[j]], "mean")
+				attr(newcovar, "centered") <- attr(const[[j]], "centered")
 				attr(newcovar, "range") <- attr(const[[j]], "range")
 				attr(newcovar, "rangep") <- rep(attr(const[[j]], "range"),
 												dim3)

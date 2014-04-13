@@ -159,7 +159,7 @@ varCovar<- function(val, centered=TRUE, nodeSet="Actors")
 }
 
 ##@coDyadCovar Create
-coDyadCovar<- function(val, nodeSets=c("Actors","Actors"),
+coDyadCovar<- function(val, centered=TRUE, nodeSets=c("Actors","Actors"),
 					   sparse=is(val,"dgTMatrix"),
 					   type=c("oneMode", "bipartite"))
 {
@@ -225,13 +225,15 @@ coDyadCovar<- function(val, nodeSets=c("Actors","Actors"),
     out <- val
     class(out) <- "coDyadCovar"
 	attr(out, "type") <- type
+    attr(out, "centered") <- centered
     attr(out, "nodeSet") <- nodeSets
     attr(out, "sparse") <- sparse
     attr(out, "vardims") <- vardims
     out
 }
 ##@varDyadCovar Create
-varDyadCovar<- function(val, nodeSets=c("Actors","Actors"), sparse=is.list(val),
+varDyadCovar<- function(val, centered=TRUE,
+						nodeSets=c("Actors","Actors"), sparse=is.list(val),
 					   type=c("oneMode", "bipartite"))
 {
     ##array, numeric or factor, dims= those of net by observations-1 -
@@ -295,6 +297,7 @@ varDyadCovar<- function(val, nodeSets=c("Actors","Actors"), sparse=is.list(val),
     out <- val
     class(out) <- "varDyadCovar"
 	attr(out, "type") <- type
+    attr(out, "centered") <- centered
     attr(out, "nodeSet") <- nodeSets
     attr(out, "sparse") <- sparse
     attr(out, "vardims") <- vardims

@@ -119,8 +119,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
     } # end storeData
 
 	##@improveMH internal sienaBayes; find scale factors
-    improveMH <- function(tiny=1.0e-15, totruns=100, desired=25, maxiter=50,
-							tolerance=6, getDocumentation=FALSE)
+    improveMH <- function(tiny=1.0e-15, totruns=100, desired=totruns/4,
+							maxiter=20, tolerance=totruns/17, getDocumentation=FALSE)
     {
 	# A rough stochastic approximation algorithm.
 	# Two consecutive iterations of "totruns" runs must result
@@ -132,7 +132,9 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 #			u <- ifelse (actual > desired,
 #							2 - ((totruns - actual) / (totruns - desired)),
 #							1 / (2 - (actual / desired)))
-			u <- 1 + (actual - desired)/(2*sqrt(iter*desired*(totruns - desired)))
+			u <- 1 + (actual - desired)/
+								(sqrt(sqrt(iter)*desired*(totruns - desired)))
+			u <- pmin(pmax(u, 0.1), 10)
             number <<- ifelse(abs(actual - desired) <= tolerance,
 								number + 1, 0 )
             success <<- (number >= 2)
@@ -144,14 +146,26 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 			return(tt)
 		}
         iter <- 0
+		nearGoal <- FALSE
         number <- rep(0, z$nGroup+2)
         success <- rep(FALSE, z$nGroup+2)
+		groups <- c(rep(TRUE, z$nGroup), FALSE, FALSE)
 		cat('improveMH\n')
         repeat
         {
             iter <- iter + 1
             cyc <- MCMCcycle(nrunMH=totruns, change=FALSE, bgain=-1)
             actual <- cyc$BayesAcceptances
+			if (nearGoal)
+			# replace actual by exponentially weighted moving average of actual
+			{
+				actual <- (actual + actual.previous)/2
+			}
+			else
+			{
+				if (max(abs(actual - desired)) < 2*tolerance){nearGoal <- TRUE}
+			}
+			actual.previous <- actual
 			## this is a vector of the expected number of acceptances by group
 			## and for the non-varying parameters, in the MH change of
 			## parameters out of nrunMHBatches trials
@@ -159,14 +173,14 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 			{
 				actual[(z$nGroup+1) : (z$nGroup+2)] <- desired
 			}
-			groups <- c(rep(TRUE, z$nGroup), FALSE, FALSE)
             multiplier <- rescaleCGD(iter)
             mustUpdate <- (number < 3)
 			if (any(is.na(mustUpdate)))
 			{
 				cat("is.na(mustUpdate) in improveMH\n")
 				mustUpdate[is.na(mustUpdate)] <- FALSE
-# Can happen in case of divergence: logLik = -Infty
+# This should not happen any more,
+# as it is caught in sampleVaryingParameters()
 			}
             z$scaleFactors[mustUpdate[groups]] <<-
 					z$scaleFactors[mustUpdate[groups]] *
@@ -393,8 +407,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 		proposalProbability <- priorNew - priorOld + logpNew - logpOld
 # cat(proposalProbability, "\n", priorNew, priorOld, "\n",
 #									logpNew, "\n", logpOld, "\n")
-		acceptProposals <- log(runif(length(proposalProbability))) <
-							proposalProbability
+		acceptProposals <- (log(runif(length(proposalProbability))) <
+							proposalProbability)
 		acceptProposals[is.na(acceptProposals)] <- FALSE # very rare but it did happen
 		thetaOld[, z$basicRate] <- antitrafo(thetaOld[, z$basicRate])
 		if (change)
@@ -406,7 +420,13 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 		{# used for improveMH, so that it is better to use probabilities
 		    	# for proposals.accept than actual acceptances
 			z$thetaMat <<- thetaOld
-			proposals.accept <- exp(pmin(proposalProbability,0))
+			proposals.accept <- exp(pmax(pmin(proposalProbability,0), -100))
+			# truncation at -100 to avoid rare cases of production of NAs
+		}
+		if (any(is.na(proposals.accept)))
+		{
+			cat("any(is.na(proposals.accept))\n")
+			browser()
 		}
 		proposals.accept
 	} # end sampleVaryingParameters
@@ -818,6 +838,7 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 						lengthPhase1=lengthPhase1, lengthPhase3=lengthPhase3,
 						prevAns=prevAns, silentstart=silentstart,
 						clusterType=clusterType)
+		flush.console()
 		createStores()
 		z$sub <- 0
 		z$nrunMHBatches <- nrunMHBatches
@@ -994,8 +1015,6 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 	bgain <- initfgain*exp(-gamma)
     for (ii in (nwarm+1):endPhase1)
     {
-#cat('hier') # abcd
-#browser()
 		cyc <- MCMCcycle(nrunMH=nrunMHBatches, bgain=bgain)
 		z$iimain <- ii
 		storeData(cyc)
@@ -1039,8 +1058,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 	cat('Phase 1 took', ctime5-ctime4,'seconds.\n')
 	flush.console()
 
-	cat('Third ')
-	improveMH()
+#	cat('Third ')
+#	improveMH()
 	flush.console()
 
 	# Phase 2
@@ -1132,8 +1151,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 		}
 		else
 		{
-			cat("Accepts ",sum(z$BayesAcceptances),"/",
-					z$nGroup*nrunMHBatches,"\n")
+			cat("Accepts ",sum(cyc$BayesAcceptances),"/",
+				z$nGroup*nrunMHBatches,"\n")
 		}
 	# save intermediate results
 		if (saveFreq >= 2)
@@ -1197,37 +1216,88 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		t(z$dfra) %*% ginv(z$msf) %*% z$dfra
 	}#end precision in initializeBayes
 
+	##@runCumSum internal initializeBayes used for projectEffects only
+	runCumSum <- function(x)
+	{
+	# A function that makes cumulative sums of uninterrupted runs
+	# for logical vectors
+	# e.g., FTTFFFTFTTTTF produces 0120001012340
+		cumsum.inrun <- rep(0,length(x))
+		if (x[1]) {cumsum.inrun[1] <- 1}
+		for (i in 2:length(x))
+		{
+			if (x[i]){cumsum.inrun[i] <- cumsum.inrun[i-1]+1}
+		}
+		cumsum.inrun
+	}
+
 	##@projectEffects internal initializeBayes project model specification
 	# modified version of updateTheta
-	# model specification of prevAns is transferred to effects
+	# model specification of prevAns is transferred to effs for group ii
 	# and !randomEffects are fixed.
 	projectEffects <- function(effs, prevAns, ii)
 	{
 		prevEffects <- prevAns$requestedEffects
 		prevEffects$initialValue <- prevAns$theta
+		# Some tricks need to be done to get matches on interactions right
+		oldInteract <- (prevEffects$shortName %in% c("unspInt" , "behUnspInt"))
+		newInteract <- (effs$shortName %in% c("unspInt", "behUnspInt"))
+		oldInterNumber <- runCumSum(oldInteract)
+		newInterNumber <- (runCumSum(newInteract) + 2) %/% 3
+		# the + 2) %/% 3 takes care of the eval/endow/creation multiplicities
 		oldlist <- apply(prevEffects, 1, function(x)
 						paste(x[c("name", "shortName",
 								"type",
 								"interaction1", "interaction2",
-								"period", "effect1", "effect2", "effect3")],
+								"period")],
 							collapse="|"))
+		oldlist <- paste(oldlist,oldInterNumber)
 		efflist <- apply(effs, 1, function(x)
 						paste(x[c("name", "shortName",
 								"type",
 								"interaction1", "interaction2",
-								"period", "effect1", "effect2", "effect3")],
+								"period")],
 							collapse="|"))
+		efflist <- paste(efflist,newInterNumber)
 		use <- efflist %in% oldlist
 		effs$include[use] <-
 			prevEffects$include[match(efflist, oldlist)][use]
-#		effs$initialValue[use] <-
-#			prevEffects$initialValue[match(efflist, oldlist)][use]
-#		effs$initialValue[effs$basicRate] <-
-#			prevEffects$initialValue[
-#				prevEffects$basicRate & (prevEffects$group == ii)]
+		effs$initialValue[use] <-
+			prevEffects$initialValue[match(efflist, oldlist)][use]
+		effs$initialValue[effs$basicRate] <-
+			prevEffects$initialValue[
+				prevEffects$basicRate & (prevEffects$group == ii)]
 		effs$fix[effs$include] <-
 			(!prevEffects$randomEffects[na.omit(match(efflist,oldlist))])|
 			(prevEffects$fix[na.omit(match(efflist,oldlist))])
+# In the full effects object used for prevAns,
+# the basic rate parameters are duplicated for all groups,
+# whereas in the effs objcet they are there only for
+# a single group.
+# This means that the effect numbers are different;
+# since effect numbers are used to define the interactions
+# in effect1, effect2, effect3,
+# the different sequence numbers must be taken into account.
+# The vector of {differences between sequence numbers
+# in the effects object for prevAns and effs} of
+# objective function effects is:
+# number of basic rate effects per dep. var. =
+#    sum(effs$shortName=="Rate")/length(unique(effs$name))
+# * (number of groups - 1)
+# * sequence number in effs of dependent variable =
+#    match(effs$name,unique(effs$name))
+		depVarNumber <- sapply(unique(effs$name),
+						function(a){match(a, unique(effs$name))})
+		extraRates <-  sum(effs$shortName=="Rate") *
+				(max(prevAns$effects$group)-1) /
+				length(unique(effs$name))
+		position.Difference <- as.vector(extraRates * depVarNumber[effs$name])
+		effs$effect1[use] <- pmax((prevEffects[prevAns$effects$group==1,])$effect1 -
+								position.Difference[use], 0)
+		effs$effect2[use] <- pmax((prevEffects[prevAns$effects$group==1,])$effect2 -
+								position.Difference[use], 0)
+		effs$effect3[use] <- pmax((prevEffects[prevAns$effects$group==1,])$effect3 -
+								position.Difference[use], 0)
 		effs
 	}#end projectEffects in initializeBayes
 
@@ -1324,6 +1394,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	cat("Estimate initial global parameters\n")
 	startupGlobal <- siena07(startupModel, data=data, effects=effects,
 								batch=TRUE, silent=silentstart)
+	z$startupGlobal <- startupGlobal
 	cat("Initial global estimates\n")
 	z$initialResults <- print(startupGlobal)
 	cat('\n')
@@ -1355,20 +1426,18 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 
 	# number of parameters per group:
 	npars <- sum(startupGlobal$effects$group==1)
+	# number of Dependent variables:
+	nDepvar <- length(unique(startupGlobal$effects$name))
 	if (ngroups >= 2)
 	{
-		if ((startupGlobal$pp - npars)%%(ngroups-1) != 0)
+	#	if ((startupGlobal$pp - npars)%%(ngroups-1) != 0)
+		if (var(sapply(data,function(x){x$observations})) > 1e-6)
 		{
 			stop("Not all groups have the same number of periods.")
 		}
-		# number of basic rate parameters per group:
-		nperiods <- (startupGlobal$pp - npars)%/%(ngroups-1)
 	}
-	else
-	{
-		nperiods <-  sum(startupGlobal$effects$basicRate)
-	}
-	rateParameters <- matrix(NA, nperiods, ngroups)
+	nBasicRatesPerGroup <- sum(startupGlobal$effects$basicRate) / ngroups
+	rateParameters <- matrix(NA, nBasicRatesPerGroup, ngroups)
 	nActors <- rep(0, ngroups)
 	initialEstimates <- matrix(0, ngroups, startupGlobal$pp)
 	factorsBasicRate <- matrix(0, ngroups, startupGlobal$pp)
@@ -1421,6 +1490,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 
 	for (i in 1:ngroups)
 	{
+		cat(paste("Group",i,"\n"))
+		flush.console()
 	# roughly estimate varying parameters
 		nActors[i] <- length(data[[i]]$nodeSets[[1]])
 		# "use" will indicate the coordinates of the global parameters
@@ -1526,9 +1597,6 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 								max=.Machine$integer.max)))
     }
 
-    z$scaleFactors <- rep(1, z$nGroup)
-	z$scaleFactor0 <- 1
-	z$scaleFactorEta <- 1
 
     ## z$returnDataFrame <- TRUE # chains come back as data frames not lists
     z$returnChains <- FALSE
@@ -1555,14 +1623,24 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
            }, periods=groupPeriods - 1, data=z$f[1:z$nGroup]
                )
 	z$ratePositions <- lapply(z$rateParameterPosition, unlist)
-	# Number of parameters in each group:
-	z$TruNumPars <- sum( !z$basicRate ) + length(z$ratePositions[[1]])
 	# Indicator of parameters in the parameter vector of length pp,
 	# for which the hierarchical model applies,
 	# which is the set of all parameters without the basic rate parameters:
-	z$generalParameters <- (z$effects$group == 1) & (!z$basicRate)
+#	z$generalParameters <- (z$effects$group == 1) & (!z$basicRate)
 	# Dependent variable:
-	z$dependentVariable <- z$effects$name
+#	z$dependentVariable <- z$effects$name
+
+
+	# Number of parameters in each group:
+	z$TruNumPars <- sum( !z$basicRate ) + length(z$ratePositions[[1]])
+	scf <- 1
+	if (z$TruNumPars > 5)
+	{
+		scf <- 5/z$TruNumPars # this is just a try
+	}
+    z$scaleFactors <- rep(scf, z$nGroup)
+	z$scaleFactor0 <- scf
+	z$scaleFactorEta <- scf
 
 	# Construction of indicator of parameters of the hierarchical model
 	# within the groupwise parameters:
