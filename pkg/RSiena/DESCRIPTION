@@ -1,7 +1,7 @@
 Package: RSiena
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.1-269
+Version: 1.1-270
 Date: 2014-04-13
 Author: Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders
 Depends: R (>= 2.15.0)

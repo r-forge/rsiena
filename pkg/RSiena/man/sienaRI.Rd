@@ -81,7 +81,9 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 RI <- sienaRI(mydata, ans)
 RI
+\dontrun{
 plot(RI)
+}
 
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
 mynet2 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
@@ -90,9 +92,10 @@ mydata2 <- sienaDataCreate(mynet2, mybeh)
 myeff2 <- getEffects(mydata2)
 myeff2 <- includeEffects(myeff2, density, recip, transTies, nbrDist2)
 ans2 <- siena07(myalgorithm, data=mydata2, effects=myeff2, batch=TRUE)
-
+# Use only the parameters for the evaluation function:
 theta.eval <- ans2$theta[myeff2$type[myeff2$include]=="eval"]
-RI <- sienaRI(mydata2, theta=theta.eval, algorithm=myalgorithm, effects = myeff2)
+RI <- sienaRI(mydata2, theta=theta.eval, algorithm=myalgorithm,
+              effects = myeff2)
 RI
 \dontrun{
 plot(RI[[2]], col = c("red", "green"), legend=FALSE)

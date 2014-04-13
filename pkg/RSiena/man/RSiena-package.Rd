@@ -44,7 +44,7 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.1-269\cr
+Version: \tab 1.1-270\cr
 Date: \tab 2014-04-13\cr
 Depends: \tab R (>= 2.15.0)\cr
 Imports: \tab Matrix\cr
