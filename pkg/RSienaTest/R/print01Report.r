@@ -713,26 +713,57 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 									  (length(myvar) - nrow(myvar)), 1),
 								width=3, nsmall=1), '%)\n'), outf)
 			}
-			Report("\nMeans of	covariates:\n", outf)
-			Report(c(format("minimum  maximum	  mean", width=38,
+			Report("\nInformation about dyadic covariates:\n", outf)
+			Report(c(format("minimum  maximum	  mean  centered", width=48,
 							justify="right"), "\n"), outf)
+			any.cent <- 0
+			any.noncent <- 0
 			for (i in seq(along=covars))
 			{
 				atts <- attributes(x$dycCovars[[i]])
+				if (atts$centered)
+				{
+					cent <- "   Y"
+					any.cent <- any.cent+1
+				}
+				else
+				{
+					cent <- "   N"
+					any.noncent <- any.noncent+1
+				}
 				Report(c(format(covars[i], width=10),
 						 format(round(atts$range2[1], 1),
 								nsmall=1, width=8),
 						 format(round(atts$range2[2], 1),
 								nsmall=1, width=7),
 						 format(round(atts$mean, 3),
-								nsmall=3, width=10), "\n"), outf)
+								nsmall=3, width=10), cent, "\n"), outf)
 			}
 			Report('\n', outf)
-			Report(c(ifelse(nCovars == 1,
-							"This mean value is ", "These mean values are "),
-					 "subtracted from the dyadic covariate",
-					 ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+
+			s.plural <- ifelse((any.cent >= 2),"s","")
+			if (any.noncent >= 1)
+			{
+				Report(c('The <mean> listed for the non-centered variable',
+						s.plural, ' is the attribute, not the observed mean.',
+						'\n'), sep="", outf)
+			}
+			if (any.noncent <= 0)
+			{
+				Report(c("The mean value", ifelse(nCovars == 1, " is", "s are"),
+					" subtracted from the",
+					ifelse(nCovars == 1, " centered", ""), " covariate",
+					ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+			}
+			else if (any.cent >= 1)
+			{
+				Report(c("For the centered variable", s.plural,
+				", the mean value", ifelse(any.cent == 1, " is", "s are"),
+					" subtracted from the covariate", s.plural,
+					".\n"), sep="", outf)
+			}
 		}
+
 		##@reportChangingDyadicCovariates internal print01Report
 		reportChangingDyadicCovariates <- function()
 		{
@@ -775,21 +806,56 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 										  width=3), '%)\n'), outf)
 				}
 			}
-			Report("\nMeans of	covariates:\n", outf)
+			Report("\nInformation about changing dyadic covariates:\n", outf)
+			Report(c(format("minimum  maximum	  mean  centered", width=48,
+							justify="right"), "\n"), outf)
+			any.cent <- 0
+			any.noncent <- 0
 			for (i in seq(along=covars))
 			{
 				atts <- attributes(x$dyvCovars[[i]])
+				if (atts$centered)
+				{
+					cent <- "   Y"
+					any.cent <- any.cent+1
+				}
+				else
+				{
+					cent <- "   N"
+					any.noncent <- any.noncent+1
+				}
 				Report(c(format(covars[i], width=10),
 						 format(round(atts$mean, 3),
-								nsmall=3, width=10), "\n"), outf)
+								nsmall=3, width=10), "\n"), cent, outf)
 			}
 			Report('\n', outf)
-			Report(c(ifelse(nCovars == 1, "This ", "These "),
-					 "global mean value",
-					 ifelse(nCovars == 1, " is ", "s are "),
-					 "subtracted from the changing dyadic covariate",
-					 ifelse(nCovars ==1, ".\n\n", "s.\n\n")), sep="", outf)
+			s.plural <- ifelse((any.cent >= 2),"s","")
+			if (any.noncent >= 1)
+			{
+				Report(c('The <mean> listed for the non-centered variable',
+						s.plural, ' is the attribute, not the observed mean.',
+						'\n'), sep="", outf)
+			}
+			if (nCovars >= 1)
+			{
+				if (any.noncent <= 0)
+				{
+					Report(c("The mean value",
+						ifelse(nCovars == 1, " is", "s are"),
+						" subtracted from the",
+						ifelse(nCovars == 1, " centered", ""), " covariate",
+						ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+				}
+				else if (any.cent >= 1)
+				{
+					Report(c("For the centered variable", s.plural,
+					", the mean value", ifelse(any.cent == 1, " is", "s are"),
+						" subtracted from the covariate", s.plural,
+						".\n"), sep="", outf)
+				}
+			}
 		}
+
 		##@reportCompositionChange internal print01Report
 		reportCompositionChange <- function()
 		{

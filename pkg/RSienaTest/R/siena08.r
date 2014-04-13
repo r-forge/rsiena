@@ -208,6 +208,8 @@ print.sienaMeta <- function(x, file=FALSE, ...)
 
     ## estimates
 
+    Report(c("\nTests for mean parameters use a t-distribution with N-1 d.f.,\n" ,
+	         "where N = number of included groups.\n"), sep="", outf)
     Report(c("\nUpper bound used for standard error is",
              format(round(x$bound, 4), width=9, nsmall=2), ".\n"), sep="", outf)
 

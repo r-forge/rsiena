@@ -208,6 +208,8 @@ print.sienaMeta <- function(x, file=FALSE, ...)
 
     ## estimates
 
+    Report(c("\nTests for mean parameters use a t-distribution with N-1 d.f.,\n" ,
+	         "where N = number of included groups.\n"), sep="", outf)
     Report(c("\nUpper bound used for standard error is",
              format(round(x$bound, 4), width=9, nsmall=2), ".\n"), sep="", outf)
 
@@ -472,7 +474,7 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
             revision <- paste(" R-forge revision: ", rforgeRevision,
                               " ", sep="")
         }
-        Report(c("SIENA version ", packageValues[[1]], " (",
+        Report(c("RSiena version ", packageValues[[1]], " (",
                  format(as.Date(packageValues[[2]]), "%d %m %Y"), ")",
                  revision, "\n\n"), sep="", outf)
     }

@@ -157,11 +157,12 @@ Total of 464 iteration steps.
 > data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj")
 Loading required package: network
 network: Classes for Relational Data
-Version 1.7.2 created on March 15, 2013.
+Version 1.9.0 created on 2014-01-03.
 copyright (c) 2005, Carter T. Butts, University of California-Irvine
-                    Mark S. Handcock, University of Washington
+                    Mark S. Handcock, University of California -- Los Angeles
                     David R. Hunter, Penn State University
                     Martina Morris, University of Washington
+                    Skye Bender-deMoll, University of Washington
  For citation information, type citation("network").
  Type help("network-package") to get started.
 

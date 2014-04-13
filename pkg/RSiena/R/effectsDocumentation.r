@@ -10,7 +10,8 @@
 # *****************************************************************************/
 
 ##@effectsDocumentation Documentation
-effectsDocumentation <- function(effects= NULL, type="html", display=(type=="html"),
+effectsDocumentation <- function(effects= NULL, type="html",
+	display=(type=="html"),
      filename=ifelse(is.null(effects), "effects", deparse(substitute(effects))))
 {
 	if (is.null(effects))
@@ -21,8 +22,13 @@ effectsDocumentation <- function(effects= NULL, type="html", display=(type=="htm
 	}
 	else
 	{
-    x <- as.data.frame(effects[, c("name", "effectName", "shortName", "type",
-                        "interaction1", "interaction2",
+		if (!inherits(effects,"sienaEffects"))
+		{
+			stop(paste(deparse(substitute(effects)),
+			     "is not a sienaEffects object."))
+		}
+		x <- as.data.frame(effects[, c("name", "effectName", "shortName",
+						"type", "interaction1", "interaction2",
                         "parm", "interactionType")])
 	}
     storage.mode(x$parm) <- "integer"
