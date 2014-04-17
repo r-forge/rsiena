@@ -6,7 +6,7 @@
 \title{Functions to assess the relative importance of effects at observation moments}
 \description{
  The function \code{sienaRI} returns the relative importance of effects of a SAOM according to the measure of relative importance described in
- Section 3.2 of Indlekofer and Brandes (2013). 
+ Section 3.1 of Indlekofer and Brandes (2013). 
  The measure is based on the influence of effects on potential tie change or behavior change
  decisions of individual actors in network at the given observation moments. It takes the data as well as the complete model specification into account. Therefore, necessary arguments are the analysed data given as a \code{siena} data object as well as the complete model specification represented either by an estimated \code{sienaFit} object or by the triple consisting of a suitable parameter vector \code{theta} and the corresponding \code{sienaAlgorithm} and \code{sienaEffects} objects.
  }
@@ -49,7 +49,7 @@ Note that \code{sienaRI} works only with Method of Moments (i.e., for \code{sien
 \value{
  If the model contains only one dependent variable, \code{sienaRI} returns an object of class \code{sienaRI}. Otherwise, it returns a list of objects of class \code{sienaRI}, each corresponding to one dependent variable.
  
- A returned \code{sienaRI} object stores the expected relative importances of effects of one dependent variable at observation moments as defined in Section 3.2 of Indlekofer and Brandes (2013).
+ A returned \code{sienaRI} object stores the expected relative importances of effects of one dependent variable at observation moments as defined in Section 3.1 of Indlekofer and Brandes (2013).
 
 A \code{sienaRI} object consists of following components:
     \describe{
@@ -57,7 +57,7 @@ A \code{sienaRI} object consists of following components:
     \item{- \code{effectNames}}{the names of considered effects.}
     \item{- \code{RIActors}}{is a list that contains the expected relative importances of effects for each potential actor decision at observation moments.}
     \item{- \code{expectedRI}}{is a list that contains the expected relative importances of effects aggregated over all actors in each network observations. More precisely, it contains the averages of the actor related values in \code{RIActors}.}
-    \item{- \code{absoluteSumActors}}{is a list that contains the sum of the (unstandardized) L1-differences calculated for each potential actor decision at observation moments. (Cf. Section 3.2 of Indlekofer and Brandes (2013))}
+    \item{- \code{absoluteSumActors}}{is a list that contains the sum of the (unstandardized) L1-differences calculated for each potential actor decision at observation moments. (Cf. Section 3.1 of Indlekofer and Brandes (2013))}
     \item{- \code{entropyActors}}{is a list that contains the entropy of each potential actor decision at observation moments.}
     }
 }
@@ -70,7 +70,7 @@ Indlekofer, N. and Brandes, U.,
 }
 }
 \author{Natalie Indlekofer}
-\seealso{\code{sienaRIDynamics}}
+\seealso{\code{\link{sienaRIDynamics}}}
 \examples{
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
