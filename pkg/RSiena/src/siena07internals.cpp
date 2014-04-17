@@ -289,7 +289,7 @@ void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
 				}
 				else
 				{
-				 	if (!strcmp(netType, "behavior") == 0)
+				 	if (!(strcmp(netType, "behavior") == 0))
 				 	{
 				 		NetworkLongitudinalData * pNetwork =
 				 			pData->pNetworkData(networkName);
@@ -1223,7 +1223,7 @@ SEXP createEffects(SEXP EFFECTS, Model *pModel, vector<Data *> * pGroupData,
 				}
 				else
 				{
-				 	if (!strcmp(netType, "behavior") == 0)
+				 	if (!(strcmp(netType, "behavior") == 0))
 				 	{
 				 		NetworkLongitudinalData * pNetwork =
 				 			pData->pNetworkData(networkName);
@@ -1899,7 +1899,7 @@ void getScores(SEXP EFFECTSLIST, int period, int group,
 					const char * effectType =
 						CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), j));
 
-					if (!strcmp(effectType, "rate") == 0)
+					if (!(strcmp(effectType, "rate") == 0))
 					{
 						//	Rprintf("%s %s \n", effectType, netType);
 						EffectInfo * pEffectInfo2 = (EffectInfo *)

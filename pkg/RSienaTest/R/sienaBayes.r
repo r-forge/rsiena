@@ -123,32 +123,33 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 							maxiter=20, tolerance=totruns/17, getDocumentation=FALSE)
     {
 	# A rough stochastic approximation algorithm.
-	# Two consecutive iterations of "totruns" runs must result
+	# Steps when at least two iterations of "totruns" runs resulted,
 	# for each coordinate of actual, in "desired" acceptances
 	# with a tolerance of "tolerance".
-		##@rescaleCGD internal improveMH Bayesian
-        rescaleCGD <- function(iter)
-        {
+#		##@rescaleCGD internal improveMH Bayesian
+#        rescaleCGD <- function(iter)
+#        {
 #			u <- ifelse (actual > desired,
 #							2 - ((totruns - actual) / (totruns - desired)),
 #							1 / (2 - (actual / desired)))
-			u <- 1 + (actual - desired)/
-								(sqrt(sqrt(iter)*desired*(totruns - desired)))
-			u <- pmin(pmax(u, 0.1), 10)
-            number <<- ifelse(abs(actual - desired) <= tolerance,
-								number + 1, 0 )
-            success <<- (number >= 2)
-            u
-        }
+#			u <- 1 + (actual - desired)/
+#								(sqrt(sqrt(iter)*desired*(totruns - desired)))
+#			u <- pmin(pmax(u, 0.1), 10)
+#            number <<- ifelse(abs(actual - desired) <= tolerance,
+#								number + 1, 0 )
+#            success <<- (number >= 2)
+#            u
+#       }
 		if (getDocumentation)
 		{
 			tt <- getInternals()
 			return(tt)
 		}
+# STILL TO BE CHECKED
         iter <- 0
-		nearGoal <- FALSE
-        number <- rep(0, z$nGroup+2)
+		nearGoal <- rep(FALSE, z$nGroup+2)
         success <- rep(FALSE, z$nGroup+2)
+		pastSuccesses <- rep(0, z$nGroup+2)
 		groups <- c(rep(TRUE, z$nGroup), FALSE, FALSE)
 		cat('improveMH\n')
         repeat
@@ -156,45 +157,31 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
             iter <- iter + 1
             cyc <- MCMCcycle(nrunMH=totruns, change=FALSE, bgain=-1)
             actual <- cyc$BayesAcceptances
-			if (nearGoal)
-			# replace actual by exponentially weighted moving average of actual
-			{
-				actual <- (actual + actual.previous)/2
-			}
-			else
-			{
-				if (max(abs(actual - desired)) < 2*tolerance){nearGoal <- TRUE}
-			}
-			actual.previous <- actual
-			## this is a vector of the expected number of acceptances by group
+			## actual is a vector of the expected number of acceptances by group
 			## and for the non-varying parameters, in the MH change of
 			## parameters out of nrunMHBatches trials
 			if (!(any(z$set2) & (!frequentist)))
 			{
 				actual[(z$nGroup+1) : (z$nGroup+2)] <- desired
 			}
-            multiplier <- rescaleCGD(iter)
-            mustUpdate <- (number < 3)
-			if (any(is.na(mustUpdate)))
-			{
-				cat("is.na(mustUpdate) in improveMH\n")
-				mustUpdate[is.na(mustUpdate)] <- FALSE
-# This should not happen any more,
-# as it is caught in sampleVaryingParameters()
-			}
-            z$scaleFactors[mustUpdate[groups]] <<-
-					z$scaleFactors[mustUpdate[groups]] *
-								multiplier[mustUpdate & groups]
-			if (mustUpdate[z$nGroup+1])
-			{
-				z$scaleFactor0 <<-
+			# if nearGoal (already at the previous step),
+			# replace actual by exponentially weighted moving average of actual
+			actual <- ifelse(nearGoal, (actual + actual.previous)/2, actual)
+			# now update nearGoal
+			nearGoal <- ifelse(max(abs(actual - desired)) < 2*tolerance,
+								TRUE, nearGoal)
+			actual.previous <- actual
+            pastSuccesses <- ifelse(abs(actual - desired) <= tolerance,
+									pastSuccesses+1, pastSuccesses)
+			multiplier <- 1 + (actual - desired)/
+								(sqrt(sqrt(iter)*desired*(totruns - desired)))
+			multiplier <- pmin(pmax(multiplier, 0.1), 10)
+            z$scaleFactors[groups] <<-
+					z$scaleFactors[groups] * multiplier[groups]
+			z$scaleFactor0 <<-
 					z$scaleFactor0 * multiplier[z$nGroup+1]
-			}
-			if (mustUpdate[z$nGroup+2])
-			{
-				z$scaleFactorEta <<-
+			z$scaleFactorEta <<-
 					z$scaleFactorEta * multiplier[z$nGroup+2]
-			}
             cat('\n',iter, '.         ', sprintf("%4.1f", actual),
 				     '\n multipliers  ', sprintf("%4.2f", multiplier),
 			         '\n scalefactors ', sprintf("%4.2f", z$scaleFactors),
@@ -202,7 +189,7 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 					sprintf("%4.2f", z$scaleFactorEta),'\n')
 
 			flush.console()
-            if (all(success) || iter == maxiter)
+            if ((min(pastSuccesses) >= 2) || (iter == maxiter))
             {
                 break
             }
@@ -1380,6 +1367,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 
 	# Short specification for initial model.
 	# Use diagonalize=1 to increase stability.
+#abcd USE MULTIPLE PROCESSES HERE
 	if (initgainGlobal <= 0)
 	{
 		startupModel <- sienaAlgorithmCreate(n3=500, nsub=0, cond=FALSE,

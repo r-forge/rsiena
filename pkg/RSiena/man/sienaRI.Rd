@@ -70,7 +70,7 @@ Indlekofer, N. and Brandes, U.,
 }
 }
 \author{Natalie Indlekofer}
-\seealso{\code{\link{sienaRIDynamics}}}
+\seealso{\code{sienaRIDynamics}}
 \examples{
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))

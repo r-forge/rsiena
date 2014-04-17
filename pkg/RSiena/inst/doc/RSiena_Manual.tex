@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-270.
+This version was renewed for \RS version 1.1-271.
 \end{abstract}
 
 
@@ -974,7 +974,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-270) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-271) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -3945,6 +3945,7 @@ Further details are in the help file for \textsf{siena07}
                                             \textsf{sienaTimeFix},\\
                                       \> these are also in \texttt{theta}). \\
  \texttt{ans\$covtheta   }            \> covariance matrix of the estimates \\
+ \texttt{ans\$se   }               \> standard errors of the estimates \\
  \texttt{ans\$pp}                     \> number of parameters  \\
  \texttt{ans\$targets }               \> targets (observed statistics)
                                          for Method of Moments estimation  \\
@@ -4797,7 +4798,8 @@ elements.
 
 In Section \ref{S_fitcomp} we saw that, for a \textsf{sienaFit}
 object \texttt{ans}, the estimates are given in
-\texttt{ans\$theta} and the covariance matrix in \texttt{ans\$covtheta}.
+\texttt{ans\$theta}, the covariance matrix in \texttt{ans\$covtheta},
+and the standard errors in \texttt{ans\$se}.
 For testing the null hypothesis that component $k$ of the parameter
 vector is 0,
 \[
@@ -4806,7 +4808,7 @@ H_0 : \ \theta_k \,=\, 0 ,
 the $t$-test is based on
 \begin{equation}
 \frac{\hat\theta_k}{\se(\hat\theta_k)} \,=\,
-   \texttt{ans\$theta[k] /sqrt(ans\$covtheta[k,k]) } \ .  \label{t-stat}
+   \texttt{ans\$theta[k] /sqrt(ans\$se[k]) } \ .  \label{t-stat}
 \end{equation}
 This can be easily calculated by hand from the \RS results.
 \medskip
@@ -10738,7 +10740,7 @@ the R-forge repository.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
-\item 2014-04-13 R-Forge Revisions 267-270.
+\item 2014-04-13 R-Forge Revisions 267-271.
 
 Changes in RSienaTest:
 \begin{itemize}
@@ -10757,6 +10759,8 @@ Changes in RSiena and RSienaTest:
 \item Corrected bug when printing siena object with a symmetric network;
      and in \sfn{varDyadCovar()} corrected a bug occurring when calling it 
      with a named list.      
+\item Added standard errors as component \texttt{se} to \texttt{sienaFit} 
+     objects.   
 \end{itemize}
 
 

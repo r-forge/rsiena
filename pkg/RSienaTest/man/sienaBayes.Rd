@@ -50,9 +50,10 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     covariance matrix); default: number of varying parameters + 2.}
   \item{priorKappa}{Proportionality constant between prior covariance matrix
     and covariance matrix of prior distribution for mu; default: 1.}
-  \item{frequentist}{Boolean: chooses between frequentist or Bayesian
-  estimation of the global parameters.
-  Frequentist estimation is possible only for at least 2 groups.}
+  \item{frequentist}{Currently only frequentist=FALSE works.
+    Boolean: chooses between frequentist or Bayesian
+    estimation of the global parameters.
+    Frequentist estimation is possible only for at least 2 groups.}
   \item{incidentalBasicRates}{Boolean: if this is TRUE, the basic rate
   parameters are defined specifically for each group, and estimated
   using a Robbins Monro algorithm; if FALSE, they have a
@@ -152,7 +153,7 @@ sienaBayes(data, effects, algo,  saveFreq=100,
   \item{ThinPosteriorEta}{array of dimensions (\code{nwarm+nmain} iterations
   by fixed parameters): sampled fixed parameters}
   \item{ThinPosteriorSigma}{array of dimensions (\code{nwarm+nmain} iterations
-  by parameters by parameters): sampled global covariance matrix 
+  by parameters by parameters): sampled global covariance matrix
   of varying parameters}
   \item{candidates}{if \code{storeAll=TRUE}: array of proposed parameters,
   by group}
