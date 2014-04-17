@@ -9,8 +9,8 @@
 # * in sequences of simulated micro-steps 
 # *****************************************************************************/
 
-##@sienaRIDynamics. Use as RSiena:::sienaRIDynamics()
-sienaRIDynamics <- function(data, ans=NULL, effects=NULL, algorithm=NULL, theta=NULL , depvar=NULL, intervalsPerPeriod=NULL)
+##@sienaRIDynamics. Use as RSienaTest:::sienaRIDynamics()
+sienaRIDynamics <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL, depvar=NULL, intervalsPerPeriod=NULL)
 {
 	if(length(data$depvars)>1){
 		if(is.null(depvar)){
@@ -46,10 +46,10 @@ sienaRIDynamics <- function(data, ans=NULL, effects=NULL, algorithm=NULL, theta=
 			}
 			effs <- effects
 		}else{
-		if(!is.null(algorithm)||!is.null(theta)||!is.null(effects))
-		{
-			warning("some information are multiply defined \n results will be based on 'theta', 'algorithm', and 'effects' stored in 'ans' (as 'ans$theta', 'ans$x', 'ans$effects')")
-		}
+			if(!is.null(algorithm)||!is.null(theta)||!is.null(effects))
+			{
+				warning("some information are multiply defined \n results will be based on 'theta', 'algorithm', and 'effects' stored in 'ans' (as 'ans$theta', 'ans$x', 'ans$effects')")
+			}
 			effs <- ans$effects
 		}	
 		if(!is.null(intervalsPerPeriod))
@@ -277,11 +277,43 @@ print.summary.sienaRIDynamics <- function(x, ...)
 
 
 ##@plot.sienaRIDynamics Methods
-plot.sienaRIDynamics <- function(x, staticValues = NULL, file = NULL, col = NULL, ylim=NULL, width = NULL, height = NULL, legend = TRUE, legendColumns = NULL, legendHeight = NULL, cex.legend = NULL, ...)
+plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, ylim=NULL, width = NULL, height = NULL, legend = TRUE, legendColumns = NULL, legendHeight = NULL, cex.legend = NULL, ...)
 { 
-	if (!inherits(x, "sienaRIDynamics"))
+	if(!inherits(x, "sienaRIDynamics"))
 	{
 		stop("x is not of class 'sienaRIDynamics' ")
+	}
+	if(!is.null(staticRI))
+	{
+		if(!inherits(staticRI, "sienaRI"))
+		{
+			warning("staticRI is not of class 'sienaRI' and is therefore ignored")
+			staticValues <- NULL
+		}else{	
+			if(staticRI$dependentVariable != x$dependentVariable)
+			{
+				warning("staticRI does not correspond to x and is therefore ignored,\n staticRI and x do not refer to the same dependent variable")
+				staticValues <- NULL
+			}
+			else if(length(staticRI$effectNames) != length(x$effectNames) || sum(x$effectNames==staticRI$effectNames)!=length(x$effectNames))
+			{
+				warning("staticRI does not correspond to x and is therefore ignored,\n staticRI and x do not refer to the same effects")
+				staticValues <- NULL
+			}
+			else if(length(staticRI$expectedRI)-1 != length(x$intervalValues))
+			{
+				warning("staticRI does not correspond to x and is therefore ignored,\n staticRI and x do not refer to the same number of observation moments")
+				staticValues <- NULL
+			}
+			else
+			{
+				staticValues <- staticRI$expectedRI
+			}
+		}
+	}
+	else
+	{
+		staticValues <- NULL
 	}
 	if(legend)
 	{
@@ -441,13 +473,18 @@ plot.sienaRIDynamics <- function(x, staticValues = NULL, file = NULL, col = NULL
 			points(ts(t(values[[period]]))[,eff], col = cl[eff], type = "p", pch = 20)
 			if(!is.null(staticValues))
 			{
-				points(xy.coords(1,staticValues[eff]),col = cl[eff], type = "p", pch = 1, cex = 1.75)
+				points(xy.coords(1,staticValues[[period]][eff]),col = cl[eff], type = "p", pch = 1, cex = 1.75)
 			}
 		}
 		ax <- ((ylim[1]*10):(ylim[2]*10))/10
 		if(period==1){
-			axis(4, ax, labels = FALSE)
-			axis(2, ax)
+			if(period == periods){
+				axis(4, ax)
+				axis(2, ax)
+			}else{
+				axis(4, ax, labels = FALSE)
+				axis(2, ax)
+			}
 		}else if(period == periods){
 			axis(4, ax)
 			axis(2, ax, labels = FALSE)

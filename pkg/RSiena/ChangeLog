@@ -1,3 +1,10 @@
+2014-04-17 R-Forge Revision 272
+Changes in RSiena and RSienaTest:
+   * sienaRIDynamics.Rd: added
+   * sienaRIDynamics.r: small changes
+   * NAMESPACE: added entries sienaRIDynamics with the corresponding 
+     print, summary, and plot methods.
+
 2014-04-17 R-Forge Revision 271
 Changes in RSiena and RSienaTest:
    * Added component se to sienaFit objects

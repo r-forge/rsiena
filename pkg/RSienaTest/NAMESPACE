@@ -7,7 +7,7 @@ sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, print.xtable.sienaFit,
        installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy,
-       sienaGOF, descriptives.sienaGOF, sienaRI, sparseMatrixExtraction,
+       sienaGOF, descriptives.sienaGOF, sienaRI, sienaRIDynamics, sparseMatrixExtraction,
        networkExtraction, behaviorExtraction,
        OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
        xtable, algorithms, profileLikelihoods, siena.table,
@@ -52,6 +52,9 @@ S3method(plot, sienaGOF)
 S3method(summary, sienaRI)
 S3method(print, sienaRI)
 S3method(plot, sienaRI)
+S3method(summary, sienaRIDynamics)
+S3method(print, sienaRIDynamics)
+S3method(plot, sienaRIDynamics)
 S3method(print, chains.data.frame)
 S3method(print, sienaBayesFit)
 S3method(print, summary.sienaBayesFit)
