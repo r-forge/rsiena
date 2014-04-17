@@ -1,3 +1,9 @@
+2014-04-17 R-Forge Revision 271
+Changes in RSiena and RSienaTest:
+   * Added component se to sienaFit objects
+   * Replaced (!strcmp...) by (!(strcmp...)) several times
+     in sienainternals07.cpp.
+
 2014-04-13 R-Forge Revision 270
 Changes in RSiena and RSienaTest:
    * Moved plot(RI) in sienaRI.Rd to dontrun{...}.

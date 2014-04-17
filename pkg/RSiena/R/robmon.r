@@ -337,6 +337,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
 		##not sure this does not use very small vals
 		z$covtheta[, z$diver] <- NA # was Root(diag(z$covtheta)) * 33
 		diag(z$covtheta)[z$diver] <- NA # was 999
+		z$se <- diag(z$covtheta)
 	}
     z$termination <- 'OK'
     z
