@@ -1,3 +1,18 @@
+2014-04-25 R-Forge Revision 273
+Changes in RSiena and RSienaTest:
+   * NAMESPACE: removed entries sienaRIDynamics with the corresponding
+     print, summary, and plot methods (to be entered later when
+	 problems have been solved).
+   * Removed sienaRIDynamics.Rd (ditto).
+   * Some changes in sienaRIDynamics.r but not enough to make it work.
+   * Duplication of outInv and outSqInv effects for two-mode networks
+     canceled (allEffects.csv).
+   * Correction of effect homWXClosure.
+   * Small change in print01Report.r to improve reporting
+     two files of composition change.
+   * sienaRI.r: require that <<file>> argument is not NULL for non-Windows
+     operating systems.
+
 2014-04-17 R-Forge Revision 272
 Changes in RSiena and RSienaTest:
    * sienaRIDynamics.Rd: added
@@ -7,7 +22,7 @@ Changes in RSiena and RSienaTest:
 
 2014-04-17 R-Forge Revision 271
 Changes in RSiena and RSienaTest:
-   * Added component se to sienaFit objects
+   * Added component se (standard errors) to sienaFit objects
    * Replaced (!strcmp...) by (!(strcmp...)) several times
      in sienainternals07.cpp.
 

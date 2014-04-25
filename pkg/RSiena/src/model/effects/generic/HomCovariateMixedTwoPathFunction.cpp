@@ -90,4 +90,3 @@ double HomCovariateMixedTwoPathFunction::value(int alter)
 }
 
 }
-

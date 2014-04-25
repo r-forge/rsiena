@@ -27,6 +27,7 @@ namespace siena
  * associated with
  * @param[in] excludeMissing: whether to exclude missing values
  */
+
 HomCovariateMixedTwoPathFunction::HomCovariateMixedTwoPathFunction(
 	string firstNetworkName, string secondNetworkName,
 	string covariateName, bool excludeMissing) :
@@ -90,4 +91,3 @@ double HomCovariateMixedTwoPathFunction::value(int alter)
 }
 
 }
-

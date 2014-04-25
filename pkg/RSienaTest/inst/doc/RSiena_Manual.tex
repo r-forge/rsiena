@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-271.
+This version was renewed for \RS version 1.1-273.
 \end{abstract}
 
 
@@ -974,7 +974,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-271) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-273) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -7915,7 +7915,8 @@ Further there are a number of mixed triadic effects.
 \end{enumerate}
 
 Then there are some  mixed triadic effects
-restricted to triples with the same or different values on a covariate.
+restricted to triples with the same or different values on a monadic 
+covariate $V$.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
 \item
@@ -9595,24 +9596,52 @@ as answerable questions about them arise.
 \subsection{During estimation}
 
 \emph{Unlikely to terminate this epoch: more than 1000000 steps}.
-\smallskip
+\medskip
 
 \begin{minipage}{0.05\textwidth}
 $\phantom{abcde}$
 
 \end{minipage}
 \begin{minipage}{0.94\textwidth}
-This can happen during conditional estimation in function \sfn{siena07},
+This can happen in function \sfn{siena07};
+in conditional estimation (\texttt{COND=FALSE} in\\
+ \sfn{sienaAlgorithmCreate}),
 when the rate parameter provisionally has hit a value such that the
-desired number of changes will never be reached.
+desired number of changes will probably never be reached;
+or in non-conditional estimation when the number of ministeps has become
+too large before arriving at the time for the next wave.
 See Section~\ref{S_cond}.
-\smallskip
+\medskip
 
 \noindent
-\emph{Solutions.}\\
-1. Check whether your model specification is reasonable;
-for example, there might be doubts about the specification of the
-rate function. 2. Use non-conditional estimation (Section~\ref{S_cond}).
+\emph{Solutions.}
+\begin{enumerate}
+\item Check whether your model specification is reasonable;
+    for example, there might be doubts about the specification of the
+    rate function.
+\item  Use non-conditional estimation (Section~\ref{S_cond}) if you were not
+   already doing so.
+\item If the model includes the \texttt{outRate} effect, consider
+    replacing it by the \texttt{outRateLog} effect.
+\item If you are working with a data set with more than two waves, there might
+   be unmodeled heterogeneity between the periods. Try modeling the periods
+   separately.
+\item Set the parameter \texttt{firstg} in \sfn{sienaAlgorithmCreate} to a
+   lower value than the default 0.2. 
+   This will make the algorithm move more slowly, hopefully avoiding the problematic region
+   in the parameter space.
+   
+   The advice would be to set  \texttt{firstg}  to 0.02
+   and expect the necessity to do a second estimation using the \texttt{prevAns}
+   parameter in \sfn{siena07}. If the problem still occurs for \texttt{firstg}=0.02,
+   use a smaller value (but less than 0.001 probably makes no sense).
+   \texttt{firstg} determines the step sizes in the stochastic approximation
+   algorithm; it is mentioned in some places earlier in this manual.
+   Especially for models with additional rate effects the default value of 0.2
+   might be too large.
+    \texttt{firstg}  is the initial value of parameter $a_N$ mentioned
+    on p.\ 393 of \citet{Snijders01}.
+\end{enumerate}
 \end{minipage}
 \bigskip
 
@@ -10743,6 +10772,16 @@ the R-forge repository.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
+\item 2014-04-25 R-Forge Revision 273.
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+\item Correction of effect \texttt{homWXClosure}.
+\item Small change in \sfn{print01Report} to improve reporting
+     two files of composition change.
+\item \sfn{sienaRI}: require that \texttt{file} argument is not NULL for non-Windows
+     operating systems.
+\end{itemize}
+
 \item 2014-04-13 R-Forge Revisions 267-271.
 
 Changes in RSienaTest:
@@ -10762,8 +10801,8 @@ Changes in RSiena and RSienaTest:
 \item Corrected bug when printing siena object with a symmetric network;
      and in \sfn{varDyadCovar()} corrected a bug occurring when calling it
      with a named list.
-\item Added standard errors as component \texttt{se} to \texttt{sienaFit} 
-     objects.   
+\item Added standard errors as component \texttt{se} to \texttt{sienaFit}
+     objects.
 \end{itemize}
 
 

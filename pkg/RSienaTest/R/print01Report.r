@@ -83,8 +83,9 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				   outf)
 			Report(c(length(x$dyvCovars),
 					 "exogenous changing dyadic covariates,\n"), outf)
-			Report(c(c('no files',
-					   'file')[1 + as.numeric(length(x$compositionChange))],
+			Report(c(length(x$compositionChange),
+					c('no files','file',
+						'files')[1 + as.numeric(length(x$compositionChange))],
 					 "with times of composition change.\n"), outf)
 			if ((length(x$cCovars) > 0 || length(x$dycCovars) > 0) && multi)
 			{
@@ -864,7 +865,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 			for (i in seq(along=comps))
 			{
 				nodeSet <- attr(comps[[i]], "nodeSet")
-				Report(c("Composition changes for nodeSet ", nodeSet, '.\n'),
+				Report(c("\nComposition changes for nodeSet ", nodeSet, '.\n\n'),
 					   sep="", outf)
 				events <- attr(comps[[i]], "events")
 				for (j in 1:nrow(events))

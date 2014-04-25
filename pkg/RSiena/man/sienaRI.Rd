@@ -24,7 +24,11 @@ sienaRI(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
   \item{algorithm}{\code{sienaAlgorithm} object as resulting from a call to \code{\link{sienaAlgorithmCreate}}. Works only for estimation by Method of Moments (i.e., if  \code{maxlike = FALSE}).}
   \item{effects}{\code{sienaEffects} object specifying which effects are included the model. Note that \code{sienaRI} does not yet work for endowment or creation effect, i.e., included effects have to be of type \code{eval} (or \code{rate}).}
   \item{x}{\code{sienaRI} object resulting from a call to \code{sienaRI}.}
-  \item{file}{Name (path) of a pdf-file indicating whether the plot should be stored in a file. If \code{file=NULL}, the plot will be opened in a separate window. Otherwise a pdf with the given name will be created in the working directory or at the given path.}
+  \item{file}{Name (path) of a pdf-file indicating whether the plot should be
+       stored in a file. If \code{file=NULL}, the plot will be opened in a
+	   separate window. Otherwise a pdf with the given name will be created
+	   in the working directory or at the given path.
+	   May not be NULL on other operating systems than Windows.}
   \item{col}{Colors used in the plot. If \code{col=NULL} a default color scheme is used.}
   \item{addPieChart}{Boolean: If \code{TRUE}, pie charts of aggregated relative importances for the complete network will be added to the plot.}
   \item{radius}{Radius of pie charts. Only effective if \code{addPieCharts = TRUE}.}
@@ -70,7 +74,7 @@ Indlekofer, N. and Brandes, U.,
 }
 }
 \author{Natalie Indlekofer}
-\seealso{\code{\link{sienaRIDynamics}}}
+\seealso{\code{sienaRIDynamics}}
 \examples{
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))

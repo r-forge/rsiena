@@ -147,45 +147,67 @@ calculateRIDynamics <- function(data=NULL, theta=NULL, algorithm=NULL, effects=N
 	networkInteraction <- effects$interaction1[noRate]
 	effectIds <- paste(effectNames,effectTypes,networkInteraction, sep = ".") 
 	currentNetObjEffs <- effects$name[noRate] == currentNetName
-	RIintervalValues <- list()
-	for(period in 1:periods)
-	{
-		RIintervalValues[[period]] <- data.frame(row.names = effectIds[currentNetObjEffs])
-	}
-	
+# The old code leading to a crash:
+#	RIintervalValues <- list()
+#	for(period in 1:periods)
+#	{
+#		RIintervalValues[[period]] <- data.frame(row.names = effectIds[currentNetObjEffs])
+#	}			
 	for (chain in (1:chains))
 	{
+cat("The following line leads to an error\n")
+browser()
 		ans <- z$FRAN(z, x)	
 		for(period in 1:periods)
 		{
 			microSteps <- length(ans$changeContributions[[1]][[period]])
 			stepsPerInterval <- microSteps/intervalsPerPeriod
-			
-			RItmp <- data.frame(row.names = effectIds[currentNetObjEffs])
+# new code TS (7 lines):			
+			blanks <- matrix(NA, sum(currentNetObjEffs), 
+									ceiling(microSteps/stepsPerInterval))
+			RIintervalValues <- 
+						as.list(rep(data.frame(blanks, 
+							row.names = effectIds[currentNetObjEffs]), periods))
+			blanks <- matrix(NA, sum(currentNetObjEffs), microSteps)
+			RItmp <- data.frame(blanks, row.names = effectIds[currentNetObjEffs])
 			interval <- 1
 			stepsInIntervalCounter <- 0
 			for(microStep in 1:microSteps)
 			{
 				#currentNetName <- attr(ans$changeContributions[[1]][[period]][[microStep]],"networkName")
-				if(attr(ans$changeContributions[[1]][[period]][[microStep]],"networkName")==currentNetName){
+				if(attr(ans$changeContributions[[1]][[period]][[microStep]],
+												"networkName")==currentNetName)
+				{
 					stepsInIntervalCounter <- stepsInIntervalCounter + 1 
-					## distributions[1,] contains the probabilities of the available choices in this micr-step
-					## distributions[2,],distributions[3,], ...contains the probabilities of the available choices
+					## distributions[1,] contains 
+					## the probabilities of the available choices in this micro-step
+					## distributions[2,],distributions[3,], ...contains 
+					## the probabilities of the available choices
 					## if the parameter of the second, third, ... effects is set to zero.
-					distributions <- calculateDistributions(ans$changeContributions[[1]][[period]][[microStep]], thetaNoRate[currentNetObjEffs])
-					## If one wishes another measure than the L^1-difference between distributions,
-					## here is the right place to call some new function instead of "L1D".
-					RItmp[,stepsInIntervalCounter] <- standardize(L1D(distributions[1,], distributions[2:dim(distributions)[1],]))            
+					distributions <- calculateDistributions(
+						ans$changeContributions[[1]][[period]][[microStep]], 
+						thetaNoRate[currentNetObjEffs])
+					## If one wishes another measure 
+					## than the L^1-difference between distributions,
+					## here is the right place 
+					## to call some new function instead of "L1D".
+					RItmp[,stepsInIntervalCounter] <- 
+						standardize(L1D(distributions[1,], 
+									distributions[2:dim(distributions)[1],]))         
 				}
-				if (microStep > interval * stepsPerInterval || microStep == microSteps) 
+				if (microStep > 
+						interval * stepsPerInterval || microStep == microSteps) 
 				{
 					if(chain == 1)
 					{
-						RIintervalValues[[period]][,interval] <-  rowSums(RItmp)/length(RItmp)
+						RIintervalValues[[period]][,interval] <- 
+										rowSums(RItmp)/length(RItmp)
 					}
 					else
 					{
-						RIintervalValues[[period]][,interval] <- RIintervalValues[[period]][,interval] + rowSums(RItmp)/length(RItmp)
+						RIintervalValues[[period]][,interval] <- 
+							RIintervalValues[[period]][,interval] + 
+											rowSums(RItmp)/length(RItmp)
 					}
 					interval <- interval + 1
 					stepsInIntervalCounter <- 0
@@ -200,7 +222,8 @@ calculateRIDynamics <- function(data=NULL, theta=NULL, algorithm=NULL, effects=N
 	RIDynamics <- NULL
 	RIDynamics$intervalValues <-RIintervalValues
 	RIDynamics$dependentVariable <- currentNetName
-	RIDynamics$effectNames <- paste(effectTypes[currentNetObjEffs], " ", (effects$effectName[noRate])[currentNetObjEffs], sep="")
+	RIDynamics$effectNames <- paste(effectTypes[currentNetObjEffs], " ", 
+						(effects$effectName[noRate])[currentNetObjEffs], sep="")
 	class(RIDynamics) <- "sienaRIDynamics"	
 	RIDynamics
 }

@@ -469,7 +469,14 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 	}
 	if(is.null(file))
 	{
+		if (Sys.info()[1]=="Windows")
+		{
 		windows(width = width, height = height)
+	}
+		else
+		{
+		stop("On non-windows systems, a non-null <<file>> argument is needed.")
+		}
 	}
 	
 	if(!is.null(col))
