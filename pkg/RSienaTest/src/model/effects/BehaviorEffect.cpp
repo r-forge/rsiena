@@ -243,7 +243,8 @@ double BehaviorEffect::egoEndowmentStatistic(int i, const int * difference,
  * indicate an increase of actors' behavior.
  * @param[in] currentValues the current state of the behavior variable
  */
-double BehaviorEffect::creationStatistic(int * difference, double * currentValues)
+double BehaviorEffect::creationStatistic(int * difference,
+	double *currentValues)
 {
 	return creationStatistic(difference, currentValues, false).first;
 }

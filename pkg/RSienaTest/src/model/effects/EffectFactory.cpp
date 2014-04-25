@@ -590,17 +590,17 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		string covariateName = pEffectInfo->interactionName2();
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			new ConditionalFunction(new EqualCovariatePredicate(covariateName),
-				0,
-			new HomCovariateMixedTwoPathFunction(pEffectInfo->variableName(),
-				networkName, covariateName, false)),
+				new SameCovariateMixedTwoPathFunction(
+								pEffectInfo->variableName(),
+								networkName, covariateName, false), 0),
 			new ConditionalFunction(
 				new MissingCovariatePredicate(covariateName),
 				0,
-			new ConditionalFunction(
-				new EqualCovariatePredicate(covariateName),
-				0,
-			new HomCovariateMixedTwoPathFunction(pEffectInfo->variableName(),
-				networkName, covariateName, true))));
+				new ConditionalFunction(
+					new EqualCovariatePredicate(covariateName),
+					new SameCovariateMixedTwoPathFunction(
+							pEffectInfo->variableName(),
+							networkName, covariateName, true), 0)));
 	}
 	else if (effectName == "jumpWXClosure")
 	{

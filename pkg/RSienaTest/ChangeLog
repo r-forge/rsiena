@@ -1,13 +1,28 @@
+2014-04-25 R-Forge Revision 273
+Changes in RSiena and RSienaTest:
+   * NAMESPACE: removed entries sienaRIDynamics with the corresponding
+     print, summary, and plot methods (to be entered later when
+	 problems have been solved).
+   * Removed sienaRIDynamics.Rd (ditto).
+   * Some changes in sienaRIDynamics.r but not enough to make it work.
+   * Duplication of outInv and outSqInv effects for two-mode networks
+     canceled (allEffects.csv).
+   * Correction of effect homWXClosure.
+   * Small change in print01Report.r to improve reporting
+     two files of composition change.
+   * sienaRI.r: require that <<file>> argument is not NULL for non-Windows
+     operating systems.
+
 2014-04-17 R-Forge Revision 272
 Changes in RSiena and RSienaTest:
    * sienaRIDynamics.Rd: added
    * sienaRIDynamics.r: small changes
-   * NAMESPACE: added entries sienaRIDynamics with the corresponding 
+   * NAMESPACE: added entries sienaRIDynamics with the corresponding
      print, summary, and plot methods.
-     
+
 2014-04-17 R-Forge Revision 271
 Changes in RSiena and RSienaTest:
-   * Added component se to sienaFit objects
+   * Added component se (standard errors) to sienaFit objects
    * Replaced (!strcmp...) by (!(strcmp...)) several times
      in sienainternals07.cpp.
 
@@ -23,7 +38,7 @@ Changes in RSienaTest:
    * Changes of version 1.1.268 in sienaRIDynamics ported from RSiena to RSienaTest.
    * Small changes in sienaRI.r.
    * sienaRI.Rd ported from RSiena to RSienaTest, with small changes.
-   * NAMESPACE: added entry sienaRI with the corresponding 
+   * NAMESPACE: added entry sienaRI with the corresponding
      print, summary, and plot methods.
    * sienaBayes.r, sienaprint.r: updates to let sienaBayes.r accept
      a wider range of data and models (e.g., user-defined interactions).
@@ -32,8 +47,8 @@ Changes in RSiena:
    * Small changes in sienaRI.r and sienaRI.Rd.
 Changes in RSiena and RSienaTest:
    * sienaDataCreate.r, sienautils.r, print01Report.r:
-     In coDyadCovar() and varDyadCovar(), centering now also is optional by the 
-     new option "centered" (like it was done for coCovar() and varCovar() 
+     In coDyadCovar() and varDyadCovar(), centering now also is optional by the
+     new option "centered" (like it was done for coCovar() and varCovar()
      in revision 1.1-251).
    * sienaprint.r: correct bug when printing siena object with symmetric network.
    * varDyadCovar: repaired bug occurring when calling it with a named list.
@@ -42,7 +57,7 @@ Changes in RSiena and RSienaTest:
 Changes in RSiena:
    * sienaRI.Rd: added
    * sienaRIDynamics.r: bugfix
-   * NAMESPACE: added entries sienaRI and sienaRIDynamics with the corresponding 
+   * NAMESPACE: added entries sienaRI and sienaRIDynamics with the corresponding
      print, summary, and plot methods.
 
 2014-03-30 R-Forge Revision 267
@@ -52,33 +67,33 @@ Added R-files that contain functionalities to calculate, print and plot relative
    * sienaRIDynamics.r: new
 Changes in RSiena and RSienaTest:
    * Model.cpp: bugfix
-   
+
 2014-03-17 R-Forge Revision 266
 Changes in RSiena and RSienaTest:
-   * getTargets.r: Added actorTargets function for use with multiple imputation 
+   * getTargets.r: Added actorTargets function for use with multiple imputation
 	   of behaviour variable.
    * sienaModelCreate.r, initializeFRAN.r, setup07setup.cpp, Model.cpp, Model.h,
 	   MLSimulation.cpp, MLSimulation.h: added localML option to sienaAlgorithm.
    * allEffects.csv: added "local" column for use with localML option.
 
 2014-03-14 R-Forge Revisions 261-265
-Changes in RSiena: Included exactly the same changes in RSiena 
+Changes in RSiena: Included exactly the same changes in RSiena
 as have been included in RSienaTest in Revision 255
 
 2014-03-14 R-Forge Revisions 255-260
 Changes in RSienaTest:
-   * Modified getTargets(...) such that it is possible to return target statistics of individual actors 
+   * Modified getTargets(...) such that it is possible to return target statistics of individual actors
      as well as change contributions necessary for calculating relative importances of effects (siena07setup.cpp).
    * Call of getTargets(...) is correspondingly adapted (initializeFRAN.r).
-   * Modified simstats0c(...) such that it is possible to return 
-     statistics of individual actors in simulated networks 
+   * Modified simstats0c(...) such that it is possible to return
+     statistics of individual actors in simulated networks
      as well as statistic contributions of all potential tie flips or behavior changes
      for all simulated micro-steps (simstatsc.r).
    * Modified model(...) such that it calculates and returns the statistics newly needed in
    	 simstats0c(...) (siena07model.cpp)
    * Added methods, functions, constructors, and fields needed due to changes in getTargets(...) and model(...):
    			public void needChangeContributions(bool flag) (Model.h, Model.cpp)
-			public bool needChangeContributions()	       (Model.h, Model.cpp)	
+			public bool needChangeContributions()	       (Model.h, Model.cpp)
 			private bool lneedChangeContributions2		   (Model.h)
 			SEXP getChangeContributionsList(...)           (siena07utilities.h, siena07utilities.cpp)
 			SEXP createRObjectAttributes(...)              (siena07utilities.h, siena07utilities.cpp)
@@ -87,7 +102,7 @@ Changes in RSienaTest:
 			public StatisticCalculator(..., bool)		   (StatisticCalculator.h, StatisticCalculator.cpp)
 	        public StatisticCalculator(..., bool, bool)    (StatisticCalculator.h, StatisticCalculator.cpp)
 			public vector<double *> staticChangeContributions(...) (StatisticCalculator.h, StatisticCalculator.cpp)
-	        public double * actorStatistics(...)		   (StatisticCalculator.h, StatisticCalculator.cpp)	
+	        public double * actorStatistics(...)		   (StatisticCalculator.h, StatisticCalculator.cpp)
 	     	private bool lneedActorStatistics              (StatisticCalculator.h, StatisticCalculator.cpp)
 		    private bool lcountStaticChangeContributions   (StatisticCalculator.h, StatisticCalculator.cpp)
 		    private map<EffectInfo *, double * > lactorStatistics (StatisticCalculator.h, StatisticCalculator.cpp)
@@ -102,10 +117,10 @@ Changes in RSienaTest:
    	 		private map<const EffectInfo *, vector<double> > * lpChangeContributions				  (MiniStep.h, MiniStep.cpp)
    	  		public map<const EffectInfo *, vector<double> >* changeContributions()					  (MiniStep.h, MiniStep.cpp)
 			public void changeContributions(map<const EffectInfo *, vector<double> > * contributions) (MiniStep.h, MiniStep.cpp)
-	* Added field to class DependentVariable (DependentVariable.h, DependentVariable.cpp) 
+	* Added field to class DependentVariable (DependentVariable.h, DependentVariable.cpp)
 		protected map<const EffectInfo *, vector<double> > * lpChangeContribution;
-   * Modifications of functions makeChange() and calculateTieFlipProbabilities() 
-   	 	in class NetworkVariable (NetworkVariable.cpp) 
+   * Modifications of functions makeChange() and calculateTieFlipProbabilities()
+   	 	in class NetworkVariable (NetworkVariable.cpp)
    	 	calculateProbabilities(), totalEvaluationContribution(), totalEndowmentContribution(), and totalCreationContribution()
    	 	in class BehaviorVariable (BehaviorVariable.cpp)
    	 	in order to store statistic contributions of effects to all possible choices od an actor in the current micro-step
@@ -115,7 +130,7 @@ Changes in RSienaTest:
 			public virtual pair <double, double * > evaluationStatistic(...,bool needActorStatistics)
 			public virtual pair <double, double * > endowmentStatistic(..., bool needActorStatistics)
 			public virtual pair <double, double * > creationStatistic(..., bool needActorStatistics)
-			
+
 2014-02-17 R-Forge Revision 254
 Changes in RSiena and RSienaTest:
    * Give the capital P to HomCovariateMixedTwoPathFunction.cpp
@@ -177,7 +192,7 @@ Changes in RSiena and RSienaTest:
    * Error occurrence with message about cvalue in EvaluateTestStatistic
      corrected (Sienatest.r).
    * Divergent parameters in siena07() get NA for their rows and columns
-     in the covariance matrix (function phase3.2 in phase3.r).   
+     in the covariance matrix (function phase3.2 in phase3.r).
 The following changes in revision 244 were ported from RSienaTest to RSiena:
    * In siena08, also report Bonferroni combination
      of the two Fisher combinations.
@@ -187,8 +202,8 @@ The following changes in revision 244 were ported from RSienaTest to RSiena:
    * Minor changes of output in siena.table, print07Report.r, print.siena,
      printInitialDescription.r, and in error message for includeEffects.
    * Change artificial results from 999 to NA (robmon.r, phase3.r)
-   * For ML estimation: added autocorrelations during phase 3 
-     to print.summary.sienaFit (sienaprint.r)	 
+   * For ML estimation: added autocorrelations during phase 3
+     to print.summary.sienaFit (sienaprint.r)
 
 2013-11-29 R-Forge Revision 249
 Changes in RSiena and RSienaTest:
@@ -215,8 +230,8 @@ Changes in RSiena and RSienaTest:
 2013-10-16 R-Forge Revision 245
 Changes in RSienaTest:
    * New structural rate effect outRateLog
-     (allEffects.csv, StatisticCalculator.cpp, DependentVariable.cpp, 
-     siena07Internals.cpp, StructuralRateEffect.cpp, Utils.h, Utils.cpp, 
+     (allEffects.csv, StatisticCalculator.cpp, DependentVariable.cpp,
+     siena07Internals.cpp, StructuralRateEffect.cpp, Utils.h, Utils.cpp,
      RSiena_Manual.tex).
    * In siena08, also report Bonferroni combination
      of the two Fisher combinations.
@@ -227,7 +242,7 @@ Changes in RSienaTest:
    * Minor changes of output in siena.table, print07Report.r, print.siena,
      printInitialDescription.r, and in error message for includeEffects.
    * Change artificial results from 999 to NA (robmon.r, phase3.r)
-   * For ML estimation: added autocorrelations during phase 3 
+   * For ML estimation: added autocorrelations during phase 3
      to print.summary.sienaFit (sienaprint.r)
    * Small addition to siena_Algorithms4.tex (statistics for rate effects).
    * Bit of cleaning up (phase3.r)

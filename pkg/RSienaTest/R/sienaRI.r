@@ -6,7 +6,7 @@
 # * File: sienaRI.r
 # *
 # * Description: Used to determine, print, and plots relative importances of effects
-# * in for potential desicions of actors at observation moments. 
+# * in for potential desicions of actors at observation moments.
 # *****************************************************************************/
 
 ##@sienaRI. Use as RSienaTest:::sienaRI()
@@ -20,7 +20,7 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 	{
 		if (!inherits(ans, "sienaFit"))
 		{
-			stop(paste("ans is not a legitimate Siena fit object", sep="")) 
+			stop(paste("ans is not a legitimate Siena fit object", sep=""))
 		}
 		if(!is.null(algorithm)||!is.null(theta)||!is.null(effects))
 		{
@@ -40,7 +40,7 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 		if (!inherits(effects, "sienaEffects"))
 		{
 			stop(paste("effects is not a legitimate Siena effects object", sep=""))
-		}		
+		}
 		if(sum(effects$include==TRUE & (effects$type =="endow"|effects$type =="creation")) > 0)
 		{
 			stop("sienaRI does not yet work for models containinf endowment or creation effects")
@@ -54,9 +54,9 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 		{
 			if(length(theta) != sum(effs$include==TRUE))
 			{
-				stop("theta is not a legitimate parameter vector \n number of parameters has to match number of effects")								
+				stop("theta is not a legitimate parameter vector \n number of parameters has to match number of effects")
 			}
-			warning("length of theta does not match the number of objective function effects\n theta is treated as if containing rate parameters")		
+			warning("length of theta does not match the number of objective function effects\n theta is treated as if containing rate parameters")
 			paras <- theta
 			## all necessary information available
 			## call getChangeContributions
@@ -81,7 +81,7 @@ getChangeContributions <- function(algorithm, data, effects)
 	## is more or less copied from "getTargets" in "getTargets.r".
 	## However, some modifications have been necessary to get it to work.
 	f <- unpackData(data,algorithm)
-	
+
 	effects <- effects[effects$include,]
 	if (!is.null(algorithm$settings))
 	{
@@ -108,28 +108,28 @@ getChangeContributions <- function(algorithm, data, effects)
 			pData,list(f$dycCovars))
 	ans<-.Call('ChangingDyadicCovariates',PACKAGE=pkgname,
 			pData, list(f$dyvCovars))
-	
+
 	storage.mode(effects$parm) <- 'integer'
 	storage.mode(effects$group) <- 'integer'
 	storage.mode(effects$period) <- 'integer'
-	
+
 	effects$effectPtr <- rep(NA, nrow(effects))
 	depvarnames <- names(data$depvars)
 	tmpeffects <- split(effects, effects$name)
 	myeffectsOrder <- match(depvarnames, names(tmpeffects))
 	ans <- .Call("effects", PACKAGE=pkgname, pData, tmpeffects)
 	pModel <- ans[[1]][[1]]
-	for (i in 1:length(ans[[2]])) 
+	for (i in 1:length(ans[[2]]))
 	{
 		effectPtr <- ans[[2]][[i]]
 		tmpeffects[[i]]$effectPtr <- effectPtr
-	}	
+	}
 	myeffects <- tmpeffects
 	for(i in 1:length(myeffectsOrder)){
 		myeffects[[i]]<-tmpeffects[[myeffectsOrder[i]]]
 	}
 	ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects, parallelrun=TRUE, returnActorStatistics=FALSE, returnStaticChangeContributions=TRUE)
-	ans	
+	ans
 }
 
 expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL)
@@ -137,7 +137,7 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 	waves <- length(conts[[1]])
 	effects <- effects[effects$include == TRUE,]
 	noRate <- effects$type != "rate"
-	effects <- effects[noRate,] 
+	effects <- effects[noRate,]
 	if(sum(noRate)!=length(theta))
 	{
 		theta <- theta[noRate]
@@ -147,14 +147,14 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 	networkNames <- attr(conts,"networkNames")
 	networkTypes <- attr(conts,"networkTypes")
 	networkInteraction <- effects$interaction1
-	effectIds <- paste(effectNa,effectTypes,networkInteraction, sep = ".") 
-	
-	currentDepName <- "" 
+	effectIds <- paste(effectNa,effectTypes,networkInteraction, sep = ".")
+
+	currentDepName <- ""
 	depNumber <- 0
 	for(eff in 1:length(effectIds))
 	{
 		if(networkNames[eff] != currentDepName)
-		{ 
+		{
 			currentDepName <- networkNames[eff]
 			actors <- length(conts[[1]][[1]][[1]])
 			if(networkTypes[eff] == "oneMode")
@@ -165,17 +165,17 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 			}else{
 				stop("so far, sienaRI works only for dependent variables of type 'oneMode' or 'behavior'")
 			}
-			depNumber <- depNumber + 1		
+			depNumber <- depNumber + 1
 			currentDepEffs <- effects$name == currentDepName
 			effNumber <- sum(currentDepEffs)
-			
+
 			RIs <- data.frame(row.names = effectIds[currentDepEffs])
 			RIs <- cbind(RIs, matrix(0, nrow=effNumber, ncol = actors))
 			entropies <- vector(mode="numeric", length = actors)
-			
+
 			currentDepObjEffsNames <- paste(effects$shortName[currentDepEffs],effects$type[currentDepEffs],effects$interaction1[currentDepEffs],sep=".")
 			otherObjEffsNames <- paste(effects$shortName[!currentDepEffs],effects$type[!currentDepEffs],effects$interaction1[!currentDepEffs],sep=".")
-			
+
 			expectedRI <- list()
 			RIActors <- list()
 			absoluteSumActors <- list()
@@ -184,19 +184,19 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 			{
 				currentDepEffectContributions <- conts[[1]][[w]][currentDepEffs]
 				currentDepEffectContributions <- sapply(lapply(currentDepEffectContributions, unlist), matrix, nrow=actors, ncol=choices, byrow=TRUE, simplify="array")
-				
+
 				distributions <- apply(apply(currentDepEffectContributions, c(2,1), as.matrix), 3, calculateDistributions, theta[which(currentDepEffs)])
 				distributions <- lapply(apply(distributions, 2, list), function(x){matrix(x[[1]], nrow=effNumber+1, ncol=choices, byrow=F)})
-				
+
 				entropy_vector <- unlist(lapply(distributions,function(x){entropy(x[1,])}))
 				## If one wishes another measure than the L^1-difference between distributions,
 				## here is the right place to call some new function instead of "L1D".
 				RIs_list <- lapply(distributions,function(x){L1D(x[1,], x[2:dim(x)[1],])})
 				RIs_matrix <-(matrix(unlist(RIs_list),nrow=effNumber, ncol=actors, byrow=F))
-				
-				RIs <- RIs_matrix 
+
+				RIs <- RIs_matrix
 				entropies <- entropy_vector
-				
+
 				RIActors[[w]] <- apply(RIs, 2, function(x){x/sum(x)})
 				absoluteSumActors[[w]] <- colSums(RIs)
 				entropyActors[[w]] <- entropies
@@ -225,14 +225,14 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 			}else{
 				RI[[depNumber]]<-RItmp
 			}
-		}	
+		}
 	}
 	if(depNumber>1)
 	{
-		warning("more than one dependent variable\n return value is therefore not of class 'sienaRI'\n but a list of objects of class 'sienaRI'")								
+		warning("more than one dependent variable\n return value is therefore not of class 'sienaRI'\n but a list of objects of class 'sienaRI'")
 	}
 	RI
-} 
+}
 
 calculateDistributions <- function(effectContributions = NULL, theta = NULL)
 {
@@ -291,7 +291,7 @@ print.sienaRI <- function(x, ...){
 	{
 		stop("not a legitimate Siena relative importance of effects object")
 	}
-	cat(paste("\n  Expected relative importance of effects for dependent variable '", 
+	cat(paste("\n  Expected relative importance of effects for dependent variable '",
 					x$dependentVariable,"' at observation moments:\n\n\n", sep=""))
 	waves <- length(x$expectedRI)
 	effs <- length(x$effectNames)
@@ -304,8 +304,8 @@ print.sienaRI <- function(x, ...){
 		line2 <- paste(line2, format(round(x$expectedRI[[w]], 4), width=8, nsmall=4),"  ",sep="")
 	}
 	line2 <- paste(line2, rep('\n',effs), sep="")
-	cat(as.matrix(line1),'\n \n', sep='')    
-	cat(as.matrix(line2),'\n', sep='')    
+	cat(as.matrix(line1),'\n \n', sep='')
+	cat(as.matrix(line2),'\n', sep='')
 	invisible(x)
 }
 
@@ -333,7 +333,7 @@ print.summary.sienaRI <- function(x, ...)
 
 ##@plot.sienaRI Methods
 plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius = 1, width = NULL, height = NULL, legend = TRUE, legendColumns = NULL, legendHeight = NULL, cex.legend = NULL, cex.names = NULL, ...)
-{ 
+{
 	if (!inherits(x, "sienaRI"))
 	{
 		stop("not a legitimate Siena relative importance of effects object")
@@ -368,8 +368,8 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 		}
 		if(is.null(legendHeight))
 		{
-			legendHeight <- max(0.6,ceiling(length(x$effectNames)/legendColumns)*0.2) 
-		}   
+			legendHeight <- max(0.6,ceiling(length(x$effectNames)/legendColumns)*0.2)
+		}
 	}
 	if(!is.null(height))
 	{
@@ -390,7 +390,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 			height <- (2*waves)*1
 		}
 	}
-	
+
 	if(!is.null(width))
 	{
 		if(is.numeric(width))
@@ -410,7 +410,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 			width = (actors/3+1)*1
 		}
 	}
-	
+
 	if(!is.null(cex.legend))
 	{
 		if(is.numeric(cex.legend))
@@ -425,7 +425,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 	{
 		cex.legend <- 1.3
 	}
-	
+
 	if(!is.null(cex.names))
 	{
 		if(is.numeric(cex.names))
@@ -440,7 +440,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 	{
 		cex.names <- 1
 	}
-	
+
 	if(!is.null(radius))
 	{
 		if(is.numeric(radius))
@@ -455,7 +455,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 	{
 		rad <- 1
 	}
-	
+
 	createPdf = FALSE
 	if(!is.null(file))
 	{
@@ -464,14 +464,21 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 			createPdf = TRUE
 		}else{
 			file = NULL
-			warning("file has to be a of type 'character' \n could not create pdf")
+		warning("file has to be a of type 'character' \n could not create pdf")
 		}
 	}
 	if(is.null(file))
 	{
-		windows(width = width, height = height)
+		if (Sys.info()[1]=="Windows")
+		{
+			windows(width = width, height = height)
+		}
+		else
+		{
+		stop("On non-windows systems, a non-null <<file>> argument is needed.")
+		}
 	}
-	
+
 	if(!is.null(col))
 	{
 		cl <- col
@@ -501,37 +508,37 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 			pink <- rgb(240,2,127,alph, maxColorValue = 255)
 			brown <- rgb(191,91,23,alph, maxColorValue = 255)
 			cl <- c(cl,green,lila,orange,yellow,blue,lightgray,darkgray,gray,pink,brown)
-		}	
+		}
 	}
 	bordergrey <-"gray25"
-	
+
 	if(addPieChart)
 	{
 		if(legend)
 		{
 			layoutMatrix <- matrix(c(1:(2*waves+1),(2*waves+1)), byrow= TRUE, ncol=2, nrow=(waves+1))
-			layout(layoutMatrix,widths=c((actors/3),2),heights=c(rep(1,waves),legendHeight)) 
+			layout(layoutMatrix,widths=c((actors/3),2),heights=c(rep(1,waves),legendHeight))
 		}else{
 			layoutMatrix <- matrix(c(1:(2*waves)), byrow= TRUE, ncol=2, nrow=waves)
-			layout(layoutMatrix,widths=c((actors/3),2),heights=rep(1,waves)) 
+			layout(layoutMatrix,widths=c((actors/3),2),heights=rep(1,waves))
 		}
-		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(-1,0,-3,-2), xpd=T , cex = 0.75, no.readonly = TRUE )  
+		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(-1,0,-3,-2), xpd=T , cex = 0.75, no.readonly = TRUE )
 	}else{
 		if(legend)
 		{
 			layoutMatrix <- matrix(c(1:(waves+1)), byrow= TRUE, ncol=1, nrow=(waves+1))
-			layout(layoutMatrix,widths=c((actors/3)),heights=c(rep(1,waves),legendHeight)) 
+			layout(layoutMatrix,widths=c((actors/3)),heights=c(rep(1,waves),legendHeight))
 		}else{
 			layoutMatrix <- matrix(c(1:waves), byrow= TRUE, ncol=1, nrow=waves)
-			layout(layoutMatrix,widths=c((actors/3)),heights=rep(1,waves)) 
+			layout(layoutMatrix,widths=c((actors/3)),heights=rep(1,waves))
 		}
-		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(-1,0,-3,1), xpd=T , cex = 0.75, no.readonly = TRUE )  
+		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(-1,0,-3,1), xpd=T , cex = 0.75, no.readonly = TRUE )
 	}
 	for(w in 1:waves)
 	{
-		barplot(cbind(x$RIActors[[w]], x$expectedRI[[w]]),space=c(rep(0.1,actors),1.5),width=c(rep(1,actors),1), beside =FALSE, yaxt = "n", xlab="Actor", cex.names = cex.names, ylab=paste("wave ", w, sep=""),border=bordergrey,  col = cl, names.arg=c(1:actors,"exp. rel. imp.")) 
+		barplot(cbind(x$RIActors[[w]], x$expectedRI[[w]]),space=c(rep(0.1,actors),1.5),width=c(rep(1,actors),1), beside =FALSE, yaxt = "n", xlab="Actor", cex.names = cex.names, ylab=paste("wave ", w, sep=""),border=bordergrey,  col = cl, names.arg=c(1:actors,"exp. rel. imp."))
 		axis(2, at=c(0,0.25,0.5,0.75,1),labels=c("0","","0.5","","1"))
-		axis(4, at=c(0,0.25,0.5,0.75,1),labels=c("0","","0.5","","1")) 
+		axis(4, at=c(0,0.25,0.5,0.75,1),labels=c("0","","0.5","","1"))
 		if(addPieChart)
 		{
 			pie(x$expectedRI[[w]], col = cl, labels=NA, border = bordergrey, radius = rad)
@@ -546,7 +553,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 	if(createPdf)
 	{
 		dev.off()
-	} 
+	}
 	invisible(cl)
 }
 

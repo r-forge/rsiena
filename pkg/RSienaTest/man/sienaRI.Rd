@@ -6,15 +6,15 @@
 \title{Functions to assess the relative importance of effects at observation moments}
 \description{
  The function \code{sienaRI} returns the relative importance of effects of a SAOM according to the measure of relative importance described in
- Section 3.1 of Indlekofer and Brandes (2013). 
+ Section 3.1 of Indlekofer and Brandes (2013).
  The measure is based on the influence of effects on potential tie change or behavior change
  decisions of individual actors in network at the given observation moments. It takes the data as well as the complete model specification into account. Therefore, necessary arguments are the analysed data given as a \code{siena} data object as well as the complete model specification represented either by an estimated \code{sienaFit} object or by the triple consisting of a suitable parameter vector \code{theta} and the corresponding \code{sienaAlgorithm} and \code{sienaEffects} objects.
  }
 \usage{
 sienaRI(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 \method{plot}{sienaRI}(x, file = NULL, col = NULL, addPieChart = FALSE,
-              radius = 1, width = NULL, height = NULL, legend = TRUE, 
-              legendColumns = NULL, legendHeight = NULL, 
+              radius = 1, width = NULL, height = NULL, legend = TRUE,
+              legendColumns = NULL, legendHeight = NULL,
               cex.legend = NULL, cex.names = NULL,\dots)
 }
 \arguments{
@@ -24,7 +24,11 @@ sienaRI(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
   \item{algorithm}{\code{sienaAlgorithm} object as resulting from a call to \code{\link{sienaAlgorithmCreate}}. Works only for estimation by Method of Moments (i.e., if  \code{maxlike = FALSE}).}
   \item{effects}{\code{sienaEffects} object specifying which effects are included the model. Note that \code{sienaRI} does not yet work for endowment or creation effect, i.e., included effects have to be of type \code{eval} (or \code{rate}).}
   \item{x}{\code{sienaRI} object resulting from a call to \code{sienaRI}.}
-  \item{file}{Name (path) of a pdf-file indicating whether the plot should be stored in a file. If \code{file=NULL}, the plot will be opened in a separate window. Otherwise a pdf with the given name will be created in the working directory or at the given path.}
+  \item{file}{Name (path) of a pdf-file indicating whether the plot should be
+       stored in a file. If \code{file=NULL}, the plot will be opened in a
+	   separate window. Otherwise a pdf with the given name will be created
+	   in the working directory or at the given path.
+	   May not be NULL on other operating systems than Windows.}
   \item{col}{Colors used in the plot. If \code{col=NULL} a default color scheme is used.}
   \item{addPieChart}{Boolean: If \code{TRUE}, pie charts of aggregated relative importances for the complete network will be added to the plot.}
   \item{radius}{Radius of pie charts. Only effective if \code{addPieCharts = TRUE}.}
@@ -48,7 +52,7 @@ Note that \code{sienaRI} works only with Method of Moments (i.e., for \code{sien
 }
 \value{
  If the model contains only one dependent variable, \code{sienaRI} returns an object of class \code{sienaRI}. Otherwise, it returns a list of objects of class \code{sienaRI}, each corresponding to one dependent variable.
- 
+
  A returned \code{sienaRI} object stores the expected relative importances of effects of one dependent variable at observation moments as defined in Section 3.1 of Indlekofer and Brandes (2013).
 
 A \code{sienaRI} object consists of following components:
@@ -64,13 +68,13 @@ A \code{sienaRI} object consists of following components:
 
 \references{
 \itemize{
-Indlekofer, N. and Brandes, U., 
+Indlekofer, N. and Brandes, U.,
  \dQuote{Relative Importance of Effects in Stochastic Actor-oriented Models.}
  Network Science, 1 (3), 2013.
 }
 }
 \author{Natalie Indlekofer}
-\seealso{\code{\link{sienaRIDynamics}}}
+\seealso{\code{sienaRIDynamics}}
 \examples{
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
