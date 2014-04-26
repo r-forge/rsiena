@@ -1206,7 +1206,7 @@ SEXP createEffects(SEXP EFFECTS, Model *pModel, vector<Data *> * pGroupData,
 
 				if (strcmp(setting, "") == 0)
 				{
-					if (!strcmp(netType, "behavior") == 0)
+					if (!(strcmp(netType, "behavior") == 0))
 					{
 						NetworkLongitudinalData * pNetwork =
 							pData->pNetworkData(networkName);

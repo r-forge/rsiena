@@ -148,7 +148,6 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 # STILL TO BE CHECKED
         iter <- 0
 		nearGoal <- rep(FALSE, z$nGroup+2)
-        success <- rep(FALSE, z$nGroup+2)
 		pastSuccesses <- rep(0, z$nGroup+2)
 		groups <- c(rep(TRUE, z$nGroup), FALSE, FALSE)
 		cat('improveMH\n')
@@ -1019,8 +1018,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 		flush.console()
 #cat("cyc\n")
 #browser()
-		scores.ans.last <- t(cyc$ans.last$fra) # the scores a z$pp by z$nGroups matrix
-		dfra.ans.last <- cyc$ans.last$dff # the Hessian a sparse z$pp by z$pp matrix
+#		scores.ans.last <- t(cyc$ans.last$fra) # the scores a z$pp by z$nGroups matrix
+#		dfra.ans.last <- cyc$ans.last$dff # the Hessian a sparse z$pp by z$pp matrix
 		if (frequentist)
 		{
 			RobbinsMonro(bgain)
@@ -1415,7 +1414,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	# number of parameters per group:
 	npars <- sum(startupGlobal$effects$group==1)
 	# number of Dependent variables:
-	nDepvar <- length(unique(startupGlobal$effects$name))
+#	nDepvar <- length(unique(startupGlobal$effects$name))
 	if (ngroups >= 2)
 	{
 	#	if ((startupGlobal$pp - npars)%%(ngroups-1) != 0)

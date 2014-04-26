@@ -231,6 +231,7 @@ browser()
 standardize <- function(values = NULL)
 {
 	newValues <- values/sum(values)
+	newValues
 } 
 
 
