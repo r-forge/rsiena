@@ -1,3 +1,8 @@
+2014-04-26 R-Forge Revision 274
+Changes in RSiena and RSienaTest:
+   * Replaced (!strcmp...) by (!(strcmp...)) one more time
+     in sienainternals07.cpp.
+ 
 2014-04-25 R-Forge Revision 273
 Changes in RSiena and RSienaTest:
    * NAMESPACE: removed entries sienaRIDynamics with the corresponding
@@ -11,7 +16,9 @@ Changes in RSiena and RSienaTest:
    * Small change in print01Report.r to improve reporting
      two files of composition change.
    * sienaRI.r: require that <<file>> argument is not NULL for non-Windows
-     operating systems.
+     operating systems.	 
+Changes in RSienaTest:
+   * Minor changes in sienaBayes.r.
 
 2014-04-17 R-Forge Revision 272
 Changes in RSiena and RSienaTest:
