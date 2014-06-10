@@ -43,7 +43,7 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
     {
         nDependents <- length(unique(x$name))
         userSpecifieds <- x$shortName[x$include] %in% c("unspInt", "behUnspInt")
-        endowments <- !x$type[x$include] %in% c("rate", "eval") 
+        endowments <- !x$type[x$include] %in% c("rate", "eval")
 											# includes creations
         timeDummies <- !x$timeDummy[x$include] == ","
         specs <- x[, c("name", "effectName", "include", "fix", "test",

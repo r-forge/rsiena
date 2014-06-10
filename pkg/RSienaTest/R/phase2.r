@@ -233,6 +233,11 @@ doIterations<- function(z, x, subphase,...)
                 z$writefreq <- 20
             }
             z$writefreq <- roundfreq(z$writefreq)
+			if (is.batch())
+			{
+				z$writefreq <-  z$writefreq * 10 ##compensation for it
+				## running faster with no tcl/tk
+			}
         }
         if ((z$nit <= 10) || (z$nit %% z$writefreq ==0))
         {

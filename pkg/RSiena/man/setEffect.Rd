@@ -38,10 +38,10 @@ period=1, group=1, character=FALSE)
 dummy. Alternatively, use \code{\link{includeTimeDummy}}.
 }
   \item{include}{Boolean. default TRUE, but can be switched to FALSE to
-	turn off an effect.}
+     turn off an effect.}
   \item{name}{Name of dependent variable (network or behavior)
-    for which effects are being	modified.
-	Defaults to the first in the effects object.
+    for which effects are being modified.
+    Defaults to the first in the effects object.
 }
   \item{type}{Character string indicating the
   type of the effect to be changed : currently "rate", "eval",
@@ -58,7 +58,7 @@ dummy. Alternatively, use \code{\link{includeTimeDummy}}.
 \item{effect1}{
   Only for \code{shortName=unspInt}, which means this is a
   user-defined interaction effect: \code{effect1} is
-  a natural number indicating the first component of the interaction effect; 
+  a natural number indicating the first component of the interaction effect;
   the number is the one listed when applying \code{print()} to \code{myeff}.
 }
 \item{effect2}{
@@ -86,14 +86,14 @@ The column elements of the output effects object for \code{parm},
 \code{initialValue}, and \code{timeDummy}
 will be set to the values requested.}
 \value{
-	An updated version of the input effects object, with one row
-	updated.
-	Details of the row altered will be printed.
+    An updated version of the input effects object, with one row
+    updated.
+    Details of the row altered will be printed.
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
 \seealso{
-  \code{\link{getEffects}}, \code{\link{includeEffects}}, 
+  \code{\link{getEffects}}, \code{\link{includeEffects}},
   \code{\link{includeInteraction}}.
 }
 
@@ -118,7 +118,7 @@ myeff
 (eff1 <- myeff[myeff$include,]$effect1[6])
 (eff2 <- myeff[myeff$include,]$effect2[6])
 myeff <- setEffect(myeff, unspInt, fix=TRUE, test=TRUE,
-									effect1=eff1, effect2=eff2)
+                                    effect1=eff1, effect2=eff2)
 myeff
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the

@@ -176,7 +176,7 @@ PrintReport <- function(z, x)
 			Report('Estimated means and standard deviations, standard errors of the mean \n', bof)
 			Report('Estimated means and standard deviations, standard errors of the mean \n', outf)
 			dmsf <- diag(z$msf)
-# sf and cov.dev may be dropped - just for now (07-10-13) I keep them in			
+# sf and cov.dev may be dropped - just for now (07-10-13) I keep them in
 #			sf <- colMeans(z$sf)
 			mean.stats <- colMeans(z$sf) + z$targets
 #			cov.dev <- z$msf

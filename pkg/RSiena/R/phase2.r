@@ -231,6 +231,11 @@ doIterations<- function(z, x, subphase,...)
                 z$writefreq <- 20
             }
             z$writefreq <- roundfreq(z$writefreq)
+			if (is.batch())
+			{
+				z$writefreq <-  z$writefreq * 10 ##compensation for it
+				## running faster with no tcl/tk
+			}
         }
         if ((z$nit <= 10) || (z$nit %% z$writefreq ==0))
         {
@@ -322,7 +327,7 @@ doIterations<- function(z, x, subphase,...)
                 DisplayThetaAutocor(z)
             }
         }
-        ## limit change.  Reporting is delayed to end of phase.
+## limit change.  Reporting is delayed to end of phase.
 # The truncation has been different from version 1.1-227 to 1.1-243,
 # due to a misunderstanding.
 # In version 1.1-244 it was changed back to the old Siena 3 way.

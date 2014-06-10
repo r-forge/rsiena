@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-273.
+This version was renewed for \RS version 1.1-276.
 \end{abstract}
 
 
@@ -248,13 +248,14 @@ the reader is referred to the corresponding literature and help pages.
 in collaboration with Tom Snijders.
 Since May 2012 the maintainer is Tom Snijders.
 Further contributions were made by Josh Lospinoso, Charlotte Greenan,
-Christian Steglich, Johan Koskinen, and Mark Ortmann.
+Christian Steglich, Johan Koskinen, Mark Ortmann, Nynke Niezink,
+and Robert Hellpap.
 
 In addition to the `official' \R distribution of \rs, there is
 an additional distribution at R-Forge, which is
 a central platform for the development of \R packages
 offering facilities for source code management.
-Sometimes latest versions of \RS are available at\\
+It is quite usual that later versions of \RS are available at
 \url{http://r-forge.r-project.org/R/?group_id=461}
 before being incorporated into the R package that can be downloaded from CRAN.
 In addition, at R-Forge there is a package {\sf RSienaTest} which may include
@@ -974,7 +975,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-273) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-276) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -2952,7 +2953,7 @@ library, accessible from within \R using the command
 Alternatively, for a given effects object, say \texttt{myeff},
 this list can be displayed in a browser by using the function:
 
-\verb|effectsDocumentation(myeff)| 
+\verb|effectsDocumentation(myeff)|
 
 \noindent
 Also see the help page for the function \sfn{effectsDocumentation()}.
@@ -6732,7 +6733,7 @@ for transitive ties for $\alpha=0$ and approximates the fit
 statistic for transitive triplets
 for large $\alpha$, the estimates are not the same because some other
 calculations are done differently. The issue is that the GWESP effects are
-not implemented as a true evaluation effect, but as a generic effect, 
+not implemented as a true evaluation effect, but as a generic effect,
 where for the change statistic only changes of the tie $i \rightarrow j$ in
 (\ref{GWESP2}) are considered, and not of the tie $i \rightarrow h$.
 
@@ -6764,8 +6765,8 @@ In version 1-1.251 this was changed (thanks to Nynke Niezink), because earlier v
 were not quite according to what is described above. The effect was earlier
 implemented as\\
 $c_1 + c_2 \times \text{GWESPFF}(i, \alpha')$\\
-for values $c_1(\alpha)$ and $c_2(\alpha)$ not dependent on $x$, and with 
-positive parameters $\alpha$, $\alpha'$ depending according to 
+for values $c_1(\alpha)$ and $c_2(\alpha)$ not dependent on $x$, and with
+positive parameters $\alpha$, $\alpha'$ depending according to
 $\exp(-\alpha) + \exp(-\alpha') = 1$. Note that for the default value
 $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha = \alpha'$.
 
@@ -7759,7 +7760,7 @@ Further there are a number of mixed triadic effects.
 \end{minipage}
  \item
 \begin{minipage}[t]{.7\textwidth}
- {\em  XWX closure of $W$}, \texttt{(cl.XWX)} \\ 
+ {\em  XWX closure of $W$}, \texttt{(cl.XWX)} \\
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, x_{ih}\, w_{hj}\,$;\\
  this refers to the closure of mixed $X-W$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
@@ -7773,7 +7774,7 @@ Further there are a number of mixed triadic effects.
  if there is a tie $h \stackrel{W}{\rightarrow} j$, then ties
   $i \stackrel{X}{\rightarrow} j $ and  $i \stackrel{X}{\rightarrow} h $
   will tend to entrain each other.\\
-  (The reported target statistic is multiplied by 2.) 
+  (The reported target statistic is multiplied by 2.)
       \end{minipage}
 \hfill
 \begin{minipage}[t]{.15\textwidth}
@@ -7913,7 +7914,7 @@ Further there are a number of mixed triadic effects.
 \end{enumerate}
 
 Then there are some  mixed triadic effects
-restricted to triples with the same or different values on a monadic 
+restricted to triples with the same or different values on a monadic
 covariate $V$.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
@@ -8725,7 +8726,8 @@ if the associated parameter is denoted $\alpha_h$ for some $h$,
 and similarly for the contributions of the in-degrees and the
 reciprocated degrees.
 
-\item For the analysis of diffusion of innovations,
+ \item[{\hspace*{-1ex}$\bigodot$}]
+ For the analysis of diffusion of innovations,
   which is applicable if the behavior variable
   is a non-decreasing variable with values 0 and 1,
   there are various contagion effects that render a model that
@@ -9251,7 +9253,7 @@ This can be represented in \R as follows.
 # must be syntactically incomplete.
 # In this case, this is satisfied because the first line ends with a +
 obj_n <- function(vi, vj){
-           b1*(vi-v_av) + b2*(vj-v_av) + b3*(vi-v_av)*(vi-v_av) +
+           b1*(vi-v_av) + b2*(vj-v_av) + b3*(vj-v_av)*(vj-v_av) +
                  b4*(vi-v_av)*(vj-v_av)
                            }
 # Now fill in the values of the parameter estimates and the averages.
@@ -9267,6 +9269,7 @@ sel_tab <- outer(vv, vv, obj_n)
 sel_tab
 \end{verbatim}
 \end{footnotesize}
+% Formula used to be wrong before 27-5-2014, figures in the table were right.
 
 \noindent
 This gives the following\footnote{In earlier versions of the manual,
@@ -9614,7 +9617,7 @@ See Section~\ref{S_cond}.
 \emph{Solutions.}
 \begin{enumerate}
 \item Check whether your model specification is reasonable;
-for example, there might be doubts about the specification of the
+    for example, there might be doubts about the specification of the
     rate function.
 \item  Use non-conditional estimation (Section~\ref{S_cond}) if you were not
    already doing so.
@@ -9624,10 +9627,10 @@ for example, there might be doubts about the specification of the
    be unmodeled heterogeneity between the periods. Try modeling the periods
    separately.
 \item Set the parameter \texttt{firstg} in \sfn{sienaAlgorithmCreate} to a
-   lower value than the default 0.2. 
+   lower value than the default 0.2.
    This will make the algorithm move more slowly, hopefully avoiding the problematic region
    in the parameter space.
-   
+
    The advice would be to set  \texttt{firstg}  to 0.02
    and expect the necessity to do a second estimation using the \texttt{prevAns}
    parameter in \sfn{siena07}. If the problem still occurs for \texttt{firstg}=0.02,
@@ -10764,12 +10767,25 @@ The argument is a sienaFit object ``x''. \\
 
 This begins (in reverse order) at end October 2009, and only presents changes
 which affect the user.
-(Programmers should consult the changeLog file in the source code on CRAN or in
-the R-forge repository.)
+(Programmers should consult the \sfn{ChangeLog} file in the source code on CRAN or in
+the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
-\item 2014-04-25 R-Forge Revision 273.
+\item 2014-06-02 R-Forge Revision 276.
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+\item Higher write-to-screen frequency for batch operation of \sfn{siena07()}.
+\item Various small bug corrections (see the \sfn{ChangeLog}).
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+\item Changes in \sfn{sienaBayes()} and its print and summary methods.
+\item New function \sfn{glueBayes()} for combining \sfn{sienaBayesFit()} objects.
+\end{itemize}
+
+\item 2014-04-26 R-Forge Revision 274.
 Changes in RSiena and RSienaTest:
 \begin{itemize}
 \item Correction of effect \texttt{homWXClosure}.
@@ -10796,14 +10812,14 @@ Changes in RSiena and RSienaTest:
       optional by the new option \texttt{centered} (like it was done for
       \sfn{coCovar()} and \sfn{varCovar()} in revision 1.1-251).
 \item Corrected bug when printing siena object with a symmetric network;
-     and in \sfn{varDyadCovar()} corrected a bug occurring when calling it 
-     with a named list.      
-\item Added standard errors as component \texttt{se} to \texttt{sienaFit} 
-     objects.   
+     and in \sfn{varDyadCovar()} corrected a bug occurring when calling it
+     with a named list.
+\item Added standard errors as component \texttt{se} to \texttt{sienaFit}
+     objects.
 \end{itemize}
 
 
-\item Internal changes in the code version 1.1-255 to 1.1-267 (see changeLog).
+\item Internal changes in the code version 1.1-255 to 1.1-267 (see \sfn{ChangeLog}).
 
 \item No noticeable changes from version 1.1-251 to 1.1-254.
 
@@ -10820,7 +10836,7 @@ effect parameter divided by 100. For the default $\alpha = \log(2)$
 this means no difference.
 
 Second, in the help page for \sfn{sienaGOF-auxiliary}, geodesic distances
-were changed to non-directed. This makes more sense usually and was done to 
+were changed to non-directed. This makes more sense usually and was done to
 avoid runtime errors that occurred very rarely.
 
 Changes in RSiena and RSienaTest:
@@ -10867,7 +10883,7 @@ Changes in RSiena and RSienaTest:
 \item \sfn{setEffect()}, \sfn{updateTheta()}, and \sfn{prevAns} in \sfn{siena07()}
      now also work properly for user-specified interactions.
 \item Tests \sfn{Wald.RSiena} and \sfn{Multipar.RSiena} added.
-\item Error occurrence with message about \texttt{cvalue} in 
+\item Error occurrence with message about \texttt{cvalue} in
       \sfn{EvaluateTestStatistic()} corrected.
 \item Divergent parameters in \sfn{siena07()} get \texttt{NA} for their rows and columns
      in the resulting covariance matrix.
@@ -11610,7 +11626,7 @@ includeTimeDummy.
 includeTimeDummy.
 \item 2010-06-08 R-forge revision 101: RSienaTest only. Fixed RateX so that it
   works with changing actor covariates as well.
-\item 2010-06-08 R-forge revision 100: corrected revision numbers in changelog.
+\item 2010-06-08 R-forge revision 100: corrected revision numbers in \sfn{ChangeLog}.
 \item 2010-06-08 R-forge revision 99
 Fix to bug introduced in revision 98: bipartite networks could not have 'loops'
 \item 2010-06-08 R-forge revision 98
@@ -11803,7 +11819,7 @@ Fix to bug in sorting effects for multiple dependent variables.
 
 \item 2010-01-01 R-forge revision 33
 
-Updated change log and manual in RSiena and changelog in RSienaTest.
+Updated change log and manual in RSiena and \sfn{ChangeLog} in RSienaTest.
 
 \item 2010-01-01 R-forge revision 32
     print07report.r: corrected standard errors for rate estimate for

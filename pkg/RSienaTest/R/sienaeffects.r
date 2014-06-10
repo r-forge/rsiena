@@ -10,6 +10,7 @@
 ##@includeEffect DataCreate
 includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 						   type="eval", interaction1="", interaction2="",
+						   fix=FALSE, test=FALSE,
 						   character=FALSE)
 {
 	if (!inherits(myeff, 'sienaEffects'))
@@ -42,6 +43,8 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 	myeff$interaction1 == interaction1 &
 	myeff$interaction2 == interaction2
 	myeff[use, "include"] <- include
+	myeff[use, "test"] <- test
+	myeff[use, "fix"] <- fix
 	if (sum(use) <= 0)
 	{
 		cat(paste("There is no effect with short name "))

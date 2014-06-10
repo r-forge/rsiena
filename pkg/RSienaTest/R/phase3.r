@@ -71,7 +71,7 @@ phase3 <- function(z, x, ...)
     writefreq <- z$writefreq
     if (is.null(z$writefreq))
     {
-        z$writefreq <- 10
+        z$writefreq <- 20
     }
 	z <- doPhase1or3Iterations(3, z, x, zsmall, xsmall, nits, 0, nits11,
 							   writefreq)
@@ -319,12 +319,12 @@ phase3.2 <- function(z, x, ...)
 CalculateDerivative3<- function(z,x)
 {
     z$mnfra <- colMeans(z$sf)
-	estMeans <- z$mnfra + z$targets	
+	estMeans <- z$mnfra + z$targets
+	z$regrCoef <- rep(0, z$pp)
+	z$regrCor <- rep(0, z$pp)
     if (z$FinDiff.method || x$maxlike)
     {
 		dfra <- t(as.matrix(Reduce("+", z$sdf) / length(z$sdf)))
-		z$regrCoef <- rep(0, z$pp)
-		z$regrCor <- rep(0, z$pp)
     }
 	else
     {
@@ -346,10 +346,9 @@ CalculateDerivative3<- function(z,x)
 				z$regrCoef[i] <- cov(z$sf[,i], scores[,i])/var(scores[,i])
 				z$regrCor[i] <- cor(z$sf[,i], scores[,i])
 			}
-		}		
+		}
 		if (x$dolby)
 		{
-#			mean.scores <- colMeans(scores)
 			estMeans <- estMeans - (z$regrCoef * colMeans(scores))
 		}
 		Report('Correlations between scores and statistics:\n', cf)
@@ -519,7 +518,7 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 					}
 					if (is.batch())
 					{
-						z$writefreq <-  z$writefreq * 2 ##compensation for it
+						z$writefreq <-  z$writefreq * 5 ##compensation for it
 						## running faster with no tcl/tk
 					}
 					z$writefreq <- roundfreq(z$writefreq)

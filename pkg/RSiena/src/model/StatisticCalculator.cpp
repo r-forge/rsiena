@@ -91,7 +91,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
 	this->lpStateLessMissingsEtc = new State();
 	this->lneedActorStatistics = returnActorStatistics;
 	this->lcountStaticChangeContributions = 0;
-
+	
 	this->calculateStatistics();
 }
 
@@ -114,7 +114,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
 	this->lpStateLessMissingsEtc = new State();
 	this->lneedActorStatistics = returnActorStatistics;
 	this->lcountStaticChangeContributions = returnStaticChangeContributions;
-
+	
 	this->calculateStatistics();
 }
 
@@ -747,7 +747,7 @@ void StatisticCalculator::calculateBehaviorStatistics(
 				}
 			}
 		}
-
+		
 		delete pEffect;
 	}
 

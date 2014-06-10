@@ -69,12 +69,12 @@ Network::Network(const Network & rNetwork) {
 
 	for (int i = 0; i < this->ln; i++) {
 		this->lpOutTies[i].insert(rNetwork.lpOutTies[i].begin(),
-			rNetwork.lpOutTies[i].end());
+				rNetwork.lpOutTies[i].end());
 	}
 
 	for (int i = 0; i < this->lm; i++) {
 		this->lpInTies[i].insert(rNetwork.lpInTies[i].begin(),
-			rNetwork.lpInTies[i].end());
+				rNetwork.lpInTies[i].end());
 	}
 
 	this->ltieCount = rNetwork.ltieCount;
@@ -111,12 +111,12 @@ Network & Network::operator=(const Network & rNetwork) {
 
 		for (int i = 0; i < this->ln; i++) {
 			this->lpOutTies[i].insert(rNetwork.lpOutTies[i].begin(),
-				rNetwork.lpOutTies[i].end());
+					rNetwork.lpOutTies[i].end());
 		}
 
 		for (int i = 0; i < this->lm; i++) {
 			this->lpInTies[i].insert(rNetwork.lpInTies[i].begin(),
-				rNetwork.lpInTies[i].end());
+					rNetwork.lpInTies[i].end());
 		}
 
 		this->ltieCount = rNetwork.ltieCount;
@@ -255,8 +255,8 @@ int Network::changeTieValue(int i, int j, int v, ChangeType type) {
 		} else {
 			// the value of the edge has been changed
 			iter->second = v;
-		this->lpInTies[j][i] = v;
-	}
+			this->lpInTies[j][i] = v;
+		}
 	} else if (v) {
 		// iter points to the element right after j. Using this position
 		// as a hint speeds things up.

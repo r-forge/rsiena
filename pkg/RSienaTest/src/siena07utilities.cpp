@@ -881,7 +881,7 @@ SEXP getChangeContributionsList(const Chain& chain, SEXP EFFECTSLIST)
 					{
 						contributions = pNetworkChange->changeContributions();
 					}
-					else 
+					else
 					{
 						contributions = pBehaviorChange->changeContributions();
 					}

@@ -175,10 +175,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     steps per iteration is set to this multiple of the total distance
     between the observations at start and finish of the wave.}
   \item{simOnly}{Logical, indicating whether output of covariance matrix
-    by \code{\link{siena07}} is to be skipped.}
+   by \code{\link{siena07}} is to be skipped.}
   \item{localML}{Logical, indicating if a local model was used, allowing 
-    faster calculations in ML estimation.}
-
+  	faster calculations in ML estimation.}
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley and Tom A.B. Snijders}

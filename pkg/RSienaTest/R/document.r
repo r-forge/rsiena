@@ -63,7 +63,10 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 		## parse it
 		Rd <- tools::parse_Rd(infile)
 		## extract the tags from the Rd object
-		tags <- tools:::RdTags(Rd)
+# used to be:		tags <- tools:::RdTags(Rd)
+# replaced by next two lines (to avoid :::)
+		tags <- sapply(Rd, attr, "Rd_tag")
+		if (!length(tags)) {tags <- character()}
 		usage[[i]] <- Rd[[which(tags=="\\usage")]]
 		desc[[i]] <- Rd[[which(tags=="\\description")]]
 		exam[[i]] <- Rd[[which(tags=="\\examples")]]
@@ -81,7 +84,10 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
                 {
                     if (!is.null(x))
                     {
-                        tmp <- tools:::RdTags(x)
+ # used to be:                       tmp <- tools:::RdTags(x)
+# replaced by next two lines (to avoid :::)
+						tmp <- sapply(x, attr, "Rd_tag")
+						if (!length(tmp)) {tmp <- character()}
                         tmp2 <- x[which(tmp=="\\item")]
                         lapply(tmp2, function(x)list(x[[1]],
                                                      gsub("\\n", "",

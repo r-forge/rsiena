@@ -541,11 +541,11 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 			{
 				if (any.noncent <= 0)
 				{
-				Report(c("The mean value", ifelse(nCovars == 1, " is", "s are"),
+					Report(c("The mean value", ifelse(nCovars == 1, " is", "s are"),
 						" subtracted from the",
 						ifelse(nCovars == 1, " centered", ""), " covariate",
-					 ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
-			}
+						ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+				}
 				else if (any.cent >= 1)
 				{
 					s.plural <- ""
@@ -754,8 +754,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				Report(c("The mean value", ifelse(nCovars == 1, " is", "s are"),
 					" subtracted from the",
 					ifelse(nCovars == 1, " centered", ""), " covariate",
-					 ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
-		}
+					ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+			}
 			else if (any.cent >= 1)
 			{
 				Report(c("For the centered variable", s.plural,
@@ -842,11 +842,11 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				if (any.noncent <= 0)
 				{
 					Report(c("The mean value",
-					 ifelse(nCovars == 1, " is ", "s are "),
+						ifelse(nCovars == 1, " is", "s are"),
 						" subtracted from the",
 						ifelse(nCovars == 1, " centered", ""), " covariate",
-					 ifelse(nCovars ==1, ".\n\n", "s.\n\n")), sep="", outf)
-		}
+						ifelse(nCovars == 1, ".\n\n", "s.\n\n")), sep="", outf)
+				}
 				else if (any.cent >= 1)
 				{
 					Report(c("For the centered variable", s.plural,
@@ -1008,22 +1008,22 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 			periodFromStart <- periodFromStart + data[[i]]$observations
 		}
 		Report("\n", outf)
-		if (length(atts$vCovars) == 1) 
+		if (length(atts$vCovars) == 1)
 		{
 			Report(c("The overall mean value ",
-				format(round(atts$vCovarMean, 4), nsmall=3, width=12), 
-					 " is subtracted from covariate ", atts$vCovars, 
+				format(round(atts$vCovarMean, 4), nsmall=3, width=12),
+					 " is subtracted from covariate ", atts$vCovars,
 					  ".\n\n"), sep="", outf)
 		}
-		else if (length(atts$vCovars) >= 2) 
+		else if (length(atts$vCovars) >= 2)
 		{
 			Report(c("The mean values are subtracted from the covariates:\n"), outf)
 			for (i in seq(along=atts$vCovars))
 			{
-				Report(c(format(atts$vCovars[i], width=15), 
+				Report(c(format(atts$vCovars[i], width=15),
 				format(round(atts$vCovarMean[i], 4), nsmall=3, width=12), '\n'), outf)
 			}
-		}		
+		}
 	}
 	periodNos <- attr(data, "periodNos")
 	if (any(atts$anyUpOnly[nets]))

@@ -1,3 +1,24 @@
+2014-06-02 R-Forge Revision 276
+Changes in RSiena and RSienaTest:
+   * Higher writefreq for batch operation (phase2.r, phase3.r) 
+   * Error check for name of dependent variable to condition upon (initializeFRAN.r)
+   * Some corrections to account for behavior dependent variables that are not
+     coded as integer (in initializeFRAN and unpackBehavior, initializeFRAN.r)
+   * Parameters fix and test now used in includeEffects() (sienaeffects.r)
+   * Small bug fix in CalculateDerivative3 (phase3.r)
+   * Avoidance of ":::" in siena01.r and document.r by small changes.
+Changes in RSienaTest:
+   * Changes in sienaBayes.r and its print and summary methods; 
+     new function glueBayes.
+
+2014-05-05 R-Forge Revision 275
+Changes in RSiena and RSienaTest:
+   * Error message and stop in case of mismatch variable names
+     in algorithm object and in data (initializeFRAN.r).
+   * Force behavior and its attribute "change" to be integer in function 
+     unpackBehavior() (initializeFRAN.r).
+   * Some tabs in .Rd files change to spaces.
+
 2014-04-26 R-Forge Revision 274
 Changes in RSiena and RSienaTest:
    * Replaced (!strcmp...) by (!(strcmp...)) one more time
@@ -7,7 +28,7 @@ Changes in RSiena and RSienaTest:
 Changes in RSiena and RSienaTest:
    * NAMESPACE: removed entries sienaRIDynamics with the corresponding
      print, summary, and plot methods (to be entered later when
-	 problems have been solved).
+	  problems have been solved).
    * Removed sienaRIDynamics.Rd (ditto).
    * Some changes in sienaRIDynamics.r but not enough to make it work.
    * Duplication of outInv and outSqInv effects for two-mode networks

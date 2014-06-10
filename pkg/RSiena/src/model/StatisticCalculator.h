@@ -110,7 +110,7 @@ private:
 
 	// indicates whether actor statistics are needed
 	bool lneedActorStatistics;
-
+	
 	// indicates whether change contributions are needed
 	bool lcountStaticChangeContributions;
 
