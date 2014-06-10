@@ -13,10 +13,10 @@
 
 ##@siena.table siena07 Saves latex or html table of estimates
 ## for a sienaFit object
-siena.table <- function(x,type='tex',
+siena.table <- function(x, type='tex',
                         file=paste(deparse(substitute(x)),'.',type,sep=""),
-                        vertLine=TRUE,tstatPrint=FALSE,
-                        sig=FALSE,d=3)
+                        vertLine=TRUE, tstatPrint=FALSE,
+                        sig=FALSE, d=3)
 {
     tstat <- tstatPrint
     effects <- x$requestedEffects

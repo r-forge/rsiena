@@ -265,22 +265,22 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
         }
 		else
 		{
-        cvalue <- t(ov) %*% vav %*% ov
-        if (cvalue < 0) cvalue <- 0
-        if (sum(test) == 1)
-        {
-            if (vav > 0)
-                oneSided <- ov * sqrt(vav)
-            else
-                oneSided <- 0
-            if (!maxlike) oneSided <- - oneSided
-            ## change the sign for intuition for users
-        }
-        else
-        {
-            oneSided <- 0
-        }
-    }
+			cvalue <- t(ov) %*% vav %*% ov
+			if (cvalue < 0) cvalue <- 0
+			if (sum(test) == 1)
+			{
+				if (vav > 0)
+					oneSided <- ov * sqrt(vav)
+				else
+					oneSided <- 0
+				if (!maxlike) oneSided <- - oneSided
+				## change the sign for intuition for users
+			}
+			else
+			{
+				oneSided <- 0
+			}
+		}
     }
     list(cvalue=cvalue, oneSided=oneSided, covMatrix=v9)
 }

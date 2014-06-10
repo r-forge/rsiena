@@ -19,10 +19,10 @@ public:
 	int actor() const;
 	void next();
 	CommonNeighborIterator* clone() const;
-	
+
 private:
 	void skipMismatches();
-	
+
 	IncidentTieIterator liter1;
 	IncidentTieIterator liter2;
 

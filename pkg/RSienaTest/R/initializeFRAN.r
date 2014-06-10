@@ -192,6 +192,14 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             if (x$condname != "")
             {
                 z$condvarno <- match(x$condname, attr(data, "netnames"))
+				if (is.na(z$condvarno))
+				{
+					cat("\nNo match between variable name in algorithm object\n")
+					cat("and those in data set.\n")
+					cat("Algorithm object: ", x$condname, "\n")
+					cat("Data set: ", attr(data, "netnames"), "\n")
+					stop("Incorrect variable name.\n")
+				}
                 z$condname <- x$condname
             }
             else
@@ -277,8 +285,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         if (z$cconditional)
         {
             attr(f, "change") <-
-                sapply(f, function(xx)attr(xx$depvars[[z$condname]],
-                                           "distance"))
+                sapply(f, function(xx)as.integer(attr(xx$depvars[[z$condname]],
+                                           "distance")))
             attr(f,"condEffects") <- requestedEffects[z$condvar,]
             effcondvar <-
                 (1:nrow(effects))[effects$name==
@@ -546,6 +554,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
                  profileData, z$parallelTesting, x$modelType, z$simpleRates)
+# Here came an error 
+# Error: INTEGER() can only be applied to a 'integer', not a 'double'				 
     if (x$maxlike)
     {
         if (!initC)
@@ -1488,7 +1498,8 @@ unpackBipartite <- function(depvar, observations, compositionChange)
 ##@unpackBehavior siena07 Reformat data for C++
 unpackBehavior<- function(depvar, observations)
 {
-    beh <- depvar[, 1, ]
+    dimdv <- dim(depvar[,1,])
+    beh <- matrix(as.integer(depvar[, 1, ]), dimdv[1], dimdv[2])
     behmiss <- is.na(beh)
     allna <- apply(beh, 1, function(x)all(is.na(x)))
     modes <- attr(depvar, "modes")

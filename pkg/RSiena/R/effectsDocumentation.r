@@ -12,11 +12,11 @@
 ##@effectsDocumentation Documentation
 effectsDocumentation <- function(effects= NULL, type="html",
 	display=(type=="html"),
-     filename=ifelse(is.null(effects), "effects", deparse(substitute(effects))))
+	filename=ifelse(is.null(effects), "effects", deparse(substitute(effects))))
 {
 	if (is.null(effects))
 	{
-    x <- allEffects[, c("effectGroup", "effectName", "shortName",
+		x <- allEffects[, c("effectGroup", "effectName", "shortName",
                         "endowment", "interaction1", "interaction2",
                         "parm", "interactionType")]
 	}

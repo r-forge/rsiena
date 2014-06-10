@@ -1,11 +1,12 @@
 \name{sienaBayes}
 \alias{sienaBayes}
+\alias{sienaBayesFit}
 \alias{bayes}
+\alias{glueBayes}
 \title{A function for fitting Bayesian models}
-\description{A function to fit Bayesian models to Siena Data
-  objects, including fitting hierarchical random effects models
-  to sienaGroup data objects. Uses the function \code{\link{maxlikec}} for the MCMC part,
-  the Bayesian part is performed in R. Still under development.
+\description{A function to fit hierarchical Bayesian models random effects
+  to sienaGroup data objects. Uses the function \code{\link{maxlikec}} for the
+  MCMC part, the Bayesian part is performed in R. Still under development.
 }
 \usage{
 sienaBayes(data, effects, algo,  saveFreq=100,
@@ -18,10 +19,13 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     storeAll=FALSE, prevAns=NULL, prevBayes=NULL, silentstart = TRUE,
     plotit=FALSE, nbrNodes=1, clusterType=c("PSOCK", "FORK"),
     getDocumentation=FALSE)
+
+glueBayes(z1, z2)
 }
 \arguments{
-  \item{data}{A sienaData object as returned by \code{\link{sienaDataCreate}},
-    or a sienaGroup object as returned by \code{\link{sienaGroupCreate}}.}
+  \item{data}{A sienaGroup object as returned by \code{\link{sienaGroupCreate}}.
+    It is planned to also allow a \code{\link{siena}} data object as returned by
+    \code{\link{sienaDataCreate}.}}
   \item{effects}{sienaEffects object as returned by \code{\link{getEffects}(data)}.
     The effects indicated by its column \code{randomEffects} get
     effects that are varying across the groups.}
@@ -32,6 +36,8 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     are saved after each multiple of saveFreq iterations in the main phase,
     in a file with name PartialBayesResult.RData (if a file with this name
     exists, it will be overwritten).
+    This file contains an object z of class "sienaBayesFit",
+    with the provisional results.
     This is to guard against crashes or power failure.}
   \item{initgainGlobal}{Step sizes in initial searches for good parameter values
   across the groups.}
@@ -44,7 +50,7 @@ sienaBayes(data, effects, algo,  saveFreq=100,
   \item{priorMu}{Vector of length equal to the number of varying parameters.
    Prior mean of mu (global population mean); default:
    0, but data-dependent for basic rate parameters.}
-  \item{priorSigma}{Matrix of dimension equal to length of priorMu.
+  \item{priorSigma}{Square matrix of dimension equal to length of priorMu.
    Prior global population covariance matrix Sigma; default: identity matrix.}
   \item{priorDf}{Prior degrees of freedom for Sigma (global population
     covariance matrix); default: number of varying parameters + 2.}
@@ -66,7 +72,7 @@ sienaBayes(data, effects, algo,  saveFreq=100,
   during iterations, it is changed so that
   all correlations are at least delta.}
   \item{nwarm}{Number of iterations in the warm up phase.}
-  \item{nmain}{Number of iterations after warm up phase.}
+  \item{nmain}{Number of iterations in the main phase.}
   \item{nrunMHBatches}{Thinning ratio in MCMC process.}
   \item{lengthPhase1}{Only used for frequentist estimation:
    length of the first phase of the Robbins Monro algorithm.
@@ -80,8 +86,8 @@ sienaBayes(data, effects, algo,  saveFreq=100,
   \item{prevAns}{An object of class "sienaFit" as returned by
     \code{\link{siena07}}, from which scaling
     information (derivative matrix and standard deviation of the
-    deviations) will be extracted along with the latest version of the
-    parameters which will be used as the initial values, unless
+    deviations) will be extracted along with the parameters estimates
+    which will be used as the initial values, unless
     \code{algo} requests the use of standard initial values.
     Influences only the start of the initialization.
     If the results used as \code{prevAns} are a reasonable starting point,
@@ -91,8 +97,8 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     Initialization and warming phases are skipped. If this is given,
     the values of \code{prevAns}, \code{nwarm}, and the prior
     distributions are disregarded. All relevant parameters of the function
-	call should be identical. This is not completely checked, so errors
-	may occur if this is not the case.}
+    call should be identical. This is not completely checked, so errors
+    may occur if this is not the case.}
   \item{silentstart}{Boolean: whether to suppress most information
     to the console during the calculation of initial values.}
   \item{plotit}{Boolean: whether to plot parameters during the run.}
@@ -102,26 +108,35 @@ sienaBayes(data, effects, algo,  saveFreq=100,
      forking processes or not. (Only "PSOCK" can be used on Windows.)}
    \item{getDocumentation}{Flag to allow documentation of internal
     functions, not for use by users.}
+   \item{z1}{\code{sienaBayes} object.}
+   \item{z2}{\code{sienaBayes} object with the same data and model specification
+   as \code{z1}.}
 }
 \details{
-  This function is for Bayesian estimation of one group or
-  of multiple groups all having the same number of waves.
+  The function \code{sienaBayes} is for Bayesian estimation of one group or
+  of multiple groups all having the same number of waves and the same
+  model specification.
   It wraps Bayesian sampling of parameters around calls to
   \code{\link{maxlikec}}.\cr
-  Initial parameter values and the proposal covariance matrix
-  for Metropolis-Hastings steps for groupwise parameters are obtained
-  from, first, Method of Moments estimation of a parameter assumed to be
-  the same across the groups, followed by one subphase of the
-  Robbins-Monro algorithm for Method of Moments estimates for the groups
-  separately, with step size \code{initgain}.
-  The proposal covariance matrices then are scaled to achieve about
-  25 out of 100 acceptances of Bayes proposals after single MH steps.\cr
-  For the groupwise parameters normal distributions are assumed.
-  The prior distribution for the basic rate parameters is determined
-  in a data dependent way.\cr
+  For the groupwise parameters normal distributions are assumed with conjugate
+  priors. The prior distribution for the basic rate parameters is determined
+  in a data-dependent way. For the non-varying parameters,
+  a flat prior is assumed.\cr
+  The frequentist option currently is not supported (may be broken).\cr
+  The procedure consists of three parts: initialization, warming,
+  main phase.\cr
+  In the initializatiion phase, initial parameter values and the proposal
+  covariance matrix for Metropolis-Hastings steps for groupwise parameters
+  are obtained from, first, Method of Moments estimation of a parameter vector
+  assumed to be the same across the groups (in a multi-group estimation),
+  followed by one subphase of the Robbins-Monro algorithm for Method of
+  Moments estimates for the groups separately, with step size \code{initgain}.
+  The proposal covariance matrices then are scaled, in the
+  function 'improveMH', to achieve about 25 out of 100 acceptances of
+  Bayes proposals after single MH steps.\cr
   After initialization and scaling of the proposal covariance matrices,
   a warming phase is done of \code{nwarm} Bayesian proposals
-  each with a number of MH steps.
+  each with a number of MH steps, followed again by the function 'improveMH'.\cr
   Finally \code{nmain} repeats (of \code{nrunMHBatches} of a
   number of MH steps plus Bayesian proposals) are performed.
   In the warming as well as the final phase, the number of MH steps is
@@ -129,12 +144,21 @@ sienaBayes(data, effects, algo,  saveFreq=100,
   in the call of \code{sienaAlgorithmCreate} that created the algorithm object.
   If \code{plotit} is TRUE,
   plots are produced at intervals during the run showing progress. They
-  can be memory hogs, but the code may be useful for use on the returned
-  values.
+  can be memory hogs, but the code may be useful for studying the returned
+  values.\cr
+  The function is time-consuming. When starting to use it, it is advisable
+  to start with low values of \code{nmain} to explore computing time.\cr
+  When the procedure seems to diverge, and for very small groups, it is
+  advisable to use smaller values of the parameters \code{initgainGlobal}
+  and \code{initgainGroupwise}.\cr
+  \code{glueBayes(z1,z2)} combines two existing \code{sienaBayesFit} objects
+  with the same data and model specifications into one (this is not
+  checked). This is intended to be used when \code{z2} was produced
+  by calling \code{sienaBayes} with \code{prevAns=z1}.
 }
 \value{
-  Returns an object of class "sienaBayesFit".
-  This is a list containing, among other things:
+  \code{sienaBayes} as well as \code{glueBayes} return an object of class
+  \code{sienaBayesFit}. This is a list containing, among other things:
   \item{priorMu}{prior global population mean (not quite the same
   as corresponding input parameter)}
   \item{priorSigma}{prior global population covariance matrix
@@ -155,8 +179,6 @@ sienaBayes(data, effects, algo,  saveFreq=100,
   \item{ThinPosteriorSigma}{array of dimensions (\code{nwarm+nmain} iterations
   by parameters by parameters): sampled global covariance matrix
   of varying parameters}
-  \item{candidates}{if \code{storeAll=TRUE}: array of proposed parameters,
-  by group}
   \item{acceptances}{if \code{storeAll=TRUE}: matrix of booleans:
    whether the corresponding change to the parameters was accepted, by group}
   \item{MHacceptances}{if \code{storeAll=TRUE}:
@@ -175,7 +197,7 @@ sienaBayes(data, effects, algo,  saveFreq=100,
 }
 \author{Ruth Ripley, Johan Koskinen, Tom Snijders }
 \seealso{\code{\link{siena07}}, \code{\link{sienaGroupCreate}} \cr
-  There is a print method for sienaBayesFit objects,
+  There are print and summary methods for sienaBayesFit objects,
   \code{\link{print.sienaBayesFit}}.}
 \examples{
   Group1 <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))
@@ -199,6 +221,11 @@ sienaBayes(data, effects, algo,  saveFreq=100,
   bayes.model <- sienaBayes(FourAlgo, data = FourGroups,
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)
   summary(bayes.model)
+  bayes.nextModel <- sienaBayes(FourAlgo, data = FourGroups,
+        effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10,
+        prevBayes = bayes.model)
+  bayes.combinedModel <- glueBayes(bayes.model, bayes.nextModel)
+  summary(bayes.combinedModel)
 }
 }
 \keyword{models}

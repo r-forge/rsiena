@@ -21,11 +21,11 @@
 
 \usage{
 sienaGOF(sienaFitObject, auxiliaryFunction,
-         period=NULL, verbose=FALSE, join=TRUE, twoTailed=FALSE,
-         cluster=NULL, robust=FALSE, groupName="Data1",
-         varName, \dots)
+        period=NULL, verbose=FALSE, join=TRUE, twoTailed=FALSE,
+        cluster=NULL, robust=FALSE, groupName="Data1",
+        varName, \dots)
 \method{plot}{sienaGOF}(x, center=FALSE, scale=FALSE, violin=TRUE, key=NULL,
-          perc=.05, period=1, main=main, ylab=ylab, \dots)
+        perc=.05, period=1, main=main, ylab=ylab, \dots)
 descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL, period=1)
 }
 \arguments{
@@ -76,20 +76,20 @@ descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL, period=1
 \details{
  This function is used to assess the goodness of fit of a stochastic actor
  oriented model for an arbitrarily defined multidimensional auxiliary statistic.
- It operates basically by comparing the observed values, at the ends of 
+ It operates basically by comparing the observed values, at the ends of
  the periods, with the simulated values for the ends of the periods.
- The differences are assessed by combining the components of the auxiliary 
+ The differences are assessed by combining the components of the auxiliary
  statistic using the Mahalanobis distance.
- 
+
  To achieve comparability between simulated and observed dependent variables,
  variables that are missing in the data at the start or end of a period
  are replaced by 0 (for tie variables) or NA (for behavior variables).
  Tie variables that are structurally determined at the beginning of a period
  are used to replace observed values at the end of the period;
  tie variables that are structurally determined at the end, but not
- the beginning, of a period are used to replace 
+ the beginning, of a period are used to replace
  simulated values at the end of the period.
- 
+
  The auxiliary statistics documented in \code{\link{sienaGOF-auxiliary}}
  are calculated for the simulated dependent
  variables in Phase 3 of the estimation algorithm,

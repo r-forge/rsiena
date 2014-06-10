@@ -44,12 +44,12 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.1-274\cr
-Date: \tab 2014-04-26\cr
+Version: \tab 1.1-276\cr
+Date: \tab 2014-06-02\cr
 Depends: \tab R (>= 2.15.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
-		  xtable, tools\cr
+		  xtable, tools, utils\cr
 SystemRequirements: \tab GNU make, tcl/tk 8.5, Tktable\cr
 License: \tab GPL-2 \cr
 LazyData: \tab yes\cr
@@ -82,7 +82,7 @@ BuildResaveData: \tab no\cr
     edited by Kees van Montfort, Han Oud and Albert Satorra; Lawrence Erlbaum.
    \item Steglich, Christian E.G., Snijders, Tom A.B., and
     Pearson, Michael A. (2010). Dynamic networks and behavior:
-    Separating selection from influence. \emph{Sociological Methodology}, 
+    Separating selection from influence. \emph{Sociological Methodology},
 	40, 329-393.
    \item Further see the extensive manual accessible by the command\cr
     \code{RShowDoc("RSiena_Manual", package="RSiena")}\cr

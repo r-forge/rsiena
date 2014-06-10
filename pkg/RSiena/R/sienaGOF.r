@@ -817,7 +817,7 @@ changeToStructural <- function(X, S) {
 		}
 	X[is.na(X)] <- 0
 	drop0(X)
-	}
+}
 
 ##@changeToNewStructural sienaGOF Utility to change
 # values in X to structural values in SAfter
@@ -833,18 +833,17 @@ changeToNewStructural <- function(X, SBefore, SAfter) {
 			S1 <- (SA>SB)*Matrix(SAfter==11)
 # the 1* turns the logical into numeric
 			X <- 1*((X - S0 + S1)>=1)
-}
+		}
 	X[is.na(X)] <- 0
 	drop0(X)
-	}
-
+}
 
 ##@sparseMatrixExtraction sienaGOF Extracts simulated networks
 # This function returns the simulated network as a dgCMatrix;
 # this is the "standard" class for sparse numeric matrices
 # in the Matrix package. See the help file for "dgCMatrix-class".
 # Ties for ordered pairs with a missing value for wave=period or period+1
-#  are zeroed;
+# are zeroed;
 # note that this also is done in RSiena for calculation of target statistics.
 # To obtain equality between observed and simulated tie values
 # in the case of structurally determined values, the following is done.
@@ -932,7 +931,7 @@ sparseMatrixExtraction <-
 			returnValue <- changeToNewStructural(returnValue,
 				Matrix(obsData[[groupName]]$depvars[[varName]][,,period]),
 				Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1]))
-	}
+		}
 	}
 	## Zero missings (the 1* turns the logical into numeric):
 	1*drop0((returnValue - missings) > 0)
@@ -975,8 +974,8 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	sparseMatrixNetwork <- as(matrixNetwork, "dgTMatrix")
 # For dgTMatrix, slots i and j are the rows and columns,
 # numbered from 0 to dimension - 1. Slot x are the values.
-		# Actors in class network are numbered starting from 1.
-		# Hence 1 must be added to missings@i and missings@j.
+# Actors in class network are numbered starting from 1.
+# Hence 1 must be added to missings@i and missings@j.
 # sparseMatrixNetwork@x is a column of ones;
 # the 1 in the 3d column of cbind below is redundant
 # because of the default ignore.eval=TRUE in network.edgelist.
@@ -992,7 +991,7 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 					sparseMatrixNetwork@j + bipartiteOffset, 1),
 					emptyNetwork)
 	}
-  returnValue
+	returnValue
 }
 
 ##@behaviorExtraction sienaGOF Extracts simulated behavioral variables.

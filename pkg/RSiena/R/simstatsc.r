@@ -33,7 +33,7 @@ simstats0c <- function(z, x, data=NULL, effects=NULL, fromFiniteDiff=FALSE,
     {
         returnDeps <- z$returnDeps
     }
-	if (is.null(z$returnActorStatistics))
+    if (is.null(z$returnActorStatistics))
 	{
 		z$returnActorStatistics <- FALSE
 	}

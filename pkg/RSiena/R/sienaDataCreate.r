@@ -22,7 +22,7 @@ addAttributes.coCovar <- function(x, name, ...)
 	nonMissingCount <- sum(!is.na(x))
 	if (attr(x, "centered"))
 	{
-	x <- x - varmean
+		x <- x - varmean
 	}
 	else
 	{
@@ -65,7 +65,7 @@ addAttributes.varCovar <- function(x, name, ...)
 	attr(x, 'mean') <- varmean
 	if (attr(x, "centered"))
 	{
-	x <- x - varmean
+		x <- x - varmean
 	}
 	else
 	{
@@ -1216,21 +1216,20 @@ groupRangeAndSimilarityAndMean <- function(group)
 					attr(group[[i]]$vCovars[[j]], "nonMissingCount")
 		}
 		varmean <- vartotal / nonMissingCount
-#browser() # Hier kijken hoe je moet centreren in de groep.	
-		j <- match(atts$vCovars[covar], names(group[[1]]$vCovars))	
+#browser() # Hier kijken hoe je moet centreren in de groep.
+		j <- match(atts$vCovars[covar], names(group[[1]]$vCovars))
 		if (attr(group[[1]]$vCovars[[j]],"centered"))
 		{
-		for (i in 1:length(group))
-		{
-			j <- match(atts$vCovars[covar], names(group[[i]]$vCovars))
-			if (is.na(j))
+			for (i in 1:length(group))
 			{
+				j <- match(atts$vCovars[covar], names(group[[i]]$vCovars))
+				if (is.na(j))
+				{
 					stop("inconsistent actor covariate names")
+				}
+				group[[i]]$vCovars[[j]] <- group[[i]]$vCovars[[j]] -
+					varmean
 			}
-
-			group[[i]]$vCovars[[j]] <- group[[i]]$vCovars[[j]] -
-				varmean
-		}
 		}
 		simTotal <- 0
 		simCnt <- 0

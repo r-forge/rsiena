@@ -386,7 +386,7 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 				vector<double *> actorStatistics;
 				getActorStatistics(EFFECTSLIST, &Calculator, &actorStatistics);
 				int actors = pData->rDependentVariableData()[0]->n();
-				for(unsigned e = 0; e < actorStatistics.size(); e++)
+			    for(unsigned e = 0; e < actorStatistics.size(); e++)
 				{
 					SEXP actorStatsValues;
 					PROTECT(actorStatsValues = allocVector(REALSXP, actors));

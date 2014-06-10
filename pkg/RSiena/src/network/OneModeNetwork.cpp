@@ -206,7 +206,7 @@ CommonNeighborIterator OneModeNetwork::reciprocatedTies(int i,
 		int lowerBound) const {
 	this->checkSenderRange(i);
 	return CommonNeighborIterator(this->inTies(i, lowerBound),
-		this->outTies(i, lowerBound));
+			this->outTies(i, lowerBound));
 }
 
 

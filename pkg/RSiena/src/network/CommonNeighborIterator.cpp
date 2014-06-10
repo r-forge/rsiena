@@ -56,7 +56,7 @@ void CommonNeighborIterator::next() {
 
 	// Advance both iterators until they point to the next common actor
 	// or we run out of actors.
-	
+
 	this->liter1.next();
 	this->liter2.next();
 	this->skipMismatches();
@@ -85,7 +85,7 @@ void CommonNeighborIterator::skipMismatches() {
 		}
 		while (liter2.valid() && liter2.actor() < liter1.actor()) {
 			liter2.next();
-	}
+		}
 	}
 }
 
