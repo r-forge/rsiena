@@ -1,6 +1,7 @@
 useDynLib(RSienaTest)
 export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
-siena01Gui, siena07, sienaCompositionChange, sienaBayes, glueBayes, updateTheta,
+siena01Gui, siena07, sienaCompositionChange, sienaBayes, glueBayes,
+simpleBayesTest, multipleBayesTest, updateTheta,
 sienaCompositionChangeFromFile, sienaDataCreate, sienaDataCreateFromSession,
 sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
        sienaDependent, sienaNodeSet, xtable.sienaFit,
@@ -56,3 +57,5 @@ S3method(print, chains.data.frame)
 S3method(print, sienaBayesFit)
 S3method(summary, sienaBayesFit)
 S3method(print, summary.sienaBayesFit)
+S3method(print, multipleBayesTest)
+S3method(plot, multipleBayesTest)

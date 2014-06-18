@@ -46,11 +46,13 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   formed using \R scripts.}
   \item{\dots}{Arguments for the simulation function, see
     \code{\link{simstats0c}}:
-    usually, \code{data} and \code{effects}, as in the examples below;
-	possibly also \code{prevAns} if a previous reasonable
-	provisional estimate was obtained for a similar model;
-	possibly also \code{returnDeps} if the simulated dependent variables
-	(networks, behaviour) should be returned.}
+    usually, \code{data} and \code{effects}, as in the examples below;\cr
+    possibly also \code{prevAns} if a previous reasonable
+    provisional estimate was obtained for a similar model;\cr
+    possibly also \code{returnDeps} if the simulated dependent variables
+    (networks, behaviour) should be returned;\cr
+    possibly also \code{returnChains} if the simulated sequences (chains)
+    of ministeps should be returned; this will produce a very big file.}
 }
 \details{
  Runs a Robbins-Monro algorithm for parameter estimation using the three-phase
@@ -70,7 +72,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 \value{
   Returns an object of class \code{\link{sienaFit}}, some parts of which are:
   \item{OK}{Boolean indicating successful termination}
-  \item{termination}{Character string, values: "OK", "Error", or
+  \item{termination }{Character string, values: "OK", "Error", or
     "UserInterrupt". "UserInterrupt" indicates that the user asked for early
   termination before phase 3. }
   \item{f}{Various characteristics of the data and model definition.}
@@ -89,6 +91,11 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  \item{sims}{If \code{returnDeps} is \code{TRUE}:
     list of simulated dependent variables (networks, behaviour).
     Networks are given as a list of edgelists, one for each period.}
+ \item{chain}{If \code{returnChains} is \code{TRUE}:
+    list, or data frame, of simulated chains of ministeps.
+    The chain has the structure
+    \code{chain[[run]][[depvar]][[period]][[ministep]]}.
+    }
    \item{Phase3nits}{Number of iterations actually performed in phase 3.}
   Writes text output to the file named "projname.out", where projname is defined
   in the sienaAlgorithm object \code{x}.

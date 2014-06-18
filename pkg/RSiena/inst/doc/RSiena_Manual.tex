@@ -10772,17 +10772,20 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
-\item 2014-06-02 R-Forge Revision 276.
+\item 2014-06-18 R-Forge Revision 276.
 Changes in RSiena and RSienaTest:
 \begin{itemize}
 \item Higher write-to-screen frequency for batch operation of \sfn{siena07()}.
+\item Function \sfn{includeEffects()} now includes parameters \texttt{fix} and \texttt{test}.
 \item Various small bug corrections (see the \sfn{ChangeLog}).
 \end{itemize}
 
 Changes in RSienaTest:
 \begin{itemize}
 \item Changes in \sfn{sienaBayes()} and its print and summary methods.
+\item Corrected starting printing \sfn{sienaBayesFit} at \texttt{nfirst}.
 \item New function \sfn{glueBayes()} for combining \sfn{sienaBayesFit()} objects.
+\item Added functions \sfn{simpleBayesTest()} and \sfn{multipleBayesTest()}.
 \end{itemize}
 
 \item 2014-04-26 R-Forge Revision 274.

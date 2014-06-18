@@ -26,9 +26,11 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 		{
 			warning(paste("some information are multiply defined \n results will be based on 'theta', 'algorithm', and 'effects' stored in 'ans' (as 'ans$theta', 'ans$x', 'ans$effects')", sep=""))
 		}
-		if(sum(ans$effects$include==TRUE & (ans$effects$type =="endow"|ans$effects$type =="creation")) > 0){
+		if (sum(ans$effects$include==TRUE &
+			(ans$effects$type =="endow"|ans$effects$type =="creation")) > 0)
+			{
 			stop("sienaRI does not yet work for models that contain endowment or creation effects")
-		}
+			}
 		contributions <- getChangeContributions(algorithm = ans$x, data = data, effects = ans$effects)
 		RI <- expectedRelativeImportance(conts = contributions, effects = ans$effects, theta =ans$theta)
 	}else{
@@ -128,7 +130,9 @@ getChangeContributions <- function(algorithm, data, effects)
 	for(i in 1:length(myeffectsOrder)){
 		myeffects[[i]]<-tmpeffects[[myeffectsOrder[i]]]
 	}
-	ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects, parallelrun=TRUE, returnActorStatistics=FALSE, returnStaticChangeContributions=TRUE)
+	ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
+			parallelrun=TRUE, returnActorStatistics=FALSE,
+			returnStaticChangeContributions=TRUE)
 	ans
 }
 
@@ -169,12 +173,14 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 			currentDepEffs <- effects$name == currentDepName
 			effNumber <- sum(currentDepEffs)
 
-			RIs <- data.frame(row.names = effectIds[currentDepEffs])
-			RIs <- cbind(RIs, matrix(0, nrow=effNumber, ncol = actors))
+#			RIs <- data.frame(row.names = effectIds[currentDepEffs])
+#			RIs <- cbind(RIs, matrix(0, nrow=effNumber, ncol = actors))
 			entropies <- vector(mode="numeric", length = actors)
 
-			currentDepObjEffsNames <- paste(effects$shortName[currentDepEffs],effects$type[currentDepEffs],effects$interaction1[currentDepEffs],sep=".")
-			otherObjEffsNames <- paste(effects$shortName[!currentDepEffs],effects$type[!currentDepEffs],effects$interaction1[!currentDepEffs],sep=".")
+#			currentDepObjEffsNames <- paste(effects$shortName[currentDepEffs],
+#				effects$type[currentDepEffs],effects$interaction1[currentDepEffs],sep=".")
+#			otherObjEffsNames <- paste(effects$shortName[!currentDepEffs],
+#				effects$type[!currentDepEffs],effects$interaction1[!currentDepEffs],sep=".")
 
 			expectedRI <- list()
 			RIActors <- list()
@@ -183,10 +189,16 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 			for(w in 1:waves)
 			{
 				currentDepEffectContributions <- conts[[1]][[w]][currentDepEffs]
-				currentDepEffectContributions <- sapply(lapply(currentDepEffectContributions, unlist), matrix, nrow=actors, ncol=choices, byrow=TRUE, simplify="array")
+				currentDepEffectContributions <-
+					sapply(lapply(currentDepEffectContributions, unlist),
+						matrix, nrow=actors, ncol=choices, byrow=TRUE, simplify="array")
 
-				distributions <- apply(apply(currentDepEffectContributions, c(2,1), as.matrix), 3, calculateDistributions, theta[which(currentDepEffs)])
-				distributions <- lapply(apply(distributions, 2, list), function(x){matrix(x[[1]], nrow=effNumber+1, ncol=choices, byrow=F)})
+				distributions <-
+					apply(apply(currentDepEffectContributions, c(2,1), as.matrix),
+						3, calculateDistributions, theta[which(currentDepEffs)])
+				distributions <-
+					lapply(apply(distributions, 2, list),
+						function(x){matrix(x[[1]], nrow=effNumber+1, ncol=choices, byrow=F)})
 
 				entropy_vector <- unlist(lapply(distributions,function(x){entropy(x[1,])}))
 				## If one wishes another measure than the L^1-difference between distributions,
@@ -194,11 +206,11 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 				RIs_list <- lapply(distributions,function(x){L1D(x[1,], x[2:dim(x)[1],])})
 				RIs_matrix <-(matrix(unlist(RIs_list),nrow=effNumber, ncol=actors, byrow=F))
 
-				RIs <- RIs_matrix
+#				RIs <- RIs_matrix
 				entropies <- entropy_vector
 
-				RIActors[[w]] <- apply(RIs, 2, function(x){x/sum(x)})
-				absoluteSumActors[[w]] <- colSums(RIs)
+				RIActors[[w]] <- apply(RIs_matrix, 2, function(x){x/sum(x)})
+				absoluteSumActors[[w]] <- colSums(RIs_matrix)
 				entropyActors[[w]] <- entropies
 				expectedRI[[w]] <- rowSums(RIActors[[w]] )/dim(RIActors[[w]])[2]
 			}
@@ -212,7 +224,9 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 			{
 				RItmp$effectNames <- effectNames[currentDepEffs]
 			}else{
-				RItmp$effectNames <- paste(effectTypes[currentDepEffs], " ", effects$effectName[currentDepEffs], sep="")
+				RItmp$effectNames <-
+					paste(effectTypes[currentDepEffs], " ",
+						effects$effectName[currentDepEffs], sep="")
 			}
 			class(RItmp) <- "sienaRI"
 			if(depNumber == 1){
@@ -240,12 +254,14 @@ calculateDistributions <- function(effectContributions = NULL, theta = NULL)
 	choices <- dim(effectContributions)[2]
 	effectContributions[effectContributions=="NaN"]<-0
 	distributions <-  array(dim = c(effects+1,choices))
-	distributions[1,] <- exp(colSums(theta*effectContributions))/sum(exp(colSums(theta*effectContributions)))
+	distributions[1,] <-
+		exp(colSums(theta*effectContributions))/sum(exp(colSums(theta*effectContributions)))
 	for(eff in 1:effects)
 	{
 		t <- theta
 		t[eff] <- 0
-		distributions[eff+1,] <- exp(colSums(t*effectContributions))/sum(exp(colSums(t*effectContributions)))
+		distributions[eff+1,] <-
+			exp(colSums(t*effectContributions))/sum(exp(colSums(t*effectContributions)))
 	}
 	distributions
 }
@@ -332,7 +348,10 @@ print.summary.sienaRI <- function(x, ...)
 
 
 ##@plot.sienaRI Methods
-plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius = 1, width = NULL, height = NULL, legend = TRUE, legendColumns = NULL, legendHeight = NULL, cex.legend = NULL, cex.names = NULL, ...)
+plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE,
+	radius = 1, width = NULL, height = NULL, legend = TRUE,
+	legendColumns = NULL, legendHeight = NULL, cex.legend = NULL,
+	cex.names = NULL, ...)
 {
 	if (!inherits(x, "sienaRI"))
 	{
@@ -405,7 +424,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 	{
 		if(addPieChart)
 		{
-			width = (actors/3+2)*1
+			width = (actors/3+2)*0.9
 		}else{
 			width = (actors/3+1)*1
 		}
@@ -522,7 +541,9 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 			layoutMatrix <- matrix(c(1:(2*waves)), byrow= TRUE, ncol=2, nrow=waves)
 			layout(layoutMatrix,widths=c((actors/3),2),heights=rep(1,waves))
 		}
-		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(-1,0,-3,-2), xpd=T , cex = 0.75, no.readonly = TRUE )
+		par( oma = c( 0, 0, 2, 0 ),
+		mar = par()$mar+c(-1,0,-3,-2),
+ xpd=T , cex = 0.75, no.readonly = TRUE )
 	}else{
 		if(legend)
 		{
@@ -532,11 +553,16 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE, radius
 			layoutMatrix <- matrix(c(1:waves), byrow= TRUE, ncol=1, nrow=waves)
 			layout(layoutMatrix,widths=c((actors/3)),heights=rep(1,waves))
 		}
-		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(-1,0,-3,1), xpd=T , cex = 0.75, no.readonly = TRUE )
+		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(-1,0,-3,1), xpd=T ,
+				cex = 0.75, no.readonly = TRUE )
 	}
 	for(w in 1:waves)
 	{
-		barplot(cbind(x$RIActors[[w]], x$expectedRI[[w]]),space=c(rep(0.1,actors),1.5),width=c(rep(1,actors),1), beside =FALSE, yaxt = "n", xlab="Actor", cex.names = cex.names, ylab=paste("wave ", w, sep=""),border=bordergrey,  col = cl, names.arg=c(1:actors,"exp. rel. imp."))
+		barplot(cbind(x$RIActors[[w]], x$expectedRI[[w]]),
+			space=c(rep(0.1,actors),1.5),width=c(rep(1,actors),1),
+			beside =FALSE, yaxt = "n", xlab="Actor", cex.names = cex.names,
+			ylab=paste("wave ", w, sep=""),border=bordergrey,
+			col = cl, names.arg=c(1:actors,"exp. rel. imp."))
 		axis(2, at=c(0,0.25,0.5,0.75,1),labels=c("0","","0.5","","1"))
 		axis(4, at=c(0,0.25,0.5,0.75,1),labels=c("0","","0.5","","1"))
 		if(addPieChart)

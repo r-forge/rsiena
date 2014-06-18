@@ -1350,6 +1350,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
     z$print <- FALSE
     z$int <- 1
     z$int2 <- nbrNodes
+	z$mult <- algo$mult
     algo$cconditional <-  FALSE
     if (!is.null(algo$randomSeed))
     {
