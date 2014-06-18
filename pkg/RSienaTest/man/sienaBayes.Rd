@@ -196,7 +196,7 @@ glueBayes(z1, z2)
   \emph{Journal of Statistical Planning and Inference}, 13, 3930-3938.
 }
 \author{Ruth Ripley, Johan Koskinen, Tom Snijders }
-\seealso{\code{\link{siena07}}, \code{\link{sienaGroupCreate}} \cr
+\seealso{\code{\link{siena07}}, \code{\link{sienaGroupCreate}}, \code{\link{bayesTest}}\cr
   There are print and summary methods for sienaBayesFit objects,
   \code{\link{print.sienaBayesFit}}.}
 \examples{

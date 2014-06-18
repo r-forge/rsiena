@@ -6,7 +6,7 @@
 # * File: sienaRIDynamics.r
 # *
 # * Description: Used to determine, print, and plots relative importances of effects
-# * in sequences of simulated micro-steps 
+# * in sequences of simulated micro-steps
 # *****************************************************************************/
 
 ##@sienaRIDynamics. Use as RSiena:::sienaRIDynamics()
@@ -51,7 +51,7 @@ sienaRIDynamics <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=
 				warning("some information are multiply defined \n results will be based on 'theta', 'algorithm', and 'effects' stored in 'ans' (as 'ans$theta', 'ans$x', 'ans$effects')")
 			}
 			effs <- ans$effects
-		}	
+		}
 		if(!is.null(intervalsPerPeriod))
 		{
 			if(is.numeric(intervalsPerPeriod))
@@ -66,7 +66,7 @@ sienaRIDynamics <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=
 		{
 			intervalsPerPeriod <- 10
 		}
-		RIValues <- calculateRIDynamics(data = data, theta= c(ans$rate,ans$theta), algorithm = ans$x,  effects = effs, depvar = currentNetName, intervalsPerPeriod=intervalsPerPeriod)	
+		RIValues <- calculateRIDynamics(data = data, theta= c(ans$rate,ans$theta), algorithm = ans$x,  effects = effs, depvar = currentNetName, intervalsPerPeriod=intervalsPerPeriod)
 	}else{
 		if (!inherits(algorithm, "sienaAlgorithm"))
 		{
@@ -76,7 +76,7 @@ sienaRIDynamics <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=
 		if (!inherits(effects, "sienaEffects"))
 		{
 			stop("effects is not a legitimate Siena effects object")
-		}		
+		}
 		effs <- effects
 		if(!is.numeric(theta))
 		{
@@ -86,9 +86,9 @@ sienaRIDynamics <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=
 		{
 			if(length(theta) == sum(effs$include==TRUE & effs$type!="rate"))
 			{
-				stop("vector of model parameters has wrong dimension, maybe rate parameters are missing")											
+				stop("vector of model parameters has wrong dimension, maybe rate parameters are missing")
 			}
-			stop("theta is not a legitimate parameter vector \n number of parameters has to match number of effects")								
+			stop("theta is not a legitimate parameter vector \n number of parameters has to match number of effects")
 		}
 		paras <- theta
 		if(!is.null(intervalsPerPeriod))
@@ -122,7 +122,7 @@ calculateRIDynamics <- function(data=NULL, theta=NULL, algorithm=NULL, effects=N
 	z$print <- FALSE
 	z$Phase <- 3
 	z <- initializeFRAN(z, x, data, effects, prevAns=NULL, initC=FALSE, returnDeps=FALSE)
-	z$returnChangeContributions <- TRUE	
+	z$returnChangeContributions <- TRUE
 	z$theta <- theta
 	if (!is.null(x$randomSeed))
 	{
@@ -137,38 +137,41 @@ calculateRIDynamics <- function(data=NULL, theta=NULL, algorithm=NULL, effects=N
 		}
 	}
 	chains <- x$n3
-	periods <- data$observation-1 
+	periods <- data$observation-1
 	effects <- effects[effects$include==TRUE,]
 	noRate <- effects$type != "rate"
 	thetaNoRate <- theta[noRate]
 	effectNames <- effects$shortName[noRate]
 	effectTypes <- effects$type[noRate]
-	networkName <- effects$name[noRate]
+#	networkName <- effects$name[noRate]
 	networkInteraction <- effects$interaction1[noRate]
-	effectIds <- paste(effectNames,effectTypes,networkInteraction, sep = ".") 
+	effectIds <- paste(effectNames,effectTypes,networkInteraction, sep = ".")
 	currentNetObjEffs <- effects$name[noRate] == currentNetName
-# The old code leading to a crash:
-#	RIintervalValues <- list()
-#	for(period in 1:periods)
-#	{
-#		RIintervalValues[[period]] <- data.frame(row.names = effectIds[currentNetObjEffs])
-#	}			
+# The old code leading to a crash...
+	RIintervalValues <- list()
+# ...threfore, the following line is added
+	blanks <- matrix(0, sum(currentNetObjEffs),intervalsPerPeriod)
+	for(period in 1:periods)
+	{
+		RIintervalValues[[period]] <- data.frame(blanks, row.names = effectIds[currentNetObjEffs])
+	}
 	for (chain in (1:chains))
 	{
-cat("The following line leads to an error\n")
-browser()
-		ans <- z$FRAN(z, x)	
+#cat("The following line leads to an error\n")
+#browser()
+		ans <- z$FRAN(z, x)
 		for(period in 1:periods)
 		{
 			microSteps <- length(ans$changeContributions[[1]][[period]])
 			stepsPerInterval <- microSteps/intervalsPerPeriod
-# new code TS (7 lines):			
-			blanks <- matrix(NA, sum(currentNetObjEffs), 
-									ceiling(microSteps/stepsPerInterval))
-			RIintervalValues <- 
-						as.list(rep(data.frame(blanks, 
-							row.names = effectIds[currentNetObjEffs]), periods))
-			blanks <- matrix(NA, sum(currentNetObjEffs), microSteps)
+# Tom's new code TS (7 lines).... Natalie slightly modified the next 4 lines
+# and moved them one loop higher (out of the "chains"-loop)
+#			blanks <- matrix(NA, sum(currentNetObjEffs),
+#									ceiling(microSteps/stepsPerInterval))
+#			RIintervalValues <-
+#						as.list(rep(data.frame(blanks,
+#							row.names = effectIds[currentNetObjEffs]), periods))
+			blanks <- matrix(0, sum(currentNetObjEffs), intervalsPerPeriod)
 			RItmp <- data.frame(blanks, row.names = effectIds[currentNetObjEffs])
 			interval <- 1
 			stepsInIntervalCounter <- 0
@@ -178,53 +181,53 @@ browser()
 				if(attr(ans$changeContributions[[1]][[period]][[microStep]],
 												"networkName")==currentNetName)
 				{
-					stepsInIntervalCounter <- stepsInIntervalCounter + 1 
-					## distributions[1,] contains 
+					stepsInIntervalCounter <- stepsInIntervalCounter + 1
+					## distributions[1,] contains
 					## the probabilities of the available choices in this micro-step
-					## distributions[2,],distributions[3,], ...contains 
+					## distributions[2,],distributions[3,],distributions[4,], ...contains
 					## the probabilities of the available choices
-					## if the parameter of the second, third, ... effects is set to zero.
+					## if the parameter of the first, second, third ... effects is set to zero.
 					distributions <- calculateDistributions(
-						ans$changeContributions[[1]][[period]][[microStep]], 
+						ans$changeContributions[[1]][[period]][[microStep]],
 						thetaNoRate[currentNetObjEffs])
-					## If one wishes another measure 
+					## If one wishes another measure
 					## than the L^1-difference between distributions,
-					## here is the right place 
+					## here is the right place
 					## to call some new function instead of "L1D".
-					RItmp[,stepsInIntervalCounter] <- 
-						standardize(L1D(distributions[1,], 
-									distributions[2:dim(distributions)[1],]))         
+					RItmp[,stepsInIntervalCounter] <-
+						standardize(L1D(distributions[1,],
+									distributions[2:dim(distributions)[1],]))
 				}
-				if (microStep > 
-						interval * stepsPerInterval || microStep == microSteps) 
+				if (microStep >
+						interval * stepsPerInterval || microStep == microSteps)
 				{
 					if(chain == 1)
 					{
-						RIintervalValues[[period]][,interval] <- 
+						RIintervalValues[[period]][,interval] <-
 										rowSums(RItmp)/length(RItmp)
 					}
 					else
 					{
-						RIintervalValues[[period]][,interval] <- 
-							RIintervalValues[[period]][,interval] + 
+						RIintervalValues[[period]][,interval] <-
+							RIintervalValues[[period]][,interval] +
 											rowSums(RItmp)/length(RItmp)
 					}
 					interval <- interval + 1
 					stepsInIntervalCounter <- 0
 				}
 			}
-		}		
+		}
 	}
 	for(period in 1:periods)
-	{  
+	{
 		RIintervalValues[[period]] <- RIintervalValues[[period]]/chains
 	}
 	RIDynamics <- NULL
 	RIDynamics$intervalValues <-RIintervalValues
 	RIDynamics$dependentVariable <- currentNetName
-	RIDynamics$effectNames <- paste(effectTypes[currentNetObjEffs], " ", 
+	RIDynamics$effectNames <- paste(effectTypes[currentNetObjEffs], " ",
 						(effects$effectName[noRate])[currentNetObjEffs], sep="")
-	class(RIDynamics) <- "sienaRIDynamics"	
+	class(RIDynamics) <- "sienaRIDynamics"
 	RIDynamics
 }
 
@@ -232,7 +235,7 @@ standardize <- function(values = NULL)
 {
 	newValues <- values/sum(values)
 	newValues
-} 
+}
 
 
 ##@print.sienaRIDynamics Methods
@@ -261,8 +264,8 @@ print.sienaRIDynamics <- function(x, ...){
 			if(col == 5)
 			{
 				line2 <- paste(line2, rep('\n',effs), sep="")
-				cat(as.matrix(line1),'\n \n', sep='')    
-				cat(as.matrix(line2),'\n', sep='') 
+				cat(as.matrix(line1),'\n \n', sep='')
+				cat(as.matrix(line2),'\n', sep='')
 				line1 <- paste(format("", width =52), sep="")
 				line2 <- paste(format(1:effs,width=3), '. ', format(x$effectNames, width = 45),sep="")
 				col<-0
@@ -271,8 +274,8 @@ print.sienaRIDynamics <- function(x, ...){
 		if(col>0)
 		{
 			line2 <- paste(line2, rep('\n',effs), sep="")
-			cat(as.matrix(line1),'\n \n', sep='')    
-			cat(as.matrix(line2),'\n', sep='') 
+			cat(as.matrix(line1),'\n \n', sep='')
+			cat(as.matrix(line2),'\n', sep='')
 		}
 	}
 	invisible(x)
@@ -301,8 +304,10 @@ print.summary.sienaRIDynamics <- function(x, ...)
 
 
 ##@plot.sienaRIDynamics Methods
-plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, ylim=NULL, width = NULL, height = NULL, legend = TRUE, legendColumns = NULL, legendHeight = NULL, cex.legend = NULL, ...)
-{ 
+plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL,
+			ylim=NULL, width = NULL, height = NULL, legend = TRUE,
+			legendColumns = NULL, legendHeight = NULL, cex.legend = NULL, ...)
+{
 	if(!inherits(x, "sienaRIDynamics"))
 	{
 		stop("x is not of class 'sienaRIDynamics' ")
@@ -313,7 +318,9 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 		{
 			warning("staticRI is not of class 'sienaRI' and is therefore ignored")
 			staticValues <- NULL
-		}else{	
+		}
+		else
+		{
 			if(staticRI$dependentVariable != x$dependentVariable)
 			{
 				warning("staticRI does not correspond to x and is therefore ignored,\n staticRI and x do not refer to the same dependent variable")
@@ -368,7 +375,7 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 		if(is.null(legendHeight))
 		{
 			legendHeight <- 1
-		}   
+		}
 	}
 	if(!is.null(height))
 	{
@@ -389,7 +396,7 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 			height <- 3
 		}
 	}
-	
+
 	if(!is.null(width))
 	{
 		if(is.numeric(width))
@@ -404,7 +411,7 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 	{
 		width <- 8
 	}
-	
+
 	if(!is.null(cex.legend))
 	{
 		if(is.numeric(cex.legend))
@@ -419,7 +426,7 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 	{
 		cex.legend <- 1
 	}
-	
+
 	createPdf = FALSE
 	if(!is.null(file))
 	{
@@ -435,7 +442,7 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 	{
 		windows(width = width, height = height)
 	}
-	
+
 	if(!is.null(col))
 	{
 		cl <- col
@@ -467,10 +474,10 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 			pink <- rgb(240,2,127,alph, maxColorValue = 255)
 			brown <- rgb(191,91,23,alph, maxColorValue = 255)
 			cl <- c(cl,green,lila,orange,yellow,blue,lightgray,darkgray,gray,pink,brown)
-		}	
+		}
 	}
-	bordergrey <-"gray25"
-	values <- x$intervalValues	
+#	bordergrey <-"gray25"
+	values <- x$intervalValues
 	periods <- length(values)
 	effectNames <- x$effectNames
 	effectNumber <- length(effectNames)
@@ -484,20 +491,24 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 	}
 	if(legend)
 	{
-		layout(rbind(1:periods, rep(periods+1,periods)),widths=rep(4, periods),heights=c(3,legendHeight))
+		layout(rbind(1:periods, rep(periods+1,periods)),
+				widths=rep(4, periods),heights=c(3,legendHeight))
 	}else{
 		layout(rbind(1:periods),widths=rep(4, periods),heights=c(3))
 	}
-	par( oma = c( 1, 3, 1, 3 ),mar = par()$mar+c(-5,-4.1,-4,-2.1), xpd=T ) 
+	par( oma = c( 1, 3, 1, 3 ),mar = par()$mar+c(-5,-4.1,-4,-2.1), xpd=T )
 	for(period in 1:periods){
 		timeseries<-ts(t(values[[period]]))
-		plot.ts(timeseries, plot.type = "single",  col = cl, lty = lineTypes, lwd = rep(1.5,effectNumber), bty = "n",xaxt = "n",yaxt = "n", ylab ="", xlab = "", ylim = ylim)
+		plot.ts(timeseries, plot.type = "single",  col = cl,
+				lty = lineTypes, lwd = rep(1.5,effectNumber), bty = "n",
+				xaxt = "n",yaxt = "n", ylab ="", xlab = "", ylim = ylim)
 		for(eff in 1:effectNumber)
 		{
 			points(ts(t(values[[period]]))[,eff], col = cl[eff], type = "p", pch = 20)
 			if(!is.null(staticValues))
 			{
-				points(xy.coords(1,staticValues[[period]][eff]),col = cl[eff], type = "p", pch = 1, cex = 1.75)
+				points(xy.coords(1,staticValues[[period]][eff]),col = cl[eff],
+						type = "p", pch = 1, cex = 1.75)
 			}
 		}
 		ax <- ((ylim[1]*10):(ylim[2]*10))/10
@@ -519,8 +530,9 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL, yl
 	}
 	if(legend)
 	{
-		plot(c(0,1), c(0,1), col=rgb(0,0,0,0),axes=FALSE,  ylab = "", xlab = "")   
-		legend(0, 1, legendNames, col = cl[1:effectNumber], lwd = 2, lty = lineTypes, ncol = legendColumns, bty = "n",cex=cex.legend)
+		plot(c(0,1), c(0,1), col=rgb(0,0,0,0),axes=FALSE,  ylab = "", xlab = "")
+		legend(0, 1, legendNames, col = cl[1:effectNumber], lwd = 2,
+				lty = lineTypes, ncol = legendColumns, bty = "n",cex=cex.legend)
 	}
 	if(createPdf)
 	{

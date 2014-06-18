@@ -520,98 +520,114 @@ print.sienaAlgorithm <- function(x, ...)
 }
 
 ##@averageTheta.last Miscellaneous
-averageTheta.last <- function(z, groupOnly=0)
+averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
+	if (nfirst > ntot)
+	{
+		stop('Sample did not come beyond warming')
+	}
 	thetaMean <- rep(NA, z$pp)
 	for (group in 1:z$nGroup)
 	{
 		thetaMean[z$ratePositions[[group]]] <- 	colMeans(
-				z$ThinParameters[(z$nwarm+1):ntot,
+				z$ThinParameters[nfirst:ntot,
 				group, !z$generalParametersInGroup, drop=FALSE], na.rm=TRUE)
 	}
 	if (groupOnly != 0)
 	{
 		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinParameters[(z$nwarm+1):ntot, groupOnly,
+				z$ThinParameters[(nfirst):ntot, groupOnly,
 				z$varyingGeneralParametersInGroup, drop=FALSE], na.rm=TRUE)
 	}
 	else
 	{
 	thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinPosteriorMu[(z$nwarm+1):ntot,
+				z$ThinPosteriorMu[(nfirst):ntot,
 				z$objectiveInVarying, drop=FALSE], na.rm=TRUE)
 	}
 	if (any(z$set2))
 	{
 		thetaMean[z$set2] <-
-			colMeans(z$ThinPosteriorEta[(z$nwarm+1):ntot,, drop=FALSE]
+			colMeans(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE]
 			, na.rm=TRUE)
 	}
 	thetaMean
 }
 
 ##@sdTheta.last Miscellaneous
-sdTheta.last <- function(z, groupOnly=0)
+sdTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
+	if (nfirst >= ntot-1)
+	{
+		stop('Sample did not come beyond warming')
+	}
 	sdTheta<- rep(NA, z$pp)
 	for (group in 1:z$nGroup)
 	{
 		sdTheta[z$ratePositions[[group]]] <- apply(
-					z$ThinParameters[(z$nwarm+1):ntot,
+					z$ThinParameters[nfirst:ntot,
 					group, !z$generalParametersInGroup, drop=FALSE], 3, sd)
 	}
 	if (groupOnly != 0)
 	{
 		sdTheta[(z$set1)&(!z$basicRate)] <- apply(
-				z$ThinParameters[(z$nwarm+1):ntot, groupOnly,
+				z$ThinParameters[nfirst:ntot, groupOnly,
 				z$varyingGeneralParametersInGroup, drop=FALSE], 3, sd)
 	}
 	else
 	{
 		sdTheta[(z$set1)&(!z$basicRate)] <- apply(
-				z$ThinPosteriorMu[(z$nwarm+1):ntot,
+				z$ThinPosteriorMu[nfirst:ntot,
 				z$objectiveInVarying, drop=FALSE], 2, sd)
 	}
 	if (any(z$set2))
 	{
 		sdTheta[z$set2] <-
-			apply(z$ThinPosteriorEta[(z$nwarm+1):ntot,, drop=FALSE],
+			apply(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE],
 			   2, sd)
 	}
 	sdTheta
 }
 
 ##@credValues Miscellaneous
-credValues <- function(z, groupOnly=0)
+credValues <- function(z, theProbs = c(0.025,0.975), tested = 0,
+						groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
+	if (nfirst >= ntot-1)
+	{
+		stop('Sample did not come beyond warming')
+	}
 	credVals <- matrix(NA, length(z$set1), 3)
 # But for the rate parameters NAs will remain.
-	cvp <- function(x){c(quantile(x, probs = c(0.025,0.975)), 1-(ecdf(x))(0))}
+	cvp <- function(x, test0){c(quantile(x, probs=theProbs), 1-(ecdf(x))(test0))}
 	if (groupOnly != 0)
 	{
 		credVals[(z$set1)&(!z$basicRate), ] <- t(apply(
-				z$ThinParameters[(z$nwarm+1):ntot, groupOnly,
-				z$varyingGeneralParametersInGroup, drop=FALSE], 3, cvp))
+				z$ThinParameters[nfirst:ntot, groupOnly,
+				z$varyingGeneralParametersInGroup, drop=FALSE], 3,
+						cvp, test0 = tested))
 	}
 	else
 	{
-		credVals[(z$set1)&(!z$basicRate), ] <- t(apply(
-				z$ThinPosteriorMu[(z$nwarm+1):ntot,
-				z$objectiveInVarying, drop=FALSE], 2, cvp))
+		credVals[(z$set1)&(!z$basicRate), ] <-
+		t(apply(
+				z$ThinPosteriorMu[nfirst:ntot,
+				z$objectiveInVarying, drop=FALSE], 2, cvp, test0 = tested))
 	}
 	if (any(z$set2))
 	{
 		credVals[z$set2, ] <-
-			t(apply(z$ThinPosteriorEta[(z$nwarm+1):ntot,, drop=FALSE], 2, cvp))
+			t(apply(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE], 2,
+					cvp, test0 = tested))
 	}
 	credVals
 }
 
 ##@sienaFitThetaTable Miscellaneous
-sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0)
+sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfirst)
 {
     theEffects <- x$effects
 # abcd	here it was not OK when interactions had creation/endowment effects
@@ -726,7 +742,7 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0)
 	}
 	if (fromBayes)
 	{
-		theta <- averageTheta.last(x, groupOnly)
+		theta <- averageTheta.last(x, groupOnly, nfirst = nfirst)
 	}
 	else
 	{
@@ -759,9 +775,9 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0)
 
 	if (fromBayes)
 	{
-		mydf[nrates + (1:xp), 'se' ] <- sdTheta.last(x, groupOnly)
+		mydf[nrates + (1:xp), 'se' ] <- sdTheta.last(x, groupOnly, nfirst=nfirst)
 		mydf[nrates + (1:xp), 'random' ] <- NA
-		credVal <- credValues(x, groupOnly)
+		credVal <- credValues(x, groupOnly = groupOnly, nfirst = nfirst)
 		mydf[nrates + (1:xp), 'cFrom' ] <- credVal[,1]
 		mydf[nrates + (1:xp), 'cTo' ] <- credVal[,2]
 		mydf[nrates + (1:xp), 'p' ] <- credVal[,3]
@@ -892,7 +908,7 @@ print.chains.data.frame <- function(x, ...)
 }
 
 ##@maketemp Methods
-makeTemp <- function(x, groupOnly=0, ...)
+makeTemp <- function(x, groupOnly=0, nfirst, ...)
 {
 # This reproduces a part of sienaFit but with Bayesian headings;
 # for use in print.sienaBayesFit and summary.sienaBayesFit
@@ -901,16 +917,19 @@ makeTemp <- function(x, groupOnly=0, ...)
 			x$requestedEffects[x$requestedEffects$groupName==name1,]
 		x$pp <- length(x$theta)
 		x$fixed <- x$fixed[x$effects$groupName==name1]
-		tmp <- sienaFitThetaTable(x, fromBayes=TRUE, groupOnly=groupOnly)
+		if (is.null(nfirst))
+		{
+			nfirst <- x$nwarm + 1
+		}
+		tmp <- sienaFitThetaTable(x, fromBayes=TRUE, groupOnly=groupOnly, nfirst=nfirst)
 		mydf <- tmp$mydf
 		mymat <- as.matrix(mydf[,names(mydf)!="tstat"])
-		mynames <- colnames(mymat)
+#		mynames <- colnames(mymat)
 #		mymat <- cbind(mymat, rep.int(NA, dim(mymat)[1]))
 #		mymat <- cbind(mymat, matrix(NA, dim(mymat)[1], 4))
 #		colnames(mymat) <- c(mynames, 'random', 'credFrom','credTo', 'p')
 		mymat[, 'value'] <- format(round(mydf$value, digits=4))
 		mymat[, 'se'] <- format(round(mydf$se, digits=4))
-#		x$basicRate
 		mymat[x$set1, 'random']      <- "   +   "
 		mymat[x$set2, 'random']      <- "   -   "
 		mymat[x$basicRate, 'random'] <- "       "
@@ -1022,7 +1041,7 @@ print.sienaBayesFit <- function(x, nfirst=NULL, ...)
 				stop("This object did not come beyond the warming phase.\n")
 			}
 		}
-		tmps <- makeTemp(x)
+		tmps <- makeTemp(x, nfirst=nfirst)
 		tmp <- tmps[[1]]
 		tmp1 <- tmps[[2]]
 		addtorow <- tmp$addtorow
@@ -1141,7 +1160,11 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 		cat("\nBasic rates parameters are treated as incidental parameters.\n\n")
 	}
 	cat("\nAlgorithm specifications were nwarm =",x$nwarm,", nmain =", x$nmain,
-	    ", nrunMHBatches =", x$nrunMHBatches, ".\n")
+	    ", nrunMHBatches =", x$nrunMHBatches, ", mult =", x$mult, ".\n")
+	if (!is.null(nfirst))
+	{
+		cat("For the results, nwarm is superseded by nfirst = ", nfirst, ".")
+	}
 	if (ntot < x$nwarm + x$nmain)
 	{
 		cat("This object resulted from an intermediate save, after",
@@ -1176,7 +1199,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 		for (h in 1:length(x$f$groupNames))
 		{
 			cat("\n", x$f$groupNames[h], "\n")
-			tmps <- makeTemp(x, groupOnly=h)
+			tmps <- makeTemp(x, groupOnly=h, nfirst=nfirst)
 			tmp <- tmps[[1]]
 			tmp1 <- tmps[[2]]
 			addtorow <- tmp$addtorow

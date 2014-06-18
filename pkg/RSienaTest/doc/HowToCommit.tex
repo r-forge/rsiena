@@ -1,0 +1,174 @@
+\documentclass[12pt, a4paper]{article}
+%\usepackage[pdftex,dvipsnames]{color}
+\usepackage{graphicx}
+\usepackage{times}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\usepackage[pdfstartview={},
+            pdftex,
+            bookmarks=true,
+            bookmarksopen=true,
+            bookmarksnumbered=true,
+            ]{hyperref}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abso}[1]{\;\mid#1\mid\;}
+\renewcommand{\=}{\,=\,}
+\newcommand{\+}{\,+\,}
+% ----------------------------------------------------------------
+\newcommand{\remark}[1]{\par\noindent{\color[named]{ProcessBlue}#1}\par}
+\newcommand{\mcc}[2]{\multicolumn{#1}{c}{#2}}
+\newcommand{\mcp}[2]{\multicolumn{#1}{c|}{#2}}
+\newcommand{\nm}[1]{\textsf{\small #1}}
+\newcommand{\nnm}[1]{\textsf{\small\textit{#1}}}
+\newcommand{\nmm}[1]{\nnm{#1}}
+\newcommand{\sfn}[1]{\textbf{\texttt{#1}}}
+\newcommand{\bs}{\backslash}
+
+\newcommand{\rs}{{\sf RSiena}}
+\newcommand{\RS}{{\sf RSiena }}
+\newcommand{\rst}{{\sf RSienaTest}}
+\newcommand{\RST}{{\sf RSienaTest }}
+
+% no labels in list of references:
+\makeatletter
+\renewcommand\@biblabel{}
+\makeatother
+
+\hyphenation{Snij-ders Duijn DataSpecification dataspecification
+  dependentvariable ModelSpecification}
+
+\makeatother
+
+
+\renewcommand{\baselinestretch}{1.0} %% For line spacing.
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus1ex}
+\raggedright
+\oddsidemargin 0in
+\evensidemargin 0in
+\textwidth 6.25in
+\textheight 9.9in
+\topmargin -2cm
+\begin{document}
+
+\title{\vspace*{-0.5cm} Notes for Committing RSiena to R-Forge}
+\author{Tom Snijders)}
+\date{}
+\maketitle
+
+\centerline{\emph{\today}}
+\bigskip
+
+This is a short set of guidelines for committing the RSiena and RSienaTest packages
+to R-Forge. It is an excerpt of the \emph{Notes for Developers of RSiena}
+(file \texttt{RSienaDeveloper}). More complete information can be found there.
+Both of these files are in the directory \texttt{RSienaTest{$\bs$}doc}
+in the package source.
+
+It is wise to have a look at \emph{Notes for Developers of RSiena}.
+For anything in this document that you don't understand, it may be illuminating.
+Further, its section on personal/private keys was useful to me.
+
+
+\section{Basics}
+
+The connection to R-Forge is made by TortoiseSVN.
+To check and compile the package, you need the most recent version of R
+and RTools. Note that RTools must be in the path of your computer.
+
+\section{The code; correspondence between packages}
+
+\emph{Notes for Developers of RSiena} mentions coding standards for R as well as C++.
+Try to respect them.
+Add comments in your code and use helpful names (in camel case).
+
+Keep the line endings in all \texttt{.tex} files intact (i.e., do not let
+an editor take away the hard returns).
+
+The correspondence between \RS and \RST should be kept intact:
+\begin{enumerate}
+\item Both packages should have the same version number, \texttt{ChangeLog}, and
+     manual; this means that if (e.g.) you commit a new version of \RST only,
+     you also need to change the version number and \texttt{ChangeLog} of \rs,
+     and see to it that the files \texttt{RSiena\_Manual.tex},\ \texttt{RSiena\_Manual.pdf},
+     and \texttt{RSiena.bib} in directory \texttt{$\bs$inst$\bs$doc} are identical
+     in both packages.
+\item Preferably, the number of the R-Forge revision (e.g., 276) should
+     be the same as the last number in the \RS version number (e.g., 1.1-276).
+     Evidently, this will lead to questions when moving to version 1.2-xxx etc.
+     We shall deal with those when the time comes.
+\item The moment when things are moved from \RST to \RS is up to the programmers.
+     Some things, certainly error corrections, should be changed in both simultaneously.
+     When we are unsure about a change in the code, it may be better to first
+     make it in \RST and then decide later, after having obtained more experience,
+     about moving it to \rs.
+\item For aligning files in \RS with those in \RST I make use (on my Windows machine)
+     of WinMerge (it's free and useful).
+\end{enumerate}
+
+The internal structure of both packages should remain intact:
+\begin{enumerate}
+\item Change the version number in the \texttt{DESCRIPTION} file and in
+      \texttt{$\bs$man$\bs$RSiena-package.Rd};
+      add your changes to the top of the \texttt{ChangeLog} and,
+      in so far as they are noticeable
+      to users, to the top of appendix B in the manual.
+\item When new effects are added, these \underline{must} be added to
+      Chapter 12 of the manual.
+\item Also new other functionalities, if any, should be added to the manual,
+      unless they are clear enough from the help pages.
+\item When new effects are added, or existing ones are ported
+      to new types of variable (e.g., one-mode to two-mode),
+      these must also be added to the file
+      \texttt{$\bs$inst$\bs$doc$\bs$effects.pdf}. This file is constructed by running
+      \sfn{effectsDocumentation(type="latex")} and compiling the \texttt{.tex} file produced.
+\end{enumerate}
+
+To keep things easy for users of different platforms, when you add a file to the system,
+in TortoiseSVN set the property \sfn{svn:eoln-style} to ``native".
+(This is not necessary for .pdf files.)
+This will avoid the all-too-usual problems when transferring files between Windows and Mac systems.\\
+Recipe: right click on the file name $\rightarrow$ TortoiseSVN $\rightarrow$ Properties  $\rightarrow$
+New  $\rightarrow$ EOL  $\rightarrow$ Platform-dependent (native).\\
+Remember to do this also for the identical file that you create for the second package (e.g., for \RS if
+first you added the file to \rst).
+
+Preferably limit line lengths to a maximum of 80 characters.
+
+\section{Checking}
+
+
+ It will be much appreciated when you update the description files in
+ the \text{doc} directory, or add new files, in cases where you made changes that are
+ important enough to deserve such documentation.
+
+  Before committing, it is mandatory to either run \\
+  \verb|R CMD check RSiena|\\
+  , or do a build, and then run \\
+  \verb|R CMD check RSiena_1.1-xxx.tar.gz|\\
+  ; do the same for \rst.
+  Use the most recent version of R for this (note that
+  successive versions and subversions of R often increase the stringency of checking).
+  Note that the C++ compiler may be different on different systems (e.g., Windows and Mac)
+  which may lead to different warnings.
+
+  Try to make the code so that notes and warnings from this Check are avoided as far as possible,
+  and that you understand those that remain.
+  There should of course be no errors at all.
+  For example, I always get a note that the package size is big
+  (because the manual is a very big file) and
+  often about some superfluous pieces of code (because I want to use them later).
+
+  Checks consist of running the examples in the help files (unless excluded by \texttt{dontrun})
+  and in \texttt{$\bs$tests}, except those that are excluded in the file \texttt{.Rbuildignore}.
+  This currently leaves only \texttt{$\bs$tests$\bs$parallel.R}.
+  Sometimes the file \texttt{$\bs$tests$\bs$parallel.Rout.save} must be updated.
+
+  It may be useful to add other scripts for checking (but they should not consume much time).
+
+\end{document}

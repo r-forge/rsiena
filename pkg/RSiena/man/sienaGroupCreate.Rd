@@ -20,9 +20,15 @@ This function creates a Siena group object from several Siena data
 objects, all of which use networks, covariates and actor sets
 with the same names. The variables must correspond exactly
 between all data objects; the numbers of waves may differ.
-It can be used as data input to \command{siena07} for the
+It can be used as data input to \code{\link{siena07}} for the
 multigroup option.
-Also used internally for convenience with a single Siena data object.}
+Also used internally for convenience with a single Siena data object.
+
+For later use in \code{\link{siena07}} or \code{sienaBayes},
+it will often (but not always...) be helpful when creating the
+Siena data objects in \code{objlist}
+to use \code{allowOnly=FALSE} in the call of
+\code{\link{sienaDependent}}; see the help page for this function.}
 
 \value{
 An object of class "sienaGroup"; this is a list

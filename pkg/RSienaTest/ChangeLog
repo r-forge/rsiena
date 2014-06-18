@@ -1,21 +1,31 @@
-2014-06-02 R-Forge Revision 276
+2014-06-17 R-Forge Revision 276
 Changes in RSiena and RSienaTest:
-   * Higher writefreq for batch operation (phase2.r, phase3.r) 
+   * Some documentation of returnChains in siena07.Rd.
+Changes in RSienaTest:
+   * Added function simpleBayesTest() (bayesTest.r, bayesTest.Rd).
+   * Added function multipleBayesTest() with print and plot
+     methods (bayesTest.r, bayesTest.Rd).
+   * Small changes in various functions in sienaBayes.r.
+   * Corrected starting printing sienaBayesFit at nfirst (sienaprint.r).
+
+2014-06-02 R-Forge Revision 275, but version predated 1.1-276
+Changes in RSiena and RSienaTest:
+   * Higher writefreq for batch operation (phase2.r, phase3.r)
    * Error check for name of dependent variable to condition upon (initializeFRAN.r)
-   * Some corrections to account for behavior dependent variables that are not
+   * Some corrections to allow behavior dependent variables that are not
      coded as integer (in initializeFRAN and unpackBehavior, initializeFRAN.r)
    * Parameters fix and test now used in includeEffects() (sienaeffects.r)
    * Small bug fix in CalculateDerivative3 (phase3.r)
    * Avoidance of ":::" in siena01.r and document.r by small changes.
 Changes in RSienaTest:
-   * Changes in sienaBayes.r and its print and summary methods; 
+   * Changes in sienaBayes.r and its print and summary methods;
      new function glueBayes.
 
 2014-05-05 R-Forge Revision 275
 Changes in RSiena and RSienaTest:
    * Error message and stop in case of mismatch variable names
      in algorithm object and in data (initializeFRAN.r).
-   * Force behavior and its attribute "change" to be integer in function 
+   * Force behavior and its attribute "change" to be integer in function
      unpackBehavior() (initializeFRAN.r).
    * Some tabs in .Rd files change to spaces.
 
@@ -23,7 +33,7 @@ Changes in RSiena and RSienaTest:
 Changes in RSiena and RSienaTest:
    * Replaced (!strcmp...) by (!(strcmp...)) one more time
      in sienainternals07.cpp.
- 
+
 2014-04-25 R-Forge Revision 273
 Changes in RSiena and RSienaTest:
    * NAMESPACE: removed entries sienaRIDynamics with the corresponding
@@ -37,7 +47,7 @@ Changes in RSiena and RSienaTest:
    * Small change in print01Report.r to improve reporting
      two files of composition change.
    * sienaRI.r: require that <<file>> argument is not NULL for non-Windows
-     operating systems.	 
+     operating systems.
 Changes in RSienaTest:
    * Minor changes in sienaBayes.r.
 

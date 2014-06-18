@@ -18,7 +18,7 @@
   \item{nfirst}{The first element of the MCMC chain used for calculating
       properties of the chain; i.e., the first element for which
       it is assumed that convergence has occurred. If \code{NULL},
-      \code{x$nwarm} will be used.}
+      the value \code{x$nwarm+1} will be used.}
   \item{\dots}{For extra arguments (none used at present).}
 }
 \value{
