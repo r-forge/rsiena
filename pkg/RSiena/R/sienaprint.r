@@ -195,7 +195,7 @@ print.sienaDependent <- function(x, ...)
 	invisible(x)
 }
 
-##@print.sienafit Methods
+##@print.sienaFit Methods
 print.sienaFit <- function(x, tstat=TRUE, ...)
 {
 	if (!inherits(x, "sienaFit"))

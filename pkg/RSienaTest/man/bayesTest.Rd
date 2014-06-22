@@ -28,8 +28,8 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
   \item{nfirst}{The first element of the MCMC chain used for calculating
       properties of the chain; this can be the first element for which
       it is assumed that convergence has occurred.}
-  \item{tested0}{The value to be tested; for \code{simpleBayesTest} this must be
-     a number (applied to all coordinates),
+  \item{tested0}{The value to be tested; for \code{simpleBayesTest} this
+     must be a number (applied to all coordinates),
      for \code{multipleBayesTest} it can be a number
      (applied to all coordinates) or a vector.}
   \item{probs}{A vector of two numbers between 0 and 1, the credibility limits
@@ -50,22 +50,25 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
     'posterior distances'.}
 }
 \details{
- For the default values of \code{probs} and \code{tested0},
+ Note that for the default values of \code{probs} and \code{tested0},
  \code{simpleBayesTest} gives information also contained in
  \code{\link{print.sienaBayesFit}}.\cr
  To use \code{multipleBayesTest}, it is advisable first to execute
- \code{simpleBayesTest} to see the numbers that should be used in \dots.\cr
- \code{multipleBayesTest} calculates Mahalanobis distances of the elements
- of the posterior sample from the posterior mean, and the p-value is the
- relative frequency with which these are greater than the distance
- between the tested value and the posterior mean.
+ \code{simpleBayesTest} to see the numbers that should be used in the
+ \dots parameter.\cr
+ \code{multipleBayesTest} tests the hypothesis that
+ the multivariate parameter for the effects indicated in \dots is equal to
+ \code{tested0}. To do this, Mahalanobis distances of the elements
+ of the posterior sample from the posterior mean are calculated,
+ and the p-value is the relative frequency that these are greater than the
+ distance between the tested value and the posterior mean.
 }
 \value{\code{simpleBayesTest} produces a data frame containing for the non-rate
  effects their names,
  an indication of whether or not they are varying parameters,
  and test results.
- For each parameter separately, (for the varying parameters) the across-group mean
- or (for the non-varying parameters) the value is tested.
+ For each parameter separately, (for the varying parameters) the across-group
+ mean or (for the non-varying parameters) the value is tested.
  The test results are the posterior credibility intervals for the
  probability limits defined by \code{probs},
  and the posterior probabilities of values larger than \code{tested0}.\cr
@@ -73,11 +76,14 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
  which is a list with values:
  \item{prob}{posterior p-value}
  \item{chisquared}{test statistic}
-  \item{postDistances}{sample from posterior }
+  \item{postDistances}{sample from posterior of distances from \code{tested0}}
   \item{nullValue}{input value of \code{tested0}}
-  \item{effectNames}{names of effects tested as given in \dots.}
- \code{print.multipleBayesTest} prints the p-value with an explanation.\cr
- \code{plot.multipleBayesTest} plots the density function of \code{x$postDistances}.\cr
+  \item{effectNames}{names of effects tested as given in \dots}
+  \item{posteriorSample}{sample from posterior of tested effects}
+ \code{print.multipleBayesTest} prints the p-value with an explanation; and
+     the proportions of all sign patterns in the sample from the posterior.\cr
+ \code{plot.multipleBayesTest} plots the density function of
+    \code{x$postDistances}.\cr
   }
 \references{See the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
@@ -106,6 +112,7 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)
   bayes.model
   simpleBayesTest(bayes.model, probs = c(0.05,0.95))
+  multipleBayesTest(bayes.model, 2, 3)
 }
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the

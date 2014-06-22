@@ -13,7 +13,7 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2,
     priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
     frequentist=FALSE, incidentalBasicRates=FALSE,
-    gamma=0.5, delta=1e-04,
+    reductionFactor=1, gamma=0.5, delta=1e-04,
     nwarm=50, nmain=250, nrunMHBatches=20,
     lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
     storeAll=FALSE, prevAns=NULL, prevBayes=NULL, silentstart = TRUE,
@@ -32,7 +32,7 @@ glueBayes(z1, z2)
   \item{algo}{Algorithm object, as created by
     \code{\link{sienaAlgorithmCreate}}. Should contain all options required
     for the MCMC scheme, and a random seed if required.}
-  \item{saveFreq}{Integer: if this is larger than 1, the provisional results
+  \item{saveFreq}{Integer. If this is larger than 1, the provisional results
     are saved after each multiple of saveFreq iterations in the main phase,
     in a file with name PartialBayesResult.RData (if a file with this name
     exists, it will be overwritten).
@@ -60,10 +60,16 @@ glueBayes(z1, z2)
     Boolean: chooses between frequentist or Bayesian
     estimation of the global parameters.
     Frequentist estimation is possible only for at least 2 groups.}
-  \item{incidentalBasicRates}{Boolean: if this is TRUE, the basic rate
+  \item{incidentalBasicRates}{Boolean. If this is TRUE, the basic rate
   parameters are defined specifically for each group, and estimated
   using a Robbins Monro algorithm; if FALSE, they have a
   common prior for all groups.}
+  \item{reductionFactor}{Positive number. The prior distribution for the rate
+   parameters is the observed covariance matrix of the estimated rate parameters
+   in the initialization phase multiplied by \code{reductionFactor}.
+   For many data sets the default will be OK. If the rate parameters diverge,
+   as evidenced by the traceplots of the posterior values,
+   then a smaller value is advisable, such as 0.01.}
   \item{gamma}{Positive number, used only for frequentist estimation:
   the gain factor in the Robbins Monro algorithm is
   initfgain * ((iteration number)^(-gamma)).}
@@ -125,7 +131,7 @@ glueBayes(z1, z2)
   The frequentist option currently is not supported (may be broken).\cr
   The procedure consists of three parts: initialization, warming,
   main phase.\cr
-  In the initializatiion phase, initial parameter values and the proposal
+  In the initialization phase, initial parameter values and the proposal
   covariance matrix for Metropolis-Hastings steps for groupwise parameters
   are obtained from, first, Method of Moments estimation of a parameter vector
   assumed to be the same across the groups (in a multi-group estimation),
