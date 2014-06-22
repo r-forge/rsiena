@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-276.
+This version was renewed for \RS version 1.1-277.
 \end{abstract}
 
 
@@ -975,7 +975,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-276) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-277) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -5980,7 +5980,7 @@ whole period being analyzed.
 \label{S_mulev}
 
 For combining \SI results of several independent networks,
-there are three options.
+there are four options.
 (`Independent'  networks here means that the sets of actors are
 disjoint, and it may be assumed that there are no direct influences
 from one network to another.)
@@ -5990,14 +5990,16 @@ networks are the same -- except
 for the basic rate parameters and for
 those differences that are explicitly modeled by interactions
 with dummy variables indicating the different networks.
-The first and third options require that the number of observations
-is the same for the different networks. This is not required for the
-second option.
+All but the second option require that the number of observations
+is the same for the different networks.
 These methods can be applied for two or more networks.
 \medskip
 
+In the following discussion, 
+the terms `networks' and `sub-projects' are used interchangeably.
+
 \noindent
-The three options are:
+The four options are:
 \begin{enumerate}
 \item Combining the different networks in one large network,
       indicating by structural zeros that ties between the
@@ -6006,7 +6008,8 @@ The three options are:
       The special effort to be made here is the construction
       of the data files for the large (combined) network.
 \item Combining different sub-projects
-      into one \emph{multi-group} project.
+      into one \emph{multi-group} project,
+      and analyzing this by \sfn{siena07}.
       The `sub-projects' are the same as the `different networks'
       mentioned here.
       This is explained in Section~\ref{S_multigroup}.\\
@@ -6016,12 +6019,27 @@ The three options are:
       (this can be changed by making the rate dependent upon dummy actor
       variables that indicate the different networks)
       whereas the multi-group option yields rate parameters
-      that are distinct across different networks.
+      that are distinct across different networks.\\
+      In this option, the assumption is made that all parameters
+      are the same for the various networks, except for the basic rate
+      parameters; and except for explicitly specified interaction
+      effects between variables depending on the sub-project, and other effects.
+      
+      Usually, option (2) is preferable to option (1).
 \item Analyzing the different networks separately, without any assumption
       that parameters are the same but using the same model specification,
       and post-processing the output files by a meta-analysis
       using \textsf{siena08}.
       This is explained in Section~\ref{S_Siena08}.
+\item Combining different sub-projects into one \emph{multi-group} project
+      as in option (2), but analyzing this by \sfn{sienaBayes}.
+      This is explained in Section~\ref{S_sienaBayes}.\\
+      Here the assumption for the parameters is that all basic rate parameters
+      may differ arbitrarily between the sub-projects;
+      for the other parameters, some are identical and others vary randomly across
+      sub-projects according to a multivariate normal distribution.
+      The distinction between ``some'' and ``others'' here is made by
+      the parameter \texttt{random} in function \sfn{setEffect()}.
 \end{enumerate}
 The first and second options will yield nearly the same results, with the
 differences depending on the basic rate (and perhaps other) parameters
@@ -6034,26 +6052,32 @@ Therefore the second option seems preferable to the first.
 
 The third option makes much less assumptions because parameters are not
 constrained at all across the different networks.
+The fourth option is a middle ground between the first two and the third.
 Therefore the arguments usual in statistical modeling apply:
-as far as assumptions is concerned, option 3 is safer;
+as far as assumptions is concerned, options (3) and (4) are safer;
 but if the assumptions are satisfied (or if they are a good approximation),
-then options 1 and 2 have higher power and are simpler.
-However, option 3 requires that each of the different network data sets
+then options (1) and (2) have higher power and are simpler.
+Option (3) requires that each of the different network data sets
 is informative enough to lead to well-converged estimates;
 this will not always be the case for small data sets,
-and then options 1 or 2 are preferable.
+and then option (4) may be preferable.
 
 When the data sets for the different networks are not too small
 individually,
 then a middle ground might be found in the following way.
-Start with option 3. This will show for which parameters there are
+Start with option (3). This will show for which parameters there are
 important differences between the networks.
-Next follow option 2, with interactions between the sub-project dummies
+Next follow option (2), with interactions between the sub-project dummies
 and those parameters for which there were important between-network
-differences.
-This procedure may work less easily when
-the number of different networks is relatively high, because it may
-then lead to too many interactions with dummy variables.
+differences; or option (4), where the randomness of the effects
+is determined by these differences.
+
+When the data sets for the different networks are quite small,
+then one might start by option (2), and use \sfn{sienaTimeTest} to test
+for which of the effects especially there is a large variation in 
+parameter values across the sub-projects;
+next one could follow approach (4), determining the randomness of the effects
+by the results about this variability.
 
 \subsection{Multi-group Siena analysis}
 \label{S_multigroup}
@@ -6398,6 +6422,201 @@ However, the results for testing $H_0^{(0)}$ and $H_0^{(2)}$
 will be significant.
 
 
+\subsection{Random coefficient multilevel Siena analysis}
+\label{S_sienaBayes}
+
+  The function \sfn{sienaBayes} is for Bayesian estimation of one group or
+  of multiple groups all having the same number of waves and the same
+  model specification.
+  The parameters -- excepting the basic rate parameters -- can be either
+  randomly varying between groups according to a multivariate
+  normal distribution, or non-varying and constant across groups.
+  The difference is made by setting the parameter \texttt{random} in 
+  the function \sfn{setEffect}. The default is that only the out-degree (density)
+  effect is randomly varying, but it is advisable to specify
+  this for a larger set of effects.
+  Specifying it for too many effects may, however, lead to unstable estimation.
+  
+  The analysis is done by a Bayesian estimation method.
+  For the groupwise parameters normal distributions are assumed with conjugate
+  priors. The prior distribution for the basic rate parameters is determined
+  in a data-dependent way. For the non-varying parameters,
+  a flat prior is assumed.
+  
+  The procedure consists of three parts: initialization, warming,
+  main phase.
+  \begin{enumerate}
+  \item
+  In the initialization phase, initial parameter values and the proposal
+  covariance matrix for Metropolis-Hastings steps for groupwise parameters
+  are obtained from, first, Method of Moments estimation of a parameter vector
+  assumed to be the same across the groups (in a multi-group estimation),
+  followed by one subphase of the Robbins-Monro algorithm for Method of
+  Moments estimates for the groups separately, with step size \sfn{initgain}.
+  The proposal covariance matrices then are scaled, in the
+  function \sfn{improveMH}, to achieve about 25 out of 100 acceptances of
+  Bayes proposals after single MH steps.
+  \item
+  After initialization and scaling of the proposal covariance matrices,
+  a warming phase is done of \sfn{nwarm} Bayesian proposals
+  each with a number of MH steps, followed again by the function \sfn{improveMH}.
+  \item
+  Finally \sfn{nmain} repeats (of \sfn{nrunMHBatches} of a
+  number of MH steps plus Bayesian proposals) are performed.
+  In the warming as well as the final phase, the number of MH steps is
+  determined by parameter \sfn{mult} (``multiplication factor'')
+  in the call of \sfn{sienaAlgorithmCreate} that created the algorithm object.
+\end{enumerate}  
+  The function \sfn{sienaBayes} is time-consuming. When starting to use it, it is advisable
+  to start with low values of \sfn{nmain} to explore computing time.
+  When the procedure seems to diverge, and for very small groups, it is
+  advisable to use smaller values of the parameters \texttt{initgainGlobal}
+  and \texttt{initgainGroupwise}; and perhaps \texttt{reductionFactor}.
+
+
+\subsubsection{Which data sets to use for sienaBayes}
+
+\sfn{sienaBayes} uses as data set a \sfn{sienaGroup} object with 2 or more groups. 
+The number of waves should be the same for all groups.
+
+\sfn{sienaBayes} should be possible for groups as small as 5 actors. 
+A restriction (maybe to be lifted later) is that the networks must not be 
+empty at any wave; and consecutive waves of networks must not be identical 
+(in other words, all Jaccard indices should be strictly less than 1).
+
+Be prepared for long computation times. The reason is that likelihood-based 
+computations are used (as distinct from the Method of Moments approach). 
+If all individual groups have enough information for good estimation by 
+the Method of Moments according to the intended model, 
+the use of \sfn{siena07()} with the (default) Method of Moments, followed by a 
+meta-analysis by means of \sfn{siena08()}, may be preferable.
+
+\subsubsection{Model specification}
+
+The extra part of model specification, compared to \sfn{siena07()},
+is that it is required to specify which parameters are
+randomly varying from group to group, and which are fixed across groups.
+The basic rate parameters always are randomly varying. 
+Other rate parameters can not yet be included.
+
+The specification of fixed vs.\ randomly varying is done in the function \sfn{setEffect}.
+
+There currently is little advice about this.
+The theoretically important effects, and those for which variation is expected, 
+may be specified as varying.
+Also it is possible to first do a multi-group analysis of the same model, 
+followed by a \sfn{sienaTimeTest}, and specify those effects as randomly 
+varying for which the time heterogeneity is largest according to the groupwise results.
+
+\subsubsection{How to enter your data in sienaBayes}
+
+See the example at the bottom of the \sfn{sienaBayes} help page for how a 
+\sfn{sienaGroup} object can be created and used.
+If some but not all of the Siena data objects combined in the \sfn{sienaGroup} have 
+periods where changes are only upward or only downward, 
+it will be necessary to use \texttt{allowOnly=FALSE} in the call of 
+\sfn{sienaDependent}; see the help page for \sfn{sienaDependent}.
+The scripts \texttt{RscriptListGroups.R} and \texttt{RscriptMultipleGroups.R} 
+give further examples and explanation for creating \sfn{sienaGroup} objects.
+
+If you have a large number of groups (more than 30), try first 
+with a smaller number of groups (10-20). If you need or wish to 
+make a selection of groups, select the one with few or no missing data and 
+with Jaccard coefficients at least 0.30.
+
+\subsubsection{How to choose the parameter settings for sienaBayes}
+
+It may be good to have an initial try run with 
+\texttt{nwarm=5, nmain=10, nrunMHBatches=5} 
+(for speed) and \texttt{silentstart = FALSE} (for information about the 
+initialization phase), and then \sfn{print} the result. 
+This will give information about the results of the initialization 
+phase and about computing time. If some of the groups have some very 
+high estimated rate parameters, you should either drop those groups 
+or decrease the value of \texttt{initgainGroupwise}. 
+The new value could be, e.g., 0.005 or 0.001 or 0.0. With the lower value 
+of \texttt{initgainGroupwise}, dropping the groups concerned may be unnecessary, 
+so don't drop groups too soon.
+
+For normal use, \texttt{nwarm=100, nmain=1000, nrunMHBatches=20}
+may be reasonable. 
+We still have to develop guidelines about how to choose the number of 
+iterations. If the tracelines show that the process is still quite 
+unstable even in the later part of the runs, possibilities are to 
+increase \texttt{nrunMHBatches} but also to increase the \texttt{mult} parameter in 
+\sfn{sienaAlgorithmCreate}. Increasing these will for both of them lead to 
+a proportional increase in computing time. 
+
+If multiple processors are available (which most computers have nowadays), 
+you can make more speed by setting the \texttt{nbrNodes} parameter to a value 
+larger than 1. Since parallelization goes by wave $\times$ group, 
+it is nice, but not necessary, to have a value for \texttt{nbrNodes} that 
+is a divisor of (the number of waves multiplied by the number of groups). 
+Do not use such a high value for \texttt{nbrNodes} that your computer gets too
+ hot or overworked. For Windows machines this can be monitored by opening 
+ the Task Manager (you will find how to do this by right clicking on the bottom toolbar).
+
+\subsubsection{Interpreting results of sienaBayes}
+
+You can visually inspect convergence by looking at the tracelines of the 
+various parameters. These can be plotted by the functions in \texttt{BayesPlots.r}
+(available from the Siena website). In many cases, the tracelines for 
+the rate parameters already tell the story about convergence.
+
+The file \texttt{BayesPlots.r} contains a variety of plotting functions that 
+can be used to obtain trace plots and posterior density plots.
+
+The parameters \texttt{nwarm} and \texttt{nmain} in the call of 
+\sfn{sienaBayes} only imply 
+that an extra \sfn{improveMH} step is made between the warming and the 
+main iterations; there are no other differences between the warming 
+and main iterations. It is possible that convergence has set in only 
+later; depending on the case, the traceplots may give information about this.
+If you conclude that convergence has occurred later, then use this to 
+define the \texttt{nfirst} parameter in the \sfn{print} and 
+\sfn{summary} functions for 
+\sfn{sienaBayesFit} object (see \texttt{`?print.sienaBayesFit'}).
+
+When the procedure seems to have diverged and this occurs right
+from the start, it is
+advisable to use smaller values of the parameters \texttt{initgainGlobal}
+and \texttt{initgainGroupwise}.
+If divergence sets in later and is most pronounced
+for the rate parameters, it may be advisable to use a smaller value of 
+\texttt{reductionFactor}, e.g., 0.1.
+If generally the tracelines are irregular, it may be good to increase
+\texttt{nrunMHBatches} but another possibility is to increase 
+the \texttt{mult} parameter set in \sfn{sienaAlgorithmCreate()}. 
+
+The \sfn{print} and \sfn{summary} functions
+give posterior means, posterior standard deviations, 95\% credibility intervals,
+and one-sided posterior $p$-values 
+for testing whether the parameter is positive or negative. 
+These are the Bayesian versions of estimates, standard errors, 
+confidence intervals, and $p$-values.
+
+The functions \sfn{simpleBayesTest()} and \sfn{multipleBayesTest()}
+are available for testing parameters; see the help page for these functions.
+To compute further properties of the sample of the posterior, 
+the components
+\texttt{ThinParameters, ThinPosteriorMu, \\
+ThinPosteriorEta}, and \texttt{ThinPosteriorSigma} of the 
+\sfn{sienaBayesFit} object, as mentioned in the help page, may be useful.
+
+When the procedure has made a good start but the MCMC sample seems too 
+short, you can make a prolonged analysis using the \texttt{prevBayes} option, 
+and then combine the earlier with the later results using \sfn{glueBayes()}. 
+This is illustrated in the example on the help page.
+
+During operation of \sfn{sienaBayes()}, partial results of the function 
+are now and then stored 
+as objects named \texttt{z} in files with the name
+\texttt{PartialBayesResult.RData}; see the help page.
+This is for the case that the computer or \R stops inadvertently
+during the long computations.
+These are \sfn{sienaBayesFit} objects, and therefore can be used in the
+\sfn{print} and \sfn{summary} functions; they also can be used for
+the \texttt{prevBayes} option to continue estimation.
 
 \newpage
 \section[Formulas for effects]{Mathematical definition of effects}
@@ -10772,7 +10991,7 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
-\item 2014-06-18 R-Forge Revision 276.
+\item 2014-06-22 R-Forge Revision 277.
 Changes in RSiena and RSienaTest:
 \begin{itemize}
 \item Higher write-to-screen frequency for batch operation of \sfn{siena07()}.

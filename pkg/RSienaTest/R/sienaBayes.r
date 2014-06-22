@@ -19,6 +19,7 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 				initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2,
 				priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
 				frequentist=FALSE, incidentalBasicRates=FALSE,
+				reductionFactor=1,
 				gamma=0.5, delta=1e-4,
 				nwarm=50, nmain=250, nrunMHBatches=20,
 				lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
@@ -529,7 +530,7 @@ browser()
 		# Draw from the inverse Wishart distribution with df v
 		# and scale matrix S
 		# inefficient if drawn multiply for the same S
-			chol2inv(chol(rWishart(1,v,chol2inv(chol(S)))[,,1]))
+		protectedInverse(rWishart(1,v,protectedInverse(S))[,,1])
 		}
 
 		muhat <- matrix( c(0), z$p1, 1)
@@ -860,6 +861,7 @@ browser()
 						priorDf=priorDf, priorKappa=priorKappa,
 						frequentist=frequentist,
 						incidentalBasicRates=incidentalBasicRates,
+						reductionFactor=reductionFactor, gamma=gamma,
 						delta=delta, nmain=nmain, nwarm=nwarm,
 						lengthPhase1=lengthPhase1, lengthPhase3=lengthPhase3,
 						prevAns=prevAns, silentstart=silentstart,
@@ -1233,7 +1235,8 @@ browser()
 initializeBayes <- function(data, effects, algo, nbrNodes,
 						initgainGlobal, initgainGroupwise,
 						priorMu, priorSigma, priorDf, priorKappa,
-						frequentist, incidentalBasicRates, delta,
+						frequentist, incidentalBasicRates, 
+						reductionFactor, gamma, delta,
 						nmain, nwarm,
 						lengthPhase1, lengthPhase3,
 						prevAns, silentstart, clusterType=c("PSOCK", "FORK"))
@@ -1784,11 +1787,15 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	z$priorMu[z$ratesInVarying] <- rowMeans(rateParameters)
 	z$priorSigma[z$ratesInVarying,] <- 0
 	z$priorSigma[,z$ratesInVarying] <- 0
-	z$priorSigma[z$ratesInVarying,z$ratesInVarying] <- cov(t(rateParameters))
-	diag(z$priorSigma)[z$ratesInVarying] <-
-				diag(z$priorSigma)[z$ratesInVarying] + 0.1
+	z$priorSigma[z$ratesInVarying,z$ratesInVarying] <- 
+			reductionFactor * cov(t(rateParameters))
+	diag(z$priorSigma)[z$ratesInVarying] <- 
+				(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
+	
 	z$incidentalBasicRates <- incidentalBasicRates
 	z$delta <- delta
+	z$gamma <- gamma
+	z$reductionFactor <- reductionFactor
 	if (nmain < 10){nmain <<- 10}
 
    if (frequentist)
@@ -2068,6 +2075,37 @@ glueBayes <- function(z1,z2){
 	class(z) <- "sienaBayesFit"
 	z
 }
+
+##@protectedInverse inverse of p.s.d matrix
+protectedInverse <- function(x){		
+	if (inherits(try(xinv <- chol2inv(chol(x)),
+					silent=TRUE), "try-error"))
+		{
+		# Now make this x positive definite, if it is not.
+		# See above for a more extensive treatment of the same.
+		# Adapted from function make.positive.definite in package corpcor
+		# which uses a method by Higham (Linear Algebra Appl 1988)
+		# but changed to make the matrix positive definite (psd)
+		# instead of nonnegative definite.
+		# The idea is to left-truncate all eigenvalues to delta0.
+		# The construction with tol, not used now,
+		# is to ensure positive definiteness given numerical inaccuracy.
+			es <- eigen(x)
+			esv <- es$values
+			delta0 <- 1e-6
+			cat("Eigenvalues Sigma = ", sort(esv), "\n")
+			if (min(esv) < delta0)
+			{
+				delta <- delta0
+				tau <- pmax(delta, esv)
+#				cat("Smallest eigenvalue of Sigma now is ",
+#								min(esv),"; make posdef.\n")
+				xinv <- es$vectors %*% diag(1/tau, dim(x)[1]) %*% t(es$vectors)
+			}
+		}
+	xinv
+}
+
 
 ##@trafo link function rates
 # the log link is too strong!

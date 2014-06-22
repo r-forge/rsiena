@@ -117,7 +117,8 @@ multipleBayesTest <- function(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4){
 	postProb <- mean((posteriorStandLengths - boundary) > 0)
 	result <- list(prob=postProb, chisquared=boundary,
 				postDistances=posteriorStandLengths,
-				nullValue=testedvec, effectNames=efNames)
+				nullValue=testedvec, effectNames=efNames,
+				posteriorSample=posteriorSample)
 	class(result) <- 'multipleBayesTest'
 	result
 }
@@ -134,7 +135,25 @@ print.multipleBayesTest <- function(x, ...){
 	names(mydf) <- c(' ', ' ')
 	cat("Tested hypothesis:\n")
 	print(mydf)
-	cat("\nposterior p-value:", round(x$prob, 4), "\n")
+	cat("\nposterior p-value:", round(x$prob, 4), "\n\n")
+	# Construct pattern of all sign combinations of p numbers
+	s <- matrix(0,1,0)
+	for (i in 1:p){
+		pp <- 2^(i-1)
+		s <- cbind(rbind(s,s), c(rep(1,pp),rep(-1,pp)))
+		}
+	propSignPattern <- function(si){
+		mean(apply(x$posteriorSample, 1, function(x){identical(sign(x), si)}))
+	}
+	propSigns <- apply(s,1,propSignPattern)
+	cat("Posterior proportion of sign patterns:\n")
+	cat("", 1:p, "\n", sep="   ")
+	pp <- dim(s)[1]
+	# cbind transforms T to 1 and F to 0
+	apply(cbind(s, propSigns), 1,
+		function(y){cat(' ', ifelse((y[1:p] > 0.5), '>0 ', '<0 '),
+				formatC(y[p+1], digits=2),'\n')})
+	cat("\n")
 	invisible(x)
 }
 
