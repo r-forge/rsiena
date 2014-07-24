@@ -148,11 +148,16 @@ phase1.2 <- function(z, x, ...)
 		scores <- apply(z$ssc, c(1,3), sum)
 		for (i in 1:z$pp)
 		{
-			if (var(scores[,i]) > 0)
+			oldwarn <- getOption("warn")
+			options(warn = -1)
+			if ((var(scores[,i]) > 0)&&(var(z$sf[,i]) > 0))
 			{
 				z$regrCoef[i] <- cov(z$sf[,i], scores[,i])/var(scores[,i])
 				z$regrCor[i] <- cor(z$sf[,i], scores[,i])
 			}
+			if (is.na(z$regrCor[i])){z$regrCor[i] <- 0}
+			if (is.na(z$regrCoef[i])){z$regrCoef[i] <- 0}
+			options(warn = oldwarn)
 		}
 		Report('Correlations between scores and statistics:\n', cf)
 		PrtOutMat(format(as.matrix(t(z$regrCor)), digits = 2, nsmall = 2), cf)

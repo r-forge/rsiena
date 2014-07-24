@@ -9,7 +9,10 @@
 # * Siena data object and group data objects.
 # *****************************************************************************/
 ##@addAttributes DataCreate method for attaching attributes to objects
+# This is used when creating the data object.
 addAttributes <- function(x, name, ...) UseMethod("addAttributes")
+# Note: this is used when creating the data object;
+# the attributes are not part of the variables.
 
 ##@addAttributes.coCovar DataCreate
 addAttributes.coCovar <- function(x, name, ...)

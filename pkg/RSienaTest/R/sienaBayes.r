@@ -25,7 +25,7 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 				lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
 				storeAll = FALSE, prevAns=NULL,
 				prevBayes = NULL, silentstart=TRUE,
-				plotit=FALSE, nbrNodes=1, clusterType=c("PSOCK", "FORK"),
+				nbrNodes=1, clusterType=c("PSOCK", "FORK"),
 				getDocumentation=FALSE)
 {
     ##@createStores internal sienaBayes Bayesian set up stores
@@ -715,99 +715,8 @@ browser()
 	}
 
 	##@somePlots make some plots during operation of the function
+	# dropped in version 1.1-278.
 	# probably requires storeAll
-	somePlots <- function()
-	{
-		cat('main after ii', ii, '\n')
-		dev.set(thetaplot)
-        thetadf <-
-        lapply(1:z$nGroup, function(i)
-            {
-                data.frame(Group=rep(i, ii * nrunMHBatches),
-                         z$candidates[1:(ii * nrunMHBatches), i, ])
-            }
-            )
-        thetadf <- do.call(rbind, thetadf)
-        basicRate <- z$basicRate
-        ##thetadf <- data.frame(z$candidates)
-        acceptsdf <- data.frame(z$MHproportions,
-                                z$acceptances)
-        ratesdf <- thetadf[, -1, drop=FALSE][, z$basicRate, drop=FALSE]
-        thetadf <- cbind(Group=thetadf[, 1, drop=FALSE],
-			 thetadf[, -1, drop=FALSE][, !z$basicRate, drop=FALSE])
-        thetaNames<- paste(z$effects$name[!z$basicRate],
-                           z$effects$shortName[!z$basicRate], sep=".")
-        rateNames <- paste(z$effects$name[basicRate],
-			    z$effects$shortName[basicRate], z$effects$period[basicRate],
-				z$effects$group[basicRate], sep=".")
-        names(ratesdf) <- rateNames
-        ratesdf <- cbind(Group=thetadf[, 1, drop=FALSE], ratesdf)
-        names(thetadf)[-1] <- make.names(thetaNames, unique=TRUE)
-        names(acceptsdf) <- c("InsDiag", "CancDiag", "Permute", "InsPerm",
-                              "DelPerm", "InsMissing", "DelMissing",
-                              "BayesAccepts")
-        varnames <- paste(names(thetadf)[-1], sep="", collapse= " + ")
-		if (z$nGroup > 1)
-		{
-			varcall <- paste("~ ", varnames,  " | Group", sep="",
-							 collapse="")
-		}
-		else
-		{
-			varcall <- paste("~ ", varnames,  sep="", collapse="")
-		}
-        print(histogram(as.formula(varcall), data=thetadf, scales="free",
-                       outer=TRUE, breaks=NULL, type="density",
-                        panel=function(x, ...)
-                    {
-                        panel.histogram(x, ...)
-                        panel.densityplot(x, darg=list(na.rm=TRUE), ...)
-                    }
-              ))
-        dev.set(ratesplot)
-        varnames <- paste(names(ratesdf)[-1], sep="", collapse= " + ")
-        varcall <- paste("~ ", varnames, sep="", collapse="")
-        print(histogram(as.formula(varcall), data=ratesdf, scales="free",
-                        outer=TRUE, breaks=NULL, type="density",
-                        panel=function(x, ...)
-						{
-							panel.histogram(x, ...)
-							panel.densityplot(x, darg=list(na.rm=TRUE), ...)
-						}
-                ))
-        varnames <- paste(names(thetadf)[-1], sep="", collapse= " + ")
-		if (z$nGroup > 1)
-		{
-			varcall <- paste(varnames,  "~ 1:", ii * nrunMHBatches * z$nGroup,
-                        " | Group", sep="", collapse="")
-		}
-		else
-		{
-			varcall <- paste(varnames,  "~ 1:", ii * nrunMHBatches * z$nGroup,
-						sep="", collapse="")
-		}
-        dev.set(tseriesplot)
-        print(xyplot(as.formula(varcall), data=thetadf, scales="free",
-                       outer=TRUE))
-        varnames <- paste(names(ratesdf)[-1], sep="", collapse= " + ")
-        varcall <- paste(varnames,  "~ 1:", ii * nrunMHBatches * z$nGroup,
-                             sep="", collapse="")
-        dev.set(tseriesratesplot)
-        print(xyplot(as.formula(varcall), data=ratesdf, scales="free",
-                         outer=TRUE))
-        ## dev.set(acceptsplot)
-        ## varnames <- paste(names(acceptsdf), sep="", collapse= " + ")
-        ## varcall <- paste("~ ", varnames,  sep="", collapse="")
-        ## print(histogram(as.formula(varcall), data=acceptsdf,
-        ##                 scales=list(x="same", y="free"),
-        ##                 outer=TRUE, breaks=NULL, type="density",
-        ##                 panel=function(x, ...)
-        ##             {
-        ##                 panel.histogram(x, ...)
-        ##                 panel.densityplot(x, darg=list(na.rm=TRUE), ...)
-        ##             }))
-	}
-
 	##@savePartial makes a partial intermediate save as a sienaBayesFit object
 	savePartial <- function(z)
 	{# save intermediate results
@@ -871,7 +780,16 @@ browser()
 		flush.console()
 		createStores()
 		z$sub <- 0
-		z$nrunMHBatches <- nrunMHBatches
+		if (nrunMHBatches >= 2)
+			{
+				z$nrunMHBatches <- nrunMHBatches
+			}
+		else
+			{
+				cat("nrunMHBatches increased to 2.\n")
+				z$nrunMHBatches <- 2
+				nrunMHBatches <- 2
+			}
 		class(z) <- "sienaBayesFit"
 
 		# Determine multiplicative constants for proposal distribution
@@ -883,18 +801,6 @@ browser()
 		flush.console()
 	}
 
-    if (plotit)
-    {
-        require(lattice)
-        dev.new()
-        thetaplot = dev.cur()
-        dev.new()
-        ratesplot = dev.cur()
-        dev.new()
-        tseriesplot = dev.cur()
-        dev.new()
-        tseriesratesplot = dev.cur()
-	}
 	if (!is.null(prevBayes))
 	{
 		if (inherits(prevBayes, "sienaBayesFit"))
@@ -973,6 +879,8 @@ browser()
 	{ # what remains to be done of the initialization
 		z <- prevBayes
 		nwarm <- 0
+		z$nmain <- nmain
+		z$nwarm <- 0
 		z$Phase <- 1
 		if (frequentist)
 		{
@@ -1081,10 +989,6 @@ browser()
 				savePartial(z)
 			}
 		}
-        if (ii %% 10 == 0 && plotit) ## do some plots
-        {
-		somePlots()
-        }
     }
 
 #	cat("thetaMat = \n")
@@ -1129,10 +1033,6 @@ browser()
 				savePartial(z)
 			}
 		}
-        if (ii %% 50 == 0 && plotit) ## do some plots
-        {
-		somePlots()
-        }
     }
 
 	# Process results Phase 2.
@@ -1198,10 +1098,6 @@ browser()
 				savePartial(z)
 			}
 		}
-        if (ii %% 10 == 0 && plotit) ## do some plots
-        {
-			somePlots()
-        }
     }
 
 # Process results of Phase 3
@@ -1235,7 +1131,7 @@ browser()
 initializeBayes <- function(data, effects, algo, nbrNodes,
 						initgainGlobal, initgainGroupwise,
 						priorMu, priorSigma, priorDf, priorKappa,
-						frequentist, incidentalBasicRates, 
+						frequentist, incidentalBasicRates,
 						reductionFactor, gamma, delta,
 						nmain, nwarm,
 						lengthPhase1, lengthPhase3,
@@ -1326,14 +1222,17 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		depVarNumber <- sapply(unique(effs$name),
 						function(a){match(a, unique(effs$name))})
 		extraRates <-  sum(effs$shortName=="Rate") *
-				(max(prevAnss$effects$group)-1) /
+				(max(prevAnss$requestedEffects$group)-1) /
 				length(unique(effs$name))
 		position.Difference <- as.vector(extraRates * depVarNumber[effs$name])
-		effs$effect1[use] <- pmax((prevEffects[prevAnss$effects$group==1,])$effect1 -
+		effs$effect1[use] <-
+			pmax((prevEffects[prevAnss$requestedEffects$group==1,])$effect1 -
 								position.Difference[use], 0)
-		effs$effect2[use] <- pmax((prevEffects[prevAnss$effects$group==1,])$effect2 -
+		effs$effect2[use] <-
+			pmax((prevEffects[prevAnss$requestedEffects$group==1,])$effect2 -
 								position.Difference[use], 0)
-		effs$effect3[use] <- pmax((prevEffects[prevAnss$effects$group==1,])$effect3 -
+		effs$effect3[use] <-
+			pmax((prevEffects[prevAnss$requestedEffects$group==1,])$effect3 -
 								position.Difference[use], 0)
 		effs
 	}#end projectEffects in initializeBayes
@@ -1431,7 +1330,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	}
 	cat("Estimate initial global parameters\n")
 	if (is.null(prevAns))
-	{	startupGlobal <- siena07(startupModel, data=data, effects=effects,
+	{
+	startupGlobal <- siena07(startupModel, data=data, effects=effects,
 								batch=TRUE, silent=silentstart,
 								useCluster=(nbrNodes >= 2), nbrNodes=nbrNodes,
 								clusterType=clusterType)
@@ -1472,9 +1372,12 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	w <- 0.8
 
 	# number of parameters per group:
-	npars <- sum(startupGlobal$effects$group==1)
+	npars <- sum(startupGlobal$requestedEffects$group==1)
+	# requestedEffects must be used, because startupGlobal$effects
+	# includes also all main effects corresponding to interactions,
+	# which is not necessarily the case for startupGlobal$requestedEffects.
 	# number of Dependent variables:
-#	nDepvar <- length(unique(startupGlobal$effects$name))
+#	nDepvar <- length(unique(startupGlobal$requestedEffects$name))
 	if (ngroups >= 2)
 	{
 	#	if ((startupGlobal$pp - npars)%%(ngroups-1) != 0)
@@ -1483,7 +1386,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 			stop("Not all groups have the same number of periods.")
 		}
 	}
-	nBasicRatesPerGroup <- sum(startupGlobal$effects$basicRate) / ngroups
+	nBasicRatesPerGroup <-
+		sum(startupGlobal$requestedEffects$basicRate) / ngroups
 	if (abs(nBasicRatesPerGroup - round(nBasicRatesPerGroup)) > 1e-6)
 	{
 		stop("Effects object and data object do not correspond.")
@@ -1508,17 +1412,17 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	# effects that are not estimated (fix) are
 	# excluded from both sets.
 	z$set1 <- rep(FALSE, startupGlobal$pp)
-	z$set1[startupGlobal$effects$basicRate] <- TRUE
-	z$set1[startupGlobal$effects$randomEffects &
-				(!startupGlobal$effects$fix)] <- TRUE
+	z$set1[startupGlobal$requestedEffects$basicRate] <- TRUE
+	z$set1[startupGlobal$requestedEffects$randomEffects &
+				(!startupGlobal$requestedEffects$fix)] <- TRUE
 	z$set2 <- !z$set1
-	z$set2[startupGlobal$effects$fix] <- FALSE
+	z$set2[startupGlobal$requestedEffects$fix] <- FALSE
 
 	# Number of non-varying non-fixed parameters
 	# among the z$truNumPars true parameters:
 	z$p2 <- sum(z$set2)
 	# Number of varying parameters among the z$truNumPars true parameters:
-	z$p1 <- npars - z$p2 - sum(startupGlobal$effects$fix)
+	z$p1 <- npars - z$p2 - sum(startupGlobal$requestedEffects$fix)
 
 	# compute covariance matrices for random walk proposals for all groups:
 	# proposalC0 for all effects;
@@ -1526,7 +1430,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	# proposalCov for theta^{(1)}_j, i.e., groupwise effects.
 	z$proposalCov <- list()
 	prec <- precision(startupGlobal)
-	rates <- startupGlobal$effects$basicRate
+	rates <- startupGlobal$requestedEffects$basicRate
 	precRate <- sum(diag(prec[rates,rates]))
 	prec[rates,rates] <- 0
 	diag(prec)[rates] <- precRate
@@ -1538,7 +1442,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		stop("Non-invertible precision(startupGlobal).")
 	}
 	z$proposalC0eta <- z$proposalC0[z$set2, z$set2, drop=FALSE]
-	z$forEtaVersion0 <- (z$set1|z$set2)&(!(rates|startupGlobal$effects$fix))
+	z$forEtaVersion0 <-
+		(z$set1|z$set2)&(!(rates|startupGlobal$requestedEffects$fix))
 	z$proposalC0 <- z$proposalC0[z$forEtaVersion0, z$forEtaVersion0, drop=FALSE]
 
 	for (i in 1:ngroups)
@@ -1551,9 +1456,9 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		# used for this group,
 		# and "rates" indicates the rate parameters among these.
 		use <- rep(TRUE, startupGlobal$pp)
-		rates <- startupGlobal$effects$basicRate
+		rates <- startupGlobal$requestedEffects$basicRate
 		use[rates] <- FALSE
-		use[startupGlobal$effects$group==i] <- TRUE
+		use[startupGlobal$requestedEffects$group==i] <- TRUE
 		rates <- rates[use]
 		# project model specification to the single group:
 		if (ngroups <= 1)
@@ -1623,7 +1528,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
     z <- initializeFRAN(z, algo, data=data, effects=effects,
                 prevAns=prevAns, initC=FALSE, onlyLoglik=TRUE)
 	z$thetaMat <- initialEstimates
-	z$basicRate <- z$effects$basicRate
+	z$basicRate <- z$requestedEffects$basicRate
     z$nGroup <- z$f$nGroup
 	is.batch(TRUE)
 
@@ -1663,9 +1568,9 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
                lapply(1:periods[i], function(j)
                   {
                       rateEffects <-
-                          z$effects[z$effects$basicRate &
-                                    z$effects$period == j &
-                                    z$effects$group == i,]
+                          z$effects[z$requestedEffects$basicRate &
+                                    z$requestedEffects$period == j &
+                                    z$requestedEffects$group == i,]
                       rateEffects <-
                           rateEffects[match(netnames,
                                             rateEffects$name), ]
@@ -1680,9 +1585,9 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	# Indicator of parameters in the parameter vector of length pp,
 	# for which the hierarchical model applies,
 	# which is the set of all parameters without the basic rate parameters:
-#	z$generalParameters <- (z$effects$group == 1) & (!z$basicRate)
+#	z$generalParameters <- (z$requestedEffects$group == 1) & (!z$basicRate)
 	# Dependent variable:
-#	z$dependentVariable <- z$effects$name
+#	z$dependentVariable <- z$requestedEffects$name
 
 	# Number of parameters in each group:
 	z$TruNumPars <- sum( !z$basicRate ) + length(z$ratePositions[[1]])
@@ -1787,16 +1692,17 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	z$priorMu[z$ratesInVarying] <- rowMeans(rateParameters)
 	z$priorSigma[z$ratesInVarying,] <- 0
 	z$priorSigma[,z$ratesInVarying] <- 0
-	z$priorSigma[z$ratesInVarying,z$ratesInVarying] <- 
-			reductionFactor * cov(t(rateParameters))
-	diag(z$priorSigma)[z$ratesInVarying] <- 
+	z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
+			z$priorKappa * reductionFactor * cov(t(rateParameters))
+	diag(z$priorSigma)[z$ratesInVarying] <- z$priorKappa *
 				(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
-	
+
 	z$incidentalBasicRates <- incidentalBasicRates
 	z$delta <- delta
 	z$gamma <- gamma
 	z$reductionFactor <- reductionFactor
-	if (nmain < 10){nmain <<- 10}
+	if (nwarm < 5){nwarm <<- 5}
+	if (nmain < 5 + nwarm){nmain <<- 5+nwarm}
 
    if (frequentist)
 	{
@@ -1885,7 +1791,7 @@ flattenChains <- function(zz)
     zz
 }
 
-##@dmvnorm algorithms calculates multivariate normal density
+##@dmvnorm algorithms calculates log multivariate normal density
 ##inefficient: should not call mahalanobis and eigen with same sigma repeatedly
 dmvnorm <- function(x, mean , sigma)
 {
@@ -1896,11 +1802,15 @@ dmvnorm <- function(x, mean , sigma)
 	if (min(eigen(sigma)$values)< 1e-8)
 	{
 		cat('singular covariance matrix in dmvnorm\n')
-		browser()
+		dmvn <- -Inf
 	}
-    distval <- mahalanobis(x, center=mean, cov=sigma)
-    logdet <- sum(log(eigen(sigma, symmetric=TRUE, only.values=TRUE)$values))
-    -(ncol(x) * log(2 * pi) + logdet + distval) / 2
+	else
+	{
+		distval <- mahalanobis(x, center=mean, cov=sigma)
+		logdet <- sum(log(eigen(sigma, symmetric=TRUE, only.values=TRUE)$values))
+		dmvn <- -(ncol(x) * log(2 * pi) + logdet + distval) / 2
+	}
+	dmvn
 }
 
 ##@getProbabilitiesFromC sienaBayes gets loglik from chains in C
@@ -1971,34 +1881,46 @@ doGetProbabilitiesFromC <- function(x, thetaMat, index, getScores)
 }
 
 ##@glueBayes combines two sienaBayesFit into one
-glueBayes <- function(z1,z2){
+glueBayes <- function(z1,z2,nwarm2=0){
 	z <- list()
 	dif <- FALSE
+	nstart2 <- nwarm2+1
 	d1 <- sum(!is.na(z1$ThinPosteriorMu[,1]))
 	d2 <- sum(!is.na(z2$ThinPosteriorMu[,1]))
+	if (nstart2 > d2){stop("Insufficient data in z2.")}
 	z$ThinPosteriorMu <-
 		rbind(z1$ThinPosteriorMu[1:d1,,drop=FALSE],
-				z2$ThinPosteriorMu[1:d2,,drop=FALSE])
+				z2$ThinPosteriorMu[nstart2:d2,,drop=FALSE])
 	z$ThinPosteriorEta  <-
 		rbind(z1$ThinPosteriorEta[1:d1,,drop=FALSE],
-				z2$ThinPosteriorEta[1:d2,,drop=FALSE])
+				z2$ThinPosteriorEta[nstart2:d2,,drop=FALSE])
 	z$ThinPosteriorSigma  <-
-		array(NA, c(d1+d2, dim(z1$ThinPosteriorSigma)[c(2,3)]))
+		array(NA, c(d1+d2-nwarm2, dim(z1$ThinPosteriorSigma)[c(2,3)]))
 	z$ThinPosteriorSigma[1:d1,,] <- z1$ThinPosteriorSigma[1:d1,,,drop=FALSE]
-	z$ThinPosteriorSigma[(d1+1):(d1+d2),,] <-
-		z2$ThinPosteriorSigma[1:d2,,,drop=FALSE]
-	z$ThinParameters  <- array(NA, c(d1+d2, dim(z1$ThinParameters)[c(2,3)]))
+	z$ThinPosteriorSigma[(d1+1):(d1+d2-nwarm2),,] <-
+		z2$ThinPosteriorSigma[nstart2:d2,,,drop=FALSE]
+	z$ThinParameters  <-
+		array(NA, c(d1+d2-nwarm2, dim(z1$ThinParameters)[c(2,3)]))
 	z$ThinParameters[1:d1,,] <- z1$ThinParameters[1:d1,,,drop=FALSE]
-	z$ThinParameters[(d1+1):(d1+d2),,] <- z2$ThinParameters[1:d2,,,drop=FALSE]
+	z$ThinParameters[(d1+1):(d1+d2-nwarm2),,] <-
+		z2$ThinParameters[nstart2:d2,,,drop=FALSE]
 	z$ThinBayesAcceptances <-
 		rbind(z1$ThinBayesAcceptances[1:d1,,drop=FALSE],
-				z2$ThinBayesAcceptances[1:d2,,drop=FALSE])
+				z2$ThinBayesAcceptances[nstart2:d2,,drop=FALSE])
 	z$frequentist <- z1$frequentist
 	z$pp <- z1$pp
 	z$cconditional <- z1$cconditional
 	z$rate <- z1$rate
 	z$nwarm  <- z1$nwarm
-	z$nmain  <- z1$nmain + z2$nwarm+z2$nmain
+	z$nmain  <- z1$nmain + z2$nwarm+z2$nmain - nwarm2
+	if (z1$mult == z2$mult)
+	{
+		z$mult <- z1$mult
+	}
+	else
+	{
+		dif <- TRUE
+	}
 	if (z1$nrunMHBatches == z2$nrunMHBatches)
 	{
 		z$nrunMHBatches <- z1$nrunMHBatches
@@ -2007,7 +1929,7 @@ glueBayes <- function(z1,z2){
 	{
 		dif <- TRUE
 	}
-	if (all(z1$priorMu == z2$priorMu))
+	if (all(z1$priorMu[!z1$ratesInVarying] == z2$priorMu[!z2$ratesInVarying]))
 	{
 		z$priorMu <- z1$priorMu
 	}
@@ -2015,7 +1937,8 @@ glueBayes <- function(z1,z2){
 	{
 		dif <- TRUE
 	}
-	if (all(z1$priorSigma == z2$priorSigma))
+	if (all(z1$priorSigma[!z1$ratesInVarying,!z1$ratesInVarying] ==
+				z2$priorSigma[!z2$ratesInVarying, !z2$ratesInVarying]))
 	{
 		z$priorSigma <- z1$priorSigma
 	}
@@ -2055,11 +1978,11 @@ glueBayes <- function(z1,z2){
 	{
 		dif <- TRUE
 	}
-	z$initialResults == z1$initialResults
 	if (dif)
 	{
 		stop("The two objects do not have the same specification.")
 	}
+	z$initialResults <- z1$initialResults
 	z$nGroup <- z1$nGroup
 	z$set1  <- z1$set1
 	z$set2  <- z1$set2
@@ -2069,6 +1992,7 @@ glueBayes <- function(z1,z2){
 	z$ratePositions  <- z1$ratePositions
 	z$objectiveInVarying  <- z1$objectiveInVarying
 	z$generalParametersInGroup <- z1$generalParametersInGroup
+	z$varyingParametersInGroup  <- z1$varyingParametersInGroup
 	z$varyingGeneralParametersInGroup  <- z1$varyingGeneralParametersInGroup
 	z$varyingObjectiveParameters <- z1$varyingObjectiveParameters
 	z$incidentalBasicRates <- z1$incidentalBasicRates
@@ -2077,7 +2001,7 @@ glueBayes <- function(z1,z2){
 }
 
 ##@protectedInverse inverse of p.s.d matrix
-protectedInverse <- function(x){		
+protectedInverse <- function(x){
 	if (inherits(try(xinv <- chol2inv(chol(x)),
 					silent=TRUE), "try-error"))
 		{

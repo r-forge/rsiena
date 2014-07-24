@@ -67,7 +67,7 @@ void GwespFunction::initialize(const Data * pData,
 double GwespFunction::value(int alter)
 {
 	int statistic = lpInitialisedTable->get(alter);
-		return this->lcumulativeWeight[statistic];
+	return this->lcumulativeWeight[statistic];
 }
 
 

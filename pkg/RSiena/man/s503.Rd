@@ -20,7 +20,7 @@ Working Paper No. 52. MRC Medical Sociology Unit Glasgow.
 
 See \url{http://www.stats.ox.ac.uk/~snijders/siena/s50_data.htm}
 }
-\seealso{\code{\link{s501}}, \code{\link{s502}}, \code{\link{s50a}}
+\seealso{\code{\link{s501}}, \code{\link{s502}}, \code{\link{s50a}}, \code{\link{s50s}}
 }
 \examples{
 mynet <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))

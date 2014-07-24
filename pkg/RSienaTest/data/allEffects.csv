@@ -102,13 +102,16 @@ covarSymmetricObjective,transitive triplets homog. xxxxxx,Number of transitive t
 covarSymmetricObjective,transitive triads jumping xxxxxx,Number of transitive triads jumping xxxxxx,jumpXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarSymmetricObjective,xxxxxx ego x xxxxxx alter,xxxxxx ego x xxxxxx alter,egoXaltX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarSymmetricObjective,xxxxxx of indirect ties,xxxxxx of indirect ties,IndTies,FALSE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarSymmetricObjective,xxxxxx alter at distance 2 (#),xxxxxx alter at distance 2 (#),altDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarSymmetricObjective,xxxxxx similarity at distance 2,xxxxxx similarity at distance 2,simDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,xxxxxx alter at dist 2 (#),xxxxxx alter at dist 2 (#),altDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,xxxxxx tot alter at dist 2 (#),xxxxxx tot alter at dist 2 (#),totDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,xxxxxx similarity at dist 2,xxxxxx similarity at dist 2,simDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,xxxxxx in-alter dist 2 (#),xxxxxx in-alter dist 2 (#),altInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,xxxxxx tot in-alter dist 2 (#),xxxxxx tot in-alter dist 2 (#),totInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBipartiteObjective,xxxxxx alter,Sum of indegrees x xxxxxx,altX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBipartiteObjective,xxxxxx squared alter,Sum of indegrees x squared xxxxxx,altSqX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBipartiteObjective,xxxxxx ego,Sum of outdegrees x xxxxxx,egoX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego,FALSE
-covarBipartiteObjective,xxxxxx alter at distance 2,xxxxxx alter at distance 2,altDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarBipartiteObjective,xxxxxx similarity at distance 2,xxxxxx similarity at distance 2,simDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarBipartiteObjective,xxxxxx in-alter dist 2 (#),xxxxxx in-alter dist 2 (#),altInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarBipartiteObjective,xxxxxx tot in-alter dist 2 (#),xxxxxx tot in-alter dist 2 (#),totInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNonSymmetricObjective,xxxxxx alter,Sum of indegrees x xxxxxx,altX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNonSymmetricObjective,xxxxxx squared alter,Sum of indegrees x squared xxxxxx,altSqX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNonSymmetricObjective,xxxxxx ego,Sum of outdegrees x xxxxxx,egoX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego,FALSE
@@ -124,8 +127,11 @@ covarNonSymmetricObjective,xxxxxx ego x xxxxxx alter,Sum xxxxxx ego x xxxxxx alt
 covarNonSymmetricObjective,xxxxxx ego x xxxxxx alter x recipr.,Sum xxxxxx ego x xxxxxx rec.alter,egoXaltXRecip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNonSymmetricObjective,higher xxxxxx,ego > alter for xxxxxx,higher,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNonSymmetricObjective,xxxxxx of indirect ties,Sum xxxxxx of indirect ties,IndTies,FALSE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNonSymmetricObjective,xxxxxx alter at distance 2 (#),xxxxxx alter at distance 2 (#),altDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNonSymmetricObjective,xxxxxx similarity at distance 2,xxxxxx similarity at distance 2,simDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,xxxxxx alter at dist 2 (#),xxxxxx alter at dist 2 (#),altDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,xxxxxx tot alter at dist 2 (#),xxxxxx tot alter at dist 2 (#),totDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,xxxxxx similarity at dist 2,xxxxxx similarity at dist 2,simDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,xxxxxx in-alter dist 2 (#),xxxxxx in-alter dist 2 (#),altInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,xxxxxx tot in-alter dist 2 (#),xxxxxx tot in-alter dist 2 (#),totInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBehaviorNetObjective,behavior xxxxxx: av. sim. (zzzzzz) x ego's yyyyyy,beh. xxxxxx av. sim. (zzzzzz) x ego's yyyyyy,avSimEgoX,TRUE,yyyyyy,zzzzzz,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarBehaviorNetObjective,behavior xxxxxx: tot. sim. (zzzzzz) x ego's yyyyyy,beh. xxxxxx tot. sim. (zzzzzz) x ego's yyyyyy,totSimEgoX,TRUE,yyyyyy,zzzzzz,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarBehaviorNetObjective,behavior xxxxxx: av. alters (zzzzzz) x ego's yyyyyy,beh. xxxxxx av. alters (zzzzzz) x ego's yyyyyy ,avAltEgoX,TRUE,yyyyyy,zzzzzz,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
@@ -152,8 +158,8 @@ nonSymmetricObjective,3-cycles,3-cycles,cycle3,TRUE,,,eval,FALSE,FALSE,FALSE,FAL
 nonSymmetricObjective,transitive ties,Number of ties with transitive closure,transTies,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,TRUE
 nonSymmetricObjective,betweenness,betweenness count,between,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,TRUE
 nonSymmetricObjective,balance,Amount of balance,balance,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
-nonSymmetricObjective,number of actors at distance 2,Number of directed distances equal to 2,nbrDist2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE,FALSE
-nonSymmetricObjective,number pairs at doubly achieved distance 2,Number of doubly achieved distances 2,nbrDist2twice,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+nonSymmetricObjective,number of actors at dist 2,Number of directed dists equal to 2,nbrDist2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE,FALSE
+nonSymmetricObjective,number pairs at doubly achieved dist 2,Number of doubly achieved dists 2,nbrDist2twice,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 nonSymmetricObjective,dense triads,Sum of triads with # or more ties,denseTriads,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,,TRUE
 nonSymmetricObjective,GWESP I -> K -> J (#),Number of edgewise shared partners by two path (#),gwespFF,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,,FALSE
 nonSymmetricObjective,GWESP I <- K <- J (#),Number of edgewise shared partners by reverse two path (#),gwespBB,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,,FALSE
@@ -189,8 +195,8 @@ symmetricObjective,transitive triads,Number of transitive triads,transTriads,TRU
 symmetricObjective,transitive ties,Number of ties with transitive closure,transTies,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 symmetricObjective,betweenness,betweenness count,between,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 symmetricObjective,balance,Amount of balance,balance,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
-symmetricObjective,number of actor pairs at distance 2,Number of distances equal to 2,nbrDist2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
-symmetricObjective,number pairs at doubly achieved distance 2,Number of doubly achieved distances 2,nbrDist2twice,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+symmetricObjective,number of actor pairs at dist 2,Number of dists equal to 2,nbrDist2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+symmetricObjective,number pairs at doubly achieved dist 2,Number of doubly achieved dists 2,nbrDist2twice,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 symmetricObjective,GWESP (#),Number of edgewise shared partners (#),gwesp,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,,FALSE
 symmetricObjective,4-cycles,(Number 4-cycles)^1/#),cycle4ND,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
 symmetricObjective,degree of alter,Sum of squared degrees,inPop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
@@ -249,5 +255,8 @@ covarNetNetObjective,from xxxxxx agr. x same yyyyyy,"m.tr. XWW, W = xxxxxx, same
 covarNetNetObjective,xxxxxx closure jumping yyyyyy,"m.tr. W->W=>X, W = xxxxxx, jump yyyyyy",jumpWWClosure,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNetNetObjective,mixed xxxxxx closure jumping yyyyyy,"m.tr. W->X=>X, W = xxxxxx, jump yyyyyy",jumpWXClosure,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNetNetObjective,mixed xxxxxx closure homog. yyyyyy,"m.tr. W->X=>X, W = xxxxxx, homog. yyyyyy",homWXClosure,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNetNetObjective,yyyyyy alter at distance 2 on xxxxxx (#),yyyyyy alter at distance 2 on xxxxxx (#),altDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
-covarNetNetObjective,yyyyyy similarity at distance 2 on xxxxxx,yyyyyy similarity at distance 2 on xxxxxx,simDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+covarNetNetObjective,yyyyyy alter at dist 2 on xxxxxx (#),yyyyyy alter at dist 2 on xxxxxx (#),altDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
+covarNetNetObjective,yyyyyy similarity at dist 2 on xxxxxx,yyyyyy similarity at dist 2 on xxxxxx,simDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
+covarNetNetObjective,yyyyyy tot alt. at dist 2 on xxxxxx (#),yyyyyy tot alt. at dist 2 on xxxxxx (#),totDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
+covarNetNetObjective,xxxxxx in-alter dist 2 (#),xxxxxx in-alter dist 2 (#),altInDist2W,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNetNetObjective,xxxxxx tot in-alter dist 2 (#),xxxxxx tot in-alter dist 2 (#),totInDist2W,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE

@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-277.
+This version was renewed for \RS version 1.1-278.
 \end{abstract}
 
 
@@ -556,7 +556,8 @@ here the behavior variable representing
 having adopted the innovation is binary, coded 0 or 1, and
 once an actor has the value 1 s/he is stuck with it.
 The only possible transitions are $0 \Rightarrow 1$, representing
-that the actor adopts the innovation.\\
+that the actor adopts the innovation.
+See Section~\ref{S_behRate}.\\
 
 \noindent
 \textbf{Covariates}\\
@@ -975,7 +976,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-277) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-278) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1259,20 +1260,28 @@ change exogenously, i.e., according
 to mechanisms not included in the model, while the dependent
 action variables change endogenously, i.e.,
 depending on their own values and on the changing network.
-In the current implementation only one dependent network variable is
-allowed, but the number of dependent action variable can be larger than one.
 Unlike the changing individual covariates,
 the values of dependent action variables are not assumed to be
 constant between observations.
 
 Dependent behavioral variables must have nonnegative integer values;
 e.g., 0 and 1, or a range of integers like 0,1,2 or 1,2,3,4,5.
+The number of different values should not be too high: ten values
+is on the high side.
 Each dependent action variable must be given in one
 matrix, containing $k = M$ columns, corresponding to the $M$
 observation moments.
 
 If any values are not integers, a warning will be printed on the initial report
 given by \sfn{print01Report()} and the values will be truncated towards zero.
+
+A special case of behavioral data can be used for
+\emph{diffusion of innovations} \citep{Greenan14}:
+here the behavior variable representing
+having adopted the innovation is binary, coded 0 or 1, and
+changes $1 \Rightarrow 0$ are impossible.
+Model specifications that are especially useful for this data type
+are presented in Section~\ref{S_behRate}.
 
 \subsubsection{Individual covariates}
 
@@ -5290,7 +5299,7 @@ test to your dataset, run an estimation in the usual way, e.g. as follows
 (we specify \texttt{nsub=2, n3=100} just to have an example that runs
 very quickly):
 \begin{verbatim}
-myalgorithm <- sienaAlgorithmCreate(fn=simstats0c, nsub=2, n3=100)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
 mynet1      <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata      <- sienaDataCreate(mynet1)
 myeff       <- getEffects(mydata)
@@ -5337,7 +5346,7 @@ By also requesting \texttt{simOnly = TRUE} the calculation
 of standard errors, which usually is not meaningful when
 simulating without estimating, is suppressed.
 \begin{verbatim}
-sim_model  <-  sienaAlgorithmCreate( projname = 'sim_model', cond = FALSE,
+sim_model  <-  sienaAlgorithmCreate( projname = "sim_model", cond = FALSE,
                       useStdInits = FALSE, nsub = 0 , simOnly = TRUE)
 sim_ans    <-  siena07( sim_model, data = mydata, effects = myeff )
 \end{verbatim}
@@ -5995,7 +6004,7 @@ is the same for the different networks.
 These methods can be applied for two or more networks.
 \medskip
 
-In the following discussion, 
+In the following discussion,
 the terms `networks' and `sub-projects' are used interchangeably.
 
 \noindent
@@ -6024,7 +6033,7 @@ The four options are:
       are the same for the various networks, except for the basic rate
       parameters; and except for explicitly specified interaction
       effects between variables depending on the sub-project, and other effects.
-      
+
       Usually, option (2) is preferable to option (1).
 \item Analyzing the different networks separately, without any assumption
       that parameters are the same but using the same model specification,
@@ -6074,7 +6083,7 @@ is determined by these differences.
 
 When the data sets for the different networks are quite small,
 then one might start by option (2), and use \sfn{sienaTimeTest} to test
-for which of the effects especially there is a large variation in 
+for which of the effects especially there is a large variation in
 parameter values across the sub-projects;
 next one could follow approach (4), determining the randomness of the effects
 by the results about this variability.
@@ -6431,18 +6440,18 @@ will be significant.
   The parameters -- excepting the basic rate parameters -- can be either
   randomly varying between groups according to a multivariate
   normal distribution, or non-varying and constant across groups.
-  The difference is made by setting the parameter \texttt{random} in 
+  The difference is made by setting the parameter \texttt{random} in
   the function \sfn{setEffect}. The default is that only the out-degree (density)
   effect is randomly varying, but it is advisable to specify
   this for a larger set of effects.
   Specifying it for too many effects may, however, lead to unstable estimation.
-  
+
   The analysis is done by a Bayesian estimation method.
   For the groupwise parameters normal distributions are assumed with conjugate
   priors. The prior distribution for the basic rate parameters is determined
   in a data-dependent way. For the non-varying parameters,
   a flat prior is assumed.
-  
+
   The procedure consists of three parts: initialization, warming,
   main phase.
   \begin{enumerate}
@@ -6466,7 +6475,7 @@ will be significant.
   In the warming as well as the final phase, the number of MH steps is
   determined by parameter \sfn{mult} (``multiplication factor'')
   in the call of \sfn{sienaAlgorithmCreate} that created the algorithm object.
-\end{enumerate}  
+\end{enumerate}
   The function \sfn{sienaBayes} is time-consuming. When starting to use it, it is advisable
   to start with low values of \sfn{nmain} to explore computing time.
   When the procedure seems to diverge, and for very small groups, it is
@@ -6476,19 +6485,19 @@ will be significant.
 
 \subsubsection{Which data sets to use for sienaBayes}
 
-\sfn{sienaBayes} uses as data set a \sfn{sienaGroup} object with 2 or more groups. 
+\sfn{sienaBayes} uses as data set a \sfn{sienaGroup} object with 2 or more groups.
 The number of waves should be the same for all groups.
 
-\sfn{sienaBayes} should be possible for groups as small as 5 actors. 
-A restriction (maybe to be lifted later) is that the networks must not be 
-empty at any wave; and consecutive waves of networks must not be identical 
+\sfn{sienaBayes} should be possible for groups as small as 5 actors.
+A restriction (maybe to be lifted later) is that the networks must not be
+empty at any wave; and consecutive waves of networks must not be identical
 (in other words, all Jaccard indices should be strictly less than 1).
 
-Be prepared for long computation times. The reason is that likelihood-based 
-computations are used (as distinct from the Method of Moments approach). 
-If all individual groups have enough information for good estimation by 
-the Method of Moments according to the intended model, 
-the use of \sfn{siena07()} with the (default) Method of Moments, followed by a 
+Be prepared for long computation times. The reason is that likelihood-based
+computations are used (as distinct from the Method of Moments approach).
+If all individual groups have enough information for good estimation by
+the Method of Moments according to the intended model,
+the use of \sfn{siena07()} with the (default) Method of Moments, followed by a
 meta-analysis by means of \sfn{siena08()}, may be preferable.
 
 \subsubsection{Model specification}
@@ -6496,85 +6505,85 @@ meta-analysis by means of \sfn{siena08()}, may be preferable.
 The extra part of model specification, compared to \sfn{siena07()},
 is that it is required to specify which parameters are
 randomly varying from group to group, and which are fixed across groups.
-The basic rate parameters always are randomly varying. 
+The basic rate parameters always are randomly varying.
 Other rate parameters can not yet be included.
 
 The specification of fixed vs.\ randomly varying is done in the function \sfn{setEffect}.
 
 There currently is little advice about this.
-The theoretically important effects, and those for which variation is expected, 
+The theoretically important effects, and those for which variation is expected,
 may be specified as varying.
-Also it is possible to first do a multi-group analysis of the same model, 
-followed by a \sfn{sienaTimeTest}, and specify those effects as randomly 
+Also it is possible to first do a multi-group analysis of the same model,
+followed by a \sfn{sienaTimeTest}, and specify those effects as randomly
 varying for which the time heterogeneity is largest according to the groupwise results.
 
 \subsubsection{How to enter your data in sienaBayes}
 
-See the example at the bottom of the \sfn{sienaBayes} help page for how a 
+See the example at the bottom of the \sfn{sienaBayes} help page for how a
 \sfn{sienaGroup} object can be created and used.
-If some but not all of the Siena data objects combined in the \sfn{sienaGroup} have 
-periods where changes are only upward or only downward, 
-it will be necessary to use \texttt{allowOnly=FALSE} in the call of 
+If some but not all of the Siena data objects combined in the \sfn{sienaGroup} have
+periods where changes are only upward or only downward,
+it will be necessary to use \texttt{allowOnly=FALSE} in the call of
 \sfn{sienaDependent}; see the help page for \sfn{sienaDependent}.
-The scripts \texttt{RscriptListGroups.R} and \texttt{RscriptMultipleGroups.R} 
+The scripts \texttt{RscriptListGroups.R} and \texttt{RscriptMultipleGroups.R}
 give further examples and explanation for creating \sfn{sienaGroup} objects.
 
-If you have a large number of groups (more than 30), try first 
-with a smaller number of groups (10-20). If you need or wish to 
-make a selection of groups, select the one with few or no missing data and 
+If you have a large number of groups (more than 30), try first
+with a smaller number of groups (10-20). If you need or wish to
+make a selection of groups, select the one with few or no missing data and
 with Jaccard coefficients at least 0.30.
 
 \subsubsection{How to choose the parameter settings for sienaBayes}
 
-It may be good to have an initial try run with 
-\texttt{nwarm=5, nmain=10, nrunMHBatches=5} 
-(for speed) and \texttt{silentstart = FALSE} (for information about the 
-initialization phase), and then \sfn{print} the result. 
-This will give information about the results of the initialization 
-phase and about computing time. If some of the groups have some very 
-high estimated rate parameters, you should either drop those groups 
-or decrease the value of \texttt{initgainGroupwise}. 
-The new value could be, e.g., 0.005 or 0.001 or 0.0. With the lower value 
-of \texttt{initgainGroupwise}, dropping the groups concerned may be unnecessary, 
+It may be good to have an initial try run with
+\texttt{nwarm=5, nmain=10, nrunMHBatches=5}
+(for speed) and \texttt{silentstart = FALSE} (for information about the
+initialization phase), and then \sfn{print} the result.
+This will give information about the results of the initialization
+phase and about computing time. If some of the groups have some very
+high estimated rate parameters, you should either drop those groups
+or decrease the value of \texttt{initgainGroupwise}.
+The new value could be, e.g., 0.005 or 0.001 or 0.0. With the lower value
+of \texttt{initgainGroupwise}, dropping the groups concerned may be unnecessary,
 so don't drop groups too soon.
 
 For normal use, \texttt{nwarm=100, nmain=1000, nrunMHBatches=20}
-may be reasonable. 
-We still have to develop guidelines about how to choose the number of 
-iterations. If the tracelines show that the process is still quite 
-unstable even in the later part of the runs, possibilities are to 
-increase \texttt{nrunMHBatches} but also to increase the \texttt{mult} parameter in 
-\sfn{sienaAlgorithmCreate}. Increasing these will for both of them lead to 
-a proportional increase in computing time. 
+may be reasonable.
+We still have to develop guidelines about how to choose the number of
+iterations. If the tracelines show that the process is still quite
+unstable even in the later part of the runs, possibilities are to
+increase \texttt{nrunMHBatches} but also to increase the \texttt{mult} parameter in
+\sfn{sienaAlgorithmCreate}. Increasing these will for both of them lead to
+a proportional increase in computing time.
 
-If multiple processors are available (which most computers have nowadays), 
-you can make more speed by setting the \texttt{nbrNodes} parameter to a value 
-larger than 1. Since parallelization goes by wave $\times$ group, 
-it is nice, but not necessary, to have a value for \texttt{nbrNodes} that 
-is a divisor of (the number of waves multiplied by the number of groups). 
+If multiple processors are available (which most computers have nowadays),
+you can make more speed by setting the \texttt{nbrNodes} parameter to a value
+larger than 1. Since parallelization goes by wave $\times$ group,
+it is nice, but not necessary, to have a value for \texttt{nbrNodes} that
+is a divisor of (the number of waves multiplied by the number of groups).
 Do not use such a high value for \texttt{nbrNodes} that your computer gets too
- hot or overworked. For Windows machines this can be monitored by opening 
+ hot or overworked. For Windows machines this can be monitored by opening
  the Task Manager (you will find how to do this by right clicking on the bottom toolbar).
 
 \subsubsection{Interpreting results of sienaBayes}
 
-You can visually inspect convergence by looking at the tracelines of the 
+You can visually inspect convergence by looking at the tracelines of the
 various parameters. These can be plotted by the functions in \texttt{BayesPlots.r}
-(available from the Siena website). In many cases, the tracelines for 
+(available from the Siena website). In many cases, the tracelines for
 the rate parameters already tell the story about convergence.
 
-The file \texttt{BayesPlots.r} contains a variety of plotting functions that 
+The file \texttt{BayesPlots.r} contains a variety of plotting functions that
 can be used to obtain trace plots and posterior density plots.
 
-The parameters \texttt{nwarm} and \texttt{nmain} in the call of 
-\sfn{sienaBayes} only imply 
-that an extra \sfn{improveMH} step is made between the warming and the 
-main iterations; there are no other differences between the warming 
-and main iterations. It is possible that convergence has set in only 
+The parameters \texttt{nwarm} and \texttt{nmain} in the call of
+\sfn{sienaBayes} only imply
+that an extra \sfn{improveMH} step is made between the warming and the
+main iterations; there are no other differences between the warming
+and main iterations. It is possible that convergence has set in only
 later; depending on the case, the traceplots may give information about this.
-If you conclude that convergence has occurred later, then use this to 
-define the \texttt{nfirst} parameter in the \sfn{print} and 
-\sfn{summary} functions for 
+If you conclude that convergence has occurred later, then use this to
+define the \texttt{nfirst} parameter in the \sfn{print} and
+\sfn{summary} functions for
 \sfn{sienaBayesFit} object (see \texttt{`?print.sienaBayesFit'}).
 
 When the procedure seems to have diverged and this occurs right
@@ -6582,34 +6591,34 @@ from the start, it is
 advisable to use smaller values of the parameters \texttt{initgainGlobal}
 and \texttt{initgainGroupwise}.
 If divergence sets in later and is most pronounced
-for the rate parameters, it may be advisable to use a smaller value of 
+for the rate parameters, it may be advisable to use a smaller value of
 \texttt{reductionFactor}, e.g., 0.1.
 If generally the tracelines are irregular, it may be good to increase
-\texttt{nrunMHBatches} but another possibility is to increase 
-the \texttt{mult} parameter set in \sfn{sienaAlgorithmCreate()}. 
+\texttt{nrunMHBatches} but another possibility is to increase
+the \texttt{mult} parameter set in \sfn{sienaAlgorithmCreate()}.
 
 The \sfn{print} and \sfn{summary} functions
 give posterior means, posterior standard deviations, 95\% credibility intervals,
-and one-sided posterior $p$-values 
-for testing whether the parameter is positive or negative. 
-These are the Bayesian versions of estimates, standard errors, 
+and one-sided posterior $p$-values
+for testing whether the parameter is positive or negative.
+These are the Bayesian versions of estimates, standard errors,
 confidence intervals, and $p$-values.
 
 The functions \sfn{simpleBayesTest()} and \sfn{multipleBayesTest()}
 are available for testing parameters; see the help page for these functions.
-To compute further properties of the sample of the posterior, 
+To compute further properties of the sample of the posterior,
 the components
 \texttt{ThinParameters, ThinPosteriorMu, \\
-ThinPosteriorEta}, and \texttt{ThinPosteriorSigma} of the 
+ThinPosteriorEta}, and \texttt{ThinPosteriorSigma} of the
 \sfn{sienaBayesFit} object, as mentioned in the help page, may be useful.
 
-When the procedure has made a good start but the MCMC sample seems too 
-short, you can make a prolonged analysis using the \texttt{prevBayes} option, 
-and then combine the earlier with the later results using \sfn{glueBayes()}. 
+When the procedure has made a good start but the MCMC sample seems too
+short, you can make a prolonged analysis using the \texttt{prevBayes} option,
+and then combine the earlier with the later results using \sfn{glueBayes()}.
 This is illustrated in the example on the help page.
 
-During operation of \sfn{sienaBayes()}, partial results of the function 
-are now and then stored 
+During operation of \sfn{sienaBayes()}, partial results of the function
+are now and then stored
 as objects named \texttt{z} in files with the name
 \texttt{PartialBayesResult.RData}; see the help page.
 This is for the case that the computer or \R stops inadvertently
@@ -6622,9 +6631,24 @@ the \texttt{prevBayes} option to continue estimation.
 \section[Formulas for effects]{Mathematical definition of effects}
 \label{S_math}
 
+The list of all effects available for any data set is obtained by
+the command
+\begin{verbatim}
+RShowDoc("effects", package="RSiena")
+\end{verbatim}
+(or \texttt{package="RSienaTest"} as the case may be).
+For a given effects object, say with the name \texttt{myeff}, the command
+\begin{verbatim}
+effectsDocumentation(effects = myeff)
+\end{verbatim}
+will give a file with all effects implemented for this effects object.
+See
+\begin{verbatim}
+?effectsDocumentation \end{verbatim}
+for further options.
 
-Here, the mathematical formulae for the definition of the effects
-are given. In \citet{Snijders01,Snijders05} and \citet*{SteglichEA10},
+This chapter present the mathematical formulae for the definition of the effects.
+In \citet{Snijders01,Snijders05} and \citet*{SteglichEA10},
 further background to these formulae can be found.
 The effects are grouped into effects for modelling network
 evolution and effects for modelling behavioral evolution (i.e.,
@@ -7664,7 +7688,7 @@ of $\breve v_i$ would be the same as the alter effect of $v_i$.
       where
 \begin{equation}
   \breve v_j^{(-i)} = \left\{\begin{array}{ll} \displaystyle
-         \frac{\sum_{h \neq j} x_{jh}v_h}{x_{j+} - x_{ji}}  &
+         \frac{\sum_{h \neq i} x_{jh}v_h}{x_{j+} - x_{ji}}  &
                                        \text{ if } x_{j+} - x_{ji} > 0     \\
          0                                &  \text{ if } x_{j+}- x_{ji} = 0  .
   \end{array}   \right.            \label{alt_av2}
@@ -7680,6 +7704,24 @@ of $\breve v_i$ would be the same as the alter effect of $v_i$.
        \frac{x_{j+} \breve v_j - x_{ji}v_i}{x_{j+}-x_{ji}}
       \]
       (where 0/0 is interpreted as 0).
+
+
+\item \emph{total covariate - alter at distance 2} \texttt{(totDist2)}.
+      This is like the previous effect, but using the total
+      instead of the average value of alter's covariate.
+      For parameter 1, it is  defined as
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, x_{j+}\breve v_j \hfill
+            (\text{parameter 1}) \hfill
+\]
+      and for parameter 2, as
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} (x_{j+} - x_{ji}) \breve v_j^{(-i)} \hfill
+                          (\text{parameter 2}) \hfill
+\]
+      where $\breve v_j$ and $\breve v_j^{(-i)}$ are as above.
+
+
 \item \emph{covariate - similarity at distance 2} \texttt{(simDist2)} ,
       defined as the sum of centered similarity
       values for alters' covariate-average between $i$ and all actors
@@ -7702,6 +7744,34 @@ of $\breve v_i$ would be the same as the alter effect of $v_i$.
  for each of the observations $t_1$ to $t_{M-1}$, and averaging
  these
  $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
+
+\item \emph{covariate - in - alter at distance 2} \texttt{(altInDist2)}.
+     This is defined as the sum of alters' values for
+     the average of the covariate values of all their
+     incoming ties, except for the possibly incoming tie from ego:
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \check v_j^{(-i)}
+\]
+      where
+\begin{equation}
+  \check v_j^{(-i)} = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_{h \neq i} x_{hj}\,v_h}{x_{+j} - x_{ij}}  &
+                                       \text{ if } x_{+j} - x_{ij} > 0     \\
+         0                                &  \text{ if } x_{+j}- x_{ij} = 0  .
+  \end{array}   \right.            \label{alt_inav2}
+\end{equation}
+
+
+\item \emph{total covariate - in - alter at distance 2} \texttt{(totInDist2)}.
+     This is defined as the sum of alters' values for
+     the total of the covariate values of all their incoming ties,
+     except for the possibly incoming tie from ego:
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} (x_{+j} - x_{ij}) \check v_j^{(-i)} \ .
+\]
+
+
+\setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 \iffalse
 If there are multiple networks, their roles can be crossed here --
@@ -7734,6 +7804,9 @@ the generality already now.
 
 \subsubsection{Multiple network effects}
 \label{S_MultiNet}
+
+An introduction to the analysis of multiple (multivariate) networks,
+with a discussion of the basic effects, is given in \citet{SLT2013}.
 
 If there are multiple dependent networks, the definition of
 cross-network effects is such that always, one network has the
@@ -8335,6 +8408,24 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
          0                                &  \text{ if } w_{j+}- w_{ji} = 0  .
   \end{array}   \right.
 \end{equation}
+
+\item \emph{total covariate - alter at W-distance 2} \texttt{(totDist2W)} \\
+      This effect is like the previous effect, but now defined
+      defined as the sum of $W$-alters' covariate-total over all actors
+      to whom $i$ has a tie. For parameter 1 it is
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, x_{j+} \, \breve v_j^W \hfill (\text{parameter 1}). \hfill
+\]
+      For parameter 2, it is defined similarly,
+      but for an alters' covariate-total excluding
+      ego:
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, (x_{j+}  - x_{ji}) \,
+               \breve v_j^{W(-i)} \hfill (\text{parameter 2}) \hfill
+\]
+      where $ \breve v_j$ and $ \breve v_j^{W(-i)}$ are as above.
+
+
 \item \emph{covariate - similarity at W-distance 2} \texttt{(simDist2W)}, % \texttt{(simXDist2W)},
       defined as the sum of centered similarity
       values for alters' covariate-average between $i$ and all actors
@@ -8498,8 +8589,12 @@ reciprocated degrees.
  This effect multiplies the factor $\lambda^{\rm net}_{i3}$ by
  \[ \exp\Big( \ln\big(\alpha_h (x_{i+} +1)\big)\Big) \,=\,
                  \big(x_{i+} +1\big)^{\alpha_h} \ . \]
+ \emph{This effect works properly only for non-conditional estimation
+    (set \texttt{cond = FALSE} in \sfn{sienaAlgorithmCreate()}).  }
+
+
  The exponential link function and logarithmic transformation collaborate
- to produce direct proportionality to the outdegree + 1, in case
+ to produce direct proportionality to (outdegree + 1), in case
  the parameter is $\alpha_h=1$.
  \end{itemize}
  For the two latter effects, the addition of 1 to the outdegrees avoids
@@ -8924,6 +9019,8 @@ $I\{A\}$ is 0 if event $A$ is true
 and 0 if it is untrue.
 
 \subsubsection{Behavioral rate function}
+\label{S_behRate}
+
 The behavioral rate function $\lambda^{\rm beh}$ consists of a
 constant term per period, \[ \lambda^{\rm beh}_{i} = \rho^{\rm
 beh}_m \] for $m = 1, ..., M-1$, which can be called the basic rate;
@@ -9841,7 +9938,9 @@ See Section~\ref{S_cond}.
 \item  Use non-conditional estimation (Section~\ref{S_cond}) if you were not
    already doing so.
 \item If the model includes the \texttt{outRate} effect, consider
-    replacing it by the \texttt{outRateLog} effect.
+    replacing it by the \texttt{outRateLog} effect;
+    but note that this works properly only for non-conditional estimation
+    (\texttt{cond = FALSE} in \sfn{sienaAlgorithmCreate()}).
 \item If you are working with a data set with more than two waves, there might
    be unmodeled heterogeneity between the periods. Try modeling the periods
    separately.
@@ -10991,12 +11090,46 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
+\item 2014-07-08  Revision 278.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item Added \texttt{s50s} to data set.
+   \item Corrected \texttt{se} component of \sfn{sienaFit} objects
+     (should be standard error, was its square).
+   \item new effects \texttt{totDist2, altInDist2, totInDist2,
+     totDist2W, altInDist2W,\\
+      totInDist2W}.
+   \item Some warnings for calculations of \texttt{z\$regrCor}
+   and \texttt{z\$regrCoef} avoided in \sfn{siena07()}.
+   \item \sfn{print01Report()} errors corrected, and slightly improved,
+    for descriptives for changing dyadic covariates
+    and for upOnly / downOnly cases.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+\item  \sfn{sienaBayes()}:
+    Internally multiplied the data-dependent choice of
+     \texttt{priorSigma} for rate parameters by \texttt{priorKappa};
+     changed \texttt{z\$nwarm} to 0 if \texttt{prevBayes} is used;
+     dropped \texttt{plotit} functionality.
+\item  \sfn{sienaBayes()}, \sfn{glueBayes()}, and 
+     \sfn{print.sienaBayes()}:
+      adapted to allow inclusion of interaction effects without the corresponding
+     main effects.
+\item Added parameter \texttt{nwarm2} to \sfn{glueBayes()}.
+      Checks of identical prior parameters in this function
+      restricted to non-rate parameters.
+\end{itemize}
+
+
 \item 2014-06-22 R-Forge Revision 277.
 Changes in RSiena and RSienaTest:
 \begin{itemize}
 \item Higher write-to-screen frequency for batch operation of \sfn{siena07()}.
 \item Function \sfn{includeEffects()} now includes parameters \texttt{fix} and \texttt{test}.
-\item Various small bug corrections (see the \sfn{ChangeLog}).
+\item Various small bug corrections (see the \sfn{ChangeLog}, 1.1-275).
 \end{itemize}
 
 Changes in RSienaTest:

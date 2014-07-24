@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: print01Report.r
 # *
@@ -608,24 +608,24 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 					 "exogenous changing actor covariate"), outf)
 				Report(ifelse(nCovars == 1, ".\n\n", "s.\n\n"), outf)
 			Report("Number of missing cases per period:\n", outf)
-			Report(c(" period	", format(1:(x$observations - 1) +
-										 periodFromStart, width=9),
-					 "		 overall\n"), sep="", outf)
+			Report(c(" period             ", format(1:(x$observations - 1) +
+										 periodFromStart, width=8),
+					 "     overall\n"), sep="", outf)
 			for (i in seq(along=covars))
 			{
 				if (use[i])
 				{
 					thiscovar <- x$vCovars[[i]] ## matrix
 					misscols <- colSums(is.na(thiscovar))
-					Report(c(format(covars[i], width=10),
-							 format(misscols, width=8),
-							 format(sum(misscols), width=9), "	   (",
+					Report(c(format(covars[i], width=20),
+							 format(misscols, width=7),
+							 format(sum(misscols), width=8), "	   (",
 							 format(round(100 * sum(misscols)/nrow(thiscovar)/
 										  ncol(thiscovar), 1), nsmall=1,
 									width=3), '%)\n'), outf)
 				}
 			}
-			Report("\nInformation about changing covariates:\n", outf)
+			Report("\nInformation about changing covariates:\n\n", outf)
 			Report(c(format("minimum  maximum	  mean  centered", width=48,
 							justify="right"), "\n"), outf)
 			any.cent <- 0
@@ -645,7 +645,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 						cent <- "   N"
 						any.noncent <- any.noncent+1
 					}
-					Report(c(covars[i], '\n'), outf) # name
+					Report(c(format(covars[i], width=39), cent, '\n'), outf) # name
 					for (j in 1:(ncol(x$vCovars[[i]])))
 					{
 						Report(c("	period", format(j + periodFromStart,
@@ -659,7 +659,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 					}
 					Report(c(format("Overall", width=29),
 							 format(round(atts$mean, 3), width=10, nsmall=3),
-							 cent, "\n"), outf)
+							 "\n\n"), outf)
 				}
 			}
 			if (nData <= 1)
@@ -708,14 +708,14 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 					myvar <- x$dycCovars[[i]]
 				}
 				diag(myvar) <- 0
-				Report(c(format(covars[i], width=15),
+				Report(c(format(covars[i], width=30),
 						 sum(is.na(myvar)), "  (",
 						 format(round(100 * sum(is.na(myvar))/
 									  (length(myvar) - nrow(myvar)), 1),
 								width=3, nsmall=1), '%)\n'), outf)
 			}
 			Report("\nInformation about dyadic covariates:\n", outf)
-			Report(c(format("minimum  maximum	  mean  centered", width=48,
+			Report(c(format("minimum  maximum	  mean  centered", width=67,
 							justify="right"), "\n"), outf)
 			any.cent <- 0
 			any.noncent <- 0
@@ -732,7 +732,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 					cent <- "   N"
 					any.noncent <- any.noncent+1
 				}
-				Report(c(format(covars[i], width=10),
+				Report(c(format(covars[i], width=30),
 						 format(round(atts$range2[1], 1),
 								nsmall=1, width=8),
 						 format(round(atts$range2[2], 1),
@@ -781,9 +781,9 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 			}
 			Report("Number of tie variables with missing data per period:\n",
 				   outf)
-			Report(c(" period	", format(1:(x$observations - 1) +
-										  periodFromStart, width=9),
-					 "		 overall\n"), sep="", outf)
+			Report(c(" period   ", format(1:(x$observations - 1) +
+										  periodFromStart, width=7),
+					 "      overall\n"), sep="", outf)
 			for (i in seq(along=covars))
 			{
 				if (use[i])
@@ -800,7 +800,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 						missvals <- sapply(thiscovar, function(x)sum(is.na(x)))
 					}
 					Report(c(format(covars[i], width=10),
-							 format(missvals, width=8),
+							 format(missvals, width=6),
 							 format(sum(missvals), width=9), "	   (",
 							 format(round(100 * sum(missvals)/vardims[1]/
 										  vardims[2]), nsmall=1,
@@ -808,7 +808,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				}
 			}
 			Report("\nInformation about changing dyadic covariates:\n", outf)
-			Report(c(format("minimum  maximum	  mean  centered", width=48,
+			Report(c(format("mean     centered", width=36,
 							justify="right"), "\n"), outf)
 			any.cent <- 0
 			any.noncent <- 0
@@ -825,9 +825,21 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 					cent <- "   N"
 					any.noncent <- any.noncent+1
 				}
-				Report(c(format(covars[i], width=10),
-						 format(round(atts$mean, 3),
-								nsmall=3, width=10), "\n"), cent, outf)
+				Report(c(format(covars[i], width=28), cent, '\n'), outf) # name
+				for (j in 1:(dim(x$dyvCovars[[i]])[3]))
+				{
+					Report(c("	period", format(j + periodFromStart,
+											   width=3),
+							 format(round(atts$meanp[j], 3),
+									nsmall=3, width=10), "\n"), outf)
+				}
+				if (!atts$centered) # else atts$mean is 0
+				{
+					Report(c(format("Overall", width=29),
+						 format(round(atts$mean, 3), width=10, nsmall=3),
+						 "\n"), outf)
+				}
+				Report("\n", outf)
 			}
 			Report('\n', outf)
 			s.plural <- ifelse((any.cent >= 2),"s","")
@@ -1030,13 +1042,14 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 	{
 		netnames <- atts$netnames[nets]
 		upOnly <- atts$anyUpOnly[nets]
+		allUpOnly <- atts$allUpOnly[nets]
 		for (i in which(upOnly))
 		{
 			if (sum(nets) > 1)
 			{
 				Report(c("Network ", netnames[i], ":\n"), sep = "", outf)
 			}
-			if (atts$allUpOnly[i])
+			if (allUpOnly[i])
 			{
 				Report("All network changes are upward.\n", outf)
 				Report("This will be respected in the simulations.\n", outf)
@@ -1062,13 +1075,14 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 	{
 		netnames <- atts$netnames[nets]
 		downOnly <- atts$anyDownOnly[nets]
+		allDownOnly <- atts$allDownOnly[nets]
 		for (i in which(downOnly))
 		{
 			if (sum(nets) > 1)
 			{
 				Report(c("Network ", netnames[i], "\n"), sep = "", outf)
 			}
-			if (atts$allDownOnly[i])
+			if (allDownOnly[i])
 			{
 				Report("All network changes are downward.\n", outf)
 				Report("This will be respected in the simulations.\n", outf)
@@ -1096,11 +1110,12 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 	{
 		netnames <- atts$netnames[!nets]
 		upOnly <- atts$anyUpOnly[!nets]
+		allUpOnly <- atts$allUpOnly[!nets]
 		for (i in which(upOnly))
 		{
 			Report(c("\nBehavior variable ", netnames[i], ":\n"), sep = "",
 				   outf)
-			if (atts$allUpOnly[i])
+			if (allUpOnly[i])
 			{
 				Report("All behavior changes are upward.\n", outf)
 				Report("This will be respected in the simulations.\n", outf)
@@ -1129,10 +1144,11 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 	{
 		netnames <- atts$netnames[!nets]
 		downOnly <- atts$anyDownOnly[!nets]
+		allDownOnly <- atts$allDownOnly[!nets]
 		for (i in which(downOnly))
 		{
 			Report(c("\nBehavior ", netnames[i], ":\n"), sep = "", outf)
-			if (atts$allDownOnly[i])
+			if (allDownOnly[i])
 			{
 				Report("All behavior changes are downward.\n", outf)
 				Report("This will be respected in the simulations.\n", outf)
@@ -1282,7 +1298,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 			{
 				if (atts$cCovarPoszvar[i])
 				{
-					Report(c("Similarity", format(atts$cCovars[i], width=12),
+					Report(c("Similarity", format(atts$cCovars[i], width=24),
 							 ':', format(round(atts$cCovarSim[i], 4), width=12,
 										 nsmall=4), '\n'), outf)
 				}
@@ -1295,7 +1311,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				if (nData > 1)
 				{
 					thisSim <- sapply(behSim, function(x)x[[netnames[i]]])
-					Report(c("Similarity ", format(atts$netnames[i], width=12),
+					Report(c("Similarity ", format(atts$netnames[i], width=24),
 							 ":\n"), sep="", outf)
 					mystr <- format(paste("	 Subproject ", 1:nData, " <",
 								  atts$names, "> ", sep=""))
@@ -1309,7 +1325,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				}
 				else
 				{
-					Report(c("Similarity", format(atts$netnames[i], width=12),
+					Report(c("Similarity", format(atts$netnames[i], width=24),
 							 ':', format(round(atts$bSim[i], 4), nsmall=4,
 										 width=12), '\n'), outf)
 				}
@@ -1323,7 +1339,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				if (nData > 1)
 				{
 					thisSim <- sapply(vCovarSim, function(x)x[[covarnames[i]]])
-					Report(c("Similarity ", format(covarnames[i], width=12),
+					Report(c("Similarity ", format(covarnames[i], width=24),
 							 ":\n"), sep="", outf)
 					mystr <- format(paste("	 Subproject ", 1:nData, " <",
 										  atts$names, "> ", sep=""))
@@ -1337,7 +1353,7 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 				}
 				else
 				{
-					Report(c("Similarity", format(atts$vCovars[i], width=12),
+					Report(c("Similarity", format(atts$vCovars[i], width=24),
 							 ':', format(round(atts$vCovarSim[i], 4), width=12,
 										 nsmall=4), '\n'), outf)
 				}

@@ -23,14 +23,14 @@ class CovariateDistance2AlterNetworkFunction: public
 {
 public:
 	CovariateDistance2AlterNetworkFunction(string networkName,
-		string covariateName, double parameter, bool excludeMissing);
+		string covariateName, double parameter, bool excludeMissing, bool total);
 
 	virtual double value(int alter);
-
 
 private:
 	double lparameter;
 	bool lexcludeMissing;
+	bool ltotal;
 };
 
 }

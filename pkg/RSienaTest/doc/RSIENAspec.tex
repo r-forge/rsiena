@@ -57,7 +57,8 @@
 \algsetup{indent=2em}
 
 \title{RSiena}
-\author{Ruth M.\ Ripley\footnote{University of Oxford}}
+\author{Ruth M.\ Ripley\footnote{University of Oxford}\\
+modified by Tom A.B.\ Snijders\footnote{Universities of Oxford and Groningen}}
 \maketitle
 \date{}
 
@@ -733,7 +734,7 @@ rate effects
 \STATE Use \sfn{covarBipartiteObjective} effect group to create the objective
 function effects
 \IF{first node set matches}
-\STATE reduce the objective function effects to ``egoX''
+\STATE reduce the objective function effects to ``egoX'', ``altDist2'', and ``totDist2''
 \ELSIF {poszvar}
 \STATE reduce the new objective function effects to the rows ``altX'' and
 ``altSqX''

@@ -8,6 +8,10 @@
 ## *
 ## * Description: This file contains the print and summary modules for the
 ## * classes siena, sienaFit, sienaDependent, sienaAlgorithm, and sienaBayesFit
+## * Note: $requestedEffects used everywhere instead of $effects,
+## * because the latter also includes all main effects corresponding to
+## * included interaction effects,
+## * even if these main effects were not requested.
 ## *
 ## ****************************************************************************/
 ##@print.siena Methods
@@ -335,8 +339,8 @@ print.summary.sienaFit <- function(x, ...)
         stop("not a legitimate summary of a Siena model fit")
 	}
 	print.sienaFit(x)
-	cat(c("Overall maximum convergence ratio: ",
-		sprintf("%8.4f", x$tconv.max), "\n\n"))
+#	cat(c("Overall maximum convergence ratio: ",
+#		sprintf("%8.4f", x$tconv.max), "\n\n"))
 
     if (x$maxlike)
     {
@@ -474,7 +478,7 @@ print.sienaAlgorithm <- function(x, ...)
 	cat(' Dolby noise reduction:', x$dolby, '\n')
     if (any(x$MaxDegree > 0))
     {
-        cat(' Restrictions on degree in simulations:')
+        cat(' Restrictions on degree in simulations: ')
         cat(x$MaxDegree,'\n')
     }
     cat(' Method for calculation of Derivatives:',
@@ -630,16 +634,15 @@ credValues <- function(z, theProbs = c(0.025,0.975), tested = 0,
 ##@sienaFitThetaTable Miscellaneous
 sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfirst)
 {
-    theEffects <- x$effects
-# abcd	here it was not OK when interactions had creation/endowment effects
 	if (fromBayes)
 	{
-		pp <- dim(theEffects)[1]
+	    theEffects <- x$initialResults$requestedEffects
 	}
 	else
 	{
-		pp <- x$pp
+		theEffects <- x$requestedEffects
 	}
+	pp <- dim(theEffects)[1]
     if (x$cconditional)
     {
         nrates <- length(x$rate)
@@ -768,6 +771,7 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
         theEffects$effectName[theEffects$netType=='behavior'] <-
             behEffects$effectName
     }
+#browser()
     mydf[nrates + (1:xp), 'row'] <-  1:xp
     mydf[nrates + (1:xp), 'type' ] <- ifelse(theEffects$type == "creation",
                                                "creat", theEffects$type)
@@ -813,7 +817,6 @@ sienaFitCovarianceCorrelation <- function(x)
     correl <- x/sqrt(diag(x))[row(x)]/ sqrt(diag(x))[col(x)]
     covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
     return(covcor)
-
 }
 
 ##@xtable fake in case package not loaded
@@ -917,7 +920,7 @@ makeTemp <- function(x, groupOnly=0, nfirst, ...)
 		x$requestedEffects <-
 			x$requestedEffects[x$requestedEffects$groupName==name1,]
 		x$pp <- length(x$theta)
-		x$fixed <- x$fixed[x$effects$groupName==name1]
+		x$fixed <- x$fixed[x$requestedEffects$groupName==name1]
 		if (is.null(nfirst))
 		{
 			nfirst <- x$nwarm + 1
