@@ -6,7 +6,7 @@
 \title{A function for fitting Bayesian models}
 \description{A function to fit hierarchical Bayesian models random effects
   to sienaGroup data objects. Uses the function \code{\link{maxlikec}} for the
-  MCMC part, the Bayesian part is performed in R. Still under development.
+  MCMC part, the Bayesian part is performed in R.
 }
 \usage{
 sienaBayes(data, effects, algo,  saveFreq=100,
@@ -17,10 +17,10 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     nwarm=50, nmain=250, nrunMHBatches=20,
     lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
     storeAll=FALSE, prevAns=NULL, prevBayes=NULL, silentstart = TRUE,
-    plotit=FALSE, nbrNodes=1, clusterType=c("PSOCK", "FORK"),
+    nbrNodes=1, clusterType=c("PSOCK", "FORK"),
     getDocumentation=FALSE)
 
-glueBayes(z1, z2)
+glueBayes(z1, z2, nwarm2=0)
 }
 \arguments{
   \item{data}{A sienaGroup object as returned by \code{\link{sienaGroupCreate}}.
@@ -77,8 +77,11 @@ glueBayes(z1, z2)
   non-positive definite (i.e., has one or more negative correlations)
   during iterations, it is changed so that
   all correlations are at least delta.}
-  \item{nwarm}{Number of iterations in the warm up phase.}
-  \item{nmain}{Number of iterations in the main phase.}
+  \item{nwarm}{Number of iterations in the warm up phase.
+    Used only if \code{prevBayes} is \code{NULL}.
+	Then it should be at least 5.}
+  \item{nmain}{Number of iterations in the main phase.
+   Should be at least 10.}
   \item{nrunMHBatches}{Thinning ratio in MCMC process.}
   \item{lengthPhase1}{Only used for frequentist estimation:
    length of the first phase of the Robbins Monro algorithm.
@@ -107,7 +110,6 @@ glueBayes(z1, z2)
     may occur if this is not the case.}
   \item{silentstart}{Boolean: whether to suppress most information
     to the console during the calculation of initial values.}
-  \item{plotit}{Boolean: whether to plot parameters during the run.}
   \item{nbrNodes}{Number of processes to be used. Cannot be more than
     the number of waves summed over number of groups.}
    \item{clusterType}{If using multiple processes, whether to use
@@ -117,6 +119,9 @@ glueBayes(z1, z2)
    \item{z1}{\code{sienaBayes} object.}
    \item{z2}{\code{sienaBayes} object with the same data and model specification
    as \code{z1}.}
+   \item{nwarm2}{Number of warming iterations in \code{z2}; the first
+   \code{nwarm2} iterations of \code{z2} will be left out of the
+   combined object.}
 }
 \details{
   The function \code{sienaBayes} is for Bayesian estimation of one group or
@@ -147,11 +152,8 @@ glueBayes(z1, z2)
   number of MH steps plus Bayesian proposals) are performed.
   In the warming as well as the final phase, the number of MH steps is
   determined by parameter \code{mult} ("multiplication factor")
-  in the call of \code{sienaAlgorithmCreate} that created the algorithm object.
-  If \code{plotit} is TRUE,
-  plots are produced at intervals during the run showing progress. They
-  can be memory hogs, but the code may be useful for studying the returned
-  values.\cr
+  in the call of \code{sienaAlgorithmCreate}
+  that created the algorithm object.\cr
   The function is time-consuming. When starting to use it, it is advisable
   to start with low values of \code{nmain} to explore computing time.\cr
   When the procedure seems to diverge, and for very small groups, it is

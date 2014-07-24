@@ -325,8 +325,6 @@ CalculateDerivative3<- function(z,x)
     if (z$FinDiff.method || x$maxlike)
     {
 		dfra <- t(as.matrix(Reduce("+", z$sdf) / length(z$sdf)))
-		z$regrCoef <- rep(0, z$pp)
-		z$regrCor <- rep(0, z$pp)
     }
 	else
     {
@@ -343,11 +341,16 @@ CalculateDerivative3<- function(z,x)
 		scores <- apply(z$ssc, c(1,3), sum)  # z$nit by z$pp matrix
 		for (i in 1:z$pp)
 		{
-			if ((var(scores[,i]) > 0)&(var(z$sf[,i]) > 0))
+			oldwarn <- getOption("warn")
+			options(warn = -1)
+			if ((var(scores[,i]) > 0)&&(var(z$sf[,i]) > 0))
 			{
 				z$regrCoef[i] <- cov(z$sf[,i], scores[,i])/var(scores[,i])
 				z$regrCor[i] <- cor(z$sf[,i], scores[,i])
 			}
+			if (is.na(z$regrCor[i])){z$regrCor[i] <- 0}
+			if (is.na(z$regrCoef[i])){z$regrCoef[i] <- 0}
+			options(warn = oldwarn)
 		}
 		if (x$dolby)
 		{

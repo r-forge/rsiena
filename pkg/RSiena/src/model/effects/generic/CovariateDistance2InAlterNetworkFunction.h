@@ -3,14 +3,14 @@
  *
  * Web: http://www.stats.ox.ac.uk/~snijders/siena/
  *
- * File: CovariateDistance2AlterNetworkFunction.h
+ * File: CovariateDistance2InAlterNetworkFunction.h
  *
  * Description: This file contains the definition of the
- * CovariateDistance2AlterNetworkFunction class.
+ * CovariateDistance2InAlterNetworkFunction class.
  *****************************************************************************/
 
-#ifndef COVARIATEDISTANCE2ALTERNETWORKFUNCTION_H_
-#define COVARIATEDISTANCE2ALTERNETWORKFUNCTION_H_
+#ifndef COVARIATEDISTANCE2INALTERNETWORKFUNCTION_H_
+#define COVARIATEDISTANCE2INALTERNETWORKFUNCTION_H_
 
 #include "CovariateDistance2NetworkFunction.h"
 
@@ -18,22 +18,19 @@ namespace siena
 {
 
 
-class CovariateDistance2AlterNetworkFunction: public
+class CovariateDistance2InAlterNetworkFunction: public
 	CovariateDistance2NetworkFunction
 {
 public:
-	CovariateDistance2AlterNetworkFunction(string networkName,
-		string covariateName, double parameter, bool excludeMissing, bool total);
-
+	CovariateDistance2InAlterNetworkFunction(string networkName,
+		string covariateName, bool excludeMissing, bool total);
 	virtual double value(int alter);
 
-
 private:
-	double lparameter;
 	bool lexcludeMissing;
 	bool ltotal;
 };
 
 }
 
-#endif /* COVARIATEDISTANCE2ALTERNETWORKFUNCTION_H_ */
+#endif /* COVARIATEDISTANCE2INALTERNETWORKFUNCTION_H_ */

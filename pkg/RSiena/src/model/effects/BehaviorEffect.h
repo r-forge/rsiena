@@ -58,11 +58,11 @@ public:
 	virtual double endowmentStatistic(const int * difference,
 		double * currentValues);
 	virtual pair<double,double *> endowmentStatistic(const int * difference,
-		double * currentValues, bool needActorStatistics);
+				double * currentValues, bool needActorStatistics);
 	virtual double creationStatistic(int * difference,
 		double * currentValues);
 	virtual pair<double,double *> creationStatistic(int * difference,
-		double * currentValues, bool needActorStatistics);
+				double * currentValues, bool needActorStatistics);
 	virtual double egoStatistic(int ego, double * currentValues);
 	virtual double egoEndowmentStatistic(int ego, const int * difference,
 		double * currentValues);

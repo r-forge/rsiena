@@ -3,13 +3,13 @@
  *
  * Web: http://www.stats.ox.ac.uk/~snijders/siena/
  *
- * File: CovariateDistance2AlterNetworkFunction.cpp
+ * File: CovariateDistance2InAlterNetworkFunction.cpp
  *
  * Description: This file contains the implementation of the class
- * CovariateDistance2AlterNetworkFunction.
+ * CovariateDistance2InAlterNetworkFunction.
  *****************************************************************************/
 #include <R_ext/Print.h>
-#include "CovariateDistance2AlterNetworkFunction.h"
+#include "CovariateDistance2InAlterNetworkFunction.h"
 #include "CovariateNetworkAlterFunction.h"
 #include "network/Network.h"
 
@@ -26,12 +26,11 @@ namespace siena
  * function is associated with
  * @param[in] excludeMissing: whether to exclude missing values
  */
-CovariateDistance2AlterNetworkFunction::
-CovariateDistance2AlterNetworkFunction(string networkName, string
-	covariateName, double parameter,  bool excludeMissing, bool total) :
+CovariateDistance2InAlterNetworkFunction::
+CovariateDistance2InAlterNetworkFunction(string networkName, string
+	covariateName, bool excludeMissing, bool total) :
 	CovariateDistance2NetworkFunction(networkName, covariateName)
 {
-	this->lparameter = parameter;
 	this->lexcludeMissing = excludeMissing;
 	this->ltotal = total;
 }
@@ -42,53 +41,42 @@ CovariateDistance2AlterNetworkFunction(string networkName, string
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double CovariateDistance2AlterNetworkFunction::value(int alter)
+double CovariateDistance2InAlterNetworkFunction::value(int alter)
 {
-//	Rprintf("cccc %d %d\n", this->ego(), alter);
 	double value = 0;
-	if (!(this->lexcludeMissing && this->missingDummy(alter)))
+	if (!(this->lexcludeMissing && this->missingInDummy(alter)))
 	{
 		if (ltotal)
 		{
-			value = this->totalAlterValue(alter);
+			value = this->totalInAlterValue(alter);
 		}
 		else
 		{
-			value = this->averageAlterValue(alter);
+			value = this->averageInAlterValue(alter);
 		}
-		if (this->lparameter == 2)
+		int tieValue =  this->pNetwork()->tieValue(this->ego(), alter);
+		if (tieValue == 1)
 		{
-			int tieValue =  this->pNetwork()->tieValue(alter, this->ego());
-			if (tieValue == 1)
+			if (ltotal)
 			{
-				int degree = this->pNetwork()->outDegree(alter);
-				//			Rprintf("before %d %f %d %f\n", degree, value,
-				//this->ego(), CovariateDistance2NetworkFunction::value(this->ego()) );
+				value = (value -
+					CovariateNetworkAlterFunction::value(this->ego()));
+			}
+			else
+			{
+				int degree = this->pNetwork()->inDegree(alter);
 				if (degree > 1)
 				{
-					if (ltotal)
-					{
-						value = (value -
-							CovariateNetworkAlterFunction::value(this->ego()));
-					}
-					else
-					{
-						value = (degree * value -
+					value = (degree * value -
 				CovariateNetworkAlterFunction::value(this->ego()))/(degree - 1);
-					}
 				}
 				else
 				{
 					value = 0;
 				}
-				//Rprintf("stat after %d %f %d %f\n", degree, value,
-				//	this->ego(),
-				//	CovariateDistance2NetworkFunction::value(this->ego()) );
 			}
 		}
 	}
-//	Rprintf("stat r  %f f\n", value);
-
 	return value;
 }
 

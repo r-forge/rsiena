@@ -324,17 +324,17 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	int creationEffectCount = this->pCreationFunction()->rEffects().size();
 
 	// initialize for later use!
-	for (int i = 0; i < evaluationEffectCount; i++)
+	for (unsigned i = 0; i < evaluationEffectCount; i++)
 	{
 		this->levaluationEffectContribution[1][i] =	0;
 	}
-	for (int i = 0; i < endowmentEffectCount; i++)
+	for (unsigned i = 0; i < endowmentEffectCount; i++)
 	{
 		this->lendowmentEffectContribution[1][i] =	0;
 		this->lendowmentEffectContribution[2][i] = 	0;
 	}
 
-	for (int i = 0; i < creationEffectCount; i++)
+	for (unsigned i = 0; i < creationEffectCount; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{

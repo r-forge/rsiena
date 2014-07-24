@@ -69,8 +69,8 @@ void FourCyclesEffect::initialize(const Data * pData,
 	delete[] this->lcounters;
 	if (this->lTwoMode)
 	{
-	this->lcounters = new int[this->pNetwork()->m()];
-}
+		this->lcounters = new int[this->pNetwork()->m()];
+	}
 	else
 	{
 		this->lcounters = new int[this->pNetwork()->n()];

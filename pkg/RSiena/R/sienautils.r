@@ -462,6 +462,7 @@ validateSienaDependent <- function(net)
 }
 
 ##@sienaDataConstraint DataCreate
+## TS 15-07-14: I think this function is not used anywhere and can be dropped.
 sienaDataConstraint <- function(x, net1, net2, type=c("higher",
                                                 "disjoint", "atLeastOne"),
                                  value=FALSE)

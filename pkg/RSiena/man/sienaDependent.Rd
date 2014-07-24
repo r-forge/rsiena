@@ -5,7 +5,7 @@
 \description{
   Creates a Siena dependent variable: either a network, created from a matrix
   or array or list of sparse matrix of triples; or a behavior variable,
-  created from a matrix.
+  created from a matrix.\cr
   \code{sienaDependent()} and \code{sienaNet()} are identical functions;
   the second name was used from the start of the \code{RSiena} package,
   but the first name indicates more precisely the purpose of this function.
@@ -21,9 +21,9 @@ nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
   \item{netarray}{matrix (type="behavior" only)
     or (for the other types) array of values or list of sparse matrices
 	of type "dgTMatrix".}
-  \item{type}{type of network, default "oneMode".}
-  \item{nodeSet}{character string naming the appropriate node set. A
-	vector containing 2 character strings for a bipartite network:
+  \item{type}{type of dependent variable, default "oneMode".}
+  \item{nodeSet}{character string naming the appropriate node set.
+	For a bipartite network, a vector containing 2 character strings:
 	"rows" first, then "columns".}
   \item{sparse}{logical: TRUE indicates the data is in sparse matrix
     format, FALSE otherwise.}
@@ -38,6 +38,7 @@ nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
     to be non-decreasing or non-increasing.
 	This also will imply that some effects are excluded because they are
 	superfluous in such constrained situations.
+	This will be reported in the output of \code{\link{print01Report}}.
 
     For normal operation, TRUE is the appropriate option.
 	For data sets that will be part of a multi-group object

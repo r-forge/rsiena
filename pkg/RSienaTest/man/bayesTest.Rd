@@ -81,7 +81,8 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
   \item{effectNames}{names of effects tested as given in \dots}
   \item{posteriorSample}{sample from posterior of tested effects}
  \code{print.multipleBayesTest} prints the p-value with an explanation; and
-     the proportions of all sign patterns in the sample from the posterior.\cr
+     the proportions of all sign patterns (of deviations from 0)
+	 in the sample from the posterior.\cr
  \code{plot.multipleBayesTest} plots the density function of
     \code{x$postDistances}.\cr
   }
@@ -113,6 +114,7 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
   bayes.model
   simpleBayesTest(bayes.model, probs = c(0.05,0.95))
   multipleBayesTest(bayes.model, 2, 3)
+  multipleBayesTest(bayes.model, 2, 3, tested0 = c(2,0.6))
 }
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the

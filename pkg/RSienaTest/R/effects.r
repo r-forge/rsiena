@@ -830,7 +830,7 @@ depvar <- attr(effects, "depvar")
                               netType=netType)
             covObjEffects <-
                 covObjEffects[covObjEffects$shortName %in%
-                              c("egoX"), ]
+                              c("egoX", "altInDist2", "totInDist2"), ]
             covRateEffects <- createEffects("covarBipartiteRate", covarname,
                                             name=varname,
                                             groupName=groupName, group=group,

@@ -28,7 +28,7 @@ namespace siena
 
 /**
  * This class defines the isolate popularity effect defined by
- * s_i(x)=  \sum_j x_{ij} I\{x_{+j} = 1, x_{j+} = 0 } 
+ * s_i(x)=  \sum_j x_{ij} I\{x_{+j} = 1, x_{j+} = 0 }
  * The corresponding statistic is
  * the number of ties to alters with indegree 1 and outdegree 0.
  */

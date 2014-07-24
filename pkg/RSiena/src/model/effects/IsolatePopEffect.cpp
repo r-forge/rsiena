@@ -37,16 +37,16 @@ double IsolatePopEffect::calculateContribution(int alter) const
 
 	if (this->loutgoing)
 	{
-	if (this->pNetwork()->outDegree(alter) == 0)
-	{
-		int degree = this->pNetwork()->inDegree(alter);
-		if ((degree == 0) || ((degree == 1)&&(this->outTieExists(alter))))
+		if (this->pNetwork()->outDegree(alter) == 0)
 		{
-		// In the second case the single tie to this alter is going to be 
-		// withdrawn, so an isolate is created
-			change = 1;
+			int degree = this->pNetwork()->inDegree(alter);
+			if ((degree == 0) || ((degree == 1)&&(this->outTieExists(alter))))
+			{
+			// In the second case the single tie to this alter is going to be 
+			// withdrawn, so an isolate is created
+				change = 1;
+			}
 		}
-	}
 	}
 	else  // cannot be combined with the above in one if statement,
 			// because for !outgoing this effect is also intended for bipartite networks
@@ -68,15 +68,15 @@ double IsolatePopEffect::calculateContribution(int alter) const
  */
 double IsolatePopEffect::tieStatistic(int alter) 
 {	
-	double statistic = 0;
+	double statistic = 0;	
 	
 	if (this->loutgoing)
 	{
-	if ((this->pNetwork()->outDegree(alter) == 0)&&
-		(this->pNetwork()->inDegree(alter) == 1))
-	{
-		statistic = 1;
-	}
+			if ((this->pNetwork()->outDegree(alter) == 0)&&
+			(this->pNetwork()->inDegree(alter) == 1))
+		{
+			statistic = 1;
+		}	
 	}
 	else // see above
 	{

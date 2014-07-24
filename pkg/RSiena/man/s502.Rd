@@ -21,5 +21,6 @@ Working Paper No. 52. MRC Medical Sociology Unit Glasgow.
 
 See \url{http://www.stats.ox.ac.uk/~snijders/siena/s50_data.htm}
 }
-\seealso{\code{\link{s501}}, \code{\link{s503}}, \code{\link{s50a}}, \code{\link{s50}}}
+\seealso{\code{\link{s501}}, \code{\link{s503}}, \code{\link{s50a}}, 
+\code{\link{s50s}}, \code{\link{s50}}}
 \keyword{datasets}
