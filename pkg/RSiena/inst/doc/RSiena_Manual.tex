@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-278.
+This version was renewed for \RS version 1.1-279.
 \end{abstract}
 
 
@@ -228,8 +228,10 @@ A tutorial for these models is in \citet{SnijdersEA10b}.
 A website for \SI is maintained at
 {\small\url{http://www.stats.ox.ac.uk/~snijders/siena/}~}.
 At this website (`publications' tab)
-you shall also find references to introductions in various other languages.
-It further contains references to many published examples,
+you shall also find references to introductions in various other languages,
+as well as the file \texttt{Siena\_algorithms.pdf} which
+gives a sketch of the main algorithms used in \rs.
+The website further contains references to many published examples,
 example scripts illustrating various possibilities of the package,
 course announcements, etc.
 
@@ -265,11 +267,11 @@ Some of the options described in this manual may apply to
 in the future.
 
 
-%\newpage
+\newpage
 
 We are grateful to NIH (National Institutes of Health, USA)
 for their funding of programming \rs.
-This is done
+This was done
 as part of the project \emph{Adolescent Peer Social Network Dynamics
 and Problem Behavior}, funded by NIH (Grant Number 1R01HD052887-01A2),
 Principal Investigator John M. Light (Oregon Research Institute).
@@ -870,6 +872,8 @@ installing \R to running models in \rs.
 The following scripts on the \RS website go through the steps
 outlined in the previous section, providing additional details and options: \\
 \begin{itemize}
+    \item \sfn{basicRSiena.r}: a minimal example of a basic sequence of commands
+           for estimating a model by function sfn{siena07()} of \rs.
 	\item \sfn{Rscript01DataFormat.R}: gives a brief overview of \R functions
             and data formats that are essential for using \rs.
 	\item \sfn{Rscript02SienaVariableFormat.R}: shows how to prepare data
@@ -976,7 +980,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-278) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-279) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -2873,7 +2877,7 @@ Value \texttt{modelType = 1} is for directed networks, values
 
 % Model.h gives the order of the model types:
 % 0-6 = { NOTUSED, NORMAL, AFORCE, AAGREE, BFORCE, BAGREE, BJOINT };
-% See Siena_algorithms4;
+% See Siena_algorithms;
 % A = unilateral, B = two-sided initiative
 % help file: modelType Type of model to be fitted:
 % 1=directed, 2:6 for symmetric networks: 2=forcing, 3=Initiative model,
@@ -2937,51 +2941,43 @@ The interaction is defined by
 the columns \texttt{effect1} and \texttt{effect2},
 and for three-way effects, \texttt{effect3},
 in the effects object; they contain the \texttt{effectNumber}
-of the effects that are interacting.
-The interaction effect must also be `included',
+(sequence number) of the effects that are interacting.
+The interaction effect must be `included' to be part of the model,
 but the underlying effects need only be `included' if
 they are also required individually.
+(In most cases this is advisable.)
 The number of possible user-defined interaction effects is limited,
 and is set in the call of \sfn{getEffects()}.
 
-One way to specify an interaction is to take one of the unspecified
-interaction effects, work directly on these columns,
-and set the \texttt{include} value to \texttt{TRUE};
-but it is more convenient to work with \sfn{includeInteraction},
-an \R function provided to facilitate the definition
-of interaction effects. Such effects can be specified simply by short names and
-the names of any variables required to identify the underlying effects: it is
-not necessary to know the effectNumbers of the effects. (The effectNumbers would
-change if new effects are introduced to \rs.) Information about short names of
-effects can be found in the file `effects.pdf' in the doc directory of the
-library, accessible from within \R using the command
+Interactions can be specified by the function \sfn{includeInteraction},
+explained in the following subsections.
 
-\verb|RShowDoc("effects", package="RSiena")|
+All effects have a so-called  \texttt{interactionType},
+defined by the column \texttt{interactionType} in the effects data frame.
+This interaction type defines what is allowed for  definition of interaction effects;
+an explanation of the background of this
+is given in section ``Statistics for MoM'' of \sfn{Siena\_Algorithms.pdf}.
+For network effects, the interaction type is "ego", "dyadic", or "" (blank);
+for behaviour effects, it is "OK" or "".
 
-\noindent
-Alternatively, for a given effects object, say \texttt{myeff},
-this list can be displayed in a browser by using the function:
+The information necessary for working with interaction effects
+-- the interaction types, short names, and sequence numbers
+of the effects -- are contained in the document produced
+for a given effects object, say \texttt{myeff}, by the function call
 
 \verb|effectsDocumentation(myeff)|
 
 \noindent
-Also see the help page for the function \sfn{effectsDocumentation()}.
+Further see the help page for the function \sfn{effectsDocumentation()}.
 Chapter~\ref{S_math} of this manual also gives the short names of all effects.
-The short name of all unspecified interaction effects is \texttt{unspInt}.
-
-For further operation on interaction effects by the function \sfn{setEffect()}
-(specifying that they  are to be fixed and tested, setting initial values),
-the effectNumbers of the interacting effects are necessary.
-These are given for the effect called, say, \texttt{myeff}, in
-the report requested by
-
-\verb|print(myeff)| \\
+The short name of all unspecified interaction effects is \texttt{unspInt}
+for network effects, and \texttt{behUnspInt} for behaviour effects.
 
 
 \subsubsection{Interaction effects for network dynamics}
 
 The following kinds of user-defined interactions are possible
-for the network dynamics.
+for network dynamics.
 \begin{description}
 \item[a.]
   Ego effects of actor variables can interact with all effects.
@@ -2989,13 +2985,10 @@ for the network dynamics.
 \end{description}
 Whether an effect is an ego effect or a dyadic effect is defined by
 the column \texttt{interactionType} in the effects data frame.
-This column can be inspected by using the \sfn{fix} editor.
+This column is shown in the list of effects that is displayed
+in a browser by using the function:
 
-The \texttt{interactionType} of the effects is also given in
-the list of effects that is displayed in a browser
-by using the function:
-
-\verb|effectsDocumentation()| \\
+\verb|effectsDocumentation()|
 \bigskip
 
 Thus a two-way interaction must be between two dyadic effects or between one
@@ -3006,7 +2999,7 @@ another effect.
 All effects used in interactions must be defined on the same network
 (in the role of dependent variable): that for
 which the ``unspecified
-interaction effects'' is defined.  And either all must be
+interaction effects'' is defined.  And all must be
 of the same type (evaluation, endowment, or creation effects).
 
 Examples of the use of \sfn{includeInteraction} are as follows.
@@ -3023,379 +3016,17 @@ and accordingly the \texttt{interaction1} parameter has two components,
 combined by the \sfn{c} function.
 For effects such as \texttt{recip} that have no \texttt{interaction1}
 parameter, the corresponding string is just the empty string, \texttt{""}.
+(Note that the name \texttt{interaction1} does not itself refer to interactions
+in the sense of this section.)
 
 Interactions between three effects are defined similarly,
 but now the \texttt{interaction1} parameter must combine three components.
 
-
-\iffalse
-
-  b. Further, interaction effects are permitted
-  which are combinations of actor variables, dyadic variables, and reciprocity.\\
-  c. The transitive triplets effect can interact with the reciprocity effect in two ways,
-  in four ways with similarity between actor variables, and in four ways with dyadic covariates.\\
-  d. The transitive triplets, 3-cycles, and transitive ties effects
-  can be restricted to triplets having the same value on an actor covariate;
-  or triplets in which all pairs have the value 1 on a dyadic covariate.
-The specification is made by changing the
-\hyperlink{T_effpar}{\emph{internal effect parameter}}
-for the interaction effects.
-The values of these internal parameters
-can be changed in the \textsf{{\em pname}.mo} file
-described in Section~\ref{S_mo3file}.
-
-For interaction effects, this parameter represents a code
-for the two or three interacting effects.
-Each effect is represented by its index number
-in three digits (including leading zeros)
-as reported in the file called \textsf{{\em pname}.eff}
-(recall that \textsf{{\em pname}} stands for your project name).
-Thus, two-way interactions are represented by twice three digits: e.g., the code 020003
-refers to the interaction between the effects numbered 20 and 3,
-where the numbers are the rank numbers in this list of all effects.
-Leading zeros of the total parameter can be skipped, so that the code 020003
-can also be represented by 20003 (but not by 203!). The order does not matter, so that
-the codes 020003, 003020, 20003, and 3020 all are equivalent.
-Three-way interactions similarly are represented by thrice three digits.
-For example, the code 020028003 represents the interaction effects
-between the effects numbered 20, 28, and 3.
-E.g., to implement the interaction effect between the effects numbered 20 and 3,
-in the \textsf{{\em pname}.mo} file the lines that initially are
-\begin{verbatim}
-unspecified interaction effect
-0 0 0 0   0.000000 0
-0 0 0 0   0.000000 0
-0 0 0 0   0.000000 0
-\end{verbatim}
-must be changed into
-\begin{verbatim}
-unspecified interaction effect
-0 0 0 0   0.000000 020003
-0 0 0 0   0.000000 0
-0 0 0 0   0.000000 0
-\end{verbatim}
-After this is done, \SI will automatically replace the name
-by the suitable interaction effect name.
-(This is done by \textsf{Siena04};
-and also when successfully exiting \textsf{Siena03} and \textsf{Siena07}.)
-\medskip
-
-One of the uses of interaction effects is non-homogeneity in time:
-interactions with an actor variable that depends only on time
-(the observation number).
-
-For example, if there are four observations, two cumulative
-dummy variables could be used for the periods,
-defined by one data file with all rows equal to\\
-\texttt{0 \ 1 \ 1 \ 1}\\
-and another data file with all rows equal to\\
-\texttt{0 \ 0 \ 1 \ 1}\\
-where these data files are used as changing actor covariates,
-called, e.g., \textsf{dum1} and \textsf{dum2}.
-For the detailed interpretation, it is important to realize that
-all covariates are centered internally in \si.
-To avoid misinterpretation, one can look up in the file
-\textsf{{\em pname}.dac} (see Section~\ref{S_datafiles})
-what are the values used by \si.
-If there are no other time-changing actor covariates,
-then in this example all lines in the .dac files are\\
-\texttt{-0.6667   0.3333   0.3333  -0.3333  -0.3333   0.6667}
-\smallskip \\
-Now suppose that the model specification includes a parameter
-$\beta_r$ for reciprocity, $\beta_{r1}$ for the interaction of reciprocity
-with dummy variable \textsf{dum1}, and $\beta_{r2}$ for the interaction of reciprocity
-with  \textsf{dum2}.
-Then the total effect of reciprocity is given by
-\[
-\beta_r + \beta_{r1}\,\textsf{dum1} + \beta_{r2}\,\textsf{dum2} \ ;
-\]
-this is then equal to \\
-$\beta_r - 0.6667 \beta_{r1} - 0.3333 \beta_{r2}$\\
-for period 1 (from observation 1 to observation 2),\\
-$\beta_r + 0.3333 \beta_{r1} - 0.3333 \beta_{r2}$\\
-for period 2, and
-\\
-$\beta_r + 0.3333 \beta_{r1} + 0.6667 \beta_{r2}$\\
-for period 3.
-\medskip
-
-
-The *.dac file made internally by Siena stores the values of
-time-changing covariates (see Siena manual section 21.3).
-Here the variables have been centered, and they are as used
-internally by Siena. For four observations / three periods,
-the number of elements of each row is three times the number
-of changing actor covariates. The order of the variables
-is the same as the order in the output file (initial section).
-This means that, if for the network process, the interaction
-with dum1, and the interaction with dum2, I get parameter
-estimates bn, bnd1, bnd2, then the resulting values for
-the network process are
-bn - 0.6667*bnd1 - 0.3333*bnd2 for period 1
-bn + 0.3333*bnd1 - 0.3333*bnd2 for period 2
-bn + 0.3333*bnd1 + 0.6667*bnd2 for period 3.
-
-
-Interactions are also possible between reciprocity and transitive triplets.
-Here it must be taken into account that several ways are possible for
-such an interaction.
-The two following interactions are available.
-\bigskip
-
-\noindent
-\hfill
-\begin{minipage}[t]{.35\textwidth}
-\linethickness{0.3pt}
-\begin{center}
-\beginpicture
-\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
-\setplotarea x from 0 to 4, y from 0 to 3
-\put{\large$\bullet$} at  2 1
-\put{\large$\bullet$} at  4 1
-\put{\large$\bullet$} at  3 2.732
-\put{$i$} at 2 0.4
-\put{$j$} at 4 0.4
-\put{$h$} at 3 3.4
-\arrow <2mm> [.2,.6]  from 2.2 1.1 to 3.8 1.1   % i => j
-\arrow <2mm> [.2,.6]  from 3.8 0.9 to 2.2 0.9   % j => i
-\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732 % h => j
-\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559   % i => h
-\endpicture
-\medskip
-
-\noindent
-Interaction reciprocity $\times$ \\ transitive triplets, type 1.\\
-Parameter \texttt{1002003}.
-\end{center}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{.35\textwidth}
-\linethickness{0.3pt}
-\begin{center}
-\beginpicture
-\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
-\setplotarea x from 0 to 4, y from 0 to 3
-\put{\large$\bullet$} at  2 1
-\put{\large$\bullet$} at  4 1
-\put{\large$\bullet$} at  3 2.732
-\put{$i$} at 2 0.4
-\put{$j$} at 4 0.4
-\put{$h$} at 3 3.4
-\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1   % i => j
-\arrow <2mm> [.2,.6]  from 1.95 1.2 to 2.75 2.55   % i => h
-\arrow <2mm> [.2,.6]  from 2.95 2.55 to 2.15 1.27   % h => i
-\arrow <2mm> [.2,.6]  from 4.05 1.2 to 3.25 2.55   % j => h
-\arrow <2mm> [.2,.6]  from 3.05 2.55 to 3.85 1.27   % h => j
-\endpicture
-\medskip
-
-\noindent
-Interaction reciprocity $\times$ \\ transitive triplets, type 2.\\
-Parameter \texttt{2002003}.
-\end{center}
-\end{minipage}
-\hfill
-\bigskip
-
-\noindent
-To interpret these interactions, keep in mind that the existence of
-the tie $i \rightarrow j$ is the `dependent variable'.
-The usual condition for this tie in the transitive triplets effect
-is the number of two-paths $i \rightarrow h \rightarrow j$.
-For the type 1 interaction, this condition is extended with
-the extra requirement that the `dependent' tie is already
-reciprocated, i.e., there already is the tie $j \rightarrow i$.
-For the type 2 interaction, the condition on each two-path
-is extended with the extra requirement that the
-two-path is reciprocated, i.e., the two-path
-$j \rightarrow h \rightarrow i$ also exists.
-To specify these interaction effects, simply change the internal
-effect parameter into \texttt{1002003} or \texttt{2002003}, respectively.
-\bigskip
-
-\noindent
-\hfill
-\begin{minipage}[t]{.24\textwidth}
-\linethickness{0.3pt}
-\begin{center}
-\beginpicture
-\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
-\setplotarea x from 1 to 4, y from 0 to 3
-\put{\large$\bullet$} at  2 1
-\put{\large$\bullet$} at  4 1
-\put{\large$\bullet$} at  3 2.732
-\put{$i$} at 2 0.4
-\put{$j$} at 4 0.4
-\put{$h$} at 3 3.4
-\put{sim} at 3 0.4
-\arrow <2mm> [.2,.6]  from 2.2 1.0 to 3.8 1.0   % i => j
-\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732 % j => j
-\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559   % i => h
-\endpicture
-\medskip
-
-\noindent
-Interaction similarity $\times$ \\ transitive triplets, \\ type 1.\\
-Parameter \texttt{1003def}.
-\end{center}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{.24\textwidth}
-\linethickness{0.3pt}
-\begin{center}
-\beginpicture
-\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
-\setplotarea x from 1 to 4, y from 0 to 3
-\put{\large$\bullet$} at  2 1
-\put{\large$\bullet$} at  4 1
-\put{\large$\bullet$} at  3 2.732
-\put{$i$} at 2 0.4
-\put{$j$} at 4 0.4
-\put{$h$} at 3 3.4
-\put{sim} at 1.8 1.9
-\arrow <2mm> [.2,.6]  from 2.2 1.0 to 3.8 1.0   % i => j
-\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732 % j => j
-\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559   % i => h
-\endpicture
-\medskip
-
-\noindent
-Interaction similarity $\times$ \\ transitive triplets, \\ type 2.\\
-Parameter \texttt{2003def}.
-\end{center}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{.24\textwidth}
-\linethickness{0.3pt}
-\begin{center}
-\beginpicture
-\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
-\setplotarea x from 1 to 4, y from 0 to 3
-\put{\large$\bullet$} at  2 1
-\put{\large$\bullet$} at  4 1
-\put{\large$\bullet$} at  3 2.732
-\put{$i$} at 2 0.4
-\put{$j$} at 4 0.4
-\put{$h$} at 3 3.4
-\put{sim} at 4.2 1.9
-\arrow <2mm> [.2,.6]  from 2.2 1.0 to 3.8 1.0   % i => j
-\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732 % j => j
-\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559   % i => h
-\endpicture
-\medskip
-
-\noindent
-Interaction similarity $\times$ \\ transitive triplets, \\ type 3.\\
-Parameter \texttt{3003def}.
-\end{center}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{.24\textwidth}
-\linethickness{0.3pt}
-\begin{center}
-\beginpicture
-\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
-\setplotarea x from 1 to 4, y from 0 to 3
-\put{\large$\bullet$} at  2 1
-\put{\large$\bullet$} at  4 1
-\put{\large$\bullet$} at  3 2.732
-\put{$i$} at 2 0.4
-\put{$j$} at 4 0.4
-\put{$h$} at 3 3.4
-\put{sim} at 1.8 1.9
-\put{sim} at 4.2 1.9
-\arrow <2mm> [.2,.6]  from 2.2 1.0 to 3.8 1.0   % i => j
-\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732 % j => j
-\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559   % i => h
-\endpicture
-\medskip
-
-\noindent
-Interaction similarity $\times$ \\ transitive triplets, \\ type 4.\\
-Parameter \texttt{4003def}.
-\end{center}
-\end{minipage}
-\hfill
-\bigskip
-
-In addition, interaction effects can be specified between transitive
-triplets and (1) similarity between actor variables
-and (2) dyadic covariates.
-Here the variables are represented by the number \textsf{001} for the
-first variable, \textsf{002} for the second variable, etc., so the numbers are
-not from the \textsf{{\em pname}.eff} file but just
-the order in which the variables occur in all of the files.
-Generally, \texttt{def} stands for the 3-digit representation
-(with leading zeros) of the number of the actor variable
-and also the number of the dyadic covariate; these
-sets of variables are numbered separately, so the first dyadic
-covariate is represented also by \textsf{001}.
-
-The parameter \texttt{1003def}, \texttt{2003def}, \texttt{3003def},
-and \texttt{4003def},
-specifies transitive triplet effects where the transitive triplet
-is weighted by the similarity between two actors
-on actor variable number \textsf{def}:
-for code \texttt{1003def} between actors $i$ and $j$,
-for \texttt{2003def} between actors $i$ and $h$,
-for \texttt{3003def} between actors $j$ and $h$, and
-for \texttt{4003def} by the product of the similarity
-between actors $i$ and $h$
-and the similarity between actors $j$ and $h$.
-Analogously, the parameter \texttt{11003def}, \texttt{12003def},
-\texttt{13003def},
-and \texttt{14003def},
-specifies transitive triplet effects where the transitive triplet
-is weighted by dyadic variable number \textsf{def}:
-for code \texttt{11003def} for actors $i$ and $j$,
-for \texttt{12003def} for actors $i$ and $h$, and
-for \texttt{13003def} for actors $j$ and $h$, and
-for \texttt{14003def} by the product of the
-dyadic variable for actors $i$ and $h$
-and for actors $j$ and $h$.
-The dyadic variables here are not centered!!
-For example, for the first actor variable,
-code \texttt{1003001} will define the transitive triplets
-effect weighted by the similarity between actors $i$ and $j$
-on the first actor variable.
-\bigskip
-
-Further, three triadic effects: transitive triplets, 3-cycles,
-and transitive ties, can be restricted to triplets which all have the
-same value of an actor variable; or triplets in which all pairs
-have the value 1 on a dyadic covariate.
-This is achieved by the following codes:
-\begin{description}
-\item[\texttt{8003def}]\ : \ transitive triplets
-                         restricted to triplets of actors
-                        having the same value on actor
-                        covariate number \texttt{def};
-\item[\texttt{8005def}]\ : \  3-cycles restricted to triplets of actors
-                        having the same value
-                        on actor covariate number \texttt{def};
-\item[\texttt{8006def}]\ : \  transitive ties restricted to triplets of actors
-                        having the same value
-                        on actor covariate number \texttt{def};
-\item[\texttt{18003def}]\ : \  transitive triplets restricted
-                        to triplets of actors
-                        where all pairs have the value 1
-                        on dyadic covariate number \texttt{def};
-\item[\texttt{18005def}]\ : \  3-cycles restricted to triplets of actors
-                        where all pairs have the value 1
-                        on dyadic covariate number \texttt{def};
-\item[\texttt{18006def}]\ : \  transitive ties restricted to
-                        triplets of actors
-                        where all pairs have the value 1
-                        on dyadic covariate number \texttt{def}.
-\end{description}
-
-
-The calculation of user-defined effects is slightly more time-consuming
-than the calculation of internally defined effects. Therefore, when there
-is the choice between two equivalent effects -- e.g., interactions
-of actor covariates with reciprocity -- it is advisable to use
-the predefined interaction effects.
-\fi
+The list of effects in Chapter~\ref{S_math} contains a variety of
+interaction effects that cannot be created in this way;
+for example, those with short names
+\texttt{transRecTrip}, \texttt{simRecipX},  \texttt{avSimEgoX},
+and \texttt{covNetNet} (there are many more).
 
 \subsubsection{Interaction effects for behavior dynamics}
 \label{S_beh_infl}
@@ -3415,15 +3046,16 @@ effects, which for behavior effects can be \texttt{OK}\footnote{The value
 is \texttt{OK} for the effects of which the
 formula as defined in Section~\ref{S_f_b}
 is given by $z_i$ multiplied by something not dependent on $z_i$.}
-or empty.
-You can see the values of the \texttt{interactionType} by requesting,
-if the behavior variable is called, e.g., \texttt{drinkingbeh}, the following:
-\begin{verbatim}
-cbind(myeff[myeff$name=="drinkingbeh","effectName"],
-      myeff[myeff$name=="drinkingbeh","shortName"],
-      myeff[myeff$name=="drinkingbeh","interactionType"])
-\end{verbatim}
-The behavioral effects with non-\texttt{OK} (i.e., empty)
+or blank.
+A further explanation is given under the heading `User-defined interaction effects'
+in Section~\ref{S_ff_b}.
+The \texttt{interactionType} of the effects
+is shown in the list of effects displayed in a browser by using the function:
+
+\verb|effectsDocumentation()|
+\bigskip
+
+The behavioral effects with non-\texttt{OK} (i.e., blank)
 \texttt{interactionType} include,
 in particular, all effects of which the name
 includes the word ``similarity",
@@ -3603,6 +3235,16 @@ there is a bound for the maximum outdegree
  but one should use a bound which is at least $n-1$,
 where $n$ is the number of actors in the network (or the largest number,
 if there are multiple groups).
+
+If the \textsf{MaxDegree} parameter is used for data where
+all, or almost all, degrees are equal to this maximum value,
+then it is likely that the estimation algorithm will not converge.
+A fixed choice design for network data collection is not
+compatible with the free choice nature of the \saom.
+See \citet{HollandLeinhardt1973} for a discussion of
+fixed choice designs and \citet{Znidarsic2012}
+for references to more recent literature.
+
 
 \subsection{Goodness of fit with auxiliary statistics}
 \label{S_gof}
@@ -4838,10 +4480,15 @@ The Wald test then cannot be used for significance testing.
 In Section~\ref{S_fixingparameters} we proposed that in such cases,
 it may be helpful to fix the parameter at some large value,
 without estimating it.
+Or, when it is being estimated and the $t$-ratio for convergence is
+small so convergence is judged as good, this estimate can be used,
+but in these cases, not its standard error.
 One possibility that then is available to test the significance
 is to make a second estimation run in which the parameter is fixed at
 the value 0, corresponding to the null hypothesis, and test
 this null value using the score-type test of Section~\ref{S_Scoretest}.
+See the script \texttt{RscriptSienaMultiple.R} on the \SI webpage
+for an example.
 
 \subsubsection*{Multi-parameter Wald tests}
 
@@ -6500,6 +6147,12 @@ the Method of Moments according to the intended model,
 the use of \sfn{siena07()} with the (default) Method of Moments, followed by a
 meta-analysis by means of \sfn{siena08()}, may be preferable.
 
+It is advisable to first do a multi-group analysis of the same model,
+followed by a \sfn{sienaTimeTest}, to get an initial understanding of where problems
+might occur. You may then later use the result for the \texttt{prevAns}
+parameter of \sfn{sienaBayes}.
+
+
 \subsubsection{Model specification}
 
 The extra part of model specification, compared to \sfn{siena07()},
@@ -6536,7 +6189,7 @@ with Jaccard coefficients at least 0.30.
 \subsubsection{How to choose the parameter settings for sienaBayes}
 
 It may be good to have an initial try run with
-\texttt{nwarm=5, nmain=10, nrunMHBatches=5}
+\texttt{nwarm=5, nmain=10, nrunMHBatches=5, nImproveMH=20}
 (for speed) and \texttt{silentstart = FALSE} (for information about the
 initialization phase), and then \sfn{print} the result.
 This will give information about the results of the initialization
@@ -6547,8 +6200,10 @@ The new value could be, e.g., 0.005 or 0.001 or 0.0. With the lower value
 of \texttt{initgainGroupwise}, dropping the groups concerned may be unnecessary,
 so don't drop groups too soon.
 
-For normal use, \texttt{nwarm=100, nmain=1000, nrunMHBatches=20}
+For normal use, \texttt{nwarm=100, nmain=1000, nrunMHBatches=20, nImproveMH=100}
 may be reasonable.
+Computing time is roughly proportional to
+\texttt{nmain $\times$ nrunMHBatches}.
 We still have to develop guidelines about how to choose the number of
 iterations. If the tracelines show that the process is still quite
 unstable even in the later part of the runs, possibilities are to
@@ -6560,10 +6215,89 @@ If multiple processors are available (which most computers have nowadays),
 you can make more speed by setting the \texttt{nbrNodes} parameter to a value
 larger than 1. Since parallelization goes by wave $\times$ group,
 it is nice, but not necessary, to have a value for \texttt{nbrNodes} that
-is a divisor of (the number of waves multiplied by the number of groups).
+is a divisor of (the number of waves multiplied by the number of groups);
+higher values are meaningless.
 Do not use such a high value for \texttt{nbrNodes} that your computer gets too
  hot or overworked. For Windows machines this can be monitored by opening
  the Task Manager (you will find how to do this by right clicking on the bottom toolbar).
+
+\subsubsection{Prior distributions}
+
+More research is needed for advice about prior distributions.
+Especially for small numbers of groups, the priors may have a strong influence.
+
+The prior mean
+\texttt{priorMu} is a vector of length equal to the number of varying parameters.
+In the object produced by \sfn{sienaBayes}, let us call it \texttt{ans},
+this length is stored as \texttt{ans\$p1}.
+For example, in a model with 4 waves, one dependent network variable,
+and varying parameters specified for outdegree, reciprocity,
+transitive ties, and similarity for some covariate $V$,
+the length would be 3+4=7.
+The prior covariance matrix
+\texttt{priorSigma} is a symmetric square matrix of dimension
+equal to the length of \texttt{priorMu}.
+\medskip
+
+\noindent
+\emph{Rate parameters}
+\smallskip
+
+\noindent
+Special attention must be given to the rate parameters.
+Sometimes, for small groups and complicated models, some of the
+rate parameters may be estimated in the multi-group option by very high
+numbers. This may be the case especially for groups with low Jaccard
+coefficients, or for groups that deviate strongly from the other groups.
+It may be advisable to take out the groups with extremely high
+rate parameters (e.g., larger than 50 or 80).
+To try and include some groups with high rate parameters, the prior
+distribution for these parameters may be employed.
+
+By default, the prior for the basic rate parameters is data-dependent.
+To try and include some groups with high rate parameters,
+this can be turned off by using \\
+\texttt{priorRatesFromData = FALSE}.
+Then the choice for \texttt{priorMu} and \texttt{priorSigma}
+is going to matter.
+Consider the rate parameters as estimated in the multi-group analysis
+of the same data set.
+Suppose the total number of groups is $N$.
+For each separate rate parameter (for a given wave
+and for a given dependent variable) there then are $N$ estimates,
+some of which may be too high; denote the average and the variance
+of the subset of not-too-high values by $m$ and $s^2$, respectively.
+These are specific for the  given wave and the given dependent variable.
+These values for mean and variance should
+represent what one might find plausible values for this rate parameter.
+
+The corresponding elements of \texttt{priorMu} and diagonal elements
+of \texttt{priorSigma} should be then set, respectively, to values
+close to these $m$ and $s^2$.
+
+As an example, suppose there are $N=20$ groups, 3 waves and one dependent
+variable (a network), and 5 varying parameters in addition to the rate parameters.
+Then \texttt{p1} = 2+5 = 7.
+Suppose that plausible values for the first rate parameter would
+be centered about 4 and for the second about 5,
+in both cases with a standard deviation of 1.4, corresponding
+to a variance of about 2.
+One could use the following piece of code.
+\begin{verbatim}
+m7 <- c(4,5,0,0,0,0,0)
+S7 <- matrix(0,7,7)
+diag(S7) <- c(2,2,1,1,1,1,1)
+ans <- sienaBayes(...., priorMu=m7, priorSigma=S7, priorDf=20,
+                  priorRatesFromData = FALSE, ....)
+\end{verbatim}
+\texttt{priorDf} is the prior degrees of freedom for the
+covariance matrix. It can be interpreted as the sample size on which,
+hypothetically, the prior knowledge about the covariance matrix of the
+parameters is based.
+By choosing it, as suggested here, equal to the number of groups,
+the prior will have a non-negligible but also not a very strong influence.
+
+
 
 \subsubsection{Interpreting results of sienaBayes}
 
@@ -6785,7 +6519,19 @@ Structural effects are the effects depending on the network only.
  effect and reciprocity, where the reciprocated tie is the tie
  $i \leftrightarrow j$  that  closes the two-path
  $i \rightarrow h \rightarrow j$,\\
-  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{ji}\, x_{ih}\, x_{jh}\,$;
+  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{ji}\, x_{ih}\, x_{hj}\,$;
+
+ \item
+ {{\em transitive reciprocated triplets effect (type 2)}}  \texttt{(transRecTrip2)},
+ another interaction between the transitive triplets
+ effect and reciprocity, where the reciprocated tie is the tie
+ $h \leftrightarrow j$   in the closed the two-path
+ $\{i \rightarrow h \rightarrow j, i \rightarrow j\}$,\\
+  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{ih}\, x_{hj}\, x_{jh}\,$;\\
+  this represents the tendency to send ties simultaneously to pairs of actors
+  who are mutually linked; but when outdegree-activity is also included in the model,
+  it represents as well the tendency to send ties simultaneously to pairs of actors
+  who are not linked to each other;
 
  \item \hypertarget{T_cycle3}{{\em number of three-cycles}}
  \texttt{(cycle3)}, \\
@@ -7489,6 +7235,37 @@ Various different ways can be modeled in which
 \end{center}
 \vfill
 \end{minipage}
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+\smallskip
+There are two partial variants of this effect; they can be
+distinguished not by the Method of Moments, but only
+by Maximum Likelihood and Bayesian estimation.
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+ \item
+ {\em  $XW => X$ closure-1 of covariate} \texttt{(XWX1)}, \\
+ This is a generic effect, not an evaluation effect,
+ comprising of the  `$XW => X$ closure of covariate' effect
+ only the contribution of the
+ the number of weighted $X-W$ two-paths
+ $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$.
+ In other words, only the $i \rightarrow j$ tie in the figure
+ is the dependent variable here.
+ Although technically this is not an evaluation effect, its type
+ in \RS still is \texttt{eval};
+\item
+ {\em  $XW => X$ closure-2 of covariate} \texttt{(XWX2)}, \\
+ This is a generic effect, not an evaluation effect,
+ comprising of the  `$XW => X $ closure of covariate' effect
+ only the contribution of the number of weighted $X-W$ two-in-stars
+ $i \stackrel{X}{\rightarrow} h $,
+ $j \stackrel{W}{\rightarrow} h $.
+ In other words, only the $i \rightarrow h$ tie in the figure
+ is the dependent variable here.\\
+ Although technically this is not an evaluation effect, its type
+ in \RS still is \texttt{eval}.
+
 
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
@@ -7552,7 +7329,7 @@ the following effects are available:
  exactly the same value on the covariate,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, I\{v_i = v_j \} $,\\
  where the indicator function $I\{v_i = v_j \} $ is 1 if the condition $\{v_i = v_j \} $
- is satisfied, and 0 if it is not;
+ is satisfied, and 0 if it is not;\\
 
  \item {\em same covariate $\times$ reciprocity}
 \texttt{(sameXRecip)} defined by the
@@ -7566,6 +7343,12 @@ the following effects are available:
  that have the same covariate value for $i$ and $j$,\\
  $s^{\rm net}_{i\vit}(x) =
  \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i = v_j\}$;
+
+ \item {\em indegree popularity from same covariate}
+\texttt{(sameXInPop)} defined by the
+ number of incoming ties received by the others to whom $i$ is tied
+ and sent by others who have the same covariate value as $i$,\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{hj} I\{v_i = v_h \} $;
 
  \item {\em homogeneous covariate $\times$ transitive triplets}
  \texttt{(homXTransTrip)}, defined by the number of transitive triplets
@@ -7643,27 +7426,27 @@ the following effects are available:
 \end{enumerate}
 
 \noindent
-The following group of effects uses an auxiliary variable $\breve v_i$ which
+The following group of effects uses an auxiliary variable $\breve v_j$ which
 can be called ``alters' $v$-average''.
-It is described as the average value of $v_j$ for those
-to whom $i$ is tied, and defined mathematically by
+It is described as the average value of $v_h$ for those $h$
+to whom $j$ is tied, and defined mathematically by
 \begin{equation}
-  \breve v_i = \left\{\begin{array}{ll} \displaystyle
-         \frac{\sum_j x_{ij}v_j}{x_{i+}}  &  \text{ if } x_{i+} > 0     \\
-         0                                &  \text{ if } x_{i+} = 0  .
+  \breve v_j = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_h x_{jh}v_h}{x_{j+}}  &  \text{ if } x_{j+} > 0     \\
+         0                                &  \text{ if } x_{j+} = 0  .
   \end{array}   \right.            \label{alt_av}
 \end{equation}
-(Since $v$ is centered, the value of 0 in case $x_{i+} = 0$ is also the mean value
+(Since $v$ is centered, the value of 0 in case $x_{j+} = 0$ is also the mean value
 of the original variable.)\\
-(It may be noted that this constructed variable $\breve v_i$
+(It may be noted that this constructed variable $\breve v_j$
 will not itself have exactly a zero mean generally.)
 
 Note that this value is being updated during the simulations.
-Network changes will change $\breve v_i$; if $v_i$ is a dependent behavior
-variable, then behaviour changes will also change $\breve v_i$.
+Network changes will change $\breve v_j$; if $v_j$ is a dependent behavior
+variable, then behaviour changes will also change $\breve v_j$.
 
 In the following list, there is no ego effect, because the ego effect
-of $\breve v_i$ would be the same as the alter effect of $v_i$.
+of $\breve v_j$ would be the same as the alter effect of $v_j$.
 
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
@@ -8092,6 +7875,41 @@ Further there are a number of mixed triadic effects.
 \end{center}
 \vfill
 \end{minipage}
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+\smallskip
+There are two partial variants of this effect; they can be
+distinguished not by the Method of Moments, but only
+by Maximum Likelihood and Bayesian estimation.
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+
+ \item
+ {\em  XWX closure-1 of $W$}, \texttt{(cl.XWX1)} \\
+ This is a generic effect, not an evaluation effect,
+ comprising of the  `XWX closure of $W$' effect
+ only the contribution of the
+ the number of mixed $X-W$ two-paths
+ $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$.\\
+ The interpretation is the closure of $X \rightarrow W$ paths,
+ only as a consequence of the
+ $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$
+ twopaths.\\
+ Although technically this is not an evaluation effect, its type
+ in \RS still is \texttt{eval}.
+ \item
+ {\em  XWX closure-2 of $W$}, \texttt{(cl.XWX2)} \\
+ This is a generic effect, not an evaluation effect,
+ comprising of the  `XWX closure of $W$' effect
+ only the contribution of the number of mixed $X-W$ two-in-stars
+ $i \stackrel{X}{\rightarrow} h $,
+ $j \stackrel{W}{\rightarrow} h $.\\
+ The interpretation is the closure of $X \rightarrow W$ paths,
+ only as a consequence of the 
+ $i \stackrel{X}{\rightarrow} h $,
+ $j \stackrel{W}{\rightarrow} h $ two-in-stars.\\
+ Although technically this is not an evaluation effect, its type
+ in \RS still is \texttt{eval}.
  \item
 \begin{minipage}[t]{.7\textwidth}
  {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\
@@ -8788,12 +8606,113 @@ The list of these effects is the following.
                                 / \big (\sum_j x_{ij}\big)  $\\
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
+ \item {\em total alter effect} \texttt{(totAlt)},
+ defined by the product of $i$'s
+ behavior multiplied by the sum of behavior of his alters, \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, z_j \big) ;  $\\
+
+ \item {\em average in-alter effect} \texttt{(avInAlt)},
+ defined by the product of $i$'s
+ behavior multiplied by the average behavior of his in-alters (a kind
+ of ego-alter behavior covariance), \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ji}\, z_j \big)
+                                / \big (\sum_j x_{ji}\big)  $\\
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
+
+ \item {\em total alter effect} \texttt{(totInAlt)},
+ defined by the product of $i$'s
+ behavior multiplied by the sum of behavior of his in-alters, \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ji}\, z_j \big) ;  $\\
+
  \item {\em average reciprocated alter effect} \texttt{(avRecAlt)},
  defined by the product of $i$'s
  behavior multiplied by the average behavior of his reciprocated alters, \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, x_{ji}\, z_j \big)
                                 / \big (\sum_j x_{ij}\, x_{ji} \big)  $\\
  (and 0 if the ratio is 0/0) ;
+
+ \item {\em total reciprocated alter effect} \texttt{(totRecAlt)},
+ defined by the product of $i$'s
+ behavior multiplied by the sum of behavior of his reciprocated alters, \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, x_{ji}\, z_j \big);  $\\
+
+ \item {\em average alter effect at distance 2} \texttt{(avAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the average of the alter-averages $\breve z_j^{(-i)}$ of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any),
+ defined by
+\begin{equation}
+  \breve z_j^{(-i)} = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_{h \neq i} x_{jh}\,z_h}{x_{j+} - x_{ji}}  &
+                                       \text{ if } x_{j+} - x_{ji} > 0     \\
+         0                                &  \text{ if } x_{j+}- x_{ji} = 0  .
+  \end{array}   \right.            \label{alt_av3}
+\end{equation}
+(also see (\ref{alt_av2})), \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \breve z_j^{(-i)} \big)
+                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
+
+
+ \item {\em total alter effect at distance 2} \texttt{(totAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the total of the alter-totals  of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any),\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\, \sum_{h \neq i} x_{jh}\,z_h =
+         z_i \sum_j x_{ij}\, (x_{j+}- x_{ji}) \, \breve z_j^{(-i)}  $;
+
+ \item {\em average total alter effect at distance 2} \texttt{(avTAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the average of the alter-totals of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any),\\[0.3ex]
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\,(x_{j+}- x_{ji}) \, \breve z_j^{(-i)} \big)
+                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
+
+ \item {\em total average alter effect at distance 2} \texttt{(totAAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the total of the alter-averages $ z_j^{(-i)}$ of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any), \\[0.3ex]
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \breve z_j^{(-i)} \big) $;
+
+ \item {\em average incoming alter effect at distance 2} \texttt{(avInAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the average of the incoming alter
+ averages $\check z_j^{(-i)}$ of his alters,
+ excluding the contribution from a tie $i \rightarrow j$ (if any),
+ defined by
+\begin{equation}
+  \check z_j^{(-i)} = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_{h \neq i} x_{hj}\,z_h}{x_{+j} - x_{ij}}  &
+                                       \text{ if } x_{+j} - x_{ij} > 0     \\
+         0                                &  \text{ if } x_{+j}- x_{ij} = 0  .
+  \end{array}   \right.            \label{inalt_av3}
+\end{equation}
+(cf.\ (\ref{alt_av3})), \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \check z_j^{(-i)} \big)
+                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
+
+ \item {\em total incoming alter effect at distance 2} \texttt{(totInAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the total of the incoming alter-totals  of his alters,
+ excluding the contribution from a tie $i \rightarrow j$ (if any),\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\, \sum_{h \neq i} x_{hj}\,z_h =
+         z_i \sum_j x_{ij}\, (x_{+j}- x_{ij}) \, \check z_j^{(-i)}  $;
+
+ \item {\em average total incoming alter effect at distance 2} \texttt{(avTInAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the average of the incoming alter-totals of his alters,
+ excluding the contribution from a tie $i \rightarrow j$ (if any),\\[0.3ex]
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\,(x_{+j}- x_{ij}) \, \check z_j^{(-i)} \big)
+                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
+
+ \item {\em total average incoming alter effect at distance 2} \texttt{(totAInAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the total of the incoming alter-averages $ z_j^{(-i)}$ of his alters,
+ excluding the contribution from a tie $i \rightarrow j$ (if any), \\[0.3ex]
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \check z_j^{(-i)} \big) $;
 
 
  \item {\em dense triads effect} \texttt{(behDenseTriads)},
@@ -8805,8 +8724,9 @@ The list of these effects is the following.
 
  \item {\em peripheral effect}, defined by the number of dense triads to which actor $i$ stands
  in a unilateral-peripheral relation,\\
- $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
- I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$,\\
+ $s^{\rm beh}_{i\vit}(x, z) =  \\[0.4ex]
+ \phantom{abcdef} z_i \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
+ I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$,\\[0.4ex]
  where $c$ is the same constant as in the {\it dense triads} effect;\\
  for symmetric networks, the unilateral condition is dropped, and the effect is\\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
@@ -8844,13 +8764,140 @@ denoted $v_j$), there are the following effects.
  here too, the other dependent behavioral variables are centered so that they
  have overall mean 0;
 \item \emph{alter's covariate average } effect on behavior $z$
- \texttt{(AltsAvAlt)},\\
+ \texttt{(avXAlt)}, formerly called \texttt{(AltsAvAlt)},\\
       defined as the product of $i$'s behavior $z_i$ and
       $i$'s alters' covariate-average $\breve v_i$ as defined
       in (\ref{alt_av}),\\
        $s^{\rm beh}_{i\vit}(x, z) = z_i \, \breve v_i $.\\
       This is similar to the `average alter' effect; for
       $v_i = z_i$ it would reduce to the latter effect.
+
+\item \emph{alter's covariate total } effect on behavior $z$
+ \texttt{(totXAlt)},\\
+      defined as the product of $i$'s behavior $z_i$ and
+      $i$'s alters' covariate sum $x_{i+}\,\breve v_i$ as defined
+      in (\ref{alt_av}),\\
+       $s^{\rm beh}_{i\vit}(x, z) = z_i \, x_{i+}\, \breve v_i $.\\
+      This is similar to the `total alter' effect; for
+      $v_i = z_i$ it would reduce to the latter effect.
+
+\item \emph{in-alter's covariate average } effect on behavior $z$
+ \texttt{(avXInAlt)},\\
+      defined as the product of $i$'s behavior $z_i$ and
+      $i$'s in-alters' covariate-average $\breve v_i$ as defined
+      in
+\begin{equation}
+  \check v_i = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_j x_{ji}v_j}{x_{+i}}  &  \text{ if } x_{+i} > 0     \\
+         0                                &  \text{ if } x_{+i} = 0  ,
+  \end{array}   \right.            \label{inalt_av}
+\end{equation}
+      the effect being \\
+       $s^{\rm beh}_{i\vit}(x, z) = z_i \, \check v_i $.\\
+      This is similar to the `average in-alter' effect; for
+      $v_i = z_i$ it would reduce to the latter effect.
+
+\item \emph{in-alter's covariate total } effect on behavior $z$
+ \texttt{(totXInAlt)},\\
+      defined as the product of $i$'s behavior $z_i$ and
+      $i$'s alters' covariate sum $x_{i+}\,\check v_i$ as defined
+      in (\ref{inalt_av}),\\
+       $s^{\rm beh}_{i\vit}(x, z) = z_i \, x_{i+}\, \check v_i $.\\
+      This is similar to the `total in-alter' effect; for
+      $v_i = z_i$ it would reduce to the latter effect.
+
+ \item {\em alter's distance-two covariate average} effect on behavior $z$ \texttt{(avXAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the average of the alter-averages $\breve v_j^{(-i)}$ of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any),
+ defined by
+\begin{equation}
+  \breve v_j^{(-i)} = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_{h \neq i} x_{jh}\,v_h}{x_{j+} - x_{ji}}  &
+                                       \text{ if } x_{j+} - x_{ji} > 0     \\
+         0                                &  \text{ if } x_{j+}- x_{ji} = 0  .
+  \end{array}   \right.            \label{alt_av4}
+\end{equation}
+(also see (\ref{alt_av2}) and (\ref{alt_av3})), \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \breve v_j^{(-i)} \big)
+                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;\\
+ this is similar to \texttt{avAltDist2}, but now for covariate $V$
+ instead of the behavior $Z$;
+
+ \item {\em alter's distance-two covariate total} effect on behavior $z$ \texttt{(totXAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the total of the alter-totals on $V$ of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any),\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\, \sum_{h \neq i} x_{jh}\,v_h =
+         z_i \sum_j x_{ij}\, (x_{j+}- x_{ji}) \, \breve v_j^{(-i)}  $;\\[0.5ex]
+ this is similar to \texttt{totAltDist2}, but now for covariate $V$
+ instead of the behavior $Z$;
+
+ \item {\em average total covariate alter effect at distance 2} \texttt{(avTXAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the average of the alter-totals on $V$ of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any),\\[0.3ex]
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\,(x_{j+}- x_{ji}) \, \breve v_j^{(-i)} \big)
+                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;\\
+ this is similar to \texttt{avTAltDist2}, but now for covariate $V$
+ instead of the behavior $Z$;
+
+ \item {\em total average covariate alter effect at distance 2} \texttt{(totAXAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the total of the alter-averages on $V$ of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any), \\[0.3ex]
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \breve v_j^{(-i)} \big) $;\\[0.5ex]
+ this is similar to \texttt{totAAltDist2}, but now for covariate $V$
+ instead of the behavior $Z$;
+
+ \item {\em alter's distance-two incoming covariate average} effect on behavior $z$ \texttt{(avXInAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the average of the incoming alter-averages $\check v_j^{(-i)}$ of his alters,
+ excluding the contribution from a tie $j \rightarrow i$ (if any),
+ defined by
+\begin{equation}
+  \check v_j^{(-i)} = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_{h \neq i} x_{hj}\,v_h}{x_{+j} - x_{ij}}  &
+                                       \text{ if } x_{+j} - x_{ij} > 0     \\
+         0                                &  \text{ if } x_{+j}- x_{ij} = 0  .
+  \end{array}   \right.            \label{inalt_av4}
+\end{equation}
+(also see (\ref{inalt_av3})), \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \check v_j^{(-i)} \big)
+                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;\\
+ this is similar to \texttt{avInAltDist2}, but now for covariate $V$
+ instead of the behavior $Z$;
+
+ \item {\em alter's distance-two incoming covariate total} effect on behavior $z$ \texttt{(totXInAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the total of the incoming alter-totals on $V$ of his alters,
+ excluding the contribution from a tie $i \rightarrow j$ (if any),\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\, \sum_{h \neq i} x_{hj}\,v_h =
+         z_i \sum_j x_{ij}\, (x_{+j}- x_{ij}) \, \check v_j^{(-i)}  $;\\[0.5ex]
+ this is similar to \texttt{totInAltDist2}, but now for covariate $V$
+ instead of the behavior $Z$;
+
+ \item {\em average total incoming covariate alter effect at distance 2} \texttt{(avTXInAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the average of the incoming alter-totals on $V$ of his alters,
+ excluding the contribution from a tie $i \rightarrow j$ (if any),\\[0.3ex]
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\,(x_{+j}- x_{ij}) \, \check v_j^{(-i)} \big)
+                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+ (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;\\
+ this is similar to \texttt{avTInAltDist2}, but now for covariate $V$
+ instead of the behavior $Z$;
+
+ \item {\em total average incoming covariate alter effect at distance 2} \texttt{(totAXInAltDist2)},
+ defined by the product of $i$'s
+ behavior multiplied by the total of the incoming alter-averages on $V$ of his alters,
+ excluding the contribution from a tie $i \rightarrow j$ (if any), \\[0.3ex]
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \check v_j^{(-i)} \big) $;\\[0.5ex]
+ this is similar to \texttt{totAInAltDist2}, but now for covariate $V$
+ instead of the behavior $Z$;
+
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 There are also a number of interaction effects between actor covariates
@@ -9204,10 +9251,13 @@ Such effects are called \emph{generic} effects.
 For generic effects, when a ministep in behavior occurs, the contribution
 on the probability distribution of the change is as follows:
 a change of $z_i $ by --1 will decrease the evaluation function by
-$\beta^{\rm beh}_k$, and a change by +1 will increase it by the same amount.
+$\beta^{\rm beh}_k s^{0}_{ik}(x, z)$,
+and a change by +1 will increase it by the same amount.
+(Note that this amount does not depend on the value of $z_i$
+because of the definition of a generic effect.)
 Therefore, the log-odds-ratio of an increase in behavior compared to
-staying constant, due to a difference of 1 in the
-value of the function $s^{0}_{ik}(x, z)$, is equal to
+staying constant that can be attributed to a difference of +1 in the
+value of the predictor function $s^{0}_{ik}(x, z)$, is equal to
 $\beta^{\rm beh}_k$. The odds ratio is $\exp(\beta^{\rm beh}_k)$.
 
 For example, later in this section results are presented where,
@@ -9909,16 +9959,28 @@ This chapter contains some error messages with their explanations.
 Currently it is not very  extensive; new error messages will be added
 as answerable questions about them arise.
 
+Note that it is not difficult to find the source of error messages in the code.
+The easiest way is searching for it by some search machine such as google.
+You will probably find it points to R-Forge or another repository of the
+code. There you can see what led to the error message, if you can understand some R.
+An alternative, if you know the function generating the error message,
+is to search directly in the code for this function.
+If the function is called, e.g., \textsf{siena07}, you can write
+the code to a file called \texttt{listing.txt} by the commands
+\begin{verbatim}
+sink("listing.txt")
+siena07
+sink()
+\end{verbatim}
+Note that you should give the function name without parentheses.
+
 \subsection{During estimation}
 
 \emph{Unlikely to terminate this epoch: more than 1000000 steps}.
 \medskip
 
-\begin{minipage}{0.05\textwidth}
-$\phantom{abcde}$
-
-\end{minipage}
-\begin{minipage}{0.94\textwidth}
+\begin{indentation}{0.04\textwidth}{0pt}
+\noindent
 This can happen in function \sfn{siena07};
 in conditional estimation (\texttt{COND=FALSE} in\\
  \sfn{sienaAlgorithmCreate}),
@@ -9960,7 +10022,8 @@ See Section~\ref{S_cond}.
     \texttt{firstg}  is the initial value of parameter $a_N$ mentioned
     on p.\ 393 of \citet{Snijders01}.
 \end{enumerate}
-\end{minipage}
+\end{indentation}
+%\end{minipage}
 \bigskip
 
 \iffalse
@@ -9978,17 +10041,14 @@ This requires allowOnly=FALSE in startup1Model
 
 \noindent
 \emph{Error in solve.default(z\$dfra) : \\
-system is computationally singular: reciprocal condition number = 2.34809e-35
+system is computationally singular: reciprocal condition number = 2.34809e--35
 }\\
-(or some other very small number -- note that `$e-35$ means 10 to the power
+(or some other very small number -- note that `\textit{e--35}' means 10 to the power
 --35.)
 \smallskip
 
-\begin{minipage}{0.05\textwidth}
-$\phantom{abcde}$
-
-\end{minipage}
-\begin{minipage}{0.94\textwidth}
+\begin{indentation}{0.04\textwidth}{0pt}
+\noindent
 This can happen at the end of estimation in function \sfn{siena07},
 when the covariance matrix is singular.
 It means that some effects in the model are linearly related,
@@ -10000,7 +10060,7 @@ or are always 0.
 Check your data (look at the description of the variables
 given as the output of \sfn{print01Report}).
 Check your model specification.
-\end{minipage}
+\end{indentation}
 
 
 \subsection{As result of a score-type test (including time test)}
@@ -10011,11 +10071,8 @@ Error in if (cvalue $<$ 0) cvalue $<\!\!-$ 0 :
    missing value where TRUE/FALSE needed.}
 \smallskip
 
-\begin{minipage}{0.05\textwidth}
-$\phantom{abcde}$
-
-\end{minipage}
-\begin{minipage}{0.94\textwidth}
+\begin{indentation}{0.04\textwidth}{0pt}
+\noindent
 This can happen as the result of a score test requested in function
 \sfn{siena07}; or the score test requested in function
 \sfn{sienaTimeTest}.
@@ -10037,7 +10094,7 @@ retaining only a set of tested effects between which there are no
 linear dependencies.\\
 For \sfn{sienaTimeTest}: exclude some of the requested
 time heterogeneity tests by the \sfn{excludeEffects} parameter.
-\end{minipage}
+\end{indentation}
 
 \subsection{In sienaGOF}
 
@@ -10046,11 +10103,8 @@ time heterogeneity tests by the \sfn{excludeEffects} parameter.
   argument is of length zero }
 \smallskip
 
-\begin{minipage}{0.05\textwidth}
-$\phantom{abcde}$
-
-\end{minipage}
-\begin{minipage}{0.94\textwidth}
+\begin{indentation}{0.04\textwidth}{0pt}
+\noindent
 This can happen directly when calling \sfn{sienaGOF}.
 It indicates that you used a wrong name for \sfn{groupName} or \sfn{varName}.
 See the help file for \sfn{sienaGOF}.
@@ -10059,18 +10113,15 @@ See the help file for \sfn{sienaGOF}.
 \noindent
 \emph{Solutions.} \\
 Use a correct \sfn{groupName} and \sfn{varName}.
-\end{minipage}
+\end{indentation}
 \bigskip
 
 \noindent
 \emph{Error in if (isbipartite) \{ : argument is of length zero }
 \smallskip
 
-\begin{minipage}{0.05\textwidth}
-$\phantom{abcde}$
-
-\end{minipage}
-\begin{minipage}{0.94\textwidth}
+\begin{indentation}{0.04\textwidth}{0pt}
+\noindent
 This can happen directly when calling \sfn{sienaGOF}.
 It indicates that you used a wrong name for \sfn{groupName} or \sfn{varName}.
 See the help file for \sfn{sienaGOF}.
@@ -10079,7 +10130,7 @@ See the help file for \sfn{sienaGOF}.
 \noindent
 \emph{Solutions.} \\
 Use a correct \sfn{groupName} and \sfn{varName}.
-\end{minipage}
+\end{indentation}
 
 \newpage
 \part{Programmers' manual}
@@ -10115,8 +10166,14 @@ In the file structure for \texttt{RSienaTest} there is a directory
 \texttt{doc} which contains a lot of programmers' documentation.
 These are in the form of \LaTeX \ files, which can be compiled
 to produce .pdf files.
-The first one to look at is \texttt{RSienaDeveloper.tex}.
-This will guide you to the further documentation.
+The file \texttt{Siena\_Algorithms.tex} contains a lot of details
+about algorithms used.
+For code developers, important files are
+\texttt{HowToCommit.tex} and \texttt{RSienaDeveloper.tex}.
+The latter file will guide you to the further documentation.
+
+The file  \texttt{Siena\_Algorithms.pdf} can also be downloaded from the
+\SI website.
 
 \section{Other tools you need}
 \begin{description}
@@ -10221,6 +10278,13 @@ file, find the name of the effect you are interested in and
 from there the function that implements it
 and read the code of this function.
 
+The explanations here are not yet given for generic effects, which allow
+a more streamlined construction of effects. Looking at the code,
+starting with the file \sfn{EffectFactory.cpp}, may be helpful for understanding
+this construction of generic effects.
+For example, compare the construction of \texttt{sameXTransTrip} to that of
+\texttt{sameXInPop}.
+
 \begin{enumerate}
 
 \item Work out the definition of the effect and the contribution or
@@ -10231,30 +10295,37 @@ and read the code of this function.
       \end{equation}
       where $x^{+ij}$ is the network with the tie $i \rightarrow j$
       and $x^{-ij}$ is the network without this tie.
-\item The list of all defined effects is in the file effects.pdf which is available
-      in the help files (click on "Index" on the last line of each help page, then go to
-      "User guides, package vignettes and other documentation") and also in the source
-      code ({\textbackslash}inst{\textbackslash}doc{\textbackslash}effects.pdf).
+\item The list of all defined effects can be obtained from \textsf{effectsDocumentation()},
+      which produces a file \textsf{effects.html} or \textsf{effects.pdf}.
       All effects are also listed, with their definitions, in the manual (Section~\ref{S_math}). \\
       Determine an existing effect that is most similar
       to this effect (or perhaps more than one).
+      In the file \textsf{effects.html} or \textsf{effects.pdf} the effects are grouped
+      by \sfn{effectGroup}.
 \item Open the file \textsf{allEffects.csv} located in
-       \textsf{"RSiena\textbackslash data"}
+       \textsf{"RSiena\textbackslash data"}. The default program for opening a .csv file
+       usually is Excel, but other editors may be more helpful 
+       for opening this particular file; e.g., NotePad or NotePad++.
 	   \begin{itemize}
-		\item Identify the effect group
-               (e.g. nonSymmetricObjective,  bipartiteSymmetricObjective)
-              where this effect belongs.
-              The names of the groups are determined by the type of dependent
-              variable and the type of explanatory variable (if any).
+		\item You will see that the first column is called \sfn{effectGroup}.
+              These groups define combinations of dependent variable, effect type,
+              and covariates (if any)
+              (e.g. nonSymmetricObjective,  bipartiteSymmetricObjective).               
+              Identify the effectGroup where this effect belongs.
               Determine which is which by considering some examples
-              in this file or in effects.pdf.
-    	\item Insert a new row in that group.
+              in this file or in the result of \sfn{effectsDocumentation()}.
+              
+              For covariate-related effects for two-mode networks, see
+              extra remarks in Section~\ref{S_notestwomode}.
+    	\item Insert a new row in this group.
               Copy a row that corresponds best to your new effect
               and modify effectName, functionName, shortName,
               and more if this seems necessary.
               Perhaps your new effect is suitable in more than one group;
               then a new row can be made for all these groups, differing only
-              in the name of the effect group.
+              in the name of the effect group; e.g., check that there are
+              three versions of \texttt{inPop}, for directed, non-directed,
+              and bipartite (two-mode) networks.
               Assume our new effect has shortName \textit{newEf}.
 
               In some cases, the new function will have extra parameters,
@@ -10570,6 +10641,23 @@ sum(pmin(rowSums(s502),3))
       changed to \sfn{bipartiteObjective} and \sfn{symmetricObjective},
       respectively.
 \end{enumerate}
+
+\subsection{Notes for effects for two-mode networks}
+\label{S_notestwomode}
+
+For two-mode networks the difference between the two node sets implies
+some peculiarities.
+In the function \sfn{getEffects} in file \sfn{effects.r}, some additional
+measures are taken for effects in effectGroup \sfn{covarBipartiteEff}.
+This implies that for adding such effects, it will be necessary to see whether
+this function also must be modified.
+(Note: it would be preferable perhaps to have separate effect classes
+for covariates on the first and on the second mode.)
+
+A different approach was taken for effectGroups
+\sfn{covarABehaviorBipartiteObjective} and \sfn{covarBBehaviorBipartiteObjective}:
+the former is for covariates on the first node set, the second for
+covariates on the second node set.
 
 \appendix
 \newpage
@@ -10935,10 +11023,9 @@ to TRUE). The arguments ``name'', ``type'' and ``interaction1'' and
 ``interaction2'' are defined as in includeInteraction  and includeEffects.\\
 \hline
 
-5 & print01Report & print01Report(data, myeff, \newline
-modelname=``Siena'',\newline
+5 & print01Report & print01Report(data, modelname=``Siena'',\newline
 session=NULL, \newline
-getDocumentation=FALSE) & print01Report(MyData, MyEff) & Prints a
+getDocumentation=FALSE) & print01Report(MyData) & Prints a
 report of a Siena data object and its default effects. We need to supply a
 Siena data object (``data'') a siena effects object (``myeff'') and a model
 name (``modelname'') that defaults to ``Siena''. It creates and saves a file
@@ -11089,6 +11176,57 @@ which affect the user.
 the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+
+\item 2014-11-13  Revision 279.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item Effects \texttt{AltsAvAlt} renamed to \texttt{avXAlt}.
+   \item Effects object no longer used as argument for \sfn{print01Report}.
+   \item A lot of new effects: \texttt{sameXInPop, transRecTrip2, totAlt, avInAlt, totInAlt,
+     totRecAlt, totXAlt, avXInAlt, totXInAlt,
+	 avAltDist2, totAltDist2, avTAltDist, totAAltDist2,
+	 avXAltDist, totXAltDist2, avTXAltDist, totAXAltDist2,
+	 avInAltDist2, totInAltDist2, avTInAltDist, totAInAltDist2,
+	 avXInAltDist2, totXInAltDist2, avTXInAltDist, totAXInAltDist2,
+     XWX1, XWX2, cl.XWX1, cl.XWX2}.
+   \item Endowment and creation effects added for \texttt{gwesp...} effects.
+   \item Some meaningless effects for two-mode networks dropped.
+   \item For non-invertible covariance matrices at the end of \sfn{siena07},
+         give diagnostic for the linear combination that gives trouble.
+   \item Correction of \sfn{igraphNetworkExtraction()} in the help page
+       for \sfn{sienaGOF-auxiliary}
+     (the earlier version dropped isolated nodes from simulated networks).
+   \item In the help page for \sfn{sienaGOF-auxiliary.Rd}, 
+     the example of constraint is replaced
+     by the example of eigenvector centrality (because constraint
+	 is undefined for isolated nodes, leading to computational problems).  
+   \item Set diagonal of observed networks to 0 in \sfn{sparseMatrixExtraction()}.
+   \item \sfn{sienaRIDynamics()} restored, after corrections.
+   \item ``file" parameter of \sfn{sienaRI()} dropped (implied platform dependence).
+   \item Section in manual about user-defined interaction effects updated.
+   \item Parameter \texttt{showAll} added to \sfn{descriptives.sienaGOF()}.
+   \item Small correction of \sfn{print.siena()} (reporting uponly/downonly).
+   \item Some changes in \sfn{print.sienaAlgorithm()}.
+   \item Check in \sfn{siena07()} for incorrect \texttt{MaxDegree} specification.
+   \item Correction of printing errors arising when result of score-type test is \texttt{NA}.
+   \item \texttt{maxRatio} checked for \texttt{NA} or \texttt{NaN} in \sfn{phase2.r}.
+   \item \texttt{Siena\_algorithms4.tex} renamed \texttt{Siena\_algorithms.tex};
+         this document now is made available also at the \SI website.
+   \item Some improvement of error messages for \sfn{sienaTimeTest()}.
+   \item $p$-value for goodness of fit (\sfn{sienaGOF()}) rounded to 3 decimal places.
+   \item File \sfn{effects.pdf} dropped from \texttt{{$\backslash$}inst{$\backslash$}doc}
+          (it can be created by \sfn{effectsDocumentation()}).
+\end{itemize}
+Changes in RSienaTest:
+\begin{itemize}
+   \item \sfn{sienaBayes()}: new parameters \texttt{nImproveMH} and \texttt{priorRatesFromData};
+      these give the possibility to truncate initial rate parameters depending on prior.
+   \item \sfn{glueBayes()} corrected so that it can be applied sequentially.
+   \item \sfn{multipleBayesTest()} now allows matrix parameter to test
+     linear combinations.
+   \item Improved \sfn{plot.multipleBayesTest} (to show truncation at 0).
+\end{itemize}
 
 \item 2014-07-08  Revision 278.
 

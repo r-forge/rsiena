@@ -47,6 +47,7 @@
 #include "model/effects/generic/CovariateMixedNetworkAlterFunction.h"
 #include "model/effects/generic/SameCovariateTwoPathFunction.h"
 #include "model/effects/generic/SameCovariateMixedTwoPathFunction.h"
+#include "model/effects/generic/SameCovariateInTiesFunction.h"
 #include "model/effects/generic/HomCovariateMixedTwoPathFunction.h"
 #include "model/tables/EgocentricConfigurationTable.h"
 #include "model/tables/NetworkCache.h"
@@ -147,6 +148,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "transRecTrip")
 	{
 		pEffect = new TransitiveReciprocatedTripletsEffect(pEffectInfo);
+	}
+	else if (effectName == "transRecTrip2")
+	{
+		pEffect = new TransitiveReciprocatedTriplets2Effect(pEffectInfo);
 	}
 	else if (effectName == "cycle3")
 	{
@@ -270,7 +275,15 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "XWX")
 	{
-		pEffect = new XWXClosureEffect(pEffectInfo);
+		pEffect = new XWXClosureEffect(pEffectInfo, true, true);
+	}
+	else if (effectName == "XWX1")
+	{
+		pEffect = new XWXClosureEffect(pEffectInfo, true, false);
+	}
+	else if (effectName == "XWX2")
+	{
+		pEffect = new XWXClosureEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "altX")
 	{
@@ -311,6 +324,17 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "sameXTransTrip")
 	{
 		pEffect = new SameCovariateTransitiveTripletsEffect(pEffectInfo, false);
+	}
+	else if (effectName == "sameXInPop")
+	{
+		string networkName = pEffectInfo->variableName();
+		string covariateName = pEffectInfo->interactionName1();
+		AlterFunction * pChangeFunction =
+			new SameCovariateInTiesFunction(networkName, covariateName, false);
+		AlterFunction * pStatisticFunction =
+			new SameCovariateInTiesFunction(networkName, covariateName, true);
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pChangeFunction, pStatisticFunction);
 	}
 	else if (effectName == "homXTransTrip")
 	{
@@ -551,6 +575,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 			new MixedInStarFunction(pEffectInfo->variableName(),
 					pEffectInfo->interactionName1())));
 	}
+	else if (effectName == "cl.XWX1")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new MixedTwoPathFunction(pEffectInfo->variableName(),
+					pEffectInfo->interactionName1()));
+	}
+	else if (effectName == "cl.XWX2")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new MixedInStarFunction(pEffectInfo->variableName(),
+					pEffectInfo->interactionName1()));
+	}
 	else if (effectName == "covNetNet")
 	{
 		string networkName = pEffectInfo->interactionName1();
@@ -720,11 +756,59 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "avAlt")
 	{
-		pEffect = new AverageAlterEffect(pEffectInfo);
+		pEffect = new AverageAlterEffect(pEffectInfo, true);
+	}
+	else if (effectName == "totAlt")
+	{
+		pEffect = new AverageAlterEffect(pEffectInfo, false);
 	}
 	else if (effectName == "avRecAlt")
 	{
-		pEffect = new AverageReciprocatedAlterEffect(pEffectInfo);
+		pEffect = new AverageReciprocatedAlterEffect(pEffectInfo, true);
+	}
+	else if (effectName == "totRecAlt")
+	{
+		pEffect = new AverageReciprocatedAlterEffect(pEffectInfo, false);
+	}
+	else if (effectName == "avInAlt")
+	{
+		pEffect = new AverageInAlterEffect(pEffectInfo, true);
+	}
+	else if (effectName == "totInAlt")
+	{
+		pEffect = new AverageInAlterEffect(pEffectInfo, false);
+	}
+	else if (effectName == "avAltDist2")
+	{
+		pEffect = new AverageAlterDist2Effect(pEffectInfo, true, true);
+	}
+	else if (effectName == "totAltDist2")
+	{
+		pEffect = new AverageAlterDist2Effect(pEffectInfo, false, false);
+	}
+	else if (effectName == "avTAltDist2")
+	{
+		pEffect = new AverageAlterDist2Effect(pEffectInfo, true, false);
+	}
+	else if (effectName == "totAAltDist2")
+	{
+		pEffect = new AverageAlterDist2Effect(pEffectInfo, false, true);
+	}
+	else if (effectName == "avInAltDist2")
+	{
+		pEffect = new AverageAlterInDist2Effect(pEffectInfo, true, true);
+	}
+	else if (effectName == "totInAltDist2")
+	{
+		pEffect = new AverageAlterInDist2Effect(pEffectInfo, false, false);
+	}
+	else if (effectName == "avTInAltDist2")
+	{
+		pEffect = new AverageAlterInDist2Effect(pEffectInfo, true, false);
+	}
+	else if (effectName == "totAInAltDist2")
+	{
+		pEffect = new AverageAlterInDist2Effect(pEffectInfo, false, true);
 	}
 	else if (effectName == "behDenseTriads")
 	{
@@ -777,7 +861,55 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "AltsAvAlt")
 	{
-		pEffect = new AltersCovariateAverageEffect(pEffectInfo);
+		throw domain_error("Effect AltsAvAlt renamed to avXAlt");
+	}
+	else if (effectName == "avXAlt")
+	{
+		pEffect = new AltersCovariateAverageEffect(pEffectInfo,true);
+	}
+	else if (effectName == "totXAlt")
+	{
+		pEffect = new AltersCovariateAverageEffect(pEffectInfo,false);
+	}
+	else if (effectName == "avXInAlt")
+	{
+		pEffect = new InAltersCovariateAverageEffect(pEffectInfo,true);
+	}
+	else if (effectName == "totXInAlt")
+	{
+		pEffect = new InAltersCovariateAverageEffect(pEffectInfo,false);
+	}
+	else if (effectName == "avXAltDist2")
+	{
+		pEffect = new AltersDist2CovariateAverageEffect(pEffectInfo,true,true);
+	}
+	else if (effectName == "totXAltDist2")
+	{
+		pEffect = new AltersDist2CovariateAverageEffect(pEffectInfo,false,false);
+	}
+	else if (effectName == "avTXAltDist2")
+	{
+		pEffect = new AltersDist2CovariateAverageEffect(pEffectInfo,true,false);
+	}
+	else if (effectName == "totAXAltDist2")
+	{
+		pEffect = new AltersDist2CovariateAverageEffect(pEffectInfo,false,true);
+	}
+	else if (effectName == "avXInAltDist2")
+	{
+		pEffect = new AltersInDist2CovariateAverageEffect(pEffectInfo,true,true);
+	}
+	else if (effectName == "totXInAltDist2")
+	{
+		pEffect = new AltersInDist2CovariateAverageEffect(pEffectInfo,false,false);
+	}
+	else if (effectName == "avTXInAltDist2")
+	{
+		pEffect = new AltersInDist2CovariateAverageEffect(pEffectInfo,true,false);
+	}
+	else if (effectName == "totAXInAltDist2")
+	{
+		pEffect = new AltersInDist2CovariateAverageEffect(pEffectInfo,false,true);
 	}
 	else if (effectName == "altDist2")
 	{

@@ -279,6 +279,25 @@ phase3.2 <- function(z, x, ...)
 		if (inherits(try(msfinv <- solve(z$msfc), silent=TRUE), "try-error"))
 		{
 			Report('*** Warning: Covariance matrix not positive definite *** \n', outf)
+			Report('***            Standard errors not reliable           *** \n', outf)
+			ei <- eigen(z$msfc)
+			maxei <- max(abs(ei[[2]][,z$pp]))
+			# last eigenvector corresponds to smallest eigenvalue
+			smallei <- ei[[2]][,z$pp]/maxei
+			Report(
+			 'The approximate linear combination that has variance 0 is\n', outf)
+			thetext <- paste(round(smallei,2)[which(abs(smallei) > 0.1)],
+							' * beta[',
+							(1:z$pp)[which(abs(smallei) > 0.1)], ']',
+							sep="", collapse=" + ")
+			Report(thetext, outf)
+			Report('\n',outf)
+			cat('*** Warning: Covariance matrix not positive definite *** \n')
+			cat('*** Standard errors not reliable ***')
+			cat('The following is approximately a linear combination \n')
+			cat('For which the data carries no information:\n',
+			     thetext,'\n')
+			cat('It is advisable to drop one or more of these effects.\n')
 			if (any(z$fixed || any(z$newfixed)))
 			{
 				Report(c('(This may be unimportant, and related to the fact\n',

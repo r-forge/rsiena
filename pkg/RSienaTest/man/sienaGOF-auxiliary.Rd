@@ -72,7 +72,7 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
  behavior jointly.
 
  The \code{levls} parameter must be adapted to the range of values that is
- considered important. For indegrees and outdegrees, the whole range should 
+ considered important. For indegrees and outdegrees, the whole range should
  usually be covered. If the range is large, which could be the case, e.g.,
  for indegrees of two-mode networks where the second mode has few nodes,
  think about the possibility of making a selection such as
@@ -146,7 +146,7 @@ Ph.D. Thesis. University of Oxford: U.K.
    myeff <- getEffects(mydata)
    myeff <- includeEffects(myeff, transTies, cycle3)
    # Shorter phases 2 and 3, just for example:
-   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=300)
+   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
    ans <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE)
 
    OutdegreeDistribution(NULL, ans$f, ans$sims, period=1, groupName="Data1",
@@ -203,8 +203,9 @@ Ph.D. Thesis. University of Oxford: U.K.
        missings <- graph.adjacency(missings)
    #sienaGOF wants the i-th simulation:
        returnValue <- graph.difference(
-                graph.edgelist(sims[[i]][[groupName]][[varName]][[period]][,1:2]),
-                missings)
+       graph.empty(dimsOfDepVar) +
+           edges(t(sims[[i]][[groupName]][[varName]][[period]][,1:2])),
+                                       missings)
      }
      returnValue
    }
@@ -226,7 +227,7 @@ Ph.D. Thesis. University of Oxford: U.K.
      {
        gdi <- sapply(levls, function(i){ sum(a<=i) })
      }
-	 else
+     else
      {
        gdi <- sapply(levls, function(i){ sum(a==i) })
      }
@@ -240,20 +241,19 @@ Ph.D. Thesis. University of Oxford: U.K.
        require(sna)
        require(network)
        x <- networkExtraction(i, data, sims, wave, groupName, varName)
-	   if (network.edgecount(x) <= 0){x <- symmetrize(x)}
+       if (network.edgecount(x) <= 0){x <- symmetrize(x)}
        # because else triad.census(x) will lead to an error
        tc <- sna::triad.census(x)[1,levls]
        # names are transferred automatically
        tc
    }
 
-  # Distribution of Burt's constraint values; see ?igraph::constraint
-  # the maximum finite value is 9/8 (see Buskens and van de Rijt, AJS 2008).
-  ConstraintDistribution <- function (i, data, sims, period, groupName, varName,
-                           levls=c(seq(0,1.125,by=0.125)), cumulative=TRUE){
+  # Distribution of Bonacich eigenvalue centrality; see ?igraph::evcent.
+  EigenvalueDistribution <- function (i, data, sims, period, groupName, varName,
+                           levls=c(seq(0,1,by=0.125)), cumulative=TRUE){
      require(igraph)
      x <- igraphNetworkExtraction(i, data, sims, period, groupName, varName)
-     a <- igraph::constraint(x)
+     a <- igraph::evcent(x)$vector
      a[is.na(a)] <- Inf
      lel <- length(levls)
      if (cumulative)
@@ -281,10 +281,10 @@ Ph.D. Thesis. University of Oxford: U.K.
    myeff <- includeEffects(myeff,  outdeg, name="mybeh",
             interaction1="mynet1")
    # Shorter phases 2 and 3, just for example:
-   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=300)
+   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
    (ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE))
 
-   gofc <- sienaGOF(ans2, ConstraintDistribution, varName="mynet1",
+   gofc <- sienaGOF(ans2, EigenvalueDistribution, varName="mynet1",
            verbose=TRUE, join=TRUE)
    plot(gofc)
 

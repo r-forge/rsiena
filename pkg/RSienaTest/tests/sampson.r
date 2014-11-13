@@ -51,7 +51,7 @@ min234 <- sienaDependent(array(c(mmin2, mmin3, mmin4),
 sampson234 <- sienaDataCreate(plus234, min234)
 sampson.eff234 <- getEffects(sampson234)
 s.model234 <- sienaModelCreate(projname = "sampson234")
-print01Report(sampson234, sampson.eff234, "sampson234")
+print01Report(sampson234, "sampson234")
 plus23 <- sienaDependent(array(c(mplus2, mplus3),
                                dim=c(18, 18, 2)))
 min23 <- sienaDependent(array(c(mmin2, mmin3),

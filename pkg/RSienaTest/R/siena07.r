@@ -138,7 +138,6 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 		}
 	}
     is.batch(batchUse)
-
     ## open the output file
     Report(openfiles=TRUE, projname=x$projname, verbose=verbose, silent=silent)
     z <- InitReports(z, seed, newseed)

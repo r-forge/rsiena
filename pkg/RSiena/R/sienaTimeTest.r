@@ -314,24 +314,28 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 			excludedNumber <- sum(extraExclusions)
 			if (excludedNumber <= 1)
 			{
-				cat(" effect",which(extraExclusions),".\n")
+				cat(" effect",":\n")
+				cat(paste(row(fitEffects)[baseInFit,][extraExclusions,][1],'.',
+				fitEffects$effectName[baseInFit][which(extraExclusions)],"\n "))
 			}
 			else
 			{
-				cat("\neffects ", which(extraExclusions)[1],
-					paste(", ",which(extraExclusions)[2:excludedNumber],sep=""),
-					".\n", sep="")
+				cat(" effects:\n")
+				cat(paste(row(fitEffects)[baseInFit,][extraExclusions,][,1],'.',
+				fitEffects$effectName[baseInFit][which(extraExclusions)],"\n "))
 			}
 			rankSigma <- qr(sigma)$rank
 			if (rankSigma < dim(sigma)[1])
 			{
 		cat("After these exclusions, there still are linear dependencies.\n")
+		cat("Advice: use sienaTimeTest with a smaller set of effects.\n\n")
 		stop("Please rerun sienaTimeTest with appropriate excluded effects.")
 			}
 		}
 		else
 		{
 			cat("Automatic discovery of dependencies had no effect.\n")
+			cat("Advice: use sienaTimeTest with a smaller set of effects.\n\n")
 		stop("Please rerun sienaTimeTest with appropriate excluded effects.")
 		}
 	}

@@ -83,7 +83,6 @@ effectsDocumentation <- function(effects= NULL, type="html",
                  "bipartiteNonSymmetricObjective",
                  "bipartiteSymmetricObjective",
                  "bipartiteBipartiteObjective",
-                 "covarNetNetObjective",
 
                  "behaviorObjective",
                  "behaviorOneModeObjective",
@@ -91,6 +90,8 @@ effectsDocumentation <- function(effects= NULL, type="html",
                  "behaviorBipartiteObjective",
                  "covarBehaviorObjective",
 				 "covarBehaviorNetObjective",
+				 "covarABehaviorBipartiteObjective",
+				 "covarBBehaviorBipartiteObjective",
                  "unspecifiedBehaviorInteraction")
 
     mytab <- table(allEffects[,1])

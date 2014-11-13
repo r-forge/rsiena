@@ -8,7 +8,7 @@
 # * Description: This module contains the function robmon which controls
 # * the phases of the robbins-monro stochastic approximation algorithm.
 # *****************************************************************************/
-##args:x: model object - intended to be read only
+##args:x: model/algorithm object - intended to be read only
 ##     z: model fitting object
 ## returns updated z
 ##@robmon siena07 Controls MOM process

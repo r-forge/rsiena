@@ -731,6 +731,9 @@ The algorithm consists of three phases.
                \end{align*}
      \end{description}
 
+     The differences $\nnm{fra} - s$ are stored as $\nnm{sf}$ in procedure
+     \nnm{doPhase1or3Iterations}.
+
      At the end of Phase 1, calculate the following results:
       \begin{enumerate}
       \item
@@ -820,8 +823,8 @@ The algorithm consists of three phases.
             If $N >= n_{2k}^+$ or
             ($N >= n_{2k}^-$ and $\max_k \rm{AC}_{kk} \leq 0$), then\\
             $\big\{$ update $\hat\theta \,=\, N^{-1} {\rm{Sum}}_{\hat\theta}$ ;
-                   set $a_k = a_k/2 \big\}$ ;
-            else goto (b).\\
+                   set $a_k = a_k \times \text{reductionfactor} \big\}$ ;
+            goto (b).\\
             (But if \nnm{phase2.0} then the update to $\hat\theta$ is done
             only for $k \geq 2$.  )
      \end{enumerate}
@@ -957,7 +960,11 @@ The default number of subphases is \nnm{nsub} = 4;
 more or fewer subphases could be used
 to obtain smaller or larger precision, but 4 seems really a good number.\\
 The initial value of $a_N$ in phase 2 is \nnm{firstg} = 0.2,
-and for multiple processes $0.2 \ttimes \sqrt{\nnm{int}}$.
+and for multiple processes $0.2 \ttimes \sqrt{\nnm{int}}$.\\
+The reductionfactor at the end of subphases in phase 2 is
+for MoM estimation parameter \nnm{reduceg}
+set by \nnm{sienaAlgorithmCreate} (default 0.5), but for ML estimation
+it is 0.25.
 
 The values of \nnm{epsilon} = $\epsilon_j$ in the FD option
 are chosen initially as 0.1,
@@ -973,6 +980,25 @@ after the estimation has finished. (Of course in many cases there
 have been done earlier estimations, and the information obtained
 from them might be used for this purpose.)
 
+\subsection{prevAns: using the previous answer}
+
+The \nnm{prevAns} option in \nnm{siena07} does the following.
+\begin{enumerate}
+\item Using the function \nnm{updateTheta}, for the requested effects
+   the initial parameter values are taken from the previous
+   answer object.
+\item If the specifications of the previous answer and the current
+  effects object correspond, then the following objects are taken from
+  Phase 3 of the previous answer, and used to substitute for the calculations
+  done at the end of Phase 1:\\
+  \nnm{dfra};
+  matrix \nnm{dinv} which is used to calculate matrix \nnm{D};
+  \nnm{sf};
+  \nnm{regrCoef};
+  \nnm{regrCor}. \\
+  This substitution is determined by the flag \nnm{haveDfra}.
+\end{enumerate}
+
 \section{Statistics for MoM}
 
 The statistics used for the MoM are proposed in
@@ -981,9 +1007,9 @@ The statistics used for the MoM are proposed in
 
 \subsection{Rate function for networks}
 
-For an effect in the rate function 
+For an effect in the rate function
 \begin{equation}
- \lambda^X(\alpha^X, i, y) \,=\, \rho^X_m \, 
+ \lambda^X(\alpha^X, i, y) \,=\, \rho^X_m \,
       \exp\Big(\sum_k \alpha^X_k s^X_{ki}(y) \Big) \ ,
                \label{ratef}
 \end{equation}
@@ -3655,8 +3681,8 @@ by $T^w_{ri}$ and $T^w_r = \sum_i T^w_{ri}$.
 Note that $\sum_{w,r} T^w_r = \textit{TotNumber}-1$.
 The score functions are given for the basic rate parameters by
 \begin{equation}
- \frac{\partial\, \text{complete data log-likelihood}}{\partial \rho^w_r} =
- \hspace{3em}   \frac{T^w_r}{\rho^w_r} - \sum_{\text{active } i}
+ \frac{\partial\, \text{complete data log-likelihood}}{\partial \rho^w_r} \, =
+ \, \frac{T^w_r}{\rho^w_r} - \sum_{\text{active } i}
              \exp(\alpha^w_{r} s^w_{ri}) \  , \label{tscore2}
 \end{equation}
 which for cases with \emph{only} a basic rate parameter

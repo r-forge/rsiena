@@ -24,6 +24,7 @@ class CovariateDistance2AlterNetworkFunction: public
 public:
 	CovariateDistance2AlterNetworkFunction(string networkName,
 		string covariateName, double parameter, bool excludeMissing, bool total);
+	virtual ~CovariateDistance2AlterNetworkFunction();
 
 	virtual double value(int alter);
 

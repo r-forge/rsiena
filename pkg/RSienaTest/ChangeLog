@@ -1,3 +1,65 @@
+2014-11-13 R-Forge Revision 279
+Changes in RSiena and RSienaTest:
+   * Effect AltsAvAlt renamed to avXAlt (with error message).
+   * effects object no longer used as argument for print01Report
+     (with error message).
+   * New effects sameXInPop, transRecTrip2, 
+     totAlt, avInAlt, totInAlt, totRecAlt,	 
+	 totXAlt, avXInAlt, totXInAlt, 
+	 avAltDist2, totAltDist2, avTAltDist, totAAltDist2, 
+	 avXAltDist, totXAltDist2, avTXAltDist, totAXAltDist2,
+	 avInAltDist2, totInAltDist2, avTInAltDist, totAInAltDist2, 
+	 avXInAltDist2, totXInAltDist2, avTXInAltDist, totAXInAltDist2,
+	 XWX1, XWX2, cl.XWX1, cl.XWX2.
+   * gwesp.. effects get endowment=TRUE in allEffects.csv, and thereby
+     obtain endowment and creation effects.
+   * In effect group behaviorBipartiteObjective, the following meaningless
+     effects were dropped: avAlt, avSim, totSim, avSimPopEgo, avSimPopAlt,
+	 behDenseTriads, simDenseTriads.
+   * Effect class covarBehaviorBipartiteObjective split into
+     covarABehaviorBipartiteObjective (for covariates on first mode)
+	 and covarBBehaviorBipartiteObjective (for covariates on second mode)
+	 (allEffects.csv, effects.r).
+   * Added effect class covarABehaviorBipartiteObjective  
+     and covarBBehaviorBipartiteObjective to effectsDocumentation.R.
+   * Undid duplication of covarNetNetObjective.
+   * For non-invertible covariance matrices, give diagnostic for the
+     linear combination that gives trouble at the end of the
+     algorithm (phase3.r).
+   * Correction of igraphNetworkExtraction() in sienaGOF-auxiliary.Rd
+     (the earlier version dropped isolated nodes from simulated networks).
+   * In sienaGOF-auxiliary.Rd, the example of constraint is replaced
+     by the example of eigenvector centrality (because constraint 
+	 is undefined for isolated nodes, leading to computational problems).
+   * sienaRIDynamics restored, after corrections.
+   * "file" parameter of sienaRI dropped (implied platform dependence).
+   * Parameter showAll added to descriptives.sienaGOF.
+   * Small correction of print.siena (reporting uponly/downonly).
+   * Some changes in print.sienaAlgorithm.
+   * Check in siena07 for incorrect MaxDegree specification.
+   * Correction of printing errors arising when result of score-type test is NA.
+   * maxRatio checked for NA or NaN in phase2.r.
+   * Section in manual about user-defined interaction effects updated.
+   * Siena_algorithms4.tex renamed Siena_algorithms.tex.
+   * Set diagonal of observed networks to 0 in sparseMatrixExtraction
+     (sienaGOF.r).
+   * Some improvement of error messages for sienaTimeTest.
+   * p-value for goodness of fit rounded to 3 decimal places (sienaGOF.r)
+   * Longer string length for output of z$requestedEffects$effectName
+     in print to output file (print07Report.r).
+   * File effects.pdf dropped from \inst\doc (it can be created
+     by effectsDocumentation() so the separate file is superfluous).
+   * AverageAlterEffect.cpp simplified.
+Changes in RSienaTest:
+   * sienaBayes(): new parameters nImproveMH and priorRatesFromData;
+      truncate initial rate parameters depending on prior. Small change
+	  in example in help page.
+   * glueBayes() corrected so that it can be applied sequentially.
+   * Small improvement in print.summary.sienaBayesFit().
+   * multipleBayesTest now allows matrix parameter to test 
+     linear combinations.
+   * Improved plot.multipleBayesTest (show truncation at 0).
+
 2014-07-24 R-Forge Revision 278
 Changes in RSiena and RSienaTest:
    * Added s50s to RSiena.rda.
@@ -9,7 +71,7 @@ Changes in RSiena and RSienaTest:
      and z$regrCor in phase1.r and phase3.r.
    * print01Report() improved for changing dyadic covariates,
      and some layout improvement for long variable names,
-	 and bug corrected for reporting upOnly/downOnly cases.
+     and bug corrected for reporting upOnly/downOnly cases.
 Changes in RSienaTest:
    * Adapted sienaBayes and glueBayes and print.sienaBayes to allow
      inclusion of interaction effects without the corresponding

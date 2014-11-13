@@ -509,6 +509,13 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                 objEffects<- rbind(objEffects, tmp$objEff)
                 rateEffects<- rbind(rateEffects, tmp$rateEff)
 			}
+			else
+            {
+				nodeSet2 <- attr(xx$cCovars[[j]], 'nodeSet')
+                tmp <- covBBehEff(varname, names(xx$cCovars)[j], nodeSet2,
+									name=varname)
+                objEffects<- rbind(objEffects, tmp$objEff)
+			}
         }
         for (j in seq(along=xx$depvars))
         {
@@ -529,6 +536,13 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                                  type='Var', name=varname)
                 objEffects<- rbind(objEffects, tmp$objEff)
                 rateEffects<- rbind(rateEffects, tmp$rateEff)
+            }
+			else
+            {
+				nodeSet2 <- attr(xx$vCovars[[j]], 'nodeSet')
+                tmp <- covBBehEff(varname, names(xx$vCovars)[j], nodeSet2,
+									name=varname)
+                objEffects<- rbind(objEffects, tmp$objEff)
             }
         }
         interaction <- createEffects("unspecifiedBehaviorInteraction",
@@ -899,19 +913,40 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 					}
                 }
                 if ((types[j] == "bipartite" &&
-                     attr(xx$depvars[[j]], 'nodeSet')[2] == nodeSet))
+                     attr(xx$depvars[[j]], 'nodeSet')[1] == nodeSet))
                 {
                     newEffects <-
-                        createEffects("covarBehaviorBipartiteObjective", varname,
+                        createEffects("covarABehaviorBipartiteObjective", varname,
                                       covarname, names(xx$depvars)[j],
                                       groupName=groupName, group=group,
                                       netType=netType, name=name)
                     covObjEffects <- rbind(covObjEffects, newEffects)
                 }
+#browser()
             }
         }
 
         list(objEff=covObjEffects, rateEff=covRateEffects)
+    }
+    ##@covBBehEff internal getEffects
+    covBBehEff<- function(varname, covarname, nodeSetB, name)
+    {
+        covObjEffects <-  NULL
+            for (j in seq(along=xx$depvars))
+            {
+                if ((types[j] == "bipartite" &&
+                     attr(xx$depvars[[j]], 'nodeSet')[2] == nodeSetB))
+                {
+                    newEffects <-
+                        createEffects("covarBBehaviorBipartiteObjective", varname,
+                                      covarname, names(xx$depvars)[j],
+                                      groupName=groupName, group=group,
+                                      netType=netType, name=name)
+                    covObjEffects <- rbind(covObjEffects, newEffects)
+                }
+#browser()
+            }
+        list(objEff=covObjEffects)
     }
     ##@covarNetNetEff internal getEffects
     covarNetNetEff<- function(othernetname,

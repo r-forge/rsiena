@@ -36,6 +36,12 @@ CovariateDistance2AlterNetworkFunction(string networkName, string
 	this->ltotal = total;
 }
 
+/**
+ * Deallocates this effect object;
+ */
+	CovariateDistance2AlterNetworkFunction::~CovariateDistance2AlterNetworkFunction()
+{
+}
 
 /**
  * Returns the value of this function for the given alter. It is assumed

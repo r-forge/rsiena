@@ -57,7 +57,7 @@
 \begin{document}
 
 \title{\vspace*{-0.5cm} Notes for Committing RSiena to R-Forge}
-\author{Tom Snijders)}
+\author{Tom Snijders}
 \date{}
 \maketitle
 
@@ -122,11 +122,6 @@ The internal structure of both packages should remain intact:
       Chapter 12 of the manual.
 \item Also new other functionalities, if any, should be added to the manual,
       unless they are clear enough from the help pages.
-\item When new effects are added, or existing ones are ported
-      to new types of variable (e.g., one-mode to two-mode),
-      these must also be added to the file
-      \texttt{$\bs$inst$\bs$doc$\bs$effects.pdf}. This file is constructed by running
-      \sfn{effectsDocumentation(type="latex")} and compiling the \texttt{.tex} file produced.
 \end{enumerate}
 
 To keep things easy for users of different platforms, when you add a file to the system,

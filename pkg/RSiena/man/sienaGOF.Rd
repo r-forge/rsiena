@@ -26,7 +26,8 @@ sienaGOF(sienaFitObject, auxiliaryFunction,
         varName, \dots)
 \method{plot}{sienaGOF}(x, center=FALSE, scale=FALSE, violin=TRUE, key=NULL,
         perc=.05, period=1, main=main, ylab=ylab, \dots)
-descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL, period=1)
+descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL,
+        period=1, showAll=FALSE)
 }
 \arguments{
   \item{sienaFitObject}{Results from a call to \code{\link{siena07}}
@@ -72,6 +73,7 @@ descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL, period=1
   \item{main}{ Main title of the plot. }
   \item{ylab}{ The y-axis label for the plot. }
   \item{\dots}{Other arguments.}
+  \item{showAll}{If FALSE, drops statistics with variance 0, like in the plot.}
 }
 \details{
  This function is used to assess the goodness of fit of a stochastic actor
@@ -151,32 +153,33 @@ We recommend the following heuristic approach to model checking:
     each list element corresponds to a period analyzed;
     the list elements are themselves lists again, including the
     following elements:
-    \describe{
-    \item{* sienaFitName}{The name of sienaFitObject.}
-    \item{* auxiliaryStatisticName}{The name of auxiliaryFunction.}
-    \item{* Observations}{The observed values for the auxiliary statistics.}
-    \item{* Simulations}{The simulated auxiliary statistics.}
-    \item{* ObservedTestStat}{The observed Mahalanobis distance in the data.}
-    \item{* SimulatedTestStat}{The Mahalanobis distance for the simulations.}
-    \item{* TwoTailed}{Whether the \eqn{p}-value corresponds to a one- or
+    \item{- sienaFitName}{The name of sienaFitObject.}
+    \item{- auxiliaryStatisticName}{The name of auxiliaryFunction.}
+    \item{- Observations}{The observed values for the auxiliary statistics.}
+    \item{- Simulations}{The simulated auxiliary statistics.}
+    \item{- ObservedTestStat}{The observed Mahalanobis distance in the data.}
+    \item{- SimulatedTestStat}{The Mahalanobis distance for the simulations.}
+    \item{- TwoTailed}{Whether the \eqn{p}-value corresponds to a one- or
                      two-tailed Monte Carlo test.}
-    \item{* p}{The \eqn{p}-value for the observed Mahalanobis distance in the
-             permutation distribution of the\cr
+    \item{- p}{The \eqn{p}-value for the observed Mahalanobis distance in the
+             permutation distribution of the
 			 simulated Mahalanobis distances.}
-    \item{* Rank}{ Rank of the covariance matrix of the simulated auxiliary
+    \item{- Rank}{ Rank of the covariance matrix of the simulated auxiliary
               statistics.}
-    }
 	The \code{plot} method makes violin plots or box plots, with superimposed
     confidence bands, for the simulated distributions of all elements
 	of the \code{auxiliaryFunction},
-	with the observed values indicated by red dots.
+    with the observed values indicated by red dots;
+    but statistics with variance 0 are dropped.
 
-    \code{descriptives.sienaGOF} returns a matrix with the numbers plotted in
-	the \code{plot} method: maximum, upper percentile, median, lower
-	percentile, minimum, of the simulated distributions of the auxiliary
-	statistics, and the observed values.\cr
-	Auxiliary functions with all simulated values equal to
-	the observed value will be dropped.
+    \code{descriptives.sienaGOF} returns a matrix giving numerical
+    information about what is plotted in the \code{plot} method:
+    maximum, upper percentile, mean, median, lower percentile, minimum,
+    of the simulated distributions of the auxiliary statistics, and the
+    observed values. If \code{center=TRUE} the median is subtracted
+    from mean, median, and percentiles; if \code{scale=TRUE}
+    these numbers are divided by (maximum - minimum). \cr
+    If \code{showAll=FALSE}, statistics with variance 0 will be dropped.
 }
 
 \references{
@@ -206,7 +209,8 @@ We recommend the following heuristic approach to model checking:
    myeff <- setEffect(myeff, cycle3, fix=TRUE, test=TRUE, include=TRUE)
    myeff  <- setEffect(myeff, nbrDist2, fix=TRUE, test=TRUE, include=TRUE)
    myeff <- setEffect(myeff, transTies, fix=TRUE, test=TRUE, include=TRUE)
-   myalgorithm <- sienaAlgorithmCreate(n3=200) # Shorter phase 3, just for example.
+   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
+                   # Shorter phases 2 and 3, just for example.
    ans <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE)
    gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
                     varName="mynet1")

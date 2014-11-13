@@ -62,6 +62,16 @@ sienaTimeTest(sienaFit, effects=NULL, excludedEffects=NULL, condition=FALSE)
  Effects leading to dummy interactions that are collinear with the
  model originally fitted, after excluding the effects mentioned,
  will be automatically excluded from the time heterogeneity testing.
+
+ If \code{sienaTimeTest} gives errors that there are too
+ many collinear effects, run it with a smaller \code{effects} parameter.
+ For example, if the model has 40 effects of which the
+ first 8 are rate parameters and therefore uninteresting,
+ and there is such an error message, try \code{effects=9:30};
+ if that still does not work, decrease the upper limit of 30, if it does work
+ increase it, to find the largest possible set of effects for which
+ heterogeneity assessment still is possible; then as a next step
+ try the remaining effects in a similar way.
 }
 \value{
   \code{sienaTimeTest} Returns a list containing many items,

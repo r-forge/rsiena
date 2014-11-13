@@ -153,10 +153,11 @@ proc2subphase <- function(z, x, subphase, useAverage=TRUE, ...)
 		cat('Regression\n')
 		##  use regression
 		cat(z$thav / z$thavn, '; ') #(z$nit + 1)
-		mylm <- lm(z$sf[1:z$nit, ] ~ z$thetaStore[1:z$nit, ])
-		coefs <- coef(mylm)[-1, ]
-		newvals <- solve(t(coefs), - mylm$coef[1, ])
-		z$theta <- newvals
+		stop('Regression not implemented; revive z$thetaStore if you wish')
+#		mylm <- lm(z$sf[1:z$nit, ] ~ z$thetaStore[1:z$nit, ])
+#		coefs <- coef(mylm)[-1, ]
+#		newvals <- solve(t(coefs), - mylm$coef[1, ])
+#		z$theta <- newvals
 		cat(z$theta, '\n')
 	}
     DisplayThetaAutocor(z)
@@ -334,7 +335,11 @@ doIterations<- function(z, x, subphase,...)
 # Except now the threshold is 5 instead of 10.
 # For the case !x$diagg it might be better
 # to base truncation on some multivariate norm of z$dfra.
-        maxRatio <- max(ifelse(z$fixed, 1.0, abs(fra)/ z$sd))
+        maxRatio <- max(ifelse(z$fixed, 1.0, abs(fra)/ z$sd), na.rm=TRUE)
+		if ((is.na(maxRatio)) || (is.nan(maxRatio)))
+		{
+			maxRatio <- 1.0
+		}
         if (x$diagg)
 		{
             changestep <- fra / diag(z$dfra)
