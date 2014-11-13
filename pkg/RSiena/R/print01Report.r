@@ -8,7 +8,7 @@
 # * Description: This module contains the function to print the initial report
 # *****************************************************************************/
 ##@print01Report Reporting
-print01Report <- function(data, myeff, modelname="Siena", session=NULL,
+print01Report <- function(data, modelname="Siena", session=NULL,
 						  getDocumentation=FALSE)
 {
 	##@reportDataObject1 internal print01Report
@@ -944,6 +944,17 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 		tt <- getInternals()
 		return(tt)
 	}
+	if (!(inherits(data, "siena")))
+	{
+		stop("The first argument needs to be a siena data object.")
+	}
+	if ((!(inherits(modelname, "character")))|
+			(inherits(session,"sienaEffects")))
+	{
+		cat("Since version 1.1-279, an effects object should not be given\n")
+		cat(" in the call of print01Report. Consult the help file.\n")
+		stop("print01Report needs no effects object.")
+	}
 	Report(openfiles=TRUE, type="w", projname=modelname)
 	Report("							************************\n", outf)
 	Report(c("									 ", modelname, ".out\n"),
@@ -1497,7 +1508,8 @@ print01Report <- function(data, myeff, modelname="Siena", session=NULL,
 			  })
 		}
 	}
-	printInitialDescription(data, myeff, modelname)
+	myeff <- getEffects(data)
+	printInitialDescription(data, myeff, modelName=modelname)
 	##close the files
 	Report(closefiles=TRUE)
 }

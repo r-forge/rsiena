@@ -336,7 +336,11 @@ doIterations<- function(z, x, subphase,...)
 # Except now the threshold is 5 instead of 10.
 # For the case !x$diagg it might be better
 # to base truncation on some multivariate norm of z$dfra.
-        maxRatio <- max(ifelse(z$fixed, 1.0, abs(fra)/ z$sd))
+        maxRatio <- max(ifelse(z$fixed, 1.0, abs(fra)/ z$sd), na.rm=TRUE)
+		if ((is.na(maxRatio)) || (is.nan(maxRatio)))
+		{
+			maxRatio <- 1.0
+		}
         if (x$diagg)
 		{
             changestep <- fra / diag(z$dfra)

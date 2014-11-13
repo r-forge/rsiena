@@ -59,7 +59,7 @@ InteractionCovariateEffect::InteractionCovariateEffect(
 	else if (averageAlter) // || pEffectInfo->internalEffectParameter() == 3)
 	{
 		this->lpInteractingEffect =
-			new AverageAlterEffect(this->lpInteractingEffectInfo);
+			new AverageAlterEffect(this->lpInteractingEffectInfo, true);
 	}
 	else
 	{

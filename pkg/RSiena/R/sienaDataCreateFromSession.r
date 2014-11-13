@@ -719,6 +719,6 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
         mydata <- get(gps)
     }
     myeff <- getEffects(mydata)
-    print01Report(mydata, myeff, modelName, session)
+    print01Report(mydata, modelName, session)
     return(list(OK=TRUE, mydata=mydata, myeff=myeff))
 }

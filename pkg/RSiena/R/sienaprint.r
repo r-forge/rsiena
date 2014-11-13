@@ -24,6 +24,12 @@ print.siena <- function(x, ...)
 	# with named columns, and rows indicating periods.
 		textattr <- deparse(substitute(attrib),  backtick=FALSE)
 		uponlys <- as.matrix(sapply(x$depvars, function(y){attr(y,attrib)}))
+		if (x$observations == 2)
+		# only one period
+		{
+			uponlys <- t(uponlys)
+		}
+		# now rows are periods; columns are dependent variables
 		for (j in 1:dim(uponlys)[2])
 		{
 			if (any(uponlys[,j]))
@@ -385,6 +391,8 @@ print.summary.sienaFit <- function(x, ...)
 		cat(c('   c = ',sprintf("%8.4f", x$testresOverall),
 			  '   d.f. = ',j,'   p-value '), sep='')
 		pvalue <- 1 - pchisq(x$testresOverall, j)
+		if (!is.na(pvalue))
+		{
         if (pvalue < 0.0001)
 		{
             cat('< 0.0001\n')
@@ -392,6 +400,11 @@ print.summary.sienaFit <- function(x, ...)
         else
 		{
             cat(c('= ', sprintf("%8.4f\n", pvalue)), sep = '')
+		}
+		}
+		else
+		{
+				Report('  NA  ',outf)
 		}
         if (testn==1)
 		{
@@ -409,6 +422,8 @@ print.summary.sienaFit <- function(x, ...)
                 cat(c('  c = ', sprintf("%8.4f", x$testresult[k]),
                          '   d.f. = 1  p-value '), sep = '')
                 pvalue<- 1-pchisq(x$testresult[k],1)
+				if (!is.na(pvalue))
+				{
                 if (pvalue < 0.0001)
 				{
                     cat('< 0.0001\n')
@@ -416,6 +431,11 @@ print.summary.sienaFit <- function(x, ...)
                 else
 				{
                     cat(c('= ', sprintf("%8.4f", pvalue), '\n'), sep = '')
+				}
+				}
+				else
+				{
+					Report('  NA  ',outf)
 				}
                 cat(c(' - one-sided (normal variate): ',
 					  sprintf("%8.4f", x$testresulto[k])), sep = '')
@@ -468,24 +488,31 @@ print.sienaAlgorithm <- function(x, ...)
 	cat(' Siena Algorithm specification.\n')
     cat(' Project name:', x$projname, '\n')
     cat(' Use standard initial values:', x$useStdInits, '\n')
-    cat(' Random seed:', x$randomSeed,'\n')
+    cat(' Random seed:', objectOrNull(x$randomSeed),'\n')
+	if (x$simOnly)
+	{
+		cat(' Simulation only', '\n')
+	}
+	else
+	{
     cat(' Starting value of gain parameter:', x$firstg, '\n')
-    cat(' Reduction factor for gain parameter:', x$reduceg, '\n')
+		cat(' Reduction factor for gain parameter:', objectOrNull(x$reduceg), '\n')
 	cat(' Diagonalization parameter:', x$diagonalize, '\n')
+	}
 	cat(' Dolby noise reduction:', x$dolby, '\n')
     if (any(x$MaxDegree > 0))
     {
         cat(' Restrictions on degree in simulations: ')
         cat(x$MaxDegree,'\n')
     }
-    cat(' Method for calculation of Derivatives:',
+    cat(' Method for calculation of derivatives:',
         c('Scores', 'Finite Differences')[as.numeric(x$FinDiff.method) + 1],
         '\n')
     cat(' Number of subphases in phase 2:', x$nsub, '\n')
     cat(' Number of iterations in phase 3:', x$n3, '\n')
 	if (x$maxlike)
 	{
-		cat(" Fitting by maximum likelihood\n")
+		cat(" Estimation by maximum likelihood\n")
 	}
 	else
 	{
@@ -519,6 +546,19 @@ print.sienaAlgorithm <- function(x, ...)
 	}
     cat(" Model Type:", ModelTypeStrings[x$modelType], "\n")
     invisible(x)
+}
+
+##@objectOrNull Miscellaneous
+objectOrNull <- function(x)
+{
+	if (is.null(x))
+	{
+		'NULL'
+	}
+	else
+	{
+		x
+	}
 }
 
 ##@averageTheta.last Miscellaneous
@@ -1025,11 +1065,11 @@ print.sienaBayesFit <- function(x, nfirst=NULL, ...)
 			{
 				stop("Not enough data: nfirst too large.")
 			}
-
+			cat("Total number of runs in the results is ",ntot, ".\n")
 			if (ntot < x$nwarm + x$nmain)
 			{
 				cat("This object resulted from an intermediate save, after",
-					ntot, "MCMC runs.\n")
+					ntot, "MCMC runs.\n\n")
 			}
 			if (ntot > first+2)
 			{
@@ -1144,7 +1184,8 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 		cat("\nMu      ")
 		for (i in seq(along=x$priorMu))
 		{
-			cat(sprintf("%8.4f", x$priorMu[i,1]),"\n        ")
+			cat(x$effectName[x$varyingParametersInGroup][i],
+					sprintf("%8.4f", x$priorMu[i,1]),"\n        ")
 		}
 		cat("\nSigma   ")
 		for (i in seq(along=x$priorMu))

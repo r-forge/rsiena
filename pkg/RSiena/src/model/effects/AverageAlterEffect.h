@@ -24,13 +24,17 @@ namespace siena
 class AverageAlterEffect : public NetworkDependentBehaviorEffect
 {
 public:
-	AverageAlterEffect(const EffectInfo * pEffectInfo);
+	AverageAlterEffect(const EffectInfo * pEffectInfo, bool divide);
 
 	virtual double calculateChangeContribution(int actor,
 		int difference);
 	virtual double egoEndowmentStatistic(int ego, const int * difference,
 		double * currentValues);
 	virtual double egoStatistic(int ego, double * currentValues);
+
+private:
+	// divide indicates whether there will be division by the outdegree
+	bool ldivide;
 };
 
 }

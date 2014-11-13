@@ -18,10 +18,12 @@
 sienaBayes <- function(data, effects, algo, saveFreq=100,
 				initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2,
 				priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
+				priorRatesFromData=TRUE,
 				frequentist=FALSE, incidentalBasicRates=FALSE,
 				reductionFactor=1,
 				gamma=0.5, delta=1e-4,
 				nwarm=50, nmain=250, nrunMHBatches=20,
+				nImproveMH=100,
 				lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
 				storeAll = FALSE, prevAns=NULL,
 				prevBayes = NULL, silentstart=TRUE,
@@ -768,6 +770,7 @@ browser()
 						initgainGroupwise=initgainGroupwise,
 						priorMu=priorMu, priorSigma=priorSigma,
 						priorDf=priorDf, priorKappa=priorKappa,
+						priorRatesFromData=priorRatesFromData,
 						frequentist=frequentist,
 						incidentalBasicRates=incidentalBasicRates,
 						reductionFactor=reductionFactor, gamma=gamma,
@@ -795,7 +798,7 @@ browser()
 		# Determine multiplicative constants for proposal distribution
 		ctime1 <- proc.time()[1]
 		cat(ctime1-ctime,'\n')
-		improveMH()
+		improveMH(totruns=nImproveMH)
 		ctime2<- proc.time()[1]
 		cat('improveMH', ctime2-ctime1,'seconds.\n')
 		flush.console()
@@ -870,7 +873,7 @@ browser()
 		cat('\n')
 		ctime1 <- proc.time()[1]
 		cat('Second ')
-		improveMH()
+		improveMH(totruns=nImproveMH)
 		ctime4<- proc.time()[1]
 		cat('Second improveMH', ctime4-ctime3,'seconds.\n')
 		flush.console()
@@ -994,7 +997,7 @@ browser()
 #	cat("thetaMat = \n")
 #	print(round(z$thetaMat,2))
 	ctime5<- proc.time()[1]
-	cat('Phase 1 took', ctime5-ctime4,'seconds.\n')
+	if (frequentist) {cat('Phase 1 took', ctime5-ctime4,'seconds.\n')}
 	flush.console()
 
 #	cat('Third ')
@@ -1009,7 +1012,7 @@ browser()
 		z$iimain <- ii
 		storeData(cyc)
 		cat('main', ii, '(', nwarm+nmain, ')')
-		if (frequentist) cat(', Phase 2')
+		if (frequentist) {cat(', Phase 2')}
 		cat("\nMu = ", round(z$muTemp,3), "\nEta = ",
 				round(z$ThinPosteriorEta[ii,],3), "\nSigma = \n")
 		print(round(z$SigmaTemp,3))
@@ -1059,7 +1062,7 @@ browser()
 	}
 
 	ctime6<- proc.time()[1]
-	cat('Phase 2 took', ctime6-ctime5,'seconds.\n')
+	if (frequentist){cat('Phase 2 took', ctime6-ctime5,'seconds.\n')}
 	cat("\nMu = ", round(z$muTemp,3), "\nEta = ",
 				round(z$ThinPosteriorEta[ii,],3), "\nSigma = \n")
 	print(round(z$SigmaTemp,3))
@@ -1068,7 +1071,7 @@ browser()
 	savePartial(z)
 
 # Phase 3
-	cat('Phase 3\n')
+	if (frequentist){cat('Phase 3\n')}
     for (ii in (endPhase2+1):(nwarm+nmain))
     {
 		cyc <- MCMCcycle(nrunMH=nrunMHBatches, bgain=0.000001)
@@ -1131,6 +1134,7 @@ browser()
 initializeBayes <- function(data, effects, algo, nbrNodes,
 						initgainGlobal, initgainGroupwise,
 						priorMu, priorSigma, priorDf, priorKappa,
+						priorRatesFromData,
 						frequentist, incidentalBasicRates,
 						reductionFactor, gamma, delta,
 						nmain, nwarm,
@@ -1530,35 +1534,11 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	z$thetaMat <- initialEstimates
 	z$basicRate <- z$requestedEffects$basicRate
     z$nGroup <- z$f$nGroup
-	is.batch(TRUE)
 
-    if (nbrNodes > 1 && z$observations > 1)
-    {
-        require(parallel)
-		clusterType <- match.arg(clusterType)
-		if (clusterType == "PSOCK")
-		{
-        clusterString <- rep("localhost", nbrNodes)
-        z$cl <- makeCluster(clusterString, type = "PSOCK",
-                            outfile = "cluster.out")
-		}
-		else
-		{
-			z$cl <- makeCluster(nbrNodes, type = "FORK",
-								outfile = "cluster.out")
-		}
-        clusterCall(z$cl, library, pkgname, character.only = TRUE)
-        clusterCall(z$cl, storeinFRANstore,  FRANstore())
-        clusterCall(z$cl, FRANstore)
-        clusterCall(z$cl, initializeFRAN, z, algo,
-                    initC = TRUE, profileData=FALSE, returnDeps=FALSE)
-		clusterSetRNGStream(z$cl, iseed = as.integer(runif(1,
-								max=.Machine$integer.max)))
-    }
+	# Further down the initial parameter values for the rate parameters are
+	# truncated depending on the prior for the rates.
+	# This might also be done for other parameters. Not done now.
 
-
-    ## z$returnDataFrame <- TRUE # chains come back as data frames not lists
-    z$returnChains <- FALSE
   	groupPeriods <- attr(z$f, "groupPeriods")
     netnames <- z$f$depNames
 	# Prepare some objects used for bookkeeping:
@@ -1643,6 +1623,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	if (is.null(priorMu))
 	{
 		z$priorMu <- matrix( c(0), z$p1, 1 )
+		z$priorMu[z$ratesInVarying] <- 2
 	}
 	else
 	{
@@ -1686,16 +1667,22 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		stop(paste("priorSigma is not a matrix of dimensions",z$p1))
 		}
 	}
+	if (priorRatesFromData)
+	{
 	# Rate parameters are nuisance parameters, and get a data-induced prior;
 	# observed covariance matrix on the trafo scale plus a small ridge.
-
-	z$priorMu[z$ratesInVarying] <- rowMeans(rateParameters)
-	z$priorSigma[z$ratesInVarying,] <- 0
-	z$priorSigma[,z$ratesInVarying] <- 0
-	z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
+		z$priorMu[z$ratesInVarying] <- rowMeans(rateParameters)
+		z$priorSigma[z$ratesInVarying,] <- 0
+		z$priorSigma[,z$ratesInVarying] <- 0
+		z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
 			z$priorKappa * reductionFactor * cov(t(rateParameters))
-	diag(z$priorSigma)[z$ratesInVarying] <- z$priorKappa *
-				(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
+		diag(z$priorSigma)[z$ratesInVarying] <- z$priorKappa *
+			(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
+	}
+	# Truncate initial parameter values for the rate parameters
+	# depending on the prior for the rates:
+	z$thetaMat[,z$basicRate] <- pmin(z$thetaMat[,z$basicRate],
+			z$priorMu[z$ratesInVarying] + 2*sqrt(diag(z$priorSigma)[z$ratesInVarying]))
 
 	z$incidentalBasicRates <- incidentalBasicRates
 	z$delta <- delta
@@ -1704,7 +1691,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	if (nwarm < 5){nwarm <<- 5}
 	if (nmain < 5 + nwarm){nmain <<- 5+nwarm}
 
-   if (frequentist)
+	if (frequentist)
 	{
 		lengthPhase1 <- max(lengthPhase1, 2)
 		lengthPhase3 <- max(lengthPhase3, 2)
@@ -1770,6 +1757,35 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 									z$nGroup, z$TruNumPars))
 	z$muTemp <- matrix(meanThetaMat[z$varyingParametersInGroup], z$p1, 1)
 	z$SigmaTemp <- diag(z$p1)
+
+	# The following moved from higher up to here, version 1.1-279
+	is.batch(TRUE)
+
+    if (nbrNodes > 1 && z$observations > 1)
+    {
+        require(parallel)
+		clusterType <- match.arg(clusterType)
+		if (clusterType == "PSOCK")
+		{
+        clusterString <- rep("localhost", nbrNodes)
+        z$cl <- makeCluster(clusterString, type = "PSOCK",
+                            outfile = "cluster.out")
+		}
+		else
+		{
+			z$cl <- makeCluster(nbrNodes, type = "FORK",
+								outfile = "cluster.out")
+		}
+        clusterCall(z$cl, library, pkgname, character.only = TRUE)
+        clusterCall(z$cl, storeinFRANstore,  FRANstore())
+        clusterCall(z$cl, FRANstore)
+        clusterCall(z$cl, initializeFRAN, z, algo,
+                    initC = TRUE, profileData=FALSE, returnDeps=FALSE)
+		clusterSetRNGStream(z$cl, iseed = as.integer(runif(1,
+								max=.Machine$integer.max)))
+    }
+    ## z$returnDataFrame <- TRUE # chains come back as data frames not lists
+    z$returnChains <- FALSE
     z
 } # end initializeBayes
 
@@ -1929,6 +1945,42 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	{
 		dif <- TRUE
 	}
+	if (all(z1$effectName == z2$effectName))
+	{
+		z$effectName <- z1$effectName
+	}
+	else
+	{
+		dif <- TRUE
+	}
+	if (all(z1$groupNames == z2$groupNames))
+	{
+		z$groupNames <- z1$groupNames
+	}
+	else
+	{
+		dif <- TRUE
+	}
+	if (all(z1$ratesInVarying == z2$ratesInVarying))
+	{
+		z$ratesInVarying <- z1$ratesInVarying
+	}
+	else
+	{
+		dif <- TRUE
+	}
+	if (z1$TruNumPars == z2$TruNumPars)
+	{
+		z$TruNumPars <- z1$TruNumPars
+	}
+	else
+	{
+		dif <- TRUE
+	}
+	if (dif)
+	{
+		stop("The two objects do not have the same specification.")
+	}
 	if (all(z1$priorMu[!z1$ratesInVarying] == z2$priorMu[!z2$ratesInVarying]))
 	{
 		z$priorMu <- z1$priorMu
@@ -1962,22 +2014,6 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	{
 		dif <- TRUE
 	}
-	if (all(z1$effectName == z2$effectName))
-	{
-		z$effectName <- z1$effectName
-	}
-	else
-	{
-		dif <- TRUE
-	}
-	if (all(z1$groupNames == z2$groupNames))
-	{
-		z$groupNames <- z1$groupNames
-	}
-	else
-	{
-		dif <- TRUE
-	}
 	if (dif)
 	{
 		stop("The two objects do not have the same specification.")
@@ -1988,6 +2024,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	z$set2  <- z1$set2
 	z$f <- z1$f
 	z$effects <- z1$effects
+	z$requestedEffects <- z1$requestedEffects
 	z$basicRate  <- z1$basicRate
 	z$ratePositions  <- z1$ratePositions
 	z$objectiveInVarying  <- z1$objectiveInVarying
@@ -2001,19 +2038,20 @@ glueBayes <- function(z1,z2,nwarm2=0){
 }
 
 ##@protectedInverse inverse of p.s.d matrix
-protectedInverse <- function(x){
-	if (inherits(try(xinv <- chol2inv(chol(x)),
-					silent=TRUE), "try-error"))
+protectedInverse <- function(x)
+	{
+		if (inherits(try(xinv <- chol2inv(chol(x)),
+			silent=TRUE), "try-error"))
 		{
-		# Now make this x positive definite, if it is not.
-		# See above for a more extensive treatment of the same.
-		# Adapted from function make.positive.definite in package corpcor
-		# which uses a method by Higham (Linear Algebra Appl 1988)
-		# but changed to make the matrix positive definite (psd)
-		# instead of nonnegative definite.
-		# The idea is to left-truncate all eigenvalues to delta0.
-		# The construction with tol, not used now,
-		# is to ensure positive definiteness given numerical inaccuracy.
+	# Now make this x positive definite, if it is not.
+	# See above for a more extensive treatment of the same.
+	# Adapted from function make.positive.definite in package corpcor
+	# which uses a method by Higham (Linear Algebra Appl 1988)
+	# but changed to make the matrix positive definite (psd)
+	# instead of nonnegative definite.
+	# The idea is to left-truncate all eigenvalues to delta0.
+	# The construction with tol, not used now,
+	# is to ensure positive definiteness given numerical inaccuracy.
 			es <- eigen(x)
 			esv <- es$values
 			delta0 <- 1e-6
@@ -2022,13 +2060,14 @@ protectedInverse <- function(x){
 			{
 				delta <- delta0
 				tau <- pmax(delta, esv)
-#				cat("Smallest eigenvalue of Sigma now is ",
-#								min(esv),"; make posdef.\n")
-				xinv <- es$vectors %*% diag(1/tau, dim(x)[1]) %*% t(es$vectors)
+		#		cat("Smallest eigenvalue of Sigma now is ",
+		#					min(esv),"; make posdef.\n")
+				xinv <- es$vectors %*%
+							diag(1/tau, dim(x)[1]) %*% t(es$vectors)
 			}
 		}
-	xinv
-}
+		xinv
+	}
 
 
 ##@trafo link function rates

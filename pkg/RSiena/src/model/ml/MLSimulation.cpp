@@ -1845,7 +1845,7 @@ bool MLSimulation::deletePermute(int c0)
 bool MLSimulation::insertMissing()
 {
 	// The numbers in the comments are referencing the specification in
-	// Siena_algorithms4.pdf.
+	// Siena_algorithms.pdf.
 
 	// Part A
 
@@ -2158,7 +2158,7 @@ bool MLSimulation::insertMissing()
 bool MLSimulation::deleteMissing()
 {
 	// The numbers in the comments are referencing the specification in
-	// Siena_algorithms4.pdf.
+	// Siena_algorithms.pdf.
 
 	// Part A
 

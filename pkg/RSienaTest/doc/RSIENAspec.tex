@@ -637,7 +637,7 @@ add the objective function effects with respect to this network.
 the rate effects with respect to this network.
 \ENDFOR
 \FORALL{constant covariates, other behavior variables or changing covariates}
-\STATE Call \sfn{covBehEff} to add the interaction effects
+\STATE Call \sfn{covBehEff} and \sfn{covBBehEff}to add the interaction effects
 \ENDFOR
 \FORALL{networks with same node set (first for bipartite)}
 \STATE Use \sfn{behaviorOneModeObjective2} or \sfn{behaviorBipartiteObjective2}
@@ -745,7 +745,7 @@ function effects
 \STATE no objective function effects
 \ENDIF
 \end{algorithmic}
-\subsection{covarBehEff}
+\subsection{covBehEff}
 \begin{algorithmic}
 \STATE Use \sfn{covarBehaviorObjective} effect group to create a potential set
 of objective function effects
@@ -761,6 +761,15 @@ set.
 \ENDIF
 \STATE Use \sfn{covarBehaviorRate} effect group to create the
 rate effects
+\STATE Use \sfn{covarABehaviorBipartiteObjective} effect group to create
+objective function effects for bipartite dependent networks combined
+with covariates on the first node set
+ \end{algorithmic}
+\subsection{covBBehEff}
+\begin{algorithmic}
+\STATE Use \sfn{covarBBehaviorBipartiteObjective} effect group to create
+objective function effects for bipartite dependent networks combined
+with covariates on the second node set
  \end{algorithmic}
 \subsection{covarNetNetEff}
 \begin{algorithmic}

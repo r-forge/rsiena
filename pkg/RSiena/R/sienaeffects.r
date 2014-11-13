@@ -37,6 +37,10 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 	{
 		effectNames <- dots
 	}
+	if ("AltsAvAlt" %in% effectNames)
+	{
+		stop("Effect AltsAvAlt now is called avXAlt. Use the new name please.")
+	}
 	use <- myeff$shortName %in% effectNames &
 	myeff$type==type &
 	myeff$name==name &
@@ -232,6 +236,10 @@ setEffect <- function(myeff, shortName, parameter=0,
 	if (!character)
 	{
 		shortName <- deparse(substitute(shortName))
+	}
+	if (shortName=="AltsAvAlt")
+	{
+		stop("Effect AltsAvAlt renamed to avXAlt.")
 	}
 	use <- myeff$shortName == shortName &
 	myeff$name == name &

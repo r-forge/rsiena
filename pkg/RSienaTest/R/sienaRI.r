@@ -87,7 +87,8 @@ getChangeContributions <- function(algorithm, data, effects)
 	effects <- effects[effects$include,]
 	if (!is.null(algorithm$settings))
 	{
-		effects <- addSettingsEffects(effects, algorithm)
+		stop('not implemented: RI together with settings')
+		# effects <- addSettingsEffects(effects, algorithm)
 	}
 	else
 	{
@@ -208,7 +209,7 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 
 #				RIs <- RIs_matrix
 				entropies <- entropy_vector
-
+				# divide by column sums:
 				RIActors[[w]] <- apply(RIs_matrix, 2, function(x){x/sum(x)})
 				absoluteSumActors[[w]] <- colSums(RIs_matrix)
 				entropyActors[[w]] <- entropies
@@ -348,8 +349,8 @@ print.summary.sienaRI <- function(x, ...)
 
 
 ##@plot.sienaRI Methods
-plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE,
-	radius = 1, width = NULL, height = NULL, legend = TRUE,
+plot.sienaRI <- function(x, col = NULL, addPieChart = FALSE,
+	radius = NULL, width = NULL, height = NULL, legend = TRUE,
 	legendColumns = NULL, legendHeight = NULL, cex.legend = NULL,
 	cex.names = NULL, ...)
 {
@@ -424,12 +425,11 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE,
 	{
 		if(addPieChart)
 		{
-			width = (actors/3+2)*0.9
+			width = (actors/3+4)
 		}else{
-			width = (actors/3+1)*1
+			width = (actors/3+3)
 		}
 	}
-
 	if(!is.null(cex.legend))
 	{
 		if(is.numeric(cex.legend))
@@ -472,30 +472,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE,
 	}
 	if(is.null(radius))
 	{
-		rad <- 1
-	}
-
-	createPdf = FALSE
-	if(!is.null(file))
-	{
-		if (is.character(file)){
-			pdf(file = file, width = width, height = height)
-			createPdf = TRUE
-		}else{
-			file = NULL
-		warning("file has to be a of type 'character' \n could not create pdf")
-		}
-	}
-	if(is.null(file))
-	{
-		if (Sys.info()[1]=="Windows")
-		{
-			windows(width = width, height = height)
-		}
-		else
-		{
-		stop("On non-windows systems, a non-null <<file>> argument is needed.")
-		}
+		rad <- 4
 	}
 
 	if(!is.null(col))
@@ -542,8 +519,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE,
 			layout(layoutMatrix,widths=c((actors/3),2),heights=rep(1,waves))
 		}
 		par( oma = c( 0, 0, 2, 0 ),
-		mar = par()$mar+c(-1,0,-3,-2),
- xpd=T , cex = 0.75, no.readonly = TRUE )
+		mar = par()$mar+c(4.1, 4.1, 1.1, 0.1), xpd=T , cex = 0.75, no.readonly = TRUE )
 	}else{
 		if(legend)
 		{
@@ -553,7 +529,7 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE,
 			layoutMatrix <- matrix(c(1:waves), byrow= TRUE, ncol=1, nrow=waves)
 			layout(layoutMatrix,widths=c((actors/3)),heights=rep(1,waves))
 		}
-		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(-1,0,-3,1), xpd=T ,
+		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(4.1,4.1,1.1,3), xpd=T ,
 				cex = 0.75, no.readonly = TRUE )
 	}
 	for(w in 1:waves)
@@ -575,10 +551,6 @@ plot.sienaRI <- function(x, file = NULL, col = NULL, addPieChart = FALSE,
 	{
 		plot(c(0,1), c(0,1), col=rgb(0,0,0,0),axes=FALSE,  ylab = "", xlab = "")
 		legend(0, 1, x$effectNames, fill=cl, ncol = legendColumns, bty = "n", cex=cex.legend)
-	}
-	if(createPdf)
-	{
-		dev.off()
 	}
 	invisible(cl)
 }

@@ -58,7 +58,7 @@
 \begin{document}
 
 \title{RSiena: processing of missing and structural values}
-\author{Ruth Ripley}
+\author{Ruth Ripley (with modifications by Tom Snijders)}
 \date{}
 \maketitle
 
@@ -203,7 +203,7 @@ value is carried forward.
   values which are being averaged are missing the result is treated as missing.
 \item[dyadic covariates] The relevant effect subtracts the mean from the value
   each time the latter is requested.
-\item[Statistics]\hfill
+\item[Statistics] See \texttt{StatisticCalculator.cpp}\hfill
 \begin{enumerate}
 \item We create \emph{predictor} versions of the dependent variables which are
   used in any effect of which the dependent variable is not the owner. For

@@ -142,7 +142,7 @@ PrintReport <- function(z, x)
 			ses <- rep('  ', z$pp)
 		}
 		tmp <- paste(sprintf("%2d", 1:length(z$requestedEffects$effectName)),
-					'. ', format(substr(tmp, 1, 50), width=50),
+					'. ', format(substr(tmp, 1, 60), width=60),
 					theta, ses, '\n', sep='', collapse = '')
 		if (nBehavs > 0 && nNetworks > 0)
 		{

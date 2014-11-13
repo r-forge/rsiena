@@ -1,7 +1,7 @@
 
-R version 3.0.1 (2013-05-16) -- "Good Sport"
-Copyright (C) 2013 The R Foundation for Statistical Computing
-Platform: i386-w64-mingw32/i386 (32-bit)
+R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -157,7 +157,7 @@ Total of 464 iteration steps.
 > data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj")
 Loading required package: network
 network: Classes for Relational Data
-Version 1.9.0 created on 2014-01-03.
+Version 1.10.2 created on 2014-06-12.
 copyright (c) 2005, Carter T. Butts, University of California-Irvine
                     Mark S. Handcock, University of California -- Los Angeles
                     David R. Hunter, Penn State University
@@ -223,4 +223,4 @@ Total of 375 iteration steps.
 > 
 > proc.time()
    user  system elapsed 
-  13.15    0.14   13.29 
+  12.48    0.06   12.57 

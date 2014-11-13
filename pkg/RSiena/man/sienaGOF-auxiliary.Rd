@@ -146,7 +146,7 @@ Ph.D. Thesis. University of Oxford: U.K.
    myeff <- getEffects(mydata)
    myeff <- includeEffects(myeff, transTies, cycle3)
    # Shorter phases 2 and 3, just for example:
-   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=300)
+   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
    ans <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE)
 
    OutdegreeDistribution(NULL, ans$f, ans$sims, period=1, groupName="Data1",
@@ -203,7 +203,8 @@ Ph.D. Thesis. University of Oxford: U.K.
        missings <- graph.adjacency(missings)
    #sienaGOF wants the i-th simulation:
        returnValue <- graph.difference(
-                graph.edgelist(sims[[i]][[groupName]][[varName]][[period]][,1:2]),
+       graph.empty(dimsOfDepVar) +
+           edges(t(sims[[i]][[groupName]][[varName]][[period]][,1:2])),
                 missings)
      }
      returnValue
@@ -247,13 +248,12 @@ Ph.D. Thesis. University of Oxford: U.K.
        tc
    }
 
-  # Distribution of Burt's constraint values; see ?igraph::constraint
-  # the maximum finite value is 9/8 (see Buskens and van de Rijt, AJS 2008).
-  ConstraintDistribution <- function (i, data, sims, period, groupName, varName,
-                           levls=c(seq(0,1.125,by=0.125)), cumulative=TRUE){
+  # Distribution of Bonacich eigenvalue centrality; see ?igraph::evcent.
+  EigenvalueDistribution <- function (i, data, sims, period, groupName, varName,
+                           levls=c(seq(0,1,by=0.125)), cumulative=TRUE){
      require(igraph)
      x <- igraphNetworkExtraction(i, data, sims, period, groupName, varName)
-     a <- igraph::constraint(x)
+     a <- igraph::evcent(x)$vector
      a[is.na(a)] <- Inf
      lel <- length(levls)
      if (cumulative)
@@ -281,10 +281,10 @@ Ph.D. Thesis. University of Oxford: U.K.
    myeff <- includeEffects(myeff,  outdeg, name="mybeh",
             interaction1="mynet1")
    # Shorter phases 2 and 3, just for example:
-   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=300)
+   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
    (ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE))
 
-   gofc <- sienaGOF(ans2, ConstraintDistribution, varName="mynet1",
+   gofc <- sienaGOF(ans2, EigenvalueDistribution, varName="mynet1",
            verbose=TRUE, join=TRUE)
    plot(gofc)
 

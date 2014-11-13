@@ -111,10 +111,21 @@ TestOutput <- function(z, x)
         Report(c('   c = ',sprintf("%8.4f", z$testresOverall),
                  '   d.f. = ',j,'   p-value '),sep='',outf)
         pvalue <- 1-pchisq(z$testresOverall,j)
+		if (!is.na(pvalue))
+		{
         if (pvalue < 0.0001)
+			{
             Report('< 0.0001',outf)
+			}
         else
+			{
             Report(c('= ',sprintf("%8.4f",pvalue)), sep = '', outf)
+			}
+		}
+		else
+		{
+				Report('  NA  ',outf)		
+		}
         if (testn==1)
             Report(c('\n   one-sided (normal variate): ',
                      sprintf("%8.4f",z$testresulto[1])), sep = '', outf)
@@ -129,6 +140,8 @@ TestOutput <- function(z, x)
                 Report(c('  c = ', sprintf("%8.4f", z$testresult[k]),
                          '   d.f. = 1  p-value '), sep = '', outf)
                 pvalue<- 1-pchisq(z$testresult[k],1)
+				if (!is.na(pvalue))
+				{
                 if (pvalue < 0.0001)
                 {
                     Report('< 0.0001\n',outf)
@@ -138,6 +151,11 @@ TestOutput <- function(z, x)
                     Report(c('= ', sprintf("%8.4f", pvalue), '\n'), sep = '',
                            outf)
                 }
+				}
+				else
+				{
+					Report('  NA  ',outf)		
+				}
                 Report(c(' - one-sided (normal variate): ',
                          sprintf("%8.4f", z$testresulto[k])), sep = '', outf)
                 if (k < j)

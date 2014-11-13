@@ -12,9 +12,11 @@
 sienaBayes(data, effects, algo,  saveFreq=100,
     initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2,
     priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
+    priorRatesFromData=TRUE,
     frequentist=FALSE, incidentalBasicRates=FALSE,
     reductionFactor=1, gamma=0.5, delta=1e-04,
     nwarm=50, nmain=250, nrunMHBatches=20,
+    nImproveMH=100,
     lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
     storeAll=FALSE, prevAns=NULL, prevBayes=NULL, silentstart = TRUE,
     nbrNodes=1, clusterType=c("PSOCK", "FORK"),
@@ -38,7 +40,8 @@ glueBayes(z1, z2, nwarm2=0)
     exists, it will be overwritten).
     This file contains an object z of class "sienaBayesFit",
     with the provisional results.
-    This is to guard against crashes or power failure.}
+    This is to guard against crashes or power failure.
+    It can be used as value for \code{prevBayes} as indicated below.}
   \item{initgainGlobal}{Step sizes in initial searches for good parameter values
   across the groups.}
   \item{initgainGroupwise}{Step sizes in initial searches for good parameter
@@ -49,13 +52,18 @@ glueBayes(z1, z2, nwarm2=0)
   initfgain * ((iteration number)^(-gamma)).}
   \item{priorMu}{Vector of length equal to the number of varying parameters.
    Prior mean of mu (global population mean); default:
-   0, but data-dependent for basic rate parameters.}
+   0. For the basic rate parameters the defaults are data-dependent,
+   but if (not \code{priorRatesFromData}) and \code{priorMu=NULL},
+   then for these parameters the prior mean will be 2.}
   \item{priorSigma}{Square matrix of dimension equal to length of priorMu.
    Prior global population covariance matrix Sigma; default: identity matrix.}
   \item{priorDf}{Prior degrees of freedom for Sigma (global population
     covariance matrix); default: number of varying parameters + 2.}
   \item{priorKappa}{Proportionality constant between prior covariance matrix
     and covariance matrix of prior distribution for mu; default: 1.}
+  \item{priorRatesFromData}{Boolean. Should the prior distribution for the
+   rate parameters be taken from the data. If TRUE, this supersedes
+   the values in priorMu and priorSigma for the rate parameters.}
   \item{frequentist}{Currently only frequentist=FALSE works.
     Boolean: chooses between frequentist or Bayesian
     estimation of the global parameters.
@@ -79,10 +87,11 @@ glueBayes(z1, z2, nwarm2=0)
   all correlations are at least delta.}
   \item{nwarm}{Number of iterations in the warm up phase.
     Used only if \code{prevBayes} is \code{NULL}.
-	Then it should be at least 5.}
+    Then it should be at least 5.}
   \item{nmain}{Number of iterations in the main phase.
    Should be at least 10.}
   \item{nrunMHBatches}{Thinning ratio in MCMC process.}
+  \item{nImproveMH}{Number of iterations per improveMH step.}
   \item{lengthPhase1}{Only used for frequentist estimation:
    length of the first phase of the Robbins Monro algorithm.
    lengthPhase1 + lengthPhase3 should be strictly less than nmain.}
@@ -103,6 +112,8 @@ glueBayes(z1, z2, nwarm2=0)
     this will increase the efficiency of the algorithm. }
   \item{prevBayes}{An object of class "sienaBayes" as returned by
     \code{sienaBayes}, on which the current function will continue.
+    For example, the object z contained in the intermediate saved result
+    PartialBayesResult.RData as mentioned above.
     Initialization and warming phases are skipped. If this is given,
     the values of \code{prevAns}, \code{nwarm}, and the prior
     distributions are disregarded. All relevant parameters of the function
@@ -160,8 +171,8 @@ glueBayes(z1, z2, nwarm2=0)
   advisable to use smaller values of the parameters \code{initgainGlobal}
   and \code{initgainGroupwise}.\cr
   \code{glueBayes(z1,z2)} combines two existing \code{sienaBayesFit} objects
-  with the same data and model specifications into one (this is not
-  checked). This is intended to be used when \code{z2} was produced
+  with the same data and model specifications (this is not
+  checked) into one. This is intended to be used when \code{z2} was produced
   by calling \code{sienaBayes} with \code{prevAns=z1}.
 }
 \value{
@@ -230,7 +241,7 @@ glueBayes(z1, z2, nwarm2=0)
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)
   summary(bayes.model)
   bayes.nextModel <- sienaBayes(FourAlgo, data = FourGroups,
-        effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10,
+        effects = FourEffects, nmain=25, nrunMHBatches=10,
         prevBayes = bayes.model)
   bayes.combinedModel <- glueBayes(bayes.model, bayes.nextModel)
   summary(bayes.combinedModel)

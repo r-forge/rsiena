@@ -304,7 +304,7 @@ print.summary.sienaRIDynamics <- function(x, ...)
 
 
 ##@plot.sienaRIDynamics Methods
-plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL,
+plot.sienaRIDynamics <- function(x, staticRI = NULL, col = NULL,
 			ylim=NULL, width = NULL, height = NULL, legend = TRUE,
 			legendColumns = NULL, legendHeight = NULL, cex.legend = NULL, ...)
 {
@@ -427,22 +427,6 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL,
 		cex.legend <- 1
 	}
 
-	createPdf = FALSE
-	if(!is.null(file))
-	{
-		if (is.character(file)){
-			pdf(file = file, width = width, height = height)
-			createPdf = TRUE
-		}else{
-			file = NULL
-			warning("file has to be a of type 'character' \n could not create pdf")
-		}
-	}
-	if(is.null(file))
-	{
-		windows(width = width, height = height)
-	}
-
 	if(!is.null(col))
 	{
 		cl <- col
@@ -496,7 +480,8 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL,
 	}else{
 		layout(rbind(1:periods),widths=rep(4, periods),heights=c(3))
 	}
-	par( oma = c( 1, 3, 1, 3 ),mar = par()$mar+c(-5,-4.1,-4,-2.1), xpd=T )
+#	par( oma = c( 1, 3, 1, 3 ),mar = par()$mar+c(-5,-4.1,-4,-2.1), xpd=T )
+	par( oma = c( 1, 3, 1, 3 ),mar = c(0.1, 0.1, 0.1, 0.1), xpd=T )
 	for(period in 1:periods){
 		timeseries<-ts(t(values[[period]]))
 		plot.ts(timeseries, plot.type = "single",  col = cl,
@@ -533,10 +518,6 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, file = NULL, col = NULL,
 		plot(c(0,1), c(0,1), col=rgb(0,0,0,0),axes=FALSE,  ylab = "", xlab = "")
 		legend(0, 1, legendNames, col = cl[1:effectNumber], lwd = 2,
 				lty = lineTypes, ncol = legendColumns, bty = "n",cex=cex.legend)
-	}
-	if(createPdf)
-	{
-		dev.off()
 	}
 	invisible(cl)
 }

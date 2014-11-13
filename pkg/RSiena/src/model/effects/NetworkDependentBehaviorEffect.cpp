@@ -10,12 +10,16 @@
  *****************************************************************************/
 
 #include <stdexcept>
-
+//#include "R_ext/Print.h"
 #include "NetworkDependentBehaviorEffect.h"
+#include "data/Data.h"
+#include "network/Network.h"
+#include "model/variables/NetworkVariable.h"
+#include "model/variables/BehaviorVariable.h"
+#include "network/IncidentTieIterator.h"
 #include "model/State.h"
 #include "model/EpochSimulation.h"
 #include "model/EffectInfo.h"
-#include "model/variables/NetworkVariable.h"
 
 namespace siena
 {
@@ -27,8 +31,18 @@ namespace siena
 NetworkDependentBehaviorEffect::NetworkDependentBehaviorEffect(
 	const EffectInfo * pEffectInfo) : BehaviorEffect(pEffectInfo)
 {
+	this->ltotalAlterValues = 0;
+	this->ltotalInAlterValues = 0;
 }
 
+/**
+ * Deallocates this effect object;
+ */
+NetworkDependentBehaviorEffect::~NetworkDependentBehaviorEffect()
+{
+	delete [] this->ltotalAlterValues;
+	delete [] this->ltotalInAlterValues;
+}
 
 /**
  * Initializes this effect.
@@ -50,6 +64,87 @@ void NetworkDependentBehaviorEffect::initialize(const Data * pData,
 	if (!this->lpNetwork)
 	{
 		throw logic_error("Network '" + networkName + "' expected.");
+	}
+	if (this->ltotalAlterValues)
+	{
+		delete [] this->ltotalAlterValues;
+	}
+	if (this->ltotalInAlterValues)
+	{
+		delete [] this->ltotalInAlterValues;
+	}
+	this->ltotalAlterValues = new double[this->lpNetwork->n()];
+	this->ltotalInAlterValues = new double[this->lpNetwork->m()];
+}
+
+/**
+ * Returns the total alter covariate value for the given actor.
+ */
+double NetworkDependentBehaviorEffect::totalAlterValue(int i) const
+{
+	return this->ltotalAlterValues[i];
+}
+
+/**
+ * Returns the total in-alter covariate value for the given actor.
+ */
+double NetworkDependentBehaviorEffect::totalInAlterValue(int i) const
+{
+	return this->ltotalInAlterValues[i];
+}
+
+
+/**
+ * Does the necessary preprocessing work for calculating the tie flip
+ * contributions for a specific ego. This method must be invoked before
+ * calling NetworkEffect::calculateTieFlipContribution(...).
+ */
+void NetworkDependentBehaviorEffect::preprocessEgo(int ego)
+{
+	// set up the covariate based on current values of the network and behavior
+	const Network * pNetwork = this->pNetwork();
+
+	for (int i = 0; i < pNetwork->n(); i++)
+	{
+		this->ltotalAlterValues[i] = 0;
+		if (pNetwork->outDegree(i) > 0)
+		{
+			for (IncidentTieIterator iter = pNetwork->outTies(i);
+				 iter.valid();
+				 iter.next())
+			{
+				int j = iter.actor();
+				this->ltotalAlterValues[i] += this->centeredValue(j);
+// 				Rprintf("%d %f %d %d %d %d\n",
+// 					j,
+// 					this->centeredValue(j),
+// 					this->period(),
+			}
+		}
+		else
+		{
+			this->ltotalAlterValues[i] = 0;
+		}
+//		Rprintf("%d %f\n", i,this->ltotalAlterValues[i]);
+	}
+
+	for (int i = 0; i < pNetwork->m(); i++)
+	{
+		this->ltotalInAlterValues[i] = 0;
+		if (pNetwork->inDegree(i) > 0)
+		{
+			for (IncidentTieIterator iter = pNetwork->inTies(i);
+				 iter.valid();
+				 iter.next())
+			{
+				int j = iter.actor();
+				this->ltotalInAlterValues[i] += this->centeredValue(j);
+			}
+		}
+		else
+		{
+			this->ltotalInAlterValues[i] = 0;
+		}
 	}
 }
 

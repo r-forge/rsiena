@@ -17,7 +17,7 @@
 \usage{
 simpleBayesTest(z, nfirst=z$nwarm+1, tested0=0,
                 probs = c(0.025,0.975), ndigits=4)
-multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
+multipleBayesTest(z, testedPar, nfirst=z$nwarm, tested0=0, ndigits=4)
 \method{print}{multipleBayesTest}(x, ...)
 \method{plot}{multipleBayesTest}(x, xlim=NULL, ylim=NULL, main=NULL, ...)
 }
@@ -36,12 +36,15 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
   for the credibility intervals.}
   \item{ndigits}{Number of digits to be given when representing the limits
    of the credibility intervals.}
-  \item{\dots}{For \code{multipleBayesTest}: the numbers of the parameters
-   to be tested (numbered as in the output of \code{simpleBayesTest});
-   for \code{print.multipleBayesTest} and \code{plot.multipleBayesTest}:
-   extra arguments.}
+  \item{testedPar}{A vector with the numbers of the parameters
+   to be tested (numbered as in the output of \code{simpleBayesTest}), or
+   a \code{k * p} matrix, for testing \code{k} linear combinations
+   given by the rows, where \code{p} is the number of effects in the model
+   except the basic rate parameters.}
   \item{x}{A \code{\link{multipleBayesTest}} object,
     resulting from a call to \code{multipleBayesTest}.}
+  \item{\dots}{Extra arguments for \code{print.multipleBayesTest}
+     and \code{plot.multipleBayesTest}.}
   \item{xlim}{Parameter \code{xlim} in \code{\link{plot}}; if \code{NULL},
    a sensible default will be used.}
   \item{ylim}{Parameter \code{ylim} in \code{\link{plot}}; if \code{NULL},
@@ -58,10 +61,17 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
  \dots parameter.\cr
  \code{multipleBayesTest} tests the hypothesis that
  the multivariate parameter for the effects indicated in \dots is equal to
- \code{tested0}. To do this, Mahalanobis distances of the elements
+ \code{tested0}. If \dots is a set or vector of numbers then the parameters
+ with these numbers are tested; if \dots is a \code{k * p} matrix,
+ the tested hypothesis is for the linear combinations defined by its rows.
+ For the test, distances (for one parameter) or Mahalanobis distances
+ (for more than one parameter) of the elements
  of the posterior sample from the posterior mean are calculated,
  and the p-value is the relative frequency that these are greater than the
- distance between the tested value and the posterior mean.
+ distance between the tested value and the posterior mean.\cr
+ The plot presents a density plot of the posterior Mahalanobis distances,
+ and the observed distance is indicated by a vertical line (if within
+ the plot window).
 }
 \value{\code{simpleBayesTest} produces a data frame containing for the non-rate
  effects their names,
@@ -82,7 +92,7 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
   \item{posteriorSample}{sample from posterior of tested effects}
  \code{print.multipleBayesTest} prints the p-value with an explanation; and
      the proportions of all sign patterns (of deviations from 0)
-	 in the sample from the posterior.\cr
+     in the sample from the posterior.\cr
  \code{plot.multipleBayesTest} plots the density function of
     \code{x$postDistances}.\cr
   }
@@ -113,8 +123,14 @@ multipleBayesTest(z, ..., nfirst=z$nwarm, tested0=0, ndigits=4)
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)
   bayes.model
   simpleBayesTest(bayes.model, probs = c(0.05,0.95))
-  multipleBayesTest(bayes.model, 2, 3)
-  multipleBayesTest(bayes.model, 2, 3, tested0 = c(2,0.6))
+  (mbt <- multipleBayesTest(bayes.model, c(2,3)))
+  (mbt2 <- multipleBayesTest(bayes.model, c(2,3), tested0 = c(2,0.6)))
+  plot(mbt)
+  plot(mbt2)
+  plot(mbt$posteriorSample)
+  # Possible because the number of tested parameters is 2.
+  A <- matrix(c(1,1,0),1,3)
+  multipleBayesTest(bayes.model, A)
 }
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the

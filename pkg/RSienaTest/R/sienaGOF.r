@@ -339,54 +339,49 @@ sienaGOF <- function(
 							maxlike=sienaFitObject$maxlike)$oneStep )
 			mmPartialThetaDelta <- rep(0,length(theta0))
 			mmPartialThetaDelta[length(theta0)] <- mmThetaDelta[length(theta0)]
+
+      # \mu'_\theta(X)
 			JacobianExpStat <- lapply(period, function (i) {
 				t(SF[,i,]) %*% simStatsByPeriod[[i]]/ nSims	 })
+
+      # List structure: Period, effect index
+      thetaIndices <- 1:sum(effectsToInclude)
+      # \Gamma_i(\theta)
+      ExpStatCovar <- lapply(period, function (i) {
+            lapply(thetaIndices, function(j){
+              Reduce("+", lapply(1:nSims,function(k){
+                simStatsByPeriod[[i]][k,] %*% t(simStatsByPeriod[[i]][k,]) * SF[k,i,j]
+              })) / nSims
+              - JacobianExpStat[[i]][j,] %*% t(ExpStat[[i]]) - ExpStat[[i]] %*% t(JacobianExpStat[[i]][j,])
+            })
+        })
+
+      # \Xi_i(\theta)
+      JacobianCovar <- lapply(period, function (i) {
+        lapply(thetaIndices, function(j){
+          -1 * covInvByPeriod[[i]] %*% ExpStatCovar[[i]][[j]]  %*% covInvByPeriod[[i]] })
+        })
+
 			Gradient <- lapply(period, function(i) {
+          sapply(thetaIndices, function(j){
+          ( obsStatsByPeriod[[i]] - ExpStat[[i]] ) %*%
+            JacobianCovar[[i]][[j]] %*%
+          t( obsStatsByPeriod[[i]] - ExpStat[[i]] )
+          })
 						-2	* JacobianExpStat[[i]] %*%
 								covInvByPeriod[[i]] %*%
-								t( obsStatsByPeriod[[i]] - ExpStat[[i]] ) })
-			Hessian <- lapply(period, function (i) {
-							2 *
-							JacobianExpStat[[i]] %*%
-							covInvByPeriod[[i]] %*%
-							t(JacobianExpStat[[i]])
+            t( obsStatsByPeriod[[i]] - ExpStat[[i]] )
 					})
-			gmmThetaDelta <- -1 * as.numeric( ginv(Reduce("+", Hessian)) %*%
-							Reduce("+", Gradient) )
-			OneStepSpecs[effectsToInclude,counterTestEffects] <- theta0 +
-					mmThetaDelta
-			PartialOneStepSpecs[effectsToInclude,counterTestEffects] <-
-					theta0 + mmPartialThetaDelta
-			GmmOneStepSpecs[effectsToInclude,counterTestEffects] <- theta0 +
-					gmmThetaDelta
+
+      OneStepSpecs[effectsToInclude,counterTestEffects] <- theta0 + mmThetaDelta
+      PartialOneStepSpecs[effectsToInclude,counterTestEffects] <- theta0 + mmPartialThetaDelta
+
 			for (i in 1:length(obsMhd)) {
-				OneStepMHD[[i]][counterTestEffects] <-	as.numeric(
-					obsMhd[i] +
-					mmThetaDelta %*% Gradient[[i]] + 0.5 *
-					mmThetaDelta %*% Hessian[[i]] %*% mmThetaDelta)
-				GmmMhdValue[[i]][counterTestEffects] <-
-						as.numeric( obsMhd[i] +
-						gmmThetaDelta %*%
-						Gradient[[i]] + 0.5 *
-						gmmThetaDelta %*%
-						Hessian[[i]] %*%
-						gmmThetaDelta )
-				PartialOneStepMHD[[i]][counterTestEffects] <-
-						as.numeric(
-						obsMhd[i] +
-						mmPartialThetaDelta %*%
-						Gradient[[i]] +
-						0.5 *
-						mmPartialThetaDelta %*%
-						Hessian[[i]] %*%
-						mmPartialThetaDelta)
-			}
-			JoinedOneStepMHD[counterTestEffects] <-
-					Reduce("+",OneStepMHD)[counterTestEffects]
-			JoinedPartialOneStepMHD[counterTestEffects] <-
-					Reduce("+",PartialOneStepMHD)[counterTestEffects]
-			JoinedGmmMhdValue[counterTestEffects] <-
-					Reduce("+",GmmMhdValue)[counterTestEffects]
+        OneStepMHD[[i]][counterTestEffects] <- as.numeric(obsMhd[i] + mmThetaDelta %*% Gradient[[i]] )
+        PartialOneStepMHD[[i]][counterTestEffects] <- as.numeric( obsMhd[i] + mmPartialThetaDelta %*% Gradient[[i]] )
+      }
+      JoinedOneStepMHD[counterTestEffects] <- Reduce("+",OneStepMHD)[counterTestEffects]
+      JoinedPartialOneStepMHD[counterTestEffects] <- Reduce("+",PartialOneStepMHD)[counterTestEffects]
 		}
 	}
 
@@ -426,7 +421,7 @@ print.sienaGOF <- function (x, ...) {
 		cat(" >",titleStr, "\n")
 		for (i in 1:length(pVals))
 		{
-			cat(names(x)[i], ": ", pVals[i], "\n")
+			cat(names(x)[i], ": ", round(pVals[i],3), "\n")
 		}
 		for (i in 1:length(pVals))
 		{
@@ -442,7 +437,7 @@ print.sienaGOF <- function (x, ...) {
 	{
 		cat("Siena Goodness of Fit (",
 			attr(x,"auxiliaryStatisticName"),"), all periods\n=====\n")
-		cat(titleStr,pVals[1], "\n")
+		cat(titleStr, round(pVals[1],3), "\n")
 		if (x[[1]]$Rank < dim(x[[1]]$Observations)[2])
 			{
 				cat("**Note: Only", x[[1]]$Rank, "statistics are",
@@ -701,7 +696,7 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 
 ##@descriptives.sienaGOF siena07 Gives numerical values in the plot.
 descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
-			perc=.05, key=NULL, period=1)
+			perc=.05, key=NULL, period=1, showAll=FALSE)
 {
 # adapted excerpt from plot.sienaGOF
 	if (attr(x,"joined"))
@@ -716,10 +711,12 @@ descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
 	sims <- x$Simulations
 	obs <- x$Observations
 	itns <- nrow(sims)
-
 	screen <- sapply(1:ncol(obs),function(i){
-						(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
-			(diag(var(rbind(sims,obs)))!=0)
+						(sum(is.nan(rbind(sims,obs)[,i])) == 0) })
+	if (!showAll)
+	{
+		screen <- screen & (diag(var(rbind(sims,obs)))!=0)
+	}
 	sims <- sims[,screen, drop=FALSE]
 	obs <- obs[,screen, drop=FALSE]
 	## Need to check for useless statistics here:
@@ -747,6 +744,7 @@ descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
 
 	sims.themin <- apply(sims, 2, min)
 	sims.themax <- apply(sims, 2, max)
+	sims.mean <- apply(sims, 2, mean)
 	sims.min <- pmin(sims.themin, obs)
 	sims.max <- pmax(sims.themax, obs)
 
@@ -757,6 +755,7 @@ descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
 					(sims[,i] - sims.median[i]) )
 		obs <- matrix(sapply(1:ncol(sims), function(i)
 							(obs[,i] - sims.median[i])), nrow=n.obs )
+		sims.mean <- sims.mean - sims.median
 		sims.min <- sims.min - sims.median
 		sims.max <- sims.max - sims.median
 	}
@@ -767,15 +766,17 @@ descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
 		sims <- sapply(1:ncol(sims), function(i) sims[,i]/(sims.range[i]))
 		obs <- matrix(sapply(1:ncol(sims), function(i) obs[,i]/(sims.range[i]))
 				, nrow=n.obs )
+		sims.mean <- sims.mean/sims.range
 		sims.min <- sims.min/sims.range
 		sims.max <- sims.max/sims.range
 	}
 
-#	ymin <- 1.05*min(sims.min) - 0.05*max(sims.max)
-#	ymax <- -0.05*min(sims.min) + 1.05*max(sims.max)
 	screen <- sapply(1:ncol(obs),function(i){
-						(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
-			(diag(var(rbind(sims,obs)))!=0)
+						(sum(is.nan(rbind(sims,obs)[,i])) == 0) })
+	if (!showAll)
+	{
+		screen <- screen & (diag(var(rbind(sims,obs)))!=0)
+	}
 	sims <- sims[,screen, drop=FALSE]
 	obs <- obs[,screen, drop=FALSE]
 	sims.themin <- sims.themin[screen, drop=FALSE]
@@ -790,14 +791,16 @@ descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
 				sort(sims[,i])[ind.lower]  )
 	yperc.upper = sapply(1:ncol(sims), function(i)
 				sort(sims[,i])[ind.upper]  )
-	violins <- matrix(NA, 6, ncol(sims))
+	violins <- matrix(NA, 7, ncol(sims))
 	violins[1,] <- sims.themax
 	violins[2,] <- yperc.upper
-	violins[3,] <- yperc.mid
-	violins[4,] <- yperc.lower
-	violins[5,] <- sims.themin
-	violins[6,] <- obs
-	rownames(violins) <- c('max', 'perc.upper', 'median', 'perc.lower', 'min', 'obs')
+	violins[3,] <- sims.mean
+	violins[4,] <- yperc.mid
+	violins[5,] <- yperc.lower
+	violins[6,] <- sims.themin
+	violins[7,] <- obs
+	rownames(violins) <- c('max', 'perc.upper', 'mean',
+							'median', 'perc.lower', 'min', 'obs')
 	colnames(violins) <- key
 	violins
 }
@@ -909,6 +912,7 @@ sparseMatrixExtraction <-
 			returnValue <- changeToStructural(returnValue,
 				Matrix(obsData[[groupName]]$depvars[[varName]][,,period]))
 		}
+		diag(returnValue) <- 0 # not guaranteed by data input
 	}
 	else
 	{

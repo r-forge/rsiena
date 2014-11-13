@@ -72,6 +72,12 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             }
             effects$initialValue <- defaultEffects$initialValue
         }
+		if (!all(names(x$MaxDegree) %in% names(data$depvars)))
+		{
+			cat(' MaxDegree in the algorithm should be a named vector\n')
+			cat(' with only names of dependent variables in the data set.\n')
+			stop('Invalid algorithm-data combination.')
+		}		
         ## get data object into group format to save coping with two
         ## different formats
         if (inherits(data, "sienaGroup"))

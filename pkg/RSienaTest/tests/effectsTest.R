@@ -108,7 +108,7 @@ mydyvcov <- varDyadCovar(array(rnorm(5000)[1:(length(use) * length(use) * 2)],
 mydata <- sienaDataCreate(mynet, alcohol=mybeh, myccov, myvcov, mydyccov,
 						  mydyvcov)
 myeff <- getEffects(mydata)
-print01Report(mydata, myeff, "Siena01")
+print01Report(mydata, "Siena01")
 
 ## create data set to use for ml (could be different size)
 use <- 1:20
@@ -208,7 +208,7 @@ mymodelBAGREEfd <- sienaModelCreate(modelType=5, nsub=1, n3=50, seed=11,
 									findiff=TRUE)
 mymodelBJOINTfd <- sienaModelCreate(modelType=6, nsub=1, n3=50, seed=12,
 									findiff=TRUE)
-print01Report(mydatas, myeffs, "Siena02")
+print01Report(mydatas, "Siena02")
 
 
 ##create a data set with bipartite networks and missing data
@@ -236,17 +236,17 @@ mydatabm <-	sienaDataCreate(mynetb1, mynetb2, bcov20, bcov32, bdycov2032,
 							bdycov3220, nodeSets=list(senders20, senders32,
 										receivers20, receivers32))
 myeffbm <- getEffects(mydatabm)
-print01Report(mydatabm, myeffbm, "Siena03")
+print01Report(mydatabm, "Siena03")
 
 ##create datasets for groups
 tmp <- sienaDataCreateFromSession("baerveldt34.csv")
 mygrp1 <- tmp$mydata
 mygrpeff <- tmp$myeff
-print01Report(mygrp1, mygrpeff, "sienag01")
+print01Report(mygrp1, "sienag01")
 ## also use duplicated bm files
 mygrp2 <- sienaGroupCreate(list(mydatabm, mydatabm, mydatabm))
 mygrpeff2 <- getEffects(mygrp2)
-print01Report(mygrp2, mygrpeff2, "sienag03")
+print01Report(mygrp2, "sienag03")
 
 ## set up sampson data for valued networks
 source("../sampson.r")
@@ -276,19 +276,19 @@ cvdyad <- varDyadCovar(cvdyad)
 mydatacc1 <- sienaDataCreate(mynet3, comp1, cccov, cvcov, cccov1, cccov2, ccdyad,
 							 cvdyad)
 myeffcc1 <- getEffects(mydatacc1)
-print01Report(mydatacc1, myeffcc1, "sienac01")
+print01Report(mydatacc1, "sienac01")
 mydatacc2 <- sienaDataCreate(mynet3, comp2, cccov, cvcov, cccov1, cccov2, ccdyad,
 							 cvdyad)
 myeffcc2 <- getEffects(mydatacc2)
-print01Report(mydatacc2, myeffcc2, "sienac02")
+print01Report(mydatacc2, "sienac02")
 mydatacc3 <- sienaDataCreate(mynet3, comp3, cccov, cvcov, cccov1, cccov2, ccdyad,
 							 cvdyad)
 myeffcc3 <- getEffects(mydatacc3)
-print01Report(mydatacc3, myeffcc3, "sienac03")
+print01Report(mydatacc3, "sienac03")
 mydatacc4 <- sienaDataCreate(mynet3, comp4, cccov, cvcov, cccov1, cccov2, ccdyad,
 							 cvdyad)
 myeffcc4 <- getEffects(mydatacc4)
-print01Report(mydatacc4, myeffcc4, "sienac04")
+print01Report(mydatacc4, "sienac04")
 
 tmp20 <- tmp2
 tmp30 <- tmp3
@@ -304,7 +304,7 @@ mynet30 <- sienaDependent(array(c(tmp20, tmp30, tmp40), dim=c(32, 32, 3)))
 mydatacc5 <- sienaDataCreate(mynet30, cccov, cvcov, cccov1, cccov2, ccdyad,
 							 cvdyad)
 myeffcc5 <- getEffects(mydatacc5)
-print01Report(mydatacc5, myeffcc5, "sienac05")
+print01Report(mydatacc5, "sienac05")
 
 ## get some data for siena08
 n341 <- as.matrix(read.table("N34_1.DAT"))
@@ -328,10 +328,10 @@ eff1 <- getEffects(data1)
 eff3 <- getEffects(data3)
 eff4 <- getEffects(data4)
 eff6 <- getEffects(data6)
-print01Report(data1, eff1, "sienaMeta1")
-print01Report(data3, eff3, "sienaMeta3")
-print01Report(data4, eff4, "sienaMeta4")
-print01Report(data6, eff6, "sienaMeta6")
+print01Report(data1, "sienaMeta1")
+print01Report(data3, "sienaMeta3")
+print01Report(data4, "sienaMeta4")
+print01Report(data6, "sienaMeta6")
 
 ## create functions to do the tests
 makefilename <- function(i, type, interaction=FALSE)
@@ -768,10 +768,10 @@ eff1 <- getEffects(data1)
 eff3 <- getEffects(data3)
 eff4 <- getEffects(data4)
 eff6 <- getEffects(data6)
-print01Report(data1, eff1, "sienaMeta1")
-print01Report(data3, eff3, "sienaMeta3")
-print01Report(data4, eff4, "sienaMeta4")
-print01Report(data6, eff6, "sienaMeta6")
+print01Report(data1, "sienaMeta1")
+print01Report(data3, "sienaMeta3")
+print01Report(data4, "sienaMeta4")
+print01Report(data6, "sienaMeta6")
 
 ## create table for effect parameters
 parmtable <- allEffects[allEffects$parm > 0, c("shortName", "parm")]

@@ -172,7 +172,7 @@ There are other documentation files:
 \end{description}
 This file contains a description of some ways of adapting the algorithms.
 
-There are also a file called siena\_algorithms4,
+There is also a file called Siena\_algorithms,
 which contain descriptions of the algorithms. It do not always match the
 code, whereas I hope the files referred to above do.
 \section{Updating the package on R-forge}
@@ -234,10 +234,6 @@ And for changes in documentation files:
   \textsf{$\bs$pkg$\bs$RSienaTest$\bs$inst$\bs$doc$\bs$RSiena\_Manual.pdf} as well as
   \textsf{$\bs$pkg$\bs$RSiena$\bs$inst$\bs$doc$\bs$RSiena\_Manual.pdf}. The same for \textsf{RSiena.bib}.
   These three files should be identical for \textsf{RSiena} and \textsf{RSienaTest}.
-\item For both packages separately:\\
-  If the set of effects was changed, make a new \textsf{effects.pdf} file by
-  calling the function \textsf{effectsDocumentation(type = "latex")} and compiling
-  this by \LaTeX, and include this as \textsf{$\bs$pkg$\bs$RSienaTest$\bs$inst$\bs$doc$\bs$effects.pdf}.
 \end{enumerate}
 
 \section{Coding standards etc}
@@ -367,7 +363,7 @@ below.
   other programs containing utilities such as tar (delphi is one offender), you
   may need to uninstall and reinstall Rtools, as you need Rtools at the start of
   your path. (Or edit the path!).\\
-  The path must start with 
+  The path must start with
   \verb|C:\Rtools\bin;C:\Rtools\gcc-4.6.3\bin;|
   (if 4.6.3 is the correct version number);
   after that must follow the path to the R executable.\\
@@ -378,7 +374,7 @@ below.
     under the System Variables section, select Path;
     edit the Path, taking care that what is previously there is left intact;
     click OK on each of the dialogs to save your settings.
-    Restart your computer.  
+    Restart your computer.
 \item If using a Mac, you will need the Xcode tools installed.
 \item Obtain the current source using a developer secure checkout.
 \item In a command prompt window, navigate to the directory above the siena
