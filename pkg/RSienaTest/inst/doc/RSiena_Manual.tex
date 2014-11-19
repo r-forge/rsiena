@@ -1582,6 +1582,10 @@ is the method of joiners and leavers, described in Section~\ref{S_comp}.
 For actors present only at the last wave, the method of
 joiners and leavers is preferable.
 
+When endowment or creation effects are to be included in the
+model specification, changing structural values should not be used,
+and the method of joiners and leavers then also is preferable.
+
 Structurally determined values are defined by reserved codes in
 the input data: the value 10 indicates a structural zero, the
 value 11 indicates a structural one. Structurally determined
@@ -1849,6 +1853,11 @@ The object \texttt{changes} created by the functions
 \sfn{sienaCompositionChange} is of class
 \sfn{compositionChange} and can be used in the function
 \sfn{sienaDataCreate}.
+
+The method of joiners and leavers for representing composition change
+does not combine properly with the \sfn{sienaGOF} function
+(Section~\ref{S_gof}).
+
 
 \subsection{Using multiple processes}
 \label{S_multipleProcesses}
@@ -3287,6 +3296,9 @@ it often is advisable to use the defaults \sfn{center = FALSE},
 \sfn{scale = FALSE}, whereas for sets of statistics for which a common scale
 is less important, e.g., triad counts, a clearer picture may be obtained by
 plotting with \sfn{center = TRUE}, \sfn{scale = TRUE}.
+
+The method of joiners and leavers for representing composition change
+(Section~\ref{S_comp}) does not combine properly with the \sfn{sienaGOF} function.
 
 The examples in the help pages for \sfn{sienaGOF} and \sfn{sienaGOF-auxiliary}
 give ample help for how to use this function.
@@ -6119,7 +6131,11 @@ will be significant.
   each with a number of MH steps, followed again by the function \sfn{improveMH}.
   \item
   Finally \sfn{nmain} repeats (of \sfn{nrunMHBatches} of a
-  number of MH steps plus Bayesian proposals) are performed.
+  number of MH steps sampling chains, plus \sfn{nSampVarying} MH steps
+  sampling the varying parameters ($\theta_j$) plus \sfn{nSampConst} MH steps
+  sampling the non-varying parameters ($\eta$) plus one Gibbs
+  step sampling the global mean and covariance matrix of the varying parameters
+  ($\mu$ and $\Sigma$) are performed.
   In the warming as well as the final phase, the number of MH steps is
   determined by parameter \sfn{mult} (``multiplication factor'')
   in the call of \sfn{sienaAlgorithmCreate} that created the algorithm object.
@@ -11190,7 +11206,7 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
-   \item Effects \texttt{AltsAvAlt} renamed to \texttt{avXAlt}.
+   \item Effect \texttt{AltsAvAlt} renamed to \texttt{avXAlt}.
    \item Effects object no longer used as argument for \sfn{print01Report}.
    \item A lot of new effects: \texttt{sameXInPop, transRecTrip2, totAlt, avInAlt, totInAlt,
      totRecAlt, totXAlt, avXInAlt, totXInAlt,
@@ -11206,10 +11222,10 @@ Changes in RSiena and RSienaTest:
    \item Correction of \sfn{igraphNetworkExtraction()} in the help page
        for \sfn{sienaGOF-auxiliary}
      (the earlier version dropped isolated nodes from simulated networks).
-   \item In the help page for \sfn{sienaGOF-auxiliary.Rd}, 
+   \item In the help page for \sfn{sienaGOF-auxiliary.Rd},
      the example of constraint is replaced
      by the example of eigenvector centrality (because constraint
-	 is undefined for isolated nodes, leading to computational problems).  
+	 is undefined for isolated nodes, leading to computational problems).
    \item Set diagonal of observed networks to 0 in \sfn{sparseMatrixExtraction()}.
    \item \sfn{sienaRIDynamics()} restored, after corrections.
    \item ``file" parameter of \sfn{sienaRI()} dropped (implied platform dependence).
@@ -11221,7 +11237,7 @@ Changes in RSiena and RSienaTest:
    \item Correction of printing errors arising when result of score-type test is \texttt{NA}.
    \item \texttt{maxRatio} checked for \texttt{NA} or \texttt{NaN} in \sfn{phase2.r}.
    \item \texttt{Siena\_algorithms4.tex} renamed \texttt{Siena\_algorithms.tex};
-         this document now is made available also at the \SI website.
+         this document now is made available as a pdf file at the \SI website.
    \item Some improvement of error messages for \sfn{sienaTimeTest()}.
    \item $p$-value for goodness of fit (\sfn{sienaGOF()}) rounded to 3 decimal places.
    \item File \sfn{effects.pdf} dropped from \texttt{{$\backslash$}inst{$\backslash$}doc}

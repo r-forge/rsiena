@@ -18,6 +18,9 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
     A list with an entry for each actor in the node set. Each entry a
     vector of numbers (may be as characters) indicating intervals during
     which the corresponding actor was present.
+    Each entry must have an even number of digits.
+    The actor is assumed to be present from the first to the second,
+    third to fourth, etc., time points.
 }
 \item{filename}{
   Name of file containing change information. One line per actor, each
@@ -56,7 +59,19 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
   See the manual for further details.\cr
   For bipartite networks, composition change objects for the second node set
   have no effect and will lead to an error message.\cr
-  Intervals are treated as closed at each end.\cr
+  For \code{m} waves, time starts at 1 and ends at \code{m};
+  so all numbers must be between 1 and the number of waves (bounds included).
+  Intervals are treated as closed at each end.
+  For example, an entry \code{(2, 4)} means that the actor corresponding
+  to this entry arrived at wave 2 and left at wave 4, but did give
+  valid date for both of these waves. An entry \code{(1.01, 2.99)} means that
+  the actor arrived just after wave 1 and left just before wave 3, and gave
+  valid data only for wave 2. An entry \code{(1, 2), (3.5, 4)} means that the
+  actor was there at the start and left at wave 2 (giving valid data for wave 2),
+  came back halfway between waves 3 and 4, and gave valid data still at wave 4;
+  if there would be more than 4 waves in the data set, this entry would also
+  mean that the actor left at wave 4.
+\cr
   For data sets including a composition change object, estimation
   by Method of Moments is forced to be unconditional, overriding
   the specification in the \code{\link{sienaAlgorithm}} object.
@@ -84,12 +99,12 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
   #or
   clist <- list(c("1", "3"), c("1.4", "2.5"))
 
-  compChange <- sienaCompositionChange(clist)  
-  
+  compChange <- sienaCompositionChange(clist)
+
   s50net <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   s50list <- rep(list(c(1,3)), 50)
   # This is a trivial composition change: all actors are present in all waves.
-  compChange <- sienaCompositionChange(s50list) 
+  compChange <- sienaCompositionChange(s50list)
   s50data <- sienaDataCreate(s50net, compChange)
   s50data
 

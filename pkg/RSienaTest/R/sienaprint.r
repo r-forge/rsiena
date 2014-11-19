@@ -1206,7 +1206,9 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 		cat("\nBasic rates parameters are treated as incidental parameters.\n\n")
 	}
 	cat("\nAlgorithm specifications were nwarm =",x$nwarm,", nmain =", x$nmain,
-	    ", nrunMHBatches =", x$nrunMHBatches, ", mult =", x$mult, ".\n")
+	    ", nrunMHBatches =", x$nrunMHBatches,
+		", nSampVarying =", x$nSampVarying, ", nSampConst =", x$nSampConst,
+		", mult =", x$mult, ".\n")
 	if (!is.null(nfirst))
 	{
 		cat("For the results, nwarm is superseded by nfirst = ", nfirst, ".")

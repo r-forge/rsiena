@@ -15,8 +15,8 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     priorRatesFromData=TRUE,
     frequentist=FALSE, incidentalBasicRates=FALSE,
     reductionFactor=1, gamma=0.5, delta=1e-04,
-    nwarm=50, nmain=250, nrunMHBatches=20,
-    nImproveMH=100,
+    nwarm=50, nmain=250,
+    nrunMHBatches=20, nSampVarying=1, nSampConst=1, nImproveMH=100,
     lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
     storeAll=FALSE, prevAns=NULL, prevBayes=NULL, silentstart = TRUE,
     nbrNodes=1, clusterType=c("PSOCK", "FORK"),
@@ -91,6 +91,10 @@ glueBayes(z1, z2, nwarm2=0)
   \item{nmain}{Number of iterations in the main phase.
    Should be at least 10.}
   \item{nrunMHBatches}{Thinning ratio in MCMC process.}
+  \item{nSampVarying}{Number of samples of varying parameters
+        for each chain sample.}
+  \item{nSampConst}{Number of samples of constant parameters ("eta")
+        for each chain sample.}
   \item{nImproveMH}{Number of iterations per improveMH step.}
   \item{lengthPhase1}{Only used for frequentist estimation:
    length of the first phase of the Robbins Monro algorithm.
@@ -160,7 +164,11 @@ glueBayes(z1, z2, nwarm2=0)
   a warming phase is done of \code{nwarm} Bayesian proposals
   each with a number of MH steps, followed again by the function 'improveMH'.\cr
   Finally \code{nmain} repeats (of \code{nrunMHBatches} of a
-  number of MH steps plus Bayesian proposals) are performed.
+  number of MH steps sampling chains, plus \code{nSampVarying} MH steps
+  sampling the varying parameters ('theta_j') plus \code{nSampConst} MH steps
+  sampling the non-varying parameters ('eta') plus one Gibbs
+  step sampling the global mean and covariance matrix of the varying parameters
+  ('mu' and 'Sigma') are performed.
   In the warming as well as the final phase, the number of MH steps is
   determined by parameter \code{mult} ("multiplication factor")
   in the call of \code{sienaAlgorithmCreate}
