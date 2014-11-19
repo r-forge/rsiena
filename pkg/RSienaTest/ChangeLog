@@ -1,3 +1,9 @@
+2014-11-19 R-Forge Revision 280
+Changes in RSiena and RSienaTest:
+   * Small changes in help pages for sienaGOF and for sienaCompositionChange.
+Changes in RSienaTest:
+   * New parameters nSampVarying and nSampConst in sienaBayes().
+
 2014-11-13 R-Forge Revision 279
 Changes in RSiena and RSienaTest:
    * Effect AltsAvAlt renamed to avXAlt (with error message).
