@@ -817,6 +817,10 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
  * Processes a complete set of data objects, creating a chain for each
  * period and returning the address.
  */
+/**
+  * NOTE; FOR SOME CONFIGURATIONS OF STRUCTURAL ZEROS
+ *  THIS RUNS INTO A HANG
+ */
 SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
     SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)

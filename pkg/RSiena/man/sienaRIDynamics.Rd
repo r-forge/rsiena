@@ -159,7 +159,7 @@ RIDynamics1
 plot(RIDynamics1)
 }
 
-myalgorithm2 <- sienaAlgorithmCreate(nsub=2, n3=100, cond=TRUE)
+myalgorithm2 <- sienaAlgorithmCreate(nsub=2, n3=50, cond=TRUE)
 ans2 <- siena07(myalgorithm2, data=mydata, effects=myeff, batch=TRUE)
 
 \dontrun{

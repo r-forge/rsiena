@@ -133,9 +133,17 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new ReciprocityEffect(pEffectInfo);
 	}
+	else if (effectName == "transTrip1")
+	{
+		pEffect = new TransitiveTripletsEffect(pEffectInfo,true,false);
+	}
+	else if (effectName == "transTrip2")
+	{
+		pEffect = new TransitiveTripletsEffect(pEffectInfo,false,true);
+	}
 	else if (effectName == "transTrip")
 	{
-		pEffect = new TransitiveTripletsEffect(pEffectInfo);
+		pEffect = new TransitiveTripletsEffect(pEffectInfo,true,true);
 	}
 	else if (effectName == "transTriads")
 	{
@@ -197,6 +205,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new OutdegreePopularityEffect(pEffectInfo, true);
 	}
+	else if (effectName == "reciPop")
+	{
+		pEffect = new RecipdegreePopularityEffect(pEffectInfo, false);
+	}
+	else if (effectName == "reciPopSqrt")
+	{
+		pEffect = new RecipdegreePopularityEffect(pEffectInfo, true);
+	}
 	else if (effectName == "inAct")
 	{
 		pEffect = new IndegreeActivityEffect(pEffectInfo, false);
@@ -212,6 +228,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "outActSqrt")
 	{
 		pEffect = new OutdegreeActivitySqrtEffect(pEffectInfo);
+	}
+	else if (effectName == "reciAct")
+	{
+		pEffect = new RecipdegreeActivityEffect(pEffectInfo);
 	}
 	else if (effectName == "outTrunc")
 	{
@@ -714,9 +734,13 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new AntiIsolateEffect(pEffectInfo, false, 1);
 	}
-	else if (effectName == "antiInIso2")
+	else if ((effectName == "antiInIso2") || (effectName == "in2Plus"))
 	{
 		pEffect = new AntiIsolateEffect(pEffectInfo, false, 2);
+	}
+	else if (effectName == "in3Plus")
+	{
+		pEffect = new AntiIsolateEffect(pEffectInfo, false, 3);
 	}
 	else if (effectName == "isolatePop")
 	{
@@ -769,6 +793,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "totRecAlt")
 	{
 		pEffect = new AverageReciprocatedAlterEffect(pEffectInfo, false);
+	}
+	else if (effectName == "maxAlt")
+	{
+		pEffect = new MaxAlterEffect(pEffectInfo, false);
+	}
+	else if (effectName == "minAlt")
+	{
+		pEffect = new MaxAlterEffect(pEffectInfo, true);
 	}
 	else if (effectName == "avInAlt")
 	{

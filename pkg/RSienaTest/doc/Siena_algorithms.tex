@@ -1048,18 +1048,46 @@ of which the basic instance is defined in \nnm{NetworkEffect()}
 and specific instances in all functions defining specific effects.
 
 The statistic used for estimation, also called the target statistic,
-is defined by the sum over the waves from 2 to $M$ of
+is defined as follows.
+To be explicit, denote all changing covariates (monadic and/or dyadic) by $v$,
+with value $v(t_m)$ for wave $m$, and all constant covariates by $w$.
+The sum of the effect over all actors is defined by
 \begin{equation}
- s_{k}^X(x,z) = \sum_i s_{ik}^X(x,z) \ .        \label{fitstat}
+ s_{k}^X(x,z,v,w) = \sum_i s_{ik}^X(x,z,v,w) \ .        \label{fitstat0}
 \end{equation}
-If the number of  dependent variables is more than one, like in studies
-of networks and behavior, for wave $m \in \{2, \ldots, M\}$,
-the dependent variable is taken as in wave $m$ and the
-explanatory as in wave $m-1$. This is explained for
-the case of networks and behavior in \citet{SnijdersEA07}.
+If there is only one network as dependent variable then there is no $z$
+so we can write $s_{k}^X(x,v,w)$.
+The target statistic then is
+\begin{subequations}
+   \label{fitstat}
+\begin{equation}
+    \sum_{m=2}^M s_{k}^X(x(t_m),v(t_{m-1}),w) \ .        \label{fitstatX}
+\end{equation}
+Note that $v$ is taken at wave $m-1$, because for changing covariates
+the assumption is that the value observed at wave $m-1$ remains valid
+up to just before wave $m$.\\
+If there are two dependent variables, one network and one behavior,
+then the target statistics for the network are
+\begin{equation}
+    \sum_{m=2}^M s_{k}^X(x(t_m),z(t_{m-1}), v(t_{m-1}),w) \ .        \label{fitstatXZ}
+\end{equation}
+and for the behavior 
+\begin{equation}
+    \sum_{m=2}^M s_{k}^Z(x(t_{m-1}),z(t_{m}), v(t_{m-1}),w) \ .        \label{fitstatZX}
+\end{equation}
+\end{subequations}
+Note the cross-lagged way of using the waves in these equations.
+This is explained in \citet{SnijdersEA07}.
+
+If the number of  dependent variables is more than one for other
+configurations of dependent variables, like multiple networks
+or a network with multiple behaviors,
+the same cross-lagged principle is used: for wave $m \in \{2, \ldots, M\}$,
+the dependent variable is taken as observed in wave $m$ and all
+explanatory (`independent') variables as observed in wave $m-1$. 
 
 In the C++ code, (\ref{fitstat}) is the function \nnm{evaluationStatistic()}.
-The terms in (\ref{fitstat}) are the function \nnm{egoStatistic()},
+The terms in (\ref{fitstat0}) are the function \nnm{egoStatistic()},
 and these are computed for some (not all) effects as
 \begin{equation}
  \text{egoStatistic}(i) = \sum_j x_{ij}\,\text{tieStatistic}(i,j) \ .

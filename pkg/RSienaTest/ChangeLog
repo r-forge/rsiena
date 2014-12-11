@@ -1,7 +1,42 @@
-2014-11-19 R-Forge Revision 280
+2014-12-11 R-Forge Revision 282
 Changes in RSiena and RSienaTest:
-   * Small changes in help pages for sienaGOF and for sienaCompositionChange.
+   * Effects cl.XWX and cl2.XWX corrected (thanks to Christoph Stadtfeld)
+     (MixedTwoPathTable.cpp).
+   * interactionType of gwesp.. effects was made dyadic (allEffects.csv)
+   * Some layout changes in warning message, phase3.r.
+   * New effects reciPop, reciAct, in3Plus, maxAlt, minAlt, transTrip1,
+     transTrip2.
+   * Effect antiInIsolate2 got alias in2Plus.
+   * inPop is dyadic effect (except for symmetric networks)
+     (it is sum_j x_{ij} (sum_{h \neq i} x_{hj} + 1)).
+   * egoX added as effect for non-directed networks
+     (can be important for representing effects of group-level covariates
+     in multi-group analyses).
+   * Components IActors and expectedI added to sienaRI() and print.sienaRI().
+   * The check for MaxDegree when running siena07 now works properly also
+     for sienaGroup objects (initializeFRAN).
+   * Manual introduces the term 'elementary effects'.
 Changes in RSienaTest:
+   * sienaBayes: the stop caused by singularity of the precision
+     matrix after the multi-group estimation now is circumvented;
+     still a warning is printed to the screen. This allows the use of
+	 more than one elementary effects having the same target statistic.
+   * sienaBayes: option priorRatesFromData changed to values 0-1-2,
+     with 0 = former FALSE, 1 = former TRUE, 2 = robust estimation of prior
+     for rate parameters from estimates at the end of initialization phase.
+   * sienaBayes: correction thetaMati (not important,
+     only for output to screen).
+   * sienaprint: correction of print.summary.sienaBayesFit for models
+     with more than one dependent variable.
+
+2014-11-22 R-Forge Revision 281
+Changes in RSiena:
+   * Translation of R messages was updated: changed file
+     \pkg\RSiena\po\R-RSiena.pot
+
+2014-11-19 R-Forge Revision 280
+Changes in RSienaTest:
+   * Small changes in help pages for sienaGOF and for sienaCompositionChange.
    * New parameters nSampVarying and nSampConst in sienaBayes().
 
 2014-11-13 R-Forge Revision 279
@@ -9,24 +44,24 @@ Changes in RSiena and RSienaTest:
    * Effect AltsAvAlt renamed to avXAlt (with error message).
    * effects object no longer used as argument for print01Report
      (with error message).
-   * New effects sameXInPop, transRecTrip2, 
-     totAlt, avInAlt, totInAlt, totRecAlt,	 
-	 totXAlt, avXInAlt, totXInAlt, 
-	 avAltDist2, totAltDist2, avTAltDist, totAAltDist2, 
-	 avXAltDist, totXAltDist2, avTXAltDist, totAXAltDist2,
-	 avInAltDist2, totInAltDist2, avTInAltDist, totAInAltDist2, 
-	 avXInAltDist2, totXInAltDist2, avTXInAltDist, totAXInAltDist2,
-	 XWX1, XWX2, cl.XWX1, cl.XWX2.
+   * New effects sameXInPop, transRecTrip2,
+     totAlt, avInAlt, totInAlt, totRecAlt,
+     totXAlt, avXInAlt, totXInAlt,
+     avAltDist2, totAltDist2, avTAltDist2, totAAltDist2,
+     avXAltDist, totXAltDist2, avTXAltDist2, totAXAltDist2,
+     avInAltDist2, totInAltDist2, avTInAltDist2, totAInAltDist2,
+     avXInAltDist2, totXInAltDist2, avTXInAltDist2, totAXInAltDist2,
+     XWX1, XWX2, cl.XWX1, cl.XWX2.
    * gwesp.. effects get endowment=TRUE in allEffects.csv, and thereby
      obtain endowment and creation effects.
    * In effect group behaviorBipartiteObjective, the following meaningless
      effects were dropped: avAlt, avSim, totSim, avSimPopEgo, avSimPopAlt,
-	 behDenseTriads, simDenseTriads.
+     behDenseTriads, simDenseTriads.
    * Effect class covarBehaviorBipartiteObjective split into
      covarABehaviorBipartiteObjective (for covariates on first mode)
-	 and covarBBehaviorBipartiteObjective (for covariates on second mode)
-	 (allEffects.csv, effects.r).
-   * Added effect class covarABehaviorBipartiteObjective  
+     and covarBBehaviorBipartiteObjective (for covariates on second mode)
+     (allEffects.csv, effects.r).
+   * Added effect class covarABehaviorBipartiteObjective
      and covarBBehaviorBipartiteObjective to effectsDocumentation.R.
    * Undid duplication of covarNetNetObjective.
    * For non-invertible covariance matrices, give diagnostic for the
@@ -35,8 +70,8 @@ Changes in RSiena and RSienaTest:
    * Correction of igraphNetworkExtraction() in sienaGOF-auxiliary.Rd
      (the earlier version dropped isolated nodes from simulated networks).
    * In sienaGOF-auxiliary.Rd, the example of constraint is replaced
-     by the example of eigenvector centrality (because constraint 
-	 is undefined for isolated nodes, leading to computational problems).
+     by the example of eigenvector centrality (because constraint
+     is undefined for isolated nodes, leading to computational problems).
    * sienaRIDynamics restored, after corrections.
    * "file" parameter of sienaRI dropped (implied platform dependence).
    * Parameter showAll added to descriptives.sienaGOF.
@@ -59,12 +94,12 @@ Changes in RSiena and RSienaTest:
 Changes in RSienaTest:
    * sienaBayes(): new parameters nImproveMH and priorRatesFromData;
       truncate initial rate parameters depending on prior. Small change
-	  in example in help page.
+      in example in help page.
    * glueBayes() corrected so that it can be applied sequentially.
    * Small improvement in print.summary.sienaBayesFit().
-   * multipleBayesTest now allows matrix parameter to test 
+   * multipleBayesTest now allows matrix parameter to test
      linear combinations.
-   * Improved plot.multipleBayesTest (show truncation at 0).
+   * Improved plot.multipleBayesTest (shows truncation at 0).
 
 2014-07-24 R-Forge Revision 278
 Changes in RSiena and RSienaTest:
@@ -190,7 +225,8 @@ Changes in RSiena:
 
 2014-03-30 R-Forge Revision 267
 Changes in RSiena:
-Added R-files that contain functionalities to calculate, print and plot relative importances of effects
+Added R-files that contain functionalities to calculate, print and plot
+     relative importances of effects
    * sienaRI.r: new
    * sienaRIDynamics.r: new
 Changes in RSiena and RSienaTest:
@@ -210,16 +246,19 @@ as have been included in RSienaTest in Revision 255
 
 2014-03-14 R-Forge Revisions 255-260
 Changes in RSienaTest:
-   * Modified getTargets(...) such that it is possible to return target statistics of individual actors
-     as well as change contributions necessary for calculating relative importances of effects (siena07setup.cpp).
+   * Modified getTargets(...) such that it is possible to return target
+     statistics of individual actors
+     as well as change contributions necessary for calculating relative
+     importances of effects (siena07setup.cpp).
    * Call of getTargets(...) is correspondingly adapted (initializeFRAN.r).
    * Modified simstats0c(...) such that it is possible to return
      statistics of individual actors in simulated networks
-     as well as statistic contributions of all potential tie flips or behavior changes
-     for all simulated micro-steps (simstatsc.r).
-   * Modified model(...) such that it calculates and returns the statistics newly needed in
-     simstats0c(...) (siena07model.cpp)
-   * Added methods, functions, constructors, and fields needed due to changes in getTargets(...) and model(...):
+     as well as statistic contributions of all potential tie flips or
+     behavior changes for all simulated micro-steps (simstatsc.r).
+   * Modified model(...) such that it calculates and returns the statistics
+     newly needed in simstats0c(...) (siena07model.cpp)
+   * Added methods, functions, constructors, and fields needed due to changes
+     in getTargets(...) and model(...):
             public void needChangeContributions(bool flag) (Model.h, Model.cpp)
             public bool needChangeContributions()          (Model.h, Model.cpp)
             private bool lneedChangeContributions2         (Model.h)
@@ -249,11 +288,15 @@ Changes in RSienaTest:
         protected map<const EffectInfo *, vector<double> > * lpChangeContribution;
    * Modifications of functions makeChange() and calculateTieFlipProbabilities()
         in class NetworkVariable (NetworkVariable.cpp)
-        calculateProbabilities(), totalEvaluationContribution(), totalEndowmentContribution(), and totalCreationContribution()
+        calculateProbabilities(), totalEvaluationContribution(),
+        totalEndowmentContribution(), and totalCreationContribution()
         in class BehaviorVariable (BehaviorVariable.cpp)
-        in order to store statistic contributions of effects to all possible choices od an actor in the current micro-step
-   * Added functions to classes NetworkEffect and BehaviorEffect (NetworkEffect.h, NetworkEffect.cpp, BehaviorEffect.h, BehaviorEffect.cpp)
-        such that, in addition to the sum of statistics ovar all actors, individual actor statistics can be returned
+        in order to store statistic contributions of effects to all possible
+        choices of an actor in the current micro-step
+   * Added functions to classes NetworkEffect and BehaviorEffect
+        (NetworkEffect.h, NetworkEffect.cpp, BehaviorEffect.h, BehaviorEffect.cpp)
+        such that, in addition to the sum of statistics ovar all actors,
+        individual actor statistics can be returned
             public virtual pair <double, double * > statistic(..., bool needActorStatistics)
             public virtual pair <double, double * > evaluationStatistic(...,bool needActorStatistics)
             public virtual pair <double, double * > endowmentStatistic(..., bool needActorStatistics)

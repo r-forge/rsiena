@@ -293,9 +293,9 @@ phase3.2 <- function(z, x, ...)
 			Report(thetext, outf)
 			Report('\n',outf)
 			cat('*** Warning: Covariance matrix not positive definite *** \n')
-			cat('*** Standard errors not reliable ***')
+			cat('*** Standard errors not reliable ***\n')
 			cat('The following is approximately a linear combination \n')
-			cat('For which the data carries no information:\n',
+			cat('for which the data carries no information:\n',
 			     thetext,'\n')
 			cat('It is advisable to drop one or more of these effects.\n')
 			if (any(z$fixed || any(z$newfixed)))

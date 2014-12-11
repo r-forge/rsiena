@@ -18,7 +18,7 @@
 sienaBayes <- function(data, effects, algo, saveFreq=100,
 				initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2,
 				priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
-				priorRatesFromData=TRUE,
+				priorRatesFromData=2,
 				frequentist=FALSE, incidentalBasicRates=FALSE,
 				reductionFactor=1,
 				gamma=0.5, delta=1e-4,
@@ -331,8 +331,8 @@ browser()
 	##@thetaMati internal sienaBayes; coordinate for group i
 	thetaMati <- function(i)
 	{
-			par.thisgroup  <- union(unlist(z$ratePositions)[i],
-							which(z$varyingObjectiveParameters))
+			par.thisgroup  <- union(z$ratePositions[[i]],
+									which(z$varyingObjectiveParameters))
 			par.thisgroup <- sort(union(par.thisgroup, which(z$set2)))
 			z$thetaMat[i,par.thisgroup]
 	}
@@ -1413,17 +1413,6 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	nActors <- rep(0, ngroups)
 	initialEstimates <- matrix(0, ngroups, startupGlobal$pp)
 	factorsBasicRate <- matrix(0, ngroups, startupGlobal$pp)
-	if (initgainGroupwise <= 0)
-	{
-		startup1Model <- sienaAlgorithmCreate(n3=500, nsub=0, cond=FALSE,
-												seed=algo$randomSeed)
-	}
-	else
-	{
-		startup1Model <- sienaAlgorithmCreate(n3=500, nsub=1,
-										firstg=initgainGroupwise, cond=FALSE,
-												seed=algo$randomSeed)
-	}
 	# Define the partition for the varying non-fixed (set1)
 	# and non-varying non-fixed (set2) effects;
 	# effects that are not estimated (fix) are
@@ -1451,12 +1440,24 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	precRate <- sum(diag(prec[rates,rates]))
 	prec[rates,rates] <- 0
 	diag(prec)[rates] <- precRate
+	prec.PA <- prec # PA = perhaps amended
 	if (inherits(try(z$proposalC0 <- chol2inv(chol(prec)),
 					silent=TRUE), "try-error"))
 	{
 		cat("precision(startupGlobal) non-invertible.\n")
 		cat("This probably means the model is not identifiable.\n")
-		stop("Non-invertible precision(startupGlobal).")
+		cat("A ridge is added to this precision matrix.\n")
+#		stop("Non-invertible precision(startupGlobal).")
+		prec.amended <- prec + diag(0.5*diag(prec), nrow=dim(prec)[1])
+		prec.PA <- prec.amended
+		if (inherits(try(z$proposalC0 <- chol2inv(chol(prec.amended)),
+					silent=TRUE), "try-error"))
+		{
+			cat("Even the amended precision(startupGlobal) is non-invertible.\n")
+			print(prec.amended)
+			cat("\n Please report this to Tom.\n")
+			stop("Non-invertible amended precision(startupGlobal).")
+		}
 	}
 	z$proposalC0eta <- z$proposalC0[z$set2, z$set2, drop=FALSE]
 	z$forEtaVersion0 <-
@@ -1466,6 +1467,19 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	for (i in 1:ngroups)
 	{
 		cat(paste("Group",i,"\n"))
+		if (initgainGroupwise <= 0)
+		{
+			startup1Model <- sienaAlgorithmCreate(n3=500, nsub=0, cond=FALSE,
+					projname=paste("project",formatC(i,width=2,flag="0"),sep=""),
+					seed=algo$randomSeed)
+		}
+		else
+		{
+			startup1Model <- sienaAlgorithmCreate(n3=500, nsub=1,
+								firstg=initgainGroupwise, cond=FALSE,
+					projname=paste("project",formatC(i,width=2,flag="0"),sep=""),
+					seed=algo$randomSeed)
+		}
 		flush.console()
 	# roughly estimate varying parameters
 		nActors[i] <- length(data[[i]]$nodeSets[[1]])
@@ -1502,9 +1516,10 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		# non-rate parameters will be dropped from this object, hence the name
 		rateParameters[,i] <- trafo(startup1$theta[rates])
 		# estimate uncertainties for this group:
+
 		covmati <- chol2inv(chol(
 			w*precision(startup1) +
-			((1-w)/ngroups)*precision(startupGlobal)[use,use,drop=FALSE]))
+			((1-w)/ngroups)*prec.PA[use,use,drop=FALSE]))
 		# now covmati is the roughly estimated covariance matrix
 		# of the parameter estimate for group i.
 		# Transform this to the trafo scale for the rate parameters:
@@ -1626,7 +1641,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 #			z$dmuinv <- matrix(0, z$TruNumPars, z$TruNumPars)
 #			diag(z$dmuinv)[rates] <- 1
 #			z$dmuinv[!rates, !rates] <-
-#				chol2inv(chol(precision(startupGlobal)
+#				chol2inv(chol(prec.PA
 #					[z$generalParameters,z$generalParameters]))
 #			z$dmuinv <- diag(1, z$TruNumPars, z$TruNumPars)
 #		}
@@ -1680,15 +1695,29 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		stop(paste("priorSigma is not a matrix of dimensions",z$p1))
 		}
 	}
-	if (priorRatesFromData)
+	if (priorRatesFromData == 1)
 	{
 	# Rate parameters are nuisance parameters, and get a data-induced prior;
-	# observed covariance matrix on the trafo scale plus a small ridge.
+	# observed covariance matrix plus a small ridge.
 		z$priorMu[z$ratesInVarying] <- rowMeans(rateParameters)
 		z$priorSigma[z$ratesInVarying,] <- 0
 		z$priorSigma[,z$ratesInVarying] <- 0
 		z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
 			z$priorKappa * reductionFactor * cov(t(rateParameters))
+		diag(z$priorSigma)[z$ratesInVarying] <- z$priorKappa *
+			(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
+	}
+	if (priorRatesFromData == 2)
+	{
+	# Rate parameters are nuisance parameters, and get a data-induced prior;
+	# robust estimates for location and scale plus a small ridge.
+		require(MASS)
+		robustRates <- cov.mcd(t(rateParameters), nsamp="sample")
+		z$priorMu[z$ratesInVarying] <- robustRates$center
+		z$priorSigma[z$ratesInVarying,] <- 0
+		z$priorSigma[,z$ratesInVarying] <- 0
+		z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
+			z$priorKappa * reductionFactor * robustRates$cov
 		diag(z$priorSigma)[z$ratesInVarying] <- z$priorKappa *
 			(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
 	}

@@ -33,8 +33,9 @@ public:
 		int minDegree);
 	virtual double calculateContribution(int alter) const;
 // The minDegree could also be dealt with by an effect parameter.
-// But I (t.s.) wish to include in any case the minDegree 1 and 2 cases
-// as separate effects, and using it for minDegree 3 and more seems overdone.	
+// But I (t.s.) wish to include in any case the minDegree 1 and 2 and 3 cases
+// as separate effects, and using it for minDegree 4 and more seems overdone.
+// Although, at least 3 is a group, so 3 might also be relevant.
 
 protected:
 	virtual double egoStatistic(int ego, const Network * pNetwork);

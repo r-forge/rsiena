@@ -72,7 +72,10 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             }
             effects$initialValue <- defaultEffects$initialValue
         }
-		if (!all(names(x$MaxDegree) %in% names(data$depvars)))
+		if (((inherits(data, "sienaGroup")) && 
+				(!all(names(x$MaxDegree) %in% names(data[[1]]$depvars)))) ||
+			((!inherits(data, "sienaGroup")) && 
+				(!all(names(x$MaxDegree) %in% names(data$depvars)))))
 		{
 			cat(' MaxDegree in the algorithm should be a named vector\n')
 			cat(' with only names of dependent variables in the data set.\n')

@@ -1207,7 +1207,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 	}
 	cat("\nAlgorithm specifications were nwarm =",x$nwarm,", nmain =", x$nmain,
 	    ", nrunMHBatches =", x$nrunMHBatches,
-		", nSampVarying =", x$nSampVarying, ", nSampConst =", x$nSampConst,
+		",\n nSampVarying =", x$nSampVarying, ", nSampConst =", x$nSampConst,
 		", mult =", x$mult, ".\n")
 	if (!is.null(nfirst))
 	{
@@ -1243,7 +1243,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 	print.sienaBayesFit(x, nfirst)
 	if (ntot > first+2)
 	{
-		cat("Posterior means and standard deviations per group\n")
+		cat("Posterior means and standard deviations of varying parameters per group\n")
 		for (h in 1:length(x$f$groupNames))
 		{
 			cat("\n", x$f$groupNames[h], "\n")
@@ -1253,7 +1253,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 			addtorow <- tmp$addtorow
 			# first two lines are the header
 			lines.thisgroup <-
-			   union(c(1,2), 2 + unlist(x$ratePositions)[h])
+			   union(c(1,2), 2 + x$ratePositions[[h]])
 			lines.thisgroup <- union(lines.thisgroup,
 							2 + which(x$varyingObjectiveParameters))
 			lines.thisgroup <- sort(union(lines.thisgroup, 2 + which(x$set2)))
