@@ -105,27 +105,36 @@ and that it does not yet work for endowment or creation effect
  effects of one dependent variable at observation moments as defined in
  Section 3.1 of Indlekofer and Brandes (2013).
 
-A \code{sienaRI} object consists of following components:
+A \code{sienaRI} object is a list with the following components:
     \describe{
-    \item{- \code{dependentVariable}}{the name of the corresponding 
+    \item{- \code{dependentVariable}}{the name of the corresponding
           dependent variable.}
     \item{- \code{effectNames}}{the names of considered effects.}
-    \item{- \code{RIActors}}{is a list that contains the expected 
+    \item{- \code{RIActors}}{is a list that contains the expected
           relative importances of effects
           for each potential actor decision at observation moments.
           This is equation (3) in Indlekofer and Brandes (2013).}
-    \item{- \code{expectedRI}}{is a list that contains the expected 
+    \item{- \code{expectedRI}}{is a list that contains the expected
           relative importances of effects
           aggregated over all actors in each network observations.
           More precisely, it contains the averages of the actor related values
           in \code{RIActors}.
           This is equation (4) in Indlekofer and Brandes (2013).}
-    \item{- \code{absoluteSumActors}}{is a list that contains the sum of 
+    \item{- \code{IActors}}{is a list that contains the expected
+          importances of effects
+          for each potential actor decision at observation moments. This
+          is the numerator of equation (3) in Indlekofer and Brandes (2013).}
+    \item{- \code{expectedI}}{is a list that contains the expected
+          importances of effects
+          aggregated over all actors in each network observations.
+          More precisely, it contains the averages of the actor related values
+          in \code{IActors}.}
+    \item{- \code{absoluteSumActors}}{is a list that contains the sum of
           the (unstandardized) L1-differences
           calculated for each potential actor decision at observation moments.
-          This is the denominator of equation (3) 
+          This is the denominator of equation (3)
           in Indlekofer and Brandes (2013).}
-    \item{- \code{entropyActors}}{is a list that contains the entropy of each 
+    \item{- \code{entropyActors}}{is a list that contains the entropy of each
           potential actor decision at observation moments.}
     }
 }

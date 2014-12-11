@@ -9,7 +9,7 @@
 # * in sequences of simulated micro-steps
 # *****************************************************************************/
 
-##@sienaRIDynamics. Use as RSiena:::sienaRIDynamics()
+##@sienaRIDynamics
 sienaRIDynamics <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL, depvar=NULL, intervalsPerPeriod=NULL)
 {
 	if(length(data$depvars)>1){

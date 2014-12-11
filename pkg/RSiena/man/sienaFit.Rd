@@ -26,33 +26,34 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
   \item{object}{An object of class \code{sienaFit}, produced by
     \code{\link{siena07}}.}
   \item{x}{An object of class \code{sienaFit}, or
-    \code{summary.sienaFit} as appropriate}
-  \item{tstat}{Boolean: add the t-statistics for convergence to the report}
+    \code{summary.sienaFit} as appropriate.}
+  \item{tstat}{Boolean: if this is NULL, the t-statistics for convergence
+     will not be added to the report.}
   \item{type}{Type of output to produce; must be either \code{"tex"} or
-    \code{"html"}}
+    \code{"html"}.}
   \item{file}{Name of the file; defaults to the name of the \code{sienaFit}
-    object}
+    object.}
   \item{vertLine}{Boolean: add vertical lines separating the columns in
-    \code{siena.table}}
+    \code{siena.table}.}
   \item{tstatPrint}{Boolean: add a column of significance t values (parameter
-    estimate/standard error estimate) to \code{siena.table}}
+    estimate/standard error estimate) to \code{siena.table}.}
   \item{sig}{Boolean: adds symbols (daggers and asterisks) indicating
-    significance levels for the parameter estimates to \code{siena.table}}
-  \item{d}{The number of decimals places used in \code{siena.table}}
+    significance levels for the parameter estimates to \code{siena.table}.}
+  \item{d}{The number of decimals places used in \code{siena.table}.}
   \item{caption}{
-    See documentation for \code{\link[xtable]{xtable}}}
+    See documentation for \code{\link[xtable]{xtable}}.}
   \item{label}{
-    See documentation for \code{\link[xtable]{xtable}}}
+    See documentation for \code{\link[xtable]{xtable}}.}
   \item{align}{
-    See documentation for \code{\link[xtable]{xtable}}}
+    See documentation for \code{\link[xtable]{xtable}}.}
   \item{digits}{
-    See documentation for \code{\link[xtable]{xtable}}}
+    See documentation for \code{\link[xtable]{xtable}}.}
   \item{display}{
     See documentation for \code{\link[xtable]{xtable}}}
   \item{\dots}{
     Add extra parameters for  \code{\link[xtable]{print.xtable}}
     here. e.g.
-    \code{type}, \code{file}}
+    \code{type}, \code{file}.}
 }
 \description{
   \code{print}, \code{summary}, and \code{xtable} methods for

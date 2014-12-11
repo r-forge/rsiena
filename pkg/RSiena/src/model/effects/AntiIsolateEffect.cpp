@@ -26,7 +26,7 @@ AntiIsolateEffect::AntiIsolateEffect(
 {
 	this->lminDegree = minDegree;
 	// Indicates the minimum degree threshold
-	// hard-coded in EffectFactory.cpp to be 1 or 2
+	// hard-coded in EffectFactory.cpp to be 1 or 2 or 3.
 	this->loutAlso = outAlso;
 	// Indicates that also out-tie-isolation of alter is considered
 }
@@ -41,7 +41,7 @@ double AntiIsolateEffect::calculateContribution(int alter) const
 
 // The following could be combined in one statement
 // but this would require more comparisons.
-// Note that lminDegree can only be 1 or 2.
+// Note that lminDegree can only be 1 or 2 or 3.
 	if (lminDegree <= 1)
 	{
 		if ((degree <= 0) || ((degree <= 1) && (this->outTieExists(alter))))
@@ -59,10 +59,10 @@ double AntiIsolateEffect::calculateContribution(int alter) const
 			}
 		}
 	}
-	else // lminDegree = 2; implies !loutAlso
+	else // lminDegree >= 2; implies !loutAlso
 	{
-		if (((degree == 1)  && (!this->outTieExists(alter))) ||
-				((degree == 2) && (this->outTieExists(alter))))
+		if ((((degree+1) == lminDegree)  && (!this->outTieExists(alter))) ||
+				((degree == lminDegree) && (this->outTieExists(alter))))
 		{
 			change = 1;
 		}

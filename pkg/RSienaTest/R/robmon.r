@@ -157,7 +157,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     {
         z$AllUserFixed <- TRUE
     }
-    ##browser()
+
     repeat  ##this is startagain:
     {
       z$epsilonProblem <- FALSE
@@ -221,7 +221,6 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
                         break
                     }
                     z<- phase1.2(z, x, ...)
-                    ## browser()
                     if (!z$OK || z$DerivativeProblem ||
                         UserInterruptFlag() || UserRestartFlag())
                     {

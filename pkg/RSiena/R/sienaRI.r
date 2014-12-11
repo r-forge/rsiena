@@ -9,7 +9,7 @@
 # * in for potential desicions of actors at observation moments.
 # *****************************************************************************/
 
-##@sienaRI. Use as RSiena:::sienaRI()
+##@sienaRI
 sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 {
 	if (!inherits(data, "siena"))
@@ -184,7 +184,9 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 #				effects$type[!currentDepEffs],effects$interaction1[!currentDepEffs],sep=".")
 
 			expectedRI <- list()
+			expectedI <- list()
 			RIActors <- list()
+			IActors <- list()
 			absoluteSumActors <- list()
 			entropyActors <-list()
 			for(w in 1:waves)
@@ -214,11 +216,15 @@ expectedRelativeImportance <- function(conts, effects, theta, effectNames = NULL
 				absoluteSumActors[[w]] <- colSums(RIs_matrix)
 				entropyActors[[w]] <- entropies
 				expectedRI[[w]] <- rowSums(RIActors[[w]] )/dim(RIActors[[w]])[2]
+				IActors[[w]] <- RIs_matrix
+				expectedI[[w]] <- rowMeans(RIs_matrix)
 			}
 			RItmp <- NULL
 			RItmp$dependentVariable <- currentDepName
 			RItmp$expectedRI <- expectedRI
 			RItmp$RIActors <- RIActors
+			RItmp$expectedI <- expectedI
+			RItmp$IActors <- IActors
 			RItmp$absoluteSumActors <- absoluteSumActors
 			RItmp$entropyActors <- entropyActors
 			if(!is.null(effectNames))
@@ -306,6 +312,12 @@ L1D <- function(referenz = NULL, distributions = NULL)
 print.sienaRI <- function(x, ...){
 	if (!inherits(x, "sienaRI"))
 	{
+		if (inherits(x[[1]], "sienaRI"))
+		{
+			cat("The components of this object ")
+			cat("are Siena relative importance of effects objects.\n")
+			cat("Apply the print function to the separate components.\n")
+		}
 		stop("not a legitimate Siena relative importance of effects object")
 	}
 	cat(paste("\n  Expected relative importance of effects for dependent variable '",
@@ -313,16 +325,27 @@ print.sienaRI <- function(x, ...){
 	waves <- length(x$expectedRI)
 	effs <- length(x$effectNames)
 	colNames = paste("wave ", 1:waves, sep="")
-	line1 <- paste(format("", width =63), sep="")
+	line1 <- format("", width =63)
 	line2 <- paste(format(1:effs,width=3), '. ', format(x$effectNames, width = 56),sep="")
+	line3 <- line2
+	line4 <- format("  Entropy", width = 61)
 	for(w in 1:length(colNames))
 	{
 		line1 <- paste(line1, format(colNames[w], width=8),"  ", sep = "")
-		line2 <- paste(line2, format(round(x$expectedRI[[w]], 4), width=8, nsmall=4),"  ",sep="")
+		line2 <- paste(line2, format(round(x$expectedRI[[w]], 4), 
+									width=8, nsmall=4),"  ",sep="")
+		line3 <- paste(line3, format(round(x$expectedI[[w]], 4), 
+									width=8, nsmall=4),"  ",sep="")
+		line4 <- paste(line4, format(round(mean(x$entropyActors[[w]]), 4), 
+									width=8, nsmall=4),"  ",sep="")
 	}
 	line2 <- paste(line2, rep('\n',effs), sep="")
+	line3 <- paste(line3, rep('\n',effs), sep="")
 	cat(as.matrix(line1),'\n \n', sep='')
 	cat(as.matrix(line2),'\n', sep='')
+	cat("\n  Expected importance of effects for this dependent variable:\n\n")
+	cat(as.matrix(line3),'\n\n', sep='')	
+	cat(as.matrix(line4),'\n', sep='')	
 	invisible(x)
 }
 
@@ -388,7 +411,7 @@ plot.sienaRI <- function(x, col = NULL, addPieChart = FALSE,
 		}
 		if(is.null(legendHeight))
 		{
-			legendHeight <- max(0.6,ceiling(length(x$effectNames)/legendColumns)*0.2)
+			legendHeight <- max(0.8,ceiling(length(x$effectNames)/legendColumns)*0.2)
 		}
 	}
 	if(!is.null(height))
@@ -519,8 +542,8 @@ plot.sienaRI <- function(x, col = NULL, addPieChart = FALSE,
 			layoutMatrix <- matrix(c(1:(2*waves)), byrow= TRUE, ncol=2, nrow=waves)
 			layout(layoutMatrix,widths=c((actors/3),2),heights=rep(1,waves))
 		}
-		par( oma = c( 0, 0, 2, 0 ),
-		mar = par()$mar+c(4.1, 4.1, 1.1, 0.1), xpd=T , cex = 0.75, no.readonly = TRUE )
+#		par( oma = c( 0, 0, 2, 0 ),
+#		mar = par()$mar+c(4.1, 4.1, 1.1, 0.1), xpd=T , cex = 0.75, no.readonly = TRUE )
 	}else{
 		if(legend)
 		{
@@ -530,8 +553,8 @@ plot.sienaRI <- function(x, col = NULL, addPieChart = FALSE,
 			layoutMatrix <- matrix(c(1:waves), byrow= TRUE, ncol=1, nrow=waves)
 			layout(layoutMatrix,widths=c((actors/3)),heights=rep(1,waves))
 		}
-		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(4.1,4.1,1.1,3), xpd=T ,
-				cex = 0.75, no.readonly = TRUE )
+#		par( oma = c( 0, 0, 2, 0 ),mar = par()$mar+c(4.1,4.1,1.1,3), xpd=T ,
+#				cex = 0.75, no.readonly = TRUE )
 	}
 	for(w in 1:waves)
 	{

@@ -120,7 +120,7 @@
 \newcommand{\nextno}{\addtocounter{thisno}{1}\thethisno .\ }
 
 \hyphenation{Snij-ders Duijn Huis-man Steg-lich Schwein-ber-ger siena-Data-Create-From-Session
-             siena-Data-Create siena-Com-position-Change RSiena-Test}
+             siena-Data-Create siena-Com-position-Change RSiena-Test siena-Group}
 
 \newcommand{\interruptenum}{
       \setcounter{savenumi}{\value{enumi}}
@@ -190,7 +190,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-279.
+This version was renewed for \RS version 1.1-282.
 \end{abstract}
 
 
@@ -980,7 +980,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-279) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-282) and an R-forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1581,6 +1581,10 @@ is the method of joiners and leavers, described in Section~\ref{S_comp}.
 For actors present only at the last wave, the method of
 joiners and leavers is preferable.
 
+When endowment or creation effects are to be included in the
+model specification, changing structural values should not be used,
+and the method of joiners and leavers then also is preferable.
+
 Structurally determined values are defined by reserved codes in
 the input data: the value 10 indicates a structural zero, the
 value 11 indicates a structural one. Structurally determined
@@ -1849,6 +1853,11 @@ The object \texttt{changes} created by the functions
 \sfn{compositionChange} and can be used in the function
 \sfn{sienaDataCreate}.
 
+The method of joiners and leavers for representing composition change
+does not combine properly with the \sfn{sienaGOF} function
+(Section~\ref{S_gof}).
+
+
 \subsection{Using multiple processes}
 \label{S_multipleProcesses}
 \begin{enumerate}
@@ -1909,6 +1918,8 @@ SnijdersEA07, SnijdersEA10b}.
 
 The model is based on four functions, which first are explained in an
 intuitive way.
+They are defined specifically for all dependent variables (network, behavior,
+or more of these if included in the model).
 These functions depend on the actor (hence the name `actor-oriented')
 and on the state of the network, behavior, and covariates.
 All these functions are constituted by a weighted sum
@@ -1951,7 +1962,9 @@ functions (described below), the evaluation function evaluates only
 the local network neighborhood configuration that results from the
 change under consideration, without considering `where you come from'.
 In most applications, the evaluation function will
-be the main focus of model selection.\\
+be the main focus of model selection.
+
+\newpage
 \item {\em creation function }\\
 The creation function\footnote{A special case of the {\it gratification
 function} in \citet{Snijders01}.}
@@ -1961,20 +1974,29 @@ increasing or decreasing behavioral scores (when evaluating
 possible behavioral changes).
 It is a component of the probabilities of change only for changes in
 an upward direction: creation of new ties, augmentation of values
-of the behavior dependent variable.\\
+of the behavior dependent variable.
+Creation effects can be the creation parts of an evaluation effect,
+or elementary effects (see below).
+
 In the interpretation using satisfaction, the creation function
 models the gain in satisfaction incurred when network ties are created
-or behavioral scores are increased.\\
-\item {\em endowment function}\\
+or behavioral scores are increased.
+
+\item {\em endowment or maintenance function}\\
 The endowment function\footnote{The endowment function also is
-a special case of the {\it gratification function} in \citet{Snijders01}.}
+a special case of the {\it gratification function} in \citet{Snijders01}.},
+which also may be called \emph{maintenance function},
 also distinguishes between new and old network
 ties (when evaluating possible network changes) and between
 increasing or decreasing behavioral scores (when evaluating
 possible behavioral changes).
 It is a component of the probabilities of change only for changes in
-a downward direction: termination of existing ties, decrease of values
-of the behavior dependent variable.\\
+a downward direction: maintenance vs.\ termination of existing ties,
+decrease of values of the behavior dependent variable.
+
+Again, endowment effects can be the maintenance parts of an evaluation effect,
+or elementary effects (see below).
+
 In the interpretation using satisfaction, the endowment function
 models the loss in satisfaction incurred when network ties are dissolved or
 behavioral scores are decreased (hence the label `endowment').
@@ -2005,6 +2027,81 @@ For any given effect, normally it makes no sense to include the effect
 in all three roles: evaluation, creation, endowment.
 If one wishes to go beyond evaluation effects, then the user has to choose
 between adding an effect in either the creation or the endowment role.
+\bigskip
+
+\newpage
+\textbf{\emph{Elementary effects}}
+\medskip
+
+Not all contributions  to the probability of change can be written
+as the change in some basic function (evaluation function).
+Therefore we sometimes need to directly represent contributions to a
+tie change or behavior change, without invoking an evaluation function.
+This can be done by using elementary effects.
+(In \citet{Snijders01} this was called a gratification function;
+as a more neutral term, we now use the word `elementary effects'.)
+\smallskip
+
+\noindent
+\begin{minipage}[t]{.8\textwidth}
+The basic example here is transitive closure, which can be represented
+by the tendency toward forming closed triplets as in this figure.
+When the focal actor is $i$, ties that lead to the closure are
+$i \rightarrow j$ and $i \rightarrow h$; but the first of these ties
+means the closing of a two-path $i \rightarrow h \rightarrow j$, while
+the second means forming a tie to an actor $h$ who made the same outgoing
+choice to the third actor $j$, a sign of structural equivalence; 
+so these are distinct processes.
+The evaluation effect corresponding to the tendency toward forming
+closed triples
+is the \texttt{transTrip} effect, which is composed of the
+two distinct elementary effects
+\texttt{transTrip1}, contributing to creating or maintaining the $i \rightarrow j$ tie,
+and \texttt{transTrip2}, contributing to the $i \rightarrow h$ tie;
+see Section~\ref{S_math}.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.1\textwidth}
+\linethickness{0.3pt}
+\vfill
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\end{minipage}
+\smallskip
+
+An elementary effect is a contribution to the creation or maintenance of a tie,
+defined directly, i.e., without expressing it based on the
+change in some evaluation function.
+This means that elementary effects are more general than
+evaluation effects, and all effects could be represented as elementary effects.
+For the sake of interpretation, however, the evaluation function formulation
+is used whenever possible.
+
+Elementary effects can apply similarly to the creation and maintenance of a tie;
+or they can apply exclusively to tie creation, or exclusively to tie
+maintenance. In \RS the difference between elementary effects and evaluation effects
+is only in the internal programming code, and the
+possible values of the \texttt{type} of effect
+as specified in the effects object and the
+functions \sfn{includeEffects()} and \sfn{setEffect()}
+are only \texttt{eval}, \texttt{creat}, and \texttt{endow}.
+In Chapter~\ref{S_math} almost all effects are evaluation effects,
+and the effects that are elementary (and not evaluation) effects
+are mentioned as such.
 
 \subsubsection{Specification in \SI}
 
@@ -2114,16 +2211,27 @@ Similarly, define  $\Delta^-(x^0, x) = 1$ if $x$ has one tie less than $x^0$,
 meaning that a tie is dissolved by this change, and $\Delta^-(x^0, x) = 0$
 otherwise.
 Then the general definition of the objective function is
-\[
-   u_i(x^0, x) \,=\, \big(f_i(x) - f_i(x^0)\big)
-                   \,+\,  \Delta^+(x^0, x)\,\big(c_i(x) - c_i(x^0)\big)
-                   \,+\,  \Delta^-(x^0, x)\,\big(e_i(x) - e_i(x^0)\big)    \ .
-\]
+\begin{align}
+   u_i(x^0, x)  \,=\,  \label{u_i}   &
+      \big(f_i(x) -  f_i(x^0)\big)  \\
+                &   \,+\,   \Delta^+(x^0, x)\,\big(c_i(x) - c_i(x^0)\big)
+                   \,+\,  \Delta^-(x^0, x)\,\big(e_i(x) - e_i(x^0)\big)    \ . \nonumber
+\end{align}
 This shows that the change in creation function plays a role
 only if a tie is created ($\Delta^+(x^0,x) = 1$), and the change in
 endowment function plays a role
 only if a tie is dissolved ($\Delta^-(x^0,x) = 1$).
-\medskip
+
+If also elementary effects are included, then denote the linear combination
+for a tie variable $x_{ij}$
+for general (evaluation-type) elementary effects by  $f^{\rm{el}}_{ij}(x)$, for creation
+elementary effects by  $c^{\rm{el}}_{ij}(x)$, and for endowment elementary effects
+by  $e^{\rm{el}}_{ij}(x)$.
+To the objective function $ u_i(x^0, x)$ we then still have to add
+\[
+     f^{\rm{el}}_{ij}(x) \,+\,   \Delta^+(x^0, x)\, c^{\rm{el}}_{ij}(x)
+                   \,+\,  \Delta^-(x^0, x)\,e^{\rm{el}}_{ij}(x) \ .
+\]
 
 For behavior dynamics the definitions are analogous.
 Here a basic assumption is that, when there is an opportunity for change,
@@ -2916,7 +3024,7 @@ Value \texttt{modelType = 1} is for directed networks, values
       \texttt{modelType = 6}:\\ %BJOINT
       a pair of actors is chosen and reconsider
       whether a tie will exist between them;
-      this is based on the sum of their utilities
+      this is based on the sum of their objective functions
       for the existence of this tie.
 \end{enumerate}
 In the first two of these models, where the initiative is one-sided,
@@ -3286,6 +3394,9 @@ it often is advisable to use the defaults \sfn{center = FALSE},
 \sfn{scale = FALSE}, whereas for sets of statistics for which a common scale
 is less important, e.g., triad counts, a clearer picture may be obtained by
 plotting with \sfn{center = TRUE}, \sfn{scale = TRUE}.
+
+The method of joiners and leavers for representing composition change
+(Section~\ref{S_comp}) does not combine properly with the \sfn{sienaGOF} function.
 
 The examples in the help pages for \sfn{sienaGOF} and \sfn{sienaGOF-auxiliary}
 give ample help for how to use this function.
@@ -4017,9 +4128,14 @@ ML estimation is done by the function \sfn{siena07()}, using a set of options
 created by \sfn{sienaAlgorithmCreate()} with \sfn{maxlike=TRUE}.
 Bayesian estimation is done by the function \sfn{sienaBayes()}.
 The following further information in this section is about ML estimation;
-Bayesian estimation is a very new option (summer 2012) and further documentation
-still must be written.
+Bayesian estimation is as yet implemented only for multilevel network modeling
+group2 (Section~\ref{S_sienaBayes}).
 
+For ML estimation, the method of joiners and leavers (Section\ref{S_comp})
+is not available.
+Further, R may run into an error (the program will hang)
+if there are any actors who are inactive at the first wave,
+as indicated by all structural zeros.
 
 For ML estimation, an important parameter for tuning the
 algorithm is the so-called \textsf{Multiplication factor}. This determines
@@ -5735,6 +5851,16 @@ parameter values across the sub-projects;
 next one could follow approach (4), determining the randomness of the effects
 by the results about this variability.
 
+In all cases, it is probably best to use an identical model specification
+for the various groups. A problem that may occur especially if the groups
+are small is that in some of the groups the change of the dependent variable
+(network or behavior) may be upward only or downward only, which by default
+then will be regarded by \RS as a constraint for the simulations,
+as mentioned in Section~\ref{S_monotone}.
+This leads to model differences that in most cases will be undesirable.
+Therefore it is advisable in the original construction of the datasets
+to use \texttt{allowOnly = FALSE} in the call of \sfn{sienaDependent}.
+
 \subsection{Multi-group Siena analysis}
 \label{S_multigroup}
 
@@ -6107,8 +6233,9 @@ will be significant.
   covariance matrix for Metropolis-Hastings steps for groupwise parameters
   are obtained from, first, Method of Moments estimation of a parameter vector
   assumed to be the same across the groups (in a multi-group estimation),
+  with step size \sfn{initgainGlobal},
   followed by one subphase of the Robbins-Monro algorithm for Method of
-  Moments estimates for the groups separately, with step size \sfn{initgain}.
+  Moments estimates for the groups separately, with step size \sfn{initgainGroupwise}.
   The proposal covariance matrices then are scaled, in the
   function \sfn{improveMH}, to achieve about 25 out of 100 acceptances of
   Bayes proposals after single MH steps.
@@ -6117,8 +6244,12 @@ will be significant.
   a warming phase is done of \sfn{nwarm} Bayesian proposals
   each with a number of MH steps, followed again by the function \sfn{improveMH}.
   \item
-  Finally \sfn{nmain} repeats (of \sfn{nrunMHBatches} of a
-  number of MH steps plus Bayesian proposals) are performed.
+  Finally \sfn{nmain} repeats of \big(\sfn{nrunMHBatches} of a
+  number of MH steps sampling chains, plus \sfn{nSampVarying} MH steps
+  sampling the varying parameters ($\theta_j$) plus \sfn{nSampConst} MH steps
+  sampling the non-varying parameters ($\eta$) plus one Gibbs
+  step sampling the global mean and covariance matrix of the varying parameters
+  ($\mu$ and $\Sigma$)\big) are performed.
   In the warming as well as the final phase, the number of MH steps is
   determined by parameter \sfn{mult} (``multiplication factor'')
   in the call of \sfn{sienaAlgorithmCreate} that created the algorithm object.
@@ -6134,6 +6265,10 @@ will be significant.
 
 \sfn{sienaBayes} uses as data set a \sfn{sienaGroup} object with 2 or more groups.
 The number of waves should be the same for all groups.
+
+\sfn{sienaBayes} may run into an error (the program will hang)
+if there are any actors who are inactive at the first wave,
+as indicated by all structural zeros.
 
 \sfn{sienaBayes} should be possible for groups as small as 5 actors.
 A restriction (maybe to be lifted later) is that the networks must not be
@@ -6447,6 +6582,17 @@ f^{\rm net}_i(x) \, = \,
 \end{equation}
 where $\beta^{\rm net}_k$ are parameters and $s^{\rm net}_{ik}(x)$
 are effects as defined below.
+If the model also contains some elementary effects, the objective
+function is the sum of this and
+\begin{equation}
+f^{\rm el}_i(x) \, = \,
+              \sum_k \beta^{\rm el}_k s^{\rm el}_{ik}(x)  \ , \label{f_el_net}
+\end{equation}
+see Section~\ref{S_mathmod}.
+Elementary effects are of the type $s^{\rm el}_{ijk}(x) = x_{ij}\,s^{\rm el0}_{ijk}(x)$,
+where $s^{\rm el0}_{ijk}(x)$ does not depend on $x_{ij}$.
+
+
 
 The potential effects in the \hypertarget{T_objective}{network
 evaluation function}
@@ -6473,7 +6619,10 @@ non-directed case.
 
 \noindent
 Structural effects are the effects depending on the network only.
-
+The following list also contains some elementary effects.
+The type of the elementary effects in \RS still is \texttt{eval},
+indicating that its parameter is applied both for creating new ties
+and for maintaining existing ties.
 
 \begin{enumerate}
  \item  \hypertarget{T_density}{{\em out-degree effect}} or
@@ -6487,18 +6636,82 @@ Structural effects are the effects depending on the network only.
  defined by the number of reciprocated ties\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\,x_{ji}$;
 
+ \begin{minipage}[t]{.75\textwidth}
  \item \hypertarget{T_transtrip}{{\em transitive triplets effect}}
  \texttt{(transTrip)},
    defined by the number of transitive
  patterns in $i$'s relations (ordered pairs of actors
  $(j,h)$ to both of whom $i$ is tied, while also $j$ is tied to $h$),\\
  for directed networks,
-  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{ih}\, x_{jh}\,$;\\
+  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{ih}\, x_{hj}\,$;\\
  and for non-directed networks,
- $s^{\rm net}_{i\vit}(x) =  \sum_{j < h} x_{ij}\, x_{ih}\, x_{jh}\,$;\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_{j < h} x_{ij}\, x_{ih}\, x_{hj}\,$;\\
  there was an error here until version 3.313,
  which amounted to combining the transitive triplets and transitive
  mediated triplets effects;
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.13\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}\\
+
+ \item {\em transitive triplets effect type 1}  \texttt{(transTrip1)},
+  the elementary effect corresponding to creating or maintaining
+  the tie  $i \rightarrow j$ in the figure; this is transitive
+  closure in the strict sense of the term. The effect is\\
+  $s^{\rm el}_{i\vit}(x) =   x_{ij} \sum_{h} x_{ih}\, x_{hj}\,$;\\
+  
+
+ \begin{minipage}[t]{.75\textwidth}  
+ \item {\em transitive triplets effect type 2}  \texttt{(transTrip2)},
+  the elementary effect corresponding to creating or maintaining
+  the tie  $i \rightarrow j$  in the figure here; this could be 
+  called structural equivalence for outgoing ties \\(but 
+  note that there is also
+  the \texttt{balance} effect which is another implementation 
+  of structural equivalence equivalence for outgoing ties).\\
+  The effect is\\
+  $s^{\rm el}_{i\vit}(x) =   x_{ij} \sum_{h} x_{ih}\, x_{jh}\,$;
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.13\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}\\
+  
 
  \item {\em transitive mediated triplets effect} \texttt{(transMedTrip)},
  defined by the number of transitive patterns in $i$'s
@@ -6722,12 +6935,19 @@ for transitive ties for $\alpha=0$ and approximates the fit
 statistic for transitive triplets
 for large $\alpha$, the estimates are not the same because some other
 calculations are done differently. The issue is that the GWESP effects are
-not implemented as a true evaluation effect, but as a generic effect,
+not implemented as an evaluation effect, but as an elementary effect,
 where for the change statistic only changes of the tie $i \rightarrow j$ in
 (\ref{GWESP2}) are considered, and not of the tie $i \rightarrow h$.
 
-% Now implemented as generic network effect.
-% Perhaps the change statistic is not correct.
+Thus, the GWESP effects are defined in \RS as the elementary effects
+\begin{equation}
+ s^{\rm el}_{i\vit}(x) \,=\,
+       x_{ij} \,
+                        e^{\alpha} \,\Big\{1 \,-\, \big(1 -
+                        e^{-\alpha}\big)^{\sum_{h=1}^n x_{ih}x_{hj} }  \Big\}
+      \,   \ .
+         \label{GWESP3}
+\end{equation}
 
 It should be noted that although the GWESP statistic is not triadic but
 depends on higher-order configurations, still it is actor-oriented
@@ -6772,7 +6992,7 @@ $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha
   the sum of
  the in-degrees of the others to whom $i$ is tied,\\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, x_{+j} =
- \sum_j x_{ij} \sum_h x_{hj} $;\\
+ \sum_j x_{ij} \sum_h x_{hj} = \sum_j x_{ij} (\sum_{h \neq i} x_{hj} + 1)$;\\
  in \SI 3 until version 3.313, this effect was multiplied by a factor $1/n$;\\
  in \RS this effect has had a bug until version 1.1-219;\\
  in \RS the target statistic for this effect was multiplied by a factor $n$ until version 1.1-241;
@@ -6804,6 +7024,18 @@ $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha
  this often works better in practice than the raw activity effect
  for the same reasons as mentioned above for the sqrt measure of the popularity effect;
 
+ \item {\em reciprocal degree-related popularity effect} \texttt{(reciPop)}
+ defined by the sum of the reciprocal degrees
+ of the others to whom $i$ is tied,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, x^{(r)}_{j} $, \\
+ where the reciprocal degree is defined by\\
+ $ x^{(r)}_{j} = \sum_h x_{jh}x_{hj} $.
+
+ \item {\em reciprocal degree-related popularity (sqrt) effect } \texttt{(reciPopSqrt)}
+ defined by the sum of the square roots of the reciprocal degrees
+ of the others to whom $i$ is tied,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{x^{(r)}_{j}} $, \\
+ where the reciprocal degree is defined as above;
 
  \item[{\hspace*{-1ex}$\bigodot$}] for non-directed networks, the popularity and activity
  effects are taken together as ``degree effects'',
@@ -6833,6 +7065,11 @@ $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha
  (earlier called {\em out-degree$\,\hat{\ }$(1.5)}), defined by  \\
  $s^{\rm net}_{i\vit}(x) = x^{1.5}_{i+} = x_{i+}\,\sqrt{x_{i+}}$ \\
  endowment effect only likelihood-based;
+
+ \item {\em reciprocal degree-related activity effect} \texttt{(reciAct)}
+ defined by the degree of $i$ multiplied by $i$'s reciprocal degree,\\
+ $s^{\rm net}_{i\vit}(x) =   x_{i+}\, x^{(r)}_{i} $, \\
+ where the reciprocal degree is defined as above;
 
  \item {\em out-degree up to $c$} (\emph{truncated out-degree}),
  where $c$ is some constant
@@ -6961,12 +7198,21 @@ $s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1, x_{j+} = 0\} $;\\
       no incoming ties, and wishing not to sever connections to
       others who thereby would lose their last incoming connection: \\
 $s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1 \} $;
-\item \emph{anti in-near-isolates effect}, (\texttt{antiInIso2}),
+
+\item \emph{anti in-near-isolates effect}
+ = \emph{indegree at least 2 effect}, (\texttt{antiInIso2 = in2Plus}),
       the effect of
       wishing to make a new connection to others who currently have
       an indegree equal to 1, and wishing not to sever connections to
       others who currently have an indegree equal to 2:\\
 $s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 2 \} $;
+
+\item \emph{indegree at least 3 effect}, (\texttt{in3Plus}),
+      the effect of
+      wishing to make a new connection to others who currently have
+      an indegree equal to 2, and wishing not to sever connections to
+      others who currently have an indegree equal to 3:\\
+$s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 3 \} $;
 
 \item \emph{isolate popularity effect}, (\texttt{isolatePop}), the effect of
       being tied to actors who further are isolates
@@ -7245,28 +7491,52 @@ by Maximum Likelihood and Bayesian estimation.
 \setcounter{enumi}{\value{savenumi}}
  \item
  {\em  $XW => X$ closure-1 of covariate} \texttt{(XWX1)}, \\
- This is a generic effect, not an evaluation effect,
+ This is an elementary effect, not an evaluation effect,
  comprising of the  `$XW => X$ closure of covariate' effect
  only the contribution of the
  the number of weighted $X-W$ two-paths
  $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$.
  In other words, only the $i \rightarrow j$ tie in the figure
- is the dependent variable here.
- Although technically this is not an evaluation effect, its type
- in \RS still is \texttt{eval};
+ is the dependent variable here. The effect is defined as\\
+ $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{hj}\,$;\\
+ 
+
+\begin{minipage}[t]{.7\textwidth}
 \item
  {\em  $XW => X$ closure-2 of covariate} \texttt{(XWX2)}, \\
- This is a generic effect, not an evaluation effect,
+ This is an elementary effect, not an evaluation effect,
  comprising of the  `$XW => X $ closure of covariate' effect
  only the contribution of the number of weighted $X-W$ two-in-stars
  $i \stackrel{X}{\rightarrow} h $,
  $j \stackrel{W}{\rightarrow} h $.
- In other words, only the $i \rightarrow h$ tie in the figure
- is the dependent variable here.\\
- Although technically this is not an evaluation effect, its type
- in \RS still is \texttt{eval}.
-
-
+ In other words, only the $i \rightarrow j$ tie in the figure here
+ is the dependent variable. The effect is defined as\\
+ $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{jh}\,$.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 3.9 2.0
+\put{{\small $X$}} at 2.1 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 \medskip
@@ -7346,7 +7616,7 @@ the following effects are available:
 
  \item {\em indegree popularity from same covariate}
 \texttt{(sameXInPop)} defined by the
- number of incoming ties received by the others to whom $i$ is tied
+ number of incoming ties received by those to whom $i$ is tied
  and sent by others who have the same covariate value as $i$,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{hj} I\{v_i = v_h \} $;
 
@@ -7886,30 +8156,53 @@ by Maximum Likelihood and Bayesian estimation.
 
  \item
  {\em  XWX closure-1 of $W$}, \texttt{(cl.XWX1)} \\
- This is a generic effect, not an evaluation effect,
+ This is an elementary effect, not an evaluation effect,
  comprising of the  `XWX closure of $W$' effect
  only the contribution of the
  the number of mixed $X-W$ two-paths
  $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$.\\
- The interpretation is the closure of $X \rightarrow W$ paths,
- only as a consequence of the
- $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$
- twopaths.\\
- Although technically this is not an evaluation effect, its type
- in \RS still is \texttt{eval}.
+ So the dependent variable here is only the tie variable
+ $i \rightarrow j$ in the figure above. The effect is defined as\\
+ $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{hj}\,$;\\
+
+
+\begin{minipage}[t]{.7\textwidth}
  \item
  {\em  XWX closure-2 of $W$}, \texttt{(cl.XWX2)} \\
- This is a generic effect, not an evaluation effect,
+ This is an elementary effect, not an evaluation effect,
  comprising of the  `XWX closure of $W$' effect
  only the contribution of the number of mixed $X-W$ two-in-stars
  $i \stackrel{X}{\rightarrow} h $,
  $j \stackrel{W}{\rightarrow} h $.\\
- The interpretation is the closure of $X \rightarrow W$ paths,
- only as a consequence of the 
- $i \stackrel{X}{\rightarrow} h $,
- $j \stackrel{W}{\rightarrow} h $ two-in-stars.\\
- Although technically this is not an evaluation effect, its type
- in \RS still is \texttt{eval}.
+ In other words, only the $i \rightarrow j$ tie in the figure here
+ is the dependent variable. The effect is defined as\\
+ $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{jh}\,$.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 3.9 2.0
+\put{{\small $X$}} at 2.1 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+ 
  \item
 \begin{minipage}[t]{.7\textwidth}
  {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\
@@ -8599,7 +8892,7 @@ The list of these effects is the following.
  $s^{\rm beh}_{i\vit}(x, z) =  \sum_j x_{ij} x_{ji} x_{+j} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;
 
  \item {\em average alter effect} \texttt{(avAlt)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average behavior of his alters (a kind
  of ego-alter behavior covariance), \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, z_j \big)
@@ -8607,12 +8900,12 @@ The list of these effects is the following.
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
  \item {\em total alter effect} \texttt{(totAlt)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the sum of behavior of his alters, \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, z_j \big) ;  $\\
 
  \item {\em average in-alter effect} \texttt{(avInAlt)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average behavior of his in-alters (a kind
  of ego-alter behavior covariance), \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ji}\, z_j \big)
@@ -8620,24 +8913,24 @@ The list of these effects is the following.
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
  \item {\em total alter effect} \texttt{(totInAlt)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the sum of behavior of his in-alters, \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ji}\, z_j \big) ;  $\\
 
  \item {\em average reciprocated alter effect} \texttt{(avRecAlt)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average behavior of his reciprocated alters, \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, x_{ji}\, z_j \big)
                                 / \big (\sum_j x_{ij}\, x_{ji} \big)  $\\
  (and 0 if the ratio is 0/0) ;
 
  \item {\em total reciprocated alter effect} \texttt{(totRecAlt)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the sum of behavior of his reciprocated alters, \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, x_{ji}\, z_j \big);  $\\
 
  \item {\em average alter effect at distance 2} \texttt{(avAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average of the alter-averages $\breve z_j^{(-i)}$ of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any),
  defined by
@@ -8655,28 +8948,31 @@ The list of these effects is the following.
 
 
  \item {\em total alter effect at distance 2} \texttt{(totAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the total of the alter-totals  of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any),\\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\, \sum_{h \neq i} x_{jh}\,z_h =
          z_i \sum_j x_{ij}\, (x_{j+}- x_{ji}) \, \breve z_j^{(-i)}  $;
 
  \item {\em average total alter effect at distance 2} \texttt{(avTAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average of the alter-totals of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any),\\[0.3ex]
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\,(x_{j+}- x_{ji}) \, \breve z_j^{(-i)} \big)
-                                / \big (\sum_j x_{ij}\big)  $\\[0.5ex]
+                                / \big (\sum_j x_{ij}\big)
+ =  z_i
+     \big( \sum_j x_{ij} \sum_{h \neq i} x_{jh}\,z_h \big) / \big( \sum_j x_{ij} \big)
+                                $\\[0.5ex]
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
  \item {\em total average alter effect at distance 2} \texttt{(totAAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the total of the alter-averages $ z_j^{(-i)}$ of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any), \\[0.3ex]
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \breve z_j^{(-i)} \big) $;
 
  \item {\em average incoming alter effect at distance 2} \texttt{(avInAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average of the incoming alter
  averages $\check z_j^{(-i)}$ of his alters,
  excluding the contribution from a tie $i \rightarrow j$ (if any),
@@ -8694,14 +8990,14 @@ The list of these effects is the following.
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
  \item {\em total incoming alter effect at distance 2} \texttt{(totInAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the total of the incoming alter-totals  of his alters,
  excluding the contribution from a tie $i \rightarrow j$ (if any),\\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\, \sum_{h \neq i} x_{hj}\,z_h =
          z_i \sum_j x_{ij}\, (x_{+j}- x_{ij}) \, \check z_j^{(-i)}  $;
 
  \item {\em average total incoming alter effect at distance 2} \texttt{(avTInAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average of the incoming alter-totals of his alters,
  excluding the contribution from a tie $i \rightarrow j$ (if any),\\[0.3ex]
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\,(x_{+j}- x_{ij}) \, \check z_j^{(-i)} \big)
@@ -8709,20 +9005,34 @@ The list of these effects is the following.
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
  \item {\em total average incoming alter effect at distance 2} \texttt{(totAInAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the total of the incoming alter-averages $ z_j^{(-i)}$ of his alters,
  excluding the contribution from a tie $i \rightarrow j$ (if any), \\[0.3ex]
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \check z_j^{(-i)} \big) $;
 
+ \item {\em maximum alter effect} \texttt{(maxAlt)},
+ defined by  $i$'s
+ behavior multiplied by the maximum behavior of his alters, \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \text{max}_j \, x_{ij}\, z_j \big) $\\
+ (and the mean behavior, i.e. $0$, if $\sum_j x_{ij} = 0$) ;
+
+ \item {\em minimum alter effect} \texttt{(minAlt)},
+ defined by  $i$'s
+ behavior multiplied by the minimum behavior of his alters, \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \text{min}_j \, x_{ij}\, z_j \big) $\\
+ (and the mean behavior, i.e. $0$, if $\sum_j x_{ij} = 0$) ;
+
 
  \item {\em dense triads effect} \texttt{(behDenseTriads)},
- defined by the number of dense triads in which actor $i$ is
+ defined by  $i$'s
+ behavior multiplied by the number of dense triads in which actor $i$ is
  located, \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h} I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
  + x_{jh}\, + x_{hj}\,)\geq c \}\,$,\\
  where $c$ is either 5 or 6; \\
 
- \item {\em peripheral effect}, defined by the number of dense triads to which actor $i$ stands
+ \item {\em peripheral effect}, defined by  $i$'s
+ behavior multiplied by the number of dense triads to which actor $i$ stands
  in a unilateral-peripheral relation,\\
  $s^{\rm beh}_{i\vit}(x, z) =  \\[0.4ex]
  \phantom{abcdef} z_i \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
@@ -8807,7 +9117,7 @@ denoted $v_j$), there are the following effects.
       $v_i = z_i$ it would reduce to the latter effect.
 
  \item {\em alter's distance-two covariate average} effect on behavior $z$ \texttt{(avXAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average of the alter-averages $\breve v_j^{(-i)}$ of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any),
  defined by
@@ -8826,7 +9136,7 @@ denoted $v_j$), there are the following effects.
  instead of the behavior $Z$;
 
  \item {\em alter's distance-two covariate total} effect on behavior $z$ \texttt{(totXAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the total of the alter-totals on $V$ of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any),\\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\, \sum_{h \neq i} x_{jh}\,v_h =
@@ -8835,7 +9145,7 @@ denoted $v_j$), there are the following effects.
  instead of the behavior $Z$;
 
  \item {\em average total covariate alter effect at distance 2} \texttt{(avTXAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average of the alter-totals on $V$ of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any),\\[0.3ex]
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\,(x_{j+}- x_{ji}) \, \breve v_j^{(-i)} \big)
@@ -8845,7 +9155,7 @@ denoted $v_j$), there are the following effects.
  instead of the behavior $Z$;
 
  \item {\em total average covariate alter effect at distance 2} \texttt{(totAXAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the total of the alter-averages on $V$ of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any), \\[0.3ex]
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \breve v_j^{(-i)} \big) $;\\[0.5ex]
@@ -8853,7 +9163,7 @@ denoted $v_j$), there are the following effects.
  instead of the behavior $Z$;
 
  \item {\em alter's distance-two incoming covariate average} effect on behavior $z$ \texttt{(avXInAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average of the incoming alter-averages $\check v_j^{(-i)}$ of his alters,
  excluding the contribution from a tie $j \rightarrow i$ (if any),
  defined by
@@ -8872,7 +9182,7 @@ denoted $v_j$), there are the following effects.
  instead of the behavior $Z$;
 
  \item {\em alter's distance-two incoming covariate total} effect on behavior $z$ \texttt{(totXInAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the total of the incoming alter-totals on $V$ of his alters,
  excluding the contribution from a tie $i \rightarrow j$ (if any),\\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\, \sum_{h \neq i} x_{hj}\,v_h =
@@ -8881,7 +9191,7 @@ denoted $v_j$), there are the following effects.
  instead of the behavior $Z$;
 
  \item {\em average total incoming covariate alter effect at distance 2} \texttt{(avTXInAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the average of the incoming alter-totals on $V$ of his alters,
  excluding the contribution from a tie $i \rightarrow j$ (if any),\\[0.3ex]
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\,(x_{+j}- x_{ij}) \, \check v_j^{(-i)} \big)
@@ -8891,7 +9201,7 @@ denoted $v_j$), there are the following effects.
  instead of the behavior $Z$;
 
  \item {\em total average incoming covariate alter effect at distance 2} \texttt{(totAXInAltDist2)},
- defined by the product of $i$'s
+ defined by  $i$'s
  behavior multiplied by the total of the incoming alter-averages on $V$ of his alters,
  excluding the contribution from a tie $i \rightarrow j$ (if any), \\[0.3ex]
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x_{ij}\, \check v_j^{(-i)} \big) $;\\[0.5ex]
@@ -9238,7 +9548,9 @@ The evaluation function for behavior is given by
 f^{\rm beh}_i(x, z) \, = \, \sum_k \beta^{\rm beh}_k s^{\rm beh}_{ik}(x, z) \ ,
 \]
 see (\ref{f_beh}).
-In many cases the effect has the form of a product
+In many cases\footnote{For effects satisfying this condition,
+the \texttt{interactionType} is defined as \texttt{OK}.}
+the effect has the form of a product
 \begin{equation}
 s^{\rm beh}_{ik}(x, z) \,=\, z_i \,s^{0}_{ik}(x, z) \ ,  \label{beh_generic}
 \end{equation}
@@ -9247,14 +9559,14 @@ where $s^{0}_{ik}(x, z)$ is not dependent on $z_i$
 would not be affected by the outcome of a behavior ministep of actor $i$.
 Examples are the main effect of an actor attribute, but also the
 average alter effect.
-Such effects are called \emph{generic} effects.
-For generic effects, when a ministep in behavior occurs, the contribution
+For such effects,
+when a ministep in behavior occurs, the contribution
 on the probability distribution of the change is as follows:
 a change of $z_i $ by --1 will decrease the evaluation function by
 $\beta^{\rm beh}_k s^{0}_{ik}(x, z)$,
 and a change by +1 will increase it by the same amount.
 (Note that this amount does not depend on the value of $z_i$
-because of the definition of a generic effect.)
+because of the mentioned condition.)
 Therefore, the log-odds-ratio of an increase in behavior compared to
 staying constant that can be attributed to a difference of +1 in the
 value of the predictor function $s^{0}_{ik}(x, z)$, is equal to
@@ -11177,18 +11489,60 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
-\item 2014-11-13  Revision 279.
+\item 2014-12-11 R-Forge Revision 282.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
-   \item Effects \texttt{AltsAvAlt} renamed to \texttt{avXAlt}.
+   \item Effects \texttt{cl.XWX} and \texttt{cl2.XWX} corrected (thanks to Christoph Stadtfeld)
+     (\sfn{MixedTwoPathTable.cpp}).
+   \item \texttt{interactionType} of \texttt{gwesp..} effects was made \texttt{dyadic} 
+      (\sfn{allEffects.csv})
+   \item Some layout changes in warning message, \sfn{phase3.r}.
+   \item New effects \texttt{reciPop, reciAct, in3Plus, maxAlt, minAlt, transTrip1, transTrip2}.
+   \item Effect \texttt{antiInIsolate2} got alias \texttt{in2Plus}.
+   \item \texttt{inPop} is dyadic effect (except for non-directed networks)
+     (it is $\sum_j x_{ij} \{\sum_{h \neq i} x_{hj} + 1\}$).
+   \item \texttt{egoX} added as effect for non-directed networks
+     (can be important for representing effects of group-level covariates
+     in multi-group analyses).
+   \item Components \texttt{IActors} and \texttt{expectedI} added to \sfn{sienaRI()}
+     and \sfn{print.sienaRI()},
+     with the parameter \texttt{relative} in \sfn{plot.sienaRI()}.
+   \item The check for \texttt{MaxDegree} when running \sfn{siena07()} now works properly also
+     for \sfn{sienaGroup} objects.
+   \item Manual introduces the term \emph{elementary effects}.
+\end{itemize}     
+Changes in RSienaTest:
+\begin{itemize}
+   \item \sfn{sienaBayes}: the stop caused by singularity of the precision
+     matrix after the multi-group estimation now is circumvented;
+	 still a warning is printed to the screen.
+  \item \sfn{sienaBayes:} option \texttt{priorRatesFromData} changed to values 0-1-2,
+     with 0 = former \texttt{FALSE}, 1 = former \texttt{TRUE}, 2 = robust estimation of prior
+     for rate parameters from estimates at the end of initialization phase.
+  \item Correction of \sfn{print.summary.sienaBayesFit} for models
+     with more than one dependent variable.
+\end{itemize}
+
+\item 2014-11-19   R-Forge Revision 280.
+Changes in RSienaTest:
+\begin{itemize}
+\item Small changes in help pages for \sfn{sienaGOF()} and for \sfn{sienaCompositionChange()}.
+\item New parameters \texttt{nSampVarying} and \texttt{nSampConst} in \sfn{sienaBayes()}.
+\end{itemize}
+
+\item 2014-11-13  R-Forge Revision 279.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item Effect \texttt{AltsAvAlt} renamed to \texttt{avXAlt}.
    \item Effects object no longer used as argument for \sfn{print01Report}.
    \item A lot of new effects: \texttt{sameXInPop, transRecTrip2, totAlt, avInAlt, totInAlt,
      totRecAlt, totXAlt, avXInAlt, totXInAlt,
-	 avAltDist2, totAltDist2, avTAltDist, totAAltDist2,
-	 avXAltDist, totXAltDist2, avTXAltDist, totAXAltDist2,
-	 avInAltDist2, totInAltDist2, avTInAltDist, totAInAltDist2,
-	 avXInAltDist2, totXInAltDist2, avTXInAltDist, totAXInAltDist2,
+	 avAltDist2, totAltDist2, avTAltDist2, totAAltDist2,
+	 avXAltDist, totXAltDist2, avTXAltDist2, totAXAltDist2,
+	 avInAltDist2, totInAltDist2, avTInAltDist2, totAInAltDist2,
+	 avXInAltDist2, totXInAltDist2, avTXInAltDist2, totAXInAltDist2,
      XWX1, XWX2, cl.XWX1, cl.XWX2}.
    \item Endowment and creation effects added for \texttt{gwesp...} effects.
    \item Some meaningless effects for two-mode networks dropped.
@@ -11212,7 +11566,7 @@ Changes in RSiena and RSienaTest:
    \item Correction of printing errors arising when result of score-type test is \texttt{NA}.
    \item \texttt{maxRatio} checked for \texttt{NA} or \texttt{NaN} in \sfn{phase2.r}.
    \item \texttt{Siena\_algorithms4.tex} renamed \texttt{Siena\_algorithms.tex};
-         this document now is made available also at the \SI website.
+         this document now is made available as a pdf file at the \SI website.
    \item Some improvement of error messages for \sfn{sienaTimeTest()}.
    \item $p$-value for goodness of fit (\sfn{sienaGOF()}) rounded to 3 decimal places.
    \item File \sfn{effects.pdf} dropped from \texttt{{$\backslash$}inst{$\backslash$}doc}
@@ -12184,7 +12538,7 @@ New print, summary and edit methods for Siena effects objects
 
 \item 2010-04-13 R-forge revision 79 new function: sienaTimeTest.
 \item 2010-04-12 R-forge revision 78 fix minor bugs in reports, allow character
-  input to effect utility functions, inlcude effect1-3 etc on diaplay of
+  input to effect utility functions, include effect1-3 etc on display of
   included effects in siena01Gui().
 \item 2010-04-12 R-forge revision 77 (RSiena only) As for RSienaTest revision 76
 \begin{itemize}

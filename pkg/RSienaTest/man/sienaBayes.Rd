@@ -12,7 +12,7 @@
 sienaBayes(data, effects, algo,  saveFreq=100,
     initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2,
     priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
-    priorRatesFromData=TRUE,
+    priorRatesFromData=2,
     frequentist=FALSE, incidentalBasicRates=FALSE,
     reductionFactor=1, gamma=0.5, delta=1e-04,
     nwarm=50, nmain=250,
@@ -53,7 +53,7 @@ glueBayes(z1, z2, nwarm2=0)
   \item{priorMu}{Vector of length equal to the number of varying parameters.
    Prior mean of mu (global population mean); default:
    0. For the basic rate parameters the defaults are data-dependent,
-   but if (not \code{priorRatesFromData}) and \code{priorMu=NULL},
+   but if ((\code{priorRatesFromData >= 1}) and \code{priorMu=NULL}),
    then for these parameters the prior mean will be 2.}
   \item{priorSigma}{Square matrix of dimension equal to length of priorMu.
    Prior global population covariance matrix Sigma; default: identity matrix.}
@@ -61,9 +61,12 @@ glueBayes(z1, z2, nwarm2=0)
     covariance matrix); default: number of varying parameters + 2.}
   \item{priorKappa}{Proportionality constant between prior covariance matrix
     and covariance matrix of prior distribution for mu; default: 1.}
-  \item{priorRatesFromData}{Boolean. Should the prior distribution for the
-   rate parameters be taken from the data. If TRUE, this supersedes
-   the values in priorMu and priorSigma for the rate parameters.}
+  \item{priorRatesFromData}{0, 1, or 2. Determines the prior distribution for the
+   rate parameters. 0: prior is taken from \code{priorMu} and \code{priorSigma};
+   1: prior is defined by mean and covariance matrix of estimated rate parameters
+   from initialization phase;
+   2: prior is defined by robust estimates for location and multivariate scale
+   of estimated rate parameters from initialization phase.}
   \item{frequentist}{Currently only frequentist=FALSE works.
     Boolean: chooses between frequentist or Bayesian
     estimation of the global parameters.
@@ -72,12 +75,14 @@ glueBayes(z1, z2, nwarm2=0)
   parameters are defined specifically for each group, and estimated
   using a Robbins Monro algorithm; if FALSE, they have a
   common prior for all groups.}
-  \item{reductionFactor}{Positive number. The prior distribution for the rate
-   parameters is the observed covariance matrix of the estimated rate parameters
+  \item{reductionFactor}{Positive number. 
+   If \code{priorRatesFromData} = 1 or 2, the prior distribution for the rate
+   parameters is the estimated covariance matrix of the estimated rate parameters
    in the initialization phase multiplied by \code{reductionFactor}.
    For many data sets the default will be OK. If the rate parameters diverge,
    as evidenced by the traceplots of the posterior values,
-   then a smaller value is advisable, such as 0.01.}
+   then a smaller value is advisable, such as 0.01.
+   Has no effect if \code{priorRatesFromData} = 0.}
   \item{gamma}{Positive number, used only for frequentist estimation:
   the gain factor in the Robbins Monro algorithm is
   initfgain * ((iteration number)^(-gamma)).}

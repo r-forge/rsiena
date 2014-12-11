@@ -72,7 +72,9 @@ descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL,
   \item{perc}{ 1 minus confidence level for the confidence bands (two sided). }
   \item{main}{ Main title of the plot. }
   \item{ylab}{ The y-axis label for the plot. }
-  \item{\dots}{Other arguments.}
+  \item{\dots}{Other arguments; e.g., \code{levls} for \code{sienaGOF()} where
+      \code{levls} is a parameter for the auxiliary statistic as in
+      \code{\link{sienaGOF-auxiliary}}.}
   \item{showAll}{If FALSE, drops statistics with variance 0, like in the plot.}
 }
 \details{
@@ -199,6 +201,8 @@ We recommend the following heuristic approach to model checking:
          \code{\link{sienaTimeTest}} }
 \examples{
 \dontrun{
+# Illustration just for showing a case with two dependent networks;
+# running time backwards is not meaningful!
    mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
    mynet2 <- sienaDependent(array(c(s503, s502, s501), dim=c(50, 50, 3)))
    mybeh <- sienaDependent(s50a, type="behavior")
@@ -233,7 +237,8 @@ We recommend the following heuristic approach to model checking:
    plot(gofb)
 
    gofo <- sienaGOF(ans, OutdegreeDistribution, verbose=TRUE, join=TRUE,
-	                varName="mynet1", cumulative=FALSE)
+                    varName="mynet1", levls=0:6, cumulative=FALSE)
+   # levls is an example of "...".
    gofo
    plot(gofo)
 }

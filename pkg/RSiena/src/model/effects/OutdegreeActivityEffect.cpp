@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "OutdegreeActivityEffect.h"
-#include "network/Network.h"
+#include "network/OneModeNetwork.h"
 #include "model/variables/NetworkVariable.h"
 
 namespace siena
