@@ -38,7 +38,9 @@ protected:
 	bool missingInDummy(int i) const;
 	double averageInAlterValue(int i) const;
 	double totalInAlterValue(int i) const;
-	double similarityNetwork(int i, int j) const;
+	double similarityAvAltNetwork(int i, int j) const;
+	double varOutAvSimilarityNetwork(int i, int j) const;
+	double varInAvSimilarityNetwork(int i, int j) const;
 
 private:
 	double * laverageAlterValues;

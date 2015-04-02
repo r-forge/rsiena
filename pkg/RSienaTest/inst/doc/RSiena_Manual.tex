@@ -191,7 +191,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-282.
+This version was renewed for \RS version 1.1-284.
 \end{abstract}
 
 
@@ -223,7 +223,7 @@ statistical estimation of models for repeated measures of social
 networks according to the Stochastic Actor-oriented Model
  (`SAOM') of \citet{SnijdersDuijn97}, \citet{Snijders01},
 \citet{SnijdersEA07},  \citet{SnijdersEA10a},
-and \citet{Greenan14}; also see \citet{SteglichEA10}.
+and \citet{Greenan15}; also see \citet{SteglichEA10}.
 A tutorial for these models is in \citet{SnijdersEA10b}.
 
 A website for \SI is maintained at
@@ -324,16 +324,13 @@ More specific references are \citet{Schweinberger12} for the score-type goodness
 of fit tests and \citet{SchweinbergerSnijders07a} for the calculation of
 standard errors of the Method of Moments estimators.
 For the model for diffusion of innovations in dynamic networks,
-please refer to \citet{Greenan14}.
+please refer to \citet{Greenan15}.
 For assessing and
 correcting time heterogeneity, and goodness of fit assement and associated model
 selection considerations, refer to \citet*{Lospinoso2011} and \citet{Lospinoso2012}.
 
 \newpage
 %\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
-\part{Minimal Intro}
-
-
 
 \section{Getting started with \SI}
 \label{S_minsi1}
@@ -554,7 +551,7 @@ how actors increase, decrease, or maintain the level of their behavior.\\
 
 A special case of the fourth type is the
 \emph{diffusion of innovations in dynamic networks}
-\citep{Greenan14}:
+\citep{Greenan15}:
 here the behavior variable representing
 having adopted the innovation is binary, coded 0 or 1, and
 once an actor has the value 1 s/he is stuck with it.
@@ -746,7 +743,7 @@ different impact) of effects for the increase and the decrease of behavior.
 \subsubsection{Outline of estimation procedure}
 \label{S_estim}
 \noindent
-\SI estimates parameters by the following procedure:
+\SI estimates parameters by the function \sfn{siena07()}, using the following procedure:
 \begin{enumerate}
 \item  Certain statistics are used that reflect the parameter values;\\
   the finally obtained parameters should be such that the \emph{expected
@@ -780,6 +777,10 @@ different impact) of effects for the increase and the decrease of behavior.
   used for the absolute value), the estimation must be repeated.
    Standard errors for the parameters are also estimated in this
   phase.
+
+  If the estimation has to be repeated, this can be done by employing the
+  argument \texttt{prevAns} in the call of \sfn{siena07()}.
+  See the help page for  \sfn{siena07()}.
 \end{enumerate}
 \end{enumerate}
 
@@ -794,19 +795,84 @@ different impact) of effects for the increase and the decrease of behavior.
 	\item	Simulation without estimation (Section~\ref{S_sim})
 \end{itemize}
 
-\subsection{Installing and using \SI within \Rn}
+\subsection{Installing \R and \SI }
 \label{S_use}
 \noindent
-This section gives an overview of steps one needs to go through from
+This and the next section give an overview of steps one needs to go through from
 installing \R to running models in \rs.
+Installing needs to be done only once (but should be repeated when next versions
+of the software appear).
 
 \begin{enumerate}
-	\item	Install \Rn.
+	\item	Install \Rn.\\
+            This can be done from \url{http://cran.r-project.org/} .\\
+            Many users prefer some kind of additional environment, such as \texttt{RStudio}, or
+            the combination of \texttt{Notepad++} with \texttt{NppToR}.
 	\item	Install the package \RS or \sfn{RSienaTest}, with dependencies.
             The other packages used are \sfn{tcltk}, \sfn{network}, \sfn{codetools},
             \sfn{lattice}, \sfn{MASS}, \sfn{parallel}, \sfn{xtable}, and \sfn{tools}.
             For goodness of fit testing it will be useful also to
-            install \sfn{sna} and \sfn{igraph}.
+            install \sfn{sna} and \sfn{igraph}.\\
+            You can just install \RS and the other packages
+            in the regular way from CRAN.
+            However, it is advisable to have the latest version of \RS
+            or \sfn{RSienaTest} from R-Forge or the \SI website.
+            You can go to\\
+               \url{http://r-forge.r-project.org/R/?group_id=461} \\
+               or to\\
+              \url{http://www.stats.ox.ac.uk/~snijders/siena/siena_downloads.htm}\\
+            and there download the appropriate version of the package
+            appropriate for your operation system (Windows, Mac, Unix). \\
+            Installation can be done in various ways --- by the function \texttt{install.packages()}
+            in \Rn,
+            via the drop-down menu in the \R console, or in command mode which for Mac is
+            the `terminal'.
+            If a binary file is available (\texttt{.zip} for Windows, \texttt{.tgz} for Mac),
+            then using the binary is recommended.
+            Installation from binary is much faster than installation from source.
+
+            Installation from the R-Forge repository can be done as follows.
+            In these commands, \texttt{RSienaTest} can be replaced by \texttt{RSiena}.
+            \begin{itemize}
+            \item for Windows:\\
+            \texttt{install.packages("RSienaTest", repos="http://R-Forge.R-project.org")}
+            \item for Mac the binary file code is not available on R-Forge, but the source code
+            may also work:\\
+            \texttt{install.packages("RSienaTest", repos="http://R-Forge.R-project.org", type = "source")}\\
+            If this does not work, try one of the following methods.
+            \end{itemize}
+
+            Installation from a downloaded file can be done as follows, assuming
+            the root name of the file is \texttt{RSienaTest\_1.1-282}, and filling in the correct path name.
+            It will be convenient to first navigate to the directory
+            containing the \RS binary or source file so that this is the current directory.
+            Then the pathname consists only of the filename.
+            \begin{itemize}
+            \item In \R from binary:\\
+            for Windows:\\
+             \texttt{install.packages("pathname to RSienaTest\_1.1-282.zip", repos = NULL, type="binary")}\\
+            for Mac:\\
+             \texttt{install.packages("pathname to RSienaTest\_1.1-282.tgz", repos = NULL, type="binary")}
+             \item In \R from source:\\
+            \texttt{install.packages("RSienaTest\_1.1-282.tar.gz", repos = NULL, type="source")}
+            \item In \text{command.com} or in batch mode (Windows) from binary:\\
+            \texttt{R CMD INSTALL RSienaTest\_1.1-282.zip}
+            \item In the terminal (Mac) from binary:\\
+            \texttt{R CMD INSTALL RSienaTest\_1.1-282.tgz}
+            \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
+            \texttt{R CMD INSTALL RSienaTest\_1.1-282.tar.gz}
+            \item In drop-down menu in \Rn:\\
+            for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
+            for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
+            \item In \sfn{RStudio}:\\
+            go to Tools  $\rightarrow$ Install packages $\rightarrow$ Install From: Package archive file (zip; tar.gz)
+            \end{itemize}
+   \end{enumerate}
+
+
+\subsection{Using \SI within \Rn}
+
+   \begin{enumerate}
 	\item	Load data (networks, behavior, covariates) into \R
             (see Section~\ref{S_datatypes}):
 	\begin{enumerate}
@@ -874,7 +940,7 @@ The following scripts on the \RS website go through the steps
 outlined in the previous section, providing additional details and options: \\
 \begin{itemize}
     \item \sfn{basicRSiena.r}: a minimal example of a basic sequence of commands
-           for estimating a model by function sfn{siena07()} of \rs.
+           for estimating a model by function \sfn{siena07()} of \rs.
 	\item \sfn{Rscript01DataFormat.R}: gives a brief overview of \R functions
             and data formats that are essential for using \rs.
 	\item \sfn{Rscript02SienaVariableFormat.R}: shows how to prepare data
@@ -981,7 +1047,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-282) and an R-forge revision
+  identified by a version number (e.g.\ 1.1-284) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -993,20 +1059,20 @@ For technical problems running \rs, follow the following points.
   necessary by downloading the tarball or binary and installing from that, but
   it is better to update your \Rn.)
 \item [Check both repositories] We have two repositories in use for \rs: CRAN
-  and R-forge. The latest version will always be available from
-  R-forge. (Frequent updates are discouraged on CRAN, so bug-fixes are likely to
-  appear first on R-forge.)
-\item[Installation] When using the repository at R-forge, \emph{install} the
+  and R-Forge. The latest version will always be available from
+  R-Forge. (Frequent updates are discouraged on CRAN, so bug-fixes are likely to
+  appear first on R-Forge.)
+\item[Installation] When using the repository at R-Forge, \emph{install} the
   package rather than updating it. Then check the version and revision numbers.
 \item[Users' group] Consult the archives of the Users' Group mentioned above, or post
      a message to the Users' Group. In your message,
      please tell which operating system, which version of \Rn, and which version
      of \RS you are using.
-\item[R-forge help list]
+\item[R-Forge help list]
      For technical questions about the \RS code (as distinct from the
      methodology), you can send an email to
      rsiena-help@lists.r-forge.r-project.org, or post in the help forum for \RS in
-     R-forge. You need to be a registered member of R-forge (and possibly of \rs)
+     R-Forge. You need to be a registered member of R-Forge (and possibly of \rs)
      to post to a forum, but anyone can send emails (at present!). In your message,
      please tell us which operating system, which version of \Rn, and which version
      of \RS you are using.
@@ -1069,13 +1135,23 @@ presented in the current section.
 
 In general, data specification in \RS consists of two steps.
 First, the role of each variable to be used must be defined using
-the functions \sfn{sienaDependent}, \sfn{coCovar}, \sfn{varCovar},
-\sfn{coDyadCovar}, \sfn{varDyadCovar}, or \sfn{sienaCompositionChange}.
+the functions \sfn{sienaDependent()}, \sfn{coCovar()}, \sfn{varCovar()},
+\sfn{coDyadCovar()}, \sfn{varDyadCovar()}, or \sfn{sienaCompositionChange()}.
 Second, the variables must be combined into one \RS data set by the function
-\sfn{sienaDataCreate}.\footnote{It is advisable to use names of variables
+\sfn{sienaDataCreate()}.
+This function puts together the data set and carries out some
+preliminary calculations.
+
+It is advisable to use names of variables
 consisting of at most 12 characters. This is because they are used as parts
 of the names of effects which can be included in the model, and the effect
-names should not be too long.}
+names should not be too long.
+
+\RS does not work with case numbers. The correspondence between cases
+in the different components of the data set is by the order of the rows
+in the data matrices. For a data set with $n$ actors,
+each data matrix should have $n$ rows and always the $i$'th row
+should correspond to the $i$'th actor.
 
 It is also useful to note here that in case of co-evolution models (those with
 more than one dependent networks and/or behaviors), data for all dependent
@@ -1281,7 +1357,7 @@ If any values are not integers, a warning will be printed on the initial report
 given by \sfn{print01Report()} and the values will be truncated towards zero.
 
 A special case of behavioral data can be used for
-\emph{diffusion of innovations} \citep{Greenan14}:
+\emph{diffusion of innovations} \citep{Greenan15}:
 here the behavior variable representing
 having adopted the innovation is binary, coded 0 or 1, and
 changes $1 \Rightarrow 0$ are impossible.
@@ -1859,49 +1935,6 @@ does not combine properly with the \sfn{sienaGOF} function
 (Section~\ref{S_gof}).
 
 
-\subsection{Using multiple processes}
-\label{S_multipleProcesses}
-\begin{enumerate}
-\item
-If multiple processors are available, then using
-multiple processes can speed up the estimation in \sfn{siena07}.
-
-\item In Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
-  multiple simulations are done with the same parameters, and the resulting
-  statistics are averaged. The gain parameter is increased and the
-  number of iterations in phase 2 reduced to take advantage of
-  the increased accuracy.
-
-\item The parameters required to run all processes on one computer are fairly
-  simple: in your call to \sfn{siena07}, set \sfn{nbrNodes} to the number of
-  processes and \sfn{useCluster} and \sfn{initC} to TRUE. The \sfn{Model
-    Options} screen also allows you to specify the number of processes, and
-  will automatically set the other required parameters for you.
-
-\item To use more than one machine is more complicated, but it can be done by
-  using, in addition, the \sfn{clusterString} parameter.  The computers need to
-  be running incoming \sfn{ssh}.
-\item For machines with exactly the same layout of \R
-  directories on each, simply set \sfn{clusterString} to a character vector of
-  the names of the machines.
-\item For other cases, e.g.\ using Macs alongside Linux,
-  see the documentation for the package \sfn{parallel}.
-
-\item \RS uses sockets for inter-process communication.
-\item On Windows, sub processes are always started using \R scripts. On Linux
-  and Mac there is an option available in \R version 2.14.0 or later via the
-  code interface to \sfn{siena07} to ask for the sub processes to be formed by
-  forking. See the help page for details.
-\item Each process needs a copy of the data in memory. If there is insufficient
-  memory available there will be no speed gain as too much time will be spent
-  paging.
-\item In each iteration the main process waits until all the other processes
-  have finished. The overall speed is therefore that of the slowest process, and
-  there should be enough processors to allow them all to run at speed.
-\end{enumerate}
-
-
-
 \newpage
 \section{Model specification}
 \label{S_modspec}
@@ -2051,7 +2084,7 @@ When the focal actor is $i$, ties that lead to the closure are
 $i \rightarrow j$ and $i \rightarrow h$; but the first of these ties
 means the closing of a two-path $i \rightarrow h \rightarrow j$, while
 the second means forming a tie to an actor $h$ who made the same outgoing
-choice to the third actor $j$, a sign of structural equivalence; 
+choice to the third actor $j$, a sign of structural equivalence;
 so these are distinct processes.
 The evaluation effect corresponding to the tendency toward forming
 closed triples
@@ -2254,13 +2287,16 @@ in Chapter~\ref{S_math}. Here we give a more qualitative description.
 
 A default model choice could consist of (1) the out-degree and reciprocity
 effects; (2) one network closure effect,
-e.g.\ transitive triplets or transitive ties; the 3-cycles effect;
+e.g.\ transitive triplets, transitive ties, or gwesp;
+the transitive reciprocated triplets effect
+and/or the 3-cycles effect;
 (3) the in-degree popularity effect (raw or square root version);
 the out-degree activity effect (raw or square root version);
 and either the in-degree activity effect or the out-degree popularity effect
 (raw or square root function).
 The two effects (1) are so basic they cannot be left out.
-The two effects selected under (2) represent the dynamics in local (triadic) structure;
+The effects selected under (2) represent the dynamics in local (triadic) structure
+\citep[also see][for the transitive reciprocated triplets effect]{Block2015};
 and the three effects selected under (3) represent the dynamics
 in in- and out-degrees (the first for the dispersion of in-degrees,
 the second for the dispersion of out-degrees, and the third for the
@@ -2273,7 +2309,7 @@ The basic list of these and other effects is as follows.
 \begin{enumerate}
 \item The \emph{out-degree effect} which always must be included.
 \item The \emph{reciprocity effect} which practically always must be included.
-\item There is a choice of four network closure effects.
+\item There is a choice among several network closure effects.
       Usually it will be sufficient to express the tendency to network
       closure by including one or two of these. They can be selected
       by theoretical considerations and/or by their empirical
@@ -2329,6 +2365,7 @@ The basic list of these and other effects is as follows.
                 how many two-paths $i \rightarrow h \rightarrow j $ there are,
                 it is only considered whether there is at least one such indirect connection.
                 Thus, one indirect tie suffices for the network embeddedness.
+      \item[d.] The \emph{gwesp} effect (see later in this manual).
       \item[d.] The \emph{number of actors at distance two effect} expresses network closure inversely:
                 stronger network closure (when the total number of ties is fixed)
                 will lead to fewer geodesic distances equal to 2.
@@ -2348,6 +2385,9 @@ The basic list of these and other effects is as follows.
       interpreted as a tendency toward local hierarchy.
       The three-cycles effect also contributes to
       network closure.\\
+      \citet{Block2015} has argued convincingly that instead of the
+      three-cycles effect, it is often advisable to use the
+      transitive reciprocated triplets effect.\\
       In a non-directed network, the three-cycles effect is identical
       to the transitive triplets effect.
       \end{minipage}
@@ -2437,7 +2477,7 @@ The basic list of these and other effects is as follows.
 The \SAOM for two-mode (or bipartite) networks
 is treated in \citet{KoskinenEdling2012}.
 The co-evolution of one-mode and two-mode networks is treated in
-\citet{SLT2012}.
+\citet{SLT2013}.
 The most important effects are as follows.
 The mathematical formulae for these and other effects are given
 in Chapter~\ref{S_math}. Here we give a more qualitative description.
@@ -2614,7 +2654,7 @@ on behavioral evolution.
 If there are multiple dependent network variables, these can be
 one-mode networks, two-mode networks, or a combination of these.
 The co-evolution of one-mode and two-mode networks is treated in
-\citet{SLT2012}, but this paper can also be used as an introduction
+\citet{SLT2013}, but this paper can also be used as an introduction
 to the dynamics of multiple one-mode networks.
 For multiple dependent network variables,
 the following effects may be important.
@@ -3542,12 +3582,26 @@ summary(results1)
 \end{verbatim}
 will produce more information, including, e.g.,
 the covariance/correlation matrix of the estimators.
+\bigskip
 
-If the estimation procedures diverges, i.e., the parameter values obtained
-are very large (e.g., larger than 50 except for covariates that have
-a very small standard deviation), then try running it with
-\sfn{diagonalize = 1} in the call of \sfn{sienaAlgorithmCreate};
-see the help file for further information.
+\emph{Convergence check}
+\smallskip
+
+\noindent
+The column \texttt{\small Convergence t-ratio} shown above, also
+called \texttt{\small t statistics for deviations from targets},
+is an indicator of convergence. If some of these values
+are higher in absolute value than 0.1, convergence is not adequate
+and the estimation must be repeated.
+Usually the best way to do this is by employing the
+argument \texttt{prevAns} in the call of \sfn{siena07()}.
+Given that the earlier result was already called \texttt{result1},
+this is done, e.g., by
+\begin{verbatim}
+results1  <-  siena07(algorithm1, data = mydata, effects = myeff,
+                      prevAns = results1)
+\end{verbatim}
+Further see below for more information about convergence.
 
 \subsubsection{Initial Values}
 \label{S_initials}
@@ -3690,6 +3744,214 @@ the \sfn{prevAns} option, sometimes it can be useful to try and use
 rather than \sfn{prevAns}; this will use the same starting values
 but not skip Phase 1 of the estimation algorithm, and sometimes
 this turns out to lead to faster convergence.
+\medskip
+
+The following function will
+iterate the execution of \sfn{siena07()} until it has converged.
+It can be modified to suit your further purposes.
+The argument \texttt{ans0} can be employed to use an earlier existing
+`on track' estimation result, if available, as the initial value
+for the algorithm.
+
+\begin{verbatim}
+siena07ToConvergence <- function(alg, dat, eff, ans0=NULL, ...){
+    numr <- 0
+    ans <- siena07(alg, data=dat, effects=eff, prevAns=ans0, ...) # the first run
+    repeat {
+        numr <- numr+1           # count number of repeated runs
+        maxt <- max(abs(ans$tconv[!ans$effects$fix[ans$effects$requested]]))
+                    # convergence indicator, excluding the fixed effects
+        cat(numr, maxt,"\n")     # report how far we are
+        if (maxt < 0.10) {break} # success
+        if (maxt > 3) {break}    # divergence without much hope
+                           # of returning to good parameter values
+        if (numr > 100) {break}  # now it has lasted too long
+        ans <- siena07(alg, data=dat, effects=eff, prevAns=ans, ...)
+        }
+    if (maxt > 0.10)
+    {
+        cat("Warning: convergence inadequate.\n")
+    }
+    ans
+}
+\end{verbatim}
+
+\iffalse
+The use of \texttt{ans\$effects\$requested} in the definition of \texttt{maxt}
+is to exclude those main effects of interaction effects which
+are not requested to be estimated, but which are contained in the answer object.
+\fi
+
+\subsection{What to do if there are convergence problems}
+\label{S_conv}
+
+If there are persisting convergence problems even after repeated estimations
+using the \texttt{prevAns} parameter
+as suggested in Section~\ref{S_ccheck}, this may have several reasons.
+\begin{itemize}
+\item The data specification was incorrect (e.g., because the coding
+      was not given properly).
+\item The starting values were poor.
+      Try restarting from the standard initial values
+      (a certain non-zero value for the
+      density parameter, and zero values for the other parameters);
+      or from values obtained as the estimates for a simpler model
+      that gave no problems.
+      The initial default parameter values can be obtained
+      by choosing the model option ``standard initial values".
+\iffalse
+      When starting estimations with Model Type 2
+      (see Section~\ref{S_modeltype}), there may be some problems to
+      find suitable starting values.
+      For Model Type 2, it is advised to start with
+      \hyperlink{T_S_cond}{unconditional estimation}
+      and a simple model,
+      and to turn back to conditional estimation, using the current parameter
+      values as initial estimates for new estimation runs, only when
+      satisfactory estimates for a simple model have been found.
+\fi
+\item The model does not fit well in the sense that even with well-chosen
+      parameters it will not give a good representation of the data.
+
+      This can be the case, e.g., when there is a large heterogeneity
+      between the actors which is not well represented by effects
+      of covariates.
+      The out-degrees and in-degrees are given in the begin of the \SI output
+      to be able to check whether there are outlying actors having very high
+      in- or out-degrees, or a deviating dynamics in their degrees.
+      Strong heterogeneity between the actors will have to be
+      represented by suitable covariates; if these are not available,
+      one may define one or a few dummy variables each representing
+      an outlying actor, and give this dummy variable an ego effect
+      in the case of deviant out-degrees, and an alter effect in the
+      case of deviant in-degrees.
+
+      Another possibility is that there is time heterogeneity.
+      Indications about this can be gathered also from the descriptives
+      given in the start of the output file: the number of changes
+      upward and downward, in the network and also -- if any -- in the
+      dependent behavioral variable. If these do not show a smooth
+      or similar pattern across the observations, then it may be useful
+      to include actor variables representing time trends. These
+      could be smooth -- e.g., linear -- but they also could be dummy variables
+      representing one or more observational periods; these must be included
+      as an ego effect to represent time trends in the tendency to make ties
+      (or to display higher values of the behavior in question).
+      Further see Section~\ref{S_timetest1} for how to discover and handle
+      time heterogeneity.
+\item Too many weak effects are included. Use a smaller number of effects,
+      delete non-significant ones, and increase complexity step by step.
+      Retain parameter estimates from the last
+      (simpler) model as the initial values for the new estimation procedure,
+      provided for this model the algorithm converged
+      without difficulties; here also \texttt{prevAns} may be used.\\
+      Effects that are left out of the estimation can still be
+      used in the model by specifying them with \texttt{test=TRUE, fix=TRUE};
+      this will not burden the estimation process, and give information
+      (with a score-type test, see Section~\ref{S_Scoretest})
+      about the significance of this excluded effect.
+\item Two or more effects are included that are almost collinear
+      in the sense that they can both explain the same observed structures.
+      This will be seen in high absolute values of
+      correlations between parameter estimates, presented in the
+      \sfn{summary} of the results object and also in the output file.
+      In this case it may be better to exclude one of these effects from the model.
+\item An effect is included that is large but of which the precise
+      value is not well-determined (see above:
+      \hyperlink{T_fix}{section on fixing parameters}).
+      This will be seen in estimates and standard errors both being large
+      and often in divergence of the algorithm.
+      Fix this parameter to some large value.
+      (Note: large here means, e.g., more than 5 or less than -5; depending
+      on the effect, of course.)
+\end{itemize}
+
+\subsubsection{Pressing on}
+
+If convergence is difficult and simplifications or step-by-step approaches
+as suggested above are not sufficient or undesirable,
+one may try to obtain convergence by playing with the
+settings of the estimation algorithm.
+For the Method of Moments,
+the main parameter for this purpose is \texttt{diagonalize},
+which is one of the arguments set in \sfn{sienaModelCreate}.
+The default value is 1.0.
+For the technical background, see \texttt{Siena\_Algorithms.pdf}
+which can be downloaded from the \SI website.
+This parameter may range from 0 to 1; the value 1 gives
+greatest stability; smaller values may give greater efficiency;
+small values (0.5 or less) usually lead to a very unstable algorithm.
+Advice for the use of this parameter is as follows.
+
+\begin{enumerate}
+\item Start with \texttt{diagonalize} = 1 (the default).
+\item If an `on track' result has been obtained with \sfn{siena07()},
+      use this for the \texttt{prevAns} parameter in \sfn{siena07()},
+      with a smaller value for \texttt{diagonalize}; try the value
+      0.6; if this leads to instability, try 0.7 or 0.8
+\end{enumerate}
+
+\noindent
+The following example script illustrates this procedure.
+
+\begin{verbatim}
+myans0 <- siena07(myalg, data=mydata, effects=myeff) # the first run
+alg.diag6 <- sienaAlgorithmCreate(diagonalize=0.6)
+        # and further parameters as desired
+siena07PressOn <- function(alg1, dat, eff, ans0, ...){
+    numr <- 0
+    ans <- ans0
+    repeat {
+        numr <- numr+1           # count number of repeated runs
+        maxt <- max(abs(ans$tconv[!ans$effects$fix[ans$effects$requested]]))
+                    # convergence indicator, excluding the fixed effects
+        cat(numr, maxt,"\n")     # report how far we are
+        if (maxt < 0.10) {break} # success
+        if (maxt > 2) {break}    # divergence without much hope
+                           # of returning to good parameter values
+        if (numr > 100) {break}  # now it has lasted too long
+        ans <- siena07(alg1, data=dat, effects=eff, prevAns=ans, ...)
+        }
+    if (maxt > 0.10)
+    {
+        cat("Warning: convergence inadequate.\n")
+    }
+    ans
+}
+myans1 <- siena07PressOn(alg.diag6, mydat, myeff, myans0)
+\end{verbatim}
+
+\noindent
+The use of \texttt{myans0} prior to and outside of the function
+\texttt{siena07PressOn} is done so that, if the algorithm
+breaks out of \texttt{siena07PressOn} without having properly
+converged, the earlier preliminary result \texttt{myans0}
+still is available.
+\iffalse
+The use of \texttt{ans\$effects\$requested} in the definition of \texttt{maxt}
+is to exclude those main effects of interaction effects which
+are not requested to be estimated, but which are contained in the answer object.
+\fi
+
+\iffalse
+If there are problems you don't understand, but you do know
+something about the operation of {\SI}, you could take a look at
+the file \textsf{{\em pname}.log\/}; and, if the problems occur in
+the estimation algorithm, at the file \textsf{{\em pname}.cck}.
+These files give information about what the program did, which may
+be helpful in diagnosing the problem. E.g., you may look in the
+\textsf{{\em pname}.cck} file to see if some of the parameters are
+associated with positive values for the so-called
+\hyperlink{T_quasiac}{quasi-auto\-correlations}.
+If this happens from
+subphase 2.2 onward for some parameters, these may be the parameters
+that led to problems
+in the estimation algorithm (e.g., because the corresponding
+effect is collinear with other effects; or because they started
+from unfortunate starting values; or because the data set contains
+too little information about their value).
+\fi
+
 
 \subsection{Some important components of the \textsf{sienaFit} object}
 \label{S_fitcomp}
@@ -3713,8 +3975,7 @@ Further details are in the help file for \textsf{siena07}
  \texttt{ans\$pp}                     \> number of parameters  \\
  \texttt{ans\$targets }               \> targets (observed statistics)
                                          for Method of Moments estimation  \\
- \texttt{ans\$tconv   }               \> $t$-ratios for convergence for \\
-                                       \> each of the parameters\\
+ \texttt{ans\$tconv   }               \> $t$-ratios for convergence for  each of the parameters\\
  \texttt{ans\$tconv.max   }         \> maximum $t$-ratio for convergence for \\
                                  \> any linear combination of the parameters\\
                                  \> (including the fixed ones!),\\
@@ -3733,7 +3994,8 @@ Further details are in the help file for \textsf{siena07}
                                         in the call of \textsf{siena07} \\
  \texttt{ans\$estMeans }               \> estimated expected values of the target statistics\\
                                      \> (if the Dolby option was chosen, this is \\
-                                     \> not equal to the average of the simulations!).
+                                     \> not equal to the average of the simulations!)\\
+ \texttt{ans\$effects }               \> the effects object with only the requested effects.
 \end{tabbing}
 Like for any \R object, the internal structure of the \textsf{sienaFit} object
 can be requested by requesting
@@ -3753,8 +4015,9 @@ sink()
 
 To get some further understanding, one could investigate some of the components
 of this object as follows.
-Note that the \texttt{(... <- ...)} statements are just a way for
-constructing the object and showing it at the same time.
+Note that putting a statement between parentheses like in\\
+\texttt{(A <- B)} is just a way for
+constructing the object \texttt{A} and showing it at the same time.
 \begin{verbatim}
 # Compute the covariance matrix of the generated statistics
 print(covsf <- cov(ans$sf))
@@ -3772,28 +4035,9 @@ stats <- t(t(ans$sf) + ans$targets)
 stats <- ans$sf + rep(ans$targets, each=nrow(ans$sf))
 \end{verbatim}
 
-The \texttt{tconv} components can be used to write a function
-that will iterate the execution of \sfn{siena07()} until it has
-converged; the following gives an example.
-
-\begin{verbatim}
-siena07ToConvergence <- function(alg, dat, eff){
-	numr <- 0			
-	ans <- siena07(alg, data=dat, effects=eff) # the first run
-	repeat {
-    	numr <- numr+1           # count number of repeated runs
-    	maxt <- max(abs(ans$tconv[!eff$fix[eff$include]]))	
-                                 # convergence indicator, excluding the fixed effects	
-    	cat(numr, maxt,"\n")     # report how far we are
-    	if (maxt < 0.10) {break} # success
-    	if (maxt > 5) {break}    # divergence without much hope
-                                 # of returning to good parameter values
-    	if (numr > 100) {break}  # now it has lasted too long
-    	ans <- siena07(alg, data=dat, effects=eff, prevAns=ans)
-    	}	
-	ans
-}
-\end{verbatim}
+The \texttt{tconv} components are used
+in the function \texttt{siena07ToConvergence}
+presented above.
 
 \subsection{Algorithm}
 \label{S_algorithm}
@@ -4429,6 +4673,50 @@ The solution is either to use different
 unconditional estimation.
 
 
+\subsection{Using multiple processes}
+\label{S_multipleProcesses}
+\begin{enumerate}
+\item
+If multiple processors are available, then using
+multiple processes can speed up the estimation in \sfn{siena07}.
+
+\item In Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
+  multiple simulations are done with the same parameters, and the resulting
+  statistics are averaged. The gain parameter is increased and the
+  number of iterations in phase 2 reduced to take advantage of
+  the increased accuracy.
+
+\item The parameters required to run all processes on one computer are fairly
+  simple: in your call to \sfn{siena07}, set \sfn{nbrNodes} to the number of
+  processes and \sfn{useCluster} and \sfn{initC} to TRUE. The \sfn{Model
+    Options} screen also allows you to specify the number of processes, and
+  will automatically set the other required parameters for you.
+
+\item To use more than one machine is more complicated, but it can be done by
+  using, in addition, the \sfn{clusterString} parameter.  The computers need to
+  be running incoming \sfn{ssh}.
+\item For machines with exactly the same layout of \R
+  directories on each, simply set \sfn{clusterString} to a character vector of
+  the names of the machines.
+\item For other cases, e.g.\ using Macs alongside Linux,
+  see the documentation for the package \sfn{parallel}.
+
+\item \RS uses sockets for inter-process communication.
+\item On Windows, sub processes are always started using \R scripts. On Linux
+  and Mac there is an option available in \R version 2.14.0 or later via the
+  code interface to \sfn{siena07} to ask for the sub processes to be formed by
+  forking. See the help page for details.
+\item Each process needs a copy of the data in memory. If there is insufficient
+  memory available there will be no speed gain as too much time will be spent
+  paging.
+\item In each iteration the main process waits until all the other processes
+  have finished. The overall speed is therefore that of the slowest process, and
+  there should be enough processors to allow them all to run at speed.
+\end{enumerate}
+
+
+
+
 \newpage
 \hypertarget{T_se}{
 \section{Standard errors}
@@ -4508,6 +4796,7 @@ having been superseded by the score function method,
 and therefore this improvement has not been effectuated.},
 with the result that the standard errors produced by this method
 are not very reliable if they are of the order of 0.02 or less.
+
 
 \newpage
 \section{Tests}
@@ -4789,8 +5078,7 @@ When using the score-type test, some model
 is specified in which one or more parameters are restricted to some
 constant, in most cases $0$ -- these constant values
 define the null hypothesis being tested.
-This can be obtained in \RS by appropriate choices in the effects dataframe
-(called \sfn{myeff} in Section~\ref{S_Rscript}).
+This can be obtained in \RS by appropriate choices in the effects dataframe.
 Parameters can be restricted by
 putting \texttt{TRUE} in the \sfn{fix} and \sfn{test} columns, and
 the tested value in the \sfn{initialValue} column.
@@ -5406,7 +5694,6 @@ conditionally or unconditionally.\medskip
 
 The best way to get started is to download the \R scripts from the
 \SI website and start reading and playing with them.
-These scripts are also included in this manual in Section~\ref{S_Rscript}.
 
 For carrying on and getting a first acquaintance with your own running
 of the model, the data set collected by Gerhard van de Bunt
@@ -5615,138 +5902,6 @@ out-degrees in the evaluation function.
 %, or by changing to Model Type 2
 %(see Section~\ref{S_modeltype}).
 
-\subsection{Convergence problems}
-
-If there are persisting convergence problems even after repeated estimations
-as suggested in Section~\ref{S_ccheck}, this may have several reasons.
-\begin{itemize}
-\item The data specification was incorrect (e.g., because the coding
-      was not given properly).
-\item The starting values were poor.
-      Try restarting from the standard initial values
-      (a certain non-zero value for the
-      density parameter, and zero values for the other parameters);
-      or from values obtained as the estimates for a simpler model
-      that gave no problems.
-      The initial default parameter values can be obtained
-      by choosing the model option ``standard initial values".
-\iffalse
-      When starting estimations with Model Type 2
-      (see Section~\ref{S_modeltype}), there may be some problems to
-      find suitable starting values.
-      For Model Type 2, it is advised to start with
-      \hyperlink{T_S_cond}{unconditional estimation}
-      and a simple model,
-      and to turn back to conditional estimation, using the current parameter
-      values as initial estimates for new estimation runs, only when
-      satisfactory estimates for a simple model have been found.
-\fi
-\item The model does not fit well in the sense that even with well-chosen
-      parameters it will not give a good representation of the data.
-
-      This can be the case, e.g., when there is a large heterogeneity
-      between the actors which is not well represented by effects
-      of covariates.
-      The out-degrees and in-degrees are given in the begin of the \SI output
-      to be able to check whether there are outlying actors having very high
-      in- or out-degrees, or a deviating dynamics in their degrees.
-      Strong heterogeneity between the actors will have to be
-      represented by suitable covariates; if these are not available,
-      one may define one or a few dummy variables each representing
-      an outlying actor, and give this dummy variable an ego effect
-      in the case of deviant out-degrees, and an alter effect in the
-      case of deviant in-degrees.
-
-      Another possibility is that there is time heterogeneity.
-      Indications about this can be gathered also from the descriptives
-      given in the start of the output file: the number of changes
-      upward and downward, in the network and also -- if any -- in the
-      dependent behavioral variable. If these do not show a smooth
-      or similar pattern across the observations, then it may be useful
-      to include actor variables representing time trends. These
-      could be smooth -- e.g., linear -- but they also could be dummy variables
-      representing one or more observational periods; these must be included
-      as an ego effect to represent time trends in the tendency to make ties
-      (or to display higher values of the behavior in question).
-      Further see Section~\ref{S_timetest1} for how to discover and handle
-      time heterogeneity.
-\item Too many weak effects are included. Use a smaller number of effects,
-      delete non-significant ones, and increase complexity step by step.
-      Retain parameter estimates from the last
-      (simpler) model as the initial values for the new estimation procedure,
-      provided for this model the algorithm converged
-      without difficulties.
-\item Two or more effects are included that are almost collinear
-      in the sense that they can both explain the same observed structures.
-      This will be seen in high absolute values of
-      correlations between parameter estimates, presented in the
-      \sfn{summary} of the results object and also in the output file.
-      In this case it may be better to exclude one of these effects from the model.
-\item An effect is included that is large but of which the precise
-      value is not well-determined (see above:
-      \hyperlink{T_fix}{section on fixing parameters}).
-      This will be seen in estimates and standard errors both being large
-      and often in divergence of the algorithm.
-      Fix this parameter to some large value.
-      (Note: large here means, e.g., more than 5 or less than -5; depending
-      on the effect, of course.)
-\end{itemize}
-
-If the algorithm is unstable, with parameter values (the left hand list
-in the \SI window) changing too wildly, or with the algorithm
-suddenly seeming stuck and not moving forward, the a solution may be
-to simplify the model (perhaps later on making it more complex again
-in forward parameter estimation steps); another solution may be
-to decrease the initial gain parameter (parameter \textsf{firstg}
-in function \textsf{sienaAlgorithmCreate()}).
-
-\iffalse
-If there are problems you don't understand, but you do know
-something about the operation of {\SI}, you could take a look at
-the file \textsf{{\em pname}.log\/}; and, if the problems occur in
-the estimation algorithm, at the file \textsf{{\em pname}.cck}.
-These files give information about what the program did, which may
-be helpful in diagnosing the problem. E.g., you may look in the
-\textsf{{\em pname}.cck} file to see if some of the parameters are
-associated with positive values for the so-called
-\hyperlink{T_quasiac}{quasi-auto\-correlations}.
-If this happens from
-subphase 2.2 onward for some parameters, these may be the parameters
-that led to problems
-in the estimation algorithm (e.g., because the corresponding
-effect is collinear with other effects; or because they started
-from unfortunate starting values; or because the data set contains
-too little information about their value).
-\fi
-
-\iffalse
-\subsection{Composition change: joiners and leavers}
-(Siena 3 text).
-Example data files for a network of changing composition are also
-provided with the program. These files are called {\sf
-vtest2.dat}, {\sf vtest3.dat}, and {\sf vtest4.dat}. They contain
-the same network data as the friendship data files of van de Bunt
-(for these three observation times and with the same coding),
-except that in these data some joiners and leavers were
-artificially created. These actors were given the code
-`\texttt{9}' for the observation moment at which they were not
-part of the network. The attribute file {\sf vtestexo.dat}
-contains the times at which the network composition changes (see
-also the example in Section~\ref{S_comp}). This file is necessary
-for the program to correctly include the times at which actors
-join or leave the network. For example, the first line of the file
-contains the values
-\begin{verbatim}
-1 0.7 3 0.0
-\end{verbatim}
-\noindent which indicates that the first actor joins the network
-at fraction 0.7 of period 1 (the period between the first and
-second observation moments) and leaves the network right after the
-beginning of the third period, i.e., he/she does not leave the
-network before the last observation at the third time point. Thus,
-the first actor joins the network and then stays in during the
-whole period being analyzed.
-\fi
 
 \newpage
 \section{Multilevel network analysis}
@@ -5968,9 +6123,23 @@ then the \emph{true parameter values} for the
 $N$ data sets are denoted $\theta_1, \theta_2, \ldots, \theta_N$,
 while their \emph{estimates} are denoted
  $\hat\theta_1, \hat\theta_2, \ldots, \hat\theta_N$.
+ \bigskip
 
 The package \sfn{metafor} can also be used for meta-analysis.
 This package is extensively documented in \citet{Viechtbauer2010}.
+In terms of \citet{Viechtbauer2010}, \sfn{siena08()} follows a
+random effects approach and presents the Hedges estimator
+which is the procedure of \citet{SnijdersBaerveldt03}, proposed
+by \citet{Cochran54}; it also presents the maximum likelihood
+estimator.
+In \citet{Viechtbauer2005}, an extensive study is made comparing
+the various approaches, and it turns out that the comparison is
+not unequivocal. His recommendation, however, is to use the
+restricted maximum likelihood estimator.
+Since this is not implemented in \sfn{siena08()}, this recommendation
+suggests that one should rather use  \sfn{metafor}, with the
+option \texttt{method = "REML"}.
+
 
 \subsubsection{Meta-analysis directed at the mean
                and variance of the parameters}
@@ -6086,6 +6255,13 @@ any case for the "average similarity" effect for behavior dynamics,
 parameters and standard errors tend to be larger, and a larger threshold
 (e.g. 10) is appropriate. The same holds for effects of covariates with small
 variances (less than .1).
+
+An alternative, probably better, for the estimation of standard errors
+is by using a non-parametric bootstrap confidence interval. For example, the
+adjusted percentile ($BC_a$) method
+\citep[][Chapter 5]{Efron1987,DavisonHinkley1997}
+which is available in function \texttt{boot.ci} in \R package \texttt{boot}.
+
 
 \subsubsection{Meta-analysis directed at testing the parameters}
 
@@ -6300,11 +6476,38 @@ Other rate parameters can not yet be included.
 The specification of fixed vs.\ randomly varying is done in the function \sfn{setEffect}.
 
 There currently is little advice about this.
-The theoretically important effects, and those for which variation is expected,
-may be specified as varying.
-Also it is possible to first do a multi-group analysis of the same model,
-followed by a \sfn{sienaTimeTest}, and specify those effects as randomly
-varying for which the time heterogeneity is largest according to the groupwise results.
+The basic issues are the following.
+\begin{description}
+\item[\emph{interest:}] is variability of the effect across groups
+   a primary part of the research question?\\
+   (Usually not; such research questions about variability
+   are of a quite secondary nature.)
+\item[\emph{knowledge:}] is there prior knowledge about whether
+   effects differ between groups?\\
+   (Usually not. It is possible to first do a multi-group analysis of the same model,
+   followed by a \sfn{sienaTimeTest}, and specify those effects as randomly
+   varying for which the time heterogeneity is largest according to the groupwise results.)
+\item[\emph{misspecification:}] if it would be erroneously assumed
+    that the effect is fixed across groups, would this affect
+    the parameter estimates of primary interest?\\
+    (About this we have little general knowledge; it can be tried out
+    by running estimations for different specifications of this
+    part of the model.)
+\item[\emph{amount of information:}] which specification will
+     use the information in the data most efficiently?\\
+     (Here finally we do have an answer. Assuming that an effect is fixed
+     across groups will give a smaller uncertainty ---posterior standard
+     deviation, interpreted as standard error--- in the estimated parameter
+     than assuming it varies randomly;
+     cf.\ Section~\ref{S_sienaBayesInterpret}.
+     This will be the more so as the number of
+     groups is smaller. Therefore, for the coefficients for which
+     there is no strong prior knowledge that they are variable across groups,
+     and which are tested as a primary issue for answering the research question,
+     from the point of view of statistical power
+     it is advisable to specify that they are fixed.)
+\end{description}
+
 
 \subsubsection{How to enter your data in sienaBayes}
 
@@ -6323,6 +6526,7 @@ make a selection of groups, select the one with few or no missing data and
 with Jaccard coefficients at least 0.30.
 
 \subsubsection{How to choose the parameter settings for sienaBayes}
+\label{S_sienaBayesParameters}
 
 It may be good to have an initial try run with
 \texttt{nwarm=5, nmain=10, nrunMHBatches=5, nImproveMH=20}
@@ -6420,9 +6624,9 @@ in both cases with a standard deviation of 1.4, corresponding
 to a variance of about 2.
 One could use the following piece of code.
 \begin{verbatim}
-m7 <- c(4,5,0,0,0,0,0)
-S7 <- matrix(0,7,7)
-diag(S7) <- c(2,2,1,1,1,1,1)
+m7 <- c(4, 5, 0, 0, 0, 0, 0)
+S7 <- matrix(0, 7, 7)
+diag(S7) <- c(2, 2, 1, 1, 1, 1, 1)
 ans <- sienaBayes(...., priorMu=m7, priorSigma=S7, priorDf=20,
                   priorRatesFromData = FALSE, ....)
 \end{verbatim}
@@ -6432,10 +6636,61 @@ hypothetically, the prior knowledge about the covariance matrix of the
 parameters is based.
 By choosing it, as suggested here, equal to the number of groups,
 the prior will have a non-negligible but also not a very strong influence.
+\medskip
+
+\noindent
+\emph{Parameters of the objective function}
+\smallskip
+
+\noindent
+For parameters of the objective function, it will be usually be possible
+to use some prior knowledge, together with neutrality with respect to
+the sign of tested parameters (in order not to unduly bias results.)
+In most cases the outdegree parameter is expected to be negative and
+the reciprocity parameter positive. The researcher should consider
+earlier studies of similar network dynamics; reasonable values for the
+prior mean for the outdegree parameter might be --2 or --1, and for the
+reciprocity parameter +1.5 or +2. For homophily parameters on important
+attributes expressed by the \texttt{simX} effect (which is standardized),
+as long as these are regarded as control effects, one might specify the
+prior mean conservatively as 0.3 or 0.5.
+Since many \SI parameters are defined in such a way that they have values
+in the range between --1 and +1, a prior variance in the range from 0.1 to
+0.5 would often be reasonable; but it will be good to consider earlier
+studies to have a good grounding for this choice.
+
+Continuing the example above, if the 5 varying non-rate parameters would
+start with an outdegree and a reciprocity parameter, the prior means
+and prior variances could be modified, e.g., to
+\begin{verbatim}
+m7 <- c(4, 5, -2, +1.5, 0, 0, 0)
+S7 <- matrix(0, 7, 7)
+diag(S7) <- c(2, 2, 1, 0.3, 0.2, 0.2, 0.2)
+\end{verbatim}
 
 
+\subsubsection{Operation of sienaBayes()}
 
-\subsubsection{Interpreting results of sienaBayes}
+In Section \ref{S_sienaBayesParameters} it was already suggested to
+start with a run with very low values of the sample size settings for the
+MCMC procedure.
+
+When the procedure has made a good start but the MCMC sample seems too
+short, you can make a prolonged analysis using the \texttt{prevBayes} option,
+and then combine the earlier with the later results using \sfn{glueBayes()}.
+This is illustrated in the example on the help page.
+
+During operation of \sfn{sienaBayes()}, partial results of the function
+are now and then stored
+as objects named \texttt{z} in files with the name
+\texttt{PartialBayesResult.RData}; see the help page.
+This is for the case that the computer or \R stops inadvertently
+during the long computations.
+These are \sfn{sienaBayesFit} objects, and therefore can be used in the
+\sfn{print} and \sfn{summary} functions; they also can be used for
+the \texttt{prevBayes} option to continue estimation.
+
+\subsubsection{Assessing convergence}
 
 You can visually inspect convergence by looking at the tracelines of the
 various parameters. These can be plotted by the functions in \texttt{BayesPlots.r}
@@ -6467,6 +6722,10 @@ If generally the tracelines are irregular, it may be good to increase
 \texttt{nrunMHBatches} but another possibility is to increase
 the \texttt{mult} parameter set in \sfn{sienaAlgorithmCreate()}.
 
+
+\subsubsection{Interpreting results of sienaBayes}
+\label{S_sienaBayesInterpret}
+
 The \sfn{print} and \sfn{summary} functions
 give posterior means, posterior standard deviations, 95\% credibility intervals,
 and one-sided posterior $p$-values
@@ -6481,21 +6740,20 @@ the components
 \texttt{ThinParameters, ThinPosteriorMu, \\
 ThinPosteriorEta}, and \texttt{ThinPosteriorSigma} of the
 \sfn{sienaBayesFit} object, as mentioned in the help page, may be useful.
+\medskip
 
-When the procedure has made a good start but the MCMC sample seems too
-short, you can make a prolonged analysis using the \texttt{prevBayes} option,
-and then combine the earlier with the later results using \sfn{glueBayes()}.
-This is illustrated in the example on the help page.
-
-During operation of \sfn{sienaBayes()}, partial results of the function
-are now and then stored
-as objects named \texttt{z} in files with the name
-\texttt{PartialBayesResult.RData}; see the help page.
-This is for the case that the computer or \R stops inadvertently
-during the long computations.
-These are \sfn{sienaBayesFit} objects, and therefore can be used in the
-\sfn{print} and \sfn{summary} functions; they also can be used for
-the \texttt{prevBayes} option to continue estimation.
+When comparing results for specifications that differ with respect
+to specifying the effects as fixed or varying across groups,
+it will be noted that posterior standard deviations for the means
+are larger when specifying the effects as randomly varying, as compared
+to specifying them as fixed. This is natural, and it is associated
+with a difference in interpretation.
+Specifying the effect as randomly varying implies that there also is
+an important step of generalization from the observed groups to the population
+of groups. The between-group variance then is a priori unknown and one is
+estimating a mean parameter from a sample of $N$ groups; usually $N$ is not
+very large and the uncertainty about the between-group differences
+will contribute considerably to the uncertainty of the population mean.
 
 \newpage
 \section[Formulas for effects]{Mathematical definition of effects}
@@ -6678,15 +6936,15 @@ and for maintaining existing ties.
   the tie  $i \rightarrow j$ in the figure; this is transitive
   closure in the strict sense of the term. The effect is\\
   $s^{\rm el}_{i\vit}(x) =   x_{ij} \sum_{h} x_{ih}\, x_{hj}\,$;\\
-  
 
- \begin{minipage}[t]{.75\textwidth}  
+
+ \begin{minipage}[t]{.75\textwidth}
  \item {\em transitive triplets effect type 2}  \texttt{(transTrip2)},
   the elementary effect corresponding to creating or maintaining
-  the tie  $i \rightarrow j$  in the figure here; this could be 
-  called structural equivalence for outgoing ties \\(but 
+  the tie  $i \rightarrow j$  in the figure here; this could be
+  called structural equivalence for outgoing ties \\(but
   note that there is also
-  the \texttt{balance} effect which is another implementation 
+  the \texttt{balance} effect which is another implementation
   of structural equivalence equivalence for outgoing ties).\\
   The effect is\\
   $s^{\rm el}_{i\vit}(x) =   x_{ij} \sum_{h} x_{ih}\, x_{jh}\,$;
@@ -6712,7 +6970,7 @@ and for maintaining existing ties.
 \end{center}
 \vfill
 \end{minipage}\\
-  
+
 
  \item {\em transitive mediated triplets effect} \texttt{(transMedTrip)},
  defined by the number of transitive patterns in $i$'s
@@ -7502,7 +7760,7 @@ by Maximum Likelihood and Bayesian estimation.
  In other words, only the $i \rightarrow j$ tie in the figure
  is the dependent variable here. The effect is defined as\\
  $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{hj}\,$;\\
- 
+
 
 \begin{minipage}[t]{.7\textwidth}
 \item
@@ -7622,6 +7880,24 @@ the following effects are available:
  number of incoming ties received by those to whom $i$ is tied
  and sent by others who have the same covariate value as $i$,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{hj} I\{v_i = v_h \} $;
+
+ \item {\em indegree popularity from different covariate}
+\texttt{(diffXInPop)} defined by the
+ number of incoming ties received by those to whom $i$ is tied
+ and sent by others who have a different covariate value than $i$,\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{hj} I\{v_i \neq v_h \} $;
+
+ \item {\em outdegree activity to same covariate}
+\texttt{(sameXOutAct)} defined by the
+ squared number of ties to those
+ others who have a different covariate value than $i$,\\
+ $s^{\rm net}_{i\vit}(x) = \big(\sum_j x_{ij} \,I\{v_i = v_j \}\big)^2 $;
+
+ \item {\em outdegree activity to different covariate}
+\texttt{(diffXOutAct)} defined by the
+ squared number of ties to those
+ others who have a different covariate value than $i$,\\
+ $s^{\rm net}_{i\vit}(x) = \big(\sum_j x_{ij} \,I\{v_i \neq v_j \}\big)^2 $;
 
  \item {\em homogeneous covariate $\times$ transitive triplets}
  \texttt{(homXTransTrip)}, defined by the number of transitive triplets
@@ -7777,14 +8053,38 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
 \]
       where $\breve v_j$ and $\breve v_j^{(-i)}$ are as above.
 
+\item \emph{ego-(alter-distance-2) covariate - similarity} \texttt{(simEgoDist2)},
+      defined as the sum of centered similarity  between $i$
+      and alters' covariate-average, for all actors
+      $j$ to whom $i$ has a tie,
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\grave v)_{ij}
+  - \widehat{{\rm sim}(\grave v)}) \ ,
+\]
+ where the similarity scores ${\rm sim}(\grave v)_{ij}$ are defined as
+\[
+{\rm sim}(\grave v)_{ij}=
+ \frac{\Delta-\vert  v_i - \breve v_j^{(-i)} \vert}{\Delta} \ ,
+\]
+  where
+ $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
+ \emph{original} covariate $v$,
+ $\breve v_j^{(-i)}$ is as above in effect \texttt{(altDist2)}.\\
+  In version 1.1-284, there still is some inconsistency in the centering by
+  $\widehat{{\rm sim}(\breve v)}$ which can be the
+ \emph{observed} mean of all similarity scores $\breve v_i$;
+ this observed mean is defined by calculating the $\breve v_i$ values
+ for each of the observations $t_1$ to $t_{M-1}$, and averaging
+ these
+ $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
 
 \item \emph{covariate - similarity at distance 2} \texttt{(simDist2)} ,
       defined as the sum of centered similarity
       values for alters' covariate-average between $i$ and all actors
       $j$ to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\breve v)_{ij}
-  - \widehat{{\rm sim}(\breve v)}) \ ,
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \,{\rm sim}(\breve v)_{ij} \ ,
+ % - \widehat{{\rm sim}(\breve v)}) \ ,
 \]
  where the similarity scores ${\rm sim}(\breve v)_{ij}$ are defined as
 \[
@@ -7793,13 +8093,18 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
 \]
  while
  $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
- \emph{original} covariate $v$, and\\
+ \emph{original} covariate $v$
+ (no centering is applied).
+\iffalse
+ , and\\
  $\widehat{{\rm sim}(\breve v)}$ is the
  \emph{observed} mean of all these similarity scores;
  this observed mean is defined by calculating the $\breve v_i$ values
  for each of the observations $t_1$ to $t_{M-1}$, and averaging
  these
  $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
+% checking revealed that no centering is applied.
+\fi
 
 \item \emph{covariate - in - alter at distance 2} \texttt{(altInDist2)}.
      This is defined as the sum of alters' values for
@@ -7826,6 +8131,31 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
  s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} (x_{+j} - x_{ij}) \check v_j^{(-i)} \ .
 \]
 
+\item \emph{ego-(in-alter-distance-2) covariate - similarity} \texttt{(simEgoInDist2)},
+      defined as the sum of centered similarity  between $i$
+      and alters' covariate-in-average, for all actors
+      $j$ to whom $i$ has a tie,
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\acute v)_{ij}
+  - \widehat{{\rm sim}(\acute v)}) \ ,
+\]
+ where the similarity scores ${\rm sim}(\acute v)_{ij}$ are defined as
+\[
+{\rm sim}(\acute v)_{ij}=
+ \frac{\Delta-\vert  v_i - \check v_j^{(-i)} \vert}{\Delta} \ ,
+\]
+ while
+ $ \check v_j^{(-i)}$ is as in the definition of \texttt{altInDist2},
+ $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
+ \emph{original} covariate $v$.\\
+
+  In version 1.1-284, there still is some inconsistency in the centering by
+ $\widehat{{\rm sim}(\breve v)}$ which can be the
+ \emph{observed} mean of all similarity scores $\breve v_i$;
+ this observed mean is defined by calculating the $\breve v_i$ values
+ for each of the observations $t_1$ to $t_{M-1}$, and averaging
+ these
+ $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
 
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
@@ -8208,7 +8538,7 @@ by Maximum Likelihood and Bayesian estimation.
 \end{center}
 \vfill
 \end{minipage}
- 
+
  \item
 \begin{minipage}[t]{.7\textwidth}
  {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\
@@ -8542,6 +8872,29 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
 \]
       where $ \breve v_j$ and $ \breve v_j^{W(-i)}$ are as above.
 
+\item \emph{ego-(alter-W-distance-2) covariate - similarity} \texttt{(simEgoDist2W)},
+      defined as the sum of centered similarity  between $i$
+      and alters' covariate-average, for all actors
+      $j$ to whom $i$ has a tie,
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\grave v^W)_{ij}
+  - \widehat{{\rm sim}(\grave v^W)}) \ ,
+\]
+ where the similarity scores ${\rm sim}(\grave v^W)_{ij}$ are defined as
+\[
+{\rm sim}(\grave v^W)_{ij}=
+ \frac{\Delta-\vert  v^W_i - \breve (v^W_j)^{(-i)} \vert}{\Delta} \ ,
+\]
+ while
+ $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
+ \emph{original} covariate $v$,
+ $\breve v_j^{(-i)}$ is as above in effect \texttt{(altDist2)},
+ and  $\widehat{{\rm sim}(\breve v)}$ is the
+ \emph{observed} mean of all similarity scores $\breve v_i$;
+ this observed mean is defined by calculating the $\breve v_i$ values
+ for each of the observations $t_1$ to $t_{M-1}$, and averaging
+ these
+ $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
 
 \item \emph{covariate - similarity at W-distance 2} \texttt{(simDist2W)}, % \texttt{(simXDist2W)},
       defined as the sum of centered similarity
@@ -8563,8 +8916,34 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
  \emph{observed} mean of all these similarity scores;
  this observed mean is defined by calculating the $\breve v_i^W$ values
  for each of the observations $t_1$ to $t_{M-1}$, and averaging
- these \\
+ these
  $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
+
+\item \emph{ego-(in-alter-W-distance-2) covariate - similarity} \texttt{(simEgoInDist2W)},
+      defined as the sum of centered similarity  between $i$
+      and alters' covariate-in-average, for all actors
+      $j$ to whom $i$ has a tie,
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\acute v^W)_{ij}
+  - \widehat{{\rm sim}(\acute v^W)}) \ ,
+\]
+ where the similarity scores ${\rm sim}(\acute v^W)_{ij}$ are defined as
+\[
+{\rm sim}(\acute v)_{ij}=
+ \frac{\Delta-\vert  v_i - \check v_j^{(-i)} \vert}{\Delta} \ ,
+\]
+ while
+ $ \check v_j^{(-i)}$ is as in the definition of \texttt{altInDist2W},
+ $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
+ \emph{original} covariate $v$, and\\
+ $\widehat{{\rm sim}(\breve v)}$ is the
+ \emph{observed} mean of all similarity scores $\breve v_i$;
+ this observed mean is defined by calculating the $\breve v_i$ values
+ for each of the observations $t_1$ to $t_{M-1}$, and averaging
+ these
+ $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
+
+
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
@@ -9412,7 +9791,7 @@ reciprocated degrees.
   is a non-decreasing variable with values 0 and 1,
   there are various contagion effects that render a model that
   would reduce to a proportional hazards model if the network
-  were constant; see \citet{Greenan14}.
+  were constant; see \citet{Greenan15}.
   This holds if they are part of the rate function,
   but not if they are included in the evaluation function.
   This also holds for effects depending on actor covariates.
@@ -10660,7 +11039,10 @@ For example, compare the construction of \texttt{sameXTransTrip} to that of
 
 		\item Build the package and install it.  Check from R that
               the new effect (which has only been created nominally)
-              appears now in the effects object in RSiena.
+              appears now in the effects object in RSiena.\\
+              If this is not the case, there may be furethr changes necessary
+              in the file \sfn{effects.r}; also see 
+              Section~\ref{S_notestwomode}.
 		\end{itemize}
 \item Open the folder
       \textsf{"RSiena\textbackslash src\textbackslash
@@ -10968,18 +11350,32 @@ sum(pmin(rowSums(s502),3))
 
 For two-mode networks the difference between the two node sets implies
 some peculiarities.
+Recall that effectGroups are used in the file \texttt{allEffects.csv}
+and in function \sfn{effects.r}.
+
 In the function \sfn{getEffects} in file \sfn{effects.r}, some additional
 measures are taken for effects in effectGroup \sfn{covarBipartiteEff}.
 This implies that for adding such effects, it will be necessary to see whether
 this function also must be modified.
 (Note: it would be preferable perhaps to have separate effect classes
-for covariates on the first and on the second mode.)
+for covariates on the first and on the second mode, as done for the effect
+groups in the following paragraphs.)
 
 A different approach was taken for effectGroups
 \sfn{covarABehaviorBipartiteObjective} and \sfn{covarBBehaviorBipartiteObjective}:
 the former is for covariates on the first node set, the second for
 covariates on the second node set.
 
+For effects defined for two dependent networks and one actor covariate,
+the following effectGroups are defined:
+\begin{itemize}
+\item \sfn{covarNetNetObjective} is for effects where the second network is one-mode;
+\item \sfn{covarABNetNetObjective} is without restriction on the modes;
+\item \sfn{covarANetNetObjective}  is for effects where, if the second network is two-mode,
+     the covariate is defined for the first node set;
+\item \sfn{covarBNetNetObjective} is for effects where, if the second network is two-mode,
+     the covariate is defined for the second node set.
+\end{itemize}
 \appendix
 \newpage
 \section{List of Functions in Order of Execution}
@@ -11498,15 +11894,47 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
+
+\item 2015-04-02 Revision 284.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item New effects: \texttt{simEgoDist2, simEgoInDist2, simEgoDist2W, simEgoInDist2W,\\
+         sameXOutAct, diffXInPop, diffXOutAct}. The centering for the similarity
+         measure in effects such as simEgoDist2 and simDist2 is not yet clear
+         (this affects only the outdegree parameter).\\
+         New effect groups  \sfn{covarABNetNetObjective},
+         \sfn{covarANetNetObjective}, and \sfn{covarBNetNetObjective}.
+   \item Bug corrected that occurred in \sfn{print01Report} for a \sfn{sienaGroup} object
+     where the component objects have constant dyadic covariates.
+   \item When a statistic is not plotted in \sfn{plot.sienaGOF()} because
+     its variance is 0, a note about this is printed to the screen.
+   \item Minimum and maximum of plotted region in \sfn{plot.sienaGOF()}
+     is calculated without taking into account non-plotted statistics.
+   \item Bug corrected with includeTimeDummy for \texttt{timeDummy} greater than
+     or equal to 10 (\sfn{sienaTimeTest.r}).
+   \item In case of collinear parameter estimates, standard errors
+     are reported as NA.
+   \item Arguments \texttt{main} and \texttt{ylab} dropped from 
+     \sfn{plot.sienaGOF()}; they did
+     not work, and their functionality now is covered by the ...
+     argument (so using \texttt{main} and \texttt{ylab} as arguments now should work).
+     (Thanks to David Kavaler.)
+\end{itemize}
+Changes in RSienaTest:
+\begin{itemize}
+   \item \sfn{sienaBayes}: correction in initialization of truncation rate parameters
+     based on prior; error corrected for sampling constant parameters.
+\end{itemize}
+
+
 \item 2014-12-11 R-Forge Revision 282.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
-   \item Effects \texttt{cl.XWX} and \texttt{cl2.XWX} corrected (thanks to Christoph Stadtfeld)
-     (\sfn{MixedTwoPathTable.cpp}).
-   \item \texttt{interactionType} of \texttt{gwesp..} effects was made \texttt{dyadic} 
-      (\sfn{allEffects.csv})
-   \item Some layout changes in warning message, \sfn{phase3.r}.
+   \item Effects \texttt{cl.XWX} and \texttt{cl2.XWX} corrected (thanks to Christoph Stadtfeld).
+   \item \texttt{interactionType} of \texttt{gwesp..} effects was made \texttt{dyadic}.
+   \item Some layout changes in warning message in \sfn{siena07()}.
    \item New effects \texttt{reciPop, reciAct, in3Plus, maxAlt, minAlt, transTrip1, transTrip2}.
    \item Effect \texttt{antiInIsolate2} got alias \texttt{in2Plus}.
    \item \texttt{inPop} is dyadic effect (except for non-directed networks)
@@ -11519,7 +11947,7 @@ Changes in RSiena and RSienaTest:
    \item The check for \texttt{MaxDegree} when running \sfn{siena07()} now works properly also
      for \sfn{sienaGroup} objects.
    \item Manual introduces the term \emph{elementary effects}.
-\end{itemize}     
+\end{itemize}
 Changes in RSienaTest:
 \begin{itemize}
    \item \sfn{sienaBayes}: the stop caused by singularity of the precision
@@ -12767,10 +13195,6 @@ Created RSienaTest which includes user
    \end{itemize}
  \end{itemize}
  \end{small}
-\nocite{Federico04}
-\nocite{Federico05}
-\nocite{Frank91}
-\nocite{JariegoFederico06}
 
 \newpage
 %\bibliographystyle{JRSS} % TS: I did not find this style so I changed it:

@@ -187,7 +187,7 @@ phase3.2 <- function(z, x, ...)
         tmax <- max(abs(tstat)[!z$fixed & !z$BasicRateFunction & z$resist > 0.9])
         z$tconv <- tstat
         error <- (abs(tmax) > 4.0 / sqrt(z$Phase3nits)) && (abs(tmax) > 0.3)
-        if (tmax >= 0.4 & !z$error)
+        if (tmax >= 0.4)
  		{
             z$error <- TRUE
  		}
@@ -264,16 +264,16 @@ phase3.2 <- function(z, x, ...)
 			dfrac[z$fixed, ] <- 0
 			dfrac[ ,z$fixed] <- 0
 			diag(dfrac)[z$fixed] <- 1
-			if (inherits(try(cov <- solve(dfrac), silent=TRUE),"try-error"))
+			if (inherits(try(cov.est <- solve(dfrac), silent=TRUE),"try-error"))
 			{
 				Report('Noninvertible estimated covariance matrix : \n', outf)
 	errorMessage.cov <- '***Warning: linear dependencies between statistics ***'
-				cov <- NULL
+				cov.est <- NA * dfrac
 			}
 		}
 		else
 		{
-			cov <- z$dinv %*% z$msfc %*% t(z$dinv)
+			cov.est <- z$dinv %*% z$msfc %*% t(z$dinv)
 		}
 		error <- FALSE
 		if (inherits(try(msfinv <- solve(z$msfc), silent=TRUE), "try-error"))
@@ -305,29 +305,24 @@ phase3.2 <- function(z, x, ...)
 			}
 			else
 			{
-				Report(c('This may mean that the reported standard errors ',
-						'are invalid.\n'), outf)
+				Report('Do not use any reported standard errors.\n', outf)
 				errorMessage.cov <- '*** Warning: Noninvertible estimated covariance matrix ***'
 			}
 			z$msfinv <- NULL
+			cov.est <- NA * z$msfc
 		}
 		else
 		{
 			z$msfinv <- msfinv
 		}
-		if (!is.null(cov))
+		if (!is.null(cov.est))
 		{
-			z$diver <- (z$fixed | z$diver | diag(cov) < 1e-9) & (!z$AllUserFixed)
-			## beware: recycling works for one direction but not the other
-			diag(cov)[z$diver] <- NA
-#			cov[z$diver, ] <- rep(Root(diag(cov)), each=sum(z$diver)) * 33
-#			diag(cov)[z$diver] <- 99 * 99
-#			cov[, z$diver] <- rep(Root(diag(cov)), sum(z$diver)) * 33
-			cov[z$diver, ] <- NA
-			cov[, z$diver] <- NA
-			diag(cov)[z$diver] <- NA
+			zerovar <- ((diag(cov.est) < 1e-9) | (is.na(diag(cov.est))))
+			z$diver <- (z$fixed | z$diver | zerovar) & (!z$AllUserFixed)
+			cov.est[z$diver, ] <- NA
+			cov.est[, z$diver] <- NA
 		}
-		z$covtheta <- cov
+		z$covtheta <- cov.est
 	}
 	z$errorMessage.cov <- errorMessage.cov
 	## ans<-InstabilityAnalysis(z)

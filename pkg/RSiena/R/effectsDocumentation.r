@@ -14,9 +14,10 @@ effectsDocumentation <- function(effects= NULL, type="html",
 	display=(type=="html"),
 	filename=ifelse(is.null(effects), "effects", deparse(substitute(effects))))
 {
+	## require(xtable)
 	if (is.null(effects))
 	{
-		x <- allEffects[, c("effectGroup", "effectName", "shortName",
+		x <- RSiena::allEffects[, c("effectGroup", "effectName", "shortName",
                         "endowment", "interaction1", "interaction2",
                         "parm", "interactionType")]
 	}
@@ -94,7 +95,7 @@ effectsDocumentation <- function(effects= NULL, type="html",
 				 "covarBBehaviorBipartiteObjective",
                  "unspecifiedBehaviorInteraction")
 
-    mytab <- table(allEffects[,1])
+	mytab <- table(RSiena::allEffects[,1])
 
     addtorowPos <- cumsum(c(0, mytab[myorder]))[1:length(myorder)]
     addtorowText <- names(mytab[myorder])

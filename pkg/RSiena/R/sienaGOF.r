@@ -19,7 +19,7 @@ sienaGOF <- function(
 		cluster=NULL, robust=FALSE,
 		groupName="Data1", varName, ...)
 	{
-	require(MASS)
+	## require(MASS)
 	## require(Matrix)
 	##	Check input
 	if (sienaFitObject$maxlike)
@@ -523,9 +523,9 @@ summary.sienaGOF <- function(object, ...) {
 
 ##@plot.sienaGOF siena07 Plot method for sienaGOF
 plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
-		key=NULL, perc=.05, period=1, main=main, ylab=ylab,	 ...)
+		key=NULL, perc=.05, period=1, ...)
 {
-	require(lattice)
+	## require(lattice)
 	args <- list(...)
 	if (is.null(args$main))
 	{
@@ -538,7 +538,7 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 	}
 	else
 	{
-		main=args
+		main=args$main
 	}
 
 	if (attr(x,"joined"))
@@ -556,12 +556,27 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 	## Need to check for useless statistics here:
 	n.obs <- nrow(obs)
 
-# Added version 1.1-243 by ts:
+	screen <- sapply(1:ncol(obs),function(i){
+						(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
+				(diag(var(rbind(sims,obs)))!=0)
+
+	if (any((diag(var(rbind(sims,obs)))==0)))
+	{	cat("Note: some statistics are not plotted because their variance is 0.\n")
+		cat("This holds for the statistic")
+		if (sum(diag(var(rbind(sims,obs)))==0) > 1){cat("s")}
+		cat(": ")
+		cat(paste(attr(x,"key")[which(diag(var(rbind(sims,obs)))==0)], sep=", "))
+		cat(".\n")
+	}
+
+	sims <- sims[,screen, drop=FALSE]
+	obs <- obs[,screen, drop=FALSE]
+	obsLabels <- round(x$Observations[,screen, drop=FALSE],3)
+
 	sims.min <- apply(sims, 2, min)
 	sims.max <- apply(sims, 2, max)
 	sims.min <- pmin(sims.min, obs)
 	sims.max <- pmax(sims.max, obs)
-# Also further use of ymin, ymax was added.
 
 	if (center)
 	{
@@ -575,8 +590,6 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 	}
 	if (scale)
 	{
-#		sims.min <- apply(sims, 2, min)
-#		sims.max <- apply(sims, 2, max)
 		sims.range <- sims.max - sims.min + 1e-6
 		sims <- sapply(1:ncol(sims), function(i) sims[,i]/(sims.range[i]))
 		obs <- matrix(sapply(1:ncol(sims), function(i) obs[,i]/(sims.range[i]))
@@ -611,13 +624,6 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 	{
 		ylabel = args$ylab
 	}
-
-	screen <- sapply(1:ncol(obs),function(i){
-						(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
-			(diag(var(rbind(sims,obs)))!=0)
-	sims <- sims[,screen, drop=FALSE]
-	obs <- obs[,screen, drop=FALSE]
-	obsLabels <- round(x$Observations[,screen, drop=FALSE],3)
 
 	if (is.null(args$xlab))
 	{
@@ -952,7 +958,7 @@ sparseMatrixExtraction <-
 # note that this also is done in RSiena for calculation of target statistics.
 # Structural values are treated as in sparseMatrixExtraction.
 networkExtraction <- function (i, obsData, sims, period, groupName, varName){
-	require(network)
+	## suppressPackageStartupMessages(require(network))
 	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
 	isbipartite <- (attr(obsData[[groupName]]$depvars[[varName]], "type")
 						=="bipartite")
@@ -966,12 +972,12 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	# Initialize empty networks:
 	if (isbipartite)
 	{
-		emptyNetwork <- network.initialize(dimsOfDepVar[1]+dimsOfDepVar[2],
+		emptyNetwork <- network::network.initialize(dimsOfDepVar[1]+dimsOfDepVar[2],
 											bipartite=dimsOfDepVar[1])
 	}
 	else
 	{
-		emptyNetwork <- network.initialize(dimsOfDepVar[1],	bipartite=NULL)
+		emptyNetwork <- network::network.initialize(dimsOfDepVar[1], bipartite=NULL)
 	}
 	# Use what was defined in the function above:
 	matrixNetwork <- sparseMatrixExtraction(i, obsData, sims,
@@ -991,7 +997,7 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	}
 	else
 	{
-		returnValue <- network.edgelist(
+		returnValue <- network::network.edgelist(
 					cbind(sparseMatrixNetwork@i + 1,
 					sparseMatrixNetwork@j + bipartiteOffset, 1),
 					emptyNetwork)

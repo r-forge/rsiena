@@ -307,6 +307,10 @@ varDyadCovar<- function(val, centered=TRUE,
 sienaDependent <- function(netarray, type=c("oneMode","bipartite","behavior"),
                     nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
 {
+	if (inherits(netarray,'data.frame'))
+	{
+		stop("The first argument must not be a data.frame, but an array or a list of sparse matrices.")
+	}
 	if (!sparse)
     {
         if (!is.array(netarray))

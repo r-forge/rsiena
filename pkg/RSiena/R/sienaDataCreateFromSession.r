@@ -19,6 +19,7 @@ trim.blanks <- function(x)
 sessionFromFile <- function(loadfilename, tk=FALSE)
 {
     ## browser()
+	## require(tcltk)
     dots <- max(c(0, gregexpr(".", loadfilename, fixed=TRUE)[[1]]))
     if (dots > 1)
     {
@@ -78,6 +79,7 @@ sessionFromFile <- function(loadfilename, tk=FALSE)
 ##@readInFiles siena01/DataCreate
 readInFiles <- function(session, edited, files=NULL)
 {
+	## require(tcltk)
     noFiles <- nrow(session)
     if (!any(edited))
     {
@@ -116,10 +118,10 @@ readInFiles <- function(session, edited, files=NULL)
                 }
                 else
                 {
-                    require(network)
+                    ## suppressPackageStartupMessages(require(network))
                     oldwarn <- getOption("warn")
                     options(warn = -1)
-                    tmp <- read.paj(session$Filename[i])
+                    tmp <- network::read.paj(session$Filename[i])
                     options(warn = oldwarn)
                     ## should be a single net
                 }
@@ -134,6 +136,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                         modelName='Siena', edited=NULL,
                                         files=NULL, getDocumentation=FALSE)
 {
+	## require(tcltk)
     ##@turnoffwarn internal sienaDataCreateFromSession
     turnoffwarn <- function()
     {
@@ -163,8 +166,8 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
             }
             else if (namesession$Format[1] == "pajek net")
             {
-                if (any(sapply(namefiles, network.size) !=
-                    network.size(namefiles[[1]])))
+                if (any(sapply(namefiles, network::network.size) !=
+                    network::network.size(namefiles[[1]])))
                    stop("Dimensions must be the same for one object")
             }
         }
@@ -197,7 +200,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                     ActorSetsSize[k] <<- dim(namefiles[[1]])[i]
                 }
                 else if (namesession$Format[1] == "pajek net")
-                    ActorSetsSize[k] <<- network.size(namefiles[[1]])
+                    ActorSetsSize[k] <<- network::network.size(namefiles[[1]])
                 else
                     ActorSetsSize[k] <<-
                         as.numeric(strsplit(namesession$NbrOfActors[1],
@@ -221,7 +224,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
             }
             else
             {
-                if (network.size(namefiles[[1]]) != ActorSetsSize[mymatch])
+                if (network::network.size(namefiles[[1]]) != ActorSetsSize[mymatch])
                 {
                     stop(paste("Conflicting sizes for actor set",
                                nodeSets[i]))
@@ -350,16 +353,16 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                        else ## pajek net
                        {
                            ##require(Matrix)
-                           nActors <- network.size(namefiles[[1]])
+                           nActors <- network::network.size(namefiles[[1]])
                            mylist <- vector("list", observations)
                            for (x in 1:nrow(namesession))
                            {
                                miss <- miss1[[x]]
                                myedgelist <-
-                                   as.matrix.network(namefiles[[x]],
+                                   network::as.matrix.network(namefiles[[x]],
                                                      matrix.type="edgelist")
                                edgenames <-
-                                   list.edge.attributes(namefiles[[x]])
+                                   network::list.edge.attributes(namefiles[[x]])
                                edgenames <- edgenames[-match("na", edgenames)]
                                if (length(edgenames) != 1)
                                {
@@ -369,7 +372,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                {
                                    myedgelist <-
                                        cbind(myedgelist,
-                                             get.edge.value(namefiles[[x]],
+                                             network::get.edge.value(namefiles[[x]],
                                                             edgenames))
                                }
                                myedgelist[myedgelist[, 3] %in% miss, 3] <-
@@ -379,14 +382,14 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
                                               c(nonzero[[x]], 10, 11)), 3] <- 0
                                myedgelist[myedgelist[,3] %in%
                                           nonzero[[x]], 3] <- 1
-                               if (!is.directed(namefiles[[x]]))
+                               if (!network::is.directed(namefiles[[x]]))
                                {
                                    perm <- c(2, 1, 3)
                                    myedgelist <- rbind(myedgelist, 
 												myedgelist[, perm])
                                }
 
-                               if (network.size(namefiles[[x]]) != nActors)
+                               if (network::network.size(namefiles[[x]]) != nActors)
                                    stop("number of actors inconsistent")
 
                                mylist[[x]] <-

@@ -88,28 +88,28 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{seed}{Integer. Starting value of random seed. Not used if
     parallel testing.}
   \item{pridg}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
+    routine in ML estimation. See Siena_Algorithms.pdf.}
   \item{prcdg}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
+    routine in ML estimation. See Siena_Algorithms.pdf.}
   \item{prper}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
+    routine in ML estimation. See Siena_Algorithms.pdf.}
   \item{pripr}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
+    routine in ML estimation. See Siena_Algorithms.pdf.}
   \item{prdpr}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
+    routine in ML estimation. See Siena_Algorithms.pdf.}
   \item{prirms}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
+    routine in ML estimation. See Siena_Algorithms.pdf.}
   \item{prdrms}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
+    routine in ML estimation. See Siena_Algorithms.pdf.}
   \item{maximumPermutationLength}{Maximum length of permutation in steps in ML
-    estimation}
+    estimation.}
   \item{minimumPermutationLength}{Minimum length of permutation in steps in ML
-    estimation}
+    estimation.}
   \item{initialPermutationLength}{Initial length of permutation in steps in ML
-    estimation}
+    estimation.}
   \item{modelType}{Type of model to be fitted: 1=directed, 2:6 for
-    symmetric networks: 2=forcing, 3=Initiative model,
-    4=Pairwise forcing model, 5=Pairwise mutual model, 6=Pairwise joint model}
+    symmetric networks only: 2=forcing, 3=Initiative model,
+    4=Pairwise forcing model, 5=Pairwise mutual model, 6=Pairwise joint model.}
   \item{mult}{Multiplication factor for maximum likelihood and Bayes. Number of
     steps per iteration is set to this multiple of the total distance
     between the observations at start and finish of the wave.
@@ -126,7 +126,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \code{\link{siena07}}.
   This function creates an object with the elements required to control the
   Robbins-Monro algorithm. Those not
-  available as arguments can be changed manually where desired.
+  available as arguments can be changed manually where desired.\cr
+  Further information about the implementation of the algorithm is in
+  http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf. 
 }
 \value{Returns an object of class \code{sienaAlgorithm} containing:
   \item{projname}{String value of name of project.}

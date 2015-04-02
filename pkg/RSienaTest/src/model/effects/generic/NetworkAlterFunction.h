@@ -21,10 +21,8 @@ using namespace std;
 
 namespace siena
 {
-
 class Network;
 class NetworkCache;
-
 
 class NetworkAlterFunction: public AlterFunction, public NamedObject
 {
@@ -38,6 +36,8 @@ public:
 		Cache * pCache);
 
 protected:
+	bool inTieExists(int alter) const;
+	bool outTieExists(int alter) const;
 	inline const Network * pNetwork() const;
 	inline NetworkCache * pNetworkCache() const;
 
@@ -55,7 +55,6 @@ const Network * NetworkAlterFunction::pNetwork() const
 {
 	return this->lpNetwork;
 }
-
 
 NetworkCache * NetworkAlterFunction::pNetworkCache() const
 {

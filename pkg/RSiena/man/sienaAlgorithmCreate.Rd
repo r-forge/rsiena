@@ -18,7 +18,7 @@
 sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0,
      useStdInits = FALSE, n3 = 1000, nsub = 4,
      dolby=TRUE, maxlike = FALSE, diagonalize=1.0*!maxlike,
-     condvarno = 0, condname = "", firstg = 0.2,
+     condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
      cond = NA, findiff = FALSE, seed = NULL, pridg=0.05,
      prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
      prdrms=0.05, maximumPermutationLength=40,
@@ -28,7 +28,7 @@ sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0,
 sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
      useStdInits = FALSE, n3 = 1000, nsub = 4,
      dolby=TRUE, maxlike = FALSE, diagonalize=1.0*!maxlike,
-     condvarno = 0, condname = "", firstg = 0.2,
+     condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
      cond = NA, findiff = FALSE, seed = NULL, pridg=0.05,
      prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
      prdrms=0.05, maximumPermutationLength=40,
@@ -75,6 +75,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     \code{condvarno} to specify the variable.}
   \item{firstg}{Initial value of scaling ("gain") parameter for updates
     in the Robbins-Monro procedure.}
+  \item{reduceg}{Reduction factor for scaling ("gain") parameter for updates
+    in the Robbins-Monro procedure (MoM only).}
   \item{cond}{Boolean. Only relevant for Method of Moments
     simulation/estimation.
     If TRUE, use conditional simulation; if FALSE, unconditional simulation.
@@ -100,15 +102,15 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{prdrms}{Real number. Probability used in Metropolis-Hastings
     routine in ML estimation.}
   \item{maximumPermutationLength}{Maximum length of permutation in steps in ML
-    estimation}
+    estimation.}
   \item{minimumPermutationLength}{Minimum length of permutation in steps in ML
-    estimation}
+    estimation.}
   \item{initialPermutationLength}{Initial length of permutation in steps in ML
-    estimation}
+    estimation.}
   \item{modelType}{Type of model to be fitted: 1=directed, 2:6 for
-    symmetric networks: 2=forcing, 3=Initiative model,
-    4=Pairwise forcing model, 5=Pairwise mutual model, 6=Pairwise joint model}
-  \item{mult}{Multiplication factor for maximum likelihood. Number of
+    symmetric networks only: 2=forcing, 3=Initiative model,
+    4=Pairwise forcing model, 5=Pairwise mutual model, 6=Pairwise joint model.}
+  \item{mult}{Multiplication factor for maximum likelihood and Bayes. Number of
     steps per iteration is set to this multiple of the total distance
     between the observations at start and finish of the wave.
     Decreasing \code{mult} below a certain value has no further effect.}
@@ -124,7 +126,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \code{\link{siena07}}.
   This function creates an object with the elements required to control the
   Robbins-Monro algorithm. Those not
-  available as arguments can be changed manually where desired.
+  available as arguments can be changed manually where desired.\cr
+  Further information about the implementation of the algorithm is in
+  http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf. 
 }
 \value{Returns an object of class \code{sienaAlgorithm} containing:
   \item{projname}{String value of name of project.}
@@ -133,6 +137,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{n3}{number of iterations in Phase 3}
   \item{firstg}{Initial value of the scaling ("gain") parameter in the
     Robbins-Monro algorithm.}
+  \item{reduceg}{Reduction factor for the scaling ("gain") parameter in the
+    Robbins-Monro algorithm (MoM only).}
   \item{maxrat}{Value used to control the maximum size of the jumps.}
   \item{maxmaxrat}{Value used to control the maximum size of the jumps.}
   \item{maxlike}{Boolean: is FRAN using maximum likelihood?}

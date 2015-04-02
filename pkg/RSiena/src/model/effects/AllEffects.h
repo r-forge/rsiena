@@ -76,6 +76,7 @@
 #include "ReciprocatedSimilarityEffect.h"
 #include "ReciprocityEffect.h"
 #include "SameCovariateEffect.h"
+#include "SameCovariateActivityEffect.h"
 #include "SameCovariateTransitiveTripletsEffect.h"
 #include "HomCovariateTransitiveTripletsEffect.h"
 #include "SimilarityEffect.h"

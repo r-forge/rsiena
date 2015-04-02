@@ -38,6 +38,8 @@ public:
 		Cache * pCache);
 
 protected:
+	bool inTieExists(int alter) const;
+	bool outTieExists(int alter) const;
 	inline const Network * pNetwork() const;
 	inline NetworkCache * pNetworkCache() const;
 

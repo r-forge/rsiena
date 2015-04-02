@@ -125,7 +125,7 @@ a time.
 For \nnm{maxlikec} we use different processes for each wave.
 This is because the chains are carried from one simulation to the next,
 and organizing the parallel processes by simulations (update steps of the Robbins
-Monro algorithm) wuold require too much passing of information.
+Monro algorithm) would require too much passing of information.
 
 We use the
 \R package \verb|parallel| to create and control the multiple processes, and
@@ -773,9 +773,17 @@ with covariates on the second node set
  \end{algorithmic}
 \subsection{covarNetNetEff}
 \begin{algorithmic}
-\IF {\nnm{poszvar} and not \nnm{moreThan2} ???}
+\IF {\nnm{poszvar} }
 \STATE  Use \sfn{covarNetNetObjective} effect group to create additional
-objective function effects.
+objective function effects if the second network is one-mode;
+\STATE  Use \sfn{covarABNetNetObjective} effect group to create additional
+objective function effects if the second network is one-mode or two-mode;
+\STATE  Use \sfn{covarANetNetObjective} effect group to create additional
+objective function effects if the second network is one-mode or
+\{two-mode while the covariate is defined for the first mode\};
+\STATE  Use \sfn{covarBNetNetObjective} effect group to create additional
+objective function effects if the second network is one-mode or
+\{two-mode while the covariate is defined for the second mode\}.
 \ENDIF
 \end{algorithmic}
 \subsection{CreateRateEffectList}

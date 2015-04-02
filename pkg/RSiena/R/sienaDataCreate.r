@@ -206,6 +206,7 @@ addAttributes.varDyadCovar <- function(x, name, bipartite, ...)
 sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 {
 	##@validNodeSet internal sienaDataCreate
+	## suppressPackageStartupMessages(require(network))
 	validNodeSet <- function(nodeSetName, n)
 	{
 		sub <- match(nodeSetName, nodeSetNames)
@@ -1384,6 +1385,7 @@ namedVector <- function(vectorValue, vectorNames, listType=FALSE)
 ##@sienaGroupCreate DataCreate
 sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 {
+	## suppressPackageStartupMessages(require(network))
 	##@copyAttributes internal sienaGroupCreate
 	copyAttributes <- function(x, y)
 	{
@@ -1706,6 +1708,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 				attr(newcovar, "nonMissingCount") <-
 					 attr(const[[j]], "nonMissingCount")
 				attr(newcovar, "mean") <- attr(const[[j]], "mean")
+				attr(newcovar, "meanp") <- rep(attr(const[[j]], "mean"), dim3)
 				attr(newcovar, "centered") <- attr(const[[j]], "centered")
 				attr(newcovar, "range") <- attr(const[[j]], "range")
 				attr(newcovar, "rangep") <- rep(attr(const[[j]], "range"),

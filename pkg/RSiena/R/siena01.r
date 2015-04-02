@@ -28,6 +28,7 @@ installGui <- function()
 siena01Gui <- function(getDocumentation=FALSE)
 {
    ##DONE (FALSE) ## this is so we can exit cleanly, but seems redundant here
+	## require(tcltk)
     maxDegree <- NULL
     nMaxDegree <- NULL
     resultsFileID <-  NULL
@@ -1071,7 +1072,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         return(getInternals())
     }
     ## check we have the right libraries
-    library(tcltk)
+    ## require(tcltk)
     if (!inherits(tclRequire("Tktable"), "tclObj"))
         stop("This function needs the tcl/tk package TkTable: install it, ",
              "or use an alternative data entry method: see RSiena help page")

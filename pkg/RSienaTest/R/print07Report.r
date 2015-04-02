@@ -189,7 +189,7 @@ PrintReport <- function(z, x)
 				sem <- sem*sqrt(1 - (z$regrCor)^2)
 			}
 			mymess1 <- paste(format(1:z$pp,width=3), '. ',
-			format(z$requestedEffects$functionName, width = 56),
+					format(z$requestedEffects$functionName, width = 56),
 					format(round(mean.stats, 3), width=8, nsmall=3), ' ',
 					format(round(sqrt(dmsf), 3) ,width=8, nsmall=3), ' ',
 					format(round(sem, 4) ,width=8, nsmall=4), sep='')
@@ -204,37 +204,46 @@ PrintReport <- function(z, x)
 		else
 		{
 			Heading(3, outf, "Covariance matrices")
-			if (any(z$fixed))
+			if (all(is.na(z$covtheta)))
 			{
-				Report(c('(Values of the covariance matrix of estimates\n',
-					' are meaningless for the fixed parameters.)\n\n'),
+				Report(c('There is a linear dependency between the parameter estimates\n',
+					'therefore the covariance matrix should not be used.\n\n'),
 					outf)
 			}
-			Report(c("Covariance matrix of estimates",
-				"(correlations below diagonal):\n"), outf)
-			covcor <- z$covtheta
-			correl <- z$covtheta/sqrt(diag(z$covtheta))[row(z$covtheta)]/
-				sqrt(diag(z$covtheta))[col(z$covtheta)]
-			covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
-			PrtOutMat(format(round(covcor, digits = 3), width = 10), outf)
-			Report(c('Derivative matrix of expected statistics X by',
-					'parameters and\n'), outf)
-			Report(c("covariance/correlation matrix of X can be found using\n",
-						"summary(ans) within R,",
-						" or by using the 'verbose' option in Siena07.\n "),
-						sep = "", outf)
-			Report(c("Derivative matrix of expected statistics X by",
-				"parameters:\n\n"), lf)
-			PrtOutMat(z$dfrac, lf)
-			Report('Covariance matrix of X (correlations below the diagonal):\n',
-			  lf)
-			covcor <- z$msf
-			correl <- z$msf/sqrt(diag(z$msf))[row(z$msf)]/
-			sqrt(diag(z$msf))[col(z$msf)]
-			covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
-			PrtOutMat(format(round(covcor, digits = 3), width = 10), lf)
-			Report('\n', outf)
-			Report('\n', lf)
+			else
+			{
+				if (any(z$fixed))
+				{
+					Report(c('(Values of the covariance matrix of estimates\n',
+						' are meaningless for the fixed parameters.)\n\n'),
+						outf)
+				}
+				Report(c("Covariance matrix of estimates",
+					"(correlations below diagonal):\n"), outf)
+				covcor <- z$covtheta
+				correl <- z$covtheta/sqrt(diag(z$covtheta))[row(z$covtheta)]/
+					sqrt(diag(z$covtheta))[col(z$covtheta)]
+				covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
+				PrtOutMat(format(round(covcor, digits = 3), width = 10), outf)
+				Report(c('Derivative matrix of expected statistics X by',
+						'parameters and\n'), outf)
+				Report(c("covariance/correlation matrix of X can be found using\n",
+							"summary(ans) within R,",
+							" or by using the 'verbose' option in Siena07.\n "),
+							sep = "", outf)
+				Report(c("Derivative matrix of expected statistics X by",
+					"parameters:\n\n"), lf)
+				PrtOutMat(z$dfrac, lf)
+				Report('Covariance matrix of X (correlations below the diagonal):\n',
+				lf)
+				covcor <- z$msf
+				correl <- z$msf/sqrt(diag(z$msf))[row(z$msf)]/
+				sqrt(diag(z$msf))[col(z$msf)]
+				covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
+				PrtOutMat(format(round(covcor, digits = 3), width = 10), lf)
+				Report('\n', outf)
+				Report('\n', lf)
+			}
 		}
 	}
 

@@ -126,7 +126,15 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         Report('This is not allowed; changed to 0.0001.\n', outf)
         z$gain <- 0.0001
     }
+    if (x$reduceg <= 0)
+    {
+        Report(c('Reduction factor for the gain parameter is ', x$reduceg,
+                 '.\n'), outf)
+        Report('This is not allowed; changed to 0.2.\n', outf)
+        x$reduceg <- 0.2
+    }
     Report(c('Initial value for gain parameter = ', format(z$gain),
+			 '.\nReduction factor for gain parameter = ', format(x$reduceg),
              '.\nStart of the algorithm.\n'), cf, sep='')
     Report('Observed function values are \n', cf)
 	targets <- if (!z$maxlike) z$targets else z$maxlikeTargets
@@ -149,7 +157,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     {
         z$AllUserFixed <- TRUE
     }
-    ##browser()
+
     repeat  ##this is startagain:
     {
       z$epsilonProblem <- FALSE
@@ -213,7 +221,6 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
                         break
                     }
                     z<- phase1.2(z, x, ...)
-                    ## browser()
                     if (!z$OK || z$DerivativeProblem ||
                         UserInterruptFlag() || UserRestartFlag())
                     {
