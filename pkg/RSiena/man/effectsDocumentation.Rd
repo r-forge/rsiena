@@ -34,7 +34,7 @@ effectsDocumentation(effects = NULL, type = "html", display = (type=="html"),
   by a particular data set. The default file name is "effects.tex" or
   "effects.pdf", respectively. The latter file is also shown in the browser
   when requesting\cr
-  \code{RShowDoc("effects", package="RSienaTest")}
+  \code{RShowDoc("effects", package="RSiena")}
 
   The table lists all effects, with their name,
   shortName, whether an endowment (and creation) effect exists,

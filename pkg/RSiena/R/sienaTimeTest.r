@@ -689,7 +689,7 @@ print.sienaTimeTest <- function(x, ...)
 plot.sienaTimeTest <- function(x, pairwise=FALSE, effects,
 	scale=0.2, plevels=c(0.1, 0.05, 0.025), ...)
 {
-	require(lattice)
+	## require(lattice)
     tmp <- paste(" (", 1:length(x$BaseRowInD), ") ",
 				 rownames(x$IndividualTest)[x$BaseRowInD], "\n", sep="")
     if (missing(effects))
@@ -853,7 +853,8 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
         return(getInternals())
     }
     nGroups <- max(unique(effects$group))
-    groupPeriods <- as.numeric(tapply(effects$period, effects$group,
+	# note that period is a character and must be changed to numeric
+    groupPeriods <- as.numeric(tapply(as.numeric(effects$period), effects$group,
                                       max, na.rm=TRUE)) + 1
     intervals <- rep(1:length(groupPeriods), groupPeriods)
     localPeriodNos <- unlist(sapply(groupPeriods, function(x)1:x))

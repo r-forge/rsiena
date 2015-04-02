@@ -13,7 +13,7 @@ sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
        siena.table, xtable,
        Wald.RSiena, Multipar.RSiena)
 
-import(Matrix)
+import(Matrix, tcltk, lattice, parallel, MASS)
 
 S3method(print, siena)
 S3method(print, sienaGroup)

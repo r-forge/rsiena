@@ -19,7 +19,7 @@ algorithms <- function(data, effects, x, ...)
     z$iter  <-  0
 
     finalLoop <- FALSE
-    library(lattice)
+    ## library(lattice)
 
     z$thetasub <- z$thetasub + 1
     z$thetaHistory[z$thetasub, ] <- z$theta
@@ -532,7 +532,7 @@ algorithmsInitialize <-
 		}
 		else
 		{
-			require(parallel)
+			## require(parallel)
 			clusterType <- match.arg(clusterType)
 			if (clusterType == "PSOCK")
 			{
@@ -897,7 +897,7 @@ responseSurfaceQuadChangeStep <- function(z, eps=0.1)
        mat2 <- diag(eigend$values)
        mat2[mat2 < 0] <- 0
        aaa <- mat1 %*% mat2 %*% t(mat1)
-       require(MASS)
+       ## require(MASS)
        newvals <- -ginv(aaa) %*% b/2
     }
     else

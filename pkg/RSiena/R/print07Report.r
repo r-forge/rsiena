@@ -204,6 +204,14 @@ PrintReport <- function(z, x)
 		else
 		{
 			Heading(3, outf, "Covariance matrices")
+			if (all(is.na(z$covtheta)))
+			{
+				Report(c('There is a linear dependency between the parameter estimates\n',
+					'therefore the covariance matrix should not be used.\n\n'),
+					outf)
+			}
+			else
+			{
 			if (any(z$fixed))
 			{
 				Report(c('(Values of the covariance matrix of estimates\n',
@@ -235,6 +243,7 @@ PrintReport <- function(z, x)
 			PrtOutMat(format(round(covcor, digits = 3), width = 10), lf)
 			Report('\n', outf)
 			Report('\n', lf)
+			}
 		}
 	}
 

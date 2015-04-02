@@ -53,7 +53,7 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 	exam <- vector("list", numberPages)
 	arguments <- vector("list", numberPages)
 
-	library(tools)
+	## library(tools)
 
 	for (i in 1:nrow(RSienaRequiredFunctions))
 	{

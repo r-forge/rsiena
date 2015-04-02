@@ -23,7 +23,7 @@ sienaModelCreate <-
              n3=1000, nsub=4, dolby=TRUE,
              maxlike=FALSE, diagonalize=1.0*!maxlike,
              condvarno=0, condname='',
-             firstg=0.2, cond=NA, findiff=FALSE,  seed=NULL,
+             firstg=0.2, reduceg=0.5, cond=NA, findiff=FALSE,  seed=NULL,
              pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
              prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
              minimumPermutationLength=2, initialPermutationLength=20,
@@ -35,6 +35,7 @@ sienaModelCreate <-
     model$checktime <- TRUE
     model$n3 <- n3
     model$firstg <- firstg
+    model$reduceg <- reduceg
     model$maxrat <- 1.0
 #    model$maxmaxrat <- 10.0
     model$maxlike <-  maxlike

@@ -280,7 +280,7 @@ browser()
 			{
 				for (i2 in 1:nSampCons)
 				{
-					sampleConstantParameters(change, i%%2)
+					sampleConstantParameters(change)
 				}
 			}
 			else
@@ -344,7 +344,7 @@ browser()
 	## not a Bayesian MH step but a Robbins Monro step is made.
 	sampleVaryingParameters <- function(change=TRUE, bgain)
 	{
-		require(MASS)
+		## require(MASS)
 
 		if (z$incidentalBasicRates)
 		{
@@ -472,41 +472,21 @@ browser()
 	##@sampleConstantParameters internal sienaBayes; propose new parameters
 	## eta (the non-varying i.e. constant parameters), and accept them or not
 	## Replace accepted new parameters only if change.
-	## MCversion = 1 proposes change only for the eta parameters,
-	## MCversion = 0 proposes one vector to change all non-rate parameters
 	## (varying and nonvarying)
-	sampleConstantParameters <- function(change=TRUE, MCversion)
+	sampleConstantParameters <- function(change=TRUE)
 	{
 	# do the chamarrita
 	# get a multivariate normal with covariance matrix
-	# proposalC0 (for MCversion=0) or proposalC0eta (for MCversion = 1)
-	# multiplied by a scale factor
+	# proposalC0eta multiplied by a scale factor
 #cat("SampleConstantParameters\n")
 #browser()
 
-		if (MCversion <= 0)
-		{
-			etaChange <- mvrnorm(1, mu=rep(0, sum(z$forEtaVersion0)),
-								Sigma=z$scaleFactor0 * z$proposalC0)
-		}
-		else
-		{
-			etaChange <- mvrnorm(1, mu=rep(0, sum(z$set2)),
-								Sigma=z$scaleFactorEta * z$proposalC0eta)
-		}
+		etaChange <- mvrnorm(1, mu=rep(0, sum(z$set2)),
+							Sigma=z$scaleFactorEta * z$proposalC0eta)
 		thetaOld <- z$thetaMat
 		thetaNew <- thetaOld
-		if (MCversion <= 0)
-		{
-			thetaNew[, z$forEtaVersion0] <-
-				thetaOld[, z$forEtaVersion0] +
-				matrix(etaChange, z$nGroup, sum(z$forEtaVersion0), byrow=TRUE)
-		}
-		else
-		{
-			thetaNew[, z$set2] <- thetaOld[, z$set2] +
-							matrix(etaChange, z$nGroup, z$p2, byrow=TRUE)
-		}
+		thetaNew[, z$set2] <- thetaOld[, z$set2] +
+						matrix(etaChange, z$nGroup, z$p2, byrow=TRUE)
 		# use z still with z$thetaMat = thetaOld:
 		logpOld <- getProbabilitiesFromC(z)[[1]]
 		z$thetaMat <<- thetaNew
@@ -941,7 +921,7 @@ browser()
 
 		if (nbrNodes > 1 && z$observations > 1)
 		{
-			require(parallel)
+			## require(parallel)
 			clusterType <- match.arg(clusterType)
 			if (clusterType == "PSOCK")
 			{
@@ -1159,7 +1139,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	## for MoM estimates only
 	precision <- function(z)
 	{
-		require(MASS)
+		## require(MASS)
 #		t(z$dfrac) %*% ginv(z$msfc) %*% z$dfrac
 # The ...c versions are corrected and have identity rows/columns
 # for fixed parameters. This correction is not to be employed here.
@@ -1711,7 +1691,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	{
 	# Rate parameters are nuisance parameters, and get a data-induced prior;
 	# robust estimates for location and scale plus a small ridge.
-		require(MASS)
+		## require(MASS)
 		robustRates <- cov.mcd(t(rateParameters), nsamp="sample")
 		z$priorMu[z$ratesInVarying] <- robustRates$center
 		z$priorSigma[z$ratesInVarying,] <- 0
@@ -1725,7 +1705,12 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	# depending on the prior for the rates:
 	z$thetaMat[,z$basicRate] <- pmin(z$thetaMat[,z$basicRate],
 			z$priorMu[z$ratesInVarying] + 2*sqrt(diag(z$priorSigma)[z$ratesInVarying]))
-
+	for (group in 1:z$nGroup)
+	{
+		z$thetaMat[group, z$ratePositions[[group]]] <-
+						pmin(z$thetaMat[group, z$ratePositions[[group]]],
+		z$priorMu[z$ratesInVarying] + 2*sqrt(diag(z$priorSigma)[z$ratesInVarying]))
+	}
 	z$incidentalBasicRates <- incidentalBasicRates
 	z$delta <- delta
 	z$gamma <- gamma
@@ -1805,7 +1790,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 
     if (nbrNodes > 1 && z$observations > 1)
     {
-        require(parallel)
+        ## require(parallel)
 		clusterType <- match.arg(clusterType)
 		if (clusterType == "PSOCK")
 		{

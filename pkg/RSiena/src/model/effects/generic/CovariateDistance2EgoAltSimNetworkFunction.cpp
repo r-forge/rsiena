@@ -3,13 +3,14 @@
  *
  * Web: http://www.stats.ox.ac.uk/~snijders/siena/
  *
- * File: CovariateDistance2SimilarityNetworkFunction.cpp
+ * File: CovariateDistance2EgoAltSimNetworkFunction.cpp
  *
  * Description: This file contains the implementation of the class
- * CovariateDistance2SimilarityNetworkFunction.
+ * CovariateDistance2EgoAltSimNetworkFunction.
  *****************************************************************************/
-
-#include "CovariateDistance2SimilarityNetworkFunction.h"
+#include <R_ext/Print.h>
+#include "CovariateDistance2EgoAltSimNetworkFunction.h"
+#include "CovariateNetworkAlterFunction.h"
 #include "network/Network.h"
 
 namespace siena
@@ -25,12 +26,13 @@ namespace siena
  * function is associated with
  * @param[in] excludeMissing: whether to exclude missing values
  */
-CovariateDistance2SimilarityNetworkFunction::
-CovariateDistance2SimilarityNetworkFunction(string networkName, string
-	covariateName, bool excludeMissing) :
+CovariateDistance2EgoAltSimNetworkFunction::
+CovariateDistance2EgoAltSimNetworkFunction(string networkName, string
+	covariateName, bool excludeMissing, bool incoming) :
 	CovariateDistance2NetworkFunction(networkName, covariateName)
 {
 	this->lexcludeMissing = excludeMissing;
+	this->lincoming = incoming;
 }
 
 
@@ -39,16 +41,23 @@ CovariateDistance2SimilarityNetworkFunction(string networkName, string
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double CovariateDistance2SimilarityNetworkFunction::value(int alter)
+double CovariateDistance2EgoAltSimNetworkFunction::value(int alter)
 {
 	double value = 0;
-	if (!this->lexcludeMissing || (!this->missingDummy(alter) &&
-				!this->missingDummy(this->ego())))
+	if (lincoming)
 	{
-		value = this->similarityAvAltNetwork(this->ego(), alter);
-  	}
+		if (!(this->lexcludeMissing && this->missingInDummy(alter)))
+		{
+			value = this->varInAvSimilarityNetwork(this->ego(), alter);
+		}
+	}
+	else
+	{
+		if (!(this->lexcludeMissing && this->missingDummy(alter)))
+		{
+			value = this->varOutAvSimilarityNetwork(this->ego(), alter);
+		}
+	}
 	return value;
 }
-
-
 }

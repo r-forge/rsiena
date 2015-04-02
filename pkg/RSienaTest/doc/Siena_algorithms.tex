@@ -599,9 +599,9 @@ where $s = s^{\rm{obs}}$, the observed value.
 The solution is denoted by $\theta_0$.
 The algorithm is a multivariate version of the Robbins-Monro (1951) algorithm.
 It uses the idea of Polyak (1990) and Ruppert (1988)
-to employ a diagonal matrix $D_0$ in the iteration step (\ref{step})
+to employ a diagonal matrix $\tilde{D}$ in the iteration step (\ref{step})
 \begin{equation}
- \hat{\theta}_{N+1} = \hat{\theta}_N \, - \, a_N\, D_0^{-1} \, (S_N - s)~,   \label{step}
+ \hat{\theta}_{N+1} = \hat{\theta}_N \, - \, a_N\, {\tilde{D}}^{-1} \, (S_N - s)~,   \label{step}
 \end{equation}
  and estimate
 the solution by partial averages of $\hat{\theta}_N$ rather than the
@@ -620,19 +620,25 @@ Whether the algorithm yields an estimate that indeed solves
 the moment equation (\ref{mom_eq0}) to a satisfactory degree of precision
 is checked in the `third phase' of the algorithm below.
 
-The reason for incorporating the matrix $D_0$ is to achieve better compatibility
+The reason for incorporating the matrix ${\tilde{D}}$ is to achieve better compatibility
 between the scales of $S$ and of $\theta$.
-The diagonal elements of $D_0$ are defined as the estimated values of the derivatives
+The diagonal elements of ${\tilde{D}}$ are defined as the estimated values of the derivatives
 $\partial \E_{\theta}(S_k) / \partial \theta_k$ where $\theta$ is
 at its initial value.
 To see that this leads to compatibility of the scales of $S$ and $\theta$
-note that in the extreme case where $\var(S_k) = 0$ and the diagonal elements of $D_0$
+note that in the extreme case where $\var(S_k) = 0$ and the diagonal elements of ${\tilde{D}}$
 are equal to
 $\partial \E_{\theta}(S_k) / \partial \theta_k$,
 (\ref{step}) for $a_N = 1$ is just the iteration step of the Newton-Raphson
 algorithm applied to each coordinate of $S$ separately.
 Thus, beginning the algorithm with $a_N$ in the order of magnitude of 1
 will imply that the initial steps have an approximately right order of magnitude.
+
+The results of Polyak and Ruppert do not point exclusively
+to diagonal matrices; other positive definite matrices could also be used.
+Therefore, the option is available instead of a diagonal matrix
+to use a partial diagonalization; this uses the parameter
+\nnm{diagonalize} set in \nm{sienaModelCreate}.
 
 The number of dimensions of \th{} and of $S$ is denoted by $p$
 and the initial value is denoted \th{1}.
@@ -678,8 +684,7 @@ The algorithm consists of three phases.
       \nnm{dfra} = $D(\theta_1) =
                 \big(\partial \E_\theta(S) / \partial \theta\big)
                        \mid_{\theta = \theta_1} $.\\
-      The diagonal elements of this
-      estimate are used to define $D_0$.
+      This estimate is used to define ${\tilde{D}}$.
       Denote by $e_j$ the $j'$th unit vector in $p$ dimensions.
 
      Initialise ${{\rm{Sum}}}_{d} = 0_{p \times p}$,
@@ -710,8 +715,6 @@ The algorithm consists of three phases.
             {\rm{Sum}}_{S}  &= {\rm{Sum}}_{S} + S \\
             {\rm{Sum}}_{d}  &= {\rm{Sum}}_{d} + d \\
             \end{align*}
-
-\newpage
 
       \item[(SF)] Generate
            \[
@@ -748,7 +751,13 @@ The algorithm consists of three phases.
       \text{SF:     }  \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_1} -
                          \frac{\sum_{m=2}^M {\rm{Sum}}_{Sm}{\rm{Sum}}_{Jm}}{n_1^2} \ .
       \end{align*}
-      \item Diagonal matrix $\tilde{D} = \mbox{diag}(\hat{D})$.
+      \item Partially (or entirely) diagonalized matrix 
+      \[
+         \tilde{D} = \nnm{diagonalize}\times\text{diag}(\hat{D}) 
+               \,+\, (1-\nnm{diagonalize})\times \hat{D} 
+      \]
+      where \nnm{diagonalize} is set in function \nm{sienaAlgorithmCreate},
+      with default value 1.
       \item Componentwise regression coefficients of statistics $S$ on scores
             $\sum_m J_m$, i.e., for each coordinate $j$,
             \[
@@ -760,7 +769,8 @@ The algorithm consists of three phases.
             coefficients are also calculated.)
       \item Make one partial estimated Newton-Raphson step,
       \[
-       {\hat{\theta}} = \theta_1 - a_1 {\hat{D}}^{-1} \left( \bar{s} - s \right)\, .
+       {\hat{\theta}} = \theta_1 - 
+         a_1 {\hat{D}}^{-1} \left( \bar{s} - s \right)\, .
       \]
       where
       \[
@@ -1071,7 +1081,7 @@ then the target statistics for the network are
 \begin{equation}
     \sum_{m=2}^M s_{k}^X(x(t_m),z(t_{m-1}), v(t_{m-1}),w) \ .        \label{fitstatXZ}
 \end{equation}
-and for the behavior 
+and for the behavior
 \begin{equation}
     \sum_{m=2}^M s_{k}^Z(x(t_{m-1}),z(t_{m}), v(t_{m-1}),w) \ .        \label{fitstatZX}
 \end{equation}
@@ -1084,7 +1094,7 @@ configurations of dependent variables, like multiple networks
 or a network with multiple behaviors,
 the same cross-lagged principle is used: for wave $m \in \{2, \ldots, M\}$,
 the dependent variable is taken as observed in wave $m$ and all
-explanatory (`independent') variables as observed in wave $m-1$. 
+explanatory (`independent') variables as observed in wave $m-1$.
 
 In the C++ code, (\ref{fitstat}) is the function \nnm{evaluationStatistic()}.
 The terms in (\ref{fitstat0}) are the function \nnm{egoStatistic()},

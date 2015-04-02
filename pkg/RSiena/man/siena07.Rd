@@ -55,10 +55,11 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     of ministeps should be returned; this will produce a very big file.}
 }
 \details{
- Runs a Robbins-Monro algorithm for parameter estimation using the three-phase
+ Runs a Robbins-Monro algorithm for parameter estimation
+ according to the Method of Moments using the three-phase
  implementation in Snijders (2001) and
  Snijders, Steglich and Schweinberger (2007),
- with (if \code{findiff=TRUE} in the \code{\link{sienaAlgorithm}} object)
+ with (if \code{findiff=FALSE} in the \code{\link{sienaAlgorithm}} object)
  derivative estimation as in Schweinberger and Snijders (2007).
  Phase 1 does a few iterations to
  estimate the derivative matrix of the targets with respect to the
@@ -68,6 +69,20 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  and also once to initialise the model fitting and once to complete it.
  Unless in batch mode, displays a tcl/tk screen to allow interruption
  and to show progress.
+
+ If  \code{maxlike=TRUE} in the \code{\link{sienaAlgorithm}} object,
+ estimation is done by Maximum Likelihood implemented as in
+ Snijders, Koskinen and Schweinberger (2010) also using the three-phase
+ Robbins-Monro algorithm.
+
+ It is necessary to check that convergence has been achieved.
+ The rule of thumb is that all t-ratios for convergence should be
+ in absolute value less than 0.1.
+ If this was not achieved, the result can be used to start
+ another estimation run from the estimate obtained, using
+ the parameter \code{prevAns} as illustrated in the example below.\cr
+ (This parameter is inserted through '\dots' into the function
+ \code{\link{initializeFRAN}}.)
 }
 \value{
   Returns an object of class \code{\link{sienaFit}}, some parts of which are:
@@ -108,6 +123,9 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     \item Snijders, Tom A.B. (2001).
     The statistical evaluation of social network dynamics.
     \emph{Sociological Methodology}, 31, 361-395.
+   \item Snijders, Tom A. B., Koskinen, Johan, and Schweinberger, Michael (2010).
+    Maximum likelihood estimation for social network dynamics.
+    \emph{Annals of Applied Statistics}, 4, 567-588.
    \item Snijders, Tom A.B., Steglich, Christian E.G., and Schweinberger,
     Michael (2007). Modeling the co-evolution of networks and behavior.
     Pp. 41-71 in \emph{Longitudinal models in the behavioral
@@ -119,7 +137,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
    \item Further see \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
            }
 }
-\author{Ruth Ripley }
+\author{Ruth Ripley, Tom Snijders}
 
 \seealso{There are print, summary and xtable
   methods for \code{\link{sienaFit}}

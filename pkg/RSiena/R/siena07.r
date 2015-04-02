@@ -59,7 +59,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 		#}
 		#else
 		#{
-		require(parallel)
+		## require(parallel)
 		#}
         if (clusterIter)
         {
@@ -196,7 +196,7 @@ InitReports <- function(z, seed, newseed)
         revision <- paste(" R-forge revision: ", rforgeRevision, " ", sep="")
     }
     version <- packageDescription(pkgname, fields = "Version")
-    Report(c("\nSiena version ", version, " (",
+    Report(c("\nRSiena version ", version, " (",
              format(as.Date(packageDescription(pkgname, fields = "Date")),
                     "%d %b %y"), ")",
              revision, "\n\n"), sep = '',  outf )
@@ -228,6 +228,7 @@ InitReports <- function(z, seed, newseed)
 ##@AnnouncePhase siena07 Progress reporting
 AnnouncePhase <- function(z, x, subphase=NULL)
 {
+	## require(tcltk)
     if (!is.batch())
     {
         tkdelete(z$tkvars$phase, 0, "end")

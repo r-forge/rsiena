@@ -6,7 +6,7 @@
  * File: SameCovariateInTiesFunction.h
  *
  * Description: This file contains the definition of the
- * SameCovariateTwoPathFunction class.
+ * SameCovariateInTiesFunction class.
  *****************************************************************************/
 
 #ifndef SAMECOVARIATEINTIESFUNCTION_H_
@@ -22,17 +22,18 @@ class SameCovariateInTiesFunction: public CovariateNetworkAlterFunction
 {
 public:
 	SameCovariateInTiesFunction(string networkName,
-		string covariateName, bool excludeMissing);
+		string covariateName, bool sameValue, bool excludeMissing);
 
 	virtual void initialize(const Data * pData,
 		State * pState,
 		int period,
 		Cache * pCache);
-
+	virtual void preprocessEgo(int ego);
 		virtual double value(int alter);
 
 private:
 	bool lexcludeMissing;
+	bool lsameValue;
 };
 
 }

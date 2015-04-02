@@ -1,3 +1,40 @@
+2015-04-02 R-Forge Revision 284
+Changes in RSiena and RSienaTest:
+   * New effects: simEgoDist2, simEgoInDist2, simEgoDist2W, simEgoInDist2W,
+     sameXOutAct, diffXInPop, diffXOutAct.
+   * New effectGroups covarABNetNetObjective,
+     covarANetNetObjective, and covarBNetNetObjective (allEffects.csv, effects.r).
+   * Bug corrected that occurred in print01Report for a sienaGroup object
+     where the component objects have constant dyadic covariates
+     (sienaDataCreate.r).
+   * When a statistic is not plotted in plot.sienaGOF() because
+     its variance is 0, a note about this is printed to the screen.
+   * Minimum and maximum of plotted region in plot.sienaGOF()
+     is calculated without taking into account non-plotted statistics.
+   * Bug corrected with includeTimeDummy for timeDummy greater than
+     or equal to 10 (sienaTimeTest.r).
+   * In case of collinear parameter estimates, standard errors
+     are reported as NA (phase3.r, print07Report.r).
+   * At the end of subphases of phase 2, add condition
+     ((!is.na(z$minacor)) & (!is.na(z$maxacor))) to avoid NA errors.
+   * Arguments main and ylab dropped from plot.sienaGOF(); they did
+     not work, and their functionality now is covered by the ...
+     argument (so using main and ylab as arguments now should work).
+     (Thanks to David Kavaler.)
+   * Various changes in DESCRIPTION and NAMESPACE files with respect
+     to Suggests and Depends; for packages in "Depends", require(packageName)
+     was dropped in all R functions; for package "network",
+     suppressPackageStartupMessages() was added to require();
+     for packages in "Suggests", the package name was everywhere
+     added as packageName:: before the function name.
+   * GPL requirement changed to >= 3.
+Changes in RSienaTest:
+   * sienaBayes: correction in initialization of truncation rate parameters
+     based on prior; correction of sampleConstantParameters() (MCversion=0
+     used the wrong MH ratio, now was dropped altogether).
+Changes in RSiena:
+   * reduceg parameter added (sienaAlgorithmCreate, siena07)
+
 2014-12-11 R-Forge Revision 282
 Changes in RSiena and RSienaTest:
    * Effects cl.XWX and cl2.XWX corrected (thanks to Christoph Stadtfeld)
@@ -20,7 +57,7 @@ Changes in RSienaTest:
    * sienaBayes: the stop caused by singularity of the precision
      matrix after the multi-group estimation now is circumvented;
      still a warning is printed to the screen. This allows the use of
-	 more than one elementary effects having the same target statistic.
+     more than one elementary effects having the same target statistic.
    * sienaBayes: option priorRatesFromData changed to values 0-1-2,
      with 0 = former FALSE, 1 = former TRUE, 2 = robust estimation of prior
      for rate parameters from estimates at the end of initialization phase.

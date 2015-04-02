@@ -21,6 +21,7 @@ storeinFRANstore <- function(...)
 ##@phase2.1 siena07 Start phase 2
 phase2.1<- function(z, x, ...)
 {
+	## require(tcltk)
     #initialise phase2
     if (x$maxlike)
     {
@@ -211,7 +212,8 @@ doIterations<- function(z, x, subphase,...)
 {
     z$nit <- 0
     ac <- 0
-	z$maxacor <- 1
+	z$maxacor <- -1
+	z$minacor <- 1
     xsmall <- NULL
     zsmall <- makeZsmall(z)
     z$returnDeps <- FALSE
@@ -376,13 +378,16 @@ doIterations<- function(z, x, subphase,...)
             break
         }
         ## do we stop?
-        if ((z$nit >= z$n2min && z$maxacor < 1e-10)||
-			   (z$nit >= z$n2max)||
-			   ((z$nit >= 50) && (z$minacor < -0.8) &&
-                (z$repeatsubphase < z$maxrepeatsubphase)))
-        {
-            break
-        }
+		if (!(is.na(z$minacor) || is.na(z$maxacor)))
+		{
+			if ((z$nit >= z$n2min && z$maxacor < 1e-10)||
+				(z$nit >= z$n2max)||
+				((z$nit >= 50) && (z$minacor < -0.8) &&
+					(z$repeatsubphase < z$maxrepeatsubphase)))
+			{
+				break
+			}
+		}
     }
     z
 }

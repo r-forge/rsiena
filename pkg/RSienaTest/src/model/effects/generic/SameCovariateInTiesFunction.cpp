@@ -30,9 +30,10 @@ namespace siena
  */
 
 SameCovariateInTiesFunction::SameCovariateInTiesFunction(
-	string networkName, string covariateName, bool excludeMissing) :
+	string networkName, string covariateName, bool sameValue, bool excludeMissing) :
 	CovariateNetworkAlterFunction(networkName, covariateName)
 {
+	this->lsameValue = sameValue;
 	this->lexcludeMissing = excludeMissing;
 }
 
@@ -53,6 +54,17 @@ void SameCovariateInTiesFunction::initialize(const Data * pData,
 
 
 /**
+ * Does the necessary preprocessing work for calculating the
+ * predicate for a specific ego. This method must be invoked before
+ * calling SameCovariateInTiesFunction::value(...).
+ */
+
+void SameCovariateInTiesFunction::preprocessEgo(int ego)
+{
+	AlterFunction::preprocessEgo(ego);
+}
+
+/**
  * Returns the value of this function for the given alter. It is assumed
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
@@ -64,8 +76,9 @@ double SameCovariateInTiesFunction::value(int alter)
 	{
 		const Network * pNetwork = this->pNetwork();
 		// Iterate over incoming ties of alter
-		for (IncidentTieIterator iter =
-				pNetwork->inTies(alter);
+		if (lsameValue)
+		{
+			for (IncidentTieIterator iter =	pNetwork->inTies(alter);
 			iter.valid();
 			iter.next())
 			{
@@ -75,7 +88,7 @@ double SameCovariateInTiesFunction::value(int alter)
 				if (!(this->lexcludeMissing && this->missing(h)))
 				{
 					if ((fabs(this->CovariateNetworkAlterFunction::value(h)
-				- this->CovariateNetworkAlterFunction::value(this->ego()))
+					- this->CovariateNetworkAlterFunction::value(this->ego()))
 									< EPSILON))
 					{
 						statistic++ ;
@@ -83,11 +96,31 @@ double SameCovariateInTiesFunction::value(int alter)
 				}
 			}
 		// Add the following just like for inPop effect:
-		// I think this is not very efficient; how to use the cache?
-		if (pNetwork->tieValue(this->ego(), alter) <= 0)
+			if  (!this->outTieExists(alter))
+			{
+				// The statistic will increase after introducing the tie
+				statistic++;
+			}
+		}
+		else
 		{
-			// The statistic will increase after introducing the tie
-			statistic++;
+			for (IncidentTieIterator iter =	pNetwork->inTies(alter);
+			iter.valid();
+			iter.next())
+			{
+				// Get the sender of the incoming tie.
+				int h = iter.actor();
+				// ego needs to have a different covariate value than h:
+				if (!(this->lexcludeMissing && this->missing(h)))
+				{
+					if ((fabs(this->CovariateNetworkAlterFunction::value(h)
+				- this->CovariateNetworkAlterFunction::value(this->ego()))
+									>= EPSILON))
+					{
+						statistic++ ;
+					}
+				}
+			}
 		}
 	}
 	return statistic;

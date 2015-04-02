@@ -371,7 +371,7 @@ reportp <- function(p, ndec)
 ##@plot.sienaMeta Methods
 plot.sienaMeta <- function(x, ..., layout = c(2,2))
 {
-    library(lattice)
+    ## library(lattice)
     tmp <- xyplot(theta ~ se|effects,
                   data=x$thetadf[is.na(x$thetadf$scoretests),],
                   ylab="estimates",

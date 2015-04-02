@@ -11,8 +11,8 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
 }
 \arguments{
   \item{\dots}{names of Siena fit objects, returned from
-	\code{\link{siena07}}. They will be renamed if entered in format
-	\code{newname=oldname}.
+    \code{\link{siena07}}. They will be renamed if entered in format
+    \code{newname=oldname}.
 }
 \item{projname}{
   Base name of report file if required
@@ -92,7 +92,8 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
   of delinquent behavior on friendship
   evolution. \emph{Journal of Mathematical Sociology}, 27: 123-151, 2003.
 
-  See also the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}
+  See also the manual (Section 11.2)
+  and \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
 \author{Ruth Ripley, Tom Snijders}
 
@@ -102,8 +103,8 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
 \dontrun{
 # A meta-analysis for three groups does not make much sense
 # for generalizing to a population of networks,
-# but it the Fisher combinations of p-values are meaningful.
-# But using three groups shows the idea.
+# but the Fisher combinations of p-values are meaningful.
+# However, using three groups does show the idea.
 
 Group1 <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))
 Group3 <- sienaDependent(array(c(N3403, HN3403), dim=c(37, 37, 2)))

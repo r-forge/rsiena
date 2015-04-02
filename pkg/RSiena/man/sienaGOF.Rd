@@ -25,7 +25,7 @@ sienaGOF(sienaFitObject, auxiliaryFunction,
         cluster=NULL, robust=FALSE, groupName="Data1",
         varName, \dots)
 \method{plot}{sienaGOF}(x, center=FALSE, scale=FALSE, violin=TRUE, key=NULL,
-        perc=.05, period=1, main=main, ylab=ylab, \dots)
+        perc=.05, period=1, \dots)
 descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL,
         period=1, showAll=FALSE)
 }
@@ -70,11 +70,10 @@ descriptives.sienaGOF(x, center=FALSE, scale=FALSE, perc=.05, key=NULL,
   \item{key}{ Keys in the plot for the levels of the auxiliary statistic
         (as given by parameter \code{levls} in the examples). }
   \item{perc}{ 1 minus confidence level for the confidence bands (two sided). }
-  \item{main}{ Main title of the plot. }
-  \item{ylab}{ The y-axis label for the plot. }
-  \item{\dots}{Other arguments; e.g., \code{levls} for \code{sienaGOF()} where
+  \item{\dots}{Other arguments; e.g. (1), \code{levls} for \code{sienaGOF()} where
       \code{levls} is a parameter for the auxiliary statistic as in
-      \code{\link{sienaGOF-auxiliary}}.}
+      \code{\link{sienaGOF-auxiliary}}; e.g. (2), \code{main}, \code{xlab}
+      and/or \code{ylab} for \code{plot.sienaGOF()}.}
   \item{showAll}{If FALSE, drops statistics with variance 0, like in the plot.}
 }
 \details{

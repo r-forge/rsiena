@@ -21,6 +21,7 @@ storeinFRANstore <- function(...)
 ##@phase2.1 siena07 Start phase 2
 phase2.1<- function(z, x, ...)
 {
+	## require(tcltk)
     #initialise phase2
     if (x$maxlike)
     {
@@ -40,6 +41,7 @@ phase2.1<- function(z, x, ...)
     z$sd[z$fixed] <- 0
     Report(paste('\nPhase 2 has', x$nsub, 'subphases.\n'), cf)
     z$gain <- x$firstg
+    z$reduceg <- x$reduceg
     if (x$nsub <= 0)
     {
         Report('With 0 subphases, there is no phase 2.\n', cf)
@@ -200,7 +202,7 @@ proc2subphase <- function(z, x, subphase, useAverage=TRUE, ...)
 	}
 	else
 	{
-		z$gain <- z$gain * 0.5
+		z$gain <- z$gain * z$reduceg
 	}
     z
 } ##end of this subphase
@@ -210,7 +212,8 @@ doIterations<- function(z, x, subphase,...)
 {
     z$nit <- 0
     ac <- 0
-	z$maxacor <- 1
+	z$maxacor <- -1
+	z$minacor <- 1
     xsmall <- NULL
     zsmall <- makeZsmall(z)
     z$returnDeps <- FALSE
@@ -375,6 +378,8 @@ doIterations<- function(z, x, subphase,...)
             break
         }
         ## do we stop?
+		if (!(is.na(z$minacor) || is.na(z$maxacor)))
+		{
         if ((z$nit >= z$n2min && z$maxacor < 1e-10)||
 			   (z$nit >= z$n2max)||
 			   ((z$nit >= 50) && (z$minacor < -0.8) &&
@@ -382,6 +387,7 @@ doIterations<- function(z, x, subphase,...)
         {
             break
         }
+		}
     }
     z
 }

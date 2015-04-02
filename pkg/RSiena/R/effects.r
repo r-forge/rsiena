@@ -36,7 +36,7 @@ substituteNames <- function(nameVectors, xName=NULL, yName=NULL, zName=NULL)
 createEffects <- function(effectGroup, xName=NULL, yName=NULL, zName = NULL,
 						  name, groupName, group, netType)
 {
-    effects <- allEffects[allEffects$effectGroup == effectGroup, ]
+	effects <- RSiena::allEffects[RSiena::allEffects$effectGroup == effectGroup, ]
     if (nrow(effects) == 0)
     {
         stop("empty effect group")
@@ -88,6 +88,16 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         tmp
     }
 
+##@addSettingseffects internal getEffects add effects for settings model
+addSettingsEffects <- function(effects)
+{
+depvar <- attr(effects, "depvar")
+	## This processes the settings (constant dyadic covariate) structure.
+	## Only for one-mode network.
+	nbrSettings <- length(attr(depvar,"settings"))
+	## This leads to a warning in R CMD Check.
+	## Not important since this is just a stub, to be developed later.
+}
     ##@networkRateEffects internal getEffects create a set of rate effects
     networkRateEffects <- function(depvar, varname, symmetric, bipartite)
     {
@@ -267,9 +277,11 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                     {
                         objEffects <-
                             rbind(objEffects,
-                                  covarNetNetEff(otherName, names(xx$cCovars)[k],
-                                                 attr(xx$cCovars[[k]],
-													  'poszvar'),
+									covarNetNetEff(otherName,
+									covarname=names(xx$cCovars)[k],
+									attr(xx$depvars[[j]], 'nodeSet'),
+									attr(xx$cCovars[[k]], 'nodeSet'),
+									attr(xx$cCovars[[k]], 'poszvar'),
                                                  name=varname))
                     }
                 }
@@ -279,9 +291,11 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                     {
                         objEffects <-
                             rbind(objEffects,
-                                  covarNetNetEff(otherName, names(xx$vCovars)[k],
-                                                 attr(xx$vCovars[[k]],
-													  'poszvar'),
+									covarNetNetEff(otherName,
+									covarname=names(xx$vCovars)[k],
+									attr(xx$depvars[[j]], 'nodeSet'),
+									attr(xx$vCovars[[k]], 'nodeSet'),
+									attr(xx$vCovars[[k]], 'poszvar'),
                                                  name=varname))
                     }
                 }
@@ -292,7 +306,10 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                     {
                         objEffects <-
                             rbind(objEffects,
-                                  covarNetNetEff(otherName, names(xx$depvars)[k],
+									covarNetNetEff(otherName,
+									covarname=names(xx$depvars)[k],
+									attr(xx$depvars[[j]], 'nodeSet'),
+									attr(xx$depvars[[k]], 'nodeSet'),
                                                  poszvar=TRUE,
                                                  name=varname))
                     }
@@ -324,9 +341,9 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         rateEffects$basicRate[1:observations] <- TRUE
 
 		objEffects[objEffects$shortName == "density" &
-                       objEffects$type == "eval",'randomEffects'] <- TRUE # added dec2013
+					   objEffects$type == "eval",'randomEffects'] <- TRUE
 		objEffects[objEffects$shortName == "linear" &
-                       objEffects$type == "eval",'randomEffects'] <- TRUE # added dec2013
+					   objEffects$type == "eval",'randomEffects'] <- TRUE
 
         objEffects$untrimmedValue <- rep(0, nrow(objEffects))
         if (attr(depvar,'symmetric'))
@@ -797,7 +814,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                                             netType=netType)
         }
 
-        if (!poszvar)
+		if (!poszvar)  # not (positive variance of z, or any z missing)
         {
             if (symmetric)
             {
@@ -834,13 +851,13 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
                               netType=netType)
             covObjEffects <-
                 covObjEffects[covObjEffects$shortName %in%
-                              c("egoX", "altInDist2", "totInDist2"), ]
+							  c("egoX", "altInDist2", "totInDist2", "simEgoInDist2"), ]
             covRateEffects <- createEffects("covarBipartiteRate", covarname,
                                             name=varname,
                                             groupName=groupName, group=group,
                                             netType=netType)
         }
-        else if (poszvar)
+		else if (poszvar) # positive variance of z, or any z missing
         {
             covObjEffects <- createEffects("covarBipartiteObjective", covarname,
                                            name=varname,
@@ -949,16 +966,56 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
         list(objEff=covObjEffects)
     }
     ##@covarNetNetEff internal getEffects
-    covarNetNetEff<- function(othernetname,
-                              covarname, poszvar, name)
+	covarNetNetEff<- function(othernetname, covarname, nodeSetsj, nodeSetk, poszvar, name)
+	{
+		if (poszvar) # positive variance of z, or any z missing
+		{
+			if (length(nodeSetsj) <= 1) ## second network onemode
+			{
+				processA <- TRUE
+				processB <- TRUE
+				objEffectsOneMode <- createEffects("covarNetNetObjective", othernetname,
+								   covarname, name=name,
+								   groupName=groupName, group=group,
+								   netType=netType)
+			}
+			else ## second network twomode
+			{
+				processA <- (nodeSetsj[[1]] == nodeSetk)
+				processB <- (nodeSetsj[[2]] == nodeSetk)
+				objEffectsOneMode <- NULL
+			}
+			if (processA)
     {
-        objEffects <- createEffects("covarNetNetObjective", othernetname,
+				objEffectsA <- createEffects("covarANetNetObjective", othernetname,
+								   covarname, name=name,
+								   groupName=groupName, group=group,
+								   netType=netType)
+			}
+			else
+			{
+				objEffectsA <- NULL
+			}
+			if (processB)
+			{
+				objEffectsB <- createEffects("covarBNetNetObjective", othernetname,
                                    covarname, name=name,
                                    groupName=groupName, group=group,
                                    netType=netType)
-        if (!poszvar)
+			}
+			else
+			{
+				objEffectsB <- NULL
+			}
+			objEffectsAB <- createEffects("covarABNetNetObjective", othernetname,
+								   covarname, name=name,
+								   groupName=groupName, group=group,
+								   netType=netType)
+			objEffects <- rbind(objEffectsOneMode, objEffectsAB, objEffectsA, objEffectsB)
+		}
+		else
         {
-            objEffects <- objEffects[objEffects$shortName != "covNetNet", ]
+			objEffects <- NULL
         }
         objEffects
     }
