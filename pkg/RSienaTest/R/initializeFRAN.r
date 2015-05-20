@@ -72,15 +72,15 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             }
             effects$initialValue <- defaultEffects$initialValue
         }
-		if (((inherits(data, "sienaGroup")) && 
+		if (((inherits(data, "sienaGroup")) &&
 				(!all(names(x$MaxDegree) %in% names(data[[1]]$depvars)))) ||
-			((!inherits(data, "sienaGroup")) && 
+			((!inherits(data, "sienaGroup")) &&
 				(!all(names(x$MaxDegree) %in% names(data$depvars)))))
 		{
 			cat(' MaxDegree in the algorithm should be a named vector\n')
 			cat(' with only names of dependent variables in the data set.\n')
 			stop('Invalid algorithm-data combination.')
-		}		
+		}
         ## get data object into group format to save coping with two
         ## different formats
         if (inherits(data, "sienaGroup"))
@@ -321,18 +321,16 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 				# is defined in x and may have changed.
 				# Therefore here we copy the corresponding lines
 				# from phase1.r.
-				if (!x$diagg)
-				{
-					# Partial diagonalization of derivative matrix
-					# for use if 0 < x$diagonalize < 1.
-					temp <- (1-x$diagonalize)*z$dfra +
-							x$diagonalize*diag(diag(z$dfra))
-					temp[z$fixed, ] <- 0.0
-					temp[, z$fixed] <- 0.0
-					diag(temp)[z$fixed] <- 1.0
-					# Invert this matrix
-					z$dinvv <- solve(temp)
-				}
+				# Partial diagonalization of derivative matrix
+				# for use if 0 < x$diagonalize < 1.
+				temp <- (1-x$diagonalize)*z$dfra +
+						x$diagonalize*diag(diag(z$dfra))
+				temp[z$fixed, ] <- 0.0
+				temp[, z$fixed] <- 0.0
+				diag(temp)[z$fixed] <- 1.0
+				# Invert this matrix
+				z$dinvv <- solve(temp)
+
 				z$sf <- prevAns$sf
 				# check for backward compatibility with pre-1.1-220 versions:
 				if (is.null(prevAns$regrCoef))
@@ -563,8 +561,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
                  profileData, z$parallelTesting, x$modelType, z$simpleRates)
-# Here came an error 
-# Error: INTEGER() can only be applied to a 'integer', not a 'double'				 
+# Here came an error
+# Error: INTEGER() can only be applied to a 'integer', not a 'double'
     if (x$maxlike)
     {
         if (!initC)

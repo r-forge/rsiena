@@ -146,7 +146,6 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     z$theta0 <- z$theta
 	## store starting value without any conditioning variables
     z$anyposj <- any(z$posj)
-    z$resist <- rep(1, z$pp)
     z$n1 <- 7 + 3 * z$pp
 	if (x$dolby){z$n1 <- max(z$n1, 50)}
     if (any(!z$fixed))

@@ -1020,6 +1020,7 @@ clearStoredChains <- function()
 doChangeStep <- function(z, x, fra)
 {
     ## limit change.  Reporting is delayed to end of phase.
+	if (is.null(x$maxmaxrat)){x$maxmaxrat <- 10.0}
     if (x$diag)## !maxlike at present
     {
         maxrat<- max(ifelse(z$sd, abs(fra)/ z$sd, 1.0))
@@ -1038,10 +1039,8 @@ doChangeStep <- function(z, x, fra)
     }
     fchange[z$fixed] <- 0.0
     ## check positivity restriction
-    if (!is.null(z$nit))
-    {
-        z$positivized[z$nit, ] <- z$posj & (fchange > z$theta)
-    }
+	z$positivized[fchange > z$theta] <- z$positivized[fchange > z$theta] +1
+	z$positivized[!z$posj] <- 0
     fchange <- ifelse(z$posj & (fchange > z$theta), z$theta * 0.5, fchange)
 
     z$theta <- z$theta - fchange

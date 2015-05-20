@@ -218,7 +218,7 @@ the first dependent variable
 \STATE Check constraints if there are multiple networks. (section
 \ref{sec:constraints}).
 \STATE Calculate similarity means for alters for each covariate and dependent
-network (see section \ref{sec:covarDist2})
+network (see section \ref{sec:covarDist2}): dropped in version 1.1-285.
 \end{algorithmic}
 \subsection{ Covariates}
 \subsubsection{Constant Covariate}
@@ -509,7 +509,7 @@ network.
 \FORALL{dependent networks which have the node set of the constant covariate as
   their receivers (not behavior variables)}
 \STATE Substract the mean from the behavior variable
-\STATE FInd the range of the behavior variable
+\STATE Find the range of the behavior variable
 \STATE Calculate the corresponding similarity mean using the centered behavior
 variable values (omitting final column) and the calculated range: see section
 \ref{sec:simdist2}).
@@ -589,7 +589,12 @@ complete effect rows including endowment effect copies.
   \IF{oneMode}
   \STATE Use \sfn{nonSymmetricSymmetricObjective} or
   \sfn{nonSymmetricNonSymmetricObjective} effect groups to add appropriate
-effects
+    effects
+  \STATE Use \sfn{tripleNetworkObjective} effect group to add appropriate
+    effects for pairs of other dependent networks
+    (`other' meaning that they have the role of explanatory variables)
+    that either are both one-mode, 
+    or both are bipartite with the same second node sets
   \ELSIF{bipartite which matches on nodeset 1}
   \STATE Use \sfn{nonSymmetricBipartiteObjective} effect group to add
   appropriate effects

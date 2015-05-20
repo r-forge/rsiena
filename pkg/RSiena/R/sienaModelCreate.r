@@ -20,14 +20,15 @@ ModelTypeStrings <- c("Standard actor-oriented model",
 sienaModelCreate <-
     function(fn,
              projname="Siena", MaxDegree=0, useStdInits=FALSE,
-             n3=1000, nsub=4, dolby=TRUE,
+n3=1000, nsub=4, n2start = NULL, dolby=TRUE,
              maxlike=FALSE, diagonalize=1.0*!maxlike,
              condvarno=0, condname='',
              firstg=0.2, reduceg=0.5, cond=NA, findiff=FALSE,  seed=NULL,
              pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
              prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
              minimumPermutationLength=2, initialPermutationLength=20,
-             modelType=1, mult=5, simOnly=FALSE, localML=FALSE)
+modelType=1, mult=5, simOnly=FALSE, localML=FALSE,
+truncation=5, doubleAveraging=nsub, standardizeVar=(diagonalize<1))
 {
     model <- NULL
     model$projname <- projname
@@ -37,7 +38,6 @@ sienaModelCreate <-
     model$firstg <- firstg
     model$reduceg <- reduceg
     model$maxrat <- 1.0
-#    model$maxmaxrat <- 10.0
     model$maxlike <-  maxlike
 	model$simOnly <- simOnly
 	model$localML <- localML
@@ -83,6 +83,7 @@ sienaModelCreate <-
     }
     model$FinDiff.method <-  findiff
     model$nsub <- nsub
+model$n2start <- n2start
 	model$dolby <- (dolby && (!maxlike))
 	if (diagonalize < 0) {diagonalize <- 0}
 	if (diagonalize > 1) {diagonalize <- 1}
@@ -102,6 +103,24 @@ sienaModelCreate <-
     model$minimumPermutationLength <- minimumPermutationLength
     model$initialPermutationLength <- initialPermutationLength
     model$mult <- mult
+model$truncation <- truncation
+model$doubleAveraging <- doubleAveraging
+model$standardizeWithTruncation <- standardizeVar
+model$standardizeVar <- standardizeVar
+# The difference between these two is a hidden, non-documented option,
+# perhaps for being tried out
+# by later modification of the sienaAlgorithm object.
+model$noAggregation <- FALSE
+# This also is a hidden, non-documented option, perhaps for being tried out.
+#  \item{noAggregation}{Logical:
+#   do not replace current parameter value after subphase 1
+#   by the mean over subphase 1, if some quasi-autocorrelation
+#   then is larger than .5. May be helpful if initial value was very far away.
+# The two options model$noAggregation and model$standardizeWithTruncation
+# are used only in phase2.r.
+model$browse1 <- FALSE # non-documented options for browsing in phase 2.
+model$browse2 <- FALSE
+model$browse3 <- FALSE
     class(model) <- "sienaAlgorithm"
     model
 }
@@ -110,4 +129,4 @@ model.create <- sienaModelCreate
 
 
 ##@sienaAlgorithmCreate AlgoritmCreate
-sienaAlgorithmCreate <- sienaModelCreate 
+sienaAlgorithmCreate <- sienaModelCreate

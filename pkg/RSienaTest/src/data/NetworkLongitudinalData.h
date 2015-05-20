@@ -61,10 +61,17 @@ public:
 
 	void calculateProperties();
 
+	int m() const; // number of receivers.
 	void maxDegree(int degree);
 	int maxDegree() const;
-	double averageInDegree() const;
-	double averageOutDegree() const;
+	double averageInDegree() const; // average over all observations,
+		//calculated in calculateProperties
+	double averageOutDegree() const;// average over all observations,
+		//calculated in calculateProperties
+	double averageSquaredInDegree() const; // average over all observations,
+		//calculated in calculateProperties
+	double averageSquaredOutDegree() const;// average over all observations,
+		//calculated in calculateProperties
 	void averageInDegree(double val);
 	void averageOutDegree(double val);
 	virtual double observedDistribution(int value, int observation) const;
@@ -100,11 +107,13 @@ private:
 	// The maximum permitted out-degree of an actor. Infinity by default.
 	int lmaxDegree;
 
-	// The average in-degree over all receivers and observations
+	// The average in-degree (and squared in-degree) over all receivers and observations
 	double laverageInDegree;
+	double laverageSquaredInDegree;
 
-	// The average out-degree over all senders and observations
+	// The average out-degree (and squared out-degree) over all senders and observations
 	double laverageOutDegree;
+	double laverageSquaredOutDegree;
 
 	// The density of the network at each observation with the missing
 	// values excluded from the calculation.

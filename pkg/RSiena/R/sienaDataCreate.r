@@ -50,6 +50,10 @@ addAttributes.coCovar <- function(x, name, ...)
 	attr(x, "name") <- name
 	attr(x, "vartotal") <- vartotal
 	attr(x, "nonMissingCount") <- nonMissingCount
+	if ((!is.null(attr(x, "imputationValues"))) && (attr(x, "centered")))
+	{
+		attr(x, "imputationValues") <- attr(x, "imputationValues") - varmean
+	}
 	x
 
 }
@@ -88,6 +92,10 @@ addAttributes.varCovar <- function(x, name, ...)
 	attr(x, 'name') <- name
 	attr(x, "vartotal") <- vartotal
 	attr(x, "nonMissingCount") <- nonMissingCount
+    if ((!is.null(attr(x, "imputationValues"))) && (attr(x, "centered")))
+	{
+		attr(x, "imputationValues") <- attr(x, "imputationValues") - varmean
+	}
 	x
 }
 ##@addAttributes.coDyadCovar DataCreate

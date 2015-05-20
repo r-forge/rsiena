@@ -148,15 +148,13 @@ phase3.2 <- function(z, x, ...)
         ##calculate t-ratios
         dmsf <- diag(z$msf)
         sf <- colMeans(z$sf)
- 		# TS: I wonder why "use" and "use2" are the names in the following lines;
- 		# the coordinates with "use" are <<not>> used.
-        use <- dmsf < 1e-20 * z$scale * z$scale
-        use2 <- abs(sf) < 1e-10 * z$scale
-        dmsf[use] <- 1e-20 * z$scale[use] * z$scale[use]
+        toosmall <- dmsf < 1e-20 * z$scale * z$scale
+        toosmall2 <- abs(sf) < 1e-10 * z$scale
+        dmsf[toosmall] <- 1e-20 * z$scale[toosmall] * z$scale[toosmall]
         tstat <- rep(NA, z$pp)
-        tstat[!use]<- sf[!use] / sqrt(dmsf[!use])
-        tstat[use & use2] <- 0
-        tstat[use & !use2] <- NA # was 999
+        tstat[!toosmall]<- sf[!toosmall] / sqrt(dmsf[!toosmall])
+        tstat[toosmall & toosmall2] <- 0
+        tstat[toosmall & !toosmall2] <- NA
         z$tstat <- tstat
  		# tconv.max = Maximum value of t-ratio for convergence,
  		# for any linear combination.
@@ -168,7 +166,7 @@ phase3.2 <- function(z, x, ...)
  			if (inherits(try(thisproduct <- solve(cov.dev, mean.dev), silent=TRUE),
  						"try-error"))
  			{
- 				Report('Maximum t-ratio for convergence not computable.\n', outf)
+ 	Report('Overall maximum t-ratio for convergence not computable.\n', outf)
  			}
  			else
  			{
@@ -184,10 +182,12 @@ phase3.2 <- function(z, x, ...)
         PrtOutMat(as.matrix(mymess), outf)
         PrtOutMat(as.matrix(mymess1), bof)
         ##  Report(mymess1, bof, fill=80)
-        tmax <- max(abs(tstat)[!z$fixed & !z$BasicRateFunction & z$resist > 0.9])
+        tmax <- max(abs(tstat)[!z$fixed])
         z$tconv <- tstat
-        error <- (abs(tmax) > 4.0 / sqrt(z$Phase3nits)) && (abs(tmax) > 0.3)
-        if (tmax >= 0.4)
+		z$tmax <- tmax
+        error <- (is.na(tmax)) ||
+						(abs(tmax) > 4.0 / sqrt(z$Phase3nits)) && (abs(tmax) > 0.3)
+        if ((is.na(tmax)) || (tmax >= 0.4))
  		{
             z$error <- TRUE
  		}
@@ -197,6 +197,8 @@ phase3.2 <- function(z, x, ...)
  			Report('of non-fixed parameters ', outf)
  		}
         Report('being close to zero.\n', outf)
+		Report(c('\nOverall maximum convergence ratio = ',
+			round(z$tconv.max, digits=4), '.\n'), outf)
         if (z$Phase3nits < 100)
  		{
             Report(c('(Since the diagnostic checks now are based only on ',
@@ -206,7 +208,8 @@ phase3.2 <- function(z, x, ...)
         if (error) ## also test subphase here but not relevant to phase 3, I think
         {
             Report('One or more of the t-statistics are rather large.\n', outf)
-            if (tmax > 0.5)
+			doubts <- ifelse(is.na(tmax), TRUE, tmax > 0.5)
+            if (doubts)
  			{
                 Report('Convergence of the algorithm is doubtful.\n', outf)
  			}

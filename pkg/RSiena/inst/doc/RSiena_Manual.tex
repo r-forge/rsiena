@@ -191,7 +191,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-284.
+This version was renewed for \RS version 1.1-285.
 \end{abstract}
 
 
@@ -772,9 +772,11 @@ different impact) of effects for the increase and the decrease of behavior.
   value itself.)
 \item In Phase 3, the final result of Phase 2 is used, and it is checked if the
   average statistics of many simulated networks are indeed close to the target
-  values. This is reflected in the so-called \texttt{t statistics for deviations
-  from targets}. If some of these are too high (a threshold of 0.1 is
-  used for the absolute value), the estimation must be repeated.
+  values. This is reflected in the so-called
+  \texttt{overall maximum convergence ratio} and the \texttt{t statistics for deviations
+  from targets}. If some of these are too high (a threshold of 0.25 is used for the
+  overall maximum convergence ratio, and a threshold of 0.1 for the absolute value
+  of the t statistics for deviations from targets), the estimation must be repeated.
    Standard errors for the parameters are also estimated in this
   phase.
 
@@ -809,8 +811,11 @@ of the software appear).
             Many users prefer some kind of additional environment, such as \texttt{RStudio}, or
             the combination of \texttt{Notepad++} with \texttt{NppToR}.
 	\item	Install the package \RS or \sfn{RSienaTest}, with dependencies.
-            The other packages used are \sfn{tcltk}, \sfn{network}, \sfn{codetools},
-            \sfn{lattice}, \sfn{MASS}, \sfn{parallel}, \sfn{xtable}, and \sfn{tools}.
+            The other packages used are \sfn{tcltk}, \sfn{parallel}
+            and \sfn{tools} (all included in the basic \R distribution); 
+            \sfn{Matrix}, \sfn{MASS}, \sfn{lattice}, \sfn{codetools}
+            (`recommended' packages included in most R distributions);
+            and \sfn{network} and \sfn{xtable}.
             For goodness of fit testing it will be useful also to
             install \sfn{sna} and \sfn{igraph}.\\
             You can just install \RS and the other packages
@@ -843,24 +848,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.1-282}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.1-285}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-282.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.1-285.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-282.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.1-285.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.1-282.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.1-285.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-282.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-285.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-282.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-285.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-282.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-285.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1000,10 +1005,12 @@ of \rs.
       If Jaccard indices are low because the network is mainly increasing
       (creation of new ties) or decreasing (termination of ties),
       this is no problem for the \SI method.
-\item When parameters have been estimated, first look at the \texttt{t
-      ratios for deviations from targets}.
-      We say that the algorithm has converged if they are all smaller than 0.1
-      in absolute value, and that it has nearly converged if they are all
+\item When parameters have been estimated, first look at the 
+     \texttt{overall maximum \\convergence ratio} and the \texttt{t statistics for deviations
+      from targets}. 
+      We say that the algorithm has converged if the former is less than 0.25,
+      and the latter all are smaller than 0.1 in absolute value;
+      and that it has nearly converged if the former is less than 0.35, and the latter are all
       smaller than 0.15. Results obtained for non-converged estimation
       runs may be misleading. (Very small deviations from these
       values are of course immaterial.) See Section~\ref{S_ccheck}.
@@ -1047,7 +1054,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-284) and an R-Forge revision
+  identified by a version number (e.g.\ 1.1-285) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1803,16 +1810,17 @@ is used: if there is a previous observation of the same variable
 then this value is imputed, if there is none then the
 observationwise mode of the variable is imputed.
 Missing covariate data are replaced by the
-variable's average score at this observation moment. In the course
+variable's global mean. In the course
 of the simulations, however, the imputed values of the dependent
 behavior variables and of the network variables are allowed to
 change.
+\medskip
 
 In order to ensure a minimal impact of missing data treatment on
-the results of parameter estimation (method of moments estimation)
-and/or simulation runs, the calculation of the statistics
-used for fitting and reporting in these procedures uses only
-non-missing data.
+the results of parameter estimation (Method of Moments estimation)
+and/or simulation runs, the calculation of the target statistics
+used for estimation by the Method of Moments, and reporting in these 
+procedures uses only non-missing data.
 When for an actor in a given period, any variable is missing that is
 required for calculating a contribution to such a statistic, this
 actor in this period does not contribute to the statistic in
@@ -1820,6 +1828,16 @@ question. For network and dependent behavior variables, the tie variable
 or the actor variable, respectively,
 must provide valid data both at the beginning and at the end of a
 period for being counted in the respective statistics.
+\medskip
+
+By using the argument \texttt{imputationValues} in \sfn{coCovar()}
+and \sfn{varCovar()}, other values 
+(i.e., values different from the mean that is used by default
+for imputation) can be given for imputation of missings
+in monadic covariates.
+These are then used for the simulations; since they were indicated as missings
+(\texttt{NA}) in the data themselves, they will not be used for the calculation
+of target statistics in the Method of Moments.
 
 \subsubsection{Composition change: joiners and leavers}
 \label{S_comp}
@@ -2064,8 +2082,8 @@ between adding an effect in either the creation or the endowment role.
 \bigskip
 
 \newpage
-\textbf{\emph{Elementary effects}}
-\medskip
+\subsubsection{Elementary effects}
+\label{S_elementary}
 
 Not all contributions  to the probability of change can be written
 as the change in some basic function (evaluation function).
@@ -3560,6 +3578,7 @@ typing the name of the  \textsf{sienaFit} object. For example,
 results1
 \end{verbatim}
 could give a summary such as
+% see sim_script.R; these are the s50 data, waves 1-2, seed=1234.
 \par
 {\footnotesize
 \begin{verbatim}
@@ -3567,13 +3586,14 @@ Estimates, standard errors and convergence t-ratios
                               Estimate   Standard   Convergence
                                            Error      t-ratio
 Rate parameters:
-  0       Rate parameter       5.9379  ( 1.0007   )
-  1. eval outdegree (density) -2.4742  ( 0.1316   )   0.1328
-  2. eval reciprocity          2.0198  ( 0.2505   )  -0.0260
-  3. eval transitive triplets  0.5137  ( 0.1726   )  -0.0053
-  4. eval 3-cycles             0.1278  ( 0.3462   )   0.0189
-  5. eval smoke1 similarity    0.4477  ( 0.2576   )   0.0244
-Total of 1399 iteration steps.
+  0       Rate parameter       6.0803  ( 1.0220   )
+  1. eval outdegree (density) -2.5270  ( 0.1589   )    0.0152
+  2. eval reciprocity          2.1021  ( 0.3038   )    0.0039
+  3. eval transitive triplets  0.5470  ( 0.1988   )    0.0214
+  4. eval 3-cycles             0.0805  ( 0.3845   )    0.0369
+  5. eval smoke1 similarity    0.4400  ( 0.2560   )   -0.0427
+  
+Overall maximum convergence ratio:    0.1608
 \end{verbatim}
 }
 Requesting a longer summary by a command such as
@@ -3591,11 +3611,16 @@ the covariance/correlation matrix of the estimators.
 The column \texttt{\small Convergence t-ratio} shown above, also
 called \texttt{\small t statistics for deviations from targets},
 is an indicator of convergence. If some of these values
-are higher in absolute value than 0.1, convergence is not adequate
-and the estimation must be repeated.
+are higher in absolute value than 0.1, convergence is not adequate.
+The value \texttt{Overall maximum convergence ratio} is another, stricter,
+indicator of convergence.
+For adequate convergence, this value should be less than 0.25.
+
+In this example, convergence is good.
+If convergence is not adequate, the estimation must be repeated.
 Usually the best way to do this is by employing the
 argument \texttt{prevAns} in the call of \sfn{siena07()}.
-Given that the earlier result was already called \texttt{result1},
+Given that the earlier result was already called \texttt{results1},
 this is done, e.g., by
 \begin{verbatim}
 results1  <-  siena07(algorithm1, data = mydata, effects = myeff,
@@ -3671,8 +3696,9 @@ results1 <- siena07(algorithm1, data = mydata, effects = myeff,
 When parameters have been estimated, first the
 \hypertarget{T_convergence}{convergence} of the
 algorithm must be checked. This is done by looking at the
-\emph{$t$-ratios for convergence}. This is the last column, denoted
-\texttt{t statistic} in the summary given above.
+\emph{$t$-ratios for convergence} and the
+\emph{overall maximum convergence ratio}. 
+These are given in the output of the algorithm, presented above.
 This check
 considers the deviations between simulated values
 (in Phase~3, see below) of the
@@ -3683,17 +3709,29 @@ converged the deviations are small but not exactly equal to 0.
 The program calculates the averages and standard deviations of the
 deviations and combines these in a $t$-ratio (in this case,
 average divided by standard deviation).
-Convergence is excellent when these $t$-ratios are less than 0.1
-in absolute value, and reasonable when they are less than 0.15.
+The overall maximum convergence ratio is the maximum value of
+the ratio
+\[
+ \frac{\text{average deviation}}{\text{standard deviation}}
+\]
+for any linear combination of the target values. 
+A precise definition is given in \\
+\texttt{Siena\_Algorithms.pdf} which can be downloaded from the \SI website.
+
+Convergence is excellent when the overall maximum convergence ratio
+is less than 0.2, and for all the individual parameters the $t$-ratios 
+for convergence all are less than 0.1 in absolute value;
+convergence is reasonable when the former is less than 0.30.
 For published results, it is suggested that estimates presented come from runs
-in which all $t$-ratios for convergence are less than 0.1 in absolute value
--- or nearly so.
-(These bounds are indications only, and
-are not meant as severe limitations.)
+in which the overall maximum convergence ratio is less than 0.25.
+(These bounds are indications only, and are not meant as severe limitations.)
 
 In the example above, the largest absolute value of the $t$-ratios for convergence
-is equal to 0.1328, which is reasonable but not as small as desired.
-The best way to continue then is by making another estimation run,
+is equal to 0.0427, and the overall maximum convergence ratio is 0.1608;
+both are quite good values.
+
+If convergence is not adequate, the best way to continue 
+is by making another estimation run,
 now carrying on from the last obtained result. This is done by
 using this result in the \textsf{prevAns} (`previous answer')
 parameter, while taking care that  \texttt{useStdInits = FALSE}
@@ -3713,36 +3751,79 @@ deviations from targets and the resulting $t$-ratios:
 End of stochastic approximation algorithm, phase 3.
 ---------------------------------------------------
 
-Total of 1981 iterations.
-Parameter estimates based on 981 iterations,
+Total of 1822 iterations.
+Parameter estimates based on 822 iterations,
 basic rate parameter as well as
 convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
 
 Information for convergence diagnosis.
 Averages, standard deviations, and t-ratios for deviations from targets:
-  1.   0.9140  16.0020   0.0571
-  2.   1.0200  14.3691   0.0710
-  3.   2.5880  44.3047   0.0584
-  4.   1.1270  14.5022   0.0777
-  5.   0.1994   4.9865   0.0400
+  1.   0.2460  16.1494   0.0152
+  2.   0.0560  14.3829   0.0039
+  3.   0.9520  44.5338   0.0214
+  4.   0.5380  14.5726   0.0369
+  5.  -0.2080   4.8672  -0.0427
 
 Good convergence is indicated by the t-ratios being close to zero.
+Overall maximum convergence ratio = 0.1608.
 \end{verbatim}
 }
 For example, for the fourth parameter (3-cycles), the average deviation
-from the target value was 1.1270, and the standard deviation across the
-1000 simulations in Phase~3 was  14.5022. This yields a $t$-ratio
-of $1.1270/14.5022 = 0.0777$.
+from the target value was 0.5380, and the standard deviation across the
+1000 simulations in Phase~3 was  14.5726. This yields a $t$-ratio
+of $ 0.5380 / 14.5726 = 0.0369$.
 Large values of the averages and standard deviations are
 in themselves not at all a reason for concern; only the
 $t$-ratio is important.
-\medskip
+
+\subsubsection{Continued estimation to obtain convergence}
+
+Above, the \sfn{prevAns} parameter was mentioned which will
+lead to using the result from a previous estimation as the initial 
+value for the next estimation. 
+If convergence is difficult to obtain, one may use other
+settings of the estimation algorithm, given as
+parameters in the \sfn{sienaAlgorithmCreate()} function, to try and
+improve convergence.
+The main parameters of \sfn{sienaAlgorithmCreate()} that can be used
+for this purpose are the following.
+For the technical background, see \texttt{Siena\_Algorithms.pdf}
+which can be downloaded from the \SI website.
+
+\begin{itemize}
+\item \texttt{doubleAveraging}\\
+      This replaces the Robbins-Monro updating step by a double averaging
+      step \citep{bather1989,SchwabeWalk96,KushnerYin03} which can be 
+      more efficient. Try \texttt{doubleAveraging=0}, which starts using
+      this step from phase 2.1. 
+\item \texttt{diagonalize}\\
+    This parameter may range from 0 to 1,
+    and determines the extent to which the matrix of derivatives of expected
+    values with respect to parameters is diagonalized.
+    The value 1 (the default) gives greatest stability; 
+    smaller values may give greater efficiency.
+    Very small values (less than 0.2) may lead to an unstable algorithm.\\
+    Advice: try values such as 0.7, 0.5, or even 0.2; if the algorithm becomes unstable
+    reduce \texttt{firstg} (e.g., to 0.005 or 0.001) but if this does not help,
+    the value used for \texttt{diagonalize} is too small.
+\item \texttt{n2start}\\
+    This is the minimum length of phase 2.1, i.e., the first subphase of phase~2.
+    The default value is $2.52\times (p+7)$, where $p$ is the number of estimated parameters.
+    The minimum lengths of the subsequent subphases are $(2.52)^{k-1} \times\,$\texttt{n2start}
+    for subphase~$k$.\\
+    This implies the total duration of the algorithm will be roughly proportional to 
+    \texttt{n2start}. One may try using a value higher than the default.
+\item \texttt{firstg}\\
+    This determines the step sizes in the estimation algorithm. If the algorithm is unstable,
+    use a smaller value (but greater than~0).
+\end{itemize}
+
 
 If convergence is not very good even with repeated estimation with
 the \sfn{prevAns} option, sometimes it can be useful to try and use
-\sfn{updateTheta} to copy the results from the earlier estimation
+\sfn{updateTheta()} to copy the results from the earlier estimation
 rather than \sfn{prevAns}; this will use the same starting values
-but not skip Phase 1 of the estimation algorithm, and sometimes
+but not skip Phase~1 of the estimation algorithm, and sometimes
 this turns out to lead to faster convergence.
 \medskip
 
@@ -3759,16 +3840,16 @@ siena07ToConvergence <- function(alg, dat, eff, ans0=NULL, ...){
     ans <- siena07(alg, data=dat, effects=eff, prevAns=ans0, ...) # the first run
     repeat {
         numr <- numr+1           # count number of repeated runs
-        maxt <- max(abs(ans$tconv[!ans$effects$fix[ans$effects$requested]]))
+        tmax <- max(abs(ans$tconv[!ans$effects$fix[ans$effects$requested]]))
                     # convergence indicator, excluding the fixed effects
-        cat(numr, maxt,"\n")     # report how far we are
-        if (maxt < 0.10) {break} # success
-        if (maxt > 3) {break}    # divergence without much hope
+        cat(numr, tmax,"\n")     # report how far we are
+        if (tmax < 0.10) {break} # success
+        if (tmax > 3) {break}    # divergence without much hope
                            # of returning to good parameter values
         if (numr > 100) {break}  # now it has lasted too long
         ans <- siena07(alg, data=dat, effects=eff, prevAns=ans, ...)
         }
-    if (maxt > 0.10)
+    if (tmax > 0.10)
     {
         cat("Warning: convergence inadequate.\n")
     }
@@ -3777,7 +3858,49 @@ siena07ToConvergence <- function(alg, dat, eff, ans0=NULL, ...){
 \end{verbatim}
 
 \iffalse
-The use of \texttt{ans\$effects\$requested} in the definition of \texttt{maxt}
+The use of \texttt{ans\$effects\$requested} in the definition of \texttt{tmax}
+is to exclude those main effects of interaction effects which
+are not requested to be estimated, but which are contained in the answer object.
+
+
+\noindent
+The following example script illustrates the procedure
+of varying \texttt{diagonalize}.
+
+\begin{verbatim}
+myans0 <- siena07(myalg, data=mydata, effects=myeff) # the first run
+alg.diag6 <- sienaAlgorithmCreate(diagonalize=0.6)
+        # and further parameters as desired
+siena07PressOn <- function(alg1, dat, eff, ans0, ...){
+    numr <- 0
+    ans <- ans0
+    repeat {
+        numr <- numr+1           # count number of repeated runs
+        tmax <- max(abs(ans$tconv[!ans$effects$fix[ans$effects$requested]]))
+                    # convergence indicator, excluding the fixed effects
+        cat(numr, tmax,"\n")     # report how far we are
+        if (tmax < 0.10) {break} # success
+        if (tmax > 2) {break}    # divergence without much hope
+                           # of returning to good parameter values
+        if (numr > 100) {break}  # now it has lasted too long
+        ans <- siena07(alg1, data=dat, effects=eff, prevAns=ans, ...)
+        }
+    if (tmax > 0.10)
+    {
+        cat("Warning: convergence inadequate.\n")
+    }
+    ans
+}
+myans1 <- siena07PressOn(alg.diag6, mydat, myeff, myans0)
+\end{verbatim}
+
+\noindent
+The use of \texttt{myans0} prior to and outside of the function
+\texttt{siena07PressOn} is done so that, if the algorithm
+breaks out of \texttt{siena07PressOn} without having properly
+converged, the earlier preliminary result \texttt{myans0}
+still is available.
+The use of \texttt{ans\$effects\$requested} in the definition of \texttt{tmax}
 is to exclude those main effects of interaction effects which
 are not requested to be estimated, but which are contained in the answer object.
 \fi
@@ -3786,8 +3909,9 @@ are not requested to be estimated, but which are contained in the answer object.
 \label{S_conv}
 
 If there are persisting convergence problems even after repeated estimations
-using the \texttt{prevAns} parameter
-as suggested in Section~\ref{S_ccheck}, this may have several reasons.
+using the \texttt{prevAns} parameter and trying out various
+settings for the algorithm as suggested in the preceding sections, 
+this may have several reasons.
 \begin{itemize}
 \item The data specification was incorrect (e.g., because the coding
       was not given properly).
@@ -3849,7 +3973,10 @@ as suggested in Section~\ref{S_ccheck}, this may have several reasons.
       used in the model by specifying them with \texttt{test=TRUE, fix=TRUE};
       this will not burden the estimation process, and give information
       (with a score-type test, see Section~\ref{S_Scoretest})
-      about the significance of this excluded effect.
+      about the significance of this excluded effect.\\
+      Usually this will be applied with \texttt{initialValue=0}, the default.
+      But sometimes it may be done with a plausible non-zero value for 
+      \texttt{initialValue}.
 \item Two or more effects are included that are almost collinear
       in the sense that they can both explain the same observed structures.
       This will be seen in high absolute values of
@@ -3866,92 +3993,6 @@ as suggested in Section~\ref{S_ccheck}, this may have several reasons.
       on the effect, of course.)
 \end{itemize}
 
-\subsubsection{Pressing on}
-
-If convergence is difficult and simplifications or step-by-step approaches
-as suggested above are not sufficient or undesirable,
-one may try to obtain convergence by playing with the
-settings of the estimation algorithm.
-For the Method of Moments,
-the main parameter for this purpose is \texttt{diagonalize},
-which is one of the arguments set in \sfn{sienaModelCreate}.
-The default value is 1.0.
-For the technical background, see \texttt{Siena\_Algorithms.pdf}
-which can be downloaded from the \SI website.
-This parameter may range from 0 to 1; the value 1 gives
-greatest stability; smaller values may give greater efficiency;
-small values (0.5 or less) usually lead to a very unstable algorithm.
-Advice for the use of this parameter is as follows.
-
-\begin{enumerate}
-\item Start with \texttt{diagonalize} = 1 (the default).
-\item If an `on track' result has been obtained with \sfn{siena07()},
-      use this for the \texttt{prevAns} parameter in \sfn{siena07()},
-      with a smaller value for \texttt{diagonalize}; try the value
-      0.6; if this leads to instability, try 0.7 or 0.8
-\end{enumerate}
-
-\noindent
-The following example script illustrates this procedure.
-
-\begin{verbatim}
-myans0 <- siena07(myalg, data=mydata, effects=myeff) # the first run
-alg.diag6 <- sienaAlgorithmCreate(diagonalize=0.6)
-        # and further parameters as desired
-siena07PressOn <- function(alg1, dat, eff, ans0, ...){
-    numr <- 0
-    ans <- ans0
-    repeat {
-        numr <- numr+1           # count number of repeated runs
-        maxt <- max(abs(ans$tconv[!ans$effects$fix[ans$effects$requested]]))
-                    # convergence indicator, excluding the fixed effects
-        cat(numr, maxt,"\n")     # report how far we are
-        if (maxt < 0.10) {break} # success
-        if (maxt > 2) {break}    # divergence without much hope
-                           # of returning to good parameter values
-        if (numr > 100) {break}  # now it has lasted too long
-        ans <- siena07(alg1, data=dat, effects=eff, prevAns=ans, ...)
-        }
-    if (maxt > 0.10)
-    {
-        cat("Warning: convergence inadequate.\n")
-    }
-    ans
-}
-myans1 <- siena07PressOn(alg.diag6, mydat, myeff, myans0)
-\end{verbatim}
-
-\noindent
-The use of \texttt{myans0} prior to and outside of the function
-\texttt{siena07PressOn} is done so that, if the algorithm
-breaks out of \texttt{siena07PressOn} without having properly
-converged, the earlier preliminary result \texttt{myans0}
-still is available.
-\iffalse
-The use of \texttt{ans\$effects\$requested} in the definition of \texttt{maxt}
-is to exclude those main effects of interaction effects which
-are not requested to be estimated, but which are contained in the answer object.
-\fi
-
-\iffalse
-If there are problems you don't understand, but you do know
-something about the operation of {\SI}, you could take a look at
-the file \textsf{{\em pname}.log\/}; and, if the problems occur in
-the estimation algorithm, at the file \textsf{{\em pname}.cck}.
-These files give information about what the program did, which may
-be helpful in diagnosing the problem. E.g., you may look in the
-\textsf{{\em pname}.cck} file to see if some of the parameters are
-associated with positive values for the so-called
-\hyperlink{T_quasiac}{quasi-auto\-correlations}.
-If this happens from
-subphase 2.2 onward for some parameters, these may be the parameters
-that led to problems
-in the estimation algorithm (e.g., because the corresponding
-effect is collinear with other effects; or because they started
-from unfortunate starting values; or because the data set contains
-too little information about their value).
-\fi
-
 
 \subsection{Some important components of the \textsf{sienaFit} object}
 \label{S_fitcomp}
@@ -3960,8 +4001,7 @@ If a user would like to do further calculations, it can be
 useful to know about the following components of  \textsf{sienaFit} objects.
 Suppose the object is called \texttt{ans}. Some of the components
 are the following.
-Further details are in the help file for \textsf{siena07}
-(which is maintained up to date better than this manual).
+Further details are in the help file for \textsf{siena07}.
 
 \begin{tabbing}
  \texttt{ans\$theta  }\hspace{3em}    \=  estimates  \\
@@ -3976,9 +4016,9 @@ Further details are in the help file for \textsf{siena07}
  \texttt{ans\$targets }               \> targets (observed statistics)
                                          for Method of Moments estimation  \\
  \texttt{ans\$tconv   }               \> $t$-ratios for convergence for  each of the parameters\\
+ \texttt{ans\$tmax   }               \> maximum absolute value of these ratios for non-fixed parameters\\
  \texttt{ans\$tconv.max   }         \> maximum $t$-ratio for convergence for \\
-                                 \> any linear combination of the parameters\\
-                                 \> (including the fixed ones!),\\
+                                 \> any linear combination of the parameters,\\
                              \> called the overall maximum convergence ratio \\
  \texttt{ans\$sf    }                 \>  generated statistics in Phase 3 \\
  \texttt{ans\$msf   }                 \>  covariance matrix of
@@ -4045,8 +4085,10 @@ presented above.
 The estimation algorithm is an implementation of a procedure of which
 the original version was proposed by \citet{RobbinsMonro51}.
 The algorithm is
-described in \citet{Snijders01, Snijders05}, and
-has %for both the MoM and ML method
+described in \citet{Snijders01, Snijders05}
+and in
+\texttt{Siena\_Algorithms.pdf} which can be downloaded from the \SI website.
+It has %for both the MoM and ML method
 three phases:
 \begin{enumerate}
 \item In phase 1, the parameter vector is held constant at its
@@ -4383,8 +4425,9 @@ if there are any actors who are inactive at the first wave,
 as indicated by all structural zeros.
 
 For ML estimation, an important parameter for tuning the
-algorithm is the so-called \textsf{Multiplication factor}. This determines
-the number of Metropolis-Hastings steps taken
+algorithm is the so-called \textsf{Multiplication factor},
+given in \sfn{sienaAlgorithmCreate()} as the argument \texttt{mult}.
+This determines the number of Metropolis-Hastings steps taken
 for simulating each new network.
 The number of steps (sometimes called `sampling frequency' in the literature)
 is the multiplication factor multiplied by the sum over dependent variables
@@ -4680,11 +4723,22 @@ unconditional estimation.
 If multiple processors are available, then using
 multiple processes can speed up the estimation in \sfn{siena07}.
 
-\item In Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
-  multiple simulations are done with the same parameters, and the resulting
-  statistics are averaged. The gain parameter is increased and the
+\item For estimation by Method of Moments (MoM), 
+  in Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
+  multiple (viz., \texttt{nbrNodes} which is a parameter
+  given in the call of \sfn{siena07()}) simulations are done with the same parameters, 
+  and the resulting statistics are averaged for the updating step in the
+  Robbins Monro algorithm. The gain parameter is increased and the
   number of iterations in phase 2 reduced to take advantage of
-  the increased accuracy.
+  the increased accuracy of the update.\\
+  When using the MoM, decrease in computation time will be somewhat less
+  than proportional to the number of processes used, if this number is less than
+  (say) 10; larger number of processes will have diminishing returns.
+  
+\item For estimation by Maximum Likelihood (ML) and by \sfn{sienaBayes()}, parallelization
+  goes by period; for multi-group projects, period $\times$ group. 
+  Therefore, for this type of estimation, the maximum meaningful number
+  of parallel processes is \\ (number of waves -- 1) $\times$ (number of groups).
 
 \item The parameters required to run all processes on one computer are fairly
   simple: in your call to \sfn{siena07}, set \sfn{nbrNodes} to the number of
@@ -4750,13 +4804,32 @@ that creates the object with specifications for the algorithm.
 
 \subsection{Multicollinearity}
 
-The estimated standard errors are less reliable in
-cases with strong multicollinearity, i.e., high correlations\footnote{More
-precisely, multicollinearity means that the matrix that is inverted
+Multicollinearity means that the matrix that is inverted
 to give the correlation matrix is ill-conditioned.
 Correlations between parameter estimates
-close to $\pm 1$ are the most usual signs of this.} between
-the parameter estimates. Estimates for these correlations
+close to $\pm 1$ are the most usual signs of this.
+
+If the parameter estimates are perfectly collinear
+(standard errors of some parameters, or linear combinations
+of parameters, being infinitely large), standard errors
+are reported\footnote{Since version 1.1-285.}
+as \texttt{NA} (the R term for "not available", missing).
+This can happen depending on the data-model combination 
+(e.g., including the covariate-ego effect for a covariate with variance 0;
+or including some effects that are collinear for any data set,
+such as the combination of outdegree, transitive triplets,
+outdegree activity, and balance effects --- see Snijders, 2005),
+or on the combination of data, model and parameters (when a parameter
+value was given or was reached where the model is not sensitive to some
+parameter or combination of parameters).
+The remedy here usually is to drop some of the effects.
+\medskip
+
+In cases with strong but not complete multicollinearity, 
+i.e., correlations between some parameter estimates
+(or some of their linear combinations) being close but not equal to --1 or +1,
+the estimated standard errors are less reliable.
+ Estimates for these correlations
 are given under the heading
 \texttt{Covariance matrix of estimates (correlations below diagonal)}
 in the output file, and in the \textsf{summary(...)} of the estimation results
@@ -4775,7 +4848,7 @@ High parameter correlations with the outdegree effect are not a
 reason for worry, but high parameter correlations with other effects are
 a reason for checking the stability of the estimated standard errors. The
 threshold for finding a parameter correlation `too high' in this respect
-can be rather high, such as 0.95, with 0.90 or 0.80 as a secondary threshold.
+can be quite high, such as 0.95 (or 0.90).
 In cases of high parameter correlations, estimating the model twice
 (or more) and considering the stability of the standard errors will be
 a good way for seeing whether there are reasons for special caution.
@@ -4886,7 +4959,8 @@ The Wald test then cannot be used for significance testing.
 In Section~\ref{S_fixingparameters} we proposed that in such cases,
 it may be helpful to fix the parameter at some large value,
 without estimating it.
-Or, when it is being estimated and the $t$-ratio for convergence is
+Or, when it is being estimated and the
+overall maximum convergence ratio is
 small so convergence is judged as good, this estimate can be used,
 but in these cases, not its standard error.
 One possibility that then is available to test the significance
@@ -5632,7 +5706,8 @@ on the distances observed for the dependent action variables.\\
 \item The number of runs in phase 3 of the estimation algorithm.\\
       This determines the precision of the estimated standard errors
       (and covariance matrix of the estimates),
-      and of the $t$-values reported as diagnostics of the convergence.
+      and of the overall maximum convergence ratio
+      and the $t$-values reported as diagnostics of the convergence.
       Advice: 200 for preliminary investigations when precise standard errors
       and $t$-values are not important,
       1000 for serious investigations,
@@ -5745,9 +5820,8 @@ phases.
 When the algorithm has finished, look at the results in the output file
 or by the \sfn{print} or \sfn{summary} function of the
 resulting \sfn{sienaFit} object. Check
-whether the $t$-ratios for convergence are small enough
-(ideally less than .10; less than .15 is acceptable for
-provisional results).
+that the overall maximum convergence ratio is small enough
+(ideally less than .25).
 If not, continue estimation with the \sfn{prevAns} option
 as discussed in Section~\ref{S_ccheck}.
 When satisfactory convergence has been obtained, make sense
@@ -6841,7 +6915,8 @@ f^{\rm net}_i(x) \, = \,
 \end{equation}
 where $\beta^{\rm net}_k$ are parameters and $s^{\rm net}_{ik}(x)$
 are effects as defined below.
-If the model also contains some elementary effects, the objective
+If the model also contains some elementary effects
+(see Section~\ref{S_elementary}), the objective
 function is the sum of this and
 \begin{equation}
 f^{\rm el}_i(x) \, = \,
@@ -6878,7 +6953,8 @@ non-directed case.
 
 \noindent
 Structural effects are the effects depending on the network only.
-The following list also contains some elementary effects.
+The following list also contains some elementary effects
+(see Section~\ref{S_elementary}).
 The type of the elementary effects in \RS still is \texttt{eval},
 indicating that its parameter is applied both for creating new ties
 and for maintaining existing ties.
@@ -7839,7 +7915,9 @@ the following effects are available:
  ${\rm sim}^v_{ij}=\frac{\Delta-\vert v_i - v_j \vert}{\Delta}$ with
  $\Delta=\max_{ij}\vert v_i - v_j \vert$ being the observed range of the covariate $v$
  (this mean is given in the output file just before the
- ``initial data description'');
+ ``initial data description''; it is also given, e..g., for data set \texttt{mydata}
+ and constant covariate \texttt{mycov}, by
+ \texttt{attr(mydata\$cCovars\$mycov, "simMean")}).\\
 
  \item {\em covariate-related similarity $\times$ reciprocity}
  \texttt{(simRecipX)}, defined by
@@ -8058,8 +8136,8 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
       and alters' covariate-average, for all actors
       $j$ to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\grave v)_{ij}
-  - \widehat{{\rm sim}(\grave v)}) \ ,
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, \Big({\rm sim}(\grave v)_{ij}
+  - \widehat{{\rm sim}^v}\Big) \ ,
 \]
  where the similarity scores ${\rm sim}(\grave v)_{ij}$ are defined as
 \[
@@ -8069,22 +8147,19 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
   where
  $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
  \emph{original} covariate $v$,
- $\breve v_j^{(-i)}$ is as above in effect \texttt{(altDist2)}.\\
-  In version 1.1-284, there still is some inconsistency in the centering by
-  $\widehat{{\rm sim}(\breve v)}$ which can be the
- \emph{observed} mean of all similarity scores $\breve v_i$;
- this observed mean is defined by calculating the $\breve v_i$ values
- for each of the observations $t_1$ to $t_{M-1}$, and averaging
- these
- $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
+ $\breve v_j^{(-i)}$ is as above in effect \texttt{(altDist2)}
+ and $\widehat{{\rm sim}^v}$ is the mean of all similarity scores as used also
+ for the \texttt{simX} effect; this centering is applied since version 1.1-285.
+ For a constant covariate \texttt{mycov}, this mean is given by
+ \texttt{attr(mydata\$cCovars\$mycov, "simMean")}.
 
 \item \emph{covariate - similarity at distance 2} \texttt{(simDist2)} ,
       defined as the sum of centered similarity
       values for alters' covariate-average between $i$ and all actors
       $j$ to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \,{\rm sim}(\breve v)_{ij} \ ,
- % - \widehat{{\rm sim}(\breve v)}) \ ,
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \,\Big({\rm sim}(\breve v)_{ij} 
+  - \widehat{{\rm sim}^v}\Big) \ ,
 \]
  where the similarity scores ${\rm sim}(\breve v)_{ij}$ are defined as
 \[
@@ -8094,8 +8169,11 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
  while
  $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
  \emph{original} covariate $v$
- (no centering is applied).
-\iffalse
+ and $\widehat{{\rm sim}^v}$ is the mean of all similarity scores as used also
+ for the \texttt{simX} effect; this centering is applied since version 1.1-285.
+ For a constant covariate \texttt{mycov}, this mean is given by
+ \texttt{attr(mydata\$cCovars\$mycov, "simMean")}.\\
+\iffalse  until version 1.1-283:
  , and\\
  $\widehat{{\rm sim}(\breve v)}$ is the
  \emph{observed} mean of all these similarity scores;
@@ -8105,6 +8183,9 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
  $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
 % checking revealed that no centering is applied.
 \fi
+  Note that for both ego ($i$) and alter ($j$) their alters' covariate-average
+  is used, so that this effect is about a comparison between the 
+  out-neighbourhoods of $i$ and $j$.
 
 \item \emph{covariate - in - alter at distance 2} \texttt{(altInDist2)}.
      This is defined as the sum of alters' values for
@@ -8136,8 +8217,8 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
       and alters' covariate-in-average, for all actors
       $j$ to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\acute v)_{ij}
-  - \widehat{{\rm sim}(\acute v)}) \ ,
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, \Big({\rm sim}(\acute v)_{ij}
+  - \widehat{{\rm sim}^v} \Big) \ ,
 \]
  where the similarity scores ${\rm sim}(\acute v)_{ij}$ are defined as
 \[
@@ -8147,15 +8228,11 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
  while
  $ \check v_j^{(-i)}$ is as in the definition of \texttt{altInDist2},
  $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
- \emph{original} covariate $v$.\\
-
-  In version 1.1-284, there still is some inconsistency in the centering by
- $\widehat{{\rm sim}(\breve v)}$ which can be the
- \emph{observed} mean of all similarity scores $\breve v_i$;
- this observed mean is defined by calculating the $\breve v_i$ values
- for each of the observations $t_1$ to $t_{M-1}$, and averaging
- these
- $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
+ \emph{original} covariate $v$, and $\widehat{{\rm sim}^v}$ is as above
+ (see \texttt{simDist2}).\\
+  Note that for ego ($i$) the own value is used and for alter ($j$) the alters' covariate-average
+  (these are alter's alters!), so that this effect is about a comparison between $i$
+   and the out-neighbourhoods of the $j$'s.
 
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
@@ -8270,34 +8347,34 @@ for $p=2$ \  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (\sqrt{w_{+j}} - \sqrt{\
 
  \item {\em Effect of in-degree in W on X-activity } ($X$: indegree$^{1/p}$ $W$ activity)  \texttt{(inActIntn)}\\
  defined by the $W$-in-degrees of $i$ (for $p = 2$ its square root)
- times $i$'s $X$-out-degree:\\
+ times $i$'s $X$-out-degree:\\[0.2em]
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, ({w_{+i}} - {\bar w})
-                 =  x_{i+}\, ({w_{+i}} - {\bar w}) $ or\\
+                 =  x_{i+}\, ({w_{+i}} - {\bar w}) $ or\\[0.2em]
 for $p=2$ \  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (\sqrt{w_{+i}} - \sqrt{\bar w})
-                 =  x_{i+}\, (\sqrt{w_{+i}} - \sqrt{\bar w}) $;\\
+                 =  x_{i+}\, (\sqrt{w_{+i}} - \sqrt{\bar w}) $;\\[0.2em]
 
  \item {\em Effect of out-degree in W on X-popularity } ($X$: outdegree$^{1/p}$ $W$ popularity) \texttt{(outPopIntn)}\\
  defined by   the sum of  the $W$-out-degrees of the others to whom $i$ is tied,
- for parameter $p = 2$ the square roots of the $W$-out-degrees:\\
- $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, ({w_{j+}} - {\bar w})$ or\\
-for $p=2$ \  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (\sqrt{w_{j+}} - \sqrt{\bar w})$;\\
+ for parameter $p = 2$ the square roots of the $W$-out-degrees:\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, ({w_{j+}} - {\bar w})$ or\\[0.2em]
+for $p=2$ \  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (\sqrt{w_{j+}} - \sqrt{\bar w})$;\\[0.2em]
 
  \item {\em Effect of out-degree  in W on X-activity } ($X$: outdegree$^{1/p}$ $W$ activity) \texttt{(outActIntn)}\\
  defined by the $W$-out-degrees of $i$ (for $p = 2$ its square root)
- times $i$'s $X$-out-degree:\\
+ times $i$'s $X$-out-degree:\\[0.2em]
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, ({w_{i+}} - {\bar w}) =
-                           x_{i+}\, ({w_{i+}} - {\bar w}) $ or\\
+                           x_{i+}\, ({w_{i+}} - {\bar w}) $ or\\[0.2em]
 for $p=2$ \  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, (\sqrt{w_{i+}} - \sqrt{\bar w}) =
-                           x_{i+}\, (\sqrt{w_{i+}} - \sqrt{\bar w}) $;\\
+                           x_{i+}\, (\sqrt{w_{i+}} - \sqrt{\bar w}) $;\\[0.2em]
 
  \item {\em Effect of both in-degrees in W on X-popularity } ($X$: both indegrees$^{1/p}$ $W$ ) \texttt{(both)}\\
  defined by   the sum of  the $W$-in-degrees of the others to whom $i$ is tied
  multiplied by the centered $W$-in-degree of $i$,
- for parameter $p = 2$ the square roots of the $W$-in-degrees:\\
+ for parameter $p = 2$ the square roots of the $W$-in-degrees:\\[0.2em]
  $s^{\rm net}_{i\vit}(x) =
-   \sum_j x_{ij}\, ({w_{+i}} - {\bar w}) \, ({w_{+j}} - {\bar w})  $ or\\
+   \sum_j x_{ij}\, ({w_{+i}} - {\bar w}) \, ({w_{+j}} - {\bar w})  $ or\\[0.2em]
 for $p=2$ \  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\,
- (\sqrt{w_{+i}} - \sqrt{\bar w}) \, (\sqrt{w_{+j}} - \sqrt{\bar w})  $;\\
+ (\sqrt{w_{+i}} - \sqrt{\bar w}) \, (\sqrt{w_{+j}} - \sqrt{\bar w})  $;\\[0.2em]
  this can be regarded as an interaction between the effect of $W$-in-degree on $X$-popularity
  and the effect of $W$-in-degree on $X$-activity.
 \setcounter{savenumi}{\value{enumi}}
@@ -8314,10 +8391,49 @@ but that are connected through $i$:
 1 or 2.
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
- \item {\em Effect of W-betweenness on X-popularity } ($X$: betweenness$^{1/p}$ $W$ popularity)  \texttt{(betweenPop)}
- defined by   the sum of  the $W$-betweenness counts of the others to whom $i$ is tied:\\
- $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \left(\sum_{h,k; h \neq k}w_{hj}\,w_{jk}\,(1-w_{hk})\right)^{1/p}  $;\\
+ \item 
+{\em Effect of W-betweenness on X-popularity } ($X$: betweenness$^{1/p}$ $W$ popularity)  \\
+ \texttt{(betweenPop)}
+ defined by   the sum of  the $W$-betweenness counts of the others to whom $i$ is tied:\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, 
+        \left(\sum_{h,k; h \neq k}w_{hj}\,w_{jk}\,(1-w_{hk})\right)^{1/p}  $;\\
+        
+\item
+\begin{minipage}[t]{.70\textwidth}
+  mixed twopath activity effect ($X$: twopath$^{1/p}$ $W$ activity)  \texttt{(outOutActIntn)}
+   defined by the outdegree of $i$
+   multiplied by sum of $X$-outdegrees of those to whom $i$ has an $X$-tie:\\
+   for $p=1$, this is\\[0.4em]
+ $s^{\rm net}_{i\vit}(x) =   x_{i+}\, \sum_h w_{ih} \big(x_{h+} - \bar x\big)$\\[0.4em]
+ and for $p=2$, there is a square root transformation:\\[0.4em]
+ $s^{\rm net}_{i\vit}(x) =  x_{i+},\ \sum_h w_{ih} \big(\sqrt{x_{h+}} - \sqrt{\bar x}\big)$\\[0.4em]
+ where $\bar x$ is the average degree over all waves. 
 \setcounter{savenumi}{\value{enumi}}
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $X$}} at 3.7 2.4
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from  3.2 2.8 to 4.5 2.8
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
 \end{enumerate}
 \smallskip
 Further there are a number of mixed triadic effects.
@@ -8326,8 +8442,8 @@ Further there are a number of mixed triadic effects.
 \setcounter{enumi}{\value{savenumi}}
 \item
 \begin{minipage}[t]{.7\textwidth}
- {\em agreement along W leading to X}, ($X$: from $W$ agreement)  \texttt{(from)} \\ % \texttt{(fromWAgree)}\\
- $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{jh}\,$;\\
+ {\em agreement along W leading to X}, ($X$: from $W$ agreement)  \texttt{(from)} \\[0.2em] % \texttt{(fromWAgree)}\\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{jh}\,$;\\[0.2em]
  this refers to agreement of actors with respect to their $W$-choices
  (structural equivalence with respect to outgoing $W$-choices);
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
@@ -8363,8 +8479,8 @@ Further there are a number of mixed triadic effects.
 \item
 \begin{minipage}[t]{.7\textwidth}
  {\em agreement along mutual W-ties leading to X}, ($X$: from $W$ mutual agreement) \texttt{(fromMutual)}
-           \\ % \texttt{(fromWMutualAgree)}\\
- $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\,  w_{hi}\, w_{jh}\, w_{hj}\,$;\\
+           \\[0.2em] % \texttt{(fromWMutualAgree)}\\
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\,  w_{hi}\, w_{jh}\, w_{hj}\,$;\\[0.2em]
  this refers to agreement of actors with respect to their mutual $W$-choices
  (structural equivalence with respect to mutual $W$-choices);
  the contribution  of the tie $i \stackrel{X}{\rightarrow} j$
@@ -8401,8 +8517,8 @@ Further there are a number of mixed triadic effects.
 \smallskip
  \item
 \begin{minipage}[t]{.7\textwidth}
- {\em  W leading to agreement along X}, ($X$: $W$ to agreement) \texttt{(to)} \\ %  \texttt{(WToAgree)}\\
- $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, x_{hj}\,$;\\
+ {\em  W leading to agreement along X}, ($X$: $W$ to agreement) \texttt{(to)} \\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, x_{hj}\,$;\\[0.2em]
  this refers to the closure of mixed $W-X$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
@@ -8441,8 +8557,8 @@ Further there are a number of mixed triadic effects.
 \end{minipage}
  \item
 \begin{minipage}[t]{.7\textwidth}
- {\em  XWX closure of $W$}, \texttt{(cl.XWX)} \\
- $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, x_{ih}\, w_{hj}\,$;\\
+ {\em  XWX closure of $W$}, \texttt{(cl.XWX)} \\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, x_{ih}\, w_{hj}\,$;\\[0.2em]
  this refers to the closure of mixed $X-W$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
@@ -8498,7 +8614,7 @@ by Maximum Likelihood and Bayesian estimation.
  the number of mixed $X-W$ two-paths
  $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$.\\
  So the dependent variable here is only the tie variable
- $i \rightarrow j$ in the figure above. The effect is defined as\\
+ $i \rightarrow j$ in the figure above. The effect is defined as\\[0.2em]
  $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{hj}\,$;\\
 
 
@@ -8511,7 +8627,7 @@ by Maximum Likelihood and Bayesian estimation.
  $i \stackrel{X}{\rightarrow} h $,
  $j \stackrel{W}{\rightarrow} h $.\\
  In other words, only the $i \rightarrow j$ tie in the figure here
- is the dependent variable. The effect is defined as\\
+ is the dependent variable. The effect is defined as\\[0.2em]
  $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{jh}\,$.
 \end{minipage}
 \hfill
@@ -8541,8 +8657,8 @@ by Maximum Likelihood and Bayesian estimation.
 
  \item
 \begin{minipage}[t]{.7\textwidth}
- {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\
- $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{hj}\,$;\\
+ {\em mixed $WW=>X$ closure}, ($X$: closure of $W$) \texttt{(closure)}  \\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{ih}\, w_{hj}\,$;\\[0.2em]
  this refers to the closure of $W-W$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
@@ -8579,8 +8695,8 @@ by Maximum Likelihood and Bayesian estimation.
 
 \item
 \begin{minipage}[t]{.7\textwidth}
- {\em mixed cyclic $WW=>X$ closure}, ($X$: cyclic closure of $W$) \texttt{(cyClosure)}  \\
- $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{jh}\, w_{hi}\,$;\\
+ {\em mixed cyclic $WW=>X$ closure}, ($X$: cyclic closure of $W$) \texttt{(cyClosure)}  \\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{jh}\, w_{hi}\,$;\\[0.2em]
  this refers to the cyclic closure of $W-W$ two-paths;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
@@ -8619,8 +8735,8 @@ by Maximum Likelihood and Bayesian estimation.
 \item
 \begin{minipage}[t]{.7\textwidth}
  {\em closure of shared incoming $WW=>X$}, \\
- ($X$: shared incoming $W$) \texttt{(sharedIn)}  \\
- $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{hi}\, w_{hj}\,$;\\
+ ($X$: shared incoming $W$) \texttt{(sharedIn)}  \\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\, w_{hi}\, w_{hj}\,$;\\[0.2em]
  this refers to shared incoming $W$ ties contributing
  to the tie $i \stackrel{X}{\rightarrow} j$.
       \end{minipage}
@@ -8648,6 +8764,76 @@ by Maximum Likelihood and Bayesian estimation.
 \end{center}
 \vfill
 \end{minipage}
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+
+\newpage
+\noindent
+Then there are effects using mixed configurations on four nodes
+(cf.\ \texttt{sharedPop}).
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+ \item
+\begin{minipage}[t]{.7\textwidth}
+ {\em shared W leading to agreement along X}, ($X$: shared $W$ to agreement) \texttt{(sharedTo)} \\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j,h,k; k \neq i} x_{ij}\, x_{kj}\,
+                  \big( w_{ih}\, w_{kh} - c\big ) \,$;\\[0.2em]
+ this refers to the closure of mixed $W-X$ three-paths;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of mixed $W-X$ three-paths
+ $i \stackrel{W}{\rightarrow} h  \stackrel{W}{\leftarrow} k  \stackrel{X}{\rightarrow} j$.\\
+ The effect parameter $p$ can take the values 1, 2, 3 and 4.
+  The value $c$, a constant for centering,
+   is the average of the observed values $w_{ih}\, w_{kh}$:\\[0.5em]
+ $ c \,=\, \left\{ \begin{array}{ll} \big(1/Mn(n-1)\big)  
+               \sum_{m,h} \big( w_{+h}^2(t_m) - w_{+h}(t_m)\big) & (p \geq 3) \\[0.3em]
+                            0  & (p < 3) \ . 
+    \end{array} \right. $\\[0.5em]
+ Note that since this is the evaluation function for actor $i$ with
+ respect to network $X$, only the $x_{ij}$ tie indicator in the formula,
+ corresponding to  the tie $i \stackrel{X}{\rightarrow} j$,
+ is the dependent variable here.\\
+ The interpretation is that actors have the tendency to make the same
+ outgoing $X$-choices as those ($k$) with whom they share many outgoing $W$-ties.\\
+ For $p=2$ and $p=4$, the square root is taken: \\[0.3em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j,k; k \neq i} x_{ij}\, x_{kj}\, 
+ \Big( \sqrt{\sum_{h} w_{ih}\, w_{kh} } \,-\, \sqrt{c} \Big)\,$.\\
+ 
+ This can be regarded as a higher-order effect related to indegree-popularity.
+ The differences between the centered and non-centered versions amount to
+ a multiple of the indegree-popularity (without $\sqrt{}$) \texttt{inPop} effect.
+ Therefore, when the \texttt{sharedTo} effect is used, it is advisable
+ also to include the \texttt{inPop} effect, so as to avoid misinterpretations.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  2 3
+\put{\large$\bullet$} at  4 3
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 2 3.6
+\put{$k$} at 4 3.6
+\put{{\small $W$}} at 1.6 2
+\put{{\small $W$}} at 3   3.3
+\put{{\small $X$}} at 4.4 2
+\put{{\small $X$}} at 3 0.6
+\arrow <2mm> [.2,.6]  from 2.25 1 to 3.75 1
+\arrow <2mm> [.2,.6]  from 2 1.25 to 2 2.75
+\arrow <2mm> [.2,.6]  from 3.75 3 to 2.25 3
+\arrow <2mm> [.2,.6]  from 4 2.75 to 4 1.25
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
 
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
@@ -8660,9 +8846,9 @@ covariate $V$.
 \item
 \begin{minipage}[t]{.7\textwidth}
  {\em agreement along W leading to X, for same V}, \\
-($X$: from $W$ agr.\ $\times$ same $V$)  \texttt{(covNetNet)},\\
+($X$: from $W$ agr.\ $\times$ same $V$)  \texttt{(covNetNet)},\\[0.2em]
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h}
-                     x_{ij}\, w_{ih}\, w_{jh}\,I\{v_i = v_j\}$;\\
+                     x_{ij}\, w_{ih}\, w_{jh}\,I\{v_i = v_j\}$;\\[0.2em]
  this refers to agreement of actors with respect to their $W$-choices
  (structural equivalence with respect to outgoing $W$-choices), but only
  for actors and choices sharing the same value of a covariate $V$;
@@ -8702,9 +8888,9 @@ covariate $V$.
 \begin{minipage}[t]{.7\textwidth}
  {\em mixed WW $\Rightarrow$ X closure, same-V path jumping to different V}
 ($X$: $W$ closure jumping $V$),   \texttt{(jumpWWClosure)}\\
-  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\,
-            w_{ih}\, w_{hj}\,I\{v_i = v_h \neq v_j\}$;\\
+            w_{ih}\, w_{hj}\,I\{v_i = v_h \neq v_j\}$;\\[0.2em]
  this refers to the closure of $W-W$ paths, restricted to ``jump outside
  of $V$-groups'' in the sense that the focal actor and the mediating
  actor have the same value of $V$, but the target actor has a
@@ -8741,9 +8927,9 @@ covariate $V$.
  {\em mixed WX $\Rightarrow$ X closure, same-V path jumping to different V}
 ($X$: mixed $W$ closure jumping $V$),
   \texttt{(jumpWXClosure)}   \\
-  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\,
-            w_{ih}\, x_{hj}\,I\{v_i = v_h \neq v_j\}$;\\
+            w_{ih}\, x_{hj}\,I\{v_i = v_h \neq v_j\}$;\\[0.2em]
  this refers to the closure of $W-X$ paths, restricted to ``jump outside
  of $V$-groups'' in the sense that the focal actor and the mediating
  actor have the same value of $V$, but the target actor has a
@@ -8781,9 +8967,9 @@ covariate $V$.
  {\em mixed WX $\Rightarrow$ X closure, homogeneous on V}
 ($X$: mixed $W$ closure homog. $V$),
   \texttt{(homWXClosure)}   \\
-  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
  $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\,
-            w_{ih}\, x_{hj}\,I\{v_i = v_j = v_h\}$;\\
+            w_{ih}\, x_{hj}\,I\{v_i = v_j = v_h\}$;\\[0.2em]
  this refers to the closure of $W-X$ paths, restricted to
  triples that are homogeneous with respect to $V$.
       \end{minipage}
@@ -8877,8 +9063,8 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
       and alters' covariate-average, for all actors
       $j$ to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\grave v^W)_{ij}
-  - \widehat{{\rm sim}(\grave v^W)}) \ ,
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, \Big({\rm sim}(\grave v^W)_{ij}
+  - \widehat{{\rm sim}^v}\Big) \ ,
 \]
  where the similarity scores ${\rm sim}(\grave v^W)_{ij}$ are defined as
 \[
@@ -8889,20 +9075,19 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
  $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
  \emph{original} covariate $v$,
  $\breve v_j^{(-i)}$ is as above in effect \texttt{(altDist2)},
- and  $\widehat{{\rm sim}(\breve v)}$ is the
- \emph{observed} mean of all similarity scores $\breve v_i$;
- this observed mean is defined by calculating the $\breve v_i$ values
- for each of the observations $t_1$ to $t_{M-1}$, and averaging
- these
- $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
+
+ and $\widehat{{\rm sim}^v}$ is the mean of all similarity scores as used also
+ for the \texttt{simX} effect; this centering is applied since version 1.1-285.
+ For a constant covariate \texttt{mycov}, this mean is given by
+ \texttt{attr(mydata\$cCovars\$mycov, "simMean")}.\\
 
 \item \emph{covariate - similarity at W-distance 2} \texttt{(simDist2W)}, % \texttt{(simXDist2W)},
       defined as the sum of centered similarity
       values for alters' covariate-average between $i$ and all actors
       $j$ to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\breve v^W)_{ij}
-  - \widehat{{\rm sim}({\breve v}^W)}) \ ,
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, \Big({\rm sim}(\breve v^W)_{ij}
+  -  \widehat{{\rm sim}^v}\Big) \ ,
 \]
  where the similarity scores ${\rm sim}(\breve v^W)_{ij}$ are defined as
 \[
@@ -8912,20 +9097,15 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
  while
  $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
  \emph{original} covariate $v$, and\\
- $\widehat{{\rm sim}({\breve v}^W)}$ is the
- \emph{observed} mean of all these similarity scores;
- this observed mean is defined by calculating the $\breve v_i^W$ values
- for each of the observations $t_1$ to $t_{M-1}$, and averaging
- these
- $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
+  $\widehat{{\rm sim}^v}$ is as above.
 
 \item \emph{ego-(in-alter-W-distance-2) covariate - similarity} \texttt{(simEgoInDist2W)},
       defined as the sum of centered similarity  between $i$
       and alters' covariate-in-average, for all actors
       $j$ to whom $i$ has a tie,
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} ({\rm sim}(\acute v^W)_{ij}
-  - \widehat{{\rm sim}(\acute v^W)}) \ ,
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, \Big({\rm sim}(\acute v^W)_{ij}
+  - \widehat{{\rm sim}^v}\Big) \ ,
 \]
  where the similarity scores ${\rm sim}(\acute v^W)_{ij}$ are defined as
 \[
@@ -8936,18 +9116,37 @@ Thus, \emph{$W$-alters' $v$-average} $\breve v_i^W$ is defined by
  $ \check v_j^{(-i)}$ is as in the definition of \texttt{altInDist2W},
  $\Delta=\max_{ij}\vert v_i - v_j \vert$ is the observed range of the
  \emph{original} covariate $v$, and\\
- $\widehat{{\rm sim}(\breve v)}$ is the
- \emph{observed} mean of all similarity scores $\breve v_i$;
- this observed mean is defined by calculating the $\breve v_i$ values
- for each of the observations $t_1$ to $t_{M-1}$, and averaging
- these
- $(M-1)n(n-1)$ (or $(M-1)n(n-1)/2$) similarity values.
-
+ $\widehat{{\rm sim}^v}$ is as above.
 
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
+\noindent
+The following is an effect for three networks:
+the dependent network is $X$, the two explanatory networks are $W$ and $Z$.
 
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+\item \emph{from $W$ agreement weighted by $Z$ indegrees} \texttt{(from.w.ind)},
+      defined as the sum of $Z$-indegrees of all 
+      actors who have incoming $W$-ties from $i$ and from those actors
+      $j$ to whom $i$ has a tie,
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, 
+        \Big( \sum_{h} w_{ih}\,w_{jh} \, z_{+h} \Big) \ .
+\]
+     For internal effect parameter $p=2$, the effect is
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\,
+        \Big( \sum_{h} w_{ih}\,w_{jh} \, \sqrt{ z_{+h}} \Big) \ .
+\]
+    $W$ is given as \texttt{interaction1}, $Z$ as \texttt{interaction2}.
+    
+    This effect also is available if all or some of $X$, $W$, and $Z$ are the same.
+    If $X$ and $W$ are the same, this effect is defined as an elementary effect
+    (see Section~\ref{S_elementary}).
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
 
 \subsubsection{Network creation and endowment functions}
 \label{S_c}
@@ -11376,6 +11575,10 @@ the following effectGroups are defined:
 \item \sfn{covarBNetNetObjective} is for effects where, if the second network is two-mode,
      the covariate is defined for the second node set.
 \end{itemize}
+
+Note that effectGroup \sfn{tripleNetworkObjective} is for combinations
+of three networks where for the two in the role of explanatory networks,
+either both should be one-mode, or both should be bipartite with the same second node sets.
 \appendix
 \newpage
 \section{List of Functions in Order of Execution}
@@ -11895,6 +12098,36 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{itemize} % Also update version number in abstract
 
 
+\item 2015-05-20 Revision 285.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize} 
+   \item \texttt{tmax} added to \sfn{sienaFit} objects and 
+     \texttt{tconv.max} mentioned in \sfn{print.sienaFit()}.
+   * \sfn{sienaAlgorithmCreate()} has new arguments \texttt{n2start},
+     \texttt{truncation}, \texttt{doubleAveraging}, \texttt{standardizeVar};
+     this leads to various changes in \texttt{phase2.r}.
+   * Diagonalization corrected (matrix transpose) (\texttt{phase2.r}).
+   \item When there are missings in constant or changing monadic covariates,
+     and centered=FALSE for their creation by \sfn{coCovar()} or
+	 \sfn{varCovar()}, the mean will be imputed (used to be 0, which was an error).
+	 For changing covariates, this is the global mean.
+   \item In \sfn{coCovar()} and \sfn{varCovar()} there is a new argument \texttt{imputationValues},
+     which are used (if given) for imputation of missing values.
+	 Like all missings, they are not used for the calculation
+	 of the target statistics in the Method of Moments.
+   \item New effects: \texttt{outOutActIntn, toDist2, from.w.ind}.
+   \item In the target statistic for the \texttt{higher} effect, contributions for
+     value(ego)=value(alter) are now set appropriately at 0.5 (was 0).
+   \item New effectGroup \sfn{tripleNetworkObjective} (\sfn{allEffects.csv, effects.r})
+     (see earlier in this manual for its characteristics).
+   \item Decent error message when there are (almost) all NA in the dependent
+     behavioural variable (\sfn{effects.r}, function \sfn{getBehaviorStartingVals()}).
+   \item The centering within effects for similarity variables at distance 2
+     now is done by the same similarity means as for the \texttt{simX} effect
+	  (\texttt{attr(mydata\$cCovars\$mycov, "simMean")}, etc.).
+\end{itemize}
+
 \item 2015-04-02 Revision 284.
 
 Changes in RSiena and RSienaTest:
@@ -11902,9 +12135,11 @@ Changes in RSiena and RSienaTest:
    \item New effects: \texttt{simEgoDist2, simEgoInDist2, simEgoDist2W, simEgoInDist2W,\\
          sameXOutAct, diffXInPop, diffXOutAct}. The centering for the similarity
          measure in effects such as simEgoDist2 and simDist2 is not yet clear
-         (this affects only the outdegree parameter).\\
+         (this affects only the outdegree parameter).
+   \item  Relevant for creating new effects:
          New effect groups  \sfn{covarABNetNetObjective},
          \sfn{covarANetNetObjective}, and \sfn{covarBNetNetObjective}.
+    	See \sfn{SienaSpec.tex/pdf}, section 4.9: \sfn{covarNetNet}.
    \item Bug corrected that occurred in \sfn{print01Report} for a \sfn{sienaGroup} object
      where the component objects have constant dyadic covariates.
    \item When a statistic is not plotted in \sfn{plot.sienaGOF()} because
@@ -11925,6 +12160,11 @@ Changes in RSienaTest:
 \begin{itemize}
    \item \sfn{sienaBayes}: correction in initialization of truncation rate parameters
      based on prior; error corrected for sampling constant parameters.
+\end{itemize}
+Changes in RSiena:
+\begin{itemize}
+   \item Parameter \texttt{reduceg} added in \textsf{sienaAlgorithmCreate()}
+   for use in \textsf{siena07()}, like in RSienaTest.
 \end{itemize}
 
 

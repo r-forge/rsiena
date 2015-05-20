@@ -13,6 +13,7 @@
 #include "network/Network.h"
 #include "model/State.h"
 #include "model/tables/Cache.h"
+#include "model/tables/NetworkCache.h"
 
 namespace siena
 {
@@ -25,13 +26,12 @@ MixedNetworkAlterFunction::MixedNetworkAlterFunction(string firstNetworkName,
 	this->lpFirstNetwork = 0;
 	this->lpSecondNetwork = 0;
 	this->lpTwoNetworkCache = 0;
+	this->lpFirstNetworkCache = 0;
 }
-
 
 MixedNetworkAlterFunction::~MixedNetworkAlterFunction()
 {
 }
-
 
 /**
  * Initializes this function.
@@ -49,7 +49,8 @@ void MixedNetworkAlterFunction::initialize(const Data * pData,
 	this->lpFirstNetwork = pState->pNetwork(this->lname1);
 	this->lpSecondNetwork = pState->pNetwork(this->lname2);
 	this->lpTwoNetworkCache = pCache->pTwoNetworkCache(this->lpFirstNetwork,
-		this->lpSecondNetwork);
+		this->lpSecondNetwork);	
+	this->lpFirstNetworkCache = pCache->pNetworkCache(this->lpFirstNetwork);
 }
 
 }

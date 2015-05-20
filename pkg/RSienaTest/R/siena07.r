@@ -28,8 +28,6 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
        RNGkind("default")
     }
     on.exit(exitfn())
-
-
     time0 <-  proc.time()['elapsed']
     z <- NULL ## z is the object for all control information which may change.
     ## x is designed to be readonly. Only z is returned.
@@ -176,6 +174,31 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
     z$pb <- NULL
     z
 }
+
+##@siena07.bis siena07 Wrapper for double estimation
+# Not exported; perhaps for later use as some kind of siena07ToConvergence.
+siena07.bis <- function(x, diagonalize1=1.0, diagonalize2=0.0,
+						nsubphases1=1, n31=500, ...)
+{
+	x1 <- x
+	x1$diagonalize <- diagonalize1
+	x1$nsub <- nsubphases1
+	x1$n3 <- n31
+	ans1 <- siena07(x1, ...)
+	if (!ans1$OK)
+	{
+		cat("The second estimation is not carried out because there is a problem.\n")
+		ans2 <- ans1
+	}
+	else
+	{
+		x2 <- x
+		x2$diagonalize <- diagonalize2
+		ans2 <- siena07(x2, prevAns=ans1, ...)
+	}
+	ans2
+}
+
 ##@InitReports siena07 Print report
 InitReports <- function(z, seed, newseed)
 {
@@ -273,7 +296,8 @@ AnnouncePhase <- function(z, x, subphase=NULL)
     ## 2.5198421 = 2^(4/3); this gives a gain parameter of order n^(-3/4) ##
         if (x$nsub > 0)
         {
-            z$n2minimum[1] <- trunc(z$n2min0 * 2.52)
+			z$n2minimum[1] <- 
+				ifelse(is.null(x$n2start), trunc(z$n2min0 * 2.52), x$n2start)
             z$n2maximum[1] <- z$n2minimum[1] + 200
             if (x$nsub > 1)
             {

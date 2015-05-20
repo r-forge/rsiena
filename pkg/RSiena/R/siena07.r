@@ -274,7 +274,8 @@ AnnouncePhase <- function(z, x, subphase=NULL)
     ## 2.5198421 = 2^(4/3); this gives a gain parameter of order n^(-3/4) ##
         if (x$nsub > 0)
         {
-            z$n2minimum[1] <- trunc(z$n2min0 * 2.52)
+			z$n2minimum[1] <- 
+				ifelse(is.null(x$n2start), trunc(z$n2min0 * 2.52), x$n2start)
             z$n2maximum[1] <- z$n2minimum[1] + 200
             if (x$nsub > 1)
             {

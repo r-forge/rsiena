@@ -122,7 +122,7 @@ sienaNodeSet <- function(n, nodeSetName="Actors", names=NULL)
 }
 
 ##@coCovar Create
-coCovar <- function(val, centered=TRUE, nodeSet="Actors")
+coCovar <- function(val, centered=TRUE, nodeSet="Actors", imputationValues=NULL)
 {
     ##vector, numeric or factor
     if (!is.vector(val))
@@ -133,14 +133,30 @@ coCovar <- function(val, centered=TRUE, nodeSet="Actors")
 	{
         stop("val must be numeric or a factor")
 	}
+	if (!is.null(imputationValues))
+    {
+		if (!(is.numeric(imputationValues) || is.factor(imputationValues)))
+		{
+			stop("imputationValues must be numeric or a factor")
+		}
+		if (anyNA(imputationValues))
+		{
+			stop("imputationValues must not contain any NA values")
+		}
+		if (length(imputationValues) != length(val))
+		{
+			stop("imputationValues must have the same length as val")
+		}
+	}
     out <- val
     class(out) <- "coCovar"
     attr(out, "centered") <- centered
     attr(out, "nodeSet") <- nodeSet
+    attr(out, "imputationValues") <- imputationValues
     out
 }
 ##@varCovar Create
-varCovar<- function(val, centered=TRUE, nodeSet="Actors")
+varCovar<- function(val, centered=TRUE, nodeSet="Actors", imputationValues=NULL)
 {
     ##matrix, numeric or factor, nrow = nactors and cols = observations-1
     if (!is.matrix(val))
@@ -151,10 +167,26 @@ varCovar<- function(val, centered=TRUE, nodeSet="Actors")
 	{
         stop("val must be numeric or a factor")
 	}
+    if (!is.null(imputationValues))
+    {
+		if (!(is.numeric(imputationValues) || is.factor(imputationValues)))
+		{
+			stop("imputationValues must be numeric or a factor")
+		}
+		if (any(is.na(imputationValues)))
+		{
+			stop("imputationValues must not contain any NA values")
+		}
+		if (any(dim(imputationValues) != dim(val)))
+		{
+			stop("imputationValues must have the same dimension as val")
+		}
+	}
     out <- val
     class(out) <- "varCovar"
     attr(out, "centered") <- centered
     attr(out, "nodeSet") <- nodeSet
+    attr(out, "imputationValues") <- imputationValues
     out
 }
 

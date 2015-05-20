@@ -45,6 +45,10 @@ public:
 		Cache * pCache);
 
 protected:
+	double covmean() const; 
+	// this is the overall observed mean;
+	// except for centered actor covariates (not dependent behavior variables),
+	// for which it is 0.
 	double value(int i) const;
 	bool missing(int i) const;
 	double similarity(int i, int j) const;

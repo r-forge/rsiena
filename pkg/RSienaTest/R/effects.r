@@ -32,6 +32,7 @@ substituteNames <- function(nameVectors, xName=NULL, yName=NULL, zName=NULL)
 					"interaction1", "interaction2")] <- effects
 	nameVectors
 }
+
 ##@createEffects DataCreate Extract required rows and change text
 createEffects <- function(effectGroup, xName=NULL, yName=NULL, zName = NULL,
 						  name, groupName, group, netType)
@@ -255,6 +256,35 @@ depvar <- attr(effects, "depvar")
 						rbind(objEffects,
 							createEffects("nonSymmetricNonSymmetricObjective",
 										otherName, name=varname,
+										groupName=groupName, group=group,
+										netType=netType))
+				}
+			}
+			
+			for (k in seq(along=xx$depvars))
+			{
+			# This is an effect group that can be used
+			# for any three dependent networks, provided the first is one-mode;
+			# the receiver sets of the second and third networks
+			# must be the same.
+			# Note that some or all of the three networks may be the same.
+				if ((types[j] == "bipartite") && (types[k] == "bipartite"))
+				{
+					suitable <- (attr(xx$depvars[[j]], 'nodeSet')[2] ==
+							attr(xx$depvars[[k]], 'nodeSet')[2])
+				}
+				else
+				{
+					suitable <- 
+						((types[j] == "oneMode") && (types[k] == "oneMode"))
+				}
+				if (suitable)
+				{
+					thirdName <- names(xx$depvars)[k]
+					objEffects <-
+						rbind(objEffects,
+						  createEffects("tripleNetworkObjective",
+										otherName, thirdName, name=varname,
 										groupName=groupName, group=group,
 										netType=netType))
 				}
@@ -1345,6 +1375,10 @@ getBehaviorStartingVals <- function(depvar)
 	  ##  dif2<- nactors/(nactors-1)*(sum(sqrdif,na.rm=TRUE)/nactors-dif^2)
 		dif1 <- mean(dif, na.rm=TRUE)
 		dif2 <- var(as.vector(dif), na.rm=TRUE)
+		if (is.na(dif2))
+		{
+			stop('Too little information in the dependent variable')
+		}
 		if (abs(dif1) < 0.9 * dif2)
 		{
 			tendency <- 0.5 * sign(dif1) * log((abs(dif1)+dif2)/(dif2-abs(dif1)))

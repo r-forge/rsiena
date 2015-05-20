@@ -187,12 +187,12 @@ void CovariateDistance2NetworkFunction::preprocessEgo(int ego)
 			}
 			else
 			{
-				this->laverageAlterValues[i] = 0;
+				this->laverageAlterValues[i] = covmean();
 			}
 		}
 		else
 		{
-			this->laverageAlterValues[i] = 0;
+			this->laverageAlterValues[i] = covmean();
 			this->ltotalAlterValues[i] = 0;
 			this->laverageAlterMissing[i] = false;
 		}
@@ -224,12 +224,12 @@ void CovariateDistance2NetworkFunction::preprocessEgo(int ego)
 			}
 			else
 			{
-				this->laverageInAlterValues[i] = 0;
+				this->laverageInAlterValues[i] = covmean();
 			}
 		}
 		else
 		{
-			this->laverageInAlterValues[i] = 0;
+			this->laverageInAlterValues[i] = covmean();
 			this->ltotalInAlterValues[i] = 0;
 			this->laverageInAlterMissing[i] = false;
 		}
@@ -240,30 +240,30 @@ void CovariateDistance2NetworkFunction::preprocessEgo(int ego)
    of the given actors wrt to the network with
  * which this function is associated.
  */
-double CovariateDistance2NetworkFunction::similarityAvAltNetwork(int i, int j) const
+double CovariateDistance2NetworkFunction::similarityAvAlt(int i, int j) const
 {
 	double similarity = 0;
 
 	if (this->pConstantCovariate())
 	{
 		similarity =
-			this->pConstantCovariate()->similarityNetwork(
+			this->pConstantCovariate()->similarity(
 				this->averageAlterValue(i),
-				this->averageAlterValue(j), this->name());
+				this->averageAlterValue(j));
 	}
 	else if (this->pChangingCovariate())
 	{
 		similarity =
-			this->pChangingCovariate()->similarityNetwork(
+			this->pChangingCovariate()->similarity(
 				this->averageAlterValue(i),
-				this->averageAlterValue(j), this->name());
+				this->averageAlterValue(j));
 	}
 	else
 	{
 		similarity =
-			this->pBehaviorData()->similarityNetwork(
+			this->pBehaviorData()->similarity(
 				this->averageAlterValue(i),
-				this->averageAlterValue(j), this->name());
+				this->averageAlterValue(j));
 	}
 	return similarity;
 }
@@ -271,7 +271,7 @@ double CovariateDistance2NetworkFunction::similarityAvAltNetwork(int i, int j) c
  * Returns the centered similarity of the own value and the average alter value
    of the given actors wrt to the network with which this function is associated.
  */
-double CovariateDistance2NetworkFunction::varOutAvSimilarityNetwork(int i, int j) const
+double CovariateDistance2NetworkFunction::varOutAvSimilarity(int i, int j) const
 {
 	double similarity = 0;
 	double outAlter = this->totalAlterValue(j);
@@ -286,45 +286,26 @@ double CovariateDistance2NetworkFunction::varOutAvSimilarityNetwork(int i, int j
 	if (degree >= 1)
 	{
 		outAlter /= degree;
+		}
+		else
+		{
+		outAlter = this->covmean();
+		}
+
 		if (this->pConstantCovariate())
 		{
 			similarity =
-				this->pConstantCovariate()->similarityNetwork(
-					this->value(i), outAlter, this->name());
+			this->pConstantCovariate()->similarity(this->value(i), outAlter);
 		}
 		else if (this->pChangingCovariate())
 		{
 			similarity =
-				this->pChangingCovariate()->similarityNetwork(
-					this->value(i), outAlter, this->name());
+			this->pChangingCovariate()->similarity(this->value(i), outAlter);
 		}
 		else
 		{
 			similarity =
-				this->pBehaviorData()->similarityNetwork(
-					this->value(i),	outAlter, this->name());
-		}
-	}
-	else
-	{
-		if (this->pConstantCovariate())
-		{
-			similarity =
-				this->pConstantCovariate()->similarityNetwork(
-					this->value(i), 0, this->name());
-		}
-		else if (this->pChangingCovariate())
-		{
-			similarity =
-				this->pChangingCovariate()->similarityNetwork(
-					this->value(i), 0, this->name());
-		}
-		else
-		{
-			similarity =
-				this->pBehaviorData()->similarityNetwork(
-					this->value(i),	0, this->name());
-		}
+			this->pBehaviorData()->similarity(this->value(i), outAlter);
 	}
 
 	return similarity;
@@ -334,7 +315,7 @@ double CovariateDistance2NetworkFunction::varOutAvSimilarityNetwork(int i, int j
    of the given actors wrt to the network with
  * which this function is associated.
  */
-double CovariateDistance2NetworkFunction::varInAvSimilarityNetwork(int i, int j) const
+double CovariateDistance2NetworkFunction::varInAvSimilarity(int i, int j) const
 {
 	double similarity = 0;
 	double inAlter = this->totalInAlterValue(j);
@@ -349,45 +330,26 @@ double CovariateDistance2NetworkFunction::varInAvSimilarityNetwork(int i, int j)
 	if (degree >= 1)
 	{
 		inAlter /= degree;
+		}
+		else
+		{
+		inAlter = this->covmean();
+		}
+
 		if (this->pConstantCovariate())
 		{
 			similarity =
-					this->pConstantCovariate()->similarityNetwork(
-						this->value(i), inAlter, this->name());
+			this->pConstantCovariate()->similarity(this->value(i), inAlter);
 		}
 		else if (this->pChangingCovariate())
 		{
 			similarity =
-					this->pChangingCovariate()->similarityNetwork(
-						this->value(i), inAlter, this->name());
+			this->pChangingCovariate()->similarity(this->value(i), inAlter);
 		}
 		else
 		{
 			similarity =
-					this->pBehaviorData()->similarityNetwork(
-						this->value(i), inAlter, this->name());
-		}
-	}
-	else
-	{
-		if (this->pConstantCovariate())
-		{
-			similarity =
-					this->pConstantCovariate()->similarityNetwork(
-						this->value(i), 0, this->name());
-		}
-		else if (this->pChangingCovariate())
-		{
-			similarity =
-					this->pChangingCovariate()->similarityNetwork(
-						this->value(i), 0, this->name());
-		}
-		else
-		{
-			similarity =
-					this->pBehaviorData()->similarityNetwork(
-						this->value(i), 0, this->name());
-		}
+			this->pBehaviorData()->similarity(this->value(i), inAlter);
 	}
 
 	return similarity;

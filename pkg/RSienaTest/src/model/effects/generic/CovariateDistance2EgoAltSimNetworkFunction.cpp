@@ -48,14 +48,14 @@ double CovariateDistance2EgoAltSimNetworkFunction::value(int alter)
 	{
 		if (!(this->lexcludeMissing && this->missingInDummy(alter)))
 		{
-			value = this->varInAvSimilarityNetwork(this->ego(), alter);
+			value = this->varInAvSimilarity(this->ego(), alter);
 		}
 	}
 	else
 	{
 		if (!(this->lexcludeMissing && this->missingDummy(alter)))
 		{
-			value = this->varOutAvSimilarityNetwork(this->ego(), alter);
+			value = this->varOutAvSimilarity(this->ego(), alter);
 		}
 	}
 	return value;

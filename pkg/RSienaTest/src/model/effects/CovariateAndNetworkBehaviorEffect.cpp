@@ -199,7 +199,7 @@ void CovariateAndNetworkBehaviorEffect::preprocessEgo(int ego)
 		}
 		else
 		{
-			this->laverageAlterValues[i] = 0;
+			this->laverageAlterValues[i] = this->covariateMean();
 			this->ltotalAlterValues[i] = 0;
 		}
 //		Rprintf("%d %f\n", i,this->laverageAlterValues[i]);
@@ -232,7 +232,7 @@ void CovariateAndNetworkBehaviorEffect::preprocessEgo(int ego)
 		}
 		else
 		{
-			this->laverageInAlterValues[i] = 0;
+			this->laverageInAlterValues[i] = this->covariateMean();
 			this->ltotalInAlterValues[i] = 0;
 		}
 	}

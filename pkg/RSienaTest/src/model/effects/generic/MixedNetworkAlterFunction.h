@@ -24,7 +24,7 @@ namespace siena
 
 class Network;
 class TwoNetworkCache;
-
+class NetworkCache;
 
 class MixedNetworkAlterFunction: public AlterFunction
 {
@@ -42,6 +42,7 @@ protected:
 	inline const Network * pFirstNetwork() const;
 	inline const Network * pSecondNetwork() const;
 	inline TwoNetworkCache * pTwoNetworkCache() const;
+	inline NetworkCache * pFirstNetworkCache() const;
 
 private:
 	string lname1;
@@ -49,6 +50,7 @@ private:
 	const Network * lpFirstNetwork;
 	const Network * lpSecondNetwork;
 	TwoNetworkCache * lpTwoNetworkCache;
+	NetworkCache * lpFirstNetworkCache;
 };
 
 
@@ -69,6 +71,11 @@ const Network * MixedNetworkAlterFunction::pSecondNetwork() const
 TwoNetworkCache * MixedNetworkAlterFunction::pTwoNetworkCache() const
 {
 	return this->lpTwoNetworkCache;
+}
+
+NetworkCache * MixedNetworkAlterFunction::pFirstNetworkCache() const
+{
+	return this->lpFirstNetworkCache;
 }
 
 }
