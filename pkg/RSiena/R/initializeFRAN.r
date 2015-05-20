@@ -321,8 +321,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 				# is defined in x and may have changed.
 				# Therefore here we copy the corresponding lines
 				# from phase1.r.
-				if (!x$diagg)
-				{
 					# Partial diagonalization of derivative matrix
 					# for use if 0 < x$diagonalize < 1.
 					temp <- (1-x$diagonalize)*z$dfra +
@@ -332,7 +330,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 					diag(temp)[z$fixed] <- 1.0
 					# Invert this matrix
 					z$dinvv <- solve(temp)
-				}
+
 				z$sf <- prevAns$sf
 				# check for backward compatibility with pre-1.1-220 versions:
 				if (is.null(prevAns$regrCoef))

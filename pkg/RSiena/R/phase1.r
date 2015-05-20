@@ -222,8 +222,6 @@ phase1.2 <- function(z, x, ...)
         fchange <- as.vector(dinv %*% z$mnfra)
         z$dinv <- dinv
     }
-	if (!x$diagg)
-	{
 		# Partial diagonalization of derivative matrix
 		# for use if 0 < x$diagonalize < 1.
 		temp <- (1-x$diagonalize)*z$dfra + x$diagonalize*diag(diag(z$dfra))
@@ -232,7 +230,7 @@ phase1.2 <- function(z, x, ...)
 		diag(temp)[z$fixed] <- 1.0
 		# Invert this matrix
 		z$dinvv <- solve(temp)
-	}
+
     Report('dfra :\n', cf)
     ##  browser()
     PrtOutMat(z$dfra, cf)

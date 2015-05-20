@@ -60,6 +60,9 @@ TwoNetworkCache::TwoNetworkCache(const Network * pFirstNetwork,
 	this->lpInStarTable =
 		new MixedTwoPathTable(this, FORWARD, BACKWARD);
 
+	this->lpOutStarTable =
+		new MixedTwoPathTable(this, BACKWARD, FORWARD);
+
 	this->initialize(-1);
 }
 
@@ -73,11 +76,13 @@ TwoNetworkCache::~TwoNetworkCache()
 	delete[] this->lsecondOutTieValues;
 	delete this->lpTwoPathTable;
 	delete this->lpInStarTable;
+	delete this->lpOutStarTable;
 
 	this->lfirstOutTieValues = 0;
 	this->lsecondOutTieValues = 0;
 	this->lpTwoPathTable = 0;
 	this->lpInStarTable = 0;
+	this->lpOutStarTable = 0;
 }
 
 
@@ -109,6 +114,8 @@ void TwoNetworkCache::initialize(int ego)
 	}
 
 	this->lpInStarTable->initialize(ego);
+
+	this->lpOutStarTable->initialize(ego);
 
 }
 

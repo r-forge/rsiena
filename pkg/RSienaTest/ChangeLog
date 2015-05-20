@@ -1,3 +1,43 @@
+2015-05-20 R-Forge Revision 285
+Changes in RSiena and RSienaTest:
+   * tmax added to sienaFit objects and tconv.max mentioned in print.sienaFit().
+   * sienaAlgorithmCreate() has new arguments n2start,
+     truncation, doubleAveraging, standardizeVar;
+     this leads to various changes in phase2.r.
+   * Diagonalization corrected (matrix transpose: for defining changestep,
+     fra %*% z$dinvv replaced by z$dinvv %*% fra in phase2.r).
+   * Truncation based on multivariate deviation if
+     diagonalize < 1 (phase2.r).
+   * When there are missings in constant or changing monadic covariates,
+     and centered=FALSE for their creation by coCovar() or
+     varCovar(), the mean will be imputed (used to be 0, which was an error).
+     For changing covariates, this is the global mean.
+   * In coCovar() and varCovar() there is a new argument imputationValues,
+     which are used (if given) for imputation of missing values.
+     Like all missings, they are not used for the calculation
+     of the target statistics in the Method of Moments,
+     but only for the simulations.
+   * For non-centered covariates, averageAlter and averageInAlter
+     values for zero degrees were replaced by the observed covariate mean.
+   * New effects: outOutActIntn, toDist2, from.w.ind
+   * New effectGroup tripleNetworkObjective (allEffects.csv, effects.r)
+     (see the manual or effects.r for its characteristics).
+   * In the target statistic for the 'higher' effect, contributions for
+     value(ego)=value(alter) are now set appropriately at 0.5 (was 0).
+   * Decent error message when there are (almost) all NA in the dependent
+     behavioural variable (effects.r, function getBehaviorStartingVals()).
+   * The centering within effects for similarity variables at distance 2
+     now is done by the same similarity means just as for the simX effect
+     (attr(mydata$cCovars$mycov, "simMean"), etc.).
+     (Background: this was done earlier by "simMeans",
+     the implementation of which contained an error;
+     but the differentiation between "simMean" and "simMeans" is not important,
+     so "simMeans" was dropped for simplicity.)
+     The object "simMeans" was not yet dropped from the data structure
+     transmitted to C++ (siena07internals.cpp. initializeFRAN.r)
+   * z$positivized changed from matrix to vector (not important enough
+     for so much memory use).
+
 2015-04-02 R-Forge Revision 284
 Changes in RSiena and RSienaTest:
    * New effects: simEgoDist2, simEgoInDist2, simEgoDist2W, simEgoInDist2W,

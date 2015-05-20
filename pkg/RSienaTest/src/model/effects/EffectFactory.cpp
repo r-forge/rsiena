@@ -50,6 +50,9 @@
 #include "model/effects/generic/SameCovariateMixedTwoPathFunction.h"
 #include "model/effects/generic/SameCovariateInTiesFunction.h"
 #include "model/effects/generic/HomCovariateMixedTwoPathFunction.h"
+#include "model/effects/generic/OutActDistance2Function.h"
+#include "model/effects/generic/MixedThreeCyclesFunction.h"
+#include "model/effects/generic/InStarsTimesDegreesFunction.h"
 #include "model/tables/EgocentricConfigurationTable.h"
 #include "model/tables/NetworkCache.h"
 
@@ -626,6 +629,20 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 			new MixedInStarFunction(pEffectInfo->variableName(),
 					pEffectInfo->interactionName1()));
 	}
+	else if (effectName == "outOutActIntn")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new OutActDistance2Function(pEffectInfo->interactionName1(),
+							pEffectInfo->variableName(),
+							pEffectInfo->internalEffectParameter(), false, false));
+	}
+	else if (effectName == "sharedTo")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new MixedThreeCyclesFunction(pEffectInfo->interactionName1(),
+				pEffectInfo->variableName(),
+				pEffectInfo->internalEffectParameter()));
+	}
 	else if (effectName == "covNetNet")
 	{
 		string networkName = pEffectInfo->interactionName1();
@@ -712,6 +729,13 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			new OutStarFunction(pEffectInfo->interactionName1()));
+	}
+	else if (effectName == "from.w.ind")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new InStarsTimesDegreesFunction(pEffectInfo->interactionName1(),
+						pEffectInfo->interactionName2(),
+						pEffectInfo->internalEffectParameter()));
 	}
 	else if (effectName == "linear")
 	{

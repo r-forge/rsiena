@@ -74,9 +74,16 @@ double AltersDist2CovariateAverageEffect::calculateChangeContribution(int actor,
 			{
 				alterValue -= this->centeredValue(actor);
 			}
-			if (((pNetwork->outDegree(iter.actor()) - tieValue)> 0) & (this->ldivide2))
+			if (this->ldivide2)
 			{
-				alterValue /= (pNetwork->outDegree(iter.actor()) - tieValue);
+				if ((pNetwork->outDegree(iter.actor()) - tieValue)> 0)
+				{
+					alterValue /= (pNetwork->outDegree(iter.actor()) - tieValue);
+				}
+				else
+				{
+					alterValue = this->covariateMean();
+				}
 			}
 			sumAlterValue += alterValue;
 		}
@@ -86,6 +93,14 @@ double AltersDist2CovariateAverageEffect::calculateChangeContribution(int actor,
 			contribution /= pNetwork->outDegree(actor);
 		}
 	}
+	else
+	{
+		if (this->ldivide1)
+		{
+			contribution = this->covariateMean();
+		}
+	}
+
 	return contribution;
 }
 
@@ -120,9 +135,16 @@ double AltersDist2CovariateAverageEffect::egoStatistic(int ego, double * current
 			}
 		}
 // tieToEgo =  this->pNetwork()->tieValue(iter.actor(), ego);
-		if ((pNetwork->outDegree(j) > tieToEgo) & (this->ldivide2))
+		if (this->ldivide2)
 		{
-			alterXValue /= (pNetwork->outDegree(j) - tieToEgo);
+			if (pNetwork->outDegree(j) > tieToEgo)
+			{
+				alterXValue /= (pNetwork->outDegree(j) - tieToEgo);
+			}
+			else
+			{
+				alterXValue = this->covariateMean();
+			}
 		}
 		statistic += alterXValue;
 		neighborCount++;
@@ -136,6 +158,14 @@ double AltersDist2CovariateAverageEffect::egoStatistic(int ego, double * current
 			statistic /= neighborCount;
 		}
 	}
+	else
+	{
+		if (this->ldivide1)
+		{
+			statistic = this->covariateMean();
+		}
+	}
+
 	return statistic;
 }
 

@@ -85,7 +85,7 @@ double CovariateDistance2AlterNetworkFunction::value(int alter)
 				}
 				else
 				{
-					value = 0;
+					value = CovariateNetworkAlterFunction::covmean();
 				}
 				//Rprintf("stat after %d %f %d %f\n", degree, value,
 				//	this->ego(),

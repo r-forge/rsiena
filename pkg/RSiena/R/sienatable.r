@@ -34,17 +34,18 @@ siena.table <- function(x, type='tex',
     ses <- sqrt(diag(x$covtheta))
     ses[x$fixed] <- NA
     max.t1 <- max(abs(x$tstat[!x$fixed]))
-    max.t <- round(max.t1, digits = d)
+	dd <- 2
+    max.t <- round(max.t1, digits = dd)
     if (max.t < max.t1)
     {
-        max.t <- max.t + 10^{-d} #needs to be rounded up
+        max.t <- max.t + 10^{-dd} #needs to be rounded up
     }
-#    maxlincomb.t1 <- x$tconv.max
-#    maxlincomb.t <- round(maxlincomb.t1, digits = d)
-#    if (maxlincomb.t < maxlincomb.t1)
-#    {
-#        maxlincomb.t <- maxlincomb.t + 10^{-d} #needs to be rounded up
-#    }
+    maxlincomb.t1 <- x$tconv.max
+	maxlincomb.t <- round(maxlincomb.t1, digits = dd)
+    if (maxlincomb.t < maxlincomb.t1)
+    {
+        maxlincomb.t <- maxlincomb.t + 10^{-dd} #needs to be rounded up
+    }
     if (length(x$condvarno) == 0)
     {
         condvarno <- 0
@@ -315,9 +316,9 @@ siena.table <- function(x, type='tex',
         footnote <- c(paste("\\multicolumn{5}{l}\n   ",
 			"{\\footnotesize{convergence $t$ ratios all $<$ ", max.t,
 			".}}\\\\\n", 
-#			"\\multicolumn{5}{l}",
-#			"{\\footnotesize{Overall maximum convergence ratio ",
-#			maxlincomb.t,".}}",	
+			"\\multicolumn{5}{l}",
+			"{\\footnotesize{Overall maximum convergence ratio ",
+			maxlincomb.t,".}}",
 			sep="",collapse=""),
 			"\\end{tabular}")
 

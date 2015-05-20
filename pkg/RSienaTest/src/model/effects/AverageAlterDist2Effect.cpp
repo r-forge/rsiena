@@ -43,7 +43,6 @@ AverageAlterDist2Effect::~AverageAlterDist2Effect()
  * Calculates the change in the statistic corresponding to this effect if
  * the given actor would change his behavior by the given amount.
  * It is assumed that preprocessEgo(ego) has been called before.
-
  */
 double AverageAlterDist2Effect::calculateChangeContribution(int actor,
 	int difference)

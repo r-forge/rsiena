@@ -119,6 +119,8 @@ void NetworkLongitudinalData::calculateProperties()
 
 	this->laverageInDegree = 0;
 	this->laverageOutDegree = 0;
+	this->laverageSquaredInDegree = 0;
+	this->laverageSquaredOutDegree = 0;
 
 	for (int observation = 0;
 		observation < this->observationCount();
@@ -130,6 +132,8 @@ void NetworkLongitudinalData::calculateProperties()
 		for (int i = 0; i < this->lpReceivers->n(); i++)
 		{
 			this->laverageInDegree += pNetwork->inDegree(i);
+			this->laverageSquaredInDegree +=
+					(pNetwork->inDegree(i))*(pNetwork->inDegree(i));
 		}
 
 		int observedTieCount = 0;
@@ -137,6 +141,8 @@ void NetworkLongitudinalData::calculateProperties()
 		for (int i = 0; i < this->pActorSet()->n(); i++)
 		{
 			this->laverageOutDegree += pNetwork->outDegree(i);
+			this->laverageSquaredOutDegree +=
+				(pNetwork->outDegree(i))*(pNetwork->outDegree(i));
 			observedTieCount +=
 				pNetwork->outDegree(i) -
 					commonActorCount(pNetwork->outTies(i),
@@ -169,6 +175,10 @@ void NetworkLongitudinalData::calculateProperties()
 	this->laverageInDegree /=
 		this->lpReceivers->n() * this->observationCount();
 	this->laverageOutDegree /=
+		this->pActorSet()->n() * this->observationCount();
+	this->laverageSquaredInDegree /=
+		this->lpReceivers->n() * this->observationCount();
+	this->laverageSquaredOutDegree /=
 		this->pActorSet()->n() * this->observationCount();
 
 	// data-less-missing-values is used in calculating statistics. Since it
@@ -354,6 +364,20 @@ int NetworkLongitudinalData::structuralTieCount(int actor, int observation)
 	return this->lstructuralTieNetworks[observation]->outDegree(actor);
 }
 
+/**
+ * Returns the number of receivers.
+ */
+int NetworkLongitudinalData::m() const
+{
+		if (this->loneMode )
+		{
+			return pActorSet()->n();
+		}
+		else
+		{
+			return this->lpReceivers->n();
+		}
+}
 
 /**
  * Stores the maximum permitted out-degree of an actor.
@@ -397,6 +421,14 @@ double NetworkLongitudinalData::averageInDegree() const
 	return this->laverageInDegree;
 }
 
+/**
+ * Returns the average squared in-degree over all receivers and observations.
+ */
+double NetworkLongitudinalData::averageSquaredInDegree() const
+{
+	return this->laverageSquaredInDegree;
+}
+
 
 /**
  * Returns the average out-degree over all senders and observations.
@@ -404,6 +436,14 @@ double NetworkLongitudinalData::averageInDegree() const
 double NetworkLongitudinalData::averageOutDegree() const
 {
 	return this->laverageOutDegree;
+}
+
+/**
+ * Returns the average squared out-degree over all senders and observations.
+ */
+double NetworkLongitudinalData::averageSquaredOutDegree() const
+{
+	return this->laverageSquaredOutDegree;
 }
 
 

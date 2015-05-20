@@ -72,7 +72,7 @@ double CovariateDistance2InAlterNetworkFunction::value(int alter)
 				}
 				else
 				{
-					value = 0;
+					value = CovariateNetworkAlterFunction::covmean();
 				}
 			}
 		}

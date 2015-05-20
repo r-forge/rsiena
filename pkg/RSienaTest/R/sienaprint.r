@@ -308,6 +308,11 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 					rep('\n',x$pp), sep='')
 			cat(as.matrix(mymess1),'\n', sep='')
 		}
+		else
+		{
+			cat(c("\nOverall maximum convergence ratio: ",
+					sprintf("%8.4f", x$tconv.max), "\n\n"))
+		}
 
 		try(if (x$errorMessage.cov > '')
 				{cat('\nWarning:', x$errorMessage.cov, '\n')}, silent=TRUE)
@@ -345,8 +350,6 @@ print.summary.sienaFit <- function(x, ...)
         stop("not a legitimate summary of a Siena model fit")
 	}
 	print.sienaFit(x)
-#	cat(c("Overall maximum convergence ratio: ",
-#		sprintf("%8.4f", x$tconv.max), "\n\n"))
 
     if (x$maxlike)
     {

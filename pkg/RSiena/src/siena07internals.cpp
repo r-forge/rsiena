@@ -731,12 +731,49 @@ void setupConstantCovariate(SEXP COCOVAR, ConstantCovariate *
     int nActors = length(COCOVAR);
 	// Rprintf("%x\n", pConstantCovariate);
     double * start = REAL(COCOVAR);
+	SEXP mn;
+	PROTECT(mn = install("mean"));
+	SEXP ans = getAttrib(COCOVAR, mn);
+	double mean = REAL(ans)[0];
+	SEXP cn;
+	PROTECT(cn = install("centered"));
+	ans = getAttrib(COCOVAR, cn);
+	bool centered = LOGICAL(ans)[0];
+
+	// extract imputationValues if provided by user
+	SEXP im;
+	PROTECT(im = install("imputationValues"));
+	ans = getAttrib(COCOVAR, im);
+	bool impute = FALSE;
+	double * imputationValues;
+	if(!isNull(ans))
+	{
+		impute = TRUE;
+		imputationValues = REAL(ans);
+//		Rprintf("We have something to impute\n");
+	}
+
     for (int actor = 0; actor < nActors; actor++)
     {
 		double value = *start++;
 		if (ISNAN(value))
 		{
+			if (impute) // imputationValues already were centered, if necessary
+			{
+				pConstantCovariate->value(actor, imputationValues[actor]);
+//				Rprintf("We impute value %f for actor %d\n",
+//					imputationValues[actor], actor + 1);
+			}
+			else if (centered) // no user input provided
+			{
 			pConstantCovariate->value(actor, 0);
+//				Rprintf("We use 0 for actor %d\n", actor + 1);
+			}
+			else // no user input provided, not centered
+			{
+				pConstantCovariate->value(actor, mean);
+//				Rprintf("We use the mean %f for actor %d\n", mean, actor + 1);
+			}
 			pConstantCovariate->missing(actor, 1);
 		}
 		else
@@ -746,6 +783,7 @@ void setupConstantCovariate(SEXP COCOVAR, ConstantCovariate *
 
 		}
     }
+	UNPROTECT(3);
 }
 /**
  * Create one group of constant covariates
@@ -779,6 +817,21 @@ void setupConstantCovariateGroup(SEXP COCOVARGROUP, Data *pData)
 				myActorSet);
         setupConstantCovariate(VECTOR_ELT(COCOVARGROUP,	constantCovariate),
 			pConstantCovariate);
+		SEXP mn;
+		PROTECT(mn = install("mean"));
+		SEXP obsmean = getAttrib(VECTOR_ELT(COCOVARGROUP, constantCovariate), mn);
+		SEXP cn;
+		PROTECT(cn = install("centered"));
+		SEXP ans = getAttrib(VECTOR_ELT(COCOVARGROUP, constantCovariate), cn);
+		bool centered = LOGICAL(ans)[0];
+		if (centered)
+		{
+			pConstantCovariate->mean(0);
+		}
+		else
+		{
+			pConstantCovariate->mean(REAL(obsmean)[0]);
+		}
 		SEXP sim;
 		PROTECT(sim = install("simMean"));
 		SEXP simMean = getAttrib(VECTOR_ELT(COCOVARGROUP, constantCovariate),
@@ -801,7 +854,7 @@ void setupConstantCovariateGroup(SEXP COCOVARGROUP, Data *pData)
 		SEXP Range = getAttrib(VECTOR_ELT(COCOVARGROUP, constantCovariate),
 			range);
 		pConstantCovariate->range(REAL(Range)[0]);
-        UNPROTECT(6);
+        UNPROTECT(8);
     }
 }
 /**
@@ -815,27 +868,68 @@ void setupChangingCovariate(SEXP VARCOVAR,
     int observations = ncols(VARCOVAR);
     int nActors = nrows(VARCOVAR);
 	double * start = REAL(VARCOVAR);
+	SEXP mn;
+	PROTECT(mn = install("mean"));
+	SEXP ans = getAttrib(VARCOVAR, mn);
+	double mean = REAL(ans)[0];
+	SEXP cn;
+	PROTECT(cn = install("centered"));
+	ans = getAttrib(VARCOVAR, cn);
+	bool centered = LOGICAL(ans)[0];
+
+	// extract imputationValues if provided by user
+	SEXP im;
+	PROTECT(im = install("imputationValues"));
+	ans = getAttrib(VARCOVAR, im);
+	bool impute = FALSE;
+	double * imputationValues;
+	if(!isNull(ans))
+	{
+		impute = TRUE;
+		imputationValues = REAL(ans);
+	}
+
 	for (int period = 0; period < observations; period++)
     {
 		for (int actor = 0; actor < nActors; actor++)
 		{
 			double value = *start++;
+			double imputationValue;
+			if (impute)
+			{
+				imputationValue = *imputationValues++;
+			}
+
 			if (ISNAN(value))
 			{
-				pChangingCovariate->value(actor, period,
-					0);
-				pChangingCovariate->missing(actor, period,
-					1);
+				if (impute) // imputationValues have been centered, if necessary
+				{
+					pChangingCovariate->value(actor, period, imputationValue);
+//					Rprintf("We impute value %f for actor %d in period %d\n",
+//										imputationValue, actor + 1, period + 1);
+				}
+				else if (centered) // no user input provided
+				{
+					pChangingCovariate->value(actor, period, 0);
+//					Rprintf("We use 0 for actor %d in period %d\n",
+//								actor + 1, period + 1);
+				}
+				else // no user input provided, not centered
+				{
+					pChangingCovariate->value(actor, period, mean);
+//					Rprintf("We use the mean %f for actor %d in period %d\n",
+//								mean, actor + 1, period + 1);
+				}
+				pChangingCovariate->missing(actor, period, 1);
 			}
 			else
 			{
-				pChangingCovariate->value(actor, period,
-					value);
-				pChangingCovariate->missing(actor, period,
-					0);
+				pChangingCovariate->value(actor, period, value);
+				pChangingCovariate->missing(actor, period, 0);
 			}
 		}
     }
+	UNPROTECT(3);
 }
 /**
  * Create one group of changing covariates
@@ -876,6 +970,21 @@ void setupChangingCovariateGroup(SEXP VARCOVARGROUP, Data *pData)
 				myActorSet);
 		setupChangingCovariate(VECTOR_ELT(VARCOVARGROUP, changingCovariate),
 			pChangingCovariate);
+		SEXP mn;
+		PROTECT(mn = install("mean"));
+		SEXP obsmean = getAttrib(VECTOR_ELT(VARCOVARGROUP, changingCovariate), mn);
+		SEXP cn;
+		PROTECT(cn = install("centered"));
+		SEXP ans = getAttrib(VECTOR_ELT(VARCOVARGROUP, changingCovariate), cn);
+		bool centered = LOGICAL(ans)[0];
+		if (centered)
+		{
+			pChangingCovariate->mean(0);
+		}
+		else
+		{
+			pChangingCovariate->mean(REAL(obsmean)[0]);
+		}
 		SEXP sim;
 		PROTECT(sim = install("simMean"));
 		SEXP simMean = getAttrib(VECTOR_ELT(VARCOVARGROUP, changingCovariate),
@@ -898,7 +1007,7 @@ void setupChangingCovariateGroup(SEXP VARCOVARGROUP, Data *pData)
 		SEXP Range = getAttrib(VECTOR_ELT(VARCOVARGROUP, changingCovariate),
 			range);
 		pChangingCovariate->range(REAL(Range)[0]);
-		UNPROTECT(6);
+		UNPROTECT(8);
 	}
 }
 /**

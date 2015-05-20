@@ -27,6 +27,7 @@ Covariate::Covariate(std::string name, const ActorSet * pActorSet) :
 	NamedObject(name)
 {
 	this->lpActorSet = pActorSet;
+	this->lmean = 0;
 	this->lrange = 0;
 	this->lsimilarityMean = 0;
 }
@@ -44,6 +45,14 @@ const ActorSet * Covariate::pActorSet() const
 	return this->lpActorSet;
 }
 
+
+/**
+ * Stores the average value of this covariate.
+ */
+void Covariate::mean(double value)
+{
+	this->lmean = value;
+}
 
 /**
  * Stores the range of values of this covariate, which is calculated in R.

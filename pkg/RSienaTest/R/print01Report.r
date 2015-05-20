@@ -1277,15 +1277,15 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 		length(atts$vCovars) > 0)
 	{
 		netnames <- atts$netnames
-		vCovarSim2 <-
-			lapply(data, function(x)
-				   lapply(x$vCovars, function(y) attr(y, "simMeans")))
-		behSim2 <-
-			lapply(data, function(x)
-				   lapply(x$depvars, function(y) attr(y, "simMeans")))
-		cCovarSim2 <-
-			lapply(data, function(x)
-				   lapply(x$cCovars, function(y) attr(y, "simMeans")))
+#		vCovarSim2 <-
+#			lapply(data, function(x)
+#				   lapply(x$vCovars, function(y) attr(y, "simMeans")))
+#		behSim2 <-
+#			lapply(data, function(x)
+#				   lapply(x$depvars, function(y) attr(y, "simMeans")))
+#		cCovarSim2 <-
+#			lapply(data, function(x)
+#				   lapply(x$cCovars, function(y) attr(y, "simMeans")))
 		if (nData > 1)
 		{
 			vCovarSim <-
@@ -1367,101 +1367,6 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 					Report(c("Similarity", format(atts$vCovars[i], width=24),
 							 ':', format(round(atts$vCovarSim[i], 4), width=12,
 										 nsmall=4), '\n'), outf)
-				}
-			}
-		}
-		## report on alter similarity means
-		Report(c("\nFor the distance-2 similarity variable calculated from",
-				 "each actor \ncovariate, the mean is also subtracted.\n",
-				 "These means are:\n"), outf)
-		if (nData == 1) ## ie we may have constant covariates
-		{
-			sims <- cCovarSim2[[1]]
-			for (i in seq(along=sims))
-			{
-				if (atts$cCovarPoszvar[i])
-				{
-					Report(c("Distance-2 Similarity ",
-							 format(atts$cCovars[i], width=12),
-							 ':', format(names(sims[[i]]), width=12,
-										 justify="right"), '\n'), sep="", outf)
-					Report(c(rep(" ",  35),
-							 format(round(sims[[i]], 4),  width=12, nsmall=4),
-							 '\n'), sep="", outf)
-				}
-			}
-		}
-		for (i in seq(along=atts$netnames))
-		{
-			if (atts$types[i] == "behavior" && atts$bPoszvar[i])
-			{
-				if (nData > 1)
-				{
-					thisSim <- lapply(behSim2, function(x)x[[netnames[i]]])
-					Report(c("Distance-2 Similarity ",
-							 format(atts$netnames[i], width=12), ":\n"),
-						   sep="", outf)
-					Report(c(rep(" ", 24),
-							 format(names(thisSim[[1]]),
-									width=12, justify="right"), "\n"), sep="",
-						   outf)
-					mystr <- format(paste("	 Subproject ", 1:nData, " <",
-								  atts$names, "> ", sep=""))
-					for (j in seq(along=thisSim))
-					{
-						Report(c(mystr[j], format(round(thisSim[[j]], 4),
-												  nsmall=4, width=12), "\n"),
-							   sep="", outf)
-					}
-					Report("\n", outf)
-				}
-				else
-				{
-					sims <- behSim2[[1]]
-					Report(c("Distance-2 Similarity ", format(atts$netnames[i],
-															 width=12),
-							 ':', format(names(sims[[i]]), width=12), '\n'),
-						   sep="", outf)
-					Report(c(rep(" ",  35), format(round(sims[[i]], 4), width=12,
-										 nsmall=4), '\n'), sep="", outf)
-				}
-			}
-		}
-		for (i in seq(along=atts$vCovars))
-		{
-			covarnames <- atts$vCovars
-			if (atts$vCovarPoszvar[i])
-			{
-				if (nData > 1)
-				{
-					thisSim <- lapply(vCovarSim2, function(x)x[[covarnames[i]]])
-					Report(c("Distance-2 Similarity ", format(covarnames[i],
-															  width=12),
-							 ":\n"), sep="", outf)
-					Report(c(rep(" ", 24), format(names(thisSim[[1]]),
-												  width=12, justify="right"),
-							 "\n"),	 sep="", outf)
-					mystr <- format(paste("	 Subproject ", 1:nData, " <",
-										  atts$names, "> ", sep=""))
-					for (j in seq(along=thisSim))
-					{
-						Report(c(mystr[j], format(round(thisSim[[j]], 4),
-												  nsmall=4, width=12), "\n"),
-							   sep="", outf)
-					}
-					Report("\n", outf)
-				}
-				else
-				{
-					sims <- vCovarSim2[[1]]
-					Report(c("Distance-2 Similarity", format(atts$vCovars[i],
-															 width=12),
-							 ':', format(names(sims[[i]]), width=12,
-										 justify="right"),
-							 '\n'), outf)
-					Report(c(rep(" ",  35), format(round(sims[[i]], 4), width=12,
-												   nsmall=4), '\n'), sep="",
-						   outf)
 				}
 			}
 		}

@@ -16,24 +16,27 @@
 }
 \usage{
 sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0,
-     useStdInits = FALSE, n3 = 1000, nsub = 4,
+     useStdInits = FALSE, n3 = 1000, nsub = 4, n2start = NULL,
      dolby=TRUE, maxlike = FALSE, diagonalize=1.0*!maxlike,
      condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
-     cond = NA, findiff = FALSE, seed = NULL, pridg=0.05,
-     prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
-     prdrms=0.05, maximumPermutationLength=40,
+     cond = NA, findiff = FALSE, seed = NULL,
+     pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
+     prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
-     modelType=1, mult=5, simOnly=FALSE, localML=FALSE)
+     modelType=1, mult=5, simOnly=FALSE, localML=FALSE,
+     truncation=5, doubleAveraging=nsub, standardizeVar=(diagonalize<1))
 
 sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
-     useStdInits = FALSE, n3 = 1000, nsub = 4,
+     useStdInits = FALSE, n3 = 1000, nsub = 4, n2start = NULL,
      dolby=TRUE, maxlike = FALSE, diagonalize=1.0*!maxlike,
      condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
-     cond = NA, findiff = FALSE, seed = NULL, pridg=0.05,
-     prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3, prirms=0.05,
-     prdrms=0.05, maximumPermutationLength=40,
+     cond = NA, findiff = FALSE, seed = NULL,
+     pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
+     prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
-     modelType=1, mult=5, simOnly=FALSE, localML=FALSE)}
+     modelType=1, mult=5, simOnly=FALSE, localML=FALSE,
+     truncation=5, doubleAveraging=nsub, standardizeVar=(diagonalize<1))
+}
 \arguments{
   \item{fn}{Function to do one simulation in the Robbins-Monro
     algorithm. Not to be touched.}
@@ -47,13 +50,17 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     If FALSE, the initial values in the effects object will be used.}
   \item{n3}{Number of iterations in phase 3. For regular use with the
     Method of Moments, n3=1000 mostly suffices.
-    For use in publications and for maximum Likelihood, n3=3000 is advised.}
+    For use in publications and for Maximum Likelihood,
+    at least n3=3000 is advised.}
   \item{nsub}{Number of subphases in phase 2.}
+  \item{n2start}{Minimum number of interations in subphase 1 of phase 2;
+   default is \code{2.52*(p+7)},
+   where \code{p} = number of estimated parameters.}
   \item{dolby}{Boolean. Should there be noise reduction by regression
     on augmented data score. In most cases dolby=TRUE yields better
-	convergence, but takes some extra computing time;
-	if convergence is problematic, however, dolby=FALSE	may be tried.
-	Just use whatever works best.}
+    convergence, but takes some extra computing time;
+    if convergence is problematic, however, dolby=FALSE may be tried.
+    Just use whatever works best.}
   \item{maxlike}{Whether to use maximum likelihood method or
     Method of Moments estimation.}
   \item{diagonalize}{Number between 0 and 1 (bounds included),
@@ -80,9 +87,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{cond}{Boolean. Only relevant for Method of Moments
     simulation/estimation.
     If TRUE, use conditional simulation; if FALSE, unconditional simulation.
-	If missing, decision is deferred until \code{\link{siena07}},
-	when it is set to TRUE if there is only one dependent variable,
-	FALSE otherwise.}
+    If missing, decision is deferred until \code{\link{siena07}},
+    when it is set to TRUE if there is only one dependent variable,
+    FALSE otherwise.}
   \item{findiff}{ Boolean: If TRUE, estimate derivatives using finite
     differences. If FALSE, use scores.}
   \item{seed}{Integer. Starting value of random seed. Not used if
@@ -120,7 +127,14 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     This is suitable if nsub=0 and siena07 is used only for the purpose
     of simulation.}
   \item{localML}{Logical: If TRUE, and \code{maxlike}, then calculations are
-  	sped up for models with all local effects.}
+    sped up for models with all local effects.}
+  \item{truncation}{Used for step truncation in the Robbins Monro algorithm
+    (applied to deviate/(standard deviation)).}
+  \item{doubleAveraging}{subphase after which double averaging is used
+    in the Robbins Monro algorithm,
+    which probably increases algorithm efficiency.}
+  \item{standardizeVar}{Logical: whether to limit deviations used in
+    Robbins-Monro updates to unit variances.}
 }
 \details{Model specification is done via this object for
   \code{\link{siena07}}.
@@ -128,68 +142,14 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   Robbins-Monro algorithm. Those not
   available as arguments can be changed manually where desired.\cr
   Further information about the implementation of the algorithm is in
-  http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf. 
+  http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf.
 }
-\value{Returns an object of class \code{sienaAlgorithm} containing:
-  \item{projname}{String value of name of project.}
-  \item{useStdInits}{Boolean, see above.}
-  \item{checktime}{Boolean, set to TRUE: report time in the phases or not.}
-  \item{n3}{number of iterations in Phase 3}
-  \item{firstg}{Initial value of the scaling ("gain") parameter in the
-    Robbins-Monro algorithm.}
-  \item{reduceg}{Reduction factor for the scaling ("gain") parameter in the
-    Robbins-Monro algorithm (MoM only).}
-  \item{maxrat}{Value used to control the maximum size of the jumps.}
-  \item{maxmaxrat}{Value used to control the maximum size of the jumps.}
-  \item{maxlike}{Boolean: is FRAN using maximum likelihood?}
-  \item{FRANname}{Name of simulation function FRAN. Is derived by
-    \code{sienaModelCreate} from \code{fn} and \code{maxlike}.}
-  \item{cconditional}{Boolean: is FRAN using conditional estimation?}
-  \item{condvarno}{Number of dependent variable on which to condition.}
-  \item{condname}{Name of dependent variable on which to condition.}
-  \item{FinDiff.method}{Boolean: are derivatives calculated using
-    finite differences?}
-  \item{nsub}{Number of subphases in phase 2.}
-  \item{diag}{Boolean: use only the diagonal of the derivative matrix?}
-  \item{modelType}{Type of model to be fitted: 1=directed, 2:6 for
-    symmetric networks: 2=forcing, 3=Initiative model,
-    4=Pairwise forcing model, 5=Pairwise mutual model, 6=Pairwise joint model}
-  \item{MaxDegree}{Named vector of maximum degree values, or NULL.}
-  \item{randomSeed}{Integer. Starting value of random seed. Not present
-    unless given in call.}
-  \item{pridg}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
-  \item{prcdg}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
-  \item{prper}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
-  \item{pripr}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
-  \item{prdpr}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
-  \item{prirms}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
-  \item{prdrms}{Real number. Probability used in Metropolis-Hastings
-    routine in ML estimation.}
-  \item{maximumPermutationLength}{Maximum length of permutation in steps in ML
-    estimation}
-  \item{minimumPermutationLength}{Minimum length of permutation in steps in ML
-    estimation}
-  \item{initialPermutationLength}{Initial length of permutation in steps in ML
-    estimation}
-  \item{mult}{Multiplication factor for maximum likelihood. Number of
-    steps per iteration is set to this multiple of the total distance
-    between the observations at start and finish of the wave.}
-  \item{simOnly}{Logical, indicating whether output of covariance matrix
-   by \code{\link{siena07}} is to be skipped.}
-  \item{localML}{Logical, indicating if a local model was used, allowing 
-  	faster calculations in ML estimation.}
-}
+\value{Returns an object of class \code{sienaAlgorithm} containing
+  values implied by the parameters.}
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley and Tom A.B. Snijders}
 \seealso{\code{\link{siena07}}, \code{\link{simstats0c}}.}
 \examples{
-
 myAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn")
 StdAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn", useStdInits=TRUE)
 CondAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn", condvarno=1, cond=TRUE)

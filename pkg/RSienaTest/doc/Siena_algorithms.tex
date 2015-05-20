@@ -601,7 +601,7 @@ The algorithm is a multivariate version of the Robbins-Monro (1951) algorithm.
 It uses the idea of Polyak (1990) and Ruppert (1988)
 to employ a diagonal matrix $\tilde{D}$ in the iteration step (\ref{step})
 \begin{equation}
- \hat{\theta}_{N+1} = \hat{\theta}_N \, - \, a_N\, {\tilde{D}}^{-1} \, (S_N - s)~,   \label{step}
+ \hat{\theta}_{N+1} \,=\, \hat{\theta}_N \, - \, a_N\, {\tilde{D}}^{-1} \, (S_N - s)~,   \label{step}
 \end{equation}
  and estimate
 the solution by partial averages of $\hat{\theta}_N$ rather than the
@@ -615,6 +615,18 @@ that for {\em each} coordinate the partial sum of the product of successive valu
 be negative, rather than requiring this only for the sum over the coordinates.
 Further, the number of steps for which $a_N$ is constant is bounded between a lower
 and an upper limit to ensure that $a_N$ is of order $N^{-c}$.
+
+Under the option \nnm{doubleAveraging}, the iteration step is 
+\begin{equation}
+ \hat{\theta}_{N+1} \,=\, \bar{\theta}_N \, - \, a_N\, N\,{\tilde{D}}^{-1} \, (\overline S_N - s)~,   \label{step.double}
+\end{equation}
+where
+\[
+  \bar{\theta}_N \,=\, \frac1N \sum_{n \leq N} \hat\theta_n \ , \hspace{1em}
+  \overline S_N \,=\, \sum_{n \leq N} s_n \ ,
+\]
+implementing a proposal of \citet{bather1989} studied by
+\citet{SchwabeWalk96}.
 
 Whether the algorithm yields an estimate that indeed solves
 the moment equation (\ref{mom_eq0}) to a satisfactory degree of precision
@@ -751,10 +763,10 @@ The algorithm consists of three phases.
       \text{SF:     }  \hat{D} &= \frac{{\rm{Sum}}_{d}}{n_1} -
                          \frac{\sum_{m=2}^M {\rm{Sum}}_{Sm}{\rm{Sum}}_{Jm}}{n_1^2} \ .
       \end{align*}
-      \item Partially (or entirely) diagonalized matrix 
+      \item Partially (or entirely) diagonalized matrix
       \[
-         \tilde{D} = \nnm{diagonalize}\times\text{diag}(\hat{D}) 
-               \,+\, (1-\nnm{diagonalize})\times \hat{D} 
+         \tilde{D} = \nnm{diagonalize}\times\text{diag}(\hat{D})
+               \,+\, (1-\nnm{diagonalize})\times \hat{D}
       \]
       where \nnm{diagonalize} is set in function \nm{sienaAlgorithmCreate},
       with default value 1.
@@ -769,7 +781,7 @@ The algorithm consists of three phases.
             coefficients are also calculated.)
       \item Make one partial estimated Newton-Raphson step,
       \[
-       {\hat{\theta}} = \theta_1 - 
+       {\hat{\theta}} = \theta_1 -
          a_1 {\hat{D}}^{-1} \left( \bar{s} - s \right)\, .
       \]
       where
@@ -779,7 +791,8 @@ The algorithm consists of three phases.
       \end{enumerate}
 
 \item[Phase 2.]
-    \emph{Note: I cannot find anything about phase2.0 in the current code -- ts 23-05-13.}\\
+    \emph{Note 1: I cannot find anything about phase2.0 in the current code -- ts 23-05-13.}\\
+    \emph{Note 2: the use of observedPos and observedNeg apparently was discontinued.}\\
     The boolean variable \nnm{phase2.0} differentiates between having or not
     having a subphase 2.0.
     Such a subphase was introduced in version R-Forge 1.1-220 (August 2012).\\
@@ -788,7 +801,7 @@ The algorithm consists of three phases.
      function \nnm{proc2subphase}
      \begin{enumerate}
      \item Initialise \nnm{nit} = $N = 0$,
-        ${\rm{Sum}}_{\hat\theta} = 0_{p \times 1}$,
+        ${\rm{Sum}}_{\hat\theta} = 0_{p \times 1}$,  ${\rm{Sum}}_\Delta = 0_{p \times 1}$,
         $S_{\rm{prev}} = 0_{p \times 1}$, \\
         \nnm{ac} = $\rm{AC} = 0_{p \times p},
         \nnm{observedPos = observedNeg}  = \text{FALSE}_{p \times 1}$.
@@ -807,8 +820,11 @@ The algorithm consists of three phases.
            variance while not affecting the expected value.
     \item  Update
             \begin{align*}
-             \hat{\theta} &\,=\,
-               \hat{\theta} \,-\, a_N\, \tilde{D}^{-1} \, (S - s) \\
+              {\rm{Sum}}_\Delta & =  {\rm{Sum}}_\Delta + (S-s) \\
+             \text{If \nnm{doubleAveraging},}\ \hat{\theta} &\,=\,
+               {\rm{Sum}}_{\hat\theta}/N \,-\, a_N\, \tilde{D}^{-1} \, {\rm{Sum}}_\Delta \\
+             \text{else}\ \hat{\theta} &\,=\,
+               \hat{\theta} \,-\, a_N\, \tilde{D}^{-1} \, (S - s) \\               
              N & =  N+1 \\
             {\rm{Sum}}_{\hat\theta} & =  {\rm{Sum}}_{\hat\theta} + \hat\theta \\
             \text{if $N \geq 2$, then }
@@ -905,9 +921,10 @@ The algorithm consists of three phases.
       \item
            To check (approximate) validity of (\ref{mom_eq0}) compute the
            $t$-ratios for convergence,
-           \[
+           \begin{equation}
            \nnm{tstat} = t_j = \frac{\bar{s}_j - s^{\rm{obs}}_j}{\sigma_j} \ ,
-           \]
+                                \label{tstat}
+           \end{equation}
            where $\sigma_j$ is the square root of the $j'$th diagonal element
            of $\Sigma$.
       \item In \nnm{CalculateDerivative3} : \
@@ -1008,6 +1025,94 @@ The \nnm{prevAns} option in \nnm{siena07} does the following.
   \nnm{regrCor}. \\
   This substitution is determined by the flag \nnm{haveDfra}.
 \end{enumerate}
+
+\subsection{Convergence criterion}
+
+Up to version 1.1-284, the proposed convergence criterion focused on
+the $t$-ratios for convergence \nnm{tstat} defined in (\ref{tstat}),
+of which the maximum absolute value
+\[
+    \nnm{tmax} \,=\,  \max_j\{ \nnm{tstat}_j \}
+\]
+ should be less than 0.10.
+This was supported by simulations of the estimators using this
+convergence criterion, for which expected values and coverage rates of
+confidence intervals were good.
+Since then it has appeared that the convergence criterion should be improved,
+and the following conclusion was reached.
+
+The \emph{overall maximum convergence ratio} should be used as an additional
+convergence criterion. It is defined as the maximum $t$-ratio for convergence for
+any linear combination of the parameters,
+\begin{equation}
+           \nnm{tconv.max} \,=\, \max_{b}
+           \left\{ \frac{b' \big(\bar{s}_j - s^{\rm{obs}}\big)}
+           {\sqrt{b' \, \Sigma\, b}} \right\} \ .  \label{tstatmax}
+\end{equation}
+This is equal to (use Cauchy-Schwarz)
+\[
+ % \max_{b} \left\{ \frac{b' \big(\bar{s}_j - s^{\rm{obs}}\big)}
+ %          {\sqrt{b' \Sigma b}} \right\} \,=\,
+  \max_{c} \left\{ \frac{c' \, \Sigma^{-1/2}  \big(\bar{s}_j - s^{\rm{obs}}\big)}
+           {\sqrt{c'c\,}} \right\} \,=\,
+           \big(\bar{s}_j - s^{\rm{obs}}\big)'\,
+           \Sigma^{-1}  \big(\bar{s}_j - s^{\rm{obs}}\big) \ .
+\]
+
+The definition implies that
+\[
+    \nnm{tconv.max} \, \geq \, \nnm{tmax}   \ .
+\]
+
+A study was made, using several data sets and model specifications,
+in which estimations were first run until $ \nnm{tmax} \leq 0.10$,
+and then continued (with \nnm{prevAns}) until $ \nnm{tconv.max} \leq 0.20$
+and then on until $ \nnm{tconv.max} \leq 0.15$.
+After each of these three endpoints, the estimate was retained.
+This led to a set of estimates $\check{\theta}_i$ each with their estimated
+covariance matrices $\check{\Sigma}_i$ and values $\nnm{tmax}_i$
+and $\nnm{tconv.max}_i$.
+
+To summarize these estimations and covariance matrices, only those
+$i$ were used for which $\nnm{tconv.max}_i \leq 0.10$,
+to obtain robust estimates
+(elementwise) of the mean $\check{\theta}_i$, and of the mean
+$\check{\Sigma}_i$; these are denoted $\bar\theta$
+and $\bar\Sigma$. It was checked that $\bar\Sigma$ still was positive
+definite.
+The quality of all estimates $\check\theta_i$ then was assessed by the
+Mahalanobis-type distances
+\[
+    d_i \,=\, (\check\theta_i - \bar\theta)' \, {\bar\Sigma}^{-1} \,
+                (\check\theta_i - \bar\theta) \ .
+\]
+Regarding $\bar\theta$ as the true estimate, this measures the
+how well $\check\theta_i$ approximates the true estimate, and therefore
+can be regarded as a measure of convergence.
+
+
+
+\begin{figure}
+\hfill
+\includegraphics*[scale=0.29]{tmax.png}
+\includegraphics*[scale=0.29]{tconvmax.png}
+\hfill\hfill
+\caption{Distances $d_i$ as a function of  \nnm{tmax} (left) and \nnm{tconv.max} (right)
+\label{distances}}
+\end{figure}
+% TestsConvergence.r
+
+This led to plots such as those in Figure~\ref{distances}
+(obtained for a model with some highly correlated
+effects, for which the algorithm was expected to encounter
+some difficulties).
+We see clearly that, although the great majority of distances
+for $\nnm{tmax}_i \leq 0.10$ are small, some distances
+are too large. By contrast, the distances are well approximated
+by a function of $\nnm{tconv.max}_i$, and for   $\nnm{tconv.max}_i \leq 0.20$
+all deviations are small.
+This supports the rule to require  $\nnm{tconv.max}_i \leq 0.20$
+or (on the safe side) $\nnm{tconv.max}_i \leq 0.15$ as a signal of convergence.
 
 \section{Statistics for MoM}
 

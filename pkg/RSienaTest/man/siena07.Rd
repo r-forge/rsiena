@@ -55,7 +55,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     of ministeps should be returned; this will produce a very big file.}
 }
 \details{
- Runs a Robbins-Monro algorithm for parameter estimation
+ \code{siena07} runs a Robbins-Monro algorithm for parameter estimation
  according to the Method of Moments using the three-phase
  implementation in Snijders (2001) and
  Snijders, Steglich and Schweinberger (2007),
@@ -76,8 +76,9 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  Robbins-Monro algorithm.
 
  It is necessary to check that convergence has been achieved.
- The rule of thumb is that all t-ratios for convergence should be
- in absolute value less than 0.1.
+ The rule of thumb is that the all t-ratios for convergence should be
+ in absolute value less than 0.1 and
+ the overall maximum convergence ratio should be less than 0.25.
  If this was not achieved, the result can be used to start
  another estimation run from the estimate obtained, using
  the parameter \code{prevAns} as illustrated in the example below.\cr
@@ -93,12 +94,14 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{f}{Various characteristics of the data and model definition.}
   \item{theta}{Estimated value of theta.}
   \item{covtheta}{Estimated covariance matrix of theta; this is not available
-    if the sienaAlgorithm object x was produced with simOnly=TRUE.}
+    if the sienaAlgorithm object \code{x} was produced with \code{simOnly=TRUE}.}
   \item{se}{Vector of standard errors of estimated theta.}
   \item{dfra}{Matrix of estimated derivatives.}
   \item{sf}{Matrix of deviations from target in phase 3.}
   \item{sf2}{Array of statistics from simulations in phase 3.}
-  \item{tstat}{t-statistics for convergence.}
+  \item{tconv}{t-statistics for convergence.}
+  \item{tmax}{maximum absolute t-statistic for convergence for non-fixed parameters.}
+  \item{tconv.max}{overall maximum convergence ratio.}
   \item{targets}{Observed statistics.}
   \item{targets2}{Observed statistics by wave, starting with the second wave .}
   \item{ssc}{Score function contributions for each wave for each
@@ -134,13 +137,15 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
    \item Steglich, Christian E. G., Snijders, Tom A. B., and
     Pearson, Michael A. (2010). Dynamic networks and behavior:
     Separating selection from influence. Sociological Methodology, 40, 329-393.
+   \item Information about the implementation of the algorithm is in
+     \url{http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf}.
    \item Further see \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
-           }
+}
 }
 \author{Ruth Ripley, Tom Snijders}
 
-\seealso{There are print, summary and xtable
-  methods for \code{\link{sienaFit}}
+\seealso{\code{\link{sienaAlgorithmCreate}}\cr
+  There are print, summary and xtable methods for \code{\link{sienaFit}}
   objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}}
 \examples{
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
