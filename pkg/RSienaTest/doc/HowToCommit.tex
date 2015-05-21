@@ -130,8 +130,9 @@ in TortoiseSVN set the property \sfn{svn:eoln-style} to ``native".
 This will avoid the all-too-usual problems when transferring files between Windows and Mac systems.\\
 Recipe: right click on the file name $\rightarrow$ TortoiseSVN $\rightarrow$ Properties  $\rightarrow$
 New  $\rightarrow$ EOL  $\rightarrow$ Platform-dependent (native).\\
-Remember to do this also for the identical file that you create for the second package (e.g., for \RS if
-first you added the file to \rst).
+Remember to do this also for identical files that you create for the second package (e.g., for \RS if
+first you added the file to \rst); just copying the files does not copy
+the Tortoise file properties.
 
 Preferably limit line lengths to a maximum of 80 characters.
 
@@ -151,12 +152,16 @@ Preferably limit line lengths to a maximum of 80 characters.
   successive versions and subversions of R often increase the stringency of checking).
   Note that the C++ compiler may be different on different systems (e.g., Windows and Mac)
   which may lead to different warnings.
+  
+  Do this also for the most recent patched version of R, because R-Forge will do this
+  and often it leads to additional errors and notes, because R becomes progressively
+  stringent.
 
   Try to make the code so that notes and warnings from this Check are avoided as far as possible,
   and that you understand those that remain.
   There should of course be no errors at all.
   For example, I always get a note that the package size is big
-  (because the manual is a very big file) and
+  (because the manual is a very big file and the C++ code is big) and
   often about some superfluous pieces of code (because I want to use them later).
 
   Checks consist of running the examples in the help files (unless excluded by \texttt{dontrun})

@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
-suppressPackageStartupMessages(library(RSiena))
+suppressPackageStartupMessages(library(RSienaTest))
 suppressPackageStartupMessages(library(tcltk))
-RSiena:::DONE(FALSE)
+RSienaTest:::DONE(FALSE)
 siena01Gui()
-while(!RSiena:::DONE()) {Sys.sleep(0.1)}
+while(!RSienaTest:::DONE()) {Sys.sleep(0.1)}
 

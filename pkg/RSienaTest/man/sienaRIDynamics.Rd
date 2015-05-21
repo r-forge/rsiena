@@ -91,6 +91,7 @@
   \item{\dots}{Other arguments.}
 }
 \details{
+Currently there still is an error in this function.\cr
 \code{sienaRIDynamics} takes the data as well as the complete model
 specification into account.
 Therefore, necessary arguments are the analyzed data given as a
@@ -146,7 +147,7 @@ Indlekofer, N. and Brandes, U.,
 \author{Natalie Indlekofer}
 \seealso{\code{\link{sienaRI}}}
 \examples{
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, cond=FALSE)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50, cond=FALSE)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
@@ -159,20 +160,19 @@ RIDynamics1
 plot(RIDynamics1)
 }
 
+\dontrun{
 myalgorithm2 <- sienaAlgorithmCreate(nsub=2, n3=50, cond=TRUE)
 ans2 <- siena07(myalgorithm2, data=mydata, effects=myeff, batch=TRUE)
 
-\dontrun{
 RIDynamics2 <- sienaRIDynamics(mydata, ans=ans2, effects=myeff)
 RIDynamics2
-
 
 RIDynamics3 <- sienaRIDynamics(data=mydata, theta=c(ans2$rate,ans2$theta),
              algorithm=myalgorithm2, effects=myeff, intervalsPerPeriod=4)
 RIDynamics3
 }
 
-
+\dontrun{
 myalgorithm3 <- sienaAlgorithmCreate(nsub=2, n3=50)
 mynet2 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mybeh <- sienaDependent(s50a, type="behavior")
@@ -181,8 +181,6 @@ myeff2 <- getEffects(mydata2)
 myeff2 <- includeEffects(myeff2, density, recip, transTies, transTrip, nbrDist2)
 ans3 <- siena07(myalgorithm3, data=mydata2, effects=myeff2, batch=TRUE)
 
-
-\dontrun{
 RIDynamics4 <- sienaRIDynamics(mydata2, ans=ans3, depvar="mybeh")
 RIDynamics4
 

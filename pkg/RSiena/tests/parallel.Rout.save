@@ -15,7 +15,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> library(RSiena)
+> library(RSienaTest)
 > 
 > 
 > ##test3
@@ -210,38 +210,6 @@ Overall maximum convergence ratio:    0.5444
 
 Total of 414 iteration steps.
 
-> ##test11
-> print('test11')
-[1] "test11"
-> data501 <- sienaDataCreateFromSession("s50.csv", modelName="s50")
-> data501e <- sienaDataCreateFromSession("s50e.csv", modelName="s50e")
-<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
-<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
-<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
-> data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj")
-<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
-<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
-<sparse>[ <logic> ] : .M.sub.i.logical() maybe inefficient
-> 
-> model501e <- model.create( projname="s50e", cond=FALSE, nsub=2, n3=50, seed=6)
-> ans501e <- siena07(model501e, data=data501e$mydata, effects=data501e$myeff,
-+                    parallelTesting=TRUE, batch=TRUE, silent=TRUE)
-> ##, verbose=TRUE)
-> ans501e
-Estimates, standard errors and convergence t-ratios
-
-                                        Estimate   Standard   Convergence 
-                                                     Error      t-ratio   
-  1. rate constant Var1 rate (period 1)  5.6753  ( 0.7600   )   0.0773    
-  2. rate constant Var1 rate (period 2)  4.5023  ( 1.3805   )   0.0952    
-  3. eval outdegree (density)           -2.3195  ( 0.1168   )   0.3096    
-  4. eval reciprocity                    2.7516  ( 0.2573   )   0.1306    
-
-Overall maximum convergence ratio:    0.3888 
-
-
-Total of 595 iteration steps.
-
 > ##test12
 > print('test12')
 [1] "test12"
@@ -279,7 +247,13 @@ Overall maximum convergence ratio:    0.1998
 Total of 325 iteration steps.
 
 > tt <- sienaTimeTest(ans)
+> tt
+Joint significance test of time heterogeneity:
+chi-squared =   0.81, d.f. = 2, p= 0.6654, 
+where H0: The following parameters are zero:
+ (1) (*)Dummy2:outdegree (density)
+ (2) (*)Dummy2:indegree - popularity
 > 
 > proc.time()
    user  system elapsed 
-  11.55    0.46   12.01 
+   8.20    0.43    8.72 
