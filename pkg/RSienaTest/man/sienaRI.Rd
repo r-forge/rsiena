@@ -149,7 +149,7 @@ Indlekofer, N. and Brandes, U.,
 \author{Natalie Indlekofer}
 \seealso{\code{\link{sienaRIDynamics}}}
 \examples{
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
@@ -162,7 +162,7 @@ RI
 plot(RI, addPieChart=TRUE)
 }
 
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50)
 mynet2 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mybeh <- sienaDependent(s50a, type="behavior")
 mydata2 <- sienaDataCreate(mynet2, mybeh)

@@ -77,17 +77,6 @@ ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
                parallelTesting=TRUE, silent=TRUE)
 ##, verbose=TRUE)
 ans
-##test11
-print('test11')
-data501 <- sienaDataCreateFromSession("s50.csv", modelName="s50")
-data501e <- sienaDataCreateFromSession("s50e.csv", modelName="s50e")
-data501paj <- sienaDataCreateFromSession("s50paj.csv", modelName="s50paj")
-
-model501e <- model.create( projname="s50e", cond=FALSE, nsub=2, n3=50, seed=6)
-ans501e <- siena07(model501e, data=data501e$mydata, effects=data501e$myeff,
-                   parallelTesting=TRUE, batch=TRUE, silent=TRUE)
-##, verbose=TRUE)
-ans501e
 ##test12
 print('test12')
 use<- 1:30
@@ -104,3 +93,4 @@ ans <- siena07(sienaModelCreate(n3=50, nsub=2,
                data=mydata, effects=myeff, batch=TRUE, silent=TRUE)
 ans
 tt <- sienaTimeTest(ans)
+tt
