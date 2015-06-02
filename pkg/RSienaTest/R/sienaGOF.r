@@ -882,6 +882,7 @@ changeToNewStructural <- function(X, SBefore, SAfter) {
 sparseMatrixExtraction <-
 	function(i, obsData, sims, period, groupName, varName){
 	# require(Matrix)
+	isBipartite <- "bipartite" == attr(obsData[[groupName]]$depvars[[varName]], "type")
 	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
 	if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
 	{
@@ -918,7 +919,7 @@ sparseMatrixExtraction <-
 			returnValue <- changeToStructural(returnValue,
 				Matrix(obsData[[groupName]]$depvars[[varName]][,,period]))
 		}
-		diag(returnValue) <- 0 # not guaranteed by data input
+		if(!isBipartite) diag(returnValue) <- 0 # not guaranteed by data input
 	}
 	else
 	{
