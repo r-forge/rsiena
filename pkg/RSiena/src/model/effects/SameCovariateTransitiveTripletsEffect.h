@@ -23,18 +23,16 @@ class SameCovariateTransitiveTripletsEffect :
 {
 public:
 	SameCovariateTransitiveTripletsEffect(
-                   const EffectInfo * pEffectInfo, bool reciprocal);
+                   const EffectInfo * pEffectInfo, bool same);
 	virtual double calculateContribution(int alter) const;
 
 protected:
 	virtual double tieStatistic(int alter);
 
 private:
-	// Indicates if the reciprocal version of the 
-   // same covariate transitive triplets effect is required;
-   // currently not implemented.
-
-	bool lreciprocal;
+	bool inequalityCondition(int a) const;
+	// lsame indicates if the requirement inthe condition is "same" or "different"
+	bool lsame;
 };
 
 }

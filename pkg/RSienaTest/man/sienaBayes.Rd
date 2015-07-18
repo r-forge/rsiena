@@ -15,8 +15,8 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     priorRatesFromData=2,
     frequentist=FALSE, incidentalBasicRates=FALSE,
     reductionFactor=1, gamma=0.5, delta=1e-04,
-    nwarm=50, nmain=250,
-    nrunMHBatches=20, nSampVarying=1, nSampConst=1, nImproveMH=100,
+    nwarm=50, nmain=250, nrunMHBatches=20,
+    nSampVarying=1, nSampConst=1, nSampRates=0, nImproveMH=100,
     lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
     storeAll=FALSE, prevAns=NULL, prevBayes=NULL, silentstart = TRUE,
     nbrNodes=1, clusterType=c("PSOCK", "FORK"),
@@ -75,7 +75,7 @@ glueBayes(z1, z2, nwarm2=0)
   parameters are defined specifically for each group, and estimated
   using a Robbins Monro algorithm; if FALSE, they have a
   common prior for all groups.}
-  \item{reductionFactor}{Positive number. 
+  \item{reductionFactor}{Positive number.
    If \code{priorRatesFromData} = 1 or 2, the prior distribution for the rate
    parameters is the estimated covariance matrix of the estimated rate parameters
    in the initialization phase multiplied by \code{reductionFactor}.
@@ -99,6 +99,8 @@ glueBayes(z1, z2, nwarm2=0)
   \item{nSampVarying}{Number of samples of varying parameters
         for each chain sample.}
   \item{nSampConst}{Number of samples of constant parameters ("eta")
+        for each chain sample.}
+  \item{nSampRates}{Number of extra samples of basic rate parameters
         for each chain sample.}
   \item{nImproveMH}{Number of iterations per improveMH step.}
   \item{lengthPhase1}{Only used for frequentist estimation:
@@ -125,13 +127,15 @@ glueBayes(z1, z2, nwarm2=0)
     PartialBayesResult.RData as mentioned above.
     Initialization and warming phases are skipped. If this is given,
     the values of \code{prevAns}, \code{nwarm}, and the prior
-    distributions are disregarded. All relevant parameters of the function
-    call should be identical. This is not completely checked, so errors
+    distributions are disregarded.
+    A new set of \code{nmain} iterations in the main phase are done.
+    All further relevant parameters of the function call should be identical.
+    This is not completely checked, so errors
     may occur if this is not the case.}
   \item{silentstart}{Boolean: whether to suppress most information
     to the console during the calculation of initial values.}
   \item{nbrNodes}{Number of processes to be used. Cannot be more than
-    the number of waves summed over number of groups.}
+    the number of periods summed over number of groups.}
    \item{clusterType}{If using multiple processes, whether to use
      forking processes or not. (Only "PSOCK" can be used on Windows.)}
    \item{getDocumentation}{Flag to allow documentation of internal
@@ -254,7 +258,7 @@ glueBayes(z1, z2, nwarm2=0)
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)
   summary(bayes.model)
   bayes.nextModel <- sienaBayes(FourAlgo, data = FourGroups,
-        effects = FourEffects, nmain=25, nrunMHBatches=10,
+        effects = FourEffects, nmain=15, nrunMHBatches=10,
         prevBayes = bayes.model)
   bayes.combinedModel <- glueBayes(bayes.model, bayes.nextModel)
   summary(bayes.combinedModel)

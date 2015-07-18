@@ -28,12 +28,21 @@ namespace siena
  */
 
 SameCovariateTransitiveTripletsEffect::SameCovariateTransitiveTripletsEffect(
-									const EffectInfo * pEffectInfo, bool reciprocal) :
+									const EffectInfo * pEffectInfo, bool same):
 	CovariateDependentNetworkEffect(pEffectInfo)
 {
-// currently not used:
+	this->lsame = same;
+}
+
+bool SameCovariateTransitiveTripletsEffect::inequalityCondition(int a) const
+{
+	if (lsame)
 	{
-		this->lreciprocal = reciprocal;
+		return (fabs(a) < EPSILON);
+	}
+	else
+	{
+		return (fabs(a) >= EPSILON);
 	}
 }
 
@@ -52,7 +61,7 @@ double SameCovariateTransitiveTripletsEffect::calculateContribution(
 	int contribution1 = 0;
 	const Network * pNetwork = this->pNetwork();
 
-	if (fabs(this->value(alter) - this->value(this->ego())) < EPSILON)
+	if (this->inequalityCondition(this->value(alter) - this->value(this->ego())))
 	{
 		contribution1 = this->pTwoPathTable()->get(alter);
 	}
@@ -66,7 +75,7 @@ double SameCovariateTransitiveTripletsEffect::calculateContribution(
 	{
 		// Get the receiver of the outgoing tie.
 		int h = iter.actor();
-		if (fabs(this->value(h) - this->value(this->ego())) < EPSILON &&
+		if (this->inequalityCondition(this->value(h) - this->value(this->ego())) &&
             pNetwork->tieValue(alter, h) >= 1)
 		{
 		 contribution1++ ;
@@ -87,7 +96,7 @@ double SameCovariateTransitiveTripletsEffect::tieStatistic(int alter)
 	double statistic = 0;
 
 	if (!this->missing(this->ego()) && !this->missing(alter) &&
-		fabs(this->value(alter) - this->value(this->ego())) < EPSILON)
+		this->inequalityCondition(this->value(alter) - this->value(this->ego())))
 	{
 		statistic = this->pTwoPathTable()->get(alter);
 	}

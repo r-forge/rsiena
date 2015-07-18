@@ -1,3 +1,27 @@
+2015-07-18 R-Forge Revision 288
+Changes in RSiena and RSienaTest:
+   * New effects homXOutAct, FFDeg, BBDeg, RFDeg, diffXTransTrip.
+   * sameXInPop and diffXInPop also added for two-mode networks;
+     but they are not dyadic!
+   * In names of behavior effects and statistics dropped the
+     (redundant) parts "behavior" and "beh.".
+   * plot.sienaRI: new parameter "actors"; 
+     proportions with piechart improved; function of parameter radius changed.
+   * fra2 constructed only if findiff (phase3.r).
+   * siena.table does no more produce the double minus sign in html output.
+Changes in RSiena:
+   * Correction of error for two-mode networks in sienaGOF.
+Changes in RSienaTest:
+   * sienaBayes: new parameter nSampRates;
+     correction in use of prevBayes (with extra createStores());
+     more efficient calculation of multivariate normal density.
+   * Small changes in HowToCommit.tex.
+
+2015-06-02 R-Forge Revision 286
+(Version number was kept the same...)
+Changes in RSienaTest:
+   * Correction of error for two-mode networks in sienaGOF.
+
 2015-05-21 R-Forge Revision 286
 Changes in RSiena and RSienaTest:
    * test11 dropped from \tests\parallel.R.
@@ -30,7 +54,7 @@ Changes in RSiena and RSienaTest:
      but only for the simulations.
    * For non-centered covariates, averageAlter and averageInAlter
      values for zero degrees were replaced by the observed covariate mean.
-   * New effects: outOutActIntn, toDist2, from.w.ind
+   * New effects: outOutActIntn, sharedTo, from.w.ind
    * New effectGroup tripleNetworkObjective (allEffects.csv, effects.r)
      (see the manual or effects.r for its characteristics).
    * In the target statistic for the 'higher' effect, contributions for
@@ -49,6 +73,8 @@ Changes in RSiena and RSienaTest:
    * z$positivized changed from matrix to vector (not important enough
      for so much memory use).
    * test7 renamed test 5, test6 and new test7 added in \tests\parallel.R
+Changes in RSienaTest:
+   * Small changes in HowToCommit.tex.
 
 2015-04-02 R-Forge Revision 284
 Changes in RSiena and RSienaTest:

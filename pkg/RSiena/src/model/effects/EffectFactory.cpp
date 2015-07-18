@@ -347,6 +347,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "sameXTransTrip")
 	{
+		pEffect = new SameCovariateTransitiveTripletsEffect(pEffectInfo, true);
+	}
+	else if (effectName == "diffXTransTrip")
+	{
 		pEffect = new SameCovariateTransitiveTripletsEffect(pEffectInfo, false);
 	}
 	else if (effectName == "sameXInPop")
@@ -378,6 +382,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "diffXOutAct")
 	{
 		pEffect = new SameCovariateActivityEffect(pEffectInfo, false);
+	}
+	else if (effectName == "homXOutAct")
+	{
+		pEffect = new HomCovariateActivityEffect(pEffectInfo, true);
 	}
 	else if (effectName == "homXTransTrip")
 	{
@@ -899,6 +907,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new ReciprocalDegreeBehaviorEffect(pEffectInfo);
 	}
+	else if (effectName == "FFDeg")
+	{
+		pEffect = new DoubleDegreeBehaviorEffect(pEffectInfo, true, 0);
+	}
+	else if (effectName == "BBDeg")
+	{
+		pEffect = new DoubleDegreeBehaviorEffect(pEffectInfo, false, 1);
+	}
+//	else if (effectName == "RRDeg")
+//	{
+//		pEffect = new DoubleRecDegreeBehaviorEffect(pEffectInfo, 2); // crashes
+//	}
 	else if (effectName == "avSimPopEgo")
 	{
 		pEffect = new SimilarityEffect(pEffectInfo, true, false, true);

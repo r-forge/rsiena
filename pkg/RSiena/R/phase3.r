@@ -611,7 +611,10 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 		{
 			fra <- colSums(zz$fra)
 			fra <- fra - z$targets
+			if (z$FinDiff.method)
+			{
 			fra2 <- zz$fra
+			}
 			z$sf[z$nit, ] <- fra
 			z$sf2[z$nit, , ] <- zz$fra
 			z$sims[[z$nit]] <- zz$sims
@@ -628,8 +631,11 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 				z$sf2[z$nit + (i - 1), , ] <- zz[[i]]$fra
 				z$sims[[z$nit + (i - 1)]] <- zz[[i]]$sims
 			}
+			if (z$FinDiff.method)
+			{
 			fra2 <- t(sapply(zz, function(x)x$fra))
 			dim(fra2) <- c(int, nrow(zz[[1]]$fra), z$pp)
+			}
 			fra <- t(sapply(zz, function(x) colSums(x$fra)))
 		}
 		if (x$maxlike)

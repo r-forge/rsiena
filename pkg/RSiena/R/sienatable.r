@@ -124,13 +124,23 @@ siena.table <- function(x, type='tex',
             {
 	  	if (tcsplit[1] == "0")
 		{
+                    if (type=='tex')
+					{
                     tcsplit[1] <- "--0"
 		}
                 else
                 {
+						tcsplit[1] <- "-0"
+					}
+				}
+                else
+                {
+                    if (type=='tex')
+					{
                     tcsplit[1] <- paste(c("-",tcsplit[1]),sep="",collapse="")
 		}
             }
+        }
         }
         else
         {
@@ -144,7 +154,7 @@ siena.table <- function(x, type='tex',
         tcsplit
     }
 
-    ## mydf creates a data.frame; these will be binded together to form the table
+    ## mydf creates a data.frame; these will be bound together to form the table
 
     mydf <- function(pp)
     {
@@ -268,8 +278,11 @@ siena.table <- function(x, type='tex',
     	ruleTable <- tableSection("")
 	footnote <- c(paste(" <TR> <TD colspan=9 align=left>
 				all convergence t ratios < ",
-                            max.t,".</TD> </TR> <TR> </TR>",sep="",collapse=""),
-                      "</TABLE>")
+                            max.t,".</TD> </TR> <TR> </TR>",
+						" <TR> <TD colspan=9 align=left>
+				Overall maximum convergence ratio ",
+                            maxlincomb.t,".</TD> </TR> <TR> </TR>",							
+							sep="",collapse=""),"</TABLE>")
 	if (sig == TRUE)
 	{
             footnote <- c("<TR> <TD colspan=4 align=left> &#134 p < 0.1;

@@ -616,7 +616,7 @@ be negative, rather than requiring this only for the sum over the coordinates.
 Further, the number of steps for which $a_N$ is constant is bounded between a lower
 and an upper limit to ensure that $a_N$ is of order $N^{-c}$.
 
-Under the option \nnm{doubleAveraging}, the iteration step is 
+Under the option \nnm{doubleAveraging}, the iteration step is
 \begin{equation}
  \hat{\theta}_{N+1} \,=\, \bar{\theta}_N \, - \, a_N\, N\,{\tilde{D}}^{-1} \, (\overline S_N - s)~,   \label{step.double}
 \end{equation}
@@ -824,7 +824,7 @@ The algorithm consists of three phases.
              \text{If \nnm{doubleAveraging},}\ \hat{\theta} &\,=\,
                {\rm{Sum}}_{\hat\theta}/N \,-\, a_N\, \tilde{D}^{-1} \, {\rm{Sum}}_\Delta \\
              \text{else}\ \hat{\theta} &\,=\,
-               \hat{\theta} \,-\, a_N\, \tilde{D}^{-1} \, (S - s) \\               
+               \hat{\theta} \,-\, a_N\, \tilde{D}^{-1} \, (S - s) \\
              N & =  N+1 \\
             {\rm{Sum}}_{\hat\theta} & =  {\rm{Sum}}_{\hat\theta} + \hat\theta \\
             \text{if $N \geq 2$, then }
@@ -1046,23 +1046,46 @@ convergence criterion. It is defined as the maximum $t$-ratio for convergence fo
 any linear combination of the parameters,
 \begin{equation}
            \nnm{tconv.max} \,=\, \max_{b}
-           \left\{ \frac{b' \big(\bar{s}_j - s^{\rm{obs}}\big)}
-           {\sqrt{b' \, \Sigma\, b}} \right\} \ .  \label{tstatmax}
+           \left\{ \frac{b' \big(\bar{s} - s^{\rm{obs}}\big)}
+           {\sqrt{b' \, \Sigma\, b}} \right\} \ , \label{tstatmax}
 \end{equation}
+where $\bar{s}$ is the average simulated vector of statistics and $s^{\rm{obs}}$
+is its observed value. 
 This is equal to (use Cauchy-Schwarz)
-\[
+\begin{equation}
  % \max_{b} \left\{ \frac{b' \big(\bar{s}_j - s^{\rm{obs}}\big)}
  %          {\sqrt{b' \Sigma b}} \right\} \,=\,
-  \max_{c} \left\{ \frac{c' \, \Sigma^{-1/2}  \big(\bar{s}_j - s^{\rm{obs}}\big)}
+  \max_{c} \left\{ \frac{c' \, \Sigma^{-1/2}  \big(\bar{s} - s^{\rm{obs}}\big)}
            {\sqrt{c'c\,}} \right\} \,=\,
-           \big(\bar{s}_j - s^{\rm{obs}}\big)'\,
-           \Sigma^{-1}  \big(\bar{s}_j - s^{\rm{obs}}\big) \ .
-\]
+          \sqrt{ \big(\bar{s} - s^{\rm{obs}}\big)'\,
+           \Sigma^{-1}  \big(\bar{s} - s^{\rm{obs}}\big) } \ .
+\end{equation}
 
 The definition implies that
 \[
     \nnm{tconv.max} \, \geq \, \nnm{tmax}   \ .
 \]
+Further, the vector $b^*$ of weights that has the largest convergence $t$-ratio
+(i.e., the largest value of the expression in braces in (\ref{tstatmax})) is
+\begin{equation}
+  b^* \,=\, \Sigma^{-1/2}c^* \,=\, \Sigma^{-1/2} \, \Sigma^{-1/2}  \big(\bar{s} - s^{\rm{obs}}\big)
+  \,=\, \Sigma^{-1}  \big(\bar{s} - s^{\rm{obs}}\big) \ .
+\end{equation}
+In case of difficult convergence, the latter vector of weights may be used
+to diagnose which is the linear combination giving most trouble
+to the algorithm.
+It may be even more instructive to study the weights of standardized statistics
+(i.e., statistics divided by their standard deviation).
+
+These can be obtained from RSiena, if the answer object is called \texttt{ans}, as
+\begin{verbatim}
+(solve(ans$msf) %*% apply(ans$sf,2,mean)) * sqrt(diag(ans$msf))
+\end{verbatim}
+A more readable representation may be given by
+\begin{verbatim}
+round((solve(ans$msf) %*% apply(ans$sf,2,mean)) * sqrt(diag(ans$msf)), 5)
+\end{verbatim}
+
 
 A study was made, using several data sets and model specifications,
 in which estimations were first run until $ \nnm{tmax} \leq 0.10$,
@@ -1081,7 +1104,7 @@ $\check{\Sigma}_i$; these are denoted $\bar\theta$
 and $\bar\Sigma$. It was checked that $\bar\Sigma$ still was positive
 definite.
 The quality of all estimates $\check\theta_i$ then was assessed by the
-Mahalanobis-type distances
+squared Mahalanobis-type distances
 \[
     d_i \,=\, (\check\theta_i - \bar\theta)' \, {\bar\Sigma}^{-1} \,
                 (\check\theta_i - \bar\theta) \ .
@@ -1109,10 +1132,10 @@ some difficulties).
 We see clearly that, although the great majority of distances
 for $\nnm{tmax}_i \leq 0.10$ are small, some distances
 are too large. By contrast, the distances are well approximated
-by a function of $\nnm{tconv.max}_i$, and for   $\nnm{tconv.max}_i \leq 0.20$
+by a function of $\nnm{tconv.max}_i$, and for   $\nnm{tconv.max}_i \leq 0.25$
 all deviations are small.
-This supports the rule to require  $\nnm{tconv.max}_i \leq 0.20$
-or (on the safe side) $\nnm{tconv.max}_i \leq 0.15$ as a signal of convergence.
+This supports the rule to require  $\nnm{tconv.max}_i \leq 0.25$
+or (on the safe side) $\nnm{tconv.max}_i \leq 0.20$ as a signal of convergence.
 
 \section{Statistics for MoM}
 

@@ -21,8 +21,8 @@
  }
 \usage{
 sienaRI(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
-\method{plot}{sienaRI}(x, col = NULL, addPieChart = FALSE,
-              radius = NULL, width = NULL, height = NULL, legend = TRUE,
+\method{plot}{sienaRI}(x, actors = NULL, col = NULL, addPieChart = FALSE,
+              radius = 1, width = NULL, height = NULL, legend = TRUE,
               legendColumns = NULL, legendHeight = NULL,
               cex.legend = NULL, cex.names = NULL,\dots)
 }
@@ -54,6 +54,8 @@ sienaRI(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
                for endowment or creation effect, i.e., included effects have to
                be of type \code{eval} (or \code{rate}).}
   \item{x}{\code{sienaRI} object resulting from a call to \code{sienaRI}.}
+  \item{actors}{vector of integers: set of actors to be included in the plot;
+       if \code{NULL}, all actors.}
   \item{col}{Colors used in the plot. If \code{col=NULL} a default color
        scheme is used.}
   \item{addPieChart}{Boolean: If \code{TRUE}, pie charts of aggregated relative
@@ -93,7 +95,7 @@ unspecified, i.e., \code{ans=NULL}.
 
 Note that \code{sienaRI} works only with Method of Moments
 (i.e., for \code{sienaAlgorithm} objects with \code{maxlike = FALSE})
-and that it does not yet work for endowment or creation effect
+and that it does not yet work for endowment or creation effects
 (i.e., included effects have to be of type \code{eval}).
 }
 \value{
@@ -148,7 +150,7 @@ Indlekofer, N. and Brandes, U.,
 }
 \author{Natalie Indlekofer}
 \examples{
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
@@ -159,6 +161,8 @@ RI <- sienaRI(mydata, ans)
 RI
 \dontrun{
 plot(RI, addPieChart=TRUE)
+plot(RI, actors=1:20, addPieChart=TRUE, radius=1.08)
+
 }
 
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50)
@@ -175,7 +179,7 @@ RI <- sienaRI(mydata2, theta=theta.eval, algorithm=myalgorithm,
 RI
 \dontrun{
 plot(RI[[2]], col = c("red", "green"), legend=FALSE)
-plot(RI[[1]], addPieChart = TRUE)
+plot(RI[[1]], addPieChart = TRUE, legendColumns=2)
 }
 }
 \keyword{models}
