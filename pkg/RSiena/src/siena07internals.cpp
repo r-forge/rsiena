@@ -882,7 +882,7 @@ void setupChangingCovariate(SEXP VARCOVAR,
 	PROTECT(im = install("imputationValues"));
 	ans = getAttrib(VARCOVAR, im);
 	bool impute = FALSE;
-	double * imputationValues;
+	double * imputationValues = 0;
 	if(!isNull(ans))
 	{
 		impute = TRUE;

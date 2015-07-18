@@ -57,6 +57,7 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 		cat(paste("interaction2 = <",interaction2,">, ", sep=""))
 		cat(paste("and type = <",type,">, \n", sep=""))
 		cat(paste("for dependent variable",name,".\n"))
+		cat("See effectsDocumentation() for this effects object.\n")
 	}
 	else
 	{

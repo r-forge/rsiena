@@ -192,7 +192,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-286.
+This version was renewed for \RS version 1.1-288.
 \end{abstract}
 
 
@@ -432,8 +432,9 @@ point is that, like other generalized regression models, \SI does not
 by itself solve all causal questions. When inferring causality from model
 results, one has to face difficulties very similar to those with other
 statistical methods; see, e.g., \citet{LSST11} and \citet{Goldthorpe2001}.
-In any case, causal interpretations should be backed by further results
-from the discipline the explanations originate in. However, {\saom}s do allow research to profit from a longitudinal
+In any case, causal interpretations should be supported by further results
+from the discipline the explanations originate in. 
+However, {\saom}s do allow research to profit from a longitudinal
 design -- therefore, they may be helpful in tackling some issues related
 to causality, like the selection-influence problem \citep{SteglichEA10, LSST11}.
 
@@ -727,7 +728,6 @@ decrease by this split.
  attention to evaluation effects. However, if there is enough data,
  the distinction between creation and maintenance of ties can
  produce powerful insights \citep[e.g.,][]{Cheadle_etal2013}.\\
-\newpage
 
 \noindent
 \textbf{Dependent variables: behavior evaluation, creation and endowment functions}\\
@@ -849,24 +849,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.1-286}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.1-288}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-286.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.1-288.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-286.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.1-288.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.1-286.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.1-288.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-286.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-288.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-286.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-288.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-286.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-288.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1055,7 +1055,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-286) and an R-Forge revision
+  identified by a version number (e.g.\ 1.1-288) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1077,7 +1077,8 @@ For technical problems running \rs, follow the following points.
      please tell which operating system, which version of \Rn, and which version
      of \RS you are using.
 \item[R-Forge help list]
-     For technical questions about the \RS code (as distinct from the
+     If you are a programmer, then
+     for technical questions about the \RS code (as distinct from the
      methodology), you can send an email to
      rsiena-help@lists.r-forge.r-project.org, or post in the help forum for \RS in
      R-Forge. You need to be a registered member of R-Forge (and possibly of \rs)
@@ -3905,6 +3906,13 @@ is to exclude those main effects of interaction effects which
 are not requested to be estimated, but which are contained in the answer object.
 \fi
 
+Another approach that sometimes can be helpful to obtain convergence in difficult
+situations is to gradually build up the model, adding further effects
+while using the \texttt{prevAns} parameter to use previous estimates as starting
+values for the next, extended model. This may be more successful than
+estimating a complicated model right from the start.
+
+
 \subsection{What to do if there are convergence problems}
 \label{S_conv}
 
@@ -3993,6 +4001,19 @@ this may have several reasons.
       on the effect, of course.)
 \end{itemize}
 
+Another trick that may be tried is the following.
+Sometimes one (or some) of the rate parameters are especially the causes of
+difficulties of convergence.
+Then one may fix this parameter at a good value, and estimate the rest
+of the parameters. Suppose that this is feasible, i.e., good convergence can be
+obtained provided that this rate parameter is fixed. Then by trial and error
+one may find a fixed value for this rate parameter for which the $t$-ratio for
+convergence for this parameter also is acceptable
+(less than 0.2, preferably less than 0.1).
+Since normally, rate parameters are nuisance parameters (i.e., not of focal interest),
+this can be an acceptable way out.
+
+
 
 \subsection{Some important components of the \textsf{sienaFit} object}
 \label{S_fitcomp}
@@ -4020,7 +4041,7 @@ Further details are in the help file for \textsf{siena07}.
  \texttt{ans\$tconv.max   }         \> maximum $t$-ratio for convergence for \\
                                  \> any linear combination of the parameters,\\
                              \> called the overall maximum convergence ratio \\
- \texttt{ans\$sf    }                 \>  generated statistics in Phase 3 \\
+ \texttt{ans\$sf    }                 \>  generated statistics in Phase 3 (targets subtracted)\\
  \texttt{ans\$msf   }                 \>  covariance matrix of
                                            \texttt{ans\$sf    } \\
  \texttt{ans\$dfra  }                 \> estimated derivative of expected
@@ -6627,9 +6648,9 @@ a proportional increase in computing time.
 
 If multiple processors are available (which most computers have nowadays),
 you can make more speed by setting the \texttt{nbrNodes} parameter to a value
-larger than 1. Since parallelization goes by wave $\times$ group,
+larger than 1. Since parallelization goes by period $\times$ group,
 it is nice, but not necessary, to have a value for \texttt{nbrNodes} that
-is a divisor of (the number of waves multiplied by the number of groups);
+is a divisor of (the number of periods multiplied by the number of groups);
 higher values are meaningless.
 Do not use such a high value for \texttt{nbrNodes} that your computer gets too
  hot or overworked. For Windows machines this can be monitored by opening
@@ -6795,6 +6816,15 @@ for the rate parameters, it may be advisable to use a smaller value of
 If generally the tracelines are irregular, it may be good to increase
 \texttt{nrunMHBatches} but another possibility is to increase
 the \texttt{mult} parameter set in \sfn{sienaAlgorithmCreate()}.
+
+\iffalse
+A way to get estimates from overdispersed starting points and not
+run the whole improveMH() over and over again is to use prevBayes,
+with an object in which \$thetaMat is changed to new initial values.
+Then the proposal covariance matrices etc. will be retained,
+so the transition distribution of the MCMC process remains the same but
+only the starting values are different.
+\fi
 
 
 \subsubsection{Interpreting results of sienaBayes}
@@ -7008,14 +7038,16 @@ and for maintaining existing ties.
 \end{minipage}\\
 
  \item {\em transitive triplets effect type 1}  \texttt{(transTrip1)},
+  may also be called \emph{transitive closure effect};
   the elementary effect corresponding to creating or maintaining
-  the tie  $i \rightarrow j$ in the figure; this is transitive
+  the tie  $i \rightarrow j$ in the figure above; this is transitive
   closure in the strict sense of the term. The effect is\\
   $s^{\rm el}_{i\vit}(x) =   x_{ij} \sum_{h} x_{ih}\, x_{hj}\,$;\\
 
 
  \begin{minipage}[t]{.75\textwidth}
  \item {\em transitive triplets effect type 2}  \texttt{(transTrip2)},
+  may also be called \emph{two-out-star closure effect};
   the elementary effect corresponding to creating or maintaining
   the tie  $i \rightarrow j$  in the figure here; this could be
   called structural equivalence for outgoing ties \\(but
@@ -7953,22 +7985,30 @@ the following effects are available:
  $s^{\rm net}_{i\vit}(x) =
  \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i = v_j\}$;
 
+
+ \item {\em different covariate $\times$ transitive triplets}
+ \texttt{(diffXTransTrip)}, defined by the number of transitive triplets
+ $i \rightarrow h \rightarrow j \leftarrow i$
+ that have different covariate values for $i$ and $j$,\\
+ $s^{\rm net}_{i\vit}(x) =
+ \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i \neq v_j\}$;
+
  \item {\em indegree popularity from same covariate}
 \texttt{(sameXInPop)} defined by the
  number of incoming ties received by those to whom $i$ is tied
  and sent by others who have the same covariate value as $i$,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{hj} I\{v_i = v_h \} $;
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{hj}\, I\{v_i = v_h \} $;
 
  \item {\em indegree popularity from different covariate}
 \texttt{(diffXInPop)} defined by the
  number of incoming ties received by those to whom $i$ is tied
  and sent by others who have a different covariate value than $i$,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{hj} I\{v_i \neq v_h \} $;
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{hj}\, I\{v_i \neq v_h \} $;
 
  \item {\em outdegree activity to same covariate}
 \texttt{(sameXOutAct)} defined by the
  squared number of ties to those
- others who have a different covariate value than $i$,\\
+ others who have the same covariate value as $i$,\\
  $s^{\rm net}_{i\vit}(x) = \big(\sum_j x_{ij} \,I\{v_i = v_j \}\big)^2 $;
 
  \item {\em outdegree activity to different covariate}
@@ -7976,6 +8016,13 @@ the following effects are available:
  squared number of ties to those
  others who have a different covariate value than $i$,\\
  $s^{\rm net}_{i\vit}(x) = \big(\sum_j x_{ij} \,I\{v_i \neq v_j \}\big)^2 $;
+
+
+ \item {\em outdegree activity to homogeneous covariate}
+\texttt{(homXOutAct)} defined by the
+ sum of outgoing ties weighted by the number of outgoing
+ ties to those with the same covariate value (as alter),\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{ih} \,I\{v_j = v_h \} $;
 
  \item {\em homogeneous covariate $\times$ transitive triplets}
  \texttt{(homXTransTrip)}, defined by the number of transitive triplets
@@ -9638,9 +9685,36 @@ The list of these effects is the following.
  because of collinearity, under the Method of Moments this cannot be estimated together with the
   average similarity $\times$ popularity alter effect.
 
-\setcounter{savenumi}{\value{enumi}}
 \end{followenum}
 \medskip
+
+
+\noindent
+\textbf{\emph{Effects of multiple networks}}
+\medskip
+
+\noindent
+If there are more than one dependent network variables,
+denoted $X_1$ and £$X_2$,
+they can operate jointly on the behavioural dependent variable using
+the following effects.
+$X_1$ is given as \texttt{interaction1}, $X_2$ as \texttt{interaction2}.
+
+For the combined degree-effects, mentioned first, \texttt{F} means `Forward',
+\texttt{B} means `Backward', and \texttt{R} means `Reciprocal'.
+
+\begin{followenum}
+ \item {\em double outdegree effect} \texttt{(FFDeg)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ij} \,$;
+ \item {\em double indegree effect} \texttt{(BBDeg)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ji}\,x_{2ji} \,$;
+ \item {\em double reciprocated -- outdegree effect} \texttt{(RFDeg)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{1ji}\,x_{2ij}\, $;
+ \item {\em double reciprocated -- indegree effect} \texttt{(RBDeg)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{1ji}\,x_{2ji}\, $;
+ \item {\em double reciprocated degree effect} \texttt{(RRDeg)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{1ji}\,x_{2ij}\,x_{2ji} \,$.
+\end{followenum}
 
 \noindent
 \textbf{\emph{Covariate effects}}
@@ -11205,6 +11279,7 @@ For example, compare the construction of \texttt{sameXTransTrip} to that of
        \textsf{"RSiena\textbackslash data"}. The default program for opening a .csv file
        usually is Excel, but other editors may be more helpful
        for opening this particular file; e.g., NotePad or NotePad++.
+       It must \underline{not} be saved as a Excel file!
 	   \begin{itemize}
 		\item You will see that the first column is called \sfn{effectGroup}.
               These groups define combinations of dependent variable, effect type,
@@ -11544,7 +11619,7 @@ sum(pmin(rowSums(s502),3))
       respectively.
 \end{enumerate}
 
-\subsection{Notes for effects for two-mode networks}
+\subsection{Notes on effectGroups and two-mode networks}
 \label{S_notestwomode}
 
 For two-mode networks the difference between the two node sets implies
@@ -11555,7 +11630,8 @@ and in function \sfn{effects.r}.
 In the function \sfn{getEffects} in file \sfn{effects.r}, some additional
 measures are taken for effects in effectGroup \sfn{covarBipartiteEff}.
 This implies that for adding such effects, it will be necessary to see whether
-this function also must be modified.
+this function also must be modified; this will have to be done
+in function \sfn{covarBipartiteEff()}.
 (Note: it would be preferable perhaps to have separate effect classes
 for covariates on the first and on the second mode, as done for the effect
 groups in the following paragraphs.)
@@ -11575,10 +11651,27 @@ the following effectGroups are defined:
 \item \sfn{covarBNetNetObjective} is for effects where, if the second network is two-mode,
      the covariate is defined for the second node set.
 \end{itemize}
+\medskip
 
-Note that effectGroup \sfn{tripleNetworkObjective} is for combinations
+Further some of the complex effectGroups are the following:
+\begin{itemize}
+\item \sfn{tripleNetworkObjective} is for combinations
 of three networks where for the two in the role of explanatory networks,
 either both should be one-mode, or both should be bipartite with the same second node sets.
+\item \sfn{behaviorOneOneModeObjective} is for dependent behavioral variables and
+    two explanatory one-mode directed networks.
+\item \sfn{behaviorSymSymObjective} is for dependent behavioral variables and
+    two explanatory one-mode non-directed networks.
+\item \sfn{behaviorOneModeSymObjective} is for dependent behavioral variables and
+    two explanatory one-mode networks, the first directed, the second non-directed.
+\item \sfn{behaviorBipBipObjective} is for dependent behavioral variables and
+    two explanatory two-mode networks with identical actor sets.
+\end{itemize}
+
+If you wish to add an effect with a combination of variables that is not yet implemented,
+you have also to treat it in \sfn{effects.r}.
+
+
 \appendix
 \newpage
 \section{List of Functions in Order of Execution}
@@ -12097,12 +12190,46 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
-\item 2015-05-21 Revision 286.
+
+\item 2015-07-18 Revision 288.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+\item New effects \texttt{homXOutAct}, \texttt{FFDeg}, \texttt{BBDeg}, 
+   \texttt{RFDeg}, \texttt{diffXTransTrip}.
+   \item \texttt{sameXInPop} and \texttt{diffXInPop} also added for two-mode networks;
+     but they are not dyadic!
+   \item In names of behavior effects and statistics dropped the
+     (redundant) parts \texttt{behavior} and \texttt{beh.}.
+   \item \sfn{plot.sienaRI}: new parameter \texttt{actors}; proportions with
+     piechart improved (hopefully); effect of parameter \texttt{radius} changed.
+   \item \sfn{siena.table} does no more produce the double minus sign in html output.
+\end{itemize}
+
+Changes in RSiena:
+\begin{itemize}
+\item Correction of error for two-mode networks in \sfn{sienaGOF()}.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item \sfn{sienaBayes}: new parameter \texttt{nSampRates};
+     correction in use of \texttt{prevBayes};
+	 more efficient calculation of multivariate normal density.
+   \item Small changes in \sfn{HowToCommit.tex}.
+\end{itemize}
+
+\item 2015-05-21 and 2015-06-02 Revision 286.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
 \item \sfn{SienaRIDynamics} dropped from \rs, it still has an error
       (retained in \rst).
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+\item Correction of error for two-mode networks in \sfn{sienaGOF()}.
 \end{itemize}
 
 \item 2015-05-20 Revision 285.

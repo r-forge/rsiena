@@ -88,7 +88,7 @@ Try to respect them.
 Add comments in your code and use helpful names (in camel case).
 
 Keep the line endings in all \texttt{.tex} files intact (i.e., do not let
-an editor take away the hard returns).
+an editor take away the hard returns). This is helpful for file comparisons.
 
 The correspondence between \RS and \RST should be kept intact:
 \begin{enumerate}
@@ -122,6 +122,9 @@ The internal structure of both packages should remain intact:
       Chapter 12 of the manual.
 \item Also new other functionalities, if any, should be added to the manual,
       unless they are clear enough from the help pages.
+\item The manual states the version to which it applies. The best way to keep
+      this up to date is to search in RSiena\_Manual.tex for the occurrence of the
+      last/current version number (e.g., 286) and replace appropriately.
 \end{enumerate}
 
 To keep things easy for users of different platforms, when you add a file to the system,
@@ -152,7 +155,7 @@ Preferably limit line lengths to a maximum of 80 characters.
   successive versions and subversions of R often increase the stringency of checking).
   Note that the C++ compiler may be different on different systems (e.g., Windows and Mac)
   which may lead to different warnings.
-  
+
   Do this also for the most recent patched version of R, because R-Forge will do this
   and often it leads to additional errors and notes, because R becomes progressively
   stringent.

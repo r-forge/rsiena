@@ -23,7 +23,7 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 				reductionFactor=1,
 				gamma=0.5, delta=1e-4,
 				nwarm=50, nmain=250, nrunMHBatches=20,
-				nSampVarying=1, nSampConst=1, nImproveMH=100,
+				nSampVarying=1, nSampConst=1, nSampRates=0, nImproveMH=100,
 				lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
 				storeAll = FALSE, prevAns=NULL,
 				prevBayes = NULL, silentstart=TRUE,
@@ -153,8 +153,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
         repeat
         {
             iter <- iter + 1
-            cyc <- MCMCcycle(nrunMH=totruns, nSampVar=1,
-								nSampCons=1, change=FALSE, bgain=-1)
+            cyc <- MCMCcycle(nrunMH=totruns, nSampVar=1, nSampCons=1,
+							nSampRate=0, change=FALSE, bgain=-1)
             actual <- cyc$BayesAcceptances
 			## actual is a vector of the expected number of acceptances by group
 			## and for the non-varying parameters, in the MH change of
@@ -231,7 +231,8 @@ browser()
 
 	##@MCMCcycle internal sienaBayes; some loops of
 	## (MH steps and sample parameters)
-	MCMCcycle <- function(nrunMH, nSampVar, nSampCons, change=TRUE, bgain)
+	MCMCcycle <- function(nrunMH, nSampVar, nSampCons, nSampRate,
+							change=TRUE, bgain)
 	{
 	# is for the storage in the object produced
 	# and for its by-effects on the MCMC state:
@@ -272,9 +273,23 @@ browser()
 			# After the nrunMH the loglik by group is used as logpOld,
 			# see below.
 			# sample the group-level parameters:
+			# First prepare eigenvalues and inverse of SigmaTemp
+			# for use in dmvnorm2 in sampleVaryingParameters
+			z$SigmaTemp.evs <<-
+				eigen(z$SigmaTemp, symmetric=TRUE, only.values=TRUE)$values
+			z$SigmaTemp.inv <<- chol2inv(chol(z$SigmaTemp))
+
 			for (i2 in 1:nSampVar)
 			{
 				mcmcc.accept <- sampleVaryingParameters(change, bgain)
+			}
+			# extra sampling of basic rate parameters:
+			if (nSampRate >= 1)
+			{
+				for (i2 in 1:nSampRate)
+				{
+					sampleVaryingParameters(change, bgain, onlyRates=TRUE)
+				}
 			}
 			if (any(z$set2) & (!frequentist))
 			{
@@ -342,10 +357,9 @@ browser()
 	## Replace accepted new parameters only if change.
 	## If z$incidentalBasicRates, for the basic rate parameters
 	## not a Bayesian MH step but a Robbins Monro step is made.
-	sampleVaryingParameters <- function(change=TRUE, bgain)
+	sampleVaryingParameters <- function(change=TRUE, bgain, onlyRates=FALSE)
 	{
 		## require(MASS)
-
 		if (z$incidentalBasicRates)
 		{
 			if ((change)&&(bgain > 0))
@@ -364,15 +378,26 @@ browser()
 					function(i){scores[z$ratePositions[[i]], i]})
 			}
 		# Basic rate parameters must be masked:
+# when this will be revived, it should be thoroughly checked;
+# the two calls of dmvnorm below used to be
+#		dmvnorm(tmp[use],  mean=z$muTemp[restrictProposal],
+#					sigma=z$SigmaTemp[restrictProposal,restrictProposal]) #density
 			varyingParameters <- z$varyingObjectiveParameters
 			restrictProposal <- z$objectiveInVarying
 		}
 		else
 		{
 			varyingParameters <- z$set1
-			restrictProposal <- rep(TRUE, z$p1) # no restriction
+			if (onlyRates)  # implies !z$incidentalBasicRates
+			{
+				# sample only rate parameters
+				restrictProposal <- !z$objectiveInVarying
+			}
+			else
+			{
+				restrictProposal <- rep(TRUE, z$p1) # no restriction
+			}
 		}
-
 	 	# do the fandango
 		## get a multivariate normal with covariance matrix proposalCov
 		## multiplied by a scale factor which varies between groups
@@ -380,7 +405,8 @@ browser()
 			thetaChanges <- t(sapply(1:z$nGroup, function(i)
 					{
 						tmp <- z$thetaMat[i, z$set1]
-						use <- !is.na(tmp)
+						use <- (!is.na(tmp))
+						if (onlyRates){use[!z$basicRate[z$set1]] <- FALSE}
 		# !is.na to get rid of parameters for other groups
 						tmp[use] <- mvrnorm(1, mu=rep(0, sum(use)),
 					Sigma=z$scaleFactors[i] *
@@ -388,7 +414,6 @@ browser()
 						tmp
 					}
 				))
-
 		thetaOld <- z$thetaMat
 		thetaOld[, z$basicRate] <- trafo(thetaOld[, z$basicRate])
 		thetaNew <- thetaOld
@@ -399,22 +424,26 @@ browser()
 # of the rate parameters stays well above the value 0.01.
 # For usual data sets, thetaNew[, z$basicRate] < 0.01 occurs
 # with a very low probability.
+		if (onlyRates)
+		{
+			restrictProposal <- rep(TRUE, z$p1) # no restriction from here on
+		}
 		thetaNew[, z$basicRate] <- ifelse(thetaNew[, z$basicRate] < 0.01,
 							thetaOld[, z$basicRate], thetaNew[, z$basicRate] )
  		priorOld <- sapply(1:z$nGroup, function(i)
 				{
 					tmp <- thetaOld[i, z$set1]
 					use <- !is.na(tmp)
-					dmvnorm(tmp[use],  mean=z$muTemp[restrictProposal],
-							sigma=z$SigmaTemp[restrictProposal,restrictProposal]) #density
+					dmvnorm2(tmp[use],  mean=z$muTemp, evs=z$SigmaTemp.evs,
+										sigma.inv=z$SigmaTemp.inv) #density
 				}
 				)
 		priorNew <- sapply(1:z$nGroup, function(i)
 				{
 					tmp <- thetaNew[i, z$set1]
 					use <- !is.na(tmp)
-					dmvnorm(tmp[use],  mean=z$muTemp[restrictProposal],
-							sigma=z$SigmaTemp[restrictProposal,restrictProposal]) #density
+					dmvnorm2(tmp[use],  mean=z$muTemp, evs=z$SigmaTemp.evs,
+										sigma.inv=z$SigmaTemp.inv) #density
 				}
 				)
 		# use z still with z$thetaMat = thetaOld:
@@ -780,8 +809,21 @@ browser()
 				z$nrunMHBatches <- 2
 				nrunMHBatches <- 2
 			}
-		z$nSampVarying <- nSampVarying
-		z$nSampConst <- nSampConst
+		z$nSampVarying <- min(nSampVarying, 1)
+		if (nSampVarying < 1)
+		{
+			cat("nSampVarying increased to 1.\n")
+		}
+		z$nSampRates <- nSampRates
+		if ((nSampRates > 0) && (incidentalBasicRates))
+		{
+			stop("If incidentalBasicRates, nSampRates should be 0.")
+		}
+		z$nSampConst <- min(nSampConst, 1)
+		if (nSampConst < 1)
+		{
+			cat("nSampConst increased to 1.\n")
+		}
 		class(z) <- "sienaBayesFit"
 
 		# Determine multiplicative constants for proposal distribution
@@ -792,8 +834,7 @@ browser()
 		cat('improveMH', ctime2-ctime1,'seconds.\n')
 		flush.console()
 	}
-
-	if (!is.null(prevBayes))
+	else #  (!is.null(prevBayes))
 	{
 		if (inherits(prevBayes, "sienaBayesFit"))
 		{
@@ -821,7 +862,8 @@ browser()
 		for (ii in 1:nwarm)
 		{
 			cyc <- MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
-								nSampCons=nSampConst, bgain=bgain)
+								nSampCons=nSampConst, nSampRate=nSampRates,
+								bgain=bgain)
 			z$iimain <- ii
 			storeData(cyc)
 			cat('Warming step',ii,'(',nwarm,')\n')
@@ -872,8 +914,9 @@ browser()
 	{ # what remains to be done of the initialization
 		z <- prevBayes
 		nwarm <- 0
-		z$nmain <- nmain
 		z$nwarm <- 0
+		z$nmain <- nmain
+		createStores()
 		z$Phase <- 1
 		if (frequentist)
 		{
@@ -900,7 +943,6 @@ browser()
 		if (!is.null(algo$randomSeed))
 		{
 			set.seed(algo$randomSeed)
-			##seed <- algo$randomSeed
 		}
 		else
 		{
@@ -910,9 +952,8 @@ browser()
 			}
 			newseed <- trunc(runif(1) * 1000000)
 			set.seed(newseed)  ## get R to create a random number seed for me.
-			##seed <- NULL
-			ctime4<- proc.time()[1]
 		}
+		ctime4<- proc.time()[1]
 		prevThetaMat <- z$thetaMat
 		z$FRAN <- getFromNamespace(algo$FRANname, pkgname)
 		z <- initializeFRAN(z, algo, data=data, effects=effects,
@@ -952,7 +993,8 @@ browser()
     for (ii in (nwarm+1):endPhase1)
     {
 		cyc <- MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
-								nSampCons=nSampConst, bgain=bgain)
+								nSampCons=nSampConst,
+								nSampRate=nSampRates, bgain=bgain)
 		z$iimain <- ii
 		storeData(cyc)
 		cat('main', ii, '(', nwarm+nmain, ')')
@@ -1000,7 +1042,8 @@ browser()
     {
 		bgain <- initfgain*exp(-gamma*log(ii-endPhase1))
 		cyc <- MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
-								nSampCons=nSampConst, bgain=bgain)
+								nSampCons=nSampConst,
+								nSampRate=nSampRates, bgain=bgain)
 		z$iimain <- ii
 		storeData(cyc)
 		cat('main', ii, '(', nwarm+nmain, ')')
@@ -1067,7 +1110,8 @@ browser()
     for (ii in (endPhase2+1):(nwarm+nmain))
     {
 		cyc <- MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
-								nSampCons=nSampConst, bgain=0.000001)
+								nSampCons=nSampConst,
+								nSampRate=nSampRates, bgain=0.000001)
 		z$iimain <- ii
 		storeData(cyc)
 		cat('main', ii, '(', nwarm+nmain, ')')
@@ -1842,7 +1886,8 @@ dmvnorm <- function(x, mean , sigma)
     {
         x <- matrix(x, ncol=length(x))
     }
-	if (min(eigen(sigma)$values)< 1e-8)
+	evs <- eigen(sigma, symmetric=TRUE, only.values=TRUE)$values
+	if (min(evs)< 1e-8)
 	{
 		cat('singular covariance matrix in dmvnorm\n')
 		dmvn <- -Inf
@@ -1850,7 +1895,29 @@ dmvnorm <- function(x, mean , sigma)
 	else
 	{
 		distval <- mahalanobis(x, center=mean, cov=sigma)
-		logdet <- sum(log(eigen(sigma, symmetric=TRUE, only.values=TRUE)$values))
+		logdet <- sum(log(evs))
+		dmvn <- -(ncol(x) * log(2 * pi) + logdet + distval) / 2
+	}
+	dmvn
+}
+
+##@dmvnorm2 algorithms calculates log multivariate normal density
+##more efficient: uses previously computed ingredients for mahalanobis and eigen
+dmvnorm2 <- function(x, mean , evs, sigma.inv)
+{
+    if (is.vector(x))
+    {
+        x <- matrix(x, ncol=length(x))
+    }
+	if (min(evs)< 1e-8)
+	{
+		cat('singular covariance matrix in dmvnorm\n')
+		dmvn <- -Inf
+	}
+	else
+	{
+		distval <- mahalanobis(x, center=mean, cov=sigma.inv, inverted=TRUE)
+		logdet <- sum(log(evs))
 		dmvn <- -(ncol(x) * log(2 * pi) + logdet + distval) / 2
 	}
 	dmvn
@@ -1983,6 +2050,14 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	if (z1$nSampVarying == z2$nSampVarying)
 	{
 		z$nSampVarying <- z1$nSampVarying
+	}
+	else
+	{
+		dif <- TRUE
+	}
+	if (z1$nSampRates == z2$nSampRates)
+	{
+		z$nSampRates <- z1$nSampRates
 	}
 	else
 	{

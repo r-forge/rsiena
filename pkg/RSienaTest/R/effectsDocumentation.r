@@ -90,6 +90,10 @@ effectsDocumentation <- function(effects= NULL, type="html",
 				 "behaviorOneModeObjective",
 				 "behaviorSymmetricObjective",
 				 "behaviorBipartiteObjective",
+				 "behaviorOneOneModeObjective",
+				 "behaviorSymSymObjective",
+				 "behaviorOneModeSymObjective",
+				 "behaviorBipBipObjective",
 				 "covarBehaviorObjective",
 				 "covarBehaviorNetObjective",
 				 "covarABehaviorBipartiteObjective",
@@ -117,12 +121,13 @@ effectsDocumentation <- function(effects= NULL, type="html",
 	add.to.row	<-	NULL
 	if (is.null(effects))
 	{
+#browser()
 		add.to.row$pos <- lapply(addtorowPos, function(x)x)
 		add.to.row$command <- as.vector(sapply(addtorowText, function(x)x))
 		order2 <- match(myorder, x[, 2])
 		order3 <- as.vector(mytab[myorder])
 		order4 <- unlist(apply(cbind(order2, order3), 1,
-						   function(x)x[1]:(x[1] + x[2] -1)))
+						   function(x)x[1]:(max(x[1] + x[2] -1,1))))
 		y <- x[order4, -2]
 	}
 	else

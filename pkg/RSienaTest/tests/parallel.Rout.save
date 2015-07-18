@@ -1,5 +1,5 @@
 
-R version 3.2.0 (2015-04-16) -- "Full of Ingredients"
+R version 3.2.0 Patched (2015-05-18 r68384) -- "Full of Ingredients"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 
@@ -173,7 +173,7 @@ Total of 398 iteration steps.
 > myeff <- getEffects(mydata)
 > myeff <- setEffect(myeff, linear, initialValue=0.34699930338, name="mynet2")
   effectName                   include fix   test  initialValue parm
-1 behavior mynet2 linear shape TRUE    FALSE FALSE      0.347   0   
+1 mynet2 linear shape TRUE    FALSE FALSE      0.347   0   
 > ##myeff$initialValue[98] <- 0.34699930338 ## siena3 starting values differ
 > ##test10
 > print('test10')
@@ -202,8 +202,8 @@ Network Dynamics
 Behavior Dynamics
   3.  rate rate mynet2 (period 1)                  1.1871  ( 0.3170   )    0.1309   
   4.  rate rate mynet2 (period 2)                  1.6950  ( 0.7495   )    0.2130   
-  5.  eval behavior mynet2 linear shape            0.3717  ( 0.2445   )    0.1079   
-  6.  eval behavior mynet2 quadratic shape        -0.2070  ( 0.1233   )    0.2108   
+  5.  eval mynet2 linear shape                     0.3717  ( 0.2445   )    0.1079   
+  6.  eval mynet2 quadratic shape                 -0.2070  ( 0.1233   )    0.2108   
 
 Overall maximum convergence ratio:    0.5444 
 
@@ -256,4 +256,4 @@ where H0: The following parameters are zero:
 > 
 > proc.time()
    user  system elapsed 
-   8.20    0.43    8.72 
+   8.19    0.39    8.65 

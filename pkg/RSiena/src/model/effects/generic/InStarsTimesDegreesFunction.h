@@ -28,7 +28,7 @@ class SqrtTable;
 // ----------------------------------------------------------------------------
 
 /**
- * For from.x.ind effect (see manual).
+ * For from.w.ind effect (see manual).
  */
 class InStarsTimesDegreesFunction : public MixedNetworkAlterFunction
 {
