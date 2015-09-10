@@ -166,7 +166,7 @@ print.sienaGroup <- function(x, ...)
 	}
 	att <- attributes(x)
 	cat('Dependent variables: \n')
-	cat(paste(att$netnames, ":", att$types),'\n')
+	cat(paste(att$netnames, ":", att$types,'\n'))
 	cat('Total number of periods:', att$observations)
 	cat("\n")
 	invisible(x)

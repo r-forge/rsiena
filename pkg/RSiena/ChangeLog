@@ -1,27 +1,63 @@
-2015-07-18 R-Forge Revision 288
+2015-09-10 R-Forge Revision 289
 Changes in RSiena and RSienaTest:
-   * New effects homXOutAct, FFDeg, BBDeg, RFDeg, diffXTransTrip.
+   * New defaults for siena07() in sienaAlgorithmCreate():
+     doubleAveraging=0, diagonalize=0.2 (for MoM).
+   * Improved one-step approximations to expected Mahalanobis
+     distances in sienaGOF() (control variates for score function).
+   * Permit 3-way interactions with one ego and two dyadic effects
+     (initializeFRAN.r) (this was erroneously not allowed).
+   * New effects Jin, Jout, JinMix, JoutMix, altXOutAct,
+     doubleInPop, doubleOutAct.
+   * print01Report() now reports in-degrees also for two-mode networks.
+   * Better error handling for sienaTimeTest and scoreTest
+     (EvaluateTestStatistic() in Sienatest.r).
+   * inOutAss is dyadic.
+   * Check for positive derivative matrix at the end of phase 1
+     omitted for effects with fixed parameters
+     (phase1.r, CalculateDerivative()).
+   * Corrected effectName and functionName of inPopIntn, outPopIntn,
+     inActIntn, and outActIntn ('in' and 'out' were missing).
+   * Extended error message for "invalid effect" in initializeFRAN().
+   * Console message when allowOnly=TRUE is active in sienaDependent().
+   * Some change in includeInteraction.Rd.
+Changes in RSiena:
+   * New effects homXOutAct, FFDeg, BBDeg, RFDeg, diffXTransTrip
+     (ported from RSienaTest).
    * sameXInPop and diffXInPop also added for two-mode networks;
      but they are not dyadic!
    * In names of behavior effects and statistics dropped the
-     (redundant) parts "behavior" and "beh.". 
-   * plot.sienaRI: new parameter "actors"; 
+     (redundant) parts "behavior" and "beh.".
+Changes in RSienaTest:
+   * New function extract.sienaBayes() (bayesTest.r).
+   * sienaBayes(): options diagonalize=0.2, doubleAveraging=0 for estimation
+     of initial models in initialization phase; save initial results in case of
+     divergence during initialization phase;
+     check for initialEstimates done only for non-rate parameters.
+
+2015-07-18 R-Forge Revision 288
+Changes in RSiena and RSienaTest:
+   * plot.sienaRI: new parameter "actors";
      proportions with piechart improved; function of parameter radius changed.
    * fra2 constructed only if findiff (phase3.r).
    * siena.table does no more produce the double minus sign in html output.
 Changes in RSiena:
    * Correction of error for two-mode networks in sienaGOF.
 Changes in RSienaTest:
-   * sienaBayes: new parameter nSampRates; 
-     correction in use of prevBayes (with extra createStores()); 
-	 more efficient calculation of multivariate normal density.
+   * New effects homXOutAct, FFDeg, BBDeg, RFDeg, diffXTransTrip.
+   * sameXInPop and diffXInPop also added for two-mode networks;
+     but they are not dyadic!
+   * In names of behavior effects and statistics dropped the
+     (redundant) parts "behavior" and "beh.".
+   * sienaBayes: new parameter nSampRates;
+     correction in use of prevBayes (with extra createStores());
+     more efficient calculation of multivariate normal density.
    * Small changes in HowToCommit.tex.
 
 2015-06-02 R-Forge Revision 286
 (Version number was kept the same...)
 Changes in RSienaTest:
    * Correction of error for two-mode networks in sienaGOF.
-	
+
 2015-05-21 R-Forge Revision 286
 Changes in RSiena and RSienaTest:
    * test11 dropped from \tests\parallel.R.
@@ -45,11 +81,11 @@ Changes in RSiena and RSienaTest:
      diagonalize < 1 (phase2.r).
    * When there are missings in constant or changing monadic covariates,
      and centered=FALSE for their creation by coCovar() or
-	 varCovar(), the mean will be imputed (used to be 0, which was an error).
-	 For changing covariates, this is the global mean.
+     varCovar(), the mean will be imputed (used to be 0, which was an error).
+     For changing covariates, this is the global mean.
    * In coCovar() and varCovar() there is a new argument imputationValues,
      which are used (if given) for imputation of missing values.
-	 Like all missings, they are not used for the calculation
+     Like all missings, they are not used for the calculation
      of the target statistics in the Method of Moments,
      but only for the simulations.
    * For non-centered covariates, averageAlter and averageInAlter
@@ -61,9 +97,9 @@ Changes in RSiena and RSienaTest:
      value(ego)=value(alter) are now set appropriately at 0.5 (was 0).
    * Decent error message when there are (almost) all NA in the dependent
      behavioural variable (effects.r, function getBehaviorStartingVals()).
-   * The centering within effects for similarity variables at distance 2 
+   * The centering within effects for similarity variables at distance 2
      now is done by the same similarity means just as for the simX effect
-	  (attr(mydata$cCovars$mycov, "simMean"), etc.).
+      (attr(mydata$cCovars$mycov, "simMean"), etc.).
      (Background: this was done earlier by "simMeans",
      the implementation of which contained an error;
      but the differentiation between "simMean" and "simMeans" is not important,
@@ -135,7 +171,7 @@ Changes in RSienaTest:
    * sienaBayes: the stop caused by singularity of the precision
      matrix after the multi-group estimation now is circumvented;
      still a warning is printed to the screen. This allows the use of
-	 more than one elementary effects having the same target statistic.
+     more than one elementary effects having the same target statistic.
    * sienaBayes: option priorRatesFromData changed to values 0-1-2,
      with 0 = former FALSE, 1 = former TRUE, 2 = robust estimation of prior
      for rate parameters from estimates at the end of initialization phase.
@@ -159,24 +195,24 @@ Changes in RSiena and RSienaTest:
    * Effect AltsAvAlt renamed to avXAlt (with error message).
    * effects object no longer used as argument for print01Report
      (with error message).
-   * New effects sameXInPop, transRecTrip2, 
-     totAlt, avInAlt, totInAlt, totRecAlt,	 
-	 totXAlt, avXInAlt, totXInAlt, 
+   * New effects sameXInPop, transRecTrip2,
+     totAlt, avInAlt, totInAlt, totRecAlt,
+     totXAlt, avXInAlt, totXInAlt,
      avAltDist2, totAltDist2, avTAltDist2, totAAltDist2,
      avXAltDist, totXAltDist2, avTXAltDist2, totAXAltDist2,
      avInAltDist2, totInAltDist2, avTInAltDist2, totAInAltDist2,
      avXInAltDist2, totXInAltDist2, avTXInAltDist2, totAXInAltDist2,
-	 XWX1, XWX2, cl.XWX1, cl.XWX2.
+     XWX1, XWX2, cl.XWX1, cl.XWX2.
    * gwesp.. effects get endowment=TRUE in allEffects.csv, and thereby
      obtain endowment and creation effects.
    * In effect group behaviorBipartiteObjective, the following meaningless
      effects were dropped: avAlt, avSim, totSim, avSimPopEgo, avSimPopAlt,
-	 behDenseTriads, simDenseTriads.
+     behDenseTriads, simDenseTriads.
    * Effect class covarBehaviorBipartiteObjective split into
      covarABehaviorBipartiteObjective (for covariates on first mode)
-	 and covarBBehaviorBipartiteObjective (for covariates on second mode)
-	 (allEffects.csv, effects.r).
-   * Added effect class covarABehaviorBipartiteObjective  
+     and covarBBehaviorBipartiteObjective (for covariates on second mode)
+     (allEffects.csv, effects.r).
+   * Added effect class covarABehaviorBipartiteObjective
      and covarBBehaviorBipartiteObjective to effectsDocumentation.R.
    * Undid duplication of covarNetNetObjective.
    * For non-invertible covariance matrices, give diagnostic for the
@@ -185,8 +221,8 @@ Changes in RSiena and RSienaTest:
    * Correction of igraphNetworkExtraction() in sienaGOF-auxiliary.Rd
      (the earlier version dropped isolated nodes from simulated networks).
    * In sienaGOF-auxiliary.Rd, the example of constraint is replaced
-     by the example of eigenvector centrality (because constraint 
-	 is undefined for isolated nodes, leading to computational problems).
+     by the example of eigenvector centrality (because constraint
+     is undefined for isolated nodes, leading to computational problems).
    * sienaRIDynamics restored, after corrections.
    * "file" parameter of sienaRI dropped (implied platform dependence).
    * Parameter showAll added to descriptives.sienaGOF.
@@ -209,10 +245,10 @@ Changes in RSiena and RSienaTest:
 Changes in RSienaTest:
    * sienaBayes(): new parameters nImproveMH and priorRatesFromData;
       truncate initial rate parameters depending on prior. Small change
-	  in example in help page.
+      in example in help page.
    * glueBayes() corrected so that it can be applied sequentially.
    * Small improvement in print.summary.sienaBayesFit().
-   * multipleBayesTest now allows matrix parameter to test 
+   * multipleBayesTest now allows matrix parameter to test
      linear combinations.
    * Improved plot.multipleBayesTest (shows truncation at 0).
 
@@ -227,7 +263,7 @@ Changes in RSiena and RSienaTest:
      and z$regrCor in phase1.r and phase3.r.
    * print01Report() improved for changing dyadic covariates,
      and some layout improvement for long variable names,
-	 and bug corrected for reporting upOnly/downOnly cases.
+     and bug corrected for reporting upOnly/downOnly cases.
 Changes in RSienaTest:
    * Adapted sienaBayes and glueBayes and print.sienaBayes to allow
      inclusion of interaction effects without the corresponding

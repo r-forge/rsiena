@@ -8,21 +8,15 @@
  * Description: This file contains the implementation of the
  * MixedNetworkEffect class.
  *****************************************************************************/
-
-//#include <stdexcept>
-//#include <R_ext/Print.h>
-
+ 
 #include "MixedNetworkEffect.h"
 #include "network/Network.h"
-//#include "network/IncidentTieIterator.h"
-//#include "data/NetworkLongitudinalData.h"
-#include "model/State.h"
-//#include "model/EpochSimulation.h"
-#include "model/EffectInfo.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/tables/Cache.h"
-#include "model/tables/NetworkCache.h"
-//#include "model/tables/EgocentricConfigurationTable.h"
+#include "model/tables/TwoNetworkCache.h"
+#include "model/EffectInfo.h"
+#include "model/State.h"
+
 
 using namespace std;
 
@@ -32,16 +26,12 @@ namespace siena
 /**
  * Constructor.
  */
-MixedNetworkEffect::MixedNetworkEffect(const EffectInfo * pEffectInfo,
-	   string firstNetworkName,	string secondNetworkName) :
+MixedNetworkEffect::MixedNetworkEffect(const EffectInfo * pEffectInfo) :
 	NetworkEffect(pEffectInfo)
 {
-	this->lname1 = firstNetworkName;
-	this->lname2 = secondNetworkName;
 	this->lpFirstNetwork = 0;
 	this->lpSecondNetwork = 0;
 	this->lpTwoNetworkCache = 0;
-	this->lpFirstNetworkCache = 0;
 }
 
 /**
@@ -57,11 +47,31 @@ void MixedNetworkEffect::initialize(const Data * pData,
 	Cache * pCache)
 {
 	NetworkEffect::initialize(pData, pState, period, pCache);
-	this->lpFirstNetwork = pState->pNetwork(this->lname1);
-	this->lpSecondNetwork = pState->pNetwork(this->lname2);
+	string networkName1 = this->pEffectInfo()->variableName();
+	string networkName2 = this->pEffectInfo()->interactionName1();
+	this->lpFirstNetwork = pState->pNetwork(networkName1);
+	this->lpSecondNetwork = pState->pNetwork(networkName2);
 	this->lpTwoNetworkCache = pCache->pTwoNetworkCache(this->lpFirstNetwork,
 		this->lpSecondNetwork);
-	this->lpFirstNetworkCache = pCache->pNetworkCache(this->lpFirstNetwork);
 }
+
+/**
+ * Returns if in the first network
+ * there is a tie from the current ego to the given alter.
+ */
+bool MixedNetworkEffect::firstOutTieExists(int alter) const
+{
+	return this->lpTwoNetworkCache->firstOutTieExists(alter);
+}
+
+/**
+ * Returns if in the second network
+ * there is a tie from the current ego to the given alter.
+ */
+bool MixedNetworkEffect::secondOutTieExists(int alter) const
+{
+	return this->lpTwoNetworkCache->secondOutTieExists(alter);
+}
+
 
 }

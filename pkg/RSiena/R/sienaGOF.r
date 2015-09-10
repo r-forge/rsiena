@@ -123,6 +123,11 @@ sienaGOF <- function(
 	{
 		ttcSimulation <- system.time( simStatsByPeriod <- lapply(period,
 					function (j) {
+						if (verbose)
+						{
+							cat("  Period ", j, "\n")
+							flush.console()
+						}
 						simStatsByPeriod <- sapply(1:iterations, function (i)
 						{
 							if (verbose && (i %% 100 == 0) )
@@ -237,24 +242,20 @@ sienaGOF <- function(
 	mhdTemplate <- rep(0, sum(sienaFitObject$test))
 	names(mhdTemplate) <- rep(0, sum(sienaFitObject$test))
 
+	JoinedOneStepMHD_old <- mhdTemplate
+	OneStepMHD_old <- lapply(period, function(i) (mhdTemplate))
 	JoinedOneStepMHD <- mhdTemplate
-	JoinedPartialOneStepMHD <- mhdTemplate
-	JoinedGmmMhdValue <- mhdTemplate
-
 	OneStepMHD <- lapply(period, function(i) (mhdTemplate))
-	PartialOneStepMHD <- lapply(period, function(i) (mhdTemplate))
-	GmmMhdValue <- lapply(period, function(i) (mhdTemplate))
 
 	obsMhd <- NULL
 
-	ExpStat <- lapply(period, function(i) {
-				colMeans(simStatsByPeriod[[i]])
-			})
+	ExpStat <-
+		lapply(period, function(i) {colMeans(simStatsByPeriod[[i]])})
+	simStatsByPeriod_tilde <-
+		lapply(period, function(i) {
+			t(apply(simStatsByPeriod[[i]],1, function(x){x - ExpStat[[i]]}))})
+
 	OneStepSpecs <- matrix(0, ncol=sum(sienaFitObject$test),
-			nrow=length(sienaFitObject$theta))
-	PartialOneStepSpecs <- matrix(0, ncol=sum(sienaFitObject$test),
-			nrow=length(sienaFitObject$theta))
-	GmmOneStepSpecs <- matrix(0, ncol=sum(sienaFitObject$test),
 			nrow=length(sienaFitObject$theta))
 	if (robust) {
 		covInvByPeriod <- lapply(period, function(i) ginv(
@@ -276,29 +277,18 @@ sienaGOF <- function(
 		effectsObject <- sienaFitObject$requestedEffects
 		nSims <- sienaFitObject$Phase3nits
 		for (i in period) {
+			names(OneStepMHD_old[[i]]) <-
+					effectsObject$effectName[sienaFitObject$test]
 			names(OneStepMHD[[i]]) <-
 					effectsObject$effectName[sienaFitObject$test]
-			names(PartialOneStepMHD[[i]]) <-
-					effectsObject$effectName[sienaFitObject$test]
-			names(GmmMhdValue[[i]]) <-
-					effectsObject$effectName[sienaFitObject$test]
 		}
+		names(JoinedOneStepMHD_old) <-
+					effectsObject$effectName[sienaFitObject$test]
 		names(JoinedOneStepMHD) <-
-				effectsObject$effectName[sienaFitObject$test]
-		names(JoinedPartialOneStepMHD) <-
-				effectsObject$effectName[sienaFitObject$test]
-		names(JoinedGmmMhdValue) <-
 				effectsObject$effectName[sienaFitObject$test]
 
 		rownames(OneStepSpecs) <- effectsObject$effectName
 		colnames(OneStepSpecs) <- effectsObject$effectName[sienaFitObject$test]
-		rownames(PartialOneStepSpecs) <- effectsObject$effectName
-		colnames(PartialOneStepSpecs) <-
-				effectsObject$effectName[sienaFitObject$test]
-		rownames(GmmOneStepSpecs) <- effectsObject$effectName
-		colnames(GmmOneStepSpecs) <-
-				effectsObject$effectName[sienaFitObject$test]
-
 		counterTestEffects <- 0
 		for(index in which(sienaFitObject$test)) {
 			if (verbose) {
@@ -337,68 +327,91 @@ sienaGOF <- function(
 			mmThetaDelta <- as.numeric(ScoreTest(length(doTests), D,
 							sigma, fra, doTests,
 							maxlike=sienaFitObject$maxlike)$oneStep )
-			mmPartialThetaDelta <- rep(0,length(theta0))
-			mmPartialThetaDelta[length(theta0)] <- mmThetaDelta[length(theta0)]
 
       # \mu'_\theta(X)
-			JacobianExpStat <- lapply(period, function (i) {
+			JacobianExpStat_old <- lapply(period, function (i) {
 				t(SF[,i,]) %*% simStatsByPeriod[[i]]/ nSims	 })
+			JacobianExpStat <- lapply(period, function (i) {
+				t(SF[,i,]) %*% simStatsByPeriod_tilde[[i]]/ nSims })
 
       # List structure: Period, effect index
       thetaIndices <- 1:sum(effectsToInclude)
-      # \Gamma_i(\theta)
-      ExpStatCovar <- lapply(period, function (i) {
+	  # \Gamma_i(\theta)  i=period, j=parameter, k=replication
+			ExpStatCovar_old <- lapply(period, function (i) {
             lapply(thetaIndices, function(j){
               Reduce("+", lapply(1:nSims,function(k){
                 simStatsByPeriod[[i]][k,] %*% t(simStatsByPeriod[[i]][k,]) * SF[k,i,j]
               })) / nSims
-              - JacobianExpStat[[i]][j,] %*% t(ExpStat[[i]]) - ExpStat[[i]] %*% t(JacobianExpStat[[i]][j,])
+				- JacobianExpStat[[i]][j,] %*%
+			t(ExpStat[[i]]) - ExpStat[[i]] %*% t(JacobianExpStat[[i]][j,])
             })
         })
+			ExpStatCovar <- lapply(period, function (i) {
+				lapply(thetaIndices, function(j){
+				Reduce("+", lapply(1:nSims,function(k){
+			simStatsByPeriod_tilde[[i]][k,] %*%
+				t(simStatsByPeriod_tilde[[i]][k,]) * SF[k,i,j] })) / nSims})})
 
       # \Xi_i(\theta)
+			JacobianCovar_old <- lapply(period, function (i) {
+				lapply(thetaIndices, function(j){
+					-1 * covInvByPeriod[[i]] %*% ExpStatCovar_old[[i]][[j]] %*%
+						covInvByPeriod[[i]] })
+			})
       JacobianCovar <- lapply(period, function (i) {
         lapply(thetaIndices, function(j){
-          -1 * covInvByPeriod[[i]] %*% ExpStatCovar[[i]][[j]]  %*% covInvByPeriod[[i]] })
+					-1 * covInvByPeriod[[i]] %*% ExpStatCovar[[i]][[j]] %*%
+						covInvByPeriod[[i]] })
         })
 
+			Gradient_old <- lapply(period, function(i) {
+				sapply(thetaIndices, function(j){
+					( obsStatsByPeriod[[i]] - ExpStat[[i]] ) %*%
+						JacobianCovar_old[[i]][[j]] %*%
+					t( obsStatsByPeriod[[i]] - ExpStat[[i]] )
+					})
+				-2 * JacobianExpStat_old[[i]] %*% covInvByPeriod[[i]] %*%
+					t( obsStatsByPeriod[[i]] - ExpStat[[i]] )
+				})
 			Gradient <- lapply(period, function(i) {
           sapply(thetaIndices, function(j){
           ( obsStatsByPeriod[[i]] - ExpStat[[i]] ) %*%
             JacobianCovar[[i]][[j]] %*%
           t( obsStatsByPeriod[[i]] - ExpStat[[i]] )
           })
-						-2	* JacobianExpStat[[i]] %*%
-								covInvByPeriod[[i]] %*%
+				-2 * JacobianExpStat[[i]] %*% covInvByPeriod[[i]] %*%
             t( obsStatsByPeriod[[i]] - ExpStat[[i]] )
 					})
 
-      OneStepSpecs[effectsToInclude,counterTestEffects] <- theta0 + mmThetaDelta
-      PartialOneStepSpecs[effectsToInclude,counterTestEffects] <- theta0 + mmPartialThetaDelta
+			OneStepSpecs[effectsToInclude,counterTestEffects] <-
+								theta0 + mmThetaDelta
 
 			for (i in 1:length(obsMhd)) {
-        OneStepMHD[[i]][counterTestEffects] <- as.numeric(obsMhd[i] + mmThetaDelta %*% Gradient[[i]] )
-        PartialOneStepMHD[[i]][counterTestEffects] <- as.numeric( obsMhd[i] + mmPartialThetaDelta %*% Gradient[[i]] )
+				OneStepMHD_old[[i]][counterTestEffects] <-
+					as.numeric(obsMhd[i] + mmThetaDelta %*% Gradient_old[[i]] )
       }
-      JoinedOneStepMHD[counterTestEffects] <- Reduce("+",OneStepMHD)[counterTestEffects]
-      JoinedPartialOneStepMHD[counterTestEffects] <- Reduce("+",PartialOneStepMHD)[counterTestEffects]
+			for (i in 1:length(obsMhd)) {
+				OneStepMHD[[i]][counterTestEffects] <-
+					as.numeric(obsMhd[i] + mmThetaDelta %*% Gradient[[i]] )
 		}
+			JoinedOneStepMHD_old[counterTestEffects] <-
+						Reduce("+",OneStepMHD_old)[counterTestEffects]
+			JoinedOneStepMHD[counterTestEffects] <-
+						Reduce("+",OneStepMHD)[counterTestEffects]
+		} # end 'for index'
 	}
 
 	names(res) <- names(obsStats)
 	class(res) <- "sienaGOF"
 	attr(res, "scoreTest") <- (sum(sienaFitObject$test) > 0)
 	attr(res, "originalMahalanobisDistances") <- obsMhd
+	attr(res, "oneStepMahalanobisDistances") <- OneStepMHD
 	attr(res, "joinedOneStepMahalanobisDistances") <-
 			JoinedOneStepMHD
+	attr(res, "oneStepMahalanobisDistances_old") <- OneStepMHD_old
+	attr(res, "joinedOneStepMahalanobisDistances_old") <-
+			JoinedOneStepMHD_old
 	attr(res, "oneStepSpecs") <- OneStepSpecs
-	attr(res, "partialOneStepMahalanobisDistances") <- PartialOneStepMHD
-	attr(res, "joinedPartialOneStepMahalanobisDistances") <-
-			JoinedPartialOneStepMHD
-	attr(res, "partialOneStepSpecs") <- PartialOneStepSpecs
-	attr(res, "gmmOneStepSpecs") <- GmmOneStepSpecs
-	attr(res, "gmmOneStepMahalanobisDistances") <- GmmMhdValue
-	attr(res, "joinedGmmOneStepMahalanobisDistances") <- JoinedGmmMhdValue
 	attr(res,"auxiliaryStatisticName") <-
 			attr(obsStats,"auxiliaryStatisticName")
 	attr(res, "simTime") <- attr(simStats,"time")
@@ -457,13 +470,13 @@ print.sienaGOF <- function (x, ...) {
 	originalMhd <- attr(x, "originalMahalanobisDistances")
 	if (attr(x, "joined")) {
 		cat("-----\nCalculated joint MHD = (",
-				sum(originalMhd),") for current model.\n")
+				round(sum(originalMhd),2),") for current model.\n")
 	}
 	else
 	{
 		for (j in 1:length(originalMhd)) {
 			cat("-----\nCalculated period ", j, " MHD = (",
-					originalMhd[j],") for current model.\n")
+					round(originalMhd[j],2),") for current model.\n")
 		}
 	}
 	invisible(x)
@@ -476,17 +489,9 @@ summary.sienaGOF <- function(object, ...) {
 	if (attr(x, "scoreTest")) {
 		oneStepSpecs <- attr(x, "oneStepSpecs")
 		oneStepMhd <- attr(x, "oneStepMahalanobisDistances")
-# Tom deleted the following statements, because they lead to warnings
-# when checking. In the current code they are superfluous.
-#		gmmMhd <- attr(x, "gmmOneStepMahalanobisDistances")
-#		gmmOneStepSpecs <- attr(x, "gmmOneStepSpecs")
-#		partialOneStepSpecs <- attr(x, "partialOneStepSpecs")
-#		partialOneStepMhd <- attr(x, "partialOneStepMahalanobisDistances")
-#		joinedPartialOneStepMhd <-
-#				attr(x, "joinedPartialOneStepMahalanobisDistances")
 		joinedOneStepMhd <- attr(x, "joinedOneStepMahalanobisDistances")
-#		joinedGmmMhd <- attr(x, "joinedGmmOneStepMahalanobisDistances")
-		cat("\nOne-step estimates for modified models.\n")
+		cat("\nOne-step estimates and predicted Mahalanobis distances")
+		cat(" for modified models.\n")
 		if (attr(x, "joined")) {
 			for (i in 1:ncol(oneStepSpecs)) {
 				a <- cbind(oneStepSpecs[,i, drop=FALSE] )
@@ -494,8 +499,8 @@ summary.sienaGOF <- function(object, ...) {
 				rownames(b) <- c("MHD")
 				a <- rbind(a, b)
 				a <- round(a, 3)
-				cat("\n**Model", colnames(a)[1], "\n")
-				colnames(a) <- "MMD"
+				cat("\n**Model including", colnames(a)[1], "\n")
+				colnames(a) <- "one-step"
 				print(a)
 			}
 		}
@@ -508,8 +513,8 @@ summary.sienaGOF <- function(object, ...) {
 					rownames(b) <- c("MHD")
 					a <- rbind(a, b)
 					a <- round(a, 3)
-					cat("\n**Model", colnames(a)[1], "\n")
-					colnames(a) <- c("MMD")
+					cat("\n**Model including", colnames(a)[1], "\n")
+					colnames(a) <- c("one-step")
 					print(a)
 				}
 			}

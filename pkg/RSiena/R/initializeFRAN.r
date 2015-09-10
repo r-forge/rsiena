@@ -56,7 +56,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             {
                 bad <- which(!(userlist %in% deflist))
                 print(userlist[bad])
-                stop("invalid effect requested: see above ")
+				cat("invalid effect requested: see above; \n")
+    stop("there seems to be a mismatch between data set and effects object.")
             }
         }
         if (!inherits(effects, "data.frame"))
@@ -1853,11 +1854,11 @@ fixUpEffectNames <- function(effects)
                    }
                    else
                    {
-                       if (egoCount < 2 && dyadCount != 3)
+                       if (egoCount < 2 && (egoCount + dyadCount < 3))
                        {
-                           stop("invalid network interaction specification: ",
-                                "must be at least two ego or all dyadic ",
-                                "effects")
+                      stop("invalid network 3-way interaction specification: ",
+									"must be at least two ego effects ",
+									"or all ego or dyadic effects")
                        }
                    }
                    ## construct a name

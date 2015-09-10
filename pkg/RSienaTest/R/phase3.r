@@ -295,21 +295,24 @@ phase3.2 <- function(z, x, ...)
 							sep="", collapse=" + ")
 			Report(thetext, outf)
 			Report('\n',outf)
-			cat('*** Warning: Covariance matrix not positive definite *** \n')
-			cat('*** Standard errors not reliable ***\n')
-			cat('The following is approximately a linear combination \n')
-			cat('for which the data carries no information:\n',
-			     thetext,'\n')
-			cat('It is advisable to drop one or more of these effects.\n')
-			if (any(z$fixed || any(z$newfixed)))
+			if (is.null(x$fromBayes))
 			{
-				Report(c('(This may be unimportant, and related to the fact\n',
-					'that some parameters are fixed.)\n'), outf)
-			}
-			else
-			{
-				Report('Do not use any reported standard errors.\n', outf)
-				errorMessage.cov <- '*** Warning: Noninvertible estimated covariance matrix ***'
+				cat('*** Warning: Covariance matrix not positive definite *** \n')
+				cat('*** Standard errors not reliable ***\n')
+				cat('The following is approximately a linear combination \n')
+				cat('for which the data carries no information:\n',
+					thetext,'\n')
+				cat('It is advisable to drop one or more of these effects.\n')
+				if (any(z$fixed || any(z$newfixed)))
+				{
+					Report(c('(This may be unimportant, and related to the fact\n',
+						'that some parameters are fixed.)\n'), outf)
+				}
+				else
+				{
+					Report('Do not use any reported standard errors.\n', outf)
+	errorMessage.cov <- '*** Warning: Noninvertible estimated covariance matrix ***'
+				}
 			}
 			z$msfinv <- NULL
 			cov.est <- NA * z$msfc

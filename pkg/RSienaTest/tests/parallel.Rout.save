@@ -1,5 +1,5 @@
 
-R version 3.2.0 Patched (2015-05-18 r68384) -- "Full of Ingredients"
+R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 
@@ -34,14 +34,14 @@ Estimates, standard errors and convergence t-ratios
 
                                       Estimate   Standard   Convergence 
                                                    Error      t-ratio   
-  1. rate basic rate parameter mynet1  3.0410  ( 0.5011   )    0.0922   
-  2. eval outdegree (density)         -1.1448  ( 0.1459   )   -0.1884   
-  3. eval reciprocity                  1.7264  ( 0.2028   )   -0.3503   
+  1. rate basic rate parameter mynet1  3.0186  ( 0.5581   )    0.0134   
+  2. eval outdegree (density)         -1.1374  ( 0.2723   )    0.1044   
+  3. eval reciprocity                  1.7459  ( 0.2854   )   -0.1847   
 
-Overall maximum convergence ratio:    0.3582 
+Overall maximum convergence ratio:    0.3838 
 
 
-Total of 427 iteration steps.
+Total of 407 iteration steps.
 
 > ##test4
 > mymodel$projname <- 'test4'
@@ -59,14 +59,14 @@ Estimates, standard errors and convergence t-ratios
                                            Error      t-ratio   
 
 Rate parameters: 
-  0       Rate parameter       3.0413  ( 0.4653   )             
-  1. eval outdegree (density) -1.1180  ( 0.2905   )   0.3542    
-  2. eval reciprocity          1.7762  ( 0.6137   )   0.3635    
+  0       Rate parameter       3.1399  ( 0.5436   )             
+  1. eval outdegree (density) -1.1246  ( 0.3169   )   0.2203    
+  2. eval reciprocity          1.7460  ( 0.4466   )   0.0080    
 
-Overall maximum convergence ratio:    0.4148 
+Overall maximum convergence ratio:    0.2341 
 
 
-Total of 382 iteration steps.
+Total of 380 iteration steps.
 
 > ##test5
 > mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
@@ -83,14 +83,14 @@ Estimates, standard errors and convergence t-ratios
 
                                       Estimate   Standard   Convergence 
                                                    Error      t-ratio   
-  1. rate basic rate parameter mynet1  3.0243  ( 0.5458   )   -0.1228   
-  2. eval outdegree (density)         -1.1365  ( 0.2544   )   -0.0164   
-  3. eval reciprocity                  1.7417  ( 0.4957   )   -0.0716   
+  1. rate basic rate parameter mynet1  3.0451  ( 0.5078   )    0.0103   
+  2. eval outdegree (density)         -1.1448  ( 0.1690   )   -0.2193   
+  3. eval reciprocity                  1.7883  ( 0.3820   )   -0.0597   
 
-Overall maximum convergence ratio:    0.1500 
+Overall maximum convergence ratio:    0.2334 
 
 
-Total of 388 iteration steps.
+Total of 588 iteration steps.
 
 > ##test6
 > mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
@@ -107,14 +107,14 @@ Estimates, standard errors and convergence t-ratios
 
                                       Estimate   Standard   Convergence 
                                                    Error      t-ratio   
-  1. rate basic rate parameter mynet1  2.9998  ( 0.4495   )   -0.0315   
-  2. eval outdegree (density)         -1.1342  ( 0.2135   )    0.0114   
-  3. eval reciprocity                  1.7923  ( 0.4203   )    0.1191   
+  1. rate basic rate parameter mynet1  3.0451  ( 0.5078   )    0.0103   
+  2. eval outdegree (density)         -1.1448  ( 0.1690   )   -0.2193   
+  3. eval reciprocity                  1.7883  ( 0.3820   )   -0.0597   
 
-Overall maximum convergence ratio:    0.1482 
+Overall maximum convergence ratio:    0.2334 
 
 
-Total of 388 iteration steps.
+Total of 588 iteration steps.
 
 > ##test7
 > mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
@@ -132,14 +132,14 @@ Estimates, standard errors and convergence t-ratios
 
                                       Estimate   Standard   Convergence 
                                                    Error      t-ratio   
-  1. rate basic rate parameter mynet1  3.0031  ( 0.4631   )   -0.1367   
-  2. eval outdegree (density)         -1.1287  ( 0.2086   )    0.0523   
-  3. eval reciprocity                  1.8048  ( 0.4106   )    0.0898   
+  1. rate basic rate parameter mynet1  3.0258  ( 0.5063   )   -0.1656   
+  2. eval outdegree (density)         -1.1558  ( 0.1821   )    0.0801   
+  3. eval reciprocity                  1.8464  ( 0.3633   )    0.2701   
 
-Overall maximum convergence ratio:    0.1868 
+Overall maximum convergence ratio:    0.3630 
 
 
-Total of 388 iteration steps.
+Total of 545 iteration steps.
 
 > ##test8
 > mymodel<- model.create(fn = simstats0c, projname='test8', nsub=2, n3=50,
@@ -156,14 +156,14 @@ Estimates, standard errors and convergence t-ratios
                                            Error      t-ratio   
 
 Rate parameters: 
-  0       Rate parameter       3.0745  ( 0.5053   )             
-  1. eval outdegree (density) -1.1450  ( 0.1686   )   0.1251    
-  2. eval reciprocity          1.8290  ( 0.3904   )   0.0760    
+  0       Rate parameter       3.0447  ( 0.4873   )             
+  1. eval outdegree (density) -1.1448  ( 0.2355   )   0.0924    
+  2. eval reciprocity          1.7887  ( 0.4195   )   0.0437    
 
-Overall maximum convergence ratio:    0.1251 
+Overall maximum convergence ratio:    0.0924 
 
 
-Total of 398 iteration steps.
+Total of 495 iteration steps.
 
 > ##test9
 > 
@@ -191,24 +191,24 @@ Estimates, standard errors and convergence t-ratios
                                                                Error      t-ratio   
 
 Rate parameters: 
-  0.1      Rate parameter cond. variable period 1  5.7721  ( 0.9175   )             
-  0.2      Rate parameter cond. variable period 2  4.5689  ( 0.8082   )             
+  0.1      Rate parameter cond. variable period 1  5.5929  ( 0.7753   )             
+  0.2      Rate parameter cond. variable period 2  4.5232  ( 0.6646   )             
 
 Other parameters: 
 Network Dynamics 
-  1.  eval outdegree (density)                    -2.3548  ( 0.1411   )   -0.3546   
-  2.  eval reciprocity                             2.8052  ( 0.2966   )   -0.4360   
+  1.  eval outdegree (density)                    -2.3838  ( 0.1024   )   -0.0123   
+  2.  eval reciprocity                             2.8551  ( 0.2210   )    0.0034   
 
 Behavior Dynamics
-  3.  rate rate mynet2 (period 1)                  1.1871  ( 0.3170   )    0.1309   
-  4.  rate rate mynet2 (period 2)                  1.6950  ( 0.7495   )    0.2130   
-  5.  eval mynet2 linear shape                     0.3717  ( 0.2445   )    0.1079   
-  6.  eval mynet2 quadratic shape                 -0.2070  ( 0.1233   )    0.2108   
+  3.  rate rate mynet2 (period 1)                  1.1727  ( 0.2596   )   -0.2215   
+  4.  rate rate mynet2 (period 2)                  1.6369  ( 0.4436   )   -0.1427   
+  5.  eval mynet2 linear shape                     0.3702  ( 0.1744   )   -0.2015   
+  6.  eval mynet2 quadratic shape                 -0.2082  ( 0.1238   )   -0.0034   
 
-Overall maximum convergence ratio:    0.5444 
+Overall maximum convergence ratio:    0.2949 
 
 
-Total of 414 iteration steps.
+Total of 612 iteration steps.
 
 > ##test12
 > print('test12')
@@ -234,26 +234,26 @@ Estimates, standard errors and convergence t-ratios
                                                 Error      t-ratio   
 
 Rate parameters: 
-  0.1      Rate parameter period 1  4.3110  ( 0.5970   )             
-  0.2      Rate parameter period 2  3.5516  ( 0.6044   )             
+  0.1      Rate parameter period 1  4.2425  ( 0.6159   )             
+  0.2      Rate parameter period 2  3.5658  ( 0.6180   )             
 
 Other parameters: 
-  1.  eval outdegree (density)     -1.8187  ( 0.1730   )   -0.0081   
-  2.  eval indegree - popularity    0.0745  ( 0.0581   )   -0.1020   
+  1.  eval outdegree (density)     -1.8491  ( 0.1944   )   -0.0905   
+  2.  eval indegree - popularity    0.0872  ( 0.0644   )   -0.1330   
 
-Overall maximum convergence ratio:    0.1998 
+Overall maximum convergence ratio:    0.1372 
 
 
-Total of 325 iteration steps.
+Total of 508 iteration steps.
 
 > tt <- sienaTimeTest(ans)
 > tt
 Joint significance test of time heterogeneity:
-chi-squared =   0.81, d.f. = 2, p= 0.6654, 
+chi-squared =   0.67, d.f. = 2, p= 0.7155, 
 where H0: The following parameters are zero:
  (1) (*)Dummy2:outdegree (density)
  (2) (*)Dummy2:indegree - popularity
 > 
 > proc.time()
    user  system elapsed 
-   8.19    0.39    8.65 
+  10.51    0.39   11.01 

@@ -26,7 +26,7 @@ namespace siena
 // ----------------------------------------------------------------------------
 
 class Network;
-class NetworkCache;
+class Cache;
 class TwoNetworkCache;
 
 
@@ -41,8 +41,7 @@ class MixedNetworkEffect : public NetworkEffect
 {
 
 public:
-	MixedNetworkEffect(const EffectInfo * pEffectInfo,
-	   string firstNetworkName,	string secondNetworkName);
+	MixedNetworkEffect(const EffectInfo * pEffectInfo);
 
 	virtual void initialize(const Data * pData,
 		State * pState,
@@ -53,18 +52,18 @@ public:
 	inline const NetworkLongitudinalData * pData() const;
 
 protected:
+//	bool firstInTieExists(int alter) const; // requires more in TwoNetworkCache
+	bool firstOutTieExists(int alter) const;
+//	bool secondInTieExists(int alter) const;
+	bool secondOutTieExists(int alter) const;
 	inline const Network * pFirstNetwork() const;
 	inline const Network * pSecondNetwork() const;
 	inline TwoNetworkCache * pTwoNetworkCache() const;
-	inline NetworkCache * pFirstNetworkCache() const;
 
 private:
-	string lname1;
-	string lname2;
 	const Network * lpFirstNetwork;
 	const Network * lpSecondNetwork;
 	TwoNetworkCache * lpTwoNetworkCache;
-	NetworkCache * lpFirstNetworkCache;
 };
 
 
@@ -85,11 +84,6 @@ const Network * MixedNetworkEffect::pSecondNetwork() const
 TwoNetworkCache * MixedNetworkEffect::pTwoNetworkCache() const
 {
 	return this->lpTwoNetworkCache;
-}
-
-NetworkCache * MixedNetworkEffect::pFirstNetworkCache() const
-{
-	return this->lpFirstNetworkCache;
 }
 
 }

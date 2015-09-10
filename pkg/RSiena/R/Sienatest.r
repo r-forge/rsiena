@@ -247,7 +247,7 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
     z2 <- fra[test]
     if (inherits(try(id11 <- solve(d11), silent=TRUE), "try-error"))
     {
-        Report('Error message for inversion of d11: \n', cf)
+        cat('Error for inversion of d11 \n')
         oneSided <- NA
         v9 <- d22
         v9[] <- NA
@@ -275,7 +275,7 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
         if (inherits(try(vav <- solve(v9), silent=TRUE), "try-error"))
             ## vav is the inverse variance matrix of ov
         {
-            Report('Error message for inversion of v9: \n', cf)
+            cat('Error for inversion of v9\n')
             vav <- v9
             vav[] <- NA
 			cvalue <- NA

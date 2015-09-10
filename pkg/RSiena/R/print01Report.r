@@ -178,15 +178,19 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 							tmpdepvar <- depvar[, , k]
 							use <- tmpdepvar %in% c(10, 11)
 							tmpdepvar[use] <- tmpdepvar[use] - 10
+							if (attr(depvar, "type") != "bipartite")
+							{
+								diag(tmpdepvar) <- 0
+							}
 							outdeg <- rowSums(tmpdepvar, na.rm=TRUE)
 							indeg <- colSums(tmpdepvar, na.rm=TRUE)
-							diag(tmpdepvar) <- 0
 							missrow <- rowSums(is.na(tmpdepvar))
 							misscol <- colSums(is.na(tmpdepvar))
 						}
 						if (attr(depvar, "type") == "bipartite")
 						{
 							tmp <- format(cbind(1:atts$netdims[1], outdeg))
+							tmp2 <- format(cbind(1:atts$netdims[2], indeg))
 						}
 						else
 						{
@@ -197,7 +201,12 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 						Report(tmp[, 1], fill=60, outf)
 						Report("out-degrees\n", outf)
 						Report(tmp[, 2], fill=60, outf)
-						if (attr(depvar, "type") != "bipartite")
+						if (attr(depvar, "type") == "bipartite")
+						{
+							Report("in-degrees\n", outf)
+							Report(tmp2[, 2], fill=60, outf)
+						}
+						else
 						{
 							Report("in-degrees\n", outf)
 							Report(tmp[, 3], fill=60, outf)
@@ -290,19 +299,7 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 									 ", number of missing values ",
 									 "are:\n"),
 								   sep="", outf)
-							if (attr(depvar, "type") != "bipartite")
-							{
-								Report("Nodes\n", outf)
-								tmp <- format(cbind(1:atts$netdims[1],
-													missrow, misscol))
-								Report(tmp[, 1], fill=60, outf)
-								Report("missing in rows\n", outf)
-								Report(tmp[, 2], fill=60, outf)
-								Report("missing in columns\n", outf)
-								Report(tmp[, 3], fill=60, outf)
-								mult <- atts$netdims[1] - 1
-							}
-							else
+							if (attr(depvar, "type") == "bipartite")
 							{
 								Report("Senders\n", outf)
 								tmp <- format(cbind(1:atts$netdims[1],
@@ -317,6 +314,18 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 								Report("missing in columns\n", outf)
 								Report(tmp[, 2], fill=60, outf)
 								mult <- atts$netdims[2]
+							}
+							else
+							{
+								Report("Nodes\n", outf)
+								tmp <- format(cbind(1:atts$netdims[1],
+													missrow, misscol))
+								Report(tmp[, 1], fill=60, outf)
+								Report("missing in rows\n", outf)
+								Report(tmp[, 2], fill=60, outf)
+								Report("missing in columns\n", outf)
+								Report(tmp[, 3], fill=60, outf)
+								mult <- atts$netdims[1] - 1
 							}
 							Report(c("Total number of missing data: ",
 									 sum(missrow),
@@ -1277,15 +1286,15 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 		length(atts$vCovars) > 0)
 	{
 		netnames <- atts$netnames
-		vCovarSim2 <-
-			lapply(data, function(x)
-				   lapply(x$vCovars, function(y) attr(y, "simMeans")))
-		behSim2 <-
-			lapply(data, function(x)
-				   lapply(x$depvars, function(y) attr(y, "simMeans")))
-		cCovarSim2 <-
-			lapply(data, function(x)
-				   lapply(x$cCovars, function(y) attr(y, "simMeans")))
+#		vCovarSim2 <-
+#			lapply(data, function(x)
+#				   lapply(x$vCovars, function(y) attr(y, "simMeans")))
+#		behSim2 <-
+#			lapply(data, function(x)
+#				   lapply(x$depvars, function(y) attr(y, "simMeans")))
+#		cCovarSim2 <-
+#			lapply(data, function(x)
+#				   lapply(x$cCovars, function(y) attr(y, "simMeans")))
 		if (nData > 1)
 		{
 			vCovarSim <-

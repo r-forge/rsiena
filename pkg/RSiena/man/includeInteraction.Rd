@@ -68,6 +68,9 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   and values of interaction1 and interaction2 (if any),
   is obtained by executing \code{\link{effectsDocumentation}(myeff)}.
 
+  To set further attributes of interaction effects in the effects object,
+  use setEffect() with its parameters effect1 and effect2,
+  as shown in the example below.
   }
 \value{
   An updated version of the input effects object, with the "include"
@@ -93,10 +96,11 @@ myeff <- includeInteraction(myeff, transTrip, egoX, interaction1=c("", "alc"))
 myeff
 # Now request the interaction between transitive triplets and alcohol ego
 # to be tested without estimation.
-# In practice one would just look up the numbers of effect1 and effect2
-# from the response to \code{myeff} and fill them in.
+# This is the 10th effect as seen in myeff.
 (eff1 <- myeff[myeff$include,]$effect1[10])
 (eff2 <- myeff[myeff$include,]$effect2[10])
+# In interactive use one could get the numbers for eff1 and eff2
+# directly from the information given by print(myeff).
 myeff <- setEffect(myeff, unspInt, fix=TRUE, test=TRUE,
 									effect1=eff1, effect2=eff2)
 myeff

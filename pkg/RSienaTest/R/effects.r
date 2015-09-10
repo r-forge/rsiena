@@ -987,7 +987,7 @@ depvar <- attr(effects, "depvar")
 			# restrict to covariates on second node set
 			covObjEffects <-
 				covObjEffects[covObjEffects$shortName %in%
-							  c("altX", "altSqX", "homXOutAct"), ]
+							  c("altX", "altSqX", "homXOutAct", "altXOutAct"), ]
 			if (!moreThan2)
 			{
 				covObjEffects <-

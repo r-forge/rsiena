@@ -43,7 +43,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 	{
 		if (is.null(sienaFit$sdf2[[1]][[1]]))
 		{
-			stop("rerun Siena07 with the byWave option TRUE")
+			stop("rerun siena07 with the byWave option TRUE")
 		}
 	}
 	## get the desired effects
@@ -363,8 +363,11 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
                                  )
 	}
 	individualTestP <- 2 * (1- pnorm(abs(individualTest)))
+	if (!is.na(jointTestP))
+	{
 	rownames(jointTestP) <- "Joint Significant Test"
 	colnames(jointTestP) <- "p-Val"
+	}
 	thetaOneStep <- c(sienaFit$theta[estimatedInFit], rep(0, nDummies)) +
 		jointTest$oneStep
 	## Define the null hypothesis for the later tests (effect-wise and group-wise)

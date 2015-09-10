@@ -167,6 +167,11 @@ We recommend the following heuristic approach to model checking:
 			 simulated Mahalanobis distances.}
     \item{- Rank}{ Rank of the covariance matrix of the simulated auxiliary
               statistics.}
+    In addition there are several attributes which give, for model
+    specifications with fixed-and-tested effects, approximations
+    to the expected Mahalanobis distance for model specifications where
+    each of these effects would be added. This is reported 
+    in the \code{summary} method. \cr
 	The \code{plot} method makes violin plots or box plots, with superimposed
     confidence bands, for the simulated distributions of all elements
 	of the \code{auxiliaryFunction},

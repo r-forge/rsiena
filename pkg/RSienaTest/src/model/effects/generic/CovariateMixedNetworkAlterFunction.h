@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 // combines MixedNetworkAlterFunction and CovariateNetworkAlterFunction
- 
+
 #ifndef COVARIATEMIXEDNETWORKALTERFUNCTION_H_
 #define COVARIATEMIXEDNETWORKALTERFUNCTION_H_
 
@@ -62,8 +62,6 @@ private:
 	ConstantCovariate * lpConstantCovariate;
 	ChangingCovariate * lpChangingCovariate;
 	BehaviorLongitudinalData * lpBehaviorData;
-	string lname1;
-	string lname2;
 	const Network * lpFirstNetwork;
 	const Network * lpSecondNetwork;
 	TwoNetworkCache * lpTwoNetworkCache;

@@ -604,6 +604,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 		attr(depvars[[i]], 'noMissing') <- rep(0, observations)
 		attr(depvars[[i]], 'noMissingEither') <- rep(0, observations - 1)
 		attr(depvars[[i]], 'nonMissingEither') <- rep(0, observations - 1)
+		someOnly <- FALSE
 		if (type == 'behavior')
 		{
 			attr(depvars[[i]], 'noMissing') <- FALSE
@@ -631,9 +632,15 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 				if (attr(depvars[[i]], 'allowOnly'))
 					{
 					if (all(mydiff >= 0, na.rm=TRUE))
+						{
 						attr(depvars[[i]], 'downonly')[j] <- TRUE
+							someOnly <- TRUE
+						}
 					if (all(mydiff <= 0, na.rm=TRUE))
+						{
 						attr(depvars[[i]], 'uponly')[j] <- TRUE
+							someOnly <- TRUE
+						}
 					}
 			}
 			rr <- range(depvars[[i]], na.rm=TRUE)
@@ -700,9 +707,15 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 					if (attr(depvars[[i]], 'allowOnly'))
 						{
 							if (all(mydiff@x >= 0, na.rm=TRUE))
+							{
 								attr(depvars[[i]], 'uponly')[j] <- TRUE
+								someOnly <- TRUE
+							}
 							if (all(mydiff@x <= 0, na.rm=TRUE))
+							{
 								attr(depvars[[i]], 'downonly')[j] <- TRUE
+								someOnly <- TRUE
+							}
 						}
 				}
 				else
@@ -735,9 +748,15 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 					if (attr(depvars[[i]], 'allowOnly'))
 						{
 							if (all(mydiff >= 0, na.rm=TRUE))
+							{
 								attr(depvars[[i]], 'uponly')[j] <- TRUE
+								someOnly <- TRUE
+							}
 							if (all(mydiff <= 0, na.rm=TRUE))
+							{
 								attr(depvars[[i]], 'downonly')[j] <- TRUE
+								someOnly <- TRUE
+							}
 						}
 				}
 			}
@@ -935,6 +954,12 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 		   }
 		}
 		attr(depvars[[i]], 'name') <- names(depvars)[i]
+	}
+	if (someOnly)
+	{
+cat('For some variables, in some periods, there are only increases, or only decreases.\n')
+cat('This will be respected in the simulations.\n')
+cat('If this is not desired, use allowOnly=FALSE when creating the dependent variables.\n')
 	}
 	## create the object
 	z <- NULL
