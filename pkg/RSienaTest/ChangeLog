@@ -1,17 +1,53 @@
-2015-07-18 R-Forge Revision 288
+2015-09-10 R-Forge Revision 289
 Changes in RSiena and RSienaTest:
-   * New effects homXOutAct, FFDeg, BBDeg, RFDeg, diffXTransTrip.
+   * New defaults for siena07() in sienaAlgorithmCreate():
+     doubleAveraging=0, diagonalize=0.2 (for MoM).
+   * Improved one-step approximations to expected Mahalanobis
+     distances in sienaGOF() (control variates for score function).
+   * Permit 3-way interactions with one ego and two dyadic effects
+     (initializeFRAN.r) (this was erroneously not allowed).
+   * New effects Jin, Jout, JinMix, JoutMix, altXOutAct,
+     doubleInPop, doubleOutAct.
+   * print01Report() now reports in-degrees also for two-mode networks.
+   * Better error handling for sienaTimeTest and scoreTest
+     (EvaluateTestStatistic() in Sienatest.r).
+   * inOutAss is dyadic.
+   * Check for positive derivative matrix at the end of phase 1
+     omitted for effects with fixed parameters
+     (phase1.r, CalculateDerivative()).
+   * Corrected effectName and functionName of inPopIntn, outPopIntn,
+     inActIntn, and outActIntn ('in' and 'out' were missing).
+   * Extended error message for "invalid effect" in initializeFRAN().
+   * Console message when allowOnly=TRUE is active in sienaDependent().
+   * Some change in includeInteraction.Rd.
+Changes in RSiena:
+   * New effects homXOutAct, FFDeg, BBDeg, RFDeg, diffXTransTrip
+     (ported from RSienaTest).
    * sameXInPop and diffXInPop also added for two-mode networks;
      but they are not dyadic!
    * In names of behavior effects and statistics dropped the
      (redundant) parts "behavior" and "beh.".
-   * plot.sienaRI: new parameter "actors"; 
+Changes in RSienaTest:
+   * New function extract.sienaBayes() (bayesTest.r).
+   * sienaBayes(): options diagonalize=0.2, doubleAveraging=0 for estimation
+     of initial models in initialization phase; save initial results in case of
+     divergence during initialization phase;
+     check for initialEstimates done only for non-rate parameters.
+
+2015-07-18 R-Forge Revision 288
+Changes in RSiena and RSienaTest:
+   * plot.sienaRI: new parameter "actors";
      proportions with piechart improved; function of parameter radius changed.
    * fra2 constructed only if findiff (phase3.r).
    * siena.table does no more produce the double minus sign in html output.
 Changes in RSiena:
    * Correction of error for two-mode networks in sienaGOF.
 Changes in RSienaTest:
+   * New effects homXOutAct, FFDeg, BBDeg, RFDeg, diffXTransTrip.
+   * sameXInPop and diffXInPop also added for two-mode networks;
+     but they are not dyadic!
+   * In names of behavior effects and statistics dropped the
+     (redundant) parts "behavior" and "beh.".
    * sienaBayes: new parameter nSampRates;
      correction in use of prevBayes (with extra createStores());
      more efficient calculation of multivariate normal density.

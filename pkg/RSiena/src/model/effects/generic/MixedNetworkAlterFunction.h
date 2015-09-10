@@ -39,14 +39,16 @@ public:
 		Cache * pCache);
 
 protected:
+	bool firstOutTieExists(int alter) const;
+	bool secondOutTieExists(int alter) const;
 	inline const Network * pFirstNetwork() const;
 	inline const Network * pSecondNetwork() const;
 	inline TwoNetworkCache * pTwoNetworkCache() const;
 	inline NetworkCache * pFirstNetworkCache() const;
 
 private:
-	string lname1;
-	string lname2;
+	string lfirstNetworkName;
+	string lsecondNetworkName;
 	const Network * lpFirstNetwork;
 	const Network * lpSecondNetwork;
 	TwoNetworkCache * lpTwoNetworkCache;

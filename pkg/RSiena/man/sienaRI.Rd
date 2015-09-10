@@ -166,11 +166,11 @@ plot(RI, actors=1:20, addPieChart=TRUE, radius=1.08)
 }
 
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50)
-mynet2 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mybeh <- sienaDependent(s50a, type="behavior")
+mynet2 <- sienaDependent(array(c(s502, s503), dim=c(50, 50, 2)))
+mybeh <- sienaDependent(s50a[,2:3], type="behavior")
 mydata2 <- sienaDataCreate(mynet2, mybeh)
 myeff2 <- getEffects(mydata2)
-myeff2 <- includeEffects(myeff2, density, recip, transTies, nbrDist2)
+myeff2 <- includeEffects(myeff2, density, recip, transTies)
 ans2 <- siena07(myalgorithm, data=mydata2, effects=myeff2, batch=TRUE)
 # Use only the parameters for the evaluation function:
 theta.eval <- ans2$theta[myeff2$type[myeff2$include]=="eval"]

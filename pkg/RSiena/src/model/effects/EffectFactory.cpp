@@ -33,6 +33,8 @@
 #include "model/effects/generic/GwespFunction.h"
 #include "model/effects/generic/InStarFunction.h"
 #include "model/effects/generic/OutStarFunction.h"
+#include "model/effects/generic/InJaccardFunction.h"
+#include "model/effects/generic/OutJaccardFunction.h"
 #include "model/effects/generic/ReciprocatedTwoPathFunction.h"
 #include "model/effects/generic/TwoPathFunction.h"
 #include "model/effects/generic/ReverseTwoPathFunction.h"
@@ -41,6 +43,7 @@
 #include "model/effects/generic/ConditionalFunction.h"
 #include "model/effects/generic/EqualCovariatePredicate.h"
 #include "model/effects/generic/MissingCovariatePredicate.h"
+#include "model/effects/generic/DoubleOutActFunction.h"
 #include "model/effects/generic/CovariateDistance2AlterNetworkFunction.h"
 #include "model/effects/generic/CovariateDistance2InAlterNetworkFunction.h"
 #include "model/effects/generic/CovariateDistance2SimilarityNetworkFunction.h"
@@ -387,6 +390,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new HomCovariateActivityEffect(pEffectInfo, true);
 	}
+	else if (effectName == "altXOutAct")
+	{
+		pEffect = new AlterCovariateActivityEffect(pEffectInfo);
+	}
 	else if (effectName == "homXTransTrip")
 	{
 		pEffect = new HomCovariateTransitiveTripletsEffect(pEffectInfo, false);
@@ -475,6 +482,16 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new InStructuralEquivalenceEffect(pEffectInfo);
 	}
+	else if (effectName == "Jin")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new InJaccardFunction(pEffectInfo->variableName()));
+	}
+	else if (effectName == "Jout")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new OutJaccardFunction(pEffectInfo->variableName()));
+	}
 	else if (effectName == "crprod")
 	{
 		pEffect = new GenericNetworkEffect(pEffectInfo,
@@ -559,6 +576,35 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			new DifferenceFunction(pFirstFunction, pSecondFunction));
+	}
+	else if (effectName == "doubleOutAct")
+	{
+		string firstNetworkName = pEffectInfo->variableName();
+		string secondNetworkName = pEffectInfo->interactionName1();
+		AlterFunction * pChangeFunction =
+			new DoubleOutActFunction(firstNetworkName, secondNetworkName,
+					pEffectInfo->internalEffectParameter(), true);
+		AlterFunction * pStatisticFunction =
+			new DoubleOutActFunction(firstNetworkName, secondNetworkName,
+					pEffectInfo->internalEffectParameter(), false);
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pChangeFunction, pStatisticFunction);
+	}
+// doubleOutAct and doubleInPop are implemented differently
+// just to explore the differences.
+	else if (effectName == "doubleInPop")
+	{
+		pEffect = new DoubleInPopEffect(pEffectInfo);
+	}
+	else if (effectName == "JinMix")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new InJaccardFunction(pEffectInfo->interactionName1()));
+	}
+	else if (effectName == "JoutMix")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new OutJaccardFunction(pEffectInfo->interactionName1()));
 	}
 	else if (effectName == "both")
 	{

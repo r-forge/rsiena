@@ -109,7 +109,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  \item{sims}{If \code{returnDeps} is \code{TRUE}:
     list of simulated dependent variables (networks, behaviour).
     Networks are given as a list of edgelists, one for each period.}
- \item{chain}{If \code{returnChains} is \code{TRUE}:
+ \item{chain}{If \code{returnChains = TRUE}:
     list, or data frame, of simulated chains of ministeps.
     The chain has the structure
     \code{chain[[run]][[depvar]][[period]][[ministep]]}.

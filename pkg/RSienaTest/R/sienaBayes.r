@@ -66,10 +66,11 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 		}
 #		z$ThinEtaScores <<- array(NA, dim=c(nwarm+nmain, z$p2, z$nGroup))
 #		z$ThinEtaHessian <<- array(NA, dim=c(nwarm+nmain, z$p2, z$p2))
-		z$ThinP3MuHat <<- matrix(NA, z$lengthPhase3, z$p1)
-		z$ThinP3SigmaHat <<- array(NA,
-							dim=c(z$lengthPhase3, z$p1, z$p1))
-		z$ThinP3EtaScores <<- matrix(NA, z$lengthPhase3, z$p2)
+#	to be revived for frequentist:
+#		z$ThinP3MuHat <<- matrix(NA, z$lengthPhase3, z$p1)
+#		z$ThinP3SigmaHat <<- array(NA,
+#							dim=c(z$lengthPhase3, z$p1, z$p1))
+#		z$ThinP3EtaScores <<- matrix(NA, z$lengthPhase3, z$p2)
 	} # end createStores
 
     ##@storeData internal sienaBayes; put data in stores
@@ -182,6 +183,11 @@ browser()
 			farFromGoal <- ifelse((abs(actual - desired) < 2*tolerance),
 								FALSE, farFromGoal)
 			farMult <- ifelse(actual > desired, 2, 0.5)
+			if (farFromGoal)
+			{
+				if (actual > 5*desired){farMult <- 5}
+				if (5*actual < desired){farMult <- 0.2}
+			}
 			actual.previous <- actual
             pastSuccesses <- ifelse(abs(actual - desired) <= tolerance,
 									pastSuccesses+1, pastSuccesses)
@@ -203,11 +209,11 @@ browser()
 				cat('\nany(is.na(z$scaleFactors)) in improveMH\n')
 				browser()
 			}
-            cat('\n',iter, '.         ', sprintf("%4.1f", actual),
-				     '\n multipliers  ', sprintf("%4.2f", multiplier),
-			         '\n scalefactors ', sprintf("%4.2f", z$scaleFactors),
-					sprintf("%4.2f", z$scaleFactor0),
-					sprintf("%4.2f", z$scaleFactorEta),'\n')
+            cat('\n',iter, '.         ', sprintf("%5.1f", actual),
+				     '\n multipliers  ', sprintf("%5.3f", multiplier),
+			         '\n scalefactors ', sprintf("%5.3f", z$scaleFactors),
+					sprintf("%5.3f", z$scaleFactor0),
+					sprintf("%5.3f", z$scaleFactorEta),'\n')
 
 			flush.console()
             if ((min(pastSuccesses) >= 2) || (iter == maxiter))
@@ -1003,7 +1009,8 @@ browser()
 					round(z$ThinPosteriorEta[ii,],3), "\nSigma = \n")
 		print(round(z$SigmaTemp,4))
 		cat("\n")
-		cat("Accepts ",sum(cyc$BayesAcceptances),"/",
+		cat('main', ii, '(', nwarm+nmain, ')',
+			" Accepts ",sum(cyc$BayesAcceptances),"/",
 				z$nGroup*nrunMHBatches,"\n")
 #	cat("thetaMat = \n")
 #	print(round(z$thetaMat,2))
@@ -1052,7 +1059,8 @@ browser()
 				round(z$ThinPosteriorEta[ii,],3), "\nSigma = \n")
 		print(round(z$SigmaTemp,3))
 		cat("\n")
-		cat("Accepts ",sum(cyc$BayesAcceptances),"/",
+		cat('main', ii, '(', nwarm+nmain, ')',
+			" Accepts ",sum(cyc$BayesAcceptances),"/",
 				z$nGroup*nrunMHBatches,"\n")
 #		print(round(z$SigmaTemp,4))
 #		cat("thetaMat = \n")
@@ -1127,7 +1135,8 @@ browser()
 		}
 		else
 		{
-			cat("Accepts ",sum(cyc$BayesAcceptances),"/",
+			cat('main', ii, '(', nwarm+nmain, ')',
+				" Accepts ",sum(cyc$BayesAcceptances),"/",
 				z$nGroup*nrunMHBatches,"\n")
 		}
 	# save intermediate results
@@ -1356,18 +1365,19 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		}
 	}
 
-	# Short specification for initial model.
-	# Use diagonalize=1 to increase stability.
+	# Short specification for initial multigroup model.
 	if (initgainGlobal <= 0)
 	{
 		startupModel <- sienaAlgorithmCreate(n3=500, nsub=0, cond=FALSE,
+						diagonalize=0.2, doubleAveraging=0,
 						seed=algo$randomSeed, projname="startup_sienaBayes")
 	}
 	else
 	{
 		startupModel <- sienaAlgorithmCreate(n3=500, nsub=3, cond=FALSE,
-							diagonalize=1.0, firstg=initgainGlobal,
-							seed=algo$randomSeed, projname="startup_sienaBayes")
+						firstg=initgainGlobal,
+						diagonalize=0.2, doubleAveraging=0,
+						seed=algo$randomSeed, projname="startup_sienaBayes")
 	}
 	cat("Estimate initial global parameters\n")
 	if (is.null(prevAns))
@@ -1398,6 +1408,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 				max(abs(startupGlobal$theta), na.rm=TRUE),
 				"\nwhich is too large for good operation of this function.\n",
 				"\nAdvice: use a smaller value of initgainGlobal.\n\n")
+		save(startupGlobal, file="startupGlobal.RData")
+		cat("startupGlobal saved.\n")
 		stop("Divergent initial estimate.")
 	}
 
@@ -1504,6 +1516,21 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 					projname=paste("project",formatC(i,width=2,flag="0"),sep=""),
 					seed=algo$randomSeed)
 		}
+		# Give the algorithm object two extra components that can be used
+		# internally in CalculateDerivative in phase1.r
+		# to prevent a prolonged phase 1 in case of
+		# non-sensitivity for certain parameters.		
+		startup1Model$fromBayes <- TRUE
+		if (sum(!effects[effects$include,"basicRate"]) >= 2)
+		{
+			startup1Model$ddfra <- 
+				diag(startupGlobal$dfra)[!effects[effects$include,"basicRate"]]/ngroups
+		}
+		else
+		{
+			indx <- which(!effects[effects$include,"basicRate"]) # has length 1
+			startup1Model$ddfra <- startupGlobal$dfra[indx,indx]/ngroups
+		}
 		flush.console()
 	# roughly estimate varying parameters
 		nActors[i] <- length(data[[i]]$nodeSets[[1]])
@@ -1567,16 +1594,6 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 				!effects0$fix[effects0$include], !effects0$fix[effects0$include]]
 	} # end for (i in 1:ngroups)
 
-	if (max(abs(initialEstimates), na.rm=TRUE) > 50)
-	{
-		cat("\nThe initial estimates are\n")
-		print(initialEstimates)
-		cat("\nThe largest absolute value is ",
-				max(abs(initialEstimates), na.rm=TRUE),
-				"\nwhich is too large for good operation of this function.\n",
-				"\nAdvice: use a smaller value of initgainGroupwise (perhaps 0).\n\n")
-		stop("Divergent initial estimate.")
-	}
 	z$effectName <- effects0$effectName[effects0$include]
 	z$requestedEffects <- startup1$requestedEffects
 
@@ -1587,6 +1604,19 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	z$basicRate <- z$requestedEffects$basicRate
     z$nGroup <- z$f$nGroup
 
+	if (max(abs(initialEstimates[,!z$basicRate]), na.rm=TRUE) > 40)
+	{
+		cat("\nThe initial estimates are\n")
+		print(initialEstimates)
+		cat("\nThe largest absolute value is ",
+				max(abs(initialEstimates), na.rm=TRUE),
+				"\nwhich is too large for good operation of this function.\n",
+				"\nAdvice: use a smaller value of initgainGroupwise (perhaps 0).\n\n")
+		save(startupGlobal, initialEstimates, file="startupGlobal.RData")
+		cat("startupGlobal and initialEstimates saved.\n")
+		stop("Divergent initial estimate.")
+	}
+	
 	# Further down the initial parameter values for the rate parameters are
 	# truncated depending on the prior for the rates.
 	# This might also be done for other parameters. Not done now.
@@ -1755,6 +1785,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 						pmin(z$thetaMat[group, z$ratePositions[[group]]],
 		z$priorMu[z$ratesInVarying] + 2*sqrt(diag(z$priorSigma)[z$ratesInVarying]))
 	}
+	
 	z$incidentalBasicRates <- incidentalBasicRates
 	z$delta <- delta
 	z$gamma <- gamma

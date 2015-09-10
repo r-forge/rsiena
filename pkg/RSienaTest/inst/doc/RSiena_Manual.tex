@@ -192,7 +192,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-288.
+This version was renewed for \RS version 1.1-289.
 \end{abstract}
 
 
@@ -433,7 +433,7 @@ by itself solve all causal questions. When inferring causality from model
 results, one has to face difficulties very similar to those with other
 statistical methods; see, e.g., \citet{LSST11} and \citet{Goldthorpe2001}.
 In any case, causal interpretations should be supported by further results
-from the discipline the explanations originate in. 
+from the discipline the explanations originate in.
 However, {\saom}s do allow research to profit from a longitudinal
 design -- therefore, they may be helpful in tackling some issues related
 to causality, like the selection-influence problem \citep{SteglichEA10, LSST11}.
@@ -849,24 +849,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.1-288}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.1-289}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-288.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.1-289.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-288.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.1-289.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.1-288.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.1-289.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-288.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-289.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-288.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-289.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-288.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-289.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1055,7 +1055,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-288) and an R-Forge revision
+  identified by a version number (e.g.\ 1.1-289) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -2869,6 +2869,9 @@ The dependent behavior variable is referred to as $Z$.
 \item The average alter effect, expressing that actors
       whose alters have a higher average value of the behavior $Z$,
       also have themselves a stronger tendency toward high values on the behavior.
+\item The total alter effect, expressing that actors
+      whose alters have a higher total value of the behavior $Z$,
+      also have themselves a stronger tendency toward high values on the behavior.
 \item The indegree effect, expressing that actors with a higher indegree
       (more `popular' actors) have a stronger tendency toward high values on the behavior.
 \item The outdegree effect, expressing that actors with a higher outdegree
@@ -2885,10 +2888,12 @@ Time variables are changing actor covariates that depend only on the
 observation number and not on the actors. E.g., they could be dummy variables, being 1
 for one or some observations, and 0 for the other observations.
 
-The average similarity, total similarity, and average alter effects
+The average similarity, total similarity, average alter, and total effects
 are different specifications of social influence.
 The choice between them will be made on theoretical grounds
 and/or on the basis of statistical significance.
+Do not include them all together in one model, as this would most likely
+lead to multicollinearity and non-convergence.
 \medskip
 
 For each actor-dependent covariate as well as for each of the other
@@ -2898,15 +2903,10 @@ the effects on $Z$ which can be included is the following.
 \item The main effect: a positive value implies that actors with a
       higher value on the covariate will have a stronger tendency
       toward high $Z$ values.
-\iffalse
-\item An interaction effect, which is a choice among three, dependent on the
-      \hyperlink{T_effpar}{internal parameter} for this effect:
-      \smallskip \\
-      value 1: interaction of actor variable with average similarity;\\
-      value 2: interaction of actor variable with total similarity;\\
-      value 3: interaction of actor variable with average alter.\\
-      See Section \ref{S_f_b}.
-\fi
+\item Various effects of the combination of covariate values for members
+      of the personal network of the focal actor (outgoing ties, incoming
+      ties, distance-two ties): search in this manual for \texttt{avXAlt,
+      avXInAlt, avXAltDist2, avXInAltDist2} and their manifold variations.
 \item Interactions between two or three actor variables, see
       Section~\ref{S_int_eff}.
 \end{enumerate}
@@ -3957,6 +3957,10 @@ this may have several reasons.
       an outlying actor, and give this dummy variable an ego effect
       in the case of deviant out-degrees, and an alter effect in the
       case of deviant in-degrees.
+
+      Sometimes transitivity can better be modeled by the GWESP effects
+      (search for this term in the manual) than by transitive triplers.
+      This may help with convergence.
 
       Another possibility is that there is time heterogeneity.
       Indications about this can be gathered also from the descriptives
@@ -5993,7 +5997,8 @@ When the distribution of the out-degrees is fitted poorly
 (which can be inspected using the \sfn{sienaGOF} function
 of Section~\ref{S_gof}), an improvement
 usually is possible either by including non-linear effects of the
-out-degrees in the evaluation function.
+out-degrees in the evaluation function, or by other improvements of the model.
+This totally depends on the data set at hand.
 %, or by changing to Model Type 2
 %(see Section~\ref{S_modeltype}).
 
@@ -6235,6 +6240,13 @@ Since this is not implemented in \sfn{siena08()}, this recommendation
 suggests that one should rather use  \sfn{metafor}, with the
 option \texttt{method = "REML"}.
 
+Still another possibility is offered by the package \sfn{mvmeta}
+\citep{Gasparrini2012}.
+This was used in conjunction with \SI by
+\citet{An2015}, who showed how to use this for incorporating
+group-level explanatory variables, using a fixed effects
+as well as a random effects approach, the latter with
+restricted maximum likelihood.
 
 \subsubsection{Meta-analysis directed at the mean
                and variance of the parameters}
@@ -6661,6 +6673,21 @@ Do not use such a high value for \texttt{nbrNodes} that your computer gets too
 More research is needed for advice about prior distributions.
 Especially for small numbers of groups, the priors may have a strong influence.
 
+The prior mean and prior variance need to be given for the vector of parameters
+that are randomly varying between the groups.
+These are the rate parameters and the parameters specified with
+\begin{verbatim}
+random = TRUE
+\end{verbatim}
+in the call of \texttt{setEffect}.
+The list and order of the randomly varying effects, except for the rate parameters,
+is shown by requesting
+\begin{verbatim}
+myeff[myeff$randomEffects & myeff$include, ]
+\end{verbatim}
+if the effects object is called \texttt{myeff}.
+\smallskip
+
 The prior mean
 \texttt{priorMu} is a vector of length equal to the number of varying parameters.
 In the object produced by \sfn{sienaBayes}, let us call it \texttt{ans},
@@ -6750,7 +6777,7 @@ attributes expressed by the \texttt{simX} effect (which is standardized),
 as long as these are regarded as control effects, one might specify the
 prior mean conservatively as 0.3 or 0.5.
 Since many \SI parameters are defined in such a way that they have values
-in the range between --1 and +1, a prior variance in the range from 0.1 to
+in the range between --1 and +1, a prior variance in the range from 0.02 to
 0.5 would often be reasonable; but it will be good to consider earlier
 studies to have a good grounding for this choice.
 
@@ -6760,7 +6787,7 @@ and prior variances could be modified, e.g., to
 \begin{verbatim}
 m7 <- c(4, 5, -2, +1.5, 0, 0, 0)
 S7 <- matrix(0, 7, 7)
-diag(S7) <- c(2, 2, 1, 0.3, 0.2, 0.2, 0.2)
+diag(S7) <- c(2, 2, 1, 0.3, 0.2, 0.1, 0.1)
 \end{verbatim}
 
 
@@ -6825,6 +6852,51 @@ Then the proposal covariance matrices etc. will be retained,
 so the transition distribution of the MCMC process remains the same but
 only the starting values are different.
 \fi
+\medskip
+
+\noindent
+\emph{Using other packages for convergence assessment}
+\smallskip
+
+\noindent
+The advice of literature such as \citet{BDA3} is to use multiple
+sequences produced independently, preferably from overdispersed
+starting points, for assessing convergence.
+For example, one may use 4 or 5 such sequences.
+Function \sfn{extract.sienaBayes()} can be used to extract
+from these sequences the draws from the posterior distributions
+of the parameters of interest.
+This function produces a three-dimensional array of
+iterations by chains by parameters, which then can be used, e.g., in
+function \sfn{monitor()} of package \sfn{stan} or with the
+help of package \sfn{coda}.
+
+Currently there is no good way in \sfn{sienaBayes()} to use
+overdispersed starting points. (The difficulty is to get overdispersion
+while still retaining a reasonable convergence for each sequence.)
+The best option currently is to use independent restarts of the whole
+algorithm; or to use one starting point and several continuations
+using \texttt{prevBayes}. In the latter option one uses a long chain
+instead of parallel chains, which is too bad, but this is the best
+we have currently on offer; and using \sfn{monitor()} on such parts of
+a long chain still will give an acceptable impression of convergence.
+
+Function \sfn{monitor()} gives information about the potential
+scale reduction $\hat R$ of the posterior distribution if simulations
+were continued indefinitely, and the effective sample size
+$n_{\text{\scriptsize eff}}$ (i.e., the estimated equivalent
+sample size under independent sampling).
+Rules of thumb given in \citet[][p. 287]{BDA3} are that,
+for all parameters of interest,
+$\hat R \leq 1.1$ and $n_{\text{\scriptsize eff}} \geq 5m$,
+where $m$ is the number of chains.
+
+Note that what is given by \sfn{monitor()} as the
+`\texttt{se\_mean}' is the standard error of the mean
+of the posterior distribution as an estimator for
+the global mean $\mu_i$: i.e., this expresses the uncertainty
+due to the finite length of the MCMC chain, it is not
+a measure of spread of the posterior distribution itself.
 
 
 \subsubsection{Interpreting results of sienaBayes}
@@ -6844,6 +6916,10 @@ the components
 \texttt{ThinParameters, ThinPosteriorMu, \\
 ThinPosteriorEta}, and \texttt{ThinPosteriorSigma} of the
 \sfn{sienaBayesFit} object, as mentioned in the help page, may be useful.
+
+It should be noted that the \texttt{.out} files produced by \sfn{sienaBayes()} 
+are produced somewhere in the initial phase of the project and not meant 
+to be informative for final results. They may be disregarded.
 \medskip
 
 When comparing results for specifications that differ with respect
@@ -6866,9 +6942,9 @@ will contribute considerably to the uncertainty of the population mean.
 The list of all effects available for any data set is obtained by
 the command
 \begin{verbatim}
-RShowDoc("effects", package="RSiena")
+effectsDocumentation()
 \end{verbatim}
-(or \texttt{package="RSienaTest"} as the case may be).
+which produces a html file.
 For a given effects object, say with the name \texttt{myeff}, the command
 \begin{verbatim}
 effectsDocumentation(effects = myeff)
@@ -6879,9 +6955,12 @@ See
 ?effectsDocumentation \end{verbatim}
 for further options.
 
-This chapter present the mathematical formulae for the definition of the effects.
-In \citet{Snijders01,Snijders05} and \citet*{SteglichEA10},
-further background to these formulae can be found.
+This chapter present the mathematical formulae for the definition of the
+effects. Further background to these formulae can be found
+for network dynamics in \citet{Snijders01,Snijders05,SnijdersEA10b};
+for network and behavior dynamics in the last reference and
+\citet*{SteglichEA10}; and for co-evolution of multiple networks,
+including two-mode networks, in \citet{SLT2013}.
 The effects are grouped into effects for modelling network
 evolution and effects for modelling behavioral evolution (i.e.,
 the dynamics of dependent actor variables). Within each group of
@@ -7207,6 +7286,33 @@ and for maintaining existing ties.
       $b_0 = 0$ instead of a mean of the subtracted values like in the balance effect.
       Subtraction of the mean will lead to better convergence properties.
 
+ \item {\em Jaccard similarity for outgoing ties effect} \texttt{(Jout)},
+ an elementary effect defined by
+ the Jaccard similarity with respect to outgoing ties,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij} \, J_{\text{out}}(i,j)$, where
+ \[
+ J_{\text{out}}(i,j) \,=\, \frac{\sum_h x_{ih}\,x_{jh}}
+                     {x_{i+} + x_{j+} - \sum_h x_{ih}\,x_{jh}}
+ \]
+ (where 0/0 is taken as 0).
+
+ \noindent
+ Since the Jaccard measure has smaller variability than a lot of other
+ effects, the parameter estimates of this will often be larger,
+ with correspondingly larger standard errors,
+ than many other parameter estimates. The same holds for
+ the other Jaccard similarity effects.
+
+ \item {\em Jaccard similarity for incoming ties effect} \texttt{(Jin)},
+ an elementary effect defined by
+ the Jaccard similarity with respect to incoming ties,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij} \, J_{\text{in}}(i,j)$, where
+ \[
+ J_{\text{in}}(i,j) \,=\, \frac{\sum_h x_{hi}\,x_{hj}}
+                     {x_{+i} + x_{+j} - \sum_h x_{hi}\,x_{hj}}
+ \]
+ (where again 0/0 is taken as 0).
+
  \item {\em number of distances two effect} \texttt{(nbrDist2)},
  \hypertarget{T_dist2}{defined by}
  the number of actors to whom $i$ is indirectly tied
@@ -7454,7 +7560,7 @@ $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha
  Since the representation is inverse, a result like a negative coefficient
  $ -1.2$ for \texttt{outTrunc} (internal effect parameter $c=1$) is interpreted
  as a positive tendency $+1.2$ toward outdegrees equal to 0; the standard
- error is unchanged. In the case of $c=1$, an alternative and mode directly
+ error is unchanged. In the case of $c=1$, an alternative and more directly
  comprehensible name is \emph{outdegree at least 1} effect.
 
  \item {\em square root out-degree}, defined by  \\
@@ -8024,6 +8130,13 @@ the following effects are available:
  ties to those with the same covariate value (as alter),\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \sum_h x_{ih} \,I\{v_j = v_h \} $;
 
+ \item {\em outdegree activity weighted by alter's covariate}
+  \texttt{(altXOutAct)} defined by the
+ squared sum of ties weighted by alter's covariate values,\\
+ $s^{\rm net}_{i\vit}(x) = \big(\sum_j x_{ij} \,v_j \big)^2 $;\\
+ since the covariate here is used as a weight, this probably
+ makes sense especially for non-centered covariates;
+
  \item {\em homogeneous covariate $\times$ transitive triplets}
  \texttt{(homXTransTrip)}, defined by the number of transitive triplets
  $i \rightarrow h \rightarrow j \leftarrow i$
@@ -8257,6 +8370,7 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
      except for the possibly incoming tie from ego:
 \[
  s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} (x_{+j} - x_{ij}) \check v_j^{(-i)} \ .
+% for centered V this is   \,=\, \sum_j x_{ij} \sum_{h \neq i} x_{hj}\,v_h   \ .
 \]
 
 \item \emph{ego-(in-alter-distance-2) covariate - similarity} \texttt{(simEgoInDist2)},
@@ -8373,16 +8487,14 @@ from each other.
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 \smallskip
-The following five are degree-related effects, where nodal degrees
+The following six are degree-related effects, where nodal degrees
 in the $W$ network have effects on popularity or activity in the
 $X$  network. They use an internal effect parameter $p$, which
 mostly will be 1 or 2.
 
 To decrease correlation with other effects, the
 $W$-degrees are centered by subtracting the value $\bar w$,
-which is the average degree of $W$ across all observations.\\
-THIS VALUE SHOULD BE GIVEN AS THE AVERAGE DEGREE IN THE INITIAL PART
-OF THE OUTPUT.
+which is the average degree of $W$ across all observations.
 
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
@@ -8424,6 +8536,25 @@ for $p=2$ \  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\,
  (\sqrt{w_{+i}} - \sqrt{\bar w}) \, (\sqrt{w_{+j}} - \sqrt{\bar w})  $;\\[0.2em]
  this can be regarded as an interaction between the effect of $W$-in-degree on $X$-popularity
  and the effect of $W$-in-degree on $X$-activity.
+
+ \item {\em Duplex XW out-degree activity effect } ($X$: duplex $W$ outdegree$^{1/p}$ activity)\\
+    \texttt{(doubleOutAct)}\\
+  which is like the out-degree activity effect, but now for the degrees in the
+  joined $X$ \underline{and} $W$ network;
+ for parameter $p = 2$ the square root of the out-degrees is taken:\\[0.4em]
+ $s^{\rm net}_{i\vit}(x) =  \big(\sum_j x_{ij}\,w_{ij} \big)^2  $ or\\[0.4em]
+for $p=2$ \  $s^{\rm net}_{i\vit}(x) =
+        \sum_j x_{ij}\,w_{ij} \sqrt{\sum_h x_{ih}\,w_{ih}^{\phantom{0}} }  $\ ;\\
+
+ \item {\em Duplex XW in-degree popularity effect } ($X$: duplex $W$ indegree$^{1/p}$ popularity)\\
+    \texttt{(doubleInPop)}\\
+  which is like the in-degree popularity effect, but now for the degrees in the
+  joined $X$ \underline{and} $W$ network;
+ for parameter $p = 2$ the square root of the out-degrees is taken:\\[0.4em]
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\,w_{ij}\sum_h x_{hj}\,w_{hj}   $ or\\[0.4em]
+for $p=2$ \  $s^{\rm net}_{i\vit}(x) =
+        \sum_j x_{ij}\,w_{ij} \sqrt{\sum_h x_{hj}\,w_{hj}^{\phantom{0}} }  $\ .\\
+
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 \smallskip
@@ -8814,6 +8945,32 @@ by Maximum Likelihood and Bayesian estimation.
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
+\noindent The following two Jaccard similarity effects also are triadic,
+ but not expressed as sums over triads.
+
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+ \item {\em Jaccard similarity with respect to outgoing $W$ ties effect} \texttt{(JoutMix)},
+ the Jaccard similarity with respect to outgoing $W$-ties,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij} \, J_{W,\, \text{out}}(i,j)$, where
+ \[
+ J_{W,\, \text{out}}(i,j) \,=\, \frac{\sum_h w_{ih}\,x_{jh}}
+                     {w_{i+} + w_{j+} - \sum_h w_{ih}\,w_{jh}}
+ \]
+ (where 0/0 is taken as 0).
+
+ \item {\em Jaccard similarity with respect to incoming $W$ ties effect} \texttt{(JinMix)},\\
+ defined by
+ the Jaccard similarity with respect to incoming $W$-ties,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij} \, J_{W,\, \text{in}}(i,j)$, where
+ \[
+ J_{W,\, \text{in}}(i,j) \,=\, \frac{\sum_h w_{hi}\,w_{hj}}
+                     {w_{+i} + w_{+j} - \sum_h w_{hi}\,w_{hj}}
+ \]
+ (where again 0/0 is taken as 0).
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+
 \newpage
 \noindent
 Then there are effects using mixed configurations on four nodes
@@ -8885,6 +9042,7 @@ Then there are effects using mixed configurations on four nodes
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
+\noindent
 Then there are some  mixed triadic effects
 restricted to triples with the same or different values on a monadic
 covariate $V$.
@@ -12191,16 +12349,51 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{itemize} % Also update version number in abstract
 
 
+\item 2015-09-10 Revision 289.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item New defaults for \sfn{siena07()} in \sfn{sienaAlgorithmCreate()}:
+     doubleAveraging=0, diagonalize=0.2 (for MoM).
+   \item Improved one-step approximations to expected Mahalanobis
+     distances in \sfn{sienaGOF()} (control variates for score function).
+   \item Permit 3-way interactions with one ego and two dyadic effects
+     (\texttt{initializeFRAN.r}) (this was erroneously not allowed).
+   \item New effects \texttt{Jin, Jout, JinMix, JoutMix, altXOutAct,
+     doubleInPop, doubleOutAct}.
+   \item \sfn{print01Report()} now reports in-degrees also for two-mode networks.
+   \item Better error handling for \sfn{sienaTimeTest} and \sfn{scoreTest}.
+   \item \texttt{inOutAss} is dyadic.
+   \item Corrected \texttt{effectName} and \texttt{functionName} of \texttt{inPopIntn, outPopIntn,
+     inActIntn}, and \texttt{outActIntn} (`\texttt{in}' and `\texttt{out}' were missing).
+  \item Check for positive derivative matrix at the end of phase 1 (non-positive
+     estimated derivatives lead to repeating a prolonged phase 1)
+     omitted for effects with fixed parameters.
+\end{itemize}
+
+Changes in RSiena:
+\begin{itemize}
+   \item New effects \texttt{homXOutAct, FFDeg, BBDeg, RFDeg, diffXTransTrip}
+     (ported from RSienaTest).
+   \item \texttt{sameXInPop} and \texttt{diffXInPop} also added for two-mode networks;
+     but they are not dyadic!
+   \item In names of behavior effects and statistics dropped the
+     (redundant) parts "behavior" and "beh.".
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item New function \sfn{extract.sienaBayes()}.
+   \item \sfn{sienaBayes()}: options diagonalize=0.2, doubleAveraging=0 for estimation
+     of initial models in initialization phase; save initial results in case of
+     divergence during initialization phase;
+     check for large initialEstimates done only for non-rate parameters.
+\end{itemize}
+
 \item 2015-07-18 Revision 288.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
-\item New effects \texttt{homXOutAct}, \texttt{FFDeg}, \texttt{BBDeg}, 
-   \texttt{RFDeg}, \texttt{diffXTransTrip}.
-   \item \texttt{sameXInPop} and \texttt{diffXInPop} also added for two-mode networks;
-     but they are not dyadic!
-   \item In names of behavior effects and statistics dropped the
-     (redundant) parts \texttt{behavior} and \texttt{beh.}.
    \item \sfn{plot.sienaRI}: new parameter \texttt{actors}; proportions with
      piechart improved (hopefully); effect of parameter \texttt{radius} changed.
    \item \sfn{siena.table} does no more produce the double minus sign in html output.
@@ -12213,6 +12406,12 @@ Changes in RSiena:
 
 Changes in RSienaTest:
 \begin{itemize}
+\item New effects \texttt{homXOutAct}, \texttt{FFDeg}, \texttt{BBDeg},
+   \texttt{RFDeg}, \texttt{diffXTransTrip}.
+   \item \texttt{sameXInPop} and \texttt{diffXInPop} also added for two-mode networks;
+     but they are not dyadic!
+   \item In names of behavior effects and statistics dropped the
+     (redundant) parts \texttt{behavior} and \texttt{beh.}.
    \item \sfn{sienaBayes}: new parameter \texttt{nSampRates};
      correction in use of \texttt{prevBayes};
 	 more efficient calculation of multivariate normal density.

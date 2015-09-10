@@ -51,9 +51,9 @@ simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
 ##@multipleBayesTest Tests parameters of sienaBayesFit objects
 multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm, tested0=0, ndigits=4){
     theEffects <- z$effects
-	efNames <- format(paste(ifelse(theEffects$type == "creation",
-									"creat", theEffects$type),
-							theEffects$effectName)[!z$basicRate])
+#	efNames <- format(paste(ifelse(theEffects$type == "creation",
+#									"creat", theEffects$type),
+#							theEffects$effectName)[!z$basicRate])
 	if (all(theEffects$type[!z$basicRate] == 'eval'))
 	{
 		efNames <- format(theEffects$effectName[!z$basicRate])
@@ -229,4 +229,132 @@ plot.multipleBayesTest <- function(x, xlim=NULL, ylim=NULL,
 	plot(d1, xlim=xlim, ylim=ylim, xlab='distance', ylab="density", col=4,
 			cex=4, cex.lab=2, cex.main=2, main=main, lwd=2, ...)
 	lines(c(x$chisquared, x$chisquared), c(0, max(d1$y)),lwd=2)
+}
+
+##@extract.sienaBayes extracts samples from sienaBayesFit objects
+extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
+                   sdLog=TRUE){
+	getNames <- function(x){
+# effect names without duplicated rate parameters
+# and with "unspecified interaction" replaced by
+# information about the effects in question
+		b <- x$basicRate
+		tpar<- rep(NA,length(b))
+# True Parameters, i.e., all except rate parameters for groups 2 and up.
+		for (i in (2:length(b))){tpar[i] <- !b[i]|(b[i]&!b[i-1])}
+		tpar[1] <- TRUE
+# Take away the ' (period 1)' in the first rate parameter
+		sub(' (period 1)','', x$requestedEffects$effectName[tpar], fixed=TRUE)
+	}
+	if (!(is.list(zlist)))
+	{
+		stop('zlist must be a list of sienaBayesFit objects')
+	}
+	if (!all(sapply(zlist, function(z){inherits(z, "sienaBayesFit")})))
+	{
+		stop('all elements of zlist must be sienaBayesFit objects')
+	}
+
+#browser()
+	niter <- sapply(zlist,function(z){dim(z$ThinPosteriorMu)[1]})
+	nit <- niter[1] - nfirst + 1
+
+	if (extracted %in% c("all", "rates")){
+# rate parameters
+		EffName <- zlist[[1]]$effectName
+		indices <- sort(which(!zlist[[1]]$generalParametersInGroup))
+		nGroups <- zlist[[1]]$nGroup
+		nind <- length(indices)
+		res1 <- array(dim = c(nit, length(zlist), nGroups*length(indices)))
+		fName1 <- rep('',dim(res1)[3])
+		for (h in 1:length(zlist)){for (i in 1:nGroups){
+			mini <- (i-1)*nind + 1
+			maxi <- i*nind
+			res1[,h,mini:maxi] <-
+				zlist[[h]]$ThinParameters[(niter[h]-nit+1):niter[h],
+												i,indices,drop=FALSE]
+			fName1[mini:maxi] <- paste(EffName[indices],i)
+		}}
+	}
+
+	if (extracted %in% c("all", "objective", "varying")){
+# mu
+		nind <- sum(zlist[[1]]$varyingParametersInGroup)
+		if (nind <= 0)
+		{
+			cat("Note: no varying parameters.\n")
+		}
+		else
+		{
+			EffName <- getNames(zlist[[1]])[zlist[[1]]$varyingParametersInGroup]
+			res2 <- array(dim = c(nit, length(zlist), (2*nind)))
+			for (h in 1:length(zlist)){
+			 res2[,h,1:nind] <-
+				zlist[[h]]$ThinPosteriorMu[(niter[h]-nit+1):niter[h], ,drop=FALSE]
+			 postsig <- zlist[[h]]$ThinPosteriorSigma
+			 postsigg <- matrix(NA,dim(postsig)[1],nind)
+			 if (sdLog){
+				for (k in 1:nind){postsigg[,k] <- 0.5*log(postsig[,k,k])}
+			 }
+			 else {
+				for (k in 1:nind){postsigg[,k] <- sqrt(postsig[,k,k])}
+			 }
+			 res2[,h,(nind+1):(2*nind)] <-
+				postsigg[(niter[h]-nit+1):niter[h],,drop=FALSE]
+			}
+			fName2 <- rep('',2*nind)
+			fName2[1:nind] <- paste(EffName,'mu')
+			if (sdLog){
+				fName2[(nind+1):(2*nind)] <- paste(EffName,'log(s.d.)')
+			}
+			else {
+				fName2[(nind+1):(2*nind)] <- paste(EffName,'s.d.')
+			}
+		}
+	}
+
+	if (extracted %in% c("all", "objective", "non-varying")){
+# eta
+		nind <- sum(!zlist[[1]]$varyingParametersInGroup)
+		if (nind <= 0)
+		{
+			cat("Note: no non-varying parameters.\n")
+		}
+		else
+		{
+			EffName <- getNames(zlist[[1]])[!zlist[[1]]$varyingParametersInGroup]
+			res3 <- array(dim = c(nit, length(zlist), nind))
+			for (h in 1:length(zlist)){
+			res3[,h,1:nind] <-
+				zlist[[h]]$ThinPosteriorEta[(niter[h]-nit+1):niter[h], ,drop=FALSE]
+			}
+			fName3 <- EffName
+		}
+	}
+
+	res <- NULL
+	switch(extracted,
+		'all' = {res <- array(c(res1,res2,res3),
+							dim=c(dim(res1)[1], dim(res1)[2],
+								dim(res1)[3]+dim(res2)[3]+dim(res3)[3]))
+				fName <- c(fName1, fName2, fName3)},
+		'rates' = {res <- res1
+					fName <- fName1},
+		'varying' = {res <- res2
+					fName <- fName2},
+		'non-varying' = {res <- res3
+					fName <- fName3},
+		'objective' = {res <- array(c(res2,res3),
+							dim=c(dim(res2)[1], dim(res2)[2],
+									dim(res2)[3]+dim(res3)[3]))
+						fName <- c(fName2, fName3)},
+		cat('wrong parameter given: extracted =',extracted,'\n'))
+	if (!is.null(res)){
+		dimnames(res) <- list(1:dim(res)[1], paste('chain', 1:length(zlist)),
+								fName)
+		if (any(is.na(res))){
+			cat('warning: the extracted array contains NA elements\n')
+		}
+	}
+	res
 }

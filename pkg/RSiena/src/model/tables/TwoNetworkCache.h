@@ -104,12 +104,21 @@ const Network * TwoNetworkCache::pSecondNetwork() const
 }
 
 /**
+ * Indicates if there is a tie from the ego to the given alter in the first
+ * network. This method runs in constant time.
+ */
+bool TwoNetworkCache::firstOutTieExists(int alter) const
+{
+	return (this->lfirstOutTieValues[alter] >= 1);
+}
+
+/**
  * Indicates if there is a tie from the ego to the given alter in the second
  * network. This method runs in constant time.
  */
 bool TwoNetworkCache::secondOutTieExists(int alter) const
 {
-	return this->lsecondOutTieValues[alter];
+	return (this->lsecondOutTieValues[alter] >= 1);
 }
 
 

@@ -295,6 +295,8 @@ phase3.2 <- function(z, x, ...)
 							sep="", collapse=" + ")
 			Report(thetext, outf)
 			Report('\n',outf)
+			if (is.null(x$fromBayes))
+			{
 			cat('*** Warning: Covariance matrix not positive definite *** \n')
 			cat('*** Standard errors not reliable ***\n')
 			cat('The following is approximately a linear combination \n')
@@ -310,6 +312,7 @@ phase3.2 <- function(z, x, ...)
 			{
 				Report('Do not use any reported standard errors.\n', outf)
 				errorMessage.cov <- '*** Warning: Noninvertible estimated covariance matrix ***'
+			}
 			}
 			z$msfinv <- NULL
 			cov.est <- NA * z$msfc

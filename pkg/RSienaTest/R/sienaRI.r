@@ -269,7 +269,7 @@ expectedRelativeImportance <- function(conts, effects, theta,
 	{
 		warning(paste("more than one dependent variable\n",
 				"return value is therefore not of class 'sienaRI'\n",
-				"but a list of objects of class 'sienaRI'\n"))
+				"but a list of objects of class 'sienaRI'.\n"))
 	}
 	RI
 }

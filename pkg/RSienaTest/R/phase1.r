@@ -21,10 +21,10 @@ phase1.1 <- function(z, x, ...)
     z$SomeFixed <- FALSE
     z$Phase <-  1
     f <- FRANstore()
-    int <- z$int
+    int <- z$int # used for multiple processes: number of processes for MoM
     z <- AnnouncePhase(z, x)
     z$phase1Its <- 0
-    ## fix up iteration numbers if using multiple processors
+    ## fix up iteration numbers if using multiple processes
     if (10 %% int == 0)
     {
         firstNit <- 10
@@ -130,7 +130,7 @@ phase1.2 <- function(z, x, ...)
     ##finish phase 1 iterations and do end-of-phase processing
     zsmall <- makeZsmall(z)
     xsmall <- NULL
-    int <- z$int
+    int <- z$int # used for multiple processes: number of processes for MoM
     if (z$n1 > z$phase1Its)
     {
         nits <- seq((z$phase1Its+1), z$n1, int)
@@ -302,12 +302,13 @@ CalculateDerivative <- function(z, x)
 
         dfra <- derivativeFromScoresAndDeviations(z$ssc, z$sf2)
 
+		fromBayes <- !is.null(x$fromBayes)
         z$jacobianwarn1 <- rep(FALSE, z$pp)
-        if (any(diag(dfra) <= 0))
+        if ((any(diag(dfra)[!z$fixed] <= 0)) && (!fromBayes))
          {
             for (i in 1 : z$pp)
             {
-                if (dfra[i, i] < 0)
+                if ((dfra[i, i] < 0)  && (!z$fixed[i]))
                 {
                     ##browser()
                     z$jacobianwarn1[i] <- TRUE
@@ -344,14 +345,23 @@ CalculateDerivative <- function(z, x)
     someFixed <- FALSE
     if (any(diag(dfra) <= 0 & !z$fixed))
     {
-        neg<- which(diag(dfra) <= 0 & !z$fixed)
-        z$fixed[neg] <- TRUE
-        z$newFixed[neg] <- TRUE
-        someFixed <- TRUE
-        Report(c('*** nonpositive diagonal value(s):', neg,
+		if (fromBayes)
+		{
+	# Use the values for diag(dfra) from startupGlobal computed in sienaBayes
+			neg <- which((diag(dfra) <= 0 & !z$fixed)[!z$effects$basicRate])			
+			diag(dfra)[!z$effects$basicRate][neg] <- x$ddfra[neg]
+		}
+		else
+		{
+			neg<- which(diag(dfra) <= 0 & !z$fixed)
+			z$fixed[neg] <- TRUE
+			z$newFixed[neg] <- TRUE
+			someFixed <- TRUE
+			Report(c('*** nonpositive diagonal value(s):', neg,
                   ' is/are fixed.\n'), cf)
             Report(c('Estimation problem with parameter(s)', neg,
                      'this/these parameter(s) is/are fixed.\n'), outf)
+		}
     }
     z$dfra <- dfra
     z$cdSomeFixed <- someFixed

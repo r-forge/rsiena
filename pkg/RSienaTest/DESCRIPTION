@@ -1,8 +1,8 @@
 Package: RSienaTest
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.1-288
-Date: 2015-07-18
+Version: 1.1-289
+Date: 2015-09-10
 Author: Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders
 Depends: R (>= 2.15.0), utils
 Imports: Matrix, tcltk, lattice, parallel, MASS

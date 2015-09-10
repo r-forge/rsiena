@@ -105,6 +105,21 @@ void TwoNetworkCache::initialize(int ego)
 		}
 	}
 
+	for (int i = 0; i < this->lpSecondNetwork->m(); i++)
+	{
+		this->lsecondOutTieValues[i] = 0;
+	}
+
+	if (ego >= 0 && ego < this->lpSecondNetwork->n())
+	{
+		for (IncidentTieIterator iter = this->lpSecondNetwork->outTies(ego);
+			iter.valid();
+			iter.next())
+		{
+			this->lsecondOutTieValues[iter.actor()] = iter.value();
+		}
+	}
+
 
 	// Initialize all configuration tables
 

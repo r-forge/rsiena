@@ -21,14 +21,14 @@ sienaModelCreate <-
 function(fn,
 projname="Siena", MaxDegree=0, useStdInits=FALSE,
 n3=1000, nsub=4, n2start = NULL, dolby=TRUE,
-maxlike=FALSE, diagonalize=1.0*!maxlike,
+maxlike=FALSE, diagonalize=0.2*!maxlike,
 condvarno=0, condname='',
 firstg=0.2, reduceg=0.5, cond=NA, findiff=FALSE,  seed=NULL,
 pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
 prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
 minimumPermutationLength=2, initialPermutationLength=20,
 modelType=1, mult=5, simOnly=FALSE, localML=FALSE,
-truncation=5, doubleAveraging=nsub, standardizeVar=(diagonalize<1))
+truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1))
 {
 model <- NULL
 model$projname <- projname

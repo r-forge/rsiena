@@ -62,8 +62,6 @@ private:
 	ConstantCovariate * lpConstantCovariate;
 	ChangingCovariate * lpChangingCovariate;
 	BehaviorLongitudinalData * lpBehaviorData;
-	string lname1;
-	string lname2;
 	const Network * lpFirstNetwork;
 	const Network * lpSecondNetwork;
 	TwoNetworkCache * lpTwoNetworkCache;
