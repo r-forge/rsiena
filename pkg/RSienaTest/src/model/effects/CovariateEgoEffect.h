@@ -23,7 +23,8 @@ namespace siena
 class CovariateEgoEffect : public CovariateDependentNetworkEffect
 {
 public:
-	CovariateEgoEffect(const EffectInfo * pEffectInfo);
+	explicit CovariateEgoEffect(const EffectInfo * pEffectInfo);
+	CovariateEgoEffect(const EffectInfo * pEffectInfo, const bool simulatedState);
 
 	virtual double calculateContribution(int alter) const;
 	virtual bool egoEffect() const;

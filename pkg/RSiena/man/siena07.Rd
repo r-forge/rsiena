@@ -97,15 +97,16 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     if the sienaAlgorithm object \code{x} was produced with \code{simOnly=TRUE}.}
   \item{se}{Vector of standard errors of estimated theta.}
   \item{dfra}{Matrix of estimated derivatives.}
-  \item{sf}{Matrix of deviations from target in phase 3.}
-  \item{sf2}{Array of statistics from simulations in phase 3.}
+  \item{sf}{Matrix of deviations from targets in phase 3.}
+  \item{sf2}{Array of periodwise deviations from simulations in phase 3.}
   \item{tconv}{t-statistics for convergence.}
   \item{tmax}{maximum absolute t-statistic for convergence for non-fixed parameters.}
   \item{tconv.max}{overall maximum convergence ratio.}
-  \item{targets}{Observed statistics.}
-  \item{targets2}{Observed statistics by wave, starting with the second wave .}
+  \item{targets}{Observed statistics; for ML, zero vector.}
+  \item{targets2}{Observed statistics by wave,
+    starting with second wave; for ML, zero matrix.}
   \item{ssc}{Score function contributions for each wave for each
-    simulation in phase 3. Zero if finite difference method is used}
+    simulation in phase 3. Zero if finite difference method is used.}
  \item{sims}{If \code{returnDeps} is \code{TRUE}:
     list of simulated dependent variables (networks, behaviour).
     Networks are given as a list of edgelists, one for each period.}
@@ -146,7 +147,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 
 \seealso{\code{\link{sienaAlgorithmCreate}}\cr
   There are print, summary and xtable methods for \code{\link{sienaFit}}
-  objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}}
+  objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}.}
 \examples{
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
 # nsub=2 and n3=100 is used here for having a brief computation, not for practice.
@@ -157,7 +158,7 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 # or for non-conditional estimation
 \dontrun{
-myalgorithm$cconditional <- FALSE
+model <- sienaModelCreate(nsub=2, n3=100, cond=FALSE)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
         }
 

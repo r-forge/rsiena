@@ -14,6 +14,7 @@ export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
        OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
        xtable, algorithms, profileLikelihoods, siena.table,
 	   Wald.RSiena, Multipar.RSiena)
+export(sienacpp)
 import(Matrix, tcltk, lattice, parallel, MASS)
 S3method(print, siena)
 S3method(print, sienaGroup)

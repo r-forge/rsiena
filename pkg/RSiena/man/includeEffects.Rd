@@ -4,8 +4,8 @@
   Function to include effects in a Siena model
 }
 \description{
-  This function provides an interface to set the include column on
-  selected rows of a Siena effects object
+  This function can be used for model specification
+  by modifying a Siena effects object.
 }
 \usage{
 includeEffects(myeff, ..., include = TRUE, name = myeff$name[1], type = "eval",

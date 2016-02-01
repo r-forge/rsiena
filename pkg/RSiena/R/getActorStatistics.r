@@ -8,14 +8,7 @@ getActorStatistics <- function(algorithm, data, effects)
 	f <- unpackData(data,algorithm)
 	
 	effects <- effects[effects$include,]
-	if (!is.null(algorithm$settings))
-	{
-		effects <- addSettingsEffects(effects, algorithm)
-	}
-	else
-	{
-		effects$setting <- rep("", nrow(effects))
-	}
+	effects$setting <- rep("", nrow(effects))
 	pData <- .Call('setupData', PACKAGE=pkgname,
 			list(as.integer(f$observations)),
 			list(f$nodeSets))

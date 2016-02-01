@@ -9,6 +9,7 @@
  * StatisticCalculator class.
  *****************************************************************************/
 
+#include "../logger/Logger.h"
 #include <cstdlib>
 #include <stdexcept>
 #include <vector>
@@ -41,6 +42,9 @@
 #include "model/variables/BehaviorVariable.h"
 #include "model/tables/Cache.h"
 #include "network/IncidentTieIterator.h"
+#include "network/layers/DistanceTwoLayer.h"
+#include "network/iterators/UnionTieIterator.h"
+using namespace siena::logger;
 
 namespace siena
 {
@@ -356,11 +360,13 @@ void StatisticCalculator::calculateStatistics()
 			this->calculateNetworkEvaluationStatistics(pNetworkData);
 			this->calculateNetworkEndowmentStatistics(pNetworkData);
 			this->calculateNetworkCreationStatistics(pNetworkData);
+			this->calculateNetworkGMMStatistics(pNetworkData);
 		}
 		else if (pBehaviorData)
 		{
 			this->calculateBehaviorRateStatistics(pBehaviorData);
 			this->calculateBehaviorStatistics(pBehaviorData);
+			this->calculateBehaviorGMMStatistics(pBehaviorData);
 		}
 		else
 		{
@@ -369,6 +375,119 @@ void StatisticCalculator::calculateStatistics()
 	}
 }
 
+/**
+ * Calculates the statistics for the GMM effects of the given
+ * network variable.
+ */
+void StatisticCalculator::calculateNetworkGMMStatistics(
+		NetworkLongitudinalData * pNetworkData) {
+	// We want to pass all networks to the effects in a single state,
+	// hence we overwrite the network in the predictor state.
+	// We do not use the predictor network with effects this network owns.
+
+	string name = pNetworkData->name();
+	const Network * pPredictorNetwork = this->lpPredictorState->pNetwork(name);
+	const Network * pCurrentLessMissingsEtc =
+			this->lpStateLessMissingsEtc->pNetwork(name);
+	this->lpPredictorState->pNetwork(name, pCurrentLessMissingsEtc);
+
+	// Loop through the evaluation effects, calculate the statistics, and store
+	// them.
+	const vector<EffectInfo *> & rEffects = this->lpModel->rGMMEffects(
+			pNetworkData->name());
+	EffectFactory factory(this->lpData);
+	Cache cache;
+
+	for (unsigned i = 0; i < rEffects.size(); i++) {
+		EffectInfo * pInfo = rEffects[i];
+		NetworkEffect * pEffect = (NetworkEffect *) factory.createEffect(pInfo);
+
+		// Initialize the effect to work with our data and state of variables.
+//		pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+		pEffect->initialize(this->lpData, this->lpPredictorState, this->lpState,
+				this->lperiod, &cache);
+
+		this->lstatistics[pInfo] = pEffect->evaluationStatistic();
+		delete pEffect;
+	}
+
+	// Restore the predictor network
+	this->lpPredictorState->pNetwork(name, pPredictorNetwork);
+}
+
+void StatisticCalculator::calculateBehaviorGMMStatistics(
+		BehaviorLongitudinalData * pBehaviorData) {
+	// create a copy of the current state and zero any values missing
+	// at either end of period
+	const int* currentState = this->lpState->behaviorValues(
+			pBehaviorData->name());
+	double* currentValues = new double[pBehaviorData->n()];
+
+	for (int i = 0; i < pBehaviorData->n(); i++) {
+		currentValues[i] = currentState[i] - pBehaviorData->overallMean();
+		if (pBehaviorData->missing(this->lperiod, i)
+				|| pBehaviorData->missing(this->lperiod + 1, i)) {
+			currentValues[i] = 0;
+		}
+	}
+	// Loop through the evaluation effects, calculate the statistics,
+	// and store them.
+	const vector<EffectInfo *> & rEffects = this->lpModel->rGMMEffects(
+			pBehaviorData->name());
+	EffectFactory factory(this->lpData);
+	Cache cache;
+	for (unsigned i = 0; i < rEffects.size(); i++) {
+		EffectInfo * pInfo = rEffects[i];
+		BehaviorEffect * pEffect = (BehaviorEffect *) factory.createEffect(
+				pInfo);
+		// Initialize the effect to work with our data and state of variables.
+		pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod,
+				&cache);
+		if (this->lneedActorStatistics) {
+			pair<double, double *> p = pEffect->evaluationStatistic(
+					currentValues, this->lneedActorStatistics);
+			this->lstatistics[pInfo] = p.first;
+			this->lactorStatistics[pInfo] = p.second;
+		} else {
+			this->lstatistics[pInfo] = pEffect->evaluationStatistic(
+					currentValues);
+		}
+		if (this->lcountStaticChangeContributions) {
+			int choices = 3;
+			vector<double *> egosMap(pBehaviorData->n());
+			this->lstaticChangeContributions.insert(make_pair(pInfo, egosMap));
+			for (int e = 0; e < pBehaviorData->n(); e++) {
+				cache.initialize(e);
+				pEffect->initialize(this->lpData, this->lpPredictorState,
+						this->lperiod, &cache);
+				double * contributions = new double[choices];
+				this->lstaticChangeContributions.at(pInfo).at(e) =
+						contributions;
+				pEffect->preprocessEgo(e);
+				// no change gives no contribution
+				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
+				// calculate the contribution of downward change
+				if (currentValues[e] > pBehaviorData->min()
+						&& !pBehaviorData->upOnly(this->lperiod)) {
+					this->lstaticChangeContributions.at(pInfo).at(e)[0] =
+							pEffect->calculateChangeContribution(e, -1);
+				} else {
+					this->lstaticChangeContributions.at(pInfo).at(e)[0] = R_NaN;
+				}
+				// calculate the contribution of upward change
+				if (currentValues[e] < pBehaviorData->max()
+						&& !pBehaviorData->downOnly(this->lperiod)) {
+					this->lstaticChangeContributions.at(pInfo).at(e)[2] =
+							pEffect->calculateChangeContribution(e, 1);
+				} else {
+					this->lstaticChangeContributions.at(pInfo).at(e)[2] = R_NaN;
+				}
+			}
+		}
+		delete pEffect;
+	}
+	delete[] currentValues;
+}
 
 /**
  * Calculates the statistics for the evaluation effects of the given
@@ -1034,98 +1153,101 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 
 	// for each covariate-defined setting, calculate
 	// setting*difference network and sum.
-	const vector<string> & rSettingNames = pNetworkData->rSettingNames();
+//	const vector<pair<string, string> > & rSettingNames =
+//			pNetworkData->rSettingNames();
 	//Rprintf("basic rate change %d size %d \n", pDifference->tieCount(),
 	//	rSettingNames.size());
-	for (unsigned i = 0; i < rSettingNames.size();
-		 i++)
-	{
-		if (!this->lsettingDistances[pNetworkData][rSettingNames[i]])
-		{
-			int * array =
-				new int[pNetworkData->observationCount() - 1];
+	// for (unsigned i = 0; i < rSettingNames.size();
+	// 	 i++)
+	// {
+	// 	if (!this->lsettingDistances[pNetworkData][rSettingNames[i]])
+	// 	{
+	// 		int * array =
+	// 			new int[pNetworkData->observationCount() - 1];
 
-			this->lsettingDistances[pNetworkData][rSettingNames[i]] = array;
-		}
-		// universal
-		int distance = pDifference->tieCount();
-		// primary
-		if (i == 1)
-		{
-			const Network * pNetwork =
-				this->lpState->pNetwork(pNetworkData->name());
-			// create a network representing primary settings
-			Network * settingNetwork = new
-				Network(pNetwork->n(), pNetwork->m());
-			for (int ego = 0; ego < pNetwork->n(); ego++)
-			{
-				vector<int> * setting = primarySetting(pNetwork, ego);
-				for (unsigned alter = 0; alter < setting->size(); alter++)
-				{
-					settingNetwork->setTieValue(ego, alter, 1);
-				}
-				delete(setting);
-			}
-			for (TieIterator iter = pDifference->ties();
-				 iter.valid();
-				 iter.next())
-			{
+	// 		this->lsettingDistances[pNetworkData][rSettingNames[i]] = array;
+	// 	}
+	// 	// universal
+	// 	int distance = pDifference->tieCount();
+	// 	// primary
+	// 	if (i == 1)
+	// 	{
+	// 		const Network * pNetwork =
+	// 			this->lpState->pNetwork(pNetworkData->name());
+	// 		// create a network representing primary settings
+	// 		Network * settingNetwork = new
+	// 			Network(pNetwork->n(), pNetwork->m());
+	// 		for (int ego = 0; ego < pNetwork->n(); ego++)
+	// 		{
+	// 			vector<int> * setting = primarySetting(pNetwork, ego);
+	// 			for (unsigned alter = 0; alter < setting->size(); alter++)
+	// 			{
+	// 				settingNetwork->setTieValue(ego, alter, 1);
+	// 			}
+	// 			delete(setting);
+	// 		}
+	// 		for (TieIterator iter = pDifference->ties();
+	// 			 iter.valid();
+	// 			 iter.next())
+	// 		{
 
-				{
-					if (settingNetwork->tieValue(iter.ego(),
-							iter.alter()) == 0)
-					{
-						distance--;
-					}
-				}
-			}
-			delete settingNetwork;
-		}
-		// for each covariate-defined setting, calculate
-		// setting*difference network and sum.
-		if (i > 1)
-		{
-			ConstantDyadicCovariate * pConstantDyadicCovariate =
-				this->lpData->pConstantDyadicCovariate(rSettingNames[i]);
-			ChangingDyadicCovariate * pChangingDyadicCovariate =
-				this->lpData->pChangingDyadicCovariate(rSettingNames[i]);
+	// 			{
+	// 				if (settingNetwork->tieValue(iter.ego(),
+	// 						iter.alter()) == 0)
+	// 				{
+	// 					distance--;
+	// 				}
+	// 			}
+	// 		}
+	// 		delete settingNetwork;
+	// 	}
+	// 	// for each covariate-defined setting, calculate
+	// 	// setting*difference network and sum.
+	// 	if (i > 1)
+	// 	{
+	// 		ConstantDyadicCovariate * pConstantDyadicCovariate =
+	// 			this->lpData->pConstantDyadicCovariate(rSettingNames[i]);
+	// 		ChangingDyadicCovariate * pChangingDyadicCovariate =
+	// 			this->lpData->pChangingDyadicCovariate(rSettingNames[i]);
 
-			for (TieIterator iter = pDifference->ties();
-				 iter.valid();
-				 iter.next())
-			{
+	// 		for (TieIterator iter = pDifference->ties();
+	// 			 iter.valid();
+	// 			 iter.next())
+	// 		{
 
-				if (pConstantDyadicCovariate)
-				{
-					if (pConstantDyadicCovariate->value(iter.ego(),
-							iter.alter()) == 0)
-					{
-						distance--;
-					}
-				}
-				else if (pChangingDyadicCovariate)
-				{
-					if (pChangingDyadicCovariate->value(iter.ego(),
-							iter.alter(),
-							this->lperiod) == 0)
-					{
-						distance--;
-					}
-				}
-				else
-				{
-					throw logic_error(
-						"No dyadic covariate named '" +
-						rSettingNames[i] +
-						"'.");
-				}
-			}
-		}
-		// store distance for later use
-		//	Rprintf(" cov %d %d\n", i, distance);
-		this->lsettingDistances[pNetworkData][rSettingNames[i]]
-			[this->lperiod] = distance;
-	}
+	// 			if (pConstantDyadicCovariate)
+	// 			{
+	// 				if (pConstantDyadicCovariate->value(iter.ego(),
+	// 						iter.alter()) == 0)
+	// 				{
+	// 					distance--;
+	// 				}
+	// 			}
+	// 			else if (pChangingDyadicCovariate)
+	// 			{
+	// 				if (pChangingDyadicCovariate->value(iter.ego(),
+	// 						iter.alter(),
+	// 						this->lperiod) == 0)
+	// 				{
+	// 					distance--;
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				throw logic_error(
+	// 					"No dyadic covariate named '" +
+	// 					rSettingNames[i] +
+	// 					"'.");
+	// 			}
+	// 		}
+	// 	}
+	// 	// store distance for later use
+	// 	//	Rprintf(" cov %d %d\n", i, distance);
+	// 	this->lsettingDistances[pNetworkData][rSettingNames[i]]
+	// 		[this->lperiod] = distance;
+	// }
+	// the universal setting can explain everything
+	calcDifferences(pNetworkData, pDifference);
 
 	// Loop through the rate effects, calculate the statistics,
 	// and store them.
@@ -1632,5 +1754,186 @@ double StatisticCalculator::calculateDiffusionRateEffect(
 	return totalAlterValue;
 }
 
+void StatisticCalculator::calcDifferences(
+		NetworkLongitudinalData * const pNetworkData,
+		const Network* const pDifference)
+{
+	// names of the settings
+	const std::vector<SettingInfo> & rSettingNames =
+			pNetworkData->rSettingNames();
+	// if there is no setting we have already stored the difference
+	if (rSettingNames.empty())
+	{
+		return;
+	}
+
+	// create a map that stores for each edge in the difference network
+	// the settings index that can explain this edge (explain means
+	// the settings has the possibility to change this edge)
+	std::map<pair<int, int>, std::vector<int> >* map = new std::map<
+			pair<int, int>, std::vector<int> >();
+	// since setting i=0 has to be the universal setting and this setting
+	// can explain every edge we just store it in the map
+	// TODO: This is a dependency we want to get rid off (currently user has
+	// to ensure that the first setting is the universal setting ... otherwise
+	// this will cause missbehaviour)
+	for (TieIterator iter = pDifference->ties(); iter.valid(); iter.next())
+	{
+		// vector<int>(1) creates an entry with 0
+		map->insert(
+				make_pair(make_pair(iter.ego(), iter.alter()),
+						std::vector<int>(1)));
+	}
+	// for each other setting (primary and covariate settings) check
+	// which edges can be explained by the setting and add it to the
+	// proper entry in the map
+	for (unsigned i = 1; i < rSettingNames.size(); i++)
+	{
+		// primary
+		if (i == 1)
+		{
+			Network * settingNetwork = pNetworkData->pNetworkLessMissing(
+					this->lperiod)->clone();
+			ConstantDyadicCovariate * pConstantDyadicCovariate = 0;
+			ChangingDyadicCovariate * pChangingDyadicCovariate = 0;
+			if (!rSettingNames[i].getCovarName().empty())
+			{
+				pConstantDyadicCovariate =
+						this->lpData->pConstantDyadicCovariate(
+								rSettingNames[i].getCovarName());
+				pChangingDyadicCovariate =
+						this->lpData->pChangingDyadicCovariate(
+								rSettingNames[i].getCovarName());
+			}
+
+			// create a network representing primary settings
+			DistanceTwoLayer primSetting;
+			primSetting.onInitializationEvent(*settingNetwork);
+
+			for (int ego = 0; ego < settingNetwork->n(); ego++)
+			{
+				for (IncidentTieIterator iter = settingNetwork->outTies(ego);
+						iter.valid(); iter.next())
+				{
+					settingNetwork->setTieValue(iter.actor(), ego, 1);
+				}
+				for (IncidentTieIterator iter =
+						primSetting.getDistanceTwoNeighbors(ego); iter.valid();
+						iter.next())
+				{
+					settingNetwork->setTieValue(ego, iter.actor(), 1);
+				}
+			}
+			primSetting.onNetworkDisposeEvent(*settingNetwork);
+			// iterate of ties in the difference network
+			for (TieIterator iter = pDifference->ties(); iter.valid();
+					iter.next())
+			{
+				{
+					// if the primary setting has this tie we know that it is
+					// not existent in the simulated network and therefore we
+					// can explain this edge via the primary setting
+					if (settingNetwork->tieValue(iter.ego(), iter.alter())
+							|| (pConstantDyadicCovariate != 0
+									&& pConstantDyadicCovariate->value(
+											iter.ego(), iter.alter()))
+							|| (pChangingDyadicCovariate != 0
+									&& pChangingDyadicCovariate->value(
+											iter.ego(), iter.alter(),
+											this->lperiod)))
+					{
+						map->find(make_pair(iter.ego(), iter.alter()))->second.push_back(
+								i);
+					}
+				}
+			}
+			delete settingNetwork;
+		}
+		// for each covariate-defined setting, calculate
+		// setting*difference network and sum.
+		if (i > 1)
+		{
+			ConstantDyadicCovariate * pConstantDyadicCovariate =
+					this->lpData->pConstantDyadicCovariate(
+							rSettingNames[i].getCovarName());
+			ChangingDyadicCovariate * pChangingDyadicCovariate =
+					this->lpData->pChangingDyadicCovariate(
+							rSettingNames[i].getCovarName());
+
+			// iterate over the ties of the difference network
+			for (TieIterator iter = pDifference->ties(); iter.valid();
+					iter.next())
+			{
+				// if our dyadic covariate has an entry for this edge
+				// we know it is not part of the simulated network and
+				// we can explain it here
+				if (pConstantDyadicCovariate)
+				{
+					if (pConstantDyadicCovariate->value(iter.ego(),
+							iter.alter()))
+					{
+						map->find(make_pair(iter.ego(), iter.alter()))->second.push_back(
+								i);
+					}
+				} else if (pChangingDyadicCovariate)
+				{
+					if (pChangingDyadicCovariate->value(iter.ego(),
+							iter.alter(), this->lperiod))
+					{
+						map->find(make_pair(iter.ego(), iter.alter()))->second.push_back(
+								i);
+					}
+				} else
+				{
+					throw logic_error(
+							"No dyadic covariate named '"
+									+ rSettingNames[i].getId() + "'.");
+				}
+			}
+		}
+	}
+	// init distances with 0s
+	double* distances = new double[rSettingNames.size()]();
+	// init stores
+	for (unsigned i = 0; i < rSettingNames.size(); i++)
+	{
+		if (!this->lsettingDistances[pNetworkData][rSettingNames[i].getId()])
+		{
+			int * array = new int[pNetworkData->observationCount() - 1];
+			this->lsettingDistances[pNetworkData][rSettingNames[i].getId()] =
+					array;
+		}
+	}
+	// iterate over each entry in the map and add the distances up
+	for (std::map<pair<int, int>, vector<int> >::const_iterator iter =
+			map->begin(); iter != map->end(); ++iter)
+	{
+		// vector storing the settings that are able to explain the current tie flip
+		const vector<int>& vec = iter->second;
+		// the number of settings that can explain this tie flip
+		double size = 1;
+		if (this->lpModel->normalizeSettingRates())
+		{
+			size = static_cast<double>(vec.size());
+		}
+		// iterate over the settings and increase the distances
+		for (std::vector<int>::const_iterator settingsIter = vec.begin();
+				settingsIter != vec.end(); ++settingsIter)
+		{
+			// increase distance by 1 divided by the number of settings that
+			// are able to explain this tie flip
+			distances[*settingsIter] += 1 / size;
+		}
+	}
+	// delete the map
+	delete map;
+	// store distances
+	for (unsigned i = 0; i < rSettingNames.size(); i++)
+	{
+		this->lsettingDistances[pNetworkData][rSettingNames[i].getId()][this->lperiod] =
+				(int) distances[i];
+	}
+	delete[] distances;
+}
 
 }

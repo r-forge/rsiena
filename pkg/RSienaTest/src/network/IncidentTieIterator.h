@@ -32,6 +32,10 @@ public:
 	IncidentTieIterator();
 	IncidentTieIterator(const IncidentTieIterator& rhs);
 
+
+	int size() const {
+		return -1;
+	}
 	/**
 	 * Returns the neighbor incident to the current tie.
 	 */
@@ -66,16 +70,22 @@ public:
 		++lcurrent;
 	}
 
+	inline void reset() {
+		lcurrent = lstart;
+	}
+
 	IncidentTieIterator* clone() const;
 
 private:
 	IncidentTieIterator(const std::map<int, int> & ties);
 	IncidentTieIterator(const std::map<int, int> & ties, int lowerBound);
 
-
 	/////////////////////////////////////////////////////////
 	//NEVER CHANGE THIS ORDERING!!! CHECK INITIALIZATION LIST
 	/////////////////////////////////////////////////////////
+
+	// Points to the start element
+	std::map<int, int>::const_iterator lstart;
 	// Points to the current element in the underlying map
 	std::map<int, int>::const_iterator lcurrent;
 

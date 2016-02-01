@@ -9,6 +9,8 @@
  * EpochSimulation class.
  *****************************************************************************/
 
+#include "logger/Logger.h"
+
 #include <algorithm>
 #include <cmath>
 #include <sstream>
@@ -38,6 +40,8 @@
 #include "model/filters/LowerFilter.h"
 #include "model/ml/Chain.h"
 #include "model/ml/MiniStep.h"
+
+using namespace siena::logger;
 
 namespace siena {
 SEXP getMiniStepList(const MiniStep& miniStep, int period);
@@ -278,6 +282,7 @@ void EpochSimulation::runEpoch(int period) {
 		if (this->lpModel->conditional()) {
 			if (this->lpConditioningVariable->simulatedDistance()
 					>= this->ltargetChange) {
+				LOGF(Priority::DEBUG, "simulated %d steps", nIter);
 				break;
 			} else if (nIter > 1000000) {
 #ifdef STANDALONE
@@ -290,6 +295,7 @@ void EpochSimulation::runEpoch(int period) {
 			}
 		} else {
 			if (this->ltime >= 1) {
+				LOGF(Priority::DEBUG, "simulated %d steps", nIter);
 				break;
 			} else if (nIter > 1000000) {
 #ifdef STANDALONE

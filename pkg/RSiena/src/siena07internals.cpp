@@ -456,8 +456,7 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 		SEXP nm;
         PROTECT(nm = install("name"));
         SEXP name = getAttrib(ONEMODES, nm);
-        const ActorSet * myActorSet = pData->pActorSet(CHAR(STRING_ELT(
-					actorSet, 0)));
+        const ActorSet* myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
 		OneModeNetworkLongitudinalData *  pOneModeNetworkLongitudinalData =
 			pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)),
                                      myActorSet);

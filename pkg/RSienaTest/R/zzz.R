@@ -36,10 +36,12 @@ pkgvers <- ""
  ##  csvpath<<- file.path(libname,pkgname)
  #   library.dynam("RSiena",package=pkgname)
  #  cat (libname,pkgname,'\n')
+  .Call("sienaInitialize", PACKAGE=pkgname)
 }
 
 ##@.onUnload Miscellaneous Unload processing
 .onUnload <- function(libpath) {
+  .Call("sienaFinalize", PACKAGE=pkgname)
     library.dynam.unload(pkgname, libpath)
 }
 

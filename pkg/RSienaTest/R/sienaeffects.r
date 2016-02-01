@@ -71,6 +71,7 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 includeInteraction <- function(myeff, ...,
 				include=TRUE, name=myeff$name[1],
 				type="eval", interaction1=rep("", 3), interaction2=rep("", 3),
+				fix=FALSE, test=FALSE, parameter=0,
 				character=FALSE, verbose=TRUE)
 {
 	if (character)
@@ -159,67 +160,84 @@ includeInteraction <- function(myeff, ...,
 	{
 		effect3 <- 0
 	}
-	## if want to include, check that we have a spare row
-	if (include)
+	## does the effect already exist?
+	intn <- (myeff$effect1 == effect1) & (myeff$effect2 == effect2)
+	if (effect3 > 0)
 	{
-		ints <- myeff[myeff$name == name & myeff$shortName  %in%
-					  c("unspInt", "behUnspInt") &
-					  (is.na(myeff$effect1) | myeff$effect1 == 0)&
-					  myeff$type == type, ]
+		intn <- intn & (myeff$effect3 == effect3)
+	}
+	# intn indicates the rows of the effects object with this interaction
+	if (sum(intn) >= 2)
+	{
+		cat('The given effects object is corrupted:\n')
+		cat('It already contains more than one copy of this interaction.\n')
+		cat('Make a new effects object from scratch.\n')
+		stop('Corrupted effects object')
+	}
+
+	## if want to include, check that we have a spare row
+	if ((include) && (sum(intn) == 0))
+	{# The interaction must be created
+		ints <- myeff[myeff$name == name & myeff$shortName	%in%
+				  c("unspInt", "behUnspInt") &
+				  (is.na(myeff$effect1) | myeff$effect1 == 0)&
+				  myeff$type == type, ]
 		if (nrow(ints) == 0)
 		{
 			baseEffect<- myeff[myeff$name == name, ][1, ]
 			if (baseEffect$netType != "behavior")
 			{
 				tmprow <- createEffects("unspecifiedNetInteraction", name=name,
-										netType=baseEffect$netType,
-										groupName=baseEffect$groupName,
-										group=baseEffect$group)
+									netType=baseEffect$netType,
+									groupName=baseEffect$groupName,
+									group=baseEffect$group)
 			}
 			else
 			{
 				tmprow <- createEffects("unspecifiedBehaviorInteraction",
-										name=name,
-										netType=baseEffect$netType,
-										groupName=baseEffect$groupName,
-										group=baseEffect$group)
+									name=name,
+									netType=baseEffect$netType,
+									groupName=baseEffect$groupName,
+									group=baseEffect$group)
 			}
 			tmprow$include <- TRUE
 			tmprow <- tmprow[tmprow$type==type, ]
 			tmprow$effectNumber <- max(myeff$effectNumber) + 1
 			rownames(tmprow) <-
 				paste(name, "obj", "type", tmprow$effectNumber, sep='.')
-		   # if ('requested' %in% names(myeff))
-		   # {
-			#    tmprow$requested <- TRUE
-		   # }
+			# if ('requested' %in% names(myeff))
+			# {
+			#	 tmprow$requested <- TRUE
+			# }
 			myeff <- rbind(myeff, tmprow)
 			ints <- tmprow
 		}
 		ints <- ints[1, ]
+		intn <- myeff$effectNumber == ints$effectNumber
 	}
 	if (include)
 	{
-		intn <- myeff$effectNumber == ints$effectNumber
 		myeff[intn, "include"] <- include
 		myeff[intn, c("effect1", "effect2", "effect3")] <-
 			c(effect1, effect2, effect3)
+		myeff[intn, "fix"] <- fix
+		myeff[intn, "test"] <- test
+		myeff[intn, "parm"] <- parameter
 	}
 	else
 	{
-		intn <- (myeff$effect1 == effect1) & (myeff$effect2 == effect2)
-		if (effect3 > 0)
+		if (sum(intn) == 0)
 		{
-			intn <- intn & (myeff$effect3 == effect3)
+		warning('Note: there was no such interaction in this effects object.')
 		}
-		myeff[intn, "include"] <- FALSE
+		else
+		{
+			myeff[intn, "include"] <- FALSE
+		}
 	}
 	if (verbose)
 	{
-		print.data.frame(myeff[intn, c("name", "shortName", "type",
-									   "interaction1", "interaction2",
-									   "include", "effect1", "effect2",
-									   "effect3")])
+		print(myeff[intn,])
 	}
 	myeff
 }
@@ -281,9 +299,9 @@ setEffect <- function(myeff, shortName, parameter=0,
 	myeff[use, "initialValue"] <- initialValue
 	myeff[use, "timeDummy"] <- timeDummy
 	myeff[use, "randomEffects"] <- random
-#    print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
-#                       "interaction2", "include", "parm", "fix", "test",
-#                       "initialValue", "timeDummy", "period", "group")])
+#	 print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
+#						"interaction2", "include", "parm", "fix", "test",
+#						"initialValue", "timeDummy", "period", "group")])
 	print.sienaEffects(myeff[use,], includeRandoms = random)
 	myeff
 }

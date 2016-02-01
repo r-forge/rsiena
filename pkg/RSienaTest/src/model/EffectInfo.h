@@ -46,6 +46,7 @@ public:
 
 	string variableName() const;
 	string effectName() const;
+	string effectType() const;
 	double parameter() const;
 	double internalEffectParameter() const;
 	string interactionName1() const;

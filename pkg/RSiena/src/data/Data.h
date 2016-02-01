@@ -15,7 +15,7 @@
 #include <set>
 #include <map>
 #include <string>
-#include "data/NetworkConstraint.h"
+#include "NetworkConstraint.h"
 
 using namespace std;
 

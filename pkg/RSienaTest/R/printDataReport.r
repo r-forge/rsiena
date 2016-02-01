@@ -201,6 +201,21 @@ DataReport <- function(z, x, f)
             }
         }
     }
+    ## any universal offsets?
+    if (any(x$universalOffset > 0))
+	{
+		Report("Offset for universal setting\n", outf)
+        for (i in 1:length(x$universalOffset))
+        {
+            if (x$universalOffset[i])
+            {
+                mdnet <- names(x$universalOffset)[i]
+                Report(c("Dependent network variable", mdnet, ': '), outf)
+				Report(c(sprintf("%9.4f",x$universalOffset[i]),'\n'), outf)
+			}
+		}
+		Report("\n", outf)
+	}
 	if ((x$nsub == 0)&(x$simOnly))
 	{
 		Report('Parameter values are \n', outf)

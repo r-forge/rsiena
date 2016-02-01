@@ -12,6 +12,10 @@
 #ifndef EFFECTFACTORY_H_
 #define EFFECTFACTORY_H_
 
+#include <map>
+#include <string>
+#include <model/EffectInfo.h>
+
 namespace siena
 {
 
@@ -35,12 +39,15 @@ class EffectInfo;
 class EffectFactory
 {
 public:
-	EffectFactory(const Data * pData);
+	static const std::string gmmGroup(const EffectInfo* pEffectInfo);
 
+	EffectFactory(const Data * pData);
 	Effect * createEffect(const EffectInfo * pEffectInfo) const;
 
 private:
 	const Data * lpData;
+	static const std::map<const std::string, const std::string> GMM_GROUPS;
+	static std::map<const std::string, const std::string> init_groups();
 };
 
 }

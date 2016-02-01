@@ -88,6 +88,11 @@ void NetworkEffect::initialize(const Data * pData,
 	this->lpBRTable = this->lpNetworkCache->pBRTable();
 }
 
+void NetworkEffect::initialize(const Data * pData, State * pState,
+		State * pSimulatedState, int period, Cache * pCache) {
+	initialize(pData, pState, period, pCache);
+}
+
 
 /**
  * Does the necessary preprocessing work for calculating the tie flip

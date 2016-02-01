@@ -1,0 +1,24 @@
+\begin{tikzpicture}[scale={\tikzscale}]
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=umlnotebox] (0) at (0, 1) {
+			\lstinline{Controller}\nodepart{two}
+			\lstinline{run():bool}
+		};
+		\node [style=umlnotebox, alert=6] (1) at (-1.25, -0) {
+			\lstinline{Simulation}\nodepart{two}
+			\lstinline{addResultListener(.)}
+		};
+		\node [style=umlnotebox] (2) at (1.25, -0) {
+			"Aggregator"\nodepart{two}
+			\lstinline{onResult(Result)}
+		};
+		\node [style=umlbox] (3) at (0, -0.5) {\lstinline{Result}};
+		\node [style=none] (4) at (0, -0) {};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [style=umlhas] (1) to (0);
+		\draw [style=umlhas] (2) to node[pos=.4]{*} (0);
+		\draw [style=seqreturn] (1) to (2);
+		\draw [dotted] (4.center) to (3);
+	\end{pgfonlayer}
+\end{tikzpicture}

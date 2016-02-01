@@ -93,14 +93,6 @@
 \newcounter{savenumi3}
 \newcounter{savenumi4}
 
-
-
-
-
-% If you wish to uncover everything in a step-wise fashion, uncomment
-% the following command:
-
-%\beamerdefaultoverlayspecification{<+->}
 \renewcommand{\baselinestretch}{1.1}
 \newcommand{\cc}{\color[named]{SeaGreen}}
 \newcommand{\itc}{\color[rgb]{0.1,0.6,0.3}}  % itemcolor
@@ -130,12 +122,6 @@
 \hyphenpenalty=8000
 %\tolerance=1000
 
-
-
-\title{Siena algorithms}
-
-\author{Tom A.B.\ Snijders }
-
 \newcommand{\sn}{{\scriptstyle N}}
 \renewcommand{\sb}{{\scriptstyle B}}
 \newcommand{\extraver}{{$\phantom{\Big(}$}}
@@ -145,7 +131,6 @@
 \newcommand{\ga}[1]{$\gamma_{#1}$}
 \newcommand{\be}[1]{$\beta_{#1}$}
 \newcommand{\maxr}{\textit{maxbeh}_r}
-
 
 \newcommand{\vit}{\theenumi}
 
@@ -168,7 +153,7 @@
 \newcommand{\remark}[1]{{\textcolor[named]{Red}{#1}}}
 %\newcommand{\adda}[1]{{\textcolor[named]{Red}{#1}}}  % additions
 %\newcommand{\addc}[1]{{\textcolor[named]{MidnightBlue}{#1}}}  % clarifications
-\newcommand{\adda}[1]{{\textcolor[named]{Black}{#1}}}  % additions
+\newcommand{\adda}[1]{{#1}}  % additions
 \newcommand{\addc}[1]{{\textcolor[named]{Black}{#1}}}  % clarifications
 \newcommand{\addaa}[1]{{\textcolor[named]{Black}{#1}}}  % additions
 \newcommand{\addca}[1]{{\textcolor[named]{Black}{#1}}}  % clarifications
@@ -182,6 +167,12 @@
 \hyphenation{mini-step mini-steps reci-pro-city}
 \setlength{\parskip}{1.5ex plus0.5ex minus0.5ex}
 \setlength{\parindent}{0ex}
+
+
+
+\title{Siena algorithms}
+
+\author{Tom A.B.\ Snijders }
 
 \begin{document}
 
@@ -1050,7 +1041,7 @@ any linear combination of the parameters,
            {\sqrt{b' \, \Sigma\, b}} \right\} \ , \label{tstatmax}
 \end{equation}
 where $\bar{s}$ is the average simulated vector of statistics and $s^{\rm{obs}}$
-is its observed value. 
+is its observed value.
 This is equal to (use Cauchy-Schwarz)
 \begin{equation}
  % \max_{b} \left\{ \frac{b' \big(\bar{s}_j - s^{\rm{obs}}\big)}
@@ -1137,10 +1128,101 @@ all deviations are small.
 This supports the rule to require  $\nnm{tconv.max}_i \leq 0.25$
 or (on the safe side) $\nnm{tconv.max}_i \leq 0.20$ as a signal of convergence.
 
+\subsection{Some remarks about GMoM and sienacpp}
+
+The Generalized Method of Moments (`\emph{GMoM}')
+as decribed in \citet{ASS2015} is implemented in \nnm{sienacpp()}.
+
+The following indicates how some of the matrices in
+the description of the algorithm in \citet{ASS2015} 
+can be obtained from a \nnm{sienaFit} object \nnm{ans}
+produced by \nnm{sienacpp()}.
+
+The dimension of the parameter is $P$ = \texttt{ans\$pp},
+of the statistics $Q$ = \texttt{ans\$qq}, with $Q \geq P$.
+
+First, let
+\begin{verbatim}
+fit <- ans$sienafit[[1]]
+\end{verbatim}
+To get some understanding of what is in this object,
+look for \texttt{rifySienaFit} in file \nnm{RInterface.cpp}.
+
+The matrix \texttt{z\$sf = fit\$phase3\_statistics} is a sample in Phase 3
+from the distribution of $S^\ast$.
+Hence $\Cov(S^\ast)$ is estimated by
+\begin{verbatim}
+    cov0 <- cov(fit$phase3_statistics)
+\end{verbatim}
+which is given as \texttt{ans\$msf}.
+As indicated in (8) of \citet{ASS2015},
+the inverse  $W = \big(\Cov(S^\ast)\big)^{-1}$  is used :
+\begin{verbatim}
+    W <- solve(cov0)
+\end{verbatim}
+The $Q \times P$ matrix of derivatives $\Gamma$ is 
+estimated by \texttt{t(fit\$gamma)}.
+For the matrix $B$ we use \texttt{B1} as defined by
+\begin{verbatim}
+    B0 <- t(fit$gamma) %*% W
+    B1 <- solve(diag(sqrt(rowSums(B0*B0)))) %*% B0
+\end{verbatim}
+Hence the covariance matrix of $\hat\theta$ under the GMoM
+can be obtained as
+\begin{verbatim}
+    D0 <- B1 %*% fit$gamma
+    D0inv <- solve(D0)
+    cov2 <- B1 %*% cov1 %*% t(B1)
+    covtheta <- D0inv %*% cov2 %*% t(D0inv)
+\end{verbatim}
+
+For the GMoM, the $t$-ratios for convergence are calculated
+for the default (main) statistics for the effects.  
+The maximum convergence ratio is calculated for all linear
+combinations of $B S^\ast$.  
+Therefore, the maximum convergence ratio refers to the
+result of the estimation algorithm, and is not
+necessarily larger than the absolute values of
+all  $t$-ratios for convergence. When some of the latter are large,
+this is an indication of poor model fit. 
+
+
 \section{Statistics for MoM}
 
 The statistics used for the MoM are proposed in
 \citet{Snijders01} and \citet{SnijdersEA07}.
+
+
+\subsection{Multi-group projects}
+
+In the following sections, statistics are often added for all periods
+from $m=2$ to $m=M$. For multi-group data sets the situation is different.
+Such data sets can be implemented by `glueing' the data sets
+as one sequence after each other.
+This is done by the function \nm{sienaGroupCreate}.
+Another implementation is by considering the data set as nested,
+with periods nested in groups.
+In the sequential implementation, we can denote statistics for period
+$m$ by $S_m$; in the nested implementation, statistics for period
+$m$ in group $g$ are denoted by $S_{gm}$.
+Denote the number of groups by $G$, and the number of waves for
+group $g$ by $M_g$; and the cumulative sums of these by
+\[
+    C_g \,=\, \sum_{h=1}^g M_h \ .
+\]
+
+In the sequential implementation, summations of the form
+\[
+\sum_{m=2}^M S_m
+\]
+should be replaced by
+\[
+\sum_{g=1}^G \sum_{m=C_{g-1}+1}^{C_g} S_m \ .
+\]
+In the nested implementation they should be replaced by
+\[
+\sum_{g=1}^G \sum_{m=2}^{M_g} S_{gm} \ .
+\]
 
 
 \subsection{Rate function for networks}
@@ -1158,6 +1240,14 @@ the statistic for the method of moments to estimate $\alpha_k^X$ is
                \label{ratestat}
 \end{equation}
 
+In the unconditional method of moments, the statistic to estimate
+$\rho^X_m$ is
+\begin{equation}
+ \sum_i \sum_j \mid x_{ij}(t_m) - x_{ij}(t_{m-1}) \mid  \ .
+               \label{rhostat}
+\end{equation}
+In the conditional method of moments, this statistic is used for
+the stopping criterion for the simulations in period $m-1$.
 
 \subsection{Evaluation function for networks}
 

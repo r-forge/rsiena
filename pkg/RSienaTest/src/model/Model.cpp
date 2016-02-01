@@ -32,6 +32,7 @@ namespace siena
 Model::Model()
 {
 	this->lconditional = false;
+	this->lGMMModel = false;
 	this->lneedChain = false;
 	this->lneedScores = false;
 	this->lneedDerivatives = false;
@@ -47,6 +48,7 @@ Model::Model()
 	this->lsimpleRates = 0;
 	this->lmodelType = NORMAL;
 	this->lneedChangeContributions2 =false;
+	this->lnormalizeSettingsRates = false;
 }
 
 
@@ -68,8 +70,8 @@ Model::~Model()
 
 	while (!this->lsettingRateParameters.empty())
 	{
-		double * array = this->lsettingRateParameters.begin()->second.
-			begin()->second;
+		double * array =
+				this->lsettingRateParameters.begin()->second.begin()->second;
 		this->lsettingRateParameters.erase(
 			this->lsettingRateParameters.begin());
 		delete[] array;
@@ -470,6 +472,11 @@ EffectInfo * Model::addEffect(string variableName,
 	{
 		this->lcreationEffects[variableName].push_back(pInfo);
 	}
+	else if (effectType == "gmm")
+	{
+		this->lGMMModel = true;
+		this->lgmmEffects[variableName].push_back(pInfo);
+	}
 	else
 	{
 		throw invalid_argument("Unexpected effect type '" + effectType + "'.");
@@ -553,6 +560,21 @@ const vector<EffectInfo *> & Model::rRateEffects(string variableName) const
 	return iter->second;
 }
 
+bool Model::gmmModel() const {
+	return lGMMModel;
+}
+
+/**
+ * Returns the GMM effects for the given dependent variable.
+ */
+const vector<EffectInfo *> & Model::rGMMEffects(string variableName) const {
+	map<string, vector<EffectInfo *> >::const_iterator iter =
+		this->lgmmEffects.find(variableName);
+	if (iter == this->lgmmEffects.end()) {
+		return this->lemptyEffectVector;
+	}
+	return iter->second;
+}
 
 /**
  * Returns the evaluation effects for the given dependent variable.
@@ -984,5 +1006,15 @@ void Model::simpleRates(bool simpleRates)
 bool Model::simpleRates() const
 {
 	return this->lsimpleRates;
+}
+
+void Model::normalizeSettingRates(bool normalize)
+{
+	this->lnormalizeSettingsRates = normalize;
+}
+
+bool Model::normalizeSettingRates() const
+{
+	return this->lnormalizeSettingsRates;
 }
 }

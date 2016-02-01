@@ -77,6 +77,7 @@ private:
 	void calculateStatistics();
 	void calculateNetworkRateStatistics(
 		NetworkLongitudinalData * pNetworkData);
+	void calculateNetworkGMMStatistics(NetworkLongitudinalData * pNetworkData);
 	void calculateNetworkEvaluationStatistics(
 		NetworkLongitudinalData * pNetworkData);
 	void calculateNetworkEndowmentStatistics(
@@ -84,6 +85,8 @@ private:
 	void calculateNetworkCreationStatistics(
 		NetworkLongitudinalData * pNetworkData);
 	void calculateBehaviorStatistics(BehaviorLongitudinalData * pBehaviorData);
+	void calculateBehaviorGMMStatistics(
+			BehaviorLongitudinalData * pBehaviorData);
 	void calculateBehaviorRateStatistics(BehaviorLongitudinalData * pBehaviorData);
 
 	// Functions to calculate value of diffusion rate effect
@@ -132,6 +135,10 @@ private:
 	State * lpPredictorState;
 
     State * lpStateLessMissingsEtc;
+
+	void calcDifferences(
+			NetworkLongitudinalData * const pNetworkData,
+			const Network* const pDifference);
 };
 
 }

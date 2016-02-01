@@ -220,7 +220,8 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 		sub <- match(nodeSetName, nodeSetNames)
 		if (is.na(sub))
 		{
-			stop("node set not found")
+			warning(paste("node set",nodeSetName,"not found in",nodeSetNames,'\n'),
+					immediate. = TRUE)
 		}
 		n == length(nodeSets[[sub]])
 	}

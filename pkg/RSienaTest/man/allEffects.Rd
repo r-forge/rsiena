@@ -37,6 +37,7 @@ This data frame is used internally to construct effect objects.
     \item{\code{effect3}}{a logical vector}
     \item{\code{interactionType}}{a character vector}
     \item{\code{local}}{a logical vector}
+    \item{\code{setting}}{Settings name: '' (no settings), 'primary', 'universal' or the name of the defining covariate.}
   }
 }
 \details{

@@ -4,8 +4,8 @@
   Function to include effects in a Siena model
 }
 \description{
-  This function provides an interface to set the include column on
-  selected rows of a Siena effects object
+  This function can be used for model specification
+  by modifying a Siena effects object.
 }
 \usage{
 includeEffects(myeff, ..., include = TRUE, name = myeff$name[1], type = "eval",
@@ -22,7 +22,7 @@ short names to identify the effects which should be included or excluded.
   \item{name}{Name of network for which effects are being
 	included. Defaults to the first in the effects object.}
   \item{type}{
-  Type of effects to be included: "eval", "endow", "creation", or "rate".}
+  Type of effects to be included: "eval", "endow", "creation", "rate" or "gmm".}
   \item{interaction1}{
   Name of siena object where needed to completely identify the
   effects e.g. covariate name or behavior variable name.}
@@ -54,9 +54,13 @@ short names to identify the effects which should be included or excluded.
   and values of interaction1 and interaction2 (if any),
   is obtained by executing \code{\link{effectsDocumentation}(myeff)}.
 
-  The function \code{}includeEffects operates by providing an interface
-  to set the "include" column on
-  selected rows of the effects object, to the value requested (TRUE or FALSE).
+  If some of the effects are specified with \code{type='gmm'},
+  the effects object can only be used for estimation by the
+  Generalized Method of Moments using \code{\link{sienacpp}}.
+
+  The function \code{}includeEffects operates as an interface
+  setting the "include" column on selected rows of the effects object,
+  to the value requested (TRUE or FALSE).
 }
 \value{
 	An updated version of the input effects object, with the include, test, and fix
@@ -67,7 +71,8 @@ short names to identify the effects which should be included or excluded.
 \author{Ruth Ripley }
 \seealso{
   \code{\link{getEffects}}, \code{\link{setEffect}},
-  \code{\link{includeInteraction}}, \code{\link{effectsDocumentation}}
+  \code{\link{includeInteraction}}, \code{\link{effectsDocumentation}},
+  \code{\link{sienacpp}}
 }
 
 \examples{

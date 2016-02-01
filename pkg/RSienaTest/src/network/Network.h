@@ -96,9 +96,12 @@ protected:
 	void checkReceiverRange(int i) const;
 	virtual int maxTieCount() const;
 
+	// set of network change listener
+	std::list<INetworkChangeListener*> lNetworkChangeListener;
 private:
 	void allocateArrays();
 	void deleteArrays();
+	void fireNetworkDisposeEvent();
 	void fireNetworkClearEvent() const;
 	void fireIntroductionEvent(int ego, int alter) const;
 	void fireWithdrawalEvent(int ego, int alter) const;
@@ -127,8 +130,6 @@ private:
 
 	int lmodificationCount;
 
-	// set of network change listener
-	std::list<INetworkChangeListener*> lNetworkChangeListener;
 };
 
 // ----------------------------------------------------------------------------

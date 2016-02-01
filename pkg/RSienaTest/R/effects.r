@@ -37,7 +37,7 @@ substituteNames <- function(nameVectors, xName=NULL, yName=NULL, zName=NULL)
 createEffects <- function(effectGroup, xName=NULL, yName=NULL, zName = NULL,
 						  name, groupName, group, netType)
 {
-	effects <- RSienaTest::allEffects[RSienaTest::allEffects$effectGroup == effectGroup, ]
+    effects <- RSienaTest::allEffects[RSienaTest::allEffects$effectGroup == effectGroup, ]
 	if (nrow(effects) == 0)
 	{
 		stop("empty effect group", effectGroup)
@@ -49,13 +49,21 @@ createEffects <- function(effectGroup, xName=NULL, yName=NULL, zName = NULL,
 	effects <- substituteNames(effects, xName, yName, zName)
 	effects$effectGroup <- NULL
 	nn <- nrow(effects)
-	if (!all(is.na(effects$endowment)))
-	{
-		neweffects <- effects[rep(1:nn,
-							   times=(1 + 2 * as.numeric(effects$endowment))), ]
-		neweffects$type <-
-			unlist(lapply(effects$endowment, function(x) if (x)
-						  c('eval', 'endow', 'creation') else 'eval'))
+    # ignore the endowment field of 'gmm' type effects
+    effects$endowment[which(effects$type == 'gmm')] <- FALSE
+    # If we have some with a valid endowment field in the selection.
+    if (!all(is.na(effects$endowment))) {
+      # create a new vector with the right dimension
+      neweffects <- effects[rep(1:nn, times=(1 + 2 * as.numeric(effects$endowment))), ]
+      # fill with eval, endow and creation effects
+      neweffects$type <- unlist(by(effects, 1:nn,
+																 function(e) {
+																	 if (e$endowment) {
+																		 c('eval', 'endow', 'creation')
+																	 } else {
+																		 e$type
+																	 }
+																 }))
 		effects <- neweffects
 		nn <- nrow(effects)
 	}
@@ -89,16 +97,17 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 		tmp
 	}
 
-##@addSettingseffects internal getEffects add effects for settings model
-addSettingsEffects <- function(effects)
-{
-depvar <- attr(effects, "depvar")
-	## This processes the settings (constant dyadic covariate) structure.
-	## Only for one-mode network.
-	nbrSettings <- length(attr(depvar,"settings"))
-	## This leads to a warning in R CMD Check.
-	## Not important since this is just a stub, to be developed later.
-}
+# ##@addSettingseffects internal getEffects add effects for settings model
+# addSettingsEffects <- function(effects)
+# {
+# 	# depvar <- attr(effects, "depvar")
+# 	## This processes the settings (constant dyadic covariate) structure.
+# 	## Only for one-mode network.
+# 	# nbrSettings <- length(attr(depvar,"settings"))
+# 	## This leads to a warning in R CMD Check.
+# 	## Not important since this is just a stub, to be developed later.
+#   # (used by sienaRI.r)
+# }
 	##@networkRateEffects internal getEffects create a set of rate effects
 	networkRateEffects <- function(depvar, varname, symmetric, bipartite)
 	{
@@ -410,17 +419,14 @@ depvar <- attr(effects, "depvar")
 		if (!is.null(attr(depvar,"settings")))
 		{
 		## add settings effects
-			nbrSettings <- ifelse(attr(depvar,"settings") == "", 0,
-									length(attr(depvar,"settings")))
+			# nbrSettings <- ifelse(attr(depvar,"settings") == "", 0, length(attr(depvar,"settings")))
+			nbrSettings <- length(attr(depvar,"settings"))
 			dupl <- rateEffects[1:observations, ]
 		## make extra copies
-			newEffects <- dupl[rep(1:nrow(dupl), each = nbrSettings[i] + 2), ]
-			newEffects <- split(newEffects,
-								list(newEffects$group, newEffects$period))
-			newEffects <- lapply(newEffects, function(dd)
-				{
-					dd$setting <- c("universal", "primary",
-							names(attr(depvar,"settings")))
+			newEffects <- dupl[rep(1:nrow(dupl), each=nbrSettings), ]
+			newEffects <- split(newEffects, list(newEffects$group, newEffects$period))
+			newEffects <- lapply(newEffects, function(dd) {
+					dd$setting <- attr(depvar,"settings")
 					i1 <- regexpr("rate", dd$effectName)
 					dd$effectName <-
 						  paste(substr(dd$effectName, 1, i1 - 2),

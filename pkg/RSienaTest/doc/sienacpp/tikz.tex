@@ -1,0 +1,42 @@
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{decorations.pathmorphing}
+% layers
+\pgfdeclarelayer{edgelayer}
+\pgfdeclarelayer{nodelayer}
+\pgfsetlayers{edgelayer,nodelayer,main}
+% style
+\tikzstyle{defline}=[line width=0.4pt]
+\tikzstyle{defnode}=[defline,align=center,inner sep=1.4pt,font=\tiny]
+\tikzstyle{defrectsplit}=[rectangle split,
+rectangle split part align={center,left}, % align the box
+every two node part/.style={align=left} % align the content inside a box
+]
+\tikzstyle{defedge}=[defline,draw=black,every node/.style={defnode,sloped,fill=white,fill opacity=1}]
+\tikzstyle{defdeko}=[decorate,decoration={pre length=3pt,post length=6pt}]
+\tikzstyle{defsnake}=[defdeko,decoration={snake,amplitude=2pt,segment length=4pt}]
+% node styles
+\tikzstyle{none}=[defnode]
+\tikzstyle{note}=[defnode,font=\em\tiny\color{gray}]
+% info
+\tikzstyle{infoarrow}=[defedge,-latex]
+\tikzstyle{infoborder}=[defedge,gray,line width=1.2pt,dashdotted]
+\tikzstyle{infoprocess}=[defsnake,infoarrow]
+\tikzstyle{infoprocesspos}=[infoprocess,dotted,gray,decoration={segment length=8pt}]
+% uml styles
+\tikzstyle{umlbox}=[defnode,rectangle,draw=black,fill=white]
+\tikzstyle{umlnotebox}=[umlbox,defrectsplit,rectangle split parts=2]
+\tikzstyle{umlhas}=[defedge,-open diamond,every node/.style={defnode,auto,pos=.1}]
+\tikzstyle{umlisa}=[defedge,-open triangle 45]
+% sequence style
+\tikzstyle{seqinit}=[defnode,circle,fill=black,minimum width=4pt]
+\tikzstyle{seqbox}=[umlbox]
+\tikzstyle{seqobj}=[defedge,dashed]
+\tikzstyle{seqcall}=[defedge,-latex]
+\tikzstyle{seqreturn}=[defedge,dotted,-latex]
+\tikzstyle{seqrunning1}=[draw=black,fill=gray,line width=.25pt,line cap=round,double distance=.8pt]
+\tikzstyle{seqrunning2}=[seqrunning1,double distance=1.6pt]
+\tikzstyle{seqloop}=[defedge,draw=gray,|-|]
+

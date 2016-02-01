@@ -14,9 +14,9 @@
 
 #include <vector>
 #include "data/LongitudinalData.h"
+#include "../model/settings/SettingInfo.h"
 
-namespace siena
-{
+namespace siena {
 
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
@@ -32,8 +32,7 @@ class Network;
 /**
  * This class stores one or more observations of a network variable.
  */
-class NetworkLongitudinalData : public LongitudinalData
-{
+class NetworkLongitudinalData: public LongitudinalData {
 public:
 	NetworkLongitudinalData(int id,
 		std::string name,
@@ -64,6 +63,8 @@ public:
 	int m() const; // number of receivers.
 	void maxDegree(int degree);
 	int maxDegree() const;
+	void universalOffset(double offset);
+	double universalOffset() const;
 	double averageInDegree() const; // average over all observations,
 		//calculated in calculateProperties
 	double averageOutDegree() const;// average over all observations,
@@ -78,8 +79,9 @@ public:
 
 	bool oneModeNetwork() const;
 
-	const std::vector<string> & rSettingNames() const;
-	void addSettingName(string name);
+	const std::vector<SettingInfo> & rSettingNames() const;
+	void addSettingName(const string id, const string settingType,
+			const string covarName, const Permission_Type permType);
 
 private:
 	// The set of actors receiving the ties of the network
@@ -107,7 +109,10 @@ private:
 	// The maximum permitted out-degree of an actor. Infinity by default.
 	int lmaxDegree;
 
-	// The average in-degree (and squared in-degree) over all receivers and observations
+	// The offset for the non-primary settings. 0 by default.
+	int luniversalOffset;
+
+	// The average in-degree over all receivers and observations
 	double laverageInDegree;
 	double laverageSquaredInDegree;
 
@@ -125,7 +130,7 @@ private:
 	bool loneMode;
 
 	// vector of setting names for this network
-	vector<string> lsettingNames;
+	vector<SettingInfo> lsettingNames;
 };
 
 }

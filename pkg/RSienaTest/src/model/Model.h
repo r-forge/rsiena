@@ -94,7 +94,10 @@ public:
 		const EffectInfo * pEffect2,
 		const EffectInfo * pEffect3 = 0);
 
+	bool gmmModel() const;
+
 	const vector<EffectInfo *> & rRateEffects(string variableName) const;
+	const vector<EffectInfo *> & rGMMEffects(string variableName) const;
 	const vector<EffectInfo *> & rEvaluationEffects(string variableName) const;
 	const vector<EffectInfo *> & rEndowmentEffects(string variableName) const;
 	const vector<EffectInfo *> & rCreationEffects(string variableName) const;
@@ -182,6 +185,11 @@ public:
 	void missingBehaviorProbability(double probability);
 	double missingBehaviorProbability(int periodFromStart) const;
 
+	void normalizeSettingRates(bool normalize);
+	bool normalizeSettingRates() const;
+
+
+
     // localML
     void localML(bool flag);
 	bool localML() const;
@@ -193,6 +201,10 @@ public:
 private:
 	// Indicates if conditional simulation has to be carried out
 	bool lconditional;
+
+	//! True if any dependent variable has effects in the gmm objective
+	//! function.
+	bool lGMMModel;
 
 	// name of conditional dependent variable
 	string lconditionalDependentVariable;
@@ -218,6 +230,9 @@ private:
 
 	// A vector of rate effects (except the basic rate effects) per variable
 	map<string, vector<EffectInfo *> > lrateEffects;
+
+	// A vector of pointers to GMM effects per variable
+	map<string, vector<EffectInfo *> > lgmmEffects;
 
 	// A vector of pointers to evaluation effects per variable
 	map<string, vector<EffectInfo *> > levaluationEffects;
@@ -292,6 +307,9 @@ private:
 	vector <vector <Chain *> > lchainStore;
 
 	int lnumberOfPeriods;
+
+	bool lnormalizeSettingsRates;
+
 
 	ModelType lmodelType;
 };

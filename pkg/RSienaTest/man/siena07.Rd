@@ -15,7 +15,9 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
         useCluster=FALSE, nbrNodes=2, initC=TRUE,
         clusterString=rep("localhost", nbrNodes), tt=NULL,
         parallelTesting=FALSE, clusterIter=!x$maxlike,
-        clusterType=c("PSOCK", "FORK"), ...)
+        clusterType=c("PSOCK", "FORK"),
+        logLevelConsole='WARNING', logLevelFile='INFO',
+        logIncludeLocation=F, ...)
       }
 \arguments{
   \item{x}{A control object, of class \code{\link{sienaAlgorithm} }}
@@ -44,6 +46,15 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   "PSOCK". On a single non-Windows machine may be "FORK", and
   subprocesses will be formed by forking. If "PSOCK", subprocesses are
   formed using \R scripts.}
+  \item{logLevelConsole}{
+    Minimal level of logging output to the console. One of 'DEBUG', 'VERBOSE',
+    'INFO', 'WARNING', 'ERROR', 'FATAL'. Where 'DEBUG' prints all messages,
+    'FATAL' only the messages with highest priority.}
+  \item{logLevelFile}{
+    Like \code{logLevelConsole} but for logging to files.}
+  \item{logIncludeLocation}{
+    When \code{TRUE} also log the code location (file, method, line) where the
+    logging message originated.}
   \item{\dots}{Arguments for the simulation function, see
     \code{\link{simstats0c}}:
     usually, \code{data} and \code{effects}, as in the examples below;\cr
@@ -84,6 +95,10 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  the parameter \code{prevAns} as illustrated in the example below.\cr
  (This parameter is inserted through '\dots' into the function
  \code{\link{initializeFRAN}}.)
+
+ An alternative implementation is in \code{\link{sienacpp}},
+ where the algorithm is coded entirely in C++;
+ in \code{siena07} the 'front end' is coded in R.
 }
 \value{
   Returns an object of class \code{\link{sienaFit}}, some parts of which are:
@@ -97,15 +112,16 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     if the sienaAlgorithm object \code{x} was produced with \code{simOnly=TRUE}.}
   \item{se}{Vector of standard errors of estimated theta.}
   \item{dfra}{Matrix of estimated derivatives.}
-  \item{sf}{Matrix of deviations from target in phase 3.}
-  \item{sf2}{Array of statistics from simulations in phase 3.}
+  \item{sf}{Matrix of deviations from targets in phase 3.}
+  \item{sf2}{Array of periodwise deviations from simulations in phase 3.}
   \item{tconv}{t-statistics for convergence.}
   \item{tmax}{maximum absolute t-statistic for convergence for non-fixed parameters.}
   \item{tconv.max}{overall maximum convergence ratio.}
-  \item{targets}{Observed statistics.}
-  \item{targets2}{Observed statistics by wave, starting with the second wave .}
+  \item{targets}{Observed statistics; for ML, zero vector.}
+  \item{targets2}{Observed statistics by wave,
+    starting with second wave; for ML, zero matrix.}
   \item{ssc}{Score function contributions for each wave for each
-    simulation in phase 3. Zero if finite difference method is used}
+    simulation in phase 3. Zero if finite difference method is used.}
  \item{sims}{If \code{returnDeps} is \code{TRUE}:
     list of simulated dependent variables (networks, behaviour).
     Networks are given as a list of edgelists, one for each period.}
@@ -144,9 +160,9 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 }
 \author{Ruth Ripley, Tom Snijders}
 
-\seealso{\code{\link{sienaAlgorithmCreate}}\cr
+\seealso{\code{\link{sienaAlgorithmCreate}}, \code{\link{sienacpp}}.\cr
   There are print, summary and xtable methods for \code{\link{sienaFit}}
-  objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}}
+  objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}.}
 \examples{
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
 # nsub=2 and n3=100 is used here for having a brief computation, not for practice.
@@ -157,7 +173,7 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 # or for non-conditional estimation
 \dontrun{
-myalgorithm$cconditional <- FALSE
+model <- sienaModelCreate(nsub=2, n3=100, cond=FALSE)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
         }
 

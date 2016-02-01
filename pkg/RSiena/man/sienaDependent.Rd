@@ -60,7 +60,8 @@ matrices with attributes:
 }
 \references{See \url{http://www.stats.ox.ac.uk/siena/}}
 \author{Ruth Ripley and Tom A.B. Snijders}
-\seealso{\code{\link{sienaDataCreate}}, \code{\link{sienaDataConstraint}}}
+\seealso{\code{\link{sienaDataCreate}}, \code{\link{sienaNodeSet}},
+   \code{\link{sienaDataConstraint}}}
 \examples{
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mybeh <- sienaDependent(s50a, type="behavior")

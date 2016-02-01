@@ -1,0 +1,28 @@
+\usepackage{listings}
+% \renewcommand{\ttdefault}{lmtt}
+\lstset{
+  escapechar=\%, % LaTeX between '%'
+  % escapeinside=`', % LaTeX starting with ` ending with '
+  % font/color
+  backgroundcolor=,
+  basicstyle=\ttfamily,
+  basewidth=1.04ex,
+  keywordstyle=\bfseries,
+  identifierstyle=\bfseries,
+  commentstyle=\sffamily\itshape,
+  stringstyle=\sffamily,
+  showstringspaces=false,
+  % language definition
+  language=,
+  % interfaces
+  emphstyle={[2]\slshape},
+  emph={[2]
+    % own
+    Simulation,
+    Controller,
+    ResultListener,
+    EstimatorListener,
+    Differentiation,
+    UpdateStep,
+  },
+}

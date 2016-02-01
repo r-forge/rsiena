@@ -77,7 +77,7 @@ extract.sienaBayes(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
   bayes.models <- replicate(4, sienaBayes(FourAlgo, data = FourGroups,
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10),
         simplify=FALSE)
-  extract.sienaBayes(bayes.models, extracted="all")
+  bayes.extracted <- extract.sienaBayes(bayes.models, extracted="all")
 }
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the

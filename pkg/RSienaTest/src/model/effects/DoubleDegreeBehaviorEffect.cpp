@@ -39,16 +39,16 @@ DoubleDegreeBehaviorEffect::DoubleDegreeBehaviorEffect(
 	this->lfirstDirection = firstDirection;
 	this->lsecondDirection = secondDirection;
 
-	if (secondDirection == 2)
-	{
-		const OneModeNetwork * pSSecondNetwork =
-			dynamic_cast<const OneModeNetwork *>(this->pSecondNetwork());
-		if (!pSSecondNetwork)
-		{
-			throw runtime_error(
-			"One-mode second network expected in DoubleDegreeBehaviorEffect");
-		}
-	}
+//	if (secondDirection == 2)
+//	{
+//		const OneModeNetwork * pSSecondNetwork =
+//			dynamic_cast<const OneModeNetwork *>(this->pSecondNetwork()); this crashes
+//		if (!pSSecondNetwork)
+//		{
+//			throw runtime_error(
+//			"One-mode second network expected in DoubleDegreeBehaviorEffect");
+//		}
+//	}
 }
 
 /**

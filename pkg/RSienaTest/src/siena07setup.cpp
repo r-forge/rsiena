@@ -497,11 +497,12 @@ SEXP deleteModel(SEXP RpModel)
 }
 
 /**
- *  sets up the model options of MAXDEGREE, CONDITIONAL
+ *  sets up the model options of MAXDEGREE, UNIVERSALOFFSET, CONDITIONAL
  */
 SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
+	SEXP UNIVERSALOFFSET,
 	SEXP CONDVAR, SEXP CONDTARGETS, SEXP PROFILEDATA, SEXP PARALLELRUN,
-	SEXP MODELTYPE, SEXP SIMPLERATES)
+	SEXP MODELTYPE, SEXP SIMPLERATES, SEXP NORMSETRATES)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -510,6 +511,10 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 
 	/* get hold of the model object */
 	Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+	if(!isNull(NORMSETRATES)){
+		pModel->normalizeSettingRates(*(LOGICAL(NORMSETRATES)));
+	}
 
 	int totObservations = totalPeriods(*pGroupData);
 
@@ -549,6 +554,22 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 				NetworkLongitudinalData * pNetworkData =
 					pData->pNetworkData(CHAR(STRING_ELT(Names, i)));
 				pNetworkData->maxDegree(INTEGER(MAXDEGREE)[i]);
+			}
+		}
+	}
+	/* get names vector for UniversalOffset */
+	if (!isNull(UNIVERSALOFFSET))
+	{
+		SEXP Names = getAttrib(UNIVERSALOFFSET, R_NamesSymbol);
+
+		for (int group = 0; group < nGroups; group++)
+		{
+			for (int i = 0; i < length(Names); i++)
+			{
+				Data * pData = (*pGroupData)[group];
+				NetworkLongitudinalData * pNetworkData =
+					pData->pNetworkData(CHAR(STRING_ELT(Names, i)));
+				pNetworkData->universalOffset(REAL(UNIVERSALOFFSET)[i]);
 			}
 		}
 	}

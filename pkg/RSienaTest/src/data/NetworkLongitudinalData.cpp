@@ -49,6 +49,7 @@ NetworkLongitudinalData::NetworkLongitudinalData(int id,
 	this->lnetworksLessMissings = new Network * [observationCount];
 	this->lnetworksLessMissingStarts = new Network * [observationCount];
 	this->lmaxDegree = std::numeric_limits<int>::max();
+	this->luniversalOffset = std::numeric_limits<double>::max();
 	this->ldensity = new double[observationCount];
 	this->loneMode = oneMode;
 
@@ -387,6 +388,12 @@ void NetworkLongitudinalData::maxDegree(int degree)
 	this->lmaxDegree = degree;
 }
 
+/**
+ * Stores the offset for the universal setting.
+ */
+void NetworkLongitudinalData::universalOffset(double offset) {
+	this->luniversalOffset = offset;
+}
 
 /**
  * Returns the maximum permitted out-degree of an actor.
@@ -394,6 +401,13 @@ void NetworkLongitudinalData::maxDegree(int degree)
 int NetworkLongitudinalData::maxDegree() const
 {
 	return this->lmaxDegree;
+}
+
+/**
+ * Returns the offset for the universal setting.
+ */
+double NetworkLongitudinalData::universalOffset() const {
+	return this->luniversalOffset;
 }
 /**
  * Stores the average in-degree over all receivers and observations.
@@ -478,16 +492,18 @@ bool NetworkLongitudinalData::oneModeNetwork() const
 /**
  *Stores a setting name for this network.
  */
-void NetworkLongitudinalData::addSettingName(string name)
+void NetworkLongitudinalData::addSettingName(const string id,
+		const string settingType, const string covarName,
+		const Permission_Type permType)
 {
-	this->lsettingNames.push_back(name);
+	this->lsettingNames.push_back(
+			SettingInfo(id, settingType, covarName, permType));
 }
 
 /**
  * Returns the collection of settings names for this network.
  */
-const std::vector<string> & NetworkLongitudinalData::rSettingNames() const
-{
+const std::vector<SettingInfo> & NetworkLongitudinalData::rSettingNames() const {
 	return this->lsettingNames;
 }
 }
