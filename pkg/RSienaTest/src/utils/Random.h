@@ -19,6 +19,8 @@ using namespace std;
 namespace siena
 {
 
+#define printRNGTrace
+
 // Drawing random number from various distributions
 
 double nextDouble();

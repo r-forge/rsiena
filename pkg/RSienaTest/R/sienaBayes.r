@@ -17,6 +17,7 @@
 ##@sienaBayes Bayesian fit a Bayesian model, allowing a hierarchical structure
 sienaBayes <- function(data, effects, algo, saveFreq=100,
 				initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2,
+				initML=FALSE,
 				priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
 				priorRatesFromData=2,
 				frequentist=FALSE, incidentalBasicRates=FALSE,
@@ -183,11 +184,8 @@ browser()
 			farFromGoal <- ifelse((abs(actual - desired) < 2*tolerance),
 								FALSE, farFromGoal)
 			farMult <- ifelse(actual > desired, 2, 0.5)
-			if (farFromGoal)
-			{
-				if (actual > 5*desired){farMult <- 5}
-				if (5*actual < desired){farMult <- 0.2}
-			}
+			farMult <- ifelse(actual > 5*desired, 5, farMult)
+			farMult <- ifelse(5*actual < desired, 0.2, farMult)
 			actual.previous <- actual
             pastSuccesses <- ifelse(abs(actual - desired) <= tolerance,
 									pastSuccesses+1, pastSuccesses)
@@ -789,7 +787,7 @@ browser()
 	{
 		z <- initializeBayes(data, effects, algo, nbrNodes,
 						initgainGlobal=initgainGlobal,
-						initgainGroupwise=initgainGroupwise,
+						initgainGroupwise=initgainGroupwise, initML=initML,
 						priorMu=priorMu, priorSigma=priorSigma,
 						priorDf=priorDf, priorKappa=priorKappa,
 						priorRatesFromData=priorRatesFromData,
@@ -992,6 +990,11 @@ browser()
 	}
 
 	z$OK <- FALSE
+	if (saveFreq >= 2)
+	{
+		savePartial(z)
+	}
+
 
 	# Main iterations
 	# Phase 1
@@ -1178,7 +1181,7 @@ browser()
 
 ##@initializeBayes algorithms do set up for Bayesian model
 initializeBayes <- function(data, effects, algo, nbrNodes,
-						initgainGlobal, initgainGroupwise,
+						initgainGlobal, initgainGroupwise, initML,
 						priorMu, priorSigma, priorDf, priorKappa,
 						priorRatesFromData,
 						frequentist, incidentalBasicRates,
@@ -1290,6 +1293,18 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	## start initializeBayes
     ## initialize
 	if (!inherits(data,"siena")){stop("The data is not a valid siena object.")}
+
+	allDistances <- sapply(data,
+		function(x){sapply(x$depvars, function(y){attr(y,'distance')})})
+	if (min(allDistances) <= 0)
+	{
+		cat('In some groups, there is no change for a dependent variable.\n')
+		cat('This is not allowed.\n')
+		cat('This problem occurs for:\n')
+		print(names(which(allDistances <= 0)))
+		stop('Adapt the data set.')
+	}
+
     Report(openfiles=TRUE, type="n") #initialize with no file
     z  <-  NULL
 
@@ -1466,6 +1481,22 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	# Number of varying parameters among the z$truNumPars true parameters:
 	z$p1 <- npars - z$p2 - sum(startupGlobal$requestedEffects$fix)
 
+	# Some checks of input parameters:
+	if (!(is.null(priorMu)))
+	{
+		if (length(priorMu) != z$p1)
+		{
+			stop(paste("priorMu must have length ",z$p1))
+		}
+	}
+	if (!is.null(priorSigma))
+	{
+	if (!((class(priorSigma)=="matrix") & all(dim(priorSigma)==c(z$p1,z$p1))))
+		{
+			stop(paste("priorSigma is not a matrix of dimensions",z$p1))
+		}
+	}
+
 	# compute covariance matrices for random walk proposals for all groups:
 	# proposalC0 for all effects;
 	# proposalC0eta for eta, i.e., non-varying effects.
@@ -1511,19 +1542,26 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		}
 		else
 		{
-			startup1Model <- sienaAlgorithmCreate(n3=500, nsub=1,
-								firstg=initgainGroupwise, cond=FALSE,
+			startup1Model <- sienaAlgorithmCreate(n3=10, nsub=1,
+					firstg=initgainGroupwise, cond=FALSE, maxlike=initML,
+					projname=paste("project",formatC(i,width=2,flag="0"),sep=""),
+					seed=algo$randomSeed)
+		}
+		if (initML)
+		{
+			startup1Model3 <- sienaAlgorithmCreate(n3=500, nsub=0,
+					firstg=initgainGroupwise, cond=FALSE, maxlike=FALSE,
 					projname=paste("project",formatC(i,width=2,flag="0"),sep=""),
 					seed=algo$randomSeed)
 		}
 		# Give the algorithm object two extra components that can be used
-		# internally in CalculateDerivative in phase1.r
+		# internally in siena07 in CalculateDerivative in phase1.r
 		# to prevent a prolonged phase 1 in case of
-		# non-sensitivity for certain parameters.		
+		# non-sensitivity for certain parameters.
 		startup1Model$fromBayes <- TRUE
 		if (sum(!effects[effects$include,"basicRate"]) >= 2)
 		{
-			startup1Model$ddfra <- 
+			startup1Model$ddfra <-
 				diag(startupGlobal$dfra)[!effects[effects$include,"basicRate"]]/ngroups
 		}
 		else
@@ -1559,6 +1597,11 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 			cat("Estimate initial parameters group", i, "\n")
 			startup1 <- siena07(startup1Model, data=data[[i]],
 					effects=effects0, batch=TRUE, silent=silentstart)
+			if (initML)
+			{	# hybrid procedure: phase1 ML, phase3 MoM.
+				startup1 <- siena07(startup1Model3, data=data[[i]],
+					effects=effects0, batch=TRUE, silent=silentstart, prevAns=startup1)
+			}
 			cat("\nInitial estimate obtained\n",
 				noquote(sprintf("%5.3f",startup1$theta)),"\n")
 		}
@@ -1616,7 +1659,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		cat("startupGlobal and initialEstimates saved.\n")
 		stop("Divergent initial estimate.")
 	}
-	
+
 	# Further down the initial parameter values for the rate parameters are
 	# truncated depending on the prior for the rates.
 	# This might also be done for other parameters. Not done now.
@@ -1736,16 +1779,16 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		z$priorDf <- z$p1 - z$nGroup + 2
 	}
 
-	z$priorSigma <- diag(z$p1)
+		z$priorSigma <- diag(z$p1)
 	if (!is.null(priorSigma))
 	{
 		if ((class(priorSigma)=="matrix") &
 			all(dim(priorSigma)==c(z$p1,z$p1)))
 		{
 		z$priorSigma <- priorSigma
-		}
-		else
-		{
+	}
+	else
+	{
 		stop(paste("priorSigma is not a matrix of dimensions",z$p1))
 		}
 	}
@@ -1785,7 +1828,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 						pmin(z$thetaMat[group, z$ratePositions[[group]]],
 		z$priorMu[z$ratesInVarying] + 2*sqrt(diag(z$priorSigma)[z$ratesInVarying]))
 	}
-	
+
 	z$incidentalBasicRates <- incidentalBasicRates
 	z$delta <- delta
 	z$gamma <- gamma
@@ -2171,6 +2214,8 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	z$nGroup <- z1$nGroup
 	z$set1  <- z1$set1
 	z$set2  <- z1$set2
+	z$p1  <- z1$p1
+	z$p2  <- z1$p2
 	z$f <- z1$f
 	z$effects <- z1$effects
 	z$requestedEffects <- z1$requestedEffects

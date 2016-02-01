@@ -70,7 +70,7 @@ phase2.1<- function(z, x, ...)
     z
 }
 ##@proc2subphase siena07 Do one subphase of phase 2
-proc2subphase <- function(z, x, subphase, ...)
+proc2subphase <- function(z, x, subphase, useAverage=TRUE, ...)
 {
     ## init subphase of phase 2
     z <- AnnouncePhase(z, x, subphase)
@@ -86,6 +86,10 @@ proc2subphase <- function(z, x, subphase, ...)
 		z$n2max <- z$n2maximum[subphase]
 	}
     z$repeatsubphase <- 0
+	if (!useAverage)
+	{
+		z$thetaStore <- matrix(NA, z$n2max, z$pp)
+	}
     repeat
     {
         z$repeatsubphase <- z$repeatsubphase + 1

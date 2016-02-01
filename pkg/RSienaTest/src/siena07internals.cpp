@@ -37,8 +37,12 @@
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/ml/MLSimulation.h"
+#include "logger/Logger.h"
+
+#include <string>
 
 using namespace std;
+using namespace siena::logger;
 using namespace siena;
 
 
@@ -450,22 +454,47 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 		SEXP avout;
         PROTECT(avout = install("averageOutDegree"));
         SEXP averageOutDegree = getAttrib(ONEMODES,	avout);
- 		SEXP sets;
-		PROTECT(sets = install("settings"));
-		SEXP Setting = getAttrib(ONEMODES, sets);
+
 		SEXP nm;
         PROTECT(nm = install("name"));
         SEXP name = getAttrib(ONEMODES, nm);
-        const ActorSet * myActorSet = pData->pActorSet(CHAR(STRING_ELT(
-					actorSet, 0)));
+        const ActorSet* myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
 		OneModeNetworkLongitudinalData *  pOneModeNetworkLongitudinalData =
-			pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)),
-                                     myActorSet);
-		for (int j = 0; j < length(Setting); j++)
-		{
-			const char * settingName = CHAR(STRING_ELT(Setting, j));
-			pOneModeNetworkLongitudinalData->addSettingName(settingName);
+          pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)), myActorSet);
+
+        // parse settings
+        SEXP settingsSymbol;
+        PROTECT(settingsSymbol = install("settingsinfo"));
+        SEXP settingsList = getAttrib(ONEMODES, settingsSymbol);
+        for (int j = 0; j < length(settingsList); j++) {
+          SEXP settingInfo = VECTOR_ELT(settingsList, j);
+          SEXP infoNames = getAttrib(settingInfo, R_NamesSymbol);
+          string id, type, covar, only;
+          // Rprintf("setting %d\n", j);
+          // parse key value list
+          for (int k = 0; k < length(settingInfo); k++) {
+            // Rprintf("key value %d\n", k);
+            const char* key = CHAR(STRING_ELT(infoNames, k));
+            const char* value = CHAR(STRING_ELT(VECTOR_ELT(settingInfo, k), 0));
+            // Rprintf("%s = %s\n", key, value);
+            if      (strcmp(key, "id") == 0)    id    = string(value);
+            else if (strcmp(key, "type") == 0)  type  = string(value);
+            else if (strcmp(key, "covar") == 0) covar = string(value);
+            else if (strcmp(key, "only") == 0)  only  = string(value);
+          }
+          // parse strings to C++ types
+          Permission_Type permType = Permission_Type::BOTH;
+          if      (only == "up")   permType = Permission_Type::UP;
+          else if (only == "down") permType = Permission_Type::DOWN;
+          // asserts
+          if (id.length() == 0) error("settings id should not be empty");
+          if (type.length() == 0) error("settings type should not be empty");
+          // add it
+          Rprintf("%s %s %s %s\n", id.c_str(), type.c_str(), covar.c_str(), only.c_str());
+          pOneModeNetworkLongitudinalData->addSettingName(id, type, covar, permType);
 		}
+		LOG(Priority::INFO, "settings done");
+
        pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
         pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
         pOneModeNetworkLongitudinalData->structuralMean(*(REAL(structmean)));

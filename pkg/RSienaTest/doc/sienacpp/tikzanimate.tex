@@ -1,0 +1,49 @@
+\usepackage{tikz}
+% animation needs [fragile] frames
+% \foreach \pc in {1,2} {\only<+>{
+%   \begin{scaletikzpicturetowidth}{.8\textwidth}
+%     \input{name.tikz}
+%   \end{scaletikzpicturetowidth}
+% }}
+\def\pc{1}
+\tikzset{
+  apply special/.style={special #1},
+  % keyword: alert=SLIDE
+  alert/.style={normal,apply special/.list/.expand once=alert_\pc,#1},
+  normal/.style={
+    0/.style={},
+    1/.style={},
+    2/.style={},
+    3/.style={},
+    4/.style={},
+    5/.style={},
+    6/.style={},
+    7/.style={},
+    8/.style={},
+  },
+  special alert_0/.style={0/.style={draw=orange!80!black,line width=0.6pt}},
+  special alert_1/.style={1/.style={draw=orange!80!black,line width=0.6pt}},
+  special alert_2/.style={2/.style={draw=orange!80!black,line width=0.6pt}},
+  special alert_3/.style={3/.style={draw=orange!80!black,line width=0.6pt}},
+  special alert_4/.style={4/.style={draw=orange!80!black,line width=0.6pt}},
+  special alert_5/.style={5/.style={draw=orange!80!black,line width=0.6pt}},
+  special alert_6/.style={6/.style={draw=orange!80!black,line width=0.6pt}},
+  special alert_7/.style={7/.style={draw=orange!80!black,line width=0.6pt}},
+  special alert_8/.style={8/.style={draw=orange!80!black,line width=0.6pt}},
+  % keyword: uncover=SLIDE
+  uncover/.style={covered,apply special/.list/.expand once=uncover_\pc,#1},
+  covered/.style={
+    1/.style={opacity=.6},
+    2/.style={opacity=.6},
+    3/.style={opacity=.6},
+    4/.style={opacity=.6},
+    5/.style={opacity=.6},
+    6/.style={opacity=.6},
+  },
+  special uncover_1/.style={1/.style={opacity=1}},
+  special uncover_2/.style={2/.style={opacity=1}},
+  special uncover_3/.style={3/.style={opacity=1}},
+  special uncover_4/.style={4/.style={opacity=1}},
+  special uncover_5/.style={5/.style={opacity=1}},
+  special uncover_6/.style={6/.style={opacity=1}},
+}

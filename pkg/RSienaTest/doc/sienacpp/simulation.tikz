@@ -1,0 +1,24 @@
+\begin{tikzpicture}[scale={\tikzscale}]
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=umlnotebox] (0) at (-1, 2.75) {
+			\lstinline{Simulation}\nodepart{two}
+			% \lstinline{addResultListener(Listener)}
+			% \\\lstinline{addResultModificator(Modificator)}
+			\lstinline{updateParameter(VectorXd)}
+			\\\lstinline{nSimulations():int}
+			\\\lstinline{simulate()}
+		};
+		\node [style=umlbox,alert=1,alert=2] (1) at (0, 1) {\lstinline{ForwardSimulation}};
+		\node [style=umlbox,alert=2,alert=3] (2) at (0.5, -0) {\lstinline{MPIForwardSimulation}};
+		\node [style=umlbox,alert=1] (3) at (-2, 0.5) {\lstinline{MaxLikeSimulation}};
+		\node [style=umlbox] (4) at (0, -1) {\lstinline{EpochSimulation}};
+		\node [style=umlbox] (5) at (-2, -1) {\lstinline{MLSimulation}};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [style=umlisa] (1) to (0);
+		\draw [style=umlisa] (3) to (0);
+		\draw [style=umlisa] (2) to (1);
+		\draw [style=umlhas] (4) to (1);
+		\draw [style=umlhas] (5) to (3);
+	\end{pgfonlayer}
+\end{tikzpicture}

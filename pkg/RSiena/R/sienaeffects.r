@@ -71,6 +71,7 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 includeInteraction <- function(myeff, ...,
 				include=TRUE, name=myeff$name[1],
 				type="eval", interaction1=rep("", 3), interaction2=rep("", 3),
+				fix=FALSE, test=FALSE, parameter=0,
 				character=FALSE, verbose=TRUE)
 {
 	if (character)
@@ -159,9 +160,24 @@ includeInteraction <- function(myeff, ...,
 	{
 		effect3 <- 0
 	}
-	## if want to include, check that we have a spare row
-	if (include)
+	## does the effect already exist?
+	intn <- (myeff$effect1 == effect1) & (myeff$effect2 == effect2)
+	if (effect3 > 0)
 	{
+		intn <- intn & (myeff$effect3 == effect3)
+	}
+	# intn indicates the rows of the effects object with this interaction
+	if (sum(intn) >= 2)
+	{
+		cat('The given effects object is corrupted:\n')
+		cat('It already contains more than one copy of this interaction.\n')
+		cat('Make a new effects object from scratch.\n')
+		stop('Corrupted effects object')
+	}
+
+	## if want to include, check that we have a spare row
+	if ((include) && (sum(intn) == 0))
+	{# The interaction must be created
 		ints <- myeff[myeff$name == name & myeff$shortName  %in%
 					  c("unspInt", "behUnspInt") &
 					  (is.na(myeff$effect1) | myeff$effect1 == 0)&
@@ -197,29 +213,31 @@ includeInteraction <- function(myeff, ...,
 			ints <- tmprow
 		}
 		ints <- ints[1, ]
+		intn <- myeff$effectNumber == ints$effectNumber
 	}
 	if (include)
 	{
-		intn <- myeff$effectNumber == ints$effectNumber
 		myeff[intn, "include"] <- include
 		myeff[intn, c("effect1", "effect2", "effect3")] <-
 			c(effect1, effect2, effect3)
+		myeff[intn, "fix"] <- fix
+		myeff[intn, "test"] <- test
+		myeff[intn, "parm"] <- parameter
 	}
 	else
 	{
-		intn <- (myeff$effect1 == effect1) & (myeff$effect2 == effect2)
-		if (effect3 > 0)
+		if (sum(intn) == 0)
 		{
-			intn <- intn & (myeff$effect3 == effect3)
+		warning('Note: there was no such interaction in this effects object.')
 		}
+		else
+		{
 		myeff[intn, "include"] <- FALSE
+	}
 	}
 	if (verbose)
 	{
-		print.data.frame(myeff[intn, c("name", "shortName", "type",
-									   "interaction1", "interaction2",
-									   "include", "effect1", "effect2",
-									   "effect3")])
+		print(myeff[intn,])
 	}
 	myeff
 }

@@ -121,7 +121,8 @@
 \newcommand{\nextno}{\addtocounter{thisno}{1}\thethisno .\ }
 
 \hyphenation{Snij-ders Duijn Huis-man Steg-lich Schwein-ber-ger siena-Data-Create-From-Session
-             siena-Data-Create siena-Com-position-Change RSiena-Test siena-Group}
+             siena-Data-Create siena-Algorithm-Create siena-Com-position-Change
+             siena-Bayes RSiena-Test siena-Group siena-Dependent}
 
 \newcommand{\interruptenum}{
       \setcounter{savenumi}{\value{enumi}}
@@ -192,7 +193,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-289.
+This version was renewed for \RS version 1.1-290.
 \end{abstract}
 
 
@@ -305,7 +306,7 @@ reference to this manual is the following.  \smallskip
 
 \noindent
 Ruth M. Ripley, Tom A.B. Snijders, Zs\'{o}fia Boda,
- Andr\'{a}s V\"{o}r\"{o}s, and Paulina Preciado, 2014.
+ Andr\'{a}s V\"{o}r\"{o}s, and Paulina Preciado, 2015.
 Manual for SIENA version 4.0 (version \today).
 Oxford: University of Oxford, Department of Statistics; Nuffield College.
 \textsf{http://www.stats.ox.ac.uk/siena/}
@@ -744,7 +745,8 @@ different impact) of effects for the increase and the decrease of behavior.
 \subsubsection{Outline of estimation procedure}
 \label{S_estim}
 \noindent
-\SI estimates parameters by the function \sfn{siena07()}, using the following procedure:
+\SI estimates parameters by the function \sfn{siena07()}
+and (alternatively) \sfn{sienacpp()}, using the following procedure:
 \begin{enumerate}
 \item  Certain statistics are used that reflect the parameter values;\\
   the finally obtained parameters should be such that the \emph{expected
@@ -782,7 +784,8 @@ different impact) of effects for the increase and the decrease of behavior.
   phase.
 
   If the estimation has to be repeated, this can be done by employing the
-  argument \texttt{prevAns} in the call of \sfn{siena07()}.
+  argument \texttt{prevAns} in the call of \sfn{siena07()}
+  (or \sfn{sienacpp()}).
   See the help page for  \sfn{siena07()}.
 \end{enumerate}
 \end{enumerate}
@@ -849,24 +852,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.1-289}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.1-290}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-289.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.1-290.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-289.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.1-290.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.1-289.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.1-290.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-289.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-290.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-289.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-290.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-289.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-290.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -930,8 +933,9 @@ of the software appear).
 	\item	Use functions \sfn{includeEffects()}, \sfn{setEffect()} and
             \sfn{includeInteraction()} to further specify the model
             (see Sections~\ref{S_imp_str1}~--~\ref{S_eff_beh}).
-	\item	Use \sfn{siena07()} to run the estimation procedure.\footnote{The
-            use of multiple processes can speed up the estimation in \sfn{siena07()}.
+	\item	Use \sfn{siena07()} or \sfn{sienacpp()}
+            to run the estimation procedure.\footnote{The
+            use of multiple processes can speed up the estimation.
             For directions on how to utilize multiple processors,
             see Section~\ref{S_multipleProcesses}.}
 	\item	Basic output is written to a log file in the actual working directory.
@@ -994,9 +998,14 @@ of \rs.
       degree is not strongly increasing, this indicates
       that the turnover in the network may be too high to consider
       the data as an evolving network, and perhaps the \SI method
-      is not suitable for the data set. Jaccard values of .3 and higher
-      are good; lower than .2 indicates that there might be difficulties
-      in estimation; lower than .1 is quite low indeed.
+      is not suitable for the data set.
+      For networks of the type that are mostly used for this method
+      (sparse but not too sparse,
+      with average degrees not too different from wave to wave
+      and between 2 and 15 for all waves),
+      Jaccard values of .3 and higher
+      are good; values lower than .2 indicate that there might be difficulties
+      in estimation; values lower than .1 are quite low indeed.
       Using the \SI method for two waves with an extremely low Jaccard
       index and average degrees that remain more or less constant
       will mean that the first wave hardly plays a role in the results, and
@@ -1005,7 +1014,9 @@ of \rs.
 
       If Jaccard indices are low because the network is mainly increasing
       (creation of new ties) or decreasing (termination of ties),
-      this is no problem for the \SI method.
+      this is no problem for the \SI method. Very sparse networks
+      (with most degrees less than 2) also may have lower Jaccard values
+      without negative consequences for estimation.
 \item When parameters have been estimated, first look at the
      \texttt{overall maximum \\convergence ratio} and the \texttt{t statistics for deviations
       from targets}.
@@ -1055,7 +1066,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-289) and an R-Forge revision
+  identified by a version number (e.g.\ 1.1-290) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -3495,13 +3506,14 @@ of the period then are replaced by the structural value at the end of the period
 The model parameters are estimated under the specification given
 during the model specification part, using an iterative stochastic
 approximation algorithm.
-Three estimation procedures are implemented:
-the Method of Moments (MoM) \citep*{Snijders01, SnijdersEA07};
- the Method of Maximum Likelihood (ML) \citep{SnijdersEA10a};
+Four estimation procedures are implemented:
+the Method of Moments \citep*[`MoM';][]{Snijders01, SnijdersEA07};
+the Generalized Method of Moments \citep*[`GMoM';][]{ASS2015};
+ the Method of Maximum Likelihood \citep[`ML';][]{SnijdersEA10a};
  and a Bayesian method
  \citep{Koskinen04, KoskinenSnijders07,SchweinbergerSnijders07c}.
  For non-constant rate functions, currently only
- MoM estimation is available.
+ MoM and GMoM estimation is available.
  The Method of Moments is the default;
  the other two methods require much more computing time.
  Given the greater efficiency but longer required computing time
@@ -3509,7 +3521,6 @@ the Method of Moments (MoM) \citep*{Snijders01, SnijdersEA07};
  these can be useful especially for smaller data sets
  and relatively complicated models
  (networks and behavior; creation or endowment effects).
-
 
 In the following, the number of
 parameters is denoted by $p$. The algorithm %s are
@@ -3533,7 +3544,8 @@ algorithm.
 \hypertarget{T_S_options}{   }
 % provisionally placed here.
 
-The estimation process implemented in function \textsf{siena07}
+The estimation process implemented in functions \textsf{siena07()}
+and \sfn{sienacpp()}
 starts with initial values for the parameters,
 and returns a so-called \textsf{sienaFit} object, in this example called
 \texttt{results1}, which contains the estimates and their standard errors and
@@ -3542,6 +3554,22 @@ Since the estimate is iterative (depending on the initial value) and stochastic,
 the results are not always completely satisfactory. We shall see below
 how the satisfactory convergence of the algorithm can be checked,
 and how to go on if this is not satisfactory.
+
+Much of what follows is about the use of \sfn{siena07()}
+but applies equally to \sfn{sienacpp()}.
+The difference between these two functions is that
+estimation by \sfn{sienacpp()} stays entirely in the
+`back end' \sfn{C++} part of \si, contrasting with \sfn{siena07()}
+which carries out the simulations in \sfn{C++} but the
+Robbins-Monro updates in the \sfn{R} `front end' part;
+this yields greater computational efficiency for \sfn{sienacpp()}.
+Since the simulations take the largest amount of processing time
+for medium-sized and large networks, the time difference is
+notable, in a proportional sense, mainly for data sets
+where simulations run very quickly (i.e., number of actors
+and distance between first and last simulations are small).
+Further, results from \sfn{sienacpp()} cannot used for
+\sfn{sienaGOF()}.
 
 The estimation algorithm is determined by a call of functions
 such as
@@ -3841,11 +3869,12 @@ siena07ToConvergence <- function(alg, dat, eff, ans0=NULL, ...){
    numr <- 0
    ans <- siena07(alg, data=dat, effects=eff, prevAns=ans0, ...) # the first run
    repeat {
+       save(ans, file=paste("ans",numr,".RData",sep="")) # to be safe
        numr <- numr+1           # count number of repeated runs
        tm <- ans$tconv.max      # convergence indicator
        cat(numr, tm,"\n")       # report how far we are
        if (tm < 0.25) {break}   # success
-       if (tm > 8) {break}      # divergence without much hope
+       if (tm > 10) {break}     # divergence without much hope
                                 # of returning to good parameter values
        if (numr > 100) {break}  # now it has lasted too long
        ans <- siena07(alg, data=dat, effects=eff, prevAns=ans, ...)
@@ -4045,22 +4074,34 @@ Further details are in the help file for \textsf{siena07}.
  \texttt{ans\$tconv.max   }         \> maximum $t$-ratio for convergence for \\
                                  \> any linear combination of the parameters,\\
                              \> called the overall maximum convergence ratio \\
- \texttt{ans\$sf    }                 \>  generated statistics in Phase 3 (targets subtracted)\\
- \texttt{ans\$msf   }                 \>  covariance matrix of
+ \texttt{ans\$sf    }        \>  generated statistics in Phase 3 (targets subtracted)\\
+ \texttt{ans\$msf   }        \>  covariance matrix of
                                            \texttt{ans\$sf    } \\
- \texttt{ans\$dfra  }                 \> estimated derivative of expected
+ \texttt{ans\$dfra  }        \> estimated derivative of expected
                                             statistics w.r.t.\ parameters,  \\
-                                     \>   for Methods of Moments estimation  \\
- \texttt{ans\$sims }               \> simulated values of dependent variables
+ \texttt{ans\$ac  }        \> autocorrelations of generated statistics in Phase 3  \\
+ \texttt{ans\$sims }         \> simulated values of dependent variables
                                       in Phase 3 of the algorithm     \\
-                                    \>     for Methods of Moments estimation
+                             \>     for Methods of Moments estimation
                                         (see Section~\ref{S_sims}),    \\
-                                       \>  if \textsf{returnDeps = TRUE}
+                             \>  if \textsf{returnDeps = TRUE}
                                         in the call of \textsf{siena07} \\
- \texttt{ans\$estMeans }               \> estimated expected values of the target statistics\\
-                                     \> (if the Dolby option was chosen, this is \\
-                                     \> not equal to the average of the simulations!)\\
- \texttt{ans\$effects }               \> the effects object with only the requested effects.
+ \texttt{ans\$estMeans }     \> estimated expected values of the target statistics\\
+                             \> (if the Dolby option was chosen, this is \\
+                             \> not equal to the average of the simulations!)\\
+ \texttt{ans\$effects }      \> the effects object with only the requested effects\\
+ \texttt{ans\$f }            \> everything needed for the calculations in C++;\\
+                             \> in particular, the data set is hidden in here,
+                                and can be reconstructed.\\
+                             \> Digging in will show as \texttt{mat1} the network data,
+                                 as \texttt{mat2} the missings, \\
+                             \>   and as \texttt{mat3} the structurally determined values.\\
+                             \> All these are stored as transposed edge lists.\\
+                             \> Programmers can consult function \texttt{initializeFRAN()}\\
+                             \> for the creation and hence contents of this object.\\
+ \texttt{ans\$version }      \> the \textsf{RSiena/Test} version\\
+ \texttt{ans\$revision }     \> the \textsf{R-Forge} revision.\\
+
 \end{tabbing}
 Like for any \R object, the internal structure of the \textsf{sienaFit} object
 can be requested by requesting
@@ -4410,24 +4451,29 @@ This is not surprising, because both are triadic effects.
 In this case, the three-cycle effect was not significant,
 and can be dropped for that reason.
 
+\subsection{Other estimation procedures}
 
-\subsection{Maximum Likelihood and Bayesian estimation}
-\label{S_ML}
-\label{S_Bayes}
-
-\SI can estimate models by three estimation methods: the (unconditional or conditional)
-Method of Moments \citep*[`MoM', the default; ][]{Snijders01, SnijdersEA07},
+\SI can estimate models by four estimation methods:
+the (unconditional or conditional)
+Method of Moments \citep*[`MoM', the default; ][]{Snijders01, SnijdersEA07};
+the Generalized Method of Moments \citep*[`GMoM', see][]{ASS2015};
 the Maximum Likelihood method \citep*[`ML', see][]{SnijdersEA10a},
 and Bayesian methods
-\citep[see][]{Koskinen04, KoskinenSnijders07, SchweinbergerSnijders07c}.
+\citep[see][]{Koskinen04,KoskinenSnijders07,SchweinbergerSnijders07c,KoskinenSnijders15}.
+
+The Generalized Method of Moments is somewhat more time-consuming
+and is theoretically more efficient than the Method of Moments.
+On the other hand, function \sfn{sienacpp()} is coded in a more efficient
+way than \sfn{siena07()}.
+
 In nice situations (data sets that are not too small, model specifications
-that do not request too much from the data),
-the three methods tend to agree
+that do not request too much from the data, good fit between data and
+model specification), the four methods tend to agree
 and there seems not to be no reason to use the more time-consuming
 ML or Bayesian methods.
-In not-so-nice situations (very small network data sets, small network and behavior
-data sets in combination with complex models),
-however, ML and Bayesian methods tend to produce slightly more accurate results
+In not-so-nice situations (very small network data sets,
+small network and behavior data sets in combination with complex models),
+however, ML and Bayesian methods tend to produce somewhat more accurate results
 than MoM.
 Statistical theory suggests that ML is a more efficient estimation method
 than MoM in the sense of producing estimates with smaller standard errors.
@@ -4436,12 +4482,95 @@ Bayesian estimation is based on a different statistical paradigm, and
 assumes and requires that the uncertainty about parameters is expressed
 itself in a probability distribution.
 
+Estimation by the regular Method of Moments (MoM)
+is implemented in the functions \sfn{siena07()} and \sfn{sienacpp()}.
+Estimation by the Generalized Method of Moments (GMoM)
+is implemented in the function \sfn{sienacpp()}.
+
 ML estimation is done by the function \sfn{siena07()}, using a set of options
 created by \sfn{sienaAlgorithmCreate()} with \sfn{maxlike=TRUE}.
+Bayesian estimation is done by the function \sfn{sienaBayes()},
+but is as yet implemented only for multilevel network modeling
+(Section~\ref{S_sienaBayes}).
+
+
+\subsection{Generalized Method of Moments estimation}
+\label{S_GMoM}
+
+Estimation by the Generalized Method of Moments (GMoM)
+was proposed in \citet{ASS2015} and is implemented
+in the function \sfn{sienacpp()}.
+
+If the algorithm object created by \sfn{sienaAlgorithmCreate()}
+uses \texttt{maxlike=FALSE}, the estimation function \sfn{sienacpp()}
+will use the MoM or the GMoM; the latter will be used as soon as
+at least one of the effects were specified in the effects object with
+\texttt{type='gmm'}.
+
+The specification of the effects object for GMoM estimation requires
+that in the effects object, apart from the basic rate effects,
+some of the effects were specified
+in  \sfn{includeEffects()} with \texttt{type='eval'}
+(the default, which means that this does not need to be stated)
+and the others with \texttt{type='gmm'}.
+The first then are evaluation effects defining the model specification,
+the second are statistics used for estimation.
+The method requires that the number of statistics (\texttt{type='gmm'})
+is equal to or larger than the number of
+evaluation effects (\texttt{type='eval'}).
+For example, the commands
+
+\begin{verbatim}
+net <- sienaDependent(array(c(s501,s502,s503), dim=c(50,50,3)))
+dataset <- sienaDataCreate(net)
+eff <- getEffects(dataset)
+eff <- includeEffects(eff, density)
+eff <- includeEffects(eff, density, type='gmm')
+eff <- includeEffects(eff, recip)
+eff <- includeEffects(eff, recip, realrecip, persistrecip, type='gmm')
+eff <- includeEffects(eff, transTrip)
+eff <- includeEffects(eff, transTrip, agreetrans, realtrans, type='gmm')
+eff
+\end{verbatim}
+will print the resulting effects object
+\begin{verbatim}
+  For estimation by the Generalized Method of Moments
+  Effects
+  effectName                   include fix   test  initialValue parm type
+1 constant net rate (period 1) TRUE    FALSE FALSE    4.69604   0    rate
+2 constant net rate (period 2) TRUE    FALSE FALSE    4.32885   0    rate
+3 outdegree (density)          TRUE    FALSE FALSE   -1.46770   0    eval
+4 reciprocity                  TRUE    FALSE FALSE    0.00000   0    eval
+5 transitive triplets          TRUE    FALSE FALSE    0.00000   0    eval
+
+ Statistics
+  effectName          include type
+1 outdegree (density) TRUE    gmm
+2 reciprocity         TRUE    gmm
+3 persistent recip.   TRUE    gmm
+4 real recip.         TRUE    gmm
+5 transitive triplets TRUE    gmm
+6 real trans. trip.   TRUE    gmm
+7 agree trans. trip.  TRUE    gmm
+\end{verbatim}
+with three evaluation effects and seven statistics.
+Like the MoM, the GMoM allows conditional as well as unconditional
+estimation (see Section~\ref{S_cond}).
+In this example, for conditional estimation the number
+of statistics will be nine, including the two statistics
+for the rate parameters, viz., Hamming distances
+between subsequent waves.
+
+\subsection{Maximum Likelihood and Bayesian estimation}
+\label{S_ML}
+\label{S_Bayes}
+
+ML estimation is done by the function \sfn{siena07()}, using a set of options
+created by \sfn{sienaAlgorithmCreate()} with \texttt{maxlike=TRUE}.
 Bayesian estimation is done by the function \sfn{sienaBayes()}.
 The following further information in this section is about ML estimation;
 Bayesian estimation is as yet implemented only for multilevel network modeling
-group2 (Section~\ref{S_sienaBayes}).
+(see Section~\ref{S_sienaBayes}).
 
 For ML estimation, the method of joiners and leavers (Section\ref{S_comp})
 is not available.
@@ -4964,7 +5093,7 @@ H_0 : \ \theta_k \,=\, 0 ,
 the $t$-test is based on
 \begin{equation}
 \frac{\hat\theta_k}{\se(\hat\theta_k)} \,=\,
-   \texttt{ans\$theta[k] /sqrt(ans\$se[k]) } \ .  \label{t-stat}
+   \texttt{ans\$theta[k] / ans\$se[k] } \ .  \label{t-stat}
 \end{equation}
 This can be easily calculated by hand from the \RS results.
 \medskip
@@ -4976,11 +5105,21 @@ This is the so-called Donner-Hauck phenomenon, named after
 \citet{HauckDonner77}, who first drew attention to this phenomenon
 in the case of logistic regression. It is discussed also in
 \citet[section 1.6]{GeyerThompson92} and \citet{AlbertAnderson84}.
-This occurs when the data indicates that the parameter
-should be very large in absolute value, but not how large.
-The parameter estimate as well as the standard error then are large,
-and the ratio (\ref{t-stat}) does not need to be large.
-The Wald test then cannot be used for significance testing.
+For logistic regression this phenomenon occurs when there is complete,
+or almost complete, separation of the set of observed values
+for the vector of predictor variables such that this set
+consists of values in two half-spaces,
+where for one of these half-spaces the
+dependent variable always is 0, and for the other half-space always 1.
+The data then indicates that the parameter
+should be very large in absolute value, but not how large;
+mathematically, the estimated value may be infinite.
+The parameter as estimated by a practical algorithm
+then will be not infinite but large, and the standard error
+also will be large;
+but the point is that ratio (\ref{t-stat}) does not need to be large,
+and the Wald test may be non-significant while
+the data flatly contradicts a hypothetical parameter value of 0.
 In Section~\ref{S_fixingparameters} we proposed that in such cases,
 it may be helpful to fix the parameter at some large value,
 without estimating it.
@@ -6688,16 +6827,17 @@ myeff[myeff$randomEffects & myeff$include, ]
 if the effects object is called \texttt{myeff}.
 \smallskip
 
-The prior mean
-\texttt{priorMu} is a vector of length equal to the number of varying parameters.
+The prior mean of the varying parameters,
+\texttt{priorMu}, is a vector of length equal to the number of varying parameters.
 In the object produced by \sfn{sienaBayes}, let us call it \texttt{ans},
 this length is stored as \texttt{ans\$p1}.
 For example, in a model with 4 waves, one dependent network variable,
 and varying parameters specified for outdegree, reciprocity,
 transitive ties, and similarity for some covariate $V$,
-the length would be 3+4=7.
-The prior covariance matrix
-\texttt{priorSigma} is a symmetric square matrix of dimension
+the length would be 3+4=7 (3 for three periods +
+4 for four varying parameters).
+The prior covariance matrix of the varying parameters,
+\texttt{priorSigma}, is a symmetric square matrix of dimension
 equal to the length of \texttt{priorMu}.
 \medskip
 
@@ -6713,13 +6853,17 @@ numbers. This may be the case especially for groups with low Jaccard
 coefficients, or for groups that deviate strongly from the other groups.
 It may be advisable to take out the groups with extremely high
 rate parameters (e.g., larger than 50 or 80).
-To try and include some groups with high rate parameters, the prior
+To try and include some groups with high estimated rate parameters, the prior
 distribution for these parameters may be employed.
 
-By default, the prior for the basic rate parameters is data-dependent.
-To try and include some groups with high rate parameters,
-this can be turned off by using \\
-\texttt{priorRatesFromData = FALSE}.
+By default, the prior for the basic rate parameters is data-dependent,
+with a mean and covariance matrix that are robust estimates
+based on the estimated rate parameters from the initialization phase.
+This mostly will be adequate.
+
+To have explicit control of the prior for the basic rate parameters,
+the data dependence can be turned off by using \\
+\texttt{priorRatesFromData = 0}.\\
 Then the choice for \texttt{priorMu} and \texttt{priorSigma}
 is going to matter.
 Consider the rate parameters as estimated in the multi-group analysis
@@ -6750,7 +6894,7 @@ m7 <- c(4, 5, 0, 0, 0, 0, 0)
 S7 <- matrix(0, 7, 7)
 diag(S7) <- c(2, 2, 1, 1, 1, 1, 1)
 ans <- sienaBayes(...., priorMu=m7, priorSigma=S7, priorDf=20,
-                  priorRatesFromData = FALSE, ....)
+                  priorRatesFromData = 0, ....)
 \end{verbatim}
 \texttt{priorDf} is the prior degrees of freedom for the
 covariance matrix. It can be interpreted as the sample size on which,
@@ -6917,8 +7061,8 @@ the components
 ThinPosteriorEta}, and \texttt{ThinPosteriorSigma} of the
 \sfn{sienaBayesFit} object, as mentioned in the help page, may be useful.
 
-It should be noted that the \texttt{.out} files produced by \sfn{sienaBayes()} 
-are produced somewhere in the initial phase of the project and not meant 
+It should be noted that the \texttt{.out} files produced by \sfn{sienaBayes()}
+are produced somewhere in the initial phase of the project and not meant
 to be informative for final results. They may be disregarded.
 \medskip
 
@@ -7341,7 +7485,7 @@ and for maintaining existing ties.
 
  \item five variations of the \emph{GWESP (geometrically weighted edgewise
   shared partners)} effects: \texttt{gwespFF, gwespBB, gwespFB, gwespBF, gwespRR},
-  and for non-directed networks the sixth version \texttt{gwesp}. \\
+  and for non-directed $W$ networks the sixth version \texttt{gwesp}. \\
   \emph{Note that there is a difference since version 1.1-251; see at the end
   of this item.}\\
   These are effects like those developed for exponential random graph models (`ERGMs')
@@ -7365,6 +7509,19 @@ and for maintaining existing ties.
 where $\text{EPFF}_{ik}$ (for `edgewise partners') is the number of nodes $j$
 such that $i \rightarrow j$ and there are exactly $k$ other
 nodes $h$ for which there is the two-path $i \rightarrow h \rightarrow j$.
+
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[scale=0.8]{gwesp.png}
+% from tikztry.tex
+\\
+\emph{Figure.} Geometrically weighted edgewise shared partners; \\
+left, transitive (`gwespFF'); right, cyclical (`gwespBB');
+for F=`forward', B=`backward'.
+\end{center}
+\end{figure}
+
 An equivalent way of writing this is
 \begin{equation}
   \text{GWESPFF}(i, \alpha) \,=\,
@@ -7376,6 +7533,15 @@ An equivalent way of writing this is
 \end{equation}
 \end{subequations}
 where the convention is used that $x_{jj} = 0$ for all $j$.
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[scale=1]{gwespCurves.png}
+
+\emph{Figure.} GWESP weight for a tie closing $s$ two-paths for
+                    $\alpha = \infty, 1.2, 0.69, 0$.
+\end{center}
+\end{figure}
 
 The parameter $\alpha$ is a tuning parameter that may range from 0 to $\infty$.
 The internal effect parameter is defined as $100 \times \alpha$.
@@ -7424,7 +7590,7 @@ Thus, the GWESP effects are defined in \RS as the elementary effects
 
 It should be noted that although the GWESP statistic is not triadic but
 depends on higher-order configurations, still it is actor-oriented
-because only those configurations are considered that are part of the
+in the sense that only those configurations are considered that are part of the
 personal network, i.e., the set of actors immediately connected
 to the focal actor $i$.
 
@@ -7443,12 +7609,12 @@ nodes $h$ for which there is the two-in-star $i \rightarrow h \leftarrow j$;\\
 with $i \rightarrow j$ and there are exactly $k$ other
 nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightleftarrows j$.
 
-In version 1-1.251 this was changed (thanks to Nynke Niezink), because earlier versions
-were not quite according to what is described above. The effect was earlier
-implemented as\\
+In version 1-1.251 the implementation was changed (thanks to Nynke Niezink),
+because earlier versions were not quite according to what is described above.
+The effect was until version 1-1.250 implemented as\\
 $c_1 + c_2 \times \text{GWESPFF}(i, \alpha')$\\
 for values $c_1(\alpha)$ and $c_2(\alpha)$ not dependent on $x$, and with
-positive parameters $\alpha$, $\alpha'$ depending according to
+positive parameters $\alpha$, $\alpha'$ related according to
 $\exp(-\alpha) + \exp(-\alpha') = 1$. Note that for the default value
 $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha = \alpha'$.
 
@@ -7583,6 +7749,10 @@ $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha
  where $c$ is some constant, defined by  \\
  $s^{\rm net}_{i\vit}(x) = 1/(x_{i+} + c)(x_{i+} + c + 1)$;\\
  endowment effect only likelihood-based.
+
+
+ \item[{\hspace*{-1ex}$\bigodot$}] the following assortativity effects are,
+ for $c=1$, various orientations of three-paths (plus a bit of two-paths):\\
 
  \item {\em out-out degree$\,\hat{\ }$(1/c) assortativity}
  \texttt{(outOutAss)},
@@ -8968,10 +9138,55 @@ by Maximum Likelihood and Bayesian estimation.
                      {w_{+i} + w_{+j} - \sum_h w_{hi}\,w_{hj}}
  \]
  (where again 0/0 is taken as 0).
+
+ \item Five variations of mixed \emph{GWESP (geometrically weighted edgewise
+  shared partners)} effects: \texttt{gwespFFMix, gwespBBMix,
+  gwespFBMix, gwespBFMix, gwespRRMix}, and for non-directed
+  and two-mode networks the sixth version \texttt{gwespMix}. \\
+  See above for the GWESP effects for one-mode networks for their
+  further background.
+  These are geometrically downweighted analogues:
+   \texttt{gwespFFMix} of \texttt{closure},
+   \texttt{gwespBBMix} of \texttt{cyClosure},
+  \texttt{gwespFBMix} of \texttt{from}, \texttt{gwespBFMix} of \texttt{sharedIn},
+  and \texttt{gwespRRMix} of \texttt{fromMutual}.
+  The \texttt{gwespFFMix} effect is defined by
+\[
+  \text{GWESPFF}(i, \alpha) \,=\,
+       \sum_{j=1}^n x_{ij} \,
+                        e^{\alpha} \,\Big\{1 \,-\, \big(1 -
+                        e^{-\alpha}\big)^{\sum_{h=1}^n w_{ih}w_{hj} }  \Big\}
+      \,   \ ,
+\]
+where the convention is used that $w_{jj} = 0$ for all $j$.
+See the figures above in the presentation of the \texttt{gwespFF}
+effect.
+
+The parameter $\alpha$ is a tuning parameter that may range from 0 to $\infty$.
+The internal effect parameter is defined as $100 \times \alpha$.
+An often used value is $\alpha = \log(2) = 0.69$ \citep{SPRH06},
+corresponding to an internal effect parameter of 69,
+but it is worthwhile to try out different values of $\alpha$
+to see which one gives the best fit.
+For large $\alpha$ the  \texttt{gwespFFMix} effect will
+approximate the \texttt{closure} effect, and similarly for the
+other correspondences mentioned above.
+
+The other types of mixed GWESP effect are analogous, with
+different tie orientations. They are defined as follows:\\
+\texttt{gwespBBMix}: ${\sum_{h=1}^n w_{ih}w_{hj} }$
+is replaced by ${\sum_{h=1}^n w_{hi}w_{jh} }$;\\[0.3em]
+\texttt{gwespFBMix}: ${\sum_{h=1}^n w_{ih}w_{hj} }$
+is replaced by ${\sum_{h=1}^n w_{ih}w_{jh} }$;\\[0.3em]
+\texttt{gwespBFMix}: ${\sum_{h=1}^n w_{ih}w_{hj} }$
+is replaced by ${\sum_{h=1}^n w_{hi}w_{hj} }$;\\[0.3em]
+\texttt{gwespRRMix}: ${\sum_{h=1}^n w_{ih}w_{hj} }$
+is replaced by ${\sum_{h=1}^n w_{ih}w_{hi}w_{jh}w_{hj} }$;\\[0.3em]
+\texttt{gwespMix} for two-mode $W$:\ ${\sum_{h=1}^n w_{ih}w_{hj} }$
+is replaced by ${\sum_{h=1}^m w_{ih}w_{jh} }$.
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
-\newpage
 \noindent
 Then there are effects using mixed configurations on four nodes
 (cf.\ \texttt{sharedPop}).
@@ -9866,12 +10081,14 @@ For the combined degree-effects, mentioned first, \texttt{F} means `Forward',
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ij} \,$;
  \item {\em double indegree effect} \texttt{(BBDeg)},\\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ji}\,x_{2ji} \,$;
- \item {\em double reciprocated -- outdegree effect} \texttt{(RFDeg)},\\
- $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{1ji}\,x_{2ij}\, $;
- \item {\em double reciprocated -- indegree effect} \texttt{(RBDeg)},\\
- $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{1ji}\,x_{2ji}\, $;
- \item {\em double reciprocated degree effect} \texttt{(RRDeg)},\\
- $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{1ji}\,x_{2ij}\,x_{2ji} \,$.
+ \item {\em combined out-indegree effect} \texttt{(FBDeg)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ji} \,$;
+ \item {\em combined out-reciprocated degree effect} \texttt{(FRDeg)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ij}\,x_{2ji}\, $;
+ \item {\em combined in-reciprocated degree effect} \texttt{(BRDeg)},\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ji}\,x_{2ij}\,x_{2ji}\, $.
+% \item {\em double reciprocated degree effect} \texttt{(RRDeg)},\\
+% $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{1ji}\,x_{2ij}\,x_{2ji} \,$.
 \end{followenum}
 
 \noindent
@@ -10272,7 +10489,14 @@ a_{i\vit}(y)=v_{i} \frac{\sum_{j=1}^n z_j x_{ij}}{\sum_{j=1}^n x_{ij}}.
 
 \end{enumerate}
 
+\subsection{Effects for estimation by Generalized Method of Moments}
 
+A variety of effects can be specified in \rst\ with \texttt{type='gmm'},
+as shown in \textsf{effectsDocumentation()}. 
+These are not effects for the definition of the probability model,
+but for the estimation by the Generalized Method of Moments
+(Section~\ref{S_GMoM}). 
+This is still in full development, and will be documented later.
 
 \newpage
 \section{Parameter interpretation}
@@ -11103,6 +11327,20 @@ siena07
 sink()
 \end{verbatim}
 Note that you should give the function name without parentheses.
+\bigskip
+
+\emph{\bf After updating}
+\smallskip
+
+\noindent
+Updates of \RS and \textsf{RSienaTest} are not always completely backward
+compatible. When updating the version, you may have to create
+effects objects and algorithm objects again. If there is
+incomplete backward compatibility with respect to
+useability of scripts, this will be mentioned at the \emph{News page}
+of the \SI website.
+
+
 
 \subsection{During estimation}
 
@@ -11178,6 +11416,13 @@ system is computationally singular: reciprocal condition number = 2.34809e--35
 --35.)
 \smallskip
 
+or
+\smallskip
+
+\noindent
+\emph{Error for inversion of d11}
+\smallskip
+
 \begin{indentation}{0.04\textwidth}{0pt}
 \noindent
 This can happen at the end of estimation in function \sfn{siena07},
@@ -11189,8 +11434,15 @@ or are always 0.
 \noindent
 \emph{Solutions.}\\
 Check your data (look at the description of the variables
-given as the output of \sfn{print01Report}).
-Check your model specification.
+given as the output of \sfn{print01Report}).\\
+Check your model specification.\\
+Find out which effect might be especially correlated
+with some other effects, and treat it by a score-type
+test without estimating (i.e., specify it with
+\texttt{fix=TRUE, test=TRUE}).
+(Also see the discussion of the Hauck-Donner phenomenon
+in Section~\ref{S_fixingparameters}; this issue might
+be relevant here.)
 \end{indentation}
 
 
@@ -12348,6 +12600,38 @@ the R-Forge repository, which contains an almost complete listing of changes.)
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
+
+\item 2016-01-30 Revision 290.
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item New effects \texttt{FBDeg}, \texttt{FRDeg}, \texttt{BRDeg}
+     (\texttt{RFDeg} was mentioned earlier
+     but was not implemented; its place is now taken by \texttt{FRDeg}),
+	 \texttt{gwespFFMix}, \texttt{gwespBBMix}, \texttt{gwespBFMix},
+     \texttt{gwespFBMix}, \texttt{gwespRRMix}, \texttt{gwespMix}.
+   \item Corrected the omission of the check for positive derivative matrix
+      at the end of phase 1 for effects with fixed parameters.
+   \item Added parameters \texttt{fix}, \texttt{test}, \texttt{parameter} to 
+   \sfn{includeInteraction()}.
+   \item More helpful error message for incorrect nodesets in
+    \sfn{sienaDataCreate()};
+     extended help pages for  \sfn{sienaDataCreate()}
+     and  \sfn{sienaDependent()}.
+   \item Correction  to allow estimation for a one-dimensional parameter.
+   \item \texttt{fromBayes} bug corrected.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item \sfn{sienacpp()} added (programmed by Felix Schoenenberger); this includes
+     gmm estimation (Amati - Snijders).
+   \item settings model added (Snijders - Preciado; programmed by Mark Ortmann);
+     totally experimental, not yet documented. 
+   \item \sfn{sienaBayes()}: option \texttt{initML} added; check for zero distances;
+     corrected function \texttt{improveMH()} in initialization.
+   \item \sfn{print.multipleBayesTest()}: option \texttt{descriptives} added.
+   \item \sfn{glueBayes()}: add \texttt{p1} and \texttt{p2} to created object.
+\end{itemize}
 
 \item 2015-09-10 Revision 289.
 

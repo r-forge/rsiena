@@ -25,6 +25,13 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
     {
         stop("User interrupted run, object possibly incomplete")
     }
+	if (!is.null(sienaFit$gmm))
+	{
+		if (sienaFit$gmm)
+    	{
+        	stop("sienaTimeTest cannot be applied to results of GMoM estimation")
+    	}
+	}
     waveNumbers <- attr(sienaFit$f, "periodNos")
     nWaves <- length(waveNumbers)
 

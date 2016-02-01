@@ -43,6 +43,7 @@ class EffectInfo;
 class StructuralRateEffect;
 class DiffusionRateEffect;
 class MiniStep;
+class Setting;
 
 
 // ----------------------------------------------------------------------------
@@ -187,7 +188,7 @@ protected:
 	double settingRate() const;
 	// A two-dimensional array of tie flip and behavior change contributions to effects.
 	map<const EffectInfo *, vector<double> > * lpChangeContribution;
-
+	Setting** lsettings;
 private:
 	void initializeFunction(Function * pFunction,
 		const vector<EffectInfo *> & rEffects) const;
@@ -220,7 +221,7 @@ private:
 
 	// The setting rate parameters for the current period. Order matches the
 	// data object. Only for network variables.
-	double * lsettingRates;
+//	double * lsettingRates;
 
 	// The scaled setting rate parameters for the current period.
 	// Order matches the data object. Only for network variables.

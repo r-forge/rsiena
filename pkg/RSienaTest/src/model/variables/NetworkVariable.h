@@ -27,7 +27,7 @@ class Network;
 class NetworkLongitudinalData;
 class NetworkCache;
 class PermittedChangeFilter;
-
+class ITieIterator;
 
 // ----------------------------------------------------------------------------
 // Section: NetworkVariable class
@@ -93,6 +93,7 @@ private:
 	bool calculateModelTypeBProbabilities();
 	bool diagonalMiniStep(int ego, int alter) const;
 
+	void initializeSetting();
 	// The current state of the network
 	Network * lpNetwork;
 
@@ -170,7 +171,7 @@ private:
 
 	double lsymmetricProbability;
 
-	vector<int> * lsetting;
+	ITieIterator* lsettingFlips;
 
 	// whether this is a one mode network or not
 

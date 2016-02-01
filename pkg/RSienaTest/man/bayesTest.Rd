@@ -17,8 +17,8 @@
 \usage{
 simpleBayesTest(z, nfirst=z$nwarm+1, tested0=0,
                 probs = c(0.025,0.975), ndigits=4)
-multipleBayesTest(z, testedPar, nfirst=z$nwarm, tested0=0, ndigits=4)
-\method{print}{multipleBayesTest}(x, ...)
+multipleBayesTest(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits=4)
+\method{print}{multipleBayesTest}(x, descriptives=FALSE, ...)
 \method{plot}{multipleBayesTest}(x, xlim=NULL, ylim=NULL, main=NULL, ...)
 }
 %- maybe also "usage" for other objects documented here.
@@ -45,6 +45,8 @@ multipleBayesTest(z, testedPar, nfirst=z$nwarm, tested0=0, ndigits=4)
     resulting from a call to \code{multipleBayesTest}.}
   \item{\dots}{Extra arguments for \code{print.multipleBayesTest}
      and \code{plot.multipleBayesTest}.}
+  \item{descriptives}{Boolean: whether to print the posterior mean, s.d., and
+     covariance matrix of the parameters included in the test.}
   \item{xlim}{Parameter \code{xlim} in \code{\link{plot}}; if \code{NULL},
    a sensible default will be used.}
   \item{ylim}{Parameter \code{ylim} in \code{\link{plot}}; if \code{NULL},

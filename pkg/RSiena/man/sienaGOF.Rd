@@ -6,7 +6,8 @@
 \description{
  The function \code{sienaGOF} assesses goodness of fit
  for a model specification as represented by an estimated
- \code{sienaFit} object. This is done by simulations of auxiliary
+ \code{sienaFit} object created by \code{\link{siena07}}.
+ This is done by simulations of auxiliary
  statistics, that differ from the statistics used for estimating
  the parameters. The auxiliary statistics must be given explicitly.
  The fit is good if the average values

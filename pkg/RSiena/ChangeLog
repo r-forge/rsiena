@@ -1,3 +1,30 @@
+2016-01-31 R-Forge Revision 290
+Changes in RSiena and RSienaTest:
+   * New effects FBDeg, FRDeg, BRDeg (RFDeg was mentioned earlier
+     but was not implemented; its place is now taken by FRDeg),
+     gwespFFMix, gwespBBMix, gwespBFMix, gwespFBMix, gwespRRMix,
+     gwespMix.
+   * Corrected check for positive derivative matrix at the end of phase 1
+     omitted for effects with fixed parameters
+     (phase1.r, CalculateDerivative(); phase3.r).
+   * Added parameters fix, test, parameter to includeInteraction().
+   * More helpful error message for incorrect nodesets in sienaDataCreate;
+     extended help pages sienaDataCreate.Rd and sienaDependent.Rd.
+   * Correction of diag(diag(..)) to allow estimation with p=1
+     (phase1.r, initializeFRAN.r)
+   * fromBayes bug corrected.
+Changes in RSienaTest:
+   * sienacpp added (programmed by Felix Schoenenberger); this includes
+     gmm estimation (Amati - Snijders);
+     and implies a lot of changes in other functions to enable this.
+   * settings model added (Snijders - Preciado; programmed by Mark Ortmann);
+     not yet documented. Also implies a lot of changes.
+   * sienaBayes(): option initML added; check for zero distances.
+     corrected function improveMH() in initialization;
+     check for dimensions priorMu and priorSigma done earlier.
+   * print.multipleBayesTest(): option descriptives added.
+   * glueBayes(): add p1 and p2 to created object.
+
 2015-09-10 R-Forge Revision 289
 Changes in RSiena and RSienaTest:
    * New defaults for siena07() in sienaAlgorithmCreate():

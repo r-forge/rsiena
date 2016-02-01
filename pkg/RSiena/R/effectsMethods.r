@@ -42,19 +42,21 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
     if (nrow(x) > 0)
     {
         nDependents <- length(unique(x$name))
-        userSpecifieds <- x$shortName[x$include] %in% c("unspInt", "behUnspInt")
+        userSpecifieds <- x$shortName[x$include] %in%
+												c("unspInt", "behUnspInt")
         endowments <- !x$type[x$include] %in% c("rate", "eval")
-											# includes creations
+											# includes creations and gmm
+		gmm <- any(x$type[x$include] %in% "gmm")
         timeDummies <- !x$timeDummy[x$include] == ","
-        specs <- x[, c("name", "effectName", "include", "fix", "test",
-                       "initialValue", "parm")]
+        specs <- as.data.frame(x[, c("name", "effectName", "include", "fix",
+											"test", "initialValue", "parm")])
         if (includeOnly)
         {
             specs <- specs[x$include, ]
         }
         if (nDependents == 1)
         {
-            specs <- specs[, -1]
+            specs <- specs[, -1]  # drop name of dependent variable
         }
         if (any(endowments))
         {
@@ -80,9 +82,30 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
                                           width=10)
         if (nrow(specs) > 0)
         {
+			if (gmm)
+			{
+				cat('  For estimation by the Generalized Method of Moments\n')
+				cat('  Effects\n')
+				if (any(specs$type!='gmm'))
+				{
+					specs1 <- specs[specs$type!='gmm',]
+					row.names(specs1) <- 1:nrow(specs1)
+					print(as.matrix(specs1), quote=FALSE)
+				}
+				if (any(specs$type=='gmm'))
+				{
+					cat('\n	 Statistics\n')
+					specs2 <- specs[specs$type=='gmm',]
+					row.names(specs2) <- 1:nrow(specs2)
+					print(as.matrix(specs2[,c(1:2,7)]), quote=FALSE)
+				}
+			}
+			else
+			{
             row.names(specs) <- 1:nrow(specs)
             print(as.matrix(specs), quote=FALSE)
         }
+		}
         else
         {
             print.data.frame(specs)

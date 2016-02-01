@@ -15,7 +15,7 @@
   indicates more precisely the purpose of this function.
 }
 \usage{
-sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0,
+sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
      useStdInits = FALSE, n3 = 1000, nsub = 4, n2start = NULL,
      dolby=TRUE, maxlike = FALSE, diagonalize=0.2*!maxlike,
      condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
@@ -24,9 +24,10 @@ sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0,
      prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
      modelType=1, mult=5, simOnly=FALSE, localML=FALSE,
-     truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1))
+     truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1),
+     normalizeSettingRates=FALSE)
 
-sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
+sienaModelCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
      useStdInits = FALSE, n3 = 1000, nsub = 4, n2start = NULL,
      dolby=TRUE, maxlike = FALSE, diagonalize=0.2*!maxlike,
      condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
@@ -35,7 +36,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
      prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
      modelType=1, mult=5, simOnly=FALSE, localML=FALSE,
-     truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1))
+     truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1),
+     normalizeSettingRates=FALSE)
 }
 \arguments{
   \item{fn}{Function to do one simulation in the Robbins-Monro
@@ -45,6 +47,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
   \item{MaxDegree}{Named vector of maximum degree values for
     corresponding networks. Allows to restrict the model to networks
     with degrees not higher than this maximum.}
+  \item{UniversalOffset}{Named vector of offset values
+    for universal setting. For Settings model only.}
   \item{useStdInits}{Boolean. If TRUE, the initial values in the effects
     object will be ignored and default values used instead.
     If FALSE, the initial values in the effects object will be used.}
@@ -128,6 +132,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0,
     of simulation.}
   \item{localML}{Logical: If TRUE, and \code{maxlike}, then calculations are
     sped up for models with all local effects.}
+  \item{normalizeSettingRates}{Logical: choice of version of statistics
+    for estimation of settings model.}
   \item{truncation}{Used for step truncation in the Robbins Monro algorithm
     (applied to deviate/(standard deviation)).}
   \item{doubleAveraging}{subphase after which double averaging is used

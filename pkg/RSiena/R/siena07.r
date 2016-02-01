@@ -5,8 +5,8 @@
 ## *
 ## * File: siena07.r
 ## *
-## * Description: This file contains the main controlling module for the model
-## * fitting
+## * Description: This file contains the main controlling module for the
+## * estimation.
 ## * Also contains utility functions used within siena07
 ## ****************************************************************************/
 

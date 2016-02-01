@@ -224,7 +224,8 @@ phase1.2 <- function(z, x, ...)
     }
 		# Partial diagonalization of derivative matrix
 		# for use if 0 < x$diagonalize < 1.
-		temp <- (1-x$diagonalize)*z$dfra + x$diagonalize*diag(diag(z$dfra))
+	temp <- (1-x$diagonalize)*z$dfra + 
+				x$diagonalize*diag(diag(z$dfra), nrow=dim(z$dfra)[1])
 		temp[z$fixed, ] <- 0.0
 		temp[, z$fixed] <- 0.0
 		diag(temp)[z$fixed] <- 1.0
@@ -301,8 +302,7 @@ CalculateDerivative <- function(z, x)
         ##browser()
 
         dfra <- derivativeFromScoresAndDeviations(z$ssc, z$sf2)
-
-		fromBayes <- !is.null(x$fromBayes)
+		fromBayes <- 'fromBayes' %in% names(x)
         z$jacobianwarn1 <- rep(FALSE, z$pp)
         if ((any(diag(dfra)[!z$fixed] <= 0)) && (!fromBayes))
          {
@@ -345,6 +345,7 @@ CalculateDerivative <- function(z, x)
     someFixed <- FALSE
     if (any(diag(dfra) <= 0 & !z$fixed))
     {
+		fromBayes <- 'fromBayes' %in% names(x)
 		if (fromBayes)
 		{
 	# Use the values for diag(dfra) from startupGlobal computed in sienaBayes

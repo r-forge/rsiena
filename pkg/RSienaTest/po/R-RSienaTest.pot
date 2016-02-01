@@ -236,6 +236,9 @@ msgstr ""
 msgid "Incompatibility between data and MaxDegree in algorithm object."
 msgstr ""
 
+msgid "Incompatibility between data and UniversalOffset in algorithm object."
+msgstr ""
+
 msgid "network names not consistent"
 msgstr ""
 

@@ -2,7 +2,7 @@
 \alias{sienaTimeTest}
 \title{Functions to assess and account for time heterogeneity of parameters}
 \description{
- Takes a \code{sienaFit} object from a \code{\link{siena07}} estimation
+ Takes a \code{sienaFit} object estimated by Method of Moments,
  and tests for time heterogeneity by the addition of interactions with
  time dummy variables at waves \code{m=2...(M-1)}.
  The test used is the score-type test of Schweinberger (2012).

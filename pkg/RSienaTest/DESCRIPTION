@@ -1,11 +1,11 @@
 Package: RSienaTest
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.1-289
-Date: 2015-09-10
-Author: Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders
+Version: 1.1-290
+Date: 2016-01-31
+Author: Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders, Felix Schoenenberger
 Depends: R (>= 2.15.0), utils
-Imports: Matrix, tcltk, lattice, parallel, MASS
+Imports: Matrix, tcltk, lattice, parallel, MASS, RUnit
 Suggests: xtable, network, tools, codetools
 SystemRequirements: GNU make, tcl/tk 8.5, Tktable
 Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>

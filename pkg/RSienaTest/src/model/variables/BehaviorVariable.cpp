@@ -91,10 +91,8 @@ BehaviorVariable::~BehaviorVariable()
 	this->lcreationEffectContribution = 0;
 	this->lprobabilities = 0;
 
-	if(this->lpChangeContribution != 0)
-	{
-		delete this->lpChangeContribution;
-	}
+	// no need to delete lpChangeContribution since this is
+	// handled by the MiniStep
 }
 
 
@@ -344,7 +342,8 @@ void BehaviorVariable::calculateProbabilities(int actor)
 
 	if (this->pSimulation()->pModel()->needChangeContributions())
 	{
-		this->lpChangeContribution = new map<const EffectInfo *, vector<double> >[evaluationEffectCount+endowmentEffectCount+creationEffectCount];
+		this->lpChangeContribution = new map<const EffectInfo *, vector<double> >();
+// used to be:   >[evaluationEffectCount+endowmentEffectCount+creationEffectCount];
 		for (int i = 0; i < evaluationEffectCount; i++)
 		{
 			vector<double> vec(3,0);

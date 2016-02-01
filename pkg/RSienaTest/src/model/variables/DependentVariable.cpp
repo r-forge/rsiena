@@ -35,10 +35,11 @@
 #include "model/effects/DiffusionRateEffect.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/variables/EffectValueTable.h"
+#include "model/settings/Setting.h"
+#include "model/settings/SettingsFactory.h"
 #include "network/IncidentTieIterator.h"
 
-namespace siena
-{
+namespace siena {
 
 // ----------------------------------------------------------------------------
 // Section: Construction area
@@ -71,14 +72,25 @@ DependentVariable::DependentVariable(string name,
 	if (pNetworkData)
 	{
 	 	this->lnumberSettings = pNetworkData->rSettingNames().size();
-	 	this->lsettingRates = new double[this->lnumberSettings];
+		if (lnumberSettings > 0) {
 	 	this->lsettingProbs = new double[this->lnumberSettings];
+			lsettings = new Setting*[numberSettings()];
+			SettingsFactory factory;
+			for (int i = 0; i < numberSettings(); i++) {
+				lsettings[i] = factory.createSetting(
+						pNetworkData->rSettingNames().at(i));
+	 }
+		} else {
+			this->lsettingProbs = 0;
+			this->lsettings = 0;
+		}
 	 }
 	 else
 	{
 		this->lnumberSettings = 0;
-		this->lsettingRates = 0;
 	 	this->lsettingProbs = 0;
+		//TODO: Check correctness
+		this->lsettings = 0;
 	}
 	this->lstepType = -1;
 	this->lpChangeContribution = 0;
@@ -99,13 +111,13 @@ void DependentVariable::initializeRateFunction()
 	if (this->networkVariable())
 	{
 		NetworkLongitudinalData * pNetworkData =
-			dynamic_cast<NetworkLongitudinalData *>(
-				this->pSimulation()->pData()->pNetworkData(this->name()));
-		const std::vector< string > & rSettingNames =
+				dynamic_cast<NetworkLongitudinalData *>(this->pSimulation()->pData()->pNetworkData(
+						this->name()));
+		const std::vector<SettingInfo> & rSettingNames =
 			pNetworkData->rSettingNames();
 		for (unsigned i = 0 ; i < rSettingNames.size(); i++)
 		{
-			this->lsettingRateScores[rSettingNames[i]] = 0;
+			this->lsettingRateScores[rSettingNames[i].getId()] = 0;
 		}
 	}
 
@@ -177,14 +189,11 @@ void DependentVariable::initializeRateFunction()
 						parameter;
 					this->lbehaviorVariableScores[pBehaviorVariable] = 0;
 					this->lbehaviorVariableSumTerm[pBehaviorVariable] = 0;
-					this->lbehaviorVariableModelBSumTerm[pBehaviorVariable]
-						= 0;
-				}
-				else
+				this->lbehaviorVariableModelBSumTerm[pBehaviorVariable] = 0;
+			} else
 					throw logic_error(
-						"No individual covariate named '" +
-						interactionName +
-						"'.");
+						"No individual covariate named '" + interactionName
+								+ "'.");
 				//}
 		}
 		else if (rateType == "structural")
@@ -221,8 +230,7 @@ void DependentVariable::initializeRateFunction()
 				}
 
 				this->lstructuralRateEffects.push_back(
-					new StructuralRateEffect(pVariable,
-						OUT_DEGREE_RATE,
+						new StructuralRateEffect(pVariable, OUT_DEGREE_RATE,
 						parameter));
 				this->loutDegreeScores[pVariable] = 0;
 				this->loutDegreeSumTerm[pVariable] = 0;
@@ -236,8 +244,7 @@ void DependentVariable::initializeRateFunction()
 				}
 
 				this->lstructuralRateEffects.push_back(
-					new StructuralRateEffect(pVariable,
-						IN_DEGREE_RATE,
+						new StructuralRateEffect(pVariable, IN_DEGREE_RATE,
 						parameter));
 				this->linDegreeScores[pVariable] = 0;
 				this->linDegreeSumTerm[pVariable] = 0;
@@ -257,8 +264,7 @@ void DependentVariable::initializeRateFunction()
 
 				this->lstructuralRateEffects.push_back(
 					new StructuralRateEffect(pVariable,
-						RECIPROCAL_DEGREE_RATE,
-						parameter));
+								RECIPROCAL_DEGREE_RATE, parameter));
 				this->lreciprocalDegreeScores[pVariable] = 0;
 				this->lreciprocalDegreeSumTerm[pVariable] = 0;
 			}
@@ -271,8 +277,7 @@ void DependentVariable::initializeRateFunction()
 
 				this->lstructuralRateEffects.push_back(
 					new StructuralRateEffect(pVariable,
-						INVERSE_OUT_DEGREE_RATE,
-						parameter));
+								INVERSE_OUT_DEGREE_RATE, parameter));
 				this->linverseOutDegreeScores[pVariable] = 0;
 				this->linverseOutDegreeSumTerm[pVariable] = 0;
 				this->linverseOutDegreeModelBSumTerm[pVariable] = 0;
@@ -285,8 +290,7 @@ void DependentVariable::initializeRateFunction()
 				}
 
 				this->lstructuralRateEffects.push_back(
-					new StructuralRateEffect(pVariable,
-						LOG_OUT_DEGREE_RATE,
+						new StructuralRateEffect(pVariable, LOG_OUT_DEGREE_RATE,
 						parameter));
 				this->llogOutDegreeScores[pVariable] = 0;
 				this->llogOutDegreeSumTerm[pVariable] = 0;
@@ -435,13 +439,20 @@ void DependentVariable::initializeFunction(Function * pFunction,
  */
 DependentVariable::~DependentVariable()
 {
+	if (lsettings != 0) {
+		for (int i = 0; i < numberSettings(); i++) {
+			delete lsettings[i];
+		}
+		delete[] lsettings;
+	}
+	if (lsettingProbs != 0) {
+		delete[] lsettingProbs;
+	}
 	delete this->lpEvaluationFunction;
 	delete this->lpEndowmentFunction;
 	delete this->lpCreationFunction;
 	delete[] this->lrate;
 	delete[] this->lcovariateRates;
-	delete[] this->lsettingRates;
-	delete[] this->lsettingProbs;
 
 	// Delete the structural rate effects.
 	deallocateVector(this->lstructuralRateEffects);
@@ -553,7 +564,7 @@ void DependentVariable::initialize(int period)
 	{
 		NetworkLongitudinalData * pNetworkData =
 			dynamic_cast<NetworkLongitudinalData *>(this->pData());
-		const std::vector< string > & rSettingNames =
+		const std::vector<SettingInfo> & rSettingNames =
 			pNetworkData->rSettingNames();
 		if (this->lnumberSettings > 0)
 		{
@@ -562,17 +573,17 @@ void DependentVariable::initialize(int period)
 				 i < rSettingNames.size();
 				 i++)
 			{
-				this->lsettingRates[i] =
-					this->pSimulation()->pModel()->
-					settingRateParameter(pNetworkData,
-						rSettingNames[i], period);
-				sum += this->lsettingRates[i];
+				this->lsettings[i]->setRate(
+						this->pSimulation()->pModel()->settingRateParameter(
+								pNetworkData, rSettingNames[i].getId(),
+								period));
+				sum += this->lsettings[i]->getRate();
 			}
 			for (unsigned i = 0;
 				 i < rSettingNames.size();
 				 i++)
 			{
-				this->lsettingProbs[i] = this->lsettingRates[i] / sum;
+				this->lsettingProbs[i] = this->lsettings[i]->getRate() / sum;
 			}
 			this->lbasicRate = 0;
 		}
@@ -863,9 +874,10 @@ double DependentVariable::behaviorVariableRate(int i) const
 double DependentVariable::settingRate() const
 {
 	double settingRate = 0;
-	for (int i = 1; i < this->lnumberSettings; i++)
+//TODO: check if 1 or 0 to n
+	for (int i = 0; i < this->lnumberSettings; i++)
 	{
-		settingRate += this->lsettingRates[i];
+		settingRate += this->lsettings[i]->getRate();
 	}
 	return settingRate;
 }
@@ -911,18 +923,19 @@ void DependentVariable::accumulateRateScores(double tau,
 	// Update scores for setting rates
 	NetworkLongitudinalData * pNetworkData =
 		dynamic_cast<NetworkLongitudinalData *>(this->pData());
-	const std::vector< string > & rSettingNames  =
+	const std::vector<SettingInfo> & rSettingNames =
 		pNetworkData->rSettingNames();
 
 	for (int i = 0; i < this->lnumberSettings; i++)
 	{
+		// TODO: Check if this correct
 		if (this == pSelectedVariable && this->lstepType == i)
 		{
-			this->lsettingRateScores[rSettingNames[i]] +=
-				1.0 / this->lsettingRates[i];
+			this->lsettingRateScores[rSettingNames[i].getId()] += 1.0
+					/ this->lsettings[i]->getRate();
 		}
-		this->lsettingRateScores[rSettingNames[i]] -= this->totalRate() * tau /
-			this->lsettingRates[i];
+		this->lsettingRateScores[rSettingNames[i].getId()] -= this->totalRate() * tau /
+			this->lsettings[i]->getRate();
 	}
 
 	// Update scores for covariate dependent rate parameters

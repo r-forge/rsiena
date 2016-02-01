@@ -56,11 +56,65 @@
 #include "model/effects/generic/OutActDistance2Function.h"
 #include "model/effects/generic/MixedThreeCyclesFunction.h"
 #include "model/effects/generic/InStarsTimesDegreesFunction.h"
+#include "model/effects/CovariateSimmelianAlterEffect.h"
+#include "model/effects/gmm/ReciprocityGMMEffect.h"
+#include "model/effects/gmm/AgreementTransitivityEffect.h"
+#include "model/effects/gmm/RealTransitivityEffect.h"
 #include "model/tables/EgocentricConfigurationTable.h"
 #include "model/tables/NetworkCache.h"
 
+#include "logger/Logger.h"
+
+using namespace std;
+using namespace siena::logger;
+
 namespace siena
 {
+/**
+ * GMM group information. Maps effect short names to the one unique gmm group
+ * (usually the basic effect). In addition there are two special groups. The
+ * empty string ("") meaning a match by position (diagonal matrix) and the
+ * star ("*") meaning matching all.
+ */
+const std::string EffectFactory::gmmGroup(const EffectInfo* pEffectInfo) {
+	// map basic rates to the empty group, that is match by position
+	if (pEffectInfo->effectName() == "BasicRate") {
+		LOGF(Priority::INFO, "'%s' in gmm group '%s'",
+				pEffectInfo->effectName().c_str(), "");
+		return "";
+	}
+	map<const string, const string>::const_iterator it =
+		EffectFactory::GMM_GROUPS.find(pEffectInfo->effectName());
+	// if group is not specified, map to base name
+	if (it == EffectFactory::GMM_GROUPS.end()) {
+		LOGF(Priority::INFO, "'%s' in gmm group '%s'",
+				pEffectInfo->effectName().c_str(), pEffectInfo->effectName().c_str());
+		return pEffectInfo->effectName();
+	}
+	// otherwise return the group
+	LOGF(Priority::INFO, "'%s' in gmm group '%s'",
+			pEffectInfo->effectName().c_str(), it->second.c_str());
+	return it->second;
+}
+const map<const string, const string> EffectFactory::GMM_GROUPS = init_groups();
+map<const string, const string> EffectFactory::init_groups() {
+	map<const string, const string> map;
+	map.insert(make_pair("recip", "recip"));
+	map.insert(make_pair("newrecip", "recip"));
+	map.insert(make_pair("realrecip", "recip"));
+	map.insert(make_pair("persistrecip", "recip"));
+	//
+	map.insert(make_pair("transTrip", "transTrip"));
+	//
+	map.insert(make_pair("egoX", "egoX"));
+	map.insert(make_pair("egoX_sim", "egoX"));
+	map.insert(make_pair("outdeg", "egoX"));
+	//
+	map.insert(make_pair("simX", "simX"));
+	map.insert(make_pair("simX_sim", "simX"));
+	map.insert(make_pair("totSim", "simX"));
+	return map;
+}
 
 /**
  * Constructor.
@@ -138,6 +192,15 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "recip")
 	{
 		pEffect = new ReciprocityEffect(pEffectInfo);
+	} else if (effectName == "newrecip") {
+		pEffect = new ReciprocityGMMEffect(pEffectInfo,
+				ReciprocityGMMEffect::NEW);
+	} else if (effectName == "realrecip") {
+		pEffect = new ReciprocityGMMEffect(pEffectInfo,
+				ReciprocityGMMEffect::REAL);
+	} else if (effectName == "persistrecip") {
+		pEffect = new ReciprocityGMMEffect(pEffectInfo,
+				ReciprocityGMMEffect::PERSISTENT);
 	}
 	else if (effectName == "transTrip1")
 	{
@@ -150,6 +213,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "transTrip")
 	{
 		pEffect = new TransitiveTripletsEffect(pEffectInfo,true,true);
+	}
+	else if (effectName == "agreetrans")
+	{
+		pEffect = new AgreementTransitivityEffect(pEffectInfo);
+	}
+	else if (effectName == "realtrans")
+	{
+		pEffect = new RealTransitivityEffect(pEffectInfo);
 	}
 	else if (effectName == "transTriads")
 	{
@@ -311,6 +382,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new XWXClosureEffect(pEffectInfo, false, true);
 	}
+	else if (effectName == "simmelianAltX")
+	{
+		pEffect = new CovariateSimmelianAlterEffect(pEffectInfo);
+	}
 	else if (effectName == "altX")
 	{
 		pEffect = new CovariateAlterEffect(pEffectInfo, false);
@@ -322,14 +397,20 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "egoX")
 	{
 		pEffect = new CovariateEgoEffect(pEffectInfo);
+	} else if (effectName == "egoX_sim") {
+		pEffect = new CovariateEgoEffect(pEffectInfo, true);
 	}
 	else if (effectName == "simX")
 	{
 		pEffect = new CovariateSimilarityEffect(pEffectInfo, false);
+	} else if (effectName == "simX_sim") {
+		pEffect = new CovariateSimilarityEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "simRecipX")
 	{
 		pEffect = new CovariateSimilarityEffect(pEffectInfo, true);
+	} else if (effectName == "simRecipX_sim") {
+		pEffect = new CovariateSimilarityEffect(pEffectInfo, true, true);
 	}
 	else if (effectName == "simXTransTrip")
 	{
@@ -603,6 +684,56 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			new OutJaccardFunction(pEffectInfo->interactionName1()));
+	}
+	else if (effectName == "gwespFFMix")
+	{
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pTwoPathTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo-> interactionName1(),
+				mytable, pEffectInfo->internalEffectParameter());
+ 		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
+	}
+	else if ((effectName == "gwespFBMix")|(effectName == "gwespMix"))
+ 	{
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pInStarTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->interactionName1(),
+				mytable, pEffectInfo->internalEffectParameter());
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
+	}
+	else if (effectName == "gwespBFMix")
+	{
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pOutStarTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->interactionName1(),
+				mytable, pEffectInfo->internalEffectParameter());
+ 		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
+	}
+	else if (effectName == "gwespBBMix")
+	{
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pReverseTwoPathTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->interactionName1(),
+				mytable, pEffectInfo->internalEffectParameter());
+ 		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
+	}
+	else if (effectName == "gwespRRMix")
+	{
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pRRTable;
+		GwespFunction * pFunction =
+			new GwespFunction(pEffectInfo->interactionName1(),
+				mytable, pEffectInfo->internalEffectParameter());
+ 		pEffect = new GenericNetworkEffect(pEffectInfo,
+			pFunction);
 	}
 	else if (effectName == "both")
 	{
@@ -958,6 +1089,22 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "BBDeg")
 	{
 		pEffect = new DoubleDegreeBehaviorEffect(pEffectInfo, false, 1);
+	}
+	else if (effectName == "FBDeg")
+	{
+		pEffect = new DoubleDegreeBehaviorEffect(pEffectInfo, true, 1);
+	}
+	else if (effectName == "BFDeg")
+	{
+		pEffect = new DoubleDegreeBehaviorEffect(pEffectInfo, false, 0);
+	}
+	else if (effectName == "FRDeg")
+	{
+		pEffect = new DoubleDegreeBehaviorEffect(pEffectInfo, true, 2);
+	}
+	else if (effectName == "BRDeg")
+	{
+		pEffect = new DoubleDegreeBehaviorEffect(pEffectInfo, false, 2);
 	}
 //	else if (effectName == "RRDeg")
 //	{

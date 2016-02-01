@@ -82,6 +82,15 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 			cat(' with only names of dependent variables in the data set.\n')
 			stop('Invalid algorithm-data combination.')
 		}
+		if (((inherits(data, "sienaGroup")) &&
+				(!all(names(x$UniversalOffset) %in% names(data[[1]]$depvars)))) ||
+			((!inherits(data, "sienaGroup")) &&
+				(!all(names(x$UniversalOffset) %in% names(data$depvars)))))
+		{
+			cat(' UniversalOffset in the algorithm should be a named vector\n')
+			cat(' with only names of dependent variables in the data set.\n')
+			stop('Invalid algorithm-data combination.')
+		}
         ## get data object into group format to save coping with two
         ## different formats
         if (inherits(data, "sienaGroup"))
@@ -112,14 +121,14 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 # I used this function as a template for the change to getEffects.
 # I wonder why the next 8 lines cannot be dropped;
 # gives error message "cannot find setting col".
-		if (!is.null(x$settings))
-		{
-			effects <- addSettingsEffects(effects, x)
-		}
-		else
-		{
-			effects$setting <- rep("", nrow(effects))
-		}
+#	if (!is.null(x$settings))
+#	{
+#		effects <- addSettingsEffects(effects, x)
+#	}
+#	else
+#	{
+#		effects$setting <- rep("", nrow(effects))
+#	}
         ## find any effects not included which are needed for interactions
         tmpEffects <- effects[effects$include, ]
         interactionNos <- unique(c(tmpEffects$effect1, tmpEffects$effect2,
@@ -236,6 +245,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             z$theta[z$posj] <-
                 z$theta[z$posj] / requestedEffects$initialValue[z$condvar]
         }
+		z$qq <- z$pp
 
         ## unpack data and put onto f anything we may need next time round.
         f <- lapply(data, function(xx, x) unpackData(xx, x), x=x)
@@ -325,7 +335,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 				# Partial diagonalization of derivative matrix
 				# for use if 0 < x$diagonalize < 1.
 				temp <- (1-x$diagonalize)*z$dfra +
-						x$diagonalize*diag(diag(z$dfra))
+						x$diagonalize*diag(diag(z$dfra), nrow=dim(z$dfra)[1])
 				temp[z$fixed, ] <- 0.0
 				temp[, z$fixed] <- 0.0
 				diag(temp)[z$fixed] <- 1.0
@@ -492,6 +502,53 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
                         x[x$requested, ]
                     }
                         )
+
+    ##store address of model
+    f$pModel <- pModel
+    ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
+    if (x$MaxDegree == 0 || is.null(x$MaxDegree))
+    {
+        MAXDEGREE <-  NULL
+    }
+    else
+    {
+        MAXDEGREE <- x$MaxDegree
+        storage.mode(MAXDEGREE) <- "integer"
+    }
+    if (x$UniversalOffset == 0 || is.null(x$UniversalOffset))
+    {
+        UNIVERSALOFFSET <-  NULL
+    }
+    else
+    {
+        UNIVERSALOFFSET <- x$UniversalOffset
+        storage.mode(UNIVERSALOFFSET) <- "double"
+    }
+    if (z$cconditional)
+    {
+        CONDVAR <- z$condname
+        CONDTARGET <- attr(f, "change")
+        ##   cat(CONDTARGET, "\n")
+    }
+    else
+    {
+        CONDVAR <- NULL
+        CONDTARGET <- NULL
+    }
+
+	simpleRates <- TRUE
+	if (any(!z$effects$basicRate & z$effects$type =="rate"))
+	{
+		## browser()
+		simpleRates <- FALSE
+	}
+	z$simpleRates <- simpleRates
+
+	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
+                 pData, pModel, MAXDEGREE, UNIVERSALOFFSET, CONDVAR, CONDTARGET,
+                 profileData, z$parallelTesting, x$modelType, z$simpleRates,
+		 x$normSetRates)
+
     if (!initC)
     {
         ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
@@ -527,41 +584,6 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         }
     }
 
-    ##store address of model
-    f$pModel <- pModel
-    ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
-    if (x$MaxDegree == 0 || is.null(x$MaxDegree))
-    {
-        MAXDEGREE <-  NULL
-    }
-    else
-    {
-        MAXDEGREE <- x$MaxDegree
-        storage.mode(MAXDEGREE) <- "integer"
-    }
-    if (z$cconditional)
-    {
-        CONDVAR <- z$condname
-        CONDTARGET <- attr(f, "change")
-        ##   cat(CONDTARGET, "\n")
-    }
-    else
-    {
-        CONDVAR <- NULL
-        CONDTARGET <- NULL
-    }
-
-	simpleRates <- TRUE
-	if (any(!z$effects$basicRate & z$effects$type =="rate"))
-	{
-		## browser()
-		simpleRates <- FALSE
-	}
-	z$simpleRates <- simpleRates
-
-	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
-                 pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
-                 profileData, z$parallelTesting, x$modelType, z$simpleRates)
 # Here came an error
 # Error: INTEGER() can only be applied to a 'integer', not a 'double'
     if (x$maxlike)
@@ -1161,6 +1183,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
     attr(edgeLists, "averageInDegree") <- attr(depvar, "averageInDegree")
     attr(edgeLists, "averageOutDegree") <- attr(depvar, "averageOutDegree")
 	attr(edgeLists, "settings") <- attr(depvar, "settings")
+	attr(edgeLists, "settingsinfo") <- attr(depvar, "settingsinfo")
     return(edgeLists = edgeLists)
 }
 ##@unpackBipartite siena07 Reformat data for C++
@@ -1674,17 +1697,14 @@ unpackData <- function(data, x)
     Behaviors <- data$depvars[types == "behavior"]
     bipartites <- data$depvars[types == "bipartite"]
 	## add the settings
-	oneModes <- lapply(oneModes, function(depvar)
-	   {
-		   name <- attr(depvar, "name")
-		   if (name %in% names(x$settings))
-		   {
-			   attr(depvar, "settings") <- c("universal", "primary",
-											 x$settings[[name]])
-		   }
-		   depvar
-	   }
-		   )
+    # oneModes <- lapply(oneModes, function(depvar) {
+    #                    name <- attr(depvar, "name")
+    #                    if (name %in% names(x$settings)) {
+    #                      # attr(depvar, "settings") <- c("universal", "primary", x$settings[[name]])
+    #                      attr(depvar, "settings") <- c(x$settings[[name]])
+    #                    }
+    #                    depvar
+    #                    })
     f$nets <- lapply(oneModes, function(x, n, comp)
 					 unpackOneMode(x, n, comp),
                      n = observations, comp=data$compositionChange)
@@ -1999,7 +2019,7 @@ updateTheta <- function(effects, prevAns)
 	{
 		stop("prevAns is not an RSiena fit object")
 	}
-	prevEffects <- prevAns$requestedEffects
+	prevEffects <- prevAns$requestedEffects[which(prevAns$requestedEffects$type != 'gmm'),]
 	prevEffects$initialValue <- prevAns$theta
 	if (prevAns$cconditional)
 	{
@@ -2026,46 +2046,46 @@ updateTheta <- function(effects, prevAns)
 }
 
 ##@addSettingseffects siena07 add extra rate effects for settings model
-addSettingsEffects <- function(effects, x)
-{
-	## need a list of settings (constant dyadic covariate name) for some or all
-	## dependent networks. If symmetric this is equivalent to a forcing model.
-	## The covariate actor sets should match the network actor sets.
-	## ?? would it ever make sense for bipartites? Allow it here for now and see!
-	## maybe better to add the settings pars to the data object but for now
-	## they are on the model with maxdegree. TODO write some validation
-	varNames <- names(x$settings)
-	nbrSettings <- sapply(x$settings, length)
-	tmp <-
-		lapply(1:length(x$settings), function(i)
-		   {
-			   ## find effects for this variable
-			   varEffects <- effects[effects$name == varNames[i], ]
-			   ## find relevant rate effects
-			   dupl <- varEffects[varEffects$basicRate, ]
-			   ## make extra copies
-			   newEffects <- dupl[rep(1:nrow(dupl),
-									  each = nbrSettings[i] + 2), ]
-			   newEffects <- split(newEffects, list(newEffects$group,
-								   newEffects$period))
-			   newEffects <- lapply(newEffects, function(dd)
-				  {
-					  dd$setting <- c("universal", "primary",
-											  x$settings[[i]])
-					  i1 <- regexpr("rate", dd$effectName)
-					  dd$effectName <-
-						  paste(substr(dd$effectName, 1, i1 - 2),
-											 dd$setting,
-								substring(dd$effectName, i1))
-					  dd
-				  }
-					  )
-			   newEffects <- do.call(rbind, newEffects)
-			   ## add extra column to non basic rate effects
-			   varEffects$setting <- rep("", nrow(varEffects))
-			   ## combine them
-			   rbind(newEffects, varEffects[!varEffects$basicRate, ])
-		   })
-	## join them together again
-	do.call(rbind, tmp)
-}
+# addSettingsEffects <- function(effects, x)
+# {
+# 	## need a list of settings (constant dyadic covariate name) for some or all
+# 	## dependent networks. If symmetric this is equivalent to a forcing model.
+# 	## The covariate actor sets should match the network actor sets.
+# 	## ?? would it ever make sense for bipartites? Allow it here for now and see!
+# 	## maybe better to add the settings pars to the data object but for now
+# 	## they are on the model with maxdegree. TODO write some validation
+# 	varNames <- names(x$settings)
+# 	nbrSettings <- sapply(x$settings, length)
+# 	tmp <-
+# 		lapply(1:length(x$settings), function(i)
+# 		   {
+# 			   ## find effects for this variable
+# 			   varEffects <- effects[effects$name == varNames[i], ]
+# 			   ## find relevant rate effects
+# 			   dupl <- varEffects[varEffects$basicRate, ]
+# 			   ## make extra copies
+# 			   newEffects <- dupl[rep(1:nrow(dupl),
+# 									  each = nbrSettings[i] + 2), ]
+# 			   newEffects <- split(newEffects, list(newEffects$group,
+# 								   newEffects$period))
+# 			   newEffects <- lapply(newEffects, function(dd)
+# 				  {
+# 					  dd$setting <- c("universal", "primary",
+# 											  x$settings[[i]])
+# 					  i1 <- regexpr("rate", dd$effectName)
+# 					  dd$effectName <-
+# 						  paste(substr(dd$effectName, 1, i1 - 2),
+# 											 dd$setting,
+# 								substring(dd$effectName, i1))
+# 					  dd
+# 				  }
+# 					  )
+# 			   newEffects <- do.call(rbind, newEffects)
+# 			   ## add extra column to non basic rate effects
+# 			   varEffects$setting <- rep("", nrow(varEffects))
+# 			   ## combine them
+# 			   rbind(newEffects, varEffects[!varEffects$basicRate, ])
+# 		   })
+# 	## join them together again
+# 	do.call(rbind, tmp)
+# }

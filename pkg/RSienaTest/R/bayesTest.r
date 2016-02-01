@@ -49,7 +49,7 @@ simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
 
 
 ##@multipleBayesTest Tests parameters of sienaBayesFit objects
-multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm, tested0=0, ndigits=4){
+multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits=4){
     theEffects <- z$effects
 #	efNames <- format(paste(ifelse(theEffects$type == "creation",
 #									"creat", theEffects$type),
@@ -149,13 +149,13 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm, tested0=0, ndigits=4
 	result
 }
 
-print.multipleBayesTest <- function(x, ...){
+print.multipleBayesTest <- function(x, descriptives=FALSE, ...){
 	if (!inherits(x, 'multipleBayesTest'))
 	{
         stop("not a legitimate multipleBayesTest object")
 	}
 	p <- length(x$effectNames)
-	mydf <- as.data.frame(matrix(NA,p,2))
+	mydf <- as.data.frame(matrix(NA,p,4))
 	if (p >= 2)
 	{
 		mydf[,1] <- paste('. ',x$effectNames,"= ")
@@ -165,14 +165,24 @@ print.multipleBayesTest <- function(x, ...){
 		mydf[,1] <- paste(x$effectNames,"= ")
 	}
 	mydf[,2] <- x$nullValue
-	names(mydf) <- c(' ', ' ')
+	mydf[,3] <- round(colMeans(x$posteriorSample),4)
+	mydf[,4] <- round(sqrt(diag(cov(x$posteriorSample))),4)
+	names(mydf) <- c('', 'hyp', 'mean', 's.d')
 	if (!(is.null(x$theUsedEffects)))
 	{
 		cat('Used effects:\n')
 		for (i in 1:length(x$theUsedEffects)){cat(x$theUsedEffects[i],'\n')}
 	}
-	cat("Tested hypothesis:\n")
-	if (p >= 2) {print(mydf)} else {cat(as.matrix(mydf),'\n')}
+	cat("\nTested hypothesis:\n")
+	if (p >= 2) {print(mydf[,1:2])} else {cat(as.matrix(mydf[,1:2]),'\n')}
+	if (descriptives)
+	{
+		cat('\nPosterior means and standard deviations:\n')
+		if (p >= 2) {print(mydf[,c(1,3,4)])} else {cat(as.matrix(mydf[,c(1,3,4)]),'\n')}
+		cat('\nPosterior covariance matrix:\n')
+		print(round(cov(x$posteriorSample),6))
+		cat('\n')
+	}
 	cat("\nposterior p-value:", round(x$prob, 4), "\n")
 	cat("\ntest statistic:", round(x$chisquared, 2), "d.f. =",p,".\n\n")
 	# Construct pattern of all sign combinations of p numbers

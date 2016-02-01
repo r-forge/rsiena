@@ -1,0 +1,38 @@
+\begin{tikzpicture}[scale={\tikzscale}]
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=umlnotebox,alert=1] (0) at (0, -1) {
+			\lstinline{Simulation}\nodepart{two}
+			\lstinline{addResultListener(listener)}
+			\\\lstinline{simulate()}
+		};
+		\node [style=umlnotebox] (1) at (0, 1.5) {
+			\lstinline{Controller}\nodepart{two}
+			\lstinline{addEstimatorListener(listener)}
+			\\\lstinline{run()}
+		};
+		\node [style=umlnotebox] (2) at (2.5, 0.25) {
+			\lstinline{EstimatorListener}\nodepart{two}
+			\lstinline{initializePhase()}
+			\\\lstinline{finalizePhase(int)}
+		};
+		\node [style=umlnotebox] (3) at (2.5, -2.25) {
+			\lstinline{ResultListener}\nodepart{two}
+			\lstinline{needs():vector<ResultType>}
+			\\\lstinline{onResult(Result)}
+		};
+		\node [style=umlnotebox,alert=2] (4) at (0, -3.5) {
+			\lstinline{Result}\nodepart{two}
+			\lstinline{pStatistics():vector<VectorXd>*}
+			\\\lstinline{// ...}
+		};
+		\node [style=umlbox,alert=3] (5) at (3, -1) {"Aggregator"};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [style=umlhas] (0) to (1);
+		\draw [style=umlhas] (2) to node[pos=.4]{*} (1);
+		\draw [style=umlhas] (3) to node[pos=.4]{*} (0);
+		\draw [style=umlhas] (4) to (0);
+		\draw [style=umlisa] (5) to (2);
+		\draw [style=umlisa] (5) to (3);
+	\end{pgfonlayer}
+\end{tikzpicture}

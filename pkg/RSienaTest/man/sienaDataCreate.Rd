@@ -44,10 +44,18 @@ model fit. The components of the object are.
 \seealso{
 \code{\link{sienaDependent}}, \code{\link{coCovar}}, \code{\link{varCovar}},
 \code{\link{coDyadCovar}}, \code{\link{varDyadCovar}},\cr
-\code{\link{sienaCompositionChange}}, \code{\link{sienaGroupCreate}}}
+\code{\link{sienaCompositionChange}}, \code{\link{sienaGroupCreate}},
+\code{\link{sienaNodeSet}}}
 \examples{
 mynet <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mybeh <- sienaDependent(s50a, type="behavior")
-mydata <- sienaDataCreate(mynet, mybeh)}
-
+mydata <- sienaDataCreate(mynet, mybeh)
+## And for a two-mode network
+mynet1 <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)), nodeSet="senders")
+senders <- sienaNodeSet(50, nodeSetName="senders")
+receivers <- sienaNodeSet(30, nodeSetName="receivers")
+mynet2 <- sienaDependent(array(c(s501[,1:30], s502[,1:30]), dim=c(50, 30, 2)),
+      nodeSet=c("senders", "receivers"))
+(mydata <- sienaDataCreate(mynet1, mynet2, nodeSets=list(senders, receivers)))
+}
 \keyword{ classes }

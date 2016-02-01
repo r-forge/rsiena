@@ -230,6 +230,17 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 		}
 		else
 		{
+			if (!is.null(x$gmm))
+			{
+				if (x$gmm)
+				{
+					cat("Estimated by Generalized Method of Moments\n\n")
+				}
+			}
+			if (x$maxlike)
+			{
+				cat("Estimated by Maximum Likelihood\n\n")
+			}
 		cat("Estimates, standard errors and convergence t-ratios\n\n")
 		}
 		tmp <- sienaFitThetaTable(x, tstat=tstat)
@@ -295,23 +306,45 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			sem <- sqrt(dmsf/dim(x$sf)[1])
 			if (x$x$dolby)
 			{
-				scores <- apply(x$ssc, c(1,3), sum)  # x$nit by x$pp matrix
+				scores <- apply(x$ssc, c(1,3), sum)	 # x$nit by x$qq matrix
 				mean.scores <- colMeans(scores)
 				mean.stats <- mean.stats - (x$regrCoef * mean.scores)
 				sem <- sem*sqrt(1 - (x$regrCor)^2)
 			}
-			mymess1 <- paste(format(1:x$pp,width=3), '. ',
-					format(x$requestedEffects$functionName, width = 56),
+			if (!is.null(x$gmm))
+			{
+				if (x$gmm)
+				{
+					selection <- which(x$requestedEffects$type=='gmm' |
+									x$requestedEffects$type=='rate')
+				}
+				else
+				{
+					selection <- 1:nrow(x$requestedEffects)
+				}
+			}
+			mymess1 <- paste(format(1:x$qq,width=3), '. ',
+					format(x$requestedEffects$functionName[selection], width = 56),
 					format(round(mean.stats, 3), width=8, nsmall=3), ' ',
 					format(round(sqrt(dmsf), 3) ,width=8, nsmall=3), ' ',
 					format(round(sem, 4) ,width=8, nsmall=4),
-					rep('\n',x$pp), sep='')
+					rep('\n',x$qq), sep='')
 			cat(as.matrix(mymess1),'\n', sep='')
 		}
 		else
 		{
 			cat(c("\nOverall maximum convergence ratio: ",
 					sprintf("%8.4f", x$tconv.max), "\n\n"))
+		}
+
+
+		if (any(x$x$MaxDegree > 0)) {
+			cat(' Restrictions on degree in simulations: maximum degrees (0 = no restriction)')
+			cat('\n',x$x$MaxDegree,'\n\n')
+		}
+		if (any(x$x$UniversalOffset > 0)) {
+			cat(' Offsets for universal and meeting settings (if any): \n')
+			cat(x$x$UniversalOffset,'\n\n')
 		}
 
 		try(if (x$errorMessage.cov > '')
@@ -472,7 +505,17 @@ print.summary.sienaFit <- function(x, ...)
        covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
        printMatrix(format(round(t(covcor),digits=3),width=12))
        cat("\nDerivative matrix of expected statistics X by parameters:\n\n")
+	   	if (!is.null(x$gmm))
+		{
+			if (x$gmm)
+			{
+				printMatrix(format(round(x$gamma,digits=3),width=12))
+			}
+		else
+			{
        printMatrix(format(round(x$dfra,digits=3),width=12))
+			}
+		}
        cat("\nCovariance matrix of X (correlations below diagonal):\n\n")
        covcor <- x$msf
        correl <- x$msf / sqrt(diag(x$msf))[row(x$msf)] /
@@ -511,6 +554,11 @@ print.sienaAlgorithm <- function(x, ...)
     {
         cat(' Restrictions on degree in simulations: ')
         cat(x$MaxDegree,'\n')
+    }
+    if (any(x$UniversalOffset > 0))
+    {
+        cat(' Offsets for universal setting: ')
+        cat(x$UniversalOffset,'\n')
     }
     cat(' Method for calculation of derivatives:',
         c('Scores', 'Finite Differences')[as.numeric(x$FinDiff.method) + 1],
@@ -685,6 +733,7 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 	else
 	{
 		theEffects <- x$requestedEffects
+    theEffects <-theEffects[which(theEffects$type!='gmm'),]
 	}
 	pp <- dim(theEffects)[1]
     if (x$cconditional)

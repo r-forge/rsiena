@@ -9,7 +9,7 @@ Function to create user-specified interactions for a Siena model.
 \usage{
 includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
     type = "eval", interaction1 = rep("", 3), interaction2 = rep("", 3),
-    character = FALSE, verbose = TRUE)
+    fix = FALSE, test = FALSE, parameter = 0, character = FALSE, verbose = TRUE)
 }
 \arguments{
   \item{myeff}{a Siena effects object as created by \code{\link{getEffects}}}
@@ -35,7 +35,14 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   effect e.g. covariate name or behavior variable name.
   Trailing blanks may be omitted.
 }
-\item{character}{Boolean: are the effect names character strings or not}
+\item{fix}{
+  Boolean. Are the effects to be fixed at the value stored in
+  \code{myeff$initialValue} or not.}
+\item{test}{
+  Boolean. Are the effects to be tested or not (requires \code{fix}).}
+\item{parameter}{
+  The parameter of this interaction effect. Integer value required. Default 0.}
+\item{character}{Boolean: are the effect names character strings or not.}
 \item{verbose}{Boolean: should the print of altered effects be produced.}
 }
 \details{The details provided should uniquely identify up to three
@@ -68,18 +75,20 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   and values of interaction1 and interaction2 (if any),
   is obtained by executing \code{\link{effectsDocumentation}(myeff)}.
 
-  To set further attributes of interaction effects in the effects object,
-  use setEffect() with its parameters effect1 and effect2,
-  as shown in the example below.
+  To set attributes of interaction effects in the effects object,
+  function \code{\link{setEffect}} can also be used with its parameters
+  \code{effect1} and \code{effect2}, as shown in the example below.
   }
 \value{
-  An updated version of the input effects object, with the "include"
-  column and the "effect1" and "effect2" and possibly "effect3" columns
-  of one row updated. \cr
+  An updated version of the input effects object; if \code{include},
+  containing the interaction effect between "effect1" and "effect2" and
+  possibly "effect3"; if not, without this interaction effect.
+  The shortName of the interaction effect is "unspInt" for network effects
+  and "behUnspInt" for behavior effects. \cr
   If \code{verbose=TRUE}, details of the fields altered will be printed.
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
-\author{Ruth Ripley }
+\author{Ruth Ripley, Tom Snijders}
 \seealso{
   \code{\link{getEffects}}, \code{\link{setEffect}},
   \code{\link{includeEffects}}, \code{\link{effectsDocumentation}
@@ -94,15 +103,23 @@ myeff <- includeEffects(myeff, egoX, altX, simX, interaction1="alc")
 myeff <- includeInteraction(myeff, recip, simX, interaction1=c("", "alc"))
 myeff <- includeInteraction(myeff, transTrip, egoX, interaction1=c("", "alc"))
 myeff
-# Now request the interaction between transitive triplets and alcohol ego
-# to be tested without estimation.
-# This is the 10th effect as seen in myeff.
-(eff1 <- myeff[myeff$include,]$effect1[10])
-(eff2 <- myeff[myeff$include,]$effect2[10])
-# In interactive use one could get the numbers for eff1 and eff2
+# How to set the effect parameter of an interaction:
+# directly:
+myeff <- getEffects(mydata)
+myeff <- setEffect(myeff, gwespFF, parameter=69)
+myeff <- includeInteraction(myeff, recip, gwespFF, parameter=69)
+myeff
+# or indirectly:
+myeff <- getEffects(mydata)
+myeff <- includeEffects(myeff, gwespFF)
+myeff <- includeInteraction(myeff, recip, gwespFF)
+myeff
+(param <- myeff[(myeff$shortName == 'gwespFF') & myeff$include,'parm']) # parameter value
+(eff1 <- myeff[(myeff$shortName == 'unspInt') & myeff$include,'effect1']) # first interacted effect
+(eff2 <- myeff[(myeff$shortName == 'unspInt') & myeff$include,'effect2']) # second interacted effect
+# In interactive use one could get the numbers for param, eff1, and eff2
 # directly from the information given by print(myeff).
-myeff <- setEffect(myeff, unspInt, fix=TRUE, test=TRUE,
-									effect1=eff1, effect2=eff2)
+myeff <- setEffect(myeff, unspInt, parameter=param, effect1=eff1, effect2=eff2)
 myeff
 }
 \keyword{ classes }

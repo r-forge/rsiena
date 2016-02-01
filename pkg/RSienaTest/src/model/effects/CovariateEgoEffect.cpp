@@ -18,10 +18,23 @@ namespace siena
 
 /**
  * Constructor.
+ *
+ * @param[in] pEffectInfo the effect descriptor
  */
 CovariateEgoEffect::CovariateEgoEffect(const EffectInfo * pEffectInfo) :
-	CovariateDependentNetworkEffect(pEffectInfo)
-{
+	CovariateDependentNetworkEffect(pEffectInfo) {
+}
+
+/**
+ * Constructor.
+ *
+ * @param[in] pEffectInfo the effect descriptor
+ * @param simulatedState If `true` the value() function uses the simulated
+ *        state, if any or the value at the end of the period.
+ */
+CovariateEgoEffect::CovariateEgoEffect(const EffectInfo * pEffectInfo,
+		const bool simulatedState) :
+	CovariateDependentNetworkEffect(pEffectInfo, simulatedState) {
 }
 
 

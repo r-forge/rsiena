@@ -1,0 +1,24 @@
+\begin{tikzpicture}[scale={\tikzscale}]
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=umlbox] (0) at (-2, 1.25) {\lstinline{DifferentiationController}};
+		\node [style=umlnotebox] (1) at (-2, 0.25) {
+			\lstinline{ScoreCollector}\nodepart{two}
+			\lstinline{// needs [SCORES]}
+			\\\lstinline{rScores():MatrixXd}
+		};
+		\node [style=umlbox] (2) at (2, 1.25) {\lstinline{UpdateController}};
+		\node [style=umlnotebox] (3) at (2, 0.25) {
+			\lstinline{DolbyModificator}\nodepart{two}
+			\lstinline{// needs [SCORES,S-s]}
+			\\\lstinline{rRegressionCoefficient():VectorXd}
+			\\\lstinline{onResult(Result)}
+		};
+		\node [style=umlbox] (4) at (0, 2) {\lstinline{GMMEstimator}};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [style=umlhas] (1) to (0);
+		\draw [style=umlhas] (3) to (2);
+		\draw [style=umlhas] (2) to (4);
+		\draw [style=umlhas] (0) to (4);
+	\end{pgfonlayer}
+\end{tikzpicture}

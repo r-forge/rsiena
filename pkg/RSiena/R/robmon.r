@@ -345,6 +345,7 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
 		diag(z$covtheta)[z$diver] <- NA # was 999
 		z$se <- sqrt(diag(z$covtheta))
 	}
+	z$gmm <- FALSE
     z$termination <- 'OK'
     z
 }

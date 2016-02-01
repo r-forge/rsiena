@@ -10,7 +10,7 @@
 }
 \usage{
 sienaBayes(data, effects, algo,  saveFreq=100,
-    initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2,
+    initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2, initML=FALSE,
     priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
     priorRatesFromData=2,
     frequentist=FALSE, incidentalBasicRates=FALSE,
@@ -50,13 +50,16 @@ glueBayes(z1, z2, nwarm2=0)
   \item{initfgain}{Positive number, used only for frequentist estimation:
   the gain factor in the Robbins Monro algorithm is
   initfgain * ((iteration number)^(-gamma)).}
+  \item{initML}{Boolean, whether to use maximum likelihood estimation for the
+   groupwise initial estimation.}
   \item{priorMu}{Vector of length equal to the number of varying parameters.
-   Prior mean of mu (global population mean); default:
-   0. For the basic rate parameters the defaults are data-dependent,
+   Prior mean of mu (global population mean for varying parameters); default: 0.
+   For the basic rate parameters the defaults are data-dependent,
    but if ((\code{priorRatesFromData >= 1}) and \code{priorMu=NULL}),
    then for these parameters the prior mean will be 2.}
   \item{priorSigma}{Square matrix of dimension equal to length of priorMu.
-   Prior global population covariance matrix Sigma; default: identity matrix.}
+   Prior global population covariance matrix Sigma for the varying parameters;
+   default: identity matrix.}
   \item{priorDf}{Prior degrees of freedom for Sigma (global population
     covariance matrix); default: number of varying parameters + 2.}
   \item{priorKappa}{Proportionality constant between prior covariance matrix
@@ -232,7 +235,8 @@ glueBayes(z1, z2, nwarm2=0)
   \emph{Journal of Statistical Planning and Inference}, 13, 3930-3938.
 }
 \author{Ruth Ripley, Johan Koskinen, Tom Snijders }
-\seealso{\code{\link{siena07}}, \code{\link{sienaGroupCreate}}, \code{\link{bayesTest}}\cr
+\seealso{\code{\link{siena07}}, \code{\link{sienaGroupCreate}}, \code{\link{bayesTest}},
+   \code{\link{extract.sienaBayes}}\cr
   There are print and summary methods for sienaBayesFit objects,
   \code{\link{print.sienaBayesFit}}.}
 \examples{
