@@ -11,6 +11,8 @@
 
 #include "NetworkConstraint.h"
 
+using namespace std;
+
 namespace siena
 {
 

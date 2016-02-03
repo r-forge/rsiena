@@ -41,9 +41,11 @@
 #include "model/ml/Chain.h"
 #include "model/ml/MiniStep.h"
 
+using namespace std;
 using namespace siena::logger;
 
 namespace siena {
+
 SEXP getMiniStepList(const MiniStep& miniStep, int period);
 SEXP getMiniStepDF(const MiniStep& miniStep);
 

@@ -38,10 +38,10 @@ class ResultModificator;
 
 //! Vector of EffectInfo pointers.
 //!
-typedef const vector<EffectInfo*> Effects;
+typedef const std::vector<EffectInfo*> Effects;
 //! Constant iterator of EffectInfo pointers.
 //!
-typedef vector<EffectInfo*>::const_iterator EffectIter;
+typedef std::vector<EffectInfo*>::const_iterator EffectIter;
 //! Custom Eigen::Vector holding EffectInfo pointers.
 //!
 typedef Eigen::Matrix<EffectInfo*, Eigen::Dynamic, 1> VectorXEffectPtr;
@@ -176,8 +176,8 @@ private:
 	Simulation(const Simulation&);
 	Simulation& operator=(const Simulation&);
 
-	void addRateEffects(vector<EffectInfo*>& rEffects, LongitudinalData* pVar);
-	void addObjectiveEffects(vector<EffectInfo*>& rEffects,
+	void addRateEffects(std::vector<EffectInfo*>& rEffects, LongitudinalData* pVar);
+	void addObjectiveEffects(std::vector<EffectInfo*>& rEffects,
 			LongitudinalData* pVar);
 
 	VectorXEffectPtr createSimulationEffectVector();
@@ -203,8 +203,8 @@ void Simulation::getSingleStatistics(Eigen::MatrixBase<Derived>& rStats,
 	int i = -1; // Statistic index
 
 	// For each dependent variable
-	const vector<LongitudinalData*>& vars = lpData->rDependentVariableData();
-	for (vector<LongitudinalData*>::size_type v = 0; v < vars.size(); ++v) {
+	const std::vector<LongitudinalData*>& vars = lpData->rDependentVariableData();
+	for (std::vector<LongitudinalData*>::size_type v = 0; v < vars.size(); ++v) {
 		BehaviorLongitudinalData* pBehavior = lpData->pBehaviorData(
 				vars[v]->name());
 

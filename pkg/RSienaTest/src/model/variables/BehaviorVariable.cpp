@@ -30,6 +30,8 @@
 #include "model/ml/MiniStep.h"
 #include "model/ml/BehaviorChange.h"
 
+using namespace std;
+
 namespace siena
 {
 SEXP getMiniStepDF(const MiniStep& miniStep);

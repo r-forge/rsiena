@@ -39,6 +39,8 @@
 #include "model/settings/SettingsFactory.h"
 #include "network/IncidentTieIterator.h"
 
+using namespace std;
+
 namespace siena {
 
 // ----------------------------------------------------------------------------

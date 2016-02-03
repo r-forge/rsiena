@@ -44,6 +44,8 @@
 #include "network/IncidentTieIterator.h"
 #include "network/layers/DistanceTwoLayer.h"
 #include "network/iterators/UnionTieIterator.h"
+
+using namespace std;
 using namespace siena::logger;
 
 namespace siena

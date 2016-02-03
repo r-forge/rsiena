@@ -100,8 +100,8 @@ void MetropolisHastingsSimulation::addSingleScores(
 	int i = 0; // Parameter index
 
 	// For each dependent variable
-	const vector<LongitudinalData*>& vars = lpData->rDependentVariableData();
-	for (vector<LongitudinalData*>::size_type v = 0; v < vars.size(); ++v) {
+	const std::vector<LongitudinalData*>& vars = lpData->rDependentVariableData();
+	for (std::vector<LongitudinalData*>::size_type v = 0; v < vars.size(); ++v) {
 		// Add basic rate effects on the diagonal
 		rScores[i + period] -=
 				rSim.pVariable(vars[v]->name())->basicRateScore();
@@ -133,8 +133,8 @@ void MetropolisHastingsSimulation::addSingleDerivatives(
 	int row = 0;
 
 	// For each dependent variable
-	const vector<LongitudinalData*>& vars = lpData->rDependentVariableData();
-	for (vector<LongitudinalData*>::size_type v = 0; v < vars.size(); ++v) {
+	const std::vector<LongitudinalData*>& vars = lpData->rDependentVariableData();
+	for (std::vector<LongitudinalData*>::size_type v = 0; v < vars.size(); ++v) {
 		// Add basic rate effects on the diagonal
 		rDeriv(row + period, row + period) -=
 				rSim.pVariable(vars[v]->name())->basicRateDerivative();

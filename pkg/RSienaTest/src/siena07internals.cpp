@@ -13,9 +13,6 @@
  * Internal routines used to set up the Data object with data from R.
  * Not visible from R.
  */
-#include <vector>
-#include <cstring>
-#include <Rinternals.h>
 #include "siena07internals.h"
 #include "data/Data.h"
 #include "data/LongitudinalData.h"
@@ -37,14 +34,12 @@
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/ml/MLSimulation.h"
-#include "logger/Logger.h"
 
+#include <cstring>
 #include <string>
+#include <vector>
 
-using namespace std;
-using namespace siena::logger;
 using namespace siena;
-
 
 /**
  * Matches column names with indices. The object Names is the names of the
@@ -210,7 +205,7 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 /**
  *  updates the parameter values for each of the effects.
  */
-void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
+void updateParameters(SEXP EFFECTSLIST, SEXP THETA, std::vector<Data *> *
 						  pGroupData, Model * pModel)
 {
     // get the column names from the names attribute
@@ -287,8 +282,7 @@ void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
 						NetworkLongitudinalData * pNetwork =
 							pData->pNetworkData(networkName);
 						pModel->basicRateParameter(pNetwork,
-							period,
-							currentValue);
+							period, currentValue);
 					}
 				}
 				else
@@ -394,116 +388,113 @@ void setupOneModeNetwork(SEXP ONEMODE,
  *
  */
 void setupOneModeObservations(SEXP ONEMODES,
-			      OneModeNetworkLongitudinalData *
-                              pOneModeNetworkLongitudinalData)
-
+		OneModeNetworkLongitudinalData * pOneModeNetworkLongitudinalData)
 {
-    int observations = length(ONEMODES);
-    if (observations != pOneModeNetworkLongitudinalData->observationCount())
-    {
+	int observations = length(ONEMODES);
+	if (observations != pOneModeNetworkLongitudinalData->observationCount())
+	{
 		error ("wrong number of observations in OneMode");
-    }
-    SEXP uo;
-    PROTECT(uo = install("uponly"));
-    SEXP uponly = getAttrib(ONEMODES, uo);
-    SEXP dow;
-    PROTECT(dow = install("downonly"));
-    SEXP downonly = getAttrib(ONEMODES, dow);
-
-    for (int period = 0; period < (observations - 1); period++)
-    {
-        pOneModeNetworkLongitudinalData->upOnly(period,
-                                         LOGICAL(uponly)[period]);
-        pOneModeNetworkLongitudinalData->downOnly(period,
-                                         LOGICAL(downonly)[period]);
-    }
-    for (int period = 0; period < observations; period++)
-    {
-    	setupOneModeNetwork(VECTOR_ELT(ONEMODES, period),
-			pOneModeNetworkLongitudinalData,
-			period);
 	}
-    UNPROTECT(2);
+	SEXP uo;
+	PROTECT(uo = install("uponly"));
+	SEXP uponly = getAttrib(ONEMODES, uo);
+	SEXP dow;
+	PROTECT(dow = install("downonly"));
+	SEXP downonly = getAttrib(ONEMODES, dow);
+
+	for (int period = 0; period < (observations - 1); period++)
+	{
+		pOneModeNetworkLongitudinalData->upOnly(period,
+				LOGICAL(uponly)[period]);
+		pOneModeNetworkLongitudinalData->downOnly(period,
+				LOGICAL(downonly)[period]);
+	}
+	for (int period = 0; period < observations; period++)
+	{
+		setupOneModeNetwork(VECTOR_ELT(ONEMODES, period),
+				pOneModeNetworkLongitudinalData, period);
+	}
+	UNPROTECT(2);
 }
+
 /**
  * Create one group of one mode Networks
  *
  */
 void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 {
-    int nOneMode = length(ONEMODEGROUP);
+	int nOneMode = length(ONEMODEGROUP);
 
-    for (int oneMode = 0; oneMode < nOneMode; oneMode++)
-    {
+	for (int oneMode = 0; oneMode < nOneMode; oneMode++)
+	{
 		SEXP ONEMODES = VECTOR_ELT(ONEMODEGROUP, oneMode);
-        SEXP as;
-        PROTECT(as = install("nodeSet"));
-        SEXP actorSet = getAttrib(ONEMODES, as);
-        SEXP symm;
-        PROTECT(symm = install("symmetric"));
-        SEXP symmetric = getAttrib(ONEMODES, symm);
+		SEXP as;
+		PROTECT(as = install("nodeSet"));
+		SEXP actorSet = getAttrib(ONEMODES, as);
+		SEXP symm;
+		PROTECT(symm = install("symmetric"));
+		SEXP symmetric = getAttrib(ONEMODES, symm);
 		SEXP balm;
-        PROTECT(balm = install("balmean"));
-        SEXP balmean = getAttrib(ONEMODES, balm);
+		PROTECT(balm = install("balmean"));
+		SEXP balmean = getAttrib(ONEMODES, balm);
 		SEXP strm;
-        PROTECT(strm = install("structmean"));
-        SEXP structmean = getAttrib(ONEMODES, strm);
+		PROTECT(strm = install("structmean"));
+		SEXP structmean = getAttrib(ONEMODES, strm);
 		SEXP avin;
-        PROTECT(avin = install("averageInDegree"));
-        SEXP averageInDegree = getAttrib(ONEMODES,	avin);
+		PROTECT(avin = install("averageInDegree"));
+		SEXP averageInDegree = getAttrib(ONEMODES,	avin);
 		SEXP avout;
-        PROTECT(avout = install("averageOutDegree"));
-        SEXP averageOutDegree = getAttrib(ONEMODES,	avout);
+		PROTECT(avout = install("averageOutDegree"));
+		SEXP averageOutDegree = getAttrib(ONEMODES,	avout);
 
 		SEXP nm;
-        PROTECT(nm = install("name"));
-        SEXP name = getAttrib(ONEMODES, nm);
-        const ActorSet* myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
+		PROTECT(nm = install("name"));
+		SEXP name = getAttrib(ONEMODES, nm);
+		const ActorSet* myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
 		OneModeNetworkLongitudinalData *  pOneModeNetworkLongitudinalData =
-          pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)), myActorSet);
+			pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)), myActorSet);
 
-        // parse settings
-        SEXP settingsSymbol;
-        PROTECT(settingsSymbol = install("settingsinfo"));
-        SEXP settingsList = getAttrib(ONEMODES, settingsSymbol);
-        for (int j = 0; j < length(settingsList); j++) {
-          SEXP settingInfo = VECTOR_ELT(settingsList, j);
-          SEXP infoNames = getAttrib(settingInfo, R_NamesSymbol);
-          string id, type, covar, only;
-          // Rprintf("setting %d\n", j);
-          // parse key value list
-          for (int k = 0; k < length(settingInfo); k++) {
-            // Rprintf("key value %d\n", k);
-            const char* key = CHAR(STRING_ELT(infoNames, k));
-            const char* value = CHAR(STRING_ELT(VECTOR_ELT(settingInfo, k), 0));
-            // Rprintf("%s = %s\n", key, value);
-            if      (strcmp(key, "id") == 0)    id    = string(value);
-            else if (strcmp(key, "type") == 0)  type  = string(value);
-            else if (strcmp(key, "covar") == 0) covar = string(value);
-            else if (strcmp(key, "only") == 0)  only  = string(value);
-          }
-          // parse strings to C++ types
-          Permission_Type permType = Permission_Type::BOTH;
-          if      (only == "up")   permType = Permission_Type::UP;
-          else if (only == "down") permType = Permission_Type::DOWN;
-          // asserts
-          if (id.length() == 0) error("settings id should not be empty");
-          if (type.length() == 0) error("settings type should not be empty");
-          // add it
-          Rprintf("%s %s %s %s\n", id.c_str(), type.c_str(), covar.c_str(), only.c_str());
-          pOneModeNetworkLongitudinalData->addSettingName(id, type, covar, permType);
+		// parse settings
+		SEXP settingsSymbol;
+		PROTECT(settingsSymbol = install("settingsinfo"));
+		SEXP settingsList = getAttrib(ONEMODES, settingsSymbol);
+		for (int j = 0; j < length(settingsList); j++) {
+			SEXP settingInfo = VECTOR_ELT(settingsList, j);
+			SEXP infoNames = getAttrib(settingInfo, R_NamesSymbol);
+			std::string id, type, covar, only;
+			// Rprintf("setting %d\n", j);
+			// parse key value list
+			for (int k = 0; k < length(settingInfo); k++) {
+				// Rprintf("key value %d\n", k);
+				const char* key = CHAR(STRING_ELT(infoNames, k));
+				const char* value = CHAR(STRING_ELT(VECTOR_ELT(settingInfo, k), 0));
+				// Rprintf("%s = %s\n", key, value);
+				if      (strcmp(key, "id") == 0)    id    = std::string(value);
+				else if (strcmp(key, "type") == 0)  type  = std::string(value);
+				else if (strcmp(key, "covar") == 0) covar = std::string(value);
+				else if (strcmp(key, "only") == 0)  only  = std::string(value);
+			}
+			// parse strings to C++ types
+			Permission_Type permType = Permission_Type::BOTH;
+			if      (only == "up")   permType = Permission_Type::UP;
+			else if (only == "down") permType = Permission_Type::DOWN;
+			// asserts
+			if (id.length() == 0) error("settings id should not be empty");
+			if (type.length() == 0) error("settings type should not be empty");
+			// add it
+			Rprintf("%s %s %s %s\n", id.c_str(), type.c_str(), covar.c_str(), only.c_str());
+			pOneModeNetworkLongitudinalData->addSettingName(id, type, covar, permType);
 		}
-		LOG(Priority::INFO, "settings done");
 
-       pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
-        pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
-        pOneModeNetworkLongitudinalData->structuralMean(*(REAL(structmean)));
-        pOneModeNetworkLongitudinalData->
+		pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
+		pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
+		pOneModeNetworkLongitudinalData->structuralMean(*(REAL(structmean)));
+		pOneModeNetworkLongitudinalData->
 			averageInDegree(*(REAL(averageInDegree)));
-        pOneModeNetworkLongitudinalData->
+		pOneModeNetworkLongitudinalData->
 			averageOutDegree(*(REAL(averageOutDegree)));
 		setupOneModeObservations(ONEMODES,
-			pOneModeNetworkLongitudinalData);
+				pOneModeNetworkLongitudinalData);
 		//	Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
 		//	averageInDegree(),  pOneModeNetworkLongitudinalData->
 		//	averageOutDegree());
@@ -514,8 +505,8 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 		//Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
 		//	averageInDegree(), pOneModeNetworkLongitudinalData->
 		//	averageOutDegree());
-        UNPROTECT(8);
-    }
+		UNPROTECT(8);
+	}
 }
 
 /**
@@ -1296,7 +1287,7 @@ void setupExogenousEventGroup(SEXP EXOGEVENTGROUP, Data *pData)
 /**
  *  Creates all the basic effects for one network
  */
-SEXP createEffects(SEXP EFFECTS, Model *pModel, vector<Data *> * pGroupData,
+SEXP createEffects(SEXP EFFECTS, Model *pModel, std::vector<Data *> * pGroupData,
 	const char *networkName, int effectCol, int parmCol, int int1Col,
 	int int2Col, int initValCol, int typeCol, int groupCol, int periodCol,
 	int rateTypeCol, int netTypeCol, int settingCol)
@@ -1454,7 +1445,8 @@ SEXP createInteractionEffects(SEXP EFFECTS, Model *pModel,
  *  are the same apart from the basic rates. Not used in maximum likelihood.
  */
 void getChangeContributionStatistics(SEXP EFFECTSLIST,
-	const StatisticCalculator * pCalculator, vector<vector<double *> > *rChangeContributions)
+		const StatisticCalculator * pCalculator,
+		std::vector<std::vector<double *> > *rChangeContributions)
 {
 
 	// get the column names from the names attribute
@@ -1519,7 +1511,7 @@ void getChangeContributionStatistics(SEXP EFFECTSLIST,
  *  are the same apart from the basic rates. Not used in maximum likelihood.
  */
 void getActorStatistics(SEXP EFFECTSLIST,
-	const StatisticCalculator * pCalculator, vector<double *> *rActorStatistics)
+	const StatisticCalculator * pCalculator, std::vector<double *> *rActorStatistics)
 {
 
 	// get the column names from the names attribute
@@ -1584,7 +1576,7 @@ void getStatistics(SEXP EFFECTSLIST,
 	const StatisticCalculator * pCalculator,
 	int period, int group, const Data *pData,
 	const EpochSimulation * pEpochSimulation,
-	vector<double> * rfra, vector<double> *rscore)
+	std::vector<double> * rfra, std::vector<double> *rscore)
 {
 
 	// get the column names from the names attribute
@@ -1946,7 +1938,7 @@ void getStatistics(SEXP EFFECTSLIST,
  */
 void getScores(SEXP EFFECTSLIST, int period, int group,
 	const MLSimulation * pMLSimulation,
-	vector<double> * rderiv, vector<double> *rscore)
+	std::vector<double> * rderiv, std::vector<double> *rscore)
 {
 
 	// get the column names from the names attribute
@@ -2029,7 +2021,7 @@ void getScores(SEXP EFFECTSLIST, int period, int group,
 				(*rscore)[storescore++] = pMLSimulation->score(pEffectInfo);
 
 				// get the map of derivatives
-				map<const EffectInfo *, double > deriv =
+				std::map<const EffectInfo *, double > deriv =
 					pMLSimulation->derivative(pEffectInfo);
 
 				for (int j = 0; j < length(VECTOR_ELT(EFFECTS,0)); j++)

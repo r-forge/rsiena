@@ -16,8 +16,6 @@
 #include <vector>
 #include <map>
 
-using namespace std;
-
 namespace siena
 {
 
@@ -50,7 +48,7 @@ public:
 
 	inline int ego() const;
 	int variableId() const;
-	string variableName() const;
+	std::string variableName() const;
 
 	virtual bool networkMiniStep() const;
 	virtual bool behaviorMiniStep() const;
@@ -103,8 +101,8 @@ public:
 
 	virtual bool firstOfConsecutiveCancelingPair() const;
 
-	map<const EffectInfo *, vector<double> >* changeContributions() const;
-	void changeContributions(map<const EffectInfo *, vector<double> > * contributions);
+	std::map<const EffectInfo *, std::vector<double> >* changeContributions() const;
+	void changeContributions(std::map<const EffectInfo *, std::vector<double> > * contributions);
 
 
 protected:
@@ -181,7 +179,7 @@ private:
 	double lorderingKey;
 
 	// Stores for each effect its contributions to the tie flip probabilities or behavior change probabilities
-	map<const EffectInfo *, vector<double> > * lpChangeContributions;
+	std::map<const EffectInfo *, std::vector<double> > * lpChangeContributions;
 };
 
 

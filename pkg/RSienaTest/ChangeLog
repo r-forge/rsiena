@@ -1,3 +1,8 @@
+2016-02-03 R-Forge Revision 291
+Changes in RSienaTest:
+   * Fixed include order.
+   * Removed `using namespace` from all headers.
+
 2016-01-31 R-Forge Revision 290
 Changes in RSiena and RSienaTest:
    * New effects FBDeg, FRDeg, BRDeg (RFDeg was mentioned earlier

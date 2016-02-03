@@ -13,6 +13,8 @@
 #include "OneModeNetworkAlterFunction.h"
 #include "network/OneModeNetwork.h"
 
+using namespace std;
+
 namespace siena
 {
 

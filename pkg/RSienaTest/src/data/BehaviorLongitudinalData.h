@@ -91,7 +91,7 @@ private:
 	// lobservedDistributions[observation][value] stores the frequency of
 	// the given value at the given observation.
 
-	map<int, double> * lobservedDistributions;
+	std::map<int, double> * lobservedDistributions;
 };
 
 }

@@ -80,8 +80,8 @@ public:
 	bool oneModeNetwork() const;
 
 	const std::vector<SettingInfo> & rSettingNames() const;
-	void addSettingName(const string id, const string settingType,
-			const string covarName, const Permission_Type permType);
+	void addSettingName(const std::string id, const std::string settingType,
+			const std::string covarName, const Permission_Type permType);
 
 private:
 	// The set of actors receiving the ties of the network
@@ -130,7 +130,7 @@ private:
 	bool loneMode;
 
 	// vector of setting names for this network
-	vector<SettingInfo> lsettingNames;
+	std::vector<SettingInfo> lsettingNames;
 };
 
 }

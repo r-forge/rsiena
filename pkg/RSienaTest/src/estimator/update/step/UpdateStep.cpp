@@ -9,6 +9,7 @@
 
 #include "UpdateStep.h"
 
+using namespace std;
 using namespace Eigen;
 
 namespace siena {

@@ -53,59 +53,53 @@ class GeneralTieIterator: public ITieIterator {
 public:
 	GeneralTieIterator(ITieIterator& iter1, ITieIterator& iter2,
 			const Set_Operation opType);
-
 	GeneralTieIterator(ITieIterator& iter, const bool* const filter,
 			const Filter_Operation opType);
-
 	GeneralTieIterator(std::vector<int>::const_iterator start,
 			std::vector<int>::const_iterator end);
-
 	GeneralTieIterator(std::map<int, double>::const_iterator start,
 			std::map<int, double>::const_iterator end);
-
 	GeneralTieIterator(const int actor);
-
 	virtual ~GeneralTieIterator();
 
-	inline void next();
+	inline void next() {
+		++lPos;
+	}
 
-	inline int actor() const;
+	inline int actor() const {
+		if (valid()) return rEntries[lPos];
+		return -1;
+	}
 
-	inline bool valid() const;
+	inline bool valid() const {
+		return lPos < lSize;
+	}
 
-	inline void reset();
+	inline void reset() {
+		lPos = 0;
+	}
 
-	inline int size() const;
+	inline int size() const {
+		return lSize;
+	}
 
 	virtual GeneralTieIterator * clone() const;
 
 protected:
-
 	GeneralTieIterator();
-
 	GeneralTieIterator(const GeneralTieIterator& rhs);
-
 	int lPos;
-
 	std::vector<int> rEntries;
-
 	int lSize;
-
 	void finalize(ITieIterator& iter1, ITieIterator& iter2);
 
 private:
-
 	void init(ITieIterator& iter1, ITieIterator& iter2,
 			const Set_Operation opType);
-
 	void calcUnion(ITieIterator& iter1, ITieIterator& iter2);
-
 	void calcIntersection(ITieIterator& iter1, ITieIterator& iter2);
-
 	void calcSymDiff(ITieIterator& iter1, ITieIterator& iter2);
-
 	void calcSetMinus(ITieIterator& iter1, ITieIterator& iter2);
-
 	void calcFilter(ITieIterator& iter, const bool* const filter,
 			const bool keep);
 

@@ -15,8 +15,6 @@
 #include "Effect.h"
 #include <utility>
 
-using namespace std;
-
 namespace siena
 {
 
@@ -54,14 +52,14 @@ public:
 		int difference) = 0;
 
 	virtual double evaluationStatistic(double * currentValues);
-	virtual pair<double,double *> evaluationStatistic(double * currentValues, bool needActorStatistics);
+	virtual std::pair<double,double *> evaluationStatistic(double * currentValues, bool needActorStatistics);
 	virtual double endowmentStatistic(const int * difference,
 		double * currentValues);
-	virtual pair<double,double *> endowmentStatistic(const int * difference,
+	virtual std::pair<double,double *> endowmentStatistic(const int * difference,
 				double * currentValues, bool needActorStatistics);
 	virtual double creationStatistic(int * difference,
 		double * currentValues);
-	virtual pair<double,double *> creationStatistic(int * difference,
+	virtual std::pair<double,double *> creationStatistic(int * difference,
 				double * currentValues, bool needActorStatistics);
 	virtual double egoStatistic(int ego, double * currentValues);
 	virtual double egoEndowmentStatistic(int ego, const int * difference,

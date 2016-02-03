@@ -32,8 +32,8 @@ class SqrtTable;
 class DoubleOutActFunction : public MixedNetworkAlterFunction
 {
 public:
-	DoubleOutActFunction(string dependentNetworkName, string explanatoryNetworkName,
-									double parameter, bool change);
+	DoubleOutActFunction(std::string dependentNetworkName,
+			std::string explanatoryNetworkName, double parameter, bool change);
 	virtual void initialize(const Data * pData,
 		State * pState,
 		int period,

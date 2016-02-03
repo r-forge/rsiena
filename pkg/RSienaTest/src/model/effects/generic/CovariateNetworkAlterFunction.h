@@ -16,8 +16,6 @@
 #include <string>
 #include "NetworkAlterFunction.h"
 
-using namespace std;
-
 namespace siena
 {
 
@@ -36,7 +34,7 @@ class BehaviorLongitudinalData;
 class CovariateNetworkAlterFunction: public NetworkAlterFunction
 {
 public:
-	CovariateNetworkAlterFunction(string networkName, string covariateName);
+	CovariateNetworkAlterFunction(std::string networkName, std::string covariateName);
 	virtual ~CovariateNetworkAlterFunction();
 
 	virtual void initialize(const Data * pData,
@@ -57,7 +55,7 @@ protected:
 	BehaviorLongitudinalData * pBehaviorData() const;
 
 private:
-	string lcovariateName;
+	std::string lcovariateName;
 	int lperiod;
 	ConstantCovariate * lpConstantCovariate;
 	ChangingCovariate * lpChangingCovariate;

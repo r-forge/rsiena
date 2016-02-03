@@ -21,8 +21,8 @@ namespace siena
 class SameCovariateInTiesFunction: public CovariateNetworkAlterFunction
 {
 public:
-	SameCovariateInTiesFunction(string networkName,
-		string covariateName, bool sameValue, bool excludeMissing);
+	SameCovariateInTiesFunction(std::string networkName,
+		std::string covariateName, bool sameValue, bool excludeMissing);
 
 	virtual void initialize(const Data * pData,
 		State * pState,

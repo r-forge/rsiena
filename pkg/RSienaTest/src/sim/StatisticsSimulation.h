@@ -207,8 +207,8 @@ void StatisticsSimulation::getSingleScores(Eigen::DenseBase<Derived>& rScores,
 	int i = -1; // Score index
 
 	// For each dependent variable
-	const vector<LongitudinalData*>& vars = lpData->rDependentVariableData();
-	for (vector<LongitudinalData*>::size_type v = 0; v < vars.size(); ++v) {
+	const std::vector<LongitudinalData*>& vars = lpData->rDependentVariableData();
+	for (std::vector<LongitudinalData*>::size_type v = 0; v < vars.size(); ++v) {
 		const DependentVariable* pVariable = rEpochSim.pVariable(
 				vars[v]->name());
 
@@ -225,25 +225,25 @@ void StatisticsSimulation::getSingleScores(Eigen::DenseBase<Derived>& rScores,
 		}
 
 		// For each rate effect
-		Effects& rRate = lpModel->rRateEffects(vars[v]->name());
+		siena::Effects& rRate = lpModel->rRateEffects(vars[v]->name());
 		for (EffectIter it = rRate.begin(); it != rRate.end(); ++it) {
 			rScores[++i] = getRateScore(*it, rEpochSim, pVariable);
 		}
 
 		// For each evaluation effect
-		Effects& rEval = lpModel->rEvaluationEffects(vars[v]->name());
+		siena::Effects& rEval = lpModel->rEvaluationEffects(vars[v]->name());
 		for (EffectIter it = rEval.begin(); it != rEval.end(); ++it) {
 			rScores[++i] = rEpochSim.score(*it);
 		}
 
 		// For each endownment effect
-		Effects& rEndowment = lpModel->rEndowmentEffects(vars[v]->name());
+		siena::Effects& rEndowment = lpModel->rEndowmentEffects(vars[v]->name());
 		for (EffectIter it = rEndowment.begin(); it != rEndowment.end(); ++it) {
 			rScores[++i] = rEpochSim.score(*it);
 		}
 
 		// For each creation effect
-		Effects& rCreation = lpModel->rCreationEffects(vars[v]->name());
+		siena::Effects& rCreation = lpModel->rCreationEffects(vars[v]->name());
 		for (EffectIter it = rCreation.begin(); it != rCreation.end(); ++it) {
 			rScores[++i] = rEpochSim.score(*it);
 		}
