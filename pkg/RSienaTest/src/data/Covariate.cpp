@@ -9,9 +9,10 @@
  * Covariate class.
  *****************************************************************************/
 
+#include "Covariate.h"
 #include <cmath>
 
-#include "Covariate.h"
+using namespace std;
 
 namespace siena
 {

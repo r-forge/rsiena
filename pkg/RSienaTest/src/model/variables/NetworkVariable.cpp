@@ -8,12 +8,6 @@
  * Description: This file contains the implementation of the
  * NetworkVariable class.
  *****************************************************************************/
-#include <R_ext/Print.h>
-#include <R_ext/Arith.h>
-#include <Rinternals.h>
-#include <algorithm>
-#include <vector>
-#include <cmath>
 #include "NetworkVariable.h"
 #include "network/NetworkUtils.h"
 #include "utils/Utils.h"
@@ -38,11 +32,20 @@
 #include "model/filters/PermittedChangeFilter.h"
 #include "model/ml/Chain.h"
 #include "model/settings/Setting.h"
-#include "../../logger/Logger.h"
+#include "logger/Logger.h"
 
-using namespace siena::logger;
+#include <algorithm>
+#include <vector>
+#include <cmath>
+
+#include <Rinternals.h>
+#include <R_ext/Print.h>
+#include <R_ext/Arith.h>
+
+using namespace std;
 
 namespace siena {
+
 SEXP getMiniStepDF(const MiniStep& miniStep);
 
 // ----------------------------------------------------------------------------
@@ -743,7 +746,7 @@ void NetworkVariable::calculatePermissibleChanges()
 		int i = ii;
 		if (this->stepType() > -1) {
 			if (!iter->valid()) {
-				LOGS(Priority::ERROR)<< "size of iterator != size of settings\n";
+				LOGS(logger::Priority::ERROR)<< "size of iterator != size of settings\n";
 				throw "size of iterator != size setting";
 			}
 			i = iter->actor();
@@ -840,7 +843,7 @@ void NetworkVariable::calculateTieFlipContributions()
 
 		if (this->stepType() != -1) {
 			if (!permIter->valid()) {
-				LOGS(Priority::ERROR)<< "permitted iter length != settings permitted size\n";
+				LOGS(logger::Priority::ERROR)<< "permitted iter length != settings permitted size\n";
 				throw "permitted iter length != settings permitted size";
 			}
 			alter = permIter->actor();
@@ -1171,7 +1174,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 		{
 			if (!permIter->valid())
 		{
-				LOGS(Priority::ERROR)<< "permitted iter size differs from permitted settings size\n";
+				LOGS(logger::Priority::ERROR)<< "permitted iter size differs from permitted settings size\n";
 				throw "permIter size differs from setting size";
 		}
 			alter = permIter->actor();
@@ -1241,7 +1244,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 
 		if (this->stepType() != -1) {
 			if (!permIter->valid()) {
-				LOGS(Priority::ERROR)<< "permitted iter length != settings permitted size\n";
+				LOGS(logger::Priority::ERROR)<< "permitted iter length != settings permitted size\n";
 				throw "permitted iter length != settings permitted size";
 			}
 			alter = permIter->actor();
@@ -1384,7 +1387,7 @@ void NetworkVariable::accumulateScores(int alter) const
 				{
 					if (!permIter->valid())
 				{
-						LOGS(Priority::ERROR)<< "iterator not valid\n";
+						LOGS(logger::Priority::ERROR)<< "iterator not valid\n";
 						throw "not valid";
 				}
 					j = permIter->actor();
@@ -1455,7 +1458,7 @@ void NetworkVariable::accumulateScores(int alter) const
 				{
 					if (!permIter->valid())
 				{
-						LOGS(Priority::ERROR)<< "iterator not valid\n";
+						LOGS(logger::Priority::ERROR)<< "iterator not valid\n";
 						throw "not valid";
 				}
 					j = permIter->actor();
@@ -1494,7 +1497,7 @@ void NetworkVariable::accumulateScores(int alter) const
 				{
 					if (!permIter->valid())
 				{
-						LOGS(Priority::ERROR)<< "iterator not valid";
+						LOGS(logger::Priority::ERROR)<< "iterator not valid";
 						throw "not valid";
 				}
 					j = permIter->actor();

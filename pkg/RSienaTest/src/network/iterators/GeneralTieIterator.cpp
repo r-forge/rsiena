@@ -73,34 +73,10 @@ GeneralTieIterator::GeneralTieIterator(std::vector<int>::const_iterator start,
 }
 
 GeneralTieIterator::~GeneralTieIterator() {
-
-}
-
-inline void GeneralTieIterator::next() {
-	++lPos;
-}
-
-inline int GeneralTieIterator::actor() const {
-	if (valid()) {
-		return rEntries[lPos];
-	}
-	return -1;
-}
-
-inline bool GeneralTieIterator::valid() const {
-	return lPos < lSize;
-}
-
-inline void GeneralTieIterator::reset() {
-	lPos = 0;
 }
 
 GeneralTieIterator* GeneralTieIterator::clone() const {
 	return new GeneralTieIterator(*this);
-}
-
-inline int GeneralTieIterator::size() const {
-	return lSize;
 }
 
 GeneralTieIterator::GeneralTieIterator(const GeneralTieIterator& rhs) :

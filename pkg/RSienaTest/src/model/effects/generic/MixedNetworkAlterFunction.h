@@ -17,8 +17,6 @@
 #include "AlterFunction.h"
 #include "utils/NamedObject.h"
 
-using namespace std;
-
 namespace siena
 {
 
@@ -29,8 +27,8 @@ class NetworkCache;
 class MixedNetworkAlterFunction: public AlterFunction
 {
 public:
-	MixedNetworkAlterFunction(string firstNetworkName,
-		string secondNetworkName);
+	MixedNetworkAlterFunction(std::string firstNetworkName,
+		std::string secondNetworkName);
 	virtual ~MixedNetworkAlterFunction();
 
 	virtual void initialize(const Data * pData,
@@ -47,8 +45,8 @@ protected:
 	inline NetworkCache * pFirstNetworkCache() const;
 
 private:
-	string lfirstNetworkName;
-	string lsecondNetworkName;
+	std::string lfirstNetworkName;
+	std::string lsecondNetworkName;
 	const Network * lpFirstNetwork;
 	const Network * lpSecondNetwork;
 	TwoNetworkCache * lpTwoNetworkCache;

@@ -33,7 +33,7 @@ class NetworkCache;
 class GwespFunction: public NetworkAlterFunction
 {
 public:
-	GwespFunction(string networkName,
+	GwespFunction(std::string networkName,
 		EgocentricConfigurationTable * (NetworkCache::*pTable)() const,
 		double parameter) ;
 	virtual void initialize(const Data * pData,
@@ -45,7 +45,7 @@ public:
 private:
 	EgocentricConfigurationTable * (NetworkCache::*lpTable)() const;
 	double lparameter;
-	vector<double> lcumulativeWeight;
+	std::vector<double> lcumulativeWeight;
 	double lweight;
 	EgocentricConfigurationTable *lpInitialisedTable;
 

@@ -29,7 +29,7 @@ class ConfigurationTable;
 class InStarFunction: public NetworkAlterFunction, IntAlterFunction
 {
 public:
-	InStarFunction(string networkName);
+	InStarFunction(std::string networkName);
 
 	virtual void initialize(const Data * pData,
 		State * pState,

@@ -17,13 +17,12 @@
 namespace siena
 {
 
-
 class CovariateDistance2EgoAltSimNetworkFunction: public
 	CovariateDistance2NetworkFunction
 {
 public:
-	CovariateDistance2EgoAltSimNetworkFunction(string networkName,
-		string covariateName, bool excludeMissing, bool incoming);
+	CovariateDistance2EgoAltSimNetworkFunction(std::string networkName,
+		std::string covariateName, bool excludeMissing, bool incoming);
 	virtual double value(int alter);
 
 private:

@@ -218,7 +218,7 @@ double CovariateIndirectTiesEffect::egoStatistic(int ego,
 double CovariateIndirectTiesEffect::endowmentStatistic(
 	Network * pLostTieNetwork)
 {
-	throw logic_error(
+	throw std::logic_error(
 		"CovariateIndirectTiesEffect: Endowment effect not supported");
 }
 

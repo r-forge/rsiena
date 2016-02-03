@@ -144,7 +144,7 @@ private:
 	// A vector of filters that may decide that some tie flips from an
 	// ego are not permitted.
 
-	vector<PermittedChangeFilter *> lpermittedChangeFilters;
+	std::vector<PermittedChangeFilter *> lpermittedChangeFilters;
 
 	// Vectors of tie flip contributions to effects for models with
 	// cooperation between actor and alter.

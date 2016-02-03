@@ -15,6 +15,8 @@
 #include "model/tables/EgocentricConfigurationTable.h"
 #include <math.h>
 
+using namespace std;
+
 namespace siena
 {
 
@@ -22,7 +24,7 @@ namespace siena
  * Constructor.
  */
 GwespFunction::GwespFunction(string networkName,
-	EgocentricConfigurationTable *	(NetworkCache::*pTable)() const,
+	EgocentricConfigurationTable * (NetworkCache::*pTable)() const,
 	double parameter) :
 	NetworkAlterFunction(networkName)
 {

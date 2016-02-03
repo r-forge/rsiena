@@ -29,7 +29,7 @@ class MixedOutStarFunction:
 public MixedNetworkAlterFunction, IntAlterFunction
 {
 public:
-	MixedOutStarFunction(string firstNetworkName, string secondNetworkName);
+	MixedOutStarFunction(std::string firstNetworkName, std::string secondNetworkName);
 
 	virtual void initialize(const Data * pData,
 		State * pState,

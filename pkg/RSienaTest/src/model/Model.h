@@ -15,8 +15,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
-
 namespace siena
 {
 
@@ -68,27 +66,27 @@ public:
 	// Setting rate effects
 
 	void settingRateParameter(NetworkLongitudinalData * pNetworkData,
-		string setting,
+		std::string setting,
 		int period,
 		double value);
 	double settingRateParameter(NetworkLongitudinalData * pNetworkData,
-		string setting,
+		std::string setting,
 		int period) const;
 	const int numberOfSettings(NetworkLongitudinalData * pNetworkData) const;
 
 	// Other effects
 
-	EffectInfo * addEffect(string variableName,
-		string effectName,
-		string effectType,
+	EffectInfo * addEffect(std::string variableName,
+		std::string effectName,
+		std::string effectType,
 		double parameter,
 		double internalEffectParameter = 0,
-		string interactionName1 = "",
-		string interactionName2 = "",
-		string rateType = "");
-	EffectInfo * addInteractionEffect(string variableName,
-		string effectName,
-		string effectType,
+		std::string interactionName1 = "",
+		std::string interactionName2 = "",
+		std::string rateType = "");
+	EffectInfo * addInteractionEffect(std::string variableName,
+		std::string effectName,
+		std::string effectType,
 		double parameter,
 		const EffectInfo * pEffect1,
 		const EffectInfo * pEffect2,
@@ -96,14 +94,14 @@ public:
 
 	bool gmmModel() const;
 
-	const vector<EffectInfo *> & rRateEffects(string variableName) const;
-	const vector<EffectInfo *> & rGMMEffects(string variableName) const;
-	const vector<EffectInfo *> & rEvaluationEffects(string variableName) const;
-	const vector<EffectInfo *> & rEndowmentEffects(string variableName) const;
-	const vector<EffectInfo *> & rCreationEffects(string variableName) const;
+	const std::vector<EffectInfo *> & rRateEffects(std::string variableName) const;
+	const std::vector<EffectInfo *> & rGMMEffects(std::string variableName) const;
+	const std::vector<EffectInfo *> & rEvaluationEffects(std::string variableName) const;
+	const std::vector<EffectInfo *> & rEndowmentEffects(std::string variableName) const;
+	const std::vector<EffectInfo *> & rCreationEffects(std::string variableName) const;
 
 	void chainStore(const Chain& chain, int periodFromStart);
-	vector <Chain *> & rChainStore( int periodFromStart);
+	std::vector <Chain *> & rChainStore(int periodFromStart);
 	void clearChainStore(int keep, int periodFromStart);
 	void setupChainStore(int numberOfPeriods);
 	void deleteLastChainStore(int periodFromStart);
@@ -118,8 +116,8 @@ public:
 	int targetChange(const Data * pData, int period) const;
 	void targetChange(const Data * pData, int period, int change);
 
-	string conditionalDependentVariable() const;
-	void conditionalDependentVariable(string variableName);
+	std::string conditionalDependentVariable() const;
+	void conditionalDependentVariable(std::string variableName);
 
 	void needChain(bool flag);
 	bool needChain() const;
@@ -188,12 +186,10 @@ public:
 	void normalizeSettingRates(bool normalize);
 	bool normalizeSettingRates() const;
 
-
-
-    // localML
-    void localML(bool flag);
+	// localML
+	void localML(bool flag);
 	bool localML() const;
-    
+
 	// simple rates flag for ML
 	bool simpleRates() const;
 	void simpleRates(bool simpleRates);
@@ -207,46 +203,46 @@ private:
 	bool lGMMModel;
 
 	// name of conditional dependent variable
-	string lconditionalDependentVariable;
+	std::string lconditionalDependentVariable;
 
 	// Targets for conditional dependent variable per each data object
 	// and period.
 
-	map<const Data *, int *> ltargetChanges;
+	std::map<const Data *, int *> ltargetChanges;
 
 	// An array of doubles per each longitudinal data object storing
 	// the basic rate parameters for all periods
 
-	map<const LongitudinalData *, double *> lbasicRateParameters;
+	std::map<const LongitudinalData *, double *> lbasicRateParameters;
 
 	// An array of doubles for some network longitudinal data objects storing
 	// the basic rate parameters for all periods by setting.
 
-	map<const NetworkLongitudinalData *, map<string, double *> >
+	std::map<const NetworkLongitudinalData *, std::map<std::string, double *> >
 		lsettingRateParameters;
 
 	// A vector of effects other than the basic rate effects.
-	vector<EffectInfo *> leffects;
+	std::vector<EffectInfo *> leffects;
 
 	// A vector of rate effects (except the basic rate effects) per variable
-	map<string, vector<EffectInfo *> > lrateEffects;
+	std::map<std::string, std::vector<EffectInfo *> > lrateEffects;
 
 	// A vector of pointers to GMM effects per variable
-	map<string, vector<EffectInfo *> > lgmmEffects;
+	std::map<std::string, std::vector<EffectInfo *> > lgmmEffects;
 
 	// A vector of pointers to evaluation effects per variable
-	map<string, vector<EffectInfo *> > levaluationEffects;
+	std::map<std::string, std::vector<EffectInfo *> > levaluationEffects;
 
 	// A vector of pointers to endowment effects per variable
-	map<string, vector<EffectInfo *> > lendowmentEffects;
+	std::map<std::string, std::vector<EffectInfo *> > lendowmentEffects;
 
 	// A vector of pointers to creation effects per variable
-	map<string, vector<EffectInfo *> > lcreationEffects;
+	std::map<std::string, std::vector<EffectInfo *> > lcreationEffects;
 
 	// A dummy vector of effect infos in case we need a reference to
 	// non-existent vectors
 
-	const vector<EffectInfo *> lemptyEffectVector;
+	const std::vector<EffectInfo *> lemptyEffectVector;
 
 	// indicates whether we need to keep a chain of ministeps
 	bool lneedChain;
@@ -282,7 +278,7 @@ private:
 	double linitialPermutationLength;
 
 	// current length of permuted interval: varies by period
-	vector <double> lcurrentPermutationLength;
+	std::vector <double> lcurrentPermutationLength;
 
 	// probabilities of the different ML steps
 	double linsertDiagonalProbability;
@@ -293,24 +289,21 @@ private:
 	double linsertRandomMissingProbability;
 	double ldeleteRandomMissingProbability;
 
-    // localML
-    bool llocalML;
-    
+	// localML
+	bool llocalML;
+
 	bool lsimpleRates;
 
-	vector <double> lmissingNetworkProbability;
-	vector <double> lmissingBehaviorProbability;
+	std::vector <double> lmissingNetworkProbability;
+	std::vector <double> lmissingBehaviorProbability;
 
 	// chain storage: vector of chains for each period for each set of samples
 	// lchainStore[i] is set of entries for periodFromStart <i>,
 	// which incorporates both the group and period.
-	vector <vector <Chain *> > lchainStore;
+	std::vector<std::vector<Chain *> > lchainStore;
 
 	int lnumberOfPeriods;
-
 	bool lnormalizeSettingsRates;
-
-
 	ModelType lmodelType;
 };
 

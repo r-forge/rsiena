@@ -11,17 +11,16 @@
 
 #ifndef SIENA07UTILITIES_H_
 #define SIENA07UTILITIES_H_
+
 namespace siena
 {
 	class Data;
 	class BehaviorVariable;
-    class Network;
+	class Network;
 	class MiniStep;
 	class Chain;
 	class State;
 }
-using namespace std;
-using namespace siena;
 
 //--------------------------------------
 // utility functions to process groups
@@ -30,13 +29,13 @@ using namespace siena;
 /* Calculate the period number of this group and period, to access
  * correct stored chain.
  */
-int periodFromStart(vector<Data *> & pGroupData, int group, int period);
+int periodFromStart(std::vector<siena::Data *> & pGroupData, int group, int period);
 
 /* Calculate the total number of periods in all groups, which is the dimension
  * of some returned arrays.
  */
 
-int totalPeriods(vector<Data *> & pGroupData);
+int totalPeriods(std::vector<siena::Data *> & pGroupData);
 /**
  * Traps errors so R can stop the function rather than being stoppped itself.
  *
@@ -47,11 +46,11 @@ void Rterminate();
  * print out the data for profiling with gprof
  *
  */
-void printOutData(Data *pData);
+void printOutData(siena::Data *pData);
 
-SEXP getBehaviorValues(const BehaviorVariable & behavior);
-SEXP getAdjacency(const Network& net);
-SEXP getEdgeList(const Network& net);
+SEXP getBehaviorValues(const siena::BehaviorVariable & behavior);
+SEXP getAdjacency(const siena::Network& net);
+SEXP getEdgeList(const siena::Network& net);
 
 /**
  * utilities to access chains and ministeps
@@ -62,7 +61,7 @@ namespace siena
 	SEXP getMiniStepDF(const MiniStep & miniStep);
 	SEXP getChainDF(const Chain& chain, bool sort=true);
 	SEXP getChainDFPlus(const Chain & chain, bool sort=true);
-	SEXP getDFFromVector(const vector<MiniStep *> & rMiniSteps, bool sort=true);
+	SEXP getDFFromVector(const std::vector<MiniStep *> & rMiniSteps, bool sort=true);
 	SEXP getMiniStepList(const MiniStep & miniStep, int period);
 	SEXP getChainList(const Chain & chain);
 	SEXP getChangeContributionsList(const Chain & chain, SEXP EFFECTSLIST);

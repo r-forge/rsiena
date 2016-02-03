@@ -14,15 +14,14 @@
 
 #include "CovariateNetworkAlterFunction.h"
 
-using namespace std;
-
 namespace siena
 {
 
 class CovariateDistance2NetworkFunction: public CovariateNetworkAlterFunction
 {
 public:
-	CovariateDistance2NetworkFunction(string networkName, string covariateName);
+	CovariateDistance2NetworkFunction(std::string networkName,
+			std::string covariateName);
 	virtual ~CovariateDistance2NetworkFunction();
 	virtual void initialize(const Data * pData,
 		State * pState,
@@ -51,8 +50,6 @@ private:
 	bool * laverageInAlterMissing;
 
 };
-
-
 
 }
 

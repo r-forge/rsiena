@@ -28,7 +28,6 @@ public:
 	}
 
 	virtual ~UnionTieIterator() {
-
 	}
 
 	UnionTieIterator * clone() const {
@@ -36,7 +35,6 @@ public:
 	}
 
 protected:
-
 	UnionTieIterator(const UnionTieIterator& rhs) :
 			GeneralTieIterator(rhs) {
 	}

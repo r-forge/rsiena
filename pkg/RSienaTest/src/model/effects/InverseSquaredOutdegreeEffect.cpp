@@ -15,6 +15,8 @@
 #include "model/EffectInfo.h"
 #include "model/variables/NetworkVariable.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -28,8 +30,7 @@ InverseSquaredOutdegreeEffect::InverseSquaredOutdegreeEffect(
 
 	if (this->lc < 1)
 	{
-		throw invalid_argument(
-			string("InverseSquaredOutdegreeEffect: ") +
+		throw invalid_argument(string("InverseSquaredOutdegreeEffect: ") +
 			"Parameter value must be at least 1");
 	}
 }

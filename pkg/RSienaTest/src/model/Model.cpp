@@ -19,6 +19,8 @@
 #include "model/effects/AllEffects.h"
 #include "model/ml/Chain.h"
 
+using namespace std;
+
 namespace siena
 {
 

@@ -19,8 +19,6 @@
 #include "utils/NamedObject.h"
 #include "MixedNetworkAlterFunction.h"
 
-using namespace std;
-
 namespace siena
 {
 
@@ -39,14 +37,12 @@ class BehaviorLongitudinalData;
 class CovariateMixedNetworkAlterFunction: public MixedNetworkAlterFunction
 {
 public:
-	CovariateMixedNetworkAlterFunction(string firstNetworkName,
-		string secondNetworkName, string covariateName);
+	CovariateMixedNetworkAlterFunction(std::string firstNetworkName,
+		std::string secondNetworkName, std::string covariateName);
 	virtual ~CovariateMixedNetworkAlterFunction();
 
 	virtual void initialize(const Data * pData,
-		State * pState,
-		int period,
-		Cache * pCache);
+		State * pState, int period, Cache * pCache);
 
 protected:
 	double value(int i) const;
@@ -57,7 +53,7 @@ protected:
 	BehaviorLongitudinalData * pBehaviorData() const;
 
 private:
-	string lcovariateName;
+	std::string lcovariateName;
 	int lperiod;
 	ConstantCovariate * lpConstantCovariate;
 	ChangingCovariate * lpChangingCovariate;

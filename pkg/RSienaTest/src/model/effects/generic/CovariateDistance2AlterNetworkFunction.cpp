@@ -13,6 +13,8 @@
 #include "CovariateNetworkAlterFunction.h"
 #include "network/Network.h"
 
+using namespace std;
+
 namespace siena
 {
 

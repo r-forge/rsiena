@@ -16,6 +16,7 @@
 #include "data/ChangingCovariate.h"
 #include "data/BehaviorLongitudinalData.h"
 
+using namespace std;
 
 namespace siena
 {
