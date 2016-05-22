@@ -1,3 +1,7 @@
+2016-02-03 R-Forge Revision 292
+Changes in RSienaTest:
+   * Fixed permission filter for 2-mode networks.
+
 2016-02-03 R-Forge Revision 291
 Changes in RSienaTest:
    * Fixed include order.

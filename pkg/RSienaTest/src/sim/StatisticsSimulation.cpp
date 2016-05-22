@@ -181,12 +181,12 @@ void StatisticsSimulation::simulate(bool withSeeds) {
  */
 void StatisticsSimulation::simulatePeriods(bool withSeeds) {
 	GetRNGstate();
-#pragma omp parallel num_threads(lNThreads)
+	#pragma omp parallel num_threads(lNThreads)
 	{
-#pragma omp for schedule(dynamic, 1)
+		#pragma omp for schedule(dynamic, 1)
 		for (unsigned int thread = 0; thread < lNThreads; ++thread) {
 			// Run epoch simulation for each period
-			LOGS(Priority::DEBUG)<<"simulate with theta: "<<rParameters().transpose();
+			LOGS(Priority::DEBUG) << "simulate with theta: " << rParameters().transpose();
 			for (int m = 0; m < lpData->observationCount() - 1; ++m) {
 				if (withSeeds) {
 					setSeed(lSeeds[m]);
