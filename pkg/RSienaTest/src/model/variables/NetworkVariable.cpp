@@ -82,9 +82,9 @@ NetworkVariable::NetworkVariable(NetworkLongitudinalData * pData,
 	else
 	{
 		this->lpNetwork = new Network(this->n(), this->m());
-		numberOfAlters = this->m() + 1; 
-						// then numberOfAlters really is a misnomer
-		this->lpermitted = new bool[this->m()+1];
+		numberOfAlters = this->m() + 1;
+		// then numberOfAlters really is a misnomer
+		this->lpermitted = new bool[numberOfAlters];
 		this->levaluationEffectContribution = new double * [numberOfAlters];
 		this->lendowmentEffectContribution = new double * [numberOfAlters];
 		this->lcreationEffectContribution = new double * [numberOfAlters];
@@ -722,27 +722,27 @@ void NetworkVariable::preprocessEgo(const Function * pFunction, int ego)
  */
 void NetworkVariable::calculatePermissibleChanges()
 {
-	NetworkLongitudinalData * pData =
-		(NetworkLongitudinalData *) this->pData();
+	NetworkLongitudinalData *pData = (NetworkLongitudinalData*) this->pData();
 
-	// Test each alter if a tie flip to that alter is permitted according
-	// to upOnly/downOnly flags and the max degree.
 	int m = this->m();
-
-	for (int i = 0; i < m; ++i) {
+	for (int i = 0; i < m; ++i)
+	{
 		this->lpermitted[i] = false;
 	}
 
 	Setting* curSetting = 0;
 	ITieIterator* iter = 0;
-	if (this->stepType() != -1) {
+	if (this->stepType() != -1)
+	{
 		curSetting = lsettings[stepType()];
 		iter = curSetting->getSteps();
 		m = curSetting->getSize();
 	}
-// Rprintf("MaxDegree %d \n", pData->maxDegree());
 
-	for (int ii = 0; ii < m; ii++) {
+  // Test each alter if a tie flip to that alter is permitted according to
+  // upOnly/downOnly flags and the max degree.
+	for (int ii = 0; ii < m; ii++)
+	{
 		int i = ii;
 		if (this->stepType() > -1) {
 			if (!iter->valid()) {
@@ -770,11 +770,8 @@ void NetworkVariable::calculatePermissibleChanges()
 	if (iter != 0) {
 		delete iter;
 	}
-	// ensure that no change is a permitted change
-	lpermitted[lego] = true;
 
 	// Prohibit the change of structural ties
-
 	for (IncidentTieIterator iter =
 			 pData->pStructuralTieNetwork(this->period())->outTies(this->lego);
 			iter.valid(); iter.next()) {
@@ -782,7 +779,6 @@ void NetworkVariable::calculatePermissibleChanges()
 	}
 
 	// Run the filters that may forbid some more changes
-
 	for (unsigned i = 0; i < this->lpermittedChangeFilters.size(); i++)
 	{
 		PermittedChangeFilter * pFilter = this->lpermittedChangeFilters[i];
@@ -790,18 +786,14 @@ void NetworkVariable::calculatePermissibleChanges()
 		pFilter->filterPermittedChanges(this->lego, this->lpermitted);
 		//Rprintf(" filtered %d %d\n ", i, this->lpermitted[10]);
 	}
-//	if (this->id() > 0)
-//	for (int i = 0; i < m; i++)
-//	 {
-//		 	 Rprintf("permitted %d %d %d\n", i, this->lpermitted[i], m);
-//	 }
 
-if (!this->oneModeNetwork())
-{
-			// It is okay to not make any change at all
-			this->lpermitted[m] = true;
-}
-
+	// ensure that no change is a permitted change
+	if (this->oneModeNetwork())
+	{
+		this->lpermitted[lego] = true;
+	} else {
+		this->lpermitted[m] = true;
+	}
 }
 
 
@@ -819,12 +811,9 @@ void NetworkVariable::calculateTieFlipContributions()
 	int evaluationEffectCount = this->pEvaluationFunction()->rEffects().size();
 	int endowmentEffectCount = this->pEndowmentFunction()->rEffects().size();
 	int creationEffectCount = this->pCreationFunction()->rEffects().size();
-	const vector<Effect *> & rEvaluationEffects =
-		this->pEvaluationFunction()->rEffects();
-	const vector<Effect *> & rEndowmentEffects =
-		this->pEndowmentFunction()->rEffects();
-	const vector<Effect *> & rCreationEffects =
-		this->pCreationFunction()->rEffects();
+	const vector<Effect*> &rEvaluationEffects = this->pEvaluationFunction()->rEffects();
+	const vector<Effect*> &rEndowmentEffects = this->pEndowmentFunction()->rEffects();
+	const vector<Effect*> &rCreationEffects = this->pCreationFunction()->rEffects();
 	bool twoModeNetwork = !this->oneModeNetwork();
 	NetworkLongitudinalData * pData = (NetworkLongitudinalData *) this->pData();
 
@@ -832,7 +821,8 @@ void NetworkVariable::calculateTieFlipContributions()
 	int alter = 0;
 	Setting* curSetting = 0;
 	ITieIterator* permIter = 0;
-	if (this->stepType() != -1) {
+	if (this->stepType() != -1)
+	{
 		curSetting = lsettings[stepType()];
 		permIter = curSetting->getPermittedSteps();
 		m = curSetting->getPermittedSize();
@@ -1457,10 +1447,10 @@ void NetworkVariable::accumulateScores(int alter) const
 				if (permIter)
 				{
 					if (!permIter->valid())
-				{
+					{
 						LOGS(logger::Priority::ERROR)<< "iterator not valid\n";
 						throw "not valid";
-				}
+					}
 					j = permIter->actor();
 					permIter->next();
 				}
@@ -1496,15 +1486,15 @@ void NetworkVariable::accumulateScores(int alter) const
 				if (permIter)
 				{
 					if (!permIter->valid())
-				{
+					{
 						LOGS(logger::Priority::ERROR)<< "iterator not valid";
 						throw "not valid";
-				}
+					}
 					j = permIter->actor();
 					permIter->next();
 				}
 				if (!this->lpNetworkCache->outTieExists(j) &&
-					this->lpermitted[j])
+						this->lpermitted[j])
 				{
 					score -=
 						this->lcreationEffectContribution[j][i] *
