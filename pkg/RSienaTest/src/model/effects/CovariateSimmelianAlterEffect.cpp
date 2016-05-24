@@ -19,79 +19,81 @@
  * assumes: simmelian strength cannot be non-0 when summationTieNetwork is 0
  */
 namespace siena {
-	using namespace logger;
+using namespace logger;
 
-	CovariateSimmelianAlterEffect::CovariateSimmelianAlterEffect(
-			const EffectInfo* pEffectInfo):
-		pSimmelian(0), //
-		CovariateDependentNetworkEffect(pEffectInfo) {
-	}
+CovariateSimmelianAlterEffect::CovariateSimmelianAlterEffect(
+		const EffectInfo* pEffectInfo):
+	pSimmelian(0), //
+	CovariateDependentNetworkEffect(pEffectInfo) {
+}
 
-	CovariateSimmelianAlterEffect::~CovariateSimmelianAlterEffect() {
-		clearSimmelian();
-	}
+CovariateSimmelianAlterEffect::~CovariateSimmelianAlterEffect() {
+	clearSimmelian();
+}
 
-	/**
-	 * Initializes contribution collection.
-	 *
-	 * Called once before all calls to calculateContribution.
-	 */
-	void CovariateSimmelianAlterEffect::preprocessEgo(int ego)
-	{
-		NetworkEffect::preprocessEgo(ego);
-		clearSimmelian();
-		updateSimmelian((const OneModeNetwork*) this->pNetwork()); // simulated state
-	}
+/**
+ * Initializes contribution collection.
+ *
+ * Called once before all calls to calculateContribution.
+ */
+void CovariateSimmelianAlterEffect::preprocessEgo(int ego)
+{
+	NetworkEffect::preprocessEgo(ego);
+	clearSimmelian();
+	updateSimmelian((const OneModeNetwork*) this->pNetwork()); // simulated state
+// This is now done for all simmelian effects;
+// must be inefficient. How to do better?
+}
 
-	/**
-	 * Contribution of one tie flip.
-	 *
-	 * Called for every alter.
-	 */
-	double CovariateSimmelianAlterEffect::calculateContribution(int alter) const {
-		// only consider simmelian ties
-		if (pSimmelian->tieValue(this->ego(), alter) > 0)
-			return this->value(alter);
-		return 0;
-	}
+/**
+ * Contribution of one tie flip.
+ *
+ * Called for every alter.
+ */
+double CovariateSimmelianAlterEffect::calculateContribution(int alter) const {
+	// only consider simmelian ties
+	if (pSimmelian->tieValue(this->ego(), alter) > 0)
+		return this->value(alter);
+	return 0;
+}
 
-	/**
-	 * Initializes statistics collection.
-	 */
-	double CovariateSimmelianAlterEffect::statistic(const Network * pSummationTieNetwork) {
-		// update pSimmelian
-		clearSimmelian();
-		updateSimmelian((const OneModeNetwork*) pSummationTieNetwork);
-		// default
-		return NetworkEffect::statistic(pSummationTieNetwork);
-	}
+/**
+ * Initializes statistics collection.
+ */
+double CovariateSimmelianAlterEffect::statistic(const Network * pSummationTieNetwork) {
+	// update pSimmelian
+	clearSimmelian();
+	updateSimmelian((const OneModeNetwork*) pSummationTieNetwork);
+	// default
+	return NetworkEffect::statistic(pSummationTieNetwork);
+}
 
-	/**
-	 * Contribution to the effect statistics.
-	 *
-	 * Called only for ties that exist in pSummationTieNetwork.
-	 */
-	double CovariateSimmelianAlterEffect::tieStatistic(int alter) {
-		if (!this->missing(alter) && pSimmelian->tieValue(this->ego(), alter) > 0)
-			return this->value(alter);
-		return 0;
-	}
+/**
+ * Contribution to the effect statistics.
+ *
+ * Called only for ties that exist in pSummationTieNetwork.
+ */
+double CovariateSimmelianAlterEffect::tieStatistic(int alter) {
+	if (!this->missing(alter) && pSimmelian->tieValue(this->ego(), alter) > 0)
+		return this->value(alter);
+	return 0;
+}
 
-	/**
-	 * Deletes pSimmelian.
-	 */
-	void CovariateSimmelianAlterEffect::clearSimmelian() {
-		if (pSimmelian != 0) {
-			delete pSimmelian;
-			pSimmelian = 0;
-		}
+/**
+ * Deletes pSimmelian.
+ */
+void CovariateSimmelianAlterEffect::clearSimmelian() {
+	if (pSimmelian != 0) {
+		delete pSimmelian;
+		pSimmelian = 0;
 	}
+}
 
-	/**
-	 * Updates pSimmelian with the simmelian strength on pNetwork.
-	 */
-	void CovariateSimmelianAlterEffect::updateSimmelian(const OneModeNetwork* pNetwork) {
-		pSimmelian = newSimmelian((const OneModeNetwork*) pNetwork);
-	}
+/**
+ * Updates pSimmelian with the simmelian strength on pNetwork.
+ */
+void CovariateSimmelianAlterEffect::updateSimmelian(const OneModeNetwork* pNetwork) {
+	pSimmelian = newSimmelian((const OneModeNetwork*) pNetwork);
+}
 
 }

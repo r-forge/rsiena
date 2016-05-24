@@ -239,12 +239,12 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 									nstruct0 <- sum(depvar[, , k] %in% c(10))
 									nstruct1 <- sum(depvar[, , k] %in% c(11))
 								}
-								Report(c('	', nstruct0, ' structural zero'),
+								Report(c('  ', nstruct0, ' structural zero'),
 									   sep='', outf)
 								Report(ifelse(nstruct0 > 1,
 											  "s were found (code 10).\n",
 											  " was found (code 10).\n"), outf)
-								Report(c('	', nstruct1, ' structural one'),
+								Report(c('  ', nstruct1, ' structural one'),
 									   sep='', outf)
 								Report(ifelse(nstruct1 > 1,
 											  "s were found (code 11).\n",
@@ -361,6 +361,7 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 								 "the value 0 is imputed.\n"), outf)
 					}
 				}
+			Report("\n", outf)
 			}
 			Report("\n", outf)
 		}

@@ -78,7 +78,11 @@ namespace siena {
 					// LOGS(Priority::INFO) << "triad: " << v << " " << u << " " << w;
 					pIncidentTriads->increaseTieValue(v, u, 1);
 					pIncidentTriads->increaseTieValue(u, w, 1);
+//					pIncidentTriads->increaseTieValue(w, u, 1); // this now is replaced by the following line (TS)
+					pIncidentTriads->increaseTieValue(w, v, 1);
+					pIncidentTriads->increaseTieValue(u, v, 1);
 					pIncidentTriads->increaseTieValue(w, u, 1);
+					pIncidentTriads->increaseTieValue(v, w, 1);
 					marked[u] = false;
 				}
 			}

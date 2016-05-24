@@ -1,6 +1,29 @@
-2016-02-03 R-Forge Revision 292
+2016-05-23 R-Forge Revision 293
+Changes in RSiena and RSienaTest:
+   * Removed manual and bibliography from installation;
+     still available in \RSienaTest\doc.
+   * Added functions initializeStatisticCalculation() and
+     cleanupStatisticCalculation() to class BehaviorEffect.
+   * New effects totAltEgoX, totAltAltX, egoSqX, diffX, diffSqX, egoDiffX, 
+     avAltW, totAltW, avSimW, totSimW, jumpFrom, jumpSharedIn, mixedInXW, mixedInWX,
+     avWalt, totWAlt.
+   * New effect class DyadicCovariateDependentBehaviorEffect corresponding
+     to group dyadBehaviorNetObjective (effects.r, effectsDocumentation.r).
+   * added endowment and creation effects for inAct, inActSqrt, outAct, outActSqrt
+   * inActIntn also implemented for two-mode dependent networks.
+   * New argument 'matrices' in print.summary.sienaFit.
+   * Changes to NAMESPACE and DESCRIPTION files to satisfy R3.3.0 for
+     external functions from base packages.
+Changes in RSiena:
+   * siena01Gui and associated functions dropped.
+   * sienaDataCreateFromSession dropped.
+Changes in RSienaTest:.
+   * Change in endowment effect estimation for avAlt effect.
+   * New effects simmelian, simmelianAltX, avSimmelianAlt, totSimmelianAlt.
+
+2016-02-22 R-Forge Revision 292
 Changes in RSienaTest:
-   * Fixed permission filter for 2-mode networks.
+   * Fixed permission filter for 2-mode networks (NetworkVariable.cpp).
 
 2016-02-03 R-Forge Revision 291
 Changes in RSienaTest:

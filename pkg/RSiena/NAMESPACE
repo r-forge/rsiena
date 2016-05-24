@@ -1,20 +1,32 @@
 useDynLib(RSiena)
 export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
-siena01Gui, siena07, sienaCompositionChange, updateTheta,
-sienaCompositionChangeFromFile, sienaDataCreate, sienaDataCreateFromSession,
-sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
+       siena07, sienaCompositionChange, updateTheta,
+       sienaCompositionChangeFromFile, sienaDataCreate,
+       sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
        sienaDependent, sienaNodeSet, xtable.sienaFit,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, print.xtable.sienaFit,
-       installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy,
+       siena08, iwlsm, sienaTimeTest, includeTimeDummy,
        sienaGOF, descriptives.sienaGOF, sienaRI,
-	   sparseMatrixExtraction, networkExtraction, behaviorExtraction,
+	    sparseMatrixExtraction, networkExtraction, behaviorExtraction,
        OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
        siena.table, xtable,
        Wald.RSiena, Multipar.RSiena)
-
+importFrom("grDevices", "rgb", "xy.coords")
+importFrom("graphics", "axis", "barplot", "layout", "mtext", "pairs",
+           "panel.smooth", "par", "pie", "plot", "points", "strwidth","text")
+importFrom("methods", "as", "is")
+importFrom("stats", ".getXlevels", "acf", "contr.helmert", "cor",
+           "cor.test", "cov", "dnorm", "ecdf", "hatvalues", "lm",
+           "lm.wfit", "mad", "median", "model.matrix", "model.offset",
+           "model.response", "model.weights", "naprint", "optimize",
+           "pchisq", "plot.ts", "pnorm", "predict.lm", "pt", "qchisq",
+           "qnorm", "quantile", "runif", "sd", "ts", "uniroot", "var",
+           "weighted.mean")
+importFrom("utils", "browseURL", "flush.console", "getFromNamespace",
+           "packageDescription", "read.csv", "read.delim",
+           "read.table", "write.csv", "write.table")
 import(Matrix, tcltk, lattice, parallel, MASS)
-
 S3method(print, siena)
 S3method(print, sienaGroup)
 S3method(print, sienaDependent)

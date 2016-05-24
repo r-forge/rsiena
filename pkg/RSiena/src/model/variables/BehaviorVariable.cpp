@@ -324,17 +324,17 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	int creationEffectCount = this->pCreationFunction()->rEffects().size();
 
 	// initialize for later use!
-	for (unsigned i = 0; i < evaluationEffectCount; i++)
+	for (int i = 0; i < evaluationEffectCount; i++)
 	{
 		this->levaluationEffectContribution[1][i] =	0;
 	}
-	for (unsigned i = 0; i < endowmentEffectCount; i++)
+	for (int i = 0; i < endowmentEffectCount; i++)
 	{
 		this->lendowmentEffectContribution[1][i] =	0;
 		this->lendowmentEffectContribution[2][i] = 	0;
 	}
 
-	for (unsigned i = 0; i < creationEffectCount; i++)
+	for (int i = 0; i < creationEffectCount; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
@@ -377,16 +377,16 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	{
 		this->lprobabilities[0] = 0;
 		this->ldownPossible = false;
-		for (unsigned i = 0; i < pEvaluationFunction()->rEffects().size(); i++)
+		for (int i = 0; i < pEvaluationFunction()->rEffects().size(); i++)
 		{
 			this->levaluationEffectContribution[0][i] =	R_NaN;
 		}
-		for (unsigned i = 0; i < pEndowmentFunction()->rEffects().size(); i++)
+		for (int i = 0; i < pEndowmentFunction()->rEffects().size(); i++)
 		{
 			this->lendowmentEffectContribution[0][i] =  R_NaN;
 		}
 
-		for (unsigned i = 0;
+		for (int i = 0;
 			i < this->pCreationFunction()->rEffects().size();
 			i++)
 		{
@@ -411,16 +411,16 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	{
 		this->lprobabilities[2] = 0;
 		this->lupPossible = false;
-		for (unsigned i = 0; i < pEvaluationFunction()->rEffects().size(); i++)
+		for (int i = 0; i < pEvaluationFunction()->rEffects().size(); i++)
 		{
 			this->levaluationEffectContribution[2][i] =	R_NaN;
 		}
-		for (unsigned i = 0; i < pEndowmentFunction()->rEffects().size(); i++)
+		for (int i = 0; i < pEndowmentFunction()->rEffects().size(); i++)
 		{
 			this->lendowmentEffectContribution[2][i] = R_NaN;
 		}
 
-		for (unsigned i = 0;
+		for (int i = 0;
 			i < this->pCreationFunction()->rEffects().size();
 			i++)
 		{
@@ -459,7 +459,7 @@ double BehaviorVariable::totalEvaluationContribution(int actor,
 	double contribution = 0;
 	const Function * pFunction = this->pEvaluationFunction();
 
-	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	for (int i = 0; i < pFunction->rEffects().size(); i++)
 	{
 		BehaviorEffect * pEffect =
 			(BehaviorEffect *) pFunction->rEffects()[i];
@@ -482,7 +482,7 @@ double BehaviorVariable::totalEndowmentContribution(int actor,
 	double contribution = 0;
 	const Function * pFunction = this->pEndowmentFunction();
 
-	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	for (int i = 0; i < pFunction->rEffects().size(); i++)
 	{
 		BehaviorEffect * pEffect =
 			(BehaviorEffect *) pFunction->rEffects()[i];
@@ -511,7 +511,7 @@ double BehaviorVariable::totalCreationContribution(int actor,
 	double contribution = 0;
 	const Function * pFunction = this->pCreationFunction();
 
-	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	for (int i = 0; i < pFunction->rEffects().size(); i++)
 	{
 		BehaviorEffect * pEffect =
 			(BehaviorEffect *) pFunction->rEffects()[i];
@@ -537,7 +537,7 @@ double BehaviorVariable::totalCreationContribution(int actor,
 void BehaviorVariable::accumulateScores(int difference,
 	bool upPossible, bool downPossible) const
 {
-	for (unsigned i = 0;
+	for (int i = 0;
 		i < this->pEvaluationFunction()->rEffects().size();
 		i++)
 	{
@@ -569,7 +569,7 @@ void BehaviorVariable::accumulateScores(int difference,
 		}
 	}
 
-	for (unsigned i = 0;
+	for (int i = 0;
 		i < this->pEndowmentFunction()->rEffects().size();
 		i++)
 	{
@@ -606,7 +606,7 @@ void BehaviorVariable::accumulateScores(int difference,
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 	}
 
-	for (unsigned i = 0;
+	for (int i = 0;
 		i < this->pCreationFunction()->rEffects().size();
 		i++)
 	{
@@ -656,7 +656,7 @@ void BehaviorVariable::preprocessEgo()
  */
 void BehaviorVariable::preprocessEffects(const Function * pFunction)
 {
-	for (unsigned i = 0; i < pFunction->rEffects().size(); i++)
+	for (int i = 0; i < pFunction->rEffects().size(); i++)
 	{
 		BehaviorEffect * pEffect =
 			(BehaviorEffect *) pFunction->rEffects()[i];

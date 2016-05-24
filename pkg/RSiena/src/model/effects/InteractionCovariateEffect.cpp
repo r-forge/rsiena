@@ -27,7 +27,8 @@ InteractionCovariateEffect::InteractionCovariateEffect(
 	const EffectInfo * pEffectInfo,
 	bool averageSimilarity,
 	bool totalSimilarity,
-	bool averageAlter) :
+	bool averageAlter,
+	bool totalAlter) :
 		CovariateDependentBehaviorEffect(pEffectInfo)
 {
 	this->lpInteractingEffectInfo =
@@ -60,6 +61,11 @@ InteractionCovariateEffect::InteractionCovariateEffect(
 	{
 		this->lpInteractingEffect =
 			new AverageAlterEffect(this->lpInteractingEffectInfo, true);
+	}
+	else if (totalAlter) // || pEffectInfo->internalEffectParameter() == 4)
+	{
+		this->lpInteractingEffect =
+			new AverageAlterEffect(this->lpInteractingEffectInfo, false);
 	}
 	else
 	{

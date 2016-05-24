@@ -17,6 +17,16 @@
 namespace siena
 {
 
+// ----------------------------------------------------------------------------
+// Section: Forward declarations
+// ----------------------------------------------------------------------------
+
+class Network;
+
+// ----------------------------------------------------------------------------
+// Section: Class definition
+// ----------------------------------------------------------------------------
+
 /**
  * This class defines the outdegree activity effect defined by
  * s_i(x)= x_{i+}^2. The corresponding statistic is
@@ -31,6 +41,7 @@ public:
 
 protected:
 	virtual double tieStatistic(int alter);
+	virtual double endowmentStatistic(Network * pLostTieNetwork);
 };
 
 }

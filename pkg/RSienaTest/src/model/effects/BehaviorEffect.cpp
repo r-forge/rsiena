@@ -141,6 +141,7 @@ double BehaviorEffect::evaluationStatistic(double * currentValues)
 
 pair<double,double *> BehaviorEffect::evaluationStatistic(double * currentValues, bool needActorStatistics)
 {
+	this->initializeStatisticCalculation();
 	double statistic = 0;
 	int n = this->n();
 
@@ -167,6 +168,7 @@ pair<double,double *> BehaviorEffect::evaluationStatistic(double * currentValues
 			}
 		}
 	}
+	this->cleanupStatisticCalculation();
 	return make_pair(statistic,actorStatistics);
 }
 
@@ -195,6 +197,7 @@ double BehaviorEffect::endowmentStatistic(const int * difference,
 
 pair<double, double * > BehaviorEffect::endowmentStatistic(const int * difference, double * currentValues, bool needActorStatistics)
 {
+	this->initializeStatisticCalculation();
 	double statistic = 0;
 	int n = this->n();
 
@@ -220,6 +223,7 @@ pair<double, double * > BehaviorEffect::endowmentStatistic(const int * differenc
 			}
 		}
 	}
+	this->cleanupStatisticCalculation();
 	return make_pair(statistic, actorStatistics);
 }
 
@@ -260,6 +264,7 @@ pair<double, double * > BehaviorEffect::creationStatistic(int * difference,
 	// values. So we just reverse the differences and call the endowment
 	// statistic.
 
+	this->initializeStatisticCalculation();
 	int n = this->n();
 	double statistic = 0;
 	double * actorStatistics = 0;
@@ -288,9 +293,9 @@ pair<double, double * > BehaviorEffect::creationStatistic(int * difference,
 		difference[i]  = -difference[i];
 	}
 
+	this->cleanupStatisticCalculation();
 	return make_pair(-statistic, actorStatistics);
 }
-
 
 /**
  * Does the necessary preprocessing work for calculating the probabilities
@@ -301,4 +306,22 @@ void BehaviorEffect::preprocessEgo(int ego)
 {
 	this->lego = ego;
 }
+
+/**
+ * This method is called at the start of the calculation of the 
+ * evaluationStatistic, endowmentStatistic, and creationStatistic
+ */
+void BehaviorEffect::initializeStatisticCalculation()
+{
 }
+
+/**
+ * This method is called at the end of the calculation of the 
+ * evaluationStatistic, endowmentStatistic, and creationStatistic.
+ */
+void BehaviorEffect::cleanupStatisticCalculation()
+{
+}
+
+}
+

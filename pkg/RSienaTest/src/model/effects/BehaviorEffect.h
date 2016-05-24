@@ -72,7 +72,9 @@ protected:
 	bool missing(int observation, int actor) const;
 	double range() const;
 	double similarity(double a, double b) const;
-	double similarityMean() const;
+	double similarityMean() const;	
+	virtual void initializeStatisticCalculation();
+	virtual void cleanupStatisticCalculation();
 
 private:
 	BehaviorLongitudinalData * lpBehaviorData;

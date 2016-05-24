@@ -272,11 +272,6 @@ siena01Gui <- function(getDocumentation=FALSE)
             }
         }
     }
-    ##@helpFn internal siena01Gui
-    helpFn <- function() ## display the manual
-    {
-        RShowDoc("RSiena_Manual", package=pkgname)
-    }
     ##@myStop internal siena01Gui
     myStop<- function()
     {
@@ -642,11 +637,6 @@ siena01Gui <- function(getDocumentation=FALSE)
                 }
                 tkfocus(resultsframe)
             }
-        }
-        ##@modelhelpFn internal siena01Gui
-        modelhelpFn <- function()
-        {
-			RShowDoc("RSiena_Manual", package=pkgname)
         }
         ##@randomseedFn internal siena01Gui
         randomseedFn <- function()
@@ -1044,8 +1034,6 @@ siena01Gui <- function(getDocumentation=FALSE)
                                text=' Display Results ', width=22)
         returnbut <- tkbutton(comf, command=returnFn,
                               text=' Exit Model Options ', width=22)
-        helpbut <- tkbutton(comf, command=modelhelpFn, text=' Help ',
-                            width=22)
         ## if (ndepvars > 1)
         ## {
         tkgrid(effectslab, effectsvarl,
@@ -1055,8 +1043,7 @@ siena01Gui <- function(getDocumentation=FALSE)
         ## {
         ##   tkgrid(editbut, showbut, applybut,  savefilebut, padx=5, pady=5)
         ## }
-        tkgrid(editbut, showbut,  resultsbut, saveresultsbut,
-                helpbut, padx=5, pady=5)
+        tkgrid(editbut, showbut,  resultsbut, saveresultsbut, padx=5, pady=5)
         tkgrid(effectsvarl, sticky="w")
         screenFromModel()
        ## make sure this window is top with a global grab, bu only for a second
@@ -1119,8 +1106,7 @@ siena01Gui <- function(getDocumentation=FALSE)
     save1 <- tkbutton(f0, command = saveFn, width=10, text=' Save to file ' )
     apply1 <- tkbutton(f0, command = applyFn, width=10, text=' Apply ')
     clear1 <- tkbutton(f0, command = clearFn, width=10, text=' Clear ' )
-    help1 <- tkbutton(f0, command = helpFn, width=10, text=' Help ')
-    tkgrid(save1, apply1,  clear1, help1, pady=10)
+    tkgrid(save1, apply1,  clear1, pady=10)
 
     ## create and display session panel
     f1 <- tkframe(df,  height=300)

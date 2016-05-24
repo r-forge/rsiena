@@ -260,21 +260,6 @@ msgstr ""
 msgid "Not enough observations to use the nodes"
 msgstr ""
 
-msgid "The standalone gui is no longer available."
-msgstr ""
-
-msgid "To run the gui within R:"
-msgstr ""
-
-msgid "Start R, load RSiena using Packages menu"
-msgstr ""
-
-msgid "then type siena01Gui() (and <ENTER>)"
-msgstr ""
-
-msgid "Gui only needs installing on Windows: on Linux use sienascript"
-msgstr ""
-
 msgid "This function needs the tcl/tk package TkTable: install it,"
 msgstr ""
 

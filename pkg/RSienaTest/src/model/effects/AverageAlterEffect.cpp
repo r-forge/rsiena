@@ -117,10 +117,12 @@ double AverageAlterEffect::egoEndowmentStatistic(int ego,
 				 iter.next())
 			{
 				double alterValue = currentValues[iter.actor()];
-				double alterPreviousValue = currentValues[iter.actor()];
-				// +		difference[iter.actor()];
-				thisStatistic += iter.value() * alterValue;
-				previousStatistic += iter.value() * alterPreviousValue;
+				double alterPreviousValue = currentValues[iter.actor()]
+													+ difference[iter.actor()]; // this addition was absent until 1.1-292
+				thisStatistic += alterValue;
+				previousStatistic += alterPreviousValue;
+//				thisStatistic += iter.value() * alterValue; these lines also until 1.1-291; but iter.value is always 1?
+//				previousStatistic += iter.value() * alterPreviousValue;
 			}
 
 			thisStatistic *= currentValues[ego];

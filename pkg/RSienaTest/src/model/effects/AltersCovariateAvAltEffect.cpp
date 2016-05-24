@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include <stdexcept>
-#include <cmath>
 
 #include "AltersCovariateAvAltEffect.h"
 #include "data/Data.h"
@@ -30,11 +29,12 @@ namespace siena
  * Constructor.
  */
 AltersCovariateAvAltEffect::AltersCovariateAvAltEffect(
-	const EffectInfo * pEffectInfo) :
+	const EffectInfo * pEffectInfo, bool divide) :
 	CovariateAndNetworkBehaviorEffect(pEffectInfo)
 {
+	this->ldivide = divide;
+	// Indicates whether there will be division by the outdegree of ego
 }
-
 
 
 /**
@@ -61,8 +61,15 @@ double AltersCovariateAvAltEffect::calculateChangeContribution(int actor,
 			totalAlterValue += alterValue;
 		}
 
-		contribution = difference * totalAlterValue /
-			pNetwork->outDegree(actor);
+		if (this->ldivide)
+		{
+			contribution = difference * totalAlterValue /
+				pNetwork->outDegree(actor);
+		}
+		else
+		{
+			contribution = difference * totalAlterValue;
+		}
 	}
 
 	return contribution;
@@ -93,7 +100,7 @@ double AltersCovariateAvAltEffect::egoStatistic(int ego, double * currentValues)
 		}
 	}
 
-	if (neighborCount > 0)
+	if ((neighborCount > 0) && (this->ldivide))
 	{
 		statistic *= currentValues[ego] / neighborCount;
 	}
@@ -115,7 +122,6 @@ double AltersCovariateAvAltEffect::egoEndowmentStatistic(int ego,
 
 	if (difference[ego] > 0 && !this->missingDummy(ego) && (pNetwork->outDegree(ego) > 0)) // otherwise, nothing to calculate...
 	{
-
 		double totalAlterValue = 0;
 
 		for (IncidentTieIterator iter = pNetwork->outTies(ego);
@@ -127,8 +133,15 @@ double AltersCovariateAvAltEffect::egoEndowmentStatistic(int ego,
 			totalAlterValue += alterValue;
 		}
 
-		statistic -= difference[ego] * totalAlterValue /
-			pNetwork->outDegree(ego);
+		if (this->ldivide)
+		{
+			statistic -= difference[ego] * totalAlterValue /
+							pNetwork->outDegree(ego);
+		} 
+		else
+		{
+			statistic -= difference[ego] * totalAlterValue;
+		} 
 	}
 	return statistic;
 }

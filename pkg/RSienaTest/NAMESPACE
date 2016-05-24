@@ -2,20 +2,38 @@ useDynLib(RSienaTest)
 export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
        siena01Gui, siena07, sienaCompositionChange, sienaBayes, glueBayes,
        simpleBayesTest, multipleBayesTest, extract.sienaBayes, updateTheta,
-       sienaCompositionChangeFromFile, sienaDataCreate, 
-	   sienaDataCreateFromSession, sienaGroupCreate, sienaModelCreate, 
+       sienaCompositionChangeFromFile, sienaDataCreate,
+	   sienaDataCreateFromSession, sienaGroupCreate, sienaModelCreate,
 	   sienaAlgorithmCreate, sienaNet,
        sienaDependent, sienaNodeSet, xtable.sienaFit,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
        effectsDocumentation, sienaDataConstraint, print.xtable.sienaFit,
        installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy,
-       sienaGOF, descriptives.sienaGOF, sienaRI, sienaRIDynamics, 
+       sienaGOF, descriptives.sienaGOF, sienaRI, sienaRIDynamics,
 	   sparseMatrixExtraction, networkExtraction, behaviorExtraction,
        OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
        xtable, algorithms, profileLikelihoods, siena.table,
 	   Wald.RSiena, Multipar.RSiena)
 export(sienacpp)
 import(Matrix, tcltk, lattice, parallel, MASS)
+importFrom("grDevices", "rgb", "xy.coords")
+importFrom("graphics", "axis", "barplot", "contour", "layout", "lines",
+           "mtext", "pairs", "panel.smooth", "par", "pie", "plot",
+           "points", "stem", "strwidth", "text")
+importFrom("methods", "as", "is")
+importFrom("stats", ".getXlevels", "acf", "as.formula", "coef",
+           "contr.helmert", "cor", "cor.test", "cov", "density",
+           "dnorm", "ecdf", "hatvalues", "lm", "lm.wfit", "mad",
+           "mahalanobis", "median", "model.matrix", "model.offset",
+           "model.response", "model.weights", "na.omit", "naprint",
+           "optim", "optimize", "pchisq", "plot.ts", "pnorm", "poly",
+           "predict.lm", "pt", "qchisq", "qnorm", "quantile",
+           "rWishart", "rnorm", "runif", "sd", "ts", "uniroot", "var",
+           "weighted.mean", "weights")
+importFrom("utils", "browseURL", "capture.output", "edit",
+           "flush.console", "getFromNamespace", "object.size",
+           "packageDescription", "read.csv", "read.delim",
+           "read.table", "write.csv", "write.table")
 S3method(print, siena)
 S3method(print, sienaGroup)
 S3method(print, sienaDependent)

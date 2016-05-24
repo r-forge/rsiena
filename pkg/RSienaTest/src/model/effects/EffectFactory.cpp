@@ -40,6 +40,7 @@
 #include "model/effects/generic/ReverseTwoPathFunction.h"
 #include "model/effects/generic/MixedTwoPathFunction.h"
 #include "model/effects/generic/MixedInStarFunction.h"
+#include "model/effects/generic/MixedOutStarFunction.h"
 #include "model/effects/generic/ConditionalFunction.h"
 #include "model/effects/generic/EqualCovariatePredicate.h"
 #include "model/effects/generic/MissingCovariatePredicate.h"
@@ -49,6 +50,8 @@
 #include "model/effects/generic/CovariateDistance2SimilarityNetworkFunction.h"
 #include "model/effects/generic/CovariateDistance2EgoAltSimNetworkFunction.h"
 #include "model/effects/generic/CovariateMixedNetworkAlterFunction.h"
+#include "model/effects/generic/SameCovariateInStarFunction.h"
+#include "model/effects/generic/SameCovariateOutStarFunction.h"
 #include "model/effects/generic/SameCovariateTwoPathFunction.h"
 #include "model/effects/generic/SameCovariateMixedTwoPathFunction.h"
 #include "model/effects/generic/SameCovariateInTiesFunction.h"
@@ -56,10 +59,6 @@
 #include "model/effects/generic/OutActDistance2Function.h"
 #include "model/effects/generic/MixedThreeCyclesFunction.h"
 #include "model/effects/generic/InStarsTimesDegreesFunction.h"
-#include "model/effects/CovariateSimmelianAlterEffect.h"
-#include "model/effects/gmm/ReciprocityGMMEffect.h"
-#include "model/effects/gmm/AgreementTransitivityEffect.h"
-#include "model/effects/gmm/RealTransitivityEffect.h"
 #include "model/tables/EgocentricConfigurationTable.h"
 #include "model/tables/NetworkCache.h"
 
@@ -342,6 +341,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new InInDegreeAssortativityEffect(pEffectInfo);
 	}
+	else if (effectName == "simmelian")
+	{
+		pEffect = new SimmelianEffect(pEffectInfo);
+	}
 	else if (effectName == "X")
 	{
 		pEffect = new DyadicCovariateMainEffect(pEffectInfo);
@@ -397,19 +400,41 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "egoX")
 	{
 		pEffect = new CovariateEgoEffect(pEffectInfo);
-	} else if (effectName == "egoX_sim") {
+	}
+	else if (effectName == "egoSqX")
+	{
+		pEffect = new CovariateEgoSquaredEffect(pEffectInfo);
+	}
+	else if (effectName == "egoX_sim")
+	{
 		pEffect = new CovariateEgoEffect(pEffectInfo, true);
+	}
+	else if (effectName == "diffX")
+	{
+		pEffect = new CovariateDiffEffect(pEffectInfo, false);
+	}
+	else if (effectName == "diffSqX")
+	{
+		pEffect = new CovariateDiffEffect(pEffectInfo, true);
+	}
+	else if (effectName == "egoDiffX")
+	{
+		pEffect = new CovariateDiffEgoEffect(pEffectInfo);
 	}
 	else if (effectName == "simX")
 	{
 		pEffect = new CovariateSimilarityEffect(pEffectInfo, false);
-	} else if (effectName == "simX_sim") {
+	}
+	else if (effectName == "simX_sim")
+	{
 		pEffect = new CovariateSimilarityEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "simRecipX")
 	{
 		pEffect = new CovariateSimilarityEffect(pEffectInfo, true);
-	} else if (effectName == "simRecipX_sim") {
+	}
+	else if (effectName == "simRecipX_sim")
+	{
 		pEffect = new CovariateSimilarityEffect(pEffectInfo, true, true);
 	}
 	else if (effectName == "simXTransTrip")
@@ -793,6 +818,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 			new MixedTwoPathFunction(pEffectInfo->interactionName1(),
 				pEffectInfo->variableName()));
 	}
+	else if (effectName == "mixedInWX")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new MixedOutStarFunction(pEffectInfo->interactionName1(),
+				pEffectInfo->variableName()));
+	}
+	else if (effectName == "mixedInXW")
+	{
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new MixedOutStarFunction(pEffectInfo->variableName(),
+				pEffectInfo->interactionName1()));
+	}
 	else if (effectName == "cl.XWX")
 	{
 		pEffect = new GenericNetworkEffect(pEffectInfo,
@@ -860,6 +897,42 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 					new EqualCovariatePredicate(covariateName),
 					0,
 					new SameCovariateTwoPathFunction(networkName,
+										covariateName, true))));
+	}
+	else if (effectName == "jumpFrom")
+	{
+		string networkName = pEffectInfo->interactionName1();
+		string covariateName = pEffectInfo->interactionName2();
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new ConditionalFunction(new EqualCovariatePredicate(covariateName),
+				0,
+				new SameCovariateInStarFunction(networkName,
+										covariateName, false)),
+			new ConditionalFunction(
+				new MissingCovariatePredicate(covariateName),
+				0,
+				new ConditionalFunction(
+					new EqualCovariatePredicate(covariateName),
+					0,
+					new SameCovariateInStarFunction(networkName,
+										covariateName, true))));
+	}
+	else if (effectName == "jumpSharedIn")
+	{
+		string networkName = pEffectInfo->interactionName1();
+		string covariateName = pEffectInfo->interactionName2();
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new ConditionalFunction(new EqualCovariatePredicate(covariateName),
+				0,
+				new SameCovariateOutStarFunction(networkName,
+										covariateName, false)),
+			new ConditionalFunction(
+				new MissingCovariatePredicate(covariateName),
+				0,
+				new ConditionalFunction(
+					new EqualCovariatePredicate(covariateName),
+					0,
+					new SameCovariateOutStarFunction(networkName,
 										covariateName, true))));
 	}
 	else if (effectName == "homWXClosure")
@@ -1021,6 +1094,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "totRecAlt")
 	{
 		pEffect = new AverageReciprocatedAlterEffect(pEffectInfo, false);
+	}	
+	else if (effectName == "avSimmelianAlt")
+	{
+		pEffect = new AverageSimmelianAlterEffect(pEffectInfo, true);
+	}
+	else if (effectName == "totSimmelianAlt")
+	{
+		pEffect = new AverageSimmelianAlterEffect(pEffectInfo, false);
 	}
 	else if (effectName == "maxAlt")
 	{
@@ -1125,15 +1206,19 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	//}
 	else if (effectName == "avSimEgoX")
 	{
-		pEffect = new InteractionCovariateEffect(pEffectInfo, true, false, false);
+		pEffect = new InteractionCovariateEffect(pEffectInfo, true, false, false, false);
 	}
 	else if (effectName == "totSimEgoX")
 	{
-		pEffect = new InteractionCovariateEffect(pEffectInfo, false, true, false);
+		pEffect = new InteractionCovariateEffect(pEffectInfo, false, true, false, false);
 	}
 	else if (effectName == "avAltEgoX")
 	{
-		pEffect = new InteractionCovariateEffect(pEffectInfo, false, false, true);
+		pEffect = new InteractionCovariateEffect(pEffectInfo, false, false, true, false);
+	}
+	else if (effectName == "totAltEgoX")
+	{
+		pEffect = new InteractionCovariateEffect(pEffectInfo, false, false, false, true);
 	}
 	else if (effectName == "totSimAltX")
 	{
@@ -1143,9 +1228,13 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new AltersCovariateAvSimEffect(pEffectInfo);
 	}
+	else if (effectName == "totAltAltX")
+	{
+		pEffect = new AltersCovariateAvAltEffect(pEffectInfo, false);
+	}
 	else if (effectName == "avAltAltX")
 	{
-		pEffect = new AltersCovariateAvAltEffect(pEffectInfo);
+		pEffect = new AltersCovariateAvAltEffect(pEffectInfo, true);
 	}
 	else if (effectName == "AltsAvAlt")
 	{
@@ -1198,6 +1287,30 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "totAXInAltDist2")
 	{
 		pEffect = new AltersInDist2CovariateAverageEffect(pEffectInfo,false,true);
+	}
+	else if (effectName == "avWAlt")
+	{
+		pEffect = new DyadicCovariateAvAltEffect(pEffectInfo,true, false);
+	}
+	else if (effectName == "totWAlt")
+	{
+		pEffect = new DyadicCovariateAvAltEffect(pEffectInfo,false, false);
+	}
+	else if (effectName == "avAltW")
+	{
+		pEffect = new DyadicCovariateAvAltEffect(pEffectInfo,true, true);
+	}
+	else if (effectName == "totAltW")
+	{
+		pEffect = new DyadicCovariateAvAltEffect(pEffectInfo,false, true);
+	}
+	else if (effectName == "avSimW")
+	{
+		pEffect = new SimilarityWEffect(pEffectInfo, true, false, false);
+	}
+	else if (effectName == "totSimW")
+	{
+		pEffect = new SimilarityWEffect(pEffectInfo, false, false, false);
 	}
 	else if (effectName == "altDist2")
 	{

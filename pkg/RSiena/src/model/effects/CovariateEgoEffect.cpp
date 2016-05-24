@@ -18,12 +18,12 @@ namespace siena
 
 /**
  * Constructor.
+ *
+ * @param[in] pEffectInfo the effect descriptor
  */
 CovariateEgoEffect::CovariateEgoEffect(const EffectInfo * pEffectInfo) :
-	CovariateDependentNetworkEffect(pEffectInfo)
-{
+	CovariateDependentNetworkEffect(pEffectInfo) {
 }
-
 
 /**
  * Calculates the contribution of a tie flip to the given actor.

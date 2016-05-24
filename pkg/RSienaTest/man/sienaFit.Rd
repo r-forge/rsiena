@@ -12,9 +12,9 @@
 \usage{
 \method{print}{sienaFit}(x, tstat=TRUE, ...)
 
-\method{summary}{sienaFit}(object,  ...)
+\method{summary}{sienaFit}(object, ...)
 
-\method{print}{summary.sienaFit}(x,  ...)
+\method{print}{summary.sienaFit}(x, matrices=TRUE, ...)
 
 \method{xtable}{sienaFit}(x, caption = NULL, label = NULL, align = NULL,
                 digits = NULL, display = NULL, ...)
@@ -27,6 +27,9 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
     \code{\link{siena07}}.}
   \item{x}{An object of class \code{sienaFit}, or
     \code{summary.sienaFit} as appropriate.}
+  \item{matrices}{Boolean: whether also to print in the summary the 
+   covariance matrix of the estimates, the derivative matrix of expected 
+   statistics X by parameters, and the covariance matrix of the statistics.}
   \item{tstat}{Boolean: if this is NULL, the t-statistics for convergence
      will not be added to the report.}
   \item{type}{Type of output to produce; must be either \code{"tex"} or
