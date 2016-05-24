@@ -77,7 +77,7 @@ NetworkVariable::NetworkVariable(NetworkLongitudinalData * pData,
 		this->lpNetwork = new Network(this->n(), this->m());
 		numberOfAlters = this->m() + 1; 
 						// then numberOfAlters really is a misnomer
-		this->lpermitted = new bool[this->m()+1];
+		this->lpermitted = new bool[numberOfAlters];
 		this->levaluationEffectContribution = new double * [numberOfAlters];
 		this->lendowmentEffectContribution = new double * [numberOfAlters];
 		this->lcreationEffectContribution = new double * [numberOfAlters];
@@ -721,7 +721,7 @@ void NetworkVariable::calculatePermissibleChanges()
 	// Test each alter if a tie flip to that alter is permitted according
 	// to upOnly/downOnly flags and the max degree.
 	int m = this->m();
-
+	
 	if (this->stepType() > 0)
 	{
 		m = this->lsetting->size();

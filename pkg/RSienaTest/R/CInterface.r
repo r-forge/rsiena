@@ -354,7 +354,7 @@ reformatSienaFit <- function(z) {
 	else
 	{
 		mean.dev <- 0
-		cov.edv <- 1
+		cov.dev <- 1
 	}
   }
   

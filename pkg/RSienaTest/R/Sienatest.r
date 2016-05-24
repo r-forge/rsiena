@@ -124,7 +124,7 @@ TestOutput <- function(z, x)
 		}
 		else
 		{
-				Report('  NA  ',outf)		
+				Report('  NA  ',outf)
 		}
         if (testn==1)
             Report(c('\n   one-sided (normal variate): ',
@@ -154,7 +154,7 @@ TestOutput <- function(z, x)
 				}
 				else
 				{
-					Report('  NA  ',outf)		
+					Report('  NA  ',outf)
 				}
                 Report(c(' - one-sided (normal variate): ',
                          sprintf("%8.4f", z$testresulto[k])), sep = '', outf)
@@ -247,7 +247,7 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
     z2 <- fra[test]
     if (inherits(try(id11 <- solve(d11), silent=TRUE), "try-error"))
     {
-        cat('Error for inversion of d11 \n')
+        cat('Score test: Error for inversion of d11 \n')
         oneSided <- NA
         v9 <- d22
         v9[] <- NA
@@ -275,7 +275,7 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
         if (inherits(try(vav <- solve(v9), silent=TRUE), "try-error"))
             ## vav is the inverse variance matrix of ov
         {
-            cat('Error for inversion of v9\n')
+            cat('Score test: Error for inversion of v9\n')
             vav <- v9
             vav[] <- NA
 			cvalue <- NA

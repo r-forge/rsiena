@@ -96,6 +96,7 @@ effectsDocumentation <- function(effects= NULL, type="html",
 				 "behaviorBipBipObjective",
                  "covarBehaviorObjective",
 				 "covarBehaviorNetObjective",
+				 "dyadBehaviorNetObjective",
 				 "covarABehaviorBipartiteObjective",
 				 "covarBBehaviorBipartiteObjective",
                  "unspecifiedBehaviorInteraction")

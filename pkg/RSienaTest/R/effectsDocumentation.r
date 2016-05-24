@@ -96,6 +96,7 @@ effectsDocumentation <- function(effects= NULL, type="html",
 				 "behaviorBipBipObjective",
 				 "covarBehaviorObjective",
 				 "covarBehaviorNetObjective",
+				 "dyadBehaviorNetObjective",
 				 "covarABehaviorBipartiteObjective",
 				 "covarBBehaviorBipartiteObjective",
 				 "unspecifiedBehaviorInteraction")
@@ -121,7 +122,6 @@ effectsDocumentation <- function(effects= NULL, type="html",
 	add.to.row	<-	NULL
 	if (is.null(effects))
 	{
-#browser()
 		add.to.row$pos <- lapply(addtorowPos, function(x)x)
 		add.to.row$command <- as.vector(sapply(addtorowText, function(x)x))
 		order2 <- match(myorder, x[, 2])

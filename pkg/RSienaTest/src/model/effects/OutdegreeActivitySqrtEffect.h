@@ -22,6 +22,7 @@ namespace siena
 // ----------------------------------------------------------------------------
 
 class SqrtTable;
+class Network;
 
 
 // ----------------------------------------------------------------------------
@@ -41,6 +42,7 @@ public:
 
 protected:
 	virtual double tieStatistic(int alter);
+	virtual double endowmentStatistic(Network * pLostTieNetwork);
 
 private:
 	// Lookup table for fast square root calculations

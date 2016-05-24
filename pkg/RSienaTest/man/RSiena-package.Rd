@@ -41,17 +41,14 @@ Package \code{"RSiena"} is the official release.
 
   A general introduction to the method is available in the tutorial paper
   Snijders, van de Bunt, and Steglich (2010).
-  Next to the help pages, more detailed help is available in the manual
-  which you can display using \cr
-  \code{RShowDoc("RSiena_Manual", package="RSienaTest")}.\cr
-  A lot of information also is
-  at the website \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
+  Next to the help pages, more detailed help is available in the manual (see below)
+  and a lot of information is at the website (also see below).
 \tabular{ll}{
 Package: \tab RSienaTest\cr
 Type: \tab Package\cr
-Version: \tab 1.1-290\cr
-Date: \tab 2016-01-31\cr
-Depends: \tab R (>= 2.15.0)\cr
+Version: \tab 1.1-293\cr
+Date: \tab 2016-05-23\cr
+Depends: \tab R (>= 3.0.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
           xtable, tools, utils\cr
@@ -92,10 +89,9 @@ BuildResaveData: \tab no\cr
     Pearson, Michael A. (2010). Dynamic networks and behavior:
     Separating selection from influence. \emph{Sociological Methodology},
     40, 329-393.
-   \item Further see the extensive manual accessible by the command\cr
-    \code{RShowDoc("RSiena_Manual", package="RSienaTest")}\cr
-    and the website \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
-           }
+   \item The manual: \url{http://www.stats.ox.ac.uk/~snijders/siena/RSiena_Manual.pdf}
+   \item The website: \url{http://www.stats.ox.ac.uk/~snijders/siena/}.
+}
 }
 \seealso{\code{\link{siena07}}}
 

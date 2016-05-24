@@ -1,5 +1,5 @@
 
-R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
 Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 
@@ -253,7 +253,67 @@ chi-squared =   0.67, d.f. = 2, p= 0.7155,
 where H0: The following parameters are zero:
  (1) (*)Dummy2:outdegree (density)
  (2) (*)Dummy2:indegree - popularity
+> ##test13
+> print('test13')
+[1] "test13"
+> net <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
+> dataset <- sienaDataCreate(net)
+> eff <- getEffects(dataset)
+> algo <- sienaAlgorithmCreate(nsub=2, n3=50, dolby=FALSE, seed=15)
+> eff <- includeEffects(eff, density)
+  effectName          include fix   test  initialValue parm
+1 outdegree (density) TRUE    FALSE FALSE   -0.56039   0   
+> eff <- includeEffects(eff, density, type='gmm')
+  For estimation by the Generalized Method of Moments
+  Effects
+
+	 Statistics
+  effectName          include type
+1 outdegree (density) TRUE    gmm 
+> eff <- includeEffects(eff, recip)
+  effectName  include fix   test  initialValue parm
+1 reciprocity TRUE    FALSE FALSE          0   0   
+> (eff <- includeEffects(eff, recip, realrecip, persistrecip, type='gmm'))
+  For estimation by the Generalized Method of Moments
+  Effects
+
+	 Statistics
+  effectName        include type
+1 reciprocity       TRUE    gmm 
+2 persistent recip. TRUE    gmm 
+3 real recip.       TRUE    gmm 
+  For estimation by the Generalized Method of Moments
+  Effects
+  effectName               include fix   test  initialValue parm type
+1 basic rate parameter net TRUE    FALSE FALSE    4.80941   0    rate
+2 outdegree (density)      TRUE    FALSE FALSE   -0.56039   0    eval
+3 reciprocity              TRUE    FALSE FALSE    0.00000   0    eval
+
+	 Statistics
+  effectName          include type
+1 outdegree (density) TRUE    gmm 
+2 reciprocity         TRUE    gmm 
+3 persistent recip.   TRUE    gmm 
+4 real recip.         TRUE    gmm 
+> (ans <- sienacpp(algo, data=dataset, effects=eff))
+Estimated by Generalized Method of Moments
+
+Estimates, standard errors and convergence t-ratios
+
+                              Estimate   Standard   Convergence 
+                                           Error      t-ratio   
+
+Rate parameters: 
+  0       Rate parameter       2.9009  ( 0.4890   )             
+  1. eval outdegree (density) -1.1160  ( 0.1866   )   0.6470    
+  2. eval reciprocity          1.9615  ( 0.3929   )   1.1065    
+
+Overall maximum convergence ratio:    1.2607 
+
+
+Total of  iteration steps.
+
 > 
 > proc.time()
    user  system elapsed 
-  10.51    0.39   11.01 
+  12.83    0.37   13.29 

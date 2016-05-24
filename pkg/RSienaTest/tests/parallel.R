@@ -94,3 +94,14 @@ ans <- siena07(sienaModelCreate(n3=50, nsub=2,
 ans
 tt <- sienaTimeTest(ans)
 tt
+##test13
+print('test13')
+net <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
+dataset <- sienaDataCreate(net)
+eff <- getEffects(dataset)
+algo <- sienaAlgorithmCreate(nsub=2, n3=50, dolby=FALSE, seed=15)
+eff <- includeEffects(eff, density)
+eff <- includeEffects(eff, density, type='gmm')
+eff <- includeEffects(eff, recip)
+(eff <- includeEffects(eff, recip, realrecip, persistrecip, type='gmm'))
+(ans <- sienacpp(algo, data=dataset, effects=eff))

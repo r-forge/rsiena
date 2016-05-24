@@ -1134,7 +1134,7 @@ The Generalized Method of Moments (`\emph{GMoM}')
 as decribed in \citet{ASS2015} is implemented in \nnm{sienacpp()}.
 
 The following indicates how some of the matrices in
-the description of the algorithm in \citet{ASS2015} 
+the description of the algorithm in \citet{ASS2015}
 can be obtained from a \nnm{sienaFit} object \nnm{ans}
 produced by \nnm{sienacpp()}.
 
@@ -1160,7 +1160,7 @@ the inverse  $W = \big(\Cov(S^\ast)\big)^{-1}$  is used :
 \begin{verbatim}
     W <- solve(cov0)
 \end{verbatim}
-The $Q \times P$ matrix of derivatives $\Gamma$ is 
+The $Q \times P$ matrix of derivatives $\Gamma$ is
 estimated by \texttt{t(fit\$gamma)}.
 For the matrix $B$ we use \texttt{B1} as defined by
 \begin{verbatim}
@@ -1177,14 +1177,14 @@ can be obtained as
 \end{verbatim}
 
 For the GMoM, the $t$-ratios for convergence are calculated
-for the default (main) statistics for the effects.  
+for the default (main) statistics for the effects.
 The maximum convergence ratio is calculated for all linear
-combinations of $B S^\ast$.  
+combinations of $B S^\ast$.
 Therefore, the maximum convergence ratio refers to the
 result of the estimation algorithm, and is not
 necessarily larger than the absolute values of
 all  $t$-ratios for convergence. When some of the latter are large,
-this is an indication of poor model fit. 
+this is an indication of poor model fit.
 
 
 \section{Statistics for MoM}
@@ -1329,6 +1329,34 @@ or \nnm{tieStatistic()} are defined in all functions defining specific effects.
 
 A special case of the construction is given by so-called generic effects,
 see the documentation in \nnm{classdesign}.
+
+Another construction uses the function \nnm{statistic()}; see
+\nnm{networkEffect.cpp}:\\
+'A convenience method for implementing statistics for both evaluation and
+endowment function. It assumes that the statistic can be calculated by
+iterating over ties $(i,j)$ of a network $Y$ and summing up some terms
+$s_{ij}(X)$ with respect to another network $X$, namely,
+$s(X,Y) = \sum_{(i,j) \in Y} s_{ij}(X)$.
+For evaluation function, $X = Y$.
+For endowment function, $X$ is the initial network of the period, and $Y$ is the
+network of ties that have been lost during the network evolution.'
+
+In \nnm{networkEffect.cpp}, \nnm{creationStatistic()} uses
+\nmm{endowmentStatistic()};
+\nmm{endowmentStatistic()} uses \nnm{statistic()};
+\nnm{statistic()} uses \nnm{egoStatistic()}, and the latter uses
+\nnm{tieStatistic()}.
+If one of these is redefined in a given model or model class, 
+then this chain is broken and the lower elements in the chain
+will be replaced by the redefinitions.
+
+Preprocessing and postprocessing is possible using the functions
+\nnm{initializeStatisticCalculation()} and
+\nnm{cleanupStatisticCalculation()}. For examples, see
+\nnm{balanceEffect}.
+\nnm{InStructuralEquivalenceEffect} also is an example of 
+interesting constructions in this respect.
+
 
 
 \subsection{Interaction effects for networks}

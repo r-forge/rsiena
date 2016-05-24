@@ -297,6 +297,10 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 		if(x$x$simOnly)
 		{
 	cat('\nEstimated means and standard deviations, standard errors of the mean \n')
+			if (x$x$maxlike)
+			{
+				cat('Note: statistics for ML simulations are score functions.\n')
+			}
 			dmsf <- diag(x$msf)
 			mean.stats <- colMeans(x$sf) + x$targets
 #  cov.dev may be dropped - just for now (07-10-13) I keep it in
@@ -373,7 +377,7 @@ summary.sienaFit <- function(object, ...)
     object
 }
 ##@print.summary.sienaFit Methods
-print.summary.sienaFit <- function(x, ...)
+print.summary.sienaFit <- function(x, matrices=TRUE, ...)
 {
 	if (!inherits(x, "summary.sienaFit"))
 	{
@@ -493,7 +497,7 @@ print.summary.sienaFit <- function(x, ...)
         }
         cat('\n')
    }
-   if ((x$OK)&(!is.null(x$covtheta)))
+   if ((matrices)&(x$OK)&(!is.null(x$covtheta)))
    {
        cat("Covariance matrix of estimates (correlations below diagonal)\n\n")
        covcor <- x$covtheta

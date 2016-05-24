@@ -470,7 +470,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 									  groupName=groupName, group=group,
 									  netType=netType)
 				}
-				else
+				else # non-symmetric
 				{
 					tmpObjEffects <-
 						createEffects("behaviorOneModeObjective",
@@ -524,6 +524,33 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 									  varname, depvarname, name=varname,
 									  groupName=groupName, group=group,
 									  netType=netType)
+				}
+# Now irrespective of (attr(xx$depvars[[j]], "symmetric"))
+				for (k in seq(along = xx$dycCovars))
+				{
+					if (attr(xx$dycCovars[[k]], "type") == "oneMode" &&
+						attr(xx$dycCovars[[k]], 'nodeSet')[1] == nodeSet)
+					{
+						othervarname <- names(xx$dycCovars)[k]
+						tmpObjEffects3 <- createEffects("dyadBehaviorNetObjective",
+											  varname, depvarname, othervarname,
+											  name=varname, groupName=groupName,
+											  group=group, netType=netType)
+						tmpObjEffects2 <- rbind(tmpObjEffects2, tmpObjEffects3)
+					}
+				}
+				for (k in seq(along = xx$dyvCovars))
+				{
+					if (attr(xx$dyvCovars[[k]], "type") == "oneMode" &&
+						attr(xx$dyvCovars[[k]], 'nodeSet')[1] == nodeSet)
+					{
+						othervarname <- names(xx$dyvCovars)[k]
+						tmpObjEffects3 <- createEffects("dyadBehaviorNetObjective",
+											  varname, depvarname, othervarname,
+											  name=varname, groupName=groupName,
+											  group=group, netType=netType)
+						tmpObjEffects2 <- rbind(tmpObjEffects2, tmpObjEffects3)
+					}
 				}
 				if ((nOneModes + nBipartites) > 1) ## add the network name
 				{
@@ -911,7 +938,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
             {
                 covObjEffects <-
                     covObjEffects[covObjEffects$shortName %in%
-                                  c("egoX"), ]
+								  c("egoX", "egoSqX"), ]
             }
         }
         if (!moreThan2)
@@ -937,7 +964,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 			# restrict to covariates on first node set
             covObjEffects <-
                 covObjEffects[covObjEffects$shortName %in%
-							  c("egoX", "altInDist2", "totInDist2",
+							  c("egoX", "egoSqX", "altInDist2", "totInDist2",
 							    "simEgoInDist2", "sameXInPop", "diffXInPop"), ]
             covRateEffects <- createEffects("covarBipartiteRate", covarname,
                                             name=varname,

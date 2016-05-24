@@ -39,7 +39,8 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
   Integer controlling the processing of the tie variables for the
   actors not currently present. Values (default is 1)
   \tabular{rl}{
-1 \tab  0 before entry, final value carried forward after leaving\cr
+1 \tab  0 before entry, final value carried forward after leaving,\cr
+  \tab  and used for calculating statistics in Method of Moments estimation\cr
 2 \tab  0 before entry, missing after (final value carried forward, but
           treated as missing) \cr
 3 \tab  missing whenever not in the network. Previous values will be used
@@ -59,7 +60,7 @@ sienaCompositionChangeFromFile(filename, nodeSet = "Actors",
   See the manual for further details.\cr
   For bipartite networks, composition change objects for the second node set
   have no effect and will lead to an error message.\cr
-  For \code{m} waves, time starts at 1 and ends at \code{m};
+  For \code{M} waves, time starts at 1 and ends at \code{M};
   so all numbers must be between 1 and the number of waves (bounds included).
   Intervals are treated as closed at each end.
   For example, an entry \code{(2, 4)} means that the actor corresponding
