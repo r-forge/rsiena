@@ -46,8 +46,8 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSienaTest\cr
 Type: \tab Package\cr
-Version: \tab 1.1-293\cr
-Date: \tab 2016-05-23\cr
+Version: \tab 1.1-294\cr
+Date: \tab 2016-05-25\cr
 Depends: \tab R (>= 3.0.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
