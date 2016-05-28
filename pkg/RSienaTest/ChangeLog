@@ -1,3 +1,10 @@
+2016-05-28 R-Forge Revision 294
+Changes in RSiena and RSienaTest:
+   * In SimilarityEffect.cpp and SimilarityWEffect.cpp, changed
+     abs to std::abs to avoid ambiguity, dropping #include <cmath>.
+Changes in RSienaTest:
+   * configure given Mac line endings.
+
 2016-05-23 R-Forge Revision 293
 Changes in RSiena and RSienaTest:
    * Removed manual and bibliography from installation;
@@ -9,7 +16,7 @@ Changes in RSiena and RSienaTest:
      avWalt, totWAlt.
    * New effect class DyadicCovariateDependentBehaviorEffect corresponding
      to group dyadBehaviorNetObjective (effects.r, effectsDocumentation.r).
-   * added endowment and creation effects for inAct, inActSqrt, outAct, outActSqrt
+   * added endowment and creation effects for inAct, inActSqrt, outAct, outActSqrt.
    * inActIntn also implemented for two-mode dependent networks.
    * New argument 'matrices' in print.summary.sienaFit.
    * Changes to NAMESPACE and DESCRIPTION files to satisfy R3.3.0 for

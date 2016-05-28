@@ -8,7 +8,7 @@
  * Description: This file contains the implementation of the
  * SimilarityWEffect class.
  *****************************************************************************/
-#include <cmath>
+#include <cstdlib>
 #include "SimilarityWEffect.h"
 #include "data/Data.h"
 #include "network/Network.h"
@@ -82,7 +82,7 @@ double SimilarityWEffect::calculateChangeContribution(int actor,
 			int alterValue = this->value(j);
 			double dycova = this->dycoValue(actor, j);
 			double change = dycova *
-				(abs(oldValue - alterValue) - abs(newValue - alterValue));
+				(std::abs(oldValue - alterValue) - std::abs(newValue - alterValue));
 			if (dycova != 0.0) totalCount++;
 			if (this->laverage)
 			{

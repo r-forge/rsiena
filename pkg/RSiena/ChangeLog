@@ -1,3 +1,10 @@
+2016-05-28 R-Forge Revision 294
+Changes in RSiena and RSienaTest:
+   * In SimilarityEffect.cpp and SimilarityWEffect.cpp, changed
+     abs to std::abs to avoid ambiguity, dropping #include <cmath>.
+Changes in RSienaTest:
+   * configure given Mac line endings.
+
 2016-05-23 R-Forge Revision 293
 Changes in RSiena and RSienaTest:
    * Removed manual and bibliography from installation;
