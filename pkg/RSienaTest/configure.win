@@ -66,8 +66,11 @@ case "$MPI_TYPE" in
   *) echo "No MPI Installation found. Compiling without MPI support." >&2 ;;
 esac
 
+PKG_SOURCES="$(cat src/sources.list)"
+
 # Take care that variables do not contain '\' backslashes or '#' hashes!
 sed "
+s#@PKG_SOURCES@#$PKG_SOURCES#;
 s#@PKG_LIBS@#$PKG_LIBS#;
 s#@PKG_CPPFLAGS@#$PKG_CPPFLAGS#" \
 src/Makevars.in >src/Makevars.win

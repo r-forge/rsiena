@@ -622,6 +622,7 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 PKG_LIBS
 PKG_CPPFLAGS
+PKG_SOURCES
 ORTED
 LIBOBJS
 EGREP
@@ -2241,7 +2242,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-# Checks                                                                  {{{1
+# Checks (autoscan)                                                       {{{1
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4130,7 +4131,7 @@ fi
 done
 
 
-# Args                                                                    {{{1
+# Args (mpi discovery)                                                    {{{1
 MPI=yes
 
 # Check whether --with-mpi-include-path was given.
@@ -4629,6 +4630,10 @@ else
   PKG_CPPFLAGS=
   PKG_LIBS=
 fi
+
+PKG_SOURCES=$(cat src/sources.list)
+
+
 
 
 

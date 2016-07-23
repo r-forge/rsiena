@@ -76,80 +76,92 @@ all_non_gmm_effects <- function(data, group, ...) {
 test.effect.symmetric.objective <- function() {
   group <- 'symmetricObjective'
   if (skip_recording(group)) return()
-  sink('/dev/null')
+  dn <- textConnection(NULL, 'w')
+  sink(dn)
   net <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   data <- sienaDataCreate(net)
   eff <- all_non_gmm_effects(data, group)
   ans <- run_effect_test_model(data, eff)
   sink()
+  close(dn)
   check_model_persistence(group, ans)
 }
 
 test.effect.non.symmetric.objective <- function() {
   group <- 'nonSymmetricObjective'
   if (skip_recording(group)) return()
-  sink('/dev/null')
+  dn <- textConnection(NULL, 'w')
+  sink(dn)
   net <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   data <- sienaDataCreate(net)
   eff <- all_non_gmm_effects(data, group)
   ans <- run_effect_test_model(data, eff)
   sink()
+  close(dn)
   check_model_persistence(group, ans)
 }
 
 test.effect.covar.symmetric.objective <- function() {
   group <- 'covarSymmetricObjective'
   if (skip_recording(group)) return()
-  sink('/dev/null')
+  dn <- textConnection(NULL, 'w')
+  sink(dn)
   net <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   atr <- varCovar(s50a)
   data <- sienaDataCreate(net, atr)
   eff <- all_non_gmm_effects(data, group, interaction1='atr')
   ans <- run_effect_test_model(data, eff)
   sink()
+  close(dn)
   check_model_persistence(group, ans)
 }
 
 test.effect.covar.non.symmetric.objective <- function() {
   group <- 'covarNonSymmetricObjective'
   if (skip_recording(group)) return()
-  sink('/dev/null')
+  dn <- textConnection(NULL, 'w')
+  sink(dn)
   net <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   atr <- varCovar(s50a)
   data <- sienaDataCreate(net, atr)
   eff <- all_non_gmm_effects(data, group, interaction1='atr')
   ans <- run_effect_test_model(data, eff)
   sink()
+  close(dn)
   check_model_persistence(group, ans)
 }
 
 test.effect.behavior.objective <- function() {
   group <- 'behaviorObjective'
   if (skip_recording(group)) return()
-  sink('/dev/null')
+  dn <- textConnection(NULL, 'w')
+  sink(dn)
   atr <- sienaDependent(s50a, type='behavior')
   data <- sienaDataCreate(atr)
   eff <- all_non_gmm_effects(data, group)
   ans <- run_effect_test_model(data, eff)
   sink()
+  close(dn)
   check_model_persistence(group, ans)
 }
 
 ignored.effect.behavior.one.mode.objective <- function() {
   group <- 'behaviorOneModeObjective'
   if (skip_recording(group)) return()
-  sink('/dev/null')
+  dn <- textConnection(NULL, 'w')
+  sink(dn)
   net <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   atr <- sienaDependent(s50a, type='behavior')
   data <- sienaDataCreate(net, atr)
   eff <- all_non_gmm_effects(data, group, interaction1='net')
   ans <- run_effect_test_model(data, eff)
   sink()
+  close(dn)
   check_model_persistence(group, ans)
 }
 
 ignored.effect.objective.gmm.onemode <- function() {
-  # sink('/dev/null')
+  # sink(NULL)
   group <- 'gmm.nonSymmetricObjective'
   if (skip_recording(group)) return()
   net <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
@@ -176,7 +188,7 @@ ignored.effect.objective.gmm.onemode <- function() {
 ignored.effect.non.symmetric.symmetric.objective <- function() {
   group <- 'nonSymmetricSymmetricObjective'
   if (skip_recording(group)) return()
-  # sink('/dev/null')
+  # sink(NULL)
   net1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   net2 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   data <- sienaDataCreate(net1, net2)
@@ -189,7 +201,8 @@ ignored.effect.non.symmetric.symmetric.objective <- function() {
 ignored.effect.covar.net.net.objective <- function() {
   group <- 'covarNetNetObjective'
   if (skip_recording(group)) return()
-  sink('/dev/null')
+  dn <- textConnection(NULL, 'w')
+  sink(dn)
   net1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   net2 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   atr <- varCovar(s50a)
@@ -197,13 +210,15 @@ ignored.effect.covar.net.net.objective <- function() {
   eff <- all_non_gmm_effects(data, group, interaction1='atr', interaction2='net2')
   ans <- run_effect_test_model(data, eff)
   sink()
+  close(dn)
   check_model_persistence(group, ans)
 }
 
 ignored.effect.triple.network.objective <- function() {
   group <- 'tripleNetworkObjective'
   if (skip_recording(group)) return()
-  sink('/dev/null')
+  dn <- textConnection(NULL, 'w')
+  sink(dn)
   net1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   net2 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
   net3 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
@@ -211,5 +226,6 @@ ignored.effect.triple.network.objective <- function() {
   eff <- all_non_gmm_effects(data, group, interaction1='net2', interaction2='net3')
   ans <- run_effect_test_model(data, eff)
   sink()
+  close(dn)
   check_model_persistence(group, ans)
 }
