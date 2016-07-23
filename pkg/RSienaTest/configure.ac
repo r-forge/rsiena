@@ -1,6 +1,20 @@
 # vim:fdm=marker:
-# Based on the autoconf.ac from the Rmpi package.
-# Process this file with autoconf to produce a configure script.
+
+# Based on the autoconf.ac from the Rmpi package
+# <http://www.stats.uwo.ca/faculty/yu/Rmpi/>. Run `autoconf` to produce the
+# 'configure' script.
+
+# - Run with automatic detection: `R CMD INSTALL {pkg}`
+
+# - Run with a prefix folder. Subfolders will be searched for binarys.
+#   `R CMD INSTALL {pkg} --configure-args=--with-mpi=/path/to/location`
+
+# - Fully specify paths and type.
+#   `R CMD INSTALL {pkg} --configure-args="        \\
+#    --with-Rmpi-include=/path/to/mpi_include_dir  \\
+#    --with-Rmpi-libpath=/path/to/mpi_lib_dir      \\
+#    --with-Rmpi-type={OPENMPI,MPICH,MPICH2,LAM}"`
+
 AC_PREREQ([2.69])
 AC_INIT([RSienaTest], 1.1-289)
 AC_CONFIG_SRCDIR([src])
@@ -275,6 +289,10 @@ else
   PKG_LIBS=
 fi
 
+PKG_SOURCES=$(cat src/sources.list)
+
+AC_SUBST(PKG_SOURCES)
 AC_SUBST(PKG_CPPFLAGS)
 AC_SUBST(PKG_LIBS)
+
 AC_OUTPUT(src/Makevars)
