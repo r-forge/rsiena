@@ -54,9 +54,10 @@ short names to identify the effects which should be included or excluded.
   and values of interaction1 and interaction2 (if any),
   is obtained by executing \code{\link{effectsDocumentation}(myeff)}.
 
-  The function \code{}includeEffects operates by providing an interface
-  to set the "include" column on
-  selected rows of the effects object, to the value requested (TRUE or FALSE).
+  The function \code{}includeEffects operates as an interface
+  setting the "include" column on selected rows of the effects object,
+  to the value requested (TRUE or FALSE).
+  
 }
 \value{
 	An updated version of the input effects object, with the include, test, and fix

@@ -65,6 +65,11 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 #			"interaction1", "interaction2", "include")])
 		print.sienaEffects(myeff[use,])
 	}
+	if (hasArg('initialValue'))
+	{
+		cat
+("Warning: argument 'initialValue' has no effect in includeEffects; use setEffect.\n")
+	}
 	myeff
 }
 ##@includeInteraction DataCreate
@@ -185,32 +190,14 @@ includeInteraction <- function(myeff, ...,
 		if (nrow(ints) == 0)
 		{
 			baseEffect<- myeff[myeff$name == name, ][1, ]
-			if (baseEffect$netType != "behavior")
+			if (baseEffect$netType == "behavior")
 			{
-				tmprow <- createEffects("unspecifiedNetInteraction", name=name,
-									netType=baseEffect$netType,
-									groupName=baseEffect$groupName,
-									group=baseEffect$group)
+				stop("Use getEffects() with a larger value for behNintn.")
 			}
 			else
 			{
-				tmprow <- createEffects("unspecifiedBehaviorInteraction",
-									name=name,
-									netType=baseEffect$netType,
-									groupName=baseEffect$groupName,
-									group=baseEffect$group)
+				stop("Use getEffects() with a larger value for nintn.")
 			}
-			tmprow$include <- TRUE
-			tmprow <- tmprow[tmprow$type==type, ]
-			tmprow$effectNumber <- max(myeff$effectNumber) + 1
-			rownames(tmprow) <-
-				paste(name, "obj", "type", tmprow$effectNumber, sep='.')
-			# if ('requested' %in% names(myeff))
-			# {
-			#	 tmprow$requested <- TRUE
-			# }
-			myeff <- rbind(myeff, tmprow)
-			ints <- tmprow
 		}
 		ints <- ints[1, ]
 		intn <- myeff$effectNumber == ints$effectNumber

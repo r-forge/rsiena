@@ -1,9 +1,23 @@
+2016-08-17 R-Forge Revision 296
+Changes in RSiena and RSienaTest:
+   * Warning if includeEffects is used with parameter initialValue.
+   * Warning if includeInteraction is used for more interactions
+     than available given parameters nintn and behNintn.
+   * Deleted session parameter from print01Report.
+   * Corrected cycle4 effect for parameter=2 (sqrt version).
+   * Additional auxiliary function CliqueCensus in help page sienaGOF-auxiliary.
+
+2016-07-23 R-Forge Revision 295
+Changes in RSienaTest (Felix Schoenenberger):
+   * buildsystem: added Makefile and src/sources.list
+     unitTests: removed sink('/dev/null')
+
 2016-05-28 R-Forge Revision 294
 Changes in RSiena and RSienaTest:
    * In SimilarityEffect.cpp and SimilarityWEffect.cpp, changed
      abs to std::abs to avoid ambiguity, dropping #include <cmath>.
 Changes in RSienaTest:
-   * configure given Mac line endings.
+   * Mac line endings given to configure file.
 
 2016-05-23 R-Forge Revision 293
 Changes in RSiena and RSienaTest:

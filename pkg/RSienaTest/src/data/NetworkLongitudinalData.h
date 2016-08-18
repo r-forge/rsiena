@@ -32,7 +32,8 @@ class Network;
 /**
  * This class stores one or more observations of a network variable.
  */
-class NetworkLongitudinalData: public LongitudinalData {
+class NetworkLongitudinalData : public LongitudinalData
+{
 public:
 	NetworkLongitudinalData(int id,
 		std::string name,

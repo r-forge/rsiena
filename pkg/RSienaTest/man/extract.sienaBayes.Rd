@@ -35,7 +35,7 @@ extract.sienaBayes(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 \details{
  This function produces a 3-dimensional array, iterations by chains
  by parameters, suitable for use, e.g., in function \code{monitor()}
- of package \code{stan}. The 'iterations' are draws from the
+ of package \code{rstan}. The 'iterations' are draws from the
  posterior distribution (provided that convergence was achieved),
  after the thinning in \code{sienaBayes} implied by its parameters
  \code{nrunMHBatches}, \code{nSampVarying}, \code{nSampConst} and

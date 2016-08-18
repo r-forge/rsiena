@@ -122,9 +122,6 @@ model$noAggregation <- FALSE
 #   then is larger than .5. May be helpful if initial value was very far away.
 # The two options model$noAggregation and model$standardizeWithTruncation
 # are used only in phase2.r.
-model$browse1 <- FALSE # non-documented options for browsing in phase 2.
-model$browse2 <- FALSE
-model$browse3 <- FALSE
 class(model) <- "sienaAlgorithm"
 model
 }

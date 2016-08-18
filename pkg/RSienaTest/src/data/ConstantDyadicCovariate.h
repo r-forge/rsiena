@@ -16,6 +16,8 @@
 #include <set>
 #include "DyadicCovariate.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -47,26 +49,30 @@ public:
 	void missing(int i, int j, bool flag);
 	DyadicCovariateValueIterator rowValues(int i) const;
 	DyadicCovariateValueIterator columnValues(int j) const;
-	const std::map<int, double> & rRowValues(int i) const;
+	const map <int, double> & rRowValues(int i) const;
 
 private:
 	// A row based representation of non-zero values of the covariate.
 	// The value for a pair (i,j) is stored in lpRowValues[i][j].
-	std::map<int, double> * lpRowValues;
+
+	map<int, double> * lpRowValues;
 
 	// A column based representation of non-zero values of the covariate.
 	// The value for a pair (i,j) is stored in lpColumnValues[j][i].
-	std::map<int, double> * lpColumnValues;
+
+	map<int, double> * lpColumnValues;
 
 	// A row based representation of missing values. Actor j belongs to
 	// lpRowMissings[i] if and only if the covariate value for the pair
 	// (i,j) is missing.
-	std::set<int> * lpRowMissings;
+
+	set<int> * lpRowMissings;
 
 	// A column based representation of missing values. Actor i belongs to
 	// lpColumnMissings[j] if and only if the covariate value for the pair
 	// (i,j) is missing.
-	std::set<int> * lpColumnMissings;
+
+	set<int> * lpColumnMissings;
 };
 
 }

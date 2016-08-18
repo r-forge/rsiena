@@ -51,8 +51,6 @@ phase2.1<- function(z, x, ...)
 		z$sf.invcov <-
 		 solve(msf[!z$fixed, !z$fixed] + 0.0001 * diag(z$pp - sum(z$fixed)))
 	}
-if (is.null(x$browse1)){x$browse1 <- FALSE}
-if (x$browse1){browser()}
     Report(paste('\nPhase 2 has', x$nsub, 'subphases.\n'), cf)
     z$gain <- x$firstg
     z$reduceg <- x$reduceg
@@ -166,8 +164,6 @@ proc2subphase <- function(z, x, subphase, useAverage=TRUE, ...)
     {
         Report('The user asked for early end of phase 2.\n', outf)
     }
-if (is.null(x$browse3)){x$browse3 <- FALSE}
-if (x$browse3){browser()}
     ##    cat('it',z$nit,'\n')
     ##recalculate autocor using -1 instead of -2 as error
     ac <- ifelse (z$prod0 > 1e-12, z$prod1 / z$prod0, -1)
@@ -376,8 +372,6 @@ doIterations<- function(z, x, subphase,...)
 # still with default 5;
 # and for the case !x$diagg, a multivariate truncation is used.
 
-if (is.null(x$browse2)){x$browse2 <- FALSE}
-if (x$browse2){browser()}
 		if (x$diagg)
 		{
 			maxRatio <- max(ifelse(z$fixed, 1.0, abs(fra)/ z$sd), na.rm=TRUE)
