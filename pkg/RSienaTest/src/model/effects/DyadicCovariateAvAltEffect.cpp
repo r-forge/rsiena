@@ -34,7 +34,7 @@ DyadicCovariateAvAltEffect::DyadicCovariateAvAltEffect(
 	// if not, used as the variable.
 	this->lpar2 = (pEffectInfo->internalEffectParameter() >= 2);
 	// specifies type of denominator
-	if (!lasWeight) {lpar2 <- false;}
+	if (!lasWeight) {lpar2 = false;}
 }
 
 

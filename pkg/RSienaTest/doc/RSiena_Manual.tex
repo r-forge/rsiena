@@ -169,7 +169,7 @@
 
 %\setlength{\unitlength}{1mm}
 %\begin{picture}(100,100)
-%\put(0,0){\includegraphics*[scale=4]{ilcampo.jpg}}
+%\put(0,0){\includegraphics\item[scale=4]{ilcampo.jpg}}
 %\end{picture}
 \vfill
 \begin{center}
@@ -191,7 +191,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-294.
+This version was renewed for \RS version 1.1-296.
 \end{abstract}
 
 
@@ -863,24 +863,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.1-294}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.1-296}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-294.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.1-296.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-294.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.1-296.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.1-294.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.1-296.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-294.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-296.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-294.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-296.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-294.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-296.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1077,7 +1077,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-294) and an R-Forge revision
+  identified by a version number (e.g.\ 1.1-296) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -3710,7 +3710,17 @@ this is done, e.g., by
 results1  <-  siena07(algorithm1, data = mydata, effects = myeff,
                       prevAns = results1)
 \end{verbatim}
-Further see below for more information about convergence.
+The practical procedure therefore, in usual cases, is that
+one runs \sfn{siena07()}, if necessary repeatedly with
+subsequent runs using the \texttt{prevAns} parameter as above,
+until the \texttt{Overall maximum convergence ratio} is less than 0.25
+and all  \texttt{\small convergence t ratios}
+are less than 0.1.
+(The threshold value of 0.25 is not hewn in stone,
+and small deviations are acceptable.)
+
+In some cases this aim is not easily reached;
+what to do then is treated in the following.
 
 \subsubsection{Initial Values}
 \label{S_initials}
@@ -3820,7 +3830,7 @@ is by making another estimation run,
 now carrying on from the last obtained result. This is done by
 using this result in the \textsf{prevAns} (`previous answer')
 parameter, while taking care that  \texttt{useStdInits = FALSE}
-has been specified. An example is
+has been specified (but this is the default). An example is
 \begin{verbatim}
 results1 <- siena07(algorithm1, data = mydata, effects = myeff,
                     prevAns = results1)
@@ -3873,6 +3883,7 @@ parameters in the \sfn{sienaAlgorithmCreate()} function, to try and
 improve convergence.
 The main parameters of \sfn{sienaAlgorithmCreate()} that can be used
 for this purpose are the following.
+They are briefly explained in the help file for this function.
 For the technical background, see
 \href{http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf}{\texttt{Siena\_algorithms.pdf}}
 which can be downloaded from the \SI website.
@@ -3881,18 +3892,15 @@ which can be downloaded from the \SI website.
 \item \texttt{doubleAveraging}\\
       This replaces the Robbins-Monro updating step by a double averaging
       step \citep{bather1989,SchwabeWalk96,KushnerYin03} which can be
-      more efficient. Try \texttt{doubleAveraging=0}, which starts using
-      this step from phase 2.1.
+      more efficient. The default is \texttt{doubleAveraging=0}, which starts using
+      this step from subphase 2.1.
 \item \texttt{diagonalize}\\
     This parameter may range from 0 to 1,
     and determines the extent to which the matrix of derivatives of expected
     values with respect to parameters is diagonalized.
-    The value 1 (the default) gives greatest stability;
-    smaller values may give greater efficiency.
-    Very small values (less than 0.2) may lead to an unstable algorithm.\\
-    Advice: try values such as 0.7, 0.5, or even 0.2; if the algorithm becomes unstable
-    reduce \texttt{firstg} (e.g., to 0.005 or 0.001) but if this does not help,
-    the value used for \texttt{diagonalize} is too small.
+    The value 1 (total diagonalization) gives greatest stability;
+    smaller values give greater efficiency.
+    The default is 0.2.
 \item \texttt{n2start}\\
     This is the minimum length of phase 2.1, i.e., the first subphase of phase~2.
     The default value
@@ -3909,6 +3917,10 @@ which can be downloaded from the \SI website.
 \item \texttt{firstg}\\
     This determines the step sizes in the estimation algorithm. If the algorithm is unstable,
     use a smaller value (but greater than~0).
+    The default value is 0.2.
+    Sometimes for difficult data-model combinations, the algorithm
+    diverges very quickly, and this may be countered by smaller values of
+     \texttt{firstg}, e.g., 0.01 or 0.05.
 \end{itemize}
 
 
@@ -3981,8 +3993,7 @@ The advice is to use (1.) \underline{or} (2.), in both cases together with (3.).
     not very high; and \emph{not} with one or more parameter estimates
     being very high in absolute value), continue the estimation, using \sfn{prevAns},
     with \sfn{nsub=1}; a high value for \sfn{n2start};
-    and \sfn{firstg} clearly less than the default 0.2,
-    e.g., about half the smallest standard error reported in the first estimation.
+    and \sfn{firstg} clearly less than the default 0.2; e.g., 0.01.
     What is `a high value' depends on the data set - model combination,
     the number of parameters in the first place.
     The baseline value (see the preceding section\footnote{The value given here
@@ -4059,6 +4070,13 @@ this may have several reasons.
       For modeling large networks, it is important to represent
       meeting opportunities, e.g., by a suitable dyadic covariate,
       or by the \texttt{sameX} effect of a suitable categorical covariate.
+
+      Sometimes there are important differences between the actors in how many
+      changes they make in their outgoing ties. This should then
+      be reflected by including one or more rate effects.
+      The experience is that the main rate effect to include
+      is the rate effect of the outdegrees (\texttt{outRate},
+      see Section~\ref{S_r}).
 
       Another possibility is that there is time heterogeneity.
       Indications about this can be gathered also from the descriptives
@@ -7082,7 +7100,7 @@ from these sequences the draws from the posterior distributions
 of the parameters of interest.
 This function produces a three-dimensional array of
 iterations by chains by parameters, which then can be used, e.g., in
-function \sfn{monitor()} of package \sfn{stan} or with the
+function \sfn{monitor()} of package \sfn{rstan} or with the
 help of package \sfn{coda}.
 
 Currently there is no good way in \sfn{sienaBayes()} to use
@@ -8341,18 +8359,22 @@ the following effects are available:
  to whom $i$ has a tie,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, v_i \, (v_j - v_i)$;
 
+
+ \item {\em covariate-ego $\times$ alter} \texttt{(egoXaltX)},
+ defined by the product of $i$'s covariate and the sum of those of his alters,\\
+ $s^{\rm net}_{i\vit}(x) = v_i \, \sum_j x_{ij}\, v_j $;
+
+ \item {\em covariate-ego $\times$ alter $\times$ reciprocity}
+ \texttt{(egoXaltXRecip)},
+ defined by the product of $i$'s covariate and the sum of those
+ of his reciprocated alters,\\
+ $s^{\rm net}_{i\vit}(x) = v_i \, \sum_j x_{ij}\,x_{ji}\, v_j $;
+
  \item {\em covariate-related similarity $\times$ reciprocity}
  \texttt{(simRecipX)}, defined by
  the sum of centered similarity scores for all
  reciprocal dyads in which $i$ is situated,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}x_{ji} ({\rm sim}^v_{ij} - \widehat{{\rm sim}^v}) $;
-
- \item {\em covariate-related similarity $\times$ transitive triplets}
- \texttt{(simXTransTrip)}, defined by the sum of transitive triplets
- $i \rightarrow h \rightarrow j \leftarrow i$
- weighted by the centered similarity scores between $i$ and $j$,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, x_{ih} \, x_{hj}
-         ({\rm sim}^v_{ij} - \widehat{{\rm sim}^v}) $;
 
  \item \emph{same covariate}, which can also be called {\em covariate-related identity} \texttt{(sameX)},
  defined by the
@@ -8367,21 +8389,6 @@ the following effects are available:
  number of reciprocated ties between $i$ and all other actors $j$ who have
  exactly the same value on the covariate,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} x_{ji}\, I\{v_i = v_j \} $;
-
- \item {\em same covariate $\times$ transitive triplets}
- \texttt{(sameXTransTrip)}, defined by the number of transitive triplets
- $i \rightarrow h \rightarrow j \leftarrow i$
- that have the same covariate value for $i$ and $j$,\\
- $s^{\rm net}_{i\vit}(x) =
- \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i = v_j\}$;
-
-
- \item {\em different covariate $\times$ transitive triplets}
- \texttt{(diffXTransTrip)}, defined by the number of transitive triplets
- $i \rightarrow h \rightarrow j \leftarrow i$
- that have different covariate values for $i$ and $j$,\\
- $s^{\rm net}_{i\vit}(x) =
- \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i \neq v_j\}$;
 
  \item {\em indegree popularity from same covariate}
 \texttt{(sameXInPop)} defined by the
@@ -8438,6 +8445,29 @@ the following effects are available:
       The Simmelian alter $V$ effect  is  \\
 $s^{\rm net}_{i\vit}(x ) = \sum_j  x^{\rm{simm}}_{ij}\,v_j $ .
 
+
+ \item {\em same covariate $\times$ transitive triplets}
+ \texttt{(sameXTransTrip)}, defined by the number of transitive triplets
+ $i \rightarrow h \rightarrow j \leftarrow i$
+ that have the same covariate value for $i$ and $j$,\\
+ $s^{\rm net}_{i\vit}(x) =
+ \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i = v_j\}$;
+
+ \item {\em different covariate $\times$ transitive triplets}
+ \texttt{(diffXTransTrip)}, defined by the number of transitive triplets
+ $i \rightarrow h \rightarrow j \leftarrow i$
+ that have different covariate values for $i$ and $j$,\\
+ $s^{\rm net}_{i\vit}(x) =
+ \sum_j x_{ij}\, x_{ih} \, x_{hj} \, I\{v_i \neq v_j\}$;
+
+
+ \item {\em covariate-related similarity $\times$ transitive triplets}
+ \texttt{(simXTransTrip)}, defined by the sum of transitive triplets
+ $i \rightarrow h \rightarrow j \leftarrow i$
+ weighted by the centered similarity scores between $i$ and $j$,\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, x_{ih} \, x_{hj}
+         ({\rm sim}^v_{ij} - \widehat{{\rm sim}^v}) $;
+
  \item {\em homogeneous covariate $\times$ transitive triplets}
  \texttt{(homXTransTrip)}, defined by the number of transitive triplets
  $i \rightarrow h \rightarrow j \leftarrow i$
@@ -8476,17 +8506,6 @@ $s^{\rm net}_{i\vit}(x ) = \sum_j  x^{\rm{simm}}_{ij}\,v_j $ .
 \end{center}
 \vfill
 \end{minipage}
-
- \item {\em covariate-ego $\times$ alter} \texttt{(egoXaltX)},
- defined by the product of $i$'s covariate and the sum of those of his alters,\\
- $s^{\rm net}_{i\vit}(x) = v_i \, \sum_j x_{ij}\, v_j $;
-
- \item {\em covariate-ego $\times$ alter $\times$ reciprocity}
- \texttt{(egoXaltXRecip)},
- defined by the product of $i$'s covariate and the sum of those
- of his reciprocated alters,\\
- $s^{\rm net}_{i\vit}(x) = v_i \, \sum_j x_{ij}\,x_{ji}\, v_j $;
-
 
 
 \iffalse
@@ -11798,7 +11817,7 @@ See Section~\ref{S_cond}.
 \item In combination with trying out a lower value for \texttt{firstg},
     you may try setting a higher value for  \texttt{doubleAveraging}
     in \sfn{sienaAlgorithmCreate}. Double averaging is a different definition
-    of the Robbins-Monro update step; see Section~\ref{S_contconv}. 
+    of the Robbins-Monro update step; see Section~\ref{S_contconv}.
     You could try setting  \texttt{doubleAveraging} to 1 or 2, which uses
     single averaging in the first 1 or 2 subphases; or you could set it to
     4, avoiding double averaging altogether (if you have 4 subphases).
@@ -11862,7 +11881,7 @@ be relevant here.)
 
 \emph{Error in solve.default(v9) :
    Lapack routine dgesv: system is exactly singular\\
-Error in if (cvalue $<$ 0) cvalue $<\!\!-$ 0 :
+Error in if (cvalue $<$ 0) cvalue $<-$ 0 :
    missing value where TRUE/FALSE needed.}
 \smallskip
 
@@ -13017,6 +13036,21 @@ the R-Forge repository, which contains a more complete listing.
 
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+
+
+\item 2016-08-17 Revision 296.
+
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item Warning if \sfn{includeEffects} is used with parameter \texttt{initialValue}.
+   \item Warning if \sfn{includeInteraction} is used for more interactions
+     than available given parameters \texttt{nintn} and \texttt{behNintn}.
+   \item Deleted session parameter from \sfn{print01Report}.
+   \item Corrected \texttt{cycle4} effect for parameter=2 (sqrt version).
+   \item Additional auxiliary function \sfn{CliqueCensus} in help page \sfn{sienaGOF-auxiliary}.
+   \item Error corrected in \texttt{DyadicCovariateAvAltEffect.cpp}.
+\end{itemize}
 
 
 \item 2016-05-28 Revision 294.

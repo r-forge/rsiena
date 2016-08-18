@@ -215,7 +215,14 @@ double FourCyclesEffect::tieStatistic(int alter)
 	// Avoid counting each 4-cycle four times in the evaluation statistic.
 	// TODO: Is it okay to divide by 4 for endowment statistic as well?
 
+	if (this->lroot)
+	{
+	return (this->lpSqrtTable->sqrt(this->lcounters[alter]))/2;
+	}
+	else
+	{
 	return this->lcounters[alter] * 0.25;
+	}
 }
 
 }

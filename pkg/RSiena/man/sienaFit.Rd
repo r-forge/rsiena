@@ -27,9 +27,9 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
     \code{\link{siena07}}.}
   \item{x}{An object of class \code{sienaFit}, or
     \code{summary.sienaFit} as appropriate.}
-  \item{matrices}{Boolean: should the covariance matrix of the estimates,
-    the derivative matrix of expected statistics,
-    and the covariance matrix of the expected statistics be printed.}
+  \item{matrices}{Boolean: whether also to print in the summary the 
+   covariance matrix of the estimates, the derivative matrix of expected 
+   statistics X by parameters, and the covariance matrix of the statistics.}
   \item{tstat}{Boolean: if this is NULL, the t-statistics for convergence
      will not be added to the report.}
   \item{type}{Type of output to produce; must be either \code{"tex"} or
@@ -69,14 +69,13 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
 
   The function \code{summary.sienaFit} prints a table containing
   estimated parameter values, standard errors and t-statistics for
-  convergence, score-type tests (if any), and if \code{matrices =TRUE}
-  also the covariance matrix of the estimates, the
+  convergence together with the covariance matrix of the estimates, the
   derivative matrix of expected statistics \code{X} by parameters, and the
   covariance matrix of the expected statistics \code{X}.
 
   The function \code{xtable.sienaFit} creates an object of class
   \code{xtable.sienaFit} which inherits from class \code{xtable} and
-  passes any extra arguments to \code{print.xtable}.
+  passes an extra arguments to the \code{print.xtable}.
 
   The function \code{siena.table} outputs a latex or html table of
   the estimates and standards errors of a \code{sienaFit} object.

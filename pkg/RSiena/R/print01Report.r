@@ -358,8 +358,7 @@ print01Report <- function(data, modelname="Siena", getDocumentation=FALSE)
 												  "3"=, "23"=, "33"= "rd",
 												  "th"), sep="")
 					Report(c(mystr, " dependent actor variable named ",
-							 netname), sep="", outf)
-					Report(".\n", outf)
+							 netname,".\n"), sep="", outf)
 					ranged <- atts$range2
 					Report(c("Maximum and minimum rounded values are ",
 							 round(ranged[1]), " and ",
@@ -862,11 +861,6 @@ print01Report <- function(data, modelname="Siena", getDocumentation=FALSE)
 		Report("\n\n", outf) ## end of reportDataObject
 	}
 	## create output file. ## start of print01Report proper
-	if (getDocumentation)
-	{
-		tt <- getInternals()
-		return(tt)
-	}
 	if (!(inherits(data, "siena")))
 	{
 		stop("The first argument needs to be a siena data object.")
@@ -876,6 +870,15 @@ print01Report <- function(data, modelname="Siena", getDocumentation=FALSE)
 		cat("Since version 1.1-279, an effects object should not be given\n")
 		cat(" in the call of print01Report. Consult the help file.\n")
 		stop("print01Report needs no effects object.")
+	}
+	if (!inherits(getDocumentation, 'logical'))
+	{
+		stop('wrong parameters; note: do not include an effects object as parameter!')
+	}
+	if (getDocumentation)
+	{
+		tt <- getInternals()
+		return(tt)
 	}
 	Report(openfiles=TRUE, type="w", projname=modelname)
 	Report("							************************\n", outf)

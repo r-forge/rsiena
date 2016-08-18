@@ -8,8 +8,7 @@
 # * Description: This module contains the function to print the initial report
 # *****************************************************************************/
 ##@print01Report Reporting
-print01Report <- function(data, modelname="Siena", session=NULL,
-						  getDocumentation=FALSE)
+print01Report <- function(data, modelname="Siena", getDocumentation=FALSE)
 {
 	##@reportDataObject1 internal print01Report
 	reportDataObject1 <- function(x)
@@ -33,8 +32,7 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 		}
 	}
 	##@reportDataObject internal print01Report
-	reportDataObject <- function(x, periodFromStart=0, multi=FALSE,
-								 session=session)
+	reportDataObject <- function(x, periodFromStart=0, multi=FALSE)
 	{
 		##@reportStart internal print01Report
 		reportStart <- function()
@@ -129,31 +127,6 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 					}
 					for (k in 1:x$observations)
 					{
-						if (!is.null(session))
-						{
-							namesession <-
-								session[session$Name == netname, ]
-							filename <- namesession$Filename
-							if (length(filename) > 1)
-							{
-								if (namesession$Format[1] == "Siena net")
-								{
-									period <-
-										strsplit(namesession$Period, " ")
-									sub <- sapply(period, function(x) k %in% x)
-								}
-								else
-								{
-								   period <-
-									unlist(strsplit(namesession$Period, " "))
-								 sub <- match(k, period)
-								}
-								filename <- filename[sub]
-							}
-							Report(c("Observation moment ", k + periodFromStart,
-									 " was read from file ", filename, '. \n'),
-								   sep='', outf)
-						}
 						Report(c("For observation moment ", k + periodFromStart,
 								 ", degree distributions are as ",
 								 "follows:\nNodes\n"),
@@ -385,18 +358,7 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 												  "3"=, "23"=, "33"= "rd",
 												  "th"), sep="")
 					Report(c(mystr, " dependent actor variable named ",
-							 netname), sep="", outf)
-					if (!is.null(session))
-					{
-						filename <-
-							session$Filename[session$Name == netname]
-							Report(c(" was read from file ", filename, ".\n"),
-								   sep="", outf)
-					}
-					else
-					{
-						Report(".\n", outf)
-					}
+							 netname,".\n"), sep="", outf)
 					ranged <- atts$range2
 					Report(c("Maximum and minimum rounded values are ",
 							 round(ranged[1]), " and ",
@@ -486,28 +448,11 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 			nCovars <- length(x$cCovars)
 			covars <- names(x$cCovars)
 			Heading(2, outf, "Reading constant actor covariates.")
-			if (!is.null(session))
+			Report(c(nCovars, "variable"),outf)
+			Report(ifelse(nCovars == 1, ", named:\n", "s, named:\n"), outf)
+			for (i in seq(along=covars))
 			{
-				covarssession <- session[session$Type == "constant covariate", ]
-				for (i in 1:nrow(covarssession))
-				{
-					names <- strsplit(covarssession$Name[i],
-									  " ", fixed=TRUE)[[1]]
-					ncases <- length(x$cCovars[[match(names[1], covars)]])
-					Report(c("Covariate data file", covarssession$Filename[i],
-						   "with", length(names), "variables,", ncases,
-							 "cases, named:\n"), outf)
-					Report(paste(names, "\n"), outf, sep="")
-				}
-			}
-			else
-			{
-				Report(c(nCovars, "variable"),outf)
-				Report(ifelse(nCovars == 1, ", named:\n", "s, named:\n"), outf)
-				for (i in seq(along=covars))
-				{
-					Report(c(format(covars[i], width=15), '\n'), outf)
-				}
+				Report(c(format(covars[i], width=15), '\n'), outf)
 			}
 			Report(c("\nA total of", nCovars,
 					 "non-changing individual covariate"), outf)
@@ -575,44 +520,11 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 			use <- ! covars %in% names(x$cCovars)
 			nCovars <- length(x$vCovars[use])
 			Heading(2, outf, "Reading exogenous changing actor covariates.")
-			if (!is.null(session))
+			Report(c(nCovars, "variable"),outf)
+			Report(ifelse(nCovars == 1, ", named:\n", "s, named:\n"), outf)
+			for (i in seq(along=covars[use]))
 			{
-				if (nData > 1)
-				{
-					covarssession <-
-						session[session$Type == "constant covariate", ]
-					for (i in 1:nrow(covarssession))
-					{
-						names <- strsplit(covarssession$Name[i],
-										  " ", fixed=TRUE)[[1]]
-						ncases <- length(x$vCovars[[match(names[1], covars)]])
-						Report(c("Covariate data file",
-								 covarssession$Filename[i],
-								 "with", length(names), "variables,", ncases,
-								 "cases, named:\n"), outf)
-						Report(paste(names, "\n"), outf, sep="")
-					}
-				}
-				covarssession <- session[session$Type == "changing covariate", ]
-				for (i in seq(along=covarssession[,1]))
-				{
-					ncases <- nrow(x$vCovars[[match(covarssession$Name[i],
-													covars)]])
-					Report(c("Exogenous changing covariate ",
-							 covarssession$name[i], " read from file ",
-							 covarssession$Filename[i], ".\n"), sep="", outf)
-					Report(c("Number of cases is ", ncases, ".\n"), sep="",
-						   outf)
-				}
-			}
-			else
-			{
-				Report(c(nCovars, "variable"),outf)
-				Report(ifelse(nCovars == 1, ", named:\n", "s, named:\n"), outf)
-				for (i in seq(along=covars[use]))
-				{
-					Report(c(format(covars[use][i], width=15), '\n'), outf)
-				}
+				Report(c(format(covars[use][i], width=15), '\n'), outf)
 			}
 			Report(c("\nA total of", nCovars,
 					 "exogenous changing actor covariate"), outf)
@@ -949,21 +861,24 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 		Report("\n\n", outf) ## end of reportDataObject
 	}
 	## create output file. ## start of print01Report proper
-	if (getDocumentation)
-	{
-		tt <- getInternals()
-		return(tt)
-	}
 	if (!(inherits(data, "siena")))
 	{
 		stop("The first argument needs to be a siena data object.")
 	}
-	if ((!(inherits(modelname, "character")))|
-			(inherits(session,"sienaEffects")))
+	if (!(inherits(modelname, "character")))
 	{
 		cat("Since version 1.1-279, an effects object should not be given\n")
 		cat(" in the call of print01Report. Consult the help file.\n")
 		stop("print01Report needs no effects object.")
+	}
+	if (!inherits(getDocumentation, 'logical'))
+	{
+		stop('wrong parameters; note: do not include an effects object as parameter!')
+	}
+	if (getDocumentation)
+	{
+		tt <- getInternals()
+		return(tt)
 	}
 	Report(openfiles=TRUE, type="w", projname=modelname)
 	Report("							************************\n", outf)
@@ -1016,16 +931,14 @@ print01Report <- function(data, modelname="Siena", session=NULL,
 					paste("Subproject ", i, ": <", names(data)[i], ">",
 						  sep="", collapse="")
 					)
-			thisSession <- session[session$Group == names(data)[i],]
-			reportDataObject(data[[i]], periodFromStart, multi=TRUE,
-							 session=thisSession)
+			reportDataObject(data[[i]], periodFromStart, multi=TRUE)
 			periodFromStart <- periodFromStart + data[[i]]$observations
 	   }
 	}
 	else
 	{
 		Heading(1, outf, "Data input.")
-		reportDataObject(data[[1]], 0, multi=FALSE, session=session)
+		reportDataObject(data[[1]], 0, multi=FALSE)
 	}
 	atts <- attributes(data)
 	nets <- atts$types != "behavior"

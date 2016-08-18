@@ -70,6 +70,8 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
  The three given here are far from a complete set;
  they will be supplemented in due time by statistics depending on networks and
  behavior jointly.
+ The examples below give a number of other statistics, using the packages
+ sna and igraph.
 
  The \code{levls} parameter must be adapted to the range of values that is
  considered important. For indegrees and outdegrees, the whole range should 
@@ -239,13 +241,26 @@ Ph.D. Thesis. University of Oxford: U.K.
    TriadCensus <- function(i, data, sims, wave, groupName, varName, levls=1:16){
        unloadNamespace("igraph") # to avoid package clashes
        require(sna)
-       require(network)
        x <- networkExtraction(i, data, sims, wave, groupName, varName)
 	   if (network.edgecount(x) <= 0){x <- symmetrize(x)}
        # because else triad.census(x) will lead to an error
        tc <- sna::triad.census(x)[1,levls]
        # names are transferred automatically
        tc
+   }
+
+   # CliqueCensus calculates the distribution of the clique census
+   # of the symmetrized network; see ?sna::clique.census.
+   CliqueCensus<-function (i, obsData, sims, period, groupName, varName, levls = 1:5){
+       require(sna)
+       x <- networkExtraction(i, obsData, sims, period, groupName, varName)
+       cc0 <- sna::clique.census(x, mode='graph', tabulate.by.vertex = FALSE,
+                                 enumerate=FALSE)[[1]]
+       cc <- 0*levls
+       names(cc) <- as.character(levls)
+       levels.used <- as.numeric(intersect(names(cc0), names(cc)))
+       cc[levels.used] <- cc0[levels.used]
+       cc
    }
 
   # Distribution of Bonacich eigenvalue centrality; see ?igraph::evcent.

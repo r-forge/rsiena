@@ -26,7 +26,7 @@ run_tests <- function(funcRegexp=NA, dir=NA) {
   # summary
   passed <- unlist(as.vector(sapply(names(res), function(file) {
     cat('\n', file, '\n', sep='')
-    passed <- as.vector(sapply(names(res[[file]]), function(method) {
+   as.vector(sapply(names(res[[file]]), function(method) {
       test <- res[[file]][[method]]
       if (test$kind == 'success') {
         cat(' - ', method, '... passed\n', sep='')
