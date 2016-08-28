@@ -1,3 +1,7 @@
+2016-08-28 R-Forge Revision 297
+Changes in RSiena:
+   * buildsystem: added Makefile and src/sources.list
+
 2016-08-17 R-Forge Revision 296
 Changes in RSiena and RSienaTest:
    * Warning if includeEffects is used with parameter initialValue.
