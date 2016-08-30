@@ -7,8 +7,6 @@
 #ifndef SIMMELIAN_TIE_ITERATOR_H_
 #define SIMMELIAN_TIE_ITERATOR_H_
 
-#include <Eigen/Dense>
-
 namespace siena {
 
 	// forward declarations
