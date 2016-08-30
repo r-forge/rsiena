@@ -4,12 +4,12 @@
  *****************************************************************************/
 #include "Simmelian.h"
 
-#include "Eigen/Types.h"
 #include "logger/Logger.h"
 #include "network/IncidentTieIterator.h"
 #include "network/OneModeNetwork.h"
 #include "network/TieIterator.h"
 
+#include <algorithm> // sort
 #include <vector>
 
 namespace siena {
