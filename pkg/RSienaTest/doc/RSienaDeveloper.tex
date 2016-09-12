@@ -596,6 +596,129 @@ r-forge name in place of \verb|rforgename|.)
 \item An hour later, try it out by doing another secure checkout. You should not
   be asked for your password this time.
 \end{enumerate}
+
+\section{Build system and the project Makefile}
+
+This section states the dependencies of files in the build chain and explains
+the Makefile residing the root folder (\texttt{\^{}/Makefile} not
+\texttt{\^{}/src/Makevars}).
+
+See the official
+\href{https://cran.r-project.org/doc/manuals/R-exts.html}{R Extension Manual}
+for general remarks about the R build chain. See
+\href{https://www.gnu.org/software/make/manual/make.html}{GNU Make Manul}
+for information on makefiles.
+
+\subsection{Steps and dependencies in the build chain}
+
+\paragraph{Packaging (on the developer machine)}
+
+\begin{itemize}
+  \item The file \texttt{src/sources.list} must contain a white space
+    delimited list of all source files. Any modification to the source file
+    set requires modification (e.g. adding/removing effects cpps).
+
+    This step can be automated by using the project Makefile. See next
+    subsection.
+
+    In older versions (RSienaTest pre 295, RSiena pre 297) this was handled by
+    the \texttt{\$(wildcard)} or \texttt{\$(shell)} extension of GNU Make
+    during compilation on the user machine. To get rid of the GNU dependency
+    and not utterly clutter the Makevars file this list is now stored as
+    \text{src/sources.list}
+
+  \item When dependencies on system libraries change (e.g. when RSienaTest
+    started to use MPI), that is almost never, the configuration scripts need
+    to be updated. The configuration process is different depending on the
+    clients operating system.
+
+    \begin{description}
+      \item[Linux, Mac] Edit \texttt{configure.ac} and run \texttt{autoconf}
+        to create the \texttt{configure} file.
+
+        See \href{https://www.gnu.org/software/autoconf/manual/index.html}{GNU
+        Autoconf Manual} on how to write the macros in configure.ac.
+
+      \item[Windows] Edit \texttt{configure.win}.
+
+    \end{description}
+
+    \texttt{configure} and \texttt{configure.win} are shell scripts collecting
+    system information, like the path to a library, and generating the
+    \texttt{Makevars} file by replacing \texttt{@}-enclosed variables in
+    \texttt{Makevars.in}.
+
+  \item \texttt{Makevars.in} replaces \texttt{Makevars}. Any change to
+    \texttt{Makevars} will be overwritten, use \texttt{Makevars.in}.
+
+\end{itemize}
+
+\paragraph{Installation (on the user machine)}
+
+\texttt{R CMD INSTALL} detects if there are \texttt{configure} files. If so it
+executes the following step before the normal build process.
+
+\begin{itemize}
+
+  \item \texttt{configure} or \texttt{configure.win} builds the
+    \texttt{Makevars} file from the \texttt{Makevars.in} template.
+
+    Variables enclosed in \texttt{@} characters are replaced by system depend
+    information. This includes compiler and linker flags required by libraries
+    (\texttt{@PKG\_CPPFLAGS@}, \texttt{@PKG\_LIBS@}) as well as the list of
+    source files (\texttt{@PKG\_SOURCES@}) which is stored in the
+    \texttt{src/sources.list}.
+
+\end{itemize}
+
+\subsection{Project Makefile}
+
+A Makefile is a file containing small named scripts and rule that model
+dependencies between them. Scripts which are to be executed by the developer
+we call targets. A target is executed by running \verb|make TARGET| in the
+shell.
+
+The project Makefile contains the following targets.
+
+\begin{description}
+  \item[build] Equivalent to \texttt{R CMD build}, ensuring
+    \texttt{src/sources.list} and \texttt{configure} is up to date.
+
+  \item[check] Equivalent to \texttt{R CMD check}, depends on build target.
+
+  \item[install] Equivalent to \texttt{R CMD INSTALL}, depends on build target.
+
+  % \item[commitchecks] Parses the DESCRIPTION file and issues warnings if the
+    % date or commit number need updating.
+
+  \item[clean] Remove current tarball and \texttt{.Rcheck} directory.
+
+  \item[test] Run regression tests against the state saved in
+    \texttt{inst/unitTests}. This will take some time.
+
+  \item[test\_capture] Capture new state for regression tests.
+
+\end{description}
+
+For example to build and check the package the following steps are necessary.
+Some can be skipped when no change occurred and output files are still up to
+date.
+\begin{verbatim}
+# manually check src/sources.list
+autoconf
+R CMD build .
+R CMD check RSienaTest_1.1-xxx.tar.gz
+\end{verbatim}
+Depending on the details (is the check performed on the directory or the
+tarball? which flags are handed to check? did I overlook a failed step or miss
+one?) the results can be different.
+
+Running the check target takes care of those steps and ensures everyone
+involved uses the same process of checking the package.
+\begin{verbatim}
+make check
+\end{verbatim}
+
 \section{Testing}
 Some testing is done automatically  by the \sfn{R CMD check} procedure. This
 includes all examples on help pages except parts marked \sfn{\textbackslash

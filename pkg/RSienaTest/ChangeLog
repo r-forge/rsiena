@@ -1,3 +1,7 @@
+2016-09-12 R-Forge Revision 300
+Changes RSienaTest:
+   * doc/RSienaDeveloper.tex: Build system documentation.
+
 2016-08-30 R-Forge Revision 299
 Changes RSienaTest:
    * network/Simmelian: Cleaned dependencies.
