@@ -71,11 +71,11 @@ void FourCyclesEffect::initialize(const Data * pData,
 	delete[] this->lcounters;
 	if (this->lTwoMode)
 	{
-		this->lcounters = new int[this->pNetwork()->m()];
+		this->lcounters = new long int[this->pNetwork()->m()];
 	}
 	else
 	{
-		this->lcounters = new int[this->pNetwork()->n()];
+		this->lcounters = new long int[this->pNetwork()->n()];
 	}
 }
 
@@ -121,7 +121,7 @@ void FourCyclesEffect::preprocessEgo(int ego)
  */
 void FourCyclesEffect::countThreePaths(int i,
 	const Network * pNetwork,
-	int * counters) const
+	long int * counters) const
 {
 
 
@@ -217,7 +217,7 @@ double FourCyclesEffect::tieStatistic(int alter)
 
 	if (this->lroot)
 	{
-	return (this->lpSqrtTable->sqrt(this->lcounters[alter]))/2;
+	return 0.5*(this->lpSqrtTable->sqrt(this->lcounters[alter]));
 	}
 	else
 	{

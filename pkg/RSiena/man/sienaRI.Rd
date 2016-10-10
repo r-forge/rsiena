@@ -1,5 +1,6 @@
 \name{sienaRI}
 \alias{sienaRI}
+\alias{entropy}
 \alias{plot.sienaRI}
 \alias{print.sienaRI}
 \alias{sienaRI.methods}
@@ -10,17 +11,22 @@
  of a SAOM according to the measure of relative importance described in
  Section 3.1 of Indlekofer and Brandes (2013).
  The measure is based on the influence of effects on potential tie change or
- behavior change decisions of individual actors in network at the given
- observation moments.
+ behavior change decisions of individual actors at the given observation
+ moments.
  It takes the data as well as the complete model specification into account.
  Therefore, necessary arguments are the analysed data given as a \code{siena}
  data object as well as the complete model specification represented either
  by an estimated \code{sienaFit} object or by the triple consisting of a
  suitable parameter vector \code{theta} and the corresponding
- \code{sienaAlgorithm} and \code{sienaEffects} objects.
- }
+ \code{sienaAlgorithm} and \code{sienaEffects} objects.\cr
+ Entropy-based effect sizes as in Snijders (2004) and the within-ego
+ standard deviations of change statistics are also computed.
+ If \code{getChangeStats=TRUE}, the arrays of change statistics are stored
+ in the \code{sienaRI} object.}
 \usage{
-sienaRI(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
+sienaRI(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL,
+        getChangeStats=FALSE)
+\method{print}{sienaRI}(x, printSigma=FALSE,\dots)
 \method{plot}{sienaRI}(x, actors = NULL, col = NULL, addPieChart = FALSE,
               radius = 1, width = NULL, height = NULL, legend = TRUE,
               legendColumns = NULL, legendHeight = NULL,
@@ -53,13 +59,17 @@ sienaRI(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
                included the model. Note that \code{sienaRI} does not yet work
                for endowment or creation effect, i.e., included effects have to
                be of type \code{eval} (or \code{rate}).}
+  \item{getChangeStats}{Boolean: If \code{TRUE}, an array of change statistics
+               is added to the \code{sienaRI} object.}
   \item{x}{\code{sienaRI} object resulting from a call to \code{sienaRI}.}
+  \item{printSigma}{Boolean: If \code{TRUE}, average within-ego standard
+       deviations of change statistics ('\code{sigma}'), are included in the print.}
   \item{actors}{vector of integers: set of actors to be included in the plot;
        if \code{NULL}, all actors.}
   \item{col}{Colors used in the plot. If \code{col=NULL} a default color
        scheme is used.}
   \item{addPieChart}{Boolean: If \code{TRUE}, pie charts of aggregated relative
-       importances for the complete network will be added to the plot.}
+       importances for the complete set of actors will be added to the plot.}
   \item{radius}{Radius of pie charts. Only effective if \code{addPieCharts = TRUE}.}
   \item{width}{Width of the plot. If \code{width=NULL} a default value is used.}
   \item{height}{Height of the plot. If \code{height=NULL} a default value is used.}
@@ -88,7 +98,7 @@ model effects \code{ans$effects}.
 
 If \code{ans} is a valid \code{sienaFit} object, the calculations of relative
 importances are based on \code{ans$theta}, \code{ans$x}, and
-\code{ans$effects}.\\ Alternatively, the necessary information can be given
+\code{ans$effects}. Alternatively, the necessary information can be given
 directly as a suitable parameter vector \code{theta}, a \code{sienaAlgorithm}
 object, and a \code{sienaEffects} object. In this case, \code{ans} has to be
 unspecified, i.e., \code{ans=NULL}.
@@ -97,6 +107,17 @@ Note that \code{sienaRI} works only with Method of Moments
 (i.e., for \code{sienaAlgorithm} objects with \code{maxlike = FALSE})
 and that it does not yet work for endowment or creation effects
 (i.e., included effects have to be of type \code{eval}).
+It does not allow two-mode (bipartite) networks as dependent variables;
+but these can be represented as one-mode networks using structural zeros.
+If the network is non-directed, the relative importances and entropy-based
+'degrees of certainty' are calculated for \code{modelType=2}
+('forcing'; see  \code{\link{sienaAlgorithmCreate}}).
+
+If there are any missing tie values in the network data set, they are imputed by
+initial zeros and Last Observation Carried Forward. Structural zeros and ones
+are replaced by \code{NA} and treated as impossible choices in the probability
+vectors and ignored in the standard deviations; but the change statistics
+for these dyads still are given in \code{changeStatistics} (if requested).
 }
 \value{
  If the model contains only one dependent variable, \code{sienaRI} returns
@@ -107,48 +128,63 @@ and that it does not yet work for endowment or creation effects
  effects of one dependent variable at observation moments as defined in
  Section 3.1 of Indlekofer and Brandes (2013).
 
-A \code{sienaRI} object is a list with the following components:
+A \code{sienaRI} object is a list with the following components.
+For the components referred to as lists themselves, these are lists
+corresponding to the observation moments.
     \describe{
     \item{- \code{dependentVariable}}{the name of the corresponding
           dependent variable.}
     \item{- \code{effectNames}}{the names of considered effects.}
-    \item{- \code{RIActors}}{is a list that contains the expected
+    \item{- \code{RIActors}}{a list that contains the expected
           relative importances of effects
           for each potential actor decision at observation moments.
           This is equation (3) in Indlekofer and Brandes (2013).}
-    \item{- \code{expectedRI}}{is a list that contains the expected
-          relative importances of effects
-          aggregated over all actors in each network observations.
-          More precisely, it contains the averages of the actor related values
-          in \code{RIActors}.
+    \item{- \code{expectedRI}}{a list that contains the expected
+          relative importances of effects aggregated over all actors in each
+          network observations. These are the averages of the actor related
+          values in \code{RIActors}.
           This is equation (4) in Indlekofer and Brandes (2013).}
-    \item{- \code{IActors}}{is a list that contains the expected
-          importances of effects
-          for each potential actor decision at observation moments. This
-          is the numerator of equation (3) in Indlekofer and Brandes (2013).}
+    \item{- \code{IActors}}{a list that contains the expected
+          importances of effects for each potential actor decision at
+          observation moments. This is the numerator of equation (3)
+          in Indlekofer and Brandes (2013).}
     \item{- \code{expectedI}}{is a list that contains the expected
           importances of effects
-          aggregated over all actors in each network observations.
+          aggregated over all actors in each observation.
           More precisely, it contains the averages of the actor related values
           in \code{IActors}.}
-    \item{- \code{absoluteSumActors}}{is a list that contains the sum of
+    \item{- \code{absoluteSumActors}}{a list that contains the sum of
           the (unstandardized) L1-differences
           calculated for each potential actor decision at observation moments.
           This is the denominator of equation (3)
           in Indlekofer and Brandes (2013).}
-    \item{- \code{entropyActors}}{is a list that contains the entropy of each
-          potential actor decision at observation moments.}
+    \item{- \code{RHActors}}{a list that contains the degree of certainty in
+          the potential ministep taken by an actor at the observation moments;
+          this is R_H(i,x) of formula (6) in Snijders (2004).
+          The mean over actors of these degrees of certainty, given by
+          formula (7) in Snijders (2004), is printed by the
+          \code{print} method for \code{sienaRI} objects.}
+    \item{- \code{sigma}}{a list of effects by ego matrices of the values of the within-ego
+          standard deviations of the change statistics. Their averages (over egos)
+		  are printed if \code{printSigma=TRUE}.}
+    \item{- \code{changeStatistics}}{a list of arrays (effects by alters by egos)
+          containing for each observation moment,
+          the values of the change statistics for toggling the tie from actor
+          to ego; this is produced only if \code{getChangeStats=TRUE}.}
     }
 }
 
 \references{
 \itemize{
-Indlekofer, N. and Brandes, U.,
- \dQuote{Relative Importance of Effects in Stochastic Actor-oriented Models.}
- Network Science, 1 (3), 278-304, 2013.
+\item Indlekofer, Natalie and Brandes, Ulrik (2013).
+ Relative Importance of Effects in Stochastic Actor-oriented Models.
+ \emph{Network Science}, 1 (3), 278-304.
+\item Snijders, Tom A.B. (2004).
+  Explained Variation in Dynamic Network Models.
+  \emph{Mathematics and Social Sciences}, 168 (4), 31-41.
 }
 }
-\author{Natalie Indlekofer}
+\author{Natalie Indlekofer, some additions by Tom Snijders}
 \examples{
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))

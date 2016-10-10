@@ -210,7 +210,7 @@ printInitialDescription <- function(data, effects, modelName="Siena",
 								(matchange[3, per] + matchange[4, per]) )
                         {
                             Report(c("\nThis means that in period ", per,
-                                     ", proportionately less 1-ties stayed 1,\n",
+                                     ", proportionately fewer 1-ties stayed 1,\n",
                                      " than 0-ties became 1. A great reversal",
                                      " of the network pattern!\n",
                                      "For some model specifications this may",

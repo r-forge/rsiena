@@ -223,6 +223,7 @@ Ph.D. Thesis. University of Oxford: U.K.
    GeodesicDistribution <- function (i, data, sims, period, groupName,
                            varName, levls=c(1:5,Inf), cumulative=TRUE, ...) {
      x <- networkExtraction(i, data, sims, period, groupName, varName)
+     require(network)
      require(sna)
      a <- sna::geodist(symmetrize(x))$gdist
      if (cumulative)
@@ -240,6 +241,7 @@ Ph.D. Thesis. University of Oxford: U.K.
    # Holland and Leinhardt Triad Census; see ?sna::triad.census.
    TriadCensus <- function(i, data, sims, wave, groupName, varName, levls=1:16){
        unloadNamespace("igraph") # to avoid package clashes
+       require(network)
        require(sna)
        x <- networkExtraction(i, data, sims, wave, groupName, varName)
        if (network.edgecount(x) <= 0){x <- symmetrize(x)}

@@ -191,7 +191,7 @@ It also contains contributions written earlier, for the manual for \SI version 3
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-296.
+This version was renewed for \RS version 1.1-301.
 \end{abstract}
 
 
@@ -863,24 +863,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.1-296}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.1-301}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-296.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.1-301.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-296.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.1-301.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.1-296.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.1-301.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-296.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-301.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-296.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-301.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-296.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.1-301.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1077,7 +1077,7 @@ For technical problems running \rs, follow the following points.
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
   be found at \url{http://r-forge.r-project.org/R/?group_id=461}. The version is
-  identified by a version number (e.g.\ 1.1-296) and an R-Forge revision
+  identified by a version number (e.g.\ 1.1-301) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1194,13 +1194,16 @@ variables must be available for the same set of time points.
 For data specification by the \textsf{sienaDependent} function, the network
 must be specified as a matrix or array or list of sparse matrix of triples.
 
-For data specification by the graphical interface \textsf{siena01Gui}
-(documented separately)
-or by the function \textsf{sienaDataCreateFromSession},
+For data specification by
+%the graphical interface \textsf{siena01Gui} (documented separately) or by
+the function \textsf{sienaDataCreateFromSession},
 edge list formats are also allowed. This can be either the
 format of the Pajek program, or a raw edge list, here called Siena format.
 For large number of nodes (say, larger than 100), the edge list
 format is more efficient in use of computer memory.
+
+Note that  \textsf{sienaDataCreateFromSession} is available only
+in  \textsf{RSienaTest}.
 
 Sparse matrices, which can be used by input via
 \sfn{sienaDependent()}, have the same efficiency as Pajek or
@@ -2383,9 +2386,6 @@ The basic list of these and other effects is as follows.
       closure by including one or two of these. They can be selected
       by theoretical considerations and/or by their empirical
       statistical significance.
-      Some researchers may find the last effect (distances two)
-      less appealing because it expresses network closure
-      inversely.
       \begin{enumerate}
       \item[a.]
       \begin{minipage}[t]{.6\textwidth}
@@ -2418,30 +2418,31 @@ The basic list of these and other effects is as follows.
 \endpicture
 \end{center}
 \end{minipage}
-      \item[b.] The \emph{balance effect}, which may also be called \emph{structural equivalence
-                with respect to outgoing ties}.
-                This expresses a preference of actors to have ties to those other actors
-                who have a similar set of outgoing ties as themselves.
-                Whereas the transitive triplets effect focuses on how many same choices
-                are made by ego (the focal actor) and alter (the other actor)
-                --- the number of $h$ for which
-                $i \rightarrow h$ and $j \rightarrow h $, i.e., $x_{ih} = x_{jh} = 1$
-                where $i$ is ego and $j$ is alter --- ,
-                the balance effect considers in addition how many the same
-                non-choices are made --- $x_{ih} = x_{jh} = 0$.
-      \item[c.] The \emph{transitive ties effect} is similar to the transitive
+      \item[b.] The \emph{transitive ties effect} is similar to the transitive
                 triplets effect, but instead of considering for each other actor $j$
                 how many two-paths $i \rightarrow h \rightarrow j $ there are,
                 it is only considered whether there is at least one such indirect connection.
                 Thus, one indirect tie suffices for the network embeddedness.
-      \item[d.] The \emph{gwesp} effect (see later in this manual).
-      \item[d.] The \emph{number of actors at distance two effect} expresses network closure inversely:
+      \item[c.] The \emph{gwesp} effect (see later in this manual).
+      \item[d.] There are various other effects that may express network closure,
+                such as the \emph{balance} effect, the
+                \emph{Jaccard similarity effects} for incoming and for outgoing ties,
+                and the \emph{number of actors at distance two effect}.
+                The balance and Jaccard similarity effects are ways to express
+                tendencies to structural equivalence.
+                The number of actors at distance two effect expresses network
+                closure inversely:
                 stronger network closure (when the total number of ties is fixed)
                 will lead to fewer geodesic distances equal to 2.
                 When this effect has a negative parameter, actors will have a preference
                 for having few others at a geodesic distance of 2 (given their
                 out-degree, which is the number of others at distance 1);
                 this is one of the ways for expressing network closure.
+                However, it is theoretically ambiguous, because the number of
+                others at a geodesic distance of 2 can be decreased in two
+                quite different ways: dropping ties to those who have many
+                connections `further out', or making ties to those who have many
+                connections to others to whom one is already directly connected.
       \end{enumerate}
 \item
       \begin{minipage}[t]{.7\textwidth}
@@ -3242,6 +3243,11 @@ in the sense of this section.)
 Interactions between three effects are defined similarly,
 but now the \texttt{interaction1} parameter must combine three components.
 
+The number of network interaction effects that can be created is defined by the
+parameter \texttt{nintn} in function \sfn{getEffects()}. If you need more
+interactions than permitted, just make a new effects object with the
+suitably increased value of \texttt{nintn}.
+
 The list of effects in Chapter~\ref{S_math} contains a variety of
 interaction effects that cannot be created in this way;
 for example, those with short names
@@ -3286,6 +3292,11 @@ of the interacting effects, all or all but one have
 the value \texttt{OK}. Thus, for an interaction between two effects,
 one or both should be \texttt{OK}; for a three-effect interaction,
 two or all three should be \texttt{OK}.
+
+The number of behavior interaction effects that can be created is defined by the
+parameter \texttt{behNintn} in function \sfn{getEffects()}. If you need more
+interactions than permitted, just make a new effects object with the
+suitably increased value of \texttt{behNintn}.
 
 As an example, suppose that we have a data set with a dependent
 network variable \texttt{friendship} and a dependent behavior variable
@@ -3624,6 +3635,7 @@ where simulations run very quickly (i.e., number of actors
 and distance between first and last simulations are small).
 Further, results from \sfn{sienacpp()} cannot used for
 \sfn{sienaGOF()}.
+Note that \sfn{sienacpp()} is available only in \sfn{RSienaTest()}.
 
 The estimation algorithm is determined by a call of functions
 such as
@@ -4587,7 +4599,7 @@ but is as yet implemented only for multilevel network modeling
 
 Estimation by the Generalized Method of Moments (GMoM)
 was proposed in \citet{ASS2015} and is implemented
-in the function \sfn{sienacpp()}.
+in the function \sfn{sienacpp()}, available in \sfn{RSienaTest()}.
 
 If the algorithm object created by \sfn{sienaAlgorithmCreate()}
 uses \texttt{maxlike=FALSE}, the estimation function \sfn{sienacpp()}
@@ -6080,8 +6092,9 @@ When satisfactory convergence has been obtained, make sense
 of the results: for example, is the reciprocity parameter significant?
 
 As further steps, include some extra effects. First candidates
-are the transitive triplets effect or the transitive ties effect
-and the 3-cycles effect (see, e.g., Section~\ref{S_modspec});
+are the transitive triplets effect or the gwesp effect, and any
+effects that may follow from your theories about the investigated network
+(see, e.g., Section~\ref{S_modspec});
 you can find their \sfn{shortName},
 needed to specify them, in Chapter~\ref{S_math},
 where also the mathematical specifications are given.
@@ -7428,12 +7441,11 @@ and for maintaining existing ties.
  \texttt{(cycle3)}, \\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{jh}\, x_{hi}\,$;
 
-
  \item
 \begin{minipage}[t]{.7\textwidth}
  {\em shared popularity} \texttt{sharedPop},\\
  $s^{\rm net}_{i\vit}(x) =
-        \sum_{j,k,h; \text{all different}} x_{ij}\, x_{hj} \, x_{ik}\, x_{hk}$;\\
+      \frac14   \sum_{j,k,h; \text{all different}} x_{ij}\, x_{hj} \, x_{ik}\, x_{hk}$;\\[0.3em]
  this is like a 4-cycle but in a special orientation, like the 2PU (`two-paths up')
  effect (for $k$=2) for directed ERGMs proposed in \citet{RPW2009}.
  Therefore the statistic is called the `number of 2-2PU' configurations;
@@ -7462,16 +7474,41 @@ and for maintaining existing ties.
 \end{center}
 \vfill
 \end{minipage}
-\smallskip
 
- \item for two-mode networks and for non-directed networks: the {\em number of four-cycles}
-   with shortName \texttt{(cycle4)} for the two-mode and \texttt{(cycle4ND)} for the
-   non-directed case,\\
- $s^{\rm net}_{i\vit}(x) =  \sum_{j,k,h; \text{all different}}
-            x_{ij}\, x_{ik}\, x_{hj}\, x_{hk}\,$;\\
+\vspace{-4em} % I do not know why this is necessary
+ \item \begin{minipage}[t]{.68\textwidth}
+for two-mode networks and for non-directed networks: \\
+the {\em number of four-cycles} with shortName \texttt{(cycle4)} \\
+   for the two-mode and \texttt{(cycle4ND)} for the  non-directed case,\\[0.3em]
+ $s^{\rm net}_{i\vit}(x) =  \frac14 \sum_{j,k,h; \text{all different}}
+            x_{ij}\, x_{ik}\, x_{hj}\, x_{hk}\,$;\\[0.3em]
  for parameter $p=2$ the square root is taken;\\
- note that this is like the \texttt{sharedPop} effect above, but for the two-mode
- and non-directed cases the directionality plays no role;
+ note that this is like the \texttt{sharedPop} effect above, \\
+ but for the two-mode  and non-directed cases \\
+ the directionality plays no role;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 0.5 to 4.5, y from 0 to 5
+\put{\large$\bullet$} at  1 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  1 3
+\put{\large$\bullet$} at  4 3
+\put{$h$} at 0.5 1
+\put{$i$} at 0.5 3
+\put{$k$} at 4.5 1
+\put{$j$} at 4.5 3
+\arrow <2mm> [.2,.6]  from 1.2 3 to 3.8 3
+\arrow <2mm> [.2,.6]  from 1.2 2.9 to 3.8 1.1
+\arrow <2mm> [.2,.6]  from 1.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 1.2 1.1 to 3.8 2.9
+\endpicture
+\end{center}
+\end{minipage}
 
  \item {\em transitive ties effect} \texttt{(transTies)}
  (earlier called \emph{(direct and indirect ties) effect}),
@@ -8530,7 +8567,39 @@ $s^{\rm net}_{i\vit}(x ) = \sum_j  x^{\rm{simm}}_{ij}\,v_j $ .
  the sum of the covariate over the actors
  to whom $i$ is tied indirectly (at a geodesic distance of 2),\\
  $s^{\rm net}_{i\vit}(x) = \sum_j (1 -x_{ij})
-                      \big( \max_h x_{ih}x_{hj} \big) v_j $.
+                      \big( \max_h x_{ih}x_{hj} \big) v_j $;
+
+ \item \begin{minipage}[t]{.68\textwidth}
+for two-mode networks and for non-directed networks: \\
+the {\em number of four-cycles from same covariate} \\
+with shortName \texttt{(sameXCycle4)}, \\[0.3em]
+ $s^{\rm net}_{i\vit}(x) =  \frac14 \sum_{j,k,h; \text{all different}}
+            x_{ij}\, x_{ik}\, x_{hj}\, x_{hk}\,I\{v_i = v_h\} $;\\[0.3em]
+ for parameter $p=2$ the square root is taken.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 0.5 to 4.5, y from 0 to 5
+\put{\large$\bullet$} at  1 1
+\put{\large$\circ$} at  4 1
+\put{\large$\bullet$} at  1 3
+\put{\large$\circ$} at  4 3
+\put{$h$} at 0.5 1
+\put{$i$} at 0.5 3
+\put{$k$} at 4.5 1
+\put{$j$} at 4.5 3
+\arrow <2mm> [.2,.6]  from 1.2 3 to 3.8 3
+\arrow <2mm> [.2,.6]  from 1.2 2.9 to 3.8 1.1
+\arrow <2mm> [.2,.6]  from 1.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 1.2 1.1 to 3.8 2.9
+\endpicture
+\end{center}
+\end{minipage}
+
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
@@ -9432,29 +9501,7 @@ Then there are effects using mixed configurations on four nodes
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
  the number of mixed $W-X$ three-paths
- $i \stackrel{W}{\rightarrow} h  \stackrel{W}{\leftarrow} k  \stackrel{X}{\rightarrow} j$.\\
- The effect parameter $p$ can take the values 1, 2, 3 and 4.
-  The value $c$, a constant for centering,
-   is the average of the observed values $w_{ih}\, w_{kh}$:\\[0.5em]
- $ c \,=\, \left\{ \begin{array}{ll} \big(1/Mn(n-1)\big)
-               \sum_{m,h} \big( w_{+h}^2(t_m) - w_{+h}(t_m)\big) & (p \geq 3) \\[0.3em]
-                            0  & (p < 3) \ .
-    \end{array} \right. $\\[0.5em]
- Note that since this is the evaluation function for actor $i$ with
- respect to network $X$, only the $x_{ij}$ tie indicator in the formula,
- corresponding to  the tie $i \stackrel{X}{\rightarrow} j$,
- is the dependent variable here.\\
- The interpretation is that actors have the tendency to make the same
- outgoing $X$-choices as those ($k$) with whom they share many outgoing $W$-ties.\\
- For $p=2$ and $p=4$, the square root is taken: \\[0.3em]
- $s^{\rm net}_{i\vit}(x) = \sum_{j,k; k \neq i} x_{ij}\, x_{kj}\,
- \Big( \sqrt{\sum_{h} w_{ih}\, w_{kh} } \,-\, \sqrt{c} \Big)\,$.\\
-
- This can be regarded as a higher-order effect related to indegree-popularity.
- The differences between the centered and non-centered versions amount to
- a multiple of the indegree-popularity (without $\sqrt{}$) \texttt{inPop} effect.
- Therefore, when the \texttt{sharedTo} effect is used, it is advisable
- also to include the \texttt{inPop} effect, so as to avoid misinterpretations.
+ $i \stackrel{W}{\rightarrow} h  \stackrel{W}{\leftarrow} k  \stackrel{X}{\rightarrow} j$.
       \end{minipage}
 \hfill
 \begin{minipage}[t]{.15\textwidth}
@@ -9485,6 +9532,102 @@ Then there are effects using mixed configurations on four nodes
 \vfill
 \end{minipage}
 
+
+ The effect parameter $p$ can take the values 1, 2, 3 and 4.
+  The value $c$, a constant for centering,
+   is the average of the observed values $w_{ih}\, w_{kh}$:\\[0.5em]
+ $ c \,=\, \left\{ \begin{array}{ll} \big(1/Mn(n-1)\big)
+               \sum_{m,h} \big( w_{+h}^2(t_m) - w_{+h}(t_m)\big) & (p \geq 3) \\[0.3em]
+                            0  & (p < 3) \ .
+    \end{array} \right. $\\[0.5em]
+ Note that since this is the evaluation function for actor $i$ with
+ respect to network $X$, only the $x_{ij}$ tie indicator in the formula,
+ corresponding to  the tie $i \stackrel{X}{\rightarrow} j$,
+ is the dependent variable here.\\
+ The interpretation is that actors have the tendency to make the same
+ outgoing $X$-choices as those ($k$) with whom they share many outgoing $W$-ties.\\
+ For $p=2$ and $p=4$, the square root is taken: \\[0.3em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j,k; k \neq i} x_{ij}\, x_{kj}\,
+ \Big( \sqrt{\sum_{h} w_{ih}\, w_{kh} } \,-\, \sqrt{c} \Big)\,$.\\
+
+ This can be regarded as a higher-order effect related to indegree-popularity.
+ The differences between the centered and non-centered versions amount to
+ a multiple of the indegree-popularity (without $\sqrt{}$) \texttt{inPop} effect.
+ Therefore, when the \texttt{sharedTo} effect is used, it is advisable
+ also to include the \texttt{inPop} effect, so as to avoid misinterpretations.
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+
+\noindent
+The mixed degree-related effects can be weighted with monadic covariates $V$,
+as implemented by the following four effects.
+(For two-mode networks, these effects are meaningful only in special cases;
+however, this is not checked when creating the effects object, so errors
+can lead here to meaningless results or to crashes.)
+Note that, unlike the unweighted effects 
+\texttt{inPopIntnX, inActIntnX, outPopIntnX, outActIntnX}, the $W$-degrees 
+here are not centered (well, they are also not really degrees).
+
+Weights at the other side of the $W$-tie can be obtained by interactions of
+\texttt{inPopIntnX, inActIntnX, outPopIntnX, outActIntnX} with the ego or
+alter effects of $V$.
+Different types of weighting are available through the distance-two
+effects \texttt{altDist2W} and \texttt{totDist2W}, see below.
+
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+ \item {\em Effect of in-degree in W, weighted by sender's V, on X-popularity }
+ ($X$: indegree$^{1/p}$ $W$ weighted by $V$ popularity)   \texttt{(inPopIntnX)}\\
+ defined by the sum of values of $V$ for actors $h$
+ for which there are ties  $ i \stackrel{X}{\rightarrow} j \stackrel{W}{\leftarrow} h$,
+ i.e., at mixed $X - W$ out-in  distance 2;
+ the value $\sum_h w_{hj}\,v_h$ can be regarded as a $V$-weighted
+ version of the $W$-indegree of $j$:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sum_h w_{hj}\,v_h  $ \\
+ or for $p=2$ \\
+   $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{hj}\,v_h}   $;\\
+ note that to use this effect for $p=2$ the variable $V$ must be nonnegative,
+ which implies that it must be non-centered;
+ 
+ \item {\em Effect of in-degree in W, weighted by sender's V, on X-activity }
+ ($X$: indegree$^{1/p}$ $W$ weighted by $V$ activity)   \texttt{(inActIntnX)}\\
+ defined by the sum of values of $V$ for actors $h$
+ for which there are ties  $h \stackrel{W}{\rightarrow} i \stackrel{X}{\rightarrow} j$,
+ i.e., a mixed $W - X$ two-path with $i$ in the middle;
+ the value $\sum_h w_{hi}\,v_h$ can be regarded as a $V$-weighted
+ version of the $W$-indegree of $i$:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sum_h w_{hi}\,v_h  $ \\
+ or for $p=2$ \\
+   $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{hi}\,v_h}   $;\\
+ note that to use this effect for $p=2$ the variable $V$ must be nonnegative,
+ which implies that it must be non-centered;
+ 
+
+ \item {\em Effect of out-degree in W, weighted by sender's V, on X-popularity }
+ ($X$: outdegree$^{1/p}$ $W$ weighted by $V$ popularity)   \texttt{(outPopIntnX)}\\
+ defined by the sum of values of $V$ for actors $h$
+ for which there are ties  $ i \stackrel{X}{\rightarrow} j \stackrel{W}{\rightarrow} h$,
+ i.e., at mixed $X - W$ outgoing  distance 2;
+ the value $\sum_h w_{jh}\,v_h$ can be regarded as a $V$-weighted
+ version of the $W$-outdegree of $j$:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sum_h w_{jh}\,v_h  $ \\
+ or for $p=2$ \\
+   $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{jh}\,v_h}   $;\\
+ note that to use this effect for $p=2$ the variable $V$ must be nonnegative,
+ which implies that it must be non-centered;
+
+ \item {\em Effect of out-degree in W, weighted by sender's V, on X-activity }
+ ($X$: outdegree$^{1/p}$ $W$ weighted by $V$ activity)   \texttt{(outActIntnX)}\\
+ defined by the sum of values of $V$ for actors $h$
+ for which there are ties  $h \stackrel{W}{\leftarrow} i \stackrel{X}{\rightarrow} j$,
+ i.e., a mixed $W - X$ two-star;
+ the value $\sum_h w_{ih}\,v_h$ can be regarded as a $V$-weighted
+ version of the $W$-outdegree of $i$:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sum_h w_{ih}\,v_h  $ \\
+ or for $p=2$ \\
+   $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{ih}\,v_h}   $;\\
+ note that to use this effect for $p=2$ the variable $V$ must be nonnegative,
+ which implies that it must be non-centered.
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
@@ -9503,7 +9646,7 @@ covariate $V$.
   (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
  this refers to agreement of actors with respect to their $W$-choices
  (structural equivalence with respect to outgoing $W$-choices), but only
- for actors and choices sharing the same value of a covariate $V$;
+ for actors sharing the same value of a covariate $V$;
  the contribution of the tie $i \stackrel{X}{\rightarrow} j$
  is proportional to
  the number of joint $W$ choices of others,
@@ -9519,9 +9662,51 @@ covariate $V$.
 \beginpicture
 \setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
 \setplotarea x from 2 to 4, y from 0 to 3
-\put{\large$\diamond$} at  2 1
-\put{\large$\diamond$} at  4 1
-\put{\large$\diamond$} at  3 2.732
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\circ$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from  3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em agreement along W leading to X, for homogeneous V}, \\
+($X$: from $W$ agr.\ $\times$ hom.\ $V$)  \texttt{(homCovNetNet)},\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h}
+                     x_{ij}\, w_{ih}\, w_{jh}\,I\{v_i = v_j = v_h\}$;\\[0.2em]
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
+ this refers to agreement of actors with respect to their $W$-choices
+ (structural equivalence with respect to outgoing $W$-choices), but only
+ for actors and choices sharing the same value of a covariate $V$;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of joint $W$ choices of others,
+ $i \stackrel{W}{\rightarrow} h \stackrel{W}{\leftarrow} j$,
+ counting only those for which $v_i = v_j= v_h$.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
 \put{$i$} at 2 0.4
 \put{$j$} at 4 0.4
 \put{$h$} at 3 3.4
@@ -9598,6 +9783,79 @@ covariate $V$.
 \put{\large$\bullet$} at  2 1
 \put{\large$\diamond$} at  4 1
 \put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em agreement along W, same-V about contrasting V, leading to X}
+($X$: from $W$ agreement contrasting $V$),   \texttt{(contrastCovNetNet)}\\
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\,
+            w_{ih}\, w_{jh}\,I\{v_i = v_j \neq v_h\}$;\\[0.2em]
+ this refers to agreement ``outside of $V$-groups'' about $W$ ties,
+ in the sense that the focal actor and the target
+ actor have the same value of $V$, but the agreed actor has a different value;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\diamond$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.1 1.1732 to 2.9 2.559
+\arrow <2mm> [.2,.6]  from 3.9 1.1732 to 3.1 2.559
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em agreement along W, all different V, leading to X}
+($X$: from $W$ agreement all diff. $V$),   \texttt{(allDifCovNetNet)}\\
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\,
+            w_{ih}\, w_{jh}\,I\{v_i, v_j, v_h \text{ all different} \}$;\\[0.2em]
+ this refers to agreement  about $W$ ties between actors who have
+ all three a different value for $V$;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\footnotesize$\triangle$} at  4 1
+\put{\large$\diamond$} at  3 2.732
 \put{$i$} at 2 0.4
 \put{$j$} at 4 0.4
 \put{$h$} at 3 3.4
@@ -9693,7 +9951,171 @@ covariate $V$.
 
 \item
 \begin{minipage}[t]{.7\textwidth}
- {\em mixed WX $\Rightarrow$ X closure, homogeneous on V}
+ {\em shared incoming W leading to X, for same V}, \\
+($X$: shared incoming $W$ same $V$)  \texttt{(covNetNetIn)},\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h}
+                     x_{ij}\, w_{hi}\, w_{hj}\,I\{v_i = v_j\}$;\\[0.2em]
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
+ this refers to shared incoming $W$-choices
+ (structural equivalence with respect to incoming $W$-choices), but only
+ for actors sharing the same value of a covariate $V$;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of joint $W$ choices of others,
+ $i \stackrel{W}{\leftarrow} h \stackrel{W}{\rightarrow} j$,
+ counting only those for which $v_i = v_j$.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\circ$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+\item
+\begin{minipage}[t]{.7\textwidth}
+ {\em shared incoming W leading to X, for homogeneous V}, \\
+($X$: shared incoming $W$ hom.\ $V$)  \texttt{(homCovNetNetIn)},\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h}
+                     x_{ij}\, w_{hi}\, w_{hj}\,I\{v_i = v_j = v_h\}$;\\[0.2em]
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
+ this refers to shared incoming $W$-choices
+ (structural equivalence with respect to incoming $W$-choices), but only
+ for actors and choices sharing the same value of a covariate $V$;
+ the contribution of the tie $i \stackrel{X}{\rightarrow} j$
+ is proportional to
+ the number of joint incoming $W$ choices of others,
+ $i \stackrel{W}{\leftarrow} h \stackrel{W}{\rightarrow} j$,
+ counting only those for which $v_i = v_j= v_h$.
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from  2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+
+\item
+\begin{minipage}[t]{.75\textwidth}
+ {\em shared incoming W, same-V about contrasting V, leading to X}\\
+($X$: shared incoming $W$ contrasting $V$),   \texttt{(contrastCovNetNetIn)}\\
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\,
+            w_{hi}\, w_{hj}\,I\{v_i = v_j \neq v_h\}$;\\[0.2em]
+ this refers to shared incoming $W$-choices
+ (structural equivalence with respect to incoming $W$-choices),
+ restricted in the sense that the focal actor and the target
+ actor have the same value of $V$, but the actors
+ making the shared incoming choices have a different value;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\diamond$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+\item
+\begin{minipage}[t]{.75\textwidth}
+ {\em shared incoming W, all different V, leading to X}\\
+($X$: shared incoming $W$ all different $V$),   \texttt{(allDifCovNetNetIn)}\\
+  (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
+ $s^{\rm net}_{i\vit}(x) = \sum_{j \neq h} x_{ij}\,
+            w_{hi}\, w_{hj}\,I\{v_i, v_j, v_h \text{ all different} \}$;\\[0.2em]
+ this refers to shared incoming $W$-choices
+ (structural equivalence with respect to incoming $W$-choices),
+ restricted in the sense that the focal actor, the target
+ actor, and the actors
+ making the shared incoming choices all have a different value of $V$;
+      \end{minipage}
+\hfill
+\begin{minipage}[t]{.15\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\footnotesize$\triangle$} at  4 1
+\put{\large$\diamond$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\put{{\small $W$}} at 2.1 1.9
+\put{{\small $W$}} at 3.9 1.9
+\put{{\small $X$}} at 3   0.6
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}
+\smallskip
+
+
+\item
+\begin{minipage}[t]{.75\textwidth}
+ {\em mixed WX $\Rightarrow$ X closure, homogeneous on V}\\
 ($X$: mixed $W$ closure homog. $V$),
   \texttt{(homWXClosure)}   \\
   (specified with \texttt{interaction1} = $W$, \texttt{interaction2} = $V$)\\[0.2em]
@@ -9710,9 +10132,9 @@ covariate $V$.
 \beginpicture
 \setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
 \setplotarea x from 2 to 4, y from 0 to 3
-\put{\large$\diamond$} at  2 1
-\put{\large$\diamond$} at  4 1
-\put{\large$\diamond$} at  3 2.732
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
 \put{$i$} at 2 0.4
 \put{$j$} at 4 0.4
 \put{$h$} at 3 3.4
@@ -11965,7 +12387,7 @@ will list the code for the function with this name.
 To get insight into a package, and certainly to modify
 or personalize it, it is necessary, however,
 to get the source code of the whole package.
-This can be done by downloading, from CRAN or R-Forge,
+This can be done by downloading, from CRAN or (preferably) R-Forge,
 the `tarball' with extension \sfn{.tar.gz}.
 This file can be extracted by compression/decompression
 programs (perhaps you need to do a double extraction).
@@ -13038,12 +13460,39 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
-\item 2016-08-17 Revision 296.
-
+\item 2016-10-09 Revision 301.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
-   \item Warning if \sfn{includeEffects} is used with parameter \texttt{initialValue}.
+   \item Warning if \sfn{includeEffects} is used with parameter 
+     \texttt{initialValue} -- corrected.
+   \item New effects: \texttt{sameXCycle4, homCovNetNet, contrastCovNetNet, 
+     covNetNetIn, homCovNetNetIn, \\
+     contrastCovNetNetIn, inPopIntnX, inActIntnX, outPopIntnX, \\
+     outActIntnX}.
+   \item Changes permitting the 4-cycles effects for larger and denser networks.
+   \item Dropped \texttt{cl.XWX} effect from two-mode -- one-mode coevolution
+     (did not belong).
+   \item \texttt{egoSqX} is an ego effect.
+   \item Added \texttt{cycle4} for one-mode networks.
+   \item Added \texttt{outAct, outInAss} for symmetric networks.
+   \item \sfn{SienaRI}: Structural zeros and ones are excluded from the calculations;
+     added option \texttt{getChangeStatistics};
+     row names given to matrices that have rows corresponding to effects;
+     adapted so that it runs for models with only 1 parameter;
+     adapted so that for a bipartite dependent variable it does not crash.
+   \item Warning if \sfn{includeEffects} is used with parameter \texttt{parameter}.
+   \item Small additions to \sfn{print.sienaAlgorithm}.
+   \item Clearer output for \texttt{MaxDegree} in \sfn{print.sienaFit}.
+   \item Correction of how effect parameter for \texttt{outInAss} 
+     for 2-mode networks is reported.
+\end{itemize}
+
+
+\item 2016-08-17 Revision 296.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
    \item Warning if \sfn{includeInteraction} is used for more interactions
      than available given parameters \texttt{nintn} and \texttt{behNintn}.
    \item Deleted session parameter from \sfn{print01Report}.

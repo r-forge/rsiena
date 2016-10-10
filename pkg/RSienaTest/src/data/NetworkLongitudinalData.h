@@ -111,7 +111,7 @@ private:
 	int lmaxDegree;
 
 	// The offset for the non-primary settings. 0 by default.
-	int luniversalOffset;
+	double luniversalOffset;
 
 	// The average in-degree over all receivers and observations
 	double laverageInDegree;

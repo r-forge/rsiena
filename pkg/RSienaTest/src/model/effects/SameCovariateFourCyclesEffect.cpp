@@ -3,20 +3,20 @@
  *
  * Web: http://www.stats.ox.ac.uk/~snijders/siena/
  *
- * File: FourCyclesEffect.cpp
+ * File: SameCovariateFourCyclesEffect.cpp
  *
  * Description: This file contains the implementation of the
- * FourCyclesEffect class.
+ * SameCovariateFourCyclesEffect class.
  *****************************************************************************/
 
 #include <cmath>
 #include <stdexcept>
-#include "FourCyclesEffect.h"
+#include "SameCovariateFourCyclesEffect.h"
 #include "utils/SqrtTable.h"
 #include "network/Network.h"
+#include "model/variables/NetworkVariable.h"
 #include "network/IncidentTieIterator.h"
 #include "model/EffectInfo.h"
-#include "model/variables/NetworkVariable.h"
 
 using namespace std;
 
@@ -25,9 +25,11 @@ namespace siena
 
 /**
  * Constructor.
+ * @param[in] pEffectInfo the effect descriptor
+ * @param[in] squared indicates if the covariate values must be squared
  */
-FourCyclesEffect::FourCyclesEffect(const EffectInfo * pEffectInfo, bool TwoMode) :
-	NetworkEffect(pEffectInfo)
+SameCovariateFourCyclesEffect::SameCovariateFourCyclesEffect(const EffectInfo * pEffectInfo,
+	bool TwoMode) :	CovariateDependentNetworkEffect(pEffectInfo)
 {
 	this->lTwoMode = TwoMode;
 	this->lcounters = 0;
@@ -36,23 +38,20 @@ FourCyclesEffect::FourCyclesEffect(const EffectInfo * pEffectInfo, bool TwoMode)
 		pEffectInfo->internalEffectParameter() != 2)
 	{
 		throw invalid_argument(
-			"FourCyclesEffect: Parameter value 1 or 2 expected");
+			"SameCovariateFourCyclesEffect: Parameter value 1 or 2 expected");
 	}
-
 	this->lroot = pEffectInfo->internalEffectParameter() == 2;
 	this->lpSqrtTable = SqrtTable::instance();
 }
 
-
 /**
  * Destructor.
  */
-FourCyclesEffect::~FourCyclesEffect()
+SameCovariateFourCyclesEffect::~SameCovariateFourCyclesEffect()
 {
 	delete[] this->lcounters;
 	this->lcounters = 0;
 }
-
 
 /**
  * Initializes this effect.
@@ -61,12 +60,12 @@ FourCyclesEffect::~FourCyclesEffect()
  * @param[in] period the period of interest
  * @param[in] pCache the cache object to be used to speed up calculations
  */
-void FourCyclesEffect::initialize(const Data * pData,
+void SameCovariateFourCyclesEffect::initialize(const Data * pData,
 	State * pState,
 	int period,
 	Cache * pCache)
 {
-	NetworkEffect::initialize(pData, pState, period, pCache);
+	CovariateDependentNetworkEffect::initialize(pData, pState, period, pCache);
 
 	delete[] this->lcounters;
 	if (this->lTwoMode)
@@ -79,15 +78,14 @@ void FourCyclesEffect::initialize(const Data * pData,
 	}
 }
 
-
 /**
  * Does the necessary preprocessing work for calculating the tie flip
  * contributions for a specific ego. This method must be invoked before
  * calling NetworkEffect::calculateTieFlipContribution(...).
  */
-void FourCyclesEffect::preprocessEgo(int ego)
+void SameCovariateFourCyclesEffect::preprocessEgo(int ego)
 {
-	NetworkEffect::preprocessEgo(ego);
+	CovariateDependentNetworkEffect::preprocessEgo(ego);
 
 	const Network * pNetwork = this->pNetwork();
 
@@ -114,17 +112,14 @@ void FourCyclesEffect::preprocessEgo(int ego)
 	}
 }
 
-
 /**
  * For each j and the given i, this method calculates the number of three-paths
- * i -> h <- k -> j.
+ * i -> h <- k -> j for v(k)=v(i)
  */
-void FourCyclesEffect::countThreePaths(int i,
+void SameCovariateFourCyclesEffect::countThreePaths(int i,
 	const Network * pNetwork,
 	long int * counters) const
 {
-
-
 	// Initialize
 
 	int nm = pNetwork->n();
@@ -137,34 +132,38 @@ void FourCyclesEffect::countThreePaths(int i,
 	{
 		counters[j] = 0;
 	}
+	double myvalue = this->value(this->ego());
 
 	// Enumerate all three-paths i -> h <- k -> j and update the counters.
 	// The (average) time complexity is obviously O(d^3), where d is the
 	// average degree.
-
-	for (IncidentTieIterator iterI = pNetwork->outTies(i);
-		iterI.valid();
-		iterI.next())
+	if (!(this->missing(this->ego())))
 	{
-		int h = iterI.actor();
-
-		for (IncidentTieIterator iterH = pNetwork->inTies(h);
-			iterH.valid();
-			iterH.next())
+		for (IncidentTieIterator iterI = pNetwork->outTies(i);
+			iterI.valid();
+			iterI.next())
 		{
-			int k = iterH.actor();
+			int h = iterI.actor();
 
-			if (i != k)
+			for (IncidentTieIterator iterH = pNetwork->inTies(h);
+				iterH.valid();
+				iterH.next())
 			{
-				for (IncidentTieIterator iterK = pNetwork->outTies(k);
-					iterK.valid();
-					iterK.next())
-				{
-					int j = iterK.actor();
+				int k = iterH.actor();
 
-					if (j != h)
+				if ((i != k) && (!(this->missing(k))) &&
+							(fabs(this->value(k) - myvalue) < EPSILON))
+				{
+					for (IncidentTieIterator iterK = pNetwork->outTies(k);
+						iterK.valid();
+						iterK.next())
 					{
+						int j = iterK.actor();
+
+						if (j != h)
+						{
 						counters[j]++;
+						}
 					}
 				}
 			}
@@ -173,10 +172,11 @@ void FourCyclesEffect::countThreePaths(int i,
 }
 
 
+
 /**
  * Calculates the contribution of a tie flip to the given actor.
  */
-double FourCyclesEffect::calculateContribution(int alter) const
+double SameCovariateFourCyclesEffect::calculateContribution(int alter) const
 {
 	double change;
 
@@ -200,17 +200,15 @@ double FourCyclesEffect::calculateContribution(int alter) const
 	{
 		change = this->lcounters[alter];
 	}
-
 	return change;
 }
-
 
 /**
  * The contribution of the tie from the implicit ego to the given alter
  * to the statistic. It is assumed that preprocessEgo(ego) has been
  * called before.
  */
-double FourCyclesEffect::tieStatistic(int alter)
+double SameCovariateFourCyclesEffect::tieStatistic(int alter)
 {
 	// Avoid counting each 4-cycle four times in the evaluation statistic.
 	// TODO: Is it okay to divide by 4 for endowment statistic as well?

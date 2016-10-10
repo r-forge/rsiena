@@ -965,7 +965,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
             covObjEffects <-
                 covObjEffects[covObjEffects$shortName %in%
 							  c("egoX", "egoSqX", "altInDist2", "totInDist2",
-							    "simEgoInDist2", "sameXInPop", "diffXInPop"), ]
+							    "simEgoInDist2", "sameXInPop", "diffXInPop", 
+								"sameXCycle4"), ]
             covRateEffects <- createEffects("covarBipartiteRate", covarname,
                                             name=varname,
                                             groupName=groupName, group=group,
