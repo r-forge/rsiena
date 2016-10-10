@@ -589,7 +589,7 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 	}
 
 	pModel->simpleRates(asInteger(SIMPLERATES));
-    
+
 	return R_NilValue;
 
 }
@@ -640,7 +640,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	{
 		rfra[i] = 0;
 	}
-	
+
 	int returnActorStatistics = 0;
 	if (!isNull(RETURNACTORSTATISTICS))
 	{
@@ -649,13 +649,13 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	/* changeStats will contain the target statistics of individual actors */
 	SEXP actorStats;
 	PROTECT(actorStats =  allocVector(VECSXP,nGroups));
-	
+
 	int returnStaticChangeContributions = 0;
 	if (!isNull(RETURNSTATICCHANGECONTRIBUTIONS))
 	{
 		returnStaticChangeContributions = asInteger(RETURNSTATICCHANGECONTRIBUTIONS);
 	}
-	/* changeStats will contain the tie flip contributions or the bahavior change contributions of each effect on the decisions of all actors */
+	/* changeStats will contain the tie flip contributions or the behavior change contributions of each effect on the decisions of all actors */
 	SEXP changeStats;
 	PROTECT(changeStats =  allocVector(VECSXP,nGroups));
 
@@ -678,7 +678,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	{
 		NETWORKTYPES =  createRObjectAttributes(EFFECTSLIST, actorStats);
 		int objEffects = length(NETWORKTYPES);
-		
+
 		for (int group = 0; group < nGroups; group++)
 		{
 			SET_VECTOR_ELT(actorStats, group, allocVector(VECSXP, (*pGroupData)[group]->observationCount()));
@@ -898,7 +898,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
         localML = asInteger(LOCALML);
     }
     pModel->localML(localML);
-    
+
 	int periodFromStart = 0;
 
 	for (int group = 0; group < nGroups; group++)
@@ -910,7 +910,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		MLSimulation * pMLSimulation = new MLSimulation(pData, pModel);
 
 		pMLSimulation->simpleRates(pModel->simpleRates());
-        
+
 		for (int period = 0; period < observations; period ++)
 		{
 			// store for later on model
@@ -940,7 +940,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 
 			/* do some more steps */
 			pMLSimulation->setUpProbabilityArray();
-            
+
 			int numSteps = 500;
 			for (int i = 0; i < numSteps; i++)
 			{
@@ -1049,9 +1049,9 @@ SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
 
 	double * prmin = REAL(PRMIN);
 	double * prmib = REAL(PRMIB);
-    
+
 	int periodFromStart = 0;
-    
+
     /* localML */
     int localML = 0;
     if (!isNull(LOCALML))
@@ -1059,7 +1059,7 @@ SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
         localML = asInteger(LOCALML);
     }
     pModel->localML(localML);
-    
+
 	for (int group = 0; group < nGroups; group++)
 	{
 		Data * pData = (*pGroupData)[group];

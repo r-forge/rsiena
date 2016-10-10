@@ -1,3 +1,29 @@
+2016-10-09 R-Forge Revision 301
+Changes in RSiena and RSienaTest:
+   * Warning if includeEffects is used with parameter initialValue - corrected.
+   * New effect: sameXCycle4, homCovNetNet, contrastCovNetNet, covNetNetIn,
+     homCovNetNetIn, contrastCovNetNetIn, 
+     inPopIntnX, inActIntnX, outPopIntnX, outActIntnX
+   * Changed type of lcounters and counters in FourCyclesEffect to long int,
+     permitting the 4-cycles effects for larger and denser networks.
+   * Dropped cl.XWX effect from two-mode - one-mode coevolution 
+     (did not belong).
+   * egoSqX is an ego effect (CovariateEgoSquared.cpp and .h).
+   * Added cycle4 for one-mode networks.
+   * Added outAct, outInAss for symmetric networks.
+   * SienaRI: Structural zeros and ones are excluded from the calculations;
+     added option getChangeStatistics; 
+     row names given to matrices that have rows corresponding to effects;
+     adapted so that it runs for models with only 1 parameter; 
+     adapted so that for a bipartite dependent variable it does not crash.
+   * Warning if includeEffects is used with parameter 'parameter'.
+   * Small additions to print.sienaAlgorithm.
+   * Clearer output for MaxDegree in print.sienaFit.
+   * Indication '^(1/2)' for outInAss for 2-mode networks changed to '^(1/#)', 
+     where # is the effect parameter (allEffects.csv).
+Changes RSienaTest:
+   * simulatedOffset changed from int to double (NetworkLongitudinalData)
+
 2016-09-12 R-Forge Revision 300
 Changes RSienaTest:
    * doc/RSienaDeveloper.tex: Build system documentation.
@@ -12,7 +38,7 @@ Changes in RSiena:
 
 2016-08-17 R-Forge Revision 296
 Changes in RSiena and RSienaTest:
-   * Warning if includeEffects is used with parameter initialValue.
+   * Warning if includeEffects is used with parameter initialValue - did not work.
    * Warning if includeInteraction is used for more interactions
      than available given parameters nintn and behNintn.
    * Deleted session parameter from print01Report.

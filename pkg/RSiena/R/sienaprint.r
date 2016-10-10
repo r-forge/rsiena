@@ -341,8 +341,10 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 
 
 		if (any(x$x$MaxDegree > 0)) {
-			cat(' Restrictions on degree in simulations: maximum degrees (0 = no restriction)')
-			cat('\n',x$x$MaxDegree,'\n\n')
+			cat('\nDegrees constrained to maximum values:\n')
+			for (i in 1:length(x$x$MaxDegree)){
+					cat(names(x$x$MaxDegree)[i],':',x$x$MaxDegree[i],'\n')}
+			cat('\n')
 		}
 		if (any(x$x$UniversalOffset > 0)) {
 			cat(' Offsets for universal and meeting settings (if any): \n')
@@ -539,6 +541,7 @@ print.sienaAlgorithm <- function(x, ...)
     cat(' Project name:', x$projname, '\n')
     cat(' Use standard initial values:', x$useStdInits, '\n')
     cat(' Random seed:', objectOrNull(x$randomSeed),'\n')
+	cat(' Number of subphases in phase 2:', x$nsub, '\n')
 	if (x$simOnly)
 	{
 		cat(' Simulation only', '\n')
@@ -548,6 +551,7 @@ print.sienaAlgorithm <- function(x, ...)
     cat(' Starting value of gain parameter:', x$firstg, '\n')
 		cat(' Reduction factor for gain parameter:', objectOrNull(x$reduceg), '\n')
 	cat(' Diagonalization parameter:', x$diagonalize, '\n')
+		cat(' Double averaging after subphase:', x$doubleAveraging, '\n')
 	}
 	cat(' Dolby noise reduction:', x$dolby, '\n')
     if (any(x$MaxDegree > 0))

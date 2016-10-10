@@ -67,8 +67,11 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 	}
 	if (hasArg('initialValue'))
 	{
-		cat
-("Warning: argument 'initialValue' has no effect in includeEffects; use setEffect.\n")
+		cat("Warning: argument 'initialValue' has no effect in includeEffects; use setEffect.\n")
+	}
+	if (hasArg('parameter'))
+	{
+		cat("Warning: argument 'parameter' has no effect in includeEffects; use setEffect.\n")
 	}
 	myeff
 }

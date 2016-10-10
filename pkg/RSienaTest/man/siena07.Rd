@@ -23,7 +23,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{x}{A control object, of class \code{\link{sienaAlgorithm} }}
   \item{batch}{ Desired interface: FALSE gives a gui (graphical user interface
      implemented as a tcl/tk screen),
-     FALSE gives a small amount of printout to the console.}
+     TRUE gives a small (if \code{verbose=FALSE}) amount of printout
+     to the console.}
   \item{verbose}{Produces various output to the console if TRUE.}
   \item{silent}{Produces no output to the console if TRUE, even if batch mode.}
   \item{useCluster}{Boolean: whether to use a cluster of processes (useful if

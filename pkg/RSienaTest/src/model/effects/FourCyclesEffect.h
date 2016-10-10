@@ -52,12 +52,12 @@ private:
 	// Indicates if the effect is used for a two-mode or one-mode network
 	bool lTwoMode;
 
-	void countThreePaths(int i, const Network * pNetwork, int * counters)
+	void countThreePaths(int i, const Network * pNetwork, long int * counters)
 		const;
 	// For a fixed i, this variable stores the number of three-paths
 	// i -> h <- k -> j per each j.
 
-	int * lcounters;
+	long int * lcounters;
 
 	// Indicates if the square root of the number of four-cycles has to
 	// be taken.

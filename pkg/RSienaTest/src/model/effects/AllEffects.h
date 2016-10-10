@@ -86,6 +86,7 @@
 #include "ReciprocityEffect.h"
 #include "SameCovariateEffect.h"
 #include "SameCovariateActivityEffect.h"
+#include "SameCovariateFourCyclesEffect.h"
 #include "SimmelianEffect.h"
 #include "HomCovariateActivityEffect.h"
 #include "AlterCovariateActivityEffect.h"

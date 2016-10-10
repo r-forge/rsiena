@@ -3,45 +3,44 @@
  *
  * Web: http://www.stats.ox.ac.uk/~snijders/siena/
  *
- * File: FourCyclesEffect.h
+ * File: SameCovariateFourCyclesEffect.h
  *
  * Description: This file contains the definition of the
- * FourCyclesEffect class.
+ * SameCovariateFourCyclesEffect class.
  *****************************************************************************/
 
-#ifndef FOURCYCLESEFFECT_H_
-#define FOURCYCLESEFFECT_H_
+#ifndef SAMECOVARIATEFOURCYCLESEFFECT_H_
+#define SAMECOVARIATEFOURCYCLESEFFECT_H_
 
-#include "NetworkEffect.h"
+#include "CovariateDependentNetworkEffect.h"
 
 namespace siena
 {
-
+	
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
 // ----------------------------------------------------------------------------
 
 class SqrtTable;
 
+// ----------------------------------------------------------------------------
+// Section: SameCovariateFourCyclesEffect class
+// ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-// Section: FourCyclesEffect class
-// ----------------------------------------------------------------------------
 
 /**
- * 4-cycles effect (see manual).
+ * Same and different covariate FourCycles effects (see manual).
  */
-class FourCyclesEffect : public NetworkEffect
+class SameCovariateFourCyclesEffect : public CovariateDependentNetworkEffect
 {
 public:
-	FourCyclesEffect(const EffectInfo * pEffectInfo, bool TwoMode);
-	virtual ~FourCyclesEffect();
+	SameCovariateFourCyclesEffect(const EffectInfo * pEffectInfo, bool  TwoMode);
+	virtual ~SameCovariateFourCyclesEffect();
 
 	virtual void initialize(const Data * pData,
 		State * pState,
 		int period,
 		Cache * pCache);
-
 	virtual void preprocessEgo(int ego);
 	virtual double calculateContribution(int alter) const;
 
@@ -54,18 +53,15 @@ private:
 
 	void countThreePaths(int i, const Network * pNetwork, long int * counters)
 		const;
-
 	// For a fixed i, this variable stores the number of three-paths
 	// i -> h <- k -> j per each j.
 
 	long int * lcounters;
-
 	// Indicates if the square root of the number of four-cycles has to
 	// be taken.
 
 	bool lroot;
-
-	// Lookup table for fast square root calculations
+	// Lookup table for fast square root calculations:
 	SqrtTable * lpSqrtTable;
 
 	// The number of 4-cycles the ego is currently involved in.
@@ -74,4 +70,4 @@ private:
 
 }
 
-#endif /*FOURCYCLESEFFECT_H_*/
+#endif /*SAMECOVARIATEFOURCYCLESEFFECT_H_*/

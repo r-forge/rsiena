@@ -54,4 +54,12 @@ double CovariateEgoSquaredEffect::tieStatistic(int alter)
 	return statistic;
 }
 
+/**
+ * Returns if this effect is an ego effect.
+ */
+bool CovariateEgoSquaredEffect::egoEffect() const
+{
+	return true;
+}
+
 }

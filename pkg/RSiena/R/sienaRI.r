@@ -10,7 +10,8 @@
 # *****************************************************************************/
 
 ##@sienaRI
-sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
+sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL,
+						getChangeStats=FALSE)
 {
 	if (!inherits(data, "siena"))
 	{
@@ -31,13 +32,17 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 		if (sum(ans$effects$include==TRUE &
 			(ans$effects$type =="endow"|ans$effects$type =="creation")) > 0)
 			{
-			stop("sienaRI does not yet work for models that contain endowment or creation effects")
+stop("sienaRI does not yet work for models containing endowment or creation effects")
 			}
 		contributions <- getChangeContributions(algorithm = ans$x, data = data,
 										effects = ans$effects)
+# contributions[[1]] is periods by effects by actors by actors
 		RI <- expectedRelativeImportance(conts = contributions,
-								effects = ans$effects, theta =ans$theta)
-	}else{
+				effects = ans$effects, theta =ans$theta, thedata=data,
+				getChangeStatistics=getChangeStats)
+	}
+	else
+	{
 		if (!inherits(algorithm, "sienaAlgorithm"))
 		{
 			stop(paste("algorithm is not a legitimate Siena algorithm specification", sep=""))
@@ -50,7 +55,7 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 		if(sum(effects$include==TRUE &
 					(effects$type =="endow"|effects$type =="creation")) > 0)
 		{
-			stop("sienaRI does not yet work for models containinf endowment or creation effects")
+	stop("sienaRI does not yet work for models containing endowment or creation effects")
 		}
 		effs <- effects
 		if (!is.numeric(theta))
@@ -67,19 +72,19 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 				"theta is treated as if containing rate parameters"))
 			paras <- theta
 			## all necessary information available
-			## call getChangeContributions
 			contributions <- getChangeContributions(algorithm = algo,
 									data = data, effects = effs)
 			RI <- expectedRelativeImportance(conts = contributions,
-									effects = effs, theta = paras)
+									effects = effs, theta = paras, thedata=data,
+									getChangeStatistics=getChangeStats)
 		}else{
 			paras <- theta
 			## all necessary information available
-			## call getChangeContributions
 			contributions <- getChangeContributions(algorithm = algo,
 									data = data, effects = effs)
 			RI <- expectedRelativeImportance(conts = contributions,
-									effects = effs, theta = paras)
+									effects = effs, theta = paras, thedata=data,
+									getChangeStatistics=getChangeStats)
 		}
 	}
 	RI
@@ -88,6 +93,7 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL)
 ##@getChangeContributions. Use as RSiena:::getChangeContributions
 getChangeContributions <- function(algorithm, data, effects)
 {
+    ## Gets the simulated statistics.
 	## The following initializations data, effects, and model
 	## for calling "getTargets" in "siena07.setup.h"
 	## is more or less copied from "getTargets" in "getTargets.r".
@@ -111,6 +117,8 @@ getChangeContributions <- function(algorithm, data, effects)
 	ans <- reg.finalizer(pData, clearData, onexit = FALSE)
 	ans<- .Call('OneMode', PACKAGE=pkgname,
 			pData, list(f$nets))
+    ans <- .Call("Bipartite", PACKAGE=pkgname, # added 1.1-299
+                pData, list(f$bipartites))
 	ans<- .Call('Behavior', PACKAGE=pkgname, pData,
 			list(f$behavs))
 	ans<-.Call('ConstantCovariates', PACKAGE=pkgname,
@@ -144,11 +152,12 @@ getChangeContributions <- function(algorithm, data, effects)
 	ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
 			parallelrun=TRUE, returnActorStatistics=FALSE,
 			returnStaticChangeContributions=TRUE)
+# See getTargets in siena07setup.cpp; also see rTargets in StatisticsSimulation.cpp
 	ans
 }
 
-expectedRelativeImportance <- function(conts, effects, theta,
-												effectNames = NULL)
+expectedRelativeImportance <- function(conts, effects, theta, thedata=NULL,
+							getChangeStatistics=FALSE, effectNames = NULL)
 {
 	waves <- length(conts[[1]])
 	effects <- effects[effects$include == TRUE,]
@@ -184,37 +193,82 @@ expectedRelativeImportance <- function(conts, effects, theta,
 			depNumber <- depNumber + 1
 			currentDepEffs <- effects$name == currentDepName
 			effNumber <- sum(currentDepEffs)
-
-#			RIs <- data.frame(row.names = effectIds[currentDepEffs])
-#			RIs <- cbind(RIs, matrix(0, nrow=effNumber, ncol = actors))
-			entropies <- vector(mode="numeric", length = actors)
+			depNetwork <- thedata$depvars[[depNumber]]
+			# impute for wave 1
+			if (networkTypes[eff] == "oneMode")
+			{
+				depNetwork[,,1][is.na(depNetwork[,,1])] <- 0
+			}
+			else
+			{
+				depNetwork[,,1][is.na(depNetwork[,,1])] <- attr(depNetwork, 'modes')[1]
+			}
+			# impute for next waves;
+			# this may be undesirable for structurals immediately followed by NA...
+			for (m in 2:dim(depNetwork)[3]){depNetwork[,,m][is.na(depNetwork[,,m])] <-
+										depNetwork[,,m-1][is.na(depNetwork[,,m])]}
+			# Make sure the diagonals are not treated as structurals
+			if (networkTypes[eff] == "oneMode")
+			{
+				for (m in 1:dim(depNetwork)[3]){diag(depNetwork[,,m]) <- 0}
+			}
+			structurals <- (depNetwork >= 10)
+			if (networkTypes[eff] == "oneMode"){
+					if (attr(depNetwork, 'symmetric')){
+	cat('\nNote that for symmetric networks, effect sizes are for modelType 2 (forcing).\n')}}
 
 #			currentDepObjEffsNames <- paste(effects$shortName[currentDepEffs],
 #				effects$type[currentDepEffs],effects$interaction1[currentDepEffs],sep=".")
 #			otherObjEffsNames <- paste(effects$shortName[!currentDepEffs],
 #				effects$type[!currentDepEffs],effects$interaction1[!currentDepEffs],sep=".")
 
+			entropies <- vector(mode="numeric", length = actors)
 			expectedRI <- list()
 			expectedI <- list()
 			RIActors <- list()
 			IActors <- list()
 			absoluteSumActors <- list()
-			entropyActors <-list()
+			RHActors <-list()
+			changeStats <-list()
+			sigma <- list()
 			for(w in 1:waves)
 			{
 				currentDepEffectContributions <- conts[[1]][[w]][currentDepEffs]
+# conts[[1]] is periods by effects by actors by actors
 				currentDepEffectContributions <-
 					sapply(lapply(currentDepEffectContributions, unlist),
 						matrix, nrow=actors, ncol=choices, byrow=TRUE,
 														simplify="array")
+				cdec <- apply(currentDepEffectContributions, c(2,1), as.matrix)
+# cdec is effects by actors (alters) by actors (egos)
+				if (dim(currentDepEffectContributions)[3] <= 1) # only one effect
+				{
+					cdec <- array(cdec, dim=c(1,dim(cdec)))
+				}
+				rownames(cdec) <- effectNa[currentDepEffs]
+				if (getChangeStatistics)
+				{
+					changeStats[[w]] <- cdec
+				}
+				# replace structural 0s and 1s by NA,
+				# so they are omitted from calculation of RI, R_H, sigma
+				if (networkTypes[eff] == "oneMode")
+				{
+				#	structuralsw <- structurals[,,w]
+					for (ff in 1:dim(cdec)[1]){cdec[ff,,][t(structurals[,,w])] <- NA}
+				}
+				distributions <- apply(cdec, 3,
+						calculateDistributions, theta[which(currentDepEffs)])
 
-				distributions <-
-					apply(apply(currentDepEffectContributions, c(2,1), as.matrix),
-						3, calculateDistributions, theta[which(currentDepEffs)])
 				distributions <-
 					lapply(apply(distributions, 2, list),
 						function(x){matrix(x[[1]], nrow=effNumber+1,
 											ncol=choices, byrow=F)})
+# distributions is a list, length = number of actors
+# distributions[[i]] is for actor i, a matrix of dim (effects + 1) * (actors as alters)
+# giving the probability of toggling the tie variable to the alters;
+# the first row is for the unchanged parameter vector theta,
+# each of the following has put one element of theta to 0.
 
 				entropy_vector <- unlist(lapply(distributions,
 										function(x){entropy(x[1,])}))
@@ -225,16 +279,18 @@ expectedRelativeImportance <- function(conts, effects, theta,
 														x[2:dim(x)[1],])})
 				RIs_matrix <-(matrix(unlist(RIs_list),nrow=effNumber,
 														ncol=actors, byrow=F))
-
-#				RIs <- RIs_matrix
 				entropies <- entropy_vector
 				# divide by column sums:
-				RIActors[[w]] <- apply(RIs_matrix, 2, function(x){x/sum(x)})
-				absoluteSumActors[[w]] <- colSums(RIs_matrix)
-				entropyActors[[w]] <- entropies
-				expectedRI[[w]] <- rowSums(RIActors[[w]] )/dim(RIActors[[w]])[2]
+				RIActors[[w]] <- t(t(RIs_matrix)/rowSums(t(RIs_matrix), na.rm=TRUE))
+				rownames(RIActors[[w]]) <- effectNa[currentDepEffs]
+				absoluteSumActors[[w]] <- colSums(RIs_matrix, na.rm=TRUE)
+				RHActors[[w]] <- entropies
+				expectedRI[[w]] <- rowMeans(RIActors[[w]], na.rm=TRUE)
 				IActors[[w]] <- RIs_matrix
-				expectedI[[w]] <- rowMeans(RIs_matrix)
+				rownames(IActors[[w]]) <- effectNa[currentDepEffs]
+				expectedI[[w]] <- rowMeans(RIs_matrix, na.rm=TRUE)
+				sigma[[w]] <- apply(cdec, c(1,3), sd, na.rm=TRUE)
+				rownames(sigma[[w]]) <- effectNa[currentDepEffs]
 			}
 			RItmp <- NULL
 			RItmp$dependentVariable <- currentDepName
@@ -243,7 +299,8 @@ expectedRelativeImportance <- function(conts, effects, theta,
 			RItmp$expectedI <- expectedI
 			RItmp$IActors <- IActors
 			RItmp$absoluteSumActors <- absoluteSumActors
-			RItmp$entropyActors <- entropyActors
+			RItmp$RHActors <- RHActors
+			RItmp$sigma <- sigma
 			if(!is.null(effectNames))
 			{
 				RItmp$effectNames <- effectNames[currentDepEffs]
@@ -251,6 +308,9 @@ expectedRelativeImportance <- function(conts, effects, theta,
 				RItmp$effectNames <-
 					paste(effectTypes[currentDepEffs], " ",
 						effects$effectName[currentDepEffs], sep="")
+			}
+			if (getChangeStatistics){
+				RItmp$changeStatistics <- changeStats
 			}
 			class(RItmp) <- "sienaRI"
 			if(depNumber == 1){
@@ -276,42 +336,60 @@ expectedRelativeImportance <- function(conts, effects, theta,
 
 calculateDistributions <- function(effectContributions = NULL, theta = NULL)
 {
-	effects <- dim(effectContributions)[1]
-	choices <- dim(effectContributions)[2]
-	effectContributions[effectContributions=="NaN"]<-0
-	distributions <-  array(dim = c(effects+1,choices))
-	distributions[1,] <-
-		exp(colSums(theta*effectContributions))/
-							sum(exp(colSums(theta*effectContributions)))
-	for(eff in 1:effects)
+	neffects <- dim(effectContributions)[1]
+	nchoices <- dim(effectContributions)[2]
+	distributions <- array(NA, dim = c(neffects+1,nchoices))
+	the.choices <- !is.na(colSums(effectContributions))
+	if (sum(the.choices) >= 2)
 	{
-		t <- theta
-		t[eff] <- 0
-		distributions[eff+1,] <-
-			exp(colSums(t*effectContributions))/
-								sum(exp(colSums(t*effectContributions)))
+		distributions[1,the.choices] <-
+			exp(colSums(theta*effectContributions[,the.choices,drop=FALSE], na.rm=TRUE))/
+				sum(exp(colSums(theta*effectContributions[,the.choices,drop=FALSE], na.rm=TRUE)))
+		for(eff in 1:neffects)
+		{
+			th <- theta
+			th[eff] <- 0
+			distributions[eff+1,the.choices] <-
+				exp(colSums(th*effectContributions[,the.choices,drop=FALSE], na.rm=TRUE))/
+					sum(exp(colSums(th*effectContributions[,the.choices,drop=FALSE], na.rm=TRUE)))
+		}
 	}
 	distributions
 }
 
 entropy <- function(distribution = NULL)
 {
-	entropy <-  -1*(distribution %*% log(distribution)/log(length(distribution)))
+	if (sum(!is.na((distribution))) <= 1) # only constant choice
+	{
+		certainty <- NA
+	}
+	else
+	{
+		entropy <- -1*(sum(distribution * log(distribution), na.rm=TRUE)/
+				log(sum(!is.na((distribution)))))
 	certainty <- 1-entropy
+	}
 	certainty
 }
 
 KLD <- function(referenz = NULL, distributions = NULL)
 {
-	if(is.vector(distributions))
+	if (sum(!is.na((referenz))) <= 1) # only constant choice
 	{
-		kld <- (referenz %*%
-					(log(referenz)-log(distributions)))/log(length(referenz))
+		kld <- rep(NA, dim(distributions)[1])
 	}
 	else
 	{
-		kld <- colSums(referenz *
-					(log(referenz)-t(log(distributions))))/log(length(referenz))
+	if(is.vector(distributions))
+	{
+			kld <- sum(referenz * (log(referenz)-log(distributions)),
+									na.rm=TRUE)/log(sum(!is.na((referenz))))
+	}
+	else
+	{
+			kld <- colSums(referenz * (log(referenz)-t(log(distributions))),
+									na.rm=TRUE)/log(sum(!is.na((referenz))))
+		}
 	}
 	kld
 }
@@ -321,24 +399,31 @@ KLD <- function(referenz = NULL, distributions = NULL)
 ## and each row of distributions (which is a matrix with n columns)
 L1D <- function(referenz = NULL, distributions = NULL)
 {
-	if(is.vector(distributions))
+	if (sum(!is.na((referenz))) <= 1) # only constant choice
 	{
-		l1d <- sum(abs(referenz-distributions))
+		l1d <- rep(NA, dim(distributions)[1])
 	}
 	else
 	{
-		l1d <- colSums(abs(referenz-t(distributions)))
+	if(is.vector(distributions))
+	{
+			l1d <- sum(abs(referenz-distributions), na.rm=TRUE)
+	}
+	else
+	{
+			l1d <- colSums(abs(referenz-t(distributions)), na.rm=TRUE)
+		}
 	}
 	l1d
 }
 
 ##@print.sienaRI Methods
-print.sienaRI <- function(x, ...){
+print.sienaRI <- function(x, printSigma = FALSE, ...){
 	if (!inherits(x, "sienaRI"))
 	{
 		if (inherits(x[[1]], "sienaRI"))
 		{
-			cat("The components of this object ")
+			cat("This object is a list, the components of which\n")
 			cat("are Siena relative importance of effects objects.\n")
 			cat("Apply the print function to the separate components.\n")
 		}
@@ -353,7 +438,13 @@ print.sienaRI <- function(x, ...){
 	line2 <- paste(format(1:effs,width=3), '. ',
 						format(x$effectNames, width = 56),sep="")
 	line3 <- line2
-	line4 <- format("  Entropy", width = 61)
+	line4 <- format(" R_H ('degree of certainty')", width = 61)
+	line5 <- line2
+	if (printSigma)
+	{
+		sigmas <- matrix(sapply(x$sigma,rowMeans,na.rm=TRUE), effs, waves)
+		# construction with matrix because of the possibility effs=1
+	}
 	for(w in 1:length(colNames))
 	{
 		line1 <- paste(line1, format(colNames[w], width=8),"  ", sep = "")
@@ -361,8 +452,14 @@ print.sienaRI <- function(x, ...){
 									width=8, nsmall=4),"  ",sep="")
 		line3 <- paste(line3, format(round(x$expectedI[[w]], 4), 
 									width=8, nsmall=4),"  ",sep="")
-		line4 <- paste(line4, format(round(mean(x$entropyActors[[w]]), 4), 
+		line4 <- paste(line4,
+					format(round(mean(x$RHActors[[w]], na.rm=TRUE), 4),
 									width=8, nsmall=4),"  ",sep="")
+		if (printSigma)
+		{
+			line5 <- paste(line5,
+					format(round(sigmas[,w], 4), width=8, nsmall=4),"  ",sep="")
+		}
 	}
 	line2 <- paste(line2, rep('\n',effs), sep="")
 	line3 <- paste(line3, rep('\n',effs), sep="")
@@ -371,6 +468,12 @@ print.sienaRI <- function(x, ...){
 	cat("\n  Expected importance of effects for this dependent variable:\n\n")
 	cat(as.matrix(line3),'\n\n', sep='')	
 	cat(as.matrix(line4),'\n', sep='')	
+	if (printSigma)
+		{
+			cat("\n sigma (within-ego standard deviation of change statistics):\n\n")
+			line5 <- paste(line5, rep('\n',effs), sep="")
+			cat('\n',as.matrix(line5),'\n', sep='')
+		}
 	invisible(x)
 }
 

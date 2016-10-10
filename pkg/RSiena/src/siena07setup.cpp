@@ -634,7 +634,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	{
 		returnStaticChangeContributions = asInteger(RETURNSTATICCHANGECONTRIBUTIONS);
 	}
-	/* changeStats will contain the tie flip contributions or the bahavior change contributions of each effect on the decisions of all actors */
+	/* changeStats will contain the tie flip contributions or the behavior change contributions of each effect on the decisions of all actors */
 	SEXP changeStats;
 	PROTECT(changeStats =  allocVector(VECSXP,nGroups));
 

@@ -26,6 +26,7 @@ public:
 	CovariateEgoSquaredEffect(const EffectInfo * pEffectInfo);
 
 	virtual double calculateContribution(int alter) const;
+	virtual bool egoEffect() const;
 
 protected:
 	virtual double tieStatistic(int alter);
