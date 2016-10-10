@@ -1,3 +1,7 @@
+2016-10-10 R-Forge Revision 302
+Changes in RSiena and RSienaTest:
+   * Capitalization error corrected in CovariateDegreeFunction.cpp.
+
 2016-10-09 R-Forge Revision 301
 Changes in RSiena and RSienaTest:
    * Warning if includeEffects is used with parameter initialValue - corrected.

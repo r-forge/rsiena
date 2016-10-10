@@ -12,7 +12,7 @@
 #include <cmath>
 #include "CovariateDegreeFunction.h"
 #include "network/Network.h"
-#include "network/IncidentTieiterator.h"
+#include "network/IncidentTieIterator.h"
 #include "utils/Utils.h"
 
 using namespace std;
