@@ -1,3 +1,12 @@
+2016-10-13 R-Forge Revision 303
+Changes in RSiena and RSienaTest (George Vega Yon):
+   * R/robmon.r: New argument -cl- allows users passing their own cluster,
+     creating a new cluster only if length(cl) == 0.
+   * R/siena07.r: Same as in robmon. Now, if the user passes -cl-, the cluster
+     is closed only if length(cl) == 0.
+   * man/siena07.Rd: Including the new -cl- option in the manual.
+   * tests/parallel.R: Adding new test using the new -cl- option.
+
 2016-10-10 R-Forge Revision 302
 Changes in RSiena and RSienaTest:
    * Capitalization error corrected in CovariateDegreeFunction.cpp.

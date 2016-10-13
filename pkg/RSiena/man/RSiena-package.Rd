@@ -44,8 +44,8 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.1-302\cr
-Date: \tab 2016-10-10\cr
+Version: \tab 1.1-303\cr
+Date: \tab 2016-10-13\cr
 Depends: \tab R (>= 3.0.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -76,7 +76,7 @@ BuildResaveData: \tab no\cr
     The statistical evaluation of social network dynamics.
     \emph{Sociological Methodology}, 31, 361-395.
    \item  Snijders, Tom A.B., van de Bunt, Gerhard G., and
-    Steglich, Christian E.G. (2010). 
+    Steglich, Christian E.G. (2010).
 	Introduction to actor-based models for network dynamics.
 	\emph{Social Networks}, 32, 44-60.
    \item Snijders, Tom A.B., Steglich, Christian E.G., and Schweinberger,
