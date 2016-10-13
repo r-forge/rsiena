@@ -17,7 +17,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
         parallelTesting=FALSE, clusterIter=!x$maxlike,
         clusterType=c("PSOCK", "FORK"),
         logLevelConsole='WARNING', logLevelFile='INFO',
-        logIncludeLocation=F, ...)
+        logIncludeLocation=F, cl=NULL, ...)
       }
 \arguments{
   \item{x}{A control object, of class \code{\link{sienaAlgorithm} }}
@@ -56,6 +56,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{logIncludeLocation}{
     When \code{TRUE} also log the code location (file, method, line) where the
     logging message originated.}
+  \item{cl}{An object of class c("SOCKcluster", "cluster").}
   \item{\dots}{Arguments for the simulation function, see
     \code{\link{simstats0c}}:
     usually, \code{data} and \code{effects}, as in the examples below;\cr

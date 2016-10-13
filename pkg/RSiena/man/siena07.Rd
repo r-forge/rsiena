@@ -15,7 +15,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
         useCluster=FALSE, nbrNodes=2, initC=TRUE,
         clusterString=rep("localhost", nbrNodes), tt=NULL,
         parallelTesting=FALSE, clusterIter=!x$maxlike,
-        clusterType=c("PSOCK", "FORK"), ...)
+        clusterType=c("PSOCK", "FORK"), cl=NULL, ...)
       }
 \arguments{
   \item{x}{A control object, of class \code{\link{sienaAlgorithm} }}
@@ -45,6 +45,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   "PSOCK". On a single non-Windows machine may be "FORK", and
   subprocesses will be formed by forking. If "PSOCK", subprocesses are
   formed using \R scripts.}
+  \item{cl}{An object of class c("SOCKcluster", "cluster").}
   \item{\dots}{Arguments for the simulation function, see
     \code{\link{simstats0c}}:
     usually, \code{data} and \code{effects}, as in the examples below;\cr

@@ -13,7 +13,7 @@
 ## returns updated z
 ##@robmon siena07 Controls MOM process
 robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
-                   clusterIter, clusterType, ...)
+                   clusterIter, clusterType, cl, ...)
 {
     z$FinDiff.method<- x$FinDiff.method
     z$n <- 0
@@ -69,17 +69,21 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         {
             stop("Not enough observations to use the nodes")
         }
-		unlink("cluster.out")
-		if (clusterType == "FORK")
-		{
-			cl <- makeCluster(nbrNodes, type = clusterType,
-                          outfile = "cluster.out")
+		
+		if (!length(cl)) {
+		    unlink("cluster.out")
+  		  if (clusterType == "FORK")
+  		  {
+  		    cl <- makeCluster(nbrNodes, type = clusterType,
+  		                      outfile = "cluster.out")
+  		  }
+  		  else
+  		  {
+  		    cl <- makeCluster(clusterString, type = clusterType,
+  		                      outfile = "cluster.out")
+  		  }
 		}
-		else
-		{
-			cl <- makeCluster(clusterString, type = clusterType,
-                          outfile = "cluster.out")
-		}
+		
         clusterCall(cl, library, pkgname, character.only = TRUE)
 		##parLapply(cl, c('f1','f2'), sink)
 		z$oldRandomNumbers <- .Random.seed

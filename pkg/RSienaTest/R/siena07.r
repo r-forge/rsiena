@@ -17,7 +17,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 					parallelTesting=FALSE, clusterIter=!x$maxlike,
 					clusterType=c("PSOCK", "FORK"),
 					logLevelConsole='WARNING', logLevelFile='INFO',
-					logIncludeLocation=F, ...)
+					logIncludeLocation=F, cl=NULL,...)
 {
 	sienaSetupLogger(logLevelConsole=logLevelConsole,
 					 logLevelFile=logLevelFile,
@@ -35,6 +35,15 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	   RNGkind("default")
 	}
 	on.exit(exitfn())
+	
+	# If the user is passing clusters through -cl- then change the 
+	# useCluster to TRUE, and assign the -nbrNodes- to number of nodes
+	if (!useCluster & length(cl))
+	{
+	  useCluster <- TRUE
+	  nbrNodes   <- length(cl)
+	}
+	
 	time0 <-  proc.time()['elapsed']
 	z <- NULL ## z is the object for all control information which may change.
 	## x is designed to be readonly. Only z is returned.
@@ -46,11 +55,15 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 		{
 			stop("cannot parallel test with multiple processes")
 		}
-		clusterType <- match.arg(clusterType)
-		if (.Platform$OS.type == "windows" && clusterType != "PSOCK")
-		{
-			stop("cannot use forking processes on Windows")
-		}
+	  
+	  if (!length(cl))
+	  {
+	    clusterType <- match.arg(clusterType)
+	    if (.Platform$OS.type == "windows" && clusterType != "PSOCK")
+	    {
+	      stop("cannot use forking processes on Windows")
+	    }
+	  }
 		# The possibility to use snow now has been dropped
 		# because RSiena requires R >= 2.15.0
 		# and snow is superseded.
@@ -163,7 +176,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	}
 
 	z <- robmon(z, x, useCluster, nbrNodes, initC, clusterString,
-				clusterIter, clusterType, ...)
+				clusterIter, clusterType, cl, ...)
 
 	time1 <-  proc.time()['elapsed']
 	Report(c("Total computation time", round(time1 - time0, digits=2),
@@ -171,7 +184,10 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 
 	if (useCluster)
 	{
-		stopCluster(z$cl)
+	  # Only stop cluster if it wasn't provided by the user
+	  if (!length(cl))
+		  stopCluster(z$cl)
+	  
 		## need to reset the random number type to the normal one
 		assign(".Random.seed", z$oldRandomNumbers, pos=1)
 	}

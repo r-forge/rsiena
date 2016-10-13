@@ -94,3 +94,27 @@ ans <- siena07(sienaModelCreate(n3=50, nsub=2,
 ans
 tt <- sienaTimeTest(ans)
 tt
+
+##test13
+print('test13')
+library(parallel)
+cl <- makeForkCluster(2)
+system.time({
+ans <- siena07(sienaModelCreate(n3=50, nsub=2,seed=1, projname="test13a"),
+               data=mydata, effects=myeff, batch=TRUE, silent=TRUE, cl = cl)
+})
+
+ans
+
+system.time({
+ans <- siena07(sienaModelCreate(n3=50, nsub=2,seed=1, projname="test13b"),
+               data=mydata, effects=myeff, batch=TRUE, silent=TRUE,
+               useCluster = TRUE, nbrNodes = 2, clusterType = "FORK")
+})
+ans
+
+
+tt <- sienaTimeTest(ans)
+tt
+
+stopCluster(cl)
