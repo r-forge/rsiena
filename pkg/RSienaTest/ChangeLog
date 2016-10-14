@@ -1,3 +1,8 @@
+2016-10-14 R-Forge Revision 304
+Changes in RSiena and RSienaTest (George Vega Yon):
+   * tests/parallel.R: Changing makeForkCluster to makeCluster.
+   * man/siena07.Rd: Adding a description of the -cl- option + examples. 
+
 2016-10-13 R-Forge Revision 303
 Changes in RSiena and RSienaTest (George Vega Yon):
    * R/robmon.r: New argument -cl- allows users passing their own cluster,
