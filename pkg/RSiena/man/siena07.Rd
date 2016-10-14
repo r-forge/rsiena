@@ -45,7 +45,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   "PSOCK". On a single non-Windows machine may be "FORK", and
   subprocesses will be formed by forking. If "PSOCK", subprocesses are
   formed using \R scripts.}
-  \item{cl}{An object of class c("SOCKcluster", "cluster").}
+  \item{cl}{An object of class c("SOCKcluster", "cluster") (see Details).}
   \item{\dots}{Arguments for the simulation function, see
     \code{\link{simstats0c}}:
     usually, \code{data} and \code{effects}, as in the examples below;\cr
@@ -86,6 +86,17 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  the parameter \code{prevAns} as illustrated in the example below.\cr
  (This parameter is inserted through '\dots' into the function
  \code{\link{initializeFRAN}}.)
+
+ In the case of using multiple processors, there are two options for telling
+ \code{siena07} to use them. By specifying the options \code{useCluster}, \code{nbrNodes},
+ \code{clusterString} and \code{initC}, \code{siena07} will create a
+ \link[parallel:makeCluster]{cluster object} that will be used by the
+ \link[parallel]{parallel} package. After finishing the estimation procedure,
+ \code{siena07} will automatically stop the cluster. Alternatively, instead of
+ having the function to create a cluster, the user may provide its own by
+ specifying the option \code{cl}, similar to what the boot function does in
+ the \CRANpkg{boot} package. By using the option \code{cl} the user may be
+ able to create more complex clusters (see examples below).
 }
 \value{
   Returns an object of class \code{\link{sienaFit}}, some parts of which are:
@@ -158,15 +169,48 @@ mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
-# or for non-conditional estimation
+# or for non-conditional estimation --------------------------------------------
 \dontrun{
 model <- sienaModelCreate(nsub=2, n3=100, cond=FALSE)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
         }
 
-# or if a previous "on track" result ans was obtained
+# or if a previous "on track" result ans was obtained --------------------------
 \dontrun{
 ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans)
          }
+
+# Running in multiple processors -----------------------------------------------
+\dontrun{
+
+# Using 8 processors
+ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE,
+                useCluster=TRUE, nbrNodes=8, initC=TRUE)
+
+# Loading the parallel package and creating a cluster
+# with 8 processors (this should be equivalent)
+
+library(parallel)
+cl <- makeCluster(8)
+
+ans3 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE,
+                cl = cl)
+
+# Notice that now -siena07- won't stop the cluster for you.
+stopCluster(cl)
+
+# You can create even more complex clusters using several computers. In this
+# example we are creating a cluster with 3*8 = 24 processors on three
+# different machines.
+cl <- makePSOCKcluster(
+    rep(c('localhost', 'machine2.website.com' , 'machine3.website.com'), 8),
+    user='myusername', rshcmd='ssh -p PORTNUMBER')
+
+ans4 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE,
+                cl = cl)
+stopCluster(cl)
+
+
+    }
 }
 \keyword{models}
