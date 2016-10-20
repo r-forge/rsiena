@@ -31,10 +31,28 @@ namespace siena
  * @param[in] pEffectInfo the descriptor object of the effect
  */
 NetworkDependentBehaviorEffect::NetworkDependentBehaviorEffect(
-	const EffectInfo * pEffectInfo) : BehaviorEffect(pEffectInfo)
+	const EffectInfo * pEffectInfo) :
+	BehaviorEffect(pEffectInfo), //
+	lSimulatedOffset(0), //
+	ltotalAlterValues(0), //
+	ltotalInAlterValues(0)
 {
-	this->ltotalAlterValues = 0;
-	this->ltotalInAlterValues = 0;
+}
+
+/**
+ * Constructor.
+ * @param[in] pEffectInfo the descriptor object of the effect
+ * @param simulatedState If `true` the value(), missing() and similarity()
+ *        functions uses the simulated state, if any or the value at the end
+ *        of the period.
+ */
+NetworkDependentBehaviorEffect::NetworkDependentBehaviorEffect(
+	const EffectInfo * pEffectInfo, bool simulatedState) :
+	BehaviorEffect(pEffectInfo), //
+	lSimulatedOffset(simulatedState ? 1 : 0), //
+	ltotalAlterValues(0), //
+	ltotalInAlterValues(0)
+{
 }
 
 /**
@@ -63,18 +81,37 @@ void NetworkDependentBehaviorEffect::initialize(const Data * pData,
 
 	this->lpNetwork = pState->pNetwork(networkName);
 
-	if (!this->lpNetwork)
-	{
+	if (!this->lpNetwork) {
 		throw logic_error("Network '" + networkName + "' expected.");
 	}
-	if (this->ltotalAlterValues)
-	{
-		delete [] this->ltotalAlterValues;
+
+	// clear old value arrays
+	if (this->ltotalAlterValues) delete [] this->ltotalAlterValues;
+	if (this->ltotalInAlterValues) delete [] this->ltotalInAlterValues;
+	// create new value arrays
+	this->ltotalAlterValues = new double[this->lpNetwork->n()];
+	this->ltotalInAlterValues = new double[this->lpNetwork->m()];
+}
+
+void NetworkDependentBehaviorEffect::initialize(const Data *pData,
+	State *pState, State *pSimulatedState, int period, Cache *pCache)
+{
+	BehaviorEffect::initialize(pData, pState, period, pCache);
+
+	// Select network state.
+	string networkName = this->pEffectInfo()->interactionName1();
+	if (lSimulatedOffset == 1) {
+		this->lpNetwork = pSimulatedState->pNetwork(networkName);
+	} else {
+		this->lpNetwork = pState->pNetwork(networkName);
 	}
-	if (this->ltotalInAlterValues)
-	{
-		delete [] this->ltotalInAlterValues;
-	}
+	if (!this->lpNetwork) throw logic_error(
+			"Network '" + networkName + "' expected.");
+
+	// clear old value arrays
+	if (this->ltotalAlterValues) delete [] this->ltotalAlterValues;
+	if (this->ltotalInAlterValues) delete [] this->ltotalInAlterValues;
+	// create new value arrays
 	this->ltotalAlterValues = new double[this->lpNetwork->n()];
 	this->ltotalInAlterValues = new double[this->lpNetwork->m()];
 }
@@ -104,7 +141,7 @@ double NetworkDependentBehaviorEffect::totalInAlterValue(int i) const
 void NetworkDependentBehaviorEffect::preprocessEgo(int ego)
 {
 	// set up the covariate based on current values of the network and behavior
-	const Network * pNetwork = this->pNetwork();
+	const Network* pNetwork = this->pNetwork();
 
 	for (int i = 0; i < pNetwork->n(); i++)
 	{
@@ -118,9 +155,7 @@ void NetworkDependentBehaviorEffect::preprocessEgo(int ego)
 				int j = iter.actor();
 				this->ltotalAlterValues[i] += this->centeredValue(j);
 // 				Rprintf("%d %f %d %d %d %d\n",
-// 					j,
-// 					this->centeredValue(j),
-// 					this->period(),
+// 					j, this->centeredValue(j), this->period(),
 			}
 		}
 		else

@@ -405,9 +405,10 @@ void StatisticCalculator::calculateNetworkGMMStatistics(
 		NetworkEffect * pEffect = (NetworkEffect *) factory.createEffect(pInfo);
 
 		// Initialize the effect to work with our data and state of variables.
-//		pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+//	pEffect->initialize(this->lpData, this->lpPredictorState,
+//		this->lperiod, &cache);
 		pEffect->initialize(this->lpData, this->lpPredictorState, this->lpState,
-				this->lperiod, &cache);
+			this->lperiod, &cache);
 
 		this->lstatistics[pInfo] = pEffect->evaluationStatistic();
 		delete pEffect;
@@ -443,8 +444,10 @@ void StatisticCalculator::calculateBehaviorGMMStatistics(
 		BehaviorEffect * pEffect = (BehaviorEffect *) factory.createEffect(
 				pInfo);
 		// Initialize the effect to work with our data and state of variables.
-		pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod,
-				&cache);
+//	pEffect->initialize(this->lpData, this->lpPredictorState,
+//			this->lperiod, &cache);
+		pEffect->initialize(this->lpData, this->lpPredictorState, this->lpState,
+				this->lperiod, &cache);
 		if (this->lneedActorStatistics) {
 			pair<double, double *> p = pEffect->evaluationStatistic(
 					currentValues, this->lneedActorStatistics);
@@ -460,7 +463,9 @@ void StatisticCalculator::calculateBehaviorGMMStatistics(
 			this->lstaticChangeContributions.insert(make_pair(pInfo, egosMap));
 			for (int e = 0; e < pBehaviorData->n(); e++) {
 				cache.initialize(e);
-				pEffect->initialize(this->lpData, this->lpPredictorState,
+//			pEffect->initialize(this->lpData, this->lpPredictorState,
+//					this->lperiod, &cache);
+				pEffect->initialize(this->lpData, this->lpPredictorState, this->lpState,
 						this->lperiod, &cache);
 				double * contributions = new double[choices];
 				this->lstaticChangeContributions.at(pInfo).at(e) =

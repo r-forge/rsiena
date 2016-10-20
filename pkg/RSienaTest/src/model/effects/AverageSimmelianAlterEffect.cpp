@@ -24,9 +24,9 @@ namespace siena
  * Constructor.
  */
 AverageSimmelianAlterEffect::AverageSimmelianAlterEffect(
-	const EffectInfo * pEffectInfo, bool divide) :
-	pSimmelian(0), //
-	NetworkDependentBehaviorEffect(pEffectInfo)
+		const EffectInfo * pEffectInfo, bool divide) :
+	NetworkDependentBehaviorEffect(pEffectInfo), //
+	pSimmelian(0)
 {
 	this->ldivide = divide;
 	// Indicates whether there will be division by the outdegree of ego
