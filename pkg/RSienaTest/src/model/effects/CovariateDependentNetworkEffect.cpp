@@ -43,8 +43,8 @@ CovariateDependentNetworkEffect::CovariateDependentNetworkEffect(
  *
  * @param pEffectInfo The effect info.
  * @param simulatedState If `true` the value(), missing() and similarity()
- *        functions uses the simulated state, if any or the value at the end of
- *        the period.
+ *        functions uses the simulated state, if any or the value at the end
+ *        of the period.
  */
 CovariateDependentNetworkEffect::CovariateDependentNetworkEffect(
 		const EffectInfo * pEffectInfo, bool simulatedState) :
@@ -116,7 +116,7 @@ void CovariateDependentNetworkEffect::initialize(const Data* pData,
 		throw logic_error(
 				"Covariate or dependent behavior variable '" + name + "' expected.");
 	}
-	}
+}
 
 /**
  * Returns the covariate value for the given actor.

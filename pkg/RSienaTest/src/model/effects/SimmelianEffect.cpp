@@ -24,8 +24,9 @@ using namespace logger;
 
 SimmelianEffect::SimmelianEffect(
 		const EffectInfo* pEffectInfo):
-	pSimmelian(0), //
-	NetworkEffect(pEffectInfo) {
+	NetworkEffect(pEffectInfo), //
+	pSimmelian(0)
+{
 }
 
 SimmelianEffect::~SimmelianEffect() {

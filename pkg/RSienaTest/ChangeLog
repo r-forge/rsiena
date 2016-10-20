@@ -1,3 +1,9 @@
+2016-10-20 R-Forge Revision 305
+Changes in RSienaTest:
+   * BehaviorEffect, NetworkDependentBehaviorEffect, StatisticCalculator:
+     initialize() with simulated state for GMM.
+   * Other effects: Fix [-Wreorder] warings.
+
 2016-10-14 R-Forge Revision 304
 Changes in RSiena and RSienaTest (George Vega Yon):
    * tests/parallel.R: Changing makeForkCluster to makeCluster.

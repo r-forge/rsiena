@@ -23,8 +23,9 @@ using namespace logger;
 
 CovariateSimmelianAlterEffect::CovariateSimmelianAlterEffect(
 		const EffectInfo* pEffectInfo):
-	pSimmelian(0), //
-	CovariateDependentNetworkEffect(pEffectInfo) {
+	CovariateDependentNetworkEffect(pEffectInfo), //
+	pSimmelian(0)
+{
 }
 
 CovariateSimmelianAlterEffect::~CovariateSimmelianAlterEffect() {
