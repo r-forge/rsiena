@@ -126,7 +126,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{se}{Vector of standard errors of estimated theta.}
   \item{dfra}{Matrix of estimated derivatives.}
   \item{sf}{Matrix of deviations from targets in phase 3.}
-  \item{sf2}{Array of periodwise deviations from simulations in phase 3.}
+  \item{sf2}{Array of periodwise deviations from simulations in phase 3.
+    Not included if \code{lessMem=FALSE} in \code{\link{sienaAlgorithmCreate}}.}
   \item{tconv}{t-statistics for convergence.}
   \item{tmax}{maximum absolute t-statistic for convergence for non-fixed parameters.}
   \item{tconv.max}{overall maximum convergence ratio.}
@@ -134,8 +135,12 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{targets2}{Observed statistics by wave,
     starting with second wave; for ML, zero matrix.}
   \item{ssc}{Score function contributions for each wave for each
-    simulation in phase 3. Zero if finite difference method is used.}
- \item{sims}{If \code{returnDeps} is \code{TRUE}:
+    simulation in phase 3. Not included if finite difference method is used
+    or if \code{lessMem=FALSE} in \code{\link{sienaAlgorithmCreate}}.}
+  \item{scores}{Score functions, added over waves, for each
+    simulation in phase 3. Only included
+    if \code{lessMem=FALSE} in \code{\link{sienaAlgorithmCreate}}.}
+ \item{sims}{If \code{returnDeps=TRUE}:
     list of simulated dependent variables (networks, behaviour).
     Networks are given as a list of edgelists, one for each period.}
  \item{chain}{If \code{returnChains = TRUE}:
@@ -177,7 +182,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   There are print, summary and xtable methods for \code{\link{sienaFit}}
   objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}.}
 \examples{
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=123)
 # nsub=2 and n3=100 is used here for having a brief computation, not for practice.
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
@@ -186,7 +191,7 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 # or for non-conditional estimation --------------------------------------------
 \dontrun{
-model <- sienaModelCreate(nsub=2, n3=100, cond=FALSE)
+model <- sienaModelCreate(nsub=2, n3=100, cond=FALSE, seed=123)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
         }
 
@@ -208,8 +213,7 @@ ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE,
 library(parallel)
 cl <- makeCluster(8)
 
-ans3 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE,
-                cl = cl)
+ans3 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, cl = cl)
 
 # Notice that now -siena07- won't stop the cluster for you.
 stopCluster(cl)
@@ -221,11 +225,8 @@ cl <- makePSOCKcluster(
     rep(c('localhost', 'machine2.website.com' , 'machine3.website.com'), 8),
     user='myusername', rshcmd='ssh -p PORTNUMBER')
 
-ans4 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE,
-                cl = cl)
+ans4 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, cl = cl)
 stopCluster(cl)
-
-
     }
 }
 \keyword{models}

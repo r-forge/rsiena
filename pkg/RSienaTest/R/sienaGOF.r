@@ -31,6 +31,13 @@ sienaGOF <- function(
 	{
 		stop("You must instruct siena07 to return the simulated networks")
 	}
+	if (!is.null(sienaFitObject$sf2.byIterations))
+	{
+		if (!sienaFitObject$sf2.byIterations)
+    	{
+        	stop("sienaGOF needs sf2 by iterations")
+    	}
+	}
 	iterations <- length(sienaFitObject$sims)
 	if (iterations < 1)
 	{
@@ -311,7 +318,7 @@ sienaGOF <- function(
 			dimnames(G) <- dimnames(SF)
 			if (!(sienaFitObject$maxlike || sienaFitObject$FinDiff.method))
 			{
-				D <- derivativeFromScoresAndDeviations(SF, G)
+				D <- derivativeFromScoresAndDeviations(SF, G, , , , TRUE, )
 			}
 			else
 			{

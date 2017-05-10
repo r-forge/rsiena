@@ -40,6 +40,7 @@ class NetworkEffect : public Effect
 {
 	friend class NetworkInteractionEffect;
 	friend class EffectFactory;
+	friend class BothDegreesEffect;
 
 public:
 	NetworkEffect(const EffectInfo * pEffectInfo);

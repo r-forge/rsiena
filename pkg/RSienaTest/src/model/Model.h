@@ -15,18 +15,10 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 namespace siena
 {
-
-// ----------------------------------------------------------------------------
-// Section: Enumerations
-// ----------------------------------------------------------------------------
-
-/**
- * This enumeration defines the possible types of model for symmetric,
- * undirected networks.
- */
-	enum ModelType { NOTUSED, NORMAL, AFORCE, AAGREE, BFORCE, BAGREE, BJOINT };
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
 // ----------------------------------------------------------------------------
@@ -66,27 +58,27 @@ public:
 	// Setting rate effects
 
 	void settingRateParameter(NetworkLongitudinalData * pNetworkData,
-		std::string setting,
+		string setting,
 		int period,
 		double value);
 	double settingRateParameter(NetworkLongitudinalData * pNetworkData,
-		std::string setting,
+		string setting,
 		int period) const;
 	const int numberOfSettings(NetworkLongitudinalData * pNetworkData) const;
 
 	// Other effects
 
-	EffectInfo * addEffect(std::string variableName,
-		std::string effectName,
-		std::string effectType,
+	EffectInfo * addEffect(string variableName,
+		string effectName,
+		string effectType,
 		double parameter,
 		double internalEffectParameter = 0,
-		std::string interactionName1 = "",
-		std::string interactionName2 = "",
-		std::string rateType = "");
-	EffectInfo * addInteractionEffect(std::string variableName,
-		std::string effectName,
-		std::string effectType,
+		string interactionName1 = "",
+		string interactionName2 = "",
+		string rateType = "");
+	EffectInfo * addInteractionEffect(string variableName,
+		string effectName,
+		string effectType,
 		double parameter,
 		const EffectInfo * pEffect1,
 		const EffectInfo * pEffect2,
@@ -94,14 +86,14 @@ public:
 
 	bool gmmModel() const;
 
-	const std::vector<EffectInfo *> & rRateEffects(std::string variableName) const;
-	const std::vector<EffectInfo *> & rGMMEffects(std::string variableName) const;
-	const std::vector<EffectInfo *> & rEvaluationEffects(std::string variableName) const;
-	const std::vector<EffectInfo *> & rEndowmentEffects(std::string variableName) const;
-	const std::vector<EffectInfo *> & rCreationEffects(std::string variableName) const;
+	const vector<EffectInfo *> & rRateEffects(string variableName) const;
+	const vector<EffectInfo *> & rGMMEffects(string variableName) const;
+	const vector<EffectInfo *> & rEvaluationEffects(string variableName) const;
+	const vector<EffectInfo *> & rEndowmentEffects(string variableName) const;
+	const vector<EffectInfo *> & rCreationEffects(string variableName) const;
 
 	void chainStore(const Chain& chain, int periodFromStart);
-	std::vector <Chain *> & rChainStore(int periodFromStart);
+	vector <Chain *> & rChainStore( int periodFromStart);
 	void clearChainStore(int keep, int periodFromStart);
 	void setupChainStore(int numberOfPeriods);
 	void deleteLastChainStore(int periodFromStart);
@@ -116,8 +108,8 @@ public:
 	int targetChange(const Data * pData, int period) const;
 	void targetChange(const Data * pData, int period, int change);
 
-	std::string conditionalDependentVariable() const;
-	void conditionalDependentVariable(std::string variableName);
+	string conditionalDependentVariable() const;
+	void conditionalDependentVariable(string variableName);
 
 	void needChain(bool flag);
 	bool needChain() const;
@@ -133,10 +125,6 @@ public:
 
 	void needChangeContributions(bool flag);
 	bool needChangeContributions() const;
-
-	void modelType(int type);
-	ModelType modelType() const;
-	bool modelTypeB() const;
 
 	// various stores for ML
 
@@ -203,46 +191,46 @@ private:
 	bool lGMMModel;
 
 	// name of conditional dependent variable
-	std::string lconditionalDependentVariable;
+	string lconditionalDependentVariable;
 
 	// Targets for conditional dependent variable per each data object
 	// and period.
 
-	std::map<const Data *, int *> ltargetChanges;
+	map<const Data *, int *> ltargetChanges;
 
 	// An array of doubles per each longitudinal data object storing
 	// the basic rate parameters for all periods
 
-	std::map<const LongitudinalData *, double *> lbasicRateParameters;
+	map<const LongitudinalData *, double *> lbasicRateParameters;
 
 	// An array of doubles for some network longitudinal data objects storing
 	// the basic rate parameters for all periods by setting.
 
-	std::map<const NetworkLongitudinalData *, std::map<std::string, double *> >
+	map<const NetworkLongitudinalData *, map<string, double *> >
 		lsettingRateParameters;
 
 	// A vector of effects other than the basic rate effects.
-	std::vector<EffectInfo *> leffects;
+	vector<EffectInfo *> leffects;
 
 	// A vector of rate effects (except the basic rate effects) per variable
-	std::map<std::string, std::vector<EffectInfo *> > lrateEffects;
+	map<string, vector<EffectInfo *> > lrateEffects;
 
 	// A vector of pointers to GMM effects per variable
 	std::map<std::string, std::vector<EffectInfo *> > lgmmEffects;
 
 	// A vector of pointers to evaluation effects per variable
-	std::map<std::string, std::vector<EffectInfo *> > levaluationEffects;
+	map<string, vector<EffectInfo *> > levaluationEffects;
 
 	// A vector of pointers to endowment effects per variable
-	std::map<std::string, std::vector<EffectInfo *> > lendowmentEffects;
+	map<string, vector<EffectInfo *> > lendowmentEffects;
 
 	// A vector of pointers to creation effects per variable
-	std::map<std::string, std::vector<EffectInfo *> > lcreationEffects;
+	map<string, vector<EffectInfo *> > lcreationEffects;
 
 	// A dummy vector of effect infos in case we need a reference to
 	// non-existent vectors
 
-	const std::vector<EffectInfo *> lemptyEffectVector;
+	const vector<EffectInfo *> lemptyEffectVector;
 
 	// indicates whether we need to keep a chain of ministeps
 	bool lneedChain;
@@ -278,7 +266,7 @@ private:
 	double linitialPermutationLength;
 
 	// current length of permuted interval: varies by period
-	std::vector <double> lcurrentPermutationLength;
+	vector <double> lcurrentPermutationLength;
 
 	// probabilities of the different ML steps
 	double linsertDiagonalProbability;
@@ -294,17 +282,16 @@ private:
 
 	bool lsimpleRates;
 
-	std::vector <double> lmissingNetworkProbability;
-	std::vector <double> lmissingBehaviorProbability;
+	vector <double> lmissingNetworkProbability;
+	vector <double> lmissingBehaviorProbability;
 
 	// chain storage: vector of chains for each period for each set of samples
 	// lchainStore[i] is set of entries for periodFromStart <i>,
 	// which incorporates both the group and period.
-	std::vector<std::vector<Chain *> > lchainStore;
+	vector <vector <Chain *> > lchainStore;
 
 	int lnumberOfPeriods;
 	bool lnormalizeSettingsRates;
-	ModelType lmodelType;
 };
 
 }

@@ -28,6 +28,7 @@
 #include "BalanceEffect.h"
 #include "BehaviorInteractionEffect.h"
 #include "BetweennessEffect.h"
+#include "BothDegreesEffect.h"
 #include "CovariateAlterEffect.h"
 #include "CovariateDiffEffect.h"
 #include "CovariateDiffEgoEffect.h"

@@ -165,7 +165,7 @@ influence. \emph{Sociological Methodology}, 40, 329-393.
 }}
 \examples{
 # Method of Moments:
-algo <- sienaAlgorithmCreate(nsub=2, n3=100)
+algo <- sienaAlgorithmCreate(nsub=2, n3=100, seed=123)
 net <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 dataset <- sienaDataCreate(net)
 eff <- getEffects(dataset)
@@ -174,7 +174,7 @@ eff
 # or if a previous 'on track' result ans was obtained
 (ans <- sienacpp(algo, data=dataset, effects=eff, prevAns=ans))
 # Generalized Method of Moments:
-algo <- sienaAlgorithmCreate(nsub=2, n3=100, dolby=FALSE)
+algo <- sienaAlgorithmCreate(nsub=2, n3=100, dolby=FALSE, seed=123)
 eff <- includeEffects(eff, density)
 eff <- includeEffects(eff, density, type='gmm')
 eff <- includeEffects(eff, recip)

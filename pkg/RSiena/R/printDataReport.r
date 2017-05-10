@@ -31,6 +31,7 @@ DataReport <- function(z, x, f)
     nBehavior <- sum(behavior)
     nBipartites <- sum(bipartite)
     oneModeNames <- attr(f, "netnames")[oneMode]
+    behaviorNames <- attr(f, "netnames")[behavior]
     ##  behaviorNames <- attr(f, "netnames")[behavior]
     ##  bipartiteNames <- attr(f, "netnames")[bipartite]
     nDepVars <- nOneMode + nBehavior + nBipartites
@@ -40,19 +41,31 @@ DataReport <- function(z, x, f)
     exoOptions <- attr(f, 'exooptions')
     if (nOneMode > 0)
     {
+		Report("Model Type:\n", outf)
         for (i in 1:nOneMode)
         {
             if (nOneMode > 1)
             {
-                Report(sprintf("Network %d %s\n", i, oneModeNames[i]), outf)
+                Report(sprintf("Network %d %s :", i, oneModeNames[i]), outf)
             }
-            Report(sprintf("Model Type %d: %s\n",
-                           z$modelType, ModelTypeStrings[z$modelType]), outf)
-            if (z$modelType != x$modelType)
+			Report(sprintf(" %s\n",ModelTypeStrings(z$modelType[i])), outf)
+        }
+           if (any(z$modelType != x$modelType))
             {
                 Report(c("Note that the model type requested has been",
                        "over-ridden\n"), outf)
             }
+        }
+    if (nBehavior > 0)
+    {
+		Report("Behavioral Model Type:\n",outf)
+        for (i in 1:nBehavior)
+        {
+            if (nBehavior > 1)
+            {
+                Report(sprintf("Behavior %d %s :", i, behaviorNames[i]), outf)
+            }
+			Report(sprintf(" %s\n",BehaviorModelTypeStrings(z$behModelType[i])), outf)
         }
     }
     if (x$cconditional  != z$cconditional)
@@ -184,6 +197,7 @@ DataReport <- function(z, x, f)
 						"but the maximum observed outdegree is", maxod,
 						".\n"), outf)
 						Report("This is incompatible.\n", outf)
+						cat('Some observed outdegrees higher than MaxDegree.\n')
 		stop("Incompatibility between data and MaxDegree in algorithm object.")
 					}
                 if (attr(f, 'symmetric')[match(mdnet, attr(f, "netnames"))])

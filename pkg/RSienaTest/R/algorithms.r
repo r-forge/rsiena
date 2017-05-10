@@ -755,7 +755,7 @@ getSamples <- function(z, x, nIter, thetas=NULL)
         if (!z$maxlike)
         {
             z$dfra <- getFromNamespace("derivativeFromScoresAndDeviations",
-									   pkgname)(z$sc, z$fra)
+									   pkgname)(z$sc, z$fra, , , , TRUE, )
         }
         else
         {

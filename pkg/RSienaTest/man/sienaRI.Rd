@@ -140,8 +140,8 @@ corresponding to the observation moments.
           for each potential actor decision at observation moments.
           This is equation (3) in Indlekofer and Brandes (2013).}
     \item{- \code{expectedRI}}{a list that contains the expected
-          relative importances of effects aggregated over all actors in each
-          network observations. These are the averages of the actor related
+          relative importances of effects aggregated over all actors for each
+          network observation. These are the averages of the actor related
           values in \code{RIActors}.
           This is equation (4) in Indlekofer and Brandes (2013).}
     \item{- \code{IActors}}{a list that contains the expected

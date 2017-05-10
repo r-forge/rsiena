@@ -198,29 +198,6 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	z
 }
 
-##@siena07.bis siena07 Wrapper for double estimation
-# Not exported; perhaps for later use as some kind of siena07ToConvergence.
-siena07.bis <- function(x, diagonalize1=1.0, diagonalize2=0.0,
-						nsubphases1=1, n31=500, ...)
-{
-	x1 <- x
-	x1$diagonalize <- diagonalize1
-	x1$nsub <- nsubphases1
-	x1$n3 <- n31
-	ans1 <- siena07(x1, ...)
-	if (!ans1$OK)
-	{
-		cat("The second estimation is not carried out because there is a problem.\n")
-		ans2 <- ans1
-	}
-	else
-	{
-		x2 <- x
-		x2$diagonalize <- diagonalize2
-		ans2 <- siena07(x2, prevAns=ans1, ...)
-	}
-	ans2
-}
 
 ##@InitReports siena07 Print report
 InitReports <- function(z, seed, newseed)

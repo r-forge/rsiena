@@ -79,7 +79,7 @@ variable in the input object, with columns
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley}
 \seealso{\code{\link{sienaDataCreate}}, \code{\link{sienaDataCreate}},
-        \code{\link{includeEffects}}, {\link{setEffect}}}
+        \code{\link{includeEffects}}, \code{\link{setEffect}}}
 \examples{
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mybeh <- sienaDependent(s50a, type="behavior")

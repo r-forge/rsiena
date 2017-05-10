@@ -9,17 +9,11 @@
 # *
 # *****************************************************************************/
 
-ModelTypeStrings <- c("Standard actor-oriented model",
-					  "Forcing model",
-					  "Initiative model",
-					  "Pairwise forcing model",
-					  "Pairwise mutual model",
-					  "Pairwise joint model")
-
 ##@sienaModelCreate DataCreate
 sienaModelCreate <-
 	function(fn,
-			projname="Siena", MaxDegree=0, useStdInits=FALSE,
+projname="Siena", MaxDegree=0,  UniversalOffset=0,
+useStdInits=FALSE,
 			n3=1000, nsub=4, n2start = NULL, dolby=TRUE,
 			maxlike=FALSE, diagonalize=0.2*!maxlike,
 			condvarno=0, condname='',
@@ -27,8 +21,9 @@ sienaModelCreate <-
 			pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
 			prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
 			minimumPermutationLength=2, initialPermutationLength=20,
-			modelType=1, mult=5, simOnly=FALSE, localML=FALSE,
-			truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1))
+modelType=1, behModelType=1, mult=5, simOnly=FALSE, localML=FALSE,
+			truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1),
+			lessMem=FALSE)
 {
 	model <- NULL
 	model$projname <- projname
@@ -38,6 +33,7 @@ sienaModelCreate <-
 	model$firstg <- firstg
 	model$reduceg <- reduceg
 	model$maxrat <- 1.0
+	model$normSetRates <- FALSE
 	model$maxlike <-  maxlike
 	model$simOnly <- simOnly
 	model$localML <- localML
@@ -90,7 +86,19 @@ sienaModelCreate <-
 	model$diagg <- (diagonalize >= 0.9999)
 	model$diagonalize <- diagonalize
 	model$modelType <- modelType
+if (any(!(modelType %in% 1:6)))
+	{
+		warning('modelType can have values from 1 to 6; other values changed to 1\n')
+		model$modelType[!(modelType %in% 1:6)] <- 1
+	}
+model$behModelType <- behModelType
+if (any(!(behModelType %in% c(1,2))))
+	{
+		warning('behModelType should be 1 or 2; other values changed to 1\n')
+		model$behModelType[!(behModelType %in% c(1,2))] <- 1
+	}
 	model$MaxDegree <- MaxDegree
+	model$UniversalOffset <- UniversalOffset
 	model$randomSeed <- seed
 	model$pridg <- pridg
 	model$prcdg <- prcdg
@@ -105,6 +113,7 @@ sienaModelCreate <-
 	model$mult <- mult
 	model$truncation <- truncation
 	model$doubleAveraging <- doubleAveraging
+	model$sf2.byIteration <- !lessMem
 	model$standardizeWithTruncation <- standardizeVar
 	model$standardizeVar <- standardizeVar
 # The difference between these two is a hidden, non-documented option,
@@ -124,6 +133,23 @@ sienaModelCreate <-
 
 model.create <- sienaModelCreate
 
-
-##@sienaAlgorithmCreate AlgoritmCreate
+##@sienaAlgorithmCreate DataCreate
 sienaAlgorithmCreate <- sienaModelCreate
+
+##@ModelTypeStrings DataCreate
+ModelTypeStrings <- function(i){
+	switch(i,
+		"Standard actor-oriented model",
+		"Forcing model",
+		"Initiative model",
+		"Pairwise forcing model",
+		"Pairwise mutual model",
+		"Pairwise joint model")
+}
+
+##@BehaviorModelTypeStrings DataCreate
+BehaviorModelTypeStrings <- function(i){
+	switch(i,
+		"Standard behavior actor-oriented model ('restrict')",
+		"Boundary-absorbing behavior model")
+}

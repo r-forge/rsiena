@@ -47,6 +47,9 @@ public:
 	virtual void setLeaverBack(const SimulationActorSet * pActorSet,
 		int actor);
 
+	void behaviorModelType(int type);
+	virtual BehaviorModelType behaviorModelType() const;
+
 	virtual void makeChange(int actor);
 
 	bool missingStartValue(int actor) const;
@@ -75,7 +78,7 @@ private:
 		int difference) const;
 	double totalCreationContribution(int actor,
 		int difference) const;
-	void accumulateScores(int difference, bool UpPossible,
+	void accumulateScores(int currentVal, int difference, bool UpPossible,
 		bool downPossible) const;
 	void calculateProbabilities(int actor);
 	void accumulateDerivatives() const;
@@ -111,6 +114,9 @@ private:
 
 	double * lprobabilities;
 
+	// Selection probability per each difference, for the behModelType ABSORB
+	double * lqrobabilities;
+
 	// Indicates if upward change is possible in the current situation
 	bool lupPossible;
 
@@ -119,6 +125,12 @@ private:
 
 	// the actor under consideration
 	int lego;
+
+	// the model type
+	BehaviorModelType lbehaviorModelType;
+	
+	// whether the model type is ABSORB
+	bool lmodelAbsorb;
 };
 
 }

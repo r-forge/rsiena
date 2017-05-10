@@ -3,14 +3,14 @@
  *
  * Web: http://www.stats.ox.ac.uk/~snijders/siena/
  *
- * File: OutdegreeActivitySqrtEffect.h
+ * File: BothDegreesEffect.h
  *
  * Description: This file contains the definition of the
- * OutdegreeActivitySqrtEffect class.
+ * BothDegreesEffect class.
  *****************************************************************************/
 
-#ifndef OUTDEGREEACTIVITYSQRTEFFECT_H_
-#define OUTDEGREEACTIVITYSQRTEFFECT_H_
+#ifndef BOTHDEGREESEFFECT_H_
+#define BOTHDEGREESEFFECT_H_
 
 #include "NetworkEffect.h"
 
@@ -22,35 +22,31 @@ namespace siena
 // ----------------------------------------------------------------------------
 
 class SqrtTable;
-class Network;
-
 
 // ----------------------------------------------------------------------------
 // Section: Class definition
 // ----------------------------------------------------------------------------
 
 /**
- * This class defines the outdegree activity (sqrt) effect defined by
- * s_i(x)= x_{i+}^1.5. The corresponding statistic is sum_i x_{i+}^1.5.
+ * This class defines the both degrees effect defined as
+ * the sum of the indegree popularity and outdegree activity effects.
  */
-class OutdegreeActivitySqrtEffect : public NetworkEffect
+class BothDegreesEffect : public NetworkEffect
 {
-friend class BothDegreesEffect;
-
 public:
-	OutdegreeActivitySqrtEffect(const EffectInfo * pEffectInfo);
-
+	BothDegreesEffect(const EffectInfo * pEffectInfo);
 	virtual double calculateContribution(int alter) const;
 
 protected:
 	virtual double tieStatistic(int alter);
-	virtual double endowmentStatistic(Network * pLostTieNetwork);
 
 private:
+	// Indicates if the square root of degrees must be used
+	bool lroot;
 	// Lookup table for fast square root calculations
 	SqrtTable * lsqrtTable;
 };
 
 }
 
-#endif /*OUTDEGREEACTIVITYSQRTEFFECT_H_*/
+#endif /*BOTHDEGREESEFFECT_H_*/

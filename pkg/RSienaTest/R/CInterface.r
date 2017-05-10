@@ -93,7 +93,7 @@ setupSeed <- function(x, z) {
   randomseed2 <-  NULL
   if (!is.null(x$randomSeed)) {
     set.seed(x$randomSeed, kind="default")
-    seed <- x$randomSeed
+#    seed <- x$randomSeed
   } else {
     if (!nzchar(Sys.getenv("RSIENA_TESTING"))) {
       if (exists(".Random.seed")) {
@@ -101,10 +101,10 @@ setupSeed <- function(x, z) {
       }
       newseed <- trunc(runif(1) * 1000000)
       set.seed(newseed)  ## get R to create a random number seed for me.
-      seed <- NULL
+#      seed <- NULL
     } else {
       newseed <- NULL
-      seed <- NULL
+#      seed <- NULL
     }
   }
   z$randomseed2 <- randomseed2
@@ -357,7 +357,7 @@ reformatSienaFit <- function(z) {
 		cov.dev <- 1
 	}
   }
-  
+
 
 	if (inherits(try(thisproduct <- solve(cov.dev, mean.dev), silent=TRUE),
 				"try-error"))
@@ -601,17 +601,16 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
   syms <- attr(data,"symmetric")
   z$FinDiffBecauseSymmetric <- FALSE
   z$modelType <- x$modelType
-  if (any(!is.na(syms) & syms)) {
+#  if (any(!is.na(syms) & syms)) {
     ##     z$FinDiff.method <- TRUE
     ##     z$FinDiffBecauseSymmetric <- TRUE
     # if (x$maxlike) {
       #                stop("Maximum likelihood method not implemented",
       #                     "for symmetric networks")
     # }
-    if (x$modelType == 1) {
-      z$modelType <- 2
-    }
-  }
+  z$modelType[(z$modelType == 1) & syms] <- 2
+  z$behModelType <- x$behModelType
+#  }
   if (z$cconditional) {
     attr(f, "change") <- sapply(f, function(xx)attr(xx$depvars[[z$condname]],
                                  "distance"))
@@ -829,6 +828,18 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
     UNIVERSALOFFSET <- x$UniversalOffset
     storage.mode(UNIVERSALOFFSET) <- "double"
   }
+  if (x$modelType == 0 || is.null(x$modelType)) {
+    MODELTYPE <-  NULL
+  } else {
+    MODELTYPE <- x$modelType
+    storage.mode(MODELTYPE) <- "integer"
+  }
+  if (x$behModelType == 0 || is.null(x$behModelType)) {
+    BEHMODELTYPE <-  NULL
+  } else {
+    BEHMODELTYPE <- x$behModelType
+    storage.mode(BEHMODELTYPE) <- "integer"
+  }
   if (z$cconditional) {
     CONDVAR <- z$condname
     CONDTARGET <- attr(f, "change")
@@ -844,7 +855,7 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
   z$simpleRates <- simpleRates
   ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                pData, pModel, MAXDEGREE, UNIVERSALOFFSET, CONDVAR, CONDTARGET,
-               profileData, z$parallelTesting, x$modelType, z$simpleRates,
+               profileData, z$parallelTesting, MODELTYPE, BEHMODELTYPE, z$simpleRates,
                x$normSetRates)
   if (x$maxlike) {
     # if (!initC) {

@@ -155,7 +155,10 @@ glueBayes(z1, z2, nwarm2=0)
   of multiple groups all having the same number of waves and the same
   model specification.
   It wraps Bayesian sampling of parameters around calls to
-  \code{\link{maxlikec}}.\cr
+  \code{\link{maxlikec}}. The RSiena manual has a lot of information. \cr
+  Effects can be randomly varying between groups, or global (i.e., constant
+  across groups). This is indicated by the keyword \code{random} in the
+  call of \code{\link{setEffect}}.\cr
   For the groupwise parameters normal distributions are assumed with conjugate
   priors. The prior distribution for the basic rate parameters is determined
   in a data-dependent way. For the non-varying parameters,
@@ -163,6 +166,9 @@ glueBayes(z1, z2, nwarm2=0)
   The frequentist option currently is not supported (may be broken).\cr
   The procedure consists of three parts: initialization, warming,
   main phase.\cr
+  The required dimensions of the prior parameters \code{priorMu} and 
+  \code{priorSigma} are given in the output for
+  \code{\link{print.sienaEffects}}.\cr
   In the initialization phase, initial parameter values and the proposal
   covariance matrix for Metropolis-Hastings steps for groupwise parameters
   are obtained from, first, Method of Moments estimation of a parameter vector
@@ -260,6 +266,7 @@ glueBayes(z1, z2, nwarm2=0)
 \dontrun{
   bayes.model <- sienaBayes(FourAlgo, data = FourGroups,
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)
+  bayes.model
   summary(bayes.model)
   bayes.nextModel <- sienaBayes(FourAlgo, data = FourGroups,
         effects = FourEffects, nmain=15, nrunMHBatches=10,

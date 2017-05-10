@@ -53,7 +53,7 @@ ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
 ##, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 ans
 ##test8
-mymodel<- model.create(fn = simstats0c, projname='test8', nsub=2, n3=50,
+mymodel<- model.create(fn = simstats0c, projname='test8', nsub=1, n3=50,
                        cond=TRUE, condvarno=1, seed=5)
 print('test8')
 ans <- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -67,6 +67,7 @@ mynet2 <- sienaDependent(s50a,type='behavior')
 mydata <- sienaDataCreate(mynet1, mynet2)
 myeff <- getEffects(mydata)
 myeff <- setEffect(myeff, linear, initialValue=0.34699930338, name="mynet2")
+myeff <- setEffect(myeff, avAlt, name="mynet2", interaction1="mynet1")
 ##myeff$initialValue[98] <- 0.34699930338 ## siena3 starting values differ
 ##test10
 print('test10')
@@ -105,27 +106,9 @@ eff <- includeEffects(eff, density, type='gmm')
 eff <- includeEffects(eff, recip)
 (eff <- includeEffects(eff, recip, realrecip, persistrecip, type='gmm'))
 (ans <- sienacpp(algo, data=dataset, effects=eff))
-
 ##test14
 print('test14')
-library(parallel)
-cl <- makeCluster(2)
-system.time({
-  ans <- siena07(sienaModelCreate(n3=50, nsub=2,seed=1, projname="test14a"),
-                 data=mydata, effects=myeff, batch=TRUE, silent=TRUE, cl = cl)
-})
-
-ans
-
-system.time({
-  ans <- siena07(sienaModelCreate(n3=50, nsub=2,seed=1, projname="test14b"),
-                 data=mydata, effects=myeff, batch=TRUE, silent=TRUE,
-                 useCluster = TRUE, nbrNodes = 2, clusterType = "PSOCK")
-})
-ans
-
-
-tt <- sienaTimeTest(ans)
-tt
-
-stopCluster(cl)
+myeff <- getEffects(dataset)
+myeff <- includeEffects(myeff, inPop)
+algo <- sienaAlgorithmCreate(nsub=1, n3=20, maxlike=TRUE, seed=15, mult=1)
+(ans <- siena07(algo, data=dataset, effects=myeff, batch=TRUE))

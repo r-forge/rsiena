@@ -197,7 +197,7 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 	}
 	if (*settingCol < 0)
 	{
-	 	error("cannot find setting col");
+	 	error("cannot find setting col; reconstruct effects object with this version of RSiena");
 	}
 //Rprintf("%d parmcol\n", *parmCol);
 }
@@ -283,8 +283,7 @@ void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
 						NetworkLongitudinalData * pNetwork =
 							pData->pNetworkData(networkName);
 						pModel->basicRateParameter(pNetwork,
-							period,
-							currentValue);
+							period, currentValue);
 					}
 				}
 				else
@@ -416,8 +415,7 @@ void setupOneModeObservations(SEXP ONEMODES,
     for (int period = 0; period < observations; period++)
     {
     	setupOneModeNetwork(VECTOR_ELT(ONEMODES, period),
-			pOneModeNetworkLongitudinalData,
-			period);
+				pOneModeNetworkLongitudinalData, period);
 	}
     UNPROTECT(2);
 }

@@ -50,6 +50,8 @@ public:
 		State * pState,
 		int period,
 		Cache * pCache);
+	virtual void initialize(const Data * pData, State * pState,
+			State * pSimulatedState, int period, Cache * pCache);
 
 	inline const Network * pNetwork() const;
 	inline const NetworkLongitudinalData * pData() const;

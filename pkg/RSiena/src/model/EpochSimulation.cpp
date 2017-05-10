@@ -529,7 +529,7 @@ void EpochSimulation::accumulateRateScores(double tau,
 		const DependentVariable * pSelectedVariable, int selectedActor) {
 	for (unsigned i = 0; i < this->lvariables.size(); i++) {
 
-		if (this->lvariables[i]->symmetric() && this->pModel()->modelTypeB()) {
+		if (this->lvariables[i]->symmetric() && this->lvariables[i]->networkModelTypeB()) {
 			//	Rprintf("1got here %d\n",this->lvariables[i]->alter());
 			this->lvariables[i]->accumulateRateScores(tau, pSelectedVariable,
 					selectedActor, this->lvariables[i]->alter());

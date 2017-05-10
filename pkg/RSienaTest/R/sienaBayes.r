@@ -34,12 +34,13 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
     ##@createStores internal sienaBayes Bayesian set up stores
     createStores <- function()
     {
-        npar <- length(z$theta)
+       # npar <- length(z$theta)
 		numberRows <- nmain * nrunMHBatches
-        z$candidates <<- array(NA, dim=c(numberRows, z$nGroup, npar))
-        z$acceptances <<- matrix(NA, nrow=numberRows, ncol=z$nGroup)
+       # z$candidates <<- array(NA, dim=c(numberRows, z$nGroup, npar))
+       # z$acceptances <<- matrix(NA, nrow=numberRows, ncol=z$nGroup)
 		if (storeAll)
 		{
+			z$acceptances <<- matrix(NA, nrow=numberRows, ncol=z$nGroup)
 			z$MHacceptances <<- array(NA, dim=c(numberRows, z$nGroup,
 									 z$nDependentVariables, 9))
 			z$MHrejections <<- array(NA, dim=c(numberRows, z$nGroup,
@@ -75,27 +76,27 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 	} # end createStores
 
     ##@storeData internal sienaBayes; put data in stores
-    storeData <- function(cycleData)
+    storeData <- function()
     {
         start <- z$sub + 1
-        nrun <- ncol(cycleData$accepts)
+        nrun <- ncol(zm$accepts)
         end <- start + nrun - 1
 		if (storeAll)
 		{
-			z$acceptances[start:end, ] <<- cycleData$accepts
-			z$StorePosteriorMu[start:end, ] <<- cycleData$posteriorMu
-			z$StorePosteriorEta[start:end, ] <<- cycleData$posteriorEta
-			z$StorePosteriorSigma[start:end, , ] <<-  cycleData$PosteriorSigma
+			z$acceptances[start:end, ] <<- zm$accepts
+			z$StorePosteriorMu[start:end, ] <<- zm$posteriorMu
+			z$StorePosteriorEta[start:end, ] <<- zm$posteriorEta
+			z$StorePosteriorSigma[start:end, , ] <<-  zm$PosteriorSigma
 		}
 		# Also store a thinned version of the process,
 		# containing only the final values in the main steps:
-        z$ThinPosteriorMu[z$iimain, ] <<- cycleData$posteriorMu[nrun,]
-        z$ThinPosteriorEta[z$iimain, ] <<- cycleData$posteriorEta[nrun,]
-		z$ThinPosteriorSigma[z$iimain, , ] <<-  cycleData$PosteriorSigma[nrun,,]
-		z$ThinBayesAcceptances[z$iimain, ] <<- cycleData$BayesAcceptances
+        z$ThinPosteriorMu[z$iimain, ] <<- zm$posteriorMu[nrun,]
+        z$ThinPosteriorEta[z$iimain, ] <<- zm$posteriorEta[nrun,]
+		z$ThinPosteriorSigma[z$iimain, , ] <<-  zm$PosteriorSigma[nrun,,]
+		z$ThinBayesAcceptances[z$iimain, ] <<- zm$BayesAcceptances
 		if (z$incidentalBasicRates)
 		{
-			z$ThinScores[z$iimain, ] <<- cycleData$thescores
+			z$ThinScores[z$iimain, ] <<- zm$thescores
 		}
         for (group in 1:z$nGroup)
         {
@@ -107,16 +108,16 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
         }
 		if (storeAll)
 		{
-			z$MHacceptances[start:end, , , ] <<- cycleData$MHaccepts
-			z$MHrejections[start:end, , , ] <<- cycleData$MHrejects
-			z$MHproportions[start:end, , , ] <<- cycleData$MHaccepts /
-				(cycleData$MHaccepts + cycleData$MHrejects)
+			z$MHacceptances[start:end, , , ] <<- zm$MHaccepts
+			z$MHrejections[start:end, , , ] <<- zm$MHrejects
+			z$MHproportions[start:end, , , ] <<- zm$MHaccepts /
+				(zm$MHaccepts + zm$MHrejects)
         }
 # Dimension of the following wrong for more than 2 waves:
 #		z$ThinEtaScores[z$iimain, ,] <<-
-#				t(cycleData$ans.last$fra)[z$set2,,drop=FALSE]
+#				t(zm$ans.last$fra)[z$set2,,drop=FALSE]
 #		z$ThinEtaHessian[z$iimain, ,] <<-
-#				as.double(cycleData$ans.last$dff[z$set2,z$set2,drop=FALSE])
+#				as.double(zm$ans.last$dff[z$set2,z$set2,drop=FALSE])
         z$sub <<- z$sub + nrun
     } # end storeData
 
@@ -155,9 +156,9 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
         repeat
         {
             iter <- iter + 1
-            cyc <- MCMCcycle(nrunMH=totruns, nSampVar=1, nSampCons=1,
+            MCMCcycle(nrunMH=totruns, nSampVar=1, nSampCons=1,
 							nSampRate=0, change=FALSE, bgain=-1)
-            actual <- cyc$BayesAcceptances
+            actual <- zm$BayesAcceptances
 			## actual is a vector of the expected number of acceptances by group
 			## and for the non-varying parameters, in the MH change of
 			## parameters out of nrunMHBatches trials
@@ -209,7 +210,7 @@ browser()
 			}
             cat('\n',iter, '.         ', sprintf("%5.1f", actual),
 				     '\n multipliers  ', sprintf("%5.3f", multiplier),
-			         '\n scalefactors ', sprintf("%5.3f", z$scaleFactors),
+			         '\n scaleFactors ', sprintf("%5.3f", z$scaleFactors),
 					sprintf("%5.3f", z$scaleFactor0),
 					sprintf("%5.3f", z$scaleFactorEta),'\n')
 
@@ -221,13 +222,13 @@ browser()
             if (any(z$scaleFactors < tiny))
             {
 				cat('tiny: ', which(z$scaleFactors < tiny),'\n')
-				cat('This is a problem: scalefactors too small.\n')
+				cat('This is a problem: scaleFactors too small.\n')
 				cat('Try a model with fewer randomly varying effects.\n')
-				stop('Tiny scalefactors.')
+				stop('Tiny scaleFactors.')
             }
         }
         cat('fine tuning took ', iter, ' iterations.\n')
-#drop		cat('scalefactors:', z$scaleFactors, z$scaleFactor0,
+#drop		cat('scaleFactors:', z$scaleFactors, z$scaleFactor0,
 #										z$scaleFactorEta, '\n')
 		flush.console()
     } # end improveMH
@@ -241,19 +242,20 @@ browser()
 	# is for the storage in the object produced
 	# and for its by-effects on the MCMC state:
 	# thetaMat, muTemp, sigmaTemp
-		zm <- list()
-		zm$accepts <- matrix(NA, nrow=z$nGroup, nrunMH)
-		acceptsEta <- rep(NA, nrunMH)
-		zm$MHaccepts <- array(NA, dim=c(nrunMH, z$nGroup,
+		zm <<- list()
+		zm$accepts <<- matrix(NA, nrow=z$nGroup, nrunMH)
+		acceptsEta <<- rep(NA, nrunMH)
+		zm$MHaccepts <<- array(NA, dim=c(nrunMH, z$nGroup,
 							  z$nDependentVariables, 9))
-		zm$MHrejects <- array(NA, dim=c(nrunMH, z$nGroup,
+		zm$MHrejects <<- array(NA, dim=c(nrunMH, z$nGroup,
 							  z$nDependentVariables, 9))
-		zm$MHaborts <- array(NA, dim=c(nrunMH, z$nGroup,
+		zm$MHaborts <<- array(NA, dim=c(nrunMH, z$nGroup,
 							 z$nDependentVariables, 9))
-		zm$posteriorMu <- matrix(0, nrow=nrunMH, ncol=z$p1)
-		zm$posteriorEta <- matrix(0, nrow=nrunMH, ncol=z$p2)
-		zm$PosteriorSigma <- array( NA, dim=c(nrunMH, z$p1, z$p1))
-		zm$BayesAcceptances <- rep(NA, z$nGroup+2)
+		zm$posteriorMu <<- matrix(0, nrow=nrunMH, ncol=z$p1)
+		zm$posteriorEta <<- matrix(0, nrow=nrunMH, ncol=z$p2)
+		zm$PosteriorSigma <<- array( NA, dim=c(nrunMH, z$p1, z$p1))
+		zm$BayesAcceptances <<- rep(NA, z$nGroup+2)
+        zsmall <<- getFromNamespace("makeZsmall", pkgname)(z)
 
 		for (i in 1:nrunMH)
 		{
@@ -266,13 +268,13 @@ browser()
 			}
 			if (i < nrunMH)
 			{
-				ans <- z$FRAN(z, byGroup=TRUE, returnLoglik=FALSE)
+				ans <- z$FRAN(zsmall, byGroup=TRUE, returnLoglik=FALSE)
 			}
 			else
 			{#abcd
-				z$Deriv <- TRUE
-				ans <- z$FRAN(z, byGroup=TRUE, returnLoglik=TRUE, onlyLoglik=FALSE)
-				z$Deriv <- FALSE
+				zsmall$Deriv <<- TRUE
+				ans <- z$FRAN(zsmall, byGroup=TRUE, returnLoglik=TRUE, onlyLoglik=FALSE)
+				zsmall$Deriv <<- FALSE
 			}
 			# After the nrunMH the loglik by group is used as logpOld,
 			# see below.
@@ -304,7 +306,7 @@ browser()
 			}
 			else
 			{
-				z$acceptEta <- 0.5
+				z$acceptEta <<- 0.5
 			# 0.5 is twice the target probability of acceptance in improveMH,
 			# and signifies in improveMH that nothing is to be done
 			# with respect to z$scaleFactor0 and z$scaleFactorEta.
@@ -321,30 +323,30 @@ browser()
 				# sample the global parameters:
 				sampleMuSigma()
 				}
-				zm$posteriorMu[i, ] <- z$muTemp
-				zm$posteriorEta[i,] <- z$thetaMat[1,z$set2]
-				zm$PosteriorSigma[i, ,] <- z$SigmaTemp
+				zm$posteriorMu[i, ] <<- z$muTemp
+				zm$posteriorEta[i,] <<- z$thetaMat[1,z$set2]
+				zm$PosteriorSigma[i, ,] <<- z$SigmaTemp
 			}
-			zm$accepts[, i] <- mcmcc.accept
+			zm$accepts[, i] <<- mcmcc.accept
 			acceptsEta[i] <- z$acceptEta
-			zm$MHaccepts[i, , , ] <-
+			zm$MHaccepts[i, , , ] <<-
 				t(do.call(cbind,
 						  tapply(ans$accepts, factor(z$callGrid[, 1]),
 								 function(x)Reduce("+", x))))
-			zm$MHrejects[i, , , ] <-
+			zm$MHrejects[i, , , ] <<-
 				t(do.call(cbind, tapply(ans$rejects, factor(z$callGrid[, 1]),
 										function(x)Reduce("+", x))))
-			zm$MHaborts[i, , , ] <- t(do.call(cbind,
+			zm$MHaborts[i, , , ] <<- t(do.call(cbind,
 										tapply(ans$aborts,
 												factor(z$callGrid[, 1]),
 												function(x)Reduce("+", x))))
 		}
 		etaAcceptances0 <- sum(acceptsEta[2*(1:(nrunMH %/% 2))])
 		etaAcceptances1 <- sum(acceptsEta[2*(1:(nrunMH %/% 2))-1])
-		zm$BayesAcceptances <- c(rowSums(zm$accepts),
+		zm$BayesAcceptances <<- c(rowSums(zm$accepts),
 					etaAcceptances0, etaAcceptances1)
-		zm$ans.last <- ans
-		zm
+		zm$ans.last <<- ans
+		#zm
 	} # end MCMCcycle
 
 	##@thetaMati internal sienaBayes; coordinate for group i
@@ -740,21 +742,25 @@ browser()
 	# dropped in version 1.1-278.
 	# probably requires storeAll
 	##@savePartial makes a partial intermediate save as a sienaBayesFit object
-	savePartial <- function(z)
+	savePartial <- function()
 	{# save intermediate results
+		saveTheta <- z$theta
+		saveSigma <- z$Sigma
 		if (frequentist)
 		{
-			z$theta <- c(z$muTemp, z$thetaMat[1, z$set2])
+			z$theta <<- c(z$muTemp, z$thetaMat[1, z$set2])
 			# but this does not duplicate the rate parameters,
 			# whereas averageTheta does duplicate. to be changed.
-			z$Sigma <- z$SigmaTemp
+			z$Sigma <<- z$SigmaTemp
 			# these have not changed during Phase 3 (check!)
 		}
 		else
 		{
-			z$theta <- averageTheta()
+			z$theta <<- averageTheta()
 		}
 		save(z,file="PartialBayesResult.RData")
+		z$theta <<- saveTheta
+		z$Sigma <<- saveSigma
 	}
 
     ## ###################################### ##
@@ -801,8 +807,20 @@ browser()
 		cat("Initial global model estimates\n")
 		print(z$initialResults)
 		flush.console()
+		# Throw out the largest parts of z$f to save memory;
+		# some part of z$f is needed for print.summary.
+		# An alternative would be to retain just that part.
+		z$f$minimalChain <- NULL
+		z$f$chain <- NULL
+		f <- FRANstore()
+		f[1:z$nGroup] <- NULL
+		f$minimalChain <- NULL
+		f$chain <- NULL
+		FRANstore(f)
 		createStores()
 		z$sub <- 0
+		zm <- list()
+		zsmall <- list()
 		if (nrunMHBatches >= 2)
 			{
 				z$nrunMHBatches <- nrunMHBatches
@@ -865,13 +883,13 @@ browser()
 		bgain <- initfgain*exp(-gamma)
 		for (ii in 1:nwarm)
 		{
-			cyc <- MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
+			MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
 								nSampCons=nSampConst, nSampRate=nSampRates,
 								bgain=bgain)
 			z$iimain <- ii
-			storeData(cyc)
+			storeData()
 			cat('Warming step',ii,'(',nwarm,')\n')
-			cat("Accepts ",sum(cyc$BayesAcceptances),"/",
+			cat("Accepts ",sum(zm$BayesAcceptances),"/",
 				z$nGroup*nrunMHBatches,"\n")
 			flush.console()
 		}
@@ -962,6 +980,7 @@ browser()
 		z$FRAN <- getFromNamespace(algo$FRANname, pkgname)
 		z <- initializeFRAN(z, algo, data=data, effects=effects,
                 prevAns=prevAns, initC=FALSE, onlyLoglik=TRUE)
+		cat('back in sienaBayes\n')
 		z$thetaMat <- prevThetaMat
 
 		if (nbrNodes > 1 && z$observations > 1)
@@ -992,7 +1011,7 @@ browser()
 	z$OK <- FALSE
 	if (saveFreq >= 2)
 	{
-		savePartial(z)
+		savePartial()
 	}
 
 
@@ -1001,11 +1020,11 @@ browser()
 	bgain <- initfgain*exp(-gamma)
     for (ii in (nwarm+1):endPhase1)
     {
-		cyc <- MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
+		MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
 								nSampCons=nSampConst,
 								nSampRate=nSampRates, bgain=bgain)
 		z$iimain <- ii
-		storeData(cyc)
+		storeData()
 		cat('main', ii, '(', nwarm+nmain, ')')
 		if (frequentist) cat(', Phase 1')
 		cat("\nMu = ", round(z$muTemp,3), "\nEta = ",
@@ -1013,16 +1032,16 @@ browser()
 		print(round(z$SigmaTemp,4))
 		cat("\n")
 		cat('main', ii, '(', nwarm+nmain, ')',
-			" Accepts ",sum(cyc$BayesAcceptances),"/",
+			" Accepts ",sum(zm$BayesAcceptances),"/",
 				z$nGroup*nrunMHBatches,"\n")
 #	cat("thetaMat = \n")
 #	print(round(z$thetaMat,2))
 #		cat("\n")
 		flush.console()
-#cat("cyc\n")
+#cat("zm\n")
 #browser()
-#		scores.ans.last <- t(cyc$ans.last$fra) # the scores a z$pp by z$nGroups matrix
-#		dfra.ans.last <- cyc$ans.last$dff # the Hessian a sparse z$pp by z$pp matrix
+#		scores.ans.last <- t(zm$ans.last$fra) # the scores a z$pp by z$nGroups matrix
+#		dfra.ans.last <- zm$ans.last$dff # the Hessian a sparse z$pp by z$pp matrix
 		if (frequentist)
 		{
 			RobbinsMonro(bgain)
@@ -1032,7 +1051,7 @@ browser()
 		{
 			if (ii %% saveFreq == 0)
 			{
-				savePartial(z)
+				savePartial()
 			}
 		}
     }
@@ -1051,11 +1070,11 @@ browser()
     for (ii in (endPhase1+1):endPhase2)
     {
 		bgain <- initfgain*exp(-gamma*log(ii-endPhase1))
-		cyc <- MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
+		MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
 								nSampCons=nSampConst,
 								nSampRate=nSampRates, bgain=bgain)
 		z$iimain <- ii
-		storeData(cyc)
+		storeData()
 		cat('main', ii, '(', nwarm+nmain, ')')
 		if (frequentist) {cat(', Phase 2')}
 		cat("\nMu = ", round(z$muTemp,3), "\nEta = ",
@@ -1063,7 +1082,7 @@ browser()
 		print(round(z$SigmaTemp,3))
 		cat("\n")
 		cat('main', ii, '(', nwarm+nmain, ')',
-			" Accepts ",sum(cyc$BayesAcceptances),"/",
+			" Accepts ",sum(zm$BayesAcceptances),"/",
 				z$nGroup*nrunMHBatches,"\n")
 #		print(round(z$SigmaTemp,4))
 #		cat("thetaMat = \n")
@@ -1079,7 +1098,7 @@ browser()
 		{
 			if (ii %% saveFreq == 0)
 			{
-				savePartial(z)
+				savePartial()
 			}
 		}
     }
@@ -1114,17 +1133,17 @@ browser()
 	print(round(z$SigmaTemp,3))
 	cat("\n")
 	flush.console()
-	savePartial(z)
+	savePartial()
 
 # Phase 3
 	if (frequentist){cat('Phase 3\n')}
     for (ii in (endPhase2+1):(nwarm+nmain))
     {
-		cyc <- MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
+		MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
 								nSampCons=nSampConst,
 								nSampRate=nSampRates, bgain=0.000001)
 		z$iimain <- ii
-		storeData(cyc)
+		storeData()
 		cat('main', ii, '(', nwarm+nmain, ')')
 		if (frequentist) cat(', Phase 3')
 		cat("\nMu = ", round(z$muTemp,3), "\nEta = ",
@@ -1139,7 +1158,7 @@ browser()
 		else
 		{
 			cat('main', ii, '(', nwarm+nmain, ')',
-				" Accepts ",sum(cyc$BayesAcceptances),"/",
+				" Accepts ",sum(zm$BayesAcceptances),"/",
 				z$nGroup*nrunMHBatches,"\n")
 		}
 	# save intermediate results
@@ -1147,7 +1166,7 @@ browser()
 		{
 			if (ii %% saveFreq == 0)
 			{
-				savePartial(z)
+				savePartial()
 			}
 		}
     }
@@ -1170,11 +1189,11 @@ browser()
 	z$frequentist <- frequentist
     z$FRAN <- NULL
     class(z) <- "sienaBayesFit"
-	if (!storeAll)
-	{
-		z$acceptances <- NULL
-		z$candidates <- NULL
-	}
+# 	if (!storeAll)
+# 	{
+# 		z$acceptances <- NULL
+# 		z$candidates <- NULL
+# 	}
 	z$OK <- TRUE
     z
 } # end sienaBayes
@@ -1293,16 +1312,34 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	## start initializeBayes
     ## initialize
 	if (!inherits(data,"siena")){stop("The data is not a valid siena object.")}
+	allDistances <- lapply(1:length(data),
+		function(i){lapply(data[[i]]$depvars, function(y){attr(y,'distance')})})
+	matDistances <- matrix(unlist(allDistances), nrow=length(data),
+									ncol=length(unlist(allDistances[[1]])), byrow=TRUE)
+	colnames(matDistances) <- names(unlist(allDistances[[1]]))
 
-	allDistances <- sapply(data,
-		function(x){sapply(x$depvars, function(y){attr(y,'distance')})})
-	if (min(allDistances) <= 0)
+	if (min(matDistances) <= 0)
 	{
 		cat('In some groups, there is no change for a dependent variable.\n')
 		cat('This is not allowed.\n')
-		cat('This problem occurs for:\n')
-		print(names(which(allDistances <= 0)))
+		dist.check <- 3
+		wh <- which((matDistances <= dist.check), arr.ind=TRUE, useNames=FALSE)
+		cat('The following shows the dependent variables and periods\n')
+		cat('for which there are less than',dist.check+1, 'changes: \n')
+		prmatrix(cbind(wh[,1], colnames(matDistances)[wh[,2]], matDistances[wh]),
+						rowlab=rep('',dim(wh)[1]),
+						collab=c('group', 'depvar/period', '# changes'), quote=FALSE)
+		cat('In any case, there should be no groups with 0 changes.\n')
 		stop('Adapt the data set.')
+	}
+
+	imp.change <- lapply(data, checkImpossibleChanges)
+	if (sum(unlist(imp.change)) > 0)
+	{
+		cat('For some groups, there are impossible changes;\n')
+		cat('This occurs for groups\n', which(sapply(imp.change,
+						function(ic){(sum(ic) > 0)})),'\n')
+		stop('This is not permitted for likelihood-based estimation')
 	}
 
     Report(openfiles=TRUE, type="n") #initialize with no file
@@ -1384,13 +1421,14 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	if (initgainGlobal <= 0)
 	{
 		startupModel <- sienaAlgorithmCreate(n3=500, nsub=0, cond=FALSE,
+						lessMem=TRUE,
 						diagonalize=0.2, doubleAveraging=0,
 						seed=algo$randomSeed, projname="startup_sienaBayes")
 	}
 	else
 	{
 		startupModel <- sienaAlgorithmCreate(n3=500, nsub=3, cond=FALSE,
-						firstg=initgainGlobal,
+						firstg=initgainGlobal, lessMem=TRUE,
 						diagonalize=0.2, doubleAveraging=0,
 						seed=algo$randomSeed, projname="startup_sienaBayes")
 	}
@@ -1410,6 +1448,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	}
 	cat("Initial global estimates\n")
 	z$initialResults <- print(startupGlobal)
+	z$initialResults$sf <- NULL
+	z$initialResults$scores <- NULL
 	cat('\n')
 	effects <- updateTheta(effects, startupGlobal)
 	z$initialGlobalEstimates <- effects[effects$include,]
@@ -1536,20 +1576,21 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		cat(paste("Group",i,"\n"))
 		if (initgainGroupwise <= 0)
 		{
-			startup1Model <- sienaAlgorithmCreate(n3=500, nsub=0, cond=FALSE,
+			startup1Model <- sienaAlgorithmCreate(n3=500, nsub=0,  lessMem=TRUE,
+					cond=FALSE,
 					projname=paste("project",formatC(i,width=2,flag="0"),sep=""),
 					seed=algo$randomSeed)
 		}
 		else
 		{
-			startup1Model <- sienaAlgorithmCreate(n3=10, nsub=1,
+			startup1Model <- sienaAlgorithmCreate(n3=10, nsub=1, lessMem=TRUE,
 					firstg=initgainGroupwise, cond=FALSE, maxlike=initML,
 					projname=paste("project",formatC(i,width=2,flag="0"),sep=""),
 					seed=algo$randomSeed)
 		}
 		if (initML)
 		{
-			startup1Model3 <- sienaAlgorithmCreate(n3=500, nsub=0,
+			startup1Model3 <- sienaAlgorithmCreate(n3=500, nsub=0, lessMem=TRUE,
 					firstg=initgainGroupwise, cond=FALSE, maxlike=FALSE,
 					projname=paste("project",formatC(i,width=2,flag="0"),sep=""),
 					seed=algo$randomSeed)
@@ -1792,6 +1833,39 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		stop(paste("priorSigma is not a matrix of dimensions",z$p1))
 		}
 	}
+	if (priorRatesFromData == 2)
+	{
+	# Rate parameters are nuisance parameters, and get a data-induced prior;
+	# robust estimates for location and scale plus a small ridge.
+		## require(MASS)
+		if (ncol(rateParameters) <= nrow(rateParameters))
+		{
+			try.error <- (inherits(try(
+						robustRates <- cov.trob(t(rateParameters)),
+								silent=TRUE), "try-error"))
+		}
+		else
+		{
+			try.error <- (inherits(try(
+					robustRates <- cov.mcd(t(rateParameters), nsamp="sample"),
+								silent=TRUE), "try-error"))
+		}
+		if (try.error)
+		{
+			cat('Condition priorRatesFromData=2 impossible, changed to 1.\n')
+			priorRatesFromData <- 1
+		}
+		else
+		{
+			z$priorMu[z$ratesInVarying] <- robustRates$center
+			z$priorSigma[z$ratesInVarying,] <- 0
+			z$priorSigma[,z$ratesInVarying] <- 0
+			z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
+				z$priorKappa * reductionFactor * robustRates$cov
+			diag(z$priorSigma)[z$ratesInVarying] <- z$priorKappa *
+				(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
+		}
+	}
 	if (priorRatesFromData == 1)
 	{
 	# Rate parameters are nuisance parameters, and get a data-induced prior;
@@ -1801,20 +1875,6 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		z$priorSigma[,z$ratesInVarying] <- 0
 		z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
 			z$priorKappa * reductionFactor * cov(t(rateParameters))
-		diag(z$priorSigma)[z$ratesInVarying] <- z$priorKappa *
-			(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
-	}
-	if (priorRatesFromData == 2)
-	{
-	# Rate parameters are nuisance parameters, and get a data-induced prior;
-	# robust estimates for location and scale plus a small ridge.
-		## require(MASS)
-		robustRates <- cov.mcd(t(rateParameters), nsamp="sample")
-		z$priorMu[z$ratesInVarying] <- robustRates$center
-		z$priorSigma[z$ratesInVarying,] <- 0
-		z$priorSigma[,z$ratesInVarying] <- 0
-		z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
-			z$priorKappa * reductionFactor * robustRates$cov
 		diag(z$priorSigma)[z$ratesInVarying] <- z$priorKappa *
 			(diag(z$priorSigma)[z$ratesInVarying] + 0.1*reductionFactor)
 	}

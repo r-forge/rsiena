@@ -28,8 +28,8 @@ period=1, group=1, character=FALSE)
   \item{test}{For testing effects by score-type tests. Boolean required.
   Default FALSE.
 }
-  \item{random}{For specifying that effects will vary randomly,
-  which is taken into account only by \code{sienaBayes}.
+  \item{random}{For specifying that effects will vary randomly;
+  not relevant for \code{RSiena} at this moment.
   Boolean required. Default FALSE.
 }
   \item{initialValue}{Initial value required. Default 0.
@@ -86,8 +86,9 @@ The column elements of the output effects object for \code{parm},
 \code{initialValue}, and \code{timeDummy}
 will be set to the values requested.}
 \value{
-    An updated version of the input effects object, with one row
-    updated.
+An object of class \code{\link{sienaEffects}} or
+\code{\link{sienaGroupEffects}}. This will be an updated version of the
+input effects object, with one row updated.
     Details of the row altered will be printed.
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}

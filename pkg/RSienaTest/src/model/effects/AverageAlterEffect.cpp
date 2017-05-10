@@ -23,11 +23,12 @@ namespace siena
  * Constructor.
  */
 AverageAlterEffect::AverageAlterEffect(
-	const EffectInfo * pEffectInfo, bool divide) :
+	const EffectInfo * pEffectInfo, bool divide, bool alterPopularity) :
 		NetworkDependentBehaviorEffect(pEffectInfo)
 {
 	this->ldivide = divide;
 	// Indicates whether there will be division by the outdegree of ego
+	this->lalterPopularity = alterPopularity;
 }
 
 
@@ -51,7 +52,20 @@ double AverageAlterEffect::calculateChangeContribution(int actor,
 		// This is d * avg(v_j), the average being taken over all neighbors
 		// of i. This is what is calculated below.
 		// if (not divide), instead of avg the total is used.
+		if (this->lalterPopularity)
+		{
+			for (IncidentTieIterator iter = pNetwork->outTies(actor);
+				 iter.valid();
+				 iter.next())
+			{
+				int j = iter.actor();
+				contribution += (this->centeredValue(j)) * (pNetwork->inDegree(j));
+			}
+		}
+		else
+		{
 		contribution = difference * totalAlterValue(actor);
+		}
 		if (this->ldivide)
 		{
 			contribution /= pNetwork->outDegree(actor);
@@ -76,7 +90,15 @@ double AverageAlterEffect::egoStatistic(int i, double * currentValues)
 		 iter.valid();
 		 iter.next())
 	{
+		if (this->lalterPopularity)
+		{
+			int j = iter.actor();
+			statistic += (currentValues[j]) * (pNetwork->inDegree(j));
+		}
+		else
+		{
 		statistic += currentValues[iter.actor()];
+		}
 		neighborCount++;
 	}
 

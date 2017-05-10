@@ -60,12 +60,12 @@ InteractionCovariateEffect::InteractionCovariateEffect(
 	else if (averageAlter) // || pEffectInfo->internalEffectParameter() == 3)
 	{
 		this->lpInteractingEffect =
-			new AverageAlterEffect(this->lpInteractingEffectInfo, true);
+			new AverageAlterEffect(this->lpInteractingEffectInfo, true, false);
 	}
 	else if (totalAlter) // || pEffectInfo->internalEffectParameter() == 4)
 	{
 		this->lpInteractingEffect =
-			new AverageAlterEffect(this->lpInteractingEffectInfo, false);
+			new AverageAlterEffect(this->lpInteractingEffectInfo, false, false);
 	}
 	else
 	{

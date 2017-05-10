@@ -15,11 +15,11 @@ maxlikefn<- function(z, x, INIT=FALSE, TERM=FALSE, data, effects=NULL,
         {
             effects <- getEffects(data)
         }
-        if (!is.data.frame(effects))
-        {
-            stop('effects is not a data.frame')
-        }
-        effects <- effects[effects$include, ]
+		if(!inherits(effects, "sienaEffects"))
+		{
+			stop("effects is not a legitimate Siena effects object")
+		}
+		effects <- effects[effects$include, ]
         z$theta <- effects$initialValue
         z$fixed <- effects$fix
         z$test <- effects$test

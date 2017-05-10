@@ -21,7 +21,7 @@
 #include "data/BehaviorLongitudinalData.h"
 #include "model/EpochSimulation.h"
 #include "model/tables/Cache.h"
-#include "model/variables/DependentVariable.h"
+#include "DependentVariable.h"
 #include "model/Model.h"
 #include "model/effects/BehaviorEffect.h"
 #include "model/EffectInfo.h"
@@ -52,6 +52,7 @@ BehaviorVariable::BehaviorVariable(BehaviorLongitudinalData * pData,
 	this->lendowmentEffectContribution = new double * [3];
 	this->lcreationEffectContribution = new double * [3];
 	this->lprobabilities = new double[3];
+	this->lqrobabilities = new double[3];
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -61,7 +62,12 @@ BehaviorVariable::BehaviorVariable(BehaviorLongitudinalData * pData,
 			new double[pSimulation->pModel()->rEndowmentEffects(pData->name()).size()];
 		this->lcreationEffectContribution[i] =
 			new double[pSimulation->pModel()->rCreationEffects(pData->name()).size()];
+		this->lprobabilities[i] = 0;
+		this->lqrobabilities[i] = 0;
 	}
+
+	this->lbehaviorModelType = BehaviorModelType(pData->behModelType());
+	this->lmodelAbsorb = (this->lbehaviorModelType == ABSORB);
 }
 
 
@@ -75,6 +81,7 @@ BehaviorVariable::~BehaviorVariable()
 	this->lpData = 0;
 	this->lvalues = 0;
 	delete[] this->lprobabilities;
+	delete[] this->lqrobabilities;
 	// Delete arrays of contributions
 
 	for (int i = 0; i < 3; i++)
@@ -92,6 +99,7 @@ BehaviorVariable::~BehaviorVariable()
 	this->lendowmentEffectContribution = 0;
 	this->lcreationEffectContribution = 0;
 	this->lprobabilities = 0;
+	this->lqrobabilities = 0;
 
 	// no need to delete lpChangeContribution since this is
 	// handled by the MiniStep
@@ -203,6 +211,22 @@ double BehaviorVariable::similarityMean() const
 	return this->lpData->similarityMean();
 }
 
+/**
+ * Sets the model type.
+ */
+void BehaviorVariable::behaviorModelType(int type)
+{
+	this->lbehaviorModelType = BehaviorModelType(type);
+}
+
+/**
+ * Returns the model type.
+ */
+BehaviorModelType BehaviorVariable::behaviorModelType() const
+{
+	return this->lbehaviorModelType;
+}
+
 // ----------------------------------------------------------------------------
 // Section: Initialization at the beginning of a period
 // ----------------------------------------------------------------------------
@@ -263,7 +287,7 @@ void BehaviorVariable::makeChange(int actor)
 
 	if (this->pSimulation()->pModel()->needScores())
 	{
-		this->accumulateScores(difference + 1,
+		this->accumulateScores(this->lvalues[actor], difference + 1,
 			this->lupPossible,
 			this->ldownPossible);
 	}
@@ -313,11 +337,12 @@ void BehaviorVariable::makeChange(int actor)
  */
 void BehaviorVariable::calculateProbabilities(int actor)
 {
-	double maxValue = R_NegInf;
+	double maxValue = 0.0; // used to be R_NegInf, but always there is a 0
 
 	this->preprocessEgo();
 	this->lupPossible = true;
 	this->ldownPossible = true;
+	int currentValue = this->lvalues[actor];
 
 	int evaluationEffectCount = this->pEvaluationFunction()->rEffects().size();
 	int endowmentEffectCount = this->pEndowmentFunction()->rEffects().size();
@@ -364,10 +389,10 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	}
 
 	// Calculate the probability for downward change.
-	// Defer exp till can subtract the largest to avoid overflow.
+	// Defer exp until we can subtract the largest to avoid overflow.
 
-	if (this->lvalues[actor] > this->lpData->min() &&
-		!this->lpData->upOnly(this->period()))
+	if (((currentValue > this->lpData->min()) &&
+		(!this->lpData->upOnly(this->period()))) || (this->lmodelAbsorb))
 	{
 		this->lprobabilities[0] =
 			this->totalEvaluationContribution(actor, -1) +
@@ -400,8 +425,8 @@ void BehaviorVariable::calculateProbabilities(int actor)
 
 	// Calculate the probability for upward change
 
-	if (this->lvalues[actor] < this->lpData->max() &&
-		!this->lpData->downOnly(this->period()))
+	if (((currentValue < this->lpData->max()) &&
+		(!this->lpData->downOnly(this->period())))  || (this->lmodelAbsorb))
 	{
 		this->lprobabilities[2] =
 			this->totalEvaluationContribution(actor, 1) +
@@ -441,12 +466,30 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	}
 	this->lprobabilities[1]  = exp(-maxValue);
 
-	double sum = this->lprobabilities[0] +
-		this->lprobabilities[1] +
+	double sum = this->lprobabilities[0] + this->lprobabilities[1] +
 		this->lprobabilities[2];
 	this->lprobabilities[0] /= sum;
 	this->lprobabilities[1] /= sum;
 	this->lprobabilities[2] /= sum;
+
+	if (this->lmodelAbsorb)
+	{
+		this->lqrobabilities = this->lprobabilities;
+		if (currentValue <= this->lpData->min())
+		{
+			this->lprobabilities[1] =
+				this->lprobabilities[0] + this->lprobabilities[1];
+			this->lprobabilities[0] = 0;
+			this->ldownPossible = false;
+		}
+		if (currentValue >= this->lpData->max())
+		{
+			this->lprobabilities[1] =
+				this->lprobabilities[1] + this->lprobabilities[2];
+			this->lprobabilities[2] = 0;
+			this->lupPossible = false;
+		}
+	}
 }
 
 
@@ -468,7 +511,8 @@ double BehaviorVariable::totalEvaluationContribution(int actor,
 			pEffect->calculateChangeContribution(actor, difference);
 		if (this->pSimulation()->pModel()->needChangeContributions())
 		{
-			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) = thisContribution;
+			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) =
+										thisContribution;
 		}
 		this->levaluationEffectContribution[difference + 1][i] =
 			thisContribution;
@@ -491,7 +535,8 @@ double BehaviorVariable::totalEndowmentContribution(int actor,
 			pEffect->calculateChangeContribution(actor, difference);
 		if (this->pSimulation()->pModel()->needChangeContributions())
 		{
-			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) = thisContribution;
+			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) =
+							thisContribution;
 		}
 		this->lendowmentEffectContribution[difference + 1][i] =
 			thisContribution;
@@ -520,7 +565,8 @@ double BehaviorVariable::totalCreationContribution(int actor,
 			pEffect->calculateChangeContribution(actor, difference);
 		if (this->pSimulation()->pModel()->needChangeContributions())
 		{
-			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) = thisContribution;
+			(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(difference + 1) =
+									thisContribution;
 		}
 		this->lcreationEffectContribution[difference + 1][i] =
 			thisContribution;
@@ -534,28 +580,46 @@ double BehaviorVariable::totalCreationContribution(int actor,
 /**
  * Updates the scores for effects according
  * to the current step in the simulation.
+ * This function is called with arguments difference = 0, 1, 2.
+ * 1 means no change.
  */
-void BehaviorVariable::accumulateScores(int difference,
+void BehaviorVariable::accumulateScores(int currentVal, int difference,
 	bool upPossible, bool downPossible) const
 {
 	for (unsigned i = 0;
 		i < this->pEvaluationFunction()->rEffects().size();
 		i++)
 	{
-// 		if (difference == 1) no change, but not initialised
-// 		{
-// 			this->levaluationEffectContribution[difference][i] = 0;
-// 		}
 		Effect * pEffect = this->pEvaluationFunction()->rEffects()[i];
-		double score = this->levaluationEffectContribution[difference][i];
-		if (upPossible)
+
+		double score = 0;
+
+		if ((difference == 1) && (this->lmodelAbsorb))
+		{
+			if (currentVal <= this->lpData->min())
+			{
+				score = this->levaluationEffectContribution[0][i] *
+							(this->lqrobabilities[0]/this->lprobabilities[1]);
+			}
+			if (currentVal >= this->lpData->max())
+			{
+				score = this->levaluationEffectContribution[2][i] *
+							(this->lqrobabilities[2]/this->lprobabilities[1]);
+			}
+		}
+		else if (difference != 1)
+		{
+			score = this->levaluationEffectContribution[difference][i];
+// which is 0 if difference==1, i.e., no change
+		}
+		if ((upPossible) || (this->lmodelAbsorb))
 		{
 			score -=
 				this->levaluationEffectContribution[2][i] *
 				this->lprobabilities[2];
 		}
 
-		if (downPossible)
+		if ((downPossible) || (this->lmodelAbsorb))
 		{
 			score -=
 				this->levaluationEffectContribution[0][i] *
@@ -566,7 +630,7 @@ void BehaviorVariable::accumulateScores(int difference,
 			this->pSimulation()->score(pEffect->pEffectInfo()) + score);
 		if (R_IsNaN(score))
 		{
-			error("nan");
+			error("nan in accumulateScores1");
 		}
 	}
 
@@ -591,7 +655,7 @@ void BehaviorVariable::accumulateScores(int difference,
 			score = this->lendowmentEffectContribution[difference][i];
 		}
 
-		if (downPossible)
+		if ((downPossible) || (this->lmodelAbsorb))
 		{
 			score -=
 				this->lendowmentEffectContribution[0][i] *
@@ -600,7 +664,7 @@ void BehaviorVariable::accumulateScores(int difference,
 		}
 		if (R_IsNaN(score))
 		{
-			error("nan");
+			error("nan in accumulateScores2");
 		}
 
 		this->pSimulation()->score(pEffect->pEffectInfo(),
@@ -620,7 +684,7 @@ void BehaviorVariable::accumulateScores(int difference,
 			score = this->lcreationEffectContribution[difference][i];
 		}
 
-		if (upPossible)
+		if ((upPossible) || (this->lmodelAbsorb))
 		{
 			score -=
 				this->lcreationEffectContribution[2][i] *
@@ -629,7 +693,7 @@ void BehaviorVariable::accumulateScores(int difference,
 
 		if (R_IsNaN(score))
 		{
-			error("nan");
+			error("nan in accumulateScores3");
 		}
 
 		this->pSimulation()->score(pEffect->pEffectInfo(),
@@ -691,9 +755,9 @@ double BehaviorVariable::probability(MiniStep * pMiniStep)
 	this->calculateProbabilities(pMiniStep->ego());
 	if (this->pSimulation()->pModel()->needScores())
 	{
-		this->accumulateScores(pBehaviorChange->difference() + 1,
-			this->lupPossible,
-			this->ldownPossible);
+		this->accumulateScores(this->lvalues[pMiniStep->ego()],
+			pBehaviorChange->difference() + 1,
+				this->lupPossible, this->ldownPossible);
 	}
 	if (this->pSimulation()->pModel()->needDerivatives())
 	{

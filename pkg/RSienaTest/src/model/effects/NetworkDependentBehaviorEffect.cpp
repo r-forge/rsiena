@@ -97,16 +97,21 @@ void NetworkDependentBehaviorEffect::initialize(const Data *pData,
 	State *pState, State *pSimulatedState, int period, Cache *pCache)
 {
 	BehaviorEffect::initialize(pData, pState, period, pCache);
+	string networkName = this->pEffectInfo()->interactionName1();
+	if (!this->lpNetwork) 
+	{
+		throw logic_error("Network '" + networkName + "' expected.");
+	}
 
 	// Select network state.
-	string networkName = this->pEffectInfo()->interactionName1();
-	if (lSimulatedOffset == 1) {
+	if (lSimulatedOffset == 1) 
+	{
 		this->lpNetwork = pSimulatedState->pNetwork(networkName);
-	} else {
+	} 
+	else 
+	{
 		this->lpNetwork = pState->pNetwork(networkName);
 	}
-	if (!this->lpNetwork) throw logic_error(
-			"Network '" + networkName + "' expected.");
 
 	// clear old value arrays
 	if (this->ltotalAlterValues) delete [] this->ltotalAlterValues;

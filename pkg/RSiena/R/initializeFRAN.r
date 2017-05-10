@@ -15,6 +15,66 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 						   returnDataFrame=FALSE, byWave=FALSE,
 						   returnLoglik=FALSE, onlyLoglik=FALSE)
 {
+##@checkNames used in initializeFRAN for siena07
+checkNames <- function(xx){
+# checks whether names of named vectors are in names of dependent variables,
+# and whether there are any names, or the vector has length 1.
+# For this check:
+# if there are no names, then (names(xx) %in% names(data$depvars))
+# will be logical(0), and all(logical(0)) is TRUE.
+	wrongName <- (((inherits(data, "sienaGroup")) &&
+			(!all(names(xx) %in% names(data[[1]]$depvars)))) ||
+		((!inherits(data, "sienaGroup")) &&
+			(!all(names(xx) %in% names(data$depvars)))))
+	if ((!wrongName) && (length(xx) >= 2))
+	{
+		if (is.null(names(xx)))
+		{
+			wrongName <- TRUE
+		}
+		else
+		{
+			if (any(is.na(names(xx))))
+			{
+				wrongName <- TRUE
+			}
+		}
+	}
+	if (wrongName)
+	{
+		cat(deparse(substitute(xx)),
+				'in the algorithm object x should be a named vector\n')
+		cat(' with only names of dependent variables in the data set.\n')
+		stop('Invalid algorithm-data combination.')
+	}
+	invisible(!wrongName)
+}
+
+##@withNames used in initializeFRAN for siena07
+withNames <- function(xx, types){
+	if (inherits(data, "sienaGroup"))
+	{
+	theVars <- sapply(data[[1]]$depvars, function(x){attr(x,'type') %in% types})
+	theVarNames <- names(data[[1]]$depvars)[theVars]
+	}
+	else
+	{
+	theVars <- sapply(data$depvars, function(x){attr(x,'type') %in% types})
+	theVarNames <- names(data$depvars)[theVars]
+	}
+	if (!(length(xx) %in% c(1, sum(theVars))))
+	{
+		cat('Lenght of',deparse(substitute(xx)),
+				'should be equal to number of variables.\n')
+		stop('Invalid algorithm-data combination.')
+	}
+	xxx <- rep(1, sum(theVars)) * xx
+# this will work if length(xx)==1 but also if length(xx)==sum(theVars)
+	names(xxx) <- theVarNames
+	xxx
+}
+
+# start of initializeFRAN proper
 	z$effectsName <- deparse(substitute(effects))
 	## fix up the interface so can call from outside robmon framework
     if (is.null(z$FinDiff.method))
@@ -57,7 +117,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
                 bad <- which(!(userlist %in% deflist))
                 print(userlist[bad])
 				cat("invalid effect requested: see above; \n")
-    stop("there seems to be a mismatch between data set and effects object.")
+    cat("there seems to be a mismatch between data set and effects object.\n")
+    stop("Perhaps the effects object must be created from scratch.")
             }
         }
         if (!inherits(effects, "data.frame"))
@@ -73,14 +134,90 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             }
             effects$initialValue <- defaultEffects$initialValue
         }
-		if (((inherits(data, "sienaGroup")) &&
-				(!all(names(x$MaxDegree) %in% names(data[[1]]$depvars)))) ||
-			((!inherits(data, "sienaGroup")) &&
-				(!all(names(x$MaxDegree) %in% names(data$depvars)))))
+
+# Give names if they did not yet exist.
+		if (length(x$MaxDegree) == 1)
 		{
-			cat(' MaxDegree in the algorithm should be a named vector\n')
-			cat(' with only names of dependent variables in the data set.\n')
-			stop('Invalid algorithm-data combination.')
+			x$MaxDegree <- withNames(x$MaxDegree, c('oneMode','bipartite'))
+		}
+		if (length(x$modelType) == 1)
+		{
+			x$modelType <- withNames(x$modelType, c('oneMode','bipartite'))
+		}
+		if (length(x$behModelType) == 1)
+		{
+			x$behModelType <- withNames(x$behModelType, 'behavior')
+		}
+		if (length(x$UniversalOffset) == 1)
+		{
+			x$UniversalOffset <- withNames(x$UniversalOffset, c('oneMode','bipartite'))
+		}
+# Check that the following attributes have correct or absent names
+		checkNames(x$MaxDegree)
+		checkNames(x$UniversalOffset)
+		checkNames(x$modelType)
+		checkNames(x$behModelType)
+		# The following error will occur if ML estimation is requested
+		# and there are any impossible changes from structural values
+		# to different observed values.
+		if (x$maxlike)
+		{
+			if (inherits(data, "sienaGroup"))
+			{
+				impossible <- FALSE
+				zerochange <- FALSE
+				imp.change <- lapply(data, checkImpossibleChanges)
+				if (sum(unlist(imp.change)) > 0)
+				{
+					cat('For some groups, there are impossible changes;\n')
+					cat('This occurs for groups\n', which(sapply(imp.change,
+									function(ic){(sum(ic) > 0)})),'\n')
+					impossible <- TRUE
+				}
+				z.changes <- sapply(data, checkZeroChanges)
+				if (sum(z.changes >= 1))
+				{
+					cat(' For some groups and some period, there is no change.\n')
+					cat('This occurs for groups ', which(sapply(z.changes,
+									function(zc){(zc > 0)})),'\n')
+					zerochange <- TRUE
+				}
+			}
+			else
+			{
+				imp.change <- checkImpossibleChanges(data)
+				if (imp.change %in% c(1,3))
+				{
+					cat('There are some changes from structural zero to observed 1.\n')
+				}
+				if (imp.change %in% c(2,3))
+				{
+					cat('There are some changes from structural one to observed 0.\n')
+				}
+				if (imp.change >= 4)
+				{
+					cat('There are some impossible changes between structural and observed values,\n')
+					cat('some through intermediary NA.\n')
+				}
+				impossible <- (imp.change > 0)
+				zerochange <- FALSE
+				z.changes <- checkZeroChanges(data)
+				if (sum(z.changes >= 1))
+				{
+					cat(' For some period, there is no change.\n')
+					zerochange <- TRUE
+				}
+			}
+			if (impossible || zerochange)
+			{
+				cat('This is not allowed for likelihood-based estimation.\n')
+				if (impossible)
+		{
+					cat('Possible remedies are: represent periods by multiple groups,\n')
+					cat('or change the offending values.\n')
+				}
+				stop('Impossible changes')
+			}
 		}
         ## get data object into group format to save coping with two
         ## different formats
@@ -110,10 +247,16 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 # If all works, this can be deleted,
 # and also the function addSettingsEffects can be deleted.
 # I used this function as a template for the change to getEffects.
-# I wonder why the next line cannot be dropped;
+# I wonder why the next 8 lines cannot be dropped;
 # gives error message "cannot find setting col".
-	effects$setting <- rep("", nrow(effects))
-
+#	if (!is.null(x$settings))
+#	{
+#		effects <- addSettingsEffects(effects, x)
+#	}
+#	else
+#	{
+#		effects$setting <- rep("", nrow(effects))
+#	}
 	## find any effects not included which are needed for interactions
         tmpEffects <- effects[effects$include, ]
         interactionNos <- unique(c(tmpEffects$effect1, tmpEffects$effect2,
@@ -267,12 +410,13 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
             stop("Finite difference method for derivatives not available",
                  "with Maximum likelihood method")
         }
-        ## if any networks symmetric must use finite differences and not maxlike
-        ## scores are now available (30.10.10) but still not maxlike.
+        ## maxlike not available for symmetric networks; or is it?.
         ## check model type: default for symmetric is type 2 (forcing model).
+		## maxlike only for some model types?
         syms <- attr(data,"symmetric")
         z$FinDiffBecauseSymmetric <- FALSE
         z$modelType <- x$modelType
+        z$behModelType <- x$behModelType
         if (any(!is.na(syms) & syms))
         {
             ##     z$FinDiff.method <- TRUE
@@ -282,10 +426,9 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 #                stop("Maximum likelihood method not implemented",
 #                     "for symmetric networks")
             }
-            if (x$modelType == 1)
-            {
-                z$modelType <- 2
-            }
+			symms <- syms
+			symms[is.na(symms)] <- FALSE
+            z$modelType[(z$modelType == 1) & symms] <- 2
         }
         if (z$cconditional)
         {
@@ -487,10 +630,74 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
                         x[x$requested, ]
                     }
                         )
+
+    ##store address of model
+    f$pModel <- pModel
+    ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
+    if (x$MaxDegree == 0 || is.null(x$MaxDegree))
+    {
+        MAXDEGREE <-  NULL
+    }
+    else
+    {
+        MAXDEGREE <- x$MaxDegree
+        storage.mode(MAXDEGREE) <- "integer"
+    }
+    if (x$UniversalOffset == 0 || is.null(x$UniversalOffset))
+    {
+        UNIVERSALOFFSET <-  NULL
+    }
+    else
+    {
+        UNIVERSALOFFSET <- x$UniversalOffset
+        storage.mode(UNIVERSALOFFSET) <- "double"
+    }
+    if ((length(x$modelType) == 0)||(x$modelType == 0) || is.null(x$modelType))
+    {
+        MODELTYPE <-  NULL
+    }
+    else
+    {
+        MODELTYPE <- x$modelType
+        storage.mode(MODELTYPE) <- "integer"
+    }
+    if ((length(x$behModelType) == 0)||(x$behModelType == 0) || is.null(x$behModelType))
+    {
+        BEHMODELTYPE <-  NULL
+    }
+    else
+    {
+        BEHMODELTYPE <- x$behModelType
+        storage.mode(BEHMODELTYPE) <- "integer"
+    }
+    if (z$cconditional)
+    {
+        CONDVAR <- z$condname
+        CONDTARGET <- attr(f, "change")
+        ##   cat(CONDTARGET, "\n")
+    }
+    else
+    {
+        CONDVAR <- NULL
+        CONDTARGET <- NULL
+    }
+
+	simpleRates <- TRUE
+	if (any(!z$effects$basicRate & z$effects$type =="rate"))
+	{
+		simpleRates <- FALSE
+	}
+	z$simpleRates <- simpleRates
+
+	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
+                 pData, pModel, MAXDEGREE, UNIVERSALOFFSET, CONDVAR, CONDTARGET,
+                 profileData, z$parallelTesting, MODELTYPE, BEHMODELTYPE,
+				 z$simpleRates, x$normSetRates)
     if (!initC)
     {
         ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
-					 z$parallelTesting, returnActorStatistics=FALSE, returnStaticChangeContributions=FALSE)
+					 z$parallelTesting, returnActorStatistics=FALSE,
+					 returnStaticChangeContributions=FALSE)
 		##stop("done")
 		## create a grid of periods with group names in case want to
 		## parallelize using this or to access chains easily
@@ -522,43 +729,9 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
         }
     }
 
-    ##store address of model
-    f$pModel <- pModel
-    ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
-    if (x$MaxDegree == 0 || is.null(x$MaxDegree))
-    {
-        MAXDEGREE <-  NULL
-    }
-    else
-    {
-        MAXDEGREE <- x$MaxDegree
-        storage.mode(MAXDEGREE) <- "integer"
-    }
-    if (z$cconditional)
-    {
-        CONDVAR <- z$condname
-        CONDTARGET <- attr(f, "change")
-        ##   cat(CONDTARGET, "\n")
-    }
-    else
-    {
-        CONDVAR <- NULL
-        CONDTARGET <- NULL
-    }
-
-	simpleRates <- TRUE
-	if (any(!z$effects$basicRate & z$effects$type =="rate"))
-	{
-		## browser()
-		simpleRates <- FALSE
-	}
-	z$simpleRates <- simpleRates
-
-	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
-                 pData, pModel, MAXDEGREE, CONDVAR, CONDTARGET,
-                 profileData, z$parallelTesting, x$modelType, z$simpleRates)
 # Here came an error
 # Error: INTEGER() can only be applied to a 'integer', not a 'double'
+# This was because storage.mode had not been set properly for some variable
     if (x$maxlike)
     {
         if (!initC)
@@ -1156,6 +1329,7 @@ unpackOneMode <- function(depvar, observations, compositionChange)
     attr(edgeLists, "averageInDegree") <- attr(depvar, "averageInDegree")
     attr(edgeLists, "averageOutDegree") <- attr(depvar, "averageOutDegree")
 	attr(edgeLists, "settings") <- attr(depvar, "settings")
+	attr(edgeLists, "settingsinfo") <- attr(depvar, "settingsinfo")
     return(edgeLists = edgeLists)
 }
 ##@unpackBipartite siena07 Reformat data for C++

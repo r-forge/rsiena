@@ -9,7 +9,8 @@ Function to create user-specified interactions for a Siena model.
 \usage{
 includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
     type = "eval", interaction1 = rep("", 3), interaction2 = rep("", 3),
-    fix = FALSE, test = FALSE, parameter = 0, character = FALSE, verbose = TRUE)
+    fix = FALSE, test = FALSE, parameter = 0, random = FALSE,
+    character = FALSE, verbose = TRUE)
 }
 \arguments{
   \item{myeff}{a Siena effects object as created by \code{\link{getEffects}}}
@@ -42,6 +43,9 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   Boolean. Are the effects to be tested or not (requires \code{fix}).}
 \item{parameter}{
   The parameter of this interaction effect. Integer value required. Default 0.}
+\item{random}{For specifying that the interaction effect will vary randomly;
+  not relevant for \code{RSiena} at this moment.
+  Boolean required. Default FALSE.}
 \item{character}{Boolean: are the effect names character strings or not.}
 \item{verbose}{Boolean: should the print of altered effects be produced.}
 }
@@ -60,10 +64,16 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   corresponding main effects. This is however not enforced
   by \code{includeInteraction()}.
 
+  Interaction effects are constructed from effects with shortName
+  \code{unspInt} (for networks) and \code{behUnspInt} (for behavior)
+  by specifying their elements \code{effect1} and \code{effect2},
+  and possibly \code{effect3}.
+
   The number of possible user-specified interaction effects is limited
   by the parameters \code{nintn} (for dependent network variables)
   and \code{behNintn} (for dependent behavior variables)
-  in the call of \code{\link{getEffects}}.
+  in the call of \code{\link{getEffects}}, which determine the numbers of
+  effects with shortNames \code{unspInt} and \code{behUnspInt}.
 
   The input names \code{interaction1} and \code{interaction2} do not themselves
   refer to created interactions, but to dependence of the base effects on
@@ -77,7 +87,7 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
 
   To set attributes of interaction effects in the effects object,
   function \code{\link{setEffect}} can also be used with its parameters
-  \code{effect1} and \code{effect2}, as shown in the example below.
+  \code{effect1} and \code{effect2}, and possibly \code{effect3}.
   }
 \value{
   An updated version of the input effects object; if \code{include},
@@ -104,22 +114,9 @@ myeff <- includeInteraction(myeff, recip, simX, interaction1=c("", "alc"))
 myeff <- includeInteraction(myeff, transTrip, egoX, interaction1=c("", "alc"))
 myeff
 # How to set the effect parameter of an interaction:
-# directly:
 myeff <- getEffects(mydata)
 myeff <- setEffect(myeff, gwespFF, parameter=69)
 myeff <- includeInteraction(myeff, recip, gwespFF, parameter=69)
-myeff
-# or indirectly:
-myeff <- getEffects(mydata)
-myeff <- includeEffects(myeff, gwespFF)
-myeff <- includeInteraction(myeff, recip, gwespFF)
-myeff
-(param <- myeff[(myeff$shortName == 'gwespFF') & myeff$include,'parm']) # parameter value
-(eff1 <- myeff[(myeff$shortName == 'unspInt') & myeff$include,'effect1']) # first interacted effect
-(eff2 <- myeff[(myeff$shortName == 'unspInt') & myeff$include,'effect2']) # second interacted effect
-# In interactive use one could get the numbers for param, eff1, and eff2
-# directly from the information given by print(myeff).
-myeff <- setEffect(myeff, unspInt, parameter=param, effect1=eff1, effect2=eff2)
 myeff
 }
 \keyword{ classes }

@@ -126,6 +126,8 @@ NetworkVariable::NetworkVariable(NetworkLongitudinalData * pData,
 		pSimulation->pCache()->pNetworkCache(this->lpNetwork);
 
 	this->lalter = 0;
+
+	this->lnetworkModelType = NetworkModelType(pData->modelType());
 }
 
 
@@ -254,6 +256,33 @@ LongitudinalData * NetworkVariable::pData() const
 {
 	return this->lpData;
 }
+
+/**
+ * Sets the model type.
+ */
+void NetworkVariable::networkModelType(int type)
+{
+	this->lnetworkModelType = NetworkModelType(type);
+}
+
+/**
+ * Returns the model type.
+ */
+NetworkModelType NetworkVariable::networkModelType() const
+{
+	return this->lnetworkModelType;
+}
+
+/**
+ * Returns whether the model type is one of the symmetric type b models.
+ */
+
+bool NetworkVariable::networkModelTypeB() const
+{
+	return this->lnetworkModelType == BFORCE ||
+		this->lnetworkModelType == BAGREE || this->lnetworkModelType == BJOINT;
+}
+
 
 
 // ----------------------------------------------------------------------------
@@ -517,7 +546,7 @@ void NetworkVariable::makeChange(int actor)
 
 	this->successfulChange(true);
 
-	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->networkModelTypeB())
 	{
 		if (this->calculateModelTypeBProbabilities())
 		{
@@ -567,7 +596,7 @@ void NetworkVariable::makeChange(int actor)
 		//if (alter != actor && !this->lpNetworkCache->outTieExists(alter) &&
 		//	this->pSimulation()->pModel()->modelType() == AAGREE)
 		if (this->symmetric() &&
-			this->pSimulation()->pModel()->modelType() == AAGREE &&
+			this->networkModelType() == AAGREE &&
 			!this->lpNetworkCache->outTieExists(alter))
 		{
 			this->checkAlterAgreement(alter);
@@ -585,7 +614,7 @@ void NetworkVariable::makeChange(int actor)
 			this->accumulateScores(alter);
 		}
 	}
-//	 NB  the probabilities are probably wrong for !accept
+//	 NB  the probabilities in the reported chain are probably wrong for !accept
 	if (this->pSimulation()->pModel()->needChain())
 	{
 		// add ministep to chain
@@ -607,11 +636,11 @@ void NetworkVariable::makeChange(int actor)
 		}
 		this->pSimulation()->pChain()->insertBefore(pMiniStep,
 			this->pSimulation()->pChain()->pLast());
-		if (!this->symmetric() || !this->pSimulation()->pModel()->modelTypeB())
+		if (!this->symmetric() || !this->networkModelTypeB())
 		{
 			pMiniStep->logChoiceProbability(log(this->lprobabilities[alter]));
 			if (this->symmetric() &&
-				this->pSimulation()->pModel()->modelType() == AAGREE)
+				this->networkModelType() == AAGREE)
 			{
 				pMiniStep->logChoiceProbability(pMiniStep->
 					logChoiceProbability() + log(this->lsymmetricProbability));
@@ -1530,14 +1559,16 @@ void NetworkVariable::checkAlterAgreement(int alter)
 	this->calculateSymmetricTieFlipProbabilities(this->lego, 1);
 
 	double probability = 0;
+	double logprob = this->lsymmetricProbabilities[1] + 
+										this->lpData->universalOffset();
 
-	if (this->lsymmetricProbabilities[1] > 0)
+	if (logprob > 0)
 	{
-		probability = 1.0 / (1.0 + exp(-this->lsymmetricProbabilities[1]));
+		probability = 1.0 / (1.0 + exp(-logprob));
 	}
 	else
 	{
-		probability = exp(this->lsymmetricProbabilities[1]);
+		probability = exp(logprob);
 		probability = probability / (1.0 + probability);
 	}
 
@@ -1629,7 +1660,7 @@ void NetworkVariable::accumulateSymmetricModelScores(int alter, bool accept)
 	double prAlter = 0;
 	double prSum = 0;
 
-	switch(this->pSimulation()->pModel()->modelType())
+	switch(this->networkModelType())
 	{
 	case BFORCE:
 		prEgo = this->lsymmetricProbabilities[0];
@@ -2096,7 +2127,7 @@ bool NetworkVariable::calculateModelTypeBProbabilities()
 	this->preprocessEgo(this->lego);
 	this->calculateSymmetricTieFlipContributions(alter, 0);
 	this->calculateSymmetricTieFlipProbabilities(alter, 0);
-	switch(this->pSimulation()->pModel()->modelType())
+	switch(this->networkModelType())
 	{
 	case BFORCE:
 		if (this->lsymmetricProbabilities[0] > 0)
@@ -2201,7 +2232,7 @@ double NetworkVariable::probability(MiniStep * pMiniStep)
 	NetworkChange * pNetworkChange =
 		dynamic_cast<NetworkChange *>(pMiniStep);
 	this->lego = pNetworkChange->ego();
-	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->networkModelTypeB())
 	{
 		this->calculateModelTypeBProbabilities();
 		if (this->pSimulation()->pModel()->needScores())

@@ -382,8 +382,9 @@ doIterations<- function(z, x, subphase,...)
 			if (z$pp > sum(z$fixed))
 			{
 				maxRatio <-
-					sqrt((t(fra[!z$fixed]) %*% z$sf.invcov %*% fra[!z$fixed]) /
-														(z$pp-sum(z$fixed)))
+					max(sqrt((t(fra[!z$fixed]) %*% z$sf.invcov %*% fra[!z$fixed]) /
+														(z$pp-sum(z$fixed))))
+# the max() is just to turn the (1,1) matrix into a number.
 			}
 			else
 			{

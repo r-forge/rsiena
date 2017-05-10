@@ -133,6 +133,11 @@ string EffectInfo::effectName() const
 	return this->leffectName;
 }
 
+string EffectInfo::effectType() const
+{
+	return this->leffectType;
+}
+
 
 /**
  * Returns the name of the variable or covariate this effect interacts with,

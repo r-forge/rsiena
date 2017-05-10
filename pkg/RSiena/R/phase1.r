@@ -143,9 +143,16 @@ phase1.2 <- function(z, x, ...)
 	# for dolby option: regress deviations fra on scores ssc
 	z$regrCoef <- rep(0, z$pp)
 	z$regrCor <- rep(0, z$pp)
-	if (!is.null(z$ssc))
+	if (x$dolby && ((!is.null(z$ssc)) || (!is.null(z$scores))))
+	{
+		if ((!is.null(z$ssc)) & (z$sf2.byIteration))
 	{
 		scores <- apply(z$ssc, c(1,3), sum)
+		}
+		else
+		{
+			scores <- z$scores
+		}
 		for (i in 1:z$pp)
 		{
 			oldwarn <- getOption("warn")
@@ -154,9 +161,16 @@ phase1.2 <- function(z, x, ...)
 			{
 				z$regrCoef[i] <- cov(z$sf[,i], scores[,i])/var(scores[,i])
 				z$regrCor[i] <- cor(z$sf[,i], scores[,i])
+#				covi <- sum(sapply(1:dim(z$sf2)[2], function(m){cov(z$sf2[,m,i], z$ssc[,m,i])}))
+#				vari.sc <- sum(sapply(1:dim(z$sf2)[2], function(m){var(z$ssc[,m,i])}))
+#				vari.fra <- sum(sapply(1:dim(z$sf2)[2], function(m){var(z$sf2[,m,i])}))
+#				z$regrCoef[i] <- covi/vari.sc
+#				z$regrCor[i] <- covi/sqrt(vari.sc * vari.fra)
 			}
 			if (is.na(z$regrCor[i])){z$regrCor[i] <- 0}
 			if (is.na(z$regrCoef[i])){z$regrCoef[i] <- 0}
+			if (!is.finite(z$regrCor[i])){z$regrCor[i] <- 0}
+			if (!is.finite(z$regrCoef[i])){z$regrCoef[i] <- 0}
 			options(warn = oldwarn)
 		}
 		Report('Correlations between scores and statistics:\n', cf)
@@ -276,14 +290,14 @@ phase1.2 <- function(z, x, ...)
     Report(c('Phase 1 achieved after ', z$phase1Its, ' iterations.\n'), cf)
     WriteOutTheta(z)
     z$nitPhase1 <- z$phase1Its
-    z$phase1devs <- z$sf
-    z$phase1dfra <- z$frda
-    z$phase1sdf <- z$sdf
-    z$phase1sdf2 <- z$sdf2
-    z$phase1scores <- z$ssc
-    z$phase1accepts <- z$accepts
-    z$phase1rejects <- z$rejects
-	z$phase1aborts <- z$aborts
+#	z$phase1devs <- z$sf
+#	z$phase1dfra <- z$frda
+#	z$phase1sdf <- z$sdf
+#	z$phase1sdf2 <- z$sdf2
+#	z$phase1scores <- z$ssc
+#	z$phase1accepts <- z$accepts
+#	z$phase1rejects <- z$rejects
+#	z$phase1aborts <- z$aborts
     ##browser()
     z
 }
@@ -300,8 +314,8 @@ CalculateDerivative <- function(z, x)
         ##note that warnings is never set as this piece of code is not executed
         ##if force_fin_diff_phase_1 is true so warning is zero on entry
         ##browser()
-
-        dfra <- derivativeFromScoresAndDeviations(z$ssc, z$sf2)
+        dfra <- derivativeFromScoresAndDeviations(z$ssc, z$sf2,
+								z$dfras, z$sscs, z$sf2s, z$sf2.byIteration, z$Phase1nits)
 		fromBayes <- 'fromBayes' %in% names(x)
         z$jacobianwarn1 <- rep(FALSE, z$pp)
         if ((any(diag(dfra)[!z$fixed] <= 0)) && (!fromBayes))
@@ -440,12 +454,15 @@ FiniteDifferences <- function(z, x, fra, fra2)
     z
 }
 ##@derivativeFromScoresAndDeviations siena07 create dfra from scores and deviations
-derivativeFromScoresAndDeviations <- function(scores, deviations)
+derivativeFromScoresAndDeviations <- function(scores, deviations, sumdfra,
+											sumscores, sumdeviations, byIterations, nIter)
 {
+	if (byIterations)
+	{
+    ## replaced nested applies by memory saving for loops after problems
     nIterations <- dim(scores)[1]
     nWaves <- dim(scores)[2]
     nParameters <- dim(scores)[3]
-    ## replaced nested applies by memory saving for loops after problems
     dfra <- matrix(0, nrow=nParameters, ncol=nParameters)
     for (i in 1:nIterations)
     {
@@ -454,12 +471,21 @@ derivativeFromScoresAndDeviations <- function(scores, deviations)
             dfra <- dfra + outer(scores[i, j, ], deviations[i, j, ])
         }
     }
-    dfra <- t(dfra)
-    dfra<- dfra / nIterations
     tmp <- matrix(sapply(1 : nWaves, function(i)
                          outer(colMeans(deviations)[i,],
                                colMeans(scores)[i,])), ncol=nWaves)
-
+		dfra <- t(dfra) / nIterations
+	}
+	else
+	{
+		nWaves <- dim(sumscores)[1]
+		nParameters <- dim(sumscores)[2]
+		dfra <- sumdfra
+		tmp <- matrix(sapply(1 : nWaves,
+						function(i){outer(sumdeviations[i,], sumscores[i,])}),
+							ncol=nWaves) / (nIter^2)
+		dfra <- t(dfra) / nIter
+	}
     dfra - matrix(rowSums(tmp), nrow=nParameters)
 }
 
@@ -493,20 +519,35 @@ makeZsmall <- function(z)
 createSiena07stores <- function(z, nIterations, f)
 {
     z$sf <- matrix(0, nrow = nIterations , ncol = z$pp)
+	if (z$sf2.byIteration) # standard situation
+	{
     z$sf2 <- array(0, dim=c(nIterations, f$observations - 1, z$pp))
-	if (!z$maxlike && !z$FinDiff.method)
+		if ((!z$maxlike) && (!z$FinDiff.method))
 	{
 		z$ssc <- array(0, dim=c(nIterations, f$observations - 1, z$pp))
 	}
-	else
+	}
+	else # store only sums over iterations
 	{
+		z$sf2s <- matrix(0, nrow=(f$observations - 1), ncol=z$pp)
+		if (!z$maxlike && !z$FinDiff.method)
+	{
+			z$sscs <- matrix(0, nrow=(f$observations - 1), ncol=z$pp)
+			z$scores <- matrix(0, nrow=nIterations, ncol=z$pp)
+			z$dfras <- matrix(0, nrow=z$pp, ncol=z$pp)
+		}
+	}
 		z$sdf <- vector("list", nIterations)
 		z$sdf2 <- vector("list", nIterations)
-	}
+
+	if (!z$sf2.byIteration){ z$ssc <- NULL}
+	if (z$maxlike)
+	{
 	## misdat steps are separated out giving 9 types
     z$accepts <- array(0, dim=c(nIterations, z$nDependentVariables, 9))
     z$rejects <- array(0, dim=c(nIterations, z$nDependentVariables, 9))
     z$aborts <- array(0, dim=c(nIterations, z$nDependentVariables, 9))
+	}
 	z$npos <- rep(0, z$pp)
     if (!is.null(z$cconditional) && z$cconditional)
     {
