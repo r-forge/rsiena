@@ -19,16 +19,6 @@ using namespace std;
 
 namespace siena
 {
-
-// ----------------------------------------------------------------------------
-// Section: Enumerations
-// ----------------------------------------------------------------------------
-
-/**
- * This enumeration defines the possible types of model for symmetric,
- * undirected networks.
- */
-	enum ModelType { NOTUSED, NORMAL, AFORCE, AAGREE, BFORCE, BAGREE, BJOINT };
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
 // ----------------------------------------------------------------------------
@@ -133,10 +123,6 @@ public:
 	void needChangeContributions(bool flag);
 	bool needChangeContributions() const;
 
-	void modelType(int type);
-	ModelType modelType() const;
-	bool modelTypeB() const;
-
 	// various stores for ML
 
 	void numberMLSteps(int value);
@@ -181,6 +167,9 @@ public:
 
 	void missingBehaviorProbability(double probability);
 	double missingBehaviorProbability(int periodFromStart) const;
+
+	void normalizeSettingRates(bool normalize);
+	bool normalizeSettingRates() const;
 
     // localML
     void localML(bool flag);
@@ -292,8 +281,7 @@ private:
 	vector <vector <Chain *> > lchainStore;
 
 	int lnumberOfPeriods;
-
-	ModelType lmodelType;
+	bool lnormalizeSettingsRates;
 };
 
 }

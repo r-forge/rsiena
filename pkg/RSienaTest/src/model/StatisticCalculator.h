@@ -14,6 +14,8 @@
 
 #include <map>
 
+using namespace std;
+
 namespace siena
 {
 
@@ -65,10 +67,10 @@ public:
 	virtual ~StatisticCalculator();
 
 	double statistic(EffectInfo * pEffectInfo) const;
-	std::vector<double *> staticChangeContributions(EffectInfo * pEffect) const;
+	vector<double *> staticChangeContributions(EffectInfo * pEffect) const;
 	double * actorStatistics(EffectInfo * pEffect) const;
 	int distance(LongitudinalData * pData, int period) const;
-	int settingDistance(LongitudinalData * pData, std::string setting,
+	int settingDistance(LongitudinalData * pData, string setting,
 		int period) const;
 
 private:
@@ -90,12 +92,12 @@ private:
 	// Functions to calculate value of diffusion rate effect
 	double calculateDiffusionRateEffect(BehaviorLongitudinalData *
 		pBehaviorData, const Network * pStructural, int i,
-		std::string effectName);
+		string effectName);
 	double calculateDiffusionRateEffect(BehaviorLongitudinalData *
 		pBehaviorData, const Network * pStructural,
 		const ConstantCovariate * pConstantCovariate,
 		const ChangingCovariate * pChangingCovariate,
-		int i, std::string effectName);
+		int i, string effectName);
 
 	// The data to be used for calculating the statistics
 	const Data * lpData;
@@ -116,19 +118,19 @@ private:
 	bool lcountStaticChangeContributions;
 
 	// The resulting map of statistic values
-	std::map<EffectInfo *, double> lstatistics;
+	map<EffectInfo *, double> lstatistics;
 
 	// The resulting map of actor statistic values
-	std::map<EffectInfo *, double * > lactorStatistics;
+	map<EffectInfo *, double * > lactorStatistics;
 
 	// The change contributions of all effects
-	std::map<EffectInfo *, std::vector<double *> > lstaticChangeContributions;
+	map<EffectInfo *, vector<double *> > lstaticChangeContributions;
 
 	// Array of simulated distances per variable
-	std::map<LongitudinalData *, int *> ldistances;
+	map<LongitudinalData *, int *> ldistances;
 
 	// Array of simulated distances per setting per network variable
-	std::map<LongitudinalData *, std::map<std::string, int *> > lsettingDistances;
+	map<LongitudinalData *, map<std::string, int *> > lsettingDistances;
 
 	State * lpPredictorState;
 

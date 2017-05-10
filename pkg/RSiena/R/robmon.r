@@ -28,6 +28,14 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     z$gain <- x$firstg
     z$haveDfra <- FALSE
     z$maxlike <- x$maxlike
+	if (is.null(x$sf2.byIteration)) # keep compatible
+	{
+		z$sf2.byIteration <- TRUE
+	}
+	else
+	{
+		z$sf2.byIteration <- x$sf2.byIteration
+	}
 	if (z$maxlike && !is.batch())
 	{
 		tkconfigure(z$tkvars$phaselabel, text="MCMC Burnin")
@@ -69,7 +77,6 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
         {
             stop("Not enough observations to use the nodes")
         }
-		
 		if (!length(cl)) {
 		    unlink("cluster.out")
   		  if (clusterType == "FORK")
@@ -83,7 +90,6 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
   		                      outfile = "cluster.out")
   		  }
 		}
-		
         clusterCall(cl, library, pkgname, character.only = TRUE)
 		##parLapply(cl, c('f1','f2'), sink)
 		z$oldRandomNumbers <- .Random.seed

@@ -11,7 +11,15 @@
 ##@siena08 siena08
 siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05, maxit=20)
 {
+	fitList <- (!inherits(list(...)[[1]], 'sienaFit'))
+	if (fitList)
+	{
+		dots <- (list(...))[[1]]
+	}
+	else
+	{
     dots <- as.list(substitute(list(...)))[-1] ##first entry is the word 'list'
+	}
     if (length(dots) == 0)
     {
         stop('need some sienafits')
@@ -25,7 +33,16 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05, maxit=20)
     {
         fixup <- nm == ''
     }
+	if (fitList)
+	{
+		listName <- deparse(substitute(fitList))
+		dep <- paste(listName, seq(along=fitList), sep='')
+	}
+	else
+	{
     dep <- sapply(dots[fixup], function(x) deparse(x)[1])
+		dots <- list(...)
+	}
     if (is.null(nm))
     {
         nm <- dep
@@ -34,7 +51,6 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05, maxit=20)
     {
         nm[fixup] <- dep
     }
-    dots <- list(...)
     names(dots) <- nm
     if (any(duplicated(nm)))
     {

@@ -21,10 +21,10 @@
 \arguments{
   \item{object}{An object of class \code{sienaMeta}}
   \item{x}{An object of class \code{sienaMeta}, or
-	\code{summary.sienaMeta} as appropriate}
+    \code{summary.sienaMeta} as appropriate}
   \item{file}{Boolean: if TRUE, sends output to file named
-	\code{x$projname.out}. If FALSE, output is to the terminal.}
-	\item{extra}{Boolean: if TRUE, prints more information}
+    \code{x$projname.out}. If FALSE, output is to the terminal.}
+    \item{extra}{Boolean: if TRUE, prints more information}
   \item{layout}{the vector giving number of rows and columns
        in the arrangement of the several panels in a
        rectangular array, possibly spanning multiple pages}
@@ -33,7 +33,9 @@
 }
 \value{
  The function \code{print.sienaMeta} prints details of the merged
- estimates of the meta-analysis, with test statistics.
+ estimates of the meta-analysis carried out by \code{\link{siena08}}, 
+ with test statistics. See the help page for \code{\link{siena08}}
+ for what is produced by this function.
 
  The function \code{summary.sienaMeta} prints details as for the
  \code{print} method, but also details of the \code{sienaFit} objects
@@ -61,6 +63,7 @@
 }
 \author{Ruth Ripley, Tom Snijders
 }
+\seealso{\code{\link{siena08}}}
 
 \examples{
 \dontrun{
@@ -93,6 +96,16 @@ ans.3
 ans.4
 (meta <- siena08(ans.1, ans.3, ans.4))
 summary(meta)
+# For specifically presenting the Fisher combinations:
+# First determine the number of estimated effects:
+(neff <- sum(sapply(meta, function(x){ifelse(is.list(x),!is.null(x$cjplus),FALSE)})))
+Fishers <- t(sapply(1:neff,
+        function(i){c(meta[[i]]$cjplus, meta[[i]]$cjminus,
+                        meta[[i]]$cjplusp, meta[[i]]$cjminusp, 2*meta[[i]]$n1 )}))
+Fishers <- as.data.frame(Fishers, row.names=names(meta)[1:neff])
+names(Fishers) <- c('Fplus', 'Fminus', 'pplus', 'pminus', 'df')
+Fishers
+# For plotting:
 plo <- plot(meta, layout = c(3,1))
 plo
 plo[3]

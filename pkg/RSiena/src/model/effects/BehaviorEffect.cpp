@@ -59,6 +59,11 @@ void BehaviorEffect::initialize(const Data * pData,
 	this->lvalues = pState->behaviorValues(name);
 }
 
+void BehaviorEffect::initialize(const Data *pData,
+	State *pState, State *pSimulatedState, int period, Cache *pCache)
+{
+	initialize(pData, pState, period, pCache);
+}
 
 /**
  * Returns the number of actors of the behavior variable associated with this

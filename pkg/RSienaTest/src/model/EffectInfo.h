@@ -14,6 +14,8 @@
 
 #include <string>
 
+using namespace std;
+
 namespace siena
 {
 
@@ -24,17 +26,17 @@ namespace siena
 class EffectInfo
 {
 public:
-	EffectInfo(std::string variableName,
-		std::string effectName,
-		std::string effectType,
+	EffectInfo(string variableName,
+		string effectName,
+		string effectType,
 		double parameter,
 		double internalEffectParameter,
-		std::string interactionName1,
-		std::string interactionName2,
-		std::string rateType);
-	EffectInfo(std::string variableName,
-		std::string effectName,
-		std::string effectType,
+		string interactionName1,
+		string interactionName2,
+		string rateType);
+	EffectInfo(string variableName,
+		string effectName,
+		string effectType,
 		double parameter,
 		const EffectInfo * pEffect1,
 		const EffectInfo * pEffect2,
@@ -42,29 +44,29 @@ public:
 
 	void parameter(double value);
 
-	std::string variableName() const;
-	std::string effectName() const;
-	std::string effectType() const;
+	string variableName() const;
+	string effectName() const;
+	string effectType() const;
 	double parameter() const;
 	double internalEffectParameter() const;
-	std::string interactionName1() const;
-	std::string interactionName2() const;
-	std::string rateType() const;
+	string interactionName1() const;
+	string interactionName2() const;
+	string rateType() const;
 	const EffectInfo * pEffectInfo1() const;
 	const EffectInfo * pEffectInfo2() const;
 	const EffectInfo * pEffectInfo3() const;
 
 private:
 	// The name of the variable this effect is associated with
-	std::string lvariableName;
+	string lvariableName;
 
 	// A short name of the effect used to identify the semantics
 	// of this effect
 
-	std::string leffectName;
+	string leffectName;
 
 	// The type of the effect ("rate", "eval", or "endow")
-	std::string leffectType;
+	string leffectType;
 
 	// The multiplicative weight in the respective function
 	double lparameter;
@@ -75,15 +77,15 @@ private:
 	// The name of a variable or covariate this effect is interacting with,
 	// if applicable
 
-	std::string linteractionName1;
+	string linteractionName1;
 
 	// The name of the other interaction variable or covariate, if the
 	// effect has two such interactions
 
-	std::string linteractionName2;
+	string linteractionName2;
 
 	// Distinguishes between structural rate effects and covariate rate effects
-	std::string lrateType;
+	string lrateType;
 
 	// The interacting effect descriptions.
 	// Undefined for non-interaction effects.

@@ -77,6 +77,8 @@ public:
 	void averageInDegree(double val);
 	void averageOutDegree(double val);
 	virtual double observedDistribution(int value, int observation) const;
+	void modelType(int type);
+	int modelType() const;
 
 	bool oneModeNetwork() const;
 
@@ -109,6 +111,9 @@ private:
 
 	// The maximum permitted out-degree of an actor. Infinity by default.
 	int lmaxDegree;
+
+	// The model type.
+	int lmodelType;
 
 	// The offset for the non-primary settings. 0 by default.
 	double luniversalOffset;

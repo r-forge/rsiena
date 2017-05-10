@@ -388,7 +388,9 @@ void setupOneModeNetwork(SEXP ONEMODE,
  *
  */
 void setupOneModeObservations(SEXP ONEMODES,
-		OneModeNetworkLongitudinalData * pOneModeNetworkLongitudinalData)
+			      OneModeNetworkLongitudinalData *
+                              pOneModeNetworkLongitudinalData)
+
 {
 	int observations = length(ONEMODES);
 	if (observations != pOneModeNetworkLongitudinalData->observationCount())

@@ -2,7 +2,7 @@ useDynLib(RSienaTest)
 export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
        siena01Gui, siena07, sienaCompositionChange, sienaBayes, glueBayes,
        simpleBayesTest, multipleBayesTest, extract.sienaBayes, updateTheta,
-       sienaCompositionChangeFromFile, sienaDataCreate,
+       updateSpecification, sienaCompositionChangeFromFile, sienaDataCreate,
        sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
        sienaDependent, sienaNodeSet, xtable.sienaFit,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,

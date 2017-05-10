@@ -647,7 +647,7 @@ void DependentVariable::calculateRates()
 		{
 		    this->calculateScoreSumTerms();
 		}
-		if(this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+		if(this->symmetric() && this->networkModelTypeB())
 		{
 		    this->ltotalRate = this->totalRate() * this->totalRate() -
 				sumRatesSquared;
@@ -908,7 +908,7 @@ void DependentVariable::accumulateRateScores(double tau,
 	{
 		this->lbasicRateScore += 1.0 / this->basicRate();
 		if (this->symmetric() &&
-			this->pSimulation()->pModel()->modelTypeB())
+			this->networkModelTypeB())
 		{
 			throw logic_error("model type b");
 			//this->lbasicRateScore += 1.0 / this->basicRate();
@@ -916,7 +916,7 @@ void DependentVariable::accumulateRateScores(double tau,
 	}
 	this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
 
-	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->networkModelTypeB())
 	{
 		throw logic_error("model type b");
 		this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
@@ -1169,7 +1169,7 @@ void DependentVariable::accumulateRateScores(double tau,
 	const DependentVariable * pSelectedVariable,
 	int selectedActor, int alter)
 {
-	 switch (this->pSimulation()->pModel()->modelType())
+	 switch (this->networkModelType())
 	 {
 	 case NOTUSED:
 	 case NORMAL:
@@ -1316,7 +1316,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += pCovariate->value(i) * this->lrate[i];
-			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->networkModelTypeB())
 			{
 				timesRateSquared += pCovariate->value(i) * this->lrate[i] *
 					this->lrate[i];
@@ -1338,7 +1338,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += pCovariate->value(i, this->period()) * this->lrate[i];
-			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->networkModelTypeB())
 			{
 				timesRateSquared += pCovariate->value(i, this->period()) *
 					this->lrate[i] * this->lrate[i];
@@ -1361,7 +1361,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += pBehavior->value(i) * this->lrate[i];
-			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->networkModelTypeB())
 			{
 				timesRateSquared += pBehavior->value(i) * this->lrate[i] *
 					this->lrate[i];
@@ -1401,7 +1401,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += pNetwork->outDegree(i) * this->lrate[i];
-			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->networkModelTypeB())
 			{
 				timesRateSquared += pNetwork->outDegree(i) * this->lrate[i] *
 					this->lrate[i];
@@ -1440,7 +1440,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += invertor(pNetwork->outDegree(i)) * this->lrate[i];
-			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->networkModelTypeB())
 			{
 				timesRateSquared += invertor(pNetwork->outDegree(i)) *
 					this->lrate[i] * this->lrate[i];
@@ -1464,7 +1464,7 @@ void DependentVariable::calculateScoreSumTerms()
 		for (int i = 0; i < this->n(); i++)
 		{
 			timesRate += logarithmer(pNetwork->outDegree(i)) * this->lrate[i];
-			if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+			if (this->symmetric() && this->networkModelTypeB())
 			{
 				timesRateSquared += logarithmer(pNetwork->outDegree(i)) *
 					this->lrate[i] * this->lrate[i];
@@ -2034,6 +2034,34 @@ bool DependentVariable::behaviorVariable() const
  * Returns if this is a symmetric one mode network.
  */
 bool DependentVariable::symmetric() const
+{
+	// This method is overridden in NetworkVariable. Here we return false.
+	return false;
+}
+
+/**
+ * Returns  the network model type.
+ */
+NetworkModelType DependentVariable::networkModelType() const
+{
+	// This method is overridden in NetworkVariable. Here we return NORMAL.
+	return NORMAL;
+}
+
+
+/**
+ * Returns  the behavioral model type.
+ */
+BehaviorModelType DependentVariable::behaviorModelType() const
+{
+	// This method is overridden in BehaviorVariable. Here we return RESTRICT.
+	return RESTRICT;
+}
+
+/**
+ * Returns whether the model type is one of the symmetric type b models.
+ */
+bool DependentVariable::networkModelTypeB() const
 {
 	// This method is overridden in NetworkVariable. Here we return false.
 	return false;

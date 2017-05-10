@@ -118,6 +118,8 @@ NetworkVariable::NetworkVariable(NetworkLongitudinalData * pData,
 
 	this->lalter = 0;
 	this->lsetting = new vector<int>;
+	this->lnetworkModelType = NetworkModelType(pData->modelType());
+
 }
 
 
@@ -177,10 +179,8 @@ NetworkVariable::~NetworkVariable()
 	this->lpermitted = 0;
 	this->lprobabilities = 0;
 
-	if(this->lpChangeContribution != 0)
-	{
-		delete this->lpChangeContribution;
-	}
+	// no need to delete lpChangeContribution since this is
+	// handled by the MiniStep
 
 	deallocateVector(this->lpermittedChangeFilters);
 }
@@ -247,6 +247,33 @@ LongitudinalData * NetworkVariable::pData() const
 {
 	return this->lpData;
 }
+
+/**
+ * Sets the model type.
+ */
+void NetworkVariable::networkModelType(int type)
+{
+	this->lnetworkModelType = NetworkModelType(type);
+}
+
+/**
+ * Returns the model type.
+ */
+NetworkModelType NetworkVariable::networkModelType() const
+{
+	return this->lnetworkModelType;
+}
+
+/**
+ * Returns whether the model type is one of the symmetric type b models.
+ */
+
+bool NetworkVariable::networkModelTypeB() const
+{
+	return this->lnetworkModelType == BFORCE ||
+		this->lnetworkModelType == BAGREE || this->lnetworkModelType == BJOINT;
+}
+
 
 
 // ----------------------------------------------------------------------------
@@ -510,7 +537,7 @@ void NetworkVariable::makeChange(int actor)
 
 	this->successfulChange(true);
 
-	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->networkModelTypeB())
 	{
 		if (this->calculateModelTypeBProbabilities())
 		{
@@ -563,7 +590,7 @@ void NetworkVariable::makeChange(int actor)
 		//if (alter != actor && !this->lpNetworkCache->outTieExists(alter) &&
 		//	this->pSimulation()->pModel()->modelType() == AAGREE)
 		if (this->symmetric() &&
-			this->pSimulation()->pModel()->modelType() == AAGREE &&
+			this->networkModelType() == AAGREE &&
 			!this->lpNetworkCache->outTieExists(alter))
 		{
 			this->checkAlterAgreement(alter);
@@ -581,7 +608,7 @@ void NetworkVariable::makeChange(int actor)
 			this->accumulateScores(alter);
 		}
 	}
-//	 NB  the probabilities are probably wrong for !accept
+//	 NB  the probabilities in the reported chain are probably wrong for !accept
 	if (this->pSimulation()->pModel()->needChain())
 	{
 		// add ministep to chain
@@ -603,11 +630,11 @@ void NetworkVariable::makeChange(int actor)
 		}
 		this->pSimulation()->pChain()->insertBefore(pMiniStep,
 			this->pSimulation()->pChain()->pLast());
-		if (!this->symmetric() || !this->pSimulation()->pModel()->modelTypeB())
+		if (!this->symmetric() || !this->networkModelTypeB())
 		{
 			pMiniStep->logChoiceProbability(log(this->lprobabilities[alter]));
 			if (this->symmetric() &&
-				this->pSimulation()->pModel()->modelType() == AAGREE)
+				this->networkModelType() == AAGREE)
 			{
 				pMiniStep->logChoiceProbability(pMiniStep->
 					logChoiceProbability() + log(this->lsymmetricProbability));
@@ -974,108 +1001,8 @@ void NetworkVariable::calculateTieFlipContributions()
  */
 void NetworkVariable::calculateTieFlipProbabilities()
 {
-	// If a settings model, decide what to do. Pre-store probabilities
-	this->getStepType();
-	if (this->stepType() > 1)
-	{
-		// clear settings vector
-		this->lsetting->clear();
-		// find the covariate and make a vector of potential alters
-		NetworkLongitudinalData * pNetworkData =
-			dynamic_cast<NetworkLongitudinalData *>(this->pData());
-		string settingName = pNetworkData->rSettingNames()[this->stepType()];
-		ConstantDyadicCovariate * pConstantCovariate =
-			this->pSimulation()->pData()->pConstantDyadicCovariate(settingName);
-	   ChangingDyadicCovariate * pChangingCovariate =
-			this->pSimulation()->pData()->pChangingDyadicCovariate(settingName);
-		map<int, double> row;
-		if (pConstantCovariate)
-		{
-			row = pConstantCovariate->rRowValues(this->lego);
-		}
-		else if (pChangingCovariate)
-		{
-			row = pChangingCovariate->rRowValues(this->lego, this->period());
-		}
-		else
-		{
-			error("setting not found");
-		}
-		bool needEgo = true;
-		if (row.size() == 0)
-		{
-			this->lsetting->push_back(this->lego);
-			needEgo = false;
-		}
-
-		for (map<int, double>::iterator iter=row.begin();
-			 iter != row.end(); iter++ )
-		{
-			if (iter->first > this->lego && needEgo)
-			{
-				this->lsetting->push_back(this->lego);
-				needEgo = false;
-			}
-			this->lsetting->push_back(iter->first);
-		}
-		if (needEgo)
-		{
-			this->lsetting->push_back(this->lego);
-		}
-	}
-	// TODO: correct this->lsetting for primary setting
-	if (this->stepType() == 1)
-	{
-		delete this->lsetting;
-		this->lsetting = primarySetting(this->pNetwork(), this->lego);
-	}
 	this->preprocessEgo(this->lego);
 	this->calculatePermissibleChanges();
-	int m = this->m();
-	
-	if (!this->oneModeNetwork())
-	{
-		m = this->m() + 1;
-	}
-	
-	if (this->stepType() > -1 && this->stepType() != 1)
-	{
-		if (this->stepType() > 1)
-		{
-			m = this->lsetting->size();
-		}
-		//  check we can find an ego in the setting
-		int numberPermitted = 0;
-		for (int i = 0; i < m; i++)
-		{
-			int ii = i;
-			if (this->stepType() > 0)
-			{
-				ii = (*this->lsetting)[i];
-			}
-			if (this->lpermitted[ii])
-			{
-				numberPermitted++;
-			}
-		}
-		int fastAlter = this->lego;
-
-		if (numberPermitted > 1)
-		{
-			while(fastAlter == this->lego && this->lpermitted[fastAlter])
-			{
-				fastAlter = nextInt(m);  // random number
-				if (this->stepType()  > 1)
-				{
-					fastAlter = (*this->lsetting)[fastAlter];
-				}
-			}
-		}
-		this->lsetting->clear();
-		this->lsetting->push_back(min(this->lego, fastAlter));
-		this->lsetting->push_back(max(this->lego, fastAlter));
-	}
-
 	this->calculateTieFlipContributions();
 
 	int evaluationEffectCount = this->pEvaluationFunction()->rEffects().size();
@@ -1105,12 +1032,8 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	double total = 0;
 	double maxValue = 0; // the maximum never can be less than 0 
 					// because there always is the no-change option
-	m = this->m(); // not this->m()+1 for two-mode network; 
+	int m = this->m(); // not this->m()+1 for two-mode network;
 					// this is handled separately below
-	if (this->stepType() > 0)
-	{
-		m = this->lsetting->size();
-	}
 
 	// calculate all contributions then subtract the largest to remove overflow
 	int alter = 0;
@@ -1118,10 +1041,6 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	for (int alteri = 0; alteri < m; alteri++)
 	{
 		alter = alteri;
-		if (this->stepType() > 0)
-		{
-			alter = (*this->lsetting)[alteri];
-		}
 		if (this->lpermitted[alter])
 		{
 			// Calculate the total contribution of all effects
@@ -1136,7 +1055,8 @@ void NetworkVariable::calculateTieFlipProbabilities()
 					this->levaluationEffectContribution[alter][i];
 				if (this->pSimulation()->pModel()->needChangeContributions())
 				{
-					(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) = this->levaluationEffectContribution[alter][i];
+					(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) =
+							this->levaluationEffectContribution[alter][i];
 				}
 			}
 
@@ -1151,7 +1071,8 @@ void NetworkVariable::calculateTieFlipProbabilities()
 						this->lendowmentEffectContribution[alter][i];
 					if (this->pSimulation()->pModel()->needChangeContributions())
 					{
-						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) = this->lendowmentEffectContribution[alter][i];
+						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) =
+								this->lendowmentEffectContribution[alter][i];
 					}
 				}
 			}
@@ -1166,7 +1087,8 @@ void NetworkVariable::calculateTieFlipProbabilities()
 						this->lcreationEffectContribution[alter][i];
 					if (this->pSimulation()->pModel()->needChangeContributions())
 					{
-						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) = this->lcreationEffectContribution[alter][i];
+						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) =
+							this->lcreationEffectContribution[alter][i];
 					}
 				}
 			}
@@ -1418,6 +1340,7 @@ void NetworkVariable::checkAlterAgreement(int alter)
 	this->calculateSymmetricTieFlipProbabilities(this->lego, 1);
 
 	double probability = 0;
+// TS hier dacht ik dat het was (offset)
 
 	if (this->lsymmetricProbabilities[1] > 0)
 	{
@@ -1517,7 +1440,7 @@ void NetworkVariable::accumulateSymmetricModelScores(int alter, bool accept)
 	double prAlter = 0;
 	double prSum = 0;
 
-	switch(this->pSimulation()->pModel()->modelType())
+	switch(this->networkModelType())
 	{
 	case BFORCE:
 		prEgo = this->lsymmetricProbabilities[0];
@@ -1984,7 +1907,7 @@ bool NetworkVariable::calculateModelTypeBProbabilities()
 	this->preprocessEgo(this->lego);
 	this->calculateSymmetricTieFlipContributions(alter, 0);
 	this->calculateSymmetricTieFlipProbabilities(alter, 0);
-	switch(this->pSimulation()->pModel()->modelType())
+	switch(this->networkModelType())
 	{
 	case BFORCE:
 		if (this->lsymmetricProbabilities[0] > 0)
@@ -2089,7 +2012,7 @@ double NetworkVariable::probability(MiniStep * pMiniStep)
 	NetworkChange * pNetworkChange =
 		dynamic_cast<NetworkChange *>(pMiniStep);
 	this->lego = pNetworkChange->ego();
-	if (this->symmetric() && this->pSimulation()->pModel()->modelTypeB())
+	if (this->symmetric() && this->networkModelTypeB())
 	{
 		this->calculateModelTypeBProbabilities();
 		if (this->pSimulation()->pModel()->needScores())

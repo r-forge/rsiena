@@ -73,13 +73,17 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 	{
 		cat("Warning: argument 'parameter' has no effect in includeEffects; use setEffect.\n")
 	}
+	if (hasArg('random'))
+	{
+		cat("Warning: argument 'random' has no effect in includeEffects; use setEffect.\n")
+	}
 	myeff
 }
 ##@includeInteraction DataCreate
 includeInteraction <- function(myeff, ...,
 				include=TRUE, name=myeff$name[1],
 				type="eval", interaction1=rep("", 3), interaction2=rep("", 3),
-				fix=FALSE, test=FALSE, parameter=0,
+				fix=FALSE, test=FALSE, parameter=0, random=FALSE,
 				character=FALSE, verbose=TRUE)
 {
 	if (character)
@@ -213,6 +217,7 @@ includeInteraction <- function(myeff, ...,
 		myeff[intn, "fix"] <- fix
 		myeff[intn, "test"] <- test
 		myeff[intn, "parm"] <- parameter
+		myeff[intn, "randomEffects"] <- random
 	}
 	else
 	{
@@ -227,7 +232,7 @@ includeInteraction <- function(myeff, ...,
 	}
 	if (verbose)
 	{
-		print(myeff[intn,])
+		print.sienaEffects(myeff[intn,], includeRandoms = random)
 	}
 	myeff
 }
@@ -292,6 +297,6 @@ setEffect <- function(myeff, shortName, parameter=0,
 #	 print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
 #						"interaction2", "include", "parm", "fix", "test",
 #						"initialValue", "timeDummy", "period", "group")])
-	print.sienaEffects(myeff[use,], includeRandoms = random)
+	print.sienaEffects(myeff[use,])
 	myeff
 }

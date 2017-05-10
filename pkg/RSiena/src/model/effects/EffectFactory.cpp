@@ -246,6 +246,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new RecipdegreeActivityEffect(pEffectInfo);
 	}
+	else if (effectName == "degPlus")
+	{
+		pEffect = new BothDegreesEffect(pEffectInfo);
+	}
 	else if (effectName == "outTrunc")
 	{
 		pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
@@ -320,27 +324,56 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "altX")
 	{
-		pEffect = new CovariateAlterEffect(pEffectInfo, false);
+		pEffect = new CovariateAlterEffect(pEffectInfo, false, false, false);
 	}
 	else if (effectName == "altSqX")
 	{
-		pEffect = new CovariateAlterEffect(pEffectInfo, true);
+		pEffect = new CovariateAlterEffect(pEffectInfo, false, false, true);
+	}
+	else if (effectName == "altLThresholdX")
+	{
+		pEffect = new CovariateAlterEffect(pEffectInfo, true, false, false);
+	}
+	else if (effectName == "altRThresholdX")
+	{
+		pEffect = new CovariateAlterEffect(pEffectInfo, false, true, false);
 	}
 	else if (effectName == "egoX")
 	{
-		pEffect = new CovariateEgoEffect(pEffectInfo);
+		pEffect = new CovariateEgoEffect(pEffectInfo, false, false);
 	}
 	else if (effectName == "egoSqX")
 	{
 		pEffect = new CovariateEgoSquaredEffect(pEffectInfo);
 	}
+
+	else if (effectName == "egoPlusAltX")
+	{
+		pEffect = new CovariateDiffEffect(pEffectInfo, false, 0);
+	}
+	else if (effectName == "egoPlusAltSqX")
+	{
+		pEffect = new CovariateDiffEffect(pEffectInfo, false, 2);
+	}
+	else if (effectName == "egoLThresholdX")
+	{
+		pEffect = new CovariateEgoEffect(pEffectInfo, true, false);
+	}
+	else if (effectName == "egoRThresholdX")
+	{
+		pEffect = new CovariateEgoEffect(pEffectInfo, false, true);
+	}
 	else if (effectName == "diffX")
 	{
-		pEffect = new CovariateDiffEffect(pEffectInfo, false);
+		pEffect = new CovariateDiffEffect(pEffectInfo, true, 0);
+	}
+	else if (effectName == "absDiffX")
+	{
+		pEffect = new CovariateDiffEffect(pEffectInfo, true, 1);
 	}
 	else if (effectName == "diffSqX")
 	{
-		pEffect = new CovariateDiffEffect(pEffectInfo, true);
+		pEffect = new CovariateDiffEffect(pEffectInfo, true, 2);
 	}
 	else if (effectName == "egoDiffX")
 	{
@@ -377,6 +410,46 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "diffXTransTrip")
 	{
 		pEffect = new SameCovariateTransitiveTripletsEffect(pEffectInfo, false);
+	}
+	else if (effectName == "inPopX")
+	{
+		string networkName = pEffectInfo->variableName();
+		string covariateName = pEffectInfo->interactionName1();
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new CovariateDegreeFunction(networkName, covariateName,
+					false, true, false, (pEffectInfo->internalEffectParameter()>=2)),
+			new CovariateDegreeFunction(networkName, covariateName,
+					true, true, false, (pEffectInfo->internalEffectParameter()>=2)));
+	}
+	else if (effectName == "outPopX")
+	{
+		string networkName = pEffectInfo->variableName();
+		string covariateName = pEffectInfo->interactionName1();
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new CovariateDegreeFunction(networkName, covariateName,
+					false, false, false, (pEffectInfo->internalEffectParameter()>=2)),
+			new CovariateDegreeFunction(networkName, covariateName,
+					true, false, false, (pEffectInfo->internalEffectParameter()>=2)));
+	}
+	else if (effectName == "inActX")
+	{
+		string networkName = pEffectInfo->variableName();
+		string covariateName = pEffectInfo->interactionName1();
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new CovariateDegreeFunction(networkName, covariateName,
+					false, true, true, (pEffectInfo->internalEffectParameter()>=2)),
+			new CovariateDegreeFunction(networkName, covariateName,
+					true, true, true, (pEffectInfo->internalEffectParameter()>=2)));
+	}
+	else if (effectName == "outActX")
+	{
+		string networkName = pEffectInfo->variableName();
+		string covariateName = pEffectInfo->interactionName1();
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new CovariateDegreeFunction(networkName, covariateName,
+					false, false, true, (pEffectInfo->internalEffectParameter()>=2)),
+			new CovariateDegreeFunction(networkName, covariateName,
+					true, false, true, (pEffectInfo->internalEffectParameter()>=2)));
 	}
 	else if (effectName == "sameXInPop")
 	{
@@ -1017,6 +1090,21 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 										covariateName, true, false),
 					0)));
 	}
+	else if (effectName == "sameWXClosure")
+	{
+		string networkName = pEffectInfo->interactionName1();
+		string covariateName = pEffectInfo->interactionName2();
+		pEffect = new GenericNetworkEffect(pEffectInfo,
+			new SameCovariateMixedTwoPathFunction(
+							pEffectInfo->variableName(),
+							networkName, covariateName, false),
+			new ConditionalFunction(
+				new MissingCovariatePredicate(covariateName),
+				0,
+				new SameCovariateMixedTwoPathFunction(
+							pEffectInfo->variableName(),
+							networkName, covariateName, true)));
+	}
 	else if (effectName == "homWXClosure")
 	{
 		string networkName = pEffectInfo->interactionName1();
@@ -1163,11 +1251,19 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "avAlt")
 	{
-		pEffect = new AverageAlterEffect(pEffectInfo, true);
+		pEffect = new AverageAlterEffect(pEffectInfo, true, false);
 	}
 	else if (effectName == "totAlt")
 	{
-		pEffect = new AverageAlterEffect(pEffectInfo, false);
+		pEffect = new AverageAlterEffect(pEffectInfo, false, false);
+	}
+	else if (effectName == "avAltPop")
+	{
+		pEffect = new AverageAlterEffect(pEffectInfo, true, true);
+	}
+	else if (effectName == "totAltPop")
+	{
+		pEffect = new AverageAlterEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "avRecAlt")
 	{

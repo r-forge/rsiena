@@ -22,6 +22,7 @@
 #include "siena07utilities.h"
 #include "data/Data.h"
 #include "data/NetworkLongitudinalData.h"
+#include "data/BehaviorLongitudinalData.h"
 #include "model/Model.h"
 #include "model/ml/Chain.h"
 #include "model/ml/MiniStep.h"
@@ -497,11 +498,12 @@ SEXP deleteModel(SEXP RpModel)
 }
 
 /**
- *  sets up the model options of MAXDEGREE, CONDITIONAL
+ *  sets up the model options of MAXDEGREE, UNIVERSALOFFSET, CONDITIONAL
  */
 SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
+	SEXP UNIVERSALOFFSET,
 	SEXP CONDVAR, SEXP CONDTARGETS, SEXP PROFILEDATA, SEXP PARALLELRUN,
-	SEXP MODELTYPE, SEXP SIMPLERATES)
+	SEXP MODELTYPE, SEXP BEHMODELTYPE, SEXP SIMPLERATES, SEXP NORMSETRATES)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -510,6 +512,10 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 
 	/* get hold of the model object */
 	Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
+
+	if(!isNull(NORMSETRATES)){
+		pModel->normalizeSettingRates(*(LOGICAL(NORMSETRATES)));
+	}
 
 	int totObservations = totalPeriods(*pGroupData);
 
@@ -552,15 +558,63 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 			}
 		}
 	}
+	/* get names vector for UniversalOffset */
+	if (!isNull(UNIVERSALOFFSET))
+	{
+		SEXP Names = getAttrib(UNIVERSALOFFSET, R_NamesSymbol);
+
+		for (int group = 0; group < nGroups; group++)
+		{
+			for (int i = 0; i < length(Names); i++)
+			{
+				Data * pData = (*pGroupData)[group];
+				NetworkLongitudinalData * pNetworkData =
+					pData->pNetworkData(CHAR(STRING_ELT(Names, i)));
+				pNetworkData->universalOffset(REAL(UNIVERSALOFFSET)[i]);
+			}
+		}
+	}
 	/* set the parallel run flag on the model */
 	if (!isNull(PARALLELRUN))
 	{
 		pModel->parallelRun(true);
 	}
+	/* get names vector for modeltype */
 	if (!isNull(MODELTYPE))
 	{
-		pModel->modelType(asInteger(MODELTYPE));
+		SEXP Names = getAttrib(MODELTYPE, R_NamesSymbol);
+
+		for (int group = 0; group < nGroups; group++)
+		{
+			for (int i = 0; i < length(Names); i++)
+			{
+				Data * pData = (*pGroupData)[group];
+				NetworkLongitudinalData * pNetworkData =
+					pData->pNetworkData(CHAR(STRING_ELT(Names, i)));
+				pNetworkData->modelType(INTEGER(MODELTYPE)[i]);
 	}
+		}
+	}
+	/* get names vector for modeltype */
+	if (!isNull(BEHMODELTYPE))
+	{
+		SEXP Names = getAttrib(BEHMODELTYPE, R_NamesSymbol);
+
+		for (int group = 0; group < nGroups; group++)
+		{
+			for (int i = 0; i < length(Names); i++)
+			{
+				Data * pData = (*pGroupData)[group];
+				BehaviorLongitudinalData * pBehaviorData =
+					pData->pBehaviorData(CHAR(STRING_ELT(Names, i)));
+				pBehaviorData->behModelType(INTEGER(BEHMODELTYPE)[i]);
+			}
+		}
+	}
+//	if (!isNull(MODELTYPE))
+//	{
+//		pModel->modelType(asInteger(MODELTYPE));
+//	}
 	// print out Data for profiling
 	if (asInteger(PROFILEDATA))
 	{

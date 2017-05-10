@@ -50,6 +50,7 @@ sienaTimeTest(sienaFit, effects=NULL, excludedEffects=NULL, condition=FALSE)
  include these in the data set through \code{\link{sienaAlgorithmCreate}},
  and include interactions of other effects with ego effects of these
  time-dependent actor covariates by \code{\link{includeInteraction}}.
+ This is illustrated in an example below.
  Using \code{\link{includeTimeDummy}} is easier;
  using self-defined interactions with time-dependent variables
  gives more control.
@@ -74,7 +75,7 @@ sienaTimeTest(sienaFit, effects=NULL, excludedEffects=NULL, condition=FALSE)
  try the remaining effects in a similar way.
 }
 \value{
-  \code{sienaTimeTest} Returns a list containing many items,
+  \code{sienaTimeTest} returns a list containing many items,
     including the following:
   \item{JointTest }{A chi-squared test for joint significance of the dummies.}
   \item{EffectTest }{A chi-squared test for joint significance
@@ -128,28 +129,58 @@ tt2 <- sienaTimeTest(ans2)
 
 ## A demonstration of the plotting facilities, on a larger dataset:
 ## (Of course pasting these identical sets of three waves after each other
-##  in a sequence of six is not really meaningful.)
-\dontrun{
-myalgorithm <- sienaAlgorithmCreate(nsub=4, n3=1000)
-mynet1 <- sienaDependent(array(c(s501, s502, s503, s501, s503, s502), dim=c(50, 50, 6)))
+##  in a sequence of six is not really meaningful. It's just a demonstration.)
+
+myalgorithm <- sienaAlgorithmCreate(nsub=4, n3=1000, seed=1234)
+mynet1 <- sienaDependent(array(c(s501, s502, s503, s501, s503, s502),
+                               dim=c(50, 50, 6)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip, balance)
+myeff <- includeTimeDummy(myeff, density, timeDummy="all")
 myeff <- includeTimeDummy(myeff, recip, timeDummy="2,3,5")
 myeff <- includeTimeDummy(myeff, balance, timeDummy="4")
-myeff <- includeTimeDummy(myeff, density, timeDummy="all")
-ansp <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
+\dontrun{
+(ansp <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE))
 ttp <- sienaTimeTest(ansp)
-
 ## Pairwise plots show
 plot(ttp, pairwise=TRUE)
-
 ## Time test plots show
 plot(ttp, effects=1:4, dims=c(2,2))
 }
-## A demonstration of RateX heterogeneity. Note that rate
-## interactions are not implemented in general, just for
-## Rate x cCovar.
+
+## Instead of working with includeTimeDummy,
+## you can also define time dummies explicitly;
+## this may give more control and more clarity:
+dum2 <- matrix(c(0,1,0,0,0), nrow=50, ncol=5, byrow=TRUE)
+dum3 <- matrix(c(0,0,1,0,0), nrow=50, ncol=5, byrow=TRUE)
+dum4 <- matrix(c(0,0,0,1,0), nrow=50, ncol=5, byrow=TRUE)
+dum5 <- matrix(c(0,0,0,0,1), nrow=50, ncol=5, byrow=TRUE)
+time2 <- varCovar(dum2)
+time3 <- varCovar(dum3)
+time4 <- varCovar(dum4)
+time5 <- varCovar(dum5)
+mydata <- sienaDataCreate(mynet1, time2, time3, time4, time5)
+myeff <- getEffects(mydata)
+myeff <- includeEffects(myeff, transTrip, balance)
+## corresponding to includeTimeDummy(myeff, density, timeDummy="all"):
+myeff <- includeEffects(myeff, egoX, interaction1='time2')
+myeff <- includeEffects(myeff, egoX, interaction1='time3')
+myeff <- includeEffects(myeff, egoX, interaction1='time4')
+myeff <- includeEffects(myeff, egoX, interaction1='time5')
+## corresponding to myeff <- includeTimeDummy(myeff, recip, timeDummy="2,3,5"):
+myeff <- includeInteraction(myeff, egoX, recip, interaction1=c('time2', ''))
+myeff <- includeInteraction(myeff, egoX, recip, interaction1=c('time3', ''))
+myeff <- includeInteraction(myeff, egoX, recip, interaction1=c('time5', ''))
+## corresponding to myeff <- includeTimeDummy(myeff, balance, timeDummy="4"):
+myeff <- includeInteraction(myeff, egoX, balance, interaction1=c('time4', ''))
+\dontrun{
+(anspp <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE))
+## anspp contains identical results as ansp above.
+}
+
+## A demonstration of RateX heterogeneity. Note that rate interactions are
+## not implemented in general, just for Rate x cCovar.
 \dontrun{
 myalgorithm <- sienaAlgorithmCreate(nsub=4, n3=1000)
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
@@ -157,8 +188,7 @@ myccov <- coCovar(s50a[,1])
 mydata <- sienaDataCreate(mynet1, myccov)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip, balance)
-myeff <- includeTimeDummy(myeff, RateX, type="rate",
-            interaction1="myccov")
+myeff <- includeTimeDummy(myeff, RateX, type="rate", interaction1="myccov")
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 }
 }

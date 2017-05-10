@@ -55,6 +55,10 @@ public:
 	virtual bool constrained() const;
 	virtual bool symmetric() const;
 
+	void networkModelType(int type);
+	virtual NetworkModelType networkModelType() const;
+	virtual bool networkModelTypeB() const;
+
 	virtual void initialize(int period);
 	virtual bool canMakeChange(int actor) const;
 	virtual void makeChange(int actor);
@@ -93,6 +97,7 @@ private:
 	bool calculateModelTypeBProbabilities();
 	bool diagonalMiniStep(int ego, int alter) const;
 
+	void initializeSetting();
 	// The current state of the network
 	Network * lpNetwork;
 
@@ -175,6 +180,9 @@ private:
 	// whether this is a one mode network or not
 
 	bool loneMode;
+
+	// the model type
+	NetworkModelType lnetworkModelType;
 };
 
 

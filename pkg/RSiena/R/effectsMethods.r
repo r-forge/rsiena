@@ -199,3 +199,79 @@ edit.sienaEffects <- function(name, ...)
     class(tmp) <- c("sienaEffects", class(tmp))
     tmp
 }
+
+##@updateSpecification Methods add specified effects from other effects object
+updateSpecification <- function(effects.to, effects.from, name.to=NULL, name.from=NULL)
+{
+	if (!inherits(effects.to, "data.frame"))
+	{
+		stop("effects.to is not a data.frame")
+	}
+	if (!inherits(effects.from, "data.frame"))
+	{
+		stop("effects.from is not a data.frame")
+	}
+	if (is.null(name.from))
+	{
+		prevEffects <-
+			effects.from[which((effects.from$type != 'gmm')&((effects.from$include))),]
+	}
+	else
+	{
+		if (!is.character(name.from))
+		{
+			stop("name.from should be a string")
+		}
+		prevEffects <-
+			effects.from[which((effects.from$type != 'gmm')&((effects.from$include))&
+				(effects.from$name == name.from)),]
+	}
+	oldlist <- apply(prevEffects, 1, function(x)
+					 paste(x[c("name", "shortName",
+							   "type", "groupName",
+							   "interaction1", "interaction2",
+							   "period", "effect1", "effect2", "effect3")],
+						   collapse="|"))
+	efflist <- apply(effects.to, 1, function(x)
+					 paste(x[c("name", "shortName",
+							   "type", "groupName",
+							   "interaction1", "interaction2",
+							   "period", "effect1", "effect2", "effect3")],
+							collapse="|"))
+	if (!(is.null(name.to)))
+	{
+		if (!is.character(name.to))
+		{
+			stop("name.to should be a string")
+		}
+		else if (name.to == "all") # omit matching on "name"
+		{
+			oldlist <- apply(prevEffects, 1, function(x)
+					 paste(x[c("shortName",
+							   "type", "groupName",
+							   "interaction1", "interaction2",
+							   "period", "effect1", "effect2", "effect3")],
+						   collapse="|"))
+			efflist <- apply(effects.to, 1, function(x)
+					 paste(x[c("shortName",
+							   "type", "groupName",
+							   "interaction1", "interaction2",
+							   "period", "effect1", "effect2", "effect3")],
+							collapse="|"))
+		}
+	}
+	use <- (efflist %in% oldlist)
+	correspondence <- match(efflist, oldlist)
+	if (!(is.null(name.to)))
+	{
+		if (name.to != "all")
+		{
+			use <- (use & (effects.to$name == name.to))
+		}
+	}
+	effects.to$include[use] <- TRUE
+	effects.to$fix[use] <- prevEffects$fix[correspondence][use]
+	effects.to$test[use] <- prevEffects$test[correspondence][use]
+	effects.to$parameter[use] <- prevEffects$parameter[correspondence][use]
+	effects.to
+}

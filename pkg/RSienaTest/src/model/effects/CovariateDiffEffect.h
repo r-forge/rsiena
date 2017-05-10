@@ -23,7 +23,7 @@ namespace siena
 class CovariateDiffEffect : public CovariateDependentNetworkEffect
 {
 public:
-	CovariateDiffEffect(const EffectInfo * pEffectInfo, bool squared);
+	CovariateDiffEffect(const EffectInfo * pEffectInfo, bool diff, int trafo);
 
 	virtual double calculateContribution(int alter) const;
 
@@ -31,7 +31,9 @@ protected:
 	virtual double tieStatistic(int alter);
 
 private:
+	bool ldiff;
 	bool lsquared;
+	bool labs;
 };
 
 }

@@ -652,6 +652,8 @@ void StatisticCalculator::calculateBehaviorStatistics(
 
 	double * currentValues  = new double[pBehaviorData->n()];
 
+	bool modelAbsorb = (BehaviorModelType(pBehaviorData->behModelType()) == ABSORB);
+
 	for (int i = 0; i < pBehaviorData->n(); i++)
 	{
 		currentValues[i] = currentState[i] - pBehaviorData->overallMean();
@@ -704,7 +706,8 @@ void StatisticCalculator::calculateBehaviorStatistics(
 
 		if(this->lneedActorStatistics)
 		{
-			pair<double, double * > p = pEffect->evaluationStatistic(currentValues,this->lneedActorStatistics);
+			pair<double, double * > p =
+				pEffect->evaluationStatistic(currentValues,this->lneedActorStatistics);
 			this->lstatistics[pInfo] = p.first;
 			this->lactorStatistics[pInfo] = p.second;
 		}
@@ -728,18 +731,22 @@ void StatisticCalculator::calculateBehaviorStatistics(
 				// no change gives no contribution
 				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
 				// calculate the contribution of downward change
-				if (currentValues[e] > pBehaviorData->min() && !pBehaviorData->upOnly(this->lperiod))
+				if (((currentValues[e] > pBehaviorData->min()) &&
+						(!pBehaviorData->upOnly(this->lperiod))) || modelAbsorb)
 				{
-					this->lstaticChangeContributions.at(pInfo).at(e)[0] = pEffect->calculateChangeContribution(e,-1);
+					this->lstaticChangeContributions.at(pInfo).at(e)[0] =
+									pEffect->calculateChangeContribution(e,-1);
 				}
 				else
 				{
 					this->lstaticChangeContributions.at(pInfo).at(e)[0] = R_NaN;
 				}
 				// calculate the contribution of upward change
-				if (currentValues[e] < pBehaviorData->max() && !pBehaviorData->downOnly(this->lperiod))
+				if (((currentValues[e] < pBehaviorData->max()) &&
+						(!pBehaviorData->downOnly(this->lperiod))) || modelAbsorb)
 				{
-					this->lstaticChangeContributions.at(pInfo).at(e)[2] = pEffect->calculateChangeContribution(e,1);
+					this->lstaticChangeContributions.at(pInfo).at(e)[2] =
+									pEffect->calculateChangeContribution(e,1);
 				}
 				else
 				{
@@ -772,7 +779,8 @@ void StatisticCalculator::calculateBehaviorStatistics(
 
 		if(this->lneedActorStatistics)
 		{
-			pair<double, double * > p = pEffect->endowmentStatistic(difference, currentValues,this->lneedActorStatistics);
+			pair<double, double * > p =
+				pEffect->endowmentStatistic(difference, currentValues,this->lneedActorStatistics);
 			this->lstatistics[pInfo] = p.first;
 			this->lactorStatistics[pInfo] = p.second;
 		}
@@ -804,7 +812,8 @@ void StatisticCalculator::calculateBehaviorStatistics(
 			&cache);
 		if(this->lneedActorStatistics)
 		{
-			pair<double, double * > p =  pEffect->creationStatistic(difference, currentValues, this->lneedActorStatistics);
+			pair<double, double * > p =
+					pEffect->creationStatistic(difference, currentValues, this->lneedActorStatistics);
 			this->lstatistics[pInfo] = p.first;
 			this->lactorStatistics[pInfo] = p.second;
 		}

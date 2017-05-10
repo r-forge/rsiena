@@ -17,6 +17,8 @@
 #include <string>
 #include "data/Data.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -57,8 +59,8 @@ public:
 	// Accessors
 	const Data * pData() const;
 	const Model * pModel() const;
-	const DependentVariable * pVariable(std::string name) const;
-	const std::vector<DependentVariable *> & rVariables() const;
+    const DependentVariable * pVariable(string name) const;
+    const vector<DependentVariable *> & rVariables() const;
 	const SimulationActorSet * pSimulationActorSet(
 			const ActorSet * pOriginalActorSet) const;
 	int period() const;
@@ -69,7 +71,7 @@ public:
 
 	double score(const EffectInfo * pEffect) const;
 	void score(const EffectInfo * pEffect, double value);
-	std::map<const EffectInfo *, double>
+	map<const EffectInfo *, double>
 		derivative(const EffectInfo * pEffect1) const;
 	double derivative(const EffectInfo * pEffect1,
 			const EffectInfo * pEffect2) const;
@@ -92,7 +94,7 @@ protected:
 	int chooseActor(const DependentVariable * pVariable) const;
 
 	// A vector of dependent variables with their current values
-	std::vector<DependentVariable *> lvariables;
+    vector<DependentVariable *> lvariables;
 
 private:
 	void runStep();
@@ -111,13 +113,13 @@ private:
 	Model * lpModel;
 
 	// A wrapper object per actor set for simulation purposes
-	std::vector<SimulationActorSet *> lsimulationActorSets;
+    vector<SimulationActorSet *> lsimulationActorSets;
 
 	// Stores the wrappers of each original actor set
-	std::map<const ActorSet *, SimulationActorSet *> lactorSetMap;
+    map<const ActorSet *, SimulationActorSet *> lactorSetMap;
 
 	// The dependent variable for look-ups by variable names
-	std::map<std::string, DependentVariable *> lvariableMap;
+    map<string, DependentVariable *> lvariableMap;
 
 	// The current period to be simulated
 	int lperiod;
@@ -151,8 +153,8 @@ private:
 	// Values of scores in this simulation: one for each selected effect,
 	// including the rate effects, but excluding the basic rate effect.
 
-	std::map<const EffectInfo *, double> lscores;
-	std::map<const EffectInfo *, std::map <const EffectInfo *, double> > lderivatives;
+    map<const EffectInfo *, double> lscores;
+    map<const EffectInfo *, map <const EffectInfo *, double> > lderivatives;
 
 	State * lpState;
 	Cache * lpCache;

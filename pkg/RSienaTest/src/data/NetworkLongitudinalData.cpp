@@ -51,6 +51,7 @@ NetworkLongitudinalData::NetworkLongitudinalData(int id,
 	this->lnetworksLessMissings = new Network * [observationCount];
 	this->lnetworksLessMissingStarts = new Network * [observationCount];
 	this->lmaxDegree = std::numeric_limits<int>::max();
+	this->lmodelType = 1;
 	this->luniversalOffset = std::numeric_limits<double>::max();
 	this->ldensity = new double[observationCount];
 	this->loneMode = oneMode;
@@ -397,6 +398,15 @@ void NetworkLongitudinalData::universalOffset(double offset) {
 	this->luniversalOffset = offset;
 }
 
+
+/**
+ * Stores the model type.
+ */
+void NetworkLongitudinalData::modelType(int type)
+{
+	this->lmodelType = type;
+}
+
 /**
  * Returns the maximum permitted out-degree of an actor.
  */
@@ -411,6 +421,16 @@ int NetworkLongitudinalData::maxDegree() const
 double NetworkLongitudinalData::universalOffset() const {
 	return this->luniversalOffset;
 }
+
+/**
+ * Returns the model type.
+ */
+int NetworkLongitudinalData::modelType() const
+{
+	return this->lmodelType;
+}
+
+
 /**
  * Stores the average in-degree over all receivers and observations.
  */

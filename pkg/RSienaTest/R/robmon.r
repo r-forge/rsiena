@@ -28,6 +28,14 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
     z$gain <- x$firstg
     z$haveDfra <- FALSE
     z$maxlike <- x$maxlike
+	if (is.null(x$sf2.byIteration)) # keep compatible
+	{
+		z$sf2.byIteration <- TRUE
+	}
+	else
+	{
+		z$sf2.byIteration <- x$sf2.byIteration
+	}
 	if (z$maxlike && !is.batch())
 	{
 		tkconfigure(z$tkvars$phaselabel, text="MCMC Burnin")

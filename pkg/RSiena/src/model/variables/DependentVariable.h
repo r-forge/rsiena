@@ -24,6 +24,18 @@ namespace siena
 {
 
 // ----------------------------------------------------------------------------
+// Section: Enumerations
+// ----------------------------------------------------------------------------
+
+/**
+ * This enumeration defines the possible types of model for symmetric,
+ * undirected networks;
+ * and the possible types of model for behavioral variables.
+ */
+	enum NetworkModelType { NOTUSED, NORMAL, AFORCE, AAGREE, BFORCE, BAGREE, BJOINT };
+	enum BehaviorModelType { OUTOFUSE, RESTRICT, ABSORB };
+	
+// ----------------------------------------------------------------------------
 // Section: Forward declarations
 // ----------------------------------------------------------------------------
 
@@ -77,6 +89,9 @@ public:
 	virtual bool behaviorVariable() const;
 	virtual bool symmetric() const;
 	virtual bool constrained() const;
+	virtual NetworkModelType networkModelType() const;
+	virtual BehaviorModelType behaviorModelType() const;
+	virtual bool networkModelTypeB() const;
 	virtual int alter() const;
 
 	inline const Function * pEvaluationFunction() const;

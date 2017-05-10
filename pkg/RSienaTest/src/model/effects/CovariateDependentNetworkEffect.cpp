@@ -99,7 +99,7 @@ void CovariateDependentNetworkEffect::initialize(const Data* pData,
 	NetworkEffect::initialize(pData, pState, pSimulatedState, period, pCache);
 	const string name = this->pEffectInfo()->interactionName1();
 
-	// For covariates lSimulatedOffset is appllied in values().
+	// For covariates lSimulatedOffset is applied in values().
 	this->lpConstantCovariate = pData->pConstantCovariate(name);
 	this->lpChangingCovariate = pData->pChangingCovariate(name);
 

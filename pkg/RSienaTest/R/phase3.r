@@ -223,14 +223,16 @@ phase3.2 <- function(z, x, ...)
 	}
     if (x$maxlike)
     {
+        sfl <- apply(z$sf, 2,
+                       function(x)acf(x, plot=FALSE, lag.max=1)[[1]][[2]])
         Report('Autocorrelations during phase 3 : \n', outf)
         Report(paste(format(1:z$pp, width=3), '. ',
-                     format(z$sfl, width=8, digits=4),
+                     format(sfl, width=8, digits=4),
                      '\n', collapse="", sep=""), outf)
         Report ('\n', outf)
         Report('Autocorrelations during phase 3 : \n', cf)
         Report(paste(format(1:z$pp, width=3), '. ',
-                     format(z$sfl, width=8, digits=4),
+                     format(sfl, width=8, digits=4),
                      '\n', collapse="", sep=""), cf)
         Report ('\n', cf)
     }
@@ -279,11 +281,12 @@ phase3.2 <- function(z, x, ...)
 			cov.est <- z$dinv %*% z$msfc %*% t(z$dinv)
 		}
 		error <- FALSE
-		if (inherits(try(msfinv <- solve(z$msfc), silent=TRUE), "try-error"))
+		ei <- eigen(z$msfc)
+		mineivalue <- min(ei[[1]])
+		if (mineivalue < 1e-12) # seems a small enough bound
 		{
 			Report('*** Warning: Covariance matrix not positive definite *** \n', outf)
 			Report('***            Standard errors not reliable           *** \n', outf)
-			ei <- eigen(z$msfc)
 			maxei <- max(abs(ei[[2]][,z$pp]))
 			# last eigenvector corresponds to smallest eigenvalue
 			smallei <- ei[[2]][,z$pp]/maxei
@@ -315,12 +318,7 @@ phase3.2 <- function(z, x, ...)
 	errorMessage.cov <- '*** Warning: Noninvertible estimated covariance matrix ***'
 				}
 			}
-			z$msfinv <- NULL
 			cov.est <- NA * z$msfc
-		}
-		else
-		{
-			z$msfinv <- msfinv
 		}
 		if (!is.null(cov.est))
 		{
@@ -332,6 +330,7 @@ phase3.2 <- function(z, x, ...)
 		z$covtheta <- cov.est
 	}
 	z$errorMessage.cov <- errorMessage.cov
+	z$sf.invcov <- NULL
 	## ans<-InstabilityAnalysis(z)
 	z
 }
@@ -349,7 +348,8 @@ CalculateDerivative3<- function(z,x)
     }
 	else
     {
-        dfra <-  derivativeFromScoresAndDeviations(z$ssc, z$sf2)
+        dfra <- derivativeFromScoresAndDeviations(z$ssc, z$sf2,
+								z$dfras, z$sscs, z$sf2s, z$sf2.byIteration, z$Phase3nits)
         if (any(diag(dfra) < 0))
         {
             sub <- which(diag(dfra) < 0)
@@ -359,27 +359,34 @@ CalculateDerivative3<- function(z,x)
             Report(c("Warning: diagonal element(s)", sub,
                      " of derivative matrix < 0\n"), cf)
         }
-		scores <- apply(z$ssc, c(1,3), sum)  # z$nit by z$pp matrix
-		for (i in 1:z$pp)
-		{
-			oldwarn <- getOption("warn")
-			options(warn = -1)
-			if ((var(scores[,i]) > 0)&&(var(z$sf[,i]) > 0))
-			{
-				z$regrCoef[i] <- cov(z$sf[,i], scores[,i])/var(scores[,i])
-				z$regrCor[i] <- cor(z$sf[,i], scores[,i])
-			}
-			if (is.na(z$regrCor[i])){z$regrCor[i] <- 0}
-			if (is.na(z$regrCoef[i])){z$regrCoef[i] <- 0}
-			options(warn = oldwarn)
-		}
 		if (x$dolby)
 		{
+			if (z$sf2.byIteration)
+			{
+				scores <- apply(z$ssc, c(1,3), sum)  # z$nit by z$pp matrix
+			}
+			else
+			{
+				scores <- z$scores
+			}
+			for (i in 1:z$pp)
+			{
+				oldwarn <- getOption("warn")
+				options(warn = -1)
+				if ((var(scores[,i]) > 0)&&(var(z$sf[,i]) > 0))
+				{
+					z$regrCoef[i] <- cov(z$sf[,i], scores[,i])/var(scores[,i])
+					z$regrCor[i] <- cor(z$sf[,i], scores[,i])
+				}
+				if (is.na(z$regrCor[i])){z$regrCor[i] <- 0}
+				if (is.na(z$regrCoef[i])){z$regrCoef[i] <- 0}
+				options(warn = oldwarn)
+			}
 			estMeans <- estMeans - (z$regrCoef * colMeans(scores))
 		}
 		Report('Correlations between scores and statistics:\n', cf)
 		PrtOutMat(format(as.matrix(t(z$regrCor)), digits = 2, nsmall = 2), cf)
-    }
+	}
 	z$estMeans <- estMeans
     z$diver <- rep(FALSE, z$pp)
     if (z$AllUserFixed & any(abs(diag(dfra)) < 1e-6))
@@ -387,11 +394,6 @@ CalculateDerivative3<- function(z,x)
         z$diver[abs(diag(dfra)) < 1e-6] <- TRUE
 	}
 	z$msf <- cov(z$sf)
-    if (z$Phase3nits > 2)
-    {
-        z$sfl <- apply(z$sf, 2,
-                       function(x)acf(x, plot=FALSE, lag.max=1)[[1]][[2]])
-    }
     z$dfra1 <- z$dfra
     z$dfra <- dfra
     z
@@ -482,6 +484,7 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 								  nits11=0, writefreq)
 {
 	int <- z$int
+	nWaves <- z$observations - 1
 	for (nit in nits)
 	{
 		z$nit <- nit
@@ -620,7 +623,14 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 				fra2 <- zz$fra
 			}
 			z$sf[z$nit, ] <- fra
-			z$sf2[z$nit, , ] <- zz$fra
+			if (z$sf2.byIteration)
+			{
+				z$sf2[z$nit, , ] <- zz$fra
+			}
+			else
+			{
+				z$sf2s <- z$sf2s + zz$fra
+			}
 			z$sims[[z$nit]] <- zz$sims
 			z$chain[[z$nit]] <- zz$chain
 			fra <- fra + z$targets
@@ -632,7 +642,14 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 				fra <- colSums(zz[[i]]$fra)
 				fra <- fra - z$targets
 				z$sf[z$nit + (i - 1), ] <- fra
-				z$sf2[z$nit + (i - 1), , ] <- zz[[i]]$fra
+				if (z$sf2.byIteration)
+				{
+					z$sf2[z$nit + (i - 1), , ] <- zz[[i]]$fra
+				}
+				else
+				{
+					z$sf2s <- z$sf2s + zz[[i]]$fra
+				}
 				z$sims[[z$nit + (i - 1)]] <- zz[[i]]$sims
 			}
 			if (z$FinDiff.method)
@@ -668,7 +685,20 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 			{
 				if (!is.null(zz[['sc']]))
 				{
-					z$ssc[z$nit , ,] <- zz$sc
+					if (z$sf2.byIteration)
+					{
+						z$ssc[z$nit , ,] <- zz$sc
+					}
+					else
+					{
+						z$sscs <- z$sscs + zz$sc
+						z$scores[z$nit,] <- colSums(zz$sc)
+# z$dfras + rowSums(sapply(1:nWaves, function(j){outer(zz$sc[j,], zz$fra[j, ])}))
+						for (j in 1:nWaves)
+						{
+							z$dfras <- z$dfras + outer(zz$sc[j,], zz$fra[j, ])
+						}
+					}
 				}
 			}
 			else
@@ -677,7 +707,19 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
                 {
                     if (!is.null(zz[[i]][['sc']]))
 					{
-                        z$ssc[z$nit + (i - 1), , ] <- zz[[i]]$sc
+						if (z$sf2.byIteration)
+						{
+							z$ssc[z$nit + (i - 1), , ] <- zz[[i]]$sc
+						}
+						else
+						{
+							z$sscs <- z$sscs + zz[[i]]$sc
+							z$scores[z$nit + (i - 1), ] <- colSums(zz[[i]]$sc)
+							for (j in 1:nWaves)
+							{
+								z$dfras <- z$dfras + outer(zz[[i]]$sc[j,], zz[[i]]$fra[j, ])
+							}
+						}
 					}
                 }
             }
@@ -713,6 +755,7 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 			{
 				val <- val + 1
 			}
+			z$Phase1nits <- nit
 			z$pb <- setProgressBar(z$pb, val)
 			progress <- val / z$pb$pbmax * 100
 			if (z$nit <= 5 || z$nit %% z$writefreq == 0 || z$nit %%5 == 0 ||
@@ -772,15 +815,27 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 									 'phase-3 iterations.\n\n'), outf)
 						}
 						z$sf <- z$sf[1:nit, , drop=FALSE]
-						z$sf2 <- z$sf2[1:nit, , , drop=FALSE]
-						if (!x$maxlike)
+
+
+						if (z$sf2.byIteration)
 						{
-							z$ssc <- z$ssc[1:nit, , , drop=FALSE]
+							z$sf2 <- z$sf2[1:nit, , , drop=FALSE]
+						}
+						if (!z$maxlike && !z$FinDiff.method)
+						{
+							if (z$sf2.byIteration)
+							{
+								z$ssc <- z$ssc[1:nit, , , drop=FALSE]
+							}
+							else
+							{
+								z$scores <- z$scores[1:nit, , drop=FALSE]
+							}
 						}
 						else
 						{
-							z$sdf <-z$sdf[1:nit]
-							z$sdf2 <-z$sdf2[1:nit]
+							z$sdf <- z$sdf[1:nit]
+							z$sdf2 <- z$sdf2[1:nit]
 						}
 						z$sims <-z$sims[1:nit]
 						z$Phase3nits <- nit

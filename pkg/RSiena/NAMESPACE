@@ -1,7 +1,7 @@
-useDynLib(RSiena)
+useDynLib(RSiena, .registration = TRUE)
 export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
        siena07, sienaCompositionChange, updateTheta,
-       sienaCompositionChangeFromFile, sienaDataCreate,
+       updateSpecification, sienaCompositionChangeFromFile, sienaDataCreate,
        sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
        sienaDependent, sienaNodeSet, xtable.sienaFit,
        varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,

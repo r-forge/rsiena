@@ -36,7 +36,7 @@ class NetworkDependentBehaviorEffect : public BehaviorEffect
 {
 public:
 	NetworkDependentBehaviorEffect(const EffectInfo * pEffectInfo);
-	NetworkDependentBehaviorEffect(const EffectInfo * pEffectInfo, const bool simulated);
+	NetworkDependentBehaviorEffect(const EffectInfo * pEffectInfo, const bool simulatedState);
 	virtual ~NetworkDependentBehaviorEffect();
 
 	virtual void initialize(const Data * pData,

@@ -145,15 +145,21 @@ print.siena <- function(x, ...)
 	atleastones <- attrs[["atLeastOne"]]
 	if (any(highers))
 	{
-		cat("Higher: ", names(highers)[highers], sep="", "\n")
+		sepsign <- ifelse((sum(highers) <= 1),'',', ')
+		cat("Higher: ")
+		cat(names(highers)[highers], sep=sepsign, "\n")
 	}
 	if (any(disjoints))
 	{
-		cat("Disjoint: ", names(disjoints)[disjoints], sep="",  "\n")
+		sepsign <- ifelse((sum(disjoints) <= 1),'','; ')
+		cat("Disjoint: ")
+		cat(names(disjoints)[disjoints], sep=sepsign,  "\n")
 	}
 	if (any(atleastones))
 	{
-		cat("atLeastOne: ", names(atleastones)[atleastones], sep="",  "\n")
+		sepsign <- ifelse((sum(atleastones) <= 1),'',', ')
+		cat("atLeastOne: ")
+		cat(names(atleastones)[atleastones], sep=sepsign,  "\n")
 	}
 	invisible(x)
 }
@@ -347,8 +353,23 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			cat('\n')
 		}
 		if (any(x$x$UniversalOffset > 0)) {
-			cat(' Offsets for universal and meeting settings (if any): \n')
-			cat(x$x$UniversalOffset,'\n\n')
+	cat(' Offsets for symmetric networks, and for settings model (if any): \n')
+			for (i in 1:length(x$x$UniversalOffset)){
+					cat(names(x$x$UniversalOffset)[i],':',x$x$UniversalOffset[i],'\n')}
+		}
+		if (any(x$x$modelType != 1)) {
+			cat('\n Model Type:\n')
+			for (i in 1:length(x$x$modelType)){
+					cat(names(x$x$modelType)[i],':',
+							ModelTypeStrings(x$x$modelType[i]),'\n')}
+			cat('\n')
+		}
+		if (any(x$x$behModelType != 1)) {
+			cat('\n Behavioral Model Type:\n')
+			for (i in 1:length(x$x$behModelType)){
+					cat(names(x$x$behModelType)[i],':',
+				BehaviorModelTypeStrings(x$x$behModelType[i]),'\n')}
+			cat('\n')
 		}
 
 		try(if (x$errorMessage.cov > '')
@@ -390,8 +411,10 @@ print.summary.sienaFit <- function(x, matrices=TRUE, ...)
     if (x$maxlike)
     {
         cat('Autocorrelations during phase 3 : \n')
+        sfl <- apply(x$sf, 2,
+                       function(y)acf(y, plot=FALSE, lag.max=1)[[1]][[2]])
         cat(paste(format(1:x$pp, width=3), '. ',
-                     format(x$sfl, width=8, digits=4),
+                     format(sfl, width=8, digits=4),
                      '\n', collapse="", sep=""))
         cat ('\n')
     }
@@ -548,6 +571,7 @@ print.sienaAlgorithm <- function(x, ...)
 	}
 	else
 	{
+		if (!is.null(x$n2start))cat(' Length of first subphase:', x$n2start, '\n')
     cat(' Starting value of gain parameter:', x$firstg, '\n')
 		cat(' Reduction factor for gain parameter:', objectOrNull(x$reduceg), '\n')
 	cat(' Diagonalization parameter:', x$diagonalize, '\n')
@@ -598,7 +622,26 @@ print.sienaAlgorithm <- function(x, ...)
 			}
 		}
 	}
-    cat(" Model Type:", ModelTypeStrings[x$modelType], "\n")
+	cat(" Model Type:\n")
+	if (is.null(names(x$modelType)))
+	{
+		names(x$modelType) <- 1:length(x$modelType)
+	}
+	for (i in 1:length(x$modelType))
+	{
+		cat(sprintf(" %s: %s\n",
+			names(x$modelType)[i], ModelTypeStrings(x$modelType[i])))
+	}
+    cat(" Behavioral Model Type:\n")
+	if (is.null(names(x$behModelType)))
+	{
+		names(x$behModelType) <- 1:length(x$behModelType)
+	}
+	for (i in 1:length(x$behModelType))
+	{
+		cat(sprintf(" %s: %s\n",
+			names(x$behModelType)[i], BehaviorModelTypeStrings(x$behModelType[i])))
+	}
     invisible(x)
 }
 
@@ -1261,6 +1304,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 	}
 	cat("\nAlgorithm specifications were nwarm =",x$nwarm,", nmain =", x$nmain,
 	    ", nrunMHBatches =", x$nrunMHBatches,
+	    ", nImproveMH =", x$nImproveMH,
 		",\n nSampVarying =", x$nSampVarying, ", nSampConst =", x$nSampConst,
 		", mult =", x$mult, ".\n")
 	if (!is.null(nfirst))

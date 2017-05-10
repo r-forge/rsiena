@@ -1346,7 +1346,7 @@ In \nnm{networkEffect.cpp}, \nnm{creationStatistic()} uses
 \nmm{endowmentStatistic()} uses \nnm{statistic()};
 \nnm{statistic()} uses \nnm{egoStatistic()}, and the latter uses
 \nnm{tieStatistic()}.
-If one of these is redefined in a given model or model class, 
+If one of these is redefined in a given model or model class,
 then this chain is broken and the lower elements in the chain
 will be replaced by the redefinitions.
 
@@ -1354,7 +1354,7 @@ Preprocessing and postprocessing is possible using the functions
 \nnm{initializeStatisticCalculation()} and
 \nnm{cleanupStatisticCalculation()}. For examples, see
 \nnm{balanceEffect}.
-\nnm{InStructuralEquivalenceEffect} also is an example of 
+\nnm{InStructuralEquivalenceEffect} also is an example of
 interesting constructions in this respect.
 
 
@@ -4640,20 +4640,24 @@ and assumption (8.) is replaced as indicated below.
       acceptance probability
       \[
       \P\{j \text{ accepts tie proposal}\} =
-                   \frac{\exp\big(f_j(x^{(+ij)}; \beta)\big)}
-        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ij)}; \beta)\big)} \ .
+                   \frac{\exp\big(f_j(x^{(+ij)}; \beta) + \beta^\text{b} \big)}
+        {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ij)}; \beta) + \beta^\text{b} \big)} \ ,
       \]
+      where $ \beta^\text{b} $ is an offset; this is a fixed parameter,
+      given as \texttt{UniversalOffset} in \nm{sienaAlgorithmCreate},
+      and is not estimated.\\
       If the choice by $i$ means termination of an existing tie,
       the proposal is always put into effect.
       Jointly these rules lead to the following probability
       that the current network $x$ changes into $x^{(\pm ij)}$:
       \begin{equation}
       \begin{split}
-      &  p_{ij}(x, \beta) = \\
-      & \hspace{1em} \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
-         {\sum_{h=1}^n \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}
-        \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
-          {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta)\big)}
+      &  p_{ij}(x, \beta) =
+          \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
+         {\sum_{h=1}^n \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}\\
+       & \hspace{3em} \times
+        \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta) + \beta^\text{b}  \big)}
+          {\exp\big(f_j(x; \beta)\big) + \exp\big(f_j(x^{(+ ij)}; \beta) + \beta^\text{b} \big)}
                          \right)^{1-x_{ij}}
           \ .   \label{eq:acbM}
       \end{split}
@@ -4897,9 +4901,11 @@ The probability of change is
       \begin{align}
         p_{ij}(x, \beta) &= \frac{\exp\big(f_i(x^{(\pm ij)}; \beta)\big)}
  {\sum_{h \in \mathcal A} \exp\big(f_i(x^{(\pm ih)}; \beta)\big)}  \nonumber \\
-       & \hspace{2em} \times \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta)\big)}
+       & \hspace{2em} \times \left(\frac{\exp\big(f_j(x^{(+ ij)}; \beta)
+             + \beta^\text{b} \big)}
                         {\exp\big(f_j(x; \beta)\big) +
-    \exp\big(f_j(x^{(+ ij)}; \beta)\big)} \right)^{1-x_{ij}} \nonumber \\[1em]
+    \exp\big(f_j(x^{(+ ij)}; \beta) + \beta^\text{b} \big)} \right)^{1-x_{ij}}
+                                    \nonumber \\[1em]
        &= p_{1ij}(x, \beta) \, \big( p_{0ji}(x, \beta)  \big)^{(1-x_{ij})} \\
     & =  p_{1ij}(x, \beta)\, \big(x_{ij} + (1-x_{ij})p_{0ji}(x, \beta) \big)\ ,
           \label{eq:cM}
@@ -5385,6 +5391,290 @@ but not again at each ministep because they do not change.
 For model specifications where the rate function depends on endogenously
 changing variables, the sums will need to be calculated repeatedly.
 
+\section{Modeltype for behavior}
+
+This section describes the option \texttt{BehaviorModelType},
+introduced in RSiena version 1.1-306.
+
+
+The enumerated types  \texttt{NetworkModelType} and
+\texttt{BehaviorModelType} are defined
+in \texttt{DependentVariable.h} as
+
+\noindent
+\texttt{\small
+enum NetworkModelType \{ NOTUSED, NORMAL, AFORCE, AAGREE,\\
+\hspace{8em}                         BFORCE, BAGREE, BJOINT \};\\
+enum BehaviorModelType \{ OUTOFUSE, RESTRICT, ABSORB \};
+}
+
+Functions \texttt{modelType()} and \texttt{modelType(type)}
+are defined in  \\
+\texttt{NetworkLongitudinalData.h},
+which is a class covering one dependent network.
+
+Functions \texttt{behaviorModelType()} and \texttt{behaviorModelType(type)}
+are defined in
+\texttt{BehaviorLongitudinalData.h},
+which is a class covering one dependent behavioral variable.
+
+The model types are transferred from these classes
+to \texttt{NetworkVariable.h} and \texttt{BehaviorVariable.h}
+where they have the accessor functions\\
+\texttt{networkModelType} and
+\texttt{behaviorModelType}.
+This makes it possible to specify different model types
+for each dependent network or behavioral variable.
+The network model type then is used further in
+\texttt{NetworkVariable.cpp}.
+In  \texttt{BehaviorVariable.cpp}, the behavioral model type
+then is used further in its local form \texttt{lmodelAbsorb}.
+
+\subsection{Behavior micro-step}
+Whenever actor $i$ may make a change in variable $Z$,
+she changes $z_{i}$ to the new value $v$ (changes can be --1, 0, +1). \\
+Denote the new vector by $z(i \leadsto v)$.
+Change probabilities are given by\\
+\[
+p_{i}(v; \beta, z, x) = \frac{\exp(f(i,v))}
+             {\displaystyle \sum_{u \in \mathcal C} \exp(f(i,u))}
+\]
+where
+\[
+f(i,v) = f^{Z}_i(\beta, z(i \leadsto v), x) \ ,
+\]
+$f_i^Z$ is the objective function of actor $i$ for behavior $Z$,
+and $\mathcal C$ is the set of allowed changes:\\
+$\{-1,0,1\}, \ \{0,1\}, \ \{-1,0\}$, \\
+depending on whether $z_i$ currently is at a boundary of its range.
+
+Thus, the range is restricted to the permissible values,
+and the objective function is evaluated accordingly.
+Therefore, this model option is called \texttt{RESTRICT}.
+
+The new model option is called behavioral model type \texttt{ABSORB}.\\
+It calculates, when $z_i$ currently is at the boundary of the range,
+hypothetically, the objective function for
+changing to the next value \emph{outside} the range;
+but if this value is chosen, then it is \emph{absorbed}
+into the range of $Z$.
+
+The choice between these options
+is specified by parameter \texttt{behModelType} in
+\texttt{sienaAlgorithmCreate}.
+This parameter can be given as an integer (1 or 2);
+or, for several dependent networks requiring different model types,
+as a named integer vector.
+
+In the earlier only available option, which is the case \texttt{RESTRICT},
+if \\$z_i = z^- = \min\{\text{range}(Z)\}$,
+the probabilities are
+\[
+p_{i}(z^- ; \beta, z^-, x) = \frac{\exp\big(f(i,z^- )\big)}
+             { \exp\big(f(i,z^- )\big) + \exp\big(f(i,z^- + 1)\big)}
+\]
+and
+\[
+p_{}(z^- + 1; \beta, z^-, x) = \frac{\exp\big(f(i,z^- + 1)\big) }
+             {\exp\big(f(i,z^- )\big) + \exp\big(f(i,z^- + 1)\big)} \ .
+\]
+
+Similarly, if $z_i = z^+ = \max\{\text{range}(Z)\}$, the probabilities are
+
+\[
+p_{i}(z^+ ; \beta, z^+, x) = \frac{\exp\big(f(i,z^+ )\big)  )\big)}
+             {\exp\big(f(i,z^+ - 1)\big) + \exp\big(f(i,z^+ )\big) \big)}
+\]
+and
+\[
+p_{}(z^+ - 1; \beta, z^+, x) = \frac{\exp\big(f(i,z^+ - 1)\big) }
+             {\exp\big(f(i,z^+ - 1)\big) + \exp\big(f(i,z^+ + 1)\big)} \ .
+\]
+
+For the new option, the case \texttt{ABSORB},
+if $z_i = z^- = \min\{\text{range}(Z)\}$,
+the probabilities are
+\[
+p_{i}(z^- ; \beta, z^-, x) = \frac{\exp\big(f(i,z^- - 1)\big) + \exp\big(f(i,z^- )\big)}
+             {\exp\big(f(i,z^- - 1)\big) +
+             \exp\big(f(i,z^- )\big) + \exp\big(f(i,z^- + 1)\big)}
+\]
+and
+\[
+p_{}(z^- + 1; \beta, z^-, x) = \frac{\exp\big(f(i,z^- + 1)\big) }
+             {\exp\big(f(i,z^- - 1)\big) +
+             \exp\big(f(i,z^- )\big) + \exp\big(f(i,z^- + 1)\big)} \ .
+\]
+
+Similarly, if $z_i = z^+ = \max\{\text{range}(Z)\}$, the probabilities are
+
+\[
+p_{i}(z^+ ; \beta, z^+, x) = \frac{\exp\big(f(i,z^+ )\big) + \exp\big(f(i,z^+ +1 )\big)}
+             {\exp\big(f(i,z^+ - 1)\big)
+             + \exp\big(f(i,z^+ )\big) + \exp\big(f(i,z^+ + 1)\big)}
+\]
+and
+\[
+p_{}(z^+ - 1; \beta, z^+, x) = \frac{\exp\big(f(i,z^+ - 1)\big) }
+             {\exp\big(f(i,z^+ - 1)\big)
+             + \exp\big(f(i,z^+ )\big) + \exp\big(f(i,z^+ + 1)\big)} \ .
+\]
+
+\subsection{Score function}
+
+To implement this requires more than changing the probabilities;
+also the score function $J_\theta$ needs to be changed.
+This is used for calculating
+\[
+    \frac{\partial \E_\theta Z}{\partial \theta} \,=\,
+             \E_\theta \big\{ J_\theta \, Z \big\} \ .
+\]
+
+
+
+For a change in the behavior variable, define by $\Delta_{ik}(d, z)$
+the change statistic for effect
+$k$, actor $i$, current state $z$, difference $d$.
+
+Define the change in the objective function by
+\[
+  \Delta f_i(d) \,=\, \sum_k \beta^Z_k \, \Delta_{ik}(d, z) \ .
+\]
+Note that $\Delta f_i(0) = 0$, which will be used repeatedly in the sequel.
+
+If there are no boundary effects, change probabilities are defined by
+\begin{equation}\label{pchange}
+     p_i(d) \,=\, \frac{\exp\big(\Delta f_i(d)\big)}
+                 { \sum_{d=-1}^1 \exp\big(\Delta f_{i}(d)\big)} \ .
+\end{equation}
+The scores for changes in behavioral variables are
+\begin{subequations}\label{sc1}
+\begin{equation}
+  J_k(d) \,=\, \frac{\partial}{\partial \beta_k} \log p^Z_{i}(d; z, \beta) \,=\,
+                  \Delta_{ik}(d, z) \, - \, \overline{ \Delta_{ik}(. , z)}
+\end{equation}
+where
+\begin{equation}
+    \overline{\Delta_{ik}(. , z)} \,=\, \sum_{d=-1}^1  q_i(d) \,  \Delta_{ik}(d, z) \
+\end{equation}
+\end{subequations}
+for $q_i(d) = p_i(d)$.
+
+
+
+
+In the standard model (`\texttt{RESTRICT}'), for the boundary cases:\\
+if the current state is at the minimum, we have
+\begin{subequations}\label{p.r}
+\begin{equation}
+     \pi_i(-1)  \,=\,  0 \ , \hspace{1em}
+     \pi_i(0)  \,=\, \frac{1}
+                 { 1 \,+\, \exp\big(\Delta f_{i}(1)\big)} \ ,
+\end{equation}
+\begin{equation}
+     \pi_i(1)  \,=\, \frac{ \exp\big(\Delta f_{i}(1)\big)}
+                 { 1 \,+\, \exp\big(\Delta f_{i}(1)\big)} \ ;
+\end{equation}
+if the current state is at the maximum, we have
+\begin{equation}
+     \pi_i(-1)  \,=\, \frac{ \exp\big(\Delta f_{i}(-1)\big)}
+                 { 1 \,+\, \exp\big(\Delta f_{i}(-1)\big)} \ ,
+\end{equation}
+\begin{equation}
+     \pi_i(0)  \,=\, \frac{1}
+                 { 1 \,+\, \exp\big(\Delta f_{i}(-1)\big)} \ ,\hspace{1em}
+     \pi_i(1)  \,=\,  0 \ .
+\end{equation}
+\end{subequations}
+
+The scores in the boundary cases still are given by (\ref{sc1})
+but with $q_i(d) = \pi_i(d)$ given in (\ref{p.r}).
+
+
+
+In the new model (`\texttt{ABSORB}'), the probabilities are:
+
+\noindent
+if the current state is at the minimum,
+\begin{subequations}\label{p.a}
+\begin{equation}
+     \pi_i(-1)  \,=\, 0 \ , \hspace{1em}
+     \pi_i(0)  \,=\, p_i(-1) \,+\, p_i(0)\ , \hspace{1em}  %\,=\, \frac{ \exp\big(\Delta f_{i}(-1)\big) \,+\, 1}
+                % { \sum_{d=-1}^1 \exp\big(\Delta f_{i}(d)\big)} \ , \hspace{2em}
+     \pi_i(1)  \,=\, p_i(1) \ ; %\frac{ \exp\big(\Delta f_{i}(1)\big)}
+                 % { \sum_{d=-1}^1 \exp\big(\Delta f_{i}(d)\big)} \ ;
+\end{equation}
+and if the current state is at the maximum,
+\begin{equation}
+     \pi_i(-1)  \,=\,  p_i(-1) \ , \hspace{1em}  %\frac{ \exp\big(\Delta f_{i}(-1)\big)}
+                %  { \sum_{d=-1}^1 \exp\big(\Delta f_{i}(d)\big)} \ ; \hspace{2em}
+     \pi_i(0)  \,=\,  p_i(0) \,+\, p_i(1) \ ,  \hspace{1em} % \frac{1 \,+\, \exp\big(\Delta f_{i}(1)\big)}
+                % { \sum_{d=-1}^1 \exp\big(\Delta f_{i}(d)\big)}  \ .
+ \pi_i(1)  \,=\, 0 \ .
+\end{equation}
+\end{subequations}
+
+
+In the second model type (`\texttt{ABSORB}'), however, the scores are different
+because we no longer are employing a multinomial regression model.
+
+We use the rule that, for a joint distribution of $(X,V)$
+with joint score function $J_{XV}$ and marginal score function $J_X$,
+\begin{equation}\label{s.xv}
+  J_X \,=\, \text{E}\big\{ J_{XV} \mid X \big\} \ .
+\end{equation}
+In  this case $V$ is the variable that takes all three values --1, 0, and +1,
+ and $X$ takes the two values absorbed to the range of $Z$.
+
+So we have to use the conditional expectation of the score function
+for the three-outcome case.
+
+
+Therefore, if the current state is at the minimum,
+the score is
+\begin{subequations}\label{sc.a}
+\begin{equation}
+  J_k(0) \,=\, \frac{p_i(-1)}{\pi_i(0)}
+                  \Delta_{ik}(-1, z) \, - \, \overline{ \Delta_{ik}(. , z)} \ ,
+\hspace{1em}
+   J_k(1) \,=\,  \Delta_{ik}(1, z) \, - \, \overline{ \Delta_{ik}(. , z)}
+\end{equation}
+with $ \overline{ \Delta_{ik}(. , z)}$ as in (\ref{sc1}b),
+for $q_i(d) = p_i(d)$.
+If the current state is at the maximum,
+the score is
+\begin{equation}
+\hspace{1em}
+   J_k(-1) \,=\,  \Delta_{ik}(-1, z) \, - \, \overline{ \Delta_{ik}(. , z)}   \ ,
+\hspace{1em}
+  J_k(0) \,=\, \frac{p_i(1)}{\pi_i(0)}
+                  \Delta_{ik}(1, z) \, - \, \overline{ \Delta_{ik}(. , z)}
+\end{equation}
+\end{subequations}
+again with $ \overline{ \Delta_{ik}(. , z)}$ as in (\ref{sc1}b),
+for $q_i(d) = p_i(d)$.
+
+
+It can be checked that the score function for the outcome that is
+observed like it is originally remains identical;
+and that the expected value of the score function is 0.
+
+For arranging the computations, it may be noted that
+we still can use formulas (\ref{sc1}) but with $ \Delta_{ik}(0, z)$
+replaced by
+\begin{subequations}\label{sca2}
+\begin{equation}
+  \tilde \Delta(0) \,=\, \frac{p_i(-1) \, \Delta_{ik}(-1, z) } {p_i(-1) \,+\, p_i(0)} \
+\end{equation}
+for the lower boundary case, and
+\begin{equation}
+  \tilde \Delta(0) \,=\, \frac{p_i(1)\,  \Delta_{ik}(1, z) } {p_i(0) \,+\, p_i(1)} \
+\end{equation}
+\end{subequations}
+for the upper boundary case; and $q_i(d) = p_i(d)$ in (\ref{sc1}b).
+
+
+
 \newpage
 \begin{appendices}
 
@@ -5621,8 +5911,7 @@ approximation, it is natural indeed that this should be the linear approximation
 \end{appendices}
 
 \bibliographystyle{Chicago}
-%\bibliography{C:/Users/tom.snijders/Documents/RForgeSecure/pkg/RSienaTest/inst/doc/RSiena}
-\bibliography{../inst/doc/RSiena}
+\bibliography{RSiena}
 
 \end{document}
 

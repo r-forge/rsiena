@@ -29,10 +29,28 @@ namespace siena
  * @param[in] pEffectInfo the descriptor object of the effect
  */
 NetworkDependentBehaviorEffect::NetworkDependentBehaviorEffect(
-	const EffectInfo * pEffectInfo) : BehaviorEffect(pEffectInfo)
+	const EffectInfo * pEffectInfo) :
+	BehaviorEffect(pEffectInfo), //
+	lSimulatedOffset(0), //
+	ltotalAlterValues(0), //
+	ltotalInAlterValues(0)
 {
-	this->ltotalAlterValues = 0;
-	this->ltotalInAlterValues = 0;
+}
+
+/**
+ * Constructor.
+ * @param[in] pEffectInfo the descriptor object of the effect
+ * @param simulatedState If `true` the value(), missing() and similarity()
+ *        functions uses the simulated state, if any or the value at the end
+ *        of the period.
+ */
+NetworkDependentBehaviorEffect::NetworkDependentBehaviorEffect(
+	const EffectInfo * pEffectInfo, bool simulatedState) :
+	BehaviorEffect(pEffectInfo), //
+	lSimulatedOffset(simulatedState ? 1 : 0), //
+	ltotalAlterValues(0), //
+	ltotalInAlterValues(0)
+{
 }
 
 /**
@@ -58,21 +76,44 @@ void NetworkDependentBehaviorEffect::initialize(const Data * pData,
 {
 	BehaviorEffect::initialize(pData, pState, period, pCache);
 	string networkName = this->pEffectInfo()->interactionName1();
-
 	this->lpNetwork = pState->pNetwork(networkName);
 
+	if (!this->lpNetwork) {
+		throw logic_error("Network '" + networkName + "' expected.");
+	}
+
+	// clear old value arrays
+	if (this->ltotalAlterValues) delete [] this->ltotalAlterValues;
+	if (this->ltotalInAlterValues) delete [] this->ltotalInAlterValues;
+	// create new value arrays
+	this->ltotalAlterValues = new double[this->lpNetwork->n()];
+	this->ltotalInAlterValues = new double[this->lpNetwork->m()];
+}
+
+void NetworkDependentBehaviorEffect::initialize(const Data *pData,
+	State *pState, State *pSimulatedState, int period, Cache *pCache)
+{
+	BehaviorEffect::initialize(pData, pState, period, pCache);
+	string networkName = this->pEffectInfo()->interactionName1();
 	if (!this->lpNetwork)
 	{
 		throw logic_error("Network '" + networkName + "' expected.");
 	}
-	if (this->ltotalAlterValues)
+
+	// Select network state.
+	if (lSimulatedOffset == 1) 
 	{
-		delete [] this->ltotalAlterValues;
+		this->lpNetwork = pSimulatedState->pNetwork(networkName);
 	}
-	if (this->ltotalInAlterValues)
+	else 
 	{
-		delete [] this->ltotalInAlterValues;
+		this->lpNetwork = pState->pNetwork(networkName);
 	}
+
+	// clear old value arrays
+	if (this->ltotalAlterValues) delete [] this->ltotalAlterValues;
+	if (this->ltotalInAlterValues) delete [] this->ltotalInAlterValues;
+	// create new value arrays
 	this->ltotalAlterValues = new double[this->lpNetwork->n()];
 	this->ltotalInAlterValues = new double[this->lpNetwork->m()];
 }
