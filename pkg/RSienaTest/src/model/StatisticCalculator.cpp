@@ -97,7 +97,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
 	this->lpStateLessMissingsEtc = new State();
 	this->lneedActorStatistics = returnActorStatistics;
 	this->lcountStaticChangeContributions = 0;
-	
+
 	this->calculateStatistics();
 }
 
@@ -120,7 +120,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
 	this->lpStateLessMissingsEtc = new State();
 	this->lneedActorStatistics = returnActorStatistics;
 	this->lcountStaticChangeContributions = returnStaticChangeContributions;
-	
+
 	this->calculateStatistics();
 }
 
@@ -426,8 +426,6 @@ void StatisticCalculator::calculateBehaviorGMMStatistics(
 			pBehaviorData->name());
 	double* currentValues = new double[pBehaviorData->n()];
 
-	bool modelAbsorb = (BehaviorModelType(pBehaviorData->behModelType()) == ABSORB);
-
 	for (int i = 0; i < pBehaviorData->n(); i++) {
 		currentValues[i] = currentState[i] - pBehaviorData->overallMean();
 		if (pBehaviorData->missing(this->lperiod, i)
@@ -476,8 +474,8 @@ void StatisticCalculator::calculateBehaviorGMMStatistics(
 				// no change gives no contribution
 				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
 				// calculate the contribution of downward change
-				if (((currentValues[e] > pBehaviorData->min())
-						&& (!pBehaviorData->upOnly(this->lperiod))) || modelAbsorb)
+				if ((currentValues[e] > pBehaviorData->min())
+						&& (!pBehaviorData->upOnly(this->lperiod)))
 				{
 					this->lstaticChangeContributions.at(pInfo).at(e)[0] =
 							pEffect->calculateChangeContribution(e, -1);
@@ -485,8 +483,8 @@ void StatisticCalculator::calculateBehaviorGMMStatistics(
 					this->lstaticChangeContributions.at(pInfo).at(e)[0] = R_NaN;
 				}
 				// calculate the contribution of upward change
-				if (((currentValues[e] < pBehaviorData->max())
-						&& (!pBehaviorData->downOnly(this->lperiod))) || modelAbsorb)
+				if ((currentValues[e] < pBehaviorData->max())
+						&& (!pBehaviorData->downOnly(this->lperiod)))
 					{
 					this->lstaticChangeContributions.at(pInfo).at(e)[2] =
 							pEffect->calculateChangeContribution(e, 1);
@@ -820,7 +818,7 @@ void StatisticCalculator::calculateNetworkCreationStatistics(
 //					}
 //				}
 //			}
-			
+
 			delete pEffect;
 		}
 
@@ -844,8 +842,6 @@ void StatisticCalculator::calculateBehaviorStatistics(
 		this->lpState->behaviorValues(pBehaviorData->name());
 
 	double * currentValues  = new double[pBehaviorData->n()];
-
-	bool modelAbsorb = (BehaviorModelType(pBehaviorData->behModelType()) == ABSORB);
 
 	for (int i = 0; i < pBehaviorData->n(); i++)
 	{
@@ -923,8 +919,8 @@ void StatisticCalculator::calculateBehaviorStatistics(
 				// no change gives no contribution
 				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
 				// calculate the contribution of downward change
-				if (((currentValues[e] > pBehaviorData->min()) &&
-						(!pBehaviorData->upOnly(this->lperiod))) || modelAbsorb)
+				if ((currentValues[e] > pBehaviorData->min()) &&
+						(!pBehaviorData->upOnly(this->lperiod)))
 				{
 					this->lstaticChangeContributions.at(pInfo).at(e)[0] =
 									pEffect->calculateChangeContribution(e,-1);
@@ -934,8 +930,8 @@ void StatisticCalculator::calculateBehaviorStatistics(
 					this->lstaticChangeContributions.at(pInfo).at(e)[0] = R_NaN;
 				}
 				// calculate the contribution of upward change
-				if (((currentValues[e] < pBehaviorData->max()) &&
-						(!pBehaviorData->downOnly(this->lperiod))) || modelAbsorb)
+				if ((currentValues[e] < pBehaviorData->max()) &&
+						(!pBehaviorData->downOnly(this->lperiod)))
 				{
 					this->lstaticChangeContributions.at(pInfo).at(e)[2] =
 									pEffect->calculateChangeContribution(e,1);
@@ -946,7 +942,7 @@ void StatisticCalculator::calculateBehaviorStatistics(
 				}
 			}
 		}
-		
+
 		delete pEffect;
 	}
 

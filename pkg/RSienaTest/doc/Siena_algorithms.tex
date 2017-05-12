@@ -5428,7 +5428,7 @@ for each dependent network or behavioral variable.
 The network model type then is used further in
 \texttt{NetworkVariable.cpp}.
 In  \texttt{BehaviorVariable.cpp}, the behavioral model type
-then is used further in its local form \texttt{lmodelAbsorb}.
+then is used further through the function \texttt{behaviorModelTypeABSORB}.
 
 \subsection{Behavior micro-step}
 Whenever actor $i$ may make a change in variable $Z$,
@@ -5482,8 +5482,8 @@ p_{}(z^- + 1; \beta, z^-, x) = \frac{\exp\big(f(i,z^- + 1)\big) }
 Similarly, if $z_i = z^+ = \max\{\text{range}(Z)\}$, the probabilities are
 
 \[
-p_{i}(z^+ ; \beta, z^+, x) = \frac{\exp\big(f(i,z^+ )\big)  )\big)}
-             {\exp\big(f(i,z^+ - 1)\big) + \exp\big(f(i,z^+ )\big) \big)}
+p_{i}(z^+ ; \beta, z^+, x) = \frac{\exp\big(f(i,z^+ )\big)  }
+             {\exp\big(f(i,z^+ - 1)\big) + \exp\big(f(i,z^+ )\big) }
 \]
 and
 \[
@@ -5495,29 +5495,27 @@ For the new option, the case \texttt{ABSORB},
 if $z_i = z^- = \min\{\text{range}(Z)\}$,
 the probabilities are
 \[
-p_{i}(z^- ; \beta, z^-, x) = \frac{\exp\big(f(i,z^- - 1)\big) + \exp\big(f(i,z^- )\big)}
-             {\exp\big(f(i,z^- - 1)\big) +
-             \exp\big(f(i,z^- )\big) + \exp\big(f(i,z^- + 1)\big)}
+p_{i}(z^- ; \beta, z^-, x) = \frac{2\, \exp\big(f(i,z^- )\big)}
+             {2\, \exp\big(f(i,z^- )\big) + \exp\big(f(i,z^- + 1)\big)}
 \]
 and
 \[
 p_{}(z^- + 1; \beta, z^-, x) = \frac{\exp\big(f(i,z^- + 1)\big) }
-             {\exp\big(f(i,z^- - 1)\big) +
-             \exp\big(f(i,z^- )\big) + \exp\big(f(i,z^- + 1)\big)} \ .
+             {2\, \exp\big(f(i,z^- )\big) + \exp\big(f(i,z^- + 1)\big)} \ .
 \]
 
 Similarly, if $z_i = z^+ = \max\{\text{range}(Z)\}$, the probabilities are
 
 \[
-p_{i}(z^+ ; \beta, z^+, x) = \frac{\exp\big(f(i,z^+ )\big) + \exp\big(f(i,z^+ +1 )\big)}
+p_{i}(z^+ ; \beta, z^+, x) = \frac{2\,\exp\big(f(i,z^+ )\big) }
              {\exp\big(f(i,z^+ - 1)\big)
-             + \exp\big(f(i,z^+ )\big) + \exp\big(f(i,z^+ + 1)\big)}
+             + 2\,\exp\big(f(i,z^+ )\big) }
 \]
 and
 \[
 p_{}(z^+ - 1; \beta, z^+, x) = \frac{\exp\big(f(i,z^+ - 1)\big) }
              {\exp\big(f(i,z^+ - 1)\big)
-             + \exp\big(f(i,z^+ )\big) + \exp\big(f(i,z^+ + 1)\big)} \ .
+             + 2\,\exp\big(f(i,z^+ )\big) } \ .
 \]
 
 \subsection{Score function}
@@ -5555,12 +5553,9 @@ The scores for changes in behavioral variables are
 \end{equation}
 where
 \begin{equation}
-    \overline{\Delta_{ik}(. , z)} \,=\, \sum_{d=-1}^1  q_i(d) \,  \Delta_{ik}(d, z) \
+    \overline{\Delta_{ik}(. , z)} \,=\, \sum_{d=-1}^1  p_i(d) \,  \Delta_{ik}(d, z) \ .
 \end{equation}
 \end{subequations}
-for $q_i(d) = p_i(d)$.
-
-
 
 
 In the standard model (`\texttt{RESTRICT}'), for the boundary cases:\\
@@ -5588,8 +5583,7 @@ if the current state is at the maximum, we have
 \end{subequations}
 
 The scores in the boundary cases still are given by (\ref{sc1})
-but with $q_i(d) = \pi_i(d)$ given in (\ref{p.r}).
-
+but with $p_i(d) = \pi_i(d)$ given in (\ref{p.r}).
 
 
 In the new model (`\texttt{ABSORB}'), the probabilities are:
@@ -5614,65 +5608,24 @@ and if the current state is at the maximum,
 \end{equation}
 \end{subequations}
 
-
-In the second model type (`\texttt{ABSORB}'), however, the scores are different
-because we no longer are employing a multinomial regression model.
-
-We use the rule that, for a joint distribution of $(X,V)$
-with joint score function $J_{XV}$ and marginal score function $J_X$,
-\begin{equation}\label{s.xv}
-  J_X \,=\, \text{E}\big\{ J_{XV} \mid X \big\} \ .
-\end{equation}
-In  this case $V$ is the variable that takes all three values --1, 0, and +1,
- and $X$ takes the two values absorbed to the range of $Z$.
-
-So we have to use the conditional expectation of the score function
-for the three-outcome case.
-
-
-Therefore, if the current state is at the minimum,
-the score is
-\begin{subequations}\label{sc.a}
-\begin{equation}
-  J_k(0) \,=\, \frac{p_i(-1)}{\pi_i(0)}
-                  \Delta_{ik}(-1, z) \, - \, \overline{ \Delta_{ik}(. , z)} \ ,
-\hspace{1em}
-   J_k(1) \,=\,  \Delta_{ik}(1, z) \, - \, \overline{ \Delta_{ik}(. , z)}
-\end{equation}
-with $ \overline{ \Delta_{ik}(. , z)}$ as in (\ref{sc1}b),
-for $q_i(d) = p_i(d)$.
-If the current state is at the maximum,
-the score is
-\begin{equation}
-\hspace{1em}
-   J_k(-1) \,=\,  \Delta_{ik}(-1, z) \, - \, \overline{ \Delta_{ik}(. , z)}   \ ,
-\hspace{1em}
-  J_k(0) \,=\, \frac{p_i(1)}{\pi_i(0)}
-                  \Delta_{ik}(1, z) \, - \, \overline{ \Delta_{ik}(. , z)}
-\end{equation}
-\end{subequations}
-again with $ \overline{ \Delta_{ik}(. , z)}$ as in (\ref{sc1}b),
-for $q_i(d) = p_i(d)$.
-
-
-It can be checked that the score function for the outcome that is
-observed like it is originally remains identical;
-and that the expected value of the score function is 0.
-
-For arranging the computations, it may be noted that
-we still can use formulas (\ref{sc1}) but with $ \Delta_{ik}(0, z)$
-replaced by
-\begin{subequations}\label{sca2}
-\begin{equation}
-  \tilde \Delta(0) \,=\, \frac{p_i(-1) \, \Delta_{ik}(-1, z) } {p_i(-1) \,+\, p_i(0)} \
-\end{equation}
-for the lower boundary case, and
-\begin{equation}
-  \tilde \Delta(0) \,=\, \frac{p_i(1)\,  \Delta_{ik}(1, z) } {p_i(0) \,+\, p_i(1)} \
-\end{equation}
-\end{subequations}
-for the upper boundary case; and $q_i(d) = p_i(d)$ in (\ref{sc1}b).
-
+To calculate the scores in the second model type (`\texttt{ABSORB}'),
+for the boundary cases,
+we may note that this is based on a multinomial regression model
+with three options $\{-1, 0, 1\}$, of which the first two outcomes
+are combined. 
+Consider the case for the right boundary.
+The first two outcomes have the same value 
+$\Delta_{ik}(-1,z) = \Delta_{ik}(0,z) = 0$; the value is 0
+because this option means no change.
+A score function is a function of the sufficient statistic,
+and for this 3-option statistical model the sufficient statistic corresponds
+to the partition of the outcome space into  $\big\{\{-1, 0\}, \{1\} \big\}$.
+Therefore the score function that we need is again (\ref{sc1}),
+for the original probabilities $p_i$. However, since 
+$\Delta_{ik}(-1,z) = \Delta_{ik}(0,z) = 0$ and $\pi_i(1) = p_i(1)$,
+it does not matter whether we calculate (\ref{sc1})
+for $p_i$ or for $\pi_i$.
+ 
 
 
 \newpage
