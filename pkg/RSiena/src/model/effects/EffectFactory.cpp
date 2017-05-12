@@ -525,7 +525,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new FourCyclesEffect(pEffectInfo, false);
 	}
-	else if ((effectName == "gwespFF")|(effectName == "gwesp"))
+	else if ((effectName == "gwespFF")||(effectName == "gwesp"))
 	{
 		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
 			&NetworkCache::pTwoPathTable;
@@ -715,7 +715,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
  		pEffect = new GenericNetworkEffect(pEffectInfo,
 			pFunction);
 	}
-	else if ((effectName == "gwespFBMix")|(effectName == "gwespMix"))
+	else if ((effectName == "gwespFBMix")||(effectName == "gwespMix"))
  	{
 		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
 			&NetworkCache::pInStarTable;

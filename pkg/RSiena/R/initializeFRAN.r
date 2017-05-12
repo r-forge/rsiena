@@ -688,7 +688,6 @@ withNames <- function(xx, types){
 		simpleRates <- FALSE
 	}
 	z$simpleRates <- simpleRates
-
 	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, UNIVERSALOFFSET, CONDVAR, CONDTARGET,
                  profileData, z$parallelTesting, MODELTYPE, BEHMODELTYPE,

@@ -49,6 +49,7 @@ public:
 
 	void behaviorModelType(int type);
 	virtual BehaviorModelType behaviorModelType() const;
+	virtual bool behaviorModelTypeABSORB() const;
 
 	virtual void makeChange(int actor);
 
@@ -78,7 +79,7 @@ private:
 		int difference) const;
 	double totalCreationContribution(int actor,
 		int difference) const;
-	void accumulateScores(int currentVal, int difference, bool UpPossible,
+	void accumulateScores(int difference, bool UpPossible,
 		bool downPossible) const;
 	void calculateProbabilities(int actor);
 	void accumulateDerivatives() const;
@@ -114,9 +115,6 @@ private:
 
 	double * lprobabilities;
 
-	// Selection probability per each difference, for the behModelType ABSORB
-	double * lqrobabilities;
-
 	// Indicates if upward change is possible in the current situation
 	bool lupPossible;
 
@@ -128,9 +126,6 @@ private:
 
 	// the model type
 	BehaviorModelType lbehaviorModelType;
-	
-	// whether the model type is ABSORB
-	bool lmodelAbsorb;
 };
 
 }

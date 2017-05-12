@@ -4,6 +4,13 @@ In the future
      in the algorithm object. This required only a change in 
      NetworkVariable::checkAlterAgreement; documented in Siena_algorithms.
 
+2017-05-12 R-Forge Revision 307
+Changes in RSiena and RSienaTest:
+   * Operation of option 'absorb' (behModelType=2) corrected.
+Changes in RSienaTest:
+   * BothDegreesEffect.h and .cpp added to repository.
+
+
 2017-05-10 R-Forge Revision 306
 Changes in RSiena and RSienaTest:
    * Added updateSpecification (effectsMethods)

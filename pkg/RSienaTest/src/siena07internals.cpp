@@ -196,7 +196,7 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 	}
 	if (*settingCol < 0)
 	{
-	 	error("cannot find setting col");
+	 	error("cannot find setting col; reconstruct effects object with this version of RSienaTest");
 	}
 //Rprintf("%d parmcol\n", *parmCol);
 }

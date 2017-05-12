@@ -652,8 +652,6 @@ void StatisticCalculator::calculateBehaviorStatistics(
 
 	double * currentValues  = new double[pBehaviorData->n()];
 
-	bool modelAbsorb = (BehaviorModelType(pBehaviorData->behModelType()) == ABSORB);
-
 	for (int i = 0; i < pBehaviorData->n(); i++)
 	{
 		currentValues[i] = currentState[i] - pBehaviorData->overallMean();
@@ -731,8 +729,8 @@ void StatisticCalculator::calculateBehaviorStatistics(
 				// no change gives no contribution
 				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
 				// calculate the contribution of downward change
-				if (((currentValues[e] > pBehaviorData->min()) &&
-						(!pBehaviorData->upOnly(this->lperiod))) || modelAbsorb)
+				if ((currentValues[e] > pBehaviorData->min()) &&
+						(!pBehaviorData->upOnly(this->lperiod)))
 				{
 					this->lstaticChangeContributions.at(pInfo).at(e)[0] =
 									pEffect->calculateChangeContribution(e,-1);
@@ -742,8 +740,8 @@ void StatisticCalculator::calculateBehaviorStatistics(
 					this->lstaticChangeContributions.at(pInfo).at(e)[0] = R_NaN;
 				}
 				// calculate the contribution of upward change
-				if (((currentValues[e] < pBehaviorData->max()) &&
-						(!pBehaviorData->downOnly(this->lperiod))) || modelAbsorb)
+				if ((currentValues[e] < pBehaviorData->max()) &&
+						(!pBehaviorData->downOnly(this->lperiod)))
 				{
 					this->lstaticChangeContributions.at(pInfo).at(e)[2] =
 									pEffect->calculateChangeContribution(e,1);
@@ -923,98 +921,101 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 
 	// for each covariate-defined setting, calculate
 	// setting*difference network and sum.
-	const vector<string> & rSettingNames = pNetworkData->rSettingNames();
+//	const vector<pair<string, string> > & rSettingNames =
+//			pNetworkData->rSettingNames();
 	//Rprintf("basic rate change %d size %d \n", pDifference->tieCount(),
 	//	rSettingNames.size());
-	for (unsigned i = 0; i < rSettingNames.size();
-		 i++)
-	{
-		if (!this->lsettingDistances[pNetworkData][rSettingNames[i]])
-		{
-			int * array =
-				new int[pNetworkData->observationCount() - 1];
+	// for (unsigned i = 0; i < rSettingNames.size();
+	// 	 i++)
+	// {
+	// 	if (!this->lsettingDistances[pNetworkData][rSettingNames[i]])
+	// 	{
+	// 		int * array =
+	// 			new int[pNetworkData->observationCount() - 1];
 
-			this->lsettingDistances[pNetworkData][rSettingNames[i]] = array;
-		}
-		// universal
-		int distance = pDifference->tieCount();
-		// primary
-		if (i == 1)
-		{
-			const Network * pNetwork =
-				this->lpState->pNetwork(pNetworkData->name());
-			// create a network representing primary settings
-			Network * settingNetwork = new
-				Network(pNetwork->n(), pNetwork->m());
-			for (int ego = 0; ego < pNetwork->n(); ego++)
-			{
-				vector<int> * setting = primarySetting(pNetwork, ego);
-				for (unsigned alter = 0; alter < setting->size(); alter++)
-				{
-					settingNetwork->setTieValue(ego, alter, 1);
-				}
-				delete(setting);
-			}
-			for (TieIterator iter = pDifference->ties();
-				 iter.valid();
-				 iter.next())
-			{
+	// 		this->lsettingDistances[pNetworkData][rSettingNames[i]] = array;
+	// 	}
+	// 	// universal
+	// 	int distance = pDifference->tieCount();
+	// 	// primary
+	// 	if (i == 1)
+	// 	{
+	// 		const Network * pNetwork =
+	// 			this->lpState->pNetwork(pNetworkData->name());
+	// 		// create a network representing primary settings
+	// 		Network * settingNetwork = new
+	// 			Network(pNetwork->n(), pNetwork->m());
+	// 		for (int ego = 0; ego < pNetwork->n(); ego++)
+	// 		{
+	// 			vector<int> * setting = primarySetting(pNetwork, ego);
+	// 			for (unsigned alter = 0; alter < setting->size(); alter++)
+	// 			{
+	// 				settingNetwork->setTieValue(ego, alter, 1);
+	// 			}
+	// 			delete(setting);
+	// 		}
+	// 		for (TieIterator iter = pDifference->ties();
+	// 			 iter.valid();
+	// 			 iter.next())
+	// 		{
 
-				{
-					if (settingNetwork->tieValue(iter.ego(),
-							iter.alter()) == 0)
-					{
-						distance--;
-					}
-				}
-			}
-			delete settingNetwork;
-		}
-		// for each covariate-defined setting, calculate
-		// setting*difference network and sum.
-		if (i > 1)
-		{
-			ConstantDyadicCovariate * pConstantDyadicCovariate =
-				this->lpData->pConstantDyadicCovariate(rSettingNames[i]);
-			ChangingDyadicCovariate * pChangingDyadicCovariate =
-				this->lpData->pChangingDyadicCovariate(rSettingNames[i]);
+	// 			{
+	// 				if (settingNetwork->tieValue(iter.ego(),
+	// 						iter.alter()) == 0)
+	// 				{
+	// 					distance--;
+	// 				}
+	// 			}
+	// 		}
+	// 		delete settingNetwork;
+	// 	}
+	// 	// for each covariate-defined setting, calculate
+	// 	// setting*difference network and sum.
+	// 	if (i > 1)
+	// 	{
+	// 		ConstantDyadicCovariate * pConstantDyadicCovariate =
+	// 			this->lpData->pConstantDyadicCovariate(rSettingNames[i]);
+	// 		ChangingDyadicCovariate * pChangingDyadicCovariate =
+	// 			this->lpData->pChangingDyadicCovariate(rSettingNames[i]);
 
-			for (TieIterator iter = pDifference->ties();
-				 iter.valid();
-				 iter.next())
-			{
+	// 		for (TieIterator iter = pDifference->ties();
+	// 			 iter.valid();
+	// 			 iter.next())
+	// 		{
 
-				if (pConstantDyadicCovariate)
-				{
-					if (pConstantDyadicCovariate->value(iter.ego(),
-							iter.alter()) == 0)
-					{
-						distance--;
-					}
-				}
-				else if (pChangingDyadicCovariate)
-				{
-					if (pChangingDyadicCovariate->value(iter.ego(),
-							iter.alter(),
-							this->lperiod) == 0)
-					{
-						distance--;
-					}
-				}
-				else
-				{
-					throw logic_error(
-						"No dyadic covariate named '" +
-						rSettingNames[i] +
-						"'.");
-				}
-			}
-		}
-		// store distance for later use
-		//	Rprintf(" cov %d %d\n", i, distance);
-		this->lsettingDistances[pNetworkData][rSettingNames[i]]
-			[this->lperiod] = distance;
-	}
+	// 			if (pConstantDyadicCovariate)
+	// 			{
+	// 				if (pConstantDyadicCovariate->value(iter.ego(),
+	// 						iter.alter()) == 0)
+	// 				{
+	// 					distance--;
+	// 				}
+	// 			}
+	// 			else if (pChangingDyadicCovariate)
+	// 			{
+	// 				if (pChangingDyadicCovariate->value(iter.ego(),
+	// 						iter.alter(),
+	// 						this->lperiod) == 0)
+	// 				{
+	// 					distance--;
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				throw logic_error(
+	// 					"No dyadic covariate named '" +
+	// 					rSettingNames[i] +
+	// 					"'.");
+	// 			}
+	// 		}
+	// 	}
+	// 	// store distance for later use
+	// 	//	Rprintf(" cov %d %d\n", i, distance);
+	// 	this->lsettingDistances[pNetworkData][rSettingNames[i]]
+	// 		[this->lperiod] = distance;
+	// }
+	// the universal setting can explain everything
+//	calcDifferences(pNetworkData, pDifference);
 
 	// Loop through the rate effects, calculate the statistics,
 	// and store them.
