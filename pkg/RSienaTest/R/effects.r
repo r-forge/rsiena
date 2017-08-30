@@ -241,7 +241,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 										 name=varname,
 										 groupName=groupName, group=group,
 										 netType=netType)
-			objEffects <-  rbind(objEffects, interaction[rep(1:3, nintn), ])
+			objEffects <-  rbind(objEffects, interaction[rep(1:nrow(interaction), nintn), ])
 		}
 
 		for (j in seq(along=xx$depvars))
@@ -718,7 +718,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 									 varname, name=varname,
 										 groupName=groupName, group=group,
 									 netType=netType)
-		objEffects <- rbind(objEffects, interaction[rep(1:3, behNintn),])
+		objEffects <- rbind(objEffects, interaction[rep(1:nrow(interaction), behNintn),])
 
 		## get starting values
 		starts <- getBehaviorStartingVals(depvar)
@@ -855,7 +855,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 										 name=varname,
 										 groupName=groupName, group=group,
 										 netType=netType)
-			objEffects <-  rbind(objEffects, interaction[rep(1:3, nintn), ])
+			objEffects <-  rbind(objEffects, interaction[rep(1:nrow(interaction), nintn), ])
 		}
 
 		for (j in seq(along=xx$depvars))

@@ -98,6 +98,8 @@ void NetworkDependentBehaviorEffect::initialize(const Data *pData,
 {
 	BehaviorEffect::initialize(pData, pState, period, pCache);
 	string networkName = this->pEffectInfo()->interactionName1();
+	this->lpNetwork = pState->pNetwork(networkName);
+
 	if (!this->lpNetwork) 
 	{
 		throw logic_error("Network '" + networkName + "' expected.");
