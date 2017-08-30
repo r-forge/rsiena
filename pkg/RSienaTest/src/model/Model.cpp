@@ -535,6 +535,11 @@ EffectInfo * Model::addInteractionEffect(string variableName,
 	{
 		this->lcreationEffects[variableName].push_back(pInfo);
 	}
+	else if (effectType == "gmm")
+	{
+		this->lGMMModel = true;
+		this->lgmmEffects[variableName].push_back(pInfo);
+	}
 	else
 	{
 		throw invalid_argument("Unexpected effect type '" + effectType + "'.");

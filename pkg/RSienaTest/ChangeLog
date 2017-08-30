@@ -4,6 +4,12 @@ In the future
      in the algorithm object. This required only a change in 
      NetworkVariable::checkAlterAgreement; documented in Siena_algorithms.
 
+2017-08-30 R-Forge Revision 308
+Changes in RSienaTest:
+   * effects.r: remove hard coded number of types of interactions
+   * Model.cpp: allow gmm type interaction effects
+   * NetworkDependentBehaviorEffect.cpp: fix uninitialized network pointer
+
 2017-05-12 R-Forge Revision 307
 Changes in RSiena and RSienaTest:
    * Operation of option 'absorb' (behModelType=2) corrected.
