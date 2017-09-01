@@ -4,6 +4,10 @@ In the future
      in the algorithm object. This required only a change in 
      NetworkVariable::checkAlterAgreement; documented in Siena_algorithms.
 
+2017-09-01 R-Forge Revision 309
+Changes in RSienaTest:
+   * configure.ac: don't compile with openmpi if orted if missing
+
 2017-08-30 R-Forge Revision 308
 Changes in RSienaTest:
    * effects.r: remove hard coded number of types of interactions

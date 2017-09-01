@@ -3,17 +3,17 @@
 # Based on the autoconf.ac from the Rmpi package
 # <http://www.stats.uwo.ca/faculty/yu/Rmpi/>. Run `autoconf` to produce the
 # 'configure' script.
-
+#
 # - Run with automatic detection: `R CMD INSTALL {pkg}`
-
+#
 # - Run with a prefix folder. Subfolders will be searched for binarys.
 #   `R CMD INSTALL {pkg} --configure-args=--with-mpi=/path/to/location`
-
+#
 # - Fully specify paths and type.
 #   `R CMD INSTALL {pkg} --configure-args="        \\
-#    --with-Rmpi-include=/path/to/mpi_include_dir  \\
-#    --with-Rmpi-libpath=/path/to/mpi_lib_dir      \\
-#    --with-Rmpi-type={OPENMPI,MPICH,MPICH2,LAM}"`
+#    --with-mpi-include=/path/to/mpi_include_dir  \\
+#    --with-mpi-libpath=/path/to/mpi_lib_dir      \\
+#    --with-mpi-type={OPENMPI,MPICH,MPICH2,LAM}"`
 
 AC_PREREQ([2.69])
 AC_INIT([RSienaTest], 1.1-289)
@@ -233,7 +233,8 @@ fi
 if test "$MPI_TYPE" = "OPENMPI" ; then
   AC_CHECK_PROG(ORTED, orted, yes, no)
   if test "$ORTED" = no ; then
-    AC_MSG_NOTICE([Cannot find orted. Rmpi needs orted to run.])
+    AC_MSG_NOTICE([Cannot find orted. RSiena needs orted to run.])
+    MPI=no
   fi
 fi
 
@@ -266,13 +267,16 @@ MPI_DEFS="-D$MPI_TYPE"
 if test "$MPI_TYPE" = "OPENMPI" -o "$MPI_TYPE" = "LAM" -o "$MPI_TYPE" = "MPICH2"; then
   MPI_DEFS="$MPI_DEFS -DMPI2"
 fi
+
 OSTYPE="`uname`"
 if test "$OSTYPE" = "Darwin"; then
   MPI_DEFS="$MPI_DEFS -DMAC"
 fi
 
-PKG_CPPFLAGS="$MPI_INCLUDES $MPI_DEFS"
 if test "$MPI" = "yes" ; then
+
+  PKG_CPPFLAGS="$MPI_INCLUDES $MPI_DEFS"
+
   case "$MPI_TYPE" in
     OPENMPI) PKG_LIBS="-lmpi_cxx -lmpi ${MPI_LIBS}";;
     LAM)     PKG_LIBS="-lmpi_cxx -llam ${MPI_LIBS}";;
