@@ -215,6 +215,21 @@ DataReport <- function(z, x, f)
             }
         }
     }
+    ## any universal offsets?
+    if (any(x$UniversalOffset != 0))
+	{
+		Report("Offset for symmetric type-3 model \n", outf)
+        for (i in 1:length(x$UniversalOffset))
+        {
+            if (x$UniversalOffset[i] != 0)
+            {
+                mdnet <- names(x$UniversalOffset)[i]
+                Report(c("Dependent network variable", mdnet, ': '), outf)
+				Report(c(sprintf("%9.4f",x$UniversalOffset[i]),'\n'), outf)
+			}
+		}
+		Report("\n", outf)
+	}
 	if ((x$nsub == 0)&(x$simOnly))
 	{
 		Report('Parameter values are \n', outf)

@@ -1,8 +1,8 @@
 Package: RSiena
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.1-307
-Date: 2017-05-12
+Version: 1.2-1
+Date: 2017-09-03
 Author: Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders, Felix Schoenenberger
 Depends: R (>= 2.15.0), utils
 Imports: Matrix, tcltk, lattice, parallel, MASS, methods
@@ -14,6 +14,7 @@ Description: Statistical modelling for longitudinal network data
 License: GPL (>= 3)
 LazyLoad: yes
 LazyData: yes
+Biarch: yes
 NeedsCompilation: yes
 BuildResaveData: no
 URL: http://www.stats.ox.ac.uk/~snijders/siena

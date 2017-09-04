@@ -20,8 +20,6 @@
 #include "model/EffectInfo.h"
 #include "model/variables/BehaviorVariable.h"
 
-using namespace std;
-
 namespace siena
 {
 

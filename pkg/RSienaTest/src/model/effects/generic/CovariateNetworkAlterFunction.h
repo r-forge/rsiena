@@ -34,7 +34,7 @@ class BehaviorLongitudinalData;
 class CovariateNetworkAlterFunction: public NetworkAlterFunction
 {
 public:
-	CovariateNetworkAlterFunction(std::string networkName, std::string covariateName);
+	CovariateNetworkAlterFunction(string networkName, string covariateName);
 	virtual ~CovariateNetworkAlterFunction();
 
 	virtual void initialize(const Data * pData,
@@ -55,7 +55,7 @@ protected:
 	BehaviorLongitudinalData * pBehaviorData() const;
 
 private:
-	std::string lcovariateName;
+	string lcovariateName;
 	int lperiod;
 	ConstantCovariate * lpConstantCovariate;
 	ChangingCovariate * lpChangingCovariate;

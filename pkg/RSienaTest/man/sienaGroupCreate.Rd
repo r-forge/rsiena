@@ -17,13 +17,23 @@ sienaGroupCreate(objlist, singleOK = FALSE, getDocumentation=FALSE)
 \details{
 
 This function creates a Siena group object from several Siena data
-objects, all of which use networks, covariates and actor sets
+objects ('groups'), all of which use networks, covariates and actor sets
 with the same names. The variables must correspond exactly
 between all data objects; the numbers of waves may differ.
 It can be used as data input to \code{\link{siena07}} for the
 multigroup option and to \code{\link{sienaBayes}} for the hierarchical
 random effects multigroup option.
 Also used internally for convenience with a single Siena data object.
+
+For combining two-wave with more-wave groups in one group object,
+covariates that are changing covariates for the more-wave groups have to
+be specified as changing covariates also for the two-wave groups.
+This can be done by specifying them with values for the two waves;
+for actor covariates this will be by using an \eqn{n \times 2}{n x 2} matrix,
+for dyadic covariates an \eqn{n \times n \times 2}{n x n x 2} array
+(or \eqn{n \times m \times 2}{nxmx2} for the two-mode case).
+The values for the second wave should be identical to those for the
+first wave (they will be used only for centering operations).
 
 For later use in \code{\link{siena07}} or \code{\link{sienaBayes}},
 it will often (but not always...) be helpful when creating the
@@ -108,7 +118,8 @@ containing the input objects, with attributes:
   \item{netRanges}{matrix of maximum and minimum values for dependent
     networks, NA for behavior variables}
 }
-\references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/ }}
+\references{See the Section on Multi-group Siena analysis in the manual
+   available from \url{http://www.stats.ox.ac.uk/~snijders/siena/ }.}
 \author{ Ruth Ripley }
 \seealso{\code{\link{sienaDataCreate}} }
 \examples{

@@ -16,18 +16,42 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 						   returnLoglik=FALSE, onlyLoglik=FALSE)
 {
 ##@checkNames used in initializeFRAN for siena07
-checkNames <- function(xx){
-# checks whether names of named vectors are in names of dependent variables,
-# and whether there are any names, or the vector has length 1.
+checkNames <- function(xx, types){
+# checks whether names of named vectors are in names of dependent variables.
+	if (('oneMode' %in% types) || ('bipartite' %in% types))
+	{
+		thetype <- 'network'
+	}
+	else
+	{
+		thetype <- 'behavior'
+	}
+	if (inherits(data, "sienaGroup"))
+	{
+	theVars <- sapply(data[[1]]$depvars, function(x){attr(x,'type') %in% types})
+	theVarNames <- names(data[[1]]$depvars)[theVars]
+	}
+	else
+	{
+	theVars <- sapply(data$depvars, function(x){attr(x,'type') %in% types})
+	theVarNames <- names(data$depvars)[theVars]
+	}
+	if ((length(xx) >= 1) && (!(length(xx) == sum(theVars))))
+	{
+		cat('Length of',deparse(substitute(xx)),
+				'should be equal to number of', thetype,'variables.\n')
+		stop('Invalid algorithm-data combination.')
+	}
 # For this check:
 # if there are no names, then (names(xx) %in% names(data$depvars))
 # will be logical(0), and all(logical(0)) is TRUE.
-	wrongName <- (((inherits(data, "sienaGroup")) &&
-			(!all(names(xx) %in% names(data[[1]]$depvars)))) ||
-		((!inherits(data, "sienaGroup")) &&
-			(!all(names(xx) %in% names(data$depvars)))))
-	if ((!wrongName) && (length(xx) >= 2))
+	if (is.null(xx))
 	{
+		wrongName <- FALSE
+	}
+	else
+	{
+		wrongName <- (!all(names(xx) == theVarNames))
 		if (is.null(names(xx)))
 		{
 			wrongName <- TRUE
@@ -39,39 +63,16 @@ checkNames <- function(xx){
 				wrongName <- TRUE
 			}
 		}
-	}
 	if (wrongName)
 	{
 		cat(deparse(substitute(xx)),
-				'in the algorithm object x should be a named vector\n')
-		cat(' with only names of dependent variables in the data set.\n')
+				'in the algorithm object x should be a named vector with\n')
+			cat(' the names of dependent', thetype, 'variables')
+			cat(' in the data set, in the same order.\n')
 		stop('Invalid algorithm-data combination.')
+	}
 	}
 	invisible(!wrongName)
-}
-
-##@withNames used in initializeFRAN for siena07
-withNames <- function(xx, types){
-	if (inherits(data, "sienaGroup"))
-	{
-	theVars <- sapply(data[[1]]$depvars, function(x){attr(x,'type') %in% types})
-	theVarNames <- names(data[[1]]$depvars)[theVars]
-	}
-	else
-	{
-	theVars <- sapply(data$depvars, function(x){attr(x,'type') %in% types})
-	theVarNames <- names(data$depvars)[theVars]
-	}
-	if (!(length(xx) %in% c(1, sum(theVars))))
-	{
-		cat('Lenght of',deparse(substitute(xx)),
-				'should be equal to number of variables.\n')
-		stop('Invalid algorithm-data combination.')
-	}
-	xxx <- rep(1, sum(theVars)) * xx
-# this will work if length(xx)==1 but also if length(xx)==sum(theVars)
-	names(xxx) <- theVarNames
-	xxx
 }
 
 # start of initializeFRAN proper
@@ -135,28 +136,11 @@ withNames <- function(xx, types){
             effects$initialValue <- defaultEffects$initialValue
         }
 
-# Give names if they did not yet exist.
-		if (length(x$MaxDegree) == 1)
-		{
-			x$MaxDegree <- withNames(x$MaxDegree, c('oneMode','bipartite'))
-		}
-		if (length(x$modelType) == 1)
-		{
-			x$modelType <- withNames(x$modelType, c('oneMode','bipartite'))
-		}
-		if (length(x$behModelType) == 1)
-		{
-			x$behModelType <- withNames(x$behModelType, 'behavior')
-		}
-		if (length(x$UniversalOffset) == 1)
-		{
-			x$UniversalOffset <- withNames(x$UniversalOffset, c('oneMode','bipartite'))
-		}
-# Check that the following attributes have correct or absent names
-		checkNames(x$MaxDegree)
-		checkNames(x$UniversalOffset)
-		checkNames(x$modelType)
-		checkNames(x$behModelType)
+# Check that the following attributes have correct names
+		checkNames(x$MaxDegree, c('oneMode','bipartite'))
+		checkNames(x$UniversalOffset, c('oneMode','bipartite'))
+		checkNames(x$modelType, 'oneMode')
+		checkNames(x$behModelType, 'behavior')
 		# The following error will occur if ML estimation is requested
 		# and there are any impossible changes from structural values
 		# to different observed values.
@@ -412,8 +396,8 @@ withNames <- function(xx, types){
         }
         ## maxlike not available for symmetric networks; or is it?.
         ## check model type: default for symmetric is type 2 (forcing model).
-		## maxlike only for some model types?
-        syms <- attr(data,"symmetric")
+		## maxlike only for some model types? ABCD
+        syms <- attr(data,"symmetric")[ attr(data,"types") %in% c("oneMode","bipartite")]
         z$FinDiffBecauseSymmetric <- FALSE
         z$modelType <- x$modelType
         z$behModelType <- x$behModelType
@@ -498,24 +482,24 @@ withNames <- function(xx, types){
         nGroup <- f$nGroup
         f[(nGroup + 1): length(f)] <- NULL
     }
-    pData <- .Call("setupData", PACKAGE=pkgname,
+    pData <- .Call(C_setupData, PACKAGE=pkgname,
                    lapply(f, function(x)(as.integer(x$observations))),
                    lapply(f, function(x)(x$nodeSets)))
-	ans <- .Call("OneMode", PACKAGE=pkgname,
+	ans <- .Call(C_OneMode, PACKAGE=pkgname,
                  pData, lapply(f, function(x)x$nets))
-    ans <- .Call("Bipartite", PACKAGE=pkgname,
+    ans <- .Call(C_Bipartite, PACKAGE=pkgname,
                  pData, lapply(f, function(x)x$bipartites))
-    ans <- .Call("Behavior", PACKAGE=pkgname,
+    ans <- .Call(C_Behavior, PACKAGE=pkgname,
                  pData, lapply(f, function(x)x$behavs))
-    ans <-.Call("ConstantCovariates", PACKAGE=pkgname,
+    ans <-.Call(C_ConstantCovariates, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$cCovars))
-    ans <-.Call("ChangingCovariates", PACKAGE=pkgname,
+    ans <-.Call(C_ChangingCovariates, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$vCovars))
-	ans <-.Call("DyadicCovariates", PACKAGE=pkgname,
+	ans <-.Call(C_DyadicCovariates, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$dycCovars))
-	ans <-.Call("ChangingDyadicCovariates", PACKAGE=pkgname,
+	ans <-.Call(C_ChangingDyadicCovariates, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$dyvCovars))
-	ans <-.Call("ExogEvent", PACKAGE=pkgname,
+	ans <-.Call(C_ExogEvent, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$exog))
    ## split the names of the constraints
     higher <- attr(f, "allHigher")
@@ -523,7 +507,7 @@ withNames <- function(xx, types){
     atLeastOne <- attr(f, "allAtLeastOne")
     froms <- sapply(strsplit(names(higher), ","), function(x)x[1])
     tos <- sapply(strsplit(names(higher), ","), function(x)x[2])
-    ans <- .Call("Constraints", PACKAGE=pkgname,
+    ans <- .Call(C_Constraints, PACKAGE=pkgname,
                  pData, froms[higher], tos[higher],
                  froms[disjoint], tos[disjoint],
                  froms[atLeastOne], tos[atLeastOne])
@@ -587,7 +571,7 @@ withNames <- function(xx, types){
         interactionEffectsl <- ff$interactionEffectsl
         types <- ff$types
     }
-	ans <- .Call("effects", PACKAGE=pkgname, pData, basicEffects)
+	ans <- .Call(C_effects, PACKAGE=pkgname, pData, basicEffects)
     pModel <- ans[[1]][[1]]
     for (i in seq(along=(ans[[2]]))) ## ans[[2]] is a list of lists of
         ## pointers to effects. Each list corresponds to one
@@ -605,7 +589,7 @@ withNames <- function(xx, types){
             basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
                                               basicEffects[[i]]$effectNumber)]
     }
-    ans <- .Call("interactionEffects", PACKAGE=pkgname,
+    ans <- .Call(C_interactionEffects, PACKAGE=pkgname,
                  pModel, interactionEffects)
     ## copy these pointers to the interaction effects and then insert in
     ## effects object in the same rows for later use
@@ -688,13 +672,13 @@ withNames <- function(xx, types){
 		simpleRates <- FALSE
 	}
 	z$simpleRates <- simpleRates
-	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
+	ans <- .Call(C_setupModelOptions, PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, UNIVERSALOFFSET, CONDVAR, CONDTARGET,
                  profileData, z$parallelTesting, MODELTYPE, BEHMODELTYPE,
 				 z$simpleRates, x$normSetRates)
     if (!initC)
     {
-        ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
+        ans <- .Call(C_getTargets, PACKAGE=pkgname, pData, pModel, myeffects,
 					 z$parallelTesting, returnActorStatistics=FALSE,
 					 returnStaticChangeContributions=FALSE)
 		##stop("done")
@@ -779,7 +763,7 @@ withNames <- function(xx, types){
 
             z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms,
                          x$prdrms)
-            ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
+            ans <- .Call(C_mlMakeChains, PACKAGE=pkgname, pData, pModel,
                          z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
                          x$maximumPermutationLength,
@@ -790,7 +774,7 @@ withNames <- function(xx, types){
         }
         else ## set up the initial chains in the sub processes
         {
-			ans <- .Call("mlInitializeSubProcesses",
+			ans <- .Call(C_mlInitializeSubProcesses,
                          PACKAGE=pkgname, pData, pModel,
                          z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
@@ -800,6 +784,7 @@ withNames <- function(xx, types){
             f$chain <- ff$chain
        }
     }
+	
 	f$simpleRates <- simpleRates
     f$myeffects <- myeffects
     f$myCompleteEffects <- myCompleteEffects
@@ -846,6 +831,7 @@ withNames <- function(xx, types){
 	z$byWave <- byWave
 	z$returnDataFrame <- returnDataFrame
     z$nDependentVariables <- length(z$f$depNames)
+	z$x <- x # some elements -- named vectors -- may have changed
 	if (initC)
 	{
 		NULL
@@ -2154,7 +2140,7 @@ fixUpEffectNames <- function(effects)
 }
 
 ##@updateTheta siena07 Copy theta values from previous fit
-updateTheta <- function(effects, prevAns)
+updateTheta <- function(effects, prevAns, varName=NULL)
 {
 	if (!inherits(effects, "data.frame"))
 	{
@@ -2171,6 +2157,10 @@ updateTheta <- function(effects, prevAns)
 		condEffects <- attr(prevAns$f, "condEffects")
 		condEffects$initialValue <- prevAns$rate
 		prevEffects <- rbind(prevEffects, condEffects)
+	}
+	if (!is.null(varName))
+	{
+		prevEffects$name[!( prevEffects$name %in% varName)] <- ' '
 	}
 	oldlist <- apply(prevEffects, 1, function(x)
 					 paste(x[c("name", "shortName",

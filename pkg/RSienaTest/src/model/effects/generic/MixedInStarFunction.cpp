@@ -13,8 +13,6 @@
 #include "model/tables/TwoNetworkCache.h"
 #include "model/tables/MixedEgocentricConfigurationTable.h"
 
-using namespace std;
-
 namespace siena
 {
 

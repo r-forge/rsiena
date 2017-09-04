@@ -24,7 +24,7 @@ namespace siena
 class MissingCovariatePredicate: public CovariatePredicate
 {
 public:
-	MissingCovariatePredicate(std::string covariateName);
+	MissingCovariatePredicate(string covariateName);
 
 	virtual bool value(int alter);
 };

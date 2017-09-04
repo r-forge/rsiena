@@ -11,7 +11,7 @@
 }
 \usage{
 \method{print}{sienaEffects}(x, fileName = NULL, includeOnly=TRUE,
-expandDummies = FALSE, includeRandoms = FALSE, ...)
+expandDummies = FALSE, includeRandoms = FALSE, dropRates=FALSE, ...)
 \method{summary}{sienaEffects}(object, fileName = NULL,
 includeOnly=TRUE, expandDummies = FALSE, ...)
 \method{print}{summary.sienaEffects}(x, fileName = NULL, ...)
@@ -29,6 +29,7 @@ includeOnly=TRUE, expandDummies = FALSE, ...)
 	any effects which would be added by \code{sienaTimeFix}}
   \item{includeRandoms}{Boolean. If TRUE, also the
 	\code{randomEffects} column will be printed.}
+  \item{dropRates}{Boolean. If TRUE, do not print the rows for basic rate effects.}
   \item{\dots}{For extra arguments (none used at present)}
 }
 \value{

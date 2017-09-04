@@ -11,7 +11,7 @@ export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
        sienaGOF, descriptives.sienaGOF, sienaRI, sienaRIDynamics,
 	   sparseMatrixExtraction, networkExtraction, behaviorExtraction,
        OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
-       xtable, algorithms, profileLikelihoods, siena.table,
+       xtable, algorithms, profileLikelihoods, siena.table, score.Test,
 	   Wald.RSiena, Multipar.RSiena)
 export(sienacpp)
 import(Matrix, tcltk, lattice, parallel, MASS)

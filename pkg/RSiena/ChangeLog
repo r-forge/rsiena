@@ -1,8 +1,81 @@
-In the future
+2017-09-03 R-Forge Revision 310
+Changes in RSiena:
+   * effects.r: remove hard coded number of types of interactions
+   * NetworkDependentBehaviorEffect.cpp: fix uninitialized network pointer
+
+2017-09-03 cran package version 1.2-1
+Changes in RSiena and RSienaTest:
+   * Score test and sienaGOF corrected for the case that some parameters are
+     fixed and not tested.
+   * New function score.Test, and its output added to print.sienaFit
+     (if any parameters fit the bill).
+   * Argument varName added to updateTheta.
+   * In sienaAlgorithmCreate, for parameters Offset, MaxDegree, modelType,
+     and behModelType, require that these are named vectors with the names
+     of the dependent variables, or NULL; this is checked in initializeFRAN.
    * For networkModelType 3 (Initiative, AAGREE), an offset is added to the
-     confirmation model; for the moment, this is taken from UniversalOffset
-     in the algorithm object. This required only a change in 
-     NetworkVariable::checkAlterAgreement; documented in Siena_algorithms.
+     confirmation model; this is taken from Offset in the algorithm object.
+   * For effects inPopX, outPopX, inActX, outActX, sameXInPop, sameXOutAct,
+     diffXInPop, diffXOutAct, homXInPop, homXOutAct, altXOutAct, diffXOutAct,
+     changed interaction2 to '' (was '1')
+     and default parameter to 1 (AllEffects.csv).
+   * New effects sameXInPopIntn, sameXOutPopIntn, sameXInActIntn,
+     sameXOutActIntn,
+   * Additional parameter dropRates in print.sienaEffects (useful for
+     sienaBayes with many groups).
+   * In print.sienaEffects, omit last remark about random effects if only
+     one line is printed.
+   * Corrected use of modeltype (initializeFRAN.r, CInterface.r),
+   * Change in print.sienaAlgorithm for modelType.
+   * In CalculateDerivative (phase1.r) changed assignment for
+     diag(dfra)[a][b] (which is wrong) to diag(dfra)[which(a)[b]]
+     (avoids crash of sienaBayes in rare cases).
+   * Added stopCluster to robmon.r.
+   * Took out verbose reporting for sienaGOF with !is.null(cluster).
+   * Added an example for multiple processes in sienaGOF.Rd.
+   * Took out 'dontrun' for the example in sienaGOF.Rd and the first example
+     in sienaTimeTest.Rd.
+   * Reduced running time of some of the algorithms used in examples.
+   * LF line endings for files configure, configure.ac, cleanup, also in
+     Tortoise properties.
+     CRLF line endings for configure.win, cleanup.win, also in Tortoise
+     properties.
+   * To avoid confusion with the C++ function, renamed getActorStatistics() in
+     getActorStatistics.R to getTheActorStatistics, and renamed getTargets()
+     in getTargets.R to getTheTargets.
+     For similarity between RSiena and RSienaTest, added getActorStatistics.R
+     to RSienaTest, even if it is not used.
+   * Completed heading for getTargets() in siena07setup.h,
+     and used these additional parameters in getTheTargets.
+Changes in RSienaTest:
+   * Error fixed in sienaBayes for definition of z$rateParameterPosition,
+     which could lead to errors in the case of more than one dependent
+     variable with an interaction effect specified for some other than
+     the last dependent variable.
+   * Parameter UniversalOffset of sienaAlgorithmCreate renamed to Offset.
+   * Added posterior variances to print.sienaBayesFit.
+   * Added stopCluster to sienaBayes.r.
+   * Dropped doCreateChains from algorithms.r.
+   * Terminated open connection at the end of sienacpp (CInterface.r).
+Changes in RSiena:
+   * New parameter OffSet in sienaAlgorithmCreate.
+   * Registration of native routines (init.c, 
+     using tools::package_native_routine_registration_skeleton, 
+     \fixes in NAMESPACE, changed specifications of arguments of .Call,
+     and with help from Brian and Ruth Ripley).
+
+2017-09-01 R-Forge Revision 309
+Changes in RSienaTest:
+   * configure.ac: don't compile with openmpi if orted is missing
+
+2017-08-30 R-Forge Revision 308
+Changes in RSienaTest:
+   * effects.r: remove hard coded number of types of interactions
+   * Model.cpp: allow gmm type interaction effects
+   * NetworkDependentBehaviorEffect.cpp: fix uninitialized network pointer
+
+Some forking here:
+RSienaTest and RSiena went their own ways, reunited in 1.2-2.
 
 2017-05-12 R-Forge Revision 307
 Changes in RSiena and RSienaTest:
@@ -21,7 +94,7 @@ Changes in RSiena and RSienaTest:
    * outActIntn added to effect group nonSymmetricSymmetricObjective.
    * outOutAss dropped for symmetric networks; only outInAss remains.
    * egoX effect has interactionType='ego' also for symmetric networks.
-   * The exclusion in effects.r of effects if the variance of a covariate is 0, 
+   * The exclusion in effects.r of effects if the variance of a covariate is 0,
      or a covariate has only two values, is dropped (these effects have no meaning,
      but their exclusion was a potential nuisance for meta-analyses).
    * Description of gwespFB and gwespBF corrected (allEffects.csv and manual).
@@ -36,7 +109,7 @@ Changes in RSiena and RSienaTest:
      Dependentvariable.h and NetworkVariable.h as networkModelType.
    * ModelTypeStrings now is a function instead of a string vector.
    * behModelType added
-     (sienaAlgorithmCreate, siena07setup.cpp, BehaviorLongitudinalData, 
+     (sienaAlgorithmCreate, siena07setup.cpp, BehaviorLongitudinalData,
      BehaviorVariable),
      and enum type BehaviorModelType specified in BehaviorVariable.cpp.
    * New option 'absorb' for behModelType=2.
@@ -56,7 +129,7 @@ Changes in RSiena and RSienaTest:
    * Check of effects object in mlInit (maxlike.r) does not use
      is.data.frame any more.
 Changes in RSiena:
-   * test13 dropped from parallel.R (using clusters undesirable 
+   * test13 dropped from parallel.R (using clusters undesirable
      for basic testing).
 Changes in RSienaTest:
    * sienaBayes:
@@ -65,7 +138,7 @@ Changes in RSienaTest:
         z$candidates removed, place of storing z$acceptances changed;
         improved report of groups with no changes;
         warning for impossible changes;
-        if priorRatesFromData=2, change to different robust covariance matrix 
+        if priorRatesFromData=2, change to different robust covariance matrix
           estimator when this is necessary (i.e., for small number of groups);
         in print.summary, also report nImproveMH;
         a few lines added to help file.
@@ -100,24 +173,24 @@ Changes in RSiena and RSienaTest:
 Changes in RSiena and RSienaTest:
    * Warning if includeEffects is used with parameter initialValue - corrected.
    * New effect: sameXCycle4, homCovNetNet, contrastCovNetNet, covNetNetIn,
-     homCovNetNetIn, contrastCovNetNetIn, 
+     homCovNetNetIn, contrastCovNetNetIn,
      inPopIntnX, inActIntnX, outPopIntnX, outActIntnX
    * Changed type of lcounters and counters in FourCyclesEffect to long int,
      permitting the 4-cycles effects for larger and denser networks.
-   * Dropped cl.XWX effect from two-mode - one-mode coevolution 
+   * Dropped cl.XWX effect from two-mode - one-mode coevolution
      (did not belong).
    * egoSqX is an ego effect (CovariateEgoSquared.cpp and .h).
    * Added cycle4 for one-mode networks.
    * Added outAct, outInAss for symmetric networks.
    * SienaRI: Structural zeros and ones are excluded from the calculations;
-     added option getChangeStatistics; 
+     added option getChangeStatistics;
      row names given to matrices that have rows corresponding to effects;
-     adapted so that it runs for models with only 1 parameter; 
+     adapted so that it runs for models with only 1 parameter;
      adapted so that for a bipartite dependent variable it does not crash.
    * Warning if includeEffects is used with parameter 'parameter'.
    * Small additions to print.sienaAlgorithm.
    * Clearer output for MaxDegree in print.sienaFit.
-   * Indication '^(1/2)' for outInAss for 2-mode networks changed to '^(1/#)', 
+   * Indication '^(1/2)' for outInAss for 2-mode networks changed to '^(1/#)',
      where # is the effect parameter (allEffects.csv).
 Changes RSienaTest:
    * simulatedOffset changed from int to double (NetworkLongitudinalData)
@@ -162,7 +235,7 @@ Changes in RSiena and RSienaTest:
      still available in \RSienaTest\doc.
    * Added functions initializeStatisticCalculation() and
      cleanupStatisticCalculation() to class BehaviorEffect.
-   * New effects totAltEgoX, totAltAltX, egoSqX, diffX, diffSqX, egoDiffX, 
+   * New effects totAltEgoX, totAltAltX, egoSqX, diffX, diffSqX, egoDiffX,
      avAltW, totAltW, avSimW, totSimW, jumpFrom, jumpSharedIn, mixedInXW, mixedInWX,
      avWalt, totWAlt.
    * New effect class DyadicCovariateDependentBehaviorEffect corresponding

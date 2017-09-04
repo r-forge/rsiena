@@ -98,7 +98,9 @@ myeff <- getEffects(mydata)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 ans
 summary(ans)
-\donttest{xtable(ans, type="html", file="ans.html")}
-\donttest{siena.table(ans, type="html", tstat=TRUE, d=2)}
+\dontrun{
+xtable(ans, type="html", file="ans.html")
+siena.table(ans, type="html", tstat=TRUE, d=2)
 }
-\keyword{method}
+}
+\keyword{methods}

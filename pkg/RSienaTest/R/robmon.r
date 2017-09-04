@@ -357,6 +357,10 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
 	}
 	z$gmm <- FALSE
     z$termination <- 'OK'
+    if (useCluster)
+    {
+		stopCluster(cl)
+	}
     z
 }
 

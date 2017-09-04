@@ -20,8 +20,7 @@ namespace siena
 class CovariateDistance2NetworkFunction: public CovariateNetworkAlterFunction
 {
 public:
-	CovariateDistance2NetworkFunction(std::string networkName,
-			std::string covariateName);
+	CovariateDistance2NetworkFunction(string networkName, string covariateName);
 	virtual ~CovariateDistance2NetworkFunction();
 	virtual void initialize(const Data * pData,
 		State * pState,

@@ -15,6 +15,8 @@
 #include <string>
 #include "AlterFunction.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -37,7 +39,7 @@ class ConstantFunction: public AlterFunction
 {
 public:
 	ConstantFunction(double constant);
-	ConstantFunction(std::string variableName, ConstantType constantType);
+	ConstantFunction(string variableName, ConstantType constantType);
 
 	virtual void initialize(const Data * pData,
 		State * pState,
@@ -61,7 +63,7 @@ private:
 	// The name of the variable if the constant is to be read from the
 	// observed data of a dependent variable.
 
-	std::string lvariableName;
+	string lvariableName;
 
 	// The function to be applied on the constant
 	double (* lpFunction)(double);

@@ -6,7 +6,7 @@
  * File: GwespFunction.cpp
  *
  * Description: This file contains the implementation of the class
- * GwespFunction. Modified by Nynke Niezink, 10/02/14.
+ * GwespFunction. Modified by Nynke Niezink, 10/02/14, Tom Snijders 11/10/15.
  *****************************************************************************/
 
 #include "GwespFunction.h"
@@ -50,9 +50,9 @@ void GwespFunction::initialize(const Data * pData,
 	// this is done several times during one estimation run (not elegant,
 	// but not computationally burdensome either)
 	double pow = 1;
-	int n = this->pNetwork()->n();
-	this->lcumulativeWeight.resize(n); // default values 0
-	for (int i = 1; i < n; i++)
+	int m = this->pNetwork()->m(); // n changed to m, TS, 1.1-290
+	this->lcumulativeWeight.resize(m); // default values 0
+	for (int i = 1; i < m; i++)
 	{
 		pow *= (1 - exp(this->lweight));
 		this->lcumulativeWeight[i] = exp(-(this->lweight)) * (1 - pow);

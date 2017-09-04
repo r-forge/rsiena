@@ -14,8 +14,6 @@
 #include "model/tables/NetworkCache.h"
 #include "model/tables/EgocentricConfigurationTable.h"
 
-using namespace std;
-
 namespace siena
 {
 

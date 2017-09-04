@@ -100,7 +100,10 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 /**
  *  Gets target values relative to the input data
  */
-SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST);
+SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
+	SEXP PARALLELRUN, SEXP RETURNACTORSTATISTICS, 
+	SEXP RETURNSTATICCHANGECONTRIBUTIONS);
+
 
 /** Sets up a minimal chain and does pre burnin and burnin.
  * Processes a complete set of data objects, crewating a chain for each

@@ -20,8 +20,8 @@ namespace siena
 class SameCovariateTwoPathFunction: public CovariateNetworkAlterFunction
 {
 public:
-	SameCovariateTwoPathFunction(std::string networkName,
-		std::string covariateName, bool excludeMissing);
+	SameCovariateTwoPathFunction(string networkName,
+		string covariateName, bool excludeMissing);
 		
 	virtual void initialize(const Data * pData,
 		State * pState,

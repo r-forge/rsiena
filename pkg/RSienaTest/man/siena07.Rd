@@ -94,7 +94,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  the overall maximum convergence ratio should be less than 0.25.
  If this was not achieved, the result can be used to start
  another estimation run from the estimate obtained, using
- the parameter \code{prevAns} as illustrated in the example below.\cr
+ the parameter \code{prevAns} as illustrated in the example below.
  (This parameter is inserted through '\dots' into the function
  \code{\link{initializeFRAN}}.)
 
@@ -160,6 +160,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     \item Snijders, Tom A.B. (2001).
     The statistical evaluation of social network dynamics.
     \emph{Sociological Methodology}, 31, 361-395.
+   \item Snijders, Tom A.B. (2017). Stochastic Actor-Oriented Models for Network
+   Dynamics. \emph{Annual Review of Statistics and Its Application}, 4, 343-363.
    \item Snijders, Tom A. B., Koskinen, Johan, and Schweinberger, Michael (2010).
     Maximum likelihood estimation for social network dynamics.
     \emph{Annals of Applied Statistics}, 4, 567-588.
@@ -201,8 +203,8 @@ ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans)
          }
 
 # Running in multiple processors -----------------------------------------------
-\dontrun{
-
+\donttest{
+# Not tested because dependent on presence of processors
 # Using 8 processors
 ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE,
                 useCluster=TRUE, nbrNodes=8, initC=TRUE)
@@ -215,8 +217,8 @@ cl <- makeCluster(8)
 
 ans3 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, cl = cl)
 
-# Notice that now -siena07- won't stop the cluster for you.
-stopCluster(cl)
+# Notice that now -siena07- perhaps won't stop the cluster for you.
+# stopCluster(cl)
 
 # You can create even more complex clusters using several computers. In this
 # example we are creating a cluster with 3*8 = 24 processors on three

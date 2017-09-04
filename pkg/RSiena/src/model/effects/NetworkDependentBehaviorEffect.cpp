@@ -95,6 +95,8 @@ void NetworkDependentBehaviorEffect::initialize(const Data *pData,
 {
 	BehaviorEffect::initialize(pData, pState, period, pCache);
 	string networkName = this->pEffectInfo()->interactionName1();
+	this->lpNetwork = pState->pNetwork(networkName);
+
 	if (!this->lpNetwork)
 	{
 		throw logic_error("Network '" + networkName + "' expected.");
@@ -157,9 +159,7 @@ void NetworkDependentBehaviorEffect::preprocessEgo(int ego)
 				int j = iter.actor();
 				this->ltotalAlterValues[i] += this->centeredValue(j);
 // 				Rprintf("%d %f %d %d %d %d\n",
-// 					j,
-// 					this->centeredValue(j),
-// 					this->period(),
+// 					j, this->centeredValue(j), this->period(),
 			}
 		}
 		else

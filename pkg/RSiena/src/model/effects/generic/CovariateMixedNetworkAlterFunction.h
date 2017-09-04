@@ -19,8 +19,6 @@
 #include "utils/NamedObject.h"
 #include "MixedNetworkAlterFunction.h"
 
-using namespace std;
-
 namespace siena
 {
 
@@ -44,9 +42,7 @@ public:
 	virtual ~CovariateMixedNetworkAlterFunction();
 
 	virtual void initialize(const Data * pData,
-		State * pState,
-		int period,
-		Cache * pCache);
+		State * pState, int period, Cache * pCache);
 
 protected:
 	double value(int i) const;

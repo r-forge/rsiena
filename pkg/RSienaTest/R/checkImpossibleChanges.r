@@ -42,8 +42,9 @@ checkImpossibleChanges <- function(x)
 		ifelse((length(dim(dv))==3),
 			ifelse((dim(dv)[3] >= 3),
 			1*any(sapply((3:dim(dv)[3]),
-					FUN=function(i){any(((dv[,,i-2] == 10) & (is.na(dv[,,i]))
-					                    (dv[,,i]==1)), na.rm=TRUE)})), 0), 0)
+					FUN=function(i){
+					any(((dv[,,i-2] == 10) & (is.na(dv[,,i])) & (dv[,,i]==1)), na.rm=TRUE)})
+					), 0), 0)
 	}
 	max(sapply(xd,impossibleChangeOne)) + 2*max(sapply(xd,impossibleChangeZero)) +
 			10*max(sapply(xd,impossibleChangeNA))

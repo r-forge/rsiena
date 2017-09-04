@@ -17,7 +17,7 @@ sienaGroupCreate(objlist, singleOK = FALSE, getDocumentation=FALSE)
 \details{
 
 This function creates a Siena group object from several Siena data
-objects, all of which use networks, covariates and actor sets
+objects ('groups'), all of which use networks, covariates and actor sets
 with the same names. The variables must correspond exactly
 between all data objects; the numbers of waves may differ.
 It can be used as data input to \code{\link{siena07}} for the
@@ -107,7 +107,8 @@ containing the input objects, with attributes:
   \item{netRanges}{matrix of maximum and minimum values for dependent
     networks, NA for behavior variables}
 }
-\references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/ }}
+\references{See the Section on Multi-group Siena analysis in the manual
+   available from \url{http://www.stats.ox.ac.uk/~snijders/siena/ }.}
 \author{ Ruth Ripley }
 \seealso{\code{\link{sienaDataCreate}} }
 \examples{

@@ -63,6 +63,7 @@ terminateFRAN(z, x)
     with \command{sienaProfile.exe}.}
 }
 \details{
+  Not for general users' use.\cr
   The name of \code{simstats0c} or \code{maxlikec}
   should be used for the element FRAN of the model object, the former  when using
   estimation by forward simulation, the latter for maximum likelihood estimation.
@@ -70,7 +71,7 @@ terminateFRAN(z, x)
   \code{\link{siena07}}.
   \code{initializeFRAN} and \code{terminateFRAN} are called in both cases.
   \code{initializeFRAN} is also called in \code{\link{sienaBayes}} and
-  \code{\link{algorithms}}
+  \code{\link{algorithms}}.
 }
 \value{\code{simstats0c} returns a list containing:
   \item{fra}{Simulated statistics.}

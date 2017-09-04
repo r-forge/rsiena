@@ -14,8 +14,6 @@
 
 #include "CovariateNetworkAlterFunction.h"
 
-using namespace std;
-
 namespace siena
 {
 

@@ -91,6 +91,10 @@ behaviorObjective,xxxxxx linear shape,xxxxxx centered sum,linear,TRUE,,,eval,FAL
 behaviorObjective,xxxxxx linear shape,xxxxxx cent. sum,linear,TRUE,,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,gmm,NA,NA,0,0,0,0,OK,FALSE
 behaviorObjective,xxxxxx quadratic shape,xxxxxx sum of cent. squares,quad,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 behaviorObjective,xxxxxx quadratic shape,xxxxxx sum of cent. squares,quad,TRUE,,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,gmm,NA,NA,0,0,0,0,,FALSE
+behaviorObjective,xxxxxx threshold,xxxxxx number cent. >= threshold,threshold,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+behaviorObjective,xxxxxx threshold,xxxxxx number cent. >= threshold,threshold2,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+behaviorObjective,xxxxxx threshold,xxxxxx number cent. >= threshold,threshold3,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+behaviorObjective,xxxxxx threshold,xxxxxx number cent. >= threshold,threshold4,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 behaviorRate,rate xxxxxx period 1,Amount of behavioral change,Rate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,1,NA,0,0,0,0,,FALSE
 behaviorRate,rate xxxxxx (period nnnnnn),Amount of behavioral change in period nnnnnn on xxxxxx,Rate,NA,,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,nnnnnn,NA,0,0,0,0,,FALSE
 behaviorOneModeRate,outdegree effect on rate xxxxxx,Amount of change on xxxxxx x outdegree,outRate,NA,yyyyyy,,rate,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,rate,NA,structural,0,0,0,0,,FALSE
@@ -180,10 +184,10 @@ covarSymmetricObjective,xxxxxx abs. difference,Sum_ties abs.diff xxxxxx,absDiffX
 covarSymmetricObjective,xxxxxx diff. squared,Sum_ties diff.sq xxxxxx,diffSqX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarSymmetricObjective,xxxxxx ego * diff.,Sum_ties ego x diff xxxxxx,egoDiffX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarSymmetricObjective,xxxxxx similarity,xxxxxx similarity,simX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarSymmetricObjective,ind. pop.^(1/#) weighted xxxxxx,indegree pop.^(1/#) weighted xxxxxx,inPopX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarSymmetricObjective,outd. pop.^(1/#) weighted xxxxxx,outdegree pop.^(1/#) weighted xxxxxx,outPopX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarSymmetricObjective,ind. act.^(1/#) weighted xxxxxx,indegree act.^(1/#) weighted xxxxxx,inActX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarSymmetricObjective,outd. act.^(1/#) weighted xxxxxx,indegree act.^(1/#) weighted xxxxxx,outActX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,ind. pop.^(1/#) weighted xxxxxx,indegree pop.^(1/#) weighted xxxxxx,inPopX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,outd. pop.^(1/#) weighted xxxxxx,outdegree pop.^(1/#) weighted xxxxxx,outPopX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,ind. act.^(1/#) weighted xxxxxx,indegree act.^(1/#) weighted xxxxxx,inActX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarSymmetricObjective,outd. act.^(1/#) weighted xxxxxx,indegree act.^(1/#) weighted xxxxxx,outActX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarSymmetricObjective,xxxxxx similarity,xxxxxx similarity,simX,FALSE,xxxxxx,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,gmm,NA,NA,0,0,0,0,dyadic,FALSE
 covarSymmetricObjective,xxxxxx similarity,xxxxxx similarity,simX_sim,FALSE,xxxxxx,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,gmm,NA,NA,0,0,0,0,dyadic,FALSE
 covarSymmetricObjective,same xxxxxx,same xxxxxx,sameX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
@@ -219,10 +223,10 @@ covarBipartiteObjective,xxxxxx right thr. (#) ego,Sum outdegr. * (xxxxxx >= #),e
 covarBipartiteObjective,xxxxxx in-alter dist 2,xxxxxx in-alter dist 2,altInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBipartiteObjective,xxxxxx tot in-alter dist 2,xxxxxx tot in-alter dist 2,totInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBipartiteObjective,xxxxxx ego-in-alter dist 2 similarity,xxxxxx ego-in-alter dist 2 similarity,simEgoInDist2,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarBipartiteObjective,ind. pop.^(1/#) weighted xxxxxx,indegree pop.^(1/#) weighted xxxxxx,inPopX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarBipartiteObjective,outd. act.^(1/#) weighted xxxxxx,outdegree act.^(1/#) weighted xxxxxx,outActX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarBipartiteObjective,ind. pop. from same xxxxxx,indegree pop. from same values on xxxxxx,sameXInPop,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarBipartiteObjective,ind. pop. from dif. xxxxxx,indegree pop. from dif. values on xxxxxx,diffXInPop,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarBipartiteObjective,ind. pop.^(1/#) weighted xxxxxx,indegree pop.^(1/#) weighted xxxxxx,inPopX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarBipartiteObjective,outd. act.^(1/#) weighted xxxxxx,outdegree act.^(1/#) weighted xxxxxx,outActX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarBipartiteObjective,ind. pop. from same xxxxxx,indegree pop. from same values on xxxxxx,sameXInPop,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarBipartiteObjective,ind. pop. from dif. xxxxxx,indegree pop. from dif. values on xxxxxx,diffXInPop,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBipartiteObjective,4-cycles (#) same xxxxxx,sum 4-cycles^1/# same xxxxxx,sameXCycle4,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
 covarBipartiteObjective,outd. act. to hom. xxxxxx,sum sqr. outd. to hom. values on xxxxxx,homXOutAct,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarBipartiteObjective,outd. act. weight alt. xxxxxx,sum sqr. outd. weight alt. xxxxxx,altXOutAct,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
@@ -253,16 +257,16 @@ covarNonSymmetricObjective,xxxxxx similarity x reciprocity,Similarity x reciproc
 covarNonSymmetricObjective,transitive triplets xxxxxx similarity,Number of trans trip similar on xxxxxx,simXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNonSymmetricObjective,same xxxxxx,Same values on xxxxxx,sameX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNonSymmetricObjective,same xxxxxx x reciprocity,Same values on xxxxxx x reciprocity,sameXRecip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNonSymmetricObjective,ind. pop.^(1/#) weighted xxxxxx,indegree pop.^(1/#) weighted xxxxxx,inPopX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNonSymmetricObjective,outd. pop.^(1/#) weighted xxxxxx,outdegree pop.^(1/#) weighted xxxxxx,outPopX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNonSymmetricObjective,ind. act.^(1/#) weighted xxxxxx,indegree act.^(1/#) weighted xxxxxx,inActX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego,FALSE
-covarNonSymmetricObjective,outd. act.^(1/#) weighted xxxxxx,outdegree act.^(1/#) weighted xxxxxx,outActX,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNonSymmetricObjective,ind. pop. from same xxxxxx,indegree pop. from same values on xxxxxx,sameXInPop,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNonSymmetricObjective,ind. pop. from dif. xxxxxx,indegree pop. from dif. values on xxxxxx,diffXInPop,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
-covarNonSymmetricObjective,outd. act. to same xxxxxx,sum sqr. outd. to same values on xxxxxx,sameXOutAct,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
-covarNonSymmetricObjective,outd. act. to hom. xxxxxx,sum sqr. outd. to hom. values on xxxxxx,homXOutAct,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
-covarNonSymmetricObjective,outd. act. weight alt. xxxxxx,sum sqr. outd. weight alt. xxxxxx,altXOutAct,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
-covarNonSymmetricObjective,outd. act. to dif. xxxxxx,sum sqr. outd. to dif. values on xxxxxx,diffXOutAct,TRUE,xxxxxx,1,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+covarNonSymmetricObjective,ind. pop.^(1/#) weighted xxxxxx,indegree pop.^(1/#) weighted xxxxxx,inPopX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,outd. pop.^(1/#) weighted xxxxxx,outdegree pop.^(1/#) weighted xxxxxx,outPopX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,ind. act.^(1/#) weighted xxxxxx,indegree act.^(1/#) weighted xxxxxx,inActX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,ego,FALSE
+covarNonSymmetricObjective,outd. act.^(1/#) weighted xxxxxx,outdegree act.^(1/#) weighted xxxxxx,outActX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,ind. pop. from same xxxxxx,indegree pop. from same values on xxxxxx,sameXInPop,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,ind. pop. from dif. xxxxxx,indegree pop. from dif. values on xxxxxx,diffXInPop,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNonSymmetricObjective,outd. act. to same xxxxxx,sum sqr. outd. to same values on xxxxxx,sameXOutAct,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
+covarNonSymmetricObjective,outd. act. to hom. xxxxxx,sum sqr. outd. to hom. values on xxxxxx,homXOutAct,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
+covarNonSymmetricObjective,outd. act. weight alt. xxxxxx,sum sqr. outd. weight alt. xxxxxx,altXOutAct,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
+covarNonSymmetricObjective,outd. act. to dif. xxxxxx,sum sqr. outd. to dif. values on xxxxxx,diffXOutAct,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
 covarNonSymmetricObjective,transitive triplets same xxxxxx,Number of transitive triplets same on xxxxxx,sameXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarNonSymmetricObjective,transitive triplets diff. xxxxxx,Number of transitive triplets diff. on xxxxxx,diffXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarNonSymmetricObjective,transitive triplets homog. xxxxxx,Number of transitive triplets homogeneous on xxxxxx,homXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
@@ -477,12 +481,16 @@ covarNetNetObjective,xxxxxx ego-alter dist 2 yyyyyy sim.ty,xxxxxx ego-alter dist
 covarNetNetObjective,yyyyyy in-alter at dist 2 on xxxxxx,yyyyyy in-alter at dist 2 on xxxxxx,altInDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNetNetObjective,yyyyyy tot in-alt. at dist 2 on xxxxxx,yyyyyy tot in-alter at dist 2 on xxxxxx,totInDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarNetNetObjective,(ind. xxxxxx wghted yyyyyy)^(1/#) activity,"sum outd. x (ind. xxxxxx wghted yyyyyy)^(1/#)",inActIntnX,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarNetNetObjective,(ind. xxxxxx same yyyyyy)^(1/#) activity,"sum outd. x (ind. same wghted yyyyyy)^(1/#)",sameXInActIntn,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarABNetNetObjective,from xxxxxx agr. x same yyyyyy,"m.tr. XWW, W = xxxxxx, same yyyyyy",covNetNet,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarABNetNetObjective,shared incoming xxxxxx x same yyyyyy,"m.tr. WWX, W = xxxxxx, same yyyyyy",covNetNetIn,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarANetNetObjective,(ind. xxxxxx wghted yyyyyy)^(1/#) popularity,"sum ind. x (ind. xxxxxx wghted yyyyyy)^(1/#)",inPopIntnX,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarANetNetObjective,(ind. xxxxxx same yyyyyy)^(1/#) popularity,"sum ind. x (ind. xxxxxx same yyyyyy)^(1/#)",sameXInPopIntn,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarANetNetObjective,xxxxxx ego-in-alter dist 2 yyyyyy sim.ty,xxxxxx ego-in-alter dist 2 yyyyyy sim.ty,simEgoInDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBNetNetObjective,(outd. xxxxxx wghted yyyyyy)^(1/#) popularity,"sum ind. x (outd. xxxxxx wghted yyyyyy)^(1/#)",outPopIntnX,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBNetNetObjective,(outd. xxxxxx wghted yyyyyy)^(1/#) activity,"sum outd. x (outd. xxxxxx wghted yyyyyy)^(1/#)",outActIntnX,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarBNetNetObjective,(outd. xxxxxx same yyyyyy)^(1/#) popularity,"sum ind. x (outd. xxxxxx same yyyyyy)^(1/#)",sameXOutPopIntn,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
+covarBNetNetObjective,(outd. xxxxxx same yyyyyy)^(1/#) activity,"sum outd. x (outd. xxxxxx same yyyyyy)^(1/#)",sameXOutActIntn,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBNetNetObjective,yyyyyy alter at dist 2 on xxxxxx (#),yyyyyy alter at dist 2 on xxxxxx (#),altDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBNetNetObjective,yyyyyy tot alt. at dist 2 on xxxxxx (#),yyyyyy tot alt. at dist 2 on xxxxxx (#),totDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE
 covarBNetNetObjective,yyyyyy similarity at dist 2 on xxxxxx,yyyyyy similarity at dist 2 on xxxxxx,simDist2W,TRUE,xxxxxx,yyyyyy,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,dyadic,FALSE

@@ -180,12 +180,12 @@ TestOutput <- function(z, x)
 }
 
 ##@ScoreTest siena07 Do score tests
-ScoreTest<- function(pp, dfra, msf, fra, test, maxlike)
+ScoreTest<- function(pp, dfra, msf, fra, test, redundant, maxlike)
 {
     testresult <- rep(NA, pp) ##for chisq per parameter
     testresulto <- rep(NA, pp) ##for one-sided tests per parameter
     ##first the general one
-    ans <- EvaluateTestStatistic(maxlike, test, dfra, msf, fra)
+	ans <- EvaluateTestStatistic(maxlike, test, redundant, dfra, msf, fra)
     testresOverall <- ans$cvalue
     covMatrix <- ans$covMatrix
     if (sum(test) == 1)
@@ -203,8 +203,8 @@ ScoreTest<- function(pp, dfra, msf, fra, test, maxlike)
             {
                 k <- k + 1
                 use[i] <- TRUE
-                ans <- EvaluateTestStatistic(maxlike, test[use], dfra[use, use],
-                           msf[use, use], fra[use])
+				ans <- EvaluateTestStatistic(maxlike, test[use], redundant[use],
+										dfra[use, use], msf[use, use], fra[use])
                 testresult[k] <- ans$cvalue
                 testresulto[k] <- ans$oneSided
                 use[i] <- FALSE
@@ -232,18 +232,18 @@ ScoreTest<- function(pp, dfra, msf, fra, test, maxlike)
          oneStep=oneStep, dinv2= dinv2, dfra2=dfra2)
 }
 ##@EvaluateTestStatistic siena07 Calculate score test statistics
-EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
+EvaluateTestStatistic<- function(maxlike, test, redundant, dfra, msf, fra)
 {
     ##uses local arrays set up in the calling procedure
-    d11 <- dfra[!test, !test, drop=FALSE]
+	d11 <- dfra[!(test|redundant), !(test|redundant), drop=FALSE]
     d22 <- dfra[test, test, drop=FALSE]
-    d21 <- dfra[test, !test, drop=FALSE]
+	d21 <- dfra[test, !(test|redundant), drop=FALSE]
     d12 <- t(d21)
-    sigma11 <- msf[!test, !test, drop=FALSE]
+	sigma11 <- msf[!(test|redundant), !(test|redundant), drop=FALSE]
     sigma22<- msf[test, test,drop=FALSE]
-    sigma12 <- msf[!test, test, drop=FALSE]
+	sigma12 <- msf[!(test|redundant), test, drop=FALSE]
     sigma21<- t(sigma12)
-    z1 <- fra[!test]
+	z1 <- fra[!(test|redundant)]
     z2 <- fra[test]
     if (inherits(try(id11 <- solve(d11), silent=TRUE), "try-error"))
     {
@@ -301,6 +301,34 @@ EvaluateTestStatistic<- function(maxlike, test, dfra, msf, fra)
 		}
     }
     list(cvalue=cvalue, oneSided=oneSided, covMatrix=v9)
+}
+
+
+##@scoreTest Calculate score test
+score.Test <- function(ans, test=ans$test)
+# use: ans must be a sienaFit object;
+# test must be a boolean vector with length equal to the number of parameters of ans,
+# or a vector of integer numbers between 1 and ans$pp.
+{
+	if ((is.numeric(test)) || (is.integer(test)))
+	{
+		if (max(test) > ans$pp)
+		{
+			stop(paste('The maximum requested coordinate is too high:',
+									max(test)))
+		}
+		test <- (1:ans$pp) %in% test
+	}
+	if (sum(test) <= 0) stop(paste('Something should be tested, but the total requested is',
+									sum(test)))
+	if (length(test) != ans$pp) stop('Dimensions of must agree')
+	if (any(test & (!ans$fix))) cat('Warning: some tested parameters were not fixed; do you know what you are doing??? \n')	
+    fra <- colMeans(ans$sf, na.rm=TRUE)
+	redundant <- (ans$fix & (!test))
+	teststat <- EvaluateTestStatistic(ans$maxlike, test, redundant, ans$dfra, ans$msf, fra)$cvalue
+	df <- sum(test)
+	pval <- 1 - pchisq(teststat, df)
+	list(chisquare = teststat, df = df, pvalue = pval)
 }
 
 ##@Wald.RSiena  Calculate Wald test statistics

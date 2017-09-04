@@ -4626,7 +4626,15 @@ if test "$OSTYPE" = "Darwin"; then
   MPI_DEFS="$MPI_DEFS -DMAC"
 fi
 
+<<<<<<< .mine
 if test "$MPI" = "yes" ; then
+
+PKG_CPPFLAGS="$MPI_INCLUDES $MPI_DEFS"
+||||||| .r305
+PKG_CPPFLAGS="$MPI_INCLUDES $MPI_DEFS"
+=======
+>>>>>>> .r309
+
 
   PKG_CPPFLAGS="$MPI_INCLUDES $MPI_DEFS"
 

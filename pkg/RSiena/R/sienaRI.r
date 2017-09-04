@@ -110,24 +110,24 @@ getChangeContributions <- function(algorithm, data, effects)
 	{
 		effects$setting <- rep("", nrow(effects))
 	}
-	pData <- .Call('setupData', PACKAGE=pkgname,
+	pData <- .Call(C_setupData, PACKAGE=pkgname,
 			list(as.integer(f$observations)),
 			list(f$nodeSets))
 	## register a finalizer
 	ans <- reg.finalizer(pData, clearData, onexit = FALSE)
-	ans<- .Call('OneMode', PACKAGE=pkgname,
+	ans<- .Call(C_OneMode, PACKAGE=pkgname,
 			pData, list(f$nets))
-    ans <- .Call("Bipartite", PACKAGE=pkgname, # added 1.1-299
+    ans <- .Call(C_Bipartite, PACKAGE=pkgname, # added 1.1-299
                 pData, list(f$bipartites))
-	ans<- .Call('Behavior', PACKAGE=pkgname, pData,
+	ans<- .Call(C_Behavior, PACKAGE=pkgname, pData,
 			list(f$behavs))
-	ans<-.Call('ConstantCovariates', PACKAGE=pkgname,
+	ans<-.Call(C_ConstantCovariates, PACKAGE=pkgname,
 			pData, list(f$cCovars))
-	ans<-.Call('ChangingCovariates',PACKAGE=pkgname,
+	ans<-.Call(C_ChangingCovariates,PACKAGE=pkgname,
 			pData,list(f$vCovars))
-	ans<-.Call('DyadicCovariates',PACKAGE=pkgname,
+	ans<-.Call(C_DyadicCovariates,PACKAGE=pkgname,
 			pData,list(f$dycCovars))
-	ans<-.Call('ChangingDyadicCovariates',PACKAGE=pkgname,
+	ans<-.Call(C_ChangingDyadicCovariates,PACKAGE=pkgname,
 			pData, list(f$dyvCovars))
 
 	storage.mode(effects$parm) <- 'integer'
@@ -138,7 +138,7 @@ getChangeContributions <- function(algorithm, data, effects)
 	depvarnames <- names(data$depvars)
 	tmpeffects <- split(effects, effects$name)
 	myeffectsOrder <- match(depvarnames, names(tmpeffects))
-	ans <- .Call("effects", PACKAGE=pkgname, pData, tmpeffects)
+	ans <- .Call(C_effects, PACKAGE=pkgname, pData, tmpeffects)
 	pModel <- ans[[1]][[1]]
 	for (i in 1:length(ans[[2]]))
 	{
@@ -149,7 +149,7 @@ getChangeContributions <- function(algorithm, data, effects)
 	for(i in 1:length(myeffectsOrder)){
 		myeffects[[i]]<-tmpeffects[[myeffectsOrder[i]]]
 	}
-	ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
+	ans <- .Call(C_getTargets, PACKAGE=pkgname, pData, pModel, myeffects,
 			parallelrun=TRUE, returnActorStatistics=FALSE,
 			returnStaticChangeContributions=TRUE)
 # See getTargets in siena07setup.cpp; also see rTargets in StatisticsSimulation.cpp

@@ -11,8 +11,6 @@
 
 #include "EffectInfo.h"
 
-using namespace std;
-
 namespace siena
 {
 

@@ -18,6 +18,8 @@
 #include "utils/NamedObject.h"
 #include "model/Function.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -69,7 +71,7 @@ class Setting;
 class DependentVariable : public NamedObject
 {
 public:
-	DependentVariable(std::string name,
+	DependentVariable(string name,
 		const ActorSet * pActorSet,
 		EpochSimulation * pSimulation);
 	virtual ~DependentVariable();
@@ -125,7 +127,7 @@ public:
 		const DependentVariable * pSelectedVariable,
 		int selectedActor, int alter);
 	double basicRateScore() const;
-	double settingRateScore(std::string setting) const;
+	double settingRateScore(string setting) const;
 	double constantCovariateScore(const ConstantCovariate * pCovariate) const;
 	double changingCovariateScore(const ChangingCovariate * pCovariate) const;
 	double behaviorVariableScore(const BehaviorVariable * pBehavior) const;
@@ -137,16 +139,16 @@ public:
 
 	// Diffusion effects
 
-	std::map<const EffectInfo *, double> ldiffusionscores;
-	std::map<const EffectInfo *, double> ldiffusionsumterms;
+	map<const EffectInfo *, double> ldiffusionscores;
+	map<const EffectInfo *, double> ldiffusionsumterms;
 	double calculateDiffusionRateEffect(
 		const BehaviorVariable * pBehaviorVariable,
 		const Network * pNetwork,
-		int i, std::string effectName);
+		int i, string effectName);
 	double calculateDiffusionRateEffect(
 		const BehaviorVariable * pBehaviorVariable,
 		const Network * pNetwork,
-		int i, std::string effectName,
+		int i, string effectName,
 		const ConstantCovariate * pConstantCovariate,
 		const ChangingCovariate * pChangingCovariate);
 
@@ -200,11 +202,11 @@ protected:
 	void getStepType();
 	double settingRate() const;
 	// A two-dimensional array of tie flip and behavior change contributions to effects.
-	std::map<const EffectInfo *, std::vector<double> > * lpChangeContribution;
+	map<const EffectInfo *, vector<double> > * lpChangeContribution;
 	Setting** lsettings;
 private:
 	void initializeFunction(Function * pFunction,
-		const std::vector<EffectInfo *> & rEffects) const;
+		const vector<EffectInfo *> & rEffects) const;
 
 	bool constantRates() const;
 	double calculateRate(int i);
@@ -252,23 +254,23 @@ private:
 	double * lcovariateRates;
 
 	// Parameters for rate effects depending on constant covariates
-	std::map<const ConstantCovariate *, double> lconstantCovariateParameters;
+	map<const ConstantCovariate *, double> lconstantCovariateParameters;
 
 	// Parameters for rate effects depending on changing covariates
-	std::map<const ChangingCovariate *, double> lchangingCovariateParameters;
+	map<const ChangingCovariate *, double> lchangingCovariateParameters;
 
 	// Parameters for rate effects depending on behavior variables
-	std::map<const BehaviorVariable *, double> lbehaviorVariableParameters;
+	map<const BehaviorVariable *, double> lbehaviorVariableParameters;
 
 	// The structural rate effects. Currently, there are four types of
 	// structural rate effects, namely, the out-degree, in-degree,
 	// reciprocal degree, and inverse out-degree effects.
 
-	std::vector<StructuralRateEffect *> lstructuralRateEffects;
+	vector<StructuralRateEffect *> lstructuralRateEffects;
 
 	// The diffusion rate effects.
 
-	std::vector<DiffusionRateEffect *> ldiffusionRateEffects;
+	vector<DiffusionRateEffect *> ldiffusionRateEffects;
 
 	// The evaluation function for this variable
 	Function * lpEvaluationFunction;
@@ -293,76 +295,76 @@ private:
 
 	// The scores for the setting basic rate parameters for this variable
 	// for this period. Only for network variables.
-	std::map<std::string, double> lsettingRateScores;
+	map<string, double> lsettingRateScores;
 
 	// Scores for rate effects depending on constant covariates
-	std::map<const ConstantCovariate *, double> lconstantCovariateScores;
+	map<const ConstantCovariate *, double> lconstantCovariateScores;
 
 	// Scores for rate effects depending on changing covariates
-	std::map<const ChangingCovariate *, double> lchangingCovariateScores;
+	map<const ChangingCovariate *, double> lchangingCovariateScores;
 
 	// Scores for rate effects depending on behavior variables
-	std::map<const BehaviorVariable *, double> lbehaviorVariableScores;
+	map<const BehaviorVariable *, double> lbehaviorVariableScores;
 
 	// Scores for rate effects depending on out degree
-	std::map<const NetworkVariable *, double> loutDegreeScores;
+	map<const NetworkVariable *, double> loutDegreeScores;
 
 	// Scores for rate effects depending on in degree
-	std::map<const NetworkVariable *, double> linDegreeScores;
+	map<const NetworkVariable *, double> linDegreeScores;
 
 	// Scores for rate effects depending on reciprocal degree
-	std::map<const NetworkVariable *, double> lreciprocalDegreeScores;
+	map<const NetworkVariable *, double> lreciprocalDegreeScores;
 
 	// Scores for rate effects depending on inverse degree
-	std::map<const NetworkVariable *, double> linverseOutDegreeScores;
+	map<const NetworkVariable *, double> linverseOutDegreeScores;
 
 	// Scores for rate effects depending on log degree
-	std::map<const NetworkVariable *, double> llogOutDegreeScores;
+	map<const NetworkVariable *, double> llogOutDegreeScores;
 
 	// Sum term for scores for rate effects depending on constant covariates
-	std::map<const ConstantCovariate *, double> lconstantCovariateSumTerm;
+	map<const ConstantCovariate *, double> lconstantCovariateSumTerm;
 
 	// Sum term for scores for rate effects depending on changing covariates
-	std::map<const ChangingCovariate *, double> lchangingCovariateSumTerm;
+	map<const ChangingCovariate *, double> lchangingCovariateSumTerm;
 
 	// Sum term for scores for rate effects depending on behavior variables
-	std::map<const BehaviorVariable *, double> lbehaviorVariableSumTerm;
+	map<const BehaviorVariable *, double> lbehaviorVariableSumTerm;
 
 	// Sum term for scores for rate effects depending on out degree
-	std::map<const NetworkVariable *, double> loutDegreeSumTerm;
+	map<const NetworkVariable *, double> loutDegreeSumTerm;
 
 	// Sum term for scores for rate effects depending on in degree
-	std::map<const NetworkVariable *, double> linDegreeSumTerm;
+	map<const NetworkVariable *, double> linDegreeSumTerm;
 
 	// Sum term for scores for rate effects depending on reciprocal degree
-	std::map<const NetworkVariable *, double> lreciprocalDegreeSumTerm;
+	map<const NetworkVariable *, double> lreciprocalDegreeSumTerm;
 
 	// Sum term for scores for rate effects depending on inverse degree
-	std::map<const NetworkVariable *, double> linverseOutDegreeSumTerm;
+	map<const NetworkVariable *, double> linverseOutDegreeSumTerm;
 
 	// Sum term for scores for rate effects depending on log degree
-	std::map<const NetworkVariable *, double> llogOutDegreeSumTerm;
+	map<const NetworkVariable *, double> llogOutDegreeSumTerm;
 
 	// Sum term for model B scores for rate effects depending on constant
 	// covariates
-	std::map<const ConstantCovariate *, double> lconstantCovariateModelBSumTerm;
+	map<const ConstantCovariate *, double> lconstantCovariateModelBSumTerm;
 
 	// Sum term for model B scores for rate effects depending on changing
 	// covariates
-	std::map<const ChangingCovariate *, double> lchangingCovariateModelBSumTerm;
+	map<const ChangingCovariate *, double> lchangingCovariateModelBSumTerm;
 
 	// Sum term for model B scores for rate effects depending on behavior
 	// variables
-	std::map<const BehaviorVariable *, double> lbehaviorVariableModelBSumTerm;
+	map<const BehaviorVariable *, double> lbehaviorVariableModelBSumTerm;
 
 	// Sum term for model B scores for rate effects depending on out degree
-	std::map<const NetworkVariable *, double> loutDegreeModelBSumTerm;
+	map<const NetworkVariable *, double> loutDegreeModelBSumTerm;
 
 	// Sum term for model B scores for rate effects depending on inverse degree
-	std::map<const NetworkVariable *, double> linverseOutDegreeModelBSumTerm;
+	map<const NetworkVariable *, double> linverseOutDegreeModelBSumTerm;
 
 	// Sum term for model B scores for rate effects depending on log degree
-	std::map<const NetworkVariable *, double> llogOutDegreeModelBSumTerm;
+	map<const NetworkVariable *, double> llogOutDegreeModelBSumTerm;
 
 	// Indicates if the rates are valid and shouldn't be recalculated
 	// provided that the rates are constant during the period.
@@ -372,9 +374,9 @@ private:
 	// flag to indicate we gave up on a step due to uponly and other filters
 	bool lsuccessfulChange;
 
-	std::vector<int> lacceptances;
-	std::vector<int> lrejections;
-	std::vector<int> laborts;
+	vector <int> lacceptances;
+	vector <int> lrejections;
+	vector <int> laborts;
 
 };
 

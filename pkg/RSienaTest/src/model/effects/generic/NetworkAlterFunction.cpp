@@ -15,7 +15,6 @@
 #include "model/tables/Cache.h"
 #include "model/tables/NetworkCache.h"
 
-using namespace std;
 
 namespace siena
 {

@@ -96,7 +96,7 @@ getChangeContributions <- function(algorithm, data, effects)
     ## Gets the simulated statistics.
 	## The following initializations data, effects, and model
 	## for calling "getTargets" in "siena07.setup.h"
-	## is more or less copied from "getTargets" in "getTargets.r".
+	## is more or less copied from "getTheTargets" in "getTargets.r".
 	## However, some modifications have been necessary to get it to work.
 	f <- unpackData(data,algorithm)
 	effects <- effects[effects$include,]

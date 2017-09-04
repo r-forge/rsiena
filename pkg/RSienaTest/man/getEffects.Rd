@@ -54,7 +54,10 @@ variable in the input object, with columns
   \item{effect1}{Used to indicate effect number in user-specified interactions}
   \item{effect2}{Used to indicate effect number in user-specified interactions}
   \item{effect3}{Used to indicate effect number in user-specified interactions}
-  \item{interactionType}{Defines "dyadic" or "ego" or "OK" effects}
+  \item{interactionType}{Defines "dyadic" or "ego" or "OK" effects, used in
+             \code{\link{includeInteraction}}}
+  \item{local}{whether a local effect; used for the option \code{localML}
+      in \code{\link{sienaAlgorithmCreate}}}
   \item{effectFn}{here NULL, but could be replaced by a function later}
   \item{statisticFn}{here NULL, but could be replaced by a function
     later}

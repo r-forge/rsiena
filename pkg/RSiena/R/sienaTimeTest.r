@@ -357,7 +357,8 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
     ## with the score type test of Schweinberger (2007-2012)
 	fra <- apply(G, 3, sum) / nSims
 	doTests <- toTest$toTest
-	jointTest <- ScoreTest(nrow(toTest), D, sigma, fra, doTests,
+	redundant <- rep(FALSE, length(doTests))
+	jointTest <- ScoreTest(nrow(toTest), D, sigma, fra, doTests, redundant,
                            maxlike=sienaFit$maxlike)
 	jointTestP <- 1 - pchisq(jointTest$testresOverall, nDummies)
 	if (! condition)
@@ -371,7 +372,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
                                  doTests <- rep(FALSE, nEffects + nDummies)
                                  doTests[nEffects + i] <- TRUE
                                  test <- ScoreTest(nrow(toTest), D, sigma,
-										fra, doTests, maxlike=sienaFit$maxlike)
+							fra, doTests, redundant, maxlike=sienaFit$maxlike)
                                  test$testresulto[1]
                              }
                                  )
@@ -407,8 +408,9 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 						## Control for everything.
 							doTests[toTest$baseEffect == (x$baseEffect[1]) &
 										toTest$toTest] <- TRUE
+							redundant <- rep(FALSE, length(doTests))
 							test <- ScoreTest(nEffects + nDummies, D, sigma,
-									fra, doTests, maxlike=sienaFit$maxlike)
+								fra, doTests, redundant, maxlike=sienaFit$maxlike)
 							test$testresOverall
 						}
                      }
@@ -563,7 +565,8 @@ transformed.scoreTest <- function(dfra, msf, fra, A, nullHyp, maxlike)
 	g <- AA %*% fra
 	tested <- rep(FALSE, dim(AA)[1])
 	tested[(sum(nullHyp)+1):dim(AA)[1]] <- TRUE
-	EvaluateTestStatistic(maxlike, tested, D, sig, g)$cvalue
+	redundant <- rep(FALSE, dim(AA)[1])
+	EvaluateTestStatistic(maxlike, tested, redundant, D, sig, g)$cvalue
 }
 ##@partial.scoreTest siena07 score test for part of the additional effects
 partial.scoreTest <- function(dfra, msf, fra, test, nullHyp, maxlike)

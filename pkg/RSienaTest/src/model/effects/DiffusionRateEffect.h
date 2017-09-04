@@ -14,6 +14,8 @@
 
 #include <string>
 
+using namespace std;
+
 namespace siena
 {
 
@@ -43,13 +45,13 @@ class DiffusionRateEffect
 public:
 	DiffusionRateEffect(const NetworkVariable * pVariable,
 		const BehaviorVariable * pBehaviorVariable,
-		std::string effectName,
+		string effectName,
 		double parameter);
 	DiffusionRateEffect(const NetworkVariable * pVariable,
 		const BehaviorVariable * pBehaviorVariable,
 		const ConstantCovariate * pCovariate,
 		const ChangingCovariate * pChangingCovariate,
-		std::string effectName,
+		string effectName,
 		double parameter);
 
 
@@ -76,7 +78,7 @@ private:
 	// calculate the same contribution twice.
 
 	DiffusionEffectValueTable * lpTable;
-	std::string leffectName;
+	string leffectName;
 
 };
 

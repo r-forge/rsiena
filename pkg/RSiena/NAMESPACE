@@ -1,4 +1,5 @@
-useDynLib(RSiena, .registration = TRUE)
+useDynLib(RSiena, .registration = TRUE, .fixes="C_")
+
 export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
        siena07, sienaCompositionChange, updateTheta,
        updateSpecification, sienaCompositionChangeFromFile, sienaDataCreate,
@@ -10,7 +11,7 @@ export(coCovar, coDyadCovar, getEffects, model.create, print01Report,
        sienaGOF, descriptives.sienaGOF, sienaRI,
 	    sparseMatrixExtraction, networkExtraction, behaviorExtraction,
        OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
-       siena.table, xtable,
+       siena.table, xtable, score.Test,
        Wald.RSiena, Multipar.RSiena)
 
 import(Matrix, tcltk, lattice, parallel, MASS)

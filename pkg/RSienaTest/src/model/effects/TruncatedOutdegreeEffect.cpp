@@ -29,7 +29,7 @@ TruncatedOutdegreeEffect::TruncatedOutdegreeEffect(
 
 	if (this->lc < 1)
 	{
-		throw std::invalid_argument(
+		throw invalid_argument(
 			"TruncatedOutdegreeEffect: Parameter value must be at least 1");
 	}
 }
@@ -95,7 +95,7 @@ double TruncatedOutdegreeEffect::egoStatistic(int ego,
  */
 double TruncatedOutdegreeEffect::endowmentStatistic(Network * pLostTieNetwork)
 {
-	throw std::logic_error(
+	throw logic_error(
 		"TruncatedOutdegreeEffect: Endowment effect not supported.");
 }
 

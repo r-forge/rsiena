@@ -30,6 +30,8 @@
 #include "model/ml/MiniStep.h"
 #include "model/ml/BehaviorChange.h"
 
+using namespace std;
+
 namespace siena
 {
 SEXP getMiniStepDF(const MiniStep& miniStep);
@@ -63,6 +65,9 @@ BehaviorVariable::BehaviorVariable(BehaviorLongitudinalData * pData,
 	}
 
 	this->lbehaviorModelType = BehaviorModelType(pData->behModelType());
+	this->lego = 0;
+	this->lupPossible = true;
+	this->ldownPossible = true;
 }
 
 
@@ -290,6 +295,15 @@ void BehaviorVariable::makeChange(int actor)
 
 	// Choose the change
 	int difference = nextIntWithProbabilities(3, this->lprobabilities) - 1;
+
+	if (difference < -1)
+	{
+		difference = -1;
+	}
+	else if (difference > 1)
+	{
+		difference = 1;
+	}
 
 	if (this->pSimulation()->pModel()->needScores())
 	{

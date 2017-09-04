@@ -16,8 +16,6 @@
 #include <string>
 #include "NetworkAlterFunction.h"
 
-using namespace std;
-
 namespace siena
 {
 

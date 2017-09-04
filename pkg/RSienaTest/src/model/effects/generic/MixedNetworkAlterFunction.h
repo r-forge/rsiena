@@ -27,8 +27,8 @@ class NetworkCache;
 class MixedNetworkAlterFunction: public AlterFunction
 {
 public:
-	MixedNetworkAlterFunction(std::string firstNetworkName,
-		std::string secondNetworkName);
+	MixedNetworkAlterFunction(string firstNetworkName,
+		string secondNetworkName);
 	virtual ~MixedNetworkAlterFunction();
 
 	virtual void initialize(const Data * pData,
@@ -45,8 +45,8 @@ protected:
 	inline NetworkCache * pFirstNetworkCache() const;
 
 private:
-	std::string lfirstNetworkName;
-	std::string lsecondNetworkName;
+	string lfirstNetworkName;
+	string lsecondNetworkName;
 	const Network * lpFirstNetwork;
 	const Network * lpSecondNetwork;
 	TwoNetworkCache * lpTwoNetworkCache;

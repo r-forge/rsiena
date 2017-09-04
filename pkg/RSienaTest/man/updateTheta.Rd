@@ -12,18 +12,21 @@ to update an effects object.
   a set of effects that are included in another effects object.
 }
 \usage{
-updateTheta(effects, prevAns)
+updateTheta(effects, prevAns, varName=NULL)
 updateSpecification(effects.to, effects.from, name.to=NULL, name.from=NULL)
 }
 \arguments{
-  \item{effects}{Object of class \code{\link{sienaEffects}}}
+  \item{effects}{Object of class \code{\link{sienaEffects}}.}
   \item{prevAns}{Object of class \code{\link{sienaFit}}
-       as returned by \code{\link{siena07}}}
-  \item{effects.to}{Object of class \code{\link{sienaEffects}}}
-  \item{effects.from}{Object of class \code{\link{sienaEffects}}}
-  \item{name.to}{Character string, name of dependent variable in \code{object.to}}
+       as returned by \code{\link{siena07}}.}
+  \item{varName}{Character string or vector of character strings;
+       is this is not \code{NULL}, the update will only applied to this
+       dependent variable / these dependent variables.}
+  \item{effects.to}{Object of class \code{\link{sienaEffects}}.}
+  \item{effects.from}{Object of class \code{\link{sienaEffects}}.}
+  \item{name.to}{Character string, name of dependent variable in \code{object.to}.}
   \item{name.from}{Character string, name of dependent variable in
-       \code{object.from}}
+       \code{object.from}.}
 }
 \details{
   The initial values of any selected effects
@@ -31,7 +34,10 @@ updateSpecification(effects.to, effects.from, name.to=NULL, name.from=NULL)
   \code{prevAns} will be updated by \code{updateTheta}.
   If the previous run was conditional, the estimated rate parameters for
   the dependent variable on which the run was conditioned are added to
-  the final value of theta.\cr
+  the final value of theta. If \code{varName} is not \code{NULL},
+  this update is restricted to effects for the dependent variable/s
+  specified by \code{varName}.
+  \cr
   By \code{updateSpecification}, the effects included in \code{effects.from}
   are also included in \code{effects.to}; if \code{name.to} and/or
   \code{name.from} is specified, this is restricted to effects

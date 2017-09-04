@@ -30,7 +30,8 @@ print01Report(data, modelname = "Siena", getDocumentation=FALSE)
 \examples{
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
-myeff <- getEffects(mydata)
-\dontrun{print01Report(mydata, myeff)}
+\dontrun{
+print01Report(mydata, modelname="mydescription")
+}
 }
 \keyword{print}
