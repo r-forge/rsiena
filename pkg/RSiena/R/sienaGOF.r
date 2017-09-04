@@ -92,7 +92,7 @@ sienaGOF <- function(
 	attr(obsStats,"auxiliaryStatisticName") <-
 			deparse(substitute(auxiliaryFunction))
 	attr(obsStats,"joint") <- join
-
+	
 	##	Calculate the simulated auxiliary statistics
 	if (verbose)
 	{
@@ -105,26 +105,17 @@ sienaGOF <- function(
 			cat("Calculating auxiliary statistics for periods", period, ".\n")
 		}
 	}
-
-	if (!is.null(cluster)) {
-		ttcSimulation <- system.time(simStatsByPeriod <- lapply(period,
-			function (j) {
-				simStatsByPeriod <- parSapply(cluster, 1:iterations,
-					function (i)
-						{ auxiliaryFunction(i,
-									sienaFitObject$f,
-									sienaFitObject$sims, j, groupName, varName, ...)
-							if (verbose && (i %% 100 == 0) )
-								{
-								cat("  > Completed ", i," calculations\n")
-								flush.console()
-								}
-						})
-							simStatsByPeriod <- matrix(simStatsByPeriod,
-								ncol=iterations)
-							dimnames(simStatsByPeriod)[[2]] <-	1:iterations
-							t(simStatsByPeriod)
-						}))
+	if (!is.null(cluster)) 
+	{
+		ttcSimulation <- system.time(simStatsByPeriod <- 
+			lapply(period, function (j) {
+					simStatsByPeriod <- parSapply(cluster, 1:iterations,
+						function (i){auxiliaryFunction(i, sienaFitObject$f,
+										sienaFitObject$sims, j, groupName, varName, ...)})
+			simStatsByPeriod <- matrix(simStatsByPeriod, ncol=iterations)
+			dimnames(simStatsByPeriod)[[2]] <-	1:iterations
+			t(simStatsByPeriod)
+			}))
 	}
 	else
 	{
@@ -154,7 +145,7 @@ sienaGOF <- function(
 					})
 	  )
 	}
-
+	
 	## Aggregate by period if necessary to produce simStats
 	if (join)
 	{
@@ -331,8 +322,9 @@ sienaGOF <- function(
 			doTests <- rep(FALSE, sum(effectsToInclude))
 			names(doTests) <- effectsObject$effectName[effectsToInclude]
 			doTests[effectsObject$effectName[index]] <- TRUE
+			redundant <- rep(FALSE, length(doTests))
 			mmThetaDelta <- as.numeric(ScoreTest(length(doTests), D,
-							sigma, fra, doTests,
+							sigma, fra, doTests, redundant,
 							maxlike=sienaFitObject$maxlike)$oneStep )
 
       # \mu'_\theta(X)

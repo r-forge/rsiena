@@ -103,35 +103,34 @@ Goodness-of-fit.
 \seealso{\code{\link{siena07}}, \code{\link{plot.sienaTimeTest}},
   \code{\link{includeTimeDummy}}}
 \examples{
-\dontrun{
 ## Estimate a restricted model
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
+myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=50)
+# Short estimation not for practice, just for having a quick demonstration
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
-myeff <- includeEffects(myeff, transTrip, balance)
+myeff <- includeEffects(myeff, transTrip)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 ## Conduct the score-type test to assess whether heterogeneity is present.
 tt <- sienaTimeTest(ans)
 summary(tt)
 
-## Suppose that we wish to include two time dummies.
+## Suppose that we wish to include time dummies.
 ## Add them in the following way:
-myeff <- includeTimeDummy(myeff, recip, balance, timeDummy="2")
+myeff <- includeTimeDummy(myeff, recip, transTrip, timeDummy="2")
 ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 ## Re-assess the time heterogeneity
-tt2 <- sienaTimeTest(ans2)
+(tt2 <- sienaTimeTest(ans2))
 
 ## And so on..
-}
 
 ## A demonstration of the plotting facilities, on a larger dataset:
 ## (Of course pasting these identical sets of three waves after each other
 ##  in a sequence of six is not really meaningful. It's just a demonstration.)
 
-myalgorithm <- sienaAlgorithmCreate(nsub=4, n3=1000, seed=1234)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50, seed=1234)
 mynet1 <- sienaDependent(array(c(s501, s502, s503, s501, s503, s502),
                                dim=c(50, 50, 6)))
 mydata <- sienaDataCreate(mynet1)

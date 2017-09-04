@@ -42,10 +42,8 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
   have the same name in each model fit.
 }
 \value{An object of class \code{\link{sienaMeta}}.  There are \code{print},
-  \code{summary} and \code{plot} methods for this class,
-
-  An object of class \code{sienaMeta} is a list. containing at least the
-  following.
+  \code{summary} and \code{plot} methods for this class.
+  This object contains at least the following.
   \item{thetadf}{Data frame containing the coefficients, standard errors
     and score test results}
   \item{projname}{Name for any output file to be produced by the print method}

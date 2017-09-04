@@ -97,6 +97,7 @@
 #include "SimilarityWEffect.h"
 #include "SimilarityTransitiveTripletsEffect.h"
 #include "ThreeCyclesEffect.h"
+#include "ThresholdShapeEffect.h"
 #include "TransitiveMediatedTripletsEffect.h"
 #include "TransitiveReciprocatedTripletsEffect.h"
 #include "TransitiveReciprocatedTriplets2Effect.h"

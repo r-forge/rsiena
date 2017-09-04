@@ -25,7 +25,7 @@ namespace siena
 class OutTieFunction: public NetworkAlterFunction
 {
 public:
-	OutTieFunction(std::string networkName);
+	OutTieFunction(string networkName);
 
 	virtual double value(int alter);
 };

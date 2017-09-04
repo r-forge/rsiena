@@ -19,7 +19,7 @@ namespace siena
 /**
  * Constructs a new predicate.
  */
-EqualCovariatePredicate::EqualCovariatePredicate(std::string covariateName) :
+EqualCovariatePredicate::EqualCovariatePredicate(string covariateName) :
 	CovariatePredicate(covariateName)
 {
 }

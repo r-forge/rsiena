@@ -20,6 +20,7 @@ class Data;
 class State;
 class Cache;
 
+using namespace std;
 
 class AlterFunction
 {

@@ -17,18 +17,42 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 						   returnLoglik=FALSE, onlyLoglik=FALSE)
 {
 ##@checkNames used in initializeFRAN for siena07
-checkNames <- function(xx){
-# checks whether names of named vectors are in names of dependent variables,
-# and whether there are any names, or the vector has length 1.
+checkNames <- function(xx, types){
+# checks whether names of named vectors are in names of dependent variables.
+	if (('oneMode' %in% types) || ('bipartite' %in% types))
+	{
+		thetype <- 'network'
+	}
+	else
+	{
+		thetype <- 'behavior'
+	}
+	if (inherits(data, "sienaGroup"))
+	{
+	theVars <- sapply(data[[1]]$depvars, function(x){attr(x,'type') %in% types})
+	theVarNames <- names(data[[1]]$depvars)[theVars]
+	}
+	else
+	{
+	theVars <- sapply(data$depvars, function(x){attr(x,'type') %in% types})
+	theVarNames <- names(data$depvars)[theVars]
+	}
+	if ((length(xx) >= 1) && (!(length(xx) == sum(theVars))))
+	{
+		cat('Length of',deparse(substitute(xx)),
+				'should be equal to number of', thetype,'variables.\n')
+		stop('Invalid algorithm-data combination.')
+	}
 # For this check:
 # if there are no names, then (names(xx) %in% names(data$depvars))
 # will be logical(0), and all(logical(0)) is TRUE.
-	wrongName <- (((inherits(data, "sienaGroup")) &&
-			(!all(names(xx) %in% names(data[[1]]$depvars)))) ||
-		((!inherits(data, "sienaGroup")) &&
-			(!all(names(xx) %in% names(data$depvars)))))
-	if ((!wrongName) && (length(xx) >= 2))
+	if (is.null(xx))
 	{
+		wrongName <- FALSE
+	}
+	else
+	{
+		wrongName <- (!all(names(xx) == theVarNames))
 		if (is.null(names(xx)))
 		{
 			wrongName <- TRUE
@@ -40,39 +64,16 @@ checkNames <- function(xx){
 				wrongName <- TRUE
 			}
 		}
-	}
-	if (wrongName)
-	{
-		cat(deparse(substitute(xx)),
-				'in the algorithm object x should be a named vector\n')
-		cat(' with only names of dependent variables in the data set.\n')
-		stop('Invalid algorithm-data combination.')
+		if (wrongName)
+		{
+			cat(deparse(substitute(xx)),
+				'in the algorithm object x should be a named vector with\n')
+			cat(' the names of dependent', thetype, 'variables')
+			cat(' in the data set, in the same order.\n')
+			stop('Invalid algorithm-data combination.')
+		}
 	}
 	invisible(!wrongName)
-}
-
-##@withNames used in initializeFRAN for siena07
-withNames <- function(xx, types){
-	if (inherits(data, "sienaGroup"))
-	{
-	theVars <- sapply(data[[1]]$depvars, function(x){attr(x,'type') %in% types})
-	theVarNames <- names(data[[1]]$depvars)[theVars]
-	}
-	else
-	{
-	theVars <- sapply(data$depvars, function(x){attr(x,'type') %in% types})
-	theVarNames <- names(data$depvars)[theVars]
-	}
-	if (!(length(xx) %in% c(1, sum(theVars))))
-	{
-		cat('Lenght of',deparse(substitute(xx)),
-				'should be equal to number of variables.\n')
-		stop('Invalid algorithm-data combination.')
-	}
-	xxx <- rep(1, sum(theVars)) * xx
-# this will work if length(xx)==1 but also if length(xx)==sum(theVars)
-	names(xxx) <- theVarNames
-	xxx
 }
 
 # start of initializeFRAN proper
@@ -136,28 +137,11 @@ withNames <- function(xx, types){
             effects$initialValue <- defaultEffects$initialValue
         }
 
-# Give names if they did not yet exist.
-		if (length(x$MaxDegree) == 1)
-		{
-			x$MaxDegree <- withNames(x$MaxDegree, c('oneMode','bipartite'))
-		}
-		if (length(x$modelType) == 1)
-		{
-			x$modelType <- withNames(x$modelType, c('oneMode','bipartite'))
-		}
-		if (length(x$behModelType) == 1)
-		{
-			x$behModelType <- withNames(x$behModelType, 'behavior')
-		}
-		if (length(x$UniversalOffset) == 1)
-		{
-			x$UniversalOffset <- withNames(x$UniversalOffset, c('oneMode','bipartite'))
-		}
-# Check that the following attributes have correct or absent names
-		checkNames(x$MaxDegree)
-		checkNames(x$UniversalOffset)
-		checkNames(x$modelType)
-		checkNames(x$behModelType)
+# Check that the following attributes have correct names
+		checkNames(x$MaxDegree, c('oneMode','bipartite'))
+		checkNames(x$UniversalOffset, c('oneMode','bipartite'))
+		checkNames(x$modelType, 'oneMode')
+		checkNames(x$behModelType, 'behavior')
 		# The following error will occur if ML estimation is requested
 		# and there are any impossible changes from structural values
 		# to different observed values.
@@ -379,7 +363,6 @@ withNames <- function(xx, types){
 
         ## unpack data and put onto f anything we may need next time round.
         f <- lapply(data, function(xx, x) unpackData(xx, x), x=x)
-
         attr(f, "netnames") <- attr(data, "netnames")
         attr(f, "symmetric") <- attr(data, "symmetric")
         attr(f, "allUpOnly") <- attr(data, "allUpOnly")
@@ -414,8 +397,8 @@ withNames <- function(xx, types){
         }
         ## maxlike not available for symmetric networks; or is it?.
         ## check model type: default for symmetric is type 2 (forcing model).
-		## maxlike only for some model types?
-        syms <- attr(data,"symmetric")
+		## maxlike only for some model types? ABCD
+        syms <- attr(data,"symmetric")[ attr(data,"types") %in% c("oneMode","bipartite")]
         z$FinDiffBecauseSymmetric <- FALSE
         z$modelType <- x$modelType
         z$behModelType <- x$behModelType
@@ -534,7 +517,8 @@ withNames <- function(xx, types){
     f$pData <- pData
     ## register a finalizer
     ans <- reg.finalizer(f$pData, clearData, onexit = FALSE)
-    if (!initC)
+	
+	if (!initC)
     {
         storage.mode(effects$parm) <- "integer"
         storage.mode(effects$group) <- "integer"
@@ -637,7 +621,7 @@ withNames <- function(xx, types){
     ans <- reg.finalizer(f$pModel, clearModel, onexit = FALSE)
     if (x$MaxDegree == 0 || is.null(x$MaxDegree))
     {
-        MAXDEGREE <-  NULL
+        MAXDEGREE <- NULL
     }
     else
     {
@@ -646,13 +630,13 @@ withNames <- function(xx, types){
     }
     if (x$UniversalOffset == 0 || is.null(x$UniversalOffset))
     {
-        UNIVERSALOFFSET <-  NULL
+        UNIVERSALOFFSET <- NULL
     }
-    else
-    {
-        UNIVERSALOFFSET <- x$UniversalOffset
+	else
+	{
+		UNIVERSALOFFSET <- x$UniversalOffset
         storage.mode(UNIVERSALOFFSET) <- "double"
-    }
+	}
     if ((length(x$modelType) == 0)||(x$modelType == 0) || is.null(x$modelType))
     {
         MODELTYPE <-  NULL
@@ -802,6 +786,7 @@ withNames <- function(xx, types){
             f$chain <- ff$chain
        }
     }
+	
 	f$simpleRates <- simpleRates
     f$myeffects <- myeffects
     f$myCompleteEffects <- myCompleteEffects
@@ -848,6 +833,7 @@ withNames <- function(xx, types){
 	z$byWave <- byWave
 	z$returnDataFrame <- returnDataFrame
     z$nDependentVariables <- length(z$f$depNames)
+	z$x <- x # some elements -- named vectors -- may have changed
 	if (initC)
 	{
 		NULL
@@ -2156,7 +2142,7 @@ fixUpEffectNames <- function(effects)
 }
 
 ##@updateTheta siena07 Copy theta values from previous fit
-updateTheta <- function(effects, prevAns)
+updateTheta <- function(effects, prevAns, varName=NULL)
 {
 	if (!inherits(effects, "data.frame"))
 	{
@@ -2173,6 +2159,10 @@ updateTheta <- function(effects, prevAns)
 		condEffects <- attr(prevAns$f, "condEffects")
 		condEffects$initialValue <- prevAns$rate
 		prevEffects <- rbind(prevEffects, condEffects)
+	}
+	if (!is.null(varName))
+	{
+		prevEffects$name[!( prevEffects$name %in% varName)] <- ' '
 	}
 	oldlist <- apply(prevEffects, 1, function(x)
 					 paste(x[c("name", "shortName",

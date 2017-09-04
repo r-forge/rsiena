@@ -11,7 +11,7 @@
 ## ****************************************************************************/
 ##@print.sienaEffects Methods
 print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
-                               expandDummies=FALSE, includeRandoms = FALSE, ...)
+                               expandDummies=FALSE, includeRandoms=FALSE, dropRates=FALSE, ...)
 {
     if (!inherits(x, "sienaEffects"))
         stop("not a legitimate Siena effects object")
@@ -50,9 +50,16 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
         timeDummies <- !x$timeDummy[x$include] == ","
         specs <- as.data.frame(x[, c("name", "effectName", "include", "fix",
 											"test", "initialValue", "parm")])
+        specs.br <- x$basicRate
         if (includeOnly)
         {
             specs <- specs[x$include, ]
+            row.names(specs) <- 1:nrow(specs)
+        }
+        if (dropRates)
+        {
+            specs.br <- specs.br[x$include]
+            specs <- specs[!specs.br, ]
         }
         if (nDependents == 1)
         {
@@ -102,7 +109,6 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
 			}
 			else
 			{
-            row.names(specs) <- 1:nrow(specs)
             print(as.matrix(specs), quote=FALSE)
         }
 		}
@@ -114,6 +120,21 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
     else
     {
         print.data.frame(x)
+    }
+    if (includeRandoms)
+    {
+        nreff <- sum(x$randomEffects & x$include)
+        nrate <- sum(x$basicRate & x$include & (x$group==2))
+        if (nrate > 0) # else there is only one group, and counting should be different.
+        {
+            cat('Dimensions of priorMu and priorSigma for sienaBayes should be',
+                nreff, '+', nrate, '=', nreff+nrate,'.\n')
+        }
+        else if (dim(x)[1] > 1)
+        # to avoid the following if called from includeInteraction or setEffect
+        {
+            cat('There are', nreff, 'random effects.\n')
+        }
     }
     if (typeof(fileName)=="character")
     {

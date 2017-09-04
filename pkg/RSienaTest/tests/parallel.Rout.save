@@ -213,6 +213,39 @@ Overall maximum convergence ratio:    0.2577
 
 
 Total of 335 iteration steps.
+ 
+> ##test11
+> print('test11')
+[1] "test11"
+> mymodel<- model.create(fn = simstats0c, projname='test11', nsub=1, n3=50,
++                        behModelType=c(mynet2=2), seed=6)
+> (ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
++                parallelTesting=TRUE, silent=TRUE))
+Estimates, standard errors and convergence t-ratios
+
+                                          Estimate   Standard   Convergence 
+                                                       Error      t-ratio   
+Network Dynamics 
+  1. rate constant mynet1 rate (period 1)  5.7911  ( 1.8273   )   -0.2276   
+  2. rate constant mynet1 rate (period 2)  4.5005  ( 0.8629   )   -0.1708   
+  3. eval outdegree (density)             -2.3618  ( 0.1201   )   -0.2746   
+  4. eval reciprocity                      2.8187  ( 0.1675   )   -0.2688   
+
+Behavior Dynamics
+  5. rate rate mynet2 (period 1)           1.3221  ( 0.4155   )    0.0399   
+  6. rate rate mynet2 (period 2)           1.7863  ( 0.5585   )   -0.0260   
+  7. eval mynet2 linear shape              0.3724  ( 0.2906   )   -0.0873   
+  8. eval mynet2 quadratic shape          -0.5723  ( 0.3959   )   -0.1168   
+  9. eval mynet2 average alter             1.2012  ( 0.7552   )    0.0420   
+
+Overall maximum convergence ratio:    0.5329 
+
+
+ Behavioral Model Type:
+mynet2 : Boundary-absorbing behavior model 
+
+
+Total of 340 iteration steps.
 
 > ##test12
 > print('test12')
@@ -394,8 +427,6 @@ Overall maximum convergence ratio:    3.7057
 
 Total of 266 iteration steps.
 
-Warning message:
-closing unused connection 3 (Siena.out) 
 > 
 > proc.time()
    user  system elapsed 

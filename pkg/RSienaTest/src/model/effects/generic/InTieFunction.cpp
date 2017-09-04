@@ -20,7 +20,7 @@ namespace siena
  * @param[in] networkName the name of the network variable this function is
  * associated with
  */
-InTieFunction::InTieFunction(std::string networkName) :
+InTieFunction::InTieFunction(string networkName) :
 	OneModeNetworkAlterFunction(networkName)
 {
 }

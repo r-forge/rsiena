@@ -12,7 +12,7 @@
 ##@sienaModelCreate DataCreate
 sienaModelCreate <-
 function(fn,
-projname="Siena", MaxDegree=0,  UniversalOffset=0,
+projname="Siena", MaxDegree=NULL,  Offset=NULL,
 useStdInits=FALSE,
 n3=1000, nsub=4, n2start = NULL, dolby=TRUE,
 maxlike=FALSE, diagonalize=0.2*!maxlike,
@@ -21,7 +21,7 @@ firstg=0.2, reduceg=0.5, cond=NA, findiff=FALSE,  seed=NULL,
 pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
 prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
 minimumPermutationLength=2, initialPermutationLength=20,
-modelType=1, behModelType=1, mult=5, simOnly=FALSE, localML=FALSE,
+modelType=NULL, behModelType=NULL, mult=5, simOnly=FALSE, localML=FALSE,
 truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1),
 lessMem=FALSE, normalizeSettingRates=FALSE)
 {
@@ -86,20 +86,41 @@ if (diagonalize > 1) {diagonalize <- 1}
 model$diagg <- (diagonalize >= 0.9999)
 model$diagonalize <- diagonalize
 
-model$modelType <- modelType
-if (any(!(modelType %in% 1:6)))
+if (!is.null(modelType))
+{
+	if (any(!(modelType %in% 1:6)))
 	{
-		warning('modelType can have values from 1 to 6; other values changed to 1\n')
+		warning('modelType can only have values from 1 to 6; other values changed to 1\n')
 		model$modelType[!(modelType %in% 1:6)] <- 1
 	}
-model$behModelType <- behModelType
-if (any(!(behModelType %in% c(1,2))))
+	if (any(is.null(names(modelType))))
 	{
-		warning('behModelType should be 1 or 2; other values changed to 1\n')
+		stop('modelType must have names of dependent networks')
+	}
+	model$modelType <- modelType
+}
+if (!is.null(behModelType))
+{
+	if (any(!(behModelType %in% c(1,2))))
+	{
+		warning('behModelType can only have values 1 or 2; other values changed to 1\n')
 		model$behModelType[!(behModelType %in% c(1,2))] <- 1
 	}
+	if (any(is.null(names(behModelType))))
+	{
+		stop('behModelType must have names of dependent behavioral variables')
+	}
+	model$behModelType <- behModelType
+}
 model$MaxDegree <- MaxDegree
-model$UniversalOffset <- UniversalOffset
+	if (!is.null(Offset))
+	{
+		if (any(is.null(names(Offset))))
+		{
+			stop('Offset must have names of dependent behavioral variables')
+		}
+model$UniversalOffset <- Offset
+	}
 model$randomSeed <- seed
 model$pridg <- pridg
 model$prcdg <- prcdg
@@ -139,18 +160,21 @@ sienaAlgorithmCreate <- sienaModelCreate
 
 ##@ModelTypeStrings DataCreate
 ModelTypeStrings <- function(i){
-	switch(i,
+	ifelse(((i %in% 1:6) && (!is.null(i))),
+	  switch(i,
 		"Standard actor-oriented model",
 		"Forcing model",
 		"Initiative model",
 		"Pairwise forcing model",
 		"Pairwise mutual model",
-		"Pairwise joint model")
+		"Pairwise joint model"), "")
 }
 
 ##@BehaviorModelTypeStrings DataCreate
 BehaviorModelTypeStrings <- function(i){
-	switch(i,
+	ifelse(((i %in% 1:2) && (!is.null(i))),
+	  switch(i,
 		"Standard behavior actor-oriented model ('restrict')",
-		"Boundary-absorbing behavior model")
+		"Boundary-absorbing behavior model"),
+		"")
 }

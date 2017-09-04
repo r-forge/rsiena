@@ -137,7 +137,7 @@ proc2subphase <- function(z, x, subphase, ...)
         }
         if ((subphase >= 1) && (z$maxacor >= sqrt(2.0 / (z$nit + 1))))
 		{
-			Report('Warning: an autocorrelation is positive at the end',cf)
+			Report('Note: an autocorrelation is positive at the end',cf)
 			Report(' of this subphase.\n',cf)
 			Report('Autocorrelations:\n',cf)
 			prtmat <- z$prod1 / z$prod0

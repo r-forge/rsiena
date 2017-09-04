@@ -185,8 +185,8 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	if (useCluster)
 	{
 	  # Only stop cluster if it wasn't provided by the user
-	  if (!length(cl))
-		  stopCluster(z$cl)
+#	  if (!length(cl))
+#		  stopCluster(z$cl)
 	  
 		## need to reset the random number type to the normal one
 		assign(".Random.seed", z$oldRandomNumbers, pos=1)

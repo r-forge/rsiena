@@ -22,7 +22,8 @@ class SameCovariateInTiesFunction: public CovariateNetworkAlterFunction
 {
 public:
 	SameCovariateInTiesFunction(string networkName,
-		string covariateName, bool sameValue, bool excludeMissing);
+		string covariateName, bool sameValue, bool sameVariable,
+								bool excludeMissing);
 
 	virtual void initialize(const Data * pData,
 		State * pState,
@@ -34,6 +35,7 @@ public:
 private:
 	bool lexcludeMissing;
 	bool lsameValue;
+	bool lsameVariable;
 };
 
 }

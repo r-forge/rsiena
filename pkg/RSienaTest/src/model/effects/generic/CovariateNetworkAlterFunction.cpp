@@ -22,8 +22,6 @@
 #include "model/tables/Cache.h"
 #include "data/Data.h"
 
-using namespace std;
-
 namespace siena
 {
 

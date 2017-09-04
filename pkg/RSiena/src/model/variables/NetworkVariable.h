@@ -93,7 +93,7 @@ private:
 	void accumulateRateScores(double tau, const DependentVariable *
 		pSelectedVariable, int selectedActor);
 	void calculateSymmetricTieFlipContributions(int alter, int sub);
-	void calculateSymmetricTieFlipProbabilities(int alter, int sub);
+	void calculateSymmetricTieFlipProbabilities(int alter, int sub, bool aagree);
 	bool calculateModelTypeBProbabilities();
 	bool diagonalMiniStep(int ego, int alter) const;
 

@@ -24,8 +24,6 @@
 #include "data/Data.h"
 #include "MixedNetworkAlterFunction.h"
 
-using namespace std;
-
 namespace siena
 {
 

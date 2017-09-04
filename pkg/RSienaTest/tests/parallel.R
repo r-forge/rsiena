@@ -78,6 +78,12 @@ ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
                parallelTesting=TRUE, silent=TRUE)
 ##, verbose=TRUE)
 ans
+##test11
+print('test11')
+mymodel<- model.create(fn = simstats0c, projname='test11', nsub=1, n3=50,
+                       behModelType=c(mynet2=2), seed=6)
+(ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
+               parallelTesting=TRUE, silent=TRUE))
 ##test12
 print('test12')
 use<- 1:30

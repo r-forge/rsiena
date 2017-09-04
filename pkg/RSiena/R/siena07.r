@@ -37,7 +37,6 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
         nbrNodes   <- length(cl)
     }
       
-    
     time0 <-  proc.time()['elapsed']
     z <- NULL ## z is the object for all control information which may change.
     ## x is designed to be readonly. Only z is returned.
@@ -58,7 +57,6 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
           stop("cannot use forking processes on Windows")
         }
       }
-		
 		# The possibility to use snow now has been dropped
 		# because RSiena requires R >= 2.15.0
 		# and snow is superseded.
@@ -181,8 +179,8 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
     if (useCluster)
     {
       # Only stop cluster if it wasn't provided by the user
-      if (!length(cl))
-        stopCluster(z$cl)
+#	  if (!length(cl))
+#		  stopCluster(z$cl)
       
       ## need to reset the random number type to the normal one
       assign(".Random.seed", z$oldRandomNumbers, pos=1)

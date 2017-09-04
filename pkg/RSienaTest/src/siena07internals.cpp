@@ -13,6 +13,8 @@
  * Internal routines used to set up the Data object with data from R.
  * Not visible from R.
  */
+#include <vector>
+#include <cstring>
 #include "siena07internals.h"
 #include "data/Data.h"
 #include "data/LongitudinalData.h"
@@ -35,11 +37,9 @@
 #include "model/variables/NetworkVariable.h"
 #include "model/ml/MLSimulation.h"
 
-#include <cstring>
-#include <string>
-#include <vector>
-
+using namespace std;
 using namespace siena;
+
 
 /**
  * Matches column names with indices. The object Names is the names of the
@@ -205,7 +205,7 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 /**
  *  updates the parameter values for each of the effects.
  */
-void updateParameters(SEXP EFFECTSLIST, SEXP THETA, std::vector<Data *> *
+void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
 						  pGroupData, Model * pModel)
 {
     // get the column names from the names attribute
@@ -1289,7 +1289,7 @@ void setupExogenousEventGroup(SEXP EXOGEVENTGROUP, Data *pData)
 /**
  *  Creates all the basic effects for one network
  */
-SEXP createEffects(SEXP EFFECTS, Model *pModel, std::vector<Data *> * pGroupData,
+SEXP createEffects(SEXP EFFECTS, Model *pModel, vector<Data *> * pGroupData,
 	const char *networkName, int effectCol, int parmCol, int int1Col,
 	int int2Col, int initValCol, int typeCol, int groupCol, int periodCol,
 	int rateTypeCol, int netTypeCol, int settingCol)
@@ -1447,8 +1447,7 @@ SEXP createInteractionEffects(SEXP EFFECTS, Model *pModel,
  *  are the same apart from the basic rates. Not used in maximum likelihood.
  */
 void getChangeContributionStatistics(SEXP EFFECTSLIST,
-		const StatisticCalculator * pCalculator,
-		std::vector<std::vector<double *> > *rChangeContributions)
+	const StatisticCalculator * pCalculator, vector<vector<double *> > *rChangeContributions)
 {
 
 	// get the column names from the names attribute
@@ -1513,7 +1512,7 @@ void getChangeContributionStatistics(SEXP EFFECTSLIST,
  *  are the same apart from the basic rates. Not used in maximum likelihood.
  */
 void getActorStatistics(SEXP EFFECTSLIST,
-	const StatisticCalculator * pCalculator, std::vector<double *> *rActorStatistics)
+	const StatisticCalculator * pCalculator, vector<double *> *rActorStatistics)
 {
 
 	// get the column names from the names attribute
@@ -1578,7 +1577,7 @@ void getStatistics(SEXP EFFECTSLIST,
 	const StatisticCalculator * pCalculator,
 	int period, int group, const Data *pData,
 	const EpochSimulation * pEpochSimulation,
-	std::vector<double> * rfra, std::vector<double> *rscore)
+	vector<double> * rfra, vector<double> *rscore)
 {
 
 	// get the column names from the names attribute
@@ -1940,7 +1939,7 @@ void getStatistics(SEXP EFFECTSLIST,
  */
 void getScores(SEXP EFFECTSLIST, int period, int group,
 	const MLSimulation * pMLSimulation,
-	std::vector<double> * rderiv, std::vector<double> *rscore)
+	vector<double> * rderiv, vector<double> *rscore)
 {
 
 	// get the column names from the names attribute
@@ -2023,7 +2022,7 @@ void getScores(SEXP EFFECTSLIST, int period, int group,
 				(*rscore)[storescore++] = pMLSimulation->score(pEffectInfo);
 
 				// get the map of derivatives
-				std::map<const EffectInfo *, double > deriv =
+				map<const EffectInfo *, double > deriv =
 					pMLSimulation->derivative(pEffectInfo);
 
 				for (int j = 0; j < length(VECTOR_ELT(EFFECTS,0)); j++)

@@ -30,7 +30,7 @@ class ReciprocatedTwoPathFunction:
 	public OneModeNetworkAlterFunction, IntAlterFunction
 {
 public:
-	ReciprocatedTwoPathFunction(std::string networkName);
+	ReciprocatedTwoPathFunction(string networkName);
 
 	virtual void initialize(const Data * pData,
 		State * pState,

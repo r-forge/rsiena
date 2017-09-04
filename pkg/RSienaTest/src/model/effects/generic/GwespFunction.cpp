@@ -15,8 +15,6 @@
 #include "model/tables/EgocentricConfigurationTable.h"
 #include <math.h>
 
-using namespace std;
-
 namespace siena
 {
 

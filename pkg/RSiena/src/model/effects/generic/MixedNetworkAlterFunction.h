@@ -17,8 +17,6 @@
 #include "AlterFunction.h"
 #include "utils/NamedObject.h"
 
-using namespace std;
-
 namespace siena
 {
 

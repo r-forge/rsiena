@@ -35,6 +35,8 @@ class Network;
  */
 class OutdegreeActivitySqrtEffect : public NetworkEffect
 {
+friend class BothDegreesEffect;
+
 public:
 	OutdegreeActivitySqrtEffect(const EffectInfo * pEffectInfo);
 

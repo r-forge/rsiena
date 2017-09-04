@@ -47,16 +47,16 @@ double BothDegreesEffect::calculateContribution(int alter) const
 		{
 			change2 =  (d * this->lsqrtTable->sqrt(d)) -
 							((d-1) * this->lsqrtTable->sqrt(d-1));
-	}
-	else
-	{
+		}
+		else
+		{
 			change2 =  ((d+1) * this->lsqrtTable->sqrt(d+1)) -
 							(d * this->lsqrtTable->sqrt(d));
 			degree1++;
+		}
 	}
-}
 	else
-{
+	{
 		if (this->outTieExists(alter))
 		{
 			change2 = 2 * d - 1;
@@ -65,8 +65,8 @@ double BothDegreesEffect::calculateContribution(int alter) const
 		{
 			change2 = 2 * d + 1;
 			degree1++;
-}
-}
+		}
+	}
 
 	double change1 = 0;
 	if (this->lroot)

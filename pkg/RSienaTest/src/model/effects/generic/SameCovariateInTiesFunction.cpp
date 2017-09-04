@@ -17,8 +17,6 @@
 #include "network/IncidentTieIterator.h"
 #include "utils/Utils.h"
 
-using namespace std;
-
 namespace siena
 {
 
@@ -32,10 +30,12 @@ namespace siena
  */
 
 SameCovariateInTiesFunction::SameCovariateInTiesFunction(
-	string networkName, string covariateName, bool sameValue, bool excludeMissing) :
+	string networkName, string covariateName, bool sameValue,
+	bool sameVariable, bool excludeMissing) :
 	CovariateNetworkAlterFunction(networkName, covariateName)
 {
 	this->lsameValue = sameValue;
+	this->lsameVariable = sameVariable;
 	this->lexcludeMissing = excludeMissing;
 }
 
@@ -63,7 +63,7 @@ void SameCovariateInTiesFunction::initialize(const Data * pData,
 
 void SameCovariateInTiesFunction::preprocessEgo(int ego)
 {
-	AlterFunction::preprocessEgo(ego);
+	CovariateNetworkAlterFunction::preprocessEgo(ego);
 }
 
 /**
@@ -98,7 +98,7 @@ double SameCovariateInTiesFunction::value(int alter)
 				}
 			}
 		// Add the following just like for inPop effect:
-			if  (!this->outTieExists(alter))
+			if  ((this->lsameVariable) && (!this->outTieExists(alter)))
 			{
 				// The statistic will increase after introducing the tie
 				statistic++;

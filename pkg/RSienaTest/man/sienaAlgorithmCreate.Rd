@@ -15,7 +15,7 @@
   indicates more precisely the purpose of this function.
 }
 \usage{
-sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
+sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
      useStdInits = FALSE, n3 = 1000, nsub = 4, n2start = NULL,
      dolby=TRUE, maxlike = FALSE, diagonalize=0.2*!maxlike,
      condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
@@ -23,11 +23,11 @@ sienaAlgorithmCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
      pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
      prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
-     modelType=1, behModelType=1, mult=5, simOnly=FALSE, localML=FALSE,
+     modelType=NULL, behModelType=NULL, mult=5, simOnly=FALSE, localML=FALSE,
      truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1),
      lessMem=FALSE, normalizeSettingRates=FALSE)
 
-sienaModelCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
+sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
      useStdInits = FALSE, n3 = 1000, nsub = 4, n2start = NULL,
      dolby=TRUE, maxlike = FALSE, diagonalize=0.2*!maxlike,
      condvarno = 0, condname = "", firstg = 0.2, reduceg = 0.5,
@@ -35,7 +35,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
      pridg=0.05, prcdg=0.05, prper=0.2, pripr=0.3, prdpr=0.3,
      prirms=0.05, prdrms=0.05, maximumPermutationLength=40,
      minimumPermutationLength=2, initialPermutationLength=20,
-     modelType=1, behModelType=1, mult=5, simOnly=FALSE, localML=FALSE,
+     modelType=NULL, behModelType=NULL, mult=5, simOnly=FALSE, localML=FALSE,
      truncation=5, doubleAveraging=0, standardizeVar=(diagonalize<1),
      lessMem=FALSE, normalizeSettingRates=FALSE)
 }
@@ -47,13 +47,14 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
   \item{MaxDegree}{Named vector of maximum degree values for
     corresponding networks. Allows to restrict the model to networks
     with degrees not higher than this maximum.
-    Names should be the names of dependent network variables; if there is
-    only one, the name can be dropped.}
-  \item{UniversalOffset}{Named vector of offset values
-    for universal setting in Settings model.
-% and for symmetric networks with \code{modelType = 3},
-    Names should be the names of dependent network variables; if there is
-    only one, the name can be dropped.}
+    Names should be the names of all dependent network variables,
+	in the same order as in the Siena data set.\cr
+	Default as well as value 0 imply no restrictions.}
+  \item{Offset}{Named vector of offset values for symmetric networks with
+   \code{modelType = 3} (M.1), and for universal setting in Settings model.
+    Names should be the names of all dependent network variables,
+	in the same order as in the Siena data set.
+	Default \code{NULL} implies values 0.}
   \item{useStdInits}{Boolean. If TRUE, the initial values in the effects
     object will be ignored and default values used instead.
     If FALSE, the initial values in the effects object will be used.}
@@ -125,17 +126,19 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
     estimation.}
   \item{modelType}{Type of model to be fitted for dependent network variables:
     1=directed, 2:6 for symmetric networks only: 2=dictatorial forcing (D.1),
-    3=Initiative model with reciprocal confirmation(M.1),
+    3=Initiative model with reciprocal confirmation (M.1),
     4=Pairwise dictatorial forcing model (D.2),
     5=Pairwise mutual model (M.2), 6=Pairwise joint model (C.2).\cr
-    For multiple dependent network variables, use a named vector,
-    with the names of the dependent variables.\cr
-    See Snijders and Pickup (2016) for the meanings of these models.}
+    Names should be the names of all dependent network variables,
+	in the same order as in the Siena data set.\cr
+    See Snijders and Pickup (2016) for the meanings of these models.
+	Default \code{NULL} implies 1 for directed or two-mode, 2 for symmetric.}
   \item{behModelType}{Type of model to be fitted for behavioral dependent
     variables:
     1=standard (restricted), 2=absorbing.
-    For multiple dependent behavioral variables, use a named vector,
-    with the names of the dependent variables.}
+    Names should be the names of all dependent network variables,
+	in the same order as in the Siena data set.
+	Default \code{NULL} implies values 1.}
   \item{mult}{Multiplication factor for maximum likelihood and Bayes. Number of
     steps per iteration is set to this multiple of the total distance
     between the observations at start and finish of the wave.
@@ -159,7 +162,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
   \item{lessMem}{Logical: whether to reduce storage during operation of
     \code{\link{siena07}}, and of the object produced, by leaving out arrays
     by iteration and by period of simulated statistics \code{sf2} and scores
-    \code{ssc}.
+    \code{ssc}.\cr
     if \code{lessMem=TRUE}, it will be impossible to run
     \code{\link{sienaTimeTest}} or \code{\link{sienaGOF}} on
     the object produced by \code{\link{siena07}}.}
@@ -169,13 +172,14 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = 0, UniversalOffset = 0,
   This function creates an object with the elements required to control the
   Robbins-Monro algorithm. Those not
   available as arguments can be changed manually where desired.\cr
-  Further information about the implementation of the algorithm is in
+  Further information about the implementation of the algorithm is in \cr
   http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf.
 }
 \value{Returns an object of class \code{sienaAlgorithm} containing
   values implied by the parameters.}
 \references{ \itemize{
-\item Tom A. B. Snijders and Mark Pickup,
+\item For the model types: \cr 
+   Tom A. B. Snijders and Mark Pickup,
    Stochastic Actor-Oriented Models for Network Dynamics.
    In: Jennifer N. Victor, Mark Lubell and Alexander H. Montgomery,
    Oxford Handbook of Political Networks. Oxford University Press, 2016.
@@ -188,7 +192,9 @@ myAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn")
 StdAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn", useStdInits=TRUE)
 CondAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn", condvarno=1, cond=TRUE)
 Max10Algorithm <- sienaAlgorithmCreate(projname="NetworkDyn", MaxDegree=c(mynet=10))
-# where mynet is the name of the network object created by sienaDependent().
+Beh2Algorithm <- sienaAlgorithmCreate(projname="NetBehDyn", behModelType=c(mybeh=2))
+# where mynet is the name of the network object created by sienaDependent(),
+# and mybeh the name of the behavior object created by the same function.
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the
 % R documentation directory.

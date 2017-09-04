@@ -296,10 +296,16 @@ independent of Tortoise.
   documentation.
 \item New source files need their \sfn{eol-style} set to \sfn{native} when they
   are added to the repository. On Windows, right-click and select
-  Tortoise-SVN/properties then add \sfn{eol-style:native}.  (One current
-  exception here: the file \sfn{sienascript} needs to have always unix line
+  Tortoise-SVN/properties then add \sfn{eol-style:native}.  \\
+  Exceptions:
+  \begin{itemize}
+  \item The file \sfn{sienascript} needs to have always unix (LF) line
   endings. Otherwise a tarball built on Windows will not produce a usable
-  \sfn{sienascript} for Mac or Linux. There may be others in the future.)
+  \sfn{sienascript} for Mac or Linux.
+  \item The file \sfn{cleanup} should have LF line endings;
+  probably it is good to also do this for the file \sfn{configure};
+  these files are used for Linux and Mac, not for Windows.
+  \end{itemize}
 \item Copy a file header from an existing source file, and adapt it.
 \item Ensure your editor removes all trailing spaces.\\
   Note that in Notepad++ there is a command Edit/Blank Operations/Trim trailing
@@ -375,6 +381,12 @@ below.
     edit the Path, taking care that what is previously there is left intact;
     click OK on each of the dialogs to save your settings.
     Restart your computer.
+\item In Windows you also will need qpdf to reduce the size of the pdf
+    created for the help pages.
+    This is necessary for passing the checks for  submitting to cran (not strictly
+    necessary otherwise), and not having this will lead to a note in R CMD check.
+    Download qpdf from the web and make sure that the path contain the directory
+    containing qpdf.exe.
 \item If using a Mac, you will need the Xcode tools installed.
 \item Obtain the current source using a developer secure checkout.
 \item In a command prompt window, navigate to the directory above the siena
@@ -476,7 +488,8 @@ files.
  Knowing how to get to your home directory, do the following:
 \begin{description}
 \item[.R directory] Create, in your home directory, a directory called .R (on
-  Windows you can use mkdir in a command prompt window to do this).
+  Windows you can use mkdir in a command prompt window to do this).\\
+  In that directory, put the following two files.
 \item[check.Renviron] This file is used in the check procedure. It should
  contain at least the following:
 {\small
@@ -551,8 +564,17 @@ GPL licensing.
 If you are lucky the same will work with Mac binaries on a Mac but there may be
 problems with differing versions of Mac OSX.
 
-There is a facility to build Windows packages on CRAN. See
-\url{http://win-builder.r-project.org/}. In the future there may be something
+\subsection{Checking on various platforms}
+There is a facility to check Windows packages on CRAN. See
+\url{http://win-builder.r-project.org/}; use the upload page!
+
+A facility to build and check packages on various platforms
+is at \url{https://builder.r-hub.io}; in the `advanced' page
+there is a variety of platforms on which you can check. 
+
+
+
+In the future there may be something
 similar for Macs.
 \section{Personal/private keys}
 \label{key}
@@ -993,10 +1015,29 @@ Follow by
 In any of these cases, you may find results vary due to garbage
 collection in R. Also changes which speed up the Mac may not speed up Windows,
 particularly changing memory allocation.
+
 \section{Debugging}
 
 \subsection{Debugging R}
-Refer to session 7 of my R programming slides.
+Refer to session 7 of the R programming slides by RR.
+
+\subsection{Debugging open connections}
+If there are warnings about undesired open connections,
+you can use the command\\
+\texttt{showConnections(all = TRUE)}\\
+to help you see where this occurs, and perhaps force closure by
+\\
+\texttt{closeAllConnections()}\\
+
+
+\subsection{Debugging examples}
+Note that for executing the examples in the help pages,
+\texttt{R CMD check} prepends the file
+\texttt{R-x.x.x$\backslash$share$\backslash$R$\backslash$examples-header.R} where \texttt{R-x.x.x}
+is the main directory of the R distribution used.
+For ill-understood errors in checking the examples, 
+this file could be changed to give the desired information.
+
 \subsection{Debugging C++}
 You may find that R tends to crash when you change the C++. You can try to trap
 the error using \sfn{Rprintf} statements to print out details at intervals. The
@@ -1050,6 +1091,20 @@ This is not easy to understand from the documentation (Writing R Extensions
 manual), but there should be examples of most functions in the code
 already. Some notes:
 \begin{description}
+\item[registration of native routines]
+As from R version 3.4.1, registration of native routines (i.e., C or C++
+routines defined in the package) is mandatory. This is explained
+in \url{https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Registering-native-routines}.\\
+I (T.S.) got help from Brian Ripley to sort this out.
+The changes were the following:
+\begin{itemize}
+  \item First line of \texttt{NAMESPACE} changed to
+  \begin{verbatim}
+useDynLib(RSiena, .registration = TRUE, .fixes="C_")
+  \end{verbatim}
+  \item New file \texttt{init.c}
+  \item All \texttt{.Call} functions in R changed to \texttt{.Call(C\_...}
+\end{itemize}
 \item[random numbers]
 We use the R random number functions such as \sfn{rexp}. These work slightly
 differently from the R versions, you need to check the syntax of the call in

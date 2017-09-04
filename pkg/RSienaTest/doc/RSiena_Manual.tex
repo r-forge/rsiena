@@ -1,5 +1,4 @@
 \documentclass[a4paper,fleqn,11pt]{article}
-
 %\usepackage{times}
 \usepackage{natbib}
 \usepackage{rotating}
@@ -132,7 +131,7 @@
       \setcounter{lijstnum}{\value{savenumi}}}
 
 
-%\renewcommand{\baselinestretch}{1.2}
+\renewcommand{\baselinestretch}{1.0}
 
 
 \setlength{\oddsidemargin}{0.6cm}
@@ -187,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.1-306.
+This version was renewed for \RS version 1.2-1.
 \end{abstract}
 
 
@@ -203,6 +202,8 @@ This version was renewed for \RS version 1.1-306.
 \makeatletter
 \def\@linkcolor{lc}
 \makeatother
+
+
 
 \section{General information}
 
@@ -221,8 +222,7 @@ networks according to the Stochastic Actor-oriented Model
 \citet{SnijdersEA07},  \citet{SnijdersEA10a}, \citet{SLT2013},
 and \citet{Greenan15}; also see \citet{SteglichEA10}.
 A tutorial for these models is in \citet{SnijdersEA10b}.
-
-\citet{SNDE,AMAND}
+Books are in preparation \citep{SNDE,AMAND}.
 
 A website for \SI is maintained at
 {\small\url{http://www.stats.ox.ac.uk/~snijders/siena/}~}.
@@ -236,7 +236,7 @@ The website further contains references to many published examples,
 example scripts illustrating various possibilities of the package,
 course announcements, etc.
 
-This is a manual for \rs, which also may be called \SI version 4.0;
+This is a manual for \rs, which also may be called \SI version 4.1.2;
 the manual is provisional in the sense
 that it is continually being updated, taking account of
 updates in the package.
@@ -247,6 +247,23 @@ the reader is referred to the corresponding literature and help pages.
 %If desired, \SI can be operated \emph{apparently}
 %independently of \Rn, as is explained in Section~\ref{Gui}.
 
+For working with \rs, please use jointly the following
+information:
+\begin{enumerate}
+  \item The help pages for the functions in \rs, which can be consulted
+        in the usual \R way by entering ? followed by the function name;\\
+        note that by clicking on the version mentioned at the bottom
+        of each help page, you are brought to a directory of all help
+        pages for the package;
+  \item this manual (of which the web version is updated quite frequently);
+  \item the website
+{\small\url{http://www.stats.ox.ac.uk/~snijders/siena/}~},
+        e.g., its \texttt{News} page and its \texttt{RSiena scripts} page;
+  \item the yahoo users' group for \SI meant to exchange information
+        and technical advice; the address is
+        {\small\url{http://groups.yahoo.com/groups/stocnet/}~}.
+\end{enumerate}
+
 \RS was originally programmed by Ruth Ripley and Krists Boitmanis,
 in collaboration with Tom Snijders.
 Since May 2012 the maintainer is Tom Snijders.
@@ -254,6 +271,9 @@ Further contributions were made by Josh Lospinoso, Charlotte Greenan,
 Felix Sch"{o}nenberger,
 Christian Steglich, Johan Koskinen, Mark Ortmann, Nynke Niezink,
 and Robert Hellpap.
+Currently, \RS is maintained by a research group
+at the University of Groningen, seconded by researchers in Z\"{u}rich,
+Konstanz, and Manchester.
 
 In addition to the `official' \R distribution of \rs, there is
 an additional distribution at R-Forge, which is
@@ -268,8 +288,7 @@ Some of the options described in this manual may apply to
 {\sf RSienaTest} only, with the plan to transfer this to \RS
 in the future.
 
-
-\newpage
+\subsection{Acknowledgements}
 
 The development of \RS was carried out by researchers of the Universities
 of Oxford, Groningen, and Konstanz.
@@ -293,17 +312,13 @@ analysis of social networks} (project number 405-20-20),
 and to the foundation ProGAMMA,
 which all contributed to the work on \si.
 
-Currently, \RS is maintained by a research group
-at the University of Groningen, seconded by researchers in Z\"{u}rich,
-Konstanz, and Manchester.
-
 \newpage
 %\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
+
 \part{Minimal Intro}
 
 
-
-\subsection{Giving references}
+\section{Giving references}
 
 When using \si, it is appreciated that you refer to this manual and to one or
 more relevant references of the methods implemented in the program.  The
@@ -757,7 +772,7 @@ different impact) of effects for the increase and the decrease of behavior.
 \label{S_estim}
 \noindent
 \SI estimates parameters by the function \sfn{siena07()}
-and (alternatively) \sfn{sienacpp()}, using the following procedure:
+and (alternatively) \sfn{sienacpr()}, using the following procedure:
 \begin{enumerate}
 \item  Certain statistics are used that reflect the parameter values;\\
   the finally obtained parameters should be such that the \emph{expected
@@ -796,7 +811,7 @@ and (alternatively) \sfn{sienacpp()}, using the following procedure:
 
   If the estimation has to be repeated, this can be done by employing the
   argument \texttt{prevAns} in the call of \sfn{siena07()}
-  (or \sfn{sienacpp()}).
+  (or \sfn{sienacpr()}).
   See the help page for  \sfn{siena07()}.
 \end{enumerate}
 \end{enumerate}
@@ -866,24 +881,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.1-306}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.1-308}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-306.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-1.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.1-306.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-1.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.1-306.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-1.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-306.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-1.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-306.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-1.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.1-306.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-1.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -947,7 +962,7 @@ of the software appear).
 	\item	Use functions \sfn{includeEffects()}, \sfn{setEffect()} and
             \sfn{includeInteraction()} to further specify the model
             (see Sections~\ref{S_imp_str1}~--~\ref{S_eff_beh}).
-	\item	Use \sfn{siena07()} or \sfn{sienacpp()}
+	\item	Use \sfn{siena07()} or \sfn{sienacpr()}
             to run the estimation procedure.\footnote{The
             use of multiple processes can speed up the estimation.
             For directions on how to utilize multiple processors,
@@ -1081,7 +1096,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.1-306) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-1) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -3192,7 +3207,8 @@ This means that opportunities for change of the single tie variable $x_{ij}$
 occur at the rate $\lambda_i \times \lambda_j$.
 The numerical interpretation is different from that in the first two models.
 
-
+Some effects specially designed for non-directed networks
+are presented in Section~\ref{S_NonDirEff}.
 
 \subsection{Model Type: behavior}
 \label{S_modeltype_beh}
@@ -3228,7 +3244,9 @@ $\mathcal C = \{z^+-1, z^+, z^++1\}$,
 respectively; but the outcome $z^--1$ when it occurs is replaced
 by $z^-$, and  $z^++1$ when it occurs is replaced
 by $z^+$.
-
+The objective function for the virtual outcome $z^--1$
+is taken to be the same as for $z^-$, and similarly for $z^++1$
+it is taken to be the same as for $z^+$.
 
 
 \hypertarget{T_int_eff}{
@@ -3694,7 +3712,7 @@ algorithm.
 % provisionally placed here.
 
 The estimation process implemented in functions \textsf{siena07()}
-and \sfn{sienacpp()}
+and \sfn{sienacpr()}
 starts with initial values for the parameters,
 and returns a so-called \textsf{sienaFit} object, in this example called
 \texttt{results1}, which contains the estimates and their standard errors and
@@ -3705,21 +3723,21 @@ how the satisfactory convergence of the algorithm can be checked,
 and how to go on if this is not satisfactory.
 
 Much of what follows is about the use of \sfn{siena07()}
-but applies equally to \sfn{sienacpp()}.
+but applies equally to \sfn{sienacpr()}.
 The difference between these two functions is that
-estimation by \sfn{sienacpp()} stays entirely in the
+estimation by \sfn{sienacpr()} stays entirely in the
 `back end' \sfn{C++} part of \si, contrasting with \sfn{siena07()}
 which carries out the simulations in \sfn{C++} but the
 Robbins-Monro updates in the \sfn{R} `front end' part;
-this yields greater computational efficiency for \sfn{sienacpp()}.
+this yields greater computational efficiency for \sfn{sienacpr()}.
 Since the simulations take the largest amount of processing time
 for medium-sized and large networks, the time difference is
 notable, in a proportional sense, mainly for data sets
 where simulations run very quickly (i.e., number of actors
 and distance between first and last simulations are small).
-Further, results from \sfn{sienacpp()} cannot used for
+Further, results from \sfn{sienacpr()} cannot used for
 \sfn{sienaGOF()}.
-Note that \sfn{sienacpp()} is available only in \sfn{RSienaTest()}.
+Note that \sfn{sienacpr()} is available only in \sfn{RSienaTest()}.
 
 The estimation algorithm is determined by a call of functions
 such as
@@ -4647,7 +4665,7 @@ and Bayesian methods
 
 The Generalized Method of Moments is still in development.
 It is theoretically more efficient than the Method of Moments.
-It is somewhat more time-consuming; on the other hand, function \sfn{sienacpp()}
+It is somewhat more time-consuming; on the other hand, function \sfn{sienacpr()}
 is coded in a more efficient way than \sfn{siena07()}.
 
 In models for one network, without co-evolution,
@@ -4670,9 +4688,9 @@ For co-evolution, estimation by the Generalized Method of Moments
 will be made available in future versions.
 
 Estimation by the regular Method of Moments (MoM)
-is implemented in the functions \sfn{siena07()} and \sfn{sienacpp()}.
+is implemented in the functions \sfn{siena07()} and \sfn{sienacpr()}.
 Estimation by the Generalized Method of Moments (GMoM)
-is implemented in the function \sfn{sienacpp()}.
+is implemented in the function \sfn{sienacpr()}.
 
 ML estimation is done by the function \sfn{siena07()}, using a set of options
 created by \sfn{sienaAlgorithmCreate()} with \sfn{maxlike=TRUE}.
@@ -4686,10 +4704,10 @@ but is as yet implemented only for multilevel network modeling
 
 Estimation by the Generalized Method of Moments (GMoM)
 was proposed in \citet{ASS2015} and is implemented
-in the function \sfn{sienacpp()}, available in \sfn{RSienaTest()}.
+in the function \sfn{sienacpr()}, available in \sfn{RSienaTest()}.
 
 If the algorithm object created by \sfn{sienaAlgorithmCreate()}
-uses \texttt{maxlike=FALSE}, the estimation function \sfn{sienacpp()}
+uses \texttt{maxlike=FALSE}, the estimation function \sfn{sienacpr()}
 will use the MoM or the GMoM; the latter will be used as soon as
 at least one of the effects were specified in the effects object with
 \texttt{type='gmm'}.
@@ -6134,6 +6152,10 @@ conditionally or unconditionally.\medskip
 \section{Getting started}
 \label{S_getting}
 
+Note that there is a section `Getting started' in the Minimal 
+Introduction: Section~\ref{S_minsi1}. It may be best
+to go through that section first.
+
 The best way to get started is to download the \R scripts from the
 \SI website and start reading and playing with them.
 
@@ -6914,8 +6936,7 @@ so as to avoid these patterns.
 For example, replace sequences 10-1 by \texttt{NA}-1,
 and 10-\texttt{NA}-1 by \texttt{NA}-\texttt{NA}-1.
 An example script to make such replacements is at
-\small{
-\url{http://www.stats.ox.ac.uk/~snijders/siena/changeForbiddenChanges.R}}.
+{\small{\url{http://www.stats.ox.ac.uk/~snijders/siena/changeForbiddenChanges.R}}}.
 
 \sfn{sienaBayes} should be possible for groups as small as 5 actors.
 A restriction (maybe to be lifted later) is that the networks must not be
@@ -6943,7 +6964,8 @@ randomly varying from group to group, and which are fixed across groups.
 The basic rate parameters always are randomly varying.
 Other rate parameters can not yet be included.
 
-The specification of fixed vs.\ randomly varying is done in the function \sfn{setEffect}.
+The specification of fixed vs.\ randomly varying is done in the function
+\sfn{setEffect}.
 
 There currently is little advice about this.
 The basic issues are the following.
@@ -6956,7 +6978,8 @@ The basic issues are the following.
    effects differ between groups?\\
    (Usually not. It is possible to first do a multi-group analysis of the same model,
    followed by a \sfn{sienaTimeTest}, and specify those effects as randomly
-   varying for which the time heterogeneity is largest according to the groupwise results.)
+   varying for which the time heterogeneity is largest according to the
+   groupwise results.)
 \item[\emph{misspecification:}] if it would be erroneously assumed
     that the effect is fixed across groups, would this affect
     the parameter estimates of primary interest?\\
@@ -6998,7 +7021,7 @@ with Jaccard coefficients at least 0.30.
 \subsubsection{How to choose the parameter settings for sienaBayes}
 \label{S_sienaBayesParameters}
 
-It may be good to have an initial try run with
+It may be good to have an initial try run with\\
 \texttt{nwarm=5, nmain=10, nrunMHBatches=5, nImproveMH=20}
 (for speed) and \texttt{silentstart = FALSE} (for information about the
 initialization phase), and then \sfn{print} the result.
@@ -7029,7 +7052,8 @@ is a divisor of (the number of periods multiplied by the number of groups);
 higher values are meaningless.
 Do not use such a high value for \texttt{nbrNodes} that your computer gets too
  hot or overworked. For Windows machines this can be monitored by opening
- the Task Manager (you will find how to do this by right clicking on the bottom toolbar).
+ the Task Manager (you will find how to do this by right clicking on the bottom
+ toolbar).
 
 \subsubsection{Prior distributions}
 
@@ -7342,9 +7366,12 @@ meaningful, since the first node set has only outgoing ties
 and the second only incoming; for example, the reciprocity effect
 is meaningless because there cannot be any reciprocal ties;
 the out-degree popularity effect is meaningless because it refers to
-incoming ties of actors with high out-degrees; and there are no similarity
-effects of actor covariates.
-There is one additional effect for two-mode networks, viz.,
+incoming ties of actors with high out-degrees; and there are no direct
+similarity effects of actor covariates. However, distance-two effects
+such as \texttt{simEgoInDist2}, and the interaction of effects like
+\texttt{altInDist2} with \texttt{egoX} can be used to represent
+homophily-like tendencies.
+There are some specific effects for two-mode networks, e.g.,
 the four-cycle effect.
 
 \hypertarget{T_effpar}{
@@ -7402,7 +7429,6 @@ f^{\rm el}_i(x) \, = \,
 see Section~\ref{S_mathmod}.
 Elementary effects are of the type $s^{\rm el}_{ijk}(x) = x_{ij}\,s^{\rm el0}_{ijk}(x)$,
 where $s^{\rm el0}_{ijk}(x)$ does not depend on $x_{ij}$.
-
 
 
 The potential effects in the \hypertarget{T_objective}{network
@@ -7851,10 +7877,11 @@ with $i \rightarrow j$ and there are exactly $k$ other
 nodes $h$ for which there is the two-path $i \leftarrow h \leftarrow j$;\\
 \texttt{gwespFB}: uses $\text{EPFB}_{ik}$, counting the number of nodes $j$
 with $i \rightarrow j$ and there are exactly $k$ other
-nodes $h$ for which there is the two-out-star $i \leftarrow h \rightarrow j$;\\
+nodes $h$ for which there is the two-out-star $i \rightarrow h \leftarrow j$;\\
 \texttt{gwespBF}: uses $\text{EPBF}_{ik}$, counting the number of nodes $j$
 with $i \rightarrow j$ and there are exactly $k$ other
-nodes $h$ for which there is the two-in-star $i \rightarrow h \leftarrow j$;\\
+nodes $h$ for which there is the two-in-star $i \leftarrow h \rightarrow j$;\\
+(the last two were incorrect in the manual before 23/06/2017)\\
 \texttt{gwespRR}: uses $\text{EPRR}_{ik}$, counting the number of nodes $j$
 with $i \rightarrow j$ and there are exactly $k$ other
 nodes $h$ for which there are the reciprocal ties $i \rightleftarrows h \rightleftarrows j$.
@@ -8136,7 +8163,7 @@ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, I\{x_{+j} = 1, x_{j+} = 0 \} $ .\\
 
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
-\item \emph{Simmelian outdegree effect}, (\texttt{simmelian}), the effect of
+\item only in RSienaTest: \emph{Simmelian outdegree effect}, (\texttt{simmelian}), the effect of
       the Simmelian outdegree. The Simmelian transformation of the network is
       the network composed of all ties embedded in at least one complete triad:
 \[
@@ -8487,9 +8514,8 @@ the following effects are available:
  is greater than (to the right of)  or equal to a threshold $c$,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, I\{v_j \geq c\} $;\\
  for an actor covariate this (and the following effect)
- can also be obtained by transforming
- the covariate, but this would be impossible for a behavioral dependent
- variable $V$;\\
+ can also be obtained as \texttt{altX} for a transformed
+ covariate, but this would be impossible for a behavioral dependent variable $V$;\\
  note that behavioral dependent variables always are centered!
 
  \item {\em left threshold covariate alter}
@@ -8499,7 +8525,7 @@ the following effects are available:
  is smaller than (to the left of)  or equal to a threshold $c$,\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, I\{v_j \geq c\} $;\\
  note that behavioral dependent variables always are centered;
- i.e., the overall mean is subtracted! 
+ i.e., the overall mean is subtracted!
 
  \item {\em covariate-ego} or {\em covariate-related activity}
  \texttt{(egoX)},
@@ -8686,7 +8712,7 @@ the following effects are available:
  makes sense especially for non-centered covariates;
 
 
-\item \emph{Simmelian alter X effect}, (\texttt{simmelianAltX}), the effect of
+\item only in RSienaTest:  \emph{Simmelian alter X effect}, (\texttt{simmelianAltX}), the effect of
       Simmelian ties weighted by alter's value of $X$. The Simmelian transformation of the network is
       the network composed of all ties embedded in at least one complete triad:
 \[
@@ -9844,6 +9870,9 @@ alter effects of $V$.
 Different types of weighting are available through the distance-two
 effects \texttt{altDist2W} and \texttt{totDist2W}, see below.
 
+For these effects the other network $W$ is given as \texttt{interaction1},
+and the covariate $V$ as \texttt{interaction2}.
+
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
  \item {\em Effect of in-degree in W, weighted by sender's V, on X-popularity }
@@ -9898,6 +9927,47 @@ effects \texttt{altDist2W} and \texttt{totDist2W}, see below.
    $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{ih}\,v_h}   $;\\
  note that to use this effect for $p=2$ the variable $V$ must be nonnegative,
  which implies that it must be non-centered.
+\setcounter{savenumi}{\value{enumi}}
+\end{enumerate}
+
+Similarly, there are some mixed degree effects restricting the summation
+to third actors $h$ with the same covariate value as $i$.
+Here again, the other network $W$ is given as \texttt{interaction1},
+and the covariate $V$ as \texttt{interaction2}.
+
+\begin{enumerate}
+\setcounter{enumi}{\value{savenumi}}
+ \item {\em Effect of in-degree in W, restricted to same $V$, on X-popularity }
+ ($X$: indegree$^{1/p}$ $W$ from same $V$ - popularity)   \texttt{(sameXinPopIntn)}\\
+ defined by the number of incoming $W$ ties to alter from other actors $h$
+ having the same value of $V$ as ego:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sum_h w_{hj}\,I\{v_i = v_h\}  $ \\
+ or for $p=2$ \\
+   $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{hj}\,I\{v_i = v_h\}}   $;
+
+ \item {\em Effect of in-degree in W, restricted to same $V$, on X-activity }
+ ($X$: indegree$^{1/p}$ $W$ from same $V$ - activity) \texttt{(sameXinActIntn)}\\
+ defined by the number of incoming $W$ ties to ego from other actors $h$
+ having the same value of $V$ as ego:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sum_h w_{hi}\,I\{v_i = v_h\}  $ \\
+ or for $p=2$ \\
+   $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{hi}\,I\{v_i = v_h\}}   $;
+
+ \item {\em Effect of out-degree in W, restricted to same $V$, on X-popularity }
+ ($X$: outdegree$^{1/p}$ $W$ to same $V$ - popularity)   \texttt{(sameXoutPopIntn)}\\
+ defined by the number of outgoing $W$ ties from alter to other actors $h$
+ having the same value of $V$ as ego:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sum_h w_{jh}\,I\{v_i = v_h\}  $ \\
+ or for $p=2$ \\
+   $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{jh}\,I\{v_i = v_h\}}   $;
+
+ \item {\em Effect of out-degree in W, restricted to same $V$, on X-activity }
+ ($X$: outdegree$^{1/p}$ $W$ to same $V$ - activity) \texttt{(sameXoutActIntn)}\\
+ defined by the number of outgoing $W$ ties from ego to other actors $h$
+ having the same value of $V$ as ego:\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sum_h w_{ih}\,I\{v_i = v_h\}  $ \\
+ or for $p=2$ \\
+   $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \sqrt{\sum_h w_{ih}\,I\{v_i = v_h\}}   $.
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 
@@ -10842,6 +10912,16 @@ with the behavioral variable itself.
  where the attractiveness of further steps up the behavior `ladder'
  depends on where the actor is on the ladder:\\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i^2$.
+
+ \item {\em threshold shape effect}    \texttt{(threshold)},
+  \texttt{(threshold2)},  \texttt{(threshold3)},  \texttt{(threshold4)},
+ where the attractiveness of the behavior depends on
+ whether it is larger than the internal effect parameter $p$:\\
+ $s^{\rm beh}_{i\vit}(x, z) =  I\{ z_i \geq p\}  $ ;\\
+ note that $z_i$ is the
+ \underline{centered} dependent behavioral variable!\\
+ Multiple versions of this effect are available to allow the use
+ of more than one threshold.
 \end{startenum}
 Next there is a list of effects that have to do with the influence of
 the network on the behavior.
@@ -10995,7 +11075,7 @@ The list of these effects is the following.
  $s^{\rm beh}_{i\vit}(x, z) =
         z_i\,  \big( \sum_j x_{ij}\, x_{+j} \,z_j \big) $;
 
-\item \emph{average Simmelian alter effect}, (\texttt{avSimmelianAlt}), the effect of
+\item only in RSienaTest:  \emph{average Simmelian alter effect}, (\texttt{avSimmelianAlt}), the effect of
       the average behavior for the Simmelian alters. The Simmelian transformation of the network is
       the network composed of all ties embedded in at least one complete triad:
 \[
@@ -11013,7 +11093,7 @@ The list of these effects is the following.
                                 / \big (\sum_j x^{\rm{simm}}_{ij}\big)  $\\
  (and the mean behavior, i.e. $0$, if the ratio is 0/0) ;
 
-\item \emph{total Simmelian alter effect}, (\texttt{totSimmelianAlt}), the effect of
+\item only in RSienaTest: \emph{total Simmelian alter effect}, (\texttt{totSimmelianAlt}), the effect of
       the sum of behavior for the Simmelian alters, defined by\\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \sum_j x^{\rm{simm}}_{ij}\, z_j \big)  $;
 
@@ -11118,7 +11198,7 @@ The list of these effects is the following.
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h} I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
  + x_{jh}\, + x_{hj}\,\geq c \}\,$,\\
  where $c$ is either 5 or 6; \\
- 
+
  \item {\em similarity in dense triads effect} \texttt{(simDenseTriads)},
  defined by  the total sum of $i$'s behavior similarity to others
  in the dense triads in which actor $i$ is located, \\
@@ -11225,7 +11305,7 @@ denoted $v_j$), there are the following effects.
   \breve w_i = \left\{\begin{array}{ll} \displaystyle
          \frac{\sum_h x_{ih}w_{ih}}{x_{i+}}  &  \text{ if } x_{i+} > 0     \\
          0                                &  \text{ if } x_{i+} = 0  .
-  \end{array}   \right.            \label{alt_av}
+  \end{array}   \right.            \label{alt_avwa}
 \end{equation}
       leading to the effect \\
        $s^{\rm beh}_{i\vit}(x, z) = z_i \, \breve w_i $.\\
@@ -11240,7 +11320,7 @@ denoted $v_j$), there are the following effects.
  \texttt{(totXAlt)},\\
       defined as the product of $i$'s behavior $z_i$ and
       $i$'s alters' covariate sum $x_{i+}\,\breve v_i$ as defined
-      in (\ref{alt_av}),\\
+      in (\ref{alt_avwa}),\\
        $s^{\rm beh}_{i\vit}(x, z) = z_i \, x_{i+}\, \breve v_i $.\\
       This is similar to the `total alter' effect; for
       $v_i = z_i$ it would reduce to the latter effect.
@@ -13313,6 +13393,8 @@ double TruncatedOutdegreeEffect::egoStatistic(int ego,
 \end{verbatim}
 }
 
+\item To the file \textsf{src$\backslash$sources.list}, the item
+      \texttt{model/effects/TruncatedOutdegreeEffect.cpp} was added.
 \item Having done this, the package was built and installed again.
       (To be honest, there first were some errors; but the error messages
        from the compiler are quite clear and easily led to solving
@@ -13573,11 +13655,11 @@ Execution}
 Only for Windows. Does not require arguments\\
 \hline
 
-3 -- 5& siena01Gui& siena01Gui()&   &   Does not require arguments.
- Opens a GUI to be used to run the model estimation or to create a session
- from which to work within \Rn. Details on how to run the estimation under
- the GUI can be found in section \ref{thegui} and \ref{estgui}.\\
-\hline
+%3 -- 5& siena01Gui& siena01Gui()&   &   Does not require arguments.
+% Opens a GUI to be used to run the model estimation or to create a session
+% from which to work within \Rn. Details on how to run the estimation under
+% the GUI can be found in section \ref{thegui} and \ref{estgui}.\\
+%\hline
 
 3   &sienaNodeSet   &sienaNodeSet (n, \newline
 nodeSetName= ``Actors'', \newline
@@ -13654,17 +13736,17 @@ for the actors not currently present. See help(sienaCompositionChange) for
 details on this\\
 \hline
 
-3 & sienaCompositionChangeFromFile & \newline
-sienaCompositionChangeFromFile ( filename, \newline
-nodeSet="Actors", \newline
-fileobj=NULL, option=1) & & Creates a list of events
-describing the changes over time in the actor set from a file. ``filename'' is
-the name of the file containing change information (one line per actor) each
-line is a series of space delimited numbers indicating intervals. ``fileobj''
-is the result of readLines on ``filename''. ``nodeSet'' is the name of the set
-of actors. ``option'' (defaults to 1) has the same
-description that in  sienaCompositionChange\\
-\hline
+%3 & sienaCompositionChangeFromFile & \newline
+%sienaCompositionChangeFromFile ( filename, \newline
+%nodeSet="Actors", \newline
+%fileobj=NULL, option=1) & & Creates a list of events
+%describing the changes over time in the actor set from a file. ``filename'' %is
+%the name of the file containing change information (one line per actor) each
+%line is a series of space delimited numbers indicating intervals. ``fileobj''
+%is the result of readLines on ``filename''. ``nodeSet'' is the name of the %set
+%of actors. ``option'' (defaults to 1) has the same
+%description that in  sienaCompositionChange\\
+%\hline
 
 3 & sienaDataCreate & sienaDataCreate(...,\newline nodeSets=NULL, \newline
 getDocumentation=FALSE) &
@@ -13680,18 +13762,18 @@ the arguments are created; ``getDocumentation'' is a flag to allow
 documentation for internal functions,  not for use by users\\
 \hline
 
-3 & sienaDataCreateFromSession & \newline
-sienaDataCreateFromSession( \newline
-filename=NULL, \newline
-session=NULL, \newline
-modelName=``Siena'', ...) & myobj $<$-- \newline
-sienaDataCreateFromSession  \newline
-(`Session.csv') & Reads a SIENA session from a file and creates a
-Siena Data object or group. ``file'' is the session file; ``session'' is the
-input session if the function is called from siena01Gui(); ``modelName'' is the
-project's name; ``...'' refers to other
-arguments used by siena01Gui()\\
-\hline
+%3 & sienaDataCreateFromSession & \newline
+%sienaDataCreateFromSession( \newline
+%filename=NULL, \newline
+%session=NULL, \newline
+%modelName=``Siena'', ...) & myobj $<$-- \newline
+%sienaDataCreateFromSession  \newline
+%(`Session.csv') & Reads a SIENA session from a file and creates a
+%Siena Data object or group. ``file'' is the session file; ``session'' is the
+%input session if the function is called from siena01Gui(); ``modelName'' is %the
+%project's name; ``...'' refers to other
+%arguments used by siena01Gui()\\
+%\hline
 
 3 & sienaGroupCreate & sienaGroupCreate (objlist, \newline
 singleOK=FALSE, \newline
@@ -13849,9 +13931,6 @@ seed. Not used if parallel
 testing.\\
 \hline
 
-5   & model.create  & & &       See sienaAlgorithmCreate\\
-\hline
-
 5 & siena07 & siena07(x, batch=FALSE, \newline
 verbose=FALSE, silent=FALSE,\newline
 useCluster=FALSE, \newline
@@ -13942,7 +14021,8 @@ The argument is a sienaFit object ``x''. \\
 
 \section{Changes compared to earlier versions}
 
-This only presents changes which affect the user, until
+This presents the main changes, especially those directly visible to the user,
+in reverse time order from the current version until
 version 1.0.6 of end October 2009.
 For more complete information about changes,
 consult the \sfn{ChangeLog} file in the source code on CRAN or in
@@ -13952,17 +14032,77 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
+\item 2017-08-30 CRAN version 1.2-1.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+ \item Score test and \sfn{sienaGOF} corrected for the case that some parameters
+      are fixed and not tested.
+ \item New function \sfn{score.Test}. This allows, for a \sfn{print.sienaFit}
+     object in which some effects were tested with \texttt{test=TRUE}, to get the
+     results of the score-type test for some of all of the parameters tested.
+     When some effects are tested with \texttt{test=TRUE}, the
+     results of the score test are also presented when printing the estimation
+     result.
+ \item Argument \texttt{varName} added to \sfn{updateTheta}.
+     This allows the update to be restricted to one or more of the
+     dependent variables.
+ \item Operation of option `\texttt{absorb}' (\texttt{behModelType}=2) corrected.
+ \item In \sfn{sienaAlgorithmCreate}, for parameters
+     \texttt{Offset, MaxDegree, modelType},
+     and \texttt{behModelType}, require that these are named vectors with the names
+     of the dependent variables, or NULL; this is checked in \sfn{initializeFRAN}.\\
+     The use of non-named vectors for these, in the case of using multiple processes
+     may have led to errors in earlier versions.\\
+     Note that the default for \texttt{MaxDegree} now is not \texttt{MaxDegree=0}
+     but \texttt{MaxDegree=NULL}.
+ \item New effects \texttt{sameXInPopIntn, sameXOutPopIntn, sameXInActIntn,
+     sameXOutActIntn}.
+ \item For \texttt{networkModelType} 3 (Initiative, \texttt{AAGREE}),
+     an offset is added to the
+     confirmation model; this is taken from \texttt{Offset} in the algorithm object.
+ \item For effects \texttt{inPopX, outPopX, inActX, outActX, sameXInPop, sameXOutAct,
+     diffXInPop, diffXOutAct, homXInPop, homXOutAct, altXOutAct, diffXOutAct},
+     changed \texttt{interaction2} to `' (was `1', erroneously)
+     and default parameter to 1 (\sfn{AllEffects.csv}).
+ \item Additional parameter \texttt{dropRates} in \sfn{print.sienaEffects}
+    (useful for \sfn{sienaBayes} with many groups).
+ \item In \sfn{print.sienaEffects}, omit last remark about random effects if only
+     one line is printed.
+ \item Corrected use of \texttt{modeltype} (\sfn{initializeFRAN.r, CInterface.r}),
+ \item Change in \sfn{print.sienaAlgorithm} for \texttt{modelType}.
+ \item Added an example for multiple processes in \sfn{sienaGOF.Rd}, and
+      took out verbose reporting from \sfn{sienaGOF} in case of multiple processes.
+\end{itemize}
+Changes in RSiena:
+\begin{itemize}
+ \item New parameter \texttt{OffSet} in \sfn{sienaAlgorithmCreate}.
+ \item Registration of native routines (requirement for CRAN).
+\end{itemize}
+Changes in RSienaTest:
+\begin{itemize}
+ \item Parameter \texttt{UniversalOffset} of \sfn{sienaAlgorithmCreate}
+       renamed to Offset.
+ \item Added posterior variances to \sfn{print.sienaBayesFit}.
+ \item Correction of error in \sfn{sienaBayes} that could lead to errors
+       in results of estimations with data sets for multiple dependent
+       variables (networks and/or behavior) with model specifications that
+       contain an interaction effect for a dependent variable that is not
+       the last of the dependent variables.
+ \item Various changes in \sfn{sienaBayes} for less memory use and
+       avoiding crashes in some situations.
+\end{itemize}
 
 \item 2017-05-08 Revision 306.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
-   \item New function \sfn{updateSpecification} to includes in an 
-   effects object a set of effects that are included in another effects object. 
+   \item New function \sfn{updateSpecification} to includes in an
+   effects object a set of effects that are included in another effects object.
    \item New effects \texttt{inPopX, outPopX, inActX, outActX, sameWXClosure, degPlus,\\
      absDiffX, avAltPop, totAltPop, egoPlusAltX, egoPlusAltSqX,
      egoRThresholdX, \\ egoLThresholdX, altRThresholdX, altLThresholdX}.
-   \item \texttt{outOutAss} dropped for symmetric networks; 
+   \item \texttt{outOutAss} dropped for symmetric networks;
    only \texttt{outInAss} remains.
    \item \texttt{egoX} effect has \texttt{interactionType='ego'}
    also for symmetric networks.
@@ -13974,14 +14114,14 @@ Changes in RSiena and RSienaTest:
    \item \sfn{siena08} now also accepts a list for ...
    \item Argument \texttt{behModelType} added to \sfn{sienaAlgorithmCreate}.
        For \texttt{behModelType=2}, the `absorbing option' is chosen
-     in the model for behavioral dependent variables; 
+     in the model for behavioral dependent variables;
      see Section~\ref{S_modeltype_beh} of this manual.
-   \item Indication of effect parameters dropped in names for 
+   \item Indication of effect parameters dropped in names for
      \texttt{altInDist2} and \texttt{totInDist2} (they have no effect parameters).
    \item \texttt{ModelType} now is specific to the dependent variable:
      given as a named integer vector in \sfn{sienaAlgorithmCreate}.
-   \item \sfn{sienaAlgorithmCreate, siena07}: new option \texttt{lessMem}, 
-      reducing storage in \sfn{siena07} by leaving out 
+   \item \sfn{sienaAlgorithmCreate, siena07}: new option \texttt{lessMem},
+      reducing storage in \sfn{siena07} by leaving out
       \texttt{z\$ssc} and \texttt{z\$sf2} from the object produced;
       but these are used by
      \sfn{sienaTimeTest} and \sfn{sienaGOF}, so running those functions will be impossible
@@ -14115,7 +14255,7 @@ Changes in RSiena and RSienaTest:
 
 Changes in RSienaTest:
 \begin{itemize}
-   \item \sfn{sienacpp()} added (programmed by Felix Sch\"{o}nenberger); this includes
+   \item \sfn{sienacpr()} added (programmed by Felix Sch\"{o}nenberger); this includes
      gmm estimation (Amati - Snijders).
    \item \sfn{sienaBayes()}: option \texttt{initML} added; check for zero distances;
      corrected function \texttt{improveMH()} in initialization.

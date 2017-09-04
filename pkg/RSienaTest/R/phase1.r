@@ -364,7 +364,7 @@ CalculateDerivative <- function(z, x)
 		{
 	# Use the values for diag(dfra) from startupGlobal computed in sienaBayes
 			neg <- which((diag(dfra) <= 0 & !z$fixed)[!z$effects$basicRate])
-			diag(dfra)[!z$effects$basicRate][neg] <- x$ddfra[neg]
+			diag(dfra)[which(!z$effects$basicRate)[neg]] <- x$ddfra[neg]				
 		}
 		else
 		{

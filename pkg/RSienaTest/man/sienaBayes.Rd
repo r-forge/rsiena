@@ -43,41 +43,41 @@ glueBayes(z1, z2, nwarm2=0)
     This is to guard against crashes or power failure.
     It can be used as value for \code{prevBayes} as indicated below.}
   \item{initgainGlobal}{Step sizes in initial searches for good parameter values
-  across the groups.}
+    across the groups.}
   \item{initgainGroupwise}{Step sizes in initial searches for good parameter
-  values by group; can be up to 0.1 for larger networks,
-  0 for very small networks.}
+    values by group; can be up to 0.1 for larger networks,
+    0 for very small networks.}
   \item{initfgain}{Positive number, used only for frequentist estimation:
-  the gain factor in the Robbins Monro algorithm is
-  initfgain * ((iteration number)^(-gamma)).}
+    the gain factor in the Robbins Monro algorithm is
+    initfgain * ((iteration number)^(-gamma)).}
   \item{initML}{Boolean, whether to use maximum likelihood estimation for the
-   groupwise initial estimation.}
+     groupwise initial estimation.}
   \item{priorMu}{Vector of length equal to the number of varying parameters.
-   Prior mean of mu (global population mean for varying parameters); default: 0.
-   For the basic rate parameters the defaults are data-dependent,
-   but if ((\code{priorRatesFromData >= 1}) and \code{priorMu=NULL}),
-   then for these parameters the prior mean will be 2.}
+     Prior mean of mu (global population mean for varying parameters); default: 0.
+     For the basic rate parameters the defaults are data-dependent,
+     but if ((\code{priorRatesFromData >= 1}) and \code{priorMu=NULL}),
+     then for these parameters the prior mean will be 2.}
   \item{priorSigma}{Square matrix of dimension equal to length of priorMu.
-   Prior global population covariance matrix Sigma for the varying parameters;
-   default: identity matrix.}
+     Prior global population covariance matrix Sigma for the varying parameters;
+     default: identity matrix.}
   \item{priorDf}{Prior degrees of freedom for Sigma (global population
     covariance matrix); default: number of varying parameters + 2.}
   \item{priorKappa}{Proportionality constant between prior covariance matrix
     and covariance matrix of prior distribution for mu; default: 1.}
   \item{priorRatesFromData}{0, 1, or 2. Determines the prior distribution for the
-   rate parameters. 0: prior is taken from \code{priorMu} and \code{priorSigma};
-   1: prior is defined by mean and covariance matrix of estimated rate parameters
-   from initialization phase;
-   2: prior is defined by robust estimates for location and multivariate scale
-   of estimated rate parameters from initialization phase.}
+     rate parameters. 0: prior is taken from \code{priorMu} and \code{priorSigma};
+     1: prior is defined by mean and covariance matrix of estimated rate parameters
+     from initialization phase;
+     2: prior is defined by robust estimates for location and multivariate scale
+    of estimated rate parameters from initialization phase.}
   \item{frequentist}{Currently only frequentist=FALSE works.
     Boolean: chooses between frequentist or Bayesian
     estimation of the global parameters.
     Frequentist estimation is possible only for at least 2 groups.}
   \item{incidentalBasicRates}{Boolean. If this is TRUE, the basic rate
-  parameters are defined specifically for each group, and estimated
-  using a Robbins Monro algorithm; if FALSE, they have a
-  common prior for all groups.}
+    parameters are defined specifically for each group, and estimated
+    using a Robbins Monro algorithm; if FALSE, they have a
+    common prior for all groups.}
   \item{reductionFactor}{Positive number.
    If \code{priorRatesFromData} = 1 or 2, the prior distribution for the rate
    parameters is the estimated covariance matrix of the estimated rate parameters
@@ -87,17 +87,17 @@ glueBayes(z1, z2, nwarm2=0)
    then a smaller value is advisable, such as 0.01.
    Has no effect if \code{priorRatesFromData} = 0.}
   \item{gamma}{Positive number, used only for frequentist estimation:
-  the gain factor in the Robbins Monro algorithm is
-  initfgain * ((iteration number)^(-gamma)).}
+    the gain factor in the Robbins Monro algorithm is
+    initfgain * ((iteration number)^(-gamma)).}
   \item{delta}{When the global population covariance matrix becomes
-  non-positive definite (i.e., has one or more negative correlations)
-  during iterations, it is changed so that
-  all correlations are at least delta.}
+    non-positive definite (i.e., has one or more negative correlations)
+    during iterations, it is changed so that
+   all correlations are at least delta.}
   \item{nwarm}{Number of iterations in the warm up phase.
     Used only if \code{prevBayes} is \code{NULL}.
     Then it should be at least 5.}
   \item{nmain}{Number of iterations in the main phase.
-   Should be at least 10.}
+     Should be at least 10.}
   \item{nrunMHBatches}{Thinning ratio in MCMC process.}
   \item{nSampVarying}{Number of samples of varying parameters
         for each chain sample.}
@@ -107,48 +107,48 @@ glueBayes(z1, z2, nwarm2=0)
         for each chain sample.}
   \item{nImproveMH}{Number of iterations per improveMH step.}
   \item{lengthPhase1}{Only used for frequentist estimation:
-   length of the first phase of the Robbins Monro algorithm.
-   lengthPhase1 + lengthPhase3 should be strictly less than nmain.}
+      length of the first phase of the Robbins Monro algorithm.
+      lengthPhase1 + lengthPhase3 should be strictly less than nmain.}
    \item{lengthPhase3}{Only used for frequentist estimation:
-   length of the third phase of the Robbins Monro algorithm.
-   lengthPhase1 + lengthPhase3 should be strictly less than nmain.}
+      length of the third phase of the Robbins Monro algorithm.
+      lengthPhase1 + lengthPhase3 should be strictly less than nmain.}
   \item{storeAll}{Boolean: whether to store parameters for all MCMC iterations,
-  i.e., before thinning. \code{storeAll=TRUE} may lead to producing
-  very large objects and is not recommended for usual operation.}
+      i.e., before thinning. \code{storeAll=TRUE} may lead to producing
+      very large objects and is not recommended for usual operation.}
   \item{prevAns}{An object of class "sienaFit" as returned by
-    \code{\link{siena07}}, from which scaling
-    information (derivative matrix and standard deviation of the
-    deviations) will be extracted along with the parameters estimates
-    which will be used as the initial values, unless
-    \code{algo} requests the use of standard initial values.
-    Influences only the start of the initialization.
-    If the results used as \code{prevAns} are a reasonable starting point,
-    this will increase the efficiency of the algorithm. }
+      \code{\link{siena07}} for the same data set and effects object.
+      This then is the result of a multi-group estimation for these data,
+      from which scaling information (derivative matrix and standard deviation of
+      the deviations) will be extracted along with the parameters estimates
+      which will be used as the initial values, unless
+      \code{algo} requests the use of standard initial values.
+      If \code{prevAns=NULL}, then a multi-group estimation will be performed
+      as part of the initialization. }
   \item{prevBayes}{An object of class "sienaBayes" as returned by
-    \code{sienaBayes}, on which the current function will continue.
-    For example, the object z contained in the intermediate saved result
-    PartialBayesResult.RData as mentioned above.
-    Initialization and warming phases are skipped. If this is given,
-    the values of \code{prevAns}, \code{nwarm}, and the prior
-    distributions are disregarded.
-    A new set of \code{nmain} iterations in the main phase are done.
-    All further relevant parameters of the function call should be identical.
-    This is not completely checked, so errors
-    may occur if this is not the case.}
+      \code{sienaBayes}, on which the current function will continue.
+      For example, the object z contained in the intermediate saved result
+      PartialBayesResult.RData as mentioned above.
+      Initialization and warming phases are skipped. If this is given,
+      the values of \code{prevAns}, \code{nwarm}, and the prior
+      distributions are disregarded.
+      A new set of \code{nmain} iterations in the main phase are done.
+      All further relevant parameters of the function call should be identical.
+      This is not completely checked, so errors
+      may occur if this is not the case.}
   \item{silentstart}{Boolean: whether to suppress most information
-    to the console during the calculation of initial values.}
+      to the console during the calculation of initial values.}
   \item{nbrNodes}{Number of processes to be used. Cannot be more than
-    the number of periods summed over number of groups.}
+      the number of periods summed over number of groups.}
    \item{clusterType}{If using multiple processes, whether to use
-     forking processes or not. (Only "PSOCK" can be used on Windows.)}
+      forking processes or not. (Only "PSOCK" can be used on Windows.)}
    \item{getDocumentation}{Flag to allow documentation of internal
-    functions, not for use by users.}
+      functions, not for use by users.}
    \item{z1}{\code{sienaBayes} object.}
    \item{z2}{\code{sienaBayes} object with the same data and model specification
-   as \code{z1}.}
+      as \code{z1}.}
    \item{nwarm2}{Number of warming iterations in \code{z2}; the first
-   \code{nwarm2} iterations of \code{z2} will be left out of the
-   combined object.}
+      \code{nwarm2} iterations of \code{z2} will be left out of the
+      combined object.}
 }
 \details{
   The function \code{sienaBayes} is for Bayesian estimation of one group or
@@ -166,7 +166,7 @@ glueBayes(z1, z2, nwarm2=0)
   The frequentist option currently is not supported (may be broken).\cr
   The procedure consists of three parts: initialization, warming,
   main phase.\cr
-  The required dimensions of the prior parameters \code{priorMu} and 
+  The required dimensions of the prior parameters \code{priorMu} and
   \code{priorSigma} are given in the output for
   \code{\link{print.sienaEffects}}.\cr
   In the initialization phase, initial parameter values and the proposal
@@ -199,7 +199,10 @@ glueBayes(z1, z2, nwarm2=0)
   \code{glueBayes(z1,z2)} combines two existing \code{sienaBayesFit} objects
   with the same data and model specifications (this is not
   checked) into one. This is intended to be used when \code{z2} was produced
-  by calling \code{sienaBayes} with \code{prevAns=z1}.
+  by calling \code{sienaBayes} with \code{prevAns=z1}.\cr
+  For the function \code{\link{print.sienaEffects}}, the option
+  \code{dropRates=TRUE} is meant to be useful especially for effects objects
+  used for \code{sienaBayes}.
 }
 \value{
   \code{sienaBayes} as well as \code{glueBayes} return an object of class
@@ -262,7 +265,8 @@ glueBayes(z1, z2, nwarm2=0)
   FourEffects <- setEffect(FourEffects, recip, random=TRUE)
   print(FourEffects, includeRandoms=TRUE)
   # Note this also shows the "randomEffects" column.
-  FourAlgo <- sienaAlgorithmCreate(projname = "FourGroups", maxlike=TRUE)
+  FourAlgo <- sienaAlgorithmCreate(projname = "FourGroups", maxlike=TRUE,
+                                   seed=123)
 \dontrun{
   bayes.model <- sienaBayes(FourAlgo, data = FourGroups,
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)

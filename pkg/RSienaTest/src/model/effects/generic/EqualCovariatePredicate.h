@@ -24,7 +24,7 @@ namespace siena
 class EqualCovariatePredicate: public CovariatePredicate
 {
 public:
-	EqualCovariatePredicate(std::string covariateName);
+	EqualCovariatePredicate(string covariateName);
 
 	virtual bool value(int alter);
 };

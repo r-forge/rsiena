@@ -275,7 +275,7 @@ fi
 
 if test "$MPI" = "yes" ; then
 
-  PKG_CPPFLAGS="$MPI_INCLUDES $MPI_DEFS"
+PKG_CPPFLAGS="$MPI_INCLUDES $MPI_DEFS"
 
   case "$MPI_TYPE" in
     OPENMPI) PKG_LIBS="-lmpi_cxx -lmpi ${MPI_LIBS}";;

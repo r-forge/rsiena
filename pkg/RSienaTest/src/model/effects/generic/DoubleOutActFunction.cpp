@@ -17,8 +17,6 @@
 #include "network/IncidentTieIterator.h"
 #include "utils/SqrtTable.h"
 
-using namespace std;
-
 namespace siena
 {
 

@@ -31,8 +31,8 @@ Package \code{"RSiena"} is the official release.
   \code{\link{setEffect}}, and \code{\link{includeInteraction}}.
 
   Control of the estimation algorithm requires a
-  \code{sienaAlgorithm} object that
-  defines the settings (parameters) of the algorithm,\cr
+  \code{\link{sienaAlgorithm}} object that
+  defines the settings (parameters) of the algorithm,
   and which can be created by \code{\link{sienaAlgorithmCreate}}.
 
   Function \code{\link{siena07}} is used to fit a model.
@@ -44,8 +44,8 @@ Package \code{"RSiena"} is the official release.
 \tabular{ll}{
 Package: \tab RSiena\cr
 Type: \tab Package\cr
-Version: \tab 1.1-306\cr
-Date: \tab 2017-05-10\cr
+Version: \tab 1.2-1\cr
+Date: \tab 2017-09-03\cr
 Depends: \tab R (>= 3.0.0)\cr
 Imports: \tab Matrix\cr
 Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -75,6 +75,8 @@ BuildResaveData: \tab no\cr
     \item Snijders, Tom A.B. (2001).
     The statistical evaluation of social network dynamics.
     \emph{Sociological Methodology}, 31, 361-395.
+   \item Snijders, Tom A.B. (2017). Stochastic Actor-Oriented Models for Network
+   Dynamics. \emph{Annual Review of Statistics and Its Application}, 4, 343-363.
    \item  Snijders, Tom A.B., van de Bunt, Gerhard G., and
     Steglich, Christian E.G. (2010).
 	Introduction to actor-based models for network dynamics.

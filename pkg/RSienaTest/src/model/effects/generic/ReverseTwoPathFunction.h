@@ -29,7 +29,7 @@ class ReverseTwoPathFunction:
 	public OneModeNetworkAlterFunction, IntAlterFunction
 {
 public:
-	ReverseTwoPathFunction(std::string networkName);
+	ReverseTwoPathFunction(string networkName);
 
 	virtual void initialize(const Data * pData,
 		State * pState,

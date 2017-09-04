@@ -29,7 +29,7 @@ class MixedTwoPathFunction:
 public MixedNetworkAlterFunction, IntAlterFunction
 {
 public:
-	MixedTwoPathFunction(std::string firstNetworkName, std::string secondNetworkName);
+	MixedTwoPathFunction(string firstNetworkName, string secondNetworkName);
 
 	virtual void initialize(const Data * pData,
 		State * pState,

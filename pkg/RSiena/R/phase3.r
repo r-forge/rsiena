@@ -283,7 +283,7 @@ phase3.2 <- function(z, x, ...)
 		error <- FALSE
 		ei <- eigen(z$msfc)
 		mineivalue <- min(ei[[1]])
-		if (mineivalue < 1e-12) # seems a small enough bound
+		if ((mineivalue < 1e-12) && (x$n3 > z$pp + 20)) # 1e-12 seems a small enough bound
 		{
 			Report('*** Warning: Covariance matrix not positive definite *** \n', outf)
 			Report('***            Standard errors not reliable           *** \n', outf)

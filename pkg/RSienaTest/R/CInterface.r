@@ -252,6 +252,7 @@ sienacpp <- function(x, # the thing returned from sienaModelCreate
   # Since we have not set all fields terminateFRAN() would fail.
   terminateC(z)
 
+  Report(closefiles=TRUE) # also mentioned in on.exit, but seems not to happen
   # LOG("DEBUG", "after terminateFRAN")
   # .Call("sienaPrintMemUsage", PACKAGE=pkgname)
   # LOG("DEBUG", "\ngc\n", paste(capture.output(gc()), collapse='\n'))
@@ -598,7 +599,7 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
   ## if any networks symmetric must use finite differences and not maxlike
   ## scores are now available (30.10.10) but still not maxlike.
   ## check model type: default for symmetric is type 2 (forcing model).
-  syms <- attr(data,"symmetric")
+  syms <- attr(data,"symmetric")[ attr(data,"types") %in% c("oneMode","bipartite")]
   z$FinDiffBecauseSymmetric <- FALSE
   z$modelType <- x$modelType
 #  if (any(!is.na(syms) & syms)) {

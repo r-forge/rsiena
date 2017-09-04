@@ -4,6 +4,8 @@
 #include "AlterPredicate.h"
 #include "utils/NamedObject.h"
 
+using namespace std;
+
 namespace siena {
 
 // ----------------------------------------------------------------------------
@@ -24,7 +26,7 @@ class BehaviorLongitudinalData;
  */
 class CovariatePredicate: public AlterPredicate, NamedObject {
 public:
-	CovariatePredicate(std::string covariateName);
+	CovariatePredicate(string covariateName);
 	virtual ~CovariatePredicate() {}
 	virtual void initialize(const Data * pData, State * pState, int period,
 			Cache * pCache);

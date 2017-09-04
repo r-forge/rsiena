@@ -53,7 +53,7 @@ ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
 ##, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 ans
 ##test8
-mymodel<- model.create(fn = simstats0c, projname='test8', nsub=2, n3=50,
+mymodel<- model.create(fn = simstats0c, projname='test8', nsub=1, n3=50,
                        cond=TRUE, condvarno=1, seed=5)
 print('test8')
 ans <- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -67,6 +67,7 @@ mynet2 <- sienaDependent(s50a,type='behavior')
 mydata <- sienaDataCreate(mynet1, mynet2)
 myeff <- getEffects(mydata)
 myeff <- setEffect(myeff, linear, initialValue=0.34699930338, name="mynet2")
+myeff <- setEffect(myeff, avAlt, name="mynet2", interaction1="mynet1")
 ##myeff$initialValue[98] <- 0.34699930338 ## siena3 starting values differ
 ##test10
 print('test10')
@@ -77,6 +78,12 @@ ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
                parallelTesting=TRUE, silent=TRUE)
 ##, verbose=TRUE)
 ans
+##test11
+print('test11')
+mymodel<- model.create(fn = simstats0c, projname='test11', nsub=1, n3=50,
+                       behModelType=c(mynet2=2), seed=6)
+(ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
+               parallelTesting=TRUE, silent=TRUE))
 ##test12
 print('test12')
 use<- 1:30

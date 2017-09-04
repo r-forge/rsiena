@@ -16,8 +16,6 @@
 #include "NetworkEffect.h"
 #include "utils/NamedObject.h"
 
-using namespace std;
-
 namespace siena
 {
 

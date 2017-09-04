@@ -29,7 +29,7 @@ class TwoPathFunction:
 	public OneModeNetworkAlterFunction, IntAlterFunction
 {
 public:
-	TwoPathFunction(std::string networkName);
+	TwoPathFunction(string networkName);
 
 	virtual void initialize(const Data * pData,
 		State * pState,

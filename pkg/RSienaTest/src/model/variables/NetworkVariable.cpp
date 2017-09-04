@@ -782,16 +782,20 @@ void NetworkVariable::calculatePermissibleChanges()
 			iter->next();
 		}
 
-		if (this->lpNetworkCache->outTieExists(i)) {
+		if (this->lpNetworkCache->outTieExists(i))
+		{
 			this->lpermitted[i] = !pData->upOnly(this->period());
-		} else if (i != this->lego || !this->oneModeNetwork()) {
+		}
+		else if (i != this->lego || !this->oneModeNetwork())
+		{
 			this->lpermitted[i] =
 				// for comparability with siena3 comment this out
 				//	this->pSimulation()->active(this->pReceivers(), i) &&
-					(!pData->downOnly(this->period()))
-							&& this->lpNetwork->outDegree(this->lego)
-									< pData->maxDegree();
-		} else {
+				(!pData->downOnly(this->period())) &&
+				this->lpNetwork->outDegree(this->lego) < pData->maxDegree();
+		}
+		else
+		{
 			// It is okay to not make any change at all
 			this->lpermitted[i] = true;
 		}
@@ -803,7 +807,9 @@ void NetworkVariable::calculatePermissibleChanges()
 	// Prohibit the change of structural ties
 	for (IncidentTieIterator iter =
 			 pData->pStructuralTieNetwork(this->period())->outTies(this->lego);
-			iter.valid(); iter.next()) {
+		 iter.valid();
+		 iter.next())
+	{
 		this->lpermitted[iter.actor()] = false;
 	}
 
@@ -1169,7 +1175,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	}
 
 	double total = 0;
-	double maxValue = 0; // the maximum never can be less than 0 
+	double maxValue = 0; // the maximum never can be less than 0
 					// because there always is the no-change option
 	int m = this->m(); // not this->m()+1 for two-mode network;
 					// this is handled separately below
@@ -1217,25 +1223,34 @@ void NetworkVariable::calculateTieFlipProbabilities()
 				}
 			}
 
-			if (this->lpNetworkCache->outTieExists(alter)) {
-				for (int i = 0; i < endowmentEffectCount; i++) {
-					Effect * pEffect = this->pEndowmentFunction()->rEffects()[i];
-					contribution += pEffect->parameter()
-							* this->lendowmentEffectContribution[alter][i];
-					if (this->pSimulation()->pModel()->needChangeContributions()) {
-						(*this->lpChangeContribution).at(pEffect->pEffectInfo()).at(
-								alter) =
+			if (this->lpNetworkCache->outTieExists(alter))
+			{
+				for (int i = 0; i < endowmentEffectCount; i++)
+				{
+					Effect * pEffect =
+						this->pEndowmentFunction()->rEffects()[i];
+					contribution +=
+						pEffect->parameter() *
+						this->lendowmentEffectContribution[alter][i];
+					if (this->pSimulation()->pModel()->needChangeContributions())
+					{
+						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) =
 						this->lendowmentEffectContribution[alter][i];
 					}
 				}
-			} else {
-				for (int i = 0; i < creationEffectCount; i++) {
-					Effect * pEffect = this->pCreationFunction()->rEffects()[i];
-					contribution += pEffect->parameter()
-							* this->lcreationEffectContribution[alter][i];
-					if (this->pSimulation()->pModel()->needChangeContributions()) {
-						(*this->lpChangeContribution).at(pEffect->pEffectInfo()).at(
-								alter) =
+			}
+			else
+			{
+				for (int i = 0; i < creationEffectCount; i++)
+				{
+					Effect * pEffect =
+						this->pCreationFunction()->rEffects()[i];
+					contribution +=
+						pEffect->parameter() *
+						this->lcreationEffectContribution[alter][i];
+					if (this->pSimulation()->pModel()->needChangeContributions())
+					{
+						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) =
 						this->lcreationEffectContribution[alter][i];
 					}
 				}
@@ -1257,7 +1272,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	if (permIter != 0) {
 		permIter->reset();
 	}
-	
+
 	for (int alteri = 0; alteri < m; alteri++) {
 		alter = alteri;
 
@@ -1423,7 +1438,7 @@ void NetworkVariable::accumulateScores(int alter) const
 					Rprintf("R_IsNaN error: i = %d ego = %d alter = %d j = %d m = %d\n",
 							i, this->lego, alter, j, m);
 //						Rprintf("lpermitted: \n");
-//						for (int hh = 0; hh < m; hh++)  
+//						for (int hh = 0; hh < m; hh++)
 //						{
 //							if (this->lpermitted[hh])
 //							{
@@ -1440,7 +1455,7 @@ void NetworkVariable::accumulateScores(int alter) const
 					Rprintf("R_IsNaN error: this->lprobabilities[j] = %f\n",
 							this->lprobabilities[j]);
 						error("nan score 1");
-					}			
+					}
 			}
 			if (R_IsNaN(this->pSimulation()->score(pEffect->pEffectInfo())))
 			{
@@ -1556,11 +1571,10 @@ void NetworkVariable::checkAlterAgreement(int alter)
 
 	this->calculateSymmetricTieFlipContributions(this->lego, 1);
 
-	this->calculateSymmetricTieFlipProbabilities(this->lego, 1);
+	this->calculateSymmetricTieFlipProbabilities(this->lego, 1, true);
 
 	double probability = 0;
-	double logprob = this->lsymmetricProbabilities[1] + 
-										this->lpData->universalOffset();
+	double logprob = this->lsymmetricProbabilities[1];
 
 	if (logprob > 0)
 	{
@@ -2019,8 +2033,10 @@ int sub)
  * Calculates the linear combinations which will be used to create the
  * probabilities of accepting change for symmetric networks.
  */
-void NetworkVariable::calculateSymmetricTieFlipProbabilities(int alter, int sub)
+void NetworkVariable::calculateSymmetricTieFlipProbabilities(int alter,
+													int sub, bool aagree)
 {
+	NetworkLongitudinalData * pData = (NetworkLongitudinalData *) this->pData();
 	int evaluationEffectCount = this->pEvaluationFunction()->rEffects().size();
 	int endowmentEffectCount = this->pEndowmentFunction()->rEffects().size();
 	int creationEffectCount = this->pCreationFunction()->rEffects().size();
@@ -2060,8 +2076,15 @@ void NetworkVariable::calculateSymmetricTieFlipProbabilities(int alter, int sub)
 		}
 	}
 
-	this->lsymmetricProbabilities[sub] = contribution;
-
+	if (aagree && (sub==1))
+	{
+		this->lsymmetricProbabilities[sub] = contribution +
+										pData->universalOffset();
+	}
+	else
+	{
+		this->lsymmetricProbabilities[sub] = contribution;
+	}
 }
 /**
  * Proposes and calculates probabilities for change.
@@ -2121,12 +2144,12 @@ bool NetworkVariable::calculateModelTypeBProbabilities()
 	this->pSimulation()->pCache()->initialize(alter);
 	this->preprocessEgo(alter);
 	this->calculateSymmetricTieFlipContributions(this->lego, 1);
-	this->calculateSymmetricTieFlipProbabilities(this->lego, 1);
+	this->calculateSymmetricTieFlipProbabilities(this->lego, 1, false);
 
 	this->pSimulation()->pCache()->initialize(this->lego);
 	this->preprocessEgo(this->lego);
 	this->calculateSymmetricTieFlipContributions(alter, 0);
-	this->calculateSymmetricTieFlipProbabilities(alter, 0);
+	this->calculateSymmetricTieFlipProbabilities(alter, 0, false);
 	switch(this->networkModelType())
 	{
 	case BFORCE:

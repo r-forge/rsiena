@@ -25,7 +25,7 @@ namespace siena
 class EgoOutDegreeFunction: public NetworkAlterFunction, IntAlterFunction
 {
 public:
-	EgoOutDegreeFunction(std::string networkName);
+	EgoOutDegreeFunction(string networkName);
 
 	virtual double value(int alter);
 	virtual int intValue(int alter);

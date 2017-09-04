@@ -858,8 +858,7 @@ void NetworkVariable::calculateTieFlipContributions()
 		// No change, zero contribution; this is done at the end
 		// of calculateTieFlipContributions.
 
-		if (this->lpermitted[alter] &&
-			(twoModeNetwork || alter != this->lego))
+		if (this->lpermitted[alter] && (twoModeNetwork || alter != this->lego))
 		// The second condition seems superfluous,
 		// as (alter = this->lego) is dealt with later.
 		// TODO: check if this can safely be dropped.
@@ -868,8 +867,7 @@ void NetworkVariable::calculateTieFlipContributions()
 			{
 				NetworkEffect * pEffect =
 					(NetworkEffect *) rEvaluationEffects[i];
-				double contribution =
-					pEffect->calculateContribution(alter);
+				double contribution = pEffect->calculateContribution(alter);
 
 				// Tie withdrawals contribute in the opposite way
 
@@ -1337,18 +1335,18 @@ void NetworkVariable::checkAlterAgreement(int alter)
 
 	this->calculateSymmetricTieFlipContributions(this->lego, 1);
 
-	this->calculateSymmetricTieFlipProbabilities(this->lego, 1);
+	this->calculateSymmetricTieFlipProbabilities(this->lego, 1, true);
 
 	double probability = 0;
-// TS hier dacht ik dat het was (offset)
+	double logprob = this->lsymmetricProbabilities[1];
 
-	if (this->lsymmetricProbabilities[1] > 0)
+	if (logprob > 0)
 	{
-		probability = 1.0 / (1.0 + exp(-this->lsymmetricProbabilities[1]));
+		probability = 1.0 / (1.0 + exp(-logprob));
 	}
 	else
 	{
-		probability = exp(this->lsymmetricProbabilities[1]);
+		probability = exp(logprob);
 		probability = probability / (1.0 + probability);
 	}
 
@@ -1799,8 +1797,10 @@ int sub)
  * Calculates the linear combinations which will be used to create the
  * probabilities of accepting change for symmetric networks.
  */
-void NetworkVariable::calculateSymmetricTieFlipProbabilities(int alter, int sub)
+void NetworkVariable::calculateSymmetricTieFlipProbabilities(int alter,
+													int sub, bool aagree)
 {
+	NetworkLongitudinalData * pData = (NetworkLongitudinalData *) this->pData();
 	int evaluationEffectCount = this->pEvaluationFunction()->rEffects().size();
 	int endowmentEffectCount = this->pEndowmentFunction()->rEffects().size();
 	int creationEffectCount = this->pCreationFunction()->rEffects().size();
@@ -1840,7 +1840,15 @@ void NetworkVariable::calculateSymmetricTieFlipProbabilities(int alter, int sub)
 		}
 	}
 
+	if (aagree && (sub==1))
+	{
+		this->lsymmetricProbabilities[sub] = contribution +
+										pData->universalOffset();
+	}
+	else
+	{
 	this->lsymmetricProbabilities[sub] = contribution;
+	}
 
 }
 /**
@@ -1901,12 +1909,12 @@ bool NetworkVariable::calculateModelTypeBProbabilities()
 	this->pSimulation()->pCache()->initialize(alter);
 	this->preprocessEgo(alter);
 	this->calculateSymmetricTieFlipContributions(this->lego, 1);
-	this->calculateSymmetricTieFlipProbabilities(this->lego, 1);
+	this->calculateSymmetricTieFlipProbabilities(this->lego, 1, false);
 
 	this->pSimulation()->pCache()->initialize(this->lego);
 	this->preprocessEgo(this->lego);
 	this->calculateSymmetricTieFlipContributions(alter, 0);
-	this->calculateSymmetricTieFlipProbabilities(alter, 0);
+	this->calculateSymmetricTieFlipProbabilities(alter, 0, false);
 	switch(this->networkModelType())
 	{
 	case BFORCE:

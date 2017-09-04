@@ -813,7 +813,7 @@ browser()
 		z$f$minimalChain <- NULL
 		z$f$chain <- NULL
 		f <- FRANstore()
-		f[1:z$nGroup] <- NULL
+#		f[1:z$nGroup] <- NULL
 		f$minimalChain <- NULL
 		f$chain <- NULL
 		FRANstore(f)
@@ -1189,6 +1189,11 @@ browser()
 	z$frequentist <- frequentist
     z$FRAN <- NULL
     class(z) <- "sienaBayesFit"
+	
+	if (nbrNodes > 1 && z$observations > 1)
+	{
+		stopCluster(z$cl)
+	}
 # 	if (!storeAll)
 # 	{
 # 		z$acceptances <- NULL
@@ -1462,7 +1467,9 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		cat("\nThe largest absolute value is ",
 				max(abs(startupGlobal$theta), na.rm=TRUE),
 				"\nwhich is too large for good operation of this function.\n",
-				"\nAdvice: use a smaller value of initgainGlobal.\n\n")
+				"\nAdvice: use a smaller value of initgainGlobal;\n",
+				"or, if possible, first estimate a multi-group project using siena07\n",
+				"and use this as prevAns in sienaBayes with initgainGlobal=0.\n\n")				
 		save(startupGlobal, file="startupGlobal.RData")
 		cat("startupGlobal saved.\n")
 		stop("Divergent initial estimate.")
@@ -1708,13 +1715,14 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
   	groupPeriods <- attr(z$f, "groupPeriods")
     netnames <- z$f$depNames
 	# Prepare some objects used for bookkeeping:
+	# ? Can't the data parameter be omitted in the following:
 	z$rateParameterPosition <-
         lapply(1:z$nGroup, function(i, periods, data)
            {
                lapply(1:periods[i], function(j)
                   {
                       rateEffects <-
-                          z$effects[z$requestedEffects$basicRate &
+                          z$requestedEffects[z$requestedEffects$basicRate &
                                     z$requestedEffects$period == j &
                                     z$requestedEffects$group == i,]
                       rateEffects <-

@@ -37,8 +37,8 @@ class BehaviorLongitudinalData;
 class CovariateMixedNetworkAlterFunction: public MixedNetworkAlterFunction
 {
 public:
-	CovariateMixedNetworkAlterFunction(std::string firstNetworkName,
-		std::string secondNetworkName, std::string covariateName);
+	CovariateMixedNetworkAlterFunction(string firstNetworkName,
+		string secondNetworkName, string covariateName);
 	virtual ~CovariateMixedNetworkAlterFunction();
 
 	virtual void initialize(const Data * pData,
@@ -53,7 +53,7 @@ protected:
 	BehaviorLongitudinalData * pBehaviorData() const;
 
 private:
-	std::string lcovariateName;
+	string lcovariateName;
 	int lperiod;
 	ConstantCovariate * lpConstantCovariate;
 	ChangingCovariate * lpChangingCovariate;

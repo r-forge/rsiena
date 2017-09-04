@@ -15,8 +15,6 @@
 #include "network/Network.h"
 #include "model/variables/NetworkVariable.h"
 
-using namespace std;
-
 namespace siena
 {
 

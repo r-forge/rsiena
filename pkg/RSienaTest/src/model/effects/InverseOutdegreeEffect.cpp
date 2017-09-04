@@ -15,8 +15,6 @@
 #include "model/EffectInfo.h"
 #include "model/variables/NetworkVariable.h"
 
-using namespace std;
-
 namespace siena
 {
 

@@ -25,9 +25,8 @@ namespace siena
  * @param[in] networkName the name of the network variable this function is
  * associated with
  */
-
-DoubleOutActFunction::DoubleOutActFunction(
-	string firstNetworkName, string secondNetworkName, double parameter, bool change) :
+DoubleOutActFunction::DoubleOutActFunction(string firstNetworkName,
+		string secondNetworkName, double parameter, bool change) :
 					MixedNetworkAlterFunction(firstNetworkName, secondNetworkName)
 {
 	this->lsqrtTable = SqrtTable::instance();

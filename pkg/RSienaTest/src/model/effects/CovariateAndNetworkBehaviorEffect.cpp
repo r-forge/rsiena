@@ -18,8 +18,6 @@
 #include "model/State.h"
 #include "model/EffectInfo.h"
 
-using namespace std;
-
 namespace siena
 {
 
