@@ -1,3 +1,7 @@
+2017-09-04 R-Forge Revision 311
+Changes in RSienaTest:
+   * configure.ac: add openmp test for macOS El Capitan compatibility
+
 2017-09-03 R-Forge Revision 310 / package version 1.2-2
 Changes in RSiena and RSienaTest:
    * Score test and sienaGOF corrected for the case that some parameters are
