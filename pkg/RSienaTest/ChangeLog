@@ -1,3 +1,12 @@
+2017-09-06 R-Forge Revision 313
+Changes in RSienaTest:
+   * DependentVariable.cpp: Fix null pointer in accumulateRateScores when
+     called on BehaviorVariable.
+
+2017-09-04 R-Forge Revision 312
+Changes in RSienaTest:
+   * configure.win: adapt windows configuration script
+
 2017-09-04 R-Forge Revision 311
 Changes in RSienaTest:
    * configure.ac: add openmp test for macOS El Capitan compatibility

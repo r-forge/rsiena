@@ -113,8 +113,8 @@ void DependentVariable::initializeRateFunction()
 	if (this->networkVariable())
 	{
 		NetworkLongitudinalData * pNetworkData =
-				dynamic_cast<NetworkLongitudinalData *>(this->pSimulation()->pData()->pNetworkData(
-						this->name()));
+			dynamic_cast<NetworkLongitudinalData *>(
+				this->pSimulation()->pData()->pNetworkData(this->name()));
 		const std::vector<SettingInfo> & rSettingNames =
 			pNetworkData->rSettingNames();
 		for (unsigned i = 0 ; i < rSettingNames.size(); i++)
@@ -922,22 +922,26 @@ void DependentVariable::accumulateRateScores(double tau,
 		this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
 	}
 
-	// Update scores for setting rates
-	NetworkLongitudinalData * pNetworkData =
-		dynamic_cast<NetworkLongitudinalData *>(this->pData());
-	const std::vector<SettingInfo> & rSettingNames =
-		pNetworkData->rSettingNames();
-
-	for (int i = 0; i < this->lnumberSettings; i++)
+	// TODO Current settings implementation is only for networks.
+	if (this->networkVariable())
 	{
-		// TODO: Check if this correct
-		if (this == pSelectedVariable && this->lstepType == i)
+		// Update scores for setting rates
+		NetworkLongitudinalData * pNetworkData =
+			dynamic_cast<NetworkLongitudinalData *>(this->pData());
+		const std::vector<SettingInfo> & rSettingNames =
+			pNetworkData->rSettingNames();
+
+		for (int i = 0; i < this->lnumberSettings; i++)
 		{
-			this->lsettingRateScores[rSettingNames[i].getId()] += 1.0
+			// TODO: Check if this correct
+			if (this == pSelectedVariable && this->lstepType == i)
+			{
+				this->lsettingRateScores[rSettingNames[i].getId()] += 1.0
 					/ this->lsettings[i]->getRate();
+			}
+			this->lsettingRateScores[rSettingNames[i].getId()] -= this->totalRate() * tau /
+				this->lsettings[i]->getRate();
 		}
-		this->lsettingRateScores[rSettingNames[i].getId()] -= this->totalRate() * tau /
-			this->lsettings[i]->getRate();
 	}
 
 	// Update scores for covariate dependent rate parameters
