@@ -82,8 +82,8 @@ public:
 
 	bool oneModeNetwork() const;
 
-	const std::vector<string> & rSettingNames() const;
-	void addSettingName(string name);
+	const std::vector<std::string> & rSettingNames() const;
+	void addSettingName(std::string name);
 
 private:
 	// The set of actors receiving the ties of the network
@@ -135,7 +135,7 @@ private:
 	bool loneMode;
 
 	// vector of setting names for this network
-	vector<string> lsettingNames;
+	std::vector<std::string> lsettingNames;
 };
 
 }

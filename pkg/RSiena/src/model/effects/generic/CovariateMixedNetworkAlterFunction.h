@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 // combines MixedNetworkAlterFunction and CovariateNetworkAlterFunction
- 
+
 #ifndef COVARIATEMIXEDNETWORKALTERFUNCTION_H_
 #define COVARIATEMIXEDNETWORKALTERFUNCTION_H_
 

@@ -37,6 +37,8 @@
 #include "model/filters/PermittedChangeFilter.h"
 #include "model/ml/Chain.h"
 
+using namespace std;
+
 namespace siena
 {
 SEXP getMiniStepDF(const MiniStep& miniStep);
@@ -807,11 +809,11 @@ void NetworkVariable::calculatePermissibleChanges()
 //		 	 Rprintf("permitted %d %d %d\n", i, this->lpermitted[i], m);
 //	 }
 
-if (!this->oneModeNetwork())
-{
-			// It is okay to not make any change at all
-			this->lpermitted[m] = true;
-}
+	if (!this->oneModeNetwork())
+	{
+		// It is okay to not make any change at all
+		this->lpermitted[m] = true;
+	}
 
 }
 
@@ -1219,7 +1221,7 @@ void NetworkVariable::accumulateScores(int alter) const
 	Rprintf("R_IsNaN error: i = %d ego = %d alter = %d alteri = %d m = %d\n",
 							i, this->lego, alter, alteri, m);
 //						Rprintf("lpermitted: \n");
-//						for (int hh = 0; hh < m; hh++)  
+//						for (int hh = 0; hh < m; hh++)
 //						{
 //							if (this->lpermitted[hh])
 //							{
@@ -1236,7 +1238,7 @@ void NetworkVariable::accumulateScores(int alter) const
 	Rprintf("R_IsNaN error: this->lprobabilities[alteri] = %f\n",
 							this->lprobabilities[alteri]);
 						error("nan score 1");
-					}			
+					}
 			}
 			if (R_IsNaN(this->pSimulation()->score(pEffect->pEffectInfo())))
 			{
@@ -1269,12 +1271,10 @@ void NetworkVariable::accumulateScores(int alter) const
 				{
 					j = (*this->lsetting)[alteri];
 				}
-				if (this->lpNetworkCache->outTieExists(j) &&
-					this->lpermitted[j])
+				if (this->lpNetworkCache->outTieExists(j) && this->lpermitted[j])
 				{
-					score -=
-						this->lendowmentEffectContribution[j][i] *
-						this->lprobabilities[alteri];
+					score -= this->lendowmentEffectContribution[j][i]
+						* this->lprobabilities[alteri];
 				}
 			}
 
@@ -1283,9 +1283,7 @@ void NetworkVariable::accumulateScores(int alter) const
 		}
 
 
-		for (unsigned i = 0;
-			i < this->pCreationFunction()->rEffects().size();
-			i++)
+		for (unsigned i = 0; i < this->pCreationFunction()->rEffects().size(); i++)
 		{
 			Effect * pEffect = this->pCreationFunction()->rEffects()[i];
 			double score = 0;
@@ -1847,7 +1845,7 @@ void NetworkVariable::calculateSymmetricTieFlipProbabilities(int alter,
 	}
 	else
 	{
-	this->lsymmetricProbabilities[sub] = contribution;
+		this->lsymmetricProbabilities[sub] = contribution;
 	}
 
 }

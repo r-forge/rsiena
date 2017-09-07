@@ -37,7 +37,6 @@ AltersCovariateAvAltEffect::AltersCovariateAvAltEffect(
 }
 
 
-
 /**
  * Calculates the change in the statistic corresponding to this effect if
  * the given actor would change his behavior by the given amount.
@@ -64,9 +63,9 @@ double AltersCovariateAvAltEffect::calculateChangeContribution(int actor,
 
 		if (this->ldivide)
 		{
-		contribution = difference * totalAlterValue /
-			pNetwork->outDegree(actor);
-	}
+			contribution = difference * totalAlterValue /
+				pNetwork->outDegree(actor);
+		}
 		else
 		{
 			contribution = difference * totalAlterValue;
@@ -123,12 +122,11 @@ double AltersCovariateAvAltEffect::egoEndowmentStatistic(int ego,
 
 	if (difference[ego] > 0 && !this->missingDummy(ego) && (pNetwork->outDegree(ego) > 0)) // otherwise, nothing to calculate...
 	{
-
 		double totalAlterValue = 0;
 
 		for (IncidentTieIterator iter = pNetwork->outTies(ego);
-			iter.valid();
-			iter.next())
+				iter.valid();
+				iter.next())
 		{
 			int j = iter.actor();                // identifies alter
 			double alterValue = this->centeredValue(j) * this->covariateValue(j);
@@ -137,13 +135,13 @@ double AltersCovariateAvAltEffect::egoEndowmentStatistic(int ego,
 
 		if (this->ldivide)
 		{
-		statistic -= difference[ego] * totalAlterValue /
-			pNetwork->outDegree(ego);
-		} 
+			statistic -= difference[ego] * totalAlterValue /
+				pNetwork->outDegree(ego);
+		}
 		else
 		{
 			statistic -= difference[ego] * totalAlterValue;
-		} 
+		}
 	}
 	return statistic;
 }

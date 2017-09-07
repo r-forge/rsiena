@@ -197,26 +197,25 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 	}
 	if (*settingCol < 0)
 	{
-	 	error("cannot find setting col; reconstruct effects object with this version of RSiena");
+		error("cannot find setting col; reconstruct effects object with this version of RSiena");
 	}
-//Rprintf("%d parmcol\n", *parmCol);
+	//Rprintf("%d parmcol\n", *parmCol);
 }
-
 
 /**
  *  updates the parameter values for each of the effects.
  */
 void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
-						  pGroupData, Model * pModel)
+		pGroupData, Model * pModel)
 {
-    // get the column names from the names attribute
-    SEXP cols;
-    PROTECT(cols = install("names"));
-    SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
+	// get the column names from the names attribute
+	SEXP cols;
+	PROTECT(cols = install("names"));
+	SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
 
 	int netTypeCol; /* net type */
-    int nameCol; /* network name */
-    int effectCol;  /* short name of effect */
+	int nameCol; /* network name */
+	int effectCol;  /* short name of effect */
 	int parmCol;
 	int int1Col;
 	int int2Col;
@@ -393,85 +392,87 @@ void setupOneModeObservations(SEXP ONEMODES,
                               pOneModeNetworkLongitudinalData)
 
 {
-    int observations = length(ONEMODES);
-    if (observations != pOneModeNetworkLongitudinalData->observationCount())
-    {
+	int observations = length(ONEMODES);
+	if (observations != pOneModeNetworkLongitudinalData->observationCount())
+	{
 		error ("wrong number of observations in OneMode");
-    }
-    SEXP uo;
-    PROTECT(uo = install("uponly"));
-    SEXP uponly = getAttrib(ONEMODES, uo);
-    SEXP dow;
-    PROTECT(dow = install("downonly"));
-    SEXP downonly = getAttrib(ONEMODES, dow);
+	}
+	SEXP uo;
+	PROTECT(uo = install("uponly"));
+	SEXP uponly = getAttrib(ONEMODES, uo);
+	SEXP dow;
+	PROTECT(dow = install("downonly"));
+	SEXP downonly = getAttrib(ONEMODES, dow);
 
-    for (int period = 0; period < (observations - 1); period++)
-    {
-        pOneModeNetworkLongitudinalData->upOnly(period,
-                                         LOGICAL(uponly)[period]);
-        pOneModeNetworkLongitudinalData->downOnly(period,
-                                         LOGICAL(downonly)[period]);
-    }
-    for (int period = 0; period < observations; period++)
-    {
-    	setupOneModeNetwork(VECTOR_ELT(ONEMODES, period),
+	for (int period = 0; period < (observations - 1); period++)
+	{
+		pOneModeNetworkLongitudinalData->upOnly(period,
+				LOGICAL(uponly)[period]);
+		pOneModeNetworkLongitudinalData->downOnly(period,
+				LOGICAL(downonly)[period]);
+	}
+	for (int period = 0; period < observations; period++)
+	{
+		setupOneModeNetwork(VECTOR_ELT(ONEMODES, period),
 				pOneModeNetworkLongitudinalData, period);
 	}
-    UNPROTECT(2);
+	UNPROTECT(2);
 }
+
 /**
  * Create one group of one mode Networks
  *
  */
 void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 {
-    int nOneMode = length(ONEMODEGROUP);
+	int nOneMode = length(ONEMODEGROUP);
 
-    for (int oneMode = 0; oneMode < nOneMode; oneMode++)
-    {
+	for (int oneMode = 0; oneMode < nOneMode; oneMode++)
+	{
 		SEXP ONEMODES = VECTOR_ELT(ONEMODEGROUP, oneMode);
-        SEXP as;
-        PROTECT(as = install("nodeSet"));
-        SEXP actorSet = getAttrib(ONEMODES, as);
-        SEXP symm;
-        PROTECT(symm = install("symmetric"));
-        SEXP symmetric = getAttrib(ONEMODES, symm);
+		SEXP as;
+		PROTECT(as = install("nodeSet"));
+		SEXP actorSet = getAttrib(ONEMODES, as);
+		SEXP symm;
+		PROTECT(symm = install("symmetric"));
+		SEXP symmetric = getAttrib(ONEMODES, symm);
 		SEXP balm;
-        PROTECT(balm = install("balmean"));
-        SEXP balmean = getAttrib(ONEMODES, balm);
+		PROTECT(balm = install("balmean"));
+		SEXP balmean = getAttrib(ONEMODES, balm);
 		SEXP strm;
-        PROTECT(strm = install("structmean"));
-        SEXP structmean = getAttrib(ONEMODES, strm);
+		PROTECT(strm = install("structmean"));
+		SEXP structmean = getAttrib(ONEMODES, strm);
 		SEXP avin;
-        PROTECT(avin = install("averageInDegree"));
-        SEXP averageInDegree = getAttrib(ONEMODES,	avin);
+		PROTECT(avin = install("averageInDegree"));
+		SEXP averageInDegree = getAttrib(ONEMODES,	avin);
 		SEXP avout;
-        PROTECT(avout = install("averageOutDegree"));
-        SEXP averageOutDegree = getAttrib(ONEMODES,	avout);
- 		SEXP sets;
+		PROTECT(avout = install("averageOutDegree"));
+		SEXP averageOutDegree = getAttrib(ONEMODES,	avout);
+		SEXP sets;
 		PROTECT(sets = install("settings"));
 		SEXP Setting = getAttrib(ONEMODES, sets);
 		SEXP nm;
-        PROTECT(nm = install("name"));
-        SEXP name = getAttrib(ONEMODES, nm);
-        const ActorSet* myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
+		PROTECT(nm = install("name"));
+		SEXP name = getAttrib(ONEMODES, nm);
+		const ActorSet* myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
 		OneModeNetworkLongitudinalData *  pOneModeNetworkLongitudinalData =
-			pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)),
-                                     myActorSet);
+			pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)), myActorSet);
+
 		for (int j = 0; j < length(Setting); j++)
 		{
 			const char * settingName = CHAR(STRING_ELT(Setting, j));
 			pOneModeNetworkLongitudinalData->addSettingName(settingName);
 		}
-       pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
-        pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
-        pOneModeNetworkLongitudinalData->structuralMean(*(REAL(structmean)));
-        pOneModeNetworkLongitudinalData->
+
+		pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
+		pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
+		pOneModeNetworkLongitudinalData->structuralMean(*(REAL(structmean)));
+		pOneModeNetworkLongitudinalData->
 			averageInDegree(*(REAL(averageInDegree)));
-        pOneModeNetworkLongitudinalData->
+		pOneModeNetworkLongitudinalData->
 			averageOutDegree(*(REAL(averageOutDegree)));
 		setupOneModeObservations(ONEMODES,
-			pOneModeNetworkLongitudinalData);
+				pOneModeNetworkLongitudinalData);
 		//	Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
 		//	averageInDegree(),  pOneModeNetworkLongitudinalData->
 		//	averageOutDegree());
@@ -482,8 +483,8 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 		//Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
 		//	averageInDegree(), pOneModeNetworkLongitudinalData->
 		//	averageOutDegree());
-        UNPROTECT(8);
-    }
+		UNPROTECT(8);
+	}
 }
 
 /**
@@ -722,12 +723,11 @@ void setupBehaviorGroup(SEXP BEHGROUP, Data *pData)
  *
  */
 void setupConstantCovariate(SEXP COCOVAR, ConstantCovariate *
-			    pConstantCovariate)
-
+		pConstantCovariate)
 {
-    int nActors = length(COCOVAR);
+	int nActors = length(COCOVAR);
 	// Rprintf("%x\n", pConstantCovariate);
-    double * start = REAL(COCOVAR);
+	double * start = REAL(COCOVAR);
 	SEXP mn;
 	PROTECT(mn = install("mean"));
 	SEXP ans = getAttrib(COCOVAR, mn);
@@ -859,11 +859,10 @@ void setupConstantCovariateGroup(SEXP COCOVARGROUP, Data *pData)
  *
  */
 void setupChangingCovariate(SEXP VARCOVAR,
-			    ChangingCovariate * pChangingCovariate)
-
+		ChangingCovariate * pChangingCovariate)
 {
-    int observations = ncols(VARCOVAR);
-    int nActors = nrows(VARCOVAR);
+	int observations = ncols(VARCOVAR);
+	int nActors = nrows(VARCOVAR);
 	double * start = REAL(VARCOVAR);
 	SEXP mn;
 	PROTECT(mn = install("mean"));
@@ -887,7 +886,7 @@ void setupChangingCovariate(SEXP VARCOVAR,
 	}
 
 	for (int period = 0; period < observations; period++)
-    {
+	{
 		for (int actor = 0; actor < nActors; actor++)
 		{
 			double value = *start++;

@@ -17,7 +17,6 @@
 namespace siena
 {
 
-
 class CovariateDistance2EgoAltSimNetworkFunction: public
 	CovariateDistance2NetworkFunction
 {

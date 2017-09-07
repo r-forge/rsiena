@@ -28,8 +28,8 @@ namespace siena
 class AntiIsolateEffect : public NetworkEffect
 {
 public:
-	AntiIsolateEffect(const EffectInfo * pEffectInfo, 
-		bool outAlso, 
+	AntiIsolateEffect(const EffectInfo * pEffectInfo,
+		bool outAlso,
 		int minDegree);
 	virtual double calculateContribution(int alter) const;
 // The minDegree could also be dealt with by an effect parameter.
@@ -39,7 +39,7 @@ public:
 
 protected:
 	virtual double egoStatistic(int ego, const Network * pNetwork);
-	
+
 private:
 	// Indicates the minimum degree threshold
 	int lminDegree;

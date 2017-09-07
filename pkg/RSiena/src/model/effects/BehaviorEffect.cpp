@@ -18,6 +18,8 @@
 #include "model/EffectInfo.h"
 #include "model/variables/BehaviorVariable.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -229,6 +231,7 @@ pair<double, double * > BehaviorEffect::endowmentStatistic(const int * differenc
 	this->cleanupStatisticCalculation();
 	return make_pair(statistic, actorStatistics);
 }
+
 /**
  * Returns the statistic corresponding the given ego as part of
  * the endowment function with respect to an initial behavior
@@ -240,7 +243,6 @@ double BehaviorEffect::egoEndowmentStatistic(int i, const int * difference,
 	throw runtime_error("egoEndowmentStatistic not implemented for " +
 		this->pEffectInfo()->effectName());
 }
-
 
 /**
  * Returns the statistic corresponding to this effect as part of

@@ -399,7 +399,7 @@ SEXP effects(SEXP RpData, SEXP EFFECTSLIST)
 
 SEXP interactionEffects(SEXP RpModel, SEXP EFFECTSLIST)
 {
-   	Model * pModel = (Model *) R_ExternalPtrAddr(RpModel);
+	Model * pModel = (Model *) R_ExternalPtrAddr(RpModel);
 
 	// get the column names from the names attribute
 
@@ -592,7 +592,7 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 				NetworkLongitudinalData * pNetworkData =
 					pData->pNetworkData(CHAR(STRING_ELT(Names, i)));
 				pNetworkData->modelType(INTEGER(MODELTYPE)[i]);
-	}
+			}
 		}
 	}
 	/* get names vector for modeltype */
@@ -622,7 +622,7 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
 	}
 
 	pModel->simpleRates(asInteger(SIMPLERATES));
-    
+
 	return R_NilValue;
 
 }
@@ -631,7 +631,7 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
  *  Gets target values relative to the input data
  */
 SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
-	SEXP PARALLELRUN, SEXP RETURNACTORSTATISTICS, 
+	SEXP PARALLELRUN, SEXP RETURNACTORSTATISTICS,
 	SEXP RETURNSTATICCHANGECONTRIBUTIONS)
 {
 	/* get hold of the data vector */
@@ -674,7 +674,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	{
 		rfra[i] = 0;
 	}
-	
+
 	int returnActorStatistics = 0;
 	if (!isNull(RETURNACTORSTATISTICS))
 	{
@@ -683,7 +683,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	/* changeStats will contain the target statistics of individual actors */
 	SEXP actorStats;
 	PROTECT(actorStats =  allocVector(VECSXP,nGroups));
-	
+
 	int returnStaticChangeContributions = 0;
 	if (!isNull(RETURNSTATICCHANGECONTRIBUTIONS))
 	{
@@ -712,7 +712,7 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	{
 		NETWORKTYPES =  createRObjectAttributes(EFFECTSLIST, actorStats);
 		int objEffects = length(NETWORKTYPES);
-		
+
 		for (int group = 0; group < nGroups; group++)
 		{
 			SET_VECTOR_ELT(actorStats, group, allocVector(VECSXP, (*pGroupData)[group]->observationCount()));
@@ -877,8 +877,8 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
  *  THIS RUNS INTO A HANG
  */
 SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
-	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
-    SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)
+		SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
+		SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -925,14 +925,14 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	PROTECT(aborts = allocVector(VECSXP, totObservations));
 	GetRNGstate();
 
-    /* localML */
-    int localML = 0;
-    if (!isNull(LOCALML))
-    {
-        localML = asInteger(LOCALML);
-    }
-    pModel->localML(localML);
-    
+	/* localML */
+	int localML = 0;
+	if (!isNull(LOCALML))
+	{
+		localML = asInteger(LOCALML);
+	}
+	pModel->localML(localML);
+
 	int periodFromStart = 0;
 
 	for (int group = 0; group < nGroups; group++)
@@ -944,7 +944,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 		MLSimulation * pMLSimulation = new MLSimulation(pData, pModel);
 
 		pMLSimulation->simpleRates(pModel->simpleRates());
-        
+
 		for (int period = 0; period < observations; period ++)
 		{
 			// store for later on model
@@ -974,7 +974,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 
 			/* do some more steps */
 			pMLSimulation->setUpProbabilityArray();
-            
+
 			int numSteps = 500;
 			for (int i = 0; i < numSteps; i++)
 			{
@@ -991,9 +991,9 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 			pModel->chainStore(*pChain, periodFromStart);
 
 			/* return chain as a list */
- 			SEXP ch1;
- 			PROTECT(ch1 = getChainList(*pChain));
-  			//PROTECT(ch1 = getChainDFPlus(*pChain, true));
+			SEXP ch1;
+			PROTECT(ch1 = getChainList(*pChain));
+			//PROTECT(ch1 = getChainDFPlus(*pChain, true));
 			SET_VECTOR_ELT(currentChains, periodFromStart, ch1);
 
 			/* get hold of the statistics for accept and reject */
@@ -1083,17 +1083,17 @@ SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
 
 	double * prmin = REAL(PRMIN);
 	double * prmib = REAL(PRMIB);
-    
+
 	int periodFromStart = 0;
-    
-    /* localML */
-    int localML = 0;
-    if (!isNull(LOCALML))
-    {
-        localML = asInteger(LOCALML);
-    }
-    pModel->localML(localML);
-    
+
+	/* localML */
+	int localML = 0;
+	if (!isNull(LOCALML))
+	{
+		localML = asInteger(LOCALML);
+	}
+	pModel->localML(localML);
+
 	for (int group = 0; group < nGroups; group++)
 	{
 		Data * pData = (*pGroupData)[group];

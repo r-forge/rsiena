@@ -30,11 +30,9 @@ MixedNetworkAlterFunction::MixedNetworkAlterFunction(string firstNetworkName,
 	this->lpFirstNetworkCache = 0;
 }
 
-
 MixedNetworkAlterFunction::~MixedNetworkAlterFunction()
 {
 }
-
 
 /**
  * Initializes this function.

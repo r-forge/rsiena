@@ -116,13 +116,13 @@ void CovariateDependentNetworkEffect::initialize(const Data* pData,
 		throw logic_error(
 				"Covariate or dependent behavior variable '" + name + "' expected.");
 	}
-	}
+}
 
 /**
  * Returns the covariate value for the given actor.
  */
 double CovariateDependentNetworkEffect::value(const int i) const
-	{
+{
 	if (this->lpConstantCovariate) {
 		return this->lpConstantCovariate->value(i);
 	}

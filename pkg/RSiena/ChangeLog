@@ -1,3 +1,7 @@
+2017-09-07 R-Forge Revision 315
+Changes in RSiena:
+   * Merge RSienaTest changes r311-r314.
+
 2017-09-03 R-Forge Revision 310
 Changes in RSiena:
    * effects.r: remove hard coded number of types of interactions

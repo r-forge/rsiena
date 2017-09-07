@@ -22,7 +22,7 @@ namespace siena
  * Constructor.
  */
 GwespFunction::GwespFunction(string networkName,
-	EgocentricConfigurationTable *	(NetworkCache::*pTable)() const,
+	EgocentricConfigurationTable * (NetworkCache::*pTable)() const,
 	double parameter) :
 	NetworkAlterFunction(networkName)
 {

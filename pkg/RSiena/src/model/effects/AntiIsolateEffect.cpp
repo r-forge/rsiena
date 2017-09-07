@@ -72,7 +72,7 @@ double AntiIsolateEffect::calculateContribution(int alter) const
 }
 
 /**
- * The contribution of ego to the statistic. 
+ * The contribution of ego to the statistic.
  * In this case, it would be better to say "contribution of alter"
  * but it is equivalent.
  * It is assumed that preprocessEgo(ego) has been called before.
@@ -80,7 +80,7 @@ double AntiIsolateEffect::calculateContribution(int alter) const
 double AntiIsolateEffect::egoStatistic(int ego, const Network * pNetwork)
 {
 	double statistic = 0;
-	
+
 	// This is a sum over the alters; since it also applies to two-mode networks,
 	// it cannot be represented as a sum over ego.
 	if (ego <= 0)
@@ -103,7 +103,7 @@ double AntiIsolateEffect::egoStatistic(int ego, const Network * pNetwork)
 			}
 		}
 	}
-	
+
 	return statistic;
 }
 

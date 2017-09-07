@@ -166,7 +166,6 @@ void CovariateAndNetworkBehaviorEffect::preprocessEgo(int ego)
 	// set up the covariate based on current values of the network
 	const Network * pNetwork = this->pNetwork();
 
-
 	for (int i = 0; i < pNetwork->n(); i++)
 	{
 		this->laverageAlterMissing[i] = false;
@@ -238,6 +237,5 @@ void CovariateAndNetworkBehaviorEffect::preprocessEgo(int ego)
 		}
 	}
 }
-
 
 }

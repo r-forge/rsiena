@@ -34,7 +34,7 @@ BothDegreesEffect::BothDegreesEffect(
  */
 double BothDegreesEffect::calculateContribution(int alter) const
 {
-// see IndegreePopularityEffect, OutdegreeActivityEffect, OutdegreeActivitySqrtEffect
+	// see IndegreePopularityEffect, OutdegreeActivityEffect, OutdegreeActivitySqrtEffect
 	// Current in-degree
 	int degree1 = this->pNetwork()->inDegree(alter);
 
@@ -46,12 +46,12 @@ double BothDegreesEffect::calculateContribution(int alter) const
 		if (this->outTieExists(alter))
 		{
 			change2 =  (d * this->lsqrtTable->sqrt(d)) -
-							((d-1) * this->lsqrtTable->sqrt(d-1));
+				((d-1) * this->lsqrtTable->sqrt(d-1));
 		}
 		else
 		{
 			change2 =  ((d+1) * this->lsqrtTable->sqrt(d+1)) -
-							(d * this->lsqrtTable->sqrt(d));
+				(d * this->lsqrtTable->sqrt(d));
 			degree1++;
 		}
 	}
@@ -70,7 +70,7 @@ double BothDegreesEffect::calculateContribution(int alter) const
 
 	double change1 = 0;
 	if (this->lroot)
-{
+	{
 		change1 = this->lsqrtTable->sqrt(degree1);
 	}
 	else

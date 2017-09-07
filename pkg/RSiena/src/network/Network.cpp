@@ -50,10 +50,8 @@ Network::Network(int n, int m) {
 
 	// No ties for now
 	this->ltieCount = 0;
-
 	this->lmodificationCount = 0;
 }
-
 
 /**
  * Creates a copy of the given network.
@@ -80,7 +78,6 @@ Network::Network(const Network & rNetwork) {
 	this->ltieCount = rNetwork.ltieCount;
 	this->lmodificationCount = 0;
 }
-
 
 /**
  * Assigns the contents of the given network to this network.
@@ -133,7 +130,6 @@ Network * Network::clone() const {
 	return new Network(*this);
 }
 
-
 /**
  * This method allocates the memory for maps of incident ties and
  * various arrays of counters.
@@ -144,7 +140,6 @@ void Network::allocateArrays() {
 	this->lpOutTies = new std::map<int, int>[this->ln];
 	this->lpInTies = new std::map<int, int>[this->lm];
 }
-
 
 /**
  * Deallocates various arrays used by this network.
@@ -157,14 +152,12 @@ void Network::deleteArrays() {
 	this->lpInTies = 0;
 }
 
-
 /**
  * Destructs this network.
  */
 Network::~Network() {
 	this->deleteArrays();
 }
-
 
 // ----------------------------------------------------------------------------
 // Section: Accessors
@@ -177,7 +170,6 @@ int Network::n() const {
 	return this->ln;
 }
 
-
 /**
  * Returns the number of actors acting as tie receivers in this network.
  */
@@ -185,14 +177,12 @@ int Network::m() const {
 	return this->lm;
 }
 
-
 /**
  * Returns the total number of ties of this network
  */
 int Network::tieCount() const {
 	return this->ltieCount;
 }
-
 
 // ----------------------------------------------------------------------------
 // Section: Basic structural operations
@@ -205,7 +195,6 @@ void Network::setTieValue(int i, int j, int v) {
 	this->changeTieValue(i, j, v, REPLACE);
 }
 
-
 /**
  * This method increases the value of the tie from <i>i</i> to <i>j</i> by
  * <i>v</i> and returns the new value.
@@ -213,7 +202,6 @@ void Network::setTieValue(int i, int j, int v) {
 int Network::increaseTieValue(int i, int j, int v) {
 	return this->changeTieValue(i, j, v, INCREASE);
 }
-
 
 /**
  * This method changes the values of the tie from <i>i</i> to <i>j</i>
@@ -234,7 +222,6 @@ int Network::changeTieValue(int i, int j, int v, ChangeType type) {
 	}
 
 	// Should we increase the value or replace?
-
 	if (type == INCREASE) {
 		v += oldValue;
 	}
@@ -277,7 +264,6 @@ int Network::changeTieValue(int i, int j, int v, ChangeType type) {
 	return v;
 }
 
-
 /**
  * Updates the state of this network to reflect the withdrawal of a tie
  * from actor <i>i</i> to actor <i>j</i>.
@@ -288,7 +274,6 @@ void Network::onTieWithdrawal(int i, int j) {
 	fireWithdrawalEvent(i, j);
 }
 
-
 /**
  * Updates the state of this network to reflect the introduction of a tie
  * from actor <i>i</i> to actor <i>j</i>.
@@ -298,7 +283,6 @@ void Network::onTieIntroduction(int i, int j) {
 	// fire the introduction even
 	fireIntroductionEvent(i, j);
 }
-
 
 /**
  * Returns the value of the tie from <i>i</i> to <i>j</i>. The default is 0.
@@ -320,7 +304,6 @@ int Network::tieValue(int i, int j) const {
 
 	return v;
 }
-
 
 /**
  * This method removes all ties from this network.
@@ -358,7 +341,6 @@ void Network::clearInTies(int actor) {
 	}
 }
 
-
 /**
  * Removes all outgoing ties of the given actor.
  */
@@ -371,7 +353,6 @@ void Network::clearOutTies(int actor) {
 	}
 }
 
-
 // ----------------------------------------------------------------------------
 // Section: Iterators
 // ----------------------------------------------------------------------------
@@ -383,7 +364,6 @@ TieIterator Network::ties() const {
 	return TieIterator(this);
 }
 
-
 /**
  * Returns an iterator over incoming ties of the actor <i>i</i>.
  */
@@ -391,7 +371,6 @@ IncidentTieIterator Network::inTies(int i) const {
 	this->checkReceiverRange(i);
 	return IncidentTieIterator(this->lpInTies[i]);
 }
-
 
 /**
  * Returns an iterator over outgoing ties of the actor <i>i</i> with
@@ -402,7 +381,6 @@ IncidentTieIterator Network::outTies(int i, int lowerBound) const {
 	return IncidentTieIterator(this->lpOutTies[i], lowerBound);
 }
 
-
 /**
  * Returns an iterator over incoming ties of the actor <i>i</i> with
  * the sender not less than the given bound.
@@ -412,7 +390,6 @@ IncidentTieIterator Network::inTies(int i, int lowerBound) const {
 	return IncidentTieIterator(this->lpInTies[i], lowerBound);
 }
 
-
 /**
  * Returns an iterator over outgoing ties of the actor <i>i</i>
  */
@@ -420,7 +397,6 @@ IncidentTieIterator Network::outTies(int i) const {
 	this->checkSenderRange(i);
 	return IncidentTieIterator(this->lpOutTies[i]);
 }
-
 
 // ----------------------------------------------------------------------------
 // Section: Degrees
@@ -434,7 +410,6 @@ int Network::inDegree(int i) const {
 	return this->lpInTies[i].size();
 }
 
-
 /**
  * Returns the number of outgoing ties of the actor <i>i</i>.
  */
@@ -442,7 +417,6 @@ int Network::outDegree(int i) const {
 	this->checkSenderRange(i);
 	return this->lpOutTies[i].size();
 }
-
 
 // ----------------------------------------------------------------------------
 // Section: Some useful statistics
@@ -472,7 +446,6 @@ int Network::minTieValue() const {
 	return minValue;
 }
 
-
 /**
  * Returns the maximal tie value in this network. The implicit values
  * of 0 are also considered.
@@ -497,7 +470,6 @@ int Network::maxTieValue() const {
 	return maxValue;
 }
 
-
 /**
  * This method returns the number of actors with ties to both <i>i</i> and
  * <i>j</i>.
@@ -508,7 +480,6 @@ int Network::outTwoStarCount(int i, int j) const {
 	return commonActorCount(this->inTies(i), this->inTies(j));
 }
 
-
 /**
  * This method returns the number of actors with ties from both <i>i</i> and
  * <i>j</i>.
@@ -518,7 +489,6 @@ int Network::inTwoStarCount(int i, int j) const {
 	this->checkSenderRange(j);
 	return commonActorCount(this->outTies(i), this->outTies(j));
 }
-
 
 /**
  * Indicates that all ties are non-zero.
@@ -544,7 +514,6 @@ int Network::maxTieCount() const {
 	return this->ln * this->lm;
 }
 
-
 // ----------------------------------------------------------------------------
 // Section: Helper checks
 // ----------------------------------------------------------------------------
@@ -562,7 +531,6 @@ void Network::checkSenderRange(int i) const {
 	}
 }
 
-
 /**
  * Tests if the given actor is in the valid range of receivers and throws an
  * std::out_of_range exception, if not.
@@ -579,7 +547,7 @@ void Network::checkReceiverRange(int i) const {
 /**
  * Adds the given <i>listener</i> from the network, if it is not yet attached.
  */
-void siena::Network::addNetworkChangeListener(
+void Network::addNetworkChangeListener(
 		INetworkChangeListener* const listener) {
 	// ensure that the list is a set (no duplicates)
 	std::list<INetworkChangeListener*>::iterator tmp = std::find(
@@ -593,7 +561,7 @@ void siena::Network::addNetworkChangeListener(
 /**
  * Removes the given <i>listener</i> from the network.
  */
-void siena::Network::removeNetworkChangeListener(
+void Network::removeNetworkChangeListener(
 		INetworkChangeListener* const listener) {
 	std::list<INetworkChangeListener*>::iterator tmp = std::find(
 			lNetworkChangeListener.begin(), lNetworkChangeListener.end(),

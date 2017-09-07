@@ -27,7 +27,6 @@ IsolatePopEffect::IsolatePopEffect(
 	// Indicates whether the outdegree=0 of alter also is taken into account
 }
 
-
 /**
  * Calculates the contribution of a tie flip to the given actor.
  */

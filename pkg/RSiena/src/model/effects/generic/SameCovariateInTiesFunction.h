@@ -30,7 +30,7 @@ public:
 		int period,
 		Cache * pCache);
 	virtual void preprocessEgo(int ego);
-		virtual double value(int alter);
+	virtual double value(int alter);
 
 private:
 	bool lexcludeMissing;

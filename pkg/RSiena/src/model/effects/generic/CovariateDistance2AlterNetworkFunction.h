@@ -28,7 +28,6 @@ public:
 
 	virtual double value(int alter);
 
-
 private:
 	double lparameter;
 	bool lexcludeMissing;

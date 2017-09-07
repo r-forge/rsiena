@@ -104,7 +104,6 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	SEXP PARALLELRUN, SEXP RETURNACTORSTATISTICS, 
 	SEXP RETURNSTATICCHANGECONTRIBUTIONS);
 
-
 /** Sets up a minimal chain and does pre burnin and burnin.
  * Processes a complete set of data objects, crewating a chain for each
  * period and storing them on the model object.

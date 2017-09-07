@@ -77,7 +77,7 @@ private:
 
 	// The number of in-two-stars from ego and alter to the middle actor.
 	MixedEgocentricConfigurationTable * lpInStarTable;
-	
+
 	// The number of out-two-stars from the middle actor to ego and alter.
 	MixedEgocentricConfigurationTable * lpOutStarTable;
 };

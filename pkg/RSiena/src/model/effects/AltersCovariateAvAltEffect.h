@@ -25,7 +25,7 @@ namespace siena
 /**
  * Alters covariate average similarity effect (not in manual)
  */
-class AltersCovariateAvAltEffect : 
+class AltersCovariateAvAltEffect :
 public CovariateAndNetworkBehaviorEffect
 {
 public:

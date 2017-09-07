@@ -141,7 +141,6 @@ pair<double, double * > NetworkEffect::evaluationStatistic(bool needActorStatist
 		return this->statistic(this->pNetwork(), needActorStatistics);
 }
 
-
 /**
  * Returns the statistic corresponding to this effect as part of
  * the endowment function.
@@ -159,7 +158,6 @@ pair<double, double *> NetworkEffect::endowmentStatistic(Network * pLostTieNetwo
 {
 	return this->statistic(pLostTieNetwork, needActorStatistics);
 }
-
 
 /**
  * Returns the statistic corresponding to this effect as part of
@@ -244,7 +242,6 @@ pair<double,double *> NetworkEffect::statistic(const Network * pSummationTieNetw
 
 	return make_pair(statistic,actorStatistics);
 }
-
 
 /**
  * Calculates the statistic corresponding to the given ego. The variable

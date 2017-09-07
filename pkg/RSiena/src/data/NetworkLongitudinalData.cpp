@@ -17,6 +17,8 @@
 #include "network/IncidentTieIterator.h"
 #include "data/ActorSet.h"
 
+using namespace std;
+
 namespace siena
 {
 

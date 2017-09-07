@@ -20,7 +20,6 @@ CommonNeighborIterator::CommonNeighborIterator(const IncidentTieIterator& iter1,
 	this->skipMismatches();
 }
 
-
 // ----------------------------------------------------------------------------
 // Section: Public interface
 // ----------------------------------------------------------------------------
@@ -31,7 +30,6 @@ CommonNeighborIterator::CommonNeighborIterator(const IncidentTieIterator& iter1,
 bool CommonNeighborIterator::valid() const {
 	return this->liter1.valid() && this->liter2.valid();
 }
-
 
 /**
  * Returns the current common actor.
@@ -44,7 +42,6 @@ int CommonNeighborIterator::actor() const {
 	// Both iterators point to the same actor, so we can use any iterator.
 	return this->liter1.actor();
 }
-
 
 /**
  * Moves on to the next common actor if any.
