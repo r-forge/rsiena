@@ -103,11 +103,11 @@ void NetworkDependentBehaviorEffect::initialize(const Data *pData,
 	}
 
 	// Select network state.
-	if (lSimulatedOffset == 1) 
+	if (lSimulatedOffset == 1)
 	{
 		this->lpNetwork = pSimulatedState->pNetwork(networkName);
 	}
-	else 
+	else
 	{
 		this->lpNetwork = pState->pNetwork(networkName);
 	}

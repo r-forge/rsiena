@@ -74,9 +74,9 @@ double AltersInDist2CovariateAverageEffect::calculateChangeContribution(int acto
 			if (this->ldivide2)
 			{
 				if (pNetwork->inDegree(iter.actor()) > 1)
-			{
-				alterValue /= (pNetwork->inDegree(iter.actor()) - 1);
-			}
+				{
+					alterValue /= (pNetwork->inDegree(iter.actor()) - 1);
+				}
 				else
 				{
 					alterValue = this->covariateMean();
@@ -129,9 +129,9 @@ double AltersInDist2CovariateAverageEffect::egoStatistic(int ego, double * curre
 		if (this->ldivide2)
 		{
 			if (pNetwork->inDegree(j) > 1)
-		{
-			alterXValue /= (pNetwork->inDegree(j) - 1);
-		}
+			{
+				alterXValue /= (pNetwork->inDegree(j) - 1);
+			}
 			else
 			{
 				alterXValue = this->covariateMean();

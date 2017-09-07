@@ -17,19 +17,16 @@
 #include "AlterFunction.h"
 #include "utils/NamedObject.h"
 
-using namespace std;
-
 namespace siena
 {
 
 class Network;
 class NetworkCache;
 
-
 class NetworkAlterFunction: public AlterFunction, public NamedObject
 {
 public:
-	NetworkAlterFunction(string networkName);
+	NetworkAlterFunction(std::string networkName);
 	virtual ~NetworkAlterFunction();
 
 	virtual void initialize(const Data * pData,
@@ -57,7 +54,6 @@ const Network * NetworkAlterFunction::pNetwork() const
 {
 	return this->lpNetwork;
 }
-
 
 NetworkCache * NetworkAlterFunction::pNetworkCache() const
 {

@@ -77,9 +77,9 @@ double AltersDist2CovariateAverageEffect::calculateChangeContribution(int actor,
 			if (this->ldivide2)
 			{
 				if ((pNetwork->outDegree(iter.actor()) - tieValue)> 0)
-			{
-				alterValue /= (pNetwork->outDegree(iter.actor()) - tieValue);
-			}
+				{
+					alterValue /= (pNetwork->outDegree(iter.actor()) - tieValue);
+				}
 				else
 				{
 					alterValue = this->covariateMean();
@@ -138,9 +138,9 @@ double AltersDist2CovariateAverageEffect::egoStatistic(int ego, double * current
 		if (this->ldivide2)
 		{
 			if (pNetwork->outDegree(j) > tieToEgo)
-		{
-			alterXValue /= (pNetwork->outDegree(j) - tieToEgo);
-		}
+			{
+				alterXValue /= (pNetwork->outDegree(j) - tieToEgo);
+			}
 			else
 			{
 				alterXValue = this->covariateMean();

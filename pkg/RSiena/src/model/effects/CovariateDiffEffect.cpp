@@ -44,10 +44,10 @@ double CovariateDiffEffect::calculateContribution(int alter) const
 	if (this->ldiff)
 	{
 		change = this->value(alter) - this->value(this->ego());
-	if (this->lsquared)
-	{
-		change *= change;
-	}
+		if (this->lsquared)
+		{
+			change *= change;
+		}
 		if (this->labs)
 		{
 			change = fabs(change);
@@ -83,15 +83,15 @@ double CovariateDiffEffect::tieStatistic(int alter)
 	{
 		if (this->ldiff)
 		{
-		statistic = this->value(alter) - this->value(this->ego());
+			statistic = this->value(alter) - this->value(this->ego());
 			if (this->labs)
 			{
 				statistic = fabs(statistic);
 			}
 
-		if (this->lsquared)
-		{
-			statistic *= statistic;
+			if (this->lsquared)
+			{
+				statistic *= statistic;
 			}
 		}
 		else

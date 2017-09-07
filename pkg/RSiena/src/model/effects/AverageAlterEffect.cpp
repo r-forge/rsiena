@@ -97,10 +97,10 @@ double AverageAlterEffect::egoStatistic(int i, double * currentValues)
 		}
 		else
 		{
-		statistic += currentValues[iter.actor()];
+			statistic += currentValues[iter.actor()];
 		}
-			neighborCount++;
-		}
+		neighborCount++;
+	}
 
 	if (neighborCount > 0)
 	{
@@ -113,8 +113,6 @@ double AverageAlterEffect::egoStatistic(int i, double * currentValues)
 
 	return statistic;
 }
-
-
 
 /**
  * Returns the statistic corresponding to the given ego as part of

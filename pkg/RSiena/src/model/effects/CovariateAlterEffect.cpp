@@ -69,10 +69,10 @@ double CovariateAlterEffect::calculateContribution(int alter) const
 		else
 		{
 			change = this->value(alter);
-	if (this->lsquared)
-	{
-		change *= change;
-	}
+			if (this->lsquared)
+			{
+				change *= change;
+			}
 		}
 	}
 

@@ -153,11 +153,8 @@ bool CovariateDistance2NetworkFunction::missingInDummy(int alter) const
 void CovariateDistance2NetworkFunction::preprocessEgo(int ego)
 {
 	AlterFunction::preprocessEgo(ego);
-
 	// set up the covariate based on current values of the network
-
 	const Network * pNetwork = this->pNetwork();
-
 
 	for (int i = 0; i < pNetwork->n(); i++)
 	{
@@ -219,7 +216,7 @@ void CovariateDistance2NetworkFunction::preprocessEgo(int ego)
 			if (numberNonMissing > 0)
 			{
 				this->laverageInAlterMissing[i] = false;
-			this->laverageInAlterValues[i] =
+				this->laverageInAlterValues[i] =
 					(this->ltotalInAlterValues[i] / numberNonMissing);
 			}
 			else
@@ -286,25 +283,25 @@ double CovariateDistance2NetworkFunction::varOutAvSimilarity(int i, int j) const
 	if (degree >= 1)
 	{
 		outAlter /= degree;
-		}
-		else
-		{
+	}
+	else
+	{
 		outAlter = this->covmean();
-		}
+	}
 
-		if (this->pConstantCovariate())
-		{
-			similarity =
+	if (this->pConstantCovariate())
+	{
+		similarity =
 			this->pConstantCovariate()->similarity(this->value(i), outAlter);
-		}
-		else if (this->pChangingCovariate())
-		{
-			similarity =
+	}
+	else if (this->pChangingCovariate())
+	{
+		similarity =
 			this->pChangingCovariate()->similarity(this->value(i), outAlter);
-		}
-		else
-		{
-			similarity =
+	}
+	else
+	{
+		similarity =
 			this->pBehaviorData()->similarity(this->value(i), outAlter);
 	}
 
@@ -330,25 +327,25 @@ double CovariateDistance2NetworkFunction::varInAvSimilarity(int i, int j) const
 	if (degree >= 1)
 	{
 		inAlter /= degree;
-		}
-		else
-		{
+	}
+	else
+	{
 		inAlter = this->covmean();
-		}
+	}
 
-		if (this->pConstantCovariate())
-		{
-			similarity =
+	if (this->pConstantCovariate())
+	{
+		similarity =
 			this->pConstantCovariate()->similarity(this->value(i), inAlter);
-		}
-		else if (this->pChangingCovariate())
-		{
-			similarity =
+	}
+	else if (this->pChangingCovariate())
+	{
+		similarity =
 			this->pChangingCovariate()->similarity(this->value(i), inAlter);
-		}
-		else
-		{
-			similarity =
+	}
+	else
+	{
+		similarity =
 			this->pBehaviorData()->similarity(this->value(i), inAlter);
 	}
 

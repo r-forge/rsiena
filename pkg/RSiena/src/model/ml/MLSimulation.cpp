@@ -31,6 +31,7 @@
 #include "model/ml/BehaviorChange.h"
 #include "model/tables/Cache.h"
 
+using namespace std;
 
 namespace siena
 {

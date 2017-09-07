@@ -31,7 +31,7 @@ StructuralRateEffect::StructuralRateEffect(const NetworkVariable * pVariable,
 	this->lpVariable = pVariable;
 	this->ltype = type;
 
-	double possibleDegree = max(this->lpVariable->n(),
+	double possibleDegree = std::max(this->lpVariable->n(),
 		this->lpVariable->m());
 	if (this->ltype == INVERSE_OUT_DEGREE_RATE)
 	{
@@ -49,7 +49,6 @@ StructuralRateEffect::StructuralRateEffect(const NetworkVariable * pVariable,
 	this->lpTable->parameter(parameter);
 }
 
-
 /**
  * Destructor.
  */
@@ -58,7 +57,6 @@ StructuralRateEffect::~StructuralRateEffect()
 	delete this->lpTable;
 	this->lpTable = 0;
 }
-
 
 /**
  * Returns the contribution of this effect for the given actor.
@@ -82,7 +80,7 @@ double StructuralRateEffect::value(int i)
 				(((OneModeNetwork *) pNetwork)->reciprocalDegree(i)));
 	}
 
-	throw new logic_error("Unexpected structural rate effect type");
+	throw std::logic_error("Unexpected structural rate effect type");
 }
 /**
  * Stores the parameter for the structural rate effect.
@@ -99,6 +97,5 @@ double StructuralRateEffect::parameter() const
 {
 	return this->lpTable->parameter();
 }
-
 
 }

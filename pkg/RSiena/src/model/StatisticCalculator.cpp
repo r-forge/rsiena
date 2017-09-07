@@ -91,7 +91,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
 	this->lpStateLessMissingsEtc = new State();
 	this->lneedActorStatistics = returnActorStatistics;
 	this->lcountStaticChangeContributions = 0;
-	
+
 	this->calculateStatistics();
 }
 
@@ -114,70 +114,57 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
 	this->lpStateLessMissingsEtc = new State();
 	this->lneedActorStatistics = returnActorStatistics;
 	this->lcountStaticChangeContributions = returnStaticChangeContributions;
-	
+
 	this->calculateStatistics();
 }
 
+template<typename T, typename A> // type and allocator
+void clear_vector_of_array_pointers(vector<T*, A>& v)
+{
+	for (typename vector<T*, A>::iterator it = v.begin(); it != v.end(); ++it)
+		delete[] (*it);
+	v.clear();
+}
+
+template <typename K, typename T>
+void clear_map_value_array_pointers(map<K, T*>& m)
+{
+	for (typename map<K, T*>::iterator it = m.begin(); it != m.end(); ++it)
+		delete[] it->second;
+	m.clear();
+}
+
+template <typename K, typename T>
+void for_each_map_value(map<K, T>& m, void (*fn)(T&))
+{
+	for (typename map<K, T>::iterator it = m.begin(); it != m.end(); ++it)
+		(*fn)(it->second);
+}
 
 /**
  * Deallocates this model.
  */
 StatisticCalculator::~StatisticCalculator()
 {
-	// Delete the arrays of simulated distances
+	clear_map_value_array_pointers(this->ldistances);
 
-	while (!this->ldistances.empty())
-	{
-		int * array = this->ldistances.begin()->second;
-		this->ldistances.erase(this->ldistances.begin());
-		delete[] array;
-	}
+	for_each_map_value(this->lsettingDistances, &clear_map_value_array_pointers);
+	this->lsettingDistances.clear();
 
-	// Delete the arrays of simulated distances for settings
-
-	while (!this->lsettingDistances.empty())
-	{
-		while (!(this->lsettingDistances.begin())->second.empty())
-		{
-			int * array =
-				this->lsettingDistances.begin()->second.begin()->second;
-			this->lsettingDistances.begin()->second.erase(
-				this->lsettingDistances.begin()->second.begin());
-			delete[] array;
-		}
-		this->lsettingDistances.erase(this->lsettingDistances.begin());
-	}
-	// The state just stores the values, but does not own them. It means that
-	// the destructor of the state won't deallocate the memory, and we must
-	// request that explicitly. The basic predictor state is now
-	// stored on the data so lpredictorState is just a pointer.
-
-	//	this->lpPredictorState->deleteValues();
+	// this->lpPredictorState->deleteValues(); // now called by the State dtor
 	delete this->lpPredictorState;
 	this->lpPredictorState = 0;
-	this->lpStateLessMissingsEtc->deleteValues();
+
+	// this->lpStateLessMissingsEtc->deleteValues(); // now called by the State dtor
 	delete this->lpStateLessMissingsEtc;
 	this->lpStateLessMissingsEtc = 0;
 
-	while (!this->lstaticChangeContributions.empty())
-	{
-		vector<double *> vec = this->lstaticChangeContributions.begin()->second;
-		while (!vec.empty())
-		{
-			double * array = *(vec.begin());
-			vec.erase(vec.begin());
-			delete array;
-		}
-		this->lstaticChangeContributions.erase(this->lstaticChangeContributions.begin());
-	}
-	while (!this->lactorStatistics.empty())
-	{
-		double * array = this->lactorStatistics.begin()->second;
-		this->lactorStatistics.erase(this->lactorStatistics.begin());
-		delete[] array;
-	}
-}
+	for_each_map_value(this->lstaticChangeContributions,
+			&clear_vector_of_array_pointers);
+	this->lstaticChangeContributions.clear();
 
+	clear_map_value_array_pointers(this->lactorStatistics);
+}
 
 // ----------------------------------------------------------------------------
 // Section: Accessors for statistics
@@ -390,24 +377,21 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 	// Loop through the evaluation effects, calculate the statistics,
 	// and store them.
 
- 	const vector<EffectInfo *> & rEffects =
- 		this->lpModel->rEvaluationEffects(pNetworkData->name());
+	const vector<EffectInfo *> & rEffects =
+		this->lpModel->rEvaluationEffects(pNetworkData->name());
 
- 	EffectFactory factory(this->lpData);
- 	Cache cache;
+	EffectFactory factory(this->lpData);
+	Cache cache;
 
 	for (unsigned i = 0; i < rEffects.size(); i++)
 	{
 		EffectInfo * pInfo = rEffects[i];
-		NetworkEffect * pEffect =
-			(NetworkEffect *) factory.createEffect(pInfo);
+		NetworkEffect * pEffect = (NetworkEffect *) factory.createEffect(pInfo);
 
 		// Initialize the effect to work with our data and state of variables.
 
-		pEffect->initialize(this->lpData,
-			this->lpPredictorState,
-			this->lperiod,
-			&cache);
+		pEffect->initialize(this->lpData, this->lpPredictorState,
+			this->lperiod, &cache);
 
 		if(this->lneedActorStatistics)
 		{
@@ -419,20 +403,24 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 		{
 			this->lstatistics[pInfo] = pEffect->evaluationStatistic();
 		}
-		if(this->lcountStaticChangeContributions)
+
+		if (this->lcountStaticChangeContributions)
 		{
-			int egos =  pCurrentLessMissingsEtc->n();
-			int alters =  pCurrentLessMissingsEtc->m();
+			int egos = pCurrentLessMissingsEtc->n();
+			int alters = pCurrentLessMissingsEtc->m();
 			vector<double *> egosMap(egos);
 			this->lstaticChangeContributions.insert(make_pair(pInfo,egosMap));
 			for (int e = 0; e < egos ; e++)
 			{
 				cache.initialize(e);
-				pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+				pEffect->initialize(this->lpData, this->lpPredictorState,
+						this->lperiod, &cache);
 				double * contributions = new double[egos];
 				this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
 				pEffect->preprocessEgo(e);
-				//TODO determine permissible changes (see: NetworkVariable::calculatePermissibleChanges())
+
+				// TODO determine permissible changes
+				// (see: NetworkVariable::calculatePermissibleChanges())
 				for (int a = 0; a < alters ; a++)
 				{
 					if(a == e)
@@ -444,11 +432,13 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 						// Tie withdrawal contributes the opposite of tie creating
 						if (pCurrentLessMissingsEtc->tieValue(e,a))
 						{
-							this->lstaticChangeContributions.at(pInfo).at(e)[a] = -pEffect->calculateContribution(a);
+							this->lstaticChangeContributions.at(pInfo).at(e)[a] =
+								-pEffect->calculateContribution(a);
 						}
 						else
 						{
-							this->lstaticChangeContributions.at(pInfo).at(e)[a] = pEffect->calculateContribution(a);
+							this->lstaticChangeContributions.at(pInfo).at(e)[a] =
+								pEffect->calculateContribution(a);
 						}
 					}
 				}
@@ -752,7 +742,7 @@ void StatisticCalculator::calculateBehaviorStatistics(
 				}
 			}
 		}
-		
+
 		delete pEffect;
 	}
 
@@ -1015,7 +1005,7 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 	// 		[this->lperiod] = distance;
 	// }
 	// the universal setting can explain everything
-//	calcDifferences(pNetworkData, pDifference);
+	// calcDifferences(pNetworkData, pDifference);
 
 	// Loop through the rate effects, calculate the statistics,
 	// and store them.

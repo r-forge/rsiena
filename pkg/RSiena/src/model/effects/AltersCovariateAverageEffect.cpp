@@ -69,8 +69,8 @@ double AltersCovariateAverageEffect::egoStatistic(int ego, double * currentValue
 	{
 		if (this->ldivide)
 		{
-		statistic = currentValues[ego] * this->averageAlterValue(ego);
-	}
+			statistic = currentValues[ego] * this->averageAlterValue(ego);
+		}
 		else
 		{
 			statistic = currentValues[ego] * this->totalAlterValue(ego);
@@ -94,8 +94,8 @@ double AltersCovariateAverageEffect::egoEndowmentStatistic(int ego,
 	{
 		if (this->ldivide)
 		{
-		statistic -= difference[ego] * this->averageAlterValue(ego);
-	}
+			statistic -= difference[ego] * this->averageAlterValue(ego);
+		}
 		else
 		{
 			statistic -= difference[ego] * this->totalAlterValue(ego);

@@ -118,7 +118,7 @@ private:
 	int lthisPermutationLength;
 
 	// A vector of options with missing values in the initial observation
-	vector<const Option *> linitialMissingOptions;
+	std::vector<const Option *> linitialMissingOptions;
 };
 
 }

@@ -27,7 +27,7 @@ namespace siena
  */
 DoubleOutActFunction::DoubleOutActFunction(string firstNetworkName,
 		string secondNetworkName, double parameter, bool change) :
-					MixedNetworkAlterFunction(firstNetworkName, secondNetworkName)
+	MixedNetworkAlterFunction(firstNetworkName, secondNetworkName)
 {
 	this->lsqrtTable = SqrtTable::instance();
 	this->lroot = (parameter >= 2);

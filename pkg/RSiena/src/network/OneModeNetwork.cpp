@@ -42,7 +42,6 @@ OneModeNetwork::OneModeNetwork(int n, bool loopsPermitted) :
 	}
 }
 
-
 /**
  * Constructs a copy of the given one-mode network.
  */
@@ -59,7 +58,6 @@ OneModeNetwork::OneModeNetwork(const OneModeNetwork & rNetwork) :
 		this->lpReciprocalDegree[i] = rNetwork.lpReciprocalDegree[i];
 	}
 }
-
 
 /**
  * Assigns the contents of the given network to this network.
@@ -91,7 +89,6 @@ Network * OneModeNetwork::clone() const {
 	return new OneModeNetwork(*this);
 }
 
-
 /**
  * Deallocates this network.
  */
@@ -99,7 +96,6 @@ OneModeNetwork::~OneModeNetwork() {
 	delete[] this->lpReciprocalDegree;
 	this->lpReciprocalDegree = 0;
 }
-
 
 // ----------------------------------------------------------------------------
 // Section: Accessors
@@ -111,7 +107,6 @@ OneModeNetwork::~OneModeNetwork() {
 bool OneModeNetwork::loopsPermitted() const {
 	return this->lloopsPermitted;
 }
-
 
 // ----------------------------------------------------------------------------
 // Section: Basic structural operations
@@ -129,7 +124,6 @@ int OneModeNetwork::changeTieValue(int i, int j, int v, ChangeType type) {
 
 	return Network::changeTieValue(i, j, v, type);
 }
-
 
 /**
  * Updates the state of this network to reflect the withdrawal of a tie
@@ -150,7 +144,6 @@ void OneModeNetwork::onTieWithdrawal(int i, int j) {
 	}
 }
 
-
 /**
  * Updates the state of this network to reflect the introduction of a tie
  * from actor <i>i</i> to actor <i>j</i>.
@@ -169,7 +162,6 @@ void OneModeNetwork::onTieIntroduction(int i, int j) {
 	}
 }
 
-
 /**
  * This method removes all ties from this network.
  */
@@ -184,7 +176,6 @@ void OneModeNetwork::clear() {
 	}
 }
 
-
 // ----------------------------------------------------------------------------
 // Section: Iterators
 // ----------------------------------------------------------------------------
@@ -197,7 +188,6 @@ CommonNeighborIterator OneModeNetwork::reciprocatedTies(int i) const {
 	return CommonNeighborIterator(this->inTies(i), this->outTies(i));
 }
 
-
 /**
  * Returns an iterator over reciprocated ties of the actor <i>i</i> with
  * the alter not less than the given bound.
@@ -208,7 +198,6 @@ CommonNeighborIterator OneModeNetwork::reciprocatedTies(int i,
 	return CommonNeighborIterator(this->inTies(i, lowerBound),
 			this->outTies(i, lowerBound));
 }
-
 
 // ----------------------------------------------------------------------------
 // Section: Degrees
@@ -221,7 +210,6 @@ int OneModeNetwork::reciprocalDegree(int i) const {
 	this->checkSenderRange(i);
 	return this->lpReciprocalDegree[i];
 }
-
 
 // ----------------------------------------------------------------------------
 // Section: Some useful statistics and properties
@@ -269,14 +257,12 @@ bool OneModeNetwork::symmetric() const {
 	return rc;
 }
 
-
 /**
  * Returns the number of two-paths from <i>i</i> to <i>j</i>.
  */
 int OneModeNetwork::twoPathCount(int i, int j) const {
 	return this->truncatedTwoPathCount(i, j, std::numeric_limits<int>::max());
 }
-
 
 /**
  * Returns the number of two-paths from <i>i</i> to <i>j</i> truncated at the
@@ -308,7 +294,6 @@ int OneModeNetwork::truncatedTwoPathCount(int i, int j, int threshold) const {
 
 	return count;
 }
-
 
 /**
  * This method indicated that there are no two-paths from <i>i</i> to <i>j</i>
@@ -343,7 +328,6 @@ bool OneModeNetwork::noTwoPaths(int i, int j,
 	return !found;
 }
 
-
 /**
  * This method indicated that there is at least one two-path from <i>i</i>
  * to <i>j</i>.
@@ -351,7 +335,6 @@ bool OneModeNetwork::noTwoPaths(int i, int j,
 bool OneModeNetwork::existsTwoPath(int i, int j) const {
 	return !this->noTwoPaths(i, j, std::numeric_limits<int>::max());
 }
-
 
 /**
  * This method tests if there are at most <i>k</i> two-paths from <i>i</i>
@@ -386,7 +369,6 @@ bool OneModeNetwork::atMostKTwoPaths(int i, int j, int k,
 
 	return twoPathCount <= k;
 }
-
 
 /**
  * This method counts the number of actors participating in three or all four

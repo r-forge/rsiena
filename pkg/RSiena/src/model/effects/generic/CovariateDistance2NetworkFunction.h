@@ -50,8 +50,6 @@ private:
 
 };
 
-
-
 }
 
 #endif /* COVARIATEDISTANCE2NETWORKFUNCTION_H_ */

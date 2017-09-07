@@ -448,17 +448,17 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	{
 		this->lprobabilities[2] = 0;
 		this->lupPossible = false;
-			for (unsigned i = 0; i < pEvaluationFunction()->rEffects().size(); i++)
+		for (unsigned i = 0; i < pEvaluationFunction()->rEffects().size(); i++)
 		{
 			this->levaluationEffectContribution[2][i] =	R_NaN;
 		}
-			for (unsigned i = 0; i < pEndowmentFunction()->rEffects().size(); i++)
+		for (unsigned i = 0; i < pEndowmentFunction()->rEffects().size(); i++)
 		{
 			this->lendowmentEffectContribution[2][i] = R_NaN;
 		}
-			for (unsigned i = 0;
-			i < this->pCreationFunction()->rEffects().size();
-			i++)
+		for (unsigned i = 0;
+				i < this->pCreationFunction()->rEffects().size();
+				i++)
 		{
 			this->lcreationEffectContribution[2][i] = R_NaN;
 		}
@@ -487,17 +487,17 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	{
 		if (ismin)
 		{
-			sum = 2*this->lprobabilities[1] + this->lprobabilities[2];
-			this->lprobabilities[1] = 2*this->lprobabilities[1]/sum;
+			sum = 2 * this->lprobabilities[1] + this->lprobabilities[2];
+			this->lprobabilities[1] = 2 * this->lprobabilities[1]/sum;
 			this->lprobabilities[2] /= sum;
 		}
 		else
 		{
-			sum = 2*this->lprobabilities[1] + this->lprobabilities[0];
-			this->lprobabilities[1] = 2*this->lprobabilities[1]/sum;
+			sum = 2 * this->lprobabilities[1] + this->lprobabilities[0];
+			this->lprobabilities[1] = 2 * this->lprobabilities[1]/sum;
 			this->lprobabilities[0] /= sum;
 		}
-		}
+	}
 	else
 	{
 		sum = this->lprobabilities[0] + this->lprobabilities[1] +
