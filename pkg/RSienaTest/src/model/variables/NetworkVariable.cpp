@@ -902,10 +902,10 @@ void NetworkVariable::calculateTieFlipContributions()
 					if ((this->stepType() == 0) || (this->stepType() >= 2))
 					{
 						contribution += pData->universalOffset();
+					}
 				}
-			}
 				this->levaluationEffectContribution[alter][i] = contribution;
-		}
+			}
 		}
 		else
 		{
@@ -1498,9 +1498,10 @@ void NetworkVariable::accumulateScores(int alter) const
 					j = permIter->actor();
 					permIter->next();
 				}
-				if (this->lpNetworkCache->outTieExists(j) && this->lpermitted[j]) {
-					score -=
-						this->lendowmentEffectContribution[j][i] * this->lprobabilities[j];
+				if (this->lpNetworkCache->outTieExists(j) && this->lpermitted[j])
+				{
+					score -= this->lendowmentEffectContribution[j][i]
+						* this->lprobabilities[j];
 				}
 			}
 
@@ -1509,7 +1510,8 @@ void NetworkVariable::accumulateScores(int alter) const
 		}
 
 
-		for (unsigned i = 0; i < this->pCreationFunction()->rEffects().size(); i++) {
+		for (unsigned i = 0; i < this->pCreationFunction()->rEffects().size(); i++)
+		{
 			Effect * pEffect = this->pCreationFunction()->rEffects()[i];
 			double score = 0;
 

@@ -16,7 +16,8 @@
 #include "data/LongitudinalData.h"
 #include "../model/settings/SettingInfo.h"
 
-namespace siena {
+namespace siena
+{
 
 // ----------------------------------------------------------------------------
 // Section: Forward declarations

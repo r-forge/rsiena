@@ -1,3 +1,9 @@
+2017-09-07 R-Forge Revision 314
+Changes in RSienaTest:
+   * StatisticCalculator.cpp: Fix memory leak in deconstructor.
+   * Move some of the 'using namespace' from header to cpp files.
+   * Lots of whitespace changes to ease the merging process.
+
 2017-09-06 R-Forge Revision 313
 Changes in RSienaTest:
    * DependentVariable.cpp: Fix null pointer in accumulateRateScores when

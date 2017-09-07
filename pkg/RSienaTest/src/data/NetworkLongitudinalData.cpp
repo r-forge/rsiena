@@ -52,7 +52,7 @@ NetworkLongitudinalData::NetworkLongitudinalData(int id,
 	this->lnetworksLessMissingStarts = new Network * [observationCount];
 	this->lmaxDegree = std::numeric_limits<int>::max();
 	this->lmodelType = 1;
-	this->luniversalOffset = std::numeric_limits<double>::max();
+	this->luniversalOffset = numeric_limits<double>::max();
 	this->ldensity = new double[observationCount];
 	this->loneMode = oneMode;
 

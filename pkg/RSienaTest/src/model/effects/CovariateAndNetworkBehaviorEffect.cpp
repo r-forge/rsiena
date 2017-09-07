@@ -237,4 +237,5 @@ void CovariateAndNetworkBehaviorEffect::preprocessEgo(int ego)
 		}
 	}
 }
+
 }

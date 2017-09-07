@@ -40,7 +40,7 @@ public:
 	Covariate(std::string name, const ActorSet * pActorSet);
 
 	const ActorSet * pActorSet() const;
-	
+
 	inline double mean() const;
 	void mean(double value);
 	inline double range() const;

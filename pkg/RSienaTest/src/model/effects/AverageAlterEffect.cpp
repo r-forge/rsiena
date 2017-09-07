@@ -97,7 +97,7 @@ double AverageAlterEffect::egoStatistic(int i, double * currentValues)
 		}
 		else
 		{
-		statistic += currentValues[iter.actor()];
+			statistic += currentValues[iter.actor()];
 		}
 		neighborCount++;
 	}

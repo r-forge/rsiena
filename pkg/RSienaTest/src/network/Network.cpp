@@ -229,8 +229,8 @@ int Network::changeTieValue(int i, int j, int v, ChangeType type) {
 	if (iter != egoMap.end() && !egoMap.key_comp()(j, iter->first)) {
 		oldValue = iter->second;
 	}
-	// Should we increase the value or replace?
 
+	// Should we increase the value or replace?
 	if (type == INCREASE) {
 		v += oldValue;
 	}

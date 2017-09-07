@@ -125,8 +125,8 @@ double AltersCovariateAvAltEffect::egoEndowmentStatistic(int ego,
 		double totalAlterValue = 0;
 
 		for (IncidentTieIterator iter = pNetwork->outTies(ego);
-			iter.valid();
-			iter.next())
+				iter.valid();
+				iter.next())
 		{
 			int j = iter.actor();                // identifies alter
 			double alterValue = this->centeredValue(j) * this->covariateValue(j);
@@ -136,12 +136,12 @@ double AltersCovariateAvAltEffect::egoEndowmentStatistic(int ego,
 		if (this->ldivide)
 		{
 			statistic -= difference[ego] * totalAlterValue /
-							pNetwork->outDegree(ego);
-		} 
+				pNetwork->outDegree(ego);
+		}
 		else
 		{
 			statistic -= difference[ego] * totalAlterValue;
-		} 
+		}
 	}
 	return statistic;
 }

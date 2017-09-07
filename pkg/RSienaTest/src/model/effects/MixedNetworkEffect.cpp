@@ -8,7 +8,7 @@
  * Description: This file contains the implementation of the
  * MixedNetworkEffect class.
  *****************************************************************************/
- 
+
 #include "MixedNetworkEffect.h"
 #include "network/Network.h"
 #include "model/variables/NetworkVariable.h"

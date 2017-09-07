@@ -54,6 +54,7 @@ private:
 
 	void countThreePaths(int i, const Network * pNetwork, long int * counters)
 		const;
+
 	// For a fixed i, this variable stores the number of three-paths
 	// i -> h <- k -> j per each j.
 

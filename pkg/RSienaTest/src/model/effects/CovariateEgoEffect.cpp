@@ -100,6 +100,7 @@ double CovariateEgoEffect::tieStatistic(int alter)
 	{
 		statistic = this->calculateContribution(alter);
 	}
+
 	return statistic;
 }
 

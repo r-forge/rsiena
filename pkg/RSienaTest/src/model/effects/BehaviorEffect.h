@@ -15,8 +15,6 @@
 #include "Effect.h"
 #include <utility>
 
-using namespace std;
-
 namespace siena
 {
 
@@ -39,10 +37,8 @@ class BehaviorEffect : public Effect
 public:
 	BehaviorEffect(const EffectInfo * pEffectInfo);
 
-	virtual void initialize(const Data * pData,
-		State * pState,
-		int period,
-		Cache * pCache);
+	virtual void initialize(const Data * pData, State * pState,
+			int period, Cache * pCache);
 	virtual void initialize(const Data *pData, State *pState,
 			State *pSimulatedState, int period, Cache *pCache);
 
@@ -53,21 +49,21 @@ public:
 	 * the given actor would change his behavior by the given amount.
 	 */
 	virtual double calculateChangeContribution(int actor,
-		int difference) = 0;
+			int difference) = 0;
 
 	virtual double evaluationStatistic(double * currentValues);
-	virtual pair<double,double *> evaluationStatistic(double * currentValues, bool needActorStatistics);
+	virtual std::pair<double,double *> evaluationStatistic(double * currentValues, bool needActorStatistics);
 	virtual double endowmentStatistic(const int * difference,
-		double * currentValues);
-	virtual pair<double,double *> endowmentStatistic(const int * difference,
-				double * currentValues, bool needActorStatistics);
+			double * currentValues);
+	virtual std::pair<double,double *> endowmentStatistic(const int * difference,
+			double * currentValues, bool needActorStatistics);
 	virtual double creationStatistic(int * difference,
-		double * currentValues);
-	virtual pair<double,double *> creationStatistic(int * difference,
-				double * currentValues, bool needActorStatistics);
+			double * currentValues);
+	virtual std::pair<double,double *> creationStatistic(int * difference,
+			double * currentValues, bool needActorStatistics);
 	virtual double egoStatistic(int ego, double * currentValues);
 	virtual double egoEndowmentStatistic(int ego, const int * difference,
-		double * currentValues);
+			double * currentValues);
 
 protected:
 	int n() const;
@@ -76,14 +72,14 @@ protected:
 	bool missing(int observation, int actor) const;
 	double range() const;
 	double similarity(double a, double b) const;
-	double similarityMean() const;	
+	double similarityMean() const;
 	virtual void initializeStatisticCalculation();
 	virtual void cleanupStatisticCalculation();
 
 private:
 	BehaviorLongitudinalData * lpBehaviorData;
 	const int * lvalues;
-	 int lego;
+	int lego;
 };
 
 }
