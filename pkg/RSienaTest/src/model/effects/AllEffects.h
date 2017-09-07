@@ -1,13 +1,13 @@
 /******************************************************************************
-* SIENA: Simulation Investigation for Empirical Network Analysis
-*
-* Web: http://www.stats.ox.ac.uk/~snijders/siena/
-*
-* File: AllEffects.h
-*
-* Description: This is a helper file that includes the declarations of all
-* effects. It can be conveniently included in files requiring all effects.
-*****************************************************************************/
+ * SIENA: Simulation Investigation for Empirical Network Analysis
+ *
+ * Web: http://www.stats.ox.ac.uk/~snijders/siena/
+ *
+ * File: AllEffects.h
+ *
+ * Description: This is a helper file that includes the declarations of all
+ * effects. It can be conveniently included in files requiring all effects.
+ *****************************************************************************/
 
 #ifndef ALLEFFECTS_H_
 #define ALLEFFECTS_H_

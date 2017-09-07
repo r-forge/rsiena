@@ -90,15 +90,15 @@ double SameCovariateInTiesFunction::value(int alter)
 				if (!(this->lexcludeMissing && this->missing(h)))
 				{
 					if ((fabs(this->CovariateNetworkAlterFunction::value(h)
-					- this->CovariateNetworkAlterFunction::value(this->ego()))
-									< EPSILON))
+									- this->CovariateNetworkAlterFunction::value(this->ego()))
+								< EPSILON))
 					{
 						statistic++ ;
 					}
 				}
 			}
-		// Add the following just like for inPop effect:
-			if  ((this->lsameVariable) && (!this->outTieExists(alter)))
+			// Add the following just like for inPop effect:
+			if ((this->lsameVariable) && (!this->outTieExists(alter)))
 			{
 				// The statistic will increase after introducing the tie
 				statistic++;
@@ -116,8 +116,8 @@ double SameCovariateInTiesFunction::value(int alter)
 				if (!(this->lexcludeMissing && this->missing(h)))
 				{
 					if ((fabs(this->CovariateNetworkAlterFunction::value(h)
-				- this->CovariateNetworkAlterFunction::value(this->ego()))
-									>= EPSILON))
+									- this->CovariateNetworkAlterFunction::value(this->ego()))
+								>= EPSILON))
 					{
 						statistic++ ;
 					}

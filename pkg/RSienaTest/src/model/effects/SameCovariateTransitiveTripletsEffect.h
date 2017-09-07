@@ -19,11 +19,11 @@ namespace siena
 {
 
 class SameCovariateTransitiveTripletsEffect :
-                   public CovariateDependentNetworkEffect
+	public CovariateDependentNetworkEffect
 {
 public:
 	SameCovariateTransitiveTripletsEffect(
-                   const EffectInfo * pEffectInfo, bool same);
+			const EffectInfo * pEffectInfo, bool same);
 	virtual double calculateContribution(int alter) const;
 
 protected:

@@ -150,7 +150,6 @@ bool CovariateDistance2NetworkFunction::missingInDummy(int alter) const
  * predicate for a specific ego. This method must be invoked before
  * calling AlterPredicate::value(...).
  */
-
 void CovariateDistance2NetworkFunction::preprocessEgo(int ego)
 {
 	AlterFunction::preprocessEgo(ego);

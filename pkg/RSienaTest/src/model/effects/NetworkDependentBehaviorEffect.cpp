@@ -76,7 +76,6 @@ void NetworkDependentBehaviorEffect::initialize(const Data * pData,
 {
 	BehaviorEffect::initialize(pData, pState, period, pCache);
 	string networkName = this->pEffectInfo()->interactionName1();
-
 	this->lpNetwork = pState->pNetwork(networkName);
 
 	if (!this->lpNetwork) {
@@ -98,17 +97,17 @@ void NetworkDependentBehaviorEffect::initialize(const Data *pData,
 	string networkName = this->pEffectInfo()->interactionName1();
 	this->lpNetwork = pState->pNetwork(networkName);
 
-	if (!this->lpNetwork) 
+	if (!this->lpNetwork)
 	{
 		throw logic_error("Network '" + networkName + "' expected.");
 	}
 
 	// Select network state.
-	if (lSimulatedOffset == 1) 
+	if (lSimulatedOffset == 1)
 	{
 		this->lpNetwork = pSimulatedState->pNetwork(networkName);
-	} 
-	else 
+	}
+	else
 	{
 		this->lpNetwork = pState->pNetwork(networkName);
 	}
@@ -146,7 +145,7 @@ double NetworkDependentBehaviorEffect::totalInAlterValue(int i) const
 void NetworkDependentBehaviorEffect::preprocessEgo(int ego)
 {
 	// set up the covariate based on current values of the network and behavior
-	const Network* pNetwork = this->pNetwork();
+	const Network * pNetwork = this->pNetwork();
 
 	for (int i = 0; i < pNetwork->n(); i++)
 	{

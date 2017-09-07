@@ -24,7 +24,7 @@ namespace siena
 /**
  * Creates a new covariate with the given name for the given set of actors.
  */
-Covariate::Covariate(std::string name, const ActorSet * pActorSet) :
+Covariate::Covariate(string name, const ActorSet * pActorSet) :
 	NamedObject(name)
 {
 	this->lpActorSet = pActorSet;
@@ -75,7 +75,7 @@ void Covariate::similarityMean(double similarityMean)
  * Stores the similarity alter mean of this covariate wrt this network,
  * which is calculated in R.
  */
-void Covariate::similarityMeans(double similarityMean, std::string networkName)
+void Covariate::similarityMeans(double similarityMean, string networkName)
 {
 	this->lsimilarityMeans[networkName] = similarityMean;
 }
@@ -100,7 +100,7 @@ double Covariate::similarity(double a, double b) const
 double Covariate::similarityNetwork(double a, double b, string networkName) const
 {
 	double similarityMean = 0;
-	map<std::string, double>::const_iterator iter =
+	map<string, double>::const_iterator iter =
 		this->lsimilarityMeans.find(networkName);
 	if (iter != this->lsimilarityMeans.end())
 	{

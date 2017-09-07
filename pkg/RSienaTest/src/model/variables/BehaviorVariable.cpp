@@ -456,10 +456,9 @@ void BehaviorVariable::calculateProbabilities(int actor)
 		{
 			this->lendowmentEffectContribution[2][i] = R_NaN;
 		}
-
 		for (unsigned i = 0;
-			i < this->pCreationFunction()->rEffects().size();
-			i++)
+				i < this->pCreationFunction()->rEffects().size();
+				i++)
 		{
 			this->lcreationEffectContribution[2][i] = R_NaN;
 		}
@@ -488,14 +487,14 @@ void BehaviorVariable::calculateProbabilities(int actor)
 	{
 		if (ismin)
 		{
-			sum = 2*this->lprobabilities[1] + this->lprobabilities[2];
-			this->lprobabilities[1] = 2*this->lprobabilities[1]/sum;
+			sum = 2 * this->lprobabilities[1] + this->lprobabilities[2];
+			this->lprobabilities[1] = 2 * this->lprobabilities[1]/sum;
 			this->lprobabilities[2] /= sum;
 		}
 		else
 		{
-			sum = 2*this->lprobabilities[1] + this->lprobabilities[0];
-			this->lprobabilities[1] = 2*this->lprobabilities[1]/sum;
+			sum = 2 * this->lprobabilities[1] + this->lprobabilities[0];
+			this->lprobabilities[1] = 2 * this->lprobabilities[1]/sum;
 			this->lprobabilities[0] /= sum;
 		}
 	}
@@ -617,14 +616,14 @@ void BehaviorVariable::accumulateScores(int difference,
 		{
 			score -=
 				this->levaluationEffectContribution[2][i] *
-					this->lprobabilities[2];
+				this->lprobabilities[2];
 		}
 
 		if (downPossible)
 		{
 			score -=
 				this->levaluationEffectContribution[0][i] *
-					this->lprobabilities[0];
+				this->lprobabilities[0];
 		}
 
 		this->pSimulation()->score(pEffect->pEffectInfo(),

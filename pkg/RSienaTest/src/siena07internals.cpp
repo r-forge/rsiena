@@ -15,6 +15,7 @@
  */
 #include <vector>
 #include <cstring>
+#include <Rinternals.h>
 #include "siena07internals.h"
 #include "data/Data.h"
 #include "data/LongitudinalData.h"
@@ -196,26 +197,25 @@ void getColNos(SEXP Names, int * netTypeCol, int * nameCol, int * effectCol,
 	}
 	if (*settingCol < 0)
 	{
-	 	error("cannot find setting col; reconstruct effects object with this version of RSienaTest");
+		error("cannot find setting col; reconstruct effects object with this version of RSienaTest");
 	}
-//Rprintf("%d parmcol\n", *parmCol);
+	//Rprintf("%d parmcol\n", *parmCol);
 }
-
 
 /**
  *  updates the parameter values for each of the effects.
  */
 void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
-						  pGroupData, Model * pModel)
+		pGroupData, Model * pModel)
 {
-    // get the column names from the names attribute
-    SEXP cols;
-    PROTECT(cols = install("names"));
-    SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
+	// get the column names from the names attribute
+	SEXP cols;
+	PROTECT(cols = install("names"));
+	SEXP Names = getAttrib(VECTOR_ELT(EFFECTSLIST, 0), cols);
 
 	int netTypeCol; /* net type */
-    int nameCol; /* network name */
-    int effectCol;  /* short name of effect */
+	int nameCol; /* network name */
+	int effectCol;  /* short name of effect */
 	int parmCol;
 	int int1Col;
 	int int2Col;
@@ -747,12 +747,11 @@ void setupBehaviorGroup(SEXP BEHGROUP, Data *pData)
  *
  */
 void setupConstantCovariate(SEXP COCOVAR, ConstantCovariate *
-			    pConstantCovariate)
+		pConstantCovariate)
 {
-    int nActors = length(COCOVAR);
+	int nActors = length(COCOVAR);
 	// Rprintf("%x\n", pConstantCovariate);
-    double * start = REAL(COCOVAR);
-
+	double * start = REAL(COCOVAR);
 	SEXP mn;
 	PROTECT(mn = install("mean"));
 	SEXP ans = getAttrib(COCOVAR, mn);
@@ -884,10 +883,10 @@ void setupConstantCovariateGroup(SEXP COCOVARGROUP, Data *pData)
  *
  */
 void setupChangingCovariate(SEXP VARCOVAR,
-			    ChangingCovariate * pChangingCovariate)
+		ChangingCovariate * pChangingCovariate)
 {
-    int observations = ncols(VARCOVAR);
-    int nActors = nrows(VARCOVAR);
+	int observations = ncols(VARCOVAR);
+	int nActors = nrows(VARCOVAR);
 	double * start = REAL(VARCOVAR);
 	SEXP mn;
 	PROTECT(mn = install("mean"));
@@ -911,7 +910,7 @@ void setupChangingCovariate(SEXP VARCOVAR,
 	}
 
 	for (int period = 0; period < observations; period++)
-    {
+	{
 		for (int actor = 0; actor < nActors; actor++)
 		{
 			double value = *start++;
@@ -1566,7 +1565,6 @@ void getActorStatistics(SEXP EFFECTSLIST,
 	}
 	UNPROTECT(1);
 }
-
 
 /**
  *  Retrieves the values of the statistics and scores for each of the effects,

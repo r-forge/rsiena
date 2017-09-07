@@ -39,7 +39,7 @@ double TransitiveTripletsEffect::calculateContribution(int alter) const
 	// two-path from i to j contributes one transitive triplet, just as each
 	// in-star between i and j.
 	double contribution = 0;
-	
+
 	if (ltwoPath) contribution += this->pTwoPathTable()->get(alter);
 	if (ltwoInStar) contribution += this->pInStarTable()->get(alter);
 

@@ -40,7 +40,7 @@ CovariateDiffEffect::CovariateDiffEffect(const EffectInfo * pEffectInfo,
 double CovariateDiffEffect::calculateContribution(int alter) const
 {
 	double change = 0;
-	
+
 	if (this->ldiff)
 	{
 		change = this->value(alter) - this->value(this->ego());

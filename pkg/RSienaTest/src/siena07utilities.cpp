@@ -1041,7 +1041,6 @@ SEXP createRObjectAttributes(SEXP EFFECTSLIST, SEXP& stats)
 	return NETWORKTYPES;
 }
 
-
 /** Create a ministep from a single ministep stored as a list (not dataframe).
  *
  */

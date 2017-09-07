@@ -4,8 +4,6 @@
 #include "AlterPredicate.h"
 #include "utils/NamedObject.h"
 
-using namespace std;
-
 namespace siena {
 
 // ----------------------------------------------------------------------------

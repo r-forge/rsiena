@@ -399,7 +399,7 @@ SEXP effects(SEXP RpData, SEXP EFFECTSLIST)
 
 SEXP interactionEffects(SEXP RpModel, SEXP EFFECTSLIST)
 {
-   	Model * pModel = (Model *) R_ExternalPtrAddr(RpModel);
+	Model * pModel = (Model *) R_ExternalPtrAddr(RpModel);
 
 	// get the column names from the names attribute
 
@@ -631,7 +631,8 @@ SEXP setupModelOptions(SEXP DATAPTR, SEXP MODELPTR, SEXP MAXDEGREE,
  *  Gets target values relative to the input data
  */
 SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
-	SEXP PARALLELRUN, SEXP RETURNACTORSTATISTICS, SEXP RETURNSTATICCHANGECONTRIBUTIONS)
+	SEXP PARALLELRUN, SEXP RETURNACTORSTATISTICS,
+	SEXP RETURNSTATICCHANGECONTRIBUTIONS)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -875,9 +876,9 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
   * NOTE; FOR SOME CONFIGURATIONS OF STRUCTURAL ZEROS
  *  THIS RUNS INTO A HANG
  */
- SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
-	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
-    SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)
+SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
+		SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
+		SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)
 {
 	/* get hold of the data vector */
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -924,13 +925,13 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	PROTECT(aborts = allocVector(VECSXP, totObservations));
 	GetRNGstate();
 
-    /* localML */
-    int localML = 0;
-    if (!isNull(LOCALML))
-    {
-        localML = asInteger(LOCALML);
-    }
-    pModel->localML(localML);
+	/* localML */
+	int localML = 0;
+	if (!isNull(LOCALML))
+	{
+		localML = asInteger(LOCALML);
+	}
+	pModel->localML(localML);
 
 	int periodFromStart = 0;
 
@@ -990,9 +991,9 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 			pModel->chainStore(*pChain, periodFromStart);
 
 			/* return chain as a list */
- 			SEXP ch1;
- 			PROTECT(ch1 = getChainList(*pChain));
-  			//PROTECT(ch1 = getChainDFPlus(*pChain, true));
+			SEXP ch1;
+			PROTECT(ch1 = getChainList(*pChain));
+			//PROTECT(ch1 = getChainDFPlus(*pChain, true));
 			SET_VECTOR_ELT(currentChains, periodFromStart, ch1);
 
 			/* get hold of the statistics for accept and reject */
@@ -1085,13 +1086,13 @@ SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
 
 	int periodFromStart = 0;
 
-    /* localML */
-    int localML = 0;
-    if (!isNull(LOCALML))
-    {
-        localML = asInteger(LOCALML);
-    }
-    pModel->localML(localML);
+	/* localML */
+	int localML = 0;
+	if (!isNull(LOCALML))
+	{
+		localML = asInteger(LOCALML);
+	}
+	pModel->localML(localML);
 
 	for (int group = 0; group < nGroups; group++)
 	{
