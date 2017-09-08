@@ -570,12 +570,19 @@ There is a facility to check Windows packages on CRAN. See
 
 A facility to build and check packages on various platforms
 is at \url{https://builder.r-hub.io}; in the `advanced' page
-there is a variety of platforms on which you can check. 
+there is a variety of platforms on which you can check.
+
+\subsection{Submitting to CRAN}
+Instruction for submitting to CRAN are linked from 
+\url{ https://CRAN.R-project.org/banner.shtml#submitting}.
+
+RSiena contains a file \texttt{cran-comments.md} which contains,
+for the last CRAN submission, the comments added for the
+submission, and noting the checks made.
+This is visible on R-Forge but excluded from the tarball
+by the file \texttt{.Rbuildignore}.
 
 
-
-In the future there may be something
-similar for Macs.
 \section{Personal/private keys}
 \label{key}
 You can set up a personal/private ssh key pair so you do not need to type the
@@ -1035,7 +1042,7 @@ Note that for executing the examples in the help pages,
 \texttt{R CMD check} prepends the file
 \texttt{R-x.x.x$\backslash$share$\backslash$R$\backslash$examples-header.R} where \texttt{R-x.x.x}
 is the main directory of the R distribution used.
-For ill-understood errors in checking the examples, 
+For ill-understood errors in checking the examples,
 this file could be changed to give the desired information.
 
 \subsection{Debugging C++}

@@ -3166,13 +3166,14 @@ Value \texttt{modelType = 1} is for directed networks, values
       For the confirmation decision, an offset is added to the objective
       function, representing the difference between a binary yes/no choice
       and the multinomial choice of one among $n-1$ tie variables to change.
-      This offset is a fixed parameter, not estimated. It is determined
-      by the value of \texttt{UniversalOffset} in function
-      \sfn{sienaAlgorithmCreate}. If there are multiple symmetric dependent
-      networks that require different offsets, this can be given as a
+      This offset is a fixed parameter, not estimated.
+      The higher the offset, the more likely it is that the confirmation
+      will be given. It is determined
+      by the value of \texttt{Offset} in function
+      \sfn{sienaAlgorithmCreate}. This parameter must be given as a
       named vector; see the help page for \sfn{sienaAlgorithmCreate}.
       Plausible values for this offset are in the range from 0 to 3,
-      and should increase with $n$.
+      and should slowly increase with $n$ (roughly proportionally to $\log(n)$).
 \iffalse
 \item Tie-based model:\\
       a random pair of actors is chosen (actor-specific rate functions
@@ -6152,7 +6153,7 @@ conditionally or unconditionally.\medskip
 \section{Getting started}
 \label{S_getting}
 
-Note that there is a section `Getting started' in the Minimal 
+Note that there is a section `Getting started' in the Minimal
 Introduction: Section~\ref{S_minsi1}. It may be best
 to go through that section first.
 
@@ -14032,15 +14033,23 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
-\item 2017-08-30 CRAN version 1.2-1.
+\item 2017-09-08 R-Forge Revision 316, CRAN package version 1.2-3.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+ \item totAlt also for non-directed networks.
+ \item Further corrections to make RSiena acceptable for CRAN.
+\end{itemize}
+
+\item 2017-09-04 R-Forge Revision 312.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
  \item Score test and \sfn{sienaGOF} corrected for the case that some parameters
       are fixed and not tested.
- \item New function \sfn{score.Test}. This allows, for a \sfn{print.sienaFit}
+ \item New function \sfn{score.Test}. This allows, for a \sfn{sienaFit}
      object in which some effects were tested with \texttt{test=TRUE}, to get the
-     results of the score-type test for some of all of the parameters tested.
+     results of the score-type test for some or all of the parameters tested.
      When some effects are tested with \texttt{test=TRUE}, the
      results of the score test are also presented when printing the estimation
      result.
@@ -14063,7 +14072,7 @@ Changes in RSiena and RSienaTest:
      confirmation model; this is taken from \texttt{Offset} in the algorithm object.
  \item For effects \texttt{inPopX, outPopX, inActX, outActX, sameXInPop, sameXOutAct,
      diffXInPop, diffXOutAct, homXInPop, homXOutAct, altXOutAct, diffXOutAct},
-     changed \texttt{interaction2} to `' (was `1', erroneously)
+     changed \texttt{interaction2} to \texttt{''} (was \texttt{'1'}, erroneously)
      and default parameter to 1 (\sfn{AllEffects.csv}).
  \item Additional parameter \texttt{dropRates} in \sfn{print.sienaEffects}
     (useful for \sfn{sienaBayes} with many groups).
@@ -14082,7 +14091,7 @@ Changes in RSiena:
 Changes in RSienaTest:
 \begin{itemize}
  \item Parameter \texttt{UniversalOffset} of \sfn{sienaAlgorithmCreate}
-       renamed to Offset.
+       renamed to \texttt{Offset}.
  \item Added posterior variances to \sfn{print.sienaBayesFit}.
  \item Correction of error in \sfn{sienaBayes} that could lead to errors
        in results of estimations with data sets for multiple dependent

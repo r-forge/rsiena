@@ -1,13 +1,44 @@
+2017-09-08 R-Forge Revision 316, cran package version 1.2-3
+Changes in RSiena and RSienaTest:
+   * totAlt also for non-directed networks
+   * siena07models.h corrected number of arguments forwardModel/model.
+   * Added cran-comments.md, .Rbuildignore for comments about cran submission
+   * dropped lpFirstNetwork, lpSecondNetwork, lpTwoNetworkCache from 
+     CovariateMixedNetworkAlterFunction.h (not used).
+Changes in RSiena:
+   * siena07models.h corrected number of arguments forwardModel.
+Changes in RSienaTest:
+   * siena07models.h corrected arguments model.
+
 2017-09-07 R-Forge Revision 315
 Changes in RSiena:
    * Merge RSienaTest changes r311-r314.
+
+2017-09-07 R-Forge Revision 314
+Changes in RSienaTest:
+   * StatisticCalculator.cpp: Fix memory leak in deconstructor.
+   * Move some of the 'using namespace' from header to cpp files.
+   * Lots of whitespace changes to ease the merging process.
+
+2017-09-06 R-Forge Revision 313
+Changes in RSienaTest:
+   * DependentVariable.cpp: Fix null pointer in accumulateRateScores when
+     called on BehaviorVariable.
+
+2017-09-04 R-Forge Revision 312
+Changes in RSienaTest:
+   * configure.win: adapt windows configuration script
+
+2017-09-04 R-Forge Revision 311
+Changes in RSienaTest:
+   * configure.ac: add openmp test for macOS El Capitan compatibility
 
 2017-09-03 R-Forge Revision 310
 Changes in RSiena:
    * effects.r: remove hard coded number of types of interactions
    * NetworkDependentBehaviorEffect.cpp: fix uninitialized network pointer
 
-2017-09-03 cran package version 1.2-1
+2017-09-03 cran proposal package version 1.2-1 (not accepted)
 Changes in RSiena and RSienaTest:
    * Score test and sienaGOF corrected for the case that some parameters are
      fixed and not tested.
