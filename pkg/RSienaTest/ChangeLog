@@ -1,3 +1,12 @@
+2017-09-08 R-Forge Revision 316, cran package version 1.2-3
+Changes in RSiena and RSienaTest:
+   * totAlt also for non-directed networks
+   * Added cran-comments.md, .Rbuildignore for comments about cran submission.
+
+2017-09-07 R-Forge Revision 315
+Changes in RSiena:
+   * Merge RSienaTest changes r311-r314.
+
 2017-09-07 R-Forge Revision 314
 Changes in RSienaTest:
    * StatisticCalculator.cpp: Fix memory leak in deconstructor.
@@ -17,7 +26,12 @@ Changes in RSienaTest:
 Changes in RSienaTest:
    * configure.ac: add openmp test for macOS El Capitan compatibility
 
-2017-09-03 R-Forge Revision 310 / package version 1.2-2
+2017-09-03 R-Forge Revision 310
+Changes in RSiena:
+   * effects.r: remove hard coded number of types of interactions
+   * NetworkDependentBehaviorEffect.cpp: fix uninitialized network pointer
+
+2017-09-03 cran proposal package version 1.2-1 (not accepted)
 Changes in RSiena and RSienaTest:
    * Score test and sienaGOF corrected for the case that some parameters are
      fixed and not tested.
