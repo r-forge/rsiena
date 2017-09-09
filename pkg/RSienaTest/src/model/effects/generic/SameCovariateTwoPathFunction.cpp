@@ -16,6 +16,8 @@
 #include "network/IncidentTieIterator.h"
 #include "utils/Utils.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -56,7 +58,7 @@ void SameCovariateTwoPathFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SameCovariateTwoPathFunction::value(int alter)
+double SameCovariateTwoPathFunction::value(int alter) const
 {
 	int statistic = 0;
 	if  (!(this->lexcludeMissing && this->missing(alter)))

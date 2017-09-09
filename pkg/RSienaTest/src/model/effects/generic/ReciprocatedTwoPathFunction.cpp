@@ -13,6 +13,8 @@
 #include "model/tables/NetworkCache.h"
 #include "model/tables/EgocentricConfigurationTable.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -50,7 +52,7 @@ void ReciprocatedTwoPathFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double ReciprocatedTwoPathFunction::value(int alter)
+double ReciprocatedTwoPathFunction::value(int alter) const
 {
 	return this->lpTable->get(alter);
 }

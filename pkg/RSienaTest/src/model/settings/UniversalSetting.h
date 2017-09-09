@@ -28,6 +28,7 @@ public:
 	 * @copydoc ASetting::terminateSetting(Network* const lpNetwork)
 	 */
 	virtual void terminateSetting(Network* const lpNetwork);
+	using GeneralSetting::terminateSetting;
 
 	int getSize();
 

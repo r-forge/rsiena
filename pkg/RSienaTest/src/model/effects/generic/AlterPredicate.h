@@ -11,11 +11,6 @@
 #ifndef ALTERPREDICATE_H_
 #define ALTERPREDICATE_H_
 
-// TODO Header files should not do 'using namespace'.  This might lead to
-// namespace conflicts which are very hard to resolve.  Removeing this breaks
-// almost all alterpredicate since the <alterpredicate>.cpp files depend on it.
-using namespace std;
-
 namespace siena {
 
 // ----------------------------------------------------------------------------
@@ -48,7 +43,7 @@ public:
 	 * that the predicate has been initialized before and pre-processed with
 	 * respect to a certain ego.
 	 */
-	virtual bool value(int alter) = 0;
+	virtual bool value(int alter) const = 0;
 
 protected:
 	AlterPredicate();

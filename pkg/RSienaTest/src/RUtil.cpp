@@ -201,10 +201,11 @@ MatrixXd asMatrixXd(SEXP sMatrix) {
  * @param sElemnt The element.
  */
 void setNamedListElt(SEXP sList, int i, const std::string& name, SEXP sElmnt) {
-	SEXP sNames = getAttrib(sList, R_NamesSymbol);
+	SEXP sNames = PROTECT(getAttrib(sList, R_NamesSymbol));
 	SET_STRING_ELT(sNames, i, mkChar(name.c_str()));
 	SET_VECTOR_ELT(sList, i, sElmnt);
 	setAttrib(sList, R_NamesSymbol, sNames);
+	UNPROTECT(1);
 }
 
 /**

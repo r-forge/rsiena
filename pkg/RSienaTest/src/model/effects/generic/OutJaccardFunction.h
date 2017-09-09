@@ -28,14 +28,14 @@ class ConfigurationTable;
 class OutJaccardFunction: public NetworkAlterFunction
 {
 public:
-	OutJaccardFunction(string networkName);
+	OutJaccardFunction(std::string networkName);
 
 	virtual void initialize(const Data * pData,
 		State * pState,
 		int period,
 		Cache * pCache);
 
-	virtual double value(int alter);
+	virtual double value(int alter) const;
 
 private:
 	ConfigurationTable * lpTable;

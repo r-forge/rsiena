@@ -58,32 +58,31 @@ void SameCovariateInStarFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SameCovariateInStarFunction::value(int alter)
+double SameCovariateInStarFunction::value(int alter) const
 {
 	int statistic = 0;
 	if  (!(this->lexcludeMissing && this->missing(alter)))
 	{
 		const Network * pNetwork = this->pNetwork();
-		// Iterate over outgoing ties in network W 
-		for (IncidentTieIterator iter =
-				pNetwork->outTies(this->ego());
-			iter.valid();
-			iter.next())
+		// Iterate over outgoing ties in network W
+		for (IncidentTieIterator iter = pNetwork->outTies(this->ego());
+				iter.valid();
+				iter.next())
+		{
+			// Get the sender of the outgoing tie.
+			int h = iter.actor();
+			// in-2-stars:
+			if (!(this->lexcludeMissing && this->missing(h)))
 			{
-				// Get the sender of the outgoing tie.
-				int h = iter.actor();
-				// in-2-stars:
-				if (!(this->lexcludeMissing && this->missing(h)))
-					{
-					if ((fabs(this->CovariateNetworkAlterFunction::value(h)
-				- this->CovariateNetworkAlterFunction::value(this->ego()))
-									< EPSILON) &&
-					(pNetwork->tieValue(alter, h) >= 1))
-						{
-							statistic++ ;
-						}
-					}
+				if ((fabs(this->CovariateNetworkAlterFunction::value(h)
+								- this->CovariateNetworkAlterFunction::value(this->ego()))
+							< EPSILON) &&
+						(pNetwork->tieValue(alter, h) >= 1))
+				{
+					statistic++ ;
+				}
 			}
+		}
 	}
 	return statistic;
 }

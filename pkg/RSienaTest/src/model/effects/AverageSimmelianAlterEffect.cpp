@@ -14,9 +14,11 @@
 #include "network/Network.h"
 #include "network/IncidentTieIterator.h"
 #include "network/Simmelian.h"
-
 #include "model/variables/NetworkVariable.h"
 #include "model/variables/BehaviorVariable.h"
+
+using namespace std;
+
 namespace siena
 {
 

@@ -1,7 +1,15 @@
 /******************************************************************************
  * SIENA: Simulation Investigation for Empirical Network Analysis
  * Web: http://www.stats.ox.ac.uk/~snijders/siena/
+ *
+ * This is a very basic (naive/dumb) implementation of a
+ * CovariateDependentNetworkEffect where the network is filtered to only
+ * consider simmelian ties. The simmelian network is reconstructed on each
+ * call to preprocessEgo and statistic.
+ *
+ * assumes: simmelian strength cannot be non-0 when summationTieNetwork is 0
  *****************************************************************************/
+
 #include "CovariateSimmelianAlterEffect.h"
 
 #include "logger/Logger.h"
@@ -10,15 +18,9 @@
 #include "network/IncidentTieIterator.h"
 #include "network/Simmelian.h"
 
-/**
- * This is a very basic (naive/dumb) implementation of a
- * CovariateDependentNetworkEffect where the network is filtered to only
- * consider simmelian ties. The simmelian network is reconstructed on each
- * call to preprocessEgo and statistic.
- *
- * assumes: simmelian strength cannot be non-0 when summationTieNetwork is 0
- */
-namespace siena {
+namespace siena
+{
+
 using namespace logger;
 
 CovariateSimmelianAlterEffect::CovariateSimmelianAlterEffect(
@@ -42,8 +44,8 @@ void CovariateSimmelianAlterEffect::preprocessEgo(int ego)
 	NetworkEffect::preprocessEgo(ego);
 	clearSimmelian();
 	updateSimmelian((const OneModeNetwork*) this->pNetwork()); // simulated state
-// This is now done for all simmelian effects;
-// must be inefficient. How to do better?
+	// This is now done for all simmelian effects;
+	// must be inefficient. How to do better?
 }
 
 /**
