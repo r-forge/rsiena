@@ -14,6 +14,8 @@
 #include "data/NetworkLongitudinalData.h"
 #include "data/Data.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -87,7 +89,7 @@ bool ConstantFunction::networkConstant() const
 }
 
 
-double ConstantFunction::value(int alter)
+double ConstantFunction::value(int alter) const
 {
 	return this->lconstant;
 }

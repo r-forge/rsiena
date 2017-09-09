@@ -34,19 +34,19 @@ class ConfigurationTable;
 class MixedThreeCyclesFunction : public MixedNetworkAlterFunction
 {
 public:
-	MixedThreeCyclesFunction(string firstNetworkName, string secondNetworkName,
-									double parameter);
+	MixedThreeCyclesFunction(std::string firstNetworkName,
+			std::string secondNetworkName, double parameter);
+
 	virtual void initialize(const Data * pData,
-		State * pState,
-		int period,
-		Cache * pCache);
-	virtual double value(int alter);
+		State * pState, int period, Cache * pCache);
+
+	virtual double value(int alter) const;
 
 private:
 	bool lroot; // should the square root be taken?
 	bool lcenter; // should there be centering?
 	double lavInTwoStar; // average observed number of in-two-stars in first network
-	string lvariableName; // name of first network
+	std::string lvariableName; // name of first network
 	ConfigurationTable * lpFirstInStarTable;
 	// Lookup table for fast square root calculations:
 	SqrtTable * lsqrtTable;

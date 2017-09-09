@@ -36,8 +36,20 @@
 #include "model/ml/MiniStep.h"
 #include "model/ml/NetworkChange.h"
 #include "model/ml/BehaviorChange.h"
+
 using namespace std;
 using namespace siena;
+
+/**
+ * Convert an inter SEXP to c int. If the R value isNull, return the default value.
+ */
+static int sexp_to_int(SEXP value, int def) {
+	if (!isNull(value))
+	{
+		return asInteger(value);
+	}
+	return def;
+}
 
 extern "C"
 {
@@ -45,21 +57,18 @@ extern "C"
 /**
  *  Does one forward simulation for all the data by period within group
  */
-
 SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 	SEXP FROMFINITEDIFF, SEXP MODELPTR, SEXP EFFECTSLIST,
 	SEXP THETA, SEXP RANDOMSEED2, SEXP RETURNDEPS, SEXP NEEDSEEDS,
 	SEXP USESTREAMS, SEXP ADDCHAINTOSTORE, SEXP RETURNCHAINS, SEXP RETURNLOGLIK,
 	SEXP RETURNACTORSTATISTICS, SEXP RETURNCHANGECONTRIBUTIONS)
 {
-	SEXP NEWRANDOMSEED; /* for parallel testing only */
-	PROTECT(NEWRANDOMSEED = duplicate(RANDOMSEED2));
+	SEXP NEWRANDOMSEED = PROTECT(duplicate(RANDOMSEED2)); // for parallel testing only
 
 	/* create a simulation and return the observed statistics and scores */
 
 	/* get hold of the data vector */
-	vector<Data *> * pGroupData = (vector<Data *> *)
-		R_ExternalPtrAddr(DATAPTR);
+	vector<Data *> * pGroupData = (vector<Data *> *) R_ExternalPtrAddr(DATAPTR);
 
 	/* get hold of the model object */
 	Model * pModel = (Model *) R_ExternalPtrAddr(MODELPTR);
@@ -68,40 +77,14 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 
 	/* find total number of periods to process */
 	int totObservations = totalPeriods(*pGroupData);
-
 	int fromFiniteDiff = asInteger(FROMFINITEDIFF);
 	int useStreams = asInteger(USESTREAMS);
-
-	int addChainToStore = 0;
-
+	int addChainToStore = sexp_to_int(ADDCHAINTOSTORE, 0);
 	int returnDependents = asInteger(RETURNDEPS);
-
-	int returnChains = 0;
-	if (!isNull(RETURNCHAINS))
-	{
-		returnChains = asInteger(RETURNCHAINS);
-	}
-	if (!isNull(ADDCHAINTOSTORE))
-	{
-		addChainToStore = asInteger(ADDCHAINTOSTORE);
-	}
-
-
-	int returnLoglik = 0;
-	if (!isNull(RETURNLOGLIK))
-	{
-		returnLoglik = asInteger(RETURNLOGLIK);
-	}
-	int returnActorStatistics = 0;
-	if (!isNull(RETURNACTORSTATISTICS))
-	{
-		returnActorStatistics = asInteger(RETURNACTORSTATISTICS);
-	}
-	int returnChangeContributions = 0;
-	if (!isNull(RETURNCHANGECONTRIBUTIONS))
-	{
-		returnChangeContributions = asInteger(RETURNCHANGECONTRIBUTIONS);
-	}
+	int returnChains = sexp_to_int(RETURNCHAINS, 0);
+	int returnLoglik = sexp_to_int(RETURNLOGLIK, 0);
+	int returnActorStatistics = sexp_to_int(RETURNACTORSTATISTICS, 0);
+	int returnChangeContributions = sexp_to_int(RETURNCHANGECONTRIBUTIONS, 0);
 	int deriv = asInteger(DERIV);
 	int needSeeds = asInteger(NEEDSEEDS);
 
@@ -109,8 +92,8 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 	pModel->needScores(deriv);
 
 	/* set the chain flag on the model */
-	pModel->needChain(returnChains == 1 || addChainToStore == 1 ||
-		returnLoglik == 1 || returnChangeContributions == 1);
+	pModel->needChain(returnChains == 1 || addChainToStore == 1
+			|| returnLoglik == 1 || returnChangeContributions == 1);
 
 	/* set the change contribution flag on the model */
 	pModel->needChangeContributions(returnChangeContributions);
@@ -119,8 +102,7 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 	updateParameters(EFFECTSLIST, THETA, pGroupData, pModel);
 
 	/* ans will be the return value */
-	SEXP ans;
-	PROTECT(ans = allocVector(VECSXP, 10));
+	SEXP ans = PROTECT(allocVector(VECSXP, 10));
 
 	/* count up the total number of parameters */
 	int dim = 0;
@@ -143,7 +125,7 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 		rfra[i] = 0;
 	}
 	/* ntim is the total time taken in each period (relevant for conditional
- estimation) */
+		 estimation) */
 	SEXP ntim;
 	double * rntim;
 	PROTECT(ntim = allocVector(REALSXP, totObservations));
@@ -159,8 +141,7 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 		int nVariables = (*pGroupData)[0]->rDependentVariableData().size();
 		for (int group = 0; group < nGroups; group++)
 		{
-			SET_VECTOR_ELT(sims, group,
-				allocVector(VECSXP, nVariables));
+			SET_VECTOR_ELT(sims, group, allocVector(VECSXP, nVariables));
 			for (int variable = 0; variable < nVariables; variable++)
 			{
 				SET_VECTOR_ELT(VECTOR_ELT(sims, group), variable,
@@ -170,8 +151,7 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 		}
 	}
 	/* chains will be the returned chains */
-	SEXP chains;
-	PROTECT(chains = allocVector(VECSXP, nGroups));
+	SEXP chains = PROTECT(allocVector(VECSXP, nGroups));
 	if (returnChains)
 	{
 		for (int group = 0; group < nGroups; group++)
@@ -183,23 +163,22 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 	}
 
 	/* changeContributionChain will be the returned change contributions for all chains */
-	SEXP changeContributionChains;
-	PROTECT(changeContributionChains = allocVector(VECSXP, nGroups));
+	SEXP changeContributionChains = PROTECT(allocVector(VECSXP, nGroups));
 	if (returnChangeContributions)
 	{
 		for (int group = 0; group < nGroups; group++)
 		{
-			SET_VECTOR_ELT(changeContributionChains, group,allocVector(VECSXP, (*pGroupData)[group]->observationCount() - 1));
+			SET_VECTOR_ELT(changeContributionChains, group,
+					allocVector(VECSXP, (*pGroupData)[group]->observationCount() - 1));
 		}
 	}
 
 	/* actorStats will be the returned statistics of individual actors*/
-	SEXP actorStats;
-	PROTECT(actorStats =  allocVector(VECSXP,nGroups));
+	SEXP actorStats = PROTECT(allocVector(VECSXP,nGroups));
 	if(returnActorStatistics)
 	{
 		SEXP NETWORKTYPES;
-		NETWORKTYPES =  createRObjectAttributes(EFFECTSLIST, actorStats);
+		NETWORKTYPES = createRObjectAttributes(EFFECTSLIST, actorStats);
 		int objEffects = length(NETWORKTYPES);
 		for (int group = 0; group < nGroups; group++)
 		{
@@ -212,24 +191,19 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 	}
 
 	/* loglik will be the returned log likelihoods */
-	SEXP logliks;
-	double * Rlogliks;
-	PROTECT(logliks = allocVector(REALSXP, totObservations));
-	Rlogliks = REAL(logliks);
+	SEXP logliks = PROTECT(allocVector(REALSXP, totObservations));
+	double * Rlogliks = REAL(logliks);
 
 	/* seed store is a list to save the random states */
-	SEXP seedstore;
-	PROTECT(seedstore = allocVector(VECSXP, nGroups));
+	SEXP seedstore = PROTECT(allocVector(VECSXP, nGroups));
 	for (int group = 0; group < nGroups; group++)
 	{
 		SET_VECTOR_ELT(seedstore, group,
-			allocVector(VECSXP, (*pGroupData)[group]->
-				observationCount() - 1));
+			allocVector(VECSXP, (*pGroupData)[group]->observationCount() - 1));
 	}
 
 	/* rs will allow us to access or set the .Random.seed in R */
-	SEXP rs;
-	PROTECT(rs = install(".Random.seed"));
+	SEXP rs = PROTECT(install(".Random.seed"));
 
 	/* scores will hold the return values of the scores */
 	SEXP scores;
@@ -420,15 +394,15 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 						const Network * pNetwork =
 							pNetworkVariable->pNetwork();
 						SEXP thisEdge = getEdgeList(*pNetwork);
-						SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(sims, group),
-								i), period, thisEdge);
+						SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(sims, group), i),
+								period, thisEdge);
 					}
 					else if (pBehaviorVariable)
 					{
 						SEXP theseValues =
 							getBehaviorValues(*pBehaviorVariable);
 						SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(sims,
-									group), i), period, theseValues);
+										group), i), period, theseValues);
 					}
 					else
 					{
@@ -914,7 +888,5 @@ SEXP getChainProbabilities(SEXP DATAPTR, SEXP MODELPTR,
 	UNPROTECT(1);
 	return  ans;
 }
-
-
 
 }

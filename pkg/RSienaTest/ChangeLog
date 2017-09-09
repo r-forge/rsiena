@@ -1,3 +1,14 @@
+2017-09-09 R-Forge Revision 317
+Changes in RSienaTest:
+   * Effects:
+     Move 'using namespace std' to cpp files.
+     Make value() consistently 'const'.
+     Use std::abs for integers.
+     Remove unused fields.
+   * UniversalSetting.cpp: Do not hide GeneralSetting::terminateSetting().
+   * siena07models.cpp: Reduce state complexity (rchk test).
+   * siena07*.cpp: Fix unPROTECTed vars (rchk test).
+
 2017-09-08 R-Forge Revision 316, cran package version 1.2-3
 Changes in RSiena and RSienaTest:
    * totAlt also for non-directed networks

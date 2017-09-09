@@ -19,7 +19,9 @@
  *
  * assumes: simmelian strength cannot be non-0 when summationTieNetwork is 0
  */
-namespace siena {
+namespace siena
+{
+
 using namespace logger;
 
 SimmelianEffect::SimmelianEffect(
@@ -43,8 +45,8 @@ void SimmelianEffect::preprocessEgo(int ego)
 	NetworkEffect::preprocessEgo(ego);
 	clearSimmelian();
 	updateSimmelian((const OneModeNetwork*) this->pNetwork()); // simulated state
-// This is now done for all simmelian effects;
-// must be inefficient. How to do better?
+	// This is now done for all simmelian effects;
+	// must be inefficient. How to do better?
 }
 
 /**

@@ -71,7 +71,7 @@ void SameCovariateOutTiesFunction::preprocessEgo(int ego)
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SameCovariateOutTiesFunction::value(int alter)
+double SameCovariateOutTiesFunction::value(int alter) const
 {
 	int statistic = 0;
 	if  (!(this->lexcludeMissing && this->missing(this->ego())))

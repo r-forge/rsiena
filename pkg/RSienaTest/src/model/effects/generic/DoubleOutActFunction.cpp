@@ -17,6 +17,8 @@
 #include "network/IncidentTieIterator.h"
 #include "utils/SqrtTable.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -58,7 +60,7 @@ void DoubleOutActFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double DoubleOutActFunction::value(int alter)
+double DoubleOutActFunction::value(int alter) const
 {
 	double statistic = 0;
 
@@ -66,16 +68,16 @@ double DoubleOutActFunction::value(int alter)
 	{
 		const Network * pFirstNetwork = this->pFirstNetwork();
 		const Network * pSecondNetwork = this->pSecondNetwork();
-		for (CommonNeighborIterator iter(pFirstNetwork->outTies(this->ego()),
-										pSecondNetwork->outTies(this->ego()));
-//		for (IncidentTieIterator iter = pFirstNetwork->outTies(this->ego());
-				iter.valid(); iter.next())
-			{
-//				if (this->secondOutTieExists(iter.actor()))
-//				{
-					statistic++;
-//				}
-			}
+		for (CommonNeighborIterator iter(pFirstNetwork->outTies(this->ego()), pSecondNetwork->outTies(this->ego()));
+				// for (IncidentTieIterator iter = pFirstNetwork->outTies(this->ego());
+				iter.valid();
+				iter.next())
+		{
+			// if (this->secondOutTieExists(iter.actor()))
+			// {
+			statistic++;
+			// }
+		}
 
 		if (lchange)
 		{
@@ -83,13 +85,13 @@ double DoubleOutActFunction::value(int alter)
 			{
 				if (this->firstOutTieExists(alter))
 				{
-					statistic = (statistic * this->lsqrtTable->sqrt(statistic)) -
-						((statistic - 1) * this->lsqrtTable->sqrt(statistic - 1));
+					statistic = (statistic * this->lsqrtTable->sqrt(statistic))
+						- ((statistic - 1) * this->lsqrtTable->sqrt(statistic - 1));
 				}
 				else
 				{
-					statistic = ((statistic+1) * this->lsqrtTable->sqrt(statistic+1)) -
-						(statistic * this->lsqrtTable->sqrt(statistic));
+					statistic = ((statistic+1) * this->lsqrtTable->sqrt(statistic+1))
+						- (statistic * this->lsqrtTable->sqrt(statistic));
 				}
 			}
 			else

@@ -16,6 +16,8 @@
 #include "CovariateMixedNetworkAlterFunction.h"
 #include "utils/Utils.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -57,7 +59,7 @@ void HomCovariateMixedTwoPathFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double HomCovariateMixedTwoPathFunction::value(int alter)
+double HomCovariateMixedTwoPathFunction::value(int alter) const
 {
 	int statistic = 0;
 	if (!(this->lexcludeMissing && this->missing(alter)))

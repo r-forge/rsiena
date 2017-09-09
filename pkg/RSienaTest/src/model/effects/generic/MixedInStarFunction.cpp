@@ -13,6 +13,8 @@
 #include "model/tables/TwoNetworkCache.h"
 #include "model/tables/MixedEgocentricConfigurationTable.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -51,7 +53,7 @@ void MixedInStarFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double MixedInStarFunction::value(int alter)
+double MixedInStarFunction::value(int alter) const
 {
 	return this->lpTable->get(alter);
 }

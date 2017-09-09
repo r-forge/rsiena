@@ -57,9 +57,7 @@ void XWXClosureEffect::initialize(const Data * pData,
 	Cache * pCache)
 {
 	DyadicCovariateDependentNetworkEffect::initialize(pData,
-		pState,
-		period,
-		pCache);
+		pState, period, pCache);
 
 	delete[] this->ltwoPathSums;
 	delete[] this->linStarSums;
@@ -86,8 +84,7 @@ void XWXClosureEffect::preprocessEgo(int ego)
  * sum_h x_{ih} w_{hj}.
  */
 void XWXClosureEffect::calculateTwoPathSums(int i,
-	const Network * pNetwork,
-	double * sums) const
+	const Network * pNetwork, double * sums) const
 {
 	int n = pNetwork->n();
 

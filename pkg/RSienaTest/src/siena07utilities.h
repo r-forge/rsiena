@@ -36,8 +36,8 @@ int periodFromStart(std::vector<Data *> & pGroupData, int group, int period);
 /* Calculate the total number of periods in all groups, which is the dimension
  * of some returned arrays.
  */
-
 int totalPeriods(std::vector<Data *> & pGroupData);
+
 /**
  * Traps errors so R can stop the function rather than being stoppped itself.
  *

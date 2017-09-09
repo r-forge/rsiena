@@ -106,14 +106,14 @@ int totalPeriods(vector<Data *> & pGroupData)
  */
 void Rterminate()
 {
-    try
-    {
+	try
+	{
 		throw;
-    }
-    catch(exception& e)
-    {
+	}
+	catch(exception& e)
+	{
 		error(e.what());
-    }
+	}
 }
 
 
@@ -173,14 +173,14 @@ void printOutData(Data *pData)
 					myfile << pNetworkData->
 						pStructuralTieNetwork(period)->tieCount() << endl;
 					for (TieIterator
-							 iter=pNetworkData->
-							 pStructuralTieNetwork(period)->ties();
-						 iter.valid();
-						 iter.next())
+							iter=pNetworkData->
+							pStructuralTieNetwork(period)->ties();
+							iter.valid();
+							iter.next())
 					{
 						myfile << iter.ego() << " "
-							   << iter.alter() << " "
-						 << iter.value() << endl;
+							<< iter.alter() << " "
+							<< iter.value() << endl;
 					}
 					// other attributes uponly downonly
 					myfile << pNetworkData->upOnly(period) <<  " " <<

@@ -63,9 +63,7 @@ namespace siena
  * @param[in] period the period under consideration
  */
 StatisticCalculator::StatisticCalculator(const Data * pData,
-	const Model * pModel,
-	State * pState,
-	int period)
+	const Model * pModel, State * pState, int period)
 {
 	this->lpData = pData;
 	this->lpModel = pModel;
@@ -87,7 +85,9 @@ StatisticCalculator::StatisticCalculator(const Data * pData,
  * @param[in] period the period under consideration
  * @param[in] returnActorStatistics whether individual actor statistics should be returned
  */
-StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pModel, State * pState, int period, bool returnActorStatistics)
+StatisticCalculator::StatisticCalculator(const Data * pData,
+		const Model * pModel, State * pState, int period,
+		bool returnActorStatistics)
 {
 	this->lpData = pData;
 	this->lpModel = pModel;
@@ -110,7 +110,9 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
  * @param[in] returnActorStatistics whether individual actor statistics should be returned
  * @param[in] returnStaticChangeContributions whether contributions of effects on possible next tie flips or behavior changes are needed
  */
-StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pModel, State * pState, int period, bool returnActorStatistics, bool returnStaticChangeContributions)
+StatisticCalculator::StatisticCalculator(const Data * pData,
+		const Model * pModel, State * pState, int period,
+		bool returnActorStatistics, bool returnStaticChangeContributions)
 {
 	this->lpData = pData;
 	this->lpModel = pModel;
@@ -125,7 +127,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
 }
 
 template<typename T, typename A> // type and allocator
-void clear_vector_of_array_pointers(vector<T*, A>& v)
+static void clear_vector_of_array_pointers(vector<T*, A>& v)
 {
 	for (typename vector<T*, A>::iterator it = v.begin(); it != v.end(); ++it)
 		delete[] (*it);
@@ -133,7 +135,7 @@ void clear_vector_of_array_pointers(vector<T*, A>& v)
 }
 
 template <typename K, typename T>
-void clear_map_value_array_pointers(map<K, T*>& m)
+static void clear_map_value_array_pointers(map<K, T*>& m)
 {
 	for (typename map<K, T*>::iterator it = m.begin(); it != m.end(); ++it)
 		delete[] it->second;
@@ -141,7 +143,7 @@ void clear_map_value_array_pointers(map<K, T*>& m)
 }
 
 template <typename K, typename T>
-void for_each_map_value(map<K, T>& m, void (*fn)(T&))
+static void for_each_map_value(map<K, T>& m, void (*fn)(T&))
 {
 	for (typename map<K, T>::iterator it = m.begin(); it != m.end(); ++it)
 		(*fn)(it->second);

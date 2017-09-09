@@ -22,7 +22,6 @@ AlterFunction::AlterFunction()
 	this->lego = -1;
 }
 
-
 AlterFunction::~AlterFunction()
 {
 }
@@ -36,9 +35,7 @@ AlterFunction::~AlterFunction()
  * @param[in] pCache the cache object to be used to speed up calculations
  */
 void AlterFunction::initialize(const Data * pData,
-	State * pState,
-	int period,
-	Cache * pCache)
+		State * pState, int period, Cache * pCache)
 {
 }
 

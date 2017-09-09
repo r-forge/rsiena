@@ -13,6 +13,8 @@
 #include "CovariateNetworkAlterFunction.h"
 #include "network/Network.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -41,7 +43,7 @@ CovariateDistance2EgoAltSimNetworkFunction(string networkName, string
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double CovariateDistance2EgoAltSimNetworkFunction::value(int alter)
+double CovariateDistance2EgoAltSimNetworkFunction::value(int alter) const
 {
 	double value = 0;
 	if (lincoming)
