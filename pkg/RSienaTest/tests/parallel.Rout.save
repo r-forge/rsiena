@@ -1,7 +1,7 @@
 
-R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+R version 3.4.1 (2017-06-30) -- "Single Candle"
 Copyright (C) 2017 The R Foundation for Statistical Computing
-Platform: x86_64-w64-mingw32/x64 (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -61,8 +61,7 @@ Total of 407 iteration steps.
 1 basic rate parameter mynet1 TRUE    FALSE FALSE    4.80941   0   
 2 outdegree (density)         TRUE    FALSE FALSE   -0.56039   0   
 3 reciprocity                 TRUE    FALSE FALSE    0.00000   0   
-4 transitive triplets         TRUE    FALSE FALSE    0.00000   0  
-
+4 transitive triplets         TRUE    FALSE FALSE    0.00000   0   
 > ##test4
 > mymodel$projname <- 'test4'
 > mymodel$cconditional <- TRUE
@@ -79,14 +78,15 @@ Estimates, standard errors and convergence t-ratios
                                            Error      t-ratio   
 
 Rate parameters: 
-  0       Rate parameter       3.1399  ( 0.5436   )             
-  1. eval outdegree (density) -1.1246  ( 0.3169   )   0.2203    
-  2. eval reciprocity          1.7460  ( 0.4466   )   0.0080    
+  0       Rate parameter       3.2640  ( 0.5554   )             
+  1. eval outdegree (density) -1.7460  ( 0.4314   )   0.1523    
+  2. eval reciprocity          1.4356  ( 0.4395   )   0.2525    
+  3. eval transitive triplets  0.3126  ( 0.1201   )   0.0971    
 
-Overall maximum convergence ratio:    0.2341 
+Overall maximum convergence ratio:    0.2753 
 
 
-Total of 380 iteration steps.
+Total of 231 iteration steps.
 
 > ##test5
 > mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
@@ -233,7 +233,7 @@ Overall maximum convergence ratio:    0.2577
 
 
 Total of 335 iteration steps.
- 
+
 > ##test11
 > print('test11')
 [1] "test11"
@@ -450,4 +450,4 @@ Total of 266 iteration steps.
 > 
 > proc.time()
    user  system elapsed 
-  15.95    0.46   17.94 
+ 21.728   0.524  22.189 

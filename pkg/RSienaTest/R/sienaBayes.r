@@ -2077,7 +2077,7 @@ getProbabilitiesFromC <- function(z, index=1, getScores=FALSE)
     if (nrow(callGrid) == 1)
     {
 		theta <- z$thetaMat[1,]
-        ans <- .Call("getChainProbabilities", PACKAGE = pkgname, f$pData,
+        ans <- .Call(C_getChainProbabilities, PACKAGE = pkgname, f$pData,
 					 f$pModel, as.integer(1), as.integer(1),
 					 as.integer(index), f$myeffects, theta, getScores)
         anss <- list(ans)
@@ -2126,7 +2126,7 @@ doGetProbabilitiesFromC <- function(x, thetaMat, index, getScores)
     f <- FRANstore()
 	theta <- thetaMat[x[1], ]
 #	gcp <-
-    .Call("getChainProbabilities", PACKAGE = pkgname, f$pData,
+    .Call(C_getChainProbabilities, PACKAGE = pkgname, f$pData,
 		  f$pModel, as.integer(x[1]), as.integer(x[2]),
 		  as.integer(index), f$myeffects, theta, getScores)
 

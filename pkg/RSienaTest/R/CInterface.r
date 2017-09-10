@@ -75,17 +75,16 @@ LOG <- function(priority, ..., callstack=sys.calls()){
     #cat('[', clean.callstack(callstack), '] ', msg, '\n', sep='')
     cat(msg, '\n', sep='')
   } else {
-    .Call("sienaLog", priority,
-          paste(clean.callstack(callstack), msg, collapse="\n"),
-          PACKAGE=pkgname)
+    .Call(C_sienaLog, PACKAGE=pkgname,
+			priority, paste(clean.callstack(callstack), msg, collapse="\n"))
   }
 }
 
 # Helper function to setup the C++ logger for the old siena07 functions.
 sienaSetupLogger <- function(logLevelConsole='INFO', logLevelFile='DEBUG',
                              logBaseName, logIncludeLocation=F) {
-  .Call("sienaSetupLogger", logLevelConsole, logLevelFile, logBaseName,
-        logIncludeLocation, 1, PACKAGE=pkgname)
+  .Call(C_sienaSetupLogger, PACKAGE=pkgname,
+		logLevelConsole, logLevelFile, logBaseName, logIncludeLocation, 1)
 }
 
 # The RNG setup use by siena07.
@@ -114,7 +113,7 @@ setupSeed <- function(x, z) {
 # Mostly copied from the parallel package.
 # See: R sources (R/src/library/parallel/R/RngStream.R)
 mpiClusterSetRNGStream <- function(iseed) {
-  if (.Call("sienaMPISize", PACKAGE=pkgname) > 1) {
+  if (.Call(C_sienaMPISize, PACKAGE=pkgname) > 1) {
     RNGkind("L'Ecuyer-CMRG")
     # Fix (as in the value can't change anymore) iseed (use it in some way,
     # print(iseed) would also work).
@@ -149,7 +148,7 @@ mpiClusterSetRNGStream <- function(iseed) {
     # ##########
     # require(parallel) # Not really, just to set up the seeds (nextRNGStream)
     set.seed(iseed)   # Now set the correct seed
-    rank <- .Call("sienaMPIRank", PACKAGE=pkgname)
+    rank <- .Call(C_sienaMPIRank, PACKAGE=pkgname)
     seeds <- vector("list", rank+1)
     seeds[[1]] <- .Random.seed
     for(i in seq_len(rank)) seeds[[i+1]] <- parallel::nextRNGStream(seeds[[i]])
@@ -176,8 +175,8 @@ sienacpp <- function(x, # the thing returned from sienaModelCreate
                      ...
                      )
 {
-  rank <- .Call("sienaMPIRank", PACKAGE=pkgname)
-  .Call("sienaSetupLogger", logLevelConsole, logLevelFile,
+  rank <- .Call(C_sienaMPIRank, PACKAGE=pkgname)
+  .Call(C_sienaSetupLogger, logLevelConsole, logLevelFile,
         paste(logBaseName, rank, sep='-'),
         logIncludeLocation, nThreads, PACKAGE=pkgname)
 
@@ -245,8 +244,8 @@ sienacpp <- function(x, # the thing returned from sienaModelCreate
 
   # Run the estimation.
   z$estimationtime <- proc.time()['elapsed']
-  z$sienafit <- .Call("sienaEstimateGroup", z,
-                      f$pModel, f$pData, nThreads, PACKAGE=pkgname)
+  z$sienafit <- .Call(C_sienaEstimateGroup, PACKAGE=pkgname, z,
+                      f$pModel, f$pData, nThreads)
   z$estimationtime <- proc.time()['elapsed'] - z$estimationtime
   z <- reformatSienaFit(z)
   # Since we have not set all fields terminateFRAN() would fail.
@@ -682,35 +681,33 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
   #   nGroup <- f$nGroup
   #   f[(nGroup + 1): length(f)] <- NULL
   # }
-  pData <- .Call("setupData", PACKAGE=pkgname,
+  pData <- .Call(C_setupData, PACKAGE=pkgname,
                  lapply(f, function(x)(as.integer(x$observations))),
                  lapply(f, function(x)(x$nodeSets)))
-  ans <- .Call("OneMode", PACKAGE=pkgname,
+  ans <- .Call(C_OneMode, PACKAGE=pkgname,
                pData, lapply(f, function(x)x$nets))
-  ans <- .Call("Bipartite", PACKAGE=pkgname,
+  ans <- .Call(C_Bipartite, PACKAGE=pkgname,
                pData, lapply(f, function(x)x$bipartites))
-  ans <- .Call("Behavior", PACKAGE=pkgname,
+  ans <- .Call(C_Behavior, PACKAGE=pkgname,
                pData, lapply(f, function(x)x$behavs))
-  ans <-.Call("ConstantCovariates", PACKAGE=pkgname,
+  ans <-.Call(C_ConstantCovariates, PACKAGE=pkgname,
               pData, lapply(f, function(x)x$cCovars))
-  ans <-.Call("ChangingCovariates", PACKAGE=pkgname,
+  ans <-.Call(C_ChangingCovariates, PACKAGE=pkgname,
               pData, lapply(f, function(x)x$vCovars))
-  ans <-.Call("DyadicCovariates", PACKAGE=pkgname,
+  ans <-.Call(C_DyadicCovariates, PACKAGE=pkgname,
               pData, lapply(f, function(x)x$dycCovars))
-  ans <-.Call("ChangingDyadicCovariates", PACKAGE=pkgname,
+  ans <-.Call(C_ChangingDyadicCovariates, PACKAGE=pkgname,
               pData, lapply(f, function(x)x$dyvCovars))
-  ans <-.Call("ExogEvent", PACKAGE=pkgname,
+  ans <-.Call(C_ExogEvent, PACKAGE=pkgname,
               pData, lapply(f, function(x)x$exog))
   ## split the names of the constraints
   higher <- attr(f, "allHigher")
   disjoint <- attr(f, "allDisjoint")
   atLeastOne <- attr(f, "allAtLeastOne")
-  froms <- sapply(strsplit(names(higher), ","), function(x)x[1])
-  tos <- sapply(strsplit(names(higher), ","), function(x)x[2])
-  ans <- .Call("Constraints", PACKAGE=pkgname,
-               pData, froms[higher], tos[higher],
-               froms[disjoint], tos[disjoint],
-               froms[atLeastOne], tos[atLeastOne])
+  froms <- sapply(strsplit(names(higher), ","), function(x) x[1])
+  tos <- sapply(strsplit(names(higher), ","), function(x) x[2])
+  ans <- .Call(C_Constraints, PACKAGE = pkgname, pData, froms[higher], tos[higher],
+    froms[disjoint], tos[disjoint], froms[atLeastOne], tos[atLeastOne])
 
   ##store the address
   f$pData <- pData
@@ -763,7 +760,7 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
   #   interactionEffectsl <- ff$interactionEffectsl
   #   types <- ff$types
   # }
-  ans <- .Call("effects", PACKAGE=pkgname, pData, basicEffects)
+  ans <- .Call(C_effects, PACKAGE=pkgname, pData, basicEffects)
   pModel <- ans[[1]][[1]]
   for (i in seq(along=(ans[[2]]))) ## ans[[2]] is a list of lists of
     ## pointers to effects. Each list corresponds to one
@@ -781,7 +778,7 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
           basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
                                             basicEffects[[i]]$effectNumber)]
   }
-  ans <- .Call("interactionEffects", PACKAGE=pkgname,
+  ans <- .Call(C_interactionEffects, PACKAGE=pkgname,
                pModel, interactionEffects)
   ## copy these pointers to the interaction effects and then insert in
   ## effects object in the same rows for later use
@@ -854,7 +851,7 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
     simpleRates <- FALSE
   }
   z$simpleRates <- simpleRates
-  ans <- .Call("setupModelOptions", PACKAGE=pkgname,
+  ans <- .Call(C_setupModelOptions, PACKAGE=pkgname,
                pData, pModel, MAXDEGREE, UNIVERSALOFFSET, CONDVAR, CONDTARGET,
                profileData, z$parallelTesting, MODELTYPE, BEHMODELTYPE, z$simpleRates,
                x$normSetRates)
@@ -889,7 +886,7 @@ initializeC <- function(z, x, data, effects, prevAns=NULL, initC,
         stop("Non-local effect chosen.")
       }
       z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms, x$prdrms)
-      ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
+      ans <- .Call(C_mlMakeChains, PACKAGE=pkgname, pData, pModel,
                    z$probs, z$prmin, z$prmib, x$minimumPermutationLength,
                    x$maximumPermutationLength, x$initialPermutationLength,
                    z$localML)

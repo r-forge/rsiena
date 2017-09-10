@@ -10,11 +10,7 @@
 #ifndef RSIENA_RINTERFACE_H_
 #define RSIENA_RINTERFACE_H_
 
-#include "estimator/SienaFit.h"
-
 #include <Rinternals.h>
-
-SEXP rifySienaFit(const siena::SienaFit& fit);
 
 extern "C" {
 

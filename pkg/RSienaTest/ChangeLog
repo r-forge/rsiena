@@ -1,3 +1,8 @@
+2017-09-10 R-Forge Revision 319
+Changes in RSienaTest:
+   * init.cpp: Register native routines.
+   * *.R: Apdapt .Call statements.
+
 2017-09-09 R-Forge Revision 318, packages version 1.2-4.
 Changes in RSiena and RSienaTest:
    * Longer Description field in DESCRIPTION, as per CRAN suggestions.

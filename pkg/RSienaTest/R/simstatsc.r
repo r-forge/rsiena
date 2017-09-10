@@ -81,7 +81,7 @@ simstats0c <- function(z, x, data=NULL, effects=NULL, fromFiniteDiff=FALSE,
 	#}
     ## z$int2 is the number of processors if iterating by period, so 1 means
     ## we are not. Now have removed option to parallelize by period
-	ans <- .Call('model', PACKAGE=pkgname, z$Deriv, f$pData, seeds,
+	ans <- .Call(C_model, PACKAGE=pkgname, z$Deriv, f$pData, seeds,
 				 fromFiniteDiff, f$pModel, f$myeffects, z$theta,
 				 randomseed2, returnDeps, z$FinDiff.method,
 				 !is.null(z$cl) && useStreams, z$addChainToStore,
@@ -169,10 +169,10 @@ simstats0c <- function(z, x, data=NULL, effects=NULL, fromFiniteDiff=FALSE,
 ##@clearData siena07 Finalizer to clear Data object in C++
 clearData <- function(pData)
 {
-    .Call('deleteData', PACKAGE=pkgname, pData)
+    .Call(C_deleteData, PACKAGE=pkgname, pData)
 }
 ##@clearModel siena07 Finalizer to clear Model object in C++
 clearModel <- function(pModel)
 {
-    .Call('deleteModel', PACKAGE=pkgname, pModel)
+    .Call(C_deleteModel, PACKAGE=pkgname, pModel)
 }

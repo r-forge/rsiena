@@ -483,24 +483,24 @@ checkNames <- function(xx, types){
         nGroup <- f$nGroup
         f[(nGroup + 1): length(f)] <- NULL
     }
-    pData <- .Call("setupData", PACKAGE=pkgname,
+    pData <- .Call(C_setupData, PACKAGE=pkgname,
                    lapply(f, function(x)(as.integer(x$observations))),
                    lapply(f, function(x)(x$nodeSets)))
-	ans <- .Call("OneMode", PACKAGE=pkgname,
+	ans <- .Call(C_OneMode, PACKAGE=pkgname,
                  pData, lapply(f, function(x)x$nets))
-    ans <- .Call("Bipartite", PACKAGE=pkgname,
+    ans <- .Call(C_Bipartite, PACKAGE=pkgname,
                  pData, lapply(f, function(x)x$bipartites))
-    ans <- .Call("Behavior", PACKAGE=pkgname,
+    ans <- .Call(C_Behavior, PACKAGE=pkgname,
                  pData, lapply(f, function(x)x$behavs))
-    ans <-.Call("ConstantCovariates", PACKAGE=pkgname,
+    ans <-.Call(C_ConstantCovariates, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$cCovars))
-    ans <-.Call("ChangingCovariates", PACKAGE=pkgname,
+    ans <-.Call(C_ChangingCovariates, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$vCovars))
-	ans <-.Call("DyadicCovariates", PACKAGE=pkgname,
+	ans <-.Call(C_DyadicCovariates, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$dycCovars))
-	ans <-.Call("ChangingDyadicCovariates", PACKAGE=pkgname,
+	ans <-.Call(C_ChangingDyadicCovariates, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$dyvCovars))
-	ans <-.Call("ExogEvent", PACKAGE=pkgname,
+	ans <-.Call(C_ExogEvent, PACKAGE=pkgname,
                 pData, lapply(f, function(x)x$exog))
    ## split the names of the constraints
     higher <- attr(f, "allHigher")
@@ -508,7 +508,7 @@ checkNames <- function(xx, types){
     atLeastOne <- attr(f, "allAtLeastOne")
     froms <- sapply(strsplit(names(higher), ","), function(x)x[1])
     tos <- sapply(strsplit(names(higher), ","), function(x)x[2])
-    ans <- .Call("Constraints", PACKAGE=pkgname,
+    ans <- .Call(C_Constraints, PACKAGE=pkgname,
                  pData, froms[higher], tos[higher],
                  froms[disjoint], tos[disjoint],
                  froms[atLeastOne], tos[atLeastOne])
@@ -572,7 +572,7 @@ checkNames <- function(xx, types){
         interactionEffectsl <- ff$interactionEffectsl
         types <- ff$types
     }
-	ans <- .Call("effects", PACKAGE=pkgname, pData, basicEffects)
+	ans <- .Call(C_effects, PACKAGE=pkgname, pData, basicEffects)
     pModel <- ans[[1]][[1]]
     for (i in seq(along=(ans[[2]]))) ## ans[[2]] is a list of lists of
         ## pointers to effects. Each list corresponds to one
@@ -590,7 +590,7 @@ checkNames <- function(xx, types){
             basicEffects[[i]]$effectPtr[match(interactionEffects[[i]]$effect3,
                                               basicEffects[[i]]$effectNumber)]
     }
-    ans <- .Call("interactionEffects", PACKAGE=pkgname,
+    ans <- .Call(C_interactionEffects, PACKAGE=pkgname,
                  pModel, interactionEffects)
     ## copy these pointers to the interaction effects and then insert in
     ## effects object in the same rows for later use
@@ -673,14 +673,13 @@ checkNames <- function(xx, types){
 		simpleRates <- FALSE
 	}
 	z$simpleRates <- simpleRates
-
-	ans <- .Call("setupModelOptions", PACKAGE=pkgname,
+	ans <- .Call(C_setupModelOptions, PACKAGE=pkgname,
                  pData, pModel, MAXDEGREE, UNIVERSALOFFSET, CONDVAR, CONDTARGET,
                  profileData, z$parallelTesting, MODELTYPE, BEHMODELTYPE,
 				 z$simpleRates, x$normSetRates)
     if (!initC)
     {
-        ans <- .Call("getTargets", PACKAGE=pkgname, pData, pModel, myeffects,
+        ans <- .Call(C_getTargets, PACKAGE=pkgname, pData, pModel, myeffects,
 					 z$parallelTesting, returnActorStatistics=FALSE,
 					 returnStaticChangeContributions=FALSE)
 		##stop("done")
@@ -765,7 +764,7 @@ checkNames <- function(xx, types){
 
             z$probs <- c(x$pridg, x$prcdg, x$prper, x$pripr, x$prdpr, x$prirms,
                          x$prdrms)
-            ans <- .Call("mlMakeChains", PACKAGE=pkgname, pData, pModel,
+            ans <- .Call(C_mlMakeChains, PACKAGE=pkgname, pData, pModel,
                          z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,
                          x$maximumPermutationLength,
@@ -776,7 +775,7 @@ checkNames <- function(xx, types){
         }
         else ## set up the initial chains in the sub processes
         {
-			ans <- .Call("mlInitializeSubProcesses",
+			ans <- .Call(C_mlInitializeSubProcesses,
                          PACKAGE=pkgname, pData, pModel,
                          z$probs, z$prmin, z$prmib,
                          x$minimumPermutationLength,

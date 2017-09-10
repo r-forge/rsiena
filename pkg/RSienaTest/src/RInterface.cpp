@@ -7,6 +7,7 @@
  * \brief Implements RInterface.h.
  *****************************************************************************/
 
+#include "estimator/SienaFit.h"
 #include "RInterface.h"
 
 #include <Eigen/Core>
@@ -65,7 +66,7 @@ Appender* logConsoleAppender;
  * @param rFit SienaFit object.
  * @return R list containing the information in `rFit`.
  */
-SEXP rifySienaFit(const SienaFit& rFit) {
+static SEXP rifySienaFit(const SienaFit& rFit) {
 	int n = 21;
 	SEXP sList;
 	PROTECT(sList = allocVector(VECSXP, n));
