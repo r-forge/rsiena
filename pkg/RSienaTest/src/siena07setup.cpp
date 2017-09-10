@@ -14,6 +14,8 @@
  * Sets up the Data object with data from R
  */
 
+#include "siena07setup.h"
+
 #include <vector>
 #include <cstring>
 #include <R_ext/Random.h>
@@ -49,6 +51,7 @@ static int sexp_to_int(SEXP value, int def) {
 
 extern "C"
 {
+
 /**
  *  Creates an array of pointers to Data objects, one for each group
  *  and returns the address of the array to R. Also creates the actor sets
@@ -114,6 +117,7 @@ SEXP OneMode(SEXP RpData, SEXP ONEMODELIST)
 	}
 	return R_NilValue;
 }
+
 /**
  *  Creates all the groups of bipartite networks in the data
  *
@@ -137,6 +141,7 @@ SEXP Bipartite(SEXP RpData, SEXP BIPARTITELIST)
 	}
 	return R_NilValue;
 }
+
 /**
  *  Creates all the groups of behavior networks in the data
  */
@@ -158,10 +163,10 @@ SEXP Behavior(SEXP RpData, SEXP BEHLIST)
 	}
 	return R_NilValue;
 }
+
 /**
  *  Creates all the groups of constant covariates in the data
  */
-
 SEXP ConstantCovariates(SEXP RpData, SEXP COCOVARLIST)
 {
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -826,9 +831,9 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	size_t nGroups = pGroupData->size();
 	int totObservations = totalPeriods(*pGroupData);
 
-	/* find the number of effects over all dependent variables:
-	   sum of lengths of first columns:
-	   for dimension of return vector */
+	// find the number of effects over all dependent variables:
+	// sum of lengths of first columns:
+	// for dimension of return vector
 	int nEffects = 0;
 	for (int i = 0; i < length(EFFECTSLIST); i++)
 	{
@@ -896,8 +901,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 		SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)
 {
 	/* get hold of the data vector */
-	vector<Data *> * pGroupData = (vector<Data *> *)
-		R_ExternalPtrAddr(DATAPTR);
+	vector<Data *> * pGroupData = (vector<Data *> *) R_ExternalPtrAddr(DATAPTR);
 	int nGroups = pGroupData->size();
 
 	/* find total number of periods to process */
@@ -923,7 +927,6 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	pModel->insertRandomMissingProbability(REAL(PROBS)[5]);
 	//PrintValue(PROBS);
 	pModel->deleteRandomMissingProbability(REAL(PROBS)[6]);
-
 
 	double * prmin = REAL(PRMIN);
 	double * prmib = REAL(PRMIB);
@@ -1051,13 +1054,12 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 /**
  * Sets up chains in sub processes by copying them from input
  */
-SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
-	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
-	SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP CHAINS, SEXP LOCALML)
+SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR, SEXP PROBS,
+		SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM, SEXP MAXIMUMPERM,
+		SEXP INITIALPERM, SEXP CHAINS, SEXP LOCALML)
 {
 	/* get hold of the data vector */
-	vector<Data *> * pGroupData = (vector<Data *> *)
-		R_ExternalPtrAddr(DATAPTR);
+	vector<Data *> * pGroupData = (vector<Data *> *) R_ExternalPtrAddr(DATAPTR);
 
 	int nGroups = pGroupData->size();
 

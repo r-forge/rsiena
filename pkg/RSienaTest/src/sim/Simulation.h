@@ -16,6 +16,10 @@
 #ifndef RSIENA_SIMULATION_H_
 #define RSIENA_SIMULATION_H_
 
+#include <Eigen/Dense>
+#include <list>
+#include <vector>
+
 #include "listener/Result.h"
 #include "listener/ResultType.h"
 
@@ -25,10 +29,6 @@
 #include "model/EffectInfo.h"
 #include "model/EpochSimulation.h"
 #include "model/StatisticCalculator.h"
-
-#include <Eigen/Dense>
-#include <list>
-#include <vector>
 
 namespace siena {
 

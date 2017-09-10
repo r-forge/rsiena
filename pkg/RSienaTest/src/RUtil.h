@@ -10,6 +10,7 @@
 #ifndef RUTIL_H_
 #define RUTIL_H_
 
+#include "Eigen/Types.h" // custom Eigen type declarations
 #include "RInterface.h"
 
 #include <Eigen/Core>
@@ -17,7 +18,8 @@
 #include <vector>
 #include <string>
 
-namespace siena {
+namespace siena
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 // RNG state

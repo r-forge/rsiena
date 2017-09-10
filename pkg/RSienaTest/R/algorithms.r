@@ -180,7 +180,7 @@ algorithms <- function(data, effects, x, ...)
 					parSapply(z$cl, 1:nrow(z$callGrid), function(i, keep)
 						  {
 							  f <- FRANstore()
-							  .Call("clearStoredChains", PACKAGE=pkgname,
+							  .Call(C_clearStoredChains, PACKAGE=pkgname,
 									f$pModel, keep, i)
 						  }, keep=keep)
 				}
@@ -189,7 +189,7 @@ algorithms <- function(data, effects, x, ...)
 					sapply(1:nrow(z$callGrid), function(i)
 					   {
 						   f <- FRANstore()
-						   .Call("clearStoredChains", PACKAGE=pkgname,
+						   .Call(C_clearStoredChains, PACKAGE=pkgname,
 								f$pModel, keep, i)
 					   })
 				}
@@ -392,7 +392,7 @@ forwardGetProbabilitiesFromC <- function(index, z, getScores=FALSE)
 {
     f <- FRANstore()
 	anss <- apply(z$callGrid, 1, function(x)
-		  .Call("getChainProbabilities", PACKAGE = pkgname, f$pData,
+		  .Call(C_getChainProbabilities, PACKAGE = pkgname, f$pData,
 				f$pModel, as.integer(x[1]), as.integer(x[2]),
 				as.integer(index), f$myeffects, z$thetaMat[1,], getScores)
 		  )
@@ -602,7 +602,7 @@ algorithmsInitialize <-
 doCreateChains <- function()
 {
 	f <- FRANstore()
-	ans <- .Call("createChainStorage", PACKAGE=pkgname,
+	ans <- .Call(C_createChainStorage, PACKAGE=pkgname,
 				 f$pData, f$pModel, f$simpleRates)
 	f$pChain <- ans
 	FRANstore(f)
@@ -1013,7 +1013,7 @@ profDerivFn <- function(theta, z, fix, thetaFix)
 clearStoredChains <- function()
 {
     f <- FRANstore()
-    .Call("clearStoredChains", PACKAGE=pkgname, f$pModel)
+    .Call(C_clearStoredChains, PACKAGE=pkgname, f$pModel)
 }
 
 ##@doChangeStep algorithms change step for use in algorithms NB may be out of sync with phase 2

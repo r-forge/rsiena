@@ -12,7 +12,8 @@
 
 #include "StepNormalization.h"
 
-namespace siena {
+namespace siena
+{
 
 /**
  * Step sanitizing with the max step width based on the statistics of phase 1.
