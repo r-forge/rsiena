@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-1.
+This version was renewed for \RS version 1.2-3.
 \end{abstract}
 
 
@@ -853,6 +853,9 @@ of the software appear).
             install \sfn{sna} and \sfn{igraph}.\\
             You can just install \RS and the other packages
             in the regular way from CRAN.
+            If you want to have detailed information about
+            what is available at CRAN, go to\\
+\url{http://cran.r-project.org/web/packages/RSiena/} .\\     
             However, it is advisable to have the latest version of \RS
             or \sfn{RSienaTest} from R-Forge or the \SI website.
             You can go to\\
@@ -881,24 +884,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.1-308}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-3}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-1.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-3.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-1.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-3.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-1.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-3.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-1.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-3.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-1.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-3.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-1.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-3.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1096,7 +1099,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-1) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-3) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1306,8 +1309,8 @@ outside R. \fi
 
 Missing values must be indicated in the way usual for \Rn,
 by \texttt{NA}.
-For data specification by the graphical interface \textsf{siena01Gui}
-or by the function \textsf{sienaDataCreateFromSession},
+For data specification by the function 
+\textsf{sienaDataCreateFromSession},
 instead of \texttt{NA} any numerical code can be used
 given that this is indicated to be a missing value code.
 
@@ -13560,12 +13563,6 @@ Tables \ref{tab:FuncExR} and \ref{tab:ListSienaExec} present the list of useful
  &                          \multicolumn{1}{c}{\textbf{Syntax}} &
  \multicolumn{1}{c}{\textbf{Examples}} &
 \multicolumn{1}{c}{\textbf{Description}} \\
-        \cline{1-5}
-        1 &help\tnote{*} &  help(funame) &  help(siena01Gui) &
-    Opens the help on the function named ``funame''; this can also be done by
-    typing ``?'' followed by ``funame'' in  the console.
-    This is the general way to get information about further options
-    of this function.    \\
         \hline
         1   &getwd  &getwd()        & &
 Returns the name of the current working directory.
@@ -13655,12 +13652,6 @@ Execution}
     &Starts the installer for the standalone version of \rs.
 Only for Windows. Does not require arguments\\
 \hline
-
-%3 -- 5& siena01Gui& siena01Gui()&   &   Does not require arguments.
-% Opens a GUI to be used to run the model estimation or to create a session
-% from which to work within \Rn. Details on how to run the estimation under
-% the GUI can be found in section \ref{thegui} and \ref{estgui}.\\
-%\hline
 
 3   &sienaNodeSet   &sienaNodeSet (n, \newline
 nodeSetName= ``Actors'', \newline

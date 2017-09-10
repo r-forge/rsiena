@@ -50,16 +50,22 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
         timeDummies <- !x$timeDummy[x$include] == ","
         specs <- as.data.frame(x[, c("name", "effectName", "include", "fix",
 											"test", "initialValue", "parm")])
-        specs.br <- x$basicRate
         if (includeOnly)
         {
-            specs <- specs[x$include, ]
-            row.names(specs) <- 1:nrow(specs)
+			included <- x$include
+			}
+		else
+		{
+			included <- rep(TRUE, nrow(x))
         }
         if (dropRates)
         {
-            specs.br <- specs.br[x$include]
-            specs <- specs[!specs.br, ]
+			included <- included & !x$basicRate
+		}
+		specs <- specs[included, ]
+		if (nrow(specs) > 0) 
+		{
+			row.names(specs) <- 1:nrow(specs)
         }
         if (nDependents == 1)
         {
@@ -67,23 +73,23 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
         }
         if (any(endowments))
         {
-            specs <- cbind(specs, type=x[x$include, "type"])
+			specs <- cbind(specs, type=x[included, "type"])
         }
         if (any(timeDummies))
         {
-            specs <- cbind(specs, timeDummy=x[x$include, "timeDummy"])
+			specs <- cbind(specs, timeDummy=x[included, "timeDummy"])
         }
         if (any(userSpecifieds))
         {
-            specs <- cbind(specs, x[x$include, c("effect1", "effect2")])
-            if (any (x$effect3[x$include] > 0))
+			specs <- cbind(specs, x[included, c("effect1", "effect2")])
+			if (any (x$effect3[included] > 0))
             {
-                specs <- cbind(specs, effect3=x[x$include, "effect3"])
+				specs <- cbind(specs, effect3=x[included, "effect3"])
             }
         }
 		if (includeRandoms)
 		{
-		     specs <- cbind(specs, randomEffects=x[x$include, "randomEffects"])
+			specs <- cbind(specs, randomEffects=x[included, "randomEffects"])
    		}
         specs[, "initialValue"] <- format(round(specs$initialValue,digits=5),
                                           width=10)

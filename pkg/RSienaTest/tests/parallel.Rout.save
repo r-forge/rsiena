@@ -43,6 +43,26 @@ Overall maximum convergence ratio:    0.3838
 
 Total of 407 iteration steps.
 
+> (myeff <- includeEffects(myeff, transTrip, cycle4))
+  effectName          include fix   test  initialValue parm
+1 transitive triplets TRUE    FALSE FALSE          0   0   
+2 4-cycles (#)        TRUE    FALSE FALSE          0   1   
+  effectName                  include fix   test  initialValue parm
+1 basic rate parameter mynet1 TRUE    FALSE FALSE    4.80941   0   
+2 outdegree (density)         TRUE    FALSE FALSE   -0.56039   0   
+3 reciprocity                 TRUE    FALSE FALSE    0.00000   0   
+4 transitive triplets         TRUE    FALSE FALSE    0.00000   0   
+5 4-cycles (#)                TRUE    FALSE FALSE    0.00000   1   
+> (myeff <- includeEffects(myeff, cycle4, include=FALSE))
+[1] effectName   include      fix          test         initialValue
+[6] parm        
+<0 rows> (or 0-length row.names)
+  effectName                  include fix   test  initialValue parm
+1 basic rate parameter mynet1 TRUE    FALSE FALSE    4.80941   0   
+2 outdegree (density)         TRUE    FALSE FALSE   -0.56039   0   
+3 reciprocity                 TRUE    FALSE FALSE    0.00000   0   
+4 transitive triplets         TRUE    FALSE FALSE    0.00000   0  
+
 > ##test4
 > mymodel$projname <- 'test4'
 > mymodel$cconditional <- TRUE
