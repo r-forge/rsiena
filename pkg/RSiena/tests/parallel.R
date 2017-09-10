@@ -12,6 +12,8 @@ ans<- siena07(mymodel, data=mydata, effects=myeff,
      batch=TRUE, parallelTesting=TRUE, silent=TRUE)
 #,dll='../siena/src/RSiena.dll')
 ans
+(myeff <- includeEffects(myeff, transTrip, cycle4))
+(myeff <- includeEffects(myeff, cycle4, include=FALSE))
 ##test4
 mymodel$projname <- 'test4'
 mymodel$cconditional <- TRUE

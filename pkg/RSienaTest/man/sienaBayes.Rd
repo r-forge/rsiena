@@ -264,7 +264,9 @@ glueBayes(z1, z2, nwarm2=0)
   FourEffects <- setEffect(FourEffects, density, random=TRUE)
   FourEffects <- setEffect(FourEffects, recip, random=TRUE)
   print(FourEffects, includeRandoms=TRUE)
-  # Note this also shows the "randomEffects" column.
+# Note this also shows the "randomEffects" column.
+  print(FourEffects, includeRandoms=TRUE, dropRates=TRUE)
+# Note this does not show the rate effects.
   FourAlgo <- sienaAlgorithmCreate(projname = "FourGroups", maxlike=TRUE,
                                    seed=123)
 \dontrun{

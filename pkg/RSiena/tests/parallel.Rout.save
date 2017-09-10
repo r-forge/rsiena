@@ -1,6 +1,6 @@
 
-R version 3.2.1 (2015-06-18) -- "World-Famous Astronaut"
-Copyright (C) 2015 The R Foundation for Statistical Computing
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -42,6 +42,26 @@ Overall maximum convergence ratio:    0.3838
 
 
 Total of 407 iteration steps.
+
+> (myeff <- includeEffects(myeff, transTrip, cycle4))
+  effectName          include fix   test  initialValue parm
+1 transitive triplets TRUE    FALSE FALSE          0   0   
+2 4-cycles (#)        TRUE    FALSE FALSE          0   1   
+  effectName                  include fix   test  initialValue parm
+1 basic rate parameter mynet1 TRUE    FALSE FALSE    4.80941   0   
+2 outdegree (density)         TRUE    FALSE FALSE   -0.56039   0   
+3 reciprocity                 TRUE    FALSE FALSE    0.00000   0   
+4 transitive triplets         TRUE    FALSE FALSE    0.00000   0   
+5 4-cycles (#)                TRUE    FALSE FALSE    0.00000   1   
+> (myeff <- includeEffects(myeff, cycle4, include=FALSE))
+[1] effectName   include      fix          test         initialValue
+[6] parm        
+<0 rows> (or 0-length row.names)
+  effectName                  include fix   test  initialValue parm
+1 basic rate parameter mynet1 TRUE    FALSE FALSE    4.80941   0   
+2 outdegree (density)         TRUE    FALSE FALSE   -0.56039   0   
+3 reciprocity                 TRUE    FALSE FALSE    0.00000   0   
+4 transitive triplets         TRUE    FALSE FALSE    0.00000   0  
 
 > ##test4
 > mymodel$projname <- 'test4'

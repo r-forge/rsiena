@@ -1,3 +1,12 @@
+2017-09-09 R-Forge Revision 318, packages version 1.2-4.
+Changes in RSiena and RSienaTest:
+   * Longer Description field in DESCRIPTION, as per CRAN suggestions.
+   * Correction of print.sienaFit, repairing the option include=FALSE
+     in setEffect and includeEffects.
+   * Included test of includeEffects in parallel.r.
+Changes in RSienaTest:
+   * Extra line in example for sienaBayes.Rd.
+
 2017-09-09 R-Forge Revision 317
 Changes in RSienaTest:
    * Effects:

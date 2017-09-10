@@ -1,14 +1,27 @@
+2017-09-09 R-Forge Revision 318, packages version 1.2-4.
+Changes in RSiena and RSienaTest:
+   * Longer Description field in DESCRIPTION, as per CRAN suggestions.
+   * Correction of print.sienaFit, repairing the option include=FALSE
+     in setEffect and includeEffects.
+   * Included test of includeEffects in parallel.r.
+Changes in RSienaTest:
+   * Extra line in example for sienaBayes.Rd.
+
+2017-09-09 R-Forge Revision 317
+Changes in RSienaTest:
+   * Effects:
+     Move 'using namespace std' to cpp files.
+     Make value() consistently 'const'.
+     Use std::abs for integers.
+     Remove unused fields.
+   * UniversalSetting.cpp: Do not hide GeneralSetting::terminateSetting().
+   * siena07models.cpp: Reduce state complexity (rchk test).
+   * siena07*.cpp: Fix unPROTECTed vars (rchk test).
+
 2017-09-08 R-Forge Revision 316, cran package version 1.2-3
 Changes in RSiena and RSienaTest:
    * totAlt also for non-directed networks
-   * siena07models.h corrected number of arguments forwardModel/model.
-   * Added cran-comments.md, .Rbuildignore for comments about cran submission
-   * dropped lpFirstNetwork, lpSecondNetwork, lpTwoNetworkCache from 
-     CovariateMixedNetworkAlterFunction.h (not used).
-Changes in RSiena:
-   * siena07models.h corrected number of arguments forwardModel.
-Changes in RSienaTest:
-   * siena07models.h corrected arguments model.
+   * Added cran-comments.md, .Rbuildignore for comments about cran submission.
 
 2017-09-07 R-Forge Revision 315
 Changes in RSiena:
