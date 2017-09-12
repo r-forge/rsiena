@@ -1,3 +1,12 @@
+2017-09-10 R-Forge Revision 320
+Changes in RSienaTest:
+   * siena07*.h: Update method declarations.
+   * getTargets.R: getTheTargets renamed to getTargets to match with RSiena.
+   * R/algorithms.r: Uncomment doCreateChains (C side is missing). See change
+     log for "2017-09-03 version 1.2-1" where it is mentioned as dropped.
+   * utils/Utils.cpp: Make log call unambiguous.
+   * R/*, man/*: Whitespace changes to ease the merging.
+
 2017-09-10 R-Forge Revision 319
 Changes in RSienaTest:
    * init.cpp: Register native routines.

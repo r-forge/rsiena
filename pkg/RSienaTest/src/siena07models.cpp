@@ -57,7 +57,7 @@ extern "C"
 /**
  *  Does one forward simulation for all the data by period within group
  */
-SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
+SEXP forwardModel(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 	SEXP FROMFINITEDIFF, SEXP MODELPTR, SEXP EFFECTSLIST,
 	SEXP THETA, SEXP RANDOMSEED2, SEXP RETURNDEPS, SEXP NEEDSEEDS,
 	SEXP USESTREAMS, SEXP ADDCHAINTOSTORE, SEXP RETURNCHAINS, SEXP RETURNLOGLIK,
@@ -351,7 +351,6 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 				 effectNo++)
 			{
 				rfra[iii + effectNo] = statistic[effectNo];
-
 				rscores[iii + effectNo] = score[effectNo];
 			}
 			if(returnActorStatistics)
@@ -360,14 +359,14 @@ SEXP model(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 				vector<double *> actorStatistics;
 				getActorStatistics(EFFECTSLIST, &Calculator, &actorStatistics);
 				int actors = pData->rDependentVariableData()[0]->n();
-			    for(unsigned e = 0; e < actorStatistics.size(); e++)
+				for(unsigned e = 0; e < actorStatistics.size(); e++)
 				{
 					SEXP actorStatsValues;
 					PROTECT(actorStatsValues = allocVector(REALSXP, actors));
 					double * astats = REAL(actorStatsValues);
 					for(int i = 0; i < actors; i++)
 					{
-						astats[i]= actorStatistics.at(e)[i];
+						astats[i] = actorStatistics.at(e)[i];
 					}
 					SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(actorStats,group), period), e, actorStatsValues);
 					UNPROTECT(1);

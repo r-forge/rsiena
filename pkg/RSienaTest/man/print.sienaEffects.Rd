@@ -19,7 +19,8 @@ includeOnly=TRUE, expandDummies = FALSE, ...)
 \arguments{
   \item{object}{An object of class \code{sienaEffects}.}
   \item{x}{An object of class \code{sienaEffects} or
-    \code{summary.sienaEffects} as appropriate.}
+    \code{summary.sienaEffects} as appropriate.
+  }
   \item{fileName}{Character string denoting file name if file output desired.}
   \item{includeOnly}{Boolean. If TRUE, only effects with the include
     flag TRUE will be printed.}
@@ -27,8 +28,8 @@ includeOnly=TRUE, expandDummies = FALSE, ...)
     any effects which would be added by \code{sienaTimeFix}.}
   \item{includeRandoms}{Boolean. If TRUE, also the
     \code{randomEffects} column will be printed.}
-  \item{dropRates}{Boolean. If TRUE, do not print the rows for basic rate 
-    effects. This may be useful especially for effects objects used for 
+  \item{dropRates}{Boolean. If TRUE, do not print the rows for basic rate
+    effects. This may be useful especially for effects objects used for
     \code{\link{sienaBayes}}.}
   \item{\dots}{For extra arguments (none used at present).}
 }

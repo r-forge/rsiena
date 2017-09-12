@@ -283,7 +283,7 @@ fi
 if test "$MPI_TYPE" = "OPENMPI" ; then
   AC_CHECK_PROG(ORTED, orted, yes, no)
   if test "$ORTED" = no ; then
-    AC_MSG_NOTICE([Cannot find orted. RSiena needs orted to run.])
+    AC_MSG_NOTICE([Cannot find orted. RSienaTest needs orted to run.])
     MPI=no
   fi
 fi

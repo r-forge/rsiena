@@ -1,20 +1,23 @@
 useDynLib(RSienaTest, .registration = TRUE, .fixes="C_")
 
 export(
-		coCovar, coDyadCovar, getEffects, model.create, print01Report,
-		siena01Gui, siena07, sienaCompositionChange, sienaBayes, glueBayes,
-		simpleBayesTest, multipleBayesTest, extract.sienaBayes, updateTheta,
-		updateSpecification, sienaCompositionChangeFromFile, sienaDataCreate,
-		sienaGroupCreate, sienaModelCreate, sienaAlgorithmCreate, sienaNet,
-		sienaDependent, sienaNodeSet, xtable.sienaFit,
-		varCovar, varDyadCovar, setEffect, includeEffects, includeInteraction,
-		effectsDocumentation, sienaDataConstraint, print.xtable.sienaFit,
-		installGui, siena08, iwlsm, sienaTimeTest, includeTimeDummy,
-		sienaGOF, descriptives.sienaGOF, sienaRI, sienaRIDynamics,
-		sparseMatrixExtraction, networkExtraction, behaviorExtraction,
-		OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
-		xtable, algorithms, profileLikelihoods, siena.table, score.Test,
-		Wald.RSiena, Multipar.RSiena
+	coCovar, coDyadCovar, getEffects, model.create, print01Report, siena07,
+	sienaCompositionChange, updateTheta, updateSpecification,
+	sienaCompositionChangeFromFile, sienaDataCreate, sienaGroupCreate,
+	sienaModelCreate, sienaAlgorithmCreate, sienaNet, sienaDependent,
+	sienaNodeSet, xtable.sienaFit, varCovar, varDyadCovar, setEffect,
+	includeEffects, includeInteraction, effectsDocumentation,
+	sienaDataConstraint, print.xtable.sienaFit, siena08, iwlsm, sienaTimeTest,
+	includeTimeDummy, sienaGOF, descriptives.sienaGOF, sienaRI,
+	sparseMatrixExtraction, networkExtraction, behaviorExtraction,
+	OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
+	siena.table, xtable, score.Test, Wald.RSiena, Multipar.RSiena
+)
+
+export(
+	siena01Gui, sienaBayes, glueBayes, simpleBayesTest, multipleBayesTest,
+	extract.sienaBayes, algorithms, profileLikelihoods, installGui,
+	sienaRIDynamics
 )
 
 export(sienacpp)

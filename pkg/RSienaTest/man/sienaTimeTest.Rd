@@ -142,8 +142,10 @@ myeff <- includeTimeDummy(myeff, balance, timeDummy="4")
 \dontrun{
 (ansp <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE))
 ttp <- sienaTimeTest(ansp)
+
 ## Pairwise plots show
 plot(ttp, pairwise=TRUE)
+
 ## Time test plots show
 plot(ttp, effects=1:4, dims=c(2,2))
 }

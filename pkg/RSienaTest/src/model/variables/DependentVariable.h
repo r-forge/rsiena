@@ -201,6 +201,7 @@ protected:
 	double settingRate() const;
 	// A two-dimensional array of tie flip and behavior change contributions to effects.
 	std::map<const EffectInfo *, std::vector<double> > * lpChangeContribution;
+
 	Setting** lsettings;
 private:
 	void initializeFunction(Function * pFunction,

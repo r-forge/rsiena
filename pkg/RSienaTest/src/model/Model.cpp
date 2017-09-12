@@ -740,9 +740,7 @@ void Model::clearChainStore(int keep, int groupPeriod)
 			delete lchainStore[groupPeriod][chain];
 		}
 		this->lchainStore[groupPeriod].clear();
-
 	}
-
 }
 
 /**

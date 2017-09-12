@@ -19,33 +19,33 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 	## to indicate whether the arguments are to be included in the final
 	## column of the table - TTT means all three arguments...
 	RSienaRequiredFunctions <- data.frame(functionName=c("installGui",
-										  "siena01Gui",
-										  "sienaNodeSet",
-										  "sienaDependent",
-										  "coCovar",
-										  "varCovar",
-										  "coDyadCovar",
-										  "varDyadCovar",
-										  "sienaCompositionChange",
-										  "sienaDataCreate",
-										  "sienaDataCreateFromSession",
-										  "sienaGroupCreate",
-										  "effectsDocumentation",
-										  "getEffects",
-										  "print.sienaEffects",
-										  "includeEffects",
-										  "includeInteraction",
-										  "setEffect",
-										  "print01Report",
-										  "`",
-										  "sienaAlgorithmCreate",
-										  "siena07",
-										  "sienaFit",
-										  "sienaTimeTest"),
-										  stage=c("1", "3--5", rep("3", 10),
-										  rep("4", 6), "5", "5", "5", "6", "6"),
-										  arguments=c("", "F", "TTT",
-										  rep("F", 20)), stringsAsFactors=FALSE)
+			"siena01Gui",
+			"sienaNodeSet",
+			"sienaDependent",
+			"coCovar",
+			"varCovar",
+			"coDyadCovar",
+			"varDyadCovar",
+			"sienaCompositionChange",
+			"sienaDataCreate",
+			"sienaDataCreateFromSession",
+			"sienaGroupCreate",
+			"effectsDocumentation",
+			"getEffects",
+			"print.sienaEffects",
+			"includeEffects",
+			"includeInteraction",
+			"setEffect",
+			"print01Report",
+			"`",
+			"sienaAlgorithmCreate",
+			"siena07",
+			"sienaFit",
+			"sienaTimeTest"),
+		stage=c("1", "3--5", rep("3", 10),
+			rep("4", 6), "5", "5", "5", "6", "6"),
+		arguments=c("", "F", "TTT",
+			rep("F", 20)), stringsAsFactors=FALSE)
 
 	numberPages <- nrow(RSienaRequiredFunctions)
 	usage <- vector("list", numberPages)
@@ -59,12 +59,12 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 	{
 		## find the path to the help file
 		infile <- file.path(RSienaDir, paste(RSienaRequiredFunctions[i, 1],
-											 ".Rd", sep=""))
+				".Rd", sep=""))
 		## parse it
 		Rd <- tools::parse_Rd(infile)
 		## extract the tags from the Rd object
-# used to be:		tags <- tools:::RdTags(Rd)
-# replaced by next two lines (to avoid :::)
+		# used to be:		tags <- tools:::RdTags(Rd)
+		# replaced by next two lines (to avoid :::)
 		tags <- sapply(Rd, attr, "Rd_tag")
 		if (!length(tags)) {tags <- character()}
 		usage[[i]] <- Rd[[which(tags=="\\usage")]]
@@ -81,19 +81,19 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 	desc1 <- sapply(desc, function(x)paste(unlist(x), collapse=""))
 	exam1 <- sapply(exam, function(x)paste(unlist(x), collapse=""))
 	args1 <- lapply(arguments, function(x)
-                {
-                    if (!is.null(x))
-                    {
- # used to be:                       tmp <- tools:::RdTags(x)
-# replaced by next two lines (to avoid :::)
-						tmp <- sapply(x, attr, "Rd_tag")
-						if (!length(tmp)) {tmp <- character()}
-                        tmp2 <- x[which(tmp=="\\item")]
-                        lapply(tmp2, function(x)list(x[[1]],
-                                                     gsub("\\n", "",
-                                                          x[[2]])))
-                    }
-                })
+		{
+			if (!is.null(x))
+			{
+				# used to be:                       tmp <- tools:::RdTags(x)
+				# replaced by next two lines (to avoid :::)
+				tmp <- sapply(x, attr, "Rd_tag")
+				if (!length(tmp)) {tmp <- character()}
+				tmp2 <- x[which(tmp=="\\item")]
+				lapply(tmp2, function(x)list(x[[1]],
+						gsub("\\n", "",
+							x[[2]])))
+			}
+		})
 
 	## optional reformatting: some examples which could be used
 
@@ -140,74 +140,74 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 	## create the table: check doc.tex for the output
 	mytab <-
 		sapply(1:numberPages, function(i, rs, usage, exam, desc, arg)
-		   {
-			   x <- rs[i, ]
-			   includeArguments <- strsplit(x$arguments, "")[[1]]
-			   includeArguments <- as.logical(includeArguments)
-			   arg <- args1[[i]]
-			   arg <- arg[includeArguments]
-			   ## sort out usage
-			   usage2 <- sortout(usage1[i])
-			   usage2 <- sub("getDocumentation=FALSE", "", usage2)
-			   if (nchar(x$functionName) > 20)
-			   {
-										#browser()
-				   usage2 <- paste("\\\\ &&", usage2)
-			   }
-			   exam2 <- sortout(exam1[[i]])
-			   desc2 <- sortout(desc1[[i]], code=FALSE)
-			   arg <- sapply(arg, function(x)
-						 {
-							 paste('\\texttt{"', unlist(x[[1]]), '"}=',
-								   paste(unlist(x[[2]]), sep=" ", collapse=""),
-								   sep="", collapse="")
-						 })
-			   tmp <- paste(x$stage, "&", x$functionName, "&",
-							usage2, "&",
-							exam2, "&", desc2, paste(arg, sep=" ",
-													 collapse=""),
-							"\\\\ \\hline",
+			{
+				x <- rs[i, ]
+				includeArguments <- strsplit(x$arguments, "")[[1]]
+				includeArguments <- as.logical(includeArguments)
+				arg <- args1[[i]]
+				arg <- arg[includeArguments]
+				## sort out usage
+				usage2 <- sortout(usage1[i])
+				usage2 <- sub("getDocumentation=FALSE", "", usage2)
+				if (nchar(x$functionName) > 20)
+				{
+					#browser()
+					usage2 <- paste("\\\\ &&", usage2)
+				}
+				exam2 <- sortout(exam1[[i]])
+				desc2 <- sortout(desc1[[i]], code=FALSE)
+				arg <- sapply(arg, function(x)
+					{
+						paste('\\texttt{"', unlist(x[[1]]), '"}=',
+							paste(unlist(x[[2]]), sep=" ", collapse=""),
 							sep="", collapse="")
-			   print(tmp)
-			   tmp
-		   }, rs=RSienaRequiredFunctions, usage=usage, desc=desc,
-			   exam=exam, arg=args1)
+					})
+				tmp <- paste(x$stage, "&", x$functionName, "&",
+					usage2, "&",
+					exam2, "&", desc2, paste(arg, sep=" ",
+						collapse=""),
+					"\\\\ \\hline",
+					sep="", collapse="")
+				print(tmp)
+				tmp
+			}, rs=RSienaRequiredFunctions, usage=usage, desc=desc,
+			exam=exam, arg=args1)
 	write.table(mytab, "docn.tex", row.names=FALSE, col.names=FALSE,
-				quote=FALSE)
+		quote=FALSE)
 	## now run LaTeX on auto.tex in the doc directory.
 }
 ##@RSienaSlowTest Tests Combine all examples on help pages and run them
 RSienaSlowTest <- function(RSienaDir="../RSiena/", lib="library(RSiena)")
 {
 	helpdir <- dir(paste(RSienaDir, "/man", sep=""), pattern="Rd$",
-				   full.names=TRUE)
+		full.names=TRUE)
 	tmp <- lapply(helpdir, function(x)
-			  {
-				  if (!grepl("maxlikefn", x)) ## obsolete, not-working function
-				  {
-					  tf <- tempfile("RSiena")
-					  tools::Rd2ex(x, tf)
-					  if (file.exists(tf))
-					  {
-						  on.exit(unlink(tf))
-						  tmpa <- readLines(tf)
-						  tmpb <- sub("##D", "", tmpa)
-						  tmpb <- ifelse (grepl("fix(", tmpb, fixed=TRUE),
-										  paste("#", tmpb), tmpb)
-						  if (basename(x) == "sienaDataCreateFromSession.Rd")
-						  {
-							  chnewdir <- paste("setwd(\"",
-												RSienaDir,
-												"/inst/examples\")", sep="")
-							  tmpb <- c("curdir <- getwd()",
-										chnewdir, tmpb, "setwd(curdir)")
-						  }
-						  unlink(tf)
-						  c(paste("#", x), tmpb)
-					  }
-				  }
-			  }
-				  )
+		{
+			if (!grepl("maxlikefn", x)) ## obsolete, not-working function
+			{
+				tf <- tempfile("RSiena")
+				tools::Rd2ex(x, tf)
+				if (file.exists(tf))
+				{
+					on.exit(unlink(tf))
+					tmpa <- readLines(tf)
+					tmpb <- sub("##D", "", tmpa)
+					tmpb <- ifelse (grepl("fix(", tmpb, fixed=TRUE),
+						paste("#", tmpb), tmpb)
+					if (basename(x) == "sienaDataCreateFromSession.Rd")
+					{
+						chnewdir <- paste("setwd(\"",
+							RSienaDir,
+							"/inst/examples\")", sep="")
+						tmpb <- c("curdir <- getwd()",
+							chnewdir, tmpb, "setwd(curdir)")
+					}
+					unlink(tf)
+					c(paste("#", x), tmpb)
+				}
+			}
+		}
+		)
 	tmp1 <- do.call(c, tmp)
 	tmp1 <- c(lib, tmp1)
 	tf <- tempfile("RSiena")

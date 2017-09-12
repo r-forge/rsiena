@@ -192,12 +192,14 @@ mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, density, recip, transTies, nbrDist2)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
+
 RI <- sienaRI(mydata, ans)
 RI
 \dontrun{
 plot(RI, addPieChart=TRUE)
 plot(RI, actors=1:20, addPieChart=TRUE, radius=1.08)
 }
+
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50)
 mynet2 <- sienaDependent(array(c(s502, s503), dim=c(50, 50, 2)))
 mybeh <- sienaDependent(s50a[,2:3], type="behavior")

@@ -430,37 +430,30 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 	for (int oneMode = 0; oneMode < nOneMode; oneMode++)
 	{
 		SEXP ONEMODES = VECTOR_ELT(ONEMODEGROUP, oneMode);
-		SEXP as;
-		PROTECT(as = install("nodeSet"));
-		SEXP actorSet = getAttrib(ONEMODES, as);
-		SEXP symm;
-		PROTECT(symm = install("symmetric"));
-		SEXP symmetric = getAttrib(ONEMODES, symm);
-		SEXP balm;
-		PROTECT(balm = install("balmean"));
-		SEXP balmean = getAttrib(ONEMODES, balm);
-		SEXP strm;
-		PROTECT(strm = install("structmean"));
-		SEXP structmean = getAttrib(ONEMODES, strm);
-		SEXP avin;
-		PROTECT(avin = install("averageInDegree"));
-		SEXP averageInDegree = getAttrib(ONEMODES,	avin);
-		SEXP avout;
-		PROTECT(avout = install("averageOutDegree"));
-		SEXP averageOutDegree = getAttrib(ONEMODES,	avout);
+		SEXP as = PROTECT(install("nodeSet"));
+		SEXP actorSet = PROTECT(getAttrib(ONEMODES, as));
+		SEXP symm = PROTECT(install("symmetric"));
+		SEXP symmetric = PROTECT(getAttrib(ONEMODES, symm));
+		SEXP balm = PROTECT(install("balmean"));
+		SEXP balmean = PROTECT(getAttrib(ONEMODES, balm));
+		SEXP strm = PROTECT(install("structmean"));
+		SEXP structmean = PROTECT(getAttrib(ONEMODES, strm));
+		SEXP avin = PROTECT(install("averageInDegree"));
+		SEXP averageInDegree = PROTECT(getAttrib(ONEMODES, avin));
+		SEXP avout = PROTECT(install("averageOutDegree"));
+		SEXP averageOutDegree = PROTECT(getAttrib(ONEMODES, avout));
 
-		SEXP nm;
-		PROTECT(nm = install("name"));
+		SEXP nm = PROTECT(install("name"));
 		SEXP name = getAttrib(ONEMODES, nm);
 		const ActorSet* myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
 		OneModeNetworkLongitudinalData *  pOneModeNetworkLongitudinalData =
 			pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)), myActorSet);
 
 		// parse settings
-		SEXP settingsSymbol;
-		PROTECT(settingsSymbol = install("settingsinfo"));
-		SEXP settingsList = getAttrib(ONEMODES, settingsSymbol);
-		for (int j = 0; j < length(settingsList); j++) {
+		SEXP settingsSymbol = PROTECT(install("settingsinfo"));
+		SEXP settingsList = PROTECT(getAttrib(ONEMODES, settingsSymbol));
+		for (int j = 0; j < length(settingsList); j++)
+		{
 			SEXP settingInfo = VECTOR_ELT(settingsList, j);
 			SEXP infoNames = getAttrib(settingInfo, R_NamesSymbol);
 			std::string id, type, covar, only;
@@ -507,7 +500,7 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 		//Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
 		//	averageInDegree(), pOneModeNetworkLongitudinalData->
 		//	averageOutDegree());
-		UNPROTECT(8);
+		UNPROTECT(16);
 	}
 }
 

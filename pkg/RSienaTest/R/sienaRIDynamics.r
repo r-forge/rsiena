@@ -426,7 +426,7 @@ plot.sienaRIDynamics <- function(x, staticRI = NULL, col = NULL,
 	{
 		cex.legend <- 1
 	}
-	
+
 	if(!is.null(col))
 	{
 		cl <- col

@@ -44,10 +44,8 @@ public:
 	virtual void initialize(const Data * pData,
 		State * pState, int period, Cache * pCache);
 
-
 protected:
-	double value(int alter) const;
-
+	double value(int i) const;
 	bool missing(int i) const;
 	double similarity(int i, int j) const;
 	ConstantCovariate * pConstantCovariate() const;

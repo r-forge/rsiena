@@ -26,7 +26,6 @@ AlterFunction::~AlterFunction()
 {
 }
 
-
 /**
  * Initializes this function.
  * @param[in] pData the observed data
@@ -38,7 +37,6 @@ void AlterFunction::initialize(const Data * pData,
 		State * pState, int period, Cache * pCache)
 {
 }
-
 
 /**
  * Does the necessary preprocessing work for calculating the alter

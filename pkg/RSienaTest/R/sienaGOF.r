@@ -105,17 +105,17 @@ sienaGOF <- function(
 			cat("Calculating auxiliary statistics for periods", period, ".\n")
 		}
 	}
-	if (!is.null(cluster)) 
-								{
+	if (!is.null(cluster))
+	{
 		ttcSimulation <- system.time(simStatsByPeriod <- 
 			lapply(period, function (j) {
-					simStatsByPeriod <- parSapply(cluster, 1:iterations,
-						function (i){auxiliaryFunction(i, sienaFitObject$f,
-										sienaFitObject$sims, j, groupName, varName, ...)})
-			simStatsByPeriod <- matrix(simStatsByPeriod, ncol=iterations)
-							dimnames(simStatsByPeriod)[[2]] <-	1:iterations
-							t(simStatsByPeriod)
-						}))
+				simStatsByPeriod <- parSapply(cluster, 1:iterations,
+					function (i){auxiliaryFunction(i, sienaFitObject$f,
+						sienaFitObject$sims, j, groupName, varName, ...)})
+				simStatsByPeriod <- matrix(simStatsByPeriod, ncol=iterations)
+				dimnames(simStatsByPeriod)[[2]] <-	1:iterations
+				t(simStatsByPeriod)
+				}))
 	}
 	else
 	{
@@ -281,7 +281,7 @@ sienaGOF <- function(
 					effectsObject$effectName[sienaFitObject$test]
 		}
 		names(JoinedOneStepMHD_old) <-
-				effectsObject$effectName[sienaFitObject$test]
+			effectsObject$effectName[sienaFitObject$test]
 		names(JoinedOneStepMHD) <-
 				effectsObject$effectName[sienaFitObject$test]
 
@@ -592,7 +592,6 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 		sims.min <- sims.min - sims.median
 		sims.max <- sims.max - sims.median
 	}
-
 	if (scale)
 	{
 		sims.range <- sims.max - sims.min + 1e-6
@@ -972,6 +971,7 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 	# with all actors preceding all events.
 	# Therefore the bipartiteOffset will come in handy:
 	bipartiteOffset <- ifelse (isbipartite, 1 + dimsOfDepVar[1], 1)
+
 	# Initialize empty networks:
 	if (isbipartite)
 	{

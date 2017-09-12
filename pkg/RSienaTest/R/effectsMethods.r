@@ -11,7 +11,7 @@
 ## ****************************************************************************/
 ##@print.sienaEffects Methods
 print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
-							   expandDummies=FALSE, includeRandoms=FALSE, dropRates=FALSE, ...)
+	expandDummies=FALSE, includeRandoms=FALSE, dropRates=FALSE, ...)
 {
 	if (!inherits(x, "sienaEffects"))
 		stop("not a legitimate Siena effects object")
@@ -22,11 +22,11 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
 	}
 
 	interactions <- x[x$shortName %in% c("unspInt", "behUnspInt") & x$include &
-							x$effect1 > 0, ]
+		x$effect1 > 0, ]
 	if (expandDummies)
 	{
 		if(includeOnly && !all(x[x$include, "timeDummy"] == ",")
-						  || !all(x[, "timeDummy"] == "," ))
+			|| !all(x[, "timeDummy"] == "," ))
 		{
 			x <- sienaTimeFix(x)$effects
 			x <- fixUpEffectNames(x)
@@ -43,13 +43,13 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
 	{
 		nDependents <- length(unique(x$name))
 		userSpecifieds <- x$shortName[x$include] %in%
-												c("unspInt", "behUnspInt")
+			c("unspInt", "behUnspInt")
 		endowments <- !x$type[x$include] %in% c("rate", "eval")
-											# includes creations and gmm
+		# includes creations and gmm
 		gmm <- any(x$type[x$include] %in% "gmm")
 		timeDummies <- !x$timeDummy[x$include] == ","
 		specs <- as.data.frame(x[, c("name", "effectName", "include", "fix",
-											"test", "initialValue", "parm")])
+				"test", "initialValue", "parm")])
 		if (includeOnly)
 		{
 			included <- x$include
@@ -92,7 +92,7 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
 			specs <- cbind(specs, randomEffects=x[included, "randomEffects"])
 		}
 		specs[, "initialValue"] <- format(round(specs$initialValue,digits=5),
-										  width=10)
+			width=10)
 		if (nrow(specs) > 0)
 		{
 			if (gmm)
@@ -151,13 +151,13 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
 
 ##@summary.sienaEffects Methods
 summary.sienaEffects <- function(object, fileName=NULL, includeOnly=TRUE,
-								 expandDummies=FALSE, ...)
+	expandDummies=FALSE, ...)
 {
 	if (!inherits(object, "sienaEffects"))
 		stop("not a legitimate Siena effects object")
 	if (expandDummies && (includeOnly && !all(object[object$include,
-													 "timeDummy"] == ",")
-		|| !all(object[, "timeDummy"] == ",")))
+				"timeDummy"] == ",")
+			|| !all(object[, "timeDummy"] == ",")))
 	{
 		object <- sienaTimeFix(object)$effects
 	}
@@ -176,11 +176,9 @@ print.summary.sienaEffects <- function(x, fileName=NULL, ...)
 		stop("not a legitimate summary of a Siena effects object")
 	## find out if any columns need removing because they will not print
 
-	problem <- sapply(x, function(x)
-				  {
-					  inherits(try(unlist(x[[1]]), silent=TRUE), "try-error")
-				  }
-					  )
+	problem <- sapply(x, function(x) {
+		inherits(try(unlist(x[[1]]), silent=TRUE), "try-error")
+	})
 	if (any(problem))
 	{
 		x1 <- x[, problem]
@@ -212,7 +210,7 @@ edit.sienaEffects <- function(name, ...)
 	originalNames <- names(name)
 	## move function name and other things out of the way
 	priorityColumns <- c("name", "effectName", "type", "include", "fix",
-						 "test", "initialValue", "parm", "shortName")
+		"test", "initialValue", "parm", "shortName")
 	priorityX <- name[, priorityColumns]
 	notPriorityX <- name[, -c(match(priorityColumns, names(name)))]
 	name <- cbind(priorityX, notPriorityX)
