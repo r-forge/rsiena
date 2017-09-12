@@ -39,6 +39,7 @@ using namespace siena;
 
 extern "C"
 {
+
 /**
  *  Creates an array of pointers to Data objects, one for each group
  *  and returns the address of the array to R. Also creates the actor sets
@@ -95,7 +96,7 @@ SEXP OneMode(SEXP RpData, SEXP ONEMODELIST)
 	   giving the size of the network */
 	if (nGroups != length(ONEMODELIST) )
 	{
-		error ("wrong number of groups");
+		error("wrong number of groups");
 	}
 	for (int group = 0; group < nGroups; group++)
 	{
@@ -104,6 +105,7 @@ SEXP OneMode(SEXP RpData, SEXP ONEMODELIST)
 	}
 	return R_NilValue;
 }
+
 /**
  *  Creates all the groups of bipartite networks in the data
  *
@@ -118,7 +120,7 @@ SEXP Bipartite(SEXP RpData, SEXP BIPARTITELIST)
    giving the size of the network */
 	if (nGroups != length(BIPARTITELIST) )
 	{
-		error ("wrong number of groups");
+		error("wrong number of groups");
 	}
 	for (int group = 0; group < nGroups; group++)
 	{
@@ -127,6 +129,7 @@ SEXP Bipartite(SEXP RpData, SEXP BIPARTITELIST)
 	}
 	return R_NilValue;
 }
+
 /**
  *  Creates all the groups of behavior networks in the data
  */
@@ -139,7 +142,7 @@ SEXP Behavior(SEXP RpData, SEXP BEHLIST)
    one of values, one of missing values (boolean) */
 	if (nGroups != length(BEHLIST) )
 	{
-		error ("wrong number of groups");
+		error("wrong number of groups");
 	}
 	for (int group = 0; group < nGroups; group++)
 	{
@@ -148,10 +151,10 @@ SEXP Behavior(SEXP RpData, SEXP BEHLIST)
 	}
 	return R_NilValue;
 }
+
 /**
  *  Creates all the groups of constant covariates in the data
  */
-
 SEXP ConstantCovariates(SEXP RpData, SEXP COCOVARLIST)
 {
 	vector<Data *> * pGroupData = (vector<Data *> *)
@@ -161,7 +164,7 @@ SEXP ConstantCovariates(SEXP RpData, SEXP COCOVARLIST)
 /* ignore missings for now */
 	if (nGroups != length(COCOVARLIST) )
 	{
-		error ("wrong number of groups");
+		error("wrong number of groups");
 	}
 	for (int group = 0; group < nGroups; group++)
 	{
@@ -184,7 +187,7 @@ SEXP ChangingCovariates(SEXP RpData, SEXP VARCOVARLIST)
 /* ignore missings for now */
 	if (nGroups != length(VARCOVARLIST) )
 	{
-		error ("wrong number of groups");
+		error("wrong number of groups");
 	}
 	for (int group = 0; group < nGroups; group++)
 	{
@@ -207,7 +210,7 @@ SEXP DyadicCovariates(SEXP RpData, SEXP DYADVARLIST)
 /* ignore missings for now */
 	if (nGroups != length(DYADVARLIST) )
 	{
-		error ("wrong number of groups");
+		error("wrong number of groups");
 	}
 	for (int group = 0; group < nGroups; group++)
 	{
@@ -231,7 +234,7 @@ SEXP ChangingDyadicCovariates(SEXP RpData, SEXP VARDYADLIST)
 /* ignore missings for now */
 	if (nGroups != length(VARDYADLIST) )
 	{
-		error ("wrong number of groups");
+		error("wrong number of groups");
 	}
 	for (int group = 0; group < nGroups; group++)
 	{
@@ -258,7 +261,7 @@ SEXP ExogEvent(SEXP RpData, SEXP EXOGEVENTLIST)
 
 	if (nGroups != length(EXOGEVENTLIST) )
 	{
-		error ("wrong number of groups");
+		error("wrong number of groups");
 	}
 	for (int group = 0; group < nGroups; group++)
 	{
@@ -881,8 +884,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 		SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP LOCALML)
 {
 	/* get hold of the data vector */
-	vector<Data *> * pGroupData = (vector<Data *> *)
-		R_ExternalPtrAddr(DATAPTR);
+	vector<Data *> * pGroupData = (vector<Data *> *) R_ExternalPtrAddr(DATAPTR);
 	int nGroups = pGroupData->size();
 
 	/* find total number of periods to process */
@@ -909,20 +911,14 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 	//PrintValue(PROBS);
 	pModel->deleteRandomMissingProbability(REAL(PROBS)[6]);
 
-
 	double * prmin = REAL(PRMIN);
 	double * prmib = REAL(PRMIB);
 
-	SEXP minimalChains;
-	PROTECT(minimalChains = allocVector(VECSXP, totObservations));
-	SEXP currentChains;
-	PROTECT(currentChains = allocVector(VECSXP, totObservations));
-	SEXP accepts;
-	PROTECT(accepts = allocVector(VECSXP, totObservations));
-	SEXP rejects;
-	PROTECT(rejects = allocVector(VECSXP, totObservations));
-	SEXP aborts;
-	PROTECT(aborts = allocVector(VECSXP, totObservations));
+	SEXP minimalChains = PROTECT(allocVector(VECSXP, totObservations));
+	SEXP currentChains = PROTECT(allocVector(VECSXP, totObservations));
+	SEXP accepts = PROTECT(allocVector(VECSXP, totObservations));
+	SEXP rejects = PROTECT(allocVector(VECSXP, totObservations));
+	SEXP aborts = PROTECT(allocVector(VECSXP, totObservations));
 	GetRNGstate();
 
 	/* localML */
@@ -952,10 +948,8 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 			pModel->missingBehaviorProbability(prmib[periodFromStart]);
 
 			// put ones for this period on simulation object
-			pMLSimulation->
-				missingNetworkProbability(prmin[periodFromStart]);
-			pMLSimulation->
-				missingBehaviorProbability(prmib[periodFromStart]);
+			pMLSimulation->missingNetworkProbability(prmin[periodFromStart]);
+			pMLSimulation->missingBehaviorProbability(prmib[periodFromStart]);
 
 			pMLSimulation->currentPermutationLength(
 				pModel->currentPermutationLength(period));
@@ -964,9 +958,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 			// does not initialise with previous period missing values yet
 			pMLSimulation->pChain()->clear();
 			pMLSimulation->connect(period);
-			SEXP ch;
-			PROTECT(ch =
-				getChainDFPlus(*(pMLSimulation->pChain()), true));
+			SEXP ch = PROTECT(getChainDFPlus(*(pMLSimulation->pChain()), true));
 			SET_VECTOR_ELT(minimalChains, periodFromStart, ch);
 
 			/* get the chain up to a reasonable length */
@@ -991,8 +983,7 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 			pModel->chainStore(*pChain, periodFromStart);
 
 			/* return chain as a list */
-			SEXP ch1;
-			PROTECT(ch1 = getChainList(*pChain));
+			SEXP ch1 = PROTECT(getChainList(*pChain));
 			//PROTECT(ch1 = getChainDFPlus(*pChain, true));
 			SET_VECTOR_ELT(currentChains, periodFromStart, ch1);
 
@@ -1001,12 +992,9 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 				pMLSimulation->rVariables();
 			int numberVariables = rVariables.size();
 
-			SEXP accepts1;
-			PROTECT(accepts1 = allocMatrix(INTSXP, numberVariables, 9));
-			SEXP rejects1;
-			PROTECT(rejects1 = allocMatrix(INTSXP, numberVariables, 9));
-			SEXP aborts1;
-			PROTECT(aborts1 = allocVector(INTSXP, 9));
+			SEXP accepts1 = PROTECT(allocMatrix(INTSXP, numberVariables, 9));
+			SEXP rejects1 = PROTECT(allocMatrix(INTSXP, numberVariables, 9));
+			SEXP aborts1 = PROTECT(allocVector(INTSXP, 9));
 			int * iaccepts = INTEGER(accepts1);
 			int * irejects = INTEGER(rejects1);
 			int * iaborts = INTEGER(aborts1);
@@ -1047,13 +1035,12 @@ SEXP mlMakeChains(SEXP DATAPTR, SEXP MODELPTR,
 /**
  * Sets up chains in sub processes by copying them from input
  */
-SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR,
-	SEXP PROBS, SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM,
-	SEXP MAXIMUMPERM, SEXP INITIALPERM, SEXP CHAINS, SEXP LOCALML)
+SEXP mlInitializeSubProcesses(SEXP DATAPTR, SEXP MODELPTR, SEXP PROBS,
+		SEXP PRMIN, SEXP PRMIB, SEXP MINIMUMPERM, SEXP MAXIMUMPERM,
+		SEXP INITIALPERM, SEXP CHAINS, SEXP LOCALML)
 {
 	/* get hold of the data vector */
-	vector<Data *> * pGroupData = (vector<Data *> *)
-		R_ExternalPtrAddr(DATAPTR);
+	vector<Data *> * pGroupData = (vector<Data *> *) R_ExternalPtrAddr(DATAPTR);
 
 	int nGroups = pGroupData->size();
 

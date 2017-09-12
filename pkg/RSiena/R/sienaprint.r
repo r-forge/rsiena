@@ -76,6 +76,7 @@ print.siena <- function(x, ...)
 		print(tmp, quote=FALSE)
 		cat("\n")
 	}
+
 	for (j in (1:length(x$depvars)))
 	{
 		xj <- x$depvars[[j]]
@@ -398,13 +399,14 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 ##@summary.sienaFit Methods
 summary.sienaFit <- function(object, ...)
 {
-    if (!inherits(object, "sienaFit"))
+	if (!inherits(object, "sienaFit"))
 	{
-        stop("not a legitimate Siena model fit")
+		stop("not a legitimate Siena model fit")
 	}
-    class(object) <- c("summary.sienaFit", class(object))
-    object
+	class(object) <- c("summary.sienaFit", class(object))
+	object
 }
+
 ##@print.summary.sienaFit Methods
 print.summary.sienaFit <- function(x, matrices=TRUE, ...)
 {
@@ -464,112 +466,113 @@ print.summary.sienaFit <- function(x, matrices=TRUE, ...)
 		pvalue <- 1 - pchisq(x$testresOverall, j)
 		if (!is.na(pvalue))
 		{
-        if (pvalue < 0.0001)
-		{
-            cat('< 0.0001\n')
-		}
-        else
-		{
-            cat(c('= ', sprintf("%8.4f\n", pvalue)), sep = '')
-		}
+			if (pvalue < 0.0001)
+			{
+				cat('< 0.0001\n')
+			}
+			else
+			{
+				cat(c('= ', sprintf("%8.4f\n", pvalue)), sep = '')
+			}
 		}
 		else
 		{
-				Report('  NA  ',outf)
+			Report('  NA  ',outf)
 		}
-        if (testn==1)
+		if (testn==1)
 		{
-            cat(c('\n   one-sided (normal variate): ',
-                     sprintf("%8.4f", x$testresulto[1])), sep = '')
+			cat(c('\n   one-sided (normal variate): ',
+					sprintf("%8.4f", x$testresulto[1])), sep = '')
 		}
-        if (testn> 1)
-        {
-            cat('\n\n')
-            for (k in 1:j)
-            {
-                cat(c('(', k, ') tested separately:\n'), sep='')
-                cat('-----------------------\n')
-                cat(' - two-sided:\n')
-                cat(c('  c = ', sprintf("%8.4f", x$testresult[k]),
-                         '   d.f. = 1  p-value '), sep = '')
-                pvalue<- 1-pchisq(x$testresult[k],1)
+		if (testn> 1)
+		{
+			cat('\n\n')
+			for (k in 1:j)
+			{
+				cat(c('(', k, ') tested separately:\n'), sep='')
+				cat('-----------------------\n')
+				cat(' - two-sided:\n')
+				cat(c('  c = ', sprintf("%8.4f", x$testresult[k]),
+						'   d.f. = 1  p-value '), sep = '')
+				pvalue<- 1-pchisq(x$testresult[k],1)
 				if (!is.na(pvalue))
 				{
-                if (pvalue < 0.0001)
-				{
-                    cat('< 0.0001\n')
-				}
-                else
-				{
-                    cat(c('= ', sprintf("%8.4f", pvalue), '\n'), sep = '')
-				}
+					if (pvalue < 0.0001)
+					{
+						cat('< 0.0001\n')
+					}
+					else
+					{
+						cat(c('= ', sprintf("%8.4f", pvalue), '\n'), sep = '')
+					}
 				}
 				else
 				{
 					Report('  NA  ',outf)
 				}
-                cat(c(' - one-sided (normal variate): ',
-					  sprintf("%8.4f", x$testresulto[k])), sep = '')
-                if (k < j)
+				cat(c(' - one-sided (normal variate): ',
+						sprintf("%8.4f", x$testresulto[k])), sep = '')
+				if (k < j)
 				{
-                    cat('\n\n')
+					cat('\n\n')
 				}
-            }
-        }
-        cat('    \n_________________________________________________\n\n')
-        cat('One-step estimates: \n\n')
-        for (i in 1 : x$pp)
-        {
-            onestepest <- x$oneStep[i] + x$theta[i]
-            cat(c(format(paste(x$requestedEffects$type[i], ':  ',
-							   x$requestedEffects$effectName[i], sep = ''),
-						 width=50),
-                     sprintf("%8.4f", onestepest), '\n'), sep = "")
-        }
-        cat('\n')
-   }
-   if ((matrices)&(x$OK)&(!is.null(x$covtheta)))
-   {
-       cat("Covariance matrix of estimates (correlations below diagonal)\n\n")
-       covcor <- x$covtheta
-       correl <- x$covtheta / sqrt(diag(x$covtheta))[row(x$covtheta)] /
-           sqrt(diag(x$covtheta))[col(x$covtheta)]
-       covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
-       printMatrix(format(round(t(covcor),digits=3),width=12))
-       cat("\nDerivative matrix of expected statistics X by parameters:\n\n")
-	   	if (!is.null(x$gmm))
+			}
+		}
+		cat('    \n_________________________________________________\n\n')
+		cat('One-step estimates: \n\n')
+		for (i in 1 : x$pp)
+		{
+			onestepest <- x$oneStep[i] + x$theta[i]
+			cat(c(format(paste(x$requestedEffects$type[i], ':  ',
+							x$requestedEffects$effectName[i], sep = ''),
+						width=50),
+					sprintf("%8.4f", onestepest), '\n'), sep = "")
+		}
+		cat('\n')
+	}
+	if ((matrices)&(x$OK)&(!is.null(x$covtheta)))
+	{
+		cat("Covariance matrix of estimates (correlations below diagonal)\n\n")
+		covcor <- x$covtheta
+		correl <- x$covtheta / sqrt(diag(x$covtheta))[row(x$covtheta)] /
+			sqrt(diag(x$covtheta))[col(x$covtheta)]
+		covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
+		printMatrix(format(round(t(covcor),digits=3),width=12))
+		cat("\nDerivative matrix of expected statistics X by parameters:\n\n")
+		if (!is.null(x$gmm))
 		{
 			if (x$gmm)
 			{
 				printMatrix(format(round(x$gamma,digits=3),width=12))
 			}
-		else
+			else
 			{
-       printMatrix(format(round(x$dfra,digits=3),width=12))
+				printMatrix(format(round(x$dfra,digits=3),width=12))
 			}
 		}
-       cat("\nCovariance matrix of X (correlations below diagonal):\n\n")
-       covcor <- x$msf
-       correl <- x$msf / sqrt(diag(x$msf))[row(x$msf)] /
-		   sqrt(diag(x$msf))[col(x$msf)]
-       covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
-       printMatrix(format(round(t(covcor),digits=3),width=12))
-   }
-   invisible(x)
+		cat("\nCovariance matrix of X (correlations below diagonal):\n\n")
+		covcor <- x$msf
+		correl <- x$msf / sqrt(diag(x$msf))[row(x$msf)] /
+			sqrt(diag(x$msf))[col(x$msf)]
+		covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
+		printMatrix(format(round(t(covcor),digits=3),width=12))
+	}
+	invisible(x)
 }
 
 ##@printMatrix Miscellaneous
 printMatrix <- function(mat)
 {
-    cat(mat, sep=c(rep.int(' ', ncol(mat) - 1), '\n'))
+	cat(mat, sep=c(rep.int(' ', ncol(mat) - 1), '\n'))
 }
+
 ##@print.sienaAlgorithm Methods
 print.sienaAlgorithm <- function(x, ...)
 {
 	cat(' Siena Algorithm specification.\n')
-    cat(' Project name:', x$projname, '\n')
-    cat(' Use standard initial values:', x$useStdInits, '\n')
-    cat(' Random seed:', objectOrNull(x$randomSeed),'\n')
+	cat(' Project name:', x$projname, '\n')
+	cat(' Use standard initial values:', x$useStdInits, '\n')
+	cat(' Random seed:', objectOrNull(x$randomSeed),'\n')
 	cat(' Number of subphases in phase 2:', x$nsub, '\n')
 	if (x$simOnly)
 	{
@@ -578,27 +581,27 @@ print.sienaAlgorithm <- function(x, ...)
 	else
 	{
 		if (!is.null(x$n2start))cat(' Length of first subphase:', x$n2start, '\n')
-    cat(' Starting value of gain parameter:', x$firstg, '\n')
+		cat(' Starting value of gain parameter:', x$firstg, '\n')
 		cat(' Reduction factor for gain parameter:', objectOrNull(x$reduceg), '\n')
-	cat(' Diagonalization parameter:', x$diagonalize, '\n')
+		cat(' Diagonalization parameter:', x$diagonalize, '\n')
 		cat(' Double averaging after subphase:', x$doubleAveraging, '\n')
 	}
 	cat(' Dolby noise reduction:', x$dolby, '\n')
-    if (any(x$MaxDegree > 0))
-    {
-        cat(' Restrictions on degree in simulations: ')
-        cat(x$MaxDegree,'\n')
-    }
-    if (any(x$UniversalOffset > 0))
-    {
-        cat(' Offsets for universal setting: ')
-        cat(x$UniversalOffset,'\n')
-    }
-    cat(' Method for calculation of derivatives:',
-        c('Scores', 'Finite Differences')[as.numeric(x$FinDiff.method) + 1],
-        '\n')
-    cat(' Number of subphases in phase 2:', x$nsub, '\n')
-    cat(' Number of iterations in phase 3:', x$n3, '\n')
+	if (any(x$MaxDegree > 0))
+	{
+		cat(' Restrictions on degree in simulations: ')
+		cat(x$MaxDegree,'\n')
+	}
+	if (any(x$UniversalOffset > 0))
+	{
+		cat(' Offsets for universal setting: ')
+		cat(x$UniversalOffset,'\n')
+	}
+	cat(' Method for calculation of derivatives:',
+		c('Scores', 'Finite Differences')[as.numeric(x$FinDiff.method) + 1],
+		'\n')
+	cat(' Number of subphases in phase 2:', x$nsub, '\n')
+	cat(' Number of iterations in phase 3:', x$n3, '\n')
 	if (x$maxlike)
 	{
 		cat(" Estimation by maximum likelihood\n")
@@ -635,31 +638,31 @@ print.sienaAlgorithm <- function(x, ...)
 	}
 	if (length(x$modelType) >= 1)
 	{
-	cat(" Model Type:\n")
-	if (is.null(names(x$modelType)))
-	{
-		names(x$modelType) <- 1:length(x$modelType)
-	}
-	for (i in 1:length(x$modelType))
-	{
+		cat(" Model Type:\n")
+		if (is.null(names(x$modelType)))
+		{
+			names(x$modelType) <- 1:length(x$modelType)
+		}
+		for (i in 1:length(x$modelType))
+		{
 			cat(sprintf(" %s: %d %s\n", names(x$modelType)[i], (x$modelType)[i],
-							ModelTypeStrings(x$modelType[i])))
+					ModelTypeStrings(x$modelType[i])))
 		}
 	}
 	if (length(x$behModelType) >= 1)
 	{
-    cat(" Behavioral Model Type:\n")
-	if (is.null(names(x$behModelType)))
-	{
-		names(x$behModelType) <- 1:length(x$behModelType)
+		cat(" Behavioral Model Type:\n")
+		if (is.null(names(x$behModelType)))
+		{
+			names(x$behModelType) <- 1:length(x$behModelType)
+		}
+		for (i in 1:length(x$behModelType))
+		{
+			cat(sprintf(" %s: %s\n",
+					names(x$behModelType)[i], BehaviorModelTypeStrings(x$behModelType[i])))
+		}
 	}
-	for (i in 1:length(x$behModelType))
-	{
-		cat(sprintf(" %s: %s\n",
-			names(x$behModelType)[i], BehaviorModelTypeStrings(x$behModelType[i])))
-	}
-	}
-    invisible(x)
+	invisible(x)
 }
 
 ##@objectOrNull Miscellaneous
@@ -920,27 +923,27 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 		theta[diag(x$covtheta) < 0.0] <- NA
 	}
 
-    if (nBehavs > 0)
-    {
-        behEffects <- theEffects[theEffects$netType == 'behavior',]
-        behNames <- unique(behEffects$name)
-    }
-    if (nBehavs > 1)
-    {
-        behEffects$effectName <- paste('<',
-                                       (1:nBehavs)[match(behEffects$name,
-                                                         behNames)],
-                                       '> ', behEffects$effectName,
-                                       sep='')
-        theEffects$effectName[theEffects$netType=='behavior'] <-
-            behEffects$effectName
-    }
-#browser()
-    mydf[nrates + (1:xp), 'row'] <-  1:xp
-    mydf[nrates + (1:xp), 'type' ] <- ifelse(theEffects$type == "creation",
-                                               "creat", theEffects$type)
-    mydf[nrates + (1:xp), 'text' ] <- theEffects$effectName
-    mydf[nrates + (1:xp), 'value' ] <- theta
+	if (nBehavs > 0)
+	{
+		behEffects <- theEffects[theEffects$netType == 'behavior',]
+		behNames <- unique(behEffects$name)
+	}
+	if (nBehavs > 1)
+	{
+		behEffects$effectName <- paste('<',
+			(1:nBehavs)[match(behEffects$name,
+				behNames)],
+			'> ', behEffects$effectName,
+			sep='')
+		theEffects$effectName[theEffects$netType=='behavior'] <-
+			behEffects$effectName
+	}
+	#browser()
+	mydf[nrates + (1:xp), 'row'] <-  1:xp
+	mydf[nrates + (1:xp), 'type' ] <- ifelse(theEffects$type == "creation",
+		"creat", theEffects$type)
+	mydf[nrates + (1:xp), 'text' ] <- theEffects$effectName
+	mydf[nrates + (1:xp), 'value' ] <- theta
 
 	if (fromBayes)
 	{
@@ -961,31 +964,30 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 			mydf[nrates + (1:xp), 'se' ] <- ses
 		}
 	}
-    if (!is.null(x$tstat))
-    {
-        mydf[1:nrates, "tstat"] <- NA
-        mydf[nrates + (1:xp), 'tstat' ] <- x$tstat
-    }
+	if (!is.null(x$tstat))
+	{
+		mydf[1:nrates, "tstat"] <- NA
+		mydf[nrates + (1:xp), 'tstat' ] <- x$tstat
+	}
 
-    if (nBehavs > 0 && nNetworks > 0)
-    {
-        nNetworkEff <- nrow(theEffects) - nrow(behEffects)
-        addtorow$command[addsub] <-
-            'Behavior Dynamics'
-        addtorow$pos[[addsub]] <- nrates + 2 + nNetworkEff
-        addsub <- addsub + 1
-    }
-    return(list(mydf=mydf, addtorow=addtorow))
+	if (nBehavs > 0 && nNetworks > 0)
+	{
+		nNetworkEff <- nrow(theEffects) - nrow(behEffects)
+		addtorow$command[addsub] <-
+			'Behavior Dynamics'
+		addtorow$pos[[addsub]] <- nrates + 2 + nNetworkEff
+		addsub <- addsub + 1
+	}
+	return(list(mydf=mydf, addtorow=addtorow))
 } # end sienaFitThetaTable
 
 ##@sienaFitCovarianceCorrelation Miscellaneous
 sienaFitCovarianceCorrelation <- function(x)
 {
-    covcor <- x
-    correl <- x/sqrt(diag(x))[row(x)]/ sqrt(diag(x))[col(x)]
-    covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
-    return(covcor)
-
+	covcor <- x
+	correl <- x/sqrt(diag(x))[row(x)]/ sqrt(diag(x))[col(x)]
+	covcor[lower.tri(covcor)] <- correl[lower.tri(correl)]
+	return(covcor)
 }
 
 ##@xtable fake in case package not loaded
@@ -1122,10 +1124,10 @@ makeTemp <- function(x, groupOnly=0, nfirst, ...)
 		mymat[mydf[,'row'] >= 1, 'row'] <-
 			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
 		mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post.   ", "",
-									 " cred.  ", " cred. ", " p", "varying ", "Post.   ", "cred.  ", "cred.  "),
-					   c(rep("", 4), "mean    ", "", "s.d.m.", "",
-									 " from   ", " to    ", "", "", "s.d.   ","from   ", "to    "),
-						mymat)
+				" cred.  ", " cred. ", " p", "varying ", "Post.   ", "cred.  ", "cred.  "),
+			c(rep("", 4), "mean    ", "", "s.d.m.", "",
+				" from   ", " to    ", "", "", "s.d.   ","from   ", "to    "),
+			mymat)
 		mymat <- apply(mymat, 2, format)
 		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
 		list(tmp, tmp1)

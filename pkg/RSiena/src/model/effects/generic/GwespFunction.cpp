@@ -15,6 +15,8 @@
 #include "model/tables/EgocentricConfigurationTable.h"
 #include <math.h>
 
+using namespace std;
+
 namespace siena
 {
 
@@ -64,7 +66,7 @@ void GwespFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double GwespFunction::value(int alter)
+double GwespFunction::value(int alter) const
 {
 	int statistic = lpInitialisedTable->get(alter);
 	return this->lcumulativeWeight[statistic];

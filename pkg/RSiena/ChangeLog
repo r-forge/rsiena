@@ -1,3 +1,21 @@
+2017-09-10 R-Forge Revision 321
+Changes in RSiena:
+   * Merge RSienaTest changes r319-r320.  Renamed init.c to init.cpp.
+
+2017-09-10 R-Forge Revision 320
+Changes in RSienaTest:
+   * siena07*.h: Update method declarations.
+   * getTargets.R: getTheTargets renamed to getTargets to match with RSiena.
+   * R/algorithms.r: Uncomment doCreateChains (C side is missing). See change
+     log for "2017-09-03 version 1.2-1" where it is mentioned as dropped.
+   * utils/Utils.cpp: Make log call unambiguous.
+   * R/*, man/*: Whitespace changes to ease the merging.
+
+2017-09-10 R-Forge Revision 319
+Changes in RSienaTest:
+   * init.cpp: Register native routines.
+   * *.R: Apdapt .Call statements.
+
 2017-09-09 R-Forge Revision 318, packages version 1.2-4.
 Changes in RSiena and RSienaTest:
    * Longer Description field in DESCRIPTION, as per CRAN suggestions.
@@ -130,7 +148,6 @@ Changes in RSiena and RSienaTest:
    * Operation of option 'absorb' (behModelType=2) corrected.
 Changes in RSienaTest:
    * BothDegreesEffect.h and .cpp added to repository.
-
 
 2017-05-10 R-Forge Revision 306
 Changes in RSiena and RSienaTest:

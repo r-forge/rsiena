@@ -69,18 +69,18 @@ DependentVariable::DependentVariable(string name,
 
 	NetworkLongitudinalData * pNetworkData =
 		dynamic_cast<NetworkLongitudinalData *>(
-			pSimulation->pData()->pNetworkData(name));
+				pSimulation->pData()->pNetworkData(name));
 	if (pNetworkData)
 	{
-	 	this->lnumberSettings = pNetworkData->rSettingNames().size();
-	 	this->lsettingRates = new double[this->lnumberSettings];
-	 	this->lsettingProbs = new double[this->lnumberSettings];
-	 }
-	 else
+		this->lnumberSettings = pNetworkData->rSettingNames().size();
+		this->lsettingRates = new double[this->lnumberSettings];
+		this->lsettingProbs = new double[this->lnumberSettings];
+	}
+	else
 	{
 		this->lnumberSettings = 0;
 		this->lsettingRates = 0;
-	 	this->lsettingProbs = 0;
+		this->lsettingProbs = 0;
 	}
 	this->lstepType = -1;
 	this->lpChangeContribution = 0;
@@ -102,7 +102,7 @@ void DependentVariable::initializeRateFunction()
 	{
 		NetworkLongitudinalData * pNetworkData =
 			dynamic_cast<NetworkLongitudinalData *>(
-				this->pSimulation()->pData()->pNetworkData(this->name()));
+					this->pSimulation()->pData()->pNetworkData(this->name()));
 		const std::vector< string > & rSettingNames =
 			pNetworkData->rSettingNames();
 		for (unsigned i = 0 ; i < rSettingNames.size(); i++)
