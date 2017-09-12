@@ -59,7 +59,7 @@ void DifferentCovariateOutStarFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double DifferentCovariateOutStarFunction::value(int alter)
+double DifferentCovariateOutStarFunction::value(int alter) const
 {
 	int statistic = 0;
 	if  (!(this->lexcludeMissing && this->missing(alter)))

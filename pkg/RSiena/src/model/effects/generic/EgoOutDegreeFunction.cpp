@@ -12,6 +12,8 @@
 #include "EgoOutDegreeFunction.h"
 #include "network/Network.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -31,7 +33,7 @@ EgoOutDegreeFunction::EgoOutDegreeFunction(string networkName) :
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double EgoOutDegreeFunction::value(int alter)
+double EgoOutDegreeFunction::value(int alter) const
 {
 	return this->pNetwork()->outDegree(this->ego());
 }

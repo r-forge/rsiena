@@ -20,11 +20,6 @@ class Data;
 class State;
 class Cache;
 
-// TODO Header files should not do 'using namespace'.  This might lead to
-// namespace conflicts which are very hard to resolve.  Removeing this breaks
-// almost all alterfunction since the <alterfunction>.cpp files depend on it.
-using namespace std;
-
 class AlterFunction
 {
 public:
@@ -32,9 +27,7 @@ public:
 	virtual ~AlterFunction();
 
 	virtual void initialize(const Data * pData,
-		State * pState,
-		int period,
-		Cache * pCache);
+		State * pState, int period, Cache * pCache);
 	virtual void preprocessEgo(int ego);
 
 	inline int ego() const;
@@ -44,7 +37,7 @@ public:
 	 * that the function has been initialized before and pre-processed with
 	 * respect to a certain ego.
 	 */
-	virtual double value(int alter) = 0;
+	virtual double value(int alter) const = 0;
 
 private:
 	int lego;

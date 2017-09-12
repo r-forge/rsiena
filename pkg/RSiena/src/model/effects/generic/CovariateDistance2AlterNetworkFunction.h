@@ -22,11 +22,11 @@ class CovariateDistance2AlterNetworkFunction: public
 	CovariateDistance2NetworkFunction
 {
 public:
-	CovariateDistance2AlterNetworkFunction(string networkName,
-		string covariateName, double parameter, bool excludeMissing, bool total);
+	CovariateDistance2AlterNetworkFunction(std::string networkName,
+		std::string covariateName, double parameter, bool excludeMissing, bool total);
 	virtual ~CovariateDistance2AlterNetworkFunction();
 
-	virtual double value(int alter);
+	virtual double value(int alter) const;
 
 private:
 	double lparameter;

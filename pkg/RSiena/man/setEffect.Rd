@@ -86,10 +86,10 @@ The column elements of the output effects object for \code{parm},
 \code{initialValue}, and \code{timeDummy}
 will be set to the values requested.}
 \value{
-An object of class \code{\link{sienaEffects}} or
-\code{\link{sienaGroupEffects}}. This will be an updated version of the
-input effects object, with one row updated.
-    Details of the row altered will be printed.
+  An object of class \code{\link{sienaEffects}} or
+  \code{\link{sienaGroupEffects}}. This will be an updated version of the
+  input effects object, with one row updated.
+  Details of the row altered will be printed.
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }

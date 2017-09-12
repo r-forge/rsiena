@@ -11,6 +11,8 @@
 
 #include "MissingCovariatePredicate.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -28,7 +30,7 @@ MissingCovariatePredicate::MissingCovariatePredicate(string covariateName) :
  * that the predicate has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-bool MissingCovariatePredicate::value(int alter)
+bool MissingCovariatePredicate::value(int alter) const
 {
 	return this->missing(this->ego()) || this->missing(alter);
 }

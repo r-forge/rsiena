@@ -92,7 +92,7 @@ sienaGOF <- function(
 	attr(obsStats,"auxiliaryStatisticName") <-
 			deparse(substitute(auxiliaryFunction))
 	attr(obsStats,"joint") <- join
-	
+
 	##	Calculate the simulated auxiliary statistics
 	if (verbose)
 	{
@@ -105,17 +105,17 @@ sienaGOF <- function(
 			cat("Calculating auxiliary statistics for periods", period, ".\n")
 		}
 	}
-	if (!is.null(cluster)) 
+	if (!is.null(cluster))
 	{
 		ttcSimulation <- system.time(simStatsByPeriod <- 
 			lapply(period, function (j) {
-					simStatsByPeriod <- parSapply(cluster, 1:iterations,
-						function (i){auxiliaryFunction(i, sienaFitObject$f,
-										sienaFitObject$sims, j, groupName, varName, ...)})
-			simStatsByPeriod <- matrix(simStatsByPeriod, ncol=iterations)
-			dimnames(simStatsByPeriod)[[2]] <-	1:iterations
-			t(simStatsByPeriod)
-			}))
+				simStatsByPeriod <- parSapply(cluster, 1:iterations,
+					function (i){auxiliaryFunction(i, sienaFitObject$f,
+						sienaFitObject$sims, j, groupName, varName, ...)})
+				simStatsByPeriod <- matrix(simStatsByPeriod, ncol=iterations)
+				dimnames(simStatsByPeriod)[[2]] <-	1:iterations
+				t(simStatsByPeriod)
+				}))
 	}
 	else
 	{
@@ -145,7 +145,7 @@ sienaGOF <- function(
 					})
 	  )
 	}
-	
+
 	## Aggregate by period if necessary to produce simStats
 	if (join)
 	{
@@ -281,7 +281,7 @@ sienaGOF <- function(
 					effectsObject$effectName[sienaFitObject$test]
 		}
 		names(JoinedOneStepMHD_old) <-
-					effectsObject$effectName[sienaFitObject$test]
+			effectsObject$effectName[sienaFitObject$test]
 		names(JoinedOneStepMHD) <-
 				effectsObject$effectName[sienaFitObject$test]
 
@@ -701,7 +701,6 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 			panel = panelFunction, xlab=xlabel, ylab=ylabel, ylim=c(ymin,ymax),
 			scales=list(x=list(labels=key), y=list(draw=FALSE)),
 			main=main)
-
 }
 
 ##@descriptives.sienaGOF siena07 Gives numerical values in the plot.
@@ -721,7 +720,6 @@ descriptives.sienaGOF <- function (x, center=FALSE, scale=FALSE,
 	sims <- x$Simulations
 	obs <- x$Observations
 	itns <- nrow(sims)
-
 	screen <- sapply(1:ncol(obs),function(i){
 						(sum(is.nan(rbind(sims,obs)[,i])) == 0) })
 	if (!showAll)

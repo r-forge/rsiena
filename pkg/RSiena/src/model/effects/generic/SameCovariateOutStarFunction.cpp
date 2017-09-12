@@ -58,7 +58,7 @@ void SameCovariateOutStarFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SameCovariateOutStarFunction::value(int alter)
+double SameCovariateOutStarFunction::value(int alter) const
 {
 	int statistic = 0;
 	if  (!(this->lexcludeMissing && this->missing(alter)))
@@ -74,15 +74,15 @@ double SameCovariateOutStarFunction::value(int alter)
 				int h = iter.actor();
 				// out-2-stars:
 				if (!(this->lexcludeMissing && this->missing(h)))
-					{
+				{
 					if ((fabs(this->CovariateNetworkAlterFunction::value(h)
-				- this->CovariateNetworkAlterFunction::value(this->ego()))
-									< EPSILON) &&
-					(pNetwork->tieValue(h, alter) >= 1))
-						{
-							statistic++ ;
-						}
+									- this->CovariateNetworkAlterFunction::value(this->ego()))
+								< EPSILON) &&
+							(pNetwork->tieValue(h, alter) >= 1))
+					{
+						statistic++ ;
 					}
+				}
 			}
 	}
 	return statistic;

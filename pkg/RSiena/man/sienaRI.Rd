@@ -198,7 +198,6 @@ RI
 \dontrun{
 plot(RI, addPieChart=TRUE)
 plot(RI, actors=1:20, addPieChart=TRUE, radius=1.08)
-
 }
 
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50)

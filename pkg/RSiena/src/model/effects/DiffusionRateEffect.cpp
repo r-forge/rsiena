@@ -33,7 +33,6 @@ namespace siena
  * @param[in] pBehaviorVariable the behavior variable this effect depends on
  * @param[in] parameter the statistical parameter of this effect
  */
-
 DiffusionRateEffect::DiffusionRateEffect(const NetworkVariable * pVariable,
 	const BehaviorVariable * pBehaviorVariable,
 	string effectName,
@@ -42,35 +41,30 @@ DiffusionRateEffect::DiffusionRateEffect(const NetworkVariable * pVariable,
 	this->lpVariable = pVariable;
 	this->lpBehaviorVariable = pBehaviorVariable;
 	this->leffectName = effectName;
-	double possibleDegreeNumer = this->lpBehaviorVariable->range() *
-		max(this->lpVariable->n(),
-			this->lpVariable->m());
+	double possibleDegreeNumer = this->lpBehaviorVariable->range()
+		* max(this->lpVariable->n(), this->lpVariable->m());
 	double possibleDegreeDenom = 1;
 
 	if (effectName == "avExposure")
 	{
-   		possibleDegreeDenom = max(this->lpVariable->n(),
-			this->lpVariable->m());
+		possibleDegreeDenom = max(this->lpVariable->n(), this->lpVariable->m());
 	}
 	if (effectName == "susceptAvIn")
 	{
-		possibleDegreeNumer *= max(this->lpVariable->n(),
-			this->lpVariable->m());
-		possibleDegreeDenom = max(this->lpVariable->n(),
-			this->lpVariable->m());
+		possibleDegreeNumer *= max(this->lpVariable->n(), this->lpVariable->m());
+		possibleDegreeDenom = max(this->lpVariable->n(), this->lpVariable->m());
 	}
 	if (effectName == "infectIn")
 	{
 		possibleDegreeNumer *= max(this->lpVariable->n(),
-			this->lpVariable->m());
+				this->lpVariable->m());
 	}
 	if (effectName == "infectOut")
 	{
-	   	possibleDegreeNumer *= max(this->lpVariable->n(),
-			this->lpVariable->m());
+		possibleDegreeNumer *= max(this->lpVariable->n(), this->lpVariable->m());
 	}
 	this->lpTable = new DiffusionEffectValueTable(possibleDegreeNumer,
-		possibleDegreeDenom);
+			possibleDegreeDenom);
 	this->lpTable->parameter(parameter);
 }
 
@@ -92,11 +86,9 @@ DiffusionRateEffect::DiffusionRateEffect(const NetworkVariable * pVariable,
 
 	if (effectName == "susceptAvCovar")
 	{
-		possibleDegreeNumer = (this->lpBehaviorVariable->range()) *
-			max(this->lpVariable->n(),
-				this->lpVariable->m());
-		possibleDegreeDenom = max(this->lpVariable->n(),
-			this->lpVariable->m());
+		possibleDegreeNumer = (this->lpBehaviorVariable->range())
+			* max(this->lpVariable->n(), this->lpVariable->m());
+		possibleDegreeDenom = max(this->lpVariable->n(), this->lpVariable->m());
 	}
 
 	this->lpTable = new DiffusionEffectValueTable(possibleDegreeNumer,
@@ -118,7 +110,7 @@ DiffusionRateEffect::~DiffusionRateEffect()
  * effect.
  */
 double DiffusionRateEffect::proximityValue(Network * pNetwork, int i,
-	int egoNumer, int egoDenom)
+		int egoNumer, int egoDenom) const
 {
 	int totalAlterValue = 0;
 	if (pNetwork->outDegree(i) > 0)
@@ -159,7 +151,7 @@ double DiffusionRateEffect::proximityValue(Network * pNetwork, int i,
  * Returns the contribution of this effect for the given actor.
  */
 
-double DiffusionRateEffect::value(int i, int period)
+double DiffusionRateEffect::value(int i, int period) const
 {
 	Network * pNetwork = this->lpVariable->pNetwork();
 
@@ -183,9 +175,9 @@ double DiffusionRateEffect::value(int i, int period)
 	{
 		if (this->lpConstantCovariate)
 		{
-			return pow(this->proximityValue(pNetwork, i, 1, max(1,
-						pNetwork->outDegree(i))),
-				this->lpConstantCovariate->value(i));
+			return pow(this->proximityValue(
+						pNetwork, i, 1, max(1, pNetwork->outDegree(i))),
+					this->lpConstantCovariate->value(i));
 		}
 		else if (this->lpChangingCovariate)
 		{
@@ -244,7 +236,7 @@ double DiffusionRateEffect::value(int i, int period)
 /**
  * Stores the parameter for the diffusion rate effect.
  */
-void DiffusionRateEffect::parameter(double parameterValue)
+void DiffusionRateEffect::parameter(double parameterValue) const
 {
 	this->lpTable->parameter(parameterValue);
 }

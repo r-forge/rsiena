@@ -48,13 +48,13 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
     corresponding networks. Allows to restrict the model to networks
     with degrees not higher than this maximum.
     Names should be the names of all dependent network variables,
-	in the same order as in the Siena data set.\cr
-	Default as well as value 0 imply no restrictions.}
+    in the same order as in the Siena data set.\cr
+    Default as well as value 0 imply no restrictions.}
   \item{Offset}{Named vector of offset values for symmetric networks with
-   \code{modelType = 3} (M.1).
+    \code{modelType = 3} (M.1).
     Names should be the names of all dependent network variables,
-	in the same order as in the Siena data set.
-	Default \code{NULL} implies values 0.}
+    in the same order as in the Siena data set.
+    Default \code{NULL} implies values 0.}
   \item{useStdInits}{Boolean. If TRUE, the initial values in the effects
     object will be ignored and default values used instead.
     If FALSE, the initial values in the effects object will be used.}
@@ -64,13 +64,13 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
     at least n3=3000 is advised.}
   \item{nsub}{Number of subphases in phase 2.}
   \item{n2start}{Minimum number of interations in subphase 1 of phase 2;
-   default is \code{2.52*(p+7)},
-   where \code{p} = number of estimated parameters.}
+    default is \code{2.52*(p+7)},
+    where \code{p} = number of estimated parameters.}
   \item{dolby}{Boolean. Should there be noise reduction by regression
     on augmented data score. In most cases dolby=TRUE yields better
-	convergence, but takes some extra computing time;
-	if convergence is problematic, however, dolby=FALSE	may be tried.
-	Just use whatever works best.}
+    convergence, but takes some extra computing time;
+    if convergence is problematic, however, dolby=FALSE may be tried.
+    Just use whatever works best.}
   \item{maxlike}{Whether to use maximum likelihood method or
     Method of Moments estimation.}
   \item{diagonalize}{Number between 0 and 1 (bounds included),
@@ -97,9 +97,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
   \item{cond}{Boolean. Only relevant for Method of Moments
     simulation/estimation.
     If TRUE, use conditional simulation; if FALSE, unconditional simulation.
-	If missing, decision is deferred until \code{\link{siena07}},
-	when it is set to TRUE if there is only one dependent variable,
-	FALSE otherwise.}
+    If missing, decision is deferred until \code{\link{siena07}},
+    when it is set to TRUE if there is only one dependent variable,
+    FALSE otherwise.}
   \item{findiff}{ Boolean: If TRUE, estimate derivatives using finite
     differences. If FALSE, use scores.}
   \item{seed}{Integer. Starting value of random seed. Not used if
@@ -126,19 +126,19 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
     estimation.}
   \item{modelType}{Type of model to be fitted for dependent network variables:
     1=directed, 2:6 for symmetric networks only: 2=dictatorial forcing (D.1),
-    3=Initiative model with reciprocal confirmation(M.1),
+    3=Initiative model with reciprocal confirmation (M.1),
     4=Pairwise dictatorial forcing model (D.2),
     5=Pairwise mutual model (M.2), 6=Pairwise joint model (C.2).\cr
     Names should be the names of all dependent network variables,
-	in the same order as in the Siena data set.\cr
+    in the same order as in the Siena data set.\cr
     See Snijders and Pickup (2016) for the meanings of these models.
-	Default \code{NULL} implies 1 for directed or two-mode, 2 for symmetric.}
+    Default \code{NULL} implies 1 for directed or two-mode, 2 for symmetric.}
   \item{behModelType}{Type of model to be fitted for behavioral dependent
     variables:
     1=standard (restricted), 2=absorbing.
     Names should be the names of all dependent network variables,
-	in the same order as in the Siena data set.
-	Default \code{NULL} implies values 1.}
+    in the same order as in the Siena data set.
+    Default \code{NULL} implies values 1.}
   \item{mult}{Multiplication factor for maximum likelihood and Bayes. Number of
     steps per iteration is set to this multiple of the total distance
     between the observations at start and finish of the wave.
@@ -149,7 +149,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
     This is suitable if nsub=0 and \code{\link{siena07}} is used only for the
     purpose of simulation.}
   \item{localML}{Logical: If TRUE, and \code{maxlike}, then calculations are
-  	sped up for models with all local effects.}
+    sped up for models with all local effects.}
   \item{truncation}{Used for step truncation in the Robbins Monro algorithm
     (applied to deviate/(standard deviation)).}
   \item{doubleAveraging}{subphase after which double averaging is used
@@ -171,7 +171,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
   Robbins-Monro algorithm. Those not
   available as arguments can be changed manually where desired.\cr
   Further information about the implementation of the algorithm is in \cr
-  http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf. 
+  http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf.
 }
 \value{Returns an object of class \code{sienaAlgorithm} containing
   values implied by the parameters.}
@@ -186,7 +186,6 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
 \author{Ruth Ripley and Tom A.B. Snijders}
 \seealso{\code{\link{siena07}}, \code{\link{simstats0c}}.}
 \examples{
-
 myAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn")
 StdAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn", useStdInits=TRUE)
 CondAlgorithm <- sienaAlgorithmCreate(projname="NetworkDyn", condvarno=1, cond=TRUE)

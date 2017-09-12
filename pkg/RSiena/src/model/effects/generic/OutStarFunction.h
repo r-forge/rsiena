@@ -29,14 +29,14 @@ class ConfigurationTable;
 class OutStarFunction: public NetworkAlterFunction, IntAlterFunction
 {
 public:
-	OutStarFunction(string networkName);
+	OutStarFunction(std::string networkName);
 
 	virtual void initialize(const Data * pData,
 		State * pState,
 		int period,
 		Cache * pCache);
 
-	virtual double value(int alter);
+	virtual double value(int alter) const;
 	virtual int intValue(int alter);
 
 private:

@@ -21,10 +21,10 @@ class CovariateDistance2SimilarityNetworkFunction: public
 	CovariateDistance2NetworkFunction
 {
 public:
-	CovariateDistance2SimilarityNetworkFunction(string networkName,
-		string covariateName, bool excludeMissing);
+	CovariateDistance2SimilarityNetworkFunction(std::string networkName,
+		std::string covariateName, bool excludeMissing);
 
-	virtual double value(int alter);
+	virtual double value(int alter) const;
 
 private:
 	bool lexcludeMissing;

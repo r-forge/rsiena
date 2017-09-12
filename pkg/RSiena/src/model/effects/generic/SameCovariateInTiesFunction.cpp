@@ -17,6 +17,8 @@
 #include "network/IncidentTieIterator.h"
 #include "utils/Utils.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -28,10 +30,9 @@ namespace siena
  * associated with
  * @param[in] excludeMissing whether to exclude missing values
  */
-
 SameCovariateInTiesFunction::SameCovariateInTiesFunction(
-	string networkName, string covariateName, bool sameValue,
-	bool sameVariable, bool excludeMissing) :
+		string networkName, string covariateName, bool sameValue,
+		bool sameVariable, bool excludeMissing) :
 	CovariateNetworkAlterFunction(networkName, covariateName)
 {
 	this->lsameValue = sameValue;
@@ -71,7 +72,7 @@ void SameCovariateInTiesFunction::preprocessEgo(int ego)
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SameCovariateInTiesFunction::value(int alter)
+double SameCovariateInTiesFunction::value(int alter) const
 {
 	int statistic = 0;
 	if  (!(this->lexcludeMissing && this->missing(this->ego())))

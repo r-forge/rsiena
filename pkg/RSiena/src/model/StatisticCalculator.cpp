@@ -42,6 +42,8 @@
 #include "model/tables/Cache.h"
 #include "network/IncidentTieIterator.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -57,9 +59,7 @@ namespace siena
  * @param[in] period the period under consideration
  */
 StatisticCalculator::StatisticCalculator(const Data * pData,
-	const Model * pModel,
-	State * pState,
-	int period)
+	const Model * pModel, State * pState, int period)
 {
 	this->lpData = pData;
 	this->lpModel = pModel;
@@ -81,7 +81,9 @@ StatisticCalculator::StatisticCalculator(const Data * pData,
  * @param[in] period the period under consideration
  * @param[in] returnActorStatistics whether individual actor statistics should be returned
  */
-StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pModel, State * pState, int period, bool returnActorStatistics)
+StatisticCalculator::StatisticCalculator(const Data * pData,
+		const Model * pModel, State * pState, int period,
+		bool returnActorStatistics)
 {
 	this->lpData = pData;
 	this->lpModel = pModel;
@@ -104,7 +106,9 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
  * @param[in] returnActorStatistics whether individual actor statistics should be returned
  * @param[in] returnStaticChangeContributions whether contributions of effects on possible next tie flips or behavior changes are needed
  */
-StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pModel, State * pState, int period, bool returnActorStatistics, bool returnStaticChangeContributions)
+StatisticCalculator::StatisticCalculator(const Data * pData,
+		const Model * pModel, State * pState, int period,
+		bool returnActorStatistics, bool returnStaticChangeContributions)
 {
 	this->lpData = pData;
 	this->lpModel = pModel;
@@ -119,7 +123,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData, const Model * pMode
 }
 
 template<typename T, typename A> // type and allocator
-void clear_vector_of_array_pointers(vector<T*, A>& v)
+static void clear_vector_of_array_pointers(vector<T*, A>& v)
 {
 	for (typename vector<T*, A>::iterator it = v.begin(); it != v.end(); ++it)
 		delete[] (*it);
@@ -127,7 +131,7 @@ void clear_vector_of_array_pointers(vector<T*, A>& v)
 }
 
 template <typename K, typename T>
-void clear_map_value_array_pointers(map<K, T*>& m)
+static void clear_map_value_array_pointers(map<K, T*>& m)
 {
 	for (typename map<K, T*>::iterator it = m.begin(); it != m.end(); ++it)
 		delete[] it->second;
@@ -135,7 +139,7 @@ void clear_map_value_array_pointers(map<K, T*>& m)
 }
 
 template <typename K, typename T>
-void for_each_map_value(map<K, T>& m, void (*fn)(T&))
+static void for_each_map_value(map<K, T>& m, void (*fn)(T&))
 {
 	for (typename map<K, T>::iterator it = m.begin(); it != m.end(); ++it)
 		(*fn)(it->second);
@@ -416,7 +420,7 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 				pEffect->initialize(this->lpData, this->lpPredictorState,
 						this->lperiod, &cache);
 				double * contributions = new double[egos];
-				this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
+				this->lstaticChangeContributions[pInfo].at(e) = contributions;
 				pEffect->preprocessEgo(e);
 
 				// TODO determine permissible changes
@@ -425,19 +429,19 @@ void StatisticCalculator::calculateNetworkEvaluationStatistics(
 				{
 					if(a == e)
 					{
-						this->lstaticChangeContributions.at(pInfo).at(e)[a] = 0;
+						this->lstaticChangeContributions[pInfo].at(e)[a] = 0;
 					}
 					else
 					{
 						// Tie withdrawal contributes the opposite of tie creating
 						if (pCurrentLessMissingsEtc->tieValue(e,a))
 						{
-							this->lstaticChangeContributions.at(pInfo).at(e)[a] =
+							this->lstaticChangeContributions[pInfo].at(e)[a] =
 								-pEffect->calculateContribution(a);
 						}
 						else
 						{
-							this->lstaticChangeContributions.at(pInfo).at(e)[a] =
+							this->lstaticChangeContributions[pInfo].at(e)[a] =
 								pEffect->calculateContribution(a);
 						}
 					}
@@ -712,33 +716,33 @@ void StatisticCalculator::calculateBehaviorStatistics(
 			for (int e = 0; e < pBehaviorData->n(); e++)
 			{
 				cache.initialize(e);
-			    pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
+				pEffect->initialize(this->lpData, this->lpPredictorState, this->lperiod, &cache);
 				double * contributions = new double[choices];
-				this->lstaticChangeContributions.at(pInfo).at(e) = contributions;
+				this->lstaticChangeContributions[pInfo].at(e) = contributions;
 				pEffect->preprocessEgo(e);
 				// no change gives no contribution
-				this->lstaticChangeContributions.at(pInfo).at(e)[1] = 0;
+				this->lstaticChangeContributions[pInfo].at(e)[1] = 0;
 				// calculate the contribution of downward change
-				if ((currentValues[e] > pBehaviorData->min()) &&
-						(!pBehaviorData->upOnly(this->lperiod)))
+				if ((currentValues[e] > pBehaviorData->min())
+						&& (!pBehaviorData->upOnly(this->lperiod)))
 				{
-					this->lstaticChangeContributions.at(pInfo).at(e)[0] =
-									pEffect->calculateChangeContribution(e,-1);
+					this->lstaticChangeContributions[pInfo].at(e)[0] =
+						pEffect->calculateChangeContribution(e,-1);
 				}
 				else
 				{
-					this->lstaticChangeContributions.at(pInfo).at(e)[0] = R_NaN;
+					this->lstaticChangeContributions[pInfo].at(e)[0] = R_NaN;
 				}
 				// calculate the contribution of upward change
-				if ((currentValues[e] < pBehaviorData->max()) &&
-						(!pBehaviorData->downOnly(this->lperiod)))
+				if ((currentValues[e] < pBehaviorData->max())
+						&& (!pBehaviorData->downOnly(this->lperiod)))
 				{
-					this->lstaticChangeContributions.at(pInfo).at(e)[2] =
-									pEffect->calculateChangeContribution(e,1);
+					this->lstaticChangeContributions[pInfo].at(e)[2] =
+						pEffect->calculateChangeContribution(e,1);
 				}
 				else
 				{
-					this->lstaticChangeContributions.at(pInfo).at(e)[2] = R_NaN;
+					this->lstaticChangeContributions[pInfo].at(e)[2] = R_NaN;
 				}
 			}
 		}

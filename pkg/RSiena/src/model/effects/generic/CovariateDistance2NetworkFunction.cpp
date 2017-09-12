@@ -16,6 +16,8 @@
 #include "data/ChangingCovariate.h"
 #include "data/BehaviorLongitudinalData.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -27,7 +29,7 @@ namespace siena
  * associated with
  */
 CovariateDistance2NetworkFunction::CovariateDistance2NetworkFunction(
-	string networkName, string covariateName) :
+		string networkName, string covariateName) :
 	CovariateNetworkAlterFunction(networkName, covariateName)
 {
 	this->laverageAlterValues = 0;
@@ -232,10 +234,10 @@ void CovariateDistance2NetworkFunction::preprocessEgo(int ego)
 		}
 	}
 }
+
 /**
- * Returns the centered similarity of the average alter values
-   of the given actors wrt to the network with
- * which this function is associated.
+ * Returns the centered similarity of the average alter values of the given
+ * actors wrt to the network with which this function is associated.
  */
 double CovariateDistance2NetworkFunction::similarityAvAlt(int i, int j) const
 {
@@ -264,9 +266,11 @@ double CovariateDistance2NetworkFunction::similarityAvAlt(int i, int j) const
 	}
 	return similarity;
 }
+
 /**
  * Returns the centered similarity of the own value and the average alter value
-   of the given actors wrt to the network with which this function is associated.
+ * of the given actors wrt to the network with which this function is
+ * associated.
  */
 double CovariateDistance2NetworkFunction::varOutAvSimilarity(int i, int j) const
 {
@@ -307,10 +311,11 @@ double CovariateDistance2NetworkFunction::varOutAvSimilarity(int i, int j) const
 
 	return similarity;
 }
+
 /**
- * Returns the centered similarity of the own value and the average in-alter value
-   of the given actors wrt to the network with
- * which this function is associated.
+ * Returns the centered similarity of the own value and the average in-alter
+ * value of the given actors wrt to the network with which this function is
+ * associated.
  */
 double CovariateDistance2NetworkFunction::varInAvSimilarity(int i, int j) const
 {

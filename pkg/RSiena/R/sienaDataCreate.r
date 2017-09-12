@@ -55,8 +55,8 @@ addAttributes.coCovar <- function(x, name, ...)
 		attr(x, "imputationValues") <- attr(x, "imputationValues") - varmean
 	}
 	x
-
 }
+
 ##@addAttributes.varCovar DataCreate
 addAttributes.varCovar <- function(x, name, ...)
 {
@@ -616,11 +616,11 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 				myvector2 <- myarray[, , j + 1]
 				mydiff <- myvector1 - myvector2
 				attr(depvars[[i]], "distance")[j] <- sum(abs(mydiff),
-														 na.rm=TRUE)
+					na.rm=TRUE)
 				attr(depvars[[i]], "vals")[[j]] <- table(myvector1,
-														 useNA="always")
+					useNA="always")
 				attr(depvars[[i]], "vals")[[j+1]] <- table(myvector2,
-														   useNA="always")
+					useNA="always")
 
 				attr(depvars[[i]], "nval")[j] <-  sum(!is.na(myvector1))
 				attr(depvars[[i]], "nval")[j + 1] <-  sum(!is.na(myvector2))
@@ -631,18 +631,18 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 				attr(depvars[[i]], 'nonMissingEither')[j] <-
 					sum(!(is.na(myvector2) | is.na(myvector1)))
 				if (attr(depvars[[i]], 'allowOnly'))
-					{
+				{
 					if (all(mydiff >= 0, na.rm=TRUE))
-						{
+					{
 						attr(depvars[[i]], 'downonly')[j] <- TRUE
-							someOnly <- TRUE
-						}
-					if (all(mydiff <= 0, na.rm=TRUE))
-						{
-						attr(depvars[[i]], 'uponly')[j] <- TRUE
-							someOnly <- TRUE
-						}
+						someOnly <- TRUE
 					}
+					if (all(mydiff <= 0, na.rm=TRUE))
+					{
+						attr(depvars[[i]], 'uponly')[j] <- TRUE
+						someOnly <- TRUE
+					}
+				}
 			}
 			rr <- range(depvars[[i]], na.rm=TRUE)
 			if (rr[2] == rr[1] && !any(is.na(depvars[[i]])))

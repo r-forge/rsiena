@@ -16,6 +16,8 @@
 #include "CovariateMixedNetworkAlterFunction.h"
 #include "utils/Utils.h"
 
+using namespace std;
+
 namespace siena
 {
 
@@ -58,7 +60,7 @@ void SameCovariateMixedTwoPathFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SameCovariateMixedTwoPathFunction::value(int alter)
+double SameCovariateMixedTwoPathFunction::value(int alter) const
 {
 	int statistic = 0;
 	if (!(this->lexcludeMissing && this->missing(alter)))
@@ -66,23 +68,23 @@ double SameCovariateMixedTwoPathFunction::value(int alter)
 		const Network * pFirstNetwork = this->pFirstNetwork();
 		const Network * pSecondNetwork = this->pSecondNetwork();
 		for (IncidentTieIterator iter = pSecondNetwork->outTies(this->ego());
-			iter.valid();
-			iter.next())
+				iter.valid();
+				iter.next())
+		{
+			// Get the receiver of the outgoing tie.
+			int h = iter.actor();
+			// 2-paths:
+			if (!(this->lexcludeMissing && this->missing(h)))
 			{
-				// Get the receiver of the outgoing tie.
-				int h = iter.actor();
-				// 2-paths:
-				if (!(this->lexcludeMissing && this->missing(h)))
-					{
 				if ((fabs(this->CovariateMixedNetworkAlterFunction::value(h) -
-				this->CovariateMixedNetworkAlterFunction::value(this->ego()))
-									< EPSILON) &&
-								(pFirstNetwork->tieValue(h, alter) >= 1))
-						{
-							statistic++ ;
-						}
-					}
+								this->CovariateMixedNetworkAlterFunction::value(this->ego()))
+							< EPSILON) &&
+						(pFirstNetwork->tieValue(h, alter) >= 1))
+				{
+					statistic++ ;
+				}
 			}
+		}
 	}
 	return statistic;
 }
