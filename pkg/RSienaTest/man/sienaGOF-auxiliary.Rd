@@ -140,186 +140,186 @@ Ph.D. Thesis. University of Oxford: U.K.
 \seealso{\code{\link{siena07}}, \code{\link{sienaGOF}} }
 \examples{
 \dontrun{
-   ### For use out of the box:
+### For use out of the box:
 
-   mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-   mybeh <- sienaDependent(s50a, type="behavior")
-   mydata <- sienaDataCreate(mynet1, mybeh)
-   myeff <- getEffects(mydata)
-   myeff <- includeEffects(myeff, transTies, cycle3)
-   # Shorter phases 2 and 3, just for example:
-   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
-   ans <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE)
+mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mybeh <- sienaDependent(s50a, type="behavior")
+mydata <- sienaDataCreate(mynet1, mybeh)
+myeff <- getEffects(mydata)
+myeff <- includeEffects(myeff, transTies, cycle3)
+# Shorter phases 2 and 3, just for example:
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
+ans <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE)
 
-   OutdegreeDistribution(NULL, ans$f, ans$sims, period=1, groupName="Data1",
-                    levls=0:7, varName="mynet1")
-   IndegreeDistribution(5, ans$f, ans$sims, period=1, groupName="Data1",
-                    varName="mynet1")
-   BehaviorDistribution(20, ans$f, ans$sims, period=1, groupName="Data1",
-                    varName="mybeh")
-   sparseMatrixExtraction(50, ans$f, ans$sims, period=1, groupName="Data1",
-                    varName="mynet1")
-   networkExtraction(100, ans$f, ans$sims, period=1, groupName="Data1",
-                    varName="mynet1")
-   behaviorExtraction(200, ans$f, ans$sims, period=1, groupName="Data1",
-                    varName="mybeh")
+OutdegreeDistribution(NULL, ans$f, ans$sims, period=1, groupName="Data1",
+  levls=0:7, varName="mynet1")
+IndegreeDistribution(5, ans$f, ans$sims, period=1, groupName="Data1",
+  varName="mynet1")
+BehaviorDistribution(20, ans$f, ans$sims, period=1, groupName="Data1",
+  varName="mybeh")
+sparseMatrixExtraction(50, ans$f, ans$sims, period=1, groupName="Data1",
+  varName="mynet1")
+networkExtraction(100, ans$f, ans$sims, period=1, groupName="Data1",
+  varName="mynet1")
+behaviorExtraction(200, ans$f, ans$sims, period=1, groupName="Data1",
+  varName="mybeh")
 
-   gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
-                    varName="mynet1")
-   gofi
-   plot(gofi)
+gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
+  varName="mynet1")
+gofi
+plot(gofi)
 
-   (gofo <- sienaGOF(ans, OutdegreeDistribution, verbose=TRUE, join=TRUE,
-                    varName="mynet1", cumulative=FALSE))
-   # cumulative is an example of "\dots".
-   plot(gofo)
+(gofo <- sienaGOF(ans, OutdegreeDistribution, verbose=TRUE, join=TRUE,
+    varName="mynet1", cumulative=FALSE))
+# cumulative is an example of "\dots".
+plot(gofo)
 
-   (gofb <- sienaGOF(ans, BehaviorDistribution, varName = "mybeh",
-                    verbose=TRUE, join=TRUE, cumulative=FALSE))
-   plot(gofb)
+(gofb <- sienaGOF(ans, BehaviorDistribution, varName = "mybeh",
+    verbose=TRUE, join=TRUE, cumulative=FALSE))
+plot(gofb)
 
-   ### Here come some useful functions for building your own auxiliary statistics:
-   ### First an extraction function.
+### Here come some useful functions for building your own auxiliary statistics:
+### First an extraction function.
 
-   # igraphNetworkExtraction extracts simulated and observed networks
-   # from the results of a siena07 run.
-   # It returns the network as an edge list of class "graph"
-   # according to the igraph package.
-   # Ties for ordered pairs with a missing value for wave=period or period+1
-   # are zeroed;
-   # note that this also is done in RSiena for calculation of target statistics.
-   # However, changing structurally fixed values are not taken into account.
-   igraphNetworkExtraction <- function(i, data, sims, period, groupName, varName){
-     require(igraph)
-     dimsOfDepVar<- attr(data[[groupName]]$depvars[[varName]], "netdims")
-     missings <- is.na(data[[groupName]]$depvars[[varName]][,,period]) |
-                 is.na(data[[groupName]]$depvars[[varName]][,,period+1])
-     if (is.null(i)) {
-   # sienaGOF wants the observation:
-       original <- data[[groupName]]$depvars[[varName]][,,period+1]
-       original[missings] <- 0
-       returnValue <- graph.adjacency(original)
-     }
-     else
-     {
-       missings <- graph.adjacency(missings)
-   #sienaGOF wants the i-th simulation:
-       returnValue <- graph.difference(
-       graph.empty(dimsOfDepVar) +
-           edges(t(sims[[i]][[groupName]][[varName]][[period]][,1:2])),
-                                       missings)
-     }
-     returnValue
-   }
-
-   ### Then some auxiliary statistics.
-
-   # GeodesicDistribution calculates the distribution of non-directed
-   # geodesic distances; see ?sna::geodist
-   # The default for \code{levls} reflects that geodesic distances larger than 5
-   # do not differ appreciably with respect to interpretation.
-   # Note that the levels of the result are named;
-   # these names are used in the \code{plot} method.
-   GeodesicDistribution <- function (i, data, sims, period, groupName,
-                           varName, levls=c(1:5,Inf), cumulative=TRUE, ...) {
-     x <- networkExtraction(i, data, sims, period, groupName, varName)
-     require(network)
-     require(sna)
-     a <- sna::geodist(symmetrize(x))$gdist
-     if (cumulative)
-     {
-       gdi <- sapply(levls, function(i){ sum(a<=i) })
-     }
-     else
-     {
-       gdi <- sapply(levls, function(i){ sum(a==i) })
-     }
-     names(gdi) <- as.character(levls)
-     gdi
-   }
-
-   # Holland and Leinhardt Triad Census; see ?sna::triad.census.
-   TriadCensus <- function(i, data, sims, wave, groupName, varName, levls=1:16){
-       unloadNamespace("igraph") # to avoid package clashes
-       require(network)
-       require(sna)
-       x <- networkExtraction(i, data, sims, wave, groupName, varName)
-       if (network.edgecount(x) <= 0){x <- symmetrize(x)}
-       # because else triad.census(x) will lead to an error
-       tc <- sna::triad.census(x)[1,levls]
-       # names are transferred automatically
-       tc
-   }
-
-   # CliqueCensus calculates the distribution of the clique census
-   # of the symmetrized network; see ?sna::clique.census.
-   CliqueCensus<-function (i, obsData, sims, period, groupName, varName, levls = 1:5){
-       require(sna)
-       x <- networkExtraction(i, obsData, sims, period, groupName, varName)
-       cc0 <- sna::clique.census(x, mode='graph', tabulate.by.vertex = FALSE,
-                                 enumerate=FALSE)[[1]]
-       cc <- 0*levls
-       names(cc) <- as.character(levls)
-       levels.used <- as.numeric(intersect(names(cc0), names(cc)))
-       cc[levels.used] <- cc0[levels.used]
-       cc
-   }
-
-  # Distribution of Bonacich eigenvalue centrality; see ?igraph::evcent.
-  EigenvalueDistribution <- function (i, data, sims, period, groupName, varName,
-                           levls=c(seq(0,1,by=0.125)), cumulative=TRUE){
-     require(igraph)
-     x <- igraphNetworkExtraction(i, data, sims, period, groupName, varName)
-     a <- igraph::evcent(x)$vector
-     a[is.na(a)] <- Inf
-     lel <- length(levls)
-     if (cumulative)
-     {
-       cdi <- sapply(2:lel, function(i){sum(a<=levls[i])})
-     }
-     else
-     {
-       cdi <- sapply(2:lel, function(i){
-                     sum(a<=levls[i]) - sum(a <= levls[i-1])})
-     }
-     names(cdi) <- as.character(levls[2:lel])
-     cdi
-    }
-
-  ## Finally some examples of the three auxiliary statistics constructed above.
-
-   mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-   mybeh <- sienaDependent(s50a, type="behavior")
-   mydata <- sienaDataCreate(mynet1, mybeh)
-   myeff <- getEffects(mydata)
-   myeff <- includeEffects(myeff, transTrip, cycle3, nbrDist2)
-   myeff <- includeEffects(myeff, outdeg, name="mybeh",
-            interaction1="mynet1")
-   myeff <- includeEffects(myeff,  outdeg, name="mybeh",
-            interaction1="mynet1")
-   # Shorter phases 2 and 3, just for example:
-   myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
-   (ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE))
-
-   gofc <- sienaGOF(ans2, EigenvalueDistribution, varName="mynet1",
-           verbose=TRUE, join=TRUE)
-   plot(gofc)
-
-   goftc <- sienaGOF(ans2, TriadCensus, varName="mynet1", verbose=TRUE, join=TRUE)
-   plot(goftc, center=TRUE, scale=TRUE)
-   # For this type of auxiliary statistics
-   # it is advisable in the plot to center and scale.
-   # note the keys at the x-axis; these names are given by sna::triad.census
-   descriptives.sienaGOF(goftc)
-   round(descriptives.sienaGOF(goftc, center=TRUE, scale=TRUE), 3)
-
-   gofgd <- sienaGOF(ans2, GeodesicDistribution, varName="mynet1",
-            verbose=TRUE, join=TRUE, cumulative=FALSE)
-   plot(gofgd)
-   # and without infinite distances:
-   gofgdd <- sienaGOF(ans2, GeodesicDistribution, varName="mynet1",
-             verbose=TRUE, join=TRUE, levls=1:7, cumulative=FALSE)
-   plot(gofgdd)
+# igraphNetworkExtraction extracts simulated and observed networks
+# from the results of a siena07 run.
+# It returns the network as an edge list of class "graph"
+# according to the igraph package.
+# Ties for ordered pairs with a missing value for wave=period or period+1
+# are zeroed;
+# note that this also is done in RSiena for calculation of target statistics.
+# However, changing structurally fixed values are not taken into account.
+igraphNetworkExtraction <- function(i, data, sims, period, groupName, varName) {
+  require(igraph)
+  dimsOfDepVar<- attr(data[[groupName]]$depvars[[varName]], "netdims")
+  missings <- is.na(data[[groupName]]$depvars[[varName]][,,period]) |
+    is.na(data[[groupName]]$depvars[[varName]][,,period+1])
+  if (is.null(i)) {
+    # sienaGOF wants the observation:
+    original <- data[[groupName]]$depvars[[varName]][,,period+1]
+    original[missings] <- 0
+    returnValue <- graph.adjacency(original)
   }
+  else
+  {
+    missings <- graph.adjacency(missings)
+    #sienaGOF wants the i-th simulation:
+    returnValue <- graph.difference(
+      graph.empty(dimsOfDepVar) +
+        edges(t(sims[[i]][[groupName]][[varName]][[period]][,1:2])),
+      missings)
+  }
+  returnValue
+}
+
+### Then some auxiliary statistics.
+
+# GeodesicDistribution calculates the distribution of non-directed
+# geodesic distances; see ?sna::geodist
+# The default for \code{levls} reflects that geodesic distances larger than 5
+# do not differ appreciably with respect to interpretation.
+# Note that the levels of the result are named;
+# these names are used in the \code{plot} method.
+GeodesicDistribution <- function (i, data, sims, period, groupName,
+  varName, levls=c(1:5,Inf), cumulative=TRUE, ...) {
+  x <- networkExtraction(i, data, sims, period, groupName, varName)
+  require(network)
+  require(sna)
+  a <- sna::geodist(symmetrize(x))$gdist
+  if (cumulative)
+  {
+    gdi <- sapply(levls, function(i){ sum(a<=i) })
+  }
+  else
+  {
+    gdi <- sapply(levls, function(i){ sum(a==i) })
+  }
+  names(gdi) <- as.character(levls)
+  gdi
+}
+
+# Holland and Leinhardt Triad Census; see ?sna::triad.census.
+TriadCensus <- function(i, data, sims, wave, groupName, varName, levls=1:16){
+  unloadNamespace("igraph") # to avoid package clashes
+  require(network)
+  require(sna)
+  x <- networkExtraction(i, data, sims, wave, groupName, varName)
+  if (network.edgecount(x) <= 0){x <- symmetrize(x)}
+  # because else triad.census(x) will lead to an error
+  tc <- sna::triad.census(x)[1,levls]
+  # names are transferred automatically
+  tc
+}
+
+# CliqueCensus calculates the distribution of the clique census
+# of the symmetrized network; see ?sna::clique.census.
+CliqueCensus<-function (i, obsData, sims, period, groupName, varName, levls = 1:5){
+  require(sna)
+  x <- networkExtraction(i, obsData, sims, period, groupName, varName)
+  cc0 <- sna::clique.census(x, mode='graph', tabulate.by.vertex = FALSE,
+    enumerate=FALSE)[[1]]
+  cc <- 0*levls
+  names(cc) <- as.character(levls)
+  levels.used <- as.numeric(intersect(names(cc0), names(cc)))
+  cc[levels.used] <- cc0[levels.used]
+  cc
+}
+
+# Distribution of Bonacich eigenvalue centrality; see ?igraph::evcent.
+EigenvalueDistribution <- function (i, data, sims, period, groupName, varName,
+  levls=c(seq(0,1,by=0.125)), cumulative=TRUE){
+  require(igraph)
+  x <- igraphNetworkExtraction(i, data, sims, period, groupName, varName)
+  a <- igraph::evcent(x)$vector
+  a[is.na(a)] <- Inf
+  lel <- length(levls)
+  if (cumulative)
+  {
+    cdi <- sapply(2:lel, function(i){sum(a<=levls[i])})
+  }
+  else
+  {
+    cdi <- sapply(2:lel, function(i){
+      sum(a<=levls[i]) - sum(a <= levls[i-1])})
+  }
+  names(cdi) <- as.character(levls[2:lel])
+  cdi
+}
+
+## Finally some examples of the three auxiliary statistics constructed above.
+
+mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
+mybeh <- sienaDependent(s50a, type="behavior")
+mydata <- sienaDataCreate(mynet1, mybeh)
+myeff <- getEffects(mydata)
+myeff <- includeEffects(myeff, transTrip, cycle3, nbrDist2)
+myeff <- includeEffects(myeff, outdeg, name="mybeh",
+  interaction1="mynet1")
+myeff <- includeEffects(myeff,  outdeg, name="mybeh",
+  interaction1="mynet1")
+# Shorter phases 2 and 3, just for example:
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=200)
+(ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE))
+
+gofc <- sienaGOF(ans2, EigenvalueDistribution, varName="mynet1",
+  verbose=TRUE, join=TRUE)
+plot(gofc)
+
+goftc <- sienaGOF(ans2, TriadCensus, varName="mynet1", verbose=TRUE, join=TRUE)
+plot(goftc, center=TRUE, scale=TRUE)
+# For this type of auxiliary statistics
+# it is advisable in the plot to center and scale.
+# note the keys at the x-axis; these names are given by sna::triad.census
+descriptives.sienaGOF(goftc)
+round(descriptives.sienaGOF(goftc, center=TRUE, scale=TRUE), 3)
+
+gofgd <- sienaGOF(ans2, GeodesicDistribution, varName="mynet1",
+  verbose=TRUE, join=TRUE, cumulative=FALSE)
+plot(gofgd)
+# and without infinite distances:
+gofgdd <- sienaGOF(ans2, GeodesicDistribution, varName="mynet1",
+  verbose=TRUE, join=TRUE, levls=1:7, cumulative=FALSE)
+plot(gofgdd)
+}
 }
 \keyword{models}

@@ -71,27 +71,26 @@ DependentVariable::DependentVariable(string name,
 
 	NetworkLongitudinalData * pNetworkData =
 		dynamic_cast<NetworkLongitudinalData *>(
-			pSimulation->pData()->pNetworkData(name));
+				pSimulation->pData()->pNetworkData(name));
 	if (pNetworkData)
 	{
-	 	this->lnumberSettings = pNetworkData->rSettingNames().size();
+		this->lnumberSettings = pNetworkData->rSettingNames().size();
 		if (lnumberSettings > 0) {
-	 	this->lsettingProbs = new double[this->lnumberSettings];
+			this->lsettingProbs = new double[this->lnumberSettings];
 			lsettings = new Setting*[numberSettings()];
 			SettingsFactory factory;
 			for (int i = 0; i < numberSettings(); i++) {
-				lsettings[i] = factory.createSetting(
-						pNetworkData->rSettingNames().at(i));
+				lsettings[i] = factory.createSetting(pNetworkData->rSettingNames().at(i));
 			}
 		} else {
 			this->lsettingProbs = 0;
 			this->lsettings = 0;
 		}
-	 }
-	 else
+	}
+	else
 	{
 		this->lnumberSettings = 0;
-	 	this->lsettingProbs = 0;
+		this->lsettingProbs = 0;
 		//TODO: Check correctness
 		this->lsettings = 0;
 	}
@@ -115,7 +114,7 @@ void DependentVariable::initializeRateFunction()
 	{
 		NetworkLongitudinalData * pNetworkData =
 			dynamic_cast<NetworkLongitudinalData *>(
-				this->pSimulation()->pData()->pNetworkData(this->name()));
+					this->pSimulation()->pData()->pNetworkData(this->name()));
 		const std::vector<SettingInfo> & rSettingNames =
 			pNetworkData->rSettingNames();
 		for (unsigned i = 0 ; i < rSettingNames.size(); i++)

@@ -49,8 +49,8 @@ nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
   Siena model fit.
 }
 \value{
-An object of class "sienaDependent". An array or (networks only) a list of sparse
-matrices with attributes:
+  An object of class "sienaDependent". An array or (networks only) a list of sparse
+  matrices with attributes:
   \item{netdims}{Dimensions of the network or behavior
     variable: senders, receivers (1 for behavior), periods}
   \item{type}{oneMode, bipartite or behavior}

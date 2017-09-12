@@ -4619,8 +4619,8 @@ fi
 
 
   if test "$ORTED" = no ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Cannot find orted. RSiena needs orted to run." >&5
-$as_echo "$as_me: Cannot find orted. RSiena needs orted to run." >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Cannot find orted. RSienaTest needs orted to run." >&5
+$as_echo "$as_me: Cannot find orted. RSienaTest needs orted to run." >&6;}
     MPI=no
   fi
 fi

@@ -13,7 +13,7 @@
 
 ##@simpleBayesTest Tests single parameters of sienaBayesFit objects
 simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
-							probs = c(0.025,0.975), ndigits=4){
+	probs = c(0.025,0.975), ndigits=4){
 	if (length(tested0) > 1)
 	{
 		stop('tested0 should be a number')
@@ -22,10 +22,10 @@ simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
 	{
 		stop('probs should be a vector of length 2')
 	}
-    theEffects <- z$effects
+	theEffects <- z$effects
 	efNames <- format(paste(ifelse(theEffects$type == "creation",
-									"creat", theEffects$type),
-							theEffects$effectName)[!z$basicRate])
+				"creat", theEffects$type),
+			theEffects$effectName)[!z$basicRate])
 	if (all(theEffects$type[!z$basicRate] == 'eval'))
 	{
 		efNames <- format(theEffects$effectName[!z$basicRate])
@@ -33,8 +33,8 @@ simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
 	else
 	{
 		efNames <- format(paste(ifelse(theEffects$type == "creation",
-									"creat", theEffects$type),
-							theEffects$effectName)[!z$basicRate])
+					"creat", theEffects$type),
+				theEffects$effectName)[!z$basicRate])
 	}
 	credVal <- credValues(z, tested = tested0, theProbs = probs, nfirst=nfirst)
 	mydf <- data.frame(matrix(NA, sum(!z$basicRate), 5))
@@ -49,11 +49,11 @@ simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
 
 
 ##@multipleBayesTest Tests parameters of sienaBayesFit objects
-multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits=4){
-    theEffects <- z$effects
-#	efNames <- format(paste(ifelse(theEffects$type == "creation",
-#									"creat", theEffects$type),
-#							theEffects$effectName)[!z$basicRate])
+multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits=4) {
+	theEffects <- z$effects
+	#	efNames <- format(paste(ifelse(theEffects$type == "creation",
+	#									"creat", theEffects$type),
+	#							theEffects$effectName)[!z$basicRate])
 	if (all(theEffects$type[!z$basicRate] == 'eval'))
 	{
 		efNames <- format(theEffects$effectName[!z$basicRate])
@@ -61,8 +61,8 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 	else
 	{
 		efNames <- format(paste(ifelse(theEffects$type == "creation",
-									"creat", theEffects$type),
-							theEffects$effectName)[!z$basicRate])
+					"creat", theEffects$type),
+				theEffects$effectName)[!z$basicRate])
 	}
 	# 7 lines borrowed from sienaBayes code:
 	vec1 <- 4 - theEffects$randomEffects[theEffects$include]
@@ -84,7 +84,7 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 			dim(z$ThinPosteriorMu[,z$objectiveInVarying, drop=FALSE])[2])
 	vio <- vec1[vec1 %in% c(3,4)] == 3 # could be called z$varyingInObjective
 	z$ThinObjective[1:nmax, vio] <-
-			z$ThinPosteriorMu[nfirst:ntot, z$objectiveInVarying, drop=FALSE]
+		z$ThinPosteriorMu[nfirst:ntot, z$objectiveInVarying, drop=FALSE]
 	z$ThinObjective[1:nmax, !vio] <- z$ThinPosteriorEta[nfirst:ntot,]
 	p <- dim(z$ThinObjective)[2]
 	if (inherits(testedPar, "matrix"))
@@ -105,7 +105,7 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 		posteriorSample <- z$ThinObjective[,, drop=FALSE] %*% t(A)
 		usedEffects <- apply(A,2,function(x){any(x!=0)})
 		theUsedEffects <- paste(which(usedEffects),
-							'. ',effeNames[usedEffects],sep='')
+			'. ',effeNames[usedEffects],sep='')
 	}
 	else
 	{
@@ -142,9 +142,9 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 	boundary <- standLength(testedvec)
 	postProb <- mean((posteriorStandLengths - boundary) > 0)
 	result <- list(prob=postProb, chisquared=boundary,
-				postDistances=posteriorStandLengths,
-				nullValue=testedvec, effectNames=efNames, theUsedEffects=theUsedEffects,
-				posteriorSample=posteriorSample)
+		postDistances=posteriorStandLengths,
+		nullValue=testedvec, effectNames=efNames, theUsedEffects=theUsedEffects,
+		posteriorSample=posteriorSample)
 	class(result) <- 'multipleBayesTest'
 	result
 }
@@ -152,7 +152,7 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 print.multipleBayesTest <- function(x, descriptives=FALSE, ...){
 	if (!inherits(x, 'multipleBayesTest'))
 	{
-        stop("not a legitimate multipleBayesTest object")
+		stop("not a legitimate multipleBayesTest object")
 	}
 	p <- length(x$effectNames)
 	mydf <- as.data.frame(matrix(NA,p,4))
@@ -190,7 +190,7 @@ print.multipleBayesTest <- function(x, descriptives=FALSE, ...){
 	for (i in 1:p){
 		pp <- 2^(i-1)
 		s <- cbind(rbind(s,s), c(rep(1,pp),rep(-1,pp)))
-		}
+	}
 	propSignPattern <- function(si){
 		mean(apply(x$posteriorSample, 1, function(x){identical(sign(x), si)}))
 	}
@@ -201,7 +201,7 @@ print.multipleBayesTest <- function(x, descriptives=FALSE, ...){
 	# cbind transforms T to 1 and F to 0
 	apply(cbind(s, propSigns), 1,
 		function(y){cat(' ', ifelse((y[1:p] > 0.5), '>0 ', '<0 '),
-				formatC(y[p+1], digits=3),'\n')})
+			formatC(y[p+1], digits=3),'\n')})
 	cat("\n")
 	invisible(x)
 }
@@ -212,20 +212,20 @@ stretch2 <- function(x){
 }
 
 plot.multipleBayesTest <- function(x, xlim=NULL, ylim=NULL,
-            main=NULL, ...){
+	main=NULL, ...){
 	if (!inherits(x, 'multipleBayesTest'))
 	{
-        stop("not a legitimate multipleBayesTest object")
+		stop("not a legitimate multipleBayesTest object")
 	}
-# Makes a density plot of the posterior sample of distances.
+	# Makes a density plot of the posterior sample of distances.
 	post <- x$postDistances
 	par(oma=c(0,1,0,0), mar=c(5.1,5.1,4.1,2.1)) # to accommodate larger font for ylab
-# density by group
+	# density by group
 	if (is.null(xlim)){xlim <- stretch2(range(post))}
 	xlim[1] <- min(0, xlim[1])
-# plot density so that truncation at 0 is clear;
-# since the distances are those from the posterior mean,
-# it is very unlikely that 0 is not in the support of the distribution.
+	# plot density so that truncation at 0 is clear;
+	# since the distances are those from the posterior mean,
+	# it is very unlikely that 0 is not in the support of the distribution.
 	d1 <- density(c(post,-post))
 	d1$x <- abs(d1$x)
 	order.x <- order(d1$x)
@@ -235,25 +235,25 @@ plot.multipleBayesTest <- function(x, xlim=NULL, ylim=NULL,
 	if (is.null(main)){main <- "posterior distances"}
 	if (x$chisquared > xlim[2]){
 		cat('note: observed chi-squared =',round(x$chisquared,1),
-				'outside plot window.\n')}
+			'outside plot window.\n')}
 	plot(d1, xlim=xlim, ylim=ylim, xlab='distance', ylab="density", col=4,
-			cex=4, cex.lab=2, cex.main=2, main=main, lwd=2, ...)
+		cex=4, cex.lab=2, cex.main=2, main=main, lwd=2, ...)
 	lines(c(x$chisquared, x$chisquared), c(0, max(d1$y)),lwd=2)
 }
 
 ##@extract.sienaBayes extracts samples from sienaBayesFit objects
 extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
-                   sdLog=TRUE){
+	sdLog=TRUE){
 	getNames <- function(x){
-# effect names without duplicated rate parameters
-# and with "unspecified interaction" replaced by
-# information about the effects in question
+		# effect names without duplicated rate parameters
+		# and with "unspecified interaction" replaced by
+		# information about the effects in question
 		b <- x$basicRate
 		tpar<- rep(NA,length(b))
-# True Parameters, i.e., all except rate parameters for groups 2 and up.
+		# True Parameters, i.e., all except rate parameters for groups 2 and up.
 		for (i in (2:length(b))){tpar[i] <- !b[i]|(b[i]&!b[i-1])}
 		tpar[1] <- TRUE
-# Take away the ' (period 1)' in the first rate parameter
+		# Take away the ' (period 1)' in the first rate parameter
 		sub(' (period 1)','', x$requestedEffects$effectName[tpar], fixed=TRUE)
 	}
 	if (!(is.list(zlist)))
@@ -265,12 +265,12 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 		stop('all elements of zlist must be sienaBayesFit objects')
 	}
 
-#browser()
+	#browser()
 	niter <- sapply(zlist,function(z){dim(z$ThinPosteriorMu)[1]})
 	nit <- niter[1] - nfirst + 1
 
 	if (extracted %in% c("all", "rates")){
-# rate parameters
+		# rate parameters
 		EffName <- zlist[[1]]$effectName
 		indices <- sort(which(!zlist[[1]]$generalParametersInGroup))
 		nGroups <- zlist[[1]]$nGroup
@@ -282,13 +282,13 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 			maxi <- i*nind
 			res1[,h,mini:maxi] <-
 				zlist[[h]]$ThinParameters[(niter[h]-nit+1):niter[h],
-												i,indices,drop=FALSE]
+			i,indices,drop=FALSE]
 			fName1[mini:maxi] <- paste(EffName[indices],i)
 		}}
 	}
 
 	if (extracted %in% c("all", "objective", "varying")){
-# mu
+		# mu
 		nind <- sum(zlist[[1]]$varyingParametersInGroup)
 		if (nind <= 0)
 		{
@@ -299,18 +299,18 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 			EffName <- getNames(zlist[[1]])[zlist[[1]]$varyingParametersInGroup]
 			res2 <- array(dim = c(nit, length(zlist), (2*nind)))
 			for (h in 1:length(zlist)){
-			 res2[,h,1:nind] <-
-				zlist[[h]]$ThinPosteriorMu[(niter[h]-nit+1):niter[h], ,drop=FALSE]
-			 postsig <- zlist[[h]]$ThinPosteriorSigma
-			 postsigg <- matrix(NA,dim(postsig)[1],nind)
-			 if (sdLog){
-				for (k in 1:nind){postsigg[,k] <- 0.5*log(postsig[,k,k])}
-			 }
-			 else {
-				for (k in 1:nind){postsigg[,k] <- sqrt(postsig[,k,k])}
-			 }
-			 res2[,h,(nind+1):(2*nind)] <-
-				postsigg[(niter[h]-nit+1):niter[h],,drop=FALSE]
+				res2[,h,1:nind] <-
+					zlist[[h]]$ThinPosteriorMu[(niter[h]-nit+1):niter[h], ,drop=FALSE]
+				postsig <- zlist[[h]]$ThinPosteriorSigma
+				postsigg <- matrix(NA,dim(postsig)[1],nind)
+				if (sdLog){
+					for (k in 1:nind){postsigg[,k] <- 0.5*log(postsig[,k,k])}
+				}
+				else {
+					for (k in 1:nind){postsigg[,k] <- sqrt(postsig[,k,k])}
+				}
+				res2[,h,(nind+1):(2*nind)] <-
+					postsigg[(niter[h]-nit+1):niter[h],,drop=FALSE]
 			}
 			fName2 <- rep('',2*nind)
 			fName2[1:nind] <- paste(EffName,'mu')
@@ -324,7 +324,7 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 	}
 
 	if (extracted %in% c("all", "objective", "non-varying")){
-# eta
+		# eta
 		nind <- sum(!zlist[[1]]$varyingParametersInGroup)
 		if (nind <= 0)
 		{
@@ -335,8 +335,8 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 			EffName <- getNames(zlist[[1]])[!zlist[[1]]$varyingParametersInGroup]
 			res3 <- array(dim = c(nit, length(zlist), nind))
 			for (h in 1:length(zlist)){
-			res3[,h,1:nind] <-
-				zlist[[h]]$ThinPosteriorEta[(niter[h]-nit+1):niter[h], ,drop=FALSE]
+				res3[,h,1:nind] <-
+					zlist[[h]]$ThinPosteriorEta[(niter[h]-nit+1):niter[h], ,drop=FALSE]
 			}
 			fName3 <- EffName
 		}
@@ -344,24 +344,35 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 
 	res <- NULL
 	switch(extracted,
-		'all' = {res <- array(c(res1,res2,res3),
-							dim=c(dim(res1)[1], dim(res1)[2],
-								dim(res1)[3]+dim(res2)[3]+dim(res3)[3]))
-				fName <- c(fName1, fName2, fName3)},
-		'rates' = {res <- res1
-					fName <- fName1},
-		'varying' = {res <- res2
-					fName <- fName2},
-		'non-varying' = {res <- res3
-					fName <- fName3},
-		'objective' = {res <- array(c(res2,res3),
-							dim=c(dim(res2)[1], dim(res2)[2],
-									dim(res2)[3]+dim(res3)[3]))
-						fName <- c(fName2, fName3)},
-		cat('wrong parameter given: extracted =',extracted,'\n'))
+		'all' = {
+			res <- array(c(res1,res2,res3),
+				dim=c(dim(res1)[1], dim(res1)[2],
+					dim(res1)[3]+dim(res2)[3]+dim(res3)[3]))
+			fName <- c(fName1, fName2, fName3)
+		},
+		'rates' = {
+			res <- res1
+			fName <- fName1
+		},
+		'varying' = {
+			res <- res2
+			fName <- fName2
+		},
+		'non-varying' = {
+			res <- res3
+			fName <- fName3
+		},
+		'objective' = {
+			res <- array(c(res2,res3),
+				dim=c(dim(res2)[1], dim(res2)[2],
+					dim(res2)[3]+dim(res3)[3]))
+			fName <- c(fName2, fName3)
+		},
+		cat('wrong parameter given: extracted =',extracted,'\n')
+	)
 	if (!is.null(res)){
 		dimnames(res) <- list(1:dim(res)[1], paste('chain', 1:length(zlist)),
-								fName)
+			fName)
 		if (any(is.na(res))){
 			cat('warning: the extracted array contains NA elements\n')
 		}

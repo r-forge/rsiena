@@ -189,11 +189,12 @@ includeInteraction <- function(myeff, ...,
 
 	## if want to include, check that we have a spare row
 	if ((include) && (sum(intn) == 0))
-	{# The interaction must be created
-		ints <- myeff[myeff$name == name & myeff$shortName	%in%
-				  c("unspInt", "behUnspInt") &
-				  (is.na(myeff$effect1) | myeff$effect1 == 0)&
-				  myeff$type == type, ]
+	{
+		# The interaction must be created
+		ints <- myeff[myeff$name == name & myeff$shortName %in%
+			c("unspInt", "behUnspInt") &
+			(is.na(myeff$effect1) | myeff$effect1 == 0)&
+			myeff$type == type, ]
 		if (nrow(ints) == 0)
 		{
 			baseEffect<- myeff[myeff$name == name, ][1, ]
@@ -294,9 +295,9 @@ setEffect <- function(myeff, shortName, parameter=0,
 	myeff[use, "initialValue"] <- initialValue
 	myeff[use, "timeDummy"] <- timeDummy
 	myeff[use, "randomEffects"] <- random
-#	 print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
-#						"interaction2", "include", "parm", "fix", "test",
-#						"initialValue", "timeDummy", "period", "group")])
+	# print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
+	# 		"interaction2", "include", "parm", "fix", "test",
+	# 		"initialValue", "timeDummy", "period", "group")])
 	print.sienaEffects(myeff[use,])
 	myeff
 }

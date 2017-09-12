@@ -12,38 +12,38 @@
 
 ##@siena07 siena07
 siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
-					useCluster = FALSE, nbrNodes = 2, initC=TRUE,
-					clusterString=rep("localhost", nbrNodes), tt=NULL,
-					parallelTesting=FALSE, clusterIter=!x$maxlike,
-					clusterType=c("PSOCK", "FORK"),
-					logLevelConsole='WARNING', logLevelFile='INFO',
-					logIncludeLocation=F, cl=NULL,...)
+	useCluster = FALSE, nbrNodes = 2, initC=TRUE,
+	clusterString=rep("localhost", nbrNodes), tt=NULL,
+	parallelTesting=FALSE, clusterIter=!x$maxlike,
+	clusterType=c("PSOCK", "FORK"),
+	logLevelConsole='WARNING', logLevelFile='INFO',
+	logIncludeLocation=F, cl=NULL,...)
 {
 	sienaSetupLogger(logLevelConsole=logLevelConsole,
-					 logLevelFile=logLevelFile,
-					 logBaseName=paste(x$projname, 0, sep='-'),
-					 logIncludeLocation=logIncludeLocation)
+		logLevelFile=logLevelFile,
+		logBaseName=paste(x$projname, 0, sep='-'),
+		logIncludeLocation=logIncludeLocation)
 
-	 exitfn <- function()
+	exitfn <- function()
 	{
-	   if (!is.batch())
-	   {
-		   tkdestroy(tkvars$tt)
-	   }
-	   ## close the report file
-	   Report(closefiles=TRUE)
-	   RNGkind("default")
+		if (!is.batch())
+		{
+			tkdestroy(tkvars$tt)
+		}
+		## close the report file
+		Report(closefiles=TRUE)
+		RNGkind("default")
 	}
 	on.exit(exitfn())
-	
+
 	# If the user is passing clusters through -cl- then change the 
 	# useCluster to TRUE, and assign the -nbrNodes- to number of nodes
 	if (!useCluster & length(cl))
 	{
-	  useCluster <- TRUE
-	  nbrNodes   <- length(cl)
+		useCluster <- TRUE
+		nbrNodes   <- length(cl)
 	}
-	
+
 	time0 <-  proc.time()['elapsed']
 	z <- NULL ## z is the object for all control information which may change.
 	## x is designed to be readonly. Only z is returned.
@@ -55,15 +55,15 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 		{
 			stop("cannot parallel test with multiple processes")
 		}
-	  
-	  if (!length(cl))
-	  {
-	    clusterType <- match.arg(clusterType)
-	    if (.Platform$OS.type == "windows" && clusterType != "PSOCK")
-	    {
-	      stop("cannot use forking processes on Windows")
-	    }
-	  }
+
+		if (!length(cl))
+		{
+			clusterType <- match.arg(clusterType)
+			if (.Platform$OS.type == "windows" && clusterType != "PSOCK")
+			{
+				stop("cannot use forking processes on Windows")
+			}
+		}
 		# The possibility to use snow now has been dropped
 		# because RSiena requires R >= 2.15.0
 		# and snow is superseded.
@@ -110,7 +110,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	}
 	else
 	{
-		randomseed2 <-	NULL
+		randomseed2 <- NULL
 		## x$randomSeed is the user seed, if any
 		if (!is.null(x$randomSeed))
 		{
@@ -156,6 +156,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 		}
 	}
 	is.batch(batchUse)
+
 	## open the output file
 	Report(openfiles=TRUE, projname=x$projname, verbose=verbose, silent=silent)
 	z <- InitReports(z, seed, newseed)
@@ -176,18 +177,18 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	}
 
 	z <- robmon(z, x, useCluster, nbrNodes, initC, clusterString,
-				clusterIter, clusterType, cl, ...)
+		clusterIter, clusterType, cl, ...)
 
 	time1 <-  proc.time()['elapsed']
 	Report(c("Total computation time", round(time1 - time0, digits=2),
-			 "seconds.\n"), outf)
+			"seconds.\n"), outf)
 
 	if (useCluster)
 	{
-	  # Only stop cluster if it wasn't provided by the user
-#	  if (!length(cl))
-#		  stopCluster(z$cl)
-	  
+		# Only stop cluster if it wasn't provided by the user
+		#	  if (!length(cl))
+		#		  stopCluster(z$cl)
+
 		## need to reset the random number type to the normal one
 		assign(".Random.seed", z$oldRandomNumbers, pos=1)
 	}
@@ -198,7 +199,6 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	z
 }
 
-
 ##@InitReports siena07 Print report
 InitReports <- function(z, seed, newseed)
 {
@@ -208,7 +208,7 @@ InitReports <- function(z, seed, newseed)
 	Report("\nNew results follow.\n", outf)
 	Report("-----------------------------------\n", outf)
 	rforgeRevision <-  packageDescription(pkgname,
-										  fields="Repository/R-Forge/Revision")
+		fields="Repository/R-Forge/Revision")
 	if (is.na(rforgeRevision))
 	{
 		revision <- ""
@@ -218,17 +218,16 @@ InitReports <- function(z, seed, newseed)
 		revision <- paste(" R-forge revision: ", rforgeRevision, " ", sep="")
 	}
 	version <- packageDescription(pkgname, fields = "Version")
-	Report(c("\nRSienaTest version ", version, " (",
-			 format(as.Date(packageDescription(pkgname, fields = "Date")),
-					"%d %b %y"), ")",
-			 revision, "\n\n"), sep = '',  outf )
+	Report(c(paste("\n", pkgname, " version ", sep = ""), version, " (",
+		format(as.Date(packageDescription(pkgname, fields = "Date")), "%d %b %y"),
+		")", revision, "\n\n"), sep = "", outf)
 	if (z$x$simOnly)
 	{
-	Heading(1, outf, "Simulations.")
+		Heading(1, outf, "Simulations.")
 	}
 	else
 	{
-	Heading(1, outf, "Estimation by stochastic approximation algorithm.")
+		Heading(1, outf, "Estimation by stochastic approximation algorithm.")
 	}
 	if (is.null(seed))
 	{
@@ -279,7 +278,7 @@ AnnouncePhase <- function(z, x, subphase=NULL)
 			##sep="", cf)
 			Report(c("\nStart phase ", z$Phase, ".", subphase, "\n"), sep="")
 		}
-   }
+	}
 	if (z$Phase == 0)
 	{
 		if (!is.batch())
@@ -293,7 +292,7 @@ AnnouncePhase <- function(z, x, subphase=NULL)
 		z$n2min0 <- max(5, z$n2min0 / z$int)
 		z$n2minimum<- rep(0, x$nsub)
 		z$n2maximum<- rep(0, x$nsub)
-	## 2.5198421 = 2^(4/3); this gives a gain parameter of order n^(-3/4) ##
+		## 2.5198421 = 2^(4/3); this gives a gain parameter of order n^(-3/4) ##
 		if (x$nsub > 0)
 		{
 			z$n2minimum[1] <-
@@ -318,7 +317,7 @@ AnnouncePhase <- function(z, x, subphase=NULL)
 		z$pb$pbval <- 0
 		z$pb <- createProgressBar(z$pb, maxvalue=pbmax)
 		z$pb$pbmax <- pbmax
-   }
+	}
 	if (z$Phase==2)
 	{
 		propo <- z$n1pos + z$n2partsum[max(subphase,1)]
@@ -330,11 +329,11 @@ AnnouncePhase <- function(z, x, subphase=NULL)
 		propo <- z$n1pos + z$n2partsum[x$nsub + 1]
 		if (!z$AllUserFixed)
 			z$pb <- setProgressBar(z$pb,propo)
-	   else
+		else
 		{
 			max <- x$n3
 			z$pb <-createProgressBar(z$pb,max)
-	   }
+		}
 	}
 	z
 }
@@ -378,7 +377,7 @@ DisplayThetaAutocor <- function(z)
 	{
 		Report(c("theta", format(z$theta, digits=3),"\n"))
 		Report(c("ac", format(z$ac, digits=3), "\n"))
-  }
+	}
 
 }
 ##@DisplayandWriteTheta siena07 Progress reporting
@@ -410,7 +409,7 @@ FormatString <- function(pp, value)
 	nbrs <- format(1:ppuse)
 	nch <- nchar(nbrs[1])
 	formatstr <- paste("%", nch, "d.%", (13 - nch), ".4f\n", sep="",
-					   collapse="")
+		collapse="")
 	paste(sprintf(formatstr, 1:ppuse, value[1:ppuse]), collapse="")
 }
 ##@DisplayDeviations siena07 Progress reporting
@@ -480,7 +479,7 @@ tkErrorMessage <- function()
 ##@errorHandler Miscellaneous Not used
 errorHandler <- function()
 {
-	##	opts <- options()
+	## opts <- options()
 	if (!is.batch())
 	{
 		options(show.error.messages=FALSE)

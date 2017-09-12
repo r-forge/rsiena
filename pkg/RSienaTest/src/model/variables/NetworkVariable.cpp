@@ -44,7 +44,8 @@
 
 using namespace std;
 
-namespace siena {
+namespace siena
+{
 
 SEXP getMiniStepDF(const MiniStep& miniStep);
 
@@ -134,7 +135,8 @@ NetworkVariable::NetworkVariable(NetworkLongitudinalData * pData,
 /**
  * Deallocates this variable object.
  */
-NetworkVariable::~NetworkVariable() {
+NetworkVariable::~NetworkVariable()
+{
 	for (int i = 0; i < numberSettings(); i++) {
 		lsettings[i]->terminateSetting(lpNetwork);
 	}
@@ -576,7 +578,8 @@ void NetworkVariable::makeChange(int actor)
 		{
 			m = this->m() + 1;
 		}
-		if (this->stepType() != -1) {
+		if (this->stepType() != -1)
+		{
 			if (!lsettings[stepType()]->validate(lpNetwork)) {
 				successfulChange(false);
 				lsettings[stepType()]->terminateSetting(ego());
@@ -751,7 +754,7 @@ void NetworkVariable::preprocessEgo(const Function * pFunction, int ego)
  */
 void NetworkVariable::calculatePermissibleChanges()
 {
-	NetworkLongitudinalData *pData = (NetworkLongitudinalData*) this->pData();
+	NetworkLongitudinalData * pData = (NetworkLongitudinalData*) this->pData();
 
 	int m = this->m();
 	for (int i = 0; i < m; ++i)
@@ -846,9 +849,12 @@ void NetworkVariable::calculateTieFlipContributions()
 	int evaluationEffectCount = this->pEvaluationFunction()->rEffects().size();
 	int endowmentEffectCount = this->pEndowmentFunction()->rEffects().size();
 	int creationEffectCount = this->pCreationFunction()->rEffects().size();
-	const vector<Effect*> &rEvaluationEffects = this->pEvaluationFunction()->rEffects();
-	const vector<Effect*> &rEndowmentEffects = this->pEndowmentFunction()->rEffects();
-	const vector<Effect*> &rCreationEffects = this->pCreationFunction()->rEffects();
+	const vector<Effect *> & rEvaluationEffects =
+		this->pEvaluationFunction()->rEffects();
+	const vector<Effect *> & rEndowmentEffects =
+		this->pEndowmentFunction()->rEffects();
+	const vector<Effect *> & rCreationEffects =
+		this->pCreationFunction()->rEffects();
 	bool twoModeNetwork = !this->oneModeNetwork();
 	NetworkLongitudinalData * pData = (NetworkLongitudinalData *) this->pData();
 
@@ -866,7 +872,8 @@ void NetworkVariable::calculateTieFlipContributions()
 	{
 		alter = alteri;
 
-		if (this->stepType() != -1) {
+		if (this->stepType() != -1)
+		{
 			if (!permIter->valid()) {
 				LOGS(logger::Priority::ERROR)<< "permitted iter length != settings permitted size\n";
 				throw "permitted iter length != settings permitted size";
@@ -1151,26 +1158,20 @@ void NetworkVariable::calculateTieFlipProbabilities()
 // used to be  >[evaluationEffectCount+endowmentEffectCount+creationEffectCount];
 		for (int i = 0; i < evaluationEffectCount; i++) {
 			vector<double> vec(this->m(),0);
-			this->lpChangeContribution->insert(
-					make_pair(
-							this->pEvaluationFunction()->rEffects()[i]->pEffectInfo(),
-							vec));
+			this->lpChangeContribution->insert(make_pair(
+						this->pEvaluationFunction()->rEffects()[i]->pEffectInfo(), vec));
 		}
 		for (int i = 0; i < endowmentEffectCount; i++)
 		{
 			vector<double> vec(this->m(),0);
-			this->lpChangeContribution->insert(
-					make_pair(
-							this->pEndowmentFunction()->rEffects()[i]->pEffectInfo(),
-							vec));
+			this->lpChangeContribution->insert(make_pair(
+						this->pEndowmentFunction()->rEffects()[i]->pEffectInfo(), vec));
 		}
 		for (int i = 0; i < creationEffectCount; i++)
 		{
 			vector<double> vec(this->m(),0);
-			this->lpChangeContribution->insert(
-					make_pair(
-							this->pCreationFunction()->rEffects()[i]->pEffectInfo(),
-							vec));
+			this->lpChangeContribution->insert(make_pair(
+						this->pCreationFunction()->rEffects()[i]->pEffectInfo(), vec));
 		}
 	}
 
@@ -1215,10 +1216,10 @@ void NetworkVariable::calculateTieFlipProbabilities()
 			{
 				Effect * pEffect = this->pEvaluationFunction()->rEffects()[i];
 				contribution += pEffect->parameter()
-						* this->levaluationEffectContribution[alter][i];
-				if (this->pSimulation()->pModel()->needChangeContributions()) {
-					(*this->lpChangeContribution).at(pEffect->pEffectInfo()).at(
-							alter) =
+					* this->levaluationEffectContribution[alter][i];
+				if (this->pSimulation()->pModel()->needChangeContributions())
+				{
+					(*this->lpChangeContribution)[pEffect->pEffectInfo()].at(alter) =
 					this->levaluationEffectContribution[alter][i];
 				}
 			}
@@ -1227,15 +1228,13 @@ void NetworkVariable::calculateTieFlipProbabilities()
 			{
 				for (int i = 0; i < endowmentEffectCount; i++)
 				{
-					Effect * pEffect =
-						this->pEndowmentFunction()->rEffects()[i];
-					contribution +=
-						pEffect->parameter() *
-						this->lendowmentEffectContribution[alter][i];
+					Effect * pEffect = this->pEndowmentFunction()->rEffects()[i];
+					contribution += pEffect->parameter()
+						* this->lendowmentEffectContribution[alter][i];
 					if (this->pSimulation()->pModel()->needChangeContributions())
 					{
-						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) =
-						this->lendowmentEffectContribution[alter][i];
+						(* this->lpChangeContribution)[pEffect->pEffectInfo()].at(alter) =
+							this->lendowmentEffectContribution[alter][i];
 					}
 				}
 			}
@@ -1243,15 +1242,13 @@ void NetworkVariable::calculateTieFlipProbabilities()
 			{
 				for (int i = 0; i < creationEffectCount; i++)
 				{
-					Effect * pEffect =
-						this->pCreationFunction()->rEffects()[i];
-					contribution +=
-						pEffect->parameter() *
-						this->lcreationEffectContribution[alter][i];
+					Effect * pEffect = this->pCreationFunction()->rEffects()[i];
+					contribution += pEffect->parameter()
+						* this->lcreationEffectContribution[alter][i];
 					if (this->pSimulation()->pModel()->needChangeContributions())
 					{
-						(* this->lpChangeContribution).at(pEffect->pEffectInfo()).at(alter) =
-						this->lcreationEffectContribution[alter][i];
+						(* this->lpChangeContribution)[pEffect->pEffectInfo()].at(alter) =
+							this->lcreationEffectContribution[alter][i];
 					}
 				}
 			}
@@ -1323,14 +1320,14 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	// Normalize
 	if (total > 0) {
 		// this loop requires that permIter processes its entries in ascending order (which it does)
-	   	for (int alter = 0; alter < m; alter++)
+		for (int alter = 0; alter < m; alter++)
 		{
 			if (permIter != 0)
 			{
 				if (permIter->valid())
-	{
+				{
 					if (alter < permIter->actor())
-		{
+					{
 						lprobabilities[alter] = 0;
 					} else {
 						//            sum -= lprobabilities[alter];
@@ -1345,10 +1342,11 @@ void NetworkVariable::calculateTieFlipProbabilities()
 			this->lprobabilities[alter] /= total;
 			} else {
 				this->lprobabilities[alter] = 0;
+			}
 		}
 	}
-
-	} else {
+	else
+	{
 		Rprintf("total = %f\n", total);
 		error("total probability non-positive");
 	}
@@ -1356,7 +1354,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	// delete iter
 	if (permIter != 0) {
 		delete permIter;
-}
+	}
 
 }
 
@@ -1434,28 +1432,28 @@ void NetworkVariable::accumulateScores(int alter) const
 						this->lprobabilities[j];
 				}
 				if (R_IsNaN(score))
-					{
+				{
 					Rprintf("R_IsNaN error: i = %d ego = %d alter = %d j = %d m = %d\n",
 							i, this->lego, alter, j, m);
-//						Rprintf("lpermitted: \n");
-//						for (int hh = 0; hh < m; hh++)
-//						{
-//							if (this->lpermitted[hh])
-//							{
-//								Rprintf("%d 1", hh);
-//							}
-//							else
-//							{
-//								Rprintf("%d 0", hh);
-//							}
-//							Rprintf("\n");
-//						}
-	Rprintf("R_IsNaN error: this->levaluationEffectContribution[j][i] = %f\n",
+					//						Rprintf("lpermitted: \n");
+					//						for (int hh = 0; hh < m; hh++)
+					//						{
+					//							if (this->lpermitted[hh])
+					//							{
+					//								Rprintf("%d 1", hh);
+					//							}
+					//							else
+					//							{
+					//								Rprintf("%d 0", hh);
+					//							}
+					//							Rprintf("\n");
+					//						}
+					Rprintf("R_IsNaN error: this->levaluationEffectContribution[j][i] = %f\n",
 							this->levaluationEffectContribution[j][i]);
 					Rprintf("R_IsNaN error: this->lprobabilities[j] = %f\n",
 							this->lprobabilities[j]);
-						error("nan score 1");
-					}
+					error("nan score 1");
+				}
 			}
 			if (R_IsNaN(this->pSimulation()->score(pEffect->pEffectInfo())))
 			{
@@ -1539,8 +1537,7 @@ void NetworkVariable::accumulateScores(int alter) const
 					j = permIter->actor();
 					permIter->next();
 				}
-				if (!this->lpNetworkCache->outTieExists(j) &&
-						this->lpermitted[j])
+				if (!this->lpNetworkCache->outTieExists(j) && this->lpermitted[j])
 				{
 					score -=
 						this->lcreationEffectContribution[j][i] *
@@ -2661,18 +2658,18 @@ bool NetworkVariable::diagonalMiniStep(int ego, int alter) const
 
 void NetworkVariable::initializeSetting() {
 	NetworkLongitudinalData * pNetworkData =
-			dynamic_cast<NetworkLongitudinalData *>(this->pData());
+		dynamic_cast<NetworkLongitudinalData *>(this->pData());
 	Setting* setting = lsettings[stepType()];
 	string covariateName = pNetworkData->rSettingNames().at(this->stepType()).getCovarName();
 	if (pSimulation()->pData()->pConstantDyadicCovariate(covariateName)) {
 		setting->initDyadicSetting(
 				pSimulation()->pData()->pConstantDyadicCovariate(covariateName)->rRowValues(
-						ego()), ego());
+					ego()), ego());
 	}
 	if (pSimulation()->pData()->pChangingDyadicCovariate(covariateName)) {
 		setting->initDyadicSetting(
 				pSimulation()->pData()->pChangingDyadicCovariate(covariateName)->rRowValues(
-						ego(), period()), ego());
+					ego(), period()), ego());
 	}
 	setting->initSetting(ego());
 }

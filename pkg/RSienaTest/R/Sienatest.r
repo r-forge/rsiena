@@ -36,8 +36,8 @@ InstabilityAnalysis<- function(z)
 	## Report(' (without coordinates that are kept constant):\n',lf)
 	##else
 	Report(c(':\n\nCondition number = ',format(cond.n, width=4, nsmall=4,
-											   digits=1),
-			 ' \n\n'),sep='',lf)
+				digits=1),
+			' \n\n'),sep='',lf)
 	Report(c('Eigen Values  ', format(eigenv, width=6, nsmall=6, digits=1)), lf)
 	Report('\n\n',lf)
 	covZ <- MatrixNorm(covZ)
@@ -50,8 +50,8 @@ InstabilityAnalysis<- function(z)
 	}
 	Report('Variance-covariance matrix of X',lf)
 	Report(c(':\n\nCondition number = ', format(cond.n, width=4, nsmall=4,
-												digits=1),
-			 ' \n\n'), sep='', lf)
+				digits=1),
+			' \n\n'), sep='', lf)
 	Report(c('Eigen Values  ', format(eigenvZ, width=6, nsmall=6, digits=1)), lf)
 	Report(c('\n\n',date(),'\n'),sep='',lf)
 	mysvd <- svd(z$sf)$d
@@ -59,8 +59,8 @@ InstabilityAnalysis<- function(z)
 	mi <- min(mysvd)
 	cond.n <- (ma/mi)^2
 	Report(c(':\n\nCondition number2 = ',
-			 format(cond.n, width=4, nsmall=4, digits=1),
-			 ' \n\n'), sep='', lf)
+			format(cond.n, width=4, nsmall=4, digits=1),
+			' \n\n'), sep='', lf)
 	Report(c('Singular Values  ', format(mysvd, width=6, nsmall=6, digits=1)), lf)
 	Report(c('\n\n', date(), '\n'), sep='', lf)
 }
@@ -95,12 +95,12 @@ TestOutput <- function(z, x)
 			{
 				j <- j + 1
 				Report(c(" (", j, ")   ",
-						 format(paste(z$requestedEffects$type[k], ":  ",
-									  z$requestedEffects$effectName[k],
-									  sep=""),
-								width=50), " = ",
-						 sprintf("%8.4f", z$theta[k]), "\n"),
-					   sep = "", outf)
+						format(paste(z$requestedEffects$type[k], ":  ",
+								z$requestedEffects$effectName[k],
+								sep=""),
+							width=50), " = ",
+						sprintf("%8.4f", z$theta[k]), "\n"),
+					sep = "", outf)
 			}
 		}
 		Report('_________________________________________________\n',outf)
@@ -109,7 +109,7 @@ TestOutput <- function(z, x)
 		if (testn > 1)
 			Report('Joint test:\n-----------\n',outf)
 		Report(c('   c = ',sprintf("%8.4f", z$testresOverall),
-				 '   d.f. = ',j,'   p-value '),sep='',outf)
+				'   d.f. = ',j,'   p-value '),sep='',outf)
 		pvalue <- 1-pchisq(z$testresOverall,j)
 		if (!is.na(pvalue))
 		{
@@ -124,11 +124,11 @@ TestOutput <- function(z, x)
 		}
 		else
 		{
-				Report('  NA  ',outf)
+			Report('  NA  ',outf)
 		}
 		if (testn==1)
 			Report(c('\n   one-sided (normal variate): ',
-					 sprintf("%8.4f",z$testresulto[1])), sep = '', outf)
+					sprintf("%8.4f",z$testresulto[1])), sep = '', outf)
 		if (testn> 1)
 		{
 			Report('\n\n',outf)
@@ -138,7 +138,7 @@ TestOutput <- function(z, x)
 				Report('-----------------------\n',outf)
 				Report(' - two-sided:\n',outf)
 				Report(c('  c = ', sprintf("%8.4f", z$testresult[k]),
-						 '   d.f. = 1  p-value '), sep = '', outf)
+						'   d.f. = 1  p-value '), sep = '', outf)
 				pvalue<- 1-pchisq(z$testresult[k],1)
 				if (!is.na(pvalue))
 				{
@@ -149,7 +149,7 @@ TestOutput <- function(z, x)
 					else
 					{
 						Report(c('= ', sprintf("%8.4f", pvalue), '\n'), sep = '',
-						   outf)
+							outf)
 					}
 				}
 				else
@@ -157,7 +157,7 @@ TestOutput <- function(z, x)
 					Report('  NA  ',outf)
 				}
 				Report(c(' - one-sided (normal variate): ',
-						 sprintf("%8.4f", z$testresulto[k])), sep = '', outf)
+						sprintf("%8.4f", z$testresulto[k])), sep = '', outf)
 				if (k < j)
 				{
 					Report('\n\n',outf)
@@ -165,15 +165,15 @@ TestOutput <- function(z, x)
 			}
 		}
 		Report('    \n_________________________________________________\n\n',
-			   outf)
+			outf)
 		Report('One-step estimates: \n\n', outf)
 		for (i in 1 : z$pp)
 		{
 			onestepest <- z$oneStep[i] + z$theta[i]
 			Report(c(format(paste(z$requestedEffects$type[i], ':  ',
-								  z$requestedEffects$effectName[i], sep = ''),
-							width=50),
-					 sprintf("%8.4f", onestepest), '\n'), sep = '', outf)
+							z$requestedEffects$effectName[i], sep = ''),
+						width=50),
+					sprintf("%8.4f", onestepest), '\n'), sep = '', outf)
 		}
 		Report('\n',outf)
 	}
@@ -204,7 +204,7 @@ ScoreTest<- function(pp, dfra, msf, fra, test, redundant, maxlike)
 				k <- k + 1
 				use[i] <- TRUE
 				ans <- EvaluateTestStatistic(maxlike, test[use], redundant[use],
-										dfra[use, use], msf[use, use], fra[use])
+					dfra[use, use], msf[use, use], fra[use])
 				testresult[k] <- ans$cvalue
 				testresulto[k] <- ans$oneSided
 				use[i] <- FALSE
@@ -228,8 +228,8 @@ ScoreTest<- function(pp, dfra, msf, fra, test, redundant, maxlike)
 		oneStep<- -dinv2 %*% fra
 	}
 	list(testresult=testresult, testresulto=testresulto,
-		 testresOverall=testresOverall, covMatrix=covMatrix,
-		 oneStep=oneStep, dinv2= dinv2, dfra2=dfra2)
+		testresOverall=testresOverall, covMatrix=covMatrix,
+		oneStep=oneStep, dinv2= dinv2, dfra2=dfra2)
 }
 ##@EvaluateTestStatistic siena07 Calculate score test statistics
 EvaluateTestStatistic<- function(maxlike, test, redundant, dfra, msf, fra)
@@ -306,24 +306,24 @@ EvaluateTestStatistic<- function(maxlike, test, redundant, dfra, msf, fra)
 
 ##@scoreTest Calculate score test
 score.Test <- function(ans, test=ans$test)
-# use: ans must be a sienaFit object;
-# test must be a boolean vector with length equal to the number of parameters of ans,
-# or a vector of integer numbers between 1 and ans$pp.
+	# use: ans must be a sienaFit object;
+	# test must be a boolean vector with length equal to the number of parameters of ans,
+	# or a vector of integer numbers between 1 and ans$pp.
 {
 	if ((is.numeric(test)) || (is.integer(test)))
 	{
 		if (max(test) > ans$pp)
 		{
 			stop(paste('The maximum requested coordinate is too high:',
-									max(test)))
+					max(test)))
 		}
 		test <- (1:ans$pp) %in% test
 	}
 	if (sum(test) <= 0) stop(paste('Something should be tested, but the total requested is',
-									sum(test)))
+			sum(test)))
 	if (length(test) != ans$pp) stop('Dimensions of must agree')
 	if (any(test & (!ans$fix))) cat('Warning: some tested parameters were not fixed; do you know what you are doing??? \n')	
-    fra <- colMeans(ans$sf, na.rm=TRUE)
+	fra <- colMeans(ans$sf, na.rm=TRUE)
 	redundant <- (ans$fix & (!test))
 	teststat <- EvaluateTestStatistic(ans$maxlike, test, redundant, ans$dfra, ans$msf, fra)$cvalue
 	df <- sum(test)
@@ -337,16 +337,17 @@ Wald.RSiena <- function(A, ans)
 	if (is.vector(A)){A <- matrix(A, nrow=1)}
 	if (dim(A)[2] != ans$pp){stop(paste('A must have', ans$pp, 'columns.'))}
 	sigma <- ans$covtheta
-	if (any(is.na(sigma))){ # happens when some coordinates were fixed
-	                        # in the call of siena07 leading to ans;
-	                        # then the non-used part of sigma,
-							# which partially consists of NA,
-							# is replaced by the identity matrix.
+	if (any(is.na(sigma))) {
+		# happens when some coordinates were fixed
+		# in the call of siena07 leading to ans;
+		# then the non-used part of sigma,
+		# which partially consists of NA,
+		# is replaced by the identity matrix.
 		zero.cols <- apply(A, 2, function(colum){all(colum==0)})
 		sigma[zero.cols, ] <- 0
 		sigma[, zero.cols] <- 0
 		diag(sigma)[zero.cols] <- 1
-		}
+	}
 	th <- A %*% ans$theta
 	covmat <- A %*% sigma %*% t(A)
 	chisq <- drop(t(th) %*% solve(covmat) %*% th)

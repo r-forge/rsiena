@@ -48,13 +48,13 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
     corresponding networks. Allows to restrict the model to networks
     with degrees not higher than this maximum.
     Names should be the names of all dependent network variables,
-	in the same order as in the Siena data set.\cr
-	Default as well as value 0 imply no restrictions.}
+    in the same order as in the Siena data set.\cr
+    Default as well as value 0 imply no restrictions.}
   \item{Offset}{Named vector of offset values for symmetric networks with
-   \code{modelType = 3} (M.1), and for universal setting in Settings model.
+    \code{modelType = 3} (M.1), and for universal setting in Settings model.
     Names should be the names of all dependent network variables,
-	in the same order as in the Siena data set.
-	Default \code{NULL} implies values 0.}
+    in the same order as in the Siena data set.
+    Default \code{NULL} implies values 0.}
   \item{useStdInits}{Boolean. If TRUE, the initial values in the effects
     object will be ignored and default values used instead.
     If FALSE, the initial values in the effects object will be used.}
@@ -64,8 +64,8 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
     at least n3=3000 is advised.}
   \item{nsub}{Number of subphases in phase 2.}
   \item{n2start}{Minimum number of interations in subphase 1 of phase 2;
-   default is \code{2.52*(p+7)},
-   where \code{p} = number of estimated parameters.}
+    default is \code{2.52*(p+7)},
+    where \code{p} = number of estimated parameters.}
   \item{dolby}{Boolean. Should there be noise reduction by regression
     on augmented data score. In most cases dolby=TRUE yields better
     convergence, but takes some extra computing time;
@@ -130,15 +130,15 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
     4=Pairwise dictatorial forcing model (D.2),
     5=Pairwise mutual model (M.2), 6=Pairwise joint model (C.2).\cr
     Names should be the names of all dependent network variables,
-	in the same order as in the Siena data set.\cr
+    in the same order as in the Siena data set.\cr
     See Snijders and Pickup (2016) for the meanings of these models.
-	Default \code{NULL} implies 1 for directed or two-mode, 2 for symmetric.}
+    Default \code{NULL} implies 1 for directed or two-mode, 2 for symmetric.}
   \item{behModelType}{Type of model to be fitted for behavioral dependent
     variables:
     1=standard (restricted), 2=absorbing.
     Names should be the names of all dependent network variables,
-	in the same order as in the Siena data set.
-	Default \code{NULL} implies values 1.}
+    in the same order as in the Siena data set.
+    Default \code{NULL} implies values 1.}
   \item{mult}{Multiplication factor for maximum likelihood and Bayes. Number of
     steps per iteration is set to this multiple of the total distance
     between the observations at start and finish of the wave.

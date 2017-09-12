@@ -15,22 +15,15 @@ effectsDocumentation <- function(effects= NULL, type="html",
 	filename=ifelse(is.null(effects), "effects", deparse(substitute(effects))))
 {
 	## require(xtable)
-	if (is.null(effects))
-	{
+	if (is.null(effects)) {
 		x <- RSienaTest::allEffects[, c("effectGroup", "effectName", "shortName",
-						"endowment", "interaction1", "interaction2",
-						"parm", "interactionType")]
-	}
-	else
-	{
-		if (!inherits(effects,"sienaEffects"))
-		{
-			stop(paste(deparse(substitute(effects)),
-				 "is not a sienaEffects object."))
+			"endowment", "interaction1", "interaction2", "parm", "interactionType")]
+	} else {
+		if (!inherits(effects, "sienaEffects")) {
+			stop(paste(deparse(substitute(effects)), "is not a sienaEffects object."))
 		}
-		x <- as.data.frame(effects[, c("name", "effectName", "shortName",
-						"type", "interaction1", "interaction2",
-						"parm", "interactionType")])
+		x <- as.data.frame(effects[, c("name", "effectName", "shortName", "type",
+			"interaction1", "interaction2", "parm", "interactionType")])
 	}
 	storage.mode(x$parm) <- "integer"
 	names(x)[4] <- ifelse(is.null(effects), "endow?", "type")
@@ -48,58 +41,58 @@ effectsDocumentation <- function(effects= NULL, type="html",
 	x <- x[, c(9, 1:8)]
 
 	myorder <- c("nonSymmetricRate",
-				 "covarNonSymmetricRate",
+				"covarNonSymmetricRate",
 
-				 "symmetricRate",
-				 "covarSymmetricRate",
+				"symmetricRate",
+				"covarSymmetricRate",
 
-				 "bipartiteRate",
-				 "covarBipartiteRate",
+				"bipartiteRate",
+				"covarBipartiteRate",
 
-				 "behaviorRate",
-				 "behaviorOneModeRate",
-				 "behaviorSymmetricRate",
-				 "covarBehaviorOneModeRate",
-				 "behaviorBipartiteRate",
-				 "covarBehaviorRate",
+				"behaviorRate",
+				"behaviorOneModeRate",
+				"behaviorSymmetricRate",
+				"covarBehaviorOneModeRate",
+				"behaviorBipartiteRate",
+				"covarBehaviorRate",
 
-				 "nonSymmetricObjective",
-				 "dyadObjective",
-				 "covarNonSymmetricObjective",
-				 "unspecifiedNetInteraction",
-				 "nonSymmetricNonSymmetricObjective",
-				 "nonSymmetricSymmetricObjective",
-				 "nonSymmetricBipartiteObjective",
-				 "covarNetNetObjective",
-				 "tripleNetworkObjective",
+				"nonSymmetricObjective",
+				"dyadObjective",
+				"covarNonSymmetricObjective",
+				"unspecifiedNetInteraction",
+				"nonSymmetricNonSymmetricObjective",
+				"nonSymmetricSymmetricObjective",
+				"nonSymmetricBipartiteObjective",
+				"covarNetNetObjective",
+				"tripleNetworkObjective",
 
-				 "symmetricObjective",
-				 "dyadObjective",
-				 "covarSymmetricObjective",
-				 "unspecifiedNetInteraction",
+				"symmetricObjective",
+				"dyadObjective",
+				"covarSymmetricObjective",
+				"unspecifiedNetInteraction",
 
-				 "bipartiteObjective",
-				 "dyadObjective",
-				 "covarBipartiteObjective",
-				 "unspecifiedNetInteraction",
-				 "bipartiteNonSymmetricObjective",
-				 "bipartiteSymmetricObjective",
-				 "bipartiteBipartiteObjective",
+				"bipartiteObjective",
+				"dyadObjective",
+				"covarBipartiteObjective",
+				"unspecifiedNetInteraction",
+				"bipartiteNonSymmetricObjective",
+				"bipartiteSymmetricObjective",
+				"bipartiteBipartiteObjective",
 
-				 "behaviorObjective",
-				 "behaviorOneModeObjective",
-				 "behaviorSymmetricObjective",
-				 "behaviorBipartiteObjective",
-				 "behaviorOneOneModeObjective",
-				 "behaviorSymSymObjective",
-				 "behaviorOneModeSymObjective",
-				 "behaviorBipBipObjective",
-				 "covarBehaviorObjective",
-				 "covarBehaviorNetObjective",
-				 "dyadBehaviorNetObjective",
-				 "covarABehaviorBipartiteObjective",
-				 "covarBBehaviorBipartiteObjective",
-				 "unspecifiedBehaviorInteraction")
+				"behaviorObjective",
+				"behaviorOneModeObjective",
+				"behaviorSymmetricObjective",
+				"behaviorBipartiteObjective",
+				"behaviorOneOneModeObjective",
+				"behaviorSymSymObjective",
+				"behaviorOneModeSymObjective",
+				"behaviorBipBipObjective",
+				"covarBehaviorObjective",
+				"covarBehaviorNetObjective",
+				"dyadBehaviorNetObjective",
+				"covarABehaviorBipartiteObjective",
+				"covarBBehaviorBipartiteObjective",
+				"unspecifiedBehaviorInteraction")
 
 	mytab <- table(RSienaTest::allEffects[,1])
 
@@ -107,19 +100,16 @@ effectsDocumentation <- function(effects= NULL, type="html",
 	addtorowText <- names(mytab[myorder])
 	x[is.na(x)] <- "FALSE" ## endow? field
 
-	if (type=="latex")
-	{
-		addtorowText <- paste(" \\hline \\multicolumn{4}{l}{",
-							  addtorowText, "}\\\\ \\hline")
-		addtorowText[1] <- paste(" \\endhead ", addtorowText[1], collapse="")
+	if (type == "latex") {
+		addtorowText <- paste(" \\hline \\multicolumn{4}{l}{", addtorowText,
+			"}\\\\ \\hline")
+		addtorowText[1] <- paste(" \\endhead ", addtorowText[1], collapse = "")
+	} else {
+		x[x == ""] <- "<br>"
+		addtorowText <- paste(" <TR> <TD colspan=\"8\" >", addtorowText,
+			"</TD> </TR>")
 	}
-	else
-	{
-		x[x==""] <- "<br>"
-		addtorowText <- paste(' <TR> <TD colspan="8" >',
-							  addtorowText, "</TD> </TR>")
-	}
-	add.to.row	<-	NULL
+	add.to.row <- NULL
 	if (is.null(effects))
 	{
 		add.to.row$pos <- lapply(addtorowPos, function(x)x)
@@ -127,7 +117,7 @@ effectsDocumentation <- function(effects= NULL, type="html",
 		order2 <- match(myorder, x[, 2])
 		order3 <- as.vector(mytab[myorder])
 		order4 <- unlist(apply(cbind(order2, order3), 1,
-						   function(x)x[1]:(max(x[1] + x[2] -1,1))))
+				function(x) x[1]:(max(x[1] + x[2] - 1, 1))))
 		y <- x[order4, -2]
 	}
 	else
@@ -142,8 +132,8 @@ effectsDocumentation <- function(effects= NULL, type="html",
 		includefile <- paste(filename,".include.tex", sep="", collapse="")
 		includepart <- paste(filename,".include", sep="", collapse="")
 		print(xtable::xtable(y), add.to.row=add.to.row, file=includefile,
-			  tabular.environment="longtable", hline.after=c(-1),
-			  floating=FALSE, include.rownames=FALSE)
+			tabular.environment="longtable", hline.after=c(-1),
+			floating=FALSE, include.rownames=FALSE)
 
 		cat(file=filename2, "\\documentclass[12pt,a4paper]{article}\n",
 			"\\usepackage[pdftex,dvipsnames]{color}\n",
@@ -164,15 +154,14 @@ effectsDocumentation <- function(effects= NULL, type="html",
 	{
 		filename <- paste(filename,".html", sep="", collapse="")
 		print(xtable::xtable(y), add.to.row=add.to.row,
-			  file=filename,
-			  type="html", hline.after=c(-1),
-			  sanitize.text.function=function(x){x},
-			  floating=FALSE, include.rownames=FALSE,
-			  html.table.attributes="border=1 cellpadding=3 cellspacing=0")
-		if (display)
-		{
-			browseURL(paste("file://", getwd(), "/", filename,
-							collapse="", sep=""))
+			file=filename,
+			type="html", hline.after=c(-1),
+			sanitize.text.function=function(x){x},
+			floating=FALSE, include.rownames=FALSE,
+			html.table.attributes="border=1 cellpadding=3 cellspacing=0")
+		if (display) {
+			browseURL(paste("file://", getwd(), "/", filename, collapse = "",
+				sep = ""))
 		}
 	}
 }

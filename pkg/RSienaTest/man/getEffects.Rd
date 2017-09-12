@@ -41,10 +41,10 @@ variable in the input object, with columns
   \item{fix}{boolean: fix parameter value or not}
   \item{test}{boolean: test parameter value or not}
   \item{timeDummy}{comma separated list of periods, or "all",
-        or "," for none --
-        which time dummy interacted parameters should be included?}
+    or "," for none --
+    which time dummy interacted parameters should be included?}
   \item{initialValue}{starting value for estimation, also used for
-        \code{fix} and \code{test}.}
+    \code{fix} and \code{test}.}
   \item{parm}{parameter values}
   \item{functionType}{"objective" or "rate"}
   \item{period}{period for basic rate parameters}
@@ -55,9 +55,9 @@ variable in the input object, with columns
   \item{effect2}{Used to indicate effect number in user-specified interactions}
   \item{effect3}{Used to indicate effect number in user-specified interactions}
   \item{interactionType}{Defines "dyadic" or "ego" or "OK" effects, used in
-             \code{\link{includeInteraction}}}
+    \code{\link{includeInteraction}}}
   \item{local}{whether a local effect; used for the option \code{localML}
-      in \code{\link{sienaAlgorithmCreate}}}
+    in \code{\link{sienaAlgorithmCreate}}}
   \item{effectFn}{here NULL, but could be replaced by a function later}
   \item{statisticFn}{here NULL, but could be replaced by a function
     later}
