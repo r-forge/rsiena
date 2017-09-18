@@ -321,7 +321,7 @@ void StatisticCalculator::calculateStatistics()
 		}
 		else if (pBehaviorData)
 		{
- 			// create a copy of the start of the period and zero any values
+			// create a copy of the start of the period and zero any values
 			// missing at (either end?) start of period
 
 			const int * values =
@@ -356,6 +356,20 @@ void StatisticCalculator::calculateStatistics()
 		else
 		{
 			throw domain_error("Unexpected class of dependent variable");
+		}
+	}
+
+	// clean up created data not owned by states
+	for (unsigned i = 0; i < rVariables.size(); i++)
+	{
+		NetworkLongitudinalData * pNetworkData =
+			dynamic_cast<NetworkLongitudinalData *>(rVariables[i]);
+		string name = rVariables[i]->name();
+
+		if (pNetworkData)
+		{
+			const Network * pNetwork = this->lpStateLessMissingsEtc->pNetwork(name);
+			delete pNetwork;
 		}
 	}
 }
