@@ -298,13 +298,10 @@ void StatisticCalculator::calculateStatistics()
 			// Duplicate the current network and remove those ties that are
 			// missing at either end of the period.
 
-			Network * pNetwork =
-				this->lpState->pNetwork(pNetworkData->name())->clone();
+			Network * pNetwork = this->lpState->pNetwork(pNetworkData->name())->clone();
 
-			subtractNetwork(pNetwork,
-				pNetworkData->pMissingTieNetwork(this->lperiod));
-			subtractNetwork(pNetwork,
-				pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+			subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod));
+			subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod + 1));
 
 			// for not-targets, overwrite the current network for values
 			// structurally fixed for the next period. (no effect for targets)
@@ -320,12 +317,14 @@ void StatisticCalculator::calculateStatistics()
 				pNetworkData->pNetwork(this->lperiod),
 				pNetworkData->pStructuralTieNetwork(this->lperiod));
 
+			// NOTE: pass delete responsibility to state
 			this->lpStateLessMissingsEtc->pNetwork(name, pNetwork);
+			// delete pNetwork;
 
 		}
 		else if (pBehaviorData)
 		{
- 			// create a copy of the start of the period and zero any values
+			// create a copy of the start of the period and zero any values
 			// missing at (either end?) start of period
 
 			const int * values =
@@ -362,6 +361,20 @@ void StatisticCalculator::calculateStatistics()
 		else
 		{
 			throw domain_error("Unexpected class of dependent variable");
+		}
+	}
+
+	// clean up created data not owned by states
+	for (unsigned i = 0; i < rVariables.size(); i++)
+	{
+		NetworkLongitudinalData * pNetworkData =
+			dynamic_cast<NetworkLongitudinalData *>(rVariables[i]);
+		string name = rVariables[i]->name();
+
+		if (pNetworkData)
+		{
+			const Network * pNetwork = this->lpStateLessMissingsEtc->pNetwork(name);
+			delete pNetwork;
 		}
 	}
 }
@@ -622,10 +635,8 @@ void StatisticCalculator::calculateNetworkEndowmentStatistics(
 
 		// remove missings and current
 
-		subtractNetwork(pLostTieNetwork,
-			pCurrentNetwork);
-		subtractNetwork(pLostTieNetwork,
-			pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+		subtractNetwork(pLostTieNetwork, pCurrentNetwork);
+		subtractNetwork(pLostTieNetwork, pNetworkData->pMissingTieNetwork(this->lperiod + 1));
 
 		// overwrite the predictor network with only start missings removed
 		const Network * pPredictor =
@@ -1089,8 +1100,7 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 		// missing at either end of the period. TODO set leavers back.
 		// (Is the TODO not done for the current network?)
 
-		pNetwork =
-			this->lpState->pNetwork(pNetworkData->name())->clone();
+		pNetwork = this->lpState->pNetwork(pNetworkData->name())->clone();
 		subtractNetwork(pNetwork,
 			pNetworkData->pMissingTieNetwork(this->lperiod));
 		subtractNetwork(pNetwork,
