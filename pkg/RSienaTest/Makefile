@@ -99,3 +99,8 @@ test_capture:
 test:
 	cd inst/unitTests && \
 	$(R_RUN) "require($(PKG_NAME)); RSienaTest:::run_tests(dir='.')"
+
+.PHONY:
+memtest:
+	R CMD INSTALL .
+	R -d 'valgrind --leak-check=full' -f tests/parallel.R

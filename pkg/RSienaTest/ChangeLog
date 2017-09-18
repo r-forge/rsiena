@@ -1,3 +1,15 @@
+2017-09-18 R-Forge Revision 323
+Changes in RSienaTest:
+   * StatisticCalculator.cpp: delete Network clones not owned by State.
+
+2017-09-18 R-Forge Revision 322
+Changes in RSiena:
+   * StatisticCalculator.cpp: delete Network clones not owned by State.
+
+2017-09-10 R-Forge Revision 321
+Changes in RSiena:
+   * Merge RSienaTest changes r319-r320.  Renamed init.c to init.cpp.
+
 2017-09-10 R-Forge Revision 320
 Changes in RSienaTest:
    * siena07*.h: Update method declarations.
