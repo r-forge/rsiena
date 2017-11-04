@@ -1,3 +1,12 @@
+Next revision.
+Changes in RSiena and RSienaTest:
+   * Drop transTriads<-TRUE in effects.r, so that initial model
+     for non-directed networks contains only basic rates and degree effect.
+Changes in RSienaTest:
+   * Add z$fix to sienaBayes object, and use !z$fix in check of maximum
+     estimated parameter value after initialization.
+   * Corrections for print and summary of sienaBayes objects (sienaprint.r).
+
 2017-09-18 R-Forge Revision 323
 Changes in RSienaTest:
    * StatisticCalculator.cpp: delete Network clones not owned by State.
