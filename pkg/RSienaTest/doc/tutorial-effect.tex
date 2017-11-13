@@ -1,0 +1,243 @@
+\PassOptionsToPackage{colorlinks=true}{hyperref}
+\documentclass{tufte-handout}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+
+\usepackage{listings}
+% https://tex.stackexchange.com/questions/282485/use-listings-in-tufte-book-with-captions-in-margin
+\makeatletter
+% enable re-use of \listoflistings facility
+\setboolean{@tufte@packages@subfigure}{true}
+\def\ext@lstlisting{lol}
+% textwidth Tuftian float for listings
+\newenvironment{listing}[1][htbp]
+  {\ifvmode\else\unskip\fi\begin{@tufte@float}[#1]{lstlisting}{}}
+  {\end{@tufte@float}}
+% fullwidth Tuftian float for listings
+\newenvironment{listing*}[1][htbp]%
+  {\ifvmode\else\unskip\fi\begin{@tufte@float}[#1]{lstlisting}{star}}
+  {\end{@tufte@float}}
+% show listing number in caption even though \lst@@caption is empty
+\def\fnum@lstlisting{\lstlistingname~\thelstlisting}
+\makeatother
+\def\linestyle{\color{white!50!black}}
+\lstset{
+% escapechar=\%,
+% mathescape=true, % bad idea with $var scripting languages
+escapeinside={<@}{@>},
+language=, % empty language == plain text
+backgroundcolor=,
+basicstyle=\scriptsize\ttfamily,
+keywordstyle=\bfseries\color{black},
+identifierstyle=\color{black},
+commentstyle=\color{darkgray},
+stringstyle=\color{red},
+showstringspaces=false,
+numbers=left,
+numberstyle=\linestyle,
+numbersep=1.6ex,
+keepspaces=true, % non-leading white space
+showtabs=true,
+basewidth=1.1ex,
+xleftmargin=2em, %\parindent,
+literate={-}{-}1%
+{|}{|}1%
+{<}{<}1{>}{>}1%
+{~}{\raisebox{-0.55ex}[0pt][-1ex]{\~{}}}1%
+,
+}
+
+\title{Tutorial: Creating an Effect}
+\author{Felix Schönenberger}
+
+% links to the right place if the file is viewed in the doc folder
+% TODO local file links?
+\newcommand\sourcelinkF[2]{\href{../#1/#2}{\mbox{#1/}\mbox{#2}}}
+\newcommand\sourcelinkFF[3]{\href{../#1/#2}{\mbox{#1/}\mbox{#2::#3}}}
+\newcommand\sourcelinkfF[3]{\href{../#1/#2}{\mbox{#2::#3}}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This is a hands on tutorial creating a new effect and adding it to RSiena.
+It links other sources of documentation (when available) or the relevant source files.
+\end{abstract}
+
+\section{Effect Implementation}
+
+Effects are organized in an hierarchical inheritance structure\footnote{See \url{./classdesign.pdf} for attempts at a more detailed class rundown. However code usually is the most up-to-date, accessible, but vast and obscure source of information.} which roughly follows the effect synopsis.
+For this tutorial we are recreating the \emph{gmm} type reciprocity effects for \emph{new}, \emph{real} and \emph{persistent} reciprocity.
+\begin{align}\label{eq:def}
+  s_{\text{recip}}(x) &= \sum_i \sum_j \left\{\begin{array}{ll}
+     1 & \text{if } x^{t}_{ij}+x^{t}_{ji}=k \wedge x^{t+1}_{ij}+x^{t+1}_{ji}=2\\
+     0 & \text{otherwise}
+  \end{array}\right.
+\end{align}
+with $k=0$ for new, $k=1$ for real and $k=2$ for persistent reciprocity.
+
+Reciprocity only depends on the network, we therefore inherit from \sourcelinkF{src/model/effects}{NetworkEffect.h} (listing~\ref{lst:class}).
+
+\begin{listing}
+\label{lst:class}
+\caption{
+  \sourcelinkF{src/model/effects/gmm}{ReciprocityGMMEffect.h}: Structure of the effect.
+}
+% using <@\label{line:const}@> line number are off
+\begin{lstlisting}[language=c++]
+class ReciprocityGMMEffect: public NetworkEffect {
+public:
+  const static int NEW = 0;
+  const static int REAL = 1;
+  const static int PERSISTENT = 2;
+
+  ReciprocityGMMEffect(const EffectInfo * pEffectInfo, const int startEdgeSum) :
+    NetworkEffect(pEffectInfo)
+  {
+    this->startEdgeSum = startEdgeSum;
+  }
+
+  double calculateContribution(int) const { return 0; }
+protected:
+  virtual double tieStatistic(int alter) { /* effect code */ }
+private:
+  int startEdgeSum;
+}
+\end{lstlisting}
+\end{listing}
+\begin{description}\itemsep0pt
+  \item[\linestyle line 3-5] Integer constants to keep the math generic.
+  \item[\linestyle line 7-11] Each effect constructor must take an \texttt{EffectInfo} pointer and can take any number of optinal arguments.
+  \item[\linestyle line 13] Being a gmm effect only the effect value is needed at the end of a simulation run, \sourcelinkfF{src/model/effects}{NetworkEffect.h}{calculateContribution} will never be called.
+  \item[\linestyle line 15] Will hold the effect code.
+\end{description}
+
+The \sourcelinkF{src/model}{StatisticCalculator.h} is responsible for initializing and evaluating effects outside of the simulation
+\footnote{
+  During the simulation only the contribution to a change is needed.
+  Evaluation happens in the responsible Variable e.g. \sourcelinkfF{src/model/variables}{NetworkVariable.h}{calculateTieFlipContribution}
+}.
+Top level effect classes split the calculation into meaningful defaults
+\footnote{
+  See \sourcelinkfF{src/model/effects}{NetworkEffect.h}{statistic} and look at the default implementation of the methods it calls.
+}.
+For most effects it will suffice to implement \sourcelinkfF{src/model/effects}{NetworkEffect.h}{tieStatistic} and leave the two outer loops as is.
+
+\begin{align*}
+  s_{\text{recip}}(x) &= \sourcelinkfF{src/model/effects}{NetworkEffect.h}{statistic}(x) \\
+  s_{\text{recip}}(x) &= \sum_{i \in V} \sourcelinkfF{src/model/effects}{NetworkEffect.h}{egoStatistic}(x,i) \\
+  s_{\text{recip}}(x) &= \sum_{i \in V} \sum_{j \in V} \sourcelinkfF{src/model/effects}{NetworkEffect.h}{tieStatistic}(x,i,j)
+\end{align*}
+
+\begin{listing}
+\caption{
+  Implementation of equation \ref{eq:def}.
+}
+\begin{lstlisting}[language=c++]
+  virtual double tieStatistic(int alter) {
+    // Outgoing tie exists, otherwise we would not be here.
+    // Check if it is reciprocated.
+    if (this->inTieExists(alter)) {
+      // We have reciprocity in the end state.
+      // Now look at the start of the period.
+      const Network* pStart = this->pData()->pNetwork(this->period());
+      if (pStart->tieValue(this->ego(), alter)
+          + pStart->tieValue(alter, this->ego()) == startEdgeSum) {
+            return 1;
+      }
+    }
+    return 0;
+  }
+\end{lstlisting}
+\end{listing}
+\begin{description}\itemsep0pt
+  \item[\linestyle line 4] Check if the reciprocal tie exists in the current time point\footnote{
+      This might not access the network directly but can use a cached store.
+      See all the super classes to familiarize yourself with what is available.
+    }.
+  \item[\linestyle line 7] Get the network at the beginning of the period.
+  \item[\linestyle line 8-11] Check the first part of equation \ref{eq:def} directly on the network.
+\end{description}
+
+\section{Binding the Effect to R}
+
+Lets have a look at a \emph{typical life of an effect} and inject the required snippets.
+
+\def\linecontinoue{\textcolor{red}{\ensuremath{\hookrightarrow}}}
+\begin{enumerate}
+\item \sourcelinkF{data}{allEffects.csv} is parsed constructing a gigantic table.  Lines are expanded/rejected based on the actual data object used.
+\begin{listing*}
+\caption{
+  \texttt{allEffects.csv}: Each line (\linecontinoue continoues a line) is one effect definition for a data scenario.
+}
+\begin{lstlisting}[language=,numbers=none]
+effectGroup,effectName,functionName,shortName,endowment,interaction1,interaction2,type,basicRate,include,randomEffects,fix,test,
+<@$\linecontinoue$@>timeDummy,initialValue,parm,functionType,period,rateType,untrimmedValue,effect1,effect2,effect3,interactionType,local
+nonSymmetricObjective,new recip.,new reciprocated ties,newrecip,FALSE,,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,
+<@$\linecontinoue$@>",",0,0,gmm,NA,NA,0,0,0,0,dyadic,FALSE
+nonSymmetricObjective,persistent recip.,persistent rec. ties,persistrecip,FALSE,,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,
+<@$\linecontinoue$@>",",0,0,gmm,NA,NA,0,0,0,0,dyadic,FALSE
+nonSymmetricObjective,real recip.,real reciprocated ties,realrecip,FALSE,,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,
+<@$\linecontinoue$@>",",0,0,gmm,NA,NA,0,0,0,0,dyadic,FALSE
+\end{lstlisting}
+\end{listing*}
+
+\item \sourcelinkFF{R}{sienaeffects.r}{includeEffect} flags the effect as included.
+
+\item \sourcelinkFF{R}{initializeFRAN.r}{initializeFRAM} constructs a vector of EffectInfo objects vis \sourcelinkFF{src}{siena07setup.cpp}{effects}
+
+\item Effects are instantiated \footnotesize{\sourcelinkF{src/model/effects}{EffectFactory.h}
+    Note: The \sourcelinkF{src/model/effects}{AllEffects.h} attempts to list all effects.}
+\begin{listing}
+  \label{lst:factory}
+  \caption{
+    \sourcelinkF{src/model/effects}{EffectFacttory.h} consisting mainly of one big conditional.
+  }
+\begin{lstlisting}[language=c++]
+Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const {
+  /* huge if-else block with other effects... */
+  if (effectName == "newrecip") {
+    pEffect = new ReciprocityGMMEffect(pEffectInfo, ReciprocityGMMEffect::NEW);
+  } else if (effectName == "realrecip") {
+    pEffect = new ReciprocityGMMEffect(pEffectInfo, ReciprocityGMMEffect::REAL);
+  } else if (effectName == "persistrecip") {
+    pEffect = new ReciprocityGMMEffect(pEffectInfo, ReciprocityGMMEffect::PERSISTENT);
+  }
+  /* ...huge if-else block with other effects */
+}
+\end{lstlisting}
+\end{listing}
+\end{enumerate}
+
+% \begin{description}
+%   \item[edit \sourcelinkF{src/model/effects}{EffectFactory.cpp}:] Add an include to the top and a conditional to the \texttt{createEffect} function \ref{lst:factory}.
+% \item[edit \sourcelinkF{data}{allEffects.csv}:] Add a line for each valid configuration.
+% \end{description}
+
+\section{TODO/Thoughts}
+
+\paragraph{explain the contribution part a bit}
+
+\paragraph{hint to other than network sides}
+
+\paragraph{hint gmm functionality in the hierarchy}
+
+\paragraph{difference between eval/endown/maintain implementation}
+
+\paragraph{differences between functions (model slots)}
+
+\paragraph{best practice for effects}
+
+\begin{itemize}
+  \item h / cpp
+  \item thematic grouping
+  \item cache usage
+\end{itemize}
+
+\paragraph{testing}
+
+\begin{itemize}
+  \item integration
+\end{itemize}
+
+\end{document}
