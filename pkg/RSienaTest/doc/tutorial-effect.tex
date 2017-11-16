@@ -51,10 +51,12 @@ literate={-}{-}1%
 \author{Felix Schönenberger}
 
 % links to the right place if the file is viewed in the doc folder
-% TODO local file links?
-\newcommand\sourcelinkF[2]{\href{../#1/#2}{\mbox{#1/}\mbox{#2}}}
-\newcommand\sourcelinkFF[3]{\href{../#1/#2}{\mbox{#1/}\mbox{#2::#3}}}
-\newcommand\sourcelinkfF[3]{\href{../#1/#2}{\mbox{#2::#3}}}
+% TODO open local file links platform independent?
+\def\linkstyle{} % TODO condensed?
+\newcommand\sourcelinkPF[2]{\href{../#1/#2}{\linkstyle{#1/}{#2}}}
+\newcommand\sourcelinkpF[2]{\href{../#1/#2}{\linkstyle{#2}}}
+\newcommand\sourcelinkpFF[3]{\href{../#1/#2}{\linkstyle{#2::}{#3}}}
+\newcommand\sourcelinkpfF[3]{\href{../#1/#2}{\linkstyle{#3}}}
 
 \begin{document}
 \maketitle
@@ -76,12 +78,12 @@ For this tutorial we are recreating the \emph{gmm} type reciprocity effects for 
 \end{align}
 with $k=0$ for new, $k=1$ for real and $k=2$ for persistent reciprocity.
 
-Reciprocity only depends on the network, we therefore inherit from \sourcelinkF{src/model/effects}{NetworkEffect.h} (listing~\ref{lst:class}).
+Reciprocity only depends on the network, we therefore inherit from \sourcelinkpF{src/model/effects}{NetworkEffect.h} (listing~\ref{lst:class}).
 
 \begin{listing}
 \label{lst:class}
 \caption{
-  \sourcelinkF{src/model/effects/gmm}{ReciprocityGMMEffect.h}: Structure of the effect.
+  \sourcelinkpF{src/model/effects/gmm}{ReciprocityGMMEffect.h}: Structure of the effect.
 }
 % using <@\label{line:const}@> line number are off
 \begin{lstlisting}[language=c++]
@@ -106,27 +108,25 @@ private:
 \end{lstlisting}
 \end{listing}
 \begin{description}\itemsep0pt
-  \item[\linestyle line 3-5] Integer constants to keep the math generic.
-  \item[\linestyle line 7-11] Each effect constructor must take an \texttt{EffectInfo} pointer and can take any number of optinal arguments.
-  \item[\linestyle line 13] Being a gmm effect only the effect value is needed at the end of a simulation run, \sourcelinkfF{src/model/effects}{NetworkEffect.h}{calculateContribution} will never be called.
-  \item[\linestyle line 15] Will hold the effect code.
+\item[\linestyle line 3-5] Integer constants to keep the math generic.
+\item[\linestyle line 7-11] Each effect constructor must take an \texttt{EffectInfo} pointer and can take any number of optinal arguments.
+\item[\linestyle line 13] Being a gmm effect only the effect value is needed at the end of a simulation run, \sourcelinkpfF{src/model/effects}{NetworkEffect.h}{calculateContribution} will never be called.
+\item[\linestyle line 15] Will hold the effect code.
 \end{description}
 
-The \sourcelinkF{src/model}{StatisticCalculator.h} is responsible for initializing and evaluating effects outside of the simulation
-\footnote{
+The \sourcelinkpF{src/model}{StatisticCalculator.h} is responsible for initializing and evaluating effects outside of the simulation\footnote{
   During the simulation only the contribution to a change is needed.
-  Evaluation happens in the responsible Variable e.g. \sourcelinkfF{src/model/variables}{NetworkVariable.h}{calculateTieFlipContribution}
+  Evaluation happens in the responsible Variable e.g. \sourcelinkpfF{src/model/variables}{NetworkVariable.h}{calculateTieFlipContribution}
 }.
-Top level effect classes split the calculation into meaningful defaults
-\footnote{
-  See \sourcelinkfF{src/model/effects}{NetworkEffect.h}{statistic} and look at the default implementation of the methods it calls.
+Top level effect classes split the calculation into meaningful defaults\footnote{
+  See \sourcelinkpfF{src/model/effects}{NetworkEffect.h}{statistic} and look at the default implementation of the methods it calls.
 }.
-For most effects it will suffice to implement \sourcelinkfF{src/model/effects}{NetworkEffect.h}{tieStatistic} and leave the two outer loops as is.
+For most effects it will suffice to implement \sourcelinkpfF{src/model/effects}{NetworkEffect.h}{tieStatistic} and leave the two outer loops as is.
 
 \begin{align*}
-  s_{\text{recip}}(x) &= \sourcelinkfF{src/model/effects}{NetworkEffect.h}{statistic}(x) \\
-  s_{\text{recip}}(x) &= \sum_{i \in V} \sourcelinkfF{src/model/effects}{NetworkEffect.h}{egoStatistic}(x,i) \\
-  s_{\text{recip}}(x) &= \sum_{i \in V} \sum_{j \in V} \sourcelinkfF{src/model/effects}{NetworkEffect.h}{tieStatistic}(x,i,j)
+  s_{\text{recip}}(x) &= \sourcelinkpfF{src/model/effects}{NetworkEffect.h}{statistic}(x) \\
+  s_{\text{recip}}(x) &= \sum_{i \in V} \sourcelinkpfF{src/model/effects}{NetworkEffect.h}{egoStatistic}(x,i) \\
+  s_{\text{recip}}(x) &= \sum_{i \in V} \sum_{j \in V} \sourcelinkpfF{src/model/effects}{NetworkEffect.h}{tieStatistic}(x,i,j)
 \end{align*}
 
 \begin{listing}
@@ -151,12 +151,12 @@ For most effects it will suffice to implement \sourcelinkfF{src/model/effects}{N
 \end{lstlisting}
 \end{listing}
 \begin{description}\itemsep0pt
-  \item[\linestyle line 4] Check if the reciprocal tie exists in the current time point\footnote{
-      This might not access the network directly but can use a cached store.
-      See all the super classes to familiarize yourself with what is available.
-    }.
-  \item[\linestyle line 7] Get the network at the beginning of the period.
-  \item[\linestyle line 8-11] Check the first part of equation \ref{eq:def} directly on the network.
+\item[\linestyle line 4] Check if the reciprocal tie exists in the current time point\footnote{
+    This might not access the network directly but can use a cached store.
+    See all the super classes to familiarize yourself with what is available.
+  }.
+\item[\linestyle line 7] Get the network at the beginning of the period.
+\item[\linestyle line 8-11] Check the first part of equation \ref{eq:def} directly on the network.
 \end{description}
 
 \section{Binding the Effect to R}
@@ -165,14 +165,20 @@ Lets have a look at a \emph{typical life of an effect} and inject the required s
 
 \def\linecontinoue{\textcolor{red}{\ensuremath{\hookrightarrow}}}
 \begin{enumerate}
-\item \sourcelinkF{data}{allEffects.csv} is parsed constructing a gigantic table.  Lines are expanded/rejected based on the actual data object used.
+\item \sourcelinkpF{data}{allEffects.csv} is parsed constructing a gigantic table.
+Lines are expanded/rejected based on the actual data object used.
+For reciprocity we limited the data to directed networks (encoded in the csv as \texttt{nonSymmetricObjective}).
+Listing \ref{lst:alleff} shows the header line and entries for the gmm reciprocity effect family.
 \begin{listing*}
+\label{lst:alleff}
 \caption{
   \texttt{allEffects.csv}: Each line (\linecontinoue continoues a line) is one effect definition for a data scenario.
 }
 \begin{lstlisting}[language=,numbers=none]
 effectGroup,effectName,functionName,shortName,endowment,interaction1,interaction2,type,basicRate,include,randomEffects,fix,test,
 <@$\linecontinoue$@>timeDummy,initialValue,parm,functionType,period,rateType,untrimmedValue,effect1,effect2,effect3,interactionType,local
+\end{lstlisting}
+\begin{lstlisting}[language=,numbers=none]
 nonSymmetricObjective,new recip.,new reciprocated ties,newrecip,FALSE,,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,
 <@$\linecontinoue$@>",",0,0,gmm,NA,NA,0,0,0,0,dyadic,FALSE
 nonSymmetricObjective,persistent recip.,persistent rec. ties,persistrecip,FALSE,,,gmm,FALSE,FALSE,FALSE,FALSE,FALSE,
@@ -182,17 +188,22 @@ nonSymmetricObjective,real recip.,real reciprocated ties,realrecip,FALSE,,,gmm,F
 \end{lstlisting}
 \end{listing*}
 
-\item \sourcelinkFF{R}{sienaeffects.r}{includeEffect} flags the effect as included.
+This tasks is best accomplished by searching for and adapting the entries of a similar effect.
 
-\item \sourcelinkFF{R}{initializeFRAN.r}{initializeFRAM} constructs a vector of EffectInfo objects vis \sourcelinkFF{src}{siena07setup.cpp}{effects}
+\item \sourcelinkpFF{R}{sienaeffects.r}{includeEffect} flags the effect as included.
 
-\item Effects are instantiated \footnotesize{\sourcelinkF{src/model/effects}{EffectFactory.h}
-    Note: The \sourcelinkF{src/model/effects}{AllEffects.h} attempts to list all effects.}
+\item \sourcelinkpFF{R}{initializeFRAN.r}{initializeFRAM} constructs a vector of \sourcelinkpF{src/model}{EffectInfo.h} objects via \sourcelinkpFF{src}{siena07setup.cpp}{effects}.
+
+\item Effects are instantiated by \sourcelinkpF{src/model/effects}{EffectFactory.h}.
+To register an effect add is header to the includes at the top\footnote{
+  The \sourcelinkpF{src/model/effects}{AllEffects.h} attempts to list all effects.
+} and a conditional to the \texttt{createEffect} function \ref{lst:factory}.
+
 \begin{listing}
-  \label{lst:factory}
-  \caption{
-    \sourcelinkF{src/model/effects}{EffectFacttory.h} consisting mainly of one big conditional.
-  }
+\label{lst:factory}
+\caption{
+  \sourcelinkpF{src/model/effects}{EffectFacttory.h} consisting mainly of one big conditional.
+}
 \begin{lstlisting}[language=c++]
 Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const {
   /* huge if-else block with other effects... */
@@ -209,10 +220,49 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const {
 \end{listing}
 \end{enumerate}
 
-% \begin{description}
-%   \item[edit \sourcelinkF{src/model/effects}{EffectFactory.cpp}:] Add an include to the top and a conditional to the \texttt{createEffect} function \ref{lst:factory}.
-% \item[edit \sourcelinkF{data}{allEffects.csv}:] Add a line for each valid configuration.
-% \end{description}
+\section{Deriving non-cross-lagged gmm effects}
+
+This section affects cross-lagged effects inheriting from \sourcelinkpF{src/model/effects}{CovariateDependentNetworkEffect.h} for which non-cross-lagged gmm effects should be implemented.
+See \sourcelinkpF{src/model/effects}{CovariateSimilarityEffect.h} for a live implementation.
+
+\paragraph{Infrastructure:}
+\sourcelinkpfF{src/model}{StatisticCalculator.h}{calculateNetworkGMMStatistics} calls \sourcelinkpfF{src/model}{CovariateDependentNetworkEffect.h}{initialize} with two states, the normal period begin state and the simulation state.  The constructor takes a \texttt{simulatedState} flag to switch the behaviour.
+\begin{description}
+\item[\texttt{simulatedState=false}] Unchanged behaviour.
+\item[\texttt{simulatedState=true}] Change the behaviour access in the following ways:
+\begin{itemize}
+\item Variable values are initialized from the simulated state.
+\item Covariates are access from the end of the period not the start.
+\end{itemize}
+\end{description}
+This affects all pointer and functions in the class.
+However and effect could still opt out and access the data directly in which case additional work has to be done.
+
+\paragraph{Derive an effect:}
+With that in place a non-cross-lagged effect can be instantiated by passing on \texttt{simulatedState=true} to the super constructor and of course registering it as new effect\footnote{
+  Once Viviana gives her OK we can patch all the effects inheriting from \sourcelinkpF{src/model/effects}{CovariateDependentNetworkEffect.h} in one go.
+}.
+
+\section{Function types}
+
+The model distinguishes 5 different effect functions.
+Each function has its own evaluation mechanism in the \sourcelinkpF{src/model}{StatisticCalculator.h} and some functions in the variable classes.
+Some effects do not fulfill the contract of functions which is captured only in the \texttt{allEffects} database and validated in R.
+
+\begin{description}
+\item[\sourcelinkpfF{src/model}{Model.h}{rEvaluationEffects}]  ...
+\item[\sourcelinkpfF{src/model}{Model.h}{rCreationEffects}] Can hold the same effects as the evaluation function.
+  SC: Effects are initialize with a modified state object constructed by subtracting the start of the period.
+  DV: \textcolor{red}{difference in dependent variable?}
+\item[\sourcelinkpfF{src/model}{Model.h}{rEndowmentEffects}] Similar to the creation function.
+  SC: Effects are initialize with a modified state object with only deleted ties.
+    DV: \textcolor{red}{difference in dependent variable?}
+\item[\sourcelinkpfF{src/model}{Model.h}{rRateEffects}] ...
+\item[\sourcelinkpfF{src/model}{Model.h}{rGMMEffects}] Effect vector for the gmm estimator.
+Effects in this function are only evaluated outside of simulations and do not need to calculate contributions.
+\end{description}
+Effects actually have different \sourcelinkpfF{src/model/effects}{NetworkEffect.h}{creationStatistic} and \sourcelinkpfF{src/model/effects}{NetworkEffect.h}{endownmentStatistic} functions.
+However the default implementation of those link to the evaluation statistic and all rely on the modified network state fed by the calculator.
 
 \section{TODO/Thoughts}
 
@@ -220,24 +270,24 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const {
 
 \paragraph{hint to other than network sides}
 
-\paragraph{hint gmm functionality in the hierarchy}
+\begin{itemize}
+\item full list of sane top level entry points
+\end{itemize}
 
 \paragraph{difference between eval/endown/maintain implementation}
-
-\paragraph{differences between functions (model slots)}
 
 \paragraph{best practice for effects}
 
 \begin{itemize}
-  \item h / cpp
-  \item thematic grouping
-  \item cache usage
+\item h / cpp
+\item grouping
+\item cache usage
 \end{itemize}
 
 \paragraph{testing}
 
 \begin{itemize}
-  \item integration
+\item integration
 \end{itemize}
 
 \end{document}
