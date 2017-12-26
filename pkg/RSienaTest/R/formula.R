@@ -8,6 +8,8 @@
 #'
 #' Effect return value: The modified effects object.
 local({
+	# TODO: lazy loading, allEffects is not accessible right now
+	# for (e in allEffects$shortName[allEffects$effectGroup %in% c('symmetricObjective')]) {
 	# define a bunch of effects
 	for (e in c('density', 'transTrip')) {
 		assign(e, function(eff, var) {
@@ -27,12 +29,8 @@ local({
 #' @param ... list of formulas
 #' @return object of class 'siena_formula'
 siena_formula <- function(...) {
-	# add term attributes
-	m <- sapply(list(...), function(f) terms(f))
 	# assert formula
-	if (!all(sapply(m, function(f) attr(f, 'response') == 1))) {
-		stop('formula without response')
-	}
+	if (!all(sapply(m, has_lhs.formula))) stop('formula without response')
 	# take response variable as name
 	names(m) <- as.character(sapply(m, function(f) f[[2]]))
 	structure(m, class='siena_formula')
@@ -47,7 +45,7 @@ print.siena_formula <- function(sformula) {
 }
 
 is.siena_formula <- function(f) {
-	'siena_formula' %in% class(f)
+	inherits(f, 'siena_formula')
 }
 
 #' Concatenates formulas for the same response variable.
@@ -57,7 +55,34 @@ is.siena_formula <- function(f) {
 #' @return object of class 'siena_formula'
 `+.siena_spec` <- function(lhs, rhs) {
 	vars <- unique(c(names(lhs), names(rhs)))
-	stop('formula concatenation not implemented')
+	print(vars)
+	vars <- sapply(vars, function(n) {
+		print(lhs[[n]])
+		print(rhs[[n]])
+		if (is.null(lhs[[n]])) {
+			return(rhs[[n]])
+		} else if (is.null(rhs[[n]])) {
+			return(lhs[[n]])
+		} else {
+			return(c.formula(lhs[[n]] + rhs[[n]]))
+		}
+	})
+	do.call(siena_formula, vars)
+}
+
+# a <- siena_formula(x ~ density)
+# b <- siena_formula(z ~ avAlt(x))
+
+has_lhs.formula <- function(f) length(f) == 3
+
+rhs.formula <- function(f) rhs <- f[[length(f)]]
+
+lhs.formula <- function(f) if (has_lhs.formula(f)) return(f[[2]])
+
+c.formula <- function(l, r) {
+	if (lhs.formula(l) != lhs.formula(r)) stop('responses do not match')
+	l[[length(l)]] <- call('+', rhs.formula(l), rhs.formula(r))
+	l
 }
 
 #' Constructs a siena data object from a model specification.
@@ -153,16 +178,3 @@ siena17 <- function(sformula, control, dat=NULL) {
 	eff <- run_effects(sformula, eff)
 	siena07(control, data=dat, effects=eff, batch=TRUE)
 }
-
-# library(RSienaTest)
-# siena_control <- model.create
-
-# x <- array(c(s501, s502, s503), dim=c(50, 50, 3))
-# z <- s50a
-
-# sformula <- siena_formula(
-# 	x ~ transTrip,
-# 	z ~ avAlt(x))
-# print(sformula)
-# siena17(sformula, control=siena_control(nsub=2, n3=50))
-
