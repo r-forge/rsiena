@@ -154,15 +154,15 @@ siena17 <- function(sformula, control, dat=NULL) {
 	siena07(control, data=dat, effects=eff, batch=TRUE)
 }
 
-library(RSienaTest)
-siena_control <- model.create
+# library(RSienaTest)
+# siena_control <- model.create
 
-x <- array(c(s501, s502, s503), dim=c(50, 50, 3))
-z <- s50a
+# x <- array(c(s501, s502, s503), dim=c(50, 50, 3))
+# z <- s50a
 
-sformula <- siena_formula(
-	x ~ transTrip,
-	z ~ avAlt(x))
-print(sformula)
-siena17(sformula, control=siena_control(nsub=2, n3=50))
+# sformula <- siena_formula(
+# 	x ~ transTrip,
+# 	z ~ avAlt(x))
+# print(sformula)
+# siena17(sformula, control=siena_control(nsub=2, n3=50))
 
