@@ -41,6 +41,7 @@ simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
 	names(mydf) <- c(' ', 'varying', 'cred.from', '  cred.to', '  p  ')
 	mydf[,1] <- efNames
 	mydf[,2] <- ifelse(z$set2[!z$basicRate], '   -   ', '   +   ')
+	mydf[z$fix[!z$basicRate],2] <- ' fixed '
 	mydf[,3] <- format(round(credVal[!z$basicRate, 1], digits=ndigits))
 	mydf[,4] <- format(round(credVal[!z$basicRate, 2], digits=ndigits))
 	mydf[,5] <- format(round(credVal[!z$basicRate, 3], digits=4))
@@ -79,20 +80,32 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 	}
 	nmax <- ntot-nfirst+1
 	# Put mu and eta parameters in their proper places:
-	z$ThinObjective <- matrix(NA, nmax,
-		dim(z$ThinPosteriorEta)[2] +
-			dim(z$ThinPosteriorMu[,z$objectiveInVarying, drop=FALSE])[2])
-	vio <- vec1[vec1 %in% c(3,4)] == 3 # could be called z$varyingInObjective
-	z$ThinObjective[1:nmax, vio] <-
+	p <- sum(vec1 %in% c(3,4,5))
+	z$ThinObjective <- matrix(NA, nmax, p)
+	vim <- vec1[vec1 %in% c(3,4,5)] == 3 # could be called z$muInObjective
+	vie <- vec1[vec1 %in% c(3,4,5)] == 4 # could be called z$etaInObjective
+	vif <- vec1[vec1 %in% c(3,4,5)] == 5 # could be called z$fixedInObjective
+	z$ThinObjective[1:nmax, vim] <-
 		z$ThinPosteriorMu[nfirst:ntot, z$objectiveInVarying, drop=FALSE]
-	z$ThinObjective[1:nmax, !vio] <- z$ThinPosteriorEta[nfirst:ntot,]
-	p <- dim(z$ThinObjective)[2]
+	z$ThinObjective[1:nmax, vie] <- z$ThinPosteriorEta[nfirst:ntot,]
+#	z$ThinObjective <- matrix(NA, nmax,
+#		dim(z$ThinPosteriorEta)[2] +
+#			dim(z$ThinPosteriorMu[,z$objectiveInVarying, drop=FALSE])[2])
+#	vio <- vec1[vec1 %in% c(3,4)] == 3 # could be called z$varyingInObjective
+#	z$ThinObjective[1:nmax, vio] <-
+#		z$ThinPosteriorMu[nfirst:ntot, z$objectiveInVarying, drop=FALSE]
+#	z$ThinObjective[1:nmax, !vio] <- z$ThinPosteriorEta[nfirst:ntot,]
+#	p <- dim(z$ThinObjective)[2]
 	if (inherits(testedPar, "matrix"))
 	{
 		A <- testedPar
 		if (dim(A)[2] != p	)
 		{
 			stop(paste("If testedPar is a matrix, it should have",p,"columns."))
+		}
+		if (any(testedPar[,vif] != 0))
+		{
+			stop('Some fixed parameters were included in the tested set of effects.')
 		}
 		effeNames <- efNames
 		testedNumber <- dim(A)[1]
@@ -102,7 +115,7 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 			efNames[i] <-
 				paste(paste(A[i,],'*','parameter',1:p)[A[i,]!=0], collapse=" + ")
 		}
-		posteriorSample <- z$ThinObjective[,, drop=FALSE] %*% t(A)
+		posteriorSample <- z$ThinObjective[,(vim|vie), drop=FALSE] %*% (t(A[,(vim|vie), drop=FALSE]))
 		usedEffects <- apply(A,2,function(x){any(x!=0)})
 		theUsedEffects <- paste(which(usedEffects),
 			'. ',effeNames[usedEffects],sep='')
@@ -116,6 +129,10 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 		}
 		testedNumber <- length(testedSet)
 		efNames <- efNames[testedSet]
+		if (any(vec1[testedSet] == 5))
+		{
+			stop('Some fixed parameters were included in the tested set of effects.')
+		}
 		posteriorSample <- z$ThinObjective[,testedSet, drop=FALSE]
 		usedEffects <- (1:p) %in% testedPar
 		theUsedEffects <- paste(which(usedEffects),'. ',efNames,sep='')
@@ -134,13 +151,13 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 		testedvec <- tested0
 	}
 	invCovParameters <- chol2inv(chol(cov(posteriorSample)))
-	meanParameters <- mean(posteriorSample)
+	meanParameters <- colMeans(posteriorSample)
 	standLength <- function(x){
 		(x - meanParameters) %*% invCovParameters %*% (x - meanParameters)
 	}
 	posteriorStandLengths <- apply(posteriorSample, 1, standLength)
 	boundary <- standLength(testedvec)
-	postProb <- mean((posteriorStandLengths - boundary) > 0)
+	postProb <- mean((posteriorStandLengths - rep(boundary, nmax)) > 0)
 	result <- list(prob=postProb, chisquared=boundary,
 		postDistances=posteriorStandLengths,
 		nullValue=testedvec, effectNames=efNames, theUsedEffects=theUsedEffects,
@@ -223,6 +240,7 @@ plot.multipleBayesTest <- function(x, xlim=NULL, ylim=NULL,
 	# density by group
 	if (is.null(xlim)){xlim <- stretch2(range(post))}
 	xlim[1] <- min(0, xlim[1])
+	xlim[2] <- max(xlim[2], x$chisquared + 0.1)
 	# plot density so that truncation at 0 is clear;
 	# since the distances are those from the posterior mean,
 	# it is very unlikely that 0 is not in the support of the distribution.
@@ -376,6 +394,57 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 		if (any(is.na(res))){
 			cat('warning: the extracted array contains NA elements\n')
 		}
+	}
+	res
+}
+
+
+##@extract.posteriorMeans extracts posterior means from sienaBayesFit object
+extract.posteriorMeans <- function(z, nfirst=z$nwarm+1){
+# produces a matrix with the groups in the rows
+# and all effects in the columns, with for each effect
+# first the posterior mean ("p.m.") and then the posterior standard deviation ("psd.")
+	getNames <- function(x){
+		# effect names without duplicated rate parameters
+		# and with "unspecified interaction" replaced by
+		# information about the effects in question
+		b <- x$basicRate
+		tpar<- rep(NA,length(b))
+		# True Parameters, i.e., all except rate parameters for groups 2 and up.
+		for (i in (2:length(b))){tpar[i] <- !b[i]|(b[i]&!b[i-1])}
+		tpar[1] <- TRUE
+		# Take away the ' (period 1)' in the first rate parameter
+		sub(' (period 1)','', x$requestedEffects$effectName[tpar], fixed=TRUE)
+	}
+	if (!inherits(z, "sienaBayesFit"))
+	{
+		stop('z must be a sienaBayesFit object')
+	}
+
+	ntot <- dim(z$ThinPosteriorMu)[1]
+	nit <- ntot - nfirst + 1
+	nind <- sum(z$varyingParametersInGroup)
+	res <- matrix(NA, z$nGroup, 2*nind)
+	if (nind <= 0)
+	{
+		cat("Note: no varying parameters. Null matrix is produced.\n")
+	}
+	else
+	{
+		EffName <- getNames(z)[z$varyingParametersInGroup]
+		for (h in 1:z$nGroup){
+			df <- sienaFitThetaTable(z, fromBayes=TRUE, tstat=FALSE, 
+									groupOnly=h, nfirst=nfirst)$mydf
+			seth <- union(z$ratePositions[[h]], which(z$varyingObjectiveParameters))
+			posttheta <- df[seth,"value"]
+			postsd <- df[seth,"se"]
+			res[h,1:nind] <- posttheta
+			res[h,(nind+1):(2*nind)] <- postsd
+		}
+		fName <- rep('',2*nind)
+		fName[2*(1:nind)-1]  <- paste('p.m.',EffName)
+		fName[2*(1:nind)]  <- paste('psd.',EffName)
+		dimnames(res) <- list(1:dim(res)[1], fName)
 	}
 	res
 }

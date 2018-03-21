@@ -141,26 +141,45 @@ print.siena <- function(x, ...)
 	onlys(x, 'downonly')
 
 	attrs <- attributes(x)
-	highers <- attrs[["higher"]]
-	disjoints <- attrs[["disjoint"]]
-	atleastones <- attrs[["atLeastOne"]]
-	if (any(highers))
+	higher <- attrs[["higher"]]
+	disjoint <- attrs[["disjoint"]]
+	atleastone <- attrs[["atLeastOne"]]
+	if (any(higher))
 	{
-		sepsign <- ifelse((sum(highers) <= 1),'',', ')
-		cat("Higher: ")
-		cat(names(highers)[highers], sep=sepsign, "\n")
+		higherSplit <- strsplit(names(higher)[higher], ",")
+		report <- sapply(higherSplit, function(x)
+		   {
+			   paste(c("Network ", x[1], " is higher than network ", x[2],
+						".\n"), sep="")
+		  })
+		cat("\n", report)
+		cat("This will be respected in the simulations.\n")
+		cat("If this is not desired, change attribute 'higher'.\n")
 	}
-	if (any(disjoints))
+	if (any(disjoint))
 	{
-		sepsign <- ifelse((sum(disjoints) <= 1),'','; ')
-		cat("Disjoint: ")
-		cat(names(disjoints)[disjoints], sep=sepsign,  "\n")
+		disjointSplit <- strsplit(names(disjoint)[disjoint],',')
+		report <- sapply(disjointSplit, function(x)
+		   {
+			   paste(c("Network ", x[1], " is disjoint from network ",
+						x[2], ".\n"), sep="")
+		  })
+		cat("\n", report)
+		cat("This will be respected in the simulations.\n")
+		cat("If this is not desired, change attribute 'disjoint'.\n")
 	}
-	if (any(atleastones))
+	if (any(atleastone))
 	{
-		sepsign <- ifelse((sum(atleastones) <= 1),'',', ')
-		cat("atLeastOne: ")
-		cat(names(atleastones)[atleastones], sep=sepsign,  "\n")
+		atLeastOneSplit <- strsplit(names(atleastone)[atleastone],',')
+		report <- sapply(atLeastOneSplit, function(x)
+		   {
+			   paste(c("A link in at least one of networks ",
+						x[1], " and", x[2],
+					   " always exists.\n"), sep="")
+		  })
+		cat("\n", report)
+		cat("This will be respected in the simulations.\n")
+		cat("If this is not desired, change attribute 'atLeastOne'.\n")
 	}
 	invisible(x)
 }
@@ -174,6 +193,7 @@ print.sienaGroup <- function(x, ...)
 	att <- attributes(x)
 	cat('Dependent variables: \n')
 	cat(paste(att$netnames, ":", att$types,'\n'))
+	cat('Total number of groups:', length(x),'\n')
 	cat('Total number of periods:', att$observations)
 	cat("\n")
 	invisible(x)
@@ -348,7 +368,8 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 		if (sum(x$test) > 0)
 		{
 			sc.t <- score.Test(x)
-			cat('\nScore test for ', sc.t$df, ' parameters:\n',
+			letter <- ifelse(sc.t$df == 1, '', 's')
+			cat('\nScore test for ', sc.t$df, ' parameter', letter, ':\n',
 			    'chi-squared = ', round(sc.t$chisquare,2),
 				', p = ', sprintf("%6.4f", sc.t$pvalue),'.\n', sep='')
 		}
@@ -679,40 +700,56 @@ objectOrNull <- function(x)
 }
 
 ##@averageTheta.last Miscellaneous
+
 averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
+	ntott <- dim(z$ThinParameters)[1]
+
 	if (nfirst > ntot)
 	{
 		stop('Sample did not come beyond warming')
+	}
+	if (nfirst > ntott)
+	{
+		stop(paste('nfirst =',nfirst,' > first dimension ThinParameters =',ntott))
 	}
 	thetaMean <- rep(NA, z$pp)
 	postVarMean <- rep(NA, z$pp)
 	for (group in 1:z$nGroup)
 	{
-		thetaMean[z$ratePositions[[group]]] <- 	colMeans(
-				z$ThinParameters[nfirst:ntot,
-				group, !z$generalParametersInGroup, drop=FALSE], na.rm=TRUE)
+		thetaMean[z$ratePositions[[group]]] <- colMeans(
+				z$ThinParameters[nfirst:ntott, group,
+					!z$generalParametersInGroup, drop=FALSE], na.rm=TRUE)
+		postVarMean[z$ratePositions[[group]]] <- apply(
+				z$ThinParameters[nfirst:ntott,
+				group, !z$generalParametersInGroup, drop=FALSE], 3, var, na.rm=TRUE)
 	}
+
 	if (groupOnly != 0)
 	{
 		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinParameters[(nfirst):ntot, groupOnly,
-				z$varyingGeneralParametersInGroup, drop=FALSE], na.rm=TRUE)
+				z$ThinParameters[(nfirst):ntott, groupOnly,
+					z$varyingGeneralParametersInGroup, drop=FALSE], na.rm=TRUE)
 	}
 	else
 	{
 	thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinPosteriorMu[(nfirst):ntot,
-				z$objectiveInVarying, drop=FALSE], na.rm=TRUE)
+				z$ThinPosteriorMu[(nfirst):dim(z$ThinPosteriorMu)[1],
+					z$objectiveInVarying, drop=FALSE], na.rm=TRUE)
 	postVarMean[z$varyingObjectiveParameters] <- sapply(1:(dim(z$ThinPosteriorSigma)[2]),
-		function(i){mean(z$ThinPosteriorSigma[nfirst:ntot,i,i], na.rm=TRUE)})[z$objectiveInVarying]
+		function(i){mean(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i], na.rm=TRUE)}
+														)[z$objectiveInVarying]
 	}
 	if (any(z$set2))
 	{
 		thetaMean[z$set2] <-
-			colMeans(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE]
-			, na.rm=TRUE)
+			colMeans(z$ThinPosteriorEta[nfirst:dim(z$ThinPosteriorEta)[1],, drop=FALSE],
+						na.rm=TRUE)
+	}
+	if (any(z$fix))
+	{
+		thetaMean[z$fix] <- z$thetaMat[1,z$fix]
 	}
 	list(thetaMean, postVarMean)
 }
@@ -721,6 +758,7 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 sdTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
+	ntott <- dim(z$ThinParameters)[1]
 	if (nfirst >= ntot-1)
 	{
 		stop('Sample did not come beyond warming')
@@ -729,13 +767,13 @@ sdTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 	for (group in 1:z$nGroup)
 	{
 		sdTheta[z$ratePositions[[group]]] <- apply(
-					z$ThinParameters[nfirst:ntot,
+					z$ThinParameters[nfirst:ntott,
 					group, !z$generalParametersInGroup, drop=FALSE], 3, sd)
 	}
 	if (groupOnly != 0)
 	{
 		sdTheta[(z$set1)&(!z$basicRate)] <- apply(
-				z$ThinParameters[nfirst:ntot, groupOnly,
+				z$ThinParameters[nfirst:ntott, groupOnly,
 				z$varyingGeneralParametersInGroup, drop=FALSE], 3, sd)
 	}
 	else
@@ -758,34 +796,44 @@ credValues <- function(z, theProbs = c(0.025,0.975), tested = 0,
 						groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
+	ntott <- dim(z$ThinParameters)[1]
 	if (nfirst >= ntot-1)
 	{
 		stop('Sample did not come beyond warming')
 	}
 	credVals <- matrix(NA, length(z$set1), 5)
-# But for the rate parameters NAs will remain.
-	cvp <- function(x, test0){c(quantile(x, probs=theProbs), 1-(ecdf(x))(test0))}
+	cvp <- function(x, test0){c(quantile(x, probs=theProbs, na.rm=TRUE),
+									1-(ecdf(x))(test0))}
 	if (groupOnly != 0)
 	{
 		credVals[(z$set1)&(!z$basicRate), 1:3] <- t(apply(
-				z$ThinParameters[nfirst:ntot, groupOnly,
+				z$ThinParameters[nfirst:ntott, groupOnly,
 				z$varyingGeneralParametersInGroup, drop=FALSE], 3,
 						cvp, test0 = tested))
 	}
 	else
 	{
 		credVals[(z$set1)&(!z$basicRate), 1:3] <-
-			t(apply(z$ThinPosteriorMu[nfirst:ntot,
+			t(apply(z$ThinPosteriorMu[nfirst:ntott,
 				z$objectiveInVarying, drop=FALSE], 2, cvp, test0 = tested))
 		credVals[z$varyingObjectiveParameters, 4:5] <-
 			t(sapply(1:(dim(z$ThinPosteriorSigma)[2]),
-	function(i){cvp(z$ThinPosteriorSigma[nfirst:ntot,i,i],10)[1:2]})[,z$objectiveInVarying])
+		function(i){cvp(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i],
+									10)[1:2]}
+		)[,z$objectiveInVarying])
+	}
+	for (group in 1:z$nGroup)
+	{
+		credVals[z$ratePositions[[group]], 1:2] <-
+			t(sapply(which(!z$generalParametersInGroup),
+			function(xx){cvp(z$ThinParameters[nfirst:ntott, group,
+												xx, drop=FALSE],0)[1:2]}))
 	}
 	if (any(z$set2))
 	{
 		credVals[z$set2,1:3 ] <-
-			t(apply(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE], 2,
-					cvp, test0 = tested))
+			t(apply(z$ThinPosteriorEta[nfirst:dim(z$ThinPosteriorEta)[1],, drop=FALSE],
+																2, cvp, test0 = tested))
 	}
 	credVals
 }
@@ -800,7 +848,7 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 	else
 	{
 		theEffects <- x$requestedEffects
-    theEffects <-theEffects[which(theEffects$type!='gmm'),]
+		theEffects <- theEffects[which(theEffects$type!='gmm'),]
 	}
 	pp <- dim(theEffects)[1]
     if (x$cconditional)
@@ -829,10 +877,14 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
                        cTo=rep(NA, pp),
                        p=rep(NA, pp),
 					   random=rep("", pp),
-					   postSd=rep("", pp),
-					   cSdFrom=rep("", pp),
-					   cSdTo=rep("", pp),
                        stringsAsFactors =FALSE)
+		if (groupOnly == 0)
+		{
+			mydf <- cbind(mydf, data.frame(postSd=rep("", pp),
+						cSdFrom=rep("", pp),
+						cSdTo=rep("", pp),
+                       stringsAsFactors =FALSE))
+		}
 	}
 	else
 	{
@@ -938,7 +990,7 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 		theEffects$effectName[theEffects$netType=='behavior'] <-
 			behEffects$effectName
 	}
-	#browser()
+
 	mydf[nrates + (1:xp), 'row'] <-  1:xp
 	mydf[nrates + (1:xp), 'type' ] <- ifelse(theEffects$type == "creation",
 		"creat", theEffects$type)
@@ -953,9 +1005,14 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 		mydf[nrates + (1:xp), 'cFrom' ] <- credVal[,1]
 		mydf[nrates + (1:xp), 'cTo' ] <- credVal[,2]
 		mydf[nrates + (1:xp), 'p' ] <- credVal[,3]
-		mydf[nrates + (1:xp), 'postSd' ] <- postSd
-		mydf[nrates + (1:xp), 'cSdFrom' ] <- sqrt(credVal[,4])
-		mydf[nrates + (1:xp), 'cSdTo' ] <- sqrt(credVal[,5])
+		if (groupOnly == 0)
+		{
+			mydf[nrates + (1:xp), 'postSd' ] <- postSd
+			mydf[nrates + (1:xp), 'cSdFrom' ] <- sqrt(credVal[,4])
+			mydf[nrates + (1:xp), 'cSdTo' ] <- sqrt(credVal[,5])
+			mydf[1:nrates, 'cFrom'] <- credVal[1:nrates,1]
+			mydf[1:nrates, 'cTo'] <- credVal[1:nrates,2]
+		}
 	}
 	else
 	{
@@ -1018,7 +1075,8 @@ xtable.sienaFit <- function(x, caption = NULL, label = NULL, align = NULL,
         if (type =="latex")
         {
             use <- addtorow$command != 'Network Dynamics'
-            addtorow$command <- paste('\\multicolumn{4}{l}{', addtorow$command,
+	## the \rule{0pt}{2.5ex}\relax gives a little bit extra vertical space
+            addtorow$command <- paste('\\multicolumn{4}{l}{\rule{0pt}{2.5ex}\relax ', addtorow$command,
                                       '} \\\\ \n')
             use[1] <- FALSE
             addtorow$command[use] <- paste('\\\\ ', addtorow$command[use])
@@ -1103,31 +1161,54 @@ makeTemp <- function(x, groupOnly=0, nfirst, ...)
 #		mymat <- cbind(mymat, rep.int(NA, dim(mymat)[1]))
 #		mymat <- cbind(mymat, matrix(NA, dim(mymat)[1], 4))
 #		colnames(mymat) <- c(mynames, 'random', 'credFrom','credTo', 'p')
-		mymat[, 'value'] <- format(round(mydf$value, digits=4))
-		mymat[, 'se'] <- format(round(mydf$se, digits=4))
+		mymat[, 'value'] <-     format(round(mydf$value, digits=4))
+		mymat[, 'se'] <-        format(round(mydf$se, digits=4))
+		mymat[x$fix, 'se'] <-   "fixed"
 		mymat[x$set1, 'random']      <- "   +   "
 		mymat[x$set2, 'random']      <- "   -   "
 		mymat[x$basicRate, 'random'] <- "       "
+		mymat[x$fix, 'random']       <- "       "
 		mymat[, 'cFrom'] <- format(round(mydf$cFrom, digits=4))
-		mymat[x$basicRate, 'cFrom'] <- "       "
+#		mymat[x$basicRate, 'cFrom'] <- "       "
+		mymat[x$fix, 'cFrom']       <- "       "
 		mymat[, 'cTo'] <- format(round(mydf$cTo, digits=4))
-		mymat[x$basicRate, 'cTo'] <- "       "
+#		mymat[x$basicRate, 'cTo'] <- "       "
+		mymat[x$fix, 'cTo']       <- "       "
 		mymat[, 'p'] <- format(round(mydf$p, digits=2))
+		mymat[x$fix, 'p'] <-       "       "
 		mymat[x$basicRate, 'p'] <- "       "
-		mymat[, 'postSd'] <- format(round(mydf$postSd, digits=4))
-		mymat[, 'cSdFrom'] <- format(round(mydf$cSdFrom, digits=4))
-		mymat[, 'cSdTo'] <- format(round(mydf$cSdTo, digits=4))
+		if (groupOnly == 0)
+		{
+			mymat[, 'postSd'] <- format(round(as.numeric(mydf$postSd), digits=4))
+			mymat[, 'cSdFrom'] <- format(round(as.numeric(mydf$cSdFrom), digits=4))
+			mymat[, 'cSdTo'] <- format(round(as.numeric(mydf$cSdTo), digits=4))
+			mymat[(x$fix|x$basicRate|x$set2), 'postSd']    <- "       "
+			mymat[(x$fix|x$basicRate|x$set2), 'cSdFrom']   <- "       "
+			mymat[(x$fix|x$basicRate|x$set2), 'cSdTo']     <- "       "
+		}
 		mymat[, 'type'] <- format(mymat[, 'type'])
 		mymat[, 'text'] <- format(mymat[, 'text'])
 		mymat[mydf$row < 1, 'row'] <-
 			format(mydf[mydf$row < 1, 'row'])
 		mymat[mydf[,'row'] >= 1, 'row'] <-
 			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
-		mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post.   ", "",
-				" cred.  ", " cred. ", " p", "varying ", "Post.   ", "cred.  ", "cred.  "),
-			c(rep("", 4), "mean    ", "", "s.d.m.", "",
-				" from   ", " to    ", "", "", "s.d.   ","from   ", "to    "),
-			mymat)
+
+		if (groupOnly == 0)
+		{
+			mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post. ", "",
+							" cred.  ", " cred. ", " p", "varying  ", "Post.   ", "cred.  ", "cred.  "),
+					   c(rep("", 4), "mean    ", "", "s.d.m.", "",
+							" from   ", " to    ", "", " ", "s.d.   ","from   ", "to    "),
+						mymat)
+		}
+		else
+		{
+			mymat <- rbind(c(rep("", 4), "Post.   ", "", "Post. ", "",
+							" cred.  ", " cred. ", " p", "varying "),
+					   c(rep("", 4), "mean    ", "", "s.d.m.", "",
+							" from   ", " to    ", "", ""),
+						mymat)
+		}
 		mymat <- apply(mymat, 2, format)
 		tmp1 <- apply(mymat, 1, function(x) paste(x, collapse=" "))
 		list(tmp, tmp1)
@@ -1280,6 +1361,7 @@ summary.sienaBayesFit <- function(object, nfirst=NULL, ...)
 	print.summary.sienaBayesFit(object, nfirst)
     invisible(object)
 }
+
 ##@print.summary.sienaBayesFit Methods
 print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 {
@@ -1390,6 +1472,8 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 			   union(c(1,2), 2 + x$ratePositions[[h]])
 			lines.thisgroup <- union(lines.thisgroup,
 							2 + which(x$varyingObjectiveParameters))
+			lines.thisgroup <- union(lines.thisgroup,
+							2 + which(x$fix))
 			lines.thisgroup <- sort(union(lines.thisgroup, 2 + which(x$set2)))
 			for (i in lines.thisgroup)
 			{

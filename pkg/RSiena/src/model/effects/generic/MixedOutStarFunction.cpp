@@ -53,7 +53,7 @@ void MixedOutStarFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double MixedOutStarFunction::value(int alter) const
+double MixedOutStarFunction::value(int alter)
 {
 	return this->lpTable->get(alter);
 }

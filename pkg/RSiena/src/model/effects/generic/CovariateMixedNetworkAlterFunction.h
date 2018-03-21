@@ -58,9 +58,11 @@ private:
 	ConstantCovariate * lpConstantCovariate;
 	ChangingCovariate * lpChangingCovariate;
 	BehaviorLongitudinalData * lpBehaviorData;
+	/* -Wunused-private-field
 	const Network * lpFirstNetwork;
 	const Network * lpSecondNetwork;
 	TwoNetworkCache * lpTwoNetworkCache;
+	*/
 
 	// The current value of a behavior variable per each actor.
 	// This array is 0 for covariate-based effects.

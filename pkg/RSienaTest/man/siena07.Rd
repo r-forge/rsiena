@@ -102,7 +102,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  \code{siena07} to use them. By specifying the options \code{useCluster}, \code{nbrNodes},
  \code{clusterString} and \code{initC}, \code{siena07} will create a
  \link[parallel:makeCluster]{cluster object} that will be used by the
- \link[parallel]{parallel} package. After finishing the estimation procedure,
+ \link[parallel:parallel]{parallel} package. After finishing the estimation procedure,
  \code{siena07} will automatically stop the cluster. Alternatively, instead of
  having the function to create a cluster, the user may provide its own by
  specifying the option \code{cl}, similar to what the boot function does in
@@ -118,8 +118,11 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{OK}{Boolean indicating successful termination}
   \item{termination }{Character string, values: "OK", "Error", or
     "UserInterrupt". "UserInterrupt" indicates that the user asked for early
-  termination before phase 3. }
+    termination before phase 3. }
   \item{f}{Various characteristics of the data and model definition.}
+  \item{requestedEffects}{The included effects in the effects object.}
+  \item{effects}{The included effects in the effects object to which are added
+    the main effects of the requested interaction effects, if any.}
   \item{theta}{Estimated value of theta.}
   \item{covtheta}{Estimated covariance matrix of theta; this is not available
     if the sienaAlgorithm object \code{x} was produced with \code{simOnly=TRUE}.}
@@ -205,15 +208,18 @@ ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans)
 # Running in multiple processors -----------------------------------------------
 \donttest{
 # Not tested because dependent on presence of processors
-# Using 8 processors
+# Find out how many processors there are
+library(parallel)
+(n.clus <- detectCores() - 1)
+# number of cores; 1 is subtracted to keep time for other processes
 ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE,
-                useCluster=TRUE, nbrNodes=8, initC=TRUE)
+                useCluster=TRUE, nbrNodes=n.clus, initC=TRUE)
 
+# Suppose 8 processors are going to be used.
 # Loading the parallel package and creating a cluster
 # with 8 processors (this should be equivalent)
-
 library(parallel)
-cl <- makeCluster(8)
+cl <- makeCluster(n.clus)
 
 ans3 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, cl = cl)
 

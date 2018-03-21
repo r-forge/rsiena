@@ -263,12 +263,6 @@ msgstr ""
 msgid "Start R, load RSiena using Packages menu"
 msgstr ""
 
-msgid "then type siena01Gui() (and <ENTER>)"
-msgstr ""
-
-msgid "Gui only needs installing on Windows: on Linux use sienascript"
-msgstr ""
-
 msgid "This function needs the tcl/tk package TkTable: install it,"
 msgstr ""
 

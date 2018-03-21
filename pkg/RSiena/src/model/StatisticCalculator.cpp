@@ -294,13 +294,10 @@ void StatisticCalculator::calculateStatistics()
 			// Duplicate the current network and remove those ties that are
 			// missing at either end of the period.
 
-			Network * pNetwork =
-				this->lpState->pNetwork(pNetworkData->name())->clone();
+			Network * pNetwork = this->lpState->pNetwork(pNetworkData->name())->clone();
 
-			subtractNetwork(pNetwork,
-				pNetworkData->pMissingTieNetwork(this->lperiod));
-			subtractNetwork(pNetwork,
-				pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+			subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod));
+			subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod + 1));
 
 			// for not-targets, overwrite the current network for values
 			// structurally fixed for the next period. (no effect for targets)
@@ -316,7 +313,9 @@ void StatisticCalculator::calculateStatistics()
 				pNetworkData->pNetwork(this->lperiod),
 				pNetworkData->pStructuralTieNetwork(this->lperiod));
 
+			// NOTE: pass delete responsibility to state
 			this->lpStateLessMissingsEtc->pNetwork(name, pNetwork);
+			// delete pNetwork;
 
 		}
 		else if (pBehaviorData)
@@ -510,10 +509,8 @@ void StatisticCalculator::calculateNetworkEndowmentStatistics(
 
 		// remove missings and current
 
-		subtractNetwork(pLostTieNetwork,
-			pCurrentNetwork);
-		subtractNetwork(pLostTieNetwork,
-			pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+		subtractNetwork(pLostTieNetwork, pCurrentNetwork);
+		subtractNetwork(pLostTieNetwork, pNetworkData->pMissingTieNetwork(this->lperiod + 1));
 
 		// overwrite the predictor network with only start missings removed
 		const Network * pPredictor =
@@ -855,8 +852,7 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 		// missing at either end of the period. TODO set leavers back.
 		// (Is the TODO not done for the current network?)
 
-		pNetwork =
-			this->lpState->pNetwork(pNetworkData->name())->clone();
+		pNetwork = this->lpState->pNetwork(pNetworkData->name())->clone();
 		subtractNetwork(pNetwork,
 			pNetworkData->pMissingTieNetwork(this->lperiod));
 		subtractNetwork(pNetwork,
@@ -924,106 +920,6 @@ void StatisticCalculator::calculateNetworkRateStatistics(
 
 	this->ldistances[pNetworkData][this->lperiod] = pDifference->tieCount();
 
-
-	// settings targets
-
-	// for each covariate-defined setting, calculate
-	// setting*difference network and sum.
-//	const vector<pair<string, string> > & rSettingNames =
-//			pNetworkData->rSettingNames();
-	//Rprintf("basic rate change %d size %d \n", pDifference->tieCount(),
-	//	rSettingNames.size());
-	// for (unsigned i = 0; i < rSettingNames.size();
-	// 	 i++)
-	// {
-	// 	if (!this->lsettingDistances[pNetworkData][rSettingNames[i]])
-	// 	{
-	// 		int * array =
-	// 			new int[pNetworkData->observationCount() - 1];
-
-	// 		this->lsettingDistances[pNetworkData][rSettingNames[i]] = array;
-	// 	}
-	// 	// universal
-	// 	int distance = pDifference->tieCount();
-	// 	// primary
-	// 	if (i == 1)
-	// 	{
-	// 		const Network * pNetwork =
-	// 			this->lpState->pNetwork(pNetworkData->name());
-	// 		// create a network representing primary settings
-	// 		Network * settingNetwork = new
-	// 			Network(pNetwork->n(), pNetwork->m());
-	// 		for (int ego = 0; ego < pNetwork->n(); ego++)
-	// 		{
-	// 			vector<int> * setting = primarySetting(pNetwork, ego);
-	// 			for (unsigned alter = 0; alter < setting->size(); alter++)
-	// 			{
-	// 				settingNetwork->setTieValue(ego, alter, 1);
-	// 			}
-	// 			delete(setting);
-	// 		}
-	// 		for (TieIterator iter = pDifference->ties();
-	// 			 iter.valid();
-	// 			 iter.next())
-	// 		{
-
-	// 			{
-	// 				if (settingNetwork->tieValue(iter.ego(),
-	// 						iter.alter()) == 0)
-	// 				{
-	// 					distance--;
-	// 				}
-	// 			}
-	// 		}
-	// 		delete settingNetwork;
-	// 	}
-	// 	// for each covariate-defined setting, calculate
-	// 	// setting*difference network and sum.
-	// 	if (i > 1)
-	// 	{
-	// 		ConstantDyadicCovariate * pConstantDyadicCovariate =
-	// 			this->lpData->pConstantDyadicCovariate(rSettingNames[i]);
-	// 		ChangingDyadicCovariate * pChangingDyadicCovariate =
-	// 			this->lpData->pChangingDyadicCovariate(rSettingNames[i]);
-
-	// 		for (TieIterator iter = pDifference->ties();
-	// 			 iter.valid();
-	// 			 iter.next())
-	// 		{
-
-	// 			if (pConstantDyadicCovariate)
-	// 			{
-	// 				if (pConstantDyadicCovariate->value(iter.ego(),
-	// 						iter.alter()) == 0)
-	// 				{
-	// 					distance--;
-	// 				}
-	// 			}
-	// 			else if (pChangingDyadicCovariate)
-	// 			{
-	// 				if (pChangingDyadicCovariate->value(iter.ego(),
-	// 						iter.alter(),
-	// 						this->lperiod) == 0)
-	// 				{
-	// 					distance--;
-	// 				}
-	// 			}
-	// 			else
-	// 			{
-	// 				throw logic_error(
-	// 					"No dyadic covariate named '" +
-	// 					rSettingNames[i] +
-	// 					"'.");
-	// 			}
-	// 		}
-	// 	}
-	// 	// store distance for later use
-	// 	//	Rprintf(" cov %d %d\n", i, distance);
-	// 	this->lsettingDistances[pNetworkData][rSettingNames[i]]
-	// 		[this->lperiod] = distance;
-	// }
-	// the universal setting can explain everything
-	// calcDifferences(pNetworkData, pDifference);
 
 	// Loop through the rate effects, calculate the statistics,
 	// and store them.
@@ -1373,6 +1269,7 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 					if (effectName == "avExposure" ||
 						effectName == "susceptAvIn" ||
 						effectName == "totExposure" ||
+						effectName == "infectDeg" ||
 						effectName == "infectIn" ||
 						effectName == "infectOut")
 					{
@@ -1454,7 +1351,7 @@ double StatisticCalculator::calculateDiffusionRateEffect(
 			{
 				alterValue *= pStructural->inDegree(iter.actor());
 			}
-			else if (effectName == "infectOut")
+			else if ((effectName == "infectOut") | (effectName == "infectDeg"))
 			{
 				alterValue *= pStructural->outDegree(iter.actor());
 			}
@@ -1529,6 +1426,5 @@ double StatisticCalculator::calculateDiffusionRateEffect(
 	}
 	return totalAlterValue;
 }
-
 
 }

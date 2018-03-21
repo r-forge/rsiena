@@ -39,7 +39,7 @@ public:
 	virtual void initialize(const Data * pData,
 		State * pState, int period, Cache * pCache);
 
-	virtual double value(int alter) const;
+	virtual double value(int alter);
 
 private:
 	EgocentricConfigurationTable * (NetworkCache::*lpTable)() const;

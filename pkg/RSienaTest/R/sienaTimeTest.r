@@ -36,7 +36,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 	{
 		if (!sienaFit$sf2.byIterations)
 		{
-			stop("sienaTimeTest needs sf2 by iterations")
+			stop("sienaTimeTest needs sf2 by iterations (use lessMem=FALSE)")
 		}
 	}
 	waveNumbers <- attr(sienaFit$f, "periodNos")

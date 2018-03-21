@@ -33,7 +33,7 @@ OutTieFunction::OutTieFunction(string networkName) :
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double OutTieFunction::value(int alter) const
+double OutTieFunction::value(int alter)
 {
 	return this->pNetworkCache()->outTieValue(alter);
 }

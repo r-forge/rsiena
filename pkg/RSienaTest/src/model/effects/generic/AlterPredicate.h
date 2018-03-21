@@ -43,7 +43,7 @@ public:
 	 * that the predicate has been initialized before and pre-processed with
 	 * respect to a certain ego.
 	 */
-	virtual bool value(int alter) const = 0;
+	virtual bool value(int alter) = 0;
 
 protected:
 	AlterPredicate();

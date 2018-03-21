@@ -132,10 +132,11 @@ readInFiles <- function(session, edited, files=NULL)
 	files
 }
 ##@sienaDataCreateFromSession siena01/DataCreate
-sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
+sienaDataCreateFromSession <- function (filename=NULL,
 	modelName='Siena', edited=NULL,
 	files=NULL, getDocumentation=FALSE)
 {
+	session <- NULL
 	## require(tcltk)
 	##@turnoffwarn internal sienaDataCreateFromSession
 	turnoffwarn <- function()
@@ -293,7 +294,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
 							myarray[ , ,
 								as.numeric(namesession$Period[x])] <-
 									namefiles[[x]]
-								tmp <- sienaDependent(myarray, 
+								tmp <- sienaDependent(myarray,
 									nodeSet=namesession[1, "ActorSet"])
 						}
 					}
@@ -347,7 +348,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
 								j=y[, 2],
 								x=y[, 3])
 									} )
-						tmp <- sienaDependent(mylist, 
+						tmp <- sienaDependent(mylist,
 							nodeSet=namesession[1, "ActorSet"])
 					}
 					else ## pajek net
@@ -385,7 +386,7 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
 							if (!network::is.directed(namefiles[[x]]))
 							{
 								perm <- c(2, 1, 3)
-								myedgelist <- rbind(myedgelist, 
+								myedgelist <- rbind(myedgelist,
 									myedgelist[, perm])
 							}
 
@@ -393,8 +394,8 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
 								stop("number of actors inconsistent")
 
 							mylist[[x]] <-
-								spMatrix(nrow=nActors, ncol=nActors, 
-									i=myedgelist[,1], j=myedgelist[,2], 
+								spMatrix(nrow=nActors, ncol=nActors,
+									i=myedgelist[,1], j=myedgelist[,2],
 									x=myedgelist[,3])
 						}
 						tmp <- sienaDependent(mylist, nodeSet=namesession[1,
@@ -722,6 +723,5 @@ sienaDataCreateFromSession <- function (filename=NULL, session=NULL,
 		mydata <- get(gps)
 	}
 	myeff <- getEffects(mydata)
-	print01Report(mydata, modelName, session)
 	return(list(OK=TRUE, mydata=mydata, myeff=myeff))
 }

@@ -58,7 +58,7 @@ void SameCovariateTwoPathFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SameCovariateTwoPathFunction::value(int alter) const
+double SameCovariateTwoPathFunction::value(int alter)
 {
 	int statistic = 0;
 	if  (!(this->lexcludeMissing && this->missing(alter)))

@@ -105,9 +105,7 @@ proc2subphase <- function(z, x, subphase, useAverage=TRUE, ...)
 		## ###############################################
 		## do the iterations for this repeat of this subphase
 		## ##############################################
-		##z <- doIterationsCopy(z, x, subphase, ...) removed as out of sync
 		z <- doIterations(z, x, subphase, ...)
-		##   if (z$nit == 50) browser()
 		if (!z$OK || UserInterruptFlag() || UserRestartFlag() ||
 			EarlyEndPhase2Flag())
 		{

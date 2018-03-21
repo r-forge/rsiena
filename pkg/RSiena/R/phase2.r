@@ -419,6 +419,18 @@ doIterations<- function(z, x, subphase,...)
 			zsmall$theta <- zsmall$theta - fchange
 		}
 		z$theta <- zsmall$theta
+		if (!is.null(z$thetaStore))
+		{
+			if (z$nit <= dim(z$thetaStore)[1])
+			{
+				z$thetaStore[z$nit,] <- z$theta
+			}
+			else
+			{
+				cat('thetaStore?\n')
+				browser()
+			}
+		}
 		z$thav <- z$thav + zsmall$theta
 		z$thavn <- z$thavn + 1
 		if (x$maxlike && !is.null(x$moreUpdates) && x$moreUpdates > 0)

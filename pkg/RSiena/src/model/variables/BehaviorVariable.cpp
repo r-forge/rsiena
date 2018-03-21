@@ -311,6 +311,10 @@ void BehaviorVariable::makeChange(int actor)
 			this->lupPossible,
 			this->ldownPossible);
 	}
+	if (this->pSimulation()->pModel()->needDerivatives())
+	{
+		this->accumulateDerivatives(); // ABC
+	}		
 
 	if (this->pSimulation()->pModel()->needChain())
 	{

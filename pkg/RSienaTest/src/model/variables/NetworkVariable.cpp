@@ -538,6 +538,7 @@ bool NetworkVariable::canMakeChange(int actor) const
  * Simulates a change of the network according to the choice of the given
  * actor. First, the actor chooses the alter based on the evaluation and
  * endowment functions, and then the tie to the selected alter is flipped.
+ * Used for MoM.
  */
 void NetworkVariable::makeChange(int actor)
 {
@@ -611,11 +612,15 @@ void NetworkVariable::makeChange(int actor)
 				this->addAlterAgreementScores(accept);
 			}
 		}
-
+		
 		if (this->pSimulation()->pModel()->needScores())
 		{
 			this->accumulateScores(alter);
 		}
+		if (this->pSimulation()->pModel()->needDerivatives())
+		{
+			this->accumulateDerivatives(); // ABC
+		}		
 	}
 //	 NB  the probabilities in the reported chain are probably wrong for !accept
 	if (this->pSimulation()->pModel()->needChain())

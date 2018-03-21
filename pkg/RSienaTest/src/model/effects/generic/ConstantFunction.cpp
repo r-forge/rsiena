@@ -89,7 +89,7 @@ bool ConstantFunction::networkConstant() const
 }
 
 
-double ConstantFunction::value(int alter) const
+double ConstantFunction::value(int alter)
 {
 	return this->lconstant;
 }

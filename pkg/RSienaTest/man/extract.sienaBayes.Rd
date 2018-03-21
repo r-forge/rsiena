@@ -1,22 +1,28 @@
 \name{extract.sienaBayes}
 \alias{extract.sienaBayes}
 \alias{extract.Bayes}
+\alias{extract.posteriorMeans}
 \title{
-  Extract posterior samples from sienaBayes results
+  Extraction of posterior samples or posterior means from sienaBayes results
 }
 \description{
-  This function extracts posterior samples from a \code{\link{sienaBayesFit}} object
-  to be used, e.g., for assessing convergence.
+  The first function extracts posterior samples from a list of
+  \code{\link{sienaBayesFit}} object to be used, e.g.,
+  for assessing convergence.\cr
+  The second function extracts posterior means and standard deviations per group
+  from a \code{\link{sienaBayesFit}} object.
 }
 \usage{
 extract.sienaBayes(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
                    sdLog=TRUE)
+extract.posteriorMeans(z, nfirst=z$nwarm+1)
 }
 \arguments{
   \item{zlist}{A list of \code{\link{sienaBayesFit}} objects,
     further called 'chains',
     resulting from calls to \code{\link{sienaBayes}} with a common
     data set and model specification.}
+  \item{z}{A \code{\link{sienaBayesFit}} object.}
   \item{nfirst}{Integer: the first element for the first MCMC chain
       used for calculating properties of the chain.}
   \item{extracted}{The parameters for which posterior samples are to be
@@ -33,7 +39,7 @@ extract.sienaBayes(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
       standard deviations (applies only to varying parameters).}
 }
 \details{
- This function produces a 3-dimensional array, iterations by chains
+ \code{extract.sienaBayes} produces a 3-dimensional array, iterations by chains
  by parameters, suitable for use, e.g., in function \code{monitor()}
  of package \code{rstan}. The 'iterations' are draws from the
  posterior distribution (provided that convergence was achieved),
@@ -47,9 +53,19 @@ extract.sienaBayes(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
  this will lead to an error message.\cr
  It is not checked that the specifications of the chains are identical.
  For the parameter names, the names in the first chain are used.
+
+ \code{extract.posteriorMeans} produces the posterior means of the
+ groupwise varying parameters. The resulting matrix has the groups
+ in the rows. The effects are in the columns: for each effect comes first
+ the posterior mean, then the posterior standard deviation.
 }
-\value{A 3-dimensional array, iterations by chains by parameters,
-  the third dimension having the names of the parameters.
+\value{For \code{extract.sienaBayes} a 3-dimensional array, iterations
+  by chains by parameters,
+  the third dimension having the names of the parameters.\cr
+  For \code{extract.posteriorMeans} a matrix with the groups in the rows
+  and all effects in the columns, with for each effect two columns:
+  first the posterior mean (effect name preceded by "p.m.") and then the
+  posterior standard deviation (effect name preceded by "psd.").
   }
 \references{See the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
@@ -78,6 +94,7 @@ extract.sienaBayes(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10),
         simplify=FALSE)
   bayes.extracted <- extract.sienaBayes(bayes.models, extracted="all")
+  extract.posteriorMeans(bayes.models[[1]])
 }
 }
 % Add one or more standard keywords, see file "KEYWORDS" in the

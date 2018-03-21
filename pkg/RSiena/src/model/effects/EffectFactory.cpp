@@ -260,7 +260,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "outTrunc2")
 	{
-		pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
+		pEffect = new TruncatedOutdegreeEffect2(pEffectInfo);
 	}
 	else if (effectName == "outInv")
 	{
@@ -366,6 +366,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "egoRThresholdX")
 	{
 		pEffect = new CovariateEgoEffect(pEffectInfo, false, true);
+	}
+	else if (effectName == "degAbsDiffX")
+	{
+		pEffect = new CovariateEgoDiffEffect(pEffectInfo, true, true);
+	}
+	else if (effectName == "degPosDiffX")
+	{
+		pEffect = new CovariateEgoDiffEffect(pEffectInfo, true, false);
+	}
+	else if (effectName == "degNegDiffX")
+	{
+		pEffect = new CovariateEgoDiffEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "diffX")
 	{
@@ -1538,6 +1550,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "totAXInAltDist2")
 	{
 		pEffect = new AltersInDist2CovariateAverageEffect(pEffectInfo,false,true);
+	}
+	else if (effectName == "degAbsContrX")
+	{
+		pEffect = new CovariateContrastEffect(pEffectInfo, true, true);
+	}
+	else if (effectName == "degPosContrX")
+	{
+		pEffect = new CovariateContrastEffect(pEffectInfo, true, false);
+	}
+	else if (effectName == "degNegContrX")
+	{
+		pEffect = new CovariateContrastEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "avWAlt")
 	{

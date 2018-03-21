@@ -72,7 +72,7 @@ void SumFunction::preprocessEgo(int ego)
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SumFunction::value(int alter) const
+double SumFunction::value(int alter)
 {
 	return this->lpFirstFunction->value(alter) +
 		this->lpSecondFunction->value(alter);

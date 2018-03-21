@@ -160,15 +160,21 @@ glueBayes(z1, z2, nwarm2=0)
   across groups). This is indicated by the keyword \code{random} in the
   call of \code{\link{setEffect}}.\cr
   For the groupwise parameters normal distributions are assumed with conjugate
-  priors. The prior distribution for the basic rate parameters is determined
+  priors.
+  The conjugate prior is an inverse Wishart distribution for the covariance
+  matrix Sigma, with parameters \code{Lambda^{-1}} and \code{priorDf},
+  where \eqn{Lambda = priorDf \times priorSigma}{Lambda = priorDf * priorSigma};
+  and, conditional on Sigma, for the expected value a multivariate normal with
+  mean \code{priorMu} and covariance matrix \code{Sigma/priorKappa}.\cr
+  The required dimensions of the prior parameters \code{priorMu} and
+  \code{priorSigma} depend on the number of groupwise varying parameters
+  and are given in the output for  \code{\link{print.sienaEffects}}.\cr
+  The prior distribution for the basic rate parameters is determined
   in a data-dependent way. For the non-varying parameters,
-  a flat prior is assumed.\cr
-  The frequentist option currently is not supported (may be broken).\cr
+  a flat prior is assumed. \cr
+  The frequentist option currently is not supported (probably broken).\cr
   The procedure consists of three parts: initialization, warming,
   main phase.\cr
-  The required dimensions of the prior parameters \code{priorMu} and
-  \code{priorSigma} are given in the output for
-  \code{\link{print.sienaEffects}}.\cr
   In the initialization phase, initial parameter values and the proposal
   covariance matrix for Metropolis-Hastings steps for groupwise parameters
   are obtained from, first, Method of Moments estimation of a parameter vector

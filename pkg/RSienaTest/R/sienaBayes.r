@@ -201,8 +201,6 @@ browser()
 					z$scaleFactor0 * multiplier[z$nGroup+1]
 			z$scaleFactorEta <<-
 					z$scaleFactorEta * multiplier[z$nGroup+2]
-#cat("a")
-#browser()
 			if (any(is.na(z$scaleFactors)))
 			{
 				cat('\nany(is.na(z$scaleFactors)) in improveMH\n')
@@ -283,7 +281,18 @@ browser()
 			# for use in dmvnorm2 in sampleVaryingParameters
 			z$SigmaTemp.evs <<-
 				eigen(z$SigmaTemp, symmetric=TRUE, only.values=TRUE)$values
-			z$SigmaTemp.inv <<- chol2inv(chol(z$SigmaTemp))
+			if (inherits(try(z$SigmaTemp.inv <<- chol2inv(chol(z$SigmaTemp)),
+					silent=TRUE), "try-error"))
+			{
+				cat('Covariance matrix z$SigmaTemp is non-invertible;\n')
+				if (nmain <= z$p2 + 2)
+				{
+					cat('this may be because nmain is too small;\n or')
+				}
+				cat('perhaps the model is not identified; please check.\n')
+				stop('Inversion error in Cholesky decomposition.')
+			}
+#			z$SigmaTemp.inv <<- chol2inv(chol(z$SigmaTemp))
 
 			for (i2 in 1:nSampVar)
 			{
@@ -513,9 +522,6 @@ browser()
 	# do the chamarrita
 	# get a multivariate normal with covariance matrix
 	# proposalC0eta multiplied by a scale factor
-#cat("SampleConstantParameters\n")
-#browser()
-
 		etaChange <- mvrnorm(1, mu=rep(0, sum(z$set2)),
 							Sigma=z$scaleFactorEta * z$proposalC0eta)
 		thetaOld <- z$thetaMat
@@ -719,8 +725,6 @@ browser()
 	##@averageTheta internal sienaBayes; algorithm to average past theta values
 	averageTheta <- function()
 	{
-#	cat('averageTheta\n')
-#drop browser()
 		thetaMean <- rep(NA, z$pp)
 		for (group in 1:z$nGroup)
 		{
@@ -734,6 +738,10 @@ browser()
 		if (any(z$set2))
 		{
 			thetaMean[z$set2] <- colMeans(z$ThinPosteriorEta[,, drop=FALSE])
+		}
+		if (any(z$fix))
+		{
+			thetaMean[z$fix] <- z$thetaMat[1,z$fix]
 		}
 		thetaMean
 	}
@@ -768,7 +776,7 @@ browser()
     ## ###################################### ##
 	if (getDocumentation != FALSE)
 	{
-		if (getDocumentation == TRUE)
+	if (getDocumentation == TRUE)
 		{
 			tt <- getInternals()
 			return(tt)
@@ -788,6 +796,11 @@ browser()
 	cat('\n')
 	ctime1 <- proc.time()[1]
 	ctime <- proc.time()[1]
+	if (any(effects$test))
+	{
+		cat("Specification that some effects are tested is canceled.\n")
+		effects$test[effects$test] <- FALSE
+	}
 
 	if (is.null(prevBayes))
 	{
@@ -801,6 +814,7 @@ browser()
 						incidentalBasicRates=incidentalBasicRates,
 						reductionFactor=reductionFactor, gamma=gamma,
 						delta=delta, nmain=nmain, nwarm=nwarm,
+						nImproveMH=nImproveMH,
 						lengthPhase1=lengthPhase1, lengthPhase3=lengthPhase3,
 						prevAns=prevAns, silentstart=silentstart,
 						clusterType=clusterType)
@@ -929,7 +943,7 @@ browser()
 		cat('Second ')
 		improveMH(totruns=nImproveMH)
 		ctime4<- proc.time()[1]
-		cat('Second improveMH', ctime4-ctime3,'seconds.\n')
+		cat('Second improveMH', ctime4-ctime1,'seconds.\n')
 		flush.console()
 	}
 	else # (!is.null(prevBayes))
@@ -1038,8 +1052,6 @@ browser()
 #	print(round(z$thetaMat,2))
 #		cat("\n")
 		flush.console()
-#cat("zm\n")
-#browser()
 #		scores.ans.last <- t(zm$ans.last$fra) # the scores a z$pp by z$nGroups matrix
 #		dfra.ans.last <- zm$ans.last$dff # the Hessian a sparse z$pp by z$pp matrix
 		if (frequentist)
@@ -1189,7 +1201,7 @@ browser()
 	z$frequentist <- frequentist
     z$FRAN <- NULL
     class(z) <- "sienaBayesFit"
-	
+
 	if (nbrNodes > 1 && z$observations > 1)
 	{
 		stopCluster(z$cl)
@@ -1210,7 +1222,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 						priorRatesFromData,
 						frequentist, incidentalBasicRates,
 						reductionFactor, gamma, delta,
-						nmain, nwarm,
+						nmain, nwarm, nImproveMH,
 						lengthPhase1, lengthPhase3,
 						prevAns, silentstart, clusterType=c("PSOCK", "FORK"))
 {
@@ -1220,97 +1232,120 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	precision <- function(z)
 	{
 		## require(MASS)
-#		t(z$dfrac) %*% ginv(z$msfc) %*% z$dfrac
-# The ...c versions are corrected and have identity rows/columns
+# Perhaps think of	t(z$dfrac) %*% ginv(z$msfc) %*% z$dfrac
+# But the ...c versions are corrected and have identity rows/columns
 # for fixed parameters. This correction is not to be employed here.
 		t(z$dfra) %*% ginv(z$msf) %*% z$dfra
 	}#end precision in initializeBayes
-
-	##@runCumSum internal initializeBayes used for projectEffects only
-	runCumSum <- function(x)
-	{
-	# A function that makes cumulative sums of uninterrupted runs
-	# for logical vectors
-	# e.g., FTTFFFTFTTTTF produces 0120001012340
-		cumsum.inrun <- rep(0,length(x))
-		if (x[1]) {cumsum.inrun[1] <- 1}
-		for (i in 2:length(x))
-		{
-			if (x[i]){cumsum.inrun[i] <- cumsum.inrun[i-1]+1}
-		}
-		cumsum.inrun
-	}
 
 	##@projectEffects internal initializeBayes project model specification
 	# modified version of updateTheta
 	# model specification of prevAnss is transferred to effs for group ii
 	# and !randomEffects are fixed.
+	# Since interactions are defined by referring for the interacting effects
+	# to numbers in the effects object,
+	# and the within-group effects object has a different numbering
+	# than the multi-group effects object,
+	# the main effects are treated in a more easy way,
+	# and the interaction effects are treated specially.
 	projectEffects <- function(effs, prevAnss, ii)
 	{
-		prevEffects <- prevAnss$requestedEffects
-		prevEffects$initialValue <- prevAnss$theta
-		# Some tricks need to be done to get matches on interactions right
-		oldInteract <- (prevEffects$shortName %in% c("unspInt" , "behUnspInt"))
-		newInteract <- (effs$shortName %in% c("unspInt", "behUnspInt"))
-		oldInterNumber <- runCumSum(oldInteract)
-		newInterNumber <- (runCumSum(newInteract) + 2) %/% 3
-		# the + 2) %/% 3 takes care of the eval/endow/creation multiplicities
-		oldlist <- apply(prevEffects, 1, function(x)
+		prevEffects <- prevAnss$effects
+		prevReqEffects <- prevAnss$requestedEffects
+		prevefflist <- apply(prevEffects, 1, function(x)
 						paste(x[c("name", "shortName",
 								"type",
 								"interaction1", "interaction2",
 								"period")],
 							collapse="|"))
-		oldlist <- paste(oldlist,oldInterNumber)
+		reqefflist <- apply(prevReqEffects, 1, function(x)
+						paste(x[c("name", "shortName",
+								"type",
+								"interaction1", "interaction2",
+								"period")],
+							collapse="|"))
+		includeEff <-  prevefflist %in% reqefflist
+	# this is the list of requested effects;
+	# if any interactions are included in prevEffects without some
+	# corresponding main effects then prevEffects contains, in addition,
+	# those main effects .
+		prevReqEffects$initialValue <- prevAnss$theta
+# this is the same as prevReqEffects <- updateTheta(prevEffects, prevAnss)
+# but without also including the interactions:
+# since interacting effects have identifying numbers (effects1, effects2, effects3)
+# that differ between prefReqEffects and effs,
+# they must be treated separately.
+		oldInteract <- (prevReqEffects$shortName %in% c("unspInt" , "behUnspInt"))
+		oldlist <- apply(prevReqEffects[(!oldInteract),], 1, function(x)
+						paste(x[c("name", "shortName",
+								"type",
+								"interaction1", "interaction2",
+								"period")],
+							collapse="|"))
 		efflist <- apply(effs, 1, function(x)
 						paste(x[c("name", "shortName",
 								"type",
 								"interaction1", "interaction2",
 								"period")],
 							collapse="|"))
-		efflist <- paste(efflist,newInterNumber)
 		use <- efflist %in% oldlist
+		# first define the include column for the main effects
 		effs$include[use] <-
-			prevEffects$include[match(efflist, oldlist)][use]
-		effs$initialValue[use] <-
-			prevEffects$initialValue[match(efflist, oldlist)][use]
-		effs$initialValue[effs$basicRate] <-
-			prevEffects$initialValue[
-				prevEffects$basicRate & (prevEffects$group == ii)]
-		effs$fix[effs$include] <-
-			(!prevEffects$randomEffects[na.omit(match(efflist,oldlist))])|
-			(prevEffects$fix[na.omit(match(efflist,oldlist))])
-# In the full effects object used for prevAnss,
-# the basic rate parameters are duplicated for all groups,
-# whereas in the effs objcet they are there only for
-# a single group.
-# This means that the effect numbers are different;
-# since effect numbers are used to define the interactions
-# in effect1, effect2, effect3,
-# the different sequence numbers must be taken into account.
-# The vector of {differences between sequence numbers
-# in the effects object for prevAnss and effs} of
-# objective function effects is:
-# number of basic rate effects per dep. var. =
-#    sum(effs$shortName=="Rate")/length(unique(effs$name))
-# * (number of groups - 1)
-# * sequence number in effs of dependent variable =
-#    match(effs$name,unique(effs$name))
-		depVarNumber <- sapply(unique(effs$name),
-						function(a){match(a, unique(effs$name))})
-		extraRates <-  sum(effs$shortName=="Rate") *
-				(max(prevAnss$requestedEffects$group)-1) /
-				length(unique(effs$name))
-		position.Difference <- as.vector(extraRates * depVarNumber[effs$name])
-		effs$effect1[use] <-
-			pmax((prevEffects[prevAnss$requestedEffects$group==1,])$effect1 -
-								position.Difference[use], 0)
-		effs$effect2[use] <-
-			pmax((prevEffects[prevAnss$requestedEffects$group==1,])$effect2 -
-								position.Difference[use], 0)
-		effs$effect3[use] <-
-			pmax((prevEffects[prevAnss$requestedEffects$group==1,])$effect3 -
-								position.Difference[use], 0)
+			prevReqEffects$include[match(efflist, oldlist)][use]
+		# this is all TRUE;
+		# these are only for the main effects (!oldInteract);
+		# now treat the include column for the interactions
+		if (sum(oldInteract) >= 1)
+		{
+			# get the characteristics of the interactions
+			Names <- prevReqEffects$name[oldInteract]
+			Types <- prevReqEffects$type[oldInteract]
+			Parameters <- prevReqEffects$parm[oldInteract]
+			effects1 <- prevReqEffects$effect1[oldInteract]
+			effects2 <- prevReqEffects$effect2[oldInteract]
+			effects3 <- prevReqEffects$effect3[oldInteract]
+			# look up the interacting main effects
+			shortNames1 <- effects[effects1,'shortName']
+			shortNames2 <- effects[effects2,'shortName']
+			shortNames3 <- effects[effects3,'shortName']
+			interactions11 <- effects[effects1,'interaction1']
+			interactions12 <- effects[effects2,'interaction1']
+			interactions13 <- effects[effects3,'interaction1']
+			interactions21 <- effects[effects1,'interaction2']
+			interactions22 <- effects[effects2,'interaction2']
+			interactions23 <- effects[effects3,'interaction2']
+			# put the interactions in the groupwise effects object
+			for (i in seq_along(effects1))
+			{
+				if (effects3[i] == 0)
+				{
+					effs <- includeInteraction(effs,
+						shortNames1[i], shortNames2[i], name=Names[i],
+						interaction1=c(interactions11[i], interactions12[i]),
+						interaction2=c(interactions21[i], interactions22[i]),
+						type=Types[i], parameter=Parameters[i],
+						character=TRUE, verbose=FALSE)
+				}
+				else
+				{
+					effs <- includeInteraction(effs,
+						shortNames1[i], shortNames2[i], shortNames3[i], name=Names[i],
+		interaction1=c(interactions11[i], interactions12[i], interactions13[i]),
+		interaction2=c(interactions21[i], interactions22[i], interactions23[i]),
+						type=Types[i], parameter=Parameters[i],
+						character=TRUE, verbose=FALSE)
+				}
+			}
+		}
+		# now continue with columns initialValue and fix effs.
+		effs$initialValue[effs$include & (!effs$basicRate)]	<-
+				prevReqEffects$initialValue[
+			prevReqEffects$include & (!prevReqEffects$basicRate)]
+		effs$initialValue[effs$basicRate] <- prevReqEffects$initialValue[
+			(prevReqEffects$basicRate) & (prevReqEffects$group == ii)]
+		effs$fix[effs$include & (!effs$basicRate)] <-
+			(!prevReqEffects$randomEffects | prevReqEffects$fix)[
+			prevReqEffects$include & (!prevReqEffects$basicRate)]
 		effs
 	}#end projectEffects in initializeBayes
 
@@ -1469,7 +1504,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 				"\nwhich is too large for good operation of this function.\n",
 				"\nAdvice: use a smaller value of initgainGlobal;\n",
 				"or, if possible, first estimate a multi-group project using siena07\n",
-				"and use this as prevAns in sienaBayes with initgainGlobal=0.\n\n")				
+				"and use this as prevAns in sienaBayes with initgainGlobal=0.\n\n")
 		save(startupGlobal, file="startupGlobal.RData")
 		cat("startupGlobal saved.\n")
 		stop("Divergent initial estimate.")
@@ -1637,11 +1672,18 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		else
 		{
 			effects0 <- getEffects(data[[i]])
+			# take out the default effects in the objective function.
+			# these will be added in projectEffects if they are included in startupGlobal
+			# (which normally will be the case, but not always).
+			effects0[effects0$shortName=='density','include'] <- FALSE
+			effects0[effects0$shortName=='recip','include'] <- FALSE
+			effects0[effects0$shortName=='linear','include'] <- FALSE
+			effects0[effects0$shortName=='quad','include'] <- FALSE
+			# The following function copies the model specification,
+			# except for the basic rate effects for other groups,
+			# copies estimated values in startupGlobal to initial values in effects0,
+			# and fixes non-random effects.
 			effects0 <- projectEffects(effects0,startupGlobal,i)
-			# projectEffects also fixes the !randomEffects effects.
-			# get the parameter values from the global fit:
-			effects0$initialValue[effects0$include] <-
-				startupGlobal$theta[use]
 			cat("Estimate initial parameters group", i, "\n")
 			startup1 <- siena07(startup1Model, data=data[[i]],
 					effects=effects0, batch=TRUE, silent=silentstart)
@@ -1686,6 +1728,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	} # end for (i in 1:ngroups)
 
 	z$effectName <- effects0$effectName[effects0$include]
+	z$effectDepvar <- effects0$name[effects0$include]
 	z$requestedEffects <- startup1$requestedEffects
 
    	z$FRAN <- getFromNamespace(algo$FRANname, pkgname)
@@ -1693,9 +1736,10 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
                 prevAns=prevAns, initC=FALSE, onlyLoglik=TRUE)
 	z$thetaMat <- initialEstimates
 	z$basicRate <- z$requestedEffects$basicRate
+	z$fix <- z$requestedEffects$fix
     z$nGroup <- z$f$nGroup
 
-	if (max(abs(initialEstimates[,!z$basicRate]), na.rm=TRUE) > 40)
+	if (max(abs(initialEstimates[,(!z$basicRate)&(!z$fix)]), na.rm=TRUE) > 40)
 	{
 		cat("\nThe initial estimates are\n")
 		print(initialEstimates)
@@ -1939,6 +1983,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	}
 	z$nwarm <- nwarm
 	z$nmain <- nmain
+	z$nImproveMH <- nImproveMH
+	z$priorRatesFromData <- priorRatesFromData
 	z$lengthPhase1 <- lengthPhase1
 	z$lengthPhase3 <- lengthPhase3
 
@@ -2163,8 +2209,10 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	z$pp <- z1$pp
 	z$cconditional <- z1$cconditional
 	z$rate <- z1$rate
+	z$nImproveMH  <- z1$nImproveMH  
 	z$nwarm  <- z1$nwarm
 	z$nmain  <- z1$nmain + z2$nwarm+z2$nmain - nwarm2
+	what <- ''
 	if (z1$mult == z2$mult)
 	{
 		z$mult <- z1$mult
@@ -2172,6 +2220,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- 'mult;'
 	}
 	if (z1$nrunMHBatches == z2$nrunMHBatches)
 	{
@@ -2180,6 +2229,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'nrunMHBatches;')
 	}
 	if (z1$nSampConst == z2$nSampConst)
 	{
@@ -2188,6 +2238,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'nSampConst;')
 	}
 	if (z1$nSampVarying == z2$nSampVarying)
 	{
@@ -2196,6 +2247,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'nSampVarying;')
 	}
 	if (z1$nSampRates == z2$nSampRates)
 	{
@@ -2204,6 +2256,16 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'nSampRates;')
+	}
+	if (all(z1$fix == z2$fix))
+	{
+		z$fix <- z1$fix
+	}
+	else
+	{
+		dif <- TRUE
+		what <- paste(what, 'fix')
 	}
 	if (all(z1$effectName == z2$effectName))
 	{
@@ -2212,6 +2274,16 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'effectName;')
+	}
+	if (all(z1$effectDepvar == z2$effectDepvar))
+	{
+		z$effectDepvar <- z1$effectDepvar
+	}
+	else
+	{
+		dif <- TRUE
+		what <- paste(what, 'effectDepvar;')
 	}
 	if (all(z1$groupNames == z2$groupNames))
 	{
@@ -2220,6 +2292,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'groupNames;')
 	}
 	if (all(z1$ratesInVarying == z2$ratesInVarying))
 	{
@@ -2228,6 +2301,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'ratesInVarying;')
 	}
 	if (z1$TruNumPars == z2$TruNumPars)
 	{
@@ -2236,10 +2310,11 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'TruNumPars;')
 	}
 	if (dif)
 	{
-		stop("The two objects do not have the same specification.")
+		stop(paste("The two objects do not have the same specification. Difference in:", what))
 	}
 	if (all(z1$priorMu[!z1$ratesInVarying] == z2$priorMu[!z2$ratesInVarying]))
 	{
@@ -2248,6 +2323,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'priorMu;')
 	}
 	if (all(z1$priorSigma[!z1$ratesInVarying,!z1$ratesInVarying] ==
 				z2$priorSigma[!z2$ratesInVarying, !z2$ratesInVarying]))
@@ -2257,6 +2333,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'priorSigma;')
 	}
 	if (z1$priorKappa == z2$priorKappa)
 	{
@@ -2265,6 +2342,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'priorKappa;')
 	}
 	if (z1$priorDf == z2$priorDf)
 	{
@@ -2273,10 +2351,11 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	else
 	{
 		dif <- TRUE
+		what <- paste(what, 'priorDf;')
 	}
 	if (dif)
 	{
-		stop("The two objects do not have the same specification.")
+		stop(paste("The two objects do not have the same prior. Difference in:", what))
 	}
 	z$initialResults <- z1$initialResults
 	z$nGroup <- z1$nGroup

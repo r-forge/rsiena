@@ -54,14 +54,11 @@ DiffusionRateEffect::DiffusionRateEffect(const NetworkVariable * pVariable,
 		possibleDegreeNumer *= max(this->lpVariable->n(), this->lpVariable->m());
 		possibleDegreeDenom = max(this->lpVariable->n(), this->lpVariable->m());
 	}
-	if (effectName == "infectIn")
+	if ((effectName == "infectDeg") | (effectName == "infectIn") |
+										(effectName == "infectOut"))
 	{
 		possibleDegreeNumer *= max(this->lpVariable->n(),
 				this->lpVariable->m());
-	}
-	if (effectName == "infectOut")
-	{
-		possibleDegreeNumer *= max(this->lpVariable->n(), this->lpVariable->m());
 	}
 	this->lpTable = new DiffusionEffectValueTable(possibleDegreeNumer,
 			possibleDegreeDenom);
@@ -126,7 +123,8 @@ double DiffusionRateEffect::proximityValue(Network * pNetwork, int i,
 			{
 				alterValue *= pNetwork->inDegree(iter.actor());
 			}
-			else if (this->leffectName == "infectOut")
+			else if ((this->leffectName == "infectDeg") |
+						(this->leffectName == "infectOut"))
 			{
 				alterValue *= pNetwork->outDegree(iter.actor());
 			}
@@ -166,6 +164,7 @@ double DiffusionRateEffect::value(int i, int period) const
 			max(1, pNetwork->outDegree(i)));
 	}
 	else if (this->leffectName == "totExposure" ||
+		this->leffectName == "infectDeg" ||
 		this->leffectName == "infectIn" ||
 		this->leffectName == "infectOut")
 	{

@@ -95,7 +95,6 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05, maxit=20)
                     )
     ## make sure the effects are in the right order.
     mydf$effects <- factor(mydf$effects, levels=unique(mydf$effects))
-    ##count the score tests
 
     ## produce meta analysis object
     dometa <- function(x)
@@ -181,13 +180,32 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05, maxit=20)
     }
 
     meta <- by(mydf, mydf$effects, dometa)
+# copy effect specification and ML estimates
+# to components requestedEffects, theta and se
+	requestedEffects <- ex[[1]]$requestedEffects
+	if (dim(requestedEffects)[1] != length(unique(mydf$effects))){
+		cat('\nWarning: length requestedEffects incorrect.\n')
+		print(requestedEffects)
+		print(mydf$effects)
+	}
+	meta.theta <- sapply(meta,
+					function(x){ifelse(is.null(x$mu.ml),NA,x$mu.ml)})
+	meta.theta[is.na(meta.theta)] <- 0
+	meta.se <- sapply(meta,
+					function(x){ifelse(is.null(x$mu.ml.se),NA,x$mu.ml.se)})
+	names(meta.theta) <- rep('', length(meta.theta))
+	names(meta.se) <- rep('', length(meta.se))
+# add everything to the meta object created
     meta$thetadf <- mydf
     class(meta) <- "sienaMeta"
     meta$projname <- projname
     meta$bound <- bound
     ## count the score tests
-    meta$scores <- by(mydf, mydf$effects, function(x)
-                      any(!is.na(x$scoretests)))
+    meta$scores <- by(mydf, mydf$effects,
+					function(x){any(!is.na(x$scoretests))})
+	meta$requestedEffects <- requestedEffects
+	meta$theta <- meta.theta
+	meta$se <- meta.se
     meta
 }
 
@@ -633,7 +651,7 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
 						format(round(y$regsummary$coefficients[1, 1], 4), width=9),
 						" (s.e.", format(round(y$regsummary$coefficients[1, 2], 4),
 							width=9), "), two-sided ",
-						reportp(pt(y$regsummary$coefficients[1, 3],
+						reportp(2*pt(-abs(y$regsummary$coefficients[1, 3]),
 								y$n1 - 1), 3), "\n"), sep="", outf)
 				Report(c("based on IWLS modification of Snijders & Baerveldt (2003). ",
 						"\n\n"), sep="", outf)
@@ -645,6 +663,32 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
 						"\n"), sep="", outf)
 				Report(c("based on IWLS modification of Snijders & Baerveldt (2003).",
 						"\n\n"), sep="", outf)
+
+				Report(c("Estimates and confidence intervals under normality",
+                    "assumptions\n"), outf)
+				Report(c("-------------------------------------------------------",
+                    "-------\n"), outf)
+				Report(c("Estimated mean parameter",
+                    format(round(y$mu.ml, 4), width=9),
+                    " (s.e.",format(round(y$mu.ml.se, 4), width=9),
+                    "), two-sided ",
+                    reportp(2 * pt(-abs(y$mu.ml/y$mu.ml.se),
+                                   y$n1 - 1), 3), "\n"), sep="", outf)
+				Report(c(format(round(y$mu.confint[3], 2), width=4),
+                    "level confidence interval [",
+                    format(round(y$mu.confint[1], 4), width=7),
+                    ",",
+                    format(round(y$mu.confint[2], 4), width=7), "]\n"), outf)
+				Report(c("Estimated standard deviation",
+                    ifelse((y$sigma.ml > 0.0001) | (y$sigma.ml < 0.0000001),
+                           format(round(y$sigma.ml, 4), width=9), " < 0.0001"),
+                     "\n"), outf)
+				Report(c(format(round(y$sigma.confint[3], 2), width=4),
+                    "level confidence interval [",
+                    format(round(y$sigma.confint[1], 4), width=7),
+                    ",",
+                    format(round(y$sigma.confint[2], 4), width=7), "]\n\n"), outf)
+
 				Report("Fisher's combination of one-sided tests\n", outf)
 				Report("----------------------------------------\n", outf)
 				Report("Combination of right one-sided p-values:\n", outf)

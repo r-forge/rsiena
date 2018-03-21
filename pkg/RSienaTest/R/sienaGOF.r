@@ -35,7 +35,7 @@ sienaGOF <- function(
 	{
 		if (!sienaFitObject$sf2.byIterations)
     	{
-        	stop("sienaGOF needs sf2 by iterations")
+        	stop("sienaGOF needs sf2 by iterations (use lessMem=FALSE)")
     	}
 	}
 	iterations <- length(sienaFitObject$sims)
@@ -131,13 +131,15 @@ sienaGOF <- function(
 							if (verbose && (i %% 100 == 0) )
 								{
 								cat("  > Completed ", i,
-										" calculations\n")
+										" calculations\r")
 								flush.console()
 								}
 								auxiliaryFunction(i,
 										sienaFitObject$f,
 										sienaFitObject$sims, j, groupName, varName, ...)
 						})
+					cat("  > Completed ", iterations, " calculations\n")
+					flush.console()
 					simStatsByPeriod <-
 							matrix(simStatsByPeriod, ncol=iterations)
 					dimnames(simStatsByPeriod)[[2]] <-	1:iterations

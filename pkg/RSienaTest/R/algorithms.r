@@ -1010,11 +1010,11 @@ profDerivFn <- function(theta, z, fix, thetaFix)
 }
 
 ##@clearStoredChains algorithms Clears storage used for chains in C.
-clearStoredChains <- function()
-{
-	f <- FRANstore()
-	.Call(C_clearStoredChains, PACKAGE=pkgname, f$pModel)
-}
+#clearStoredChains <- function()
+#{
+#	f <- FRANstore()
+#	.Call(C_clearStoredChains, PACKAGE=pkgname, f$pModel)
+#}
 
 ##@doChangeStep algorithms change step for use in algorithms NB may be out of sync with phase 2
 doChangeStep <- function(z, x, fra)

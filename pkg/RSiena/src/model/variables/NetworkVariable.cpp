@@ -610,6 +610,10 @@ void NetworkVariable::makeChange(int actor)
 		{
 			this->accumulateScores(alter);
 		}
+		if (this->pSimulation()->pModel()->needDerivatives())
+		{
+			this->accumulateDerivatives(); // ABC
+		}		
 	}
 //	 NB  the probabilities in the reported chain are probably wrong for !accept
 	if (this->pSimulation()->pModel()->needChain())

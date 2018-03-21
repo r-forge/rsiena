@@ -161,7 +161,7 @@ run_effects <- function(sformula, eff) {
 	eff
 }
 
-#' Conveniece wrapper to siena07.
+#' Convenience wrapper to siena07.
 #'
 #' @param sformula a model specification as produced by `siena_formula`
 #' @param control algorithm specification as produced by `model.create`

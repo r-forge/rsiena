@@ -1571,7 +1571,7 @@ void getStatistics(SEXP EFFECTSLIST,
 		const StatisticCalculator * pCalculator,
 		int period, int group, const Data *pData,
 		const EpochSimulation * pEpochSimulation,
-		vector<double> * rfra, vector<double> *rscore)
+		vector<double> * rfra, vector<double> *rscore, vector<double> * rderiv) // ABC
 {
 
 	// get the column names from the names attribute
@@ -1788,6 +1788,7 @@ void getStatistics(SEXP EFFECTSLIST,
 								strcmp(effectName, "totExposure") == 0 ||
 								strcmp(effectName, "susceptAvIn") == 0 ||
 								strcmp(effectName, "infectIn") == 0 ||
+								strcmp(effectName, "infectDeg") == 0 ||
 								strcmp(effectName, "infectOut") == 0 ||
 								strcmp(effectName, "susceptAvCovar") == 0 ||
 								strcmp(effectName, "infectCovar") == 0)
@@ -1923,6 +1924,99 @@ void getStatistics(SEXP EFFECTSLIST,
 			istore++; /* keep forgetting to move the ++ */
 		}
 	}
+
+// ABC
+// the following just copied from getScores;
+// with pMLSimulation replaced by pEpochSimulation
+// and everything for score dropped;
+// this of course should be integrated with the above.
+// ABCD
+if (false){
+	int storederiv = 0;
+
+	for (int ii = 0; ii < length(EFFECTSLIST); ii++)
+	{
+		const char * networkName =
+			CHAR(STRING_ELT(VECTOR_ELT(VECTOR_ELT(EFFECTSLIST, ii),
+							nameCol), 0));
+		SEXP EFFECTS = VECTOR_ELT(EFFECTSLIST, ii);
+
+		for (int i = 0; i < length(VECTOR_ELT(EFFECTS,0)); i++)
+		{
+			const char * effectName =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, effectCol),  i));
+			const char * effectType =
+				CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), i));
+			if (strcmp(effectType, "rate") == 0)
+			{
+				if (strcmp(effectName, "Rate") == 0)
+				{
+					int groupno =
+						INTEGER(VECTOR_ELT(EFFECTS, groupCol))[i];
+					int periodno =
+						INTEGER(VECTOR_ELT(EFFECTS, periodCol))[i];
+					if ((periodno - 1) == period && (groupno - 1) == group)
+					{
+					if (pEpochSimulation)
+						{
+							const DependentVariable * pVariable =
+								pEpochSimulation->pVariable(networkName);
+							(*rderiv)[storederiv++] =
+										pVariable->basicRateDerivative();
+						}
+						else
+						{
+							(*rderiv)[storederiv++] = 0;
+						}
+					}
+				}
+				else
+				{
+					// Non constant rate effects not yet implemented here ABC
+					// Also symmetric networks probably not implemented.
+					(*rderiv)[storederiv++] = 0;
+				}
+			}
+			else if ((strcmp(effectType, "eval") == 0) ||
+			(strcmp(effectType, "endow") == 0) || (strcmp(effectType, "creation") == 0) )
+			{
+				if (pEpochSimulation)
+				{
+					EffectInfo * pEffectInfo = (EffectInfo *)
+						R_ExternalPtrAddr(VECTOR_ELT(VECTOR_ELT(EFFECTS,
+									pointerCol), i));
+				// get the map of derivatives
+					map<const EffectInfo *, double > deriv =
+						pEpochSimulation->derivative(pEffectInfo);
+					for (int j = 0; j < length(VECTOR_ELT(EFFECTS,0)); j++)
+					{
+						const char * effectType =
+							CHAR(STRING_ELT(VECTOR_ELT(EFFECTS, typeCol), j));
+						if ((strcmp(effectType, "eval") == 0) ||
+			(strcmp(effectType, "endow") == 0) || (strcmp(effectType, "creation") == 0) )
+						{
+						//	Rprintf("%s %s \n", effectType, netType);
+							EffectInfo * pEffectInfo2 = (EffectInfo *)
+								R_ExternalPtrAddr(
+									VECTOR_ELT(VECTOR_ELT(EFFECTS,
+											pointerCol), j));
+//		NEXT THING TO TRY IS INCLUDE THIS		ABCD
+			(*rderiv)[storederiv++] =
+							pEpochSimulation->derivative(pEffectInfo, pEffectInfo2);
+						}
+					}
+				}
+				else
+				{
+//		AND THIS ABCD
+					(*rderiv)[storederiv++] = 0;
+				}
+			}
+		}
+	}
+// ABCD
+}
+
 	UNPROTECT(1);
 }
 

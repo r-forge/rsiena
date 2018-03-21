@@ -1,3 +1,90 @@
+2018-03-21 R-Forge Revision 332, packages version 1.2-9.
+Changes in RSiena and RSienaTest:
+   * model/effects/generic: Remove const from some of the value methods (as
+     it was in rev316).
+   * new effect group covarBehaviorSymmetricRate (effects.r,
+     effectsDocumentation.r).
+   * Added effects avExposure, totExposure, infectDeg,
+     susceptAvCovar, infectCovar for symmetric networks.
+   * New effects degAbsDiffX, degPosDiffX, degNegDiffX, degAbsContrX,
+     degPosContrX, degNegContrX,
+   * New effect group dyadBipartiteObjective (effects.r).
+   * Effects XWX, XWX1, and XWX2 enabled for bipartite networks.
+   * Added parameter=2 for FFDeg, BBDegm FBDeg, FRDeg, BRDeg.
+   * Corrected altInDist2, totInDist2 for two-mode networks.
+   * Dropped some duplications in effectsDocumentation.
+   * Modification of effect outTrunc2 (TruncatedOutdegreeEffect2).
+     Perhaps this was superfluous.
+   * Export of last simulated state from ML simulations if
+     returnDeps: new function gotoLastState() in MLSimulation, adaptation of
+     mlPeriod() in siena07models.cpp, and some other small changes.
+   * Added endowment and creation effects for maxAlt and minAlt.
+   * Error messages for non-character nodeSets in sienaDependent, coCovar, varCovar.
+   * Improved way of handling missings for distance-2 network effects.
+   * Added components requestedEffects, theta, and se to siena08
+     (theta and se are the ML estimates).
+   * Error in summary of sienaMeta object corrected:
+     for the Estimated mean parameter the two-sided p was announced but a
+     one-sided p was given. Also the ML results under normality assumptions
+     were copied from print.sienaMeta to print.summary.sienaMeta.
+   * Drop transTriads<-TRUE in effects.r, so that initial model
+     for non-directed networks contains only basic rates and degree effect.
+   * Added reference to DESCRIPTION and citation info in \inst.
+   * The dropping of the exclusion in effects.r of effects if the variance of a
+     covariate is 0, or a covariate has only two values, of version 1.1-306,
+     is  taken further (was incomplete).
+   * Message if attributes higher, disjoint, or atLeastOne are TRUE
+     at the end of sienaDataCreate.
+   * Incomplete changes toward export of observed information matrix for MoM
+     (derivative of score function): extensions to getStatistics in
+     siena07internals, implying also changes in siena07models.cpp,
+     Networkvariable.cpp, BehaviorVariable.cpp.
+   * Added altInDist2 test to parallel.R (test12, test13).
+Changes in RSiena:
+   * siena07internals.cpp, siena07model.cpp, and siena07setup.cpp brought
+     in line with RSienaTest.
+Changes in RSienaTest:
+   * new function extract.posteriorMeans for sienaBayes results.
+   * Add z$fix to sienaBayes object, and use !z$fix in check of maximum
+     estimated parameter value after initialization.
+   * Correct construction of groupwise effects object in sienaBayes so that this
+     will work also when evaluation effects for density and/or reciprocity are
+     not included; and when there are interaction effects for which the main
+     effects are not included.
+   * Corrections for print and summary of sienaBayes objects.
+     In print.sienaBayesFit:
+     include fixed parameters and give credibility intervals
+     for rate parameters;
+     also give posterior means and credibility intervals for standard deviations
+     of randomly varying parameters;
+     allow shorter ThinParameters;
+     print objects returned through partialBayesResult.RData.
+   * multipleBayesTest corrected (there was an error for testing 2 or more
+     linear combinations simultaneously) and adapted for cases with fixed
+     parameters;
+     adapted help file text.
+   * All remaining parts of rsiena01gui removed.
+   * As a compensation of this, sienaDataCreateFromSession exported,
+     with a more informative help page.
+
+2017-09-18 R-Forge Revision 331
+Changes in RSienaTest:
+   * simplify/harden configure.ac
+     Compiling examples and trying to load them should prove more robust against
+     the ongoing changes in the R-Forge build setup.
+
+2017-09-18 R-Forge Revisions 328-330
+Changes in RSienaTest:
+   * Added \R\formula.R and \tests\formula.R.
+
+2017-09-18 R-Forge Revision 325
+Changes in RSienaTest:
+   * Added \doc\tutorial-effect.tex
+
+2017-09-18 R-Forge Revision 323
+Changes in RSienaTest:
+   * StatisticCalculator.cpp: delete Network clones not owned by State.
+
 2017-09-18 R-Forge Revision 322
 Changes in RSiena:
    * StatisticCalculator.cpp: delete Network clones not owned by State.
@@ -129,8 +216,8 @@ Changes in RSienaTest:
    * Terminated open connection at the end of sienacpp (CInterface.r).
 Changes in RSiena:
    * New parameter OffSet in sienaAlgorithmCreate.
-   * Registration of native routines (init.c, 
-     using tools::package_native_routine_registration_skeleton, 
+   * Registration of native routines (init.c,
+     using tools::package_native_routine_registration_skeleton,
      \fixes in NAMESPACE, changed specifications of arguments of .Call,
      and with help from Brian and Ruth Ripley).
 

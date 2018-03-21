@@ -52,7 +52,7 @@ void TwoPathFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double TwoPathFunction::value(int alter) const
+double TwoPathFunction::value(int alter)
 {
 	return this->lpTable->get(alter);
 }
