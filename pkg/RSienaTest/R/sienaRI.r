@@ -34,6 +34,9 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL,
 		{
 			stop("sienaRI does not yet work for models containing endowment or creation effects")
 		}
+		if (any(ans$effects$shortName %in% c("unspInt", "behUnspInt"))){
+			stop("sienaRI does not yet work for models containing interaction effects")
+		}
 		contributions <- getChangeContributions(algorithm = ans$x, data = data,
 			effects = ans$effects)
 		# contributions[[1]] is periods by effects by actors by actors

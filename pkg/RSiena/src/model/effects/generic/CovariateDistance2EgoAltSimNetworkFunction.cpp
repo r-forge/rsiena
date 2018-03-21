@@ -31,7 +31,7 @@ namespace siena
 CovariateDistance2EgoAltSimNetworkFunction::
 CovariateDistance2EgoAltSimNetworkFunction(string networkName, string
 	covariateName, bool excludeMissing, bool incoming) :
-	CovariateDistance2NetworkFunction(networkName, covariateName)
+	CovariateDistance2NetworkFunction(networkName, covariateName, excludeMissing, incoming)
 {
 	this->lexcludeMissing = excludeMissing;
 	this->lincoming = incoming;
@@ -43,7 +43,7 @@ CovariateDistance2EgoAltSimNetworkFunction(string networkName, string
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double CovariateDistance2EgoAltSimNetworkFunction::value(int alter) const
+double CovariateDistance2EgoAltSimNetworkFunction::value(int alter)
 {
 	double value = 0;
 	if (lincoming)

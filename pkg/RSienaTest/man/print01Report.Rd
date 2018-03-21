@@ -26,9 +26,6 @@ print01Report(data, modelname = "Siena", getDocumentation=FALSE)
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
-\seealso{
- \code{\link{siena01Gui}}
-}
 
 \examples{
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))

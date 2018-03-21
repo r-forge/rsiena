@@ -3,7 +3,8 @@ useDynLib(RSienaTest, .registration = TRUE, .fixes="C_")
 export(
 	coCovar, coDyadCovar, getEffects, model.create, print01Report, siena07,
 	sienaCompositionChange, updateTheta, updateSpecification,
-	sienaCompositionChangeFromFile, sienaDataCreate, sienaGroupCreate,
+	sienaCompositionChangeFromFile, sienaDataCreate, sienaDataCreateFromSession,
+	sienaGroupCreate,
 	sienaModelCreate, sienaAlgorithmCreate, sienaNet, sienaDependent,
 	sienaNodeSet, xtable.sienaFit, varCovar, varDyadCovar, setEffect,
 	includeEffects, includeInteraction, effectsDocumentation,
@@ -15,8 +16,8 @@ export(
 )
 
 export(
-	siena01Gui, sienaBayes, glueBayes, simpleBayesTest, multipleBayesTest,
-	extract.sienaBayes, algorithms, profileLikelihoods, installGui,
+	sienaBayes, glueBayes, simpleBayesTest, multipleBayesTest,
+	extract.sienaBayes, extract.posteriorMeans, algorithms, profileLikelihoods,
 	sienaRIDynamics
 )
 

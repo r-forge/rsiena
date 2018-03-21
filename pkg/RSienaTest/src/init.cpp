@@ -5,7 +5,7 @@
 #include "siena07models.h"
 #include "RInterface.h"
 
-// R stuff last redifine length macro
+// R stuff last redefine length macro
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
@@ -40,7 +40,7 @@ static const R_CallMethodDef CallEntries[] = {
 	CALLDEF(interactionEffects, 2),
 	CALLDEF(mlInitializeSubProcesses, 10),
 	CALLDEF(mlMakeChains, 9),
-	CALLDEF(mlPeriod, 13),
+	CALLDEF(mlPeriod, 14),
 	CALLDEF(OneMode, 2),
 	CALLDEF(setupData, 2),
 	CALLDEF(setupModelOptions, 12),

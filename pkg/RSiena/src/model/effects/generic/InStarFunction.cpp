@@ -52,7 +52,7 @@ void InStarFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double InStarFunction::value(int alter) const
+double InStarFunction::value(int alter)
 {
 	return this->lpTable->get(alter);
 }

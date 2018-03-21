@@ -30,7 +30,7 @@ MissingCovariatePredicate::MissingCovariatePredicate(string covariateName) :
  * that the predicate has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-bool MissingCovariatePredicate::value(int alter) const
+bool MissingCovariatePredicate::value(int alter)
 {
 	return this->missing(this->ego()) || this->missing(alter);
 }

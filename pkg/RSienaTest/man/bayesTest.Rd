@@ -59,18 +59,24 @@ multipleBayesTest(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits=4)
  \code{simpleBayesTest} gives information also contained in
  \code{\link{print.sienaBayesFit}}.\cr
  To use \code{multipleBayesTest}, it is advisable first to execute
- \code{simpleBayesTest} to see the numbers that should be used in the
- \dots parameter.\cr
- \code{multipleBayesTest} tests the hypothesis that
- the multivariate parameter for the effects indicated in \dots is equal to
- \code{tested0}. If \dots is a set or vector of numbers then the parameters
- with these numbers are tested; if \dots is a \code{k * p} matrix,
- the tested hypothesis is for the linear combinations defined by its rows.
+ \code{simpleBayesTest} to see the numbers that index the \code{testedPar}
+ parameter;  or its columns, if it is a matrix.\cr
+ \code{multipleBayesTest} tests the hypothesis that the multivariate parameter
+ for the effects defined by \code{testedPar} is equal to \code{tested0}.
+ If  \code{testedPar} is a set or vector of numbers then the parameters
+ with these numbers are tested; if \code{testedPar} is a \code{k * p} matrix,
+ the tested hypothesis is for the \code{k} linear combinations defined by its
+ rows, and the number of columns \code{p} should be equal to the number of
+ non-rate effects,  which is the same as the number of effects listed by
+ \code{simpleBayesTest}.\cr
  For the test, distances (for one parameter) or Mahalanobis distances
  (for more than one parameter) of the elements
  of the posterior sample from the posterior mean are calculated,
- and the p-value is the relative frequency that these are greater than the
+ and the \code{p}-value is the relative frequency that these are greater than the
  distance between the tested value and the posterior mean.\cr
+ The \code{p}-values reported by \code{simpleBayesTest} are one-sided, and those
+ reported by \code{multipleBayesTest} are two-sided for \code{k=1},
+ and 'all-sided' if \code{k} is larger than 1.\cr
  The plot presents a density plot of the posterior Mahalanobis distances,
  and the observed distance is indicated by a vertical line (if within
  the plot window).
@@ -79,22 +85,22 @@ multipleBayesTest(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits=4)
  effects their names,
  an indication of whether or not they are varying parameters,
  and test results.
- For each parameter separately, (for the varying parameters) the across-group
+ For each parameter separately, (for the varying parameters) the population
  mean or (for the non-varying parameters) the value is tested.
  The test results are the posterior credibility intervals for the
  probability limits defined by \code{probs},
  and the posterior probabilities of values larger than \code{tested0}.\cr
  \code{multipleBayesTest} produces an object of type \code{multipleBayesTest}
  which is a list with values:
- \item{prob}{posterior p-value}
+ \item{prob}{posterior \code{p}-value}
  \item{chisquared}{test statistic}
   \item{postDistances}{sample from posterior of distances from \code{tested0}}
   \item{nullValue}{input value of \code{tested0}}
   \item{effectNames}{names of effects tested as given in \dots}
   \item{posteriorSample}{sample from posterior of tested effects}
- \code{print.multipleBayesTest} prints the p-value with an explanation; and
-     the proportions of all sign patterns (of deviations from 0)
-     in the sample from the posterior.\cr
+ \code{print.multipleBayesTest} prints the posterior \code{p}-value with an
+     explanation; and the proportions of all sign patterns
+     (of deviations from 0) in the sample from the posterior.\cr
  \code{plot.multipleBayesTest} plots the density function of
     \code{x$postDistances}.\cr
   }

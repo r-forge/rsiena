@@ -314,6 +314,7 @@ void DependentVariable::initializeRateFunction()
 					effectName == "totExposure" ||
 					effectName == "susceptAvIn" ||
 					effectName == "infectIn" ||
+					effectName == "infectDeg" ||
 					effectName == "infectOut")
 				{
 					if (this->lpActorSet != pVariable->pSenders())
@@ -1087,6 +1088,7 @@ void DependentVariable::accumulateRateScores(double tau,
 						effectName == "totExposure" ||
 						effectName == "susceptAvIn" ||
 						effectName == "infectIn" ||
+						effectName == "infectDeg" ||
 						effectName == "infectOut")
 					{
 						this->ldiffusionscores[pInfo] +=
@@ -1745,7 +1747,7 @@ double DependentVariable::calculateDiffusionRateEffect(
 			{
 				alterValue *= pNetwork->inDegree(i);
 			}
-			else if (effectName == "infectOut")
+			else if ((effectName == "infectOut") | (effectName == "infectDeg"))
 			{
 				alterValue *= pNetwork->outDegree(i);
 			}

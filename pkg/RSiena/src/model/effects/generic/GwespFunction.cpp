@@ -66,7 +66,7 @@ void GwespFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double GwespFunction::value(int alter) const
+double GwespFunction::value(int alter)
 {
 	int statistic = lpInitialisedTable->get(alter);
 	return this->lcumulativeWeight[statistic];

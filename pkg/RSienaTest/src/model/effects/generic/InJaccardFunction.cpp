@@ -53,7 +53,7 @@ void InJaccardFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double InJaccardFunction::value(int alter) const
+double InJaccardFunction::value(int alter)
 {
 	const Network * pNetwork = this->pNetwork();
 	double statistic = 0;

@@ -1094,5 +1094,4 @@ Chain * makeChainFromList(Data * pData, SEXP CHAIN, int period)
 	return pChain;
 }
 
-
 }

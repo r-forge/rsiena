@@ -52,7 +52,7 @@ void OutStarFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double OutStarFunction::value(int alter) const
+double OutStarFunction::value(int alter)
 {
 	return this->lpTable->get(alter);
 }

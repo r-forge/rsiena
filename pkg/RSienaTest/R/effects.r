@@ -384,8 +384,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 				objEffects$type == "eval",
 			c('include', "initialValue", "untrimmedValue")] <-
 				list(TRUE, starts$degree, starts$untrimmed)
-			objEffects[objEffects$shortName=='transTriads' &
-				objEffects$type=='eval','include'] <- TRUE
+#			objEffects[objEffects$shortName=='transTriads' &
+#					   objEffects$type=='eval','include'] <- TRUE
 		}
 		else
 		{
@@ -775,6 +775,17 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 						groupName=groupName, group=group,
 						netType=netType))
 			}
+			if (attr(xx$dycCovars[[j]], "type") == "oneMode" &&
+				(nodeSets[2] == attr(xx$dycCovars[[j]], 'nodeSet')[1]) &&
+				(nodeSets[2] == attr(xx$dycCovars[[j]], 'nodeSet')[2]) )
+			{
+				objEffects <- rbind(objEffects,
+					createEffects("dyadSecondBipartiteObjective",
+						names(xx$dycCovars)[j],
+						name=varname,
+						groupName=groupName, group=group,
+						netType=netType))
+			}
 		}
 		for (j in seq(along = xx$dyvCovars))
 		{
@@ -784,6 +795,17 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 				objEffects <- rbind(objEffects,
 					createEffects("dyadBipartiteObjective",
 						names(xx$dyvCovars)[j],
+						name=varname,
+						groupName=groupName, group=group,
+						netType=netType))
+			}
+			if (attr(xx$dyvCovars[[j]], "type") == "oneMode" &&
+				(nodeSets[2] == attr(xx$dyvCovars[[j]], 'nodeSet')[1]) &&
+				(nodeSets[2] == attr(xx$dyvCovars[[j]], 'nodeSet')[2]) )
+			{
+				objEffects <- rbind(objEffects,
+					createEffects("dyadSecondBipartiteObjective",
+						names(xx$dycCovars)[j],
 						name=varname,
 						groupName=groupName, group=group,
 						netType=netType))
@@ -998,27 +1020,28 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 				netType=netType)
 		}
 
-		if (!tr & (!poszvar))  # not (positive variance of z, or any z missing)
-		{
-			if (symmetric)
-			{
-				covObjEffects <-
-					covObjEffects[covObjEffects$shortName %in%
-					c("altX", "altSqX"), ]
-			}
-			else
-			{
-				covObjEffects <-
-					covObjEffects[covObjEffects$shortName %in%
-					c("egoX", "egoSqX"), ]
-			}
-		}
-		if (!tr & (!moreThan2))
-		{
-			covObjEffects <-
-				covObjEffects[!covObjEffects$shortName %in%
-				c("altSqX", "egoPlusAltSqX"), ]
-		}
+# these lines tentatively dropped version 1.2-5
+#		if (!tr & (!poszvar))  # not (positive variance of z, or any z missing)
+#		{
+#			if (symmetric)
+#			{
+#				covObjEffects <-
+#					covObjEffects[covObjEffects$shortName %in%
+#					c("altX", "altSqX"), ]
+#			}
+#			else
+#			{
+#				covObjEffects <-
+#					covObjEffects[covObjEffects$shortName %in%
+#					c("egoX", "egoSqX"), ]
+#			}
+#		}
+#		if (!tr & (!moreThan2))
+#		{
+#			covObjEffects <-
+#				covObjEffects[!covObjEffects$shortName %in%
+#				c("altSqX", "egoPlusAltSqX"), ]
+#		}
 
 		list(objEff=covObjEffects, rateEff=covRateEffects)
 	}
@@ -1038,6 +1061,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 			covObjEffects <-
 				covObjEffects[covObjEffects$shortName %in%
 				c("egoX", "egoSqX", "egoLThresholdX", "egoRThresholdX",
+					"degAbsDiffX", "degPosDiffX", "degNegDiffX",
 					"altInDist2", "totInDist2",
 					"simEgoInDist2", "sameXInPop", "diffXInPop",
 					"sameXCycle4", "inPopX", "inActX"), ]
@@ -1108,18 +1132,25 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 							netType=netType, name=name)
 
 					covObjEffects <- rbind(covObjEffects, newEffects)
-					if (!attr(xx$depvars[[j]], "symmetric"))
+					if (attr(xx$depvars[[j]], "symmetric"))
 					{
-						covOneModeRateEffects <-
+						covBehRateEffects <-
+							createEffects("covarBehaviorSymmetricRate", varname,
+								yName=names(xx$depvars)[j],
+								zName=covarname,
+								groupName=groupName, group=group,
+								netType=netType, name=name)
+					}
+					else
+					{
+						covBehRateEffects <-
 							createEffects("covarBehaviorOneModeRate", varname,
 								yName=names(xx$depvars)[j],
 								zName=covarname,
 								groupName=groupName, group=group,
 								netType=netType, name=name)
-
-						covRateEffects <- rbind(covRateEffects,
-							covOneModeRateEffects)
 					}
+					covRateEffects <- rbind(covRateEffects, covBehRateEffects)
 				}
 				if ((types[j] == "bipartite" &&
 						attr(xx$depvars[[j]], 'nodeSet')[1] == nodeSet))

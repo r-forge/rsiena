@@ -23,7 +23,7 @@ class CovariateDistance2EgoAltSimNetworkFunction: public
 public:
 	CovariateDistance2EgoAltSimNetworkFunction(std::string networkName,
 		std::string covariateName, bool excludeMissing, bool incoming);
-	virtual double value(int alter) const;
+	virtual double value(int alter);
 
 private:
 	bool lexcludeMissing;

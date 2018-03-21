@@ -868,9 +868,10 @@ SEXP getTargets(SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 				period);
 			vector<double> statistic(nEffects);
 			vector<double> score(nEffects); /* not used */
+			vector<double> deriv(nEffects*nEffects); /* ABC not used */
 
 			getStatistics(EFFECTSLIST, &Calculator, period,
-					group, pData, (EpochSimulation *) 0, &statistic, &score);
+					group, pData, (EpochSimulation *) 0, &statistic, &score, &deriv); // ABC
 			//getStatistics(EFFECTSLIST, &Calculator, period,
 			//			group, pData, &Simulation,
 			//&statistic, &score);

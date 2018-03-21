@@ -37,7 +37,7 @@ public:
 	 * that the function has been initialized before and pre-processed with
 	 * respect to a certain ego.
 	 */
-	virtual double value(int alter) const = 0;
+	virtual double value(int alter) = 0;
 
 private:
 	int lego;

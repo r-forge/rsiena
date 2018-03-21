@@ -53,7 +53,7 @@ void MixedTwoPathFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double MixedTwoPathFunction::value(int alter) const
+double MixedTwoPathFunction::value(int alter)
 {
 	return this->lpTable->get(alter);
 }

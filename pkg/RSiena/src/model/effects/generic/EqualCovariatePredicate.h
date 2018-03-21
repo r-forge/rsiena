@@ -26,7 +26,7 @@ class EqualCovariatePredicate: public CovariatePredicate
 public:
 	EqualCovariatePredicate(std::string covariateName);
 
-	virtual bool value(int alter) const;
+	virtual bool value(int alter);
 };
 
 }

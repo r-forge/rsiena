@@ -48,7 +48,7 @@ public:
 		Cache * pCache);
 	virtual void preprocessEgo(int ego);
 
-	virtual double value(int alter) const;
+	virtual double value(int alter);
 
 private:
 	AlterPredicate * lpPredicate;

@@ -2,6 +2,5 @@
 suppressPackageStartupMessages(library(RSienaTest))
 suppressPackageStartupMessages(library(tcltk))
 RSienaTest:::DONE(FALSE)
-siena01Gui()
 while(!RSienaTest:::DONE()) {Sys.sleep(0.1)}
 

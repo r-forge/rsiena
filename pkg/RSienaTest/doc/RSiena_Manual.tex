@@ -58,7 +58,6 @@
 \newcommand{\mathbold}[1]{\mbox{\boldmath $\bf#1$}}
 \newcommand{\Reals}{\mbox{I} \! \mbox{R}}
 \newcommand{\+}{\, + \,}
-\renewcommand{\min}{\, - \,}
 \newcommand{\half}{{\textstyle \frac{1}{2}}}
 \newcommand{\neqsum}[3]
 {\, \sum_{\stackrel{\scriptstyle #1 = 1}{\scriptstyle #2 \neq #3}}^n \,}
@@ -186,7 +185,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-3.
+This version was renewed for \RS version 1.2-9.
 \end{abstract}
 
 
@@ -202,7 +201,6 @@ This version was renewed for \RS version 1.2-3.
 \makeatletter
 \def\@linkcolor{lc}
 \makeatother
-
 
 
 \section{General information}
@@ -315,10 +313,9 @@ which all contributed to the work on \si.
 \newpage
 %\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
 
-\part{Minimal Intro}
+\newpage
 
-
-\section{Giving references}
+\subsection{Giving references to RSiena}
 
 When using \si, it is appreciated that you refer to this manual and to one or
 more relevant references of the methods implemented in the program.  The
@@ -329,7 +326,7 @@ Ruth M. Ripley, Tom A.B. Snijders, Zs\'{o}fia Boda,
  Andr\'{a}s V\"{o}r\"{o}s, and Paulina Preciado, \the\year.
 Manual for SIENA version 4.0 (version \today).
 Oxford: University of Oxford, Department of Statistics; Nuffield College.
-\textsf{http://www.stats.ox.ac.uk/siena/}
+\textsf{http://www.stats.ox.ac.uk/~snijders/siena/}.
 \smallskip
 
 
@@ -855,7 +852,7 @@ of the software appear).
             in the regular way from CRAN.
             If you want to have detailed information about
             what is available at CRAN, go to\\
-\url{http://cran.r-project.org/web/packages/RSiena/} .\\     
+\url{http://cran.r-project.org/web/packages/RSiena/} .\\
             However, it is advisable to have the latest version of \RS
             or \sfn{RSienaTest} from R-Forge or the \SI website.
             You can go to\\
@@ -884,24 +881,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-3}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-9}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-3.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-9.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-3.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-9.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-3.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-9.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-3.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-9.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-3.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-9.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-3.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-9.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1099,12 +1096,12 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-3) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-9) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
   near the top, the revision number near the end. Both are also displayed at the
-  start of \SI output files produced by \sfn{print01Report()}.
+  start of \SI output files.
 \item[Check your version of \Rn] When there is a new version or revision of \RS
   it will only be available to you automatically if you are running the most
   recent major version of \Rn. (You can force an installation if
@@ -1133,7 +1130,6 @@ For technical problems running \rs, follow the following points.
 %\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
 
 \newpage
-\part{Users' manual}
 
 \section{Steps of modelling}
 \label{S_parts}
@@ -1222,8 +1218,23 @@ variables must be available for the same set of time points.
 
 \subsubsection{Network data}
 
-For data specification by the \textsf{sienaDependent} function, the network
+There can be one or more networks in the data set.
+Networks can be one-mode or two-mode.
+Modes are identified with node sets.
+All one-mode networks must have the same node set,
+also referred to as `actors'.
+If there are some one-mode networks and any two-mode networks,
+the first node set of all two-mode networks should be the node set
+(actor set) of the one-mode networks.
+The choice between one- and two-mode is specified by the argument
+\texttt{type} in  the \textsf{sienaDependent} function, which for
+networks can be \texttt{oneMode} or \texttt{bipartite};
+the latter signifies a two-mode network.
+
+For data specification by  \textsf{sienaDependent}, the network
 must be specified as a matrix or array or list of sparse matrix of triples.
+The help page for \textsf{sienaDependent} has an example of input
+by sparse matrices.
 
 For data specification by
 %the graphical interface \textsf{siena01Gui} (documented separately) or by
@@ -1237,8 +1248,8 @@ Note that  \textsf{sienaDataCreateFromSession} is available only
 in  \textsf{RSienaTest}.
 
 Sparse matrices, which can be used by input via
-\sfn{sienaDependent()}, have the same efficiency as Pajek or
-Siena format.
+\sfn{sienaDependent()}, have for running the estimations
+the same efficiency as Pajek or Siena format.
 %Data input as edge lists will also be made available by means of the
 %\textsf{sienaDependent} function (in some future version of \sn).
 The three possible formats for digraph input are as follows.
@@ -1309,7 +1320,7 @@ outside R. \fi
 
 Missing values must be indicated in the way usual for \Rn,
 by \texttt{NA}.
-For data specification by the function 
+For data specification by the function
 \textsf{sienaDataCreateFromSession},
 instead of \texttt{NA} any numerical code can be used
 given that this is indicated to be a missing value code.
@@ -1645,7 +1656,8 @@ The formula for balance is a kind of dissimilarity between rows of
 the adjacency matrix. The mean dissimilarity is subtracted in this
 formula, having been calculated according to a
 \hyperlink{T_meanbal}{formula given in Chapter}~\ref{S_math}.
-It is also reported in the output and available -- e.g., for the first
+It is also reported in the
+ output file produced by \sfn{print01Report()} and available -- e.g., for the first
 dependent variable -- as \texttt{attr(mydata\$depvars[[1]], "balmean")}.
 Instead of \texttt{[[1]]} you can request a different number or
 the name of the variable.
@@ -1855,7 +1867,7 @@ More in detail, the procedure is as follows.
 
 The simulations are carried out over all variables,
 as if they were complete.
-To enable this, missing data are imputed.
+To allow this, missing data are imputed.
 In the initial observation, missing entries in the adjacency
 matrix are set to 0,
 i.e., it is assumed that there is \emph{no} tie;
@@ -2169,14 +2181,24 @@ for practical research still is uncertain.
 A model specification with only evaluation effects and without creation and
 endowment effects leads to exactly the same network dynamics as a specification
 where these effects are turned into creation and endowment effects,
-with the same parameters.
-For any given effect, normally it makes no sense to include the effect
+if the same parameters would have exactly the same values.
+For any given effect, it makes no sense to include the effect
 in all three roles: evaluation, creation, endowment.
 If one wishes to go beyond evaluation effects, then the user has to choose
 between adding an effect in either the creation or the endowment role.
-\bigskip
 
-\newpage
+For any effect, the model specifications of (evaluation \& creation),
+(evaluation \& endowment), and (creation \& endowment) are equivalent,
+and pairs of parameters can be directly transformed into each other
+(cf.\ Section~\ref{S_c}),
+but the estimates by the Method of Moments will not have the same correspondence
+because different pairs of target statistics are used.
+Each of the pair specifications could be tried out, in principle.
+Perhaps the first two pair specifications, containing the evaluation
+effect and one of the other two, give the most precise estimates;
+but this is not necessarily always the case.
+
+
 \subsubsection{Elementary effects}
 \label{S_elementary}
 
@@ -2740,8 +2762,9 @@ important, followed by the effects of covariate-ego and
 covariate-alter.
 
 When the network dynamics is not smooth over the observation waves --- meaning that
-the pattern of ties created and terminated, as reported in the initial part of the output
-file under the heading \emph{Initial data description -- Change in networks --
+the pattern of ties created and terminated, as reported in the initial part of the
+output file produced by \sfn{print01Report()}
+under the heading \emph{Initial data description -- Change in networks --
 Tie changes between subsequent observations},
 is very irregular across the observation periods --- it can be important to include
 effects of time variables on the network.
@@ -2767,9 +2790,11 @@ can be included in the model for network evolution:
 \item the interaction effect of the dyadic covariate with reciprocity.
 \end{enumerate}
 \end{itemize}
-The main evaluation effect is usually the most important. In the
-current version of \si, there are no effects of dyadic covariates
-on behavioral evolution.
+The main evaluation effect is usually the most important.
+But dyadic covariates can also be transformed, e.g., to patterns
+of indirect connections, which then are again usable as dyadic covariates.
+Dyadic covariates can also be used in various ways as weights
+for behavioral evolution.
 
 \subsection{Cross-network effects for dynamics of multiple networks}
 
@@ -2923,6 +2948,34 @@ If $X$ and $W$ both are one-mode networks, the \emph{closure of W} effect
 \end{enumerate}
 
 
+\subsection{Constraints between networks}
+\label{S_constraints}
+
+When analysing multiple dependent networks, the following constraints
+between networks can be considered:
+\begin{description}
+  \item[disjoint:] for any given pair of actors $(i,j)$,
+      it is impossible that ties exists in both networks;
+  \item[higher:] for any given pair of actors $(i,j)$,
+      it is impossible that a tie exists in the first
+      but not in the second network;
+  \item[atleastone:] for any given pair of actors $(i,j)$,
+     there must be a tie in at least one of the networks.
+\end{description}
+Whether this is so, is indicated in the attributes of the data set
+(of class \texttt{siena}).
+These constraints are observed and set during the creation of the
+\texttt{siena} object in \sfn{sienaDataCreate}.
+When one of the constraints is true,
+this will be reported in the output of \sfn{print01Report}.
+These constraints will continue to be respected during the simulations.
+The constraints for the simulations can be changed by function
+\sfn{sienaDataConstraint}.
+
+This does not work for multigroup projects! By implication,
+it does not work for \sfn{sienaBayes}.
+
+
 \subsection{Effects on behavior evolution}
 \label{S_eff_beh}
 
@@ -2983,8 +3036,9 @@ The dependent behavior variable is referred to as $Z$.
 Effects 1 and 2 will practically always have to be included as control variables.
 (For dependent behavior variables with 2 categories, this applies only to effect 1.)
 When the behavior dynamics is not smooth over the observation waves --- meaning that
-the pattern of steps up and down, as reported in the initial part of the output
-file under the heading \emph{Initial data description -- Dependent actor variables -- Changes},
+the pattern of steps up and down, as reported in the initial part of the
+output file produced by \sfn{print01Report()}
+under the heading \emph{Initial data description -- Dependent actor variables -- Changes},
 is very irregular across the observation periods --- it can be important to include
 effects of time variables on the behavior.
 Time variables are changing actor covariates that depend only on the
@@ -3686,7 +3740,7 @@ the Generalized Method of Moments \citep*[`GMoM';][]{ASS2015};
  For non-constant rate functions, currently only
  MoM and GMoM estimation is available.
  The Method of Moments is the default;
- the other two methods require much more computing time.
+ ML and Bayesian estimation methods require much more computing time.
  Given the greater efficiency but longer required computing time
  for the ML and Bayesian methods,
  these can be useful especially for smaller data sets
@@ -4198,7 +4252,8 @@ this may have several reasons.
 
       Another possibility is that there is time heterogeneity.
       Indications about this can be gathered also from the descriptives
-      given in the start of the output file: the number of changes
+      given in the start of the output file produced by \sfn{print01Report()}:
+      the number of changes
       upward and downward, in the network and also -- if any -- in the
       dependent behavioral variable. If these do not show a smooth
       or similar pattern across the observations, then it may be useful
@@ -4287,14 +4342,18 @@ Further details are in the help file for \textsf{siena07}.
  \texttt{ans\$ac  }        \> autocorrelations of generated statistics in Phase 3  \\
  \texttt{ans\$sims }         \> simulated values of dependent variables
                                       in Phase 3 of the algorithm     \\
-                             \>     for Methods of Moments estimation
-                                        (see Section~\ref{S_sims}),    \\
                              \>  if \textsf{returnDeps = TRUE}
-                                        in the call of \textsf{siena07} \\
+                                        in the call of \textsf{siena07}; \\
+                             \> in case of Maximum Likelihood estimation (see Section~\ref{S_sims}), note that \\
+                             \> for observed tie variables the simulated values are
+                             equal to the observed; \\
+                             \> for missing tie variables, the simulated values can be regarded \\
+                             \> as model-based imputations \\
  \texttt{ans\$estMeans }     \> estimated expected values of the target statistics\\
                              \> (if the Dolby option was chosen, this is \\
                              \> not equal to the average of the simulations!)\\
  \texttt{ans\$effects }      \> the effects object with only the requested effects\\
+ \texttt{ans\$x }            \> the algorithm object used\\
  \texttt{ans\$f }            \> everything needed for the calculations in C++;\\
                              \> in particular, the data set is hidden in here,
                                 and can be reconstructed.\\
@@ -4544,7 +4603,7 @@ Section \ref{S_f}, the
 Therefore the
 estimated evaluation function here is
 \[
-\min 2.53 \, s_{i1}(x) \+ 2.11\, s_{i2}(x) \+ 0.54 \, s_{i3}(x)\+ 0.08 \, s_{i5}(x)\+ 0.45 \, s_{i\ref{simx}}(x)
+\,- 2.53 \, s_{i1}(x) \+ 2.11\, s_{i2}(x) \+ 0.54 \, s_{i3}(x)\+ 0.08 \, s_{i5}(x)\+ 0.45 \, s_{i\ref{simx}}(x)
 \]
 where again some rounding was applied in view of the standard errors.
 The parameter estimates can be combined with
@@ -5099,11 +5158,19 @@ unconditional estimation.
 \label{S_multipleProcesses}
 \begin{enumerate}
 \item
-If multiple processors are available, then using
-multiple processes can speed up the estimation in \sfn{siena07}.
-
-\item For estimation by Method of Moments (MoM),
-  in Phases 1 and 3 the simulations are performed in parallel. In Phase 2,
+  If multiple processors are available, then using
+  multiple processes can speed up the estimation in \sfn{siena07},
+  \sfn{sienacpp}, and \sfn{sienaGOF}.
+  You can find out the number of processes possible by
+\begin{verbatim}
+library(parallel)
+detectCores()
+\end{verbatim}
+  It is not advisable to utilize all available cores, because
+  other processes also have to run. If you are not the only user
+  of the machine, then there are obvious issues to be dealt with.
+\item For estimation by Method of Moments (MoM),  in Phases 1 and 3
+  the simulations are performed in parallel. In Phase 2,
   multiple (viz., \texttt{nbrNodes} which is a parameter
   given in the call of \sfn{siena07()}) simulations are done with the same parameters,
   and the resulting statistics are averaged for the updating step in the
@@ -5112,11 +5179,12 @@ multiple processes can speed up the estimation in \sfn{siena07}.
   the increased accuracy of the update.\\
   When using the MoM, decrease in computation time will be somewhat less
   than proportional to the number of processes used, if this number is less than
-  (say) 10; larger number of processes will have diminishing returns.
+  (say) 10; larger number of processes will have diminishing proportional
+  returns.
 
-\item For estimation by Maximum Likelihood (ML) and by \sfn{sienaBayes()}, parallelization
-  goes by period; for multi-group projects, period $\times$ group.
-  Therefore, for this type of estimation, the maximum meaningful number
+\item For estimation by Maximum Likelihood (ML) and by \sfn{sienaBayes()},
+  parallelization goes by period; for multi-group projects, period $\times$
+  group. Therefore, for this type of estimation, the maximum meaningful number
   of parallel processes is \\ (number of waves -- 1) $\times$ (number of groups).
 
 \item The parameters required to run all processes on one computer are fairly
@@ -5746,7 +5814,7 @@ restricting and estimating models, as small values of the test
 statistic indicate that the imposed restriction on the parameters is
 not problematic.
 
-\subsection{Testing differences between independent groups}
+\subsection{Testing differences between independent groups or periods}
 
 Sometimes it is interesting to test differences between parameters estimated for
 independent groups. For example, for work-related support networks analyzed in
@@ -5761,10 +5829,20 @@ If the parameter estimates in the two networks are $\hat\beta_a$ and $\hat\beta_
 with standard errors \textit{s.e}$_a$ and  \textit{s.e}$_b$, respectively,
 then the difference can be tested with the test statistic
 \begin{equation}
-    \frac{\hat\beta_a  - \hat\beta_b}{\sqrt{s.e_a^2 + s.e_b^2}} \ ,
+    \frac{\hat\beta_a  - \hat\beta_b}{\sqrt{(s.e_a)^2 + (s.e_b)^2}} \ ,
 \end{equation}
-which under the null hypothesis of equal parameters has an approximating
+which under the null hypothesis of equal parameters,
+$\beta_a = \beta_b$, has an approximating
 standard normal distribution.
+
+The same method can be used for comparing estimates obtained from
+separate analyses for different periods from a data set with three
+or more waves. For example, if there are three waves and separate analyses
+were done for period~1 (wave~1 -- wave~2) and  period~2 (wave~2 -- wave~3),
+then $\hat\beta_a$ could be an estimate obtained for period~1 while
+$\hat\beta_b$ would be the estimate for the same parameter for period~2.
+This is allowed because the analysis of period~2 conditions on wave~2.
+
 
 \newpage
 \subsection{Testing time heterogeneity in parameters}
@@ -6962,16 +7040,31 @@ parameter of \sfn{sienaBayes}.
 
 \subsubsection{Model specification}
 
-The extra part of model specification, compared to \sfn{siena07()},
+Non-constant rate functions currently are not supported in \sfn{sienaBayes}.
+
+The extra part of model specification for \sfn{sienaBayes},
+compared to \sfn{siena07},
 is that it is required to specify which parameters are
 randomly varying from group to group, and which are fixed across groups.
 The basic rate parameters always are randomly varying.
-Other rate parameters can not yet be included.
+The specification of fixed vs.\ randomly varying
+for the other parameters is done in the function
+\sfn{setEffect}, by its parameter \texttt{random}.
+To be able to see which of the effects are specified in this way,
+please have a look at the help page for \sfn{print.sienaEffects}:
+\begin{verbatim}
+?print.sienaEffects
+\end{verbatim}
+and note the parameters \texttt{includeRandoms}
+and \texttt{dropRates}, which are helpful especially for
+random coefficient multilevel modeling.
+Requesting \texttt{includeRandoms=TRUE} will show the column indicating
+which effects are random; \texttt{dropRates= TRUE} omits the
+rows with rate effects, which can be a lot of superfluous information
+that perhaps you do not want to see.
 
-The specification of fixed vs.\ randomly varying is done in the function
-\sfn{setEffect}.
-
-There currently is little advice about this.
+There currently is little advice about which effects to specify
+as randomly varying.
 The basic issues are the following.
 \begin{description}
 \item[\emph{interest:}] is variability of the effect across groups
@@ -6992,7 +7085,7 @@ The basic issues are the following.
     part of the model.)
 \item[\emph{amount of information:}] which specification will
      use the information in the data most efficiently?\\
-     (Here finally we do have an answer. Assuming that an effect is fixed
+     (Here finally we do have a provisional answer. Assuming that an effect is fixed
      across groups will give a smaller uncertainty ---posterior standard
      deviation, interpreted as standard error--- in the estimated parameter
      than assuming it varies randomly;
@@ -7071,13 +7164,22 @@ These are the rate parameters and the parameters specified with
 random = TRUE
 \end{verbatim}
 in the call of \texttt{setEffect}.
-The list and order of the randomly varying effects, except for the rate parameters,
-is shown by requesting
+For an effects object called \texttt{myeff}, you can see which
+parameters are specified as randomly varying by
 \begin{verbatim}
-myeff[myeff$randomEffects & myeff$include, ]
+print(myeff, includeRandoms=TRUE)
 \end{verbatim}
-if the effects object is called \texttt{myeff}.
+This will also tell you the number of random effects, which are the
+dimensions for the parameters \texttt{priorMu} and  \texttt{priorSigma}
+used to specify the prior distribution.
+The list and order of only the randomly varying effects
+can be shown by requesting
+\begin{verbatim}
+myeff[(myeff$randomEffects | (myeff$basicRate & (myeff$group==1) )) & myeff$include, ]
+\end{verbatim}
 \smallskip
+
+
 
 The prior mean of the varying parameters,
 \texttt{priorMu}, is a vector of length equal to the number of varying parameters.
@@ -7140,11 +7242,15 @@ Suppose that plausible values for the first rate parameter would
 be centered about 4 and for the second about 5,
 in both cases with a standard deviation of 1.4, corresponding
 to a variance of about 2.
-One could use the following piece of code.
+Suppose further that for the parameters of the objective function
+the prior mean for the density parameter is specified as $-1$,
+all other prior means as $0$, and all prior variances as $0.16$,
+corresponding to prior standard deviations of $0.4$.
+One then could use the following piece of code.
 \begin{verbatim}
-m7 <- c(4, 5, 0, 0, 0, 0, 0)
+m7 <- c(4, 5, -1, 0, 0, 0, 0)
 S7 <- matrix(0, 7, 7)
-diag(S7) <- c(2, 2, 1, 1, 1, 1, 1)
+diag(S7) <- c(2, 2, 0.16, 0.16, 0.16, 0.16, 0.16)
 ans <- sienaBayes(...., priorMu=m7, priorSigma=S7, priorDf=20,
                   priorRatesFromData = 0, ....)
 \end{verbatim}
@@ -7313,9 +7419,18 @@ the components
 ThinPosteriorEta}, and \texttt{ThinPosteriorSigma} of the
 \sfn{sienaBayesFit} object, as mentioned in the help page, may be useful.
 
+The function \sfn{extract.posteriorMeans()} can be used to obtain
+posterior means and standard deviations of the groupwise estimated
+parameters. These are like the `\emph{empirical Bayes}' estimates
+known also from other statistical models.
+
+The file \texttt{BayesPlots.r}, mentioned above, contains some plotting
+functions that are useful for making posterior density plots.
+
 It should be noted that the \texttt{.out} files produced by \sfn{sienaBayes()}
 are produced somewhere in the initial phase of the project and not meant
-to be informative for final results. They may be disregarded.
+to be informative for final results. They contain the results of the
+initial estimate by the multiple groups method and may be disregarded.
 \medskip
 
 When comparing results for specifications that differ with respect
@@ -7348,8 +7463,10 @@ effectsDocumentation(effects = myeff)
 will give a file with all effects implemented for this effects object.
 See
 \begin{verbatim}
-?effectsDocumentation \end{verbatim}
+?effectsDocumentation
+\end{verbatim}
 for further options.
+\bigskip
 
 This chapter present the mathematical formulae for the definition of the
 effects. Further background to these formulae can be found
@@ -7745,7 +7862,14 @@ the {\em number of four-cycles} with shortName \texttt{(cycle4)} \\
  endowment effect only likelihood-based because the Method of Moments
  estimators for endowment effects are based on the `loss' associated
  with terminated ties, and this cannot be straightforwardly applied
- for the number of distances two effect.
+ for the number of distances two effect.\\
+ This effect is difficult to interpret: actor $i$ can increase this effect by making a
+ new tie to an actor $j$ at distance 2 but also by dropping a direct tie to an
+ actor $j$ to whom $i$ is also connected via a two-path
+ $i \rightarrow h \rightarrow j$.
+ Instead of this effect it may be preferable to use one of the many other
+ effects representing closure (\texttt{transTrip}, \texttt{transTies},
+ the various gwesp effects, the various Jaccard effects, etc.).
 
  \item {\em number of doubly achieved distances two effect} \texttt{(nbrDist2twice)},
  defined by
@@ -7996,7 +8120,7 @@ $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha
  \item {\em out-degree up to $c$} (\emph{truncated out-degree}),
  where $c$ is some constant
  (internal effect parameter, see above),  there are two implementations here:
- \texttt{outTrunc} and \texttt{outTrunc2}, to enable the simultaneous use of this
+ \texttt{outTrunc} and \texttt{outTrunc2}, to allow the simultaneous use of this
  effect with 2 different internal effect parameters; the effect is
  defined by  \\
  $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;\\
@@ -8212,7 +8336,7 @@ Various different ways can be modeled in which
  (which will be reduced to a non-weighted network if $w_{ij}$ only
  assumes the values 0 and 1).
  By way of exception, the dyadic covariate
- is not centered in these three effects
+ is not centered in these effects
  (to make it better interpretable as a network).
  In the text and the pictures, an arrow with the letter $W$
  represents a tie according to the weighted network $W$.
@@ -8402,7 +8526,8 @@ Various different ways can be modeled in which
  is weighted by $w_{hj} $
  and the sum of these  weights measures the
  strength of the tendency toward closure of
- these mixed $X-W$ twopaths by a tie.
+ these mixed $X-W$ twopaths by a tie.\\
+ The covariate $W$ here always is used non-centered.
       \end{minipage}
 \hfill
 \begin{minipage}[t]{.15\textwidth}
@@ -8446,6 +8571,7 @@ by Maximum Likelihood and Bayesian estimation.
  In other words, only the $i \rightarrow j$ tie in the figure
  is the dependent variable here. The effect is defined as\\
  $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{hj}\,$;\\
+ The covariate $W$ here always is used non-centered.
 
 
 \begin{minipage}[t]{.7\textwidth}
@@ -8458,7 +8584,8 @@ by Maximum Likelihood and Bayesian estimation.
  $j \stackrel{W}{\rightarrow} h $.
  In other words, only the $i \rightarrow j$ tie in the figure here
  is the dependent variable. The effect is defined as\\
- $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{jh}\,$.
+ $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{jh}\,$.\\
+ The covariate $W$ here always is used non-centered.
 \end{minipage}
 \hfill
 \begin{minipage}[t]{.15\textwidth}
@@ -8558,6 +8685,33 @@ the following effects are available:
  is less than (to the right of) or equal to a threshold $c$,\\
  $s^{\rm net}_{i\vit}(x) = I\{v_i \leq c\} \, x_{i+} $;\\
  note that behavioral dependent variables always are centered!
+
+ \item {\em absolute difference outdegree -- covariate}
+ \texttt{(degAbsDiffX)},
+ defined by the absolute difference between $i$'s out-degree and his covariate value,\\
+ $s^{\rm net}_{i\vit}(x) = \ \mid x_{i+} \,-\, \lfloor v_i \rfloor \mid $;\\
+ here $\lfloor v_i \rfloor $ is $v_i$ truncated to the largest integer
+ not larger than $v_i$;
+ working with a non-centered covariate may be advisable for this effect;
+
+ \item {\em positive difference outdegree -- covariate}
+ \texttt{(degPosDiffX)},
+ defined by the positive part of the difference between $i$'s out-degree
+ and her covariate value,\\
+ $s^{\rm net}_{i\vit}(x) = \max \{ x_{i+} \,-\, \lfloor v_i \rfloor  ,\, 0 \} $;\\
+ here $\lfloor v_i \rfloor $ is $v_i$ truncated to the largest integer
+ not larger than $v_i$;
+ working with a non-centered covariate may be advisable for this effect;
+
+ \item {\em negative difference outdegree -- covariate}
+ \texttt{(degNegDiffX)},
+ defined by the negative part of the difference between $i$'s out-degree
+ and her covariate value,\\
+ $s^{\rm net}_{i\vit}(x) =  - \, \min \{ x_{i+} \,-\, \lfloor v_i \rfloor  ,\, 0 \}
+ \,=\, \max \{ \lfloor v_i \rfloor \,-\, x_{i+} ,\, 0 \}  $;\\
+ here $\lfloor v_i \rfloor $ is $v_i$ truncated to the largest integer
+ not larger than $v_i$;
+ working with a non-centered covariate may be advisable for this effect;
 
  \item \hypertarget{T_simx}{{\em covariate-related similarity}} \texttt{(simX)},
  \label{simx}
@@ -9073,9 +9227,9 @@ the generality already now.
 \label{S_NonDirEff}
 
 For non-directed networks
-\citep[see Section~\ref{S_modeltype_nd}][and]{SnijdersPickup16},
-in principle the same effects are used as above; you may
-search for 'non-directed' to see the cases where the definition of
+\citep[see Section~\ref{S_modeltype_nd} and][]{SnijdersPickup16},
+in principle the same effects are used as above; you may search
+in this manual for 'non-directed' to see the cases where the definition of
 an effect for non-directed networks deviates from the
 definition for directed networks.
 Here we present a few effects that are defined specifically for
@@ -10899,7 +11053,11 @@ dependent network variable by $x$.
 Here the dependent variable is transformed
 to have an overall average value of 0;
 in other words, $z$ denotes the original input variable
-minus the overall mean, which is given in the output file under the heading
+minus the overall mean\footnote{More precisely:
+this is the mean of the means per wave, and the
+means per wave are means of the non-missing observations
+for that wave.}, which is given in the
+output file produced by \sfn{print01Report()} under the heading
 \emph{Reading dependent actor variables}.
 
 First there are effects that have to do only
@@ -10964,6 +11122,10 @@ The list of these effects is the following.
  \item {\em outdegree effect} \texttt{(outdeg)}, \\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij} $;
 
+\item {\em reciprocated degree effect} \texttt{(recipDeg)}, \\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\,x_{ji} $;
+
+
 % \item {\em indegree up to $c$ effect}, where $c$ is a constant between 1 and $n-1$,\\
 % $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} \leq c\}$,\\
 % where again $I\{A\}$ denotes the indicator function of the condition $A$;
@@ -10972,7 +11134,6 @@ The list of these effects is the following.
   the differential attractiveness of the behavior for isolates, \\
  $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} = 0 \}$,\\
  where again $I\{A\}$ denotes the indicator function of the condition $A$;
-
 
  \item
  {\em average similarity $\times$ reciprocity effect} \texttt{(avSimRecip)},
@@ -11200,8 +11361,8 @@ The list of these effects is the following.
  behavior multiplied by the number of dense triads in which actor $i$ is
  located, \\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h} I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
- + x_{jh}\, + x_{hj}\,\geq c \}\,$,\\
- where $c$ is either 5 or 6; \\
+ + x_{jh}\, + x_{hj}\,\geq p \}\,$,\\
+ where the internal effect parameter $p$ is either 5 or 6; \\
 
  \item {\em similarity in dense triads effect} \texttt{(simDenseTriads)},
  defined by  the total sum of $i$'s behavior similarity to others
@@ -11221,9 +11382,6 @@ The list of these effects is the following.
  for symmetric networks, the unilateral condition is dropped, and the effect is\\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
  I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$;\\
-
- \item {\em reciprocated degree effect} \texttt{(recipDeg)}, \\
- $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\,x_{ji} $;
 
  \item {\em average similarity $\times$ popularity ego effect}
  \texttt{(avSimPopEgo)}, defined by the
@@ -11254,15 +11412,52 @@ For the combined degree-effects, mentioned first, \texttt{F} means `Forward',
 
 \begin{followenum}
  \item {\em double outdegree effect} \texttt{(FFDeg)},\\
- $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ij} \,$;
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ij} \,$;\\[0.2em]
+ if the internal effect parameter $p$ is at least~2, the outdegree
+ for $X_1$ is subtracted:\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \Big( \sum_j x_{1ij}\,x_{2ij} \,-\,
+  \sum_j x_{1ij} \Big)  \,$;\\
+  note that in this case, the factor between $\Big( \ldots \Big)$
+  is non-positive;
+
  \item {\em double indegree effect} \texttt{(BBDeg)},\\
- $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ji}\,x_{2ji} \,$;
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ji}\,x_{2ji} \,$;\\[0.2em]
+ if the internal effect parameter $p$ is at least~2, the indegree
+ for $X_1$ is subtracted:\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \Big( \sum_j x_{1ji}\,x_{2ji} \,-\,
+  \sum_j x_{1ji} \Big)  \,$;\\
+  note that also in this case, the factor between $\Big( \ldots \Big)$
+  is non-positive;
+
  \item {\em combined out-indegree effect} \texttt{(FBDeg)},\\
- $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ji} \,$;
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ji} \,$;\\[0.2em]
+ if the internal effect parameter $p$ is at least~2, the outdegree
+ for $X_1$ is subtracted:\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \Big( \sum_j x_{1ij}\,x_{2ji} \,-\,
+  \sum_j x_{1ij} \Big)  \,$;\\
+  note that also in this case, the factor between $\Big( \ldots \Big)$
+  is non-positive;
+
  \item {\em combined out-reciprocated degree effect} \texttt{(FRDeg)},\\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{2ij}\,x_{2ji}\, $;
+ \\[0.2em]
+ if the internal effect parameter $p$ is at least~2, the outdegree
+ for $X_1$ is subtracted:\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \Big( \sum_j x_{1ij}\,x_{2ij}\,x_{2ji}\,-\,
+  \sum_j x_{1ij} \Big)  \,$;\\
+  note that also in this case, the factor between $\Big( \ldots \Big)$
+  is non-positive;
+
  \item {\em combined in-reciprocated degree effect} \texttt{(BRDeg)},\\
- $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ji}\,x_{2ij}\,x_{2ji}\, $.
+ $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ji}\,x_{2ij}\,x_{2ji}\, $;
+ \\[0.2em]
+ if the internal effect parameter $p$ is at least~2, the indegree
+ for $X_1$ is subtracted:\\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i 
+ \Big( \sum_j x_{1ji}\,x_{2ij}\,x_{2ji} \,-\,  \sum_j x_{1ji} \Big)  \,$;\\
+  note that also in this case, the factor between $\Big( \ldots \Big)$
+  is non-positive.
+
 % \item {\em double reciprocated degree effect} \texttt{(RRDeg)},\\
 % $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{1ij}\,x_{1ji}\,x_{2ij}\,x_{2ji} \,$.
 \end{followenum}
@@ -11301,24 +11496,31 @@ denoted $v_j$), there are the following effects.
       This is similar to the `total alter' effect; for
       $v_i = z_i$ it would reduce to the latter effect.
 
-\item \emph{alter's  average of dyadic covariate } effect on behavior $z$
- \texttt{(avWAlt)},\\
-      defined as the product of $i$'s behavior $z_i$ and
-      $i$'s alters' dyadic covariate-average $\breve w_i$ as defined by
-\begin{equation}
-  \breve w_i = \left\{\begin{array}{ll} \displaystyle
-         \frac{\sum_h x_{ih}w_{ih}}{x_{i+}}  &  \text{ if } x_{i+} > 0     \\
-         0                                &  \text{ if } x_{i+} = 0  .
-  \end{array}   \right.            \label{alt_avwa}
-\end{equation}
-      leading to the effect \\
-       $s^{\rm beh}_{i\vit}(x, z) = z_i \, \breve w_i $.\\
 
-\item \emph{alter's  total of dyadic covariate W } effect on behavior $z$
- \texttt{(totWAlt)},\\
-      defined as the product of $i$'s behavior $z_i$ and
-      the sum of $i$'s alters' values of the dyadic covariate, \\
-       $s^{\rm beh}_{i\vit}(x, z) = z_i \, \sum_h x_{ih}w_{ih}  $.\\
+\item {\em absolute contrast outdegree -- covariate}
+ \texttt{(degAbsContrX)},
+ defined as the product of $i$'s behavior $z_i$ and
+ the absolute difference between $i$'s out-degree and his covariate value,\\
+ $s^{\rm beh}_{i\vit}(x, z) = \ z_i \, \mid x_{i+} \,-\, v_i  \mid $;\\
+ working with a non-centered covariate may be advisable for this effect;
+
+\item {\em positive contrast outdegree -- covariate}
+ \texttt{(degPosContrX)},
+ defined as the product of $i$'s behavior $z_i$ and
+ the positive part of the difference between $i$'s out-degree
+ and her covariate value,\\
+ $s^{\rm net}_{i\vit}(x) = \ z_i \, \max \{ x_{i+} \,-\,  v_i   ,\, 0 \} $;\\
+ working with a non-centered covariate may be advisable for this effect;
+
+\item {\em negative contrast outdegree -- covariate}
+ \texttt{(degNegContrX)},
+ defined as the product of $i$'s behavior $z_i$ and
+ the negative part of the difference between $i$'s out-degree
+ and her covariate value,\\
+ $s^{\rm net}_{i\vit}(x) =  - \, z_i \, \min \{ x_{i+} \,-\, v_i   ,\, 0 \}
+ \,=\, z_i \, \max \{  v_i  \,-\, x_{i+} ,\, 0 \}  $;\\
+ working with a non-centered covariate may be advisable for this effect;
+
 
 \item \emph{alter's covariate total } effect on behavior $z$
  \texttt{(totXAlt)},\\
@@ -11539,6 +11741,27 @@ will be preferable here to use non-centered covariates.
 
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
+
+
+\item \emph{alter's  average of dyadic covariate } effect on behavior $z$
+ \texttt{(avWAlt)},\\
+      defined as the product of $i$'s behavior $z_i$ and
+      $i$'s alters' dyadic covariate-average $\breve w_i$ as defined by
+\begin{equation}
+  \breve w_i = \left\{\begin{array}{ll} \displaystyle
+         \frac{\sum_h x_{ih}w_{ih}}{x_{i+}}  &  \text{ if } x_{i+} > 0     \\
+         0                                &  \text{ if } x_{i+} = 0  .
+  \end{array}   \right.            \label{alt_avwa}
+\end{equation}
+      leading to the effect \\
+       $s^{\rm beh}_{i\vit}(x, z) = z_i \, \breve w_i $.\\
+
+\item \emph{alter's  total of dyadic covariate W } effect on behavior $z$
+ \texttt{(totWAlt)},\\
+      defined as the product of $i$'s behavior $z_i$ and
+      the sum of $i$'s alters' values of the dyadic covariate, \\
+       $s^{\rm beh}_{i\vit}(x, z) = z_i \, \sum_h x_{ih}w_{ih}  $.\\
+
  \item {\em average alter weighted by dyadic covariate $W$}
                        \texttt{(avAltW)},
                        a weighted version of  \texttt{avAlt};\\
@@ -11715,38 +11938,42 @@ reciprocated degrees.
 \item \emph{average exposure effect} (\verb|avExposure|),
   defined as the proportion of $i$'s alters who have adopted the innovation,
 \[
-a_{i\vit}(y) = \frac{\sum_{j=1}^n z_j x_{ij} }{\sum_{j=1}^n x_{ij}};
+a_{i\vit}(y) = \frac{\sum_{j=1}^n z_j\, x_{ij} }{\sum_{j=1}^n x_{ij}};
 \]
 
 \item \emph{total exposure effect} (\verb|totExposure|), defined as the
  number of $i$'s alters who have adopted the innovation,
 \[
-a_{i\vit}(y) = \sum_{j=1}^n z_j x_{ij} ;
+a_{i\vit}(y) = \sum_{j=1}^n z_j\, x_{ij} ;
 \]
 \item \emph{infection by indegree effect} (\verb|infectIn|),
   defined as the sum of indegrees of $i$'s alters who are also adopters of the innovation,
 \[
-a_{i\vit}(y)=\sum_{j=1}^n z_j x_{ij}x_{+j};
+a_{i\vit}(y)=\sum_{j=1}^n z_j \,x_{ij}\, x_{+j};
 \]
+  for non-directed networks this is called the
+   \emph{infection by degree effect} (\verb|infectDeg|);
 \item \emph{infection by outdegree effect} (\verb|infectOut|),
  defined as the sum of outdegrees of $i$'s alters who are also adopters of the innovation,
 \[
-a_{i\vit}(y)=\sum_{j=1}^n z_j x_{ij}x_{j+};
+a_{i\vit}(y)=\sum_{j=1}^n z_j\, x_{ij}\, x_{j+};
 \]
 \item \emph{infection by covariate effect} (\verb|infectCovar|),
  defined as the sum of covariate values of $i$'s alters who are also adopters of the innovation,
 \[
-a_{i\vit}(y)=\sum_{j=1}^n z_j x_{ij} v_j;
+a_{i\vit}(y)=\sum_{j=1}^n z_j\, x_{ij}\, v_j;
 \]
 \item \emph{susceptibility to average exposure by indegree effect} (\verb|susceptAvIn|),
  defined as the interaction between $i$'s indegree and $i$'s average exposure,
 \[
-a_{i\vit}(y)=x_{+i} \frac{\sum_{j=1}^n z_j x_{ij}}{\sum_{j=1}^n x_{ij}};
+a_{i\vit}(y)=x_{+i} \frac{\sum_{j=1}^n z_j\, x_{ij}}{\sum_{j=1}^n x_{ij}};
 \]
+  for non-directed networks the equivalent effect is \verb|totExposure|;
+
 \item \emph{susceptibility to average exposure by covariate effect} (\verb|susceptAvCovar|),
   defined as the interaction between $i$'s covariate value and $i$'s  average exposure,
 \[
-a_{i\vit}(y)=v_{i} \frac{\sum_{j=1}^n z_j x_{ij}}{\sum_{j=1}^n x_{ij}}.
+a_{i\vit}(y)=v_{i} \frac{\sum_{j=1}^n z_j\, x_{ij}}{\sum_{j=1}^n x_{ij}}.
 \]
 
 \end{enumerate}
@@ -11948,6 +12175,61 @@ about all friends.
 When some variable $V$ occurs in several effects in the model,
 then its effects can best be understood
 by considering all these effects simultaneously.
+This section treats this issue for the case that $V$ is an
+actor variable with more than two values (for dichotomous
+variables the situation is simpler).
+
+As an example, consider the
+Glasgow data set from the Teenage Friends and Lifestyle Study of
+West et al.\ \citep{MichellWest1996,PearsonWest03,SteglichEA10}.
+We refer to any of these papers for a further description of the data.
+The data is used for the 129 students who were present at all three measurement
+times; this data set is available from the \SI website.
+We treat friendship as the dependent network, drinking as the
+dependent behaviour variable, and cannabis use (`drugs') as an
+actor covariate.
+Drinking has categories 1--5, coded as
+1 (none), 2 (once or twice a year), 3 (once a month), 4 (once a week),
+and 5 (more than once a week);
+cannabis use is coded 1 (none), 2 (tried once), 3 (occasional) and 4 (regular).
+The frequencies (over the three waves combined) of these substance
+use variables are given in Figure~\ref{F_DD}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.4\textwidth]{TableDrinking.png}
+  \hspace{1em}
+  \includegraphics[width=0.4\textwidth]{TableDrugs.png}
+  \caption{Frequencies of drinking and drug use over 3 waves combined.}\label{F_DD}
+\end{figure}
+
+For both actor variables, in the network part we use the
+four-parameter specification of \citet{SL2018}, which is
+a combination of the ego minus alter squared, alter squared,
+ego, and alter effects.
+
+The formulae in Section~\ref{S_f} imply that the
+components in the network evaluation function corresponding to the effects
+of variable $V$ are
+\begin{equation}
+\beta_{\rm sq.\ diff}  \sum_j x_{ij}\, (v_j - v_i)^2  \, + \,
+ \beta_{\rm ego}\, (v_i - \bar v) \, x_{i+}
+           \, + \, \beta_{\rm alter}  \sum_j x_{ij}\, (v_j - \bar v)
+ \, + \, \beta_{\rm sq.\ alter}  \sum_j x_{ij}\, (v_j - \bar v)^2  \ .
+          \label{eq_4par_V}
+\end{equation}
+The contribution to this formula of the single tie variable $x_{ij}$  ---
+i.e., the difference between the values of~(\ref{eq_4par_V}) for $x_{ij}=1$
+and $x_{ij}=0$  ---  is equal to
+\begin{equation}
+\beta_{\rm sq.\ diff}   (v_j - v_i)^2 \, + \,
+  \beta_{\rm ego}\, (v_i - \bar v)
+         \, + \, \beta_{\rm alter}\,  (v_j - \bar v) \, + \,
+      \beta_{\rm sq.\ alter}  \, (v_j - \bar v)^2   \ .
+                 \label{eq_4par}
+\end{equation}
+
+\iffalse
 For example, if in a network dynamics model the
 ego, alter, and similarity effects of a variable $V$ are specified,
 then the formulae for their contribution
@@ -11968,22 +12250,11 @@ with
 $\Delta_V=\max_{ij}\vert v_i - v_j \vert$ being
 the observed range of the covariate $v$
 and where $\widehat{{\rm sim}^v}$ is the mean of all similarity scores.
+
 The superscript $^{\rm net}$ is left out of the notation for the parameters
 in order not to clutter the notation.
 
-Similarly to how it was done above, the contribution to~(\ref{eq_contr_V})
-of the tie from $i$ to $j$, represented by the
-single tie variable $x_{ij}$ --- i.e., the difference
-between the values of~(\ref{eq_contr_V}) for $x_{ij}=1$
-and $x_{ij}=0$  ---  can be calculated from this formula.
-It should be noted that all variables are internally centered by \si,
-and that the mean values used for the centering
-are given near the beginning of the input file.
-More precision can be obtained by requesting the \textsf{"mean"}
-attributes of the covariates, as explained in
-Section~\ref{S_center}.
-This is made explicit in the following by the subtraction
-of the mean $\bar v$. The contribution of variable $V$ to the
+The contribution of variable $V$ to the
 network evaluation function of actor $i$ is given by
 \begin{align}
   &  \beta_{\rm ego}\, (v_i - \bar v)
@@ -11995,433 +12266,540 @@ network evaluation function of actor $i$ is given by
                      - \widehat{{\rm sim}^v} \Big) \ .
                  \label{eq_sel}
 \end{align}
-%Since constant additive terms do not make a difference,
-% we can just as well work with
-%\begin{equation}
-% \beta_{\rm ego}\, v_i  \, + \, \beta_{\rm alter}\,  v_j \,
-%         - \, \beta_{\rm sim} \,  \frac{\vert v_i - v_j \vert}{\Delta_V}  \ .
-%                 \label{eq_sel}
-%\end{equation}
-From this equation a table can be made that gives the
-outcome of (\ref{eq_sel}) for some values of $v_i$ and $v_j$.
+\fi
 
+It should be noted that all variables are internally centered by \si.
+The mean values used for the centering
+are given near the beginning of the file produced by
+\sfn{print01Report()} and are given by the \textsf{"mean"}
+attributes of the covariates, as explained in
+Section~\ref{S_center}.
+This is made explicit in the formulae by the subtraction
+of the mean $\bar v$.
+From this equation (\ref{eq_4par}) a table, or a plot, can be made
+that gives these contributions for some values of $v_i$ and $v_j$.
 
-This can be concretely carried out using the data set {\sf s50}
-which is an excerpt of 50 girls in the data set used in
-\citet{PearsonMichell00, PearsonWest03,
-SteglichEA06} and \citet{SteglichEA10}.
-We refer to any of these papers for a further description of the data.
-The friendship network data over 3 waves are in
-the files {\sf s50-network1.dat}, {\sf s50-network2.dat},
-and {\sf s50-network3.dat}.
-We also use the attribute data
-for alcohol use, {\sf s50-alcohol.dat}, as a dependent variable.
-It can be seen from the \SI output file using these data that
-the alcohol use variable assumes values from 1 to 5, with overall mean
-equal to $\bar v = 3.113$, and mean of the
-similarity variable $\widehat{{\rm sim}^v} = 0.6983$.
-Drug use is used as a changing actor variable, with
-range 1--4, average $\bar v = 1.5$ and
-average dyadic similarity $\widehat{{\rm sim}^v} = 0.7533$.
+From the output of \sfn{print01Report()} for these data it can be seen that
+the alcohol use variable assumes values from 1 to 5, with overall
+mean\footnote{The mean of the three means per wave.}
+equal to $\bar v = 2.99$.
+%, and mean of the similarity variable $\widehat{{\rm sim}^v} = 0.6983$.
+Drug use is a changing actor variable, with
+range 1--4, and mean $\bar v = 1.5$.
+% and average dyadic similarity $\widehat{{\rm sim}^v} = 0.7533$.
 
 Suppose that we fit a model of network-behavior co-evolution to this data set
 with for the network evolution the effects of outdegree, reciprocity,
-transitive ties, number of distances two,
-the ego, alter, and similarity effects of alcohol use,
-as well as the ego, alter, and similarity effects of drug use;
-and for the behavior (i.e., alcohol) dynamics
-the shape effect,
-the effect of alcohol on itself (quadratic shape effect),
-and the average similarity effect.
+geometrically weighted edgewise shared partners (`gwesp', in the
+\texttt{gwespFF} version, representing transitivity),
+indegree popularity, outdegree activity, outdegree popularity,
+and reciprocal degree activity; ego, alter, and same effect of sex;
+for drinking and drug use the four effects in (\ref{eq_4par_V});
+and for the  behavior (i.e., alcohol drinking) dynamics the
+effects linear shape, quadratic shape (effect of drinking on itself),
+and average alter.
 
-The results obtained are given in the following
-part of the output file.
+The results obtained are as follows.\\
 
-{\footnotesize
-\begin{verbatim}
-Network Dynamics
- 1. rate:  constant network rate (period 1)              8.2357  (   1.6225)
- 2. rate:  constant network rate (period 2)              5.6885  (   0.8434)
- 3. eval:  outdegree (density)                          -2.1287  (   0.1565)
- 4. eval:  reciprocity                                   2.3205  (   0.2132)
- 5. eval:  transitive ties                               0.2656  (   0.2025)
- 6. eval:  number of actors at distance 2               -0.9947  (   0.2173)
- 7. eval:  drink alter                                   0.0899  (   0.1184)
- 8. eval:  drink ego                                    -0.0100  (   0.1087)
- 9. eval:  drink similarity                              0.8994  (   0.5864)
-10. eval:  drug use alter                               -0.1295  (   0.1282)
-11. eval:  drug use ego                                  0.1362  (   0.1253)
-12. eval:  drug use similarity                           0.6650  (   0.3381)
-
-Behavior Dynamics
-13. rate:  rate drink period 1                           1.3376  (   0.3708)
-14. rate:  rate drink period 2                           1.8323  (   0.4546)
-15. eval:  behavior drink linear shape                   0.3618  (   0.1946)
-16. eval:  behavior drink quadratic shape               -0.0600  (   0.1181)
-17. eval:  behavior drink average similarity             3.9689  (   2.2053)
-\end{verbatim}
+{\small
+% Table based on sienaFit object ans5 , Sat Feb 03 18:03:20 2018
+\begin{center}
+\begin{tabular}{l | r@{.}l r@{.}l   }
+\hline
+\rule{0pt}{2ex}\relax
+Effect &\multicolumn{2}{c}{par.}&\multicolumn{2}{c  }{(s.e.)}  \\[0.5ex]
+\hline
+\multicolumn{4}{l}{\rule{0pt}{2.5ex}\relax \emph{Network Dynamics}}&\\
+\hline
+\rule{0pt}{2ex}\relax
+constant friendship rate (period 1) &   12 & 643 & (1 & 595)\\
+constant friendship rate (period 2) &   10 & 201 & (1 & 024)\\
+\hline
+\rule{0pt}{2ex}\relax
+outdegree (density)                 &  --2 & 723 & (0 & 304)\\
+reciprocity                         &    3 & 387 & (0 & 244)\\
+gwesp (transitivity)                &    1 & 847 & (0 & 088)\\
+indegree -- popularity              &  --0 & 030 & (0 & 025)\\
+outdegree -- popularity             &  --0 & 107 & (0 & 048)\\
+outdegree -- activity               &    0 & 075 & (0 & 037)\\
+reciprocal degree -- activity       &  --0 & 287 & (0 & 051)\\
+sex alter                           &  --0 & 120 & (0 & 096)\\
+sex ego                             &    0 & 054 & (0 & 108)\\
+same sex                            &    0 & 664 & (0 & 089)\\
+drinking alter                      &    0 & 024 & (0 & 082)\\
+drinking squared alter              &  --0 & 113 & (0 & 091)\\
+drinking ego                        &    0 & 104 & (0 & 088)\\
+drinking (alter-ego) squared        &  --0 & 117 & (0 & 056)\\
+drugs alter                         &  --0 & 137 & (0 & 091)\\
+drugs squared alter                 &    0 & 164 & (0 & 067)\\
+drugs ego                           &  --0 & 123 & (0 & 068)\\
+drugs  (alter-ego) squared          &  --0 & 051 & (0 & 025)\\
+\hline
+\multicolumn{4}{l}{\rule{0pt}{2.5ex}\relax \emph{Behaviour Dynamics}}&\\
+\hline
+\rule{0pt}{2ex}\relax
+rate drinking (period 1)            &    1 & 598 & (0 & 302)\\
+rate drinking (period 2)            &    2 & 431 & (0 & 508)\\
+\hline
+\rule{0pt}{2ex}\relax
+drinking linear shape               &    0 & 452 & (0 & 138)\\
+drinking quadratic shape            &  --0 & 609 & (0 & 181)\\
+drinking average alter              &    1 & 281 & (0 & 488)\\
+\hline
+\multicolumn{5}{l}
+   {\footnotesize{convergence $t$ ratios all $<$ 0.04.}}\\
+\multicolumn{5}{l}{\footnotesize{Overall maximum convergence ratio 0.15.}}
+\end{tabular}
+\end{center}
 }
 
 \noindent
 We interpret here the parameter estimates for the effects of drinking behavior
 and drug use without being concerned with the significance, or lack thereof.
-For the drinking behavior, formula (\ref{eq_sel}) yields
+For the drinking behavior, formula (\ref{eq_4par}) yields
 \[
-  -0.0100 \, (v_i - \bar v) \,+\, 0.0899 \, (v_j - \bar v) \,+\,
-     0.8994 \Big( 1 \, - \, \frac{\vert v_i - v_j \vert}
-                                 { \Delta_V }  - 0.6983 \Big) \ .
+  -0.117\, (v_j - v_i)^2 \, + \,
+  0.104 \, (v_i - \bar v)
+         \, + \, 0.024 \,  (v_j - \bar v) \, - \,
+      0.113  \, (v_j - \bar v)^2   \ .
 \]
 
-\noindent
-In \R the following code can be used to construct the selection table.
-Note that the function \sfn{outer} here is very convenient.
+These values can be calculated for $v_i$ and $v_j$ ranging
+from 1 to 5, with $\bar v = 2.99$.
+This is called the \emph{selection table}.
+On the \SI website the script \texttt{SelectionTables.r} is available,
+which contains several functions that can be helpful for doing this.
 
-\begin{footnotesize}
+
+Given that this script is available in the working directory,
+the data set is called \texttt{G129\_Data}, the answer
+(\sfn{sienaFit}) object is called \texttt{ans}, the network \texttt{"friendship"},
+and the actor variable \texttt{"drinking"}, the following script
+can be used.
+
 \begin{verbatim}
-# First define a function that incorporates the relevant part
-# of the evaluation function, dependent on the parameters b1, b2, b3,
-# the overall average v_av, the similarity average sim_av,
-# and the range ran_v
-obj_n <- function(vi, vj){
-           b1*(vi-v_av) + b2*(vj-v_av) + b3*(1 - abs(vi-vj)/ran_v - sim_av)
-                           }
-# Now fill in the values of the parameter estimates and the averages.
-v_av   <-  3.113
-sim_av <-  0.6983
-ran_v  <-  4
-b1     <- -0.0100
-b2     <-  0.0899
-b3     <-  0.8994
-
-# Define the value of v for which the table is to be given.
-vv     <- c(1, 2, 3, 4, 5)
-# And calculate the table
-sel_tab <- outer(vv, vv, obj_n)
+source("SelectionTables.r") # needs to be done only once in the session
+sm.drink <- selectionMatrix(ans, G129_Data, "friendship", "drinking", 1:5)
 # It can be displayed
-sel_tab
+sm.drink
 # and if package xtable is loaded, also be written
 # to a latex or html file. For example,
-tab_sel <- xtable(sel_tab)
-print(tab_sel,file="tab_sel.htm", type="html",
+tab.drink <- xtable(sm.drink)
+print(tab.drink,file="tab_drink.htm", type="html",
              html.table.attributes = "rules = none")
 # The html.table.attributes option gives the <table> tag
 # used in the html file.
+# and optional
+xtable(sm.drink) # for a LaTeX table
 \end{verbatim}
-\end{footnotesize}
 
-The results can be tabulated as follows.
-\bigskip
+This will produce the following table.
 
-\begin{center}
-\begin{tabular}{l  r@{.}l  r@{.}l  r@{.}l  r@{.}l  r@{.}l }
-$ v_i \ \  \backslash  \ \ v_j $   &  \mcc{2}{ 1}
-           & \mcc{2}{ 2} & \mcc{2}{ 3} & \mcc{2}{ 4} &  \mcc{2}{ 5}
-\separationb
- 1        &    0&10    &  --0&03    &  --0&17    &  --0&30    &  --0&44   \\
- 2        &  --0&13    &    0&18    &    0&05    &  --0&09    &  --0&22   \\
- 3        &  --0&37    &  --0&05    &    0&26    &    0&13    &  --0&01   \\
- 4        &  --0&60    &  --0&29    &    0&03    &    0&34    &    0&21   \\
- 5        &  --0&84    &  --0&52    &  --0&21    &    0&11    &    0&42   \\
-\hline
+\begin{table}[h]
+\centering
+\begin{tabular}{l  r@{.}l  r@{.}l  r@{.}l  r@{.}l  r@{.}l}
+  \hline
+$ v_i \ \  \backslash  \ \ v_j $
+    & \mcc{2}{1}  & \mcc{2}{2} & \mcc{2}{3} & \mcc{2}{4} & \mcc{2}{5} \\
+  \hline
+  1 & --0&70 & --0&46 & --0&68 & --1&35 & --2&49 \\
+  2 & --0&72 & --0&24 & --0&22 & --0&66 & --1&57 \\
+  3 & --0&96 & --0&25 &   0&00 & --0&21 & --0&88 \\
+  4 & --1&45 & --0&50 & --0&01 &   0&01 & --0&42 \\
+  5 & --2&17 & --0&98 & --0&26 &   0&00 & --0&20 \\
+   \hline
 \end{tabular}
-\end{center}
+\caption{Selection table for friendship with respect to drinking.}
+\label{T_sel_fd}
+\end{table}
 
-This table shows the preference for similar alters: in all rows,
-the highest value is at the diagonal ($v_j = v_i$).
-The ego and alter parameters are close to 0, therefore the similarity
-effect is dominant. However, note that the formula uses raw values for $v_i$
-and $v_j$ but divides the values for the absolute difference
-$ \vert v_i - v_j \vert$ by $\Delta_V$ which here is $5-1=4$.
-Therefore the weight of 0.09 for the alter effect is not
-completely negligible compared to the weight of 0.90
-for the similarity effect. The positive alter effect leads to a preference
-for ties to alters with a high $v_j$ value which
-goes against the similarity effect for $v_i = 1$ but strengthens
-the similarity effect for $v_i = 5$. The table shows that the net resulting
-preference for similar others is strongest for actors (egos)
-high on drinking behavior,
-and weakest for actors in the middle and low range of drinking behavior.
+It is instructive to make a plot of this table. This can be
+done, e.g., using package \sfn{ggplot2} \citep{ggplot2}.
+The following script will produce a \texttt{png} plot in the
+current working directory.
+Of course all elements of this script can be changed to accommodate the wishes
+given the purpose of the figure.
+
+\begin{verbatim}
+library(ggplot2)
+vname <- "drinking"
+name <- "friendship"
+levls <- 1:5
+vselect <- selectionTable(ans, G129_Data, name, vname, levls)
+sp <- ggplot(vselect, aes(valter, select, group=ego, colour=ego))
+png(filename=paste("selectionTable_",vname,".png",sep=""),
+        width=1000,height=800)
+sp  +geom_point() + geom_smooth(size=1.2, span=3) +
+        scale_colour_hue() +
+        scale_x_continuous(breaks=levls) +
+        theme(legend.key=element_blank())+
+        labs(x=paste(vname),
+                y=paste("selection function"),
+                title=paste("Effect",vname,"on",name),
+                colour=paste(vname)) +
+        theme_grey(base_size=26, base_family="") +
+        theme(legend.key.width=unit(1, "cm")) +
+        theme(plot.title=element_text(hjust=0.5))
+graphics.off()
+\end{verbatim}
+
+In this case, what was produced can be seen in Figure~\ref{F_sel_dk}.
+
+\begin{figure}[hb]
+  \centering
+  \includegraphics[width=0.7\textwidth]{selectionTable_drinking.png}
+  \caption{Plot of selection table  for friendship with respect to drinking.}
+  \label{F_sel_dk}
+\end{figure}
+
+From the table it can be concluded that there is a significant tendency
+toward homophily (negative effect of ego minus alter squared).
+\iffalse % to be added when SL2018 is out
+Interpreting the results along the lines of  \citet{SL2018},
+ there is a significant tendency
+to homophily (negative effect of ego minus alter squared), and
+a non-significant tendency to conformity (negative effect
+of alter squared), where the estimated social norm is
+$\bar v + \hat\beta_{\rm{altX}}/(2 \,  \hat\beta_{\rm{altSqX}}) =
+2.99 + 0.024/(2 \times 0.113) = 3.1$.
+\fi
+We see that the maximum of the curves increases with
+ego's value $v_i$, but for low $v_i$ the maximum is larger than $v_i$,
+and for high $v_i$ it is less than $v_i$:
+homophily is combined with a kind of `regression to the mean'.
 \medskip
 
-For drug use, the formula yields
+For drug use,  formula (\ref{eq_4par}) yields
 \[
-  0.1362 \, (v_i - \bar v) \,-\, 0.1295\, (v_j - \bar v) \,+\,
-       0.665 \Big( 1 \, - \, \frac{ \vert v_i - v_j \vert }
-                                  { \Delta_V }  \, -\, 0.7533  \Big) \ ,
+  -0.051\, (v_j - v_i)^2 \, + \,
+  -0.123 \, (v_i - \bar v)
+         \, - \, 0.137 \,  (v_j - \bar v) \, + \,
+      0.164  \, (v_j - \bar v)^2   \ ,
 \]
 which leads to the following table.
 \bigskip
 
-\begin{center}
-%\begin{tabular}{l| r@{.}l  r@{.}l  r@{.}l  r@{.}l }
-\begin{tabular}{l r@{.}l  r@{.}l  r@{.}l  r@{.}l }
-$ v_i \ \  \backslash  \ \ v_j $   &  \mcc{2}{ 1}
-              & \mcc{2}{ 2} & \mcc{2}{ 3} &  \mcc{2}{ 4}
-\separationb
- 1        &    0&16    &  --0&19    &  --0&54    &  --0&89   \\
- 2        &    0&08    &    0&17    &  --0&18    &  --0&53   \\
- 3        &  --0&01    &    0&08    &    0&17    &  --0&18   \\
- 4        &  --0&10    &  --0&00    &    0&09    &    0&18   \\
-\hline
+\begin{table}[h]
+\centering
+\begin{tabular}{l  r@{.}l  r@{.}l  r@{.}l  r@{.}l }
+  \hline
+$ v_i \ \  \backslash  \ \ v_j $
+    & \mcc{2}{1}  & \mcc{2}{2} & \mcc{2}{3} & \mcc{2}{4}  \\
+  \hline
+1 & 0&16 & --0&02 & 0&03 & 0&30 \\
+  2 & --0&02 & --0&09 & 0&06 & 0&43 \\
+  3 & --0&30 & --0&27 & --0&01 & 0&47 \\
+  4 & --0&68 & --0&54 & --0&19 & 0&39 \\
+   \hline
 \end{tabular}
-\end{center}
-In each row the highest value is at the diagonal, which shows that
-indeed everybody prefers to be friends with similar others also
-with respect to drug use.
-The negative alter effect supports this for low $v_i$ values
-and counteracts it for high $v_i$ values.
-This is seen in the table in the strong preference of low drug users
-($v_i = 1$) for others who are low on drug use, and the very weak
-preference for high drug users ($v_i = 4$) for others
-also high on drug use.
-\bigskip
-
-An alternative specification uses the drink ego $\times$ drink alter interaction
-together with the drink squared alter effect in the network dynamics model,
-and similarly for drug use; for the behavior dynamics,
-an alternative specification uses the average alter effect.
-This leads to the following table of results.
-
-{\footnotesize
-\begin{verbatim}
-Network Dynamics
- 1. rate:  constant network rate (period 1)              8.0978  (   1.5118)
- 2. rate:  constant network rate (period 2)              5.7781  (   0.9474)
- 3. eval:  outdegree (density)                          -2.1333  (   0.2196)
- 4. eval:  reciprocity                                   2.3033  (   0.2184)
- 5. eval:  transitive ties                               0.2430  (   0.2059)
- 6. eval:  number of actors at distance 2               -1.0011  (   0.2275)
- 7. eval:  drink alter                                   0.1041  (   0.1348)
- 8. eval:  drink squared alter                           0.0141  (   0.1329)
- 9. eval:  drink ego                                     0.0078  (   0.1157)
-10. eval:  drink ego x drink alter                       0.1655  (   0.1095)
-11. eval:  drug use alter                               -0.2603  (   0.2436)
-12. eval:  drug use squared alter                       -0.0249  (   0.1945)
-13. eval:  drug use ego                                 -0.0214  (   0.1454)
-14. eval:  drug use ego x drug use alter                 0.1976  (   0.1146)
-
-Behavior Dynamics
-15. rate:  rate drink period 1                           1.3218  (   0.3632)
-16. rate:  rate drink period 2                           1.7884  (   0.5053)
-17. eval:  behavior drink linear shape                   0.3820  (   0.2421)
-18. eval:  behavior drink quadratic shape               -0.5428  (   0.2839)
-19. eval:  behavior drink average alter                  1.1414  (   0.6737)
-\end{verbatim}
-}
-
-For this specification, the formulae in Section~\ref{S_f} imply that the
-components in the network evaluation function corresponding to the effects
-of variable $V$ are
-\begin{equation}
- \beta_{\rm ego}\, (v_i - \bar v) \, x_{i+}
-           \, + \, \beta_{\rm alter}  \sum_j x_{ij}\, (v_j - \bar v)
- \, + \, \beta_{\rm sq.\ alter}  \sum_j x_{ij}\, (v_j - \bar v)^2  \, + \,
-   \beta_{\rm e \times a}  \sum_j x_{ij}\,(v_i - \bar v) \,(v_j - \bar v)  \ .
-        \label{eq_contr2_V}
-\end{equation}
-The contribution of the single tie variable $x_{ij}$ to this formula
-is equal to
-\begin{equation}
-  \beta_{\rm ego}\, (v_i - \bar v)
-         \, + \, \beta_{\rm alter}\,  (v_j - \bar v) \, + \,
-      \beta_{\rm sq.\ alter}  \, (v_j - \bar v)^2  \,+\,
-        \beta_{\rm e \times a} \, (v_i - \bar v)\, (v_j - \bar v) \ .
-                 \label{eq_sel2}
-\end{equation}
-Filling in the estimates for the effects of drinking behavior yields
-\[
-  0.0078 \, (v_i - \bar v)  \, + \,  0.1041 \, (v_j - \bar v) \, + \,
-      0.0141 \, (v_j - \bar v)^2
-           \,+\,  0.1655   (v_i - \bar v)\, (v_j - \bar v) \ .
-\]
-This can be represented in \R as follows.
-\begin{footnotesize}
-\begin{verbatim}
-# First define a function that incorporates the relevant part
-# of the evaluation function, dependent on the parameters b1, b2, b3,
-# and the overall average v_av.
-# Watch out for statements that take more than one line,
-# as used here in the definition of the functions obj_n.
-# The rule is that always, the lines before the last
-# must be syntactically incomplete.
-# In this case, this is satisfied because the first line ends with a +
-obj_n <- function(vi, vj){
-           b1*(vi-v_av) + b2*(vj-v_av) + b3*(vj-v_av)*(vj-v_av) +
-                 b4*(vi-v_av)*(vj-v_av)
-                           }
-# Now fill in the values of the parameter estimates and the averages.
-v_av   <-  3.113
-b1     <-  0.0078
-b2     <-  0.1041
-b3     <-  0.0141
-b4     <-  0.1655
-# Define the value of v for which the table is to be given.
-vv     <- c(1, 2, 3, 4, 5)
-# And calculate and display the table
-sel_tab <- outer(vv, vv, obj_n)
-sel_tab
-\end{verbatim}
-\end{footnotesize}
-% Formula used to be wrong before 27-5-2014, figures in the table were right.
-
-\noindent
-This gives the following\footnote{In earlier versions of the manual,
-there were some differences
-in this and the following tables, because too much rounding was used
-at an early stage.}
-table.
-\begin{center}
-\begin{tabular}{l r@{.}l  r@{.}l  r@{.}l  r@{.}l  r@{.}l }
-$ v_i \ \  \backslash  \ \ v_j $   &  \mcc{2}{ 1}
-            & \mcc{2}{ 2} & \mcc{2}{ 3} & \mcc{2}{ 4} &  \mcc{2}{ 5}
-\separationb
- 1        &    0&57    &    0&32    &    0&07    &  --0&17    &  --0&42   \\
- 2        &    0&18    &    0&10    &    0&02    &  --0&06    &  --0&14   \\
- 3        &  --0&18    &  --0&10    &  --0&01    &    0&08    &    0&16   \\
- 4        &  --0&51    &  --0&26    &  --0&01    &    0&24    &    0&49   \\
- 5        &  --0&81    &  --0&40    &  --0&02    &    0&43    &    0&85   \\
-\hline
-\end{tabular}
-\end{center}
+\caption{Selection table for friendship with respect to drug use.}
+\label{T_sel_fdg}
+\end{table}
 
 
+The corresponding figure is in Figure~\ref{F_sel_dg}.
 
-For drug use we obtain the formula
-\[
-  -0.0214 \, (v_i - \bar v)  \, - \,  0.2603 \, (v_j - \bar v) \, - \,
-      0.0249 \, (v_j - \bar v)^2
-          \,+\,  0.1976   (v_i - \bar v)\, (v_j - \bar v) \ .
-\]
-and the following table.
-\begin{center}
-\begin{tabular}{l r@{.}l  r@{.}l  r@{.}l  r@{.}l }
-$ v_i \ \  \backslash  \ \ v_j $   &  \mcc{2}{ 1}
-            & \mcc{2}{ 2} & \mcc{2}{ 3} &  \mcc{2}{ 4}
-\separationb
- 1        &    0&18    &  --0&18    &  --0&53    &  --0&89   \\
- 2        &    0&06    &  --0&10    &  --0&26    &  --0&42   \\
- 3        &  --0&11    &  --0&07    &  --0&03    &    0&00   \\
- 4        &  --0&33    &    0&09    &    0&14    &    0&38   \\
-\hline
-\end{tabular}
-\end{center}
+\begin{figure}[hb]
+  \centering
+  \includegraphics[width=0.7\textwidth]{selectionTable_drugs.png}
+  \caption{Plot of selection table  for friendship with respect to drug use.}
+  \label{F_sel_dg}
+\end{figure}
 
-The fact that we are using three variables
-involving alter
-(alter, alter squared, interaction) instead of two
-(alter and similarity) leads to greater freedom in the curve that is fitted:
-the top (or, in the rare case of a reversed pattern, bottom)
-of the attractiveness of alters is not necessarily
-obtained at the diagonal, i.e., at ego's value.
-Straightforward calculus shows us that (\ref{eq_sel2}) is a quadratic
-function and obtains its extreme value (a maximum if $\beta_{\rm sq.\ alter} $
-is negative, a minimum if it is positive -- the latter is, in general,
-less likely) for
-\begin{equation}
-  v_j \,=\, \bar v \,-\, \frac{\beta_{\rm alter}
-            \, + \,  \beta_{\rm e \times a} \, (v_i - \bar v)}
-                              {2\, \beta_{\rm sq.\ alter}} \ .
-                 \label{eq_extreme}
-\end{equation}
-If the effect $\beta_{\rm sq.\ alter}$ of the squared alter's value is negative
-and the interaction effect $\beta_{\rm e \times a}$ is positive,
-then this location of the maximum increases with ego's own value, $v_i$.
-Of course the number given by (\ref{eq_extreme})
-will usually not be an integer number,
-so the actual value of $v_j$ for which attractiveness is maximized is
-the integer in the range of $V$ closest to~(\ref{eq_extreme}).
+Here we see a totally different pattern.
+Since the sum of the alter squared and the difference squared effects
+is positive, the parabolas have a minimum rather than a maximum.
+Pay attention to the vertical scale: in Figure~\ref{F_sel_dk} the
+difference between the highest and lowest values is about 2.5,
+in Figure~\ref{F_sel_dg} it is about 1.2, half as much.
+This signifies that overall, drug use has smaller effects on friendship
+than smoking. For ego's who do not use cannabis ($v_i = 1$),
+drug use of alters hardly matters;
+egos who use cannabis regularly ($v_i = 4$) have a somewhat lower
+attraction to alters with lower cannabis use.
+For this actor variable, the specification with the effects of ego, alter,
+and the product interaction ego $\times$ alter might fit just as well,
+or perhaps better.
 
-For drinking there is a weak positive effect of squared drinking alter;
-the effect of squared drug use alter is weak negative.
-For drinking we see that the most attractive value
-for egos with $v_i = 1$ or 2 is no drinking, $v_j = 1$,
-whereas for egos with $v_i \geq 3$ the most attractive alters
-are those who drink most, $v_j = 5$.
-We also see that egos with the highest drinking
-behavior are those who differentiate most strongly
-depending on the drinking behavior of their potential friends.
-
-For drug use the situation is different.
-Actors with $v_i = 1$ or 2 prefer friends with drug use $v_j = 1$;
-for actors with $v_i = 3$ the difference is hardly discernible,
-but if we consider the differences even though they are tiny,
-then they are most attracted to others with $v_j = 4$;
-actors with the highest drug use ($v_i = 4$) differentiate most strongly,
-and are attracted most to others with also the highest drug use.
-
-The differences between the results with the similarity effects and the
-interaction effects are minor. The extra degrees of freedom of the
-latter model gives a slightly closer fit to the data.
-However, the differences between the two fits are not significant,
-as can be shown e.g.\ by score-type tests.
+\clearpage
 
 \subsection{Ego -- alter influence tables}
 
 In quite a similar way as in the preceding section,
 from the parameter estimates as presented in the
 output tables, combined with the formulae for the effects,
-we can construct tables indicating how attractive are
+we can construct tables indicating how likely are changes to
 various different values of the behavior,
 depending on the behavior of the actor's friends.
 The functions used to define the effects can be found
 in Section~\ref{S_f_b}, and it must not be forgotten that all variables
 are internally centered in \rs, and the subtracted means are reported
 in the initial output produced by \sfn{print01Report},
-but more precision can be obtained by requesting the \textsf{"mean"}
-attributes of the covariates, see Section~\ref{S_center}.
+but for the covariates they also can be obtained by requesting the
+\textsf{"mean"} attributes of the covariates, see Section~\ref{S_center}.
 
-In the first model, the estimated coefficients in the
+\subsubsection{Average alter}
+
+In the model from the preceding section, the estimated coefficients in the
 behavior evaluation function are as follows.
+\medskip
 
-{\footnotesize
-\begin{verbatim}
-15. eval:  behavior drink linear shape                   0.3618  (   0.1946)
-16. eval:  behavior drink quadratic shape               -0.0600  (   0.1181)
-17. eval:  behavior drink average similarity             3.9689  (   2.2053)
-\end{verbatim}
+{\small
+% Table based on sienaFit object ans5 , Sat Feb 03 18:03:20 2018
+\begin{center}
+\begin{tabular}{l | r@{.}l r@{.}l   }
+\hline
+\rule{0pt}{2ex}\relax
+Effect &\multicolumn{2}{c}{par.}&\multicolumn{2}{c  }{(s.e.)}  \\[0.5ex]
+\hline
+\multicolumn{4}{l}{\rule{0pt}{2.5ex}\relax \emph{Behaviour Dynamics}}&\\
+\hline
+\rule{0pt}{2ex}\relax
+rate drinking (period 1)            &    1 & 598 & (0 & 302)\\
+rate drinking (period 2)            &    2 & 431 & (0 & 508)\\
+\hline
+\rule{0pt}{2ex}\relax
+drinking linear shape               &    0 & 452 & (0 & 138)\\
+drinking quadratic shape            &  --0 & 609 & (0 & 181)\\
+drinking average alter              &    1 & 281 & (0 & 488)\\
+\hline
+\end{tabular}
+\end{center}
 }
+
 The dependent behavior variable now is indicated $Z$. (In the preceding
 section the letter $V$ was used, but this referred to any actor variable
 predicting network dynamics,
 irrespective of whether it was also a dependent behavior variable.)
+
 The formulae in Section \ref{S_f_b} show that the evaluation function
 for this model specification is
 \begin{equation}
-   f^{\rm beh}_i \,=\, \beta_{\rm trend} \, (z_i - \bar z)
-               \,+\, \beta_{\rm drink} \, (z_i - \bar z)^2 \,+\,
-                 \beta_{\rm av.\ sim}\,  \frac{1}{x_{i+}} \,
-          \sum_j x_{ij} \big({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}\big) \ .
-                    \label{eq_f_b1}
-\end{equation}
-
-\noindent
-In the second model, the table gave the following results.
-
-{\footnotesize
-\begin{verbatim}
-17. eval:  behavior drink linear shape                   0.3820  (   0.2421)
-18. eval:  behavior drink quadratic shape               -0.5428  (   0.2839)
-19. eval:  behavior drink average alter                  1.1414  (   0.6737)
-\end{verbatim}
-}
-\noindent
-Here the evaluation function is
-\begin{equation}
-   f^{\rm beh}_i \,=\, \beta_{\rm trend} \, (z_i - \bar z)
-           \,+\, \beta_{\rm drink} \, (z_i - \bar z)^2 \,+\,
-          \beta_{\rm av.\ alter}\,  (z_i - \bar z)(\bar z_{(i)} - \bar z)  \ ,
+   f^{\rm beh}_i \,=\, \beta_{\rm linear} \, (z_i - \bar z)
+           \,+\, \beta_{\rm quad} \, (z_i - \bar z)^2 \,+\,
+          \beta_{\rm avAlt}\,  (z_i - \bar z)(\bar z_{(i)} - \bar z)  \ ,
                     \label{eq_f_b2}
 \end{equation}
+where $\bar z_{(i)} $ is the average $Z$ value of $i$'s
+friends,
+\[
+  \bar z_{(i)}  =\frac{1}{x_{i+}} \, \sum_j x_{ij}\, z_j   \ ,
+\]
+and 0 if this formula would be 0/0.
+
+The \emph{Influence Table} presents a matrix with in the rows
+the average of $Z$ for $i$'s friends,
+in the columns the possible values of $z_i$,
+and in the cells the evaluation function (\ref{eq_f_b2}).
+For the table above, the evaluation function is
+\[
+   {\hat f}^{\rm beh}_i \,=\, 0.452 \, (z_i - \bar z)
+           \,-\, 0.609 \, (z_i - \bar z)^2 \,+\,
+         1.281\,  (z_i - \bar z)(\bar z_{(i)} - \bar z)  \ .
+\]
+At the \SI website there is a script \texttt{InfluenceTables.r}
+which can be used to produce the table and the corresponding plot.
+
+Given that this script is available in the working directory,
+the data set is called \texttt{G129\_Data}, the answer
+(\sfn{sienaFit}) object is called \texttt{ans}, the network \texttt{"friendship"},
+and the actor variable \texttt{"drinking"}, the following script
+can be used.
+
+\begin{verbatim}
+source("InfluenceTables.r") # needs to be done only once in the session
+im.drink <- influenceMatrix(ans, G129_Data, 'friendship', 'drinking', 1:5)
+# It can be displayed
+im.drink
+# and if package xtable is loaded, also be written
+# to a latex or html file. For example,
+tbl.drink <- xtable(im.drink)
+print(tbl.drink,file="tbl_drink.htm", type="html",
+             html.table.attributes = "rules = none")
+# The html.table.attributes option gives the <table> tag
+# used in the html file.
+# and optional
+xtable(tbl.drink) # for a LaTeX table
+\end{verbatim}
+
+The influence table is as follows.
+\begin{center}
+\begin{tabular}{l r@{.}l  r@{.}l  r@{.}l  r@{.}l  r@{.}l }
+ $\bar z_{(i)}$ \ \ $ \backslash $ \ \ $z_i $   &  \mcc{2}{ 1}
+               & \mcc{2}{ 2} & \mcc{2}{ 3} & \mcc{2}{ 4} &  \mcc{2}{ 5}
+\separationb
+  1 &   1&76 &   1&48 & --0&02 & --2&74 & --6&67 \\
+  2 & --0&79 &   0&21 & --0&01 & --1&44 & --4&10 \\
+  3 & --3&34 & --1&06 &   0&00 & --0&15 & --1&53 \\
+  4 & --5&89 & --2&33 &   0&02 &   1&14 &   1&05 \\
+  5 & --8&44 & --3&59 &   0&03 &   2&43 &   3&62 \\
+   \hline
+\end{tabular}
+\end{center}
+The interpretation\footnote{The interpretation is given here
+in terms of attraction and preferences;
+this is for the sake of having a straightforward and easy way of expressing
+the interpretation, which strictly should be only about probabilities.}
+is that each row corresponds to a given average behavior
+of the focal actor's friends; comparing the different values in the row
+shows the relative `attractiveness' of the different potential values
+of ego's own behavior.
+The maximum in each row is assumed at the diagonal. This means that
+for each value for the average friends' behavior $\bar z_{(i)}$,
+the focal actor `prefers' to have the same behavior as all these friends.
+The differences in the bottom rows are larger than in the top rows,
+indicating that in the case where the friends who do not drink at all,
+the `preference' (or social pressure) toward imitating their behavior is
+less strong than in the case where all the friends drink a lot.
+
+A figure of this table can be produced, e.g., by the following script.
+\begin{verbatim}
+library(ggplot2)
+name <- 'drinking'
+zname <- 'friendship'
+levls <- 1:5
+png(filename=paste("influenceTable_",name,".png",sep=""), width=1000,height=800)
+zselect <- influenceTable(ans, G129_Data, zname, name, levls)
+sp <- ggplot(zselect, aes(zego, select, group=alter, colour=alter))
+sp + geom_point() + geom_smooth(size=1.2, span=3) +
+   scale_colour_hue() +
+   scale_x_continuous(breaks=levls) +
+   theme(legend.key=element_blank())+
+   labs(x=paste(name),
+      y=paste('evaluation function'),
+      title=paste('Influence effect',zname,'on',name),
+      colour=paste(name,'\nalter')) +
+   theme_grey(base_size=26, base_family="") +
+   theme(legend.key.width=unit(1, "cm")) +
+   theme(plot.title=element_text(hjust=0.5))
+graphics.off()
+\end{verbatim}
+
+The corresponding figure is in Figure~\ref{F_infl_dk}.
+
+\begin{figure}[hb]
+  \centering
+  \includegraphics[width=0.7\textwidth]{influenceTable_drinking.png}
+  \caption{Plot of influence table  for friendship with respect to drinking.}
+  \label{F_infl_dk}
+\end{figure}
 
 \noindent
-where $\bar z_{(i)} $ is the average $Z$ value of $i$'s
-friends\footnote{If $i$ has no friends, i.e., $x_{i+} = 0$,
-then $\bar z_{(i)} $ is defined
-to be equal to $\bar z$.},
+The five plotted curves intersect at the same point. This is indeed implied
+by  formula (\ref{eq_f_b2}), which is 0 if $z_i = \bar z = 2.99$.
+
+
+Another way to look at the behavior evaluation function is to consider
+mathematically the location of its maximum.
+This function here can be written also as
 \[
-  \bar z_{(i)}  =\frac{1}{x_{i+}} \, \sum_j x_{ij}\, z_j   \ .
+   f^{\rm beh}_i \,=\, \big( 0.452 +
+                1.281( \bar z_{(i)} - \bar z) \big) \, (z_i - \bar z)
+       \,-\, 0.609 \, (z_i - \bar z)^2   \ .
 \]
-Equation (\ref{eq_f_b2}) is simpler than equation (\ref{eq_f_b1}), because
+Differentiating with respect to $z_i$ shows that
+this function is maximal for
+\[
+   z_i = \bar z \,+\, \frac{0.452 +
+               1.281( \bar z_{(i)} - \bar z)}{2 \times  0.609 }
+    \,=\,  0.22 \,+\, 1.05 \,  \bar z_{(i)}  \ ,
+\]
+just a little bit larger than $ \bar z_{(i)}$.
+Indeed in the table and in the plot we see that, if $ \bar z_{(i)}$
+has integer values 1, 2, 3, 4, or 5,
+the highest values are obtained exactly
+for  $z_i = \bar z_{(i)}$.
+
+
+\subsubsection{Average similarity}
+
+The formulae in Section \ref{S_f_b} show that when average similarity is used
+as the specification of social influence, the evaluation function is given by
+\begin{equation}
+   f^{\rm beh}_i(z_i) \,=\, \beta_{\rm trend} \, (z_i - \bar z)
+               \,+\, \beta_{\rm drink} \, (z_i - \bar z)^2 \,+\,
+                 \beta_{\rm av.\ sim}\,  \frac{1}{x_{i+}} \,
+          \sum_j x_{ij} \big({\rm sim}(z_i, z_j) - \widehat{{\rm sim}^z}\big)
+                    \label{eq_f_b10}
+\end{equation}
+where the similarity score is
+\[
+ {\rm sim}(z_i, z_j) \,=\, 1 \,-\, \frac{ \vert z_i - z_j \vert}{\Delta}
+\]
+in which $\Delta$ is the range (maximum minus minimum) of $Z$,
+while $\widehat{{\rm sim}^z}$ is the mean of the similarity scores.
+The latter is just a constant that does not have any influence on
+the change probabilities of the behavior. Therefore we
+use the equivalent form
+\begin{equation}
+   f^{\rm beh}_i(z_i) \,=\, \beta_{\rm trend} \, (z_i - \bar z)
+               \,+\, \beta_{\rm drink} \, (z_i - \bar z)^2 \,+\,
+                 \beta_{\rm av.\ sim}\,  \frac{1}{x_{i+}} \,
+          \sum_j x_{ij} \bigg(
+          \frac{ \vert \bar z - z_j \vert \,-\, \vert z_i - z_j \vert}{\Delta}
+          \bigg) \ ,                    \label{eq_f_b1}
+\end{equation}
+which has the advantage that it is zero for $z_i = \bar z$,
+and therefore comparable across $i$.
+
+With this specification for the effect of drinking
+(and a modified specification of the effect of drug use), the estimation
+results are as follows.
+\medskip
+
+{\small
+\begin{center}
+% Table based on sienaFit object ans.s , Sun Feb 04 20:09:27 2018
+\begin{tabular}{l | r@{.}l r@{.}l  | }
+\hline
+\rule{0pt}{2ex}\relax
+Effect &\multicolumn{2}{c}{par.}&\multicolumn{2}{c | }{(s.e.)}  \\[0.5ex]
+\hline
+\multicolumn{4}{l}{\rule{0pt}{2.5ex}\relax \emph{Network Dynamics}}&\\
+\hline
+\rule{0pt}{2ex}\relax
+constant friendship rate (period 1) &   12 & 769 & (1 & 331)\\
+constant friendship rate (period 2) &   10 & 262 & (0 & 987)\\
+\hline
+\rule{0pt}{2ex}\relax
+outdegree (density)                 &  --2 & 708 & (0 & 320)\\
+reciprocity                         &    3 & 376 & (0 & 247)\\
+gwesp (transitivity)                &    1 & 837 & (0 & 084)\\
+indegree -- popularity              &  --0 & 028 & (0 & 027)\\
+outdegree -- popularity             &  --0 & 108 & (0 & 053)\\
+outdegree -- activity               &    0 & 075 & (0 & 037)\\
+reciprocal degree -- activity       &  --0 & 285 & (0 & 052)\\
+sex alter                           &  --0 & 123 & (0 & 092)\\
+sex ego                             &    0 & 051 & (0 & 107)\\
+same sex                            &    0 & 661 & (0 & 087)\\
+drinking alter                      &    0 & 037 & (0 & 075)\\
+drinking squared alter              &  --0 & 108 & (0 & 095)\\
+drinking ego                        &    0 & 097 & (0 & 091)\\
+drinking squared ego                &    0 & 010 & (0 & 098)\\
+drinking (ego -- alter) squared     &  --0 & 108 & (0 & 052)\\
+drugs alter                         &  --0 & 020 & (0 & 054)\\
+drugs ego                           &  --0 & 183 & (0 & 066)\\
+drugs ego $\times$ drugs alter      &    0 & 126 & (0 & 052)\\
+\hline
+\multicolumn{4}{l}{\rule{0pt}{2.5ex}\relax \emph{Behaviour Dynamics}}&\\
+\hline
+\rule{0pt}{2ex}\relax
+rate drinking (period 1)            &    1 & 696 & (0 & 326)\\
+rate drinking (period 2)            &    2 & 659 & (0 & 565)\\
+\hline
+\rule{0pt}{2ex}\relax
+drinking linear shape               &    0 & 461 & (0 & 136)\\
+drinking quadratic shape            &  --0 & 003 & (0 & 088)\\
+drinking average similarity         &    6 & 190 & (1 & 810)\\
+\hline
+\multicolumn{5}{l}
+   {\footnotesize{convergence $t$ ratios all $<$ 0.08.}}\\
+\multicolumn{5}{l}{\footnotesize{Overall maximum convergence ratio 0.17.}}
+\end{tabular}
+\end{center}
+}
+
+Equation (\ref{eq_f_b1}) is less simple than equation (\ref{eq_f_b2}), because
 (\ref{eq_f_b2}) is a quadratic function of $z_i$, with coefficients depending
 on the $Z$ values of $i$'s friends as a function of their average,
 whereas (\ref{eq_f_b1}) depends on the entire distribution
@@ -12440,144 +12818,78 @@ than for $i_2$.
 In model (\ref{eq_f_b2}), on the other hand,
 since the average is the same,
 both actors would be drawn equally strongly toward
-the average value 3.
+the average value of~3.
 
 Since the objective function for model (\ref{eq_f_b1}) depends
-not generally on the average behavior of the actor's friends,
+on all behavior values of the actor's friends, not just on their average,
 here we present a table only for the special case of actors
 all whose friends have the same behavior $z_{j}$.
 For the parameters given above, the behavior
 evaluation function then reads
 \[
-   f^{\rm beh}_i \,=\, 0.3618 \, (z_i - \bar z)
-              \,-\, 0.0600 \, (z_i - \bar z)^2 \,+\,
-             3.9689 \,  \big({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}\big) \ .
+   f^{\rm beh}_i(z_i) \,=\, 0.461 \, (z_i - \bar z)
+              \,-\, 0.003 \, (z_i - \bar z)^2 \,+\,
+             6.190 \, \bigg(
+          \frac{ \vert \bar z - z_j \vert \,-\, \vert z_i - z_j \vert}{\Delta}\bigg)  \ .
 \]
-This can be calculated by \R  as follows.
-\begin{footnotesize}
-\begin{verbatim}
-# Define part of evaluation function
-obj_b <- function(zi, zj){
-         b1*(zi-z_av) + b2*(zi-z_av)^2 + b3*(1 - abs(zi-zj)/ran_v - sim_av)
-                         }
-# Fill in the values of the parameter estimates and the averages.
-z_av   <-  3.113
-sim_av <-  0.6983
-b1     <-  0.3618
-b2     <- -0.06
-b3     <-  3.9689
-zz     <-  c(1, 2, 3, 4, 5)
-# The table is transposed: zi in the columns!
-t(outer(zz, zz, obj_b))
-\end{verbatim}
-\end{footnotesize}
 
-The result is the following\footnote{There were errors in this table
-in an earlier version of the manual.}.
+The same script used above for average alter, \texttt{InfluenceTables.r},
+will for this model specification produce the following table and plot.
+
 \begin{center}
 \begin{tabular}{l r@{.}l  r@{.}l  r@{.}l  r@{.}l  r@{.}l }
- $\bar z_{(i)}$ \ \ $ \backslash $ \ \ $z_i $   &  \mcc{2}{ 1}
+ $z_j$ \ \ $ \backslash $ \ \ $z_i $   &  \mcc{2}{ 1}
                & \mcc{2}{ 2} & \mcc{2}{ 3} & \mcc{2}{ 4} &  \mcc{2}{ 5}
 \separationb
-  1 &   0&17 & --0&27 & --0&83 & --1&51 & --2&30 \\
-  2 & --0&83   & 0&72 &   0&16 & --0&51 & --1&31 \\
-  3 & --1&82 & --0&27 &   1&16 &   0&48 & --0&32 \\
-  4 & --2&81 & --1&26 &   0&16 &   1&47 &   0&67 \\
-  5 & --3&80 & --2&26 & --0&83 &   0&48 &   1&67 \\
-\iffalse
-earlier, wrong:
- 1        &  --0&05    &  --0&82    &  --1&71    &  --2&72    &  --3&84   \\
- 2        &  --1&38    &    0&50    &  --0&39    &  --1&39    &  --2&52   \\
- 3        &  --2&70    &  --0&82    &    0&94    &  --0&07    &  --1&20   \\
- 4        &  --4&02    &  --2&14    &  --0&39    &    1&25    &    0&13   \\
- 5        &  --5&35    &  --3&47    &  --1&71    &  --0&07    &    1&45   \\
- \fi
+  1 &   2&15 &   1&07 & --0&01 & --1&10 & --2&19 \\
+  2 & --0&94 &   1&07 & --0&01 & --1&10 & --2&19 \\
+  3 & --4&01 & --1&99 &   0&02 & --1&07 & --2&17 \\
+  4 & --4&01 & --1&99 &   0&02 &   2&02 &   0&93 \\
+  5 & --4&01 & --1&99 &   0&02 &   2&02 &   4&02 \\
 \hline
 \end{tabular}
 \end{center}
-The interpretation is that each row corresponds to a given common behavior
+The interpretation of this table is that each row corresponds to a
+given common behavior
 of the focal actor's friends; comparing the different values in the row
-shows the relative attractiveness of the different potential values
+shows the relative `attractiveness' of the different potential values
 of ego's own behavior.
 The maximum in each row is assumed at the diagonal. This means that
-for each value for the common friends' behavior $\bar z_{(i)}$,
-the focal actor prefers to have the same behavior as all these friends.
+for each value for the common friends' behavior $z_j$,
+the focal actor prefers to have the same behavior as these friends.
 The differences in the bottom rows are larger than in the top rows,
 indicating that in the case where the friends who do not drink at all,
 the preference (or social pressure) toward imitating their behavior is
 less strong than in the case where all the friends drink a lot.
 
-For the other model the objective function depends on the behavior of
-the focal actor's friends only as a function of their average behavior.
-Filling in the estimated parameters in (\ref{eq_f_b2}) yields
-\[
-   f^{\rm beh}_i \,=\, 0.3820 \, (z_i - \bar z)
-                 \,-\, 0.5428 \, (z_i - \bar z)^2 \,+\,
-                   1.1414  \, (z_i - \bar z) ( \bar z_{(i)} - \bar z) \ .
-\]
-For a given average $Z$ values of $i$'s friends, this is a
-quadratic function of $z_i$.
-The following table indicates the behavior evaluation function
-for $z_i$ (columns) as a function of the average drinking behavior
-of $i$'s friends (rows).
-\iffalse
-obj_b <- function(vi, vj){
-          b1*(vi-v_av) + b2*(vi-v_av)^2 + b3*(vi-v_av)*(vj-v_av)
-v_av   <-  3.113
-sim_av <-  0.6983
-b1     <-  0.3820
-b2     <-  -0.5428
-b3     <-  1.1414
-vv     <- c(1, 2, 3, 4, 5)
-t(outer(vv, vv, obj_b))
-\fi
-\begin{center}
-\begin{tabular}{l r@{.}l  r@{.}l  r@{.}l  r@{.}l  r@{.}l }
- $\bar z_{(i)}$ \ \ $\backslash $ \ \ $z_i $   &  \mcc{2}{ 1} & \mcc{2}{ 2}
-                   & \mcc{2}{ 3} & \mcc{2}{ 4} &  \mcc{2}{ 5}
-\separationb
- 1        &    1&87    &    1&59    &    0&22    &  --2&23    &  --5&76   \\
- 2        &  --0&55    &    0&32    &    0&09    &  --1&22    &  --3&61   \\
- 3        &  --2&96    &  --0&95    &  --0&04    &  --0&20    &  --1&46   \\
- 4        &  --5&37    &  --2&22    &  --0&16    &    0&81    &    0&70   \\
- 5        &  --7&78    &  --3&49    &  --0&29    &    1&82    &    2&85   \\
-\hline
-\end{tabular}
-\end{center}
-We see that, even though the squared function does not necessarily
-draw the actors toward the average of their friends' behavior,
-for these parameters the highest values of the
-behavior evaluation function are obtained indeed
-when the focal actor ($i$) behaves just like
-the average of his friends.
-The values far away from the maximum contrast in this case more
-strongly than in the case of the model with the average similarity
-effect, but neither of these models fits clearly better than the other.
+
+The values far away from the maximum contrast in this case less
+strongly than in the case of the model with the average alter
+effect, which is a consequence of the use of the absolute rather than
+squared deviation.
+However, neither of these models fits clearly better than the other.
+The fact that the $t$-ratio for testing the social influence effect
+is larger for average similarity (6.190/1.810 vs.\ 1.281/0.488)
+suggest that this specification has a slightly better fit.
 
 These tables present only the contribution of some of the terms of the
 objective function, and the behavior dynamics will of course
 be compounded if the objective function contains more effects.
 
-Another way to look at the behavior evaluation function is to consider
-the location of its maximum. This function here can be written also as
-\[
-   f^{\rm beh}_i \,=\, \big( 0.3820 +
-                1.1414( \bar z_{(i)} - \bar z) \big) \, (z_i - \bar z)
-       \,-\, 0.5428 \, (z_i - \bar z)^2   \ .
-\]
-Differentiating with respect to $z_i$ shows that
-this function is maximal for
-\[
-   z_i = \bar z \,+\, \frac{0.3820 +
-               1.1414( \bar z_{(i)} - \bar z)}{2 \times  0.5428 }
-    \,=\,  0.19 \,+\, 1.05 \,  \bar z_{(i)}  \ ,
-\]
-just a little bit larger than $ \bar z_{(i)}$.
-Indeed in the table we see that, if $ \bar z_{(i)}$
-has integer values 1, 2, 3, 4, or 5,
-the highest values are obtained exactly
-for  $z_i = \bar z_{(i)}$.
+Figure~\ref{F_infl_dk_avsim} gives the same information as the table.
 
+
+\begin{figure}[hb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{influenceTable_s_drinking.png}
+  \caption{Plot of influence table  for friendship with respect to drinking,\protect\newline
+  for specification by average similarity.
+  \protect\newline Small vertical displacements
+  were added to make the curves visually distinguishable.}
+  \label{F_infl_dk_avsim}
+\end{figure}
+
+\clearpage
 
 \subsection{Effect sizes}
 
@@ -12866,6 +13178,33 @@ effectsDocumentation(myeff)
 for \texttt{myeff}).
 If this is all right, the recreate the effects object.
 \end{indentation}
+\bigskip
+
+
+\noindent\emph{Endowment effect not supported}\\
+(for a specified endowment or creation effect).
+\smallskip
+
+\begin{indentation}{0.04\textwidth}{0pt}
+\noindent
+This endowment or creation effect was not implemented.
+\smallskip
+
+\noindent
+\emph{Solution.} \\
+First check that the short name was correctly spelled and
+is available in your version of {\rs}, by requesting
+\begin{verbatim}
+effectsDocumentation(myeff)
+\end{verbatim}
+(where of course you should substitute the name of your effects object
+for \texttt{myeff}).
+If this is all right, the recreate the effects object.
+\end{indentation}
+\bigskip
+
+
+
 
 \subsection{As the result of a score-type test (including time test)}
 
@@ -12937,9 +13276,8 @@ Use a correct \sfn{groupName} and \sfn{varName}.
 \end{indentation}
 
 \newpage
-\part{Programmers' manual}
 
-\section{Get the source code}
+\section{For programmers: Get the source code}
 
 To do something with the source code,
 first you must get access to it.
@@ -12981,7 +13319,7 @@ The file
 can also be downloaded from the
 \SI website.
 
-\section{Other tools you need}
+\section{For programmers: Other tools you need}
 \begin{description}
 \item[Windows]
 \begin{enumerate}
@@ -13009,7 +13347,7 @@ can also be downloaded from the
  Add the path-to-the-file R.exe to your path.
 \end{description}
 
-\section{Building, installing and checking the package}
+\section{For programmers: Building, installing and checking the package}
 In a command prompt or terminal window, navigate to the directory
 immediately above the
 siena source tree. Here we assume the source tree is in a directory
@@ -13063,7 +13401,7 @@ You can unpack a tar ball by using
 
 \verb|tar xf tar-ball-name|
 
-\section{Understanding and adding an effect}
+\section{For programmers: Understanding and adding an effect}
 
 If you wish to check the definition of an effect,
 you can locate it in the source code and study it.
@@ -13397,7 +13735,7 @@ double TruncatedOutdegreeEffect::egoStatistic(int ego,
 \end{verbatim}
 }
 
-\item To the file \textsf{src$\backslash$sources.list}, the item
+\item To the file \textsf{src{\textbackslash}sources.list}, the item
       \texttt{model/effects/TruncatedOutdegreeEffect.cpp} was added.
 \item Having done this, the package was built and installed again.
       (To be honest, there first were some errors; but the error messages
@@ -14024,6 +14362,87 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
+\item 2018-03-21 R-Forge Revision 332, packages version 1.2-9.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item Added effects \texttt{avExposure, totExposure, infectDeg,
+     susceptAvCovar, infectCovar} for symmetric networks, in 
+     new effect group \texttt{covarBehaviorSymmetricRate}.
+   \item New effects \texttt{degAbsDiffX, degPosDiffX, degNegDiffX, degAbsContrX,
+     degPosContrX, degNegContrX}.
+   \item Effects \texttt{XWX, XWX1}, and \texttt{XWX2} enabled for 
+   bipartite networks, in
+    new effect group \texttt{dyadBipartiteObjective}.
+   \item Added parameter=2 for \texttt{FFDeg, BBDeg, FBDeg, FRDeg, BRDeg}.
+   \item Corrected \texttt{altInDist2, totInDist2} for two-mode networks.
+   \item Dropped some duplications in \sfn{effectsDocumentation}.
+   \item Modification of effect \texttt{outTrunc2}.
+     Perhaps this was superfluous.
+   \item Export of last simulated state from ML simulations if
+     \texttt{returnDeps}.
+   \item Added endowment and creation effects for \texttt{maxAlt} and \texttt{minAlt}.
+   \item Error messages for non-character \texttt{nodeSets} in functions 
+    \sfn{sienaDependent, coCovar,\\ varCovar}.
+   \item Improved way of handling missings for distance-2 network effects.
+   \item Added components \texttt{requestedEffects}, \texttt{theta}, and 
+    \texttt{se} to \texttt{siena08}
+     (\texttt{theta} and \texttt{se} are the ML estimates).
+   \item Error in summary of \sfn{sienaMeta} object corrected:
+     for the estimated mean parameter the two-sided $p$ was announced but a
+     one-sided $p$ was given. Also the ML results under normality assumptions
+     were copied from \sfn{print.sienaMeta} to \sfn{print.summary.sienaMeta}.
+   \item For non-directed networks, the initial model now contains 
+    only basic rates and degree effect.
+   \item Added reference to \texttt{DESCRIPTION} and citation info in 
+    \texttt{{\textbackslash}inst},
+   so \texttt{citation("RSiena")} now gives useful information.
+   \item The dropping of the exclusion of effects if the variance of a
+     covariate is 0, or a covariate has only two values, of version 1.1-306,
+     was  taken further (was incomplete).
+   \item Message if attributes \texttt{higher, disjoint}, 
+   or \texttt{atLeastOne} are \texttt{TRUE}      at the end of \\
+     \sfn{sienaDataCreate}.
+   \end{itemize}
+Changes in RSienaTest:
+\begin{itemize}
+   \item new function \sfn{extract.posteriorMeans} for \sfn{sienaBayes} results.
+   \item Add \texttt{z{\$fix}} to \sfn{sienaBayes} object, and 
+   use \texttt{!z{\$fix}} in check of maximum
+     estimated parameter value after initialization.
+   \item Correct construction of groupwise effects object in \sfn{sienaBayes} 
+    so that this
+     will work also when evaluation effects for density and/or reciprocity are
+     not included; and when there are interaction effects for which the main
+     effects are not included.
+   \item Corrections for \sfn{print} and \sfn{summary} of \sfn{sienaBayes} objects.
+     In \sfn{print.sienaBayesFit}, include fixed parameters and
+     give credibility intervals for rate parameters; include variance parameters;
+     allow shorter \texttt{ThinParameters};
+     print objects returned through \texttt{partialBayesResult.RData}
+     (by adding \texttt{na.rm=TRUE} to quantile).
+   \item \sfn{multipleBayesTest} corrected (there was an error for testing 
+      2 or more linear combinations simultaneously)
+       and adapted for cases with fixed  parameters;
+     adapted help file text.
+   \item All remaining parts of \sfn{rsiena01gui} removed.
+   \item As a compensation of this, \sfn{sienaDataCreateFromSession} exported,
+   and a more informative help page written.
+\end{itemize}
+
+\item 2017-09-09 R-Forge Revision 318, packages version 1.2-4.
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item Longer Description field in \texttt{DESCRIPTION}, as per CRAN suggestions.
+   \item Correction of \sfn{print.sienaFit}, repairing the option 
+        \texttt{include=FALSE}  in \sfn{setEffect} and \\
+        \sfn{includeEffects}.
+\end{itemize}
+Changes in RSienaTest:
+\begin{itemize}
+   \item Extra line in example for \texttt{sienaBayes.Rd}.
+\end{itemize}
+
 \item 2017-09-08 R-Forge Revision 316, CRAN package version 1.2-3.
 
 Changes in RSiena and RSienaTest:
@@ -14204,7 +14623,7 @@ Changes in RSiena and RSienaTest:
    it still is in the source code distribution as
    RSienatest{$\backslash$}doc{$\backslash$}RSiena\_Manual.tex. It still is publicly
    it can be downloaded from \\
-\href{http://www.stats.ox.ac.uk/~snijders/siena/RSiena_Manual.pdf}
+%\href{http://www.stats.ox.ac.uk/~snijders/siena/RSiena_Manual.pdf}
 {\texttt{http://www.stats.ox.ac.uk/$\tilde{\ }$snijders/siena/RSiena\_Manual.pdf}}.
    \item New effects  \texttt{totAltEgoX}, \texttt{totAltAltX}, \texttt{egoSqX},
      \texttt{diffX}, \texttt{diffSqX}, \texttt{egoDiffX},
@@ -14955,7 +15374,7 @@ For RSiena and RSienaTest:
 	\item The \sfn{print} method for objects of class \sfn{siena} (created by
         \sfn{sienaDataCreate})
 		has been extended with printing \sfn{uponly} and \sfn{downly} attributes,
-		if these are TRUE.
+		if these are \texttt{TRUE}.
 	\item A bug in the starting values for two-mode networks was corrected.
 	\item Small bug fixed in \sfn{print01Report()} for reporting of \sfn{uponly}
         and \sfn{downonly},
@@ -15282,7 +15701,7 @@ New goodness of fit functions: work in progress.
 \item Fix bug for bipartite networks which usually crashed, but could have given
   incorrect answers.
 \item Fix bug with multiple processes and sienaTimeTest.
-\item Default value of siena07 argument initC is now TRUE.
+\item Default value of siena07 argument initC is now \texttt{TRUE}.
 \end{itemize}
 \item 2011-01-08  R-forge revision 129:
 \begin{itemize}
@@ -15303,7 +15722,7 @@ New goodness of fit functions: work in progress.
   likelihood.
 \item User defined interactions (and time dummies) can be expanded
   when printing
-  the effects object, use parameter expandDummies=TRUE.
+  the effects object, use parameter \texttt{expandDummies=TRUE}.
 \end{itemize}
 \item 2010-11-25 R-forge revision 126:
 \begin{itemize}

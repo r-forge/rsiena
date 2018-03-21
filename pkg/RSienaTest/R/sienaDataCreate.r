@@ -333,6 +333,13 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 	{
 		nodeSets <- list(sienaNodeSet(attr(depvars[[1]], "netdims")[1]))
 	}
+	else
+	{
+		if (!(inherits(nodeSets, "sienaNodeSet") || inherits(nodeSets[[1]], "sienaNodeSet")))
+		{
+			stop("nodeSets should be a sienaNodeSet object or a list of such objects")
+		}		
+	}
 	nodeSetNames <- sapply(nodeSets,function(x) attr(x,"nodeSetName"))
 	names(nodeSets) <- nodeSetNames
 	if (v2 == 0)
@@ -1085,6 +1092,45 @@ checkConstraints <- function(z)
 	attr(z, "higher") <- higher
 	attr(z, "disjoint") <- disjoint
 	attr(z, "atLeastOne") <- atLeastOne
+
+	## report on constraints; adapted from print01Report
+	if (any(higher))
+	{
+		higherSplit <- strsplit(names(higher)[higher], ",")
+		report <- sapply(higherSplit, function(x)
+		   {
+			   paste(c("Network ", x[1], " is higher than network ", x[2],
+						".\n"), sep="")
+		  })
+		cat(report)
+		cat("This will be respected in the simulations.\n")
+cat("If this is not desired, change attribute 'higher'.\n")
+	}
+	if (any(disjoint))
+	{
+		disjointSplit <- strsplit(names(disjoint)[disjoint],',')
+		report <- sapply(disjointSplit, function(x)
+		   {
+			   paste(c("Network ", x[1], " is disjoint from network ",
+						x[2], ".\n"), sep="")
+		  })
+		cat(report)
+		cat("This will be respected in the simulations.\n")
+cat("If this is not desired, change attribute 'disjoint'.\n")
+	}
+	if (any(atLeastOne))
+	{
+		atLeastOneSplit <- strsplit(names(atLeastOne)[atLeastOne],',')
+		report <- sapply(atLeastOneSplit, function(x)
+		   {
+			   paste(c("A link in at least one of networks ",
+						x[1], " and", x[2],
+					   " always exists.\n"), sep="")
+		  })
+		cat(report)
+		cat("This will be respected in the simulations.\n")
+cat("If this is not desired, change attribute 'atLeastOne'.\n")
+	}
 	z
 }
 

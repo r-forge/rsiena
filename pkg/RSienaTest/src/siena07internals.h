@@ -223,7 +223,8 @@ void getStatistics(SEXP EFFECTSLIST,
 	const StatisticCalculator * pCalculator,
 	int period, int group, const Data *pData,
 	const EpochSimulation * pEpochSimulation,
-	std::vector<double> * rfra, std::vector<double> *rscore);
+	std::vector<double> * rfra, std::vector<double> *rscore,
+	std::vector<double> * rderiv);
 
 /**
  *  retrieves the values of the scores and derivatives for each of the effects,

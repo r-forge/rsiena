@@ -26,7 +26,7 @@ class MissingCovariatePredicate: public CovariatePredicate
 public:
 	MissingCovariatePredicate(std::string covariateName);
 
-	virtual bool value(int alter) const;
+	virtual bool value(int alter);
 };
 
 }

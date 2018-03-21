@@ -65,7 +65,7 @@ void IntSqrtFunction::preprocessEgo(int ego)
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double IntSqrtFunction::value(int alter) const
+double IntSqrtFunction::value(int alter)
 {
 	return this->lpSqrtTable->sqrt(this->lpFunction->value(alter));
 }

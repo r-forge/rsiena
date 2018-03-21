@@ -347,6 +347,7 @@ double StatisticsSimulation::getDiffusionRateScore(const EffectInfo* effectInfo,
 	if (effectInfo->effectName() == "avExposure"
 			|| effectInfo->effectName() == "totExposure"
 			|| effectInfo->effectName() == "susceptAvIn"
+			|| effectInfo->effectName() == "infectDeg"
 			|| effectInfo->effectName() == "infectIn"
 			|| effectInfo->effectName() == "infectOut"
 			|| effectInfo->effectName() == "susceptAvCovar"

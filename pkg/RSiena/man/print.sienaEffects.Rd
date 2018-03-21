@@ -46,7 +46,7 @@ includeOnly=TRUE, expandDummies = FALSE, ...)
 \references{
   See \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
-\author{Ruth Ripley
+\author{Ruth Ripley, modifications by Tom Snijders.
 }
 \seealso{\code{\link{sienaTimeTest}}, \code{\link{effectsDocumentation}}}
 \examples{

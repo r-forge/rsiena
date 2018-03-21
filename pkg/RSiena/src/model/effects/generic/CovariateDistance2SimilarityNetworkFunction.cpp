@@ -30,7 +30,7 @@ namespace siena
 CovariateDistance2SimilarityNetworkFunction::
 CovariateDistance2SimilarityNetworkFunction(string networkName, string
 	covariateName, bool excludeMissing) :
-	CovariateDistance2NetworkFunction(networkName, covariateName)
+	CovariateDistance2NetworkFunction(networkName, covariateName, excludeMissing, true)
 {
 	this->lexcludeMissing = excludeMissing;
 }
@@ -41,7 +41,7 @@ CovariateDistance2SimilarityNetworkFunction(string networkName, string
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double CovariateDistance2SimilarityNetworkFunction::value(int alter) const
+double CovariateDistance2SimilarityNetworkFunction::value(int alter)
 {
 	double value = 0;
 	if (!this->lexcludeMissing || (!this->missingDummy(alter) &&

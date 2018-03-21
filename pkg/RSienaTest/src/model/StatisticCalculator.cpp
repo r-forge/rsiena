@@ -1617,6 +1617,7 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 					if (effectName == "avExposure" ||
 						effectName == "susceptAvIn" ||
 						effectName == "totExposure" ||
+						effectName == "infectDeg" ||
 						effectName == "infectIn" ||
 						effectName == "infectOut")
 					{
@@ -1698,7 +1699,7 @@ double StatisticCalculator::calculateDiffusionRateEffect(
 			{
 				alterValue *= pStructural->inDegree(iter.actor());
 			}
-			else if (effectName == "infectOut")
+			else if ((effectName == "infectOut") | (effectName == "infectDeg"))
 			{
 				alterValue *= pStructural->outDegree(iter.actor());
 			}

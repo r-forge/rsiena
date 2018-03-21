@@ -62,7 +62,7 @@ void InStarsTimesDegreesFunction::initialize(const Data * pData,
  * To generalize this allowing other directions and network choices:
  * see OutActDistance2Function.cpp for an example.
  */
-double InStarsTimesDegreesFunction::value(int alter) const
+double InStarsTimesDegreesFunction::value(int alter)
 {
 	double statistic = 0;
 	const Network * pFirstNetwork = this->pFirstNetwork();

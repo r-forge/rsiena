@@ -344,7 +344,7 @@ SEXP forwardModel(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 			vector<double> score(dim);
 			getStatistics(EFFECTSLIST, &Calculator,
 				period, group, pData, pEpochSimulation,
-				&statistic, &score);
+				&statistic, &score);  // ABC
 			/* fill up matrices for  return value list */
 			int iii = (periodFromStart - 1) * dim;
 			for (unsigned effectNo = 0; effectNo < statistic.size();
@@ -487,7 +487,7 @@ SEXP forwardModel(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	SEXP THETA, SEXP GROUP, SEXP PERIOD,
 	SEXP NRUNMH, SEXP ADDCHAINTOSTORE,
-	SEXP RETURNDATAFRAME, SEXP RETURNCHAINS,
+	SEXP RETURNDATAFRAME, SEXP RETURNDEPS, SEXP RETURNCHAINS,
 	SEXP RETURNLOGLIK, SEXP ONLYLOGLIK)
 {
 	/* do some MH steps and return some or all of the scores and derivs
@@ -501,6 +501,7 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	int period = asInteger(PERIOD) - 1;
 	int groupPeriod = periodFromStart(*pGroupData, group, period);
 
+	/* get hold of the data object */
 	Data * pData = (*pGroupData)[group];
 
 	/* get hold of the model object */
@@ -546,6 +547,11 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		pModel->deleteLastChainStore(groupPeriod);
 	}
 
+	int returnDeps = 0;
+	if (!isNull(RETURNDEPS))
+	{
+		returnDeps = asInteger(RETURNDEPS);
+	}
 	int returnChains = 0;
 	if (!isNull(RETURNCHAINS))
 	{
@@ -634,7 +640,44 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	/* sims will be the returned chain */
 	SEXP sims;
 	PROTECT(sims = allocVector(VECSXP, 1));
-	int nProtects = 4;
+	/* theseDeps will be the returned dependent variables */
+	SEXP theseDeps;
+	PROTECT(theseDeps = allocVector(VECSXP, numberVariables));
+	int nProtects = 5;
+
+	if (returnDeps)
+	{
+		// get simulated last state
+		pMLSimulation->gotoLastState();
+		const vector<DependentVariable *> lastVariables =
+				  pMLSimulation->rVariables();
+
+		for (unsigned i = 0; i < numberVariables; i++)
+		{
+			NetworkVariable * pNetworkVariable =
+				dynamic_cast<NetworkVariable *>(lastVariables[i]);
+			BehaviorVariable * pBehaviorVariable =
+				dynamic_cast<BehaviorVariable *>(lastVariables[i]);
+				if (pNetworkVariable)
+			{
+				const Network * pNetwork = pNetworkVariable->pNetwork();
+				SEXP thisEdge;
+				PROTECT(thisEdge = getEdgeList(*pNetwork));
+				SET_VECTOR_ELT(theseDeps, i, thisEdge);
+			}
+			else if (pBehaviorVariable)
+			{
+				SEXP theseValues;
+				PROTECT(theseValues = getBehaviorValues(*pBehaviorVariable));
+				SET_VECTOR_ELT(theseDeps, i, theseValues);
+			}
+			else
+			{
+				throw domain_error("Unexpected class of dependent variable");
+			}
+		nProtects++;
+		}
+	}
 
 	// get chain
 	if (returnChains)
@@ -711,7 +754,7 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 				rdff[ii] = derivs[ii];
 			}
 		}
-		PROTECT(ans = allocVector(VECSXP, 11));
+		PROTECT(ans = allocVector(VECSXP, 12));
 		nProtects++;
 
 		/* set up the return object */
@@ -728,6 +771,7 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		SET_VECTOR_ELT(ans, 8, rejects);
 		SET_VECTOR_ELT(ans, 9, aborts);
 		SET_VECTOR_ELT(ans, 10, ScalarReal(loglik));
+		SET_VECTOR_ELT(ans, 11, theseDeps);
 
 //	PrintValue(getChainDF(*pChain, true));
 	}
@@ -739,7 +783,8 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 		SET_VECTOR_ELT(ans, 1, accepts);
 		SET_VECTOR_ELT(ans, 2, rejects);
 		SET_VECTOR_ELT(ans, 3, aborts);
-		SET_VECTOR_ELT(ans, 4, sims);
+//		SET_VECTOR_ELT(ans, 4, sims);
+//		SET_VECTOR_ELT(ans, 5, theseDeps);
 	}
 
 	PutRNGstate();

@@ -1763,6 +1763,7 @@ void getStatistics(SEXP EFFECTSLIST,
 								strcmp(effectName, "totExposure") == 0 ||
 								strcmp(effectName, "susceptAvIn") == 0 ||
 								strcmp(effectName, "infectIn") == 0 ||
+								strcmp(effectName, "infectDeg") == 0 ||
 								strcmp(effectName, "infectOut") == 0 ||
 								strcmp(effectName, "susceptAvCovar") == 0 ||
 								strcmp(effectName, "infectCovar") == 0)

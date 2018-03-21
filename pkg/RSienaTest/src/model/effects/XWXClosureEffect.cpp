@@ -61,8 +61,8 @@ void XWXClosureEffect::initialize(const Data * pData,
 
 	delete[] this->ltwoPathSums;
 	delete[] this->linStarSums;
-	this->ltwoPathSums = new double[this->pNetwork()->n()];
-	this->linStarSums = new double[this->pNetwork()->n()];
+	this->ltwoPathSums = new double[this->pNetwork()->m()]; // was n() until March 2018
+	this->linStarSums = new double[this->pNetwork()->m()]; // was n() until March 2018
 }
 
 
@@ -86,11 +86,11 @@ void XWXClosureEffect::preprocessEgo(int ego)
 void XWXClosureEffect::calculateTwoPathSums(int i,
 	const Network * pNetwork, double * sums) const
 {
-	int n = pNetwork->n();
+	int m = pNetwork->m(); // was n() until March 2018
 
 	// Initialize
 
-	for (int j = 0; j < n; j++)
+	for (int j = 0; j < m; j++)
 	{
 		sums[j] = 0;
 	}
@@ -126,11 +126,11 @@ void XWXClosureEffect::calculateInStarSums(int i,
 	const Network * pNetwork,
 	double * sums) const
 {
-	int n = pNetwork->n();
+	int m = pNetwork->m();// was n() until March 2018
 
 	// Initialize
 
-	for (int j = 0; j < n; j++)
+	for (int j = 0; j < m; j++)
 	{
 		sums[j] = 0;
 	}

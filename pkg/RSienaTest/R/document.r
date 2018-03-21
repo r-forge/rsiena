@@ -18,8 +18,7 @@ RSienaAutoHelpTable <- function(RSienaDir="../RSiena/man")
 	## stage of processing relevant, and T or F in the arguments column
 	## to indicate whether the arguments are to be included in the final
 	## column of the table - TTT means all three arguments...
-	RSienaRequiredFunctions <- data.frame(functionName=c("installGui",
-			"siena01Gui",
+	RSienaRequiredFunctions <- data.frame(functionName=c(
 			"sienaNodeSet",
 			"sienaDependent",
 			"coCovar",

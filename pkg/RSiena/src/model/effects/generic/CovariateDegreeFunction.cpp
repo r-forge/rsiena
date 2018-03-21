@@ -61,7 +61,7 @@ void CovariateDegreeFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double CovariateDegreeFunction::value(int alter) const
+double CovariateDegreeFunction::value(int alter)
 {
 	double statistic = 0;
 	if  (!(this->lexcludeMissing && this->missing(alter)))

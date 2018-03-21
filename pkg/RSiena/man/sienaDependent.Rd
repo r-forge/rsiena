@@ -40,9 +40,10 @@ nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
     superfluous in such constrained situations.
     This will be reported in the output of \code{\link{print01Report}}.
 
-    For normal operation, TRUE is the appropriate option.
-    For data sets that will be part of a multi-group object
-    created by \code{\link{sienaGroupCreate}}, FALSE is preferable.}
+    For normal operation when this is the case for all periods, usually
+    TRUE is the appropriate option. When it is only the case for some of the
+    periods, and for data sets that will be part of a multi-group object
+    created by \code{\link{sienaGroupCreate}}, FALSE usually is preferable.}
 }
 \details{
   Adds attributes so that the array or list of matrices can be used in a

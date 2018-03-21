@@ -86,7 +86,8 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   is obtained by executing \code{\link{effectsDocumentation}(myeff)}.
 
   To set attributes of interaction effects in the effects object,
-  function \code{\link{setEffect}} can also be used with its parameters
+  function \code{\link{setEffect}} can also be used with short name 
+  \code{unspInt} or \code{behUnspInt}, and further using parameters
   \code{effect1} and \code{effect2}, and possibly \code{effect3}.
   }
 \value{

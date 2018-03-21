@@ -60,7 +60,7 @@ void SameCovariateMixedTwoPathFunction::initialize(const Data * pData,
  * that the function has been initialized before and pre-processed with
  * respect to a certain ego.
  */
-double SameCovariateMixedTwoPathFunction::value(int alter) const
+double SameCovariateMixedTwoPathFunction::value(int alter)
 {
 	int statistic = 0;
 	if (!(this->lexcludeMissing && this->missing(alter)))

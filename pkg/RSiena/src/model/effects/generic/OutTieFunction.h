@@ -27,7 +27,7 @@ class OutTieFunction: public NetworkAlterFunction
 public:
 	OutTieFunction(std::string networkName);
 
-	virtual double value(int alter) const;
+	virtual double value(int alter);
 };
 
 }
