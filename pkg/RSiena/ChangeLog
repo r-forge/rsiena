@@ -1,3 +1,8 @@
+2018-03-23 R-Forge Revision 333, packages version 1.2-10.
+Changes in RSiena and RSienaTest:
+   * Example in help file siena07 for accessing generated networks for ML.
+
+
 2018-03-21 R-Forge Revision 332, packages version 1.2-9.
 Changes in RSiena and RSienaTest:
    * model/effects/generic: Remove const from some of the value methods (as

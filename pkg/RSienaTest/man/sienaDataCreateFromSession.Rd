@@ -99,12 +99,16 @@ sienaDataCreateFromSession(filename = NULL,
 \seealso{ \code{\link{sienaDataCreate}}, \code{\link{siena}}}
 \examples{
 \dontrun{
+# Go to the directory that has the files needed here,
+# but make sure to go back to the current directory at the end:
 thiswd <- getwd()
-pd <- system.file("examples", package="RSienaTest")
+# The directory where we want to go for the data files:
+(pd <- system.file("examples", package="RSienaTest"))
 setwd(pd)
+# The file we need:
 (filePath <- system.file("examples", "sienafreshman.csv", package="RSienaTest"))
-# In this path there are also other .csv files with accompanying data sets.
 session <- sienaDataCreateFromSession(filePath)
+# In directory pd there are also other .csv files with accompanying data sets.
 (mydata <- session$mydata)
 (myeff <- session$myeff)
 setwd(thiswd)

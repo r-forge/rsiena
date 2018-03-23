@@ -101,8 +101,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  In the case of using multiple processors, there are two options for telling
  \code{siena07} to use them. By specifying the options \code{useCluster}, \code{nbrNodes},
  \code{clusterString} and \code{initC}, \code{siena07} will create a
- \link[parallel:makeCluster]{cluster object} that will be used by the
- \link[parallel:parallel]{parallel} package. After finishing the estimation procedure,
+ \code{cluster object} that will be used by the
+ \code{parallel} package. After finishing the estimation procedure,
  \code{siena07} will automatically stop the cluster. Alternatively, instead of
  having the function to create a cluster, the user may provide its own by
  specifying the option \code{cl}, similar to what the boot function does in
@@ -235,6 +235,50 @@ cl <- makePSOCKcluster(
 
 ans4 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, cl = cl)
 stopCluster(cl)
+    }
+# Accessing simulated networks for ML ------------------------------------------
+# The following is an example for accessing the simulated networks for ML,
+# which makes sense only if there are some missing tie variables;
+# observed tie variables are identically simulated at the moment of observation,
+# missing tie variable are imputed in a model-based way.
+mat1 <- matrix(c(0,0,1,1,
+                 1,0,0,0,
+                 0,0,0,1,
+                 0,1,0,0),4,4, byrow=TRUE)
+mat2 <- matrix(c(0,1,1,1,
+                 1,0,0,0,
+                 0,0,0,1,
+                 0,0,1,0),4,4, byrow=TRUE)
+mat3 <- matrix(c(0,1,0,1,
+                 1,0,0,0,
+                 0,0,0,0,
+                 NA,1,1,0),4,4, byrow=TRUE)
+mats <- array(c(mat1,mat2,mat3), dim=c(4,4,3))
+net <- sienaDependent(mats, allowOnly=FALSE)
+sdat <- sienaDataCreate(net)
+alg <- sienaAlgorithmCreate(maxlike=TRUE, nsub=3, n3=100, seed=1234)
+effs <- getEffects(sdat)
+\dontrun{
+(ans <- siena07(alg, data=sdat, effects=effs, returnDeps=TRUE))
+# See manual Section 9.1 for information about the following functions
+edges.to.adj <- function(x,n){
+# create empty adjacency matrix
+    adj <- matrix(0, n, n)
+# put edge values in desired places
+    adj[x[, 1:2]] <- x[, 3]
+    adj
+}
+the.edge <- function(x,n,h,k){
+    edges.to.adj(x,n)[h,k]
+}
+# Now show the results
+n <- 4
+ego <- rep.int(1:n,n)
+alter <- rep(1:n, each=n)
+ones <- sapply(1:n^2, function(i)
+    {mean(sapply(ans$sims, function(x){the.edge(x[[1]][[2]],n,ego[i],alter[i])}))})
+cbind(ego,alter,ones)
+matrix(ones,n,n)
     }
 }
 \keyword{models}
