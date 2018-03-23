@@ -14407,9 +14407,8 @@ Changes in RSiena and RSienaTest:
 Changes in RSienaTest:
 \begin{itemize}
    \item new function \sfn{extract.posteriorMeans} for \sfn{sienaBayes} results.
-   \item Add \texttt{z{\$fix}} to \sfn{sienaBayes} object, and 
-   use \texttt{!z{\$fix}} in check of maximum
-     estimated parameter value after initialization.
+   \item Restrict check of maximum
+     estimated parameter value after initialization to non-fixed effects.
    \item Correct construction of groupwise effects object in \sfn{sienaBayes} 
     so that this
      will work also when evaluation effects for density and/or reciprocity are
