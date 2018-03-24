@@ -12891,7 +12891,7 @@ Figure~\ref{F_infl_dk_avsim} gives the same information as the table.
 
 \clearpage
 
-\subsection{Effect sizes}
+\subsection{Effect sizes and measures of fit}
 
 For linear regression models we are used to the coefficient of determination,
 usually denoted $R^2$, defined as the proportion of variance
@@ -12957,6 +12957,10 @@ degree of `chance variability'.
 They are calculated by  \sfn{sienaRI()} as \texttt{RHActors}
 (see the help page). The mean over actors is printed by the print method
 for \sfn{sienaRI()}.
+
+Note that the values given by \sfn{sienaRI()} refer to each of the waves,
+including the first wave; for this purpose, $x$ in (\ref{explained})
+is taken as the observed network (and behaviour...) at each wave.
 
 
 \subsubsection{Standard deviation of change statistics}
