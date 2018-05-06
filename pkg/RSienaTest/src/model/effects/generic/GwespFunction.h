@@ -38,7 +38,6 @@ public:
 		double parameter) ;
 	virtual void initialize(const Data * pData,
 		State * pState, int period, Cache * pCache);
-
 	virtual double value(int alter);
 
 private:
@@ -46,8 +45,9 @@ private:
 	double lparameter;
 	std::vector<double> lcumulativeWeight;
 	double lweight;
+	double lexpmweight;
+	double lexpfactor;
 	EgocentricConfigurationTable *lpInitialisedTable;
-
 };
 }
 

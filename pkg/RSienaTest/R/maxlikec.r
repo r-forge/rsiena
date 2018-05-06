@@ -18,7 +18,6 @@ maxlikec <- function(z, x, data=NULL, effects=NULL,
 # note: parameter x is not used. Just for consistency with other possibilities for FRAN.
     ## retrieve stored information
     f <- FRANstore()
-# Hier is f$myeffects verkeerd.
     callGrid <- z$callGrid
     if (nrow(callGrid) == 1)
     {

@@ -593,6 +593,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
  		pEffect = new GenericNetworkEffect(pEffectInfo,
 			pFunction);
 	}
+	else if (effectName == "gwdspFF")
+	{
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pTwoPathTable;
+		pEffect = new GwdspEffect(pEffectInfo, mytable, true);
+	}
+	else if (effectName == "gwdspFB")
+	{
+		EgocentricConfigurationTable * (NetworkCache::*mytable)() const =
+			&NetworkCache::pInStarTable;
+		pEffect = new GwdspEffect(pEffectInfo, mytable, false);
+	}
 	else if (effectName == "inStructEq")
 	{
 		pEffect = new InStructuralEquivalenceEffect(pEffectInfo);
@@ -1634,10 +1646,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		string covariateName = pEffectInfo->interactionName1();
 		AlterFunction * pChangeFunction =
 			new CovariateDistance2EgoAltSimNetworkFunction(networkName,
-				covariateName, false, false);
+				covariateName, false, true);
 		AlterFunction * pStatisticFunction =
 			new CovariateDistance2EgoAltSimNetworkFunction(networkName,
-				covariateName, true, false);
+				covariateName, true, true);
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			pChangeFunction, pStatisticFunction);
 	}
@@ -1647,10 +1659,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		string covariateName = pEffectInfo->interactionName1();
 		AlterFunction * pChangeFunction =
 			new CovariateDistance2EgoAltSimNetworkFunction(networkName,
-				covariateName, false, true);
+				covariateName, false, false);
 		AlterFunction * pStatisticFunction =
 			new CovariateDistance2EgoAltSimNetworkFunction(networkName,
-				covariateName, true, true);
+				covariateName, true, false);
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			pChangeFunction, pStatisticFunction);
 	}
@@ -1753,10 +1765,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		string covariateName = pEffectInfo->interactionName2();
 		AlterFunction * pChangeFunction =
 			new CovariateDistance2EgoAltSimNetworkFunction(networkName,
-				covariateName, false, false);
+				covariateName, false, true);
 		AlterFunction * pStatisticFunction =
 			new CovariateDistance2EgoAltSimNetworkFunction(networkName,
-				covariateName, true, false);
+				covariateName, true, true);
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			pChangeFunction, pStatisticFunction);
 	}
@@ -1766,10 +1778,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		string covariateName = pEffectInfo->interactionName2();
 		AlterFunction * pChangeFunction =
 			new CovariateDistance2EgoAltSimNetworkFunction(networkName,
-				covariateName, false, true);
+				covariateName, false, false);
 		AlterFunction * pStatisticFunction =
 			new CovariateDistance2EgoAltSimNetworkFunction(networkName,
-				covariateName, true, true);
+				covariateName, true, false);
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			pChangeFunction, pStatisticFunction);
 	}

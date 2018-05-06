@@ -575,8 +575,9 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 	ans <- .Call(C_effects, PACKAGE=pkgname, pData, basicEffects)
 	pModel <- ans[[1]][[1]]
 	for (i in seq(along=(ans[[2]]))) ## ans[[2]] is a list of lists of
-		## pointers to effects. Each list corresponds to one
+		## pointers to effects. Each list, here i, corresponds to one
 		## dependent variable
+		## The first are NULL, for rate effects, which are not used for interactions.
 	{
 		effectPtr <- ans[[2]][[i]]
 		basicEffects[[i]]$effectPtr <- effectPtr

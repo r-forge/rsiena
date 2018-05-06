@@ -308,14 +308,15 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 	if (extracted %in% c("all", "objective", "varying")){
 		# mu
 		nind <- sum(zlist[[1]]$varyingParametersInGroup)
+		res2 <- array(dim = c(nit, length(zlist), (2*nind)))
 		if (nind <= 0)
 		{
 			cat("Note: no varying parameters.\n")
+			fName2 <- NULL
 		}
 		else
 		{
 			EffName <- getNames(zlist[[1]])[zlist[[1]]$varyingParametersInGroup]
-			res2 <- array(dim = c(nit, length(zlist), (2*nind)))
 			for (h in 1:length(zlist)){
 				res2[,h,1:nind] <-
 					zlist[[h]]$ThinPosteriorMu[(niter[h]-nit+1):niter[h], ,drop=FALSE]
@@ -344,14 +345,15 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 	if (extracted %in% c("all", "objective", "non-varying")){
 		# eta
 		nind <- sum(!zlist[[1]]$varyingParametersInGroup)
+		res3 <- array(dim = c(nit, length(zlist), nind))
 		if (nind <= 0)
 		{
 			cat("Note: no non-varying parameters.\n")
+			fName3 <- NULL
 		}
 		else
 		{
 			EffName <- getNames(zlist[[1]])[!zlist[[1]]$varyingParametersInGroup]
-			res3 <- array(dim = c(nit, length(zlist), nind))
 			for (h in 1:length(zlist)){
 				res3[,h,1:nind] <-
 					zlist[[h]]$ThinPosteriorEta[(niter[h]-nit+1):niter[h], ,drop=FALSE]
@@ -433,7 +435,7 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1){
 	{
 		EffName <- getNames(z)[z$varyingParametersInGroup]
 		for (h in 1:z$nGroup){
-			df <- sienaFitThetaTable(z, fromBayes=TRUE, tstat=FALSE, 
+			df <- sienaFitThetaTable(z, fromBayes=TRUE, tstat=FALSE,
 									groupOnly=h, nfirst=nfirst)$mydf
 			seth <- union(z$ratePositions[[h]], which(z$varyingObjectiveParameters))
 			posttheta <- df[seth,"value"]

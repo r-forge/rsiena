@@ -54,6 +54,7 @@
 #include "DyadicCovariateReciprocityEffect.h"
 #include "FourCyclesEffect.h"
 #include "HigherCovariateEffect.h"
+#include "GwdspEffect.h"
 #include "IndegreeEffect.h"
 #include "IndegreeActivityEffect.h"
 #include "IndegreePopularityEffect.h"
