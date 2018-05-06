@@ -338,7 +338,14 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
             z$termination <- 'Error'
         }
         if (!z$OK || !z$Phase3Interrupt)
+		{
+			if (useCluster)
+			{
+				stopCluster(cl)
+			}
+			useCluster <- FALSE
             return(z)
+		}
     }
     ## #####################################################
     ## do final call of FRAN

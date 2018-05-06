@@ -94,6 +94,8 @@ extract.posteriorMeans(z, nfirst=z$nwarm+1)
         effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10),
         simplify=FALSE)
   bayes.extracted <- extract.sienaBayes(bayes.models, extracted="all")
+  dim(bayes.extracted)
+  dimnames(bayes.extracted)
   extract.posteriorMeans(bayes.models[[1]])
 }
 }

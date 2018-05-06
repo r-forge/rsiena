@@ -185,7 +185,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-9.
+This version was renewed for \RS version 1.2-10.
 \end{abstract}
 
 
@@ -813,7 +813,13 @@ and (alternatively) \sfn{sienacpr()}, using the following procedure:
 \end{enumerate}
 \end{enumerate}
 
-\newpage
+
+\subsubsection{Design issues for longitudinal network modeling}
+
+Issues concerning the design of longitudinal network models
+according to the \SAOM are discussed in 
+\citet{StadfeldSnijdersSteglichVanDuijn2018}.
+
 \subsubsection{Further useful options in \RS}
 \label{S_etc}
 \begin{itemize}
@@ -881,24 +887,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-9}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-10}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-9.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-10.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-9.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-10.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-9.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-10.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-9.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-10.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-9.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-10.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-9.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-10.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1096,7 +1102,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-9) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-10) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1537,29 +1543,43 @@ See Section~\ref{S_center} on centering.
 
 For actor covariates (also called monadic covariates),
 two kinds of transformations to dyadic covariates
-are made internally in \si. Denote the actor covariate by $v_i$,
+are made internally in \si, by the definition of the
+corresponding effects. Denote the actor covariate by $v_i$,
 and the two actors in the dyad by $i$ and $j$.
 Suppose that the range of $v_i$ (i.e., the difference between the
 highest and the lowest values) is given by $r_V$.
 The two transformations are the following:
 \begin{enumerate}
-\item \emph{dyadic similarity}, defined by
-      $ 1 - \big( \vert v_i - v_j \vert / r_V \big) $,
-      and centered so the mean of this similarity variable becomes 0;\\
-      note that before centering, the similarity variable is 1 if
+\item \emph{dyadic similarity} is defined by
+\begin{equation}
+ \text{sim}^V_{ij} \,=\, 1 - \frac{ \vert v_i - v_j \vert }{ r_V } \ .
+            \label{simV}
+\end{equation}
+      This similarity measure is 1 if
       the two actors have the same value, and 0 if one has the highest and the
-      other the lowest possible value;
-      the mean of the similarity variable is calculated by function
+      other the lowest possible value.
+      For the various similarity effects, this measure
+      is centered by subtracting the mean over all dyads,
+      so the mean of this similarity variable becomes 0.    \\
+      The advantage of this similarity measure is that its coefficients
+      are comparable in the sense that the measure always ranges
+      between 0 and~1.  \\
+      The mean of (\ref{simV}) is calculated by function
       \sfn{sienaDataCreate} and stored as the \sfn{simMean} attribute
       of \texttt{mydata\$cCovars\$myvar}, where \texttt{mydata} is the name
       of the object created by \sfn{sienaDataCreate}, and \texttt{myvar}
       is the name of the variable used as the argument for
       \sfn{sienaDataCreate}, while the name \texttt{cCovars} applies for
       constant monadic covariates, and is to be replaced by \texttt{vCovars}
-      for changing (varying) monadic covariates;\\
+      for changing (varying) monadic covariates;
       for centering issues, further see Section~\ref{S_center}.
-\item \emph{same $V$}, defined by 1 if $v_i = v_j$,
-      and 0 otherwise (not centered) ($V$ is the name of the variable).
+\item \emph{same $V$} is defined by
+\begin{equation}
+ \text{same}^V_{ij} \,=\,
+        \left\{ \begin{array}{ll} 1 & \text{ if } v_i \,=\, v_j \\
+                          0 & \text{ if } v_i \,\neq\, v_j \ .
+    \end{array} \right.
+\end{equation}
       This can also be referred to as \emph{dyadic identity}
       with respect to $V$.
 \end{enumerate}
@@ -3640,10 +3660,9 @@ for references to more recent literature.
 \subsection{Goodness of fit with auxiliary statistics}
 \label{S_gof}
 
-There is now available in RSienaTest a function \verb!sienaGOF!
+There is available in RSienaTest a function \verb!sienaGOF!
 which permits users to assess the fit of the model with respect to
-auxiliary statistics of networks,
-e.g. geodesic distributions,
+auxiliary statistics of networks, e.g. geodesic distributions,
 that are not explicitly fit by a particular effect,
 but are nonetheless important features of the network to represent by the
 probability model.
@@ -3659,6 +3678,16 @@ the observed values, at the ends of the periods, with the
 simulated values for the ends of the periods.
 The differences are assessed by combining the auxiliary statistics
 using the Mahalanobis distance.
+
+Various auxiliary statistics are available directly (`out of the box'),
+e.g., distributions of indegrees and outdegrees and of behavioral
+variables. These are listed in the help page for
+\verb!sienaGOF-auxiliary!. Some other auxiliary statistics, requiring
+additional packages such as \texttt{igraph} and \texttt{sna},
+are available by copying script from the examples in the same help page.
+(The reason for this construction is to reduce dependencies
+of the basic \sfn{RSiena} on other packages.)
+\medskip
 
 The results of \verb!sienaGOF! can be plotted which then produces
 \emph{violin plots} \citep{HintzeNelson1998}, which present
@@ -5169,7 +5198,9 @@ detectCores()
   It is not advisable to utilize all available cores, because
   other processes also have to run. If you are not the only user
   of the machine, then there are obvious issues to be dealt with.
-\item For estimation by Method of Moments (MoM),  in Phases 1 and 3
+
+  There are some examples in the help page for \sfn{siena07}.
+\item For estimation by Method of Moments (MoM), in Phases 1 and 3
   the simulations are performed in parallel. In Phase 2,
   multiple (viz., \texttt{nbrNodes} which is a parameter
   given in the call of \sfn{siena07()}) simulations are done with the same parameters,
@@ -5653,12 +5684,26 @@ myans1 <- siena07(estimationSettings, data=mydata, effects=myeff)
 summary(myans1)
 \end{verbatim}
 
+
+The one-step estimates are given in the file \texttt{pname.out},
+mentioned in Section~\ref{S_output}.
+These are `quick and easy' estimates that are not totally
+reliable, but that can be used as approximations of the unrestricted estimates
+(that is, the estimates that would be obtained if the model were estimated
+once again, but without restricting the parameter by \texttt{fix=TRUE}).
+They are explained mathematically in \citet{Schweinberger12}.
+Their computational advantage is based on the fact that they require simulations
+only for parameter vectors where this parameter is fixed (usually, to 0;
+but other values could be used, and this would be preferable if they are closer
+to the resulting estimate).
+
 \subsection{Example: one-sided tests, two-sided tests, and one-step estimates}
 \label{example}
 
 Suppose that it is desired to test the goodness-of-fit of the model
 restricted by the null hypothesis that the reciprocity parameter is zero.
-The following output may be obtained:
+The following output may be obtained in the file \texttt{pname.out},
+mentioned in Section~\ref{S_output}:
 
 
 {\footnotesize
@@ -5718,12 +5763,8 @@ parameters.
 The one-sided test statistic, which can be regarded as normal variate, equals {\tt 1.9996}
 indicating that the value of the transitivity parameter is positive.
 
-The one-step estimates are approximations of the unrestricted estimates (that is,
-the estimates that would be obtained if the model were estimated once again,
-but without restricting the reciprocity parameter).
-The one-step estimate of reciprocity, {\tt 1.2567},
-hints that this parameter is positive,
-which agrees with the one-sided test.
+In this example, the one-step estimate of reciprocity is {\tt 1.2567},
+suggesting that this parameter is positive, which agrees with the one-sided test.
 
 \subsubsection{Multi-parameter tests}
 
@@ -6036,6 +6077,11 @@ This type of information can be found out by requesting
 \begin{verbatim}
 str(sim_ans$sims[[568]])
 \end{verbatim}
+
+The help page for \textsf{siena07} contains an example for how to access the
+generated networks in the case of ML estimation. Note that this is meaningful only in view
+of the missing values of dependent variables for waves~2 and further, for which the
+simulations in Phase~3 can be regarded as a kind of model-based imputation.
 
 Section \ref{S_trafos} explains how such an edgelist can be
 transformed to an adjacency matrix:
@@ -7789,7 +7835,10 @@ the {\em number of four-cycles} with shortName \texttt{(cycle4)} \\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij} \, \max_h (x_{ih}\, x_{hj}) $;
 
  \item {\em betweenness count} \texttt{(between)},\\
- $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{hi}\, x_{ij}\, (1-x_{hj})\,$;
+ $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{hi}\, x_{ij}\, (1-x_{hj})\,$;\\
+ note that this is one of the rare effects that depends on \underline{non-existence}
+ of a tie (here, the tie $h \rightarrow j$); this makes it less attractive,
+ use it only if you know what you are doing!
 
  \item {\em balance} \texttt{(balance)}, defined by the similarity between
  the outgoing ties of actor $i$ and the outgoing ties of the other actors
@@ -8023,6 +8072,33 @@ positive parameters $\alpha$, $\alpha'$ related according to
 $\exp(-\alpha) + \exp(-\alpha') = 1$. Note that for the default value
 $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha = \alpha'$.
 
+\item two variations of the
+   \emph{GWDSP (geometrically weighted dyadwise shared partners)} effects:
+   \texttt{gwdspFF} and \texttt{gwdspFB}.
+   These are defined, respectively, by
+\begin{equation}
+  \text{GWDSPFF}(i, \alpha) \,=\,
+       \sum_{h=1;\; h \neq i}^n \, e^{\alpha} \,\Big\{1 \,-\, \big(1 -
+   e^{-\alpha}\big)^{\sum_{j=1}^n x_{ij}x_{jh} }  \Big\}    \,   \ ,
+\end{equation}
+and
+\begin{equation}
+  \text{GWDSPFB}(i, \alpha) \,=\,
+       \sum_{h=1;\; h \neq i}^n \, e^{\alpha} \,\Big\{1 \,-\, \big(1 -
+   e^{-\alpha}\big)^{\sum_{j=1}^n x_{ij}x_{hj} }  \Big\}    \,   \ .
+\end{equation}
+   It may be noted these are of a quite different nature than most other effects,
+   with the outgoing tie variables from $i$ tucked far away in the formula.
+   These effects are somewhat similar with respect to what they mean for the
+   networks as \texttt{outPop} and \texttt{inPop}, respectively.\\
+   Like the gwesp effects, these are similar to the effects developed for 
+   exponential random graph models (`ERGMs')
+   by \citet{SPRH06}, in the parametrisation of \citet{Hunter2007}.
+   They are motivated because they are natural companions to \texttt{gwespFF}
+   and \texttt{gwespFB}, as the conditions for the transitive closure
+   expressed by the latter two effects.\\   
+   These effects are implemented as regular effects, not as elementary effects.
+   
  \item {\em number of (unilateral) peripheral relations to dense triads},\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
  I\{ (x_{jh}\,  + x_{hj}\, + x_{jk}\, + x_{kj}\, + x_{hk}\, + x_{kh}\,)\geq c \} \,$,\\
@@ -8114,8 +8190,10 @@ $\alpha = \log(2)$ corresponding to the effect parameter 69 (see above), $\alpha
 
  \item {\em reciprocal degree-related activity effect} \texttt{(reciAct)}
  defined by the degree of $i$ multiplied by $i$'s reciprocal degree,\\
- $s^{\rm net}_{i\vit}(x) =   x_{i+}\, x^{(r)}_{i} $, \\
- where the reciprocal degree is defined as above;
+ $s^{\rm net}_{i\vit}(x) =   x_{i+}\, x^{(r)}_{i} $; \\
+ where the reciprocal degree is defined as above;\\
+ for internal effect parameter $c=2$, it is defined by\\
+ $s^{\rm net}_{i\vit}(x) =   x_{i+}\, \sqrt{x^{(r)}_{i}} $; \\
 
  \item {\em out-degree up to $c$} (\emph{truncated out-degree}),
  where $c$ is some constant
@@ -8724,7 +8802,9 @@ the following effects are available:
  (this mean is given in the output file just before the
  ``initial data description''; it is also given, e..g., for data set \texttt{mydata}
  and constant covariate \texttt{mycov}, by
- \texttt{attr(mydata\$cCovars\$mycov, "simMean")});
+ \texttt{attr(mydata\$cCovars\$mycov, "simMean")});\\
+ the definition of ${\rm sim}^v_{ij}$ is discussed in
+ section~\ref{S_internal}, see (\ref{simV});
 
  \item {\em covariate-difference} or {\em covariate-related difference}
  \texttt{(diffX)},
@@ -11108,7 +11188,9 @@ The list of these effects is the following.
  and the other actors $j$ to whom he is tied,\\
  $s^{\rm beh}_{i\vit}(x, z) = x_{i+}^{-1} \,
            \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
- (and 0 if $x_{i+} = 0$) ;
+ (and 0 if $x_{i+} = 0$) ;\\
+ the definition of ${\rm sim}^z_{ij}$ is discussed in
+ section~\ref{S_internal}, see (\ref{simV});
 
  \item {\em total similarity effect} \texttt{(totSim)}, defined by the
  sum of centered similarity scores ${\rm sim}^z_{ij}$ between $i$
@@ -11453,7 +11535,7 @@ For the combined degree-effects, mentioned first, \texttt{F} means `Forward',
  \\[0.2em]
  if the internal effect parameter $p$ is at least~2, the indegree
  for $X_1$ is subtracted:\\
- $s^{\rm beh}_{i\vit}(x, z) = z_i 
+ $s^{\rm beh}_{i\vit}(x, z) = z_i
  \Big( \sum_j x_{1ji}\,x_{2ij}\,x_{2ji} \,-\,  \sum_j x_{1ji} \Big)  \,$;\\
   note that also in this case, the factor between $\Big( \ldots \Big)$
   is non-positive.
@@ -12124,6 +12206,29 @@ the odds of increasing drinking behavior compared to no change
 (in the event of a ministep with respect to drinking behavior)
 are $\exp(1.1414) = 3.1$ times higher for the first individual
 than for the second.
+\medskip
+
+The average similarity effect is defined by
+\[ s^{\rm beh}_{i\vit}(x, z) = x_{i+}^{-1} \,
+           \sum_j x_{ij} \big({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}\big)
+\]
+(see Section~\ref{S_f_b}), where ${\rm sim}^z_{ij}$ is given in (\ref{simV})
+in Section~\ref{S_internal}.
+(If the ratio is 0/0, the effect is defined as 0.)
+Subtracting $\widehat{{\rm sim}^z}$ is done just for the purpose
+of centering.
+Since the underlying measure ${\rm sim}^z_{ij}$ ranges from 0
+(if $z_i$ and $z_j$ are the two different extreme values of $Z$)
+to 1 (if $z_i = z_j$), this effect has a range of 1 independently
+of the scaling of $Z$.
+Therefore the average similarity effect, and also the total
+similarity effect, differ from the total and average
+alter effects by the fact that the latter are dependent on the scaling
+of $Z$, whereas the former are not directly dependent on this scaling.
+This means that parameters for average similarity effects can be regarded
+as being on the same scale for different variables, but parameters
+for average alter are not.
+\medskip
 
 The interpretations of total and average similarity are more laborious
 to explain than the interpretation of the average alter effect.
@@ -13066,7 +13171,7 @@ See Section~\ref{S_cond}.
 \medskip
 
 \noindent
-\emph{Solutions.}
+\emph{Potential solutions.}
 \begin{enumerate}
 \item Check whether your model specification is reasonable;
     for example, there might be doubts about the specification of the
@@ -13088,7 +13193,7 @@ See Section~\ref{S_cond}.
    The advice would be to set  \texttt{firstg}  to 0.02
    and expect the necessity to do a second estimation using the \texttt{prevAns}
    parameter in \sfn{siena07}. If the problem still occurs for \texttt{firstg}=0.02,
-   use a smaller value (but less than 0.0001 probably makes no sense).
+   use a smaller value (but less than 0.001 probably makes no sense).
    \texttt{firstg} determines the step sizes in the stochastic approximation
    algorithm; it is mentioned in some places earlier in this manual.
    Especially for models with additional rate effects the default value of 0.2
@@ -14366,16 +14471,24 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
+\item 2018-03-24 R-Forge Revision 334, packages version 1.2-10.
+
+Change in RSiena and RSienaTest:
+\begin{itemize}
+   \item Example in help file \textsf{siena07} for accessing generated networks
+   in case of ML estimation/simulation.
+   \end{itemize}
+
 \item 2018-03-21 R-Forge Revision 332, packages version 1.2-9.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
    \item Added effects \texttt{avExposure, totExposure, infectDeg,
-     susceptAvCovar, infectCovar} for symmetric networks, in 
+     susceptAvCovar, infectCovar} for symmetric networks, in
      new effect group \texttt{covarBehaviorSymmetricRate}.
    \item New effects \texttt{degAbsDiffX, degPosDiffX, degNegDiffX, degAbsContrX,
      degPosContrX, degNegContrX}.
-   \item Effects \texttt{XWX, XWX1}, and \texttt{XWX2} enabled for 
+   \item Effects \texttt{XWX, XWX1}, and \texttt{XWX2} enabled for
    bipartite networks, in
     new effect group \texttt{dyadBipartiteObjective}.
    \item Added parameter=2 for \texttt{FFDeg, BBDeg, FBDeg, FRDeg, BRDeg}.
@@ -14386,25 +14499,25 @@ Changes in RSiena and RSienaTest:
    \item Export of last simulated state from ML simulations if
      \texttt{returnDeps}.
    \item Added endowment and creation effects for \texttt{maxAlt} and \texttt{minAlt}.
-   \item Error messages for non-character \texttt{nodeSets} in functions 
+   \item Error messages for non-character \texttt{nodeSets} in functions
     \sfn{sienaDependent, coCovar,\\ varCovar}.
    \item Improved way of handling missings for distance-2 network effects.
-   \item Added components \texttt{requestedEffects}, \texttt{theta}, and 
+   \item Added components \texttt{requestedEffects}, \texttt{theta}, and
     \texttt{se} to \texttt{siena08}
      (\texttt{theta} and \texttt{se} are the ML estimates).
    \item Error in summary of \sfn{sienaMeta} object corrected:
      for the estimated mean parameter the two-sided $p$ was announced but a
      one-sided $p$ was given. Also the ML results under normality assumptions
      were copied from \sfn{print.sienaMeta} to \sfn{print.summary.sienaMeta}.
-   \item For non-directed networks, the initial model now contains 
+   \item For non-directed networks, the initial model now contains
     only basic rates and degree effect.
-   \item Added reference to \texttt{DESCRIPTION} and citation info in 
+   \item Added reference to \texttt{DESCRIPTION} and citation info in
     \texttt{{\textbackslash}inst},
    so \texttt{citation("RSiena")} now gives useful information.
    \item The dropping of the exclusion of effects if the variance of a
      covariate is 0, or a covariate has only two values, of version 1.1-306,
      was  taken further (was incomplete).
-   \item Message if attributes \texttt{higher, disjoint}, 
+   \item Message if attributes \texttt{higher, disjoint},
    or \texttt{atLeastOne} are \texttt{TRUE}      at the end of \\
      \sfn{sienaDataCreate}.
    \end{itemize}
@@ -14413,7 +14526,7 @@ Changes in RSienaTest:
    \item new function \sfn{extract.posteriorMeans} for \sfn{sienaBayes} results.
    \item Restrict check of maximum
      estimated parameter value after initialization to non-fixed effects.
-   \item Correct construction of groupwise effects object in \sfn{sienaBayes} 
+   \item Correct construction of groupwise effects object in \sfn{sienaBayes}
     so that this
      will work also when evaluation effects for density and/or reciprocity are
      not included; and when there are interaction effects for which the main
@@ -14424,7 +14537,7 @@ Changes in RSienaTest:
      allow shorter \texttt{ThinParameters};
      print objects returned through \texttt{partialBayesResult.RData}
      (by adding \texttt{na.rm=TRUE} to quantile).
-   \item \sfn{multipleBayesTest} corrected (there was an error for testing 
+   \item \sfn{multipleBayesTest} corrected (there was an error for testing
       2 or more linear combinations simultaneously)
        and adapted for cases with fixed  parameters;
      adapted help file text.
@@ -14437,7 +14550,7 @@ Changes in RSienaTest:
 Changes in RSiena and RSienaTest:
 \begin{itemize}
    \item Longer Description field in \texttt{DESCRIPTION}, as per CRAN suggestions.
-   \item Correction of \sfn{print.sienaFit}, repairing the option 
+   \item Correction of \sfn{print.sienaFit}, repairing the option
         \texttt{include=FALSE}  in \sfn{setEffect} and \\
         \sfn{includeEffects}.
 \end{itemize}
@@ -16106,7 +16219,6 @@ Created RSienaTest which includes user
  \end{small}
 
 \newpage
-%\bibliographystyle{JRSS} % TS: I did not find this style so I changed it:
 \bibliographystyle{apalike}
 %\bibliographystyle{plain}
 \bibliography{RSiena}

@@ -8,7 +8,7 @@
   selected row of a Siena effects object.
 }
 \usage{
-setEffect(myeff, shortName, parameter = 0, fix = FALSE,
+setEffect(myeff, shortName, parameter = NULL, fix = FALSE,
 test = FALSE, random=FALSE, initialValue = 0, timeDummy = ",", include = TRUE,
 name = myeff$name[1], type = "eval", interaction1 = "",
 interaction2 = "", effect1=0, effect2=0, effect3=0,
@@ -21,7 +21,7 @@ period=1, group=1, character=FALSE)
 \item{shortName}{A short name (all with or all without quotes)
   to identify the effect which should be changed.
 }
-  \item{parameter}{Integer value required. Default 0.
+  \item{parameter}{Value of internal effect parameter. If NULL, no change is made.
 }
   \item{fix}{For fixing effects. Boolean required. Default FALSE.
 }

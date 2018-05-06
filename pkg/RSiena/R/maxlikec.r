@@ -15,6 +15,7 @@ maxlikec <- function(z, x, data=NULL, effects=NULL,
 					 returnDataFrame=FALSE,
 					 returnLoglik=FALSE, onlyLoglik=FALSE)
 {
+# note: parameter x is not used. Just for consistency with other possibilities for FRAN.
     ## retrieve stored information
     f <- FRANstore()
     callGrid <- z$callGrid

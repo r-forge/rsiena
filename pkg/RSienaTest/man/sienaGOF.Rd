@@ -233,7 +233,6 @@ gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
 summary(gofi)
 plot(gofi)
 
-\dontrun{
 # Illustration just for showing a case with two dependent networks;
 # running time backwards is not meaningful!
 mynet1 <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
@@ -287,7 +286,6 @@ gofi.cl <- sienaGOF(ans.c, IndegreeDistribution, varName="mynet1",
 # compare simulation times
 attr(gofi.1,"simTime")
 attr(gofi.cl,"simTime")
-}
 }
 
 }

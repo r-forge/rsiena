@@ -217,7 +217,7 @@ includeInteraction <- function(myeff, ...,
 			c(effect1, effect2, effect3)
 		myeff[intn, "fix"] <- fix
 		myeff[intn, "test"] <- test
-		myeff[intn, "parm"] <- parameter
+		if (!is.null(parameter)) {myeff[intn, "parm"] <- parameter}
 		myeff[intn, "randomEffects"] <- random
 	}
 	else
@@ -239,7 +239,7 @@ includeInteraction <- function(myeff, ...,
 }
 
 ##@setEffect DataCreate
-setEffect <- function(myeff, shortName, parameter=0,
+setEffect <- function(myeff, shortName, parameter=NULL,
 					fix=FALSE, test=FALSE, random=FALSE,
 					initialValue=0,
 					timeDummy=",",
@@ -288,7 +288,7 @@ setEffect <- function(myeff, shortName, parameter=0,
 	{
 		stop("Effect not unique")
 	}
-	myeff[use, "parm"] <- parameter
+	if (!is.null(parameter)) {myeff[use, "parm"] <- parameter}
 	myeff[use, "include"] <- include
 	myeff[use, "fix"] <- fix
 	myeff[use, "test"] <- test

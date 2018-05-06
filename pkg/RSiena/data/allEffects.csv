@@ -308,6 +308,8 @@ nonSymmetricObjective,GWESP I <- K <- J (#),Numb. edgew. shrd prtns.by reverse t
 nonSymmetricObjective,GWESP I -> K <- J (#),Numb. edgew. shrd prtns.by in two stars (#),gwespFB,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,dyadic,FALSE
 nonSymmetricObjective,GWESP I <- K -> J (#),Numb. edgew. shrd prtns.by out two stars (#),gwespBF,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,dyadic,FALSE
 nonSymmetricObjective,GWESP I <> K <> J (#),Numb. edgew. shrd prtns. in AND out twostars (#),gwespRR,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,dyadic,FALSE
+nonSymmetricObjective,GWDSP I -> K -> J (#),Numb. dyadw. shrd prtns.by two path (#),gwdspFF,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,,FALSE
+nonSymmetricObjective,GWDSP I -> K <- J (#),Numb. dyadw. shrd prtns.by in two stars (#),gwdspFB,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,69,objective,NA,NA,0,0,0,0,,FALSE
 nonSymmetricObjective,shared popularity,(Number 2-2PU)^1/#),sharedPop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,FALSE
 nonSymmetricObjective,indegree - popularity,Sum of squared indegrees,inPop,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 nonSymmetricObjective,indegree - popularity (sqrt),Sum of indegrees x sqrt(indegree),inPopSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
@@ -317,8 +319,8 @@ nonSymmetricObjective,rec.degree - popularity,Sum rec.degr x indegr,reciPop,TRUE
 nonSymmetricObjective,rec.degree - popularity (sqrt),Sum sqrt(rec.degr) x indegr,reciPopSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE
 nonSymmetricObjective,indegree - activity (sqrt),Sum of outdegrees x sqrt(indegree),inActSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego,TRUE
 nonSymmetricObjective,outdegree - activity,Sum of squared outdegrees,outAct,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,TRUE
-nonSymmetricObjective,outdegree - activity (sqrt),Sum of outdegrees^(1.5),outActSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,TRUE
-nonSymmetricObjective,rec.degree - activity,Sum rec.degr x outdegr,reciAct,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,TRUE
+nonSymmetricObjective,outdegree - activity (sqrt),Sum of outdegrees^(1.5),outActSqrt,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,TRUE
+nonSymmetricObjective,rec.degree^(1/#) - activity,Sum rec.degr^(1/#) x outdegr,reciAct,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,TRUE
 nonSymmetricObjective,indegree - activity,Sum of crossproducts indegree x outdegree,inAct,TRUE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,ego,TRUE
 nonSymmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,1,objective,NA,NA,0,0,0,0,,TRUE
 nonSymmetricObjective,outdegree-trunc(#),Sum of outdegrees trunc(#),outTrunc2,FALSE,,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,5,objective,NA,NA,0,0,0,0,,TRUE

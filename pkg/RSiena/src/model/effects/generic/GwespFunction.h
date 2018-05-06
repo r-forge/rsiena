@@ -46,6 +46,8 @@ private:
 	double lparameter;
 	std::vector<double> lcumulativeWeight;
 	double lweight;
+	double lexpmweight;
+	double lexpfactor;
 	EgocentricConfigurationTable *lpInitialisedTable;
 
 };

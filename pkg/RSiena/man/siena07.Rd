@@ -97,6 +97,16 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  specifying the option \code{cl}, similar to what the boot function does in
  the \CRANpkg{boot} package. By using the option \code{cl} the user may be
  able to create more complex clusters (see examples below).
+
+ Parameters can be tested against zero by dividing the estimate by its
+ standard error and using an approximate standard normal null distribution.
+ Further, functions \code{\link{Wald.RSiena}} and
+ \code{\link{Multipar.RSiena}} are available for multi-parameter testing.\cr
+ Parameters specified in \code{\link{includeEffects}} or
+ \code{\link{setEffect}} with \code{fix=TRUE, test=TRUE} will not be estimated;
+ score tests of their hypothesized values are reported in the output file
+ specified in the control (algorithm) object.
+ These tests can be obtained also using \code{\link{score.Test}} .
 }
 \value{
   Returns an object of class \code{\link{sienaFit}}, some parts of which are:
@@ -164,11 +174,14 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
    \item Information about the implementation of the algorithm is in
      \url{http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf}.
    \item Further see \url{http://www.stats.ox.ac.uk/~snijders/siena/} .
-           }
+    }
 }
 \author{Ruth Ripley, Tom Snijders}
 
-\seealso{\code{\link{sienaAlgorithmCreate}}\cr
+\seealso{\code{\link{sienaAlgorithmCreate}},
+  \code{\link{Wald.RSiena}}, \code{\link{Multipar.RSiena}},
+  \code{\link{score.Test}}.
+
   There are print, summary and xtable methods for \code{\link{sienaFit}}
   objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}.}
 \examples{
@@ -187,11 +200,11 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 # or if a previous "on track" result ans was obtained --------------------------
 \dontrun{
-ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans)
+ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans, batch=TRUE)
          }
 
 # Running in multiple processors -----------------------------------------------
-\donttest{
+\dontrun{
 # Not tested because dependent on presence of processors
 # Find out how many processors there are
 library(parallel)
@@ -221,7 +234,7 @@ cl <- makePSOCKcluster(
 
 ans4 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, cl = cl)
 stopCluster(cl)
-    }
+}
 # Accessing simulated networks for ML ------------------------------------------
 # The following is an example for accessing the simulated networks for ML,
 # which makes sense only if there are some missing tie variables;
@@ -245,7 +258,7 @@ sdat <- sienaDataCreate(net)
 alg <- sienaAlgorithmCreate(maxlike=TRUE, nsub=3, n3=100, seed=1234)
 effs <- getEffects(sdat)
 \dontrun{
-(ans <- siena07(alg, data=sdat, effects=effs, returnDeps=TRUE))
+(ans <- siena07(alg, data=sdat, effects=effs, returnDeps=TRUE, batch=TRUE))
 # See manual Section 9.1 for information about the following functions
 edges.to.adj <- function(x,n){
 # create empty adjacency matrix

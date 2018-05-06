@@ -46,8 +46,8 @@ Package \code{"RSiena"} is the official release.
   \tabular{ll}{
     Package: \tab RSienaTest\cr
     Type: \tab Package\cr
-    Version: \tab 1.2-10\cr
-    Date: \tab 2018-03-24\cr
+    Version: \tab 1.2-11\cr
+    Date: \tab 2018-05-06\cr
     Depends: \tab R (>= 3.0.0)\cr
     Imports: \tab Matrix\cr
     Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -63,7 +63,7 @@ Package \code{"RSiena"} is the official release.
   Ruth Ripley, Krists Boitmanis, Tom Snijders, Felix Schoenenberger.
   Contributions by Josh Lospinoso, Charlotte Greenan, Christian Steglich,
   Johan Koskinen, Mark Ortmann, Nynke Niezink, Natalie Indlekofer,
-  and Robert Hellpap.
+  Christoph Stadtfeld, and Robert Hellpap.
 
   Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>
 }

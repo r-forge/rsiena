@@ -41,7 +41,8 @@ score.Test(ans, test=ans$test)
    parameters given in \eqn{\ldots} are 0. This is a special case of
    the preceding.
 
-   The tested effects for \code{score.Test} should have been specified with
+   The tested effects for \code{score.Test} should have been specified
+   in \code{\link{includeEffects}} or \code{\link{setEffect}} with
    \code{fix=TRUE, test=TRUE}, i.e., they should not have been estimated.
    The hypothesis tested by \code{score.Test} is that the tested parameters have
    the value indicated in the effects object used for obtaining \code{ans}.

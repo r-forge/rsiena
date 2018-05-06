@@ -109,6 +109,16 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  the \CRANpkg{boot} package. By using the option \code{cl} the user may be
  able to create more complex clusters (see examples below).
 
+ Parameters can be tested against zero by dividing the estimate by its
+ standard error and using an approximate standard normal null distribution.
+ Further, functions \code{\link{Wald.RSiena}} and
+ \code{\link{Multipar.RSiena}} are available for multi-parameter testing.\cr
+ Parameters specified in \code{\link{includeEffects}} or
+ \code{\link{setEffect}} with \code{fix=TRUE, test=TRUE} will not be estimated;
+ score tests of their hypothesized values are reported in the output file
+ specified in the control (algorithm) object.
+ These tests can be obtained also using \code{\link{score.Test}} .
+
  An alternative implementation is in \code{\link{sienacpp}},
  where the algorithm is coded entirely in C++;
  in \code{siena07} the 'front end' is coded in R.
@@ -183,7 +193,10 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 }
 \author{Ruth Ripley, Tom Snijders}
 
-\seealso{\code{\link{sienaAlgorithmCreate}}, \code{\link{sienacpp}}.\cr
+\seealso{\code{\link{sienaAlgorithmCreate}},
+  \code{\link{Wald.RSiena}}, \code{\link{Multipar.RSiena}},
+  \code{\link{score.Test}}, \code{\link{sienacpp}}.
+
   There are print, summary and xtable methods for \code{\link{sienaFit}}
   objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}.}
 \examples{
@@ -206,7 +219,7 @@ ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans)
          }
 
 # Running in multiple processors -----------------------------------------------
-\donttest{
+\dontrun{
 # Not tested because dependent on presence of processors
 # Find out how many processors there are
 library(parallel)

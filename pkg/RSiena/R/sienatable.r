@@ -7,7 +7,7 @@
 ##  *
 ##  * Description: This file contains the code to save a latex or html table of
 ##  * estimates for a sienaFit object
-##  * Written by Charlotte Greenan.
+##  * Written by Charlotte Greenan; small modifications by Tom Snijders.
 ##  *
 ##  ***************************************************************************/
 
@@ -130,7 +130,7 @@ siena.table <- function(x, type='tex',
 					}
 					else
 					{
-						tcsplit[1] <- "-0"
+						tcsplit[1] <- "&nbsp;&ndash;0"
 					}
 				}
 				else
@@ -138,6 +138,10 @@ siena.table <- function(x, type='tex',
 					if (type=='tex')
 					{
 						tcsplit[1] <- paste(c("-",tcsplit[1]),sep="",collapse="")
+					}
+					else
+					{
+						tcsplit[1] <- sub("-","&nbsp;&ndash;",tcsplit[1])
 					}
 				}
 			}
@@ -158,6 +162,30 @@ siena.table <- function(x, type='tex',
 
 	mydf <- function(pp)
 	{
+		if (type == "html")
+		{
+		data.frame(first=rep("", pp),
+			effect=rep("", pp),
+			amp1 = rep("", pp),
+			par1 = rep("", pp),
+			amp2 = rep("", pp),
+			par2 = rep("", pp),
+			amp3s = rep("", pp),
+			signif = rep("",pp),
+			amp3lpar = rep("", pp),
+			se1 = rep("", pp),
+			amp4 = rep("", pp),
+			se2 = rep("", pp),
+			rpar = rep("", pp),
+			amp5 = rep("", pp),
+			tstat1 = rep("",pp),
+			amp6 = rep("",pp),
+			tstat2 = rep("",pp),
+			ent = rep("",pp),
+			stringsAsFactors =FALSE)
+		}
+		else
+		{
 		data.frame(first=rep("", pp),
 			effect=rep("", pp),
 			amp1 = rep("", pp),
@@ -176,6 +204,7 @@ siena.table <- function(x, type='tex',
 			tstat2 = rep("",pp),
 			ent = rep("",pp),
 			stringsAsFactors =FALSE)
+	}
 	}
 
 	## mydf2 creates a data.frame with latex symbols required
@@ -202,8 +231,9 @@ siena.table <- function(x, type='tex',
 				par1 = rep("", pp),
 				amp2 = rep(".", pp),
 				par2 = rep("", pp),
+				amp3s = rep("</TD><TD align=\"left\">", pp),
 				signif = rep("",pp),
-				amp3lpar = rep("</TD><TD align=\"right\">(", pp),
+				amp3lpar = rep("</TD><TD align=\"right\">&nbsp;&nbsp;&nbsp;(", pp),
 				se1 = rep("", pp),
 				amp4 = rep(".", pp),
 				se2 = rep("", pp),
@@ -270,12 +300,13 @@ siena.table <- function(x, type='tex',
 			start.tstat <- ""
 		}
 
-		startTable <- tableSection(c("<TABLE border=1>",
-				paste("<TR><TD>Effect</TD><TD>par.</TD>
-					<TD>(s.e.)</TD>",start.tstat,"</TR>")))
+		startTable <- tableSection(c("<TABLE border=1  rules=none frame = hsides>",
+				paste("<TR><TD>Effect</TD><TD>&nbsp;&nbsp;&nbsp;par.</TD><TD></TD>
+					<TD>&nbsp;&nbsp;&nbsp;(s.e.)</TD>",start.tstat,"</TR>")))
 					midTable <- tableSection(c("",""))
 					indentTable <- tableSection("")
-					ruleTable <- tableSection("")
+		ruleTable <- tableSection("</TABLE>")
+		footnoteStart <- "<TABLE border=1  rules=none frame = below>"
 					footnote <- c(paste(" <TR> <TD colspan=9 align=left>
 							all convergence t ratios < ",
 							max.t,".</TD> </TR> <TR> </TR>",
@@ -283,11 +314,16 @@ siena.table <- function(x, type='tex',
 							Overall maximum convergence ratio ",
 							maxlincomb.t,".</TD> </TR> <TR> </TR>",							
 							sep="",collapse=""),"</TABLE>")
-					if (sig == TRUE)
+		if (sig)
 					{
-						footnote <- c("<TR> <TD colspan=4 align=left> &#134 p < 0.1;
+			footnote <- c(footnoteStart, "<TR> <TD colspan=4 align=left> &#134 p < 0.1;
 							* p < 0.05; ** p < 0.01; *** p < 0.001;  </TD> </TR> <TR> </TR> " ,footnote)
 					}
+		else
+		{
+			footnote <- c(footnoteStart, footnote)
+		}
+
 	}
 	else
 	{

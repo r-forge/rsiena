@@ -22,12 +22,12 @@ class CovariateDistance2EgoAltSimNetworkFunction: public
 {
 public:
 	CovariateDistance2EgoAltSimNetworkFunction(std::string networkName,
-		std::string covariateName, bool excludeMissing, bool incoming);
+		std::string covariateName, bool excludeMissing, bool outgoing);
 	virtual double value(int alter);
 
 private:
 	bool lexcludeMissing;
-	bool lincoming;
+	bool loutgoing;
 };
 
 }

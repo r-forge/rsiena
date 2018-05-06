@@ -42,7 +42,8 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   \item{test}{
     Boolean. Are the effects to be tested or not (requires \code{fix}).}
   \item{parameter}{
-    The parameter of this interaction effect. Integer value required. Default 0.}
+    Value of internal effect parameter of this interaction effect. Default 0.
+	If NULL, no change is made.}
   \item{random}{For specifying that the interaction effect will vary randomly,
     which is taken into account only by \code{\link{sienaBayes}}.
     Boolean required. Default FALSE.}
