@@ -748,7 +748,7 @@ print01Report <- function(data, modelname="Siena", getDocumentation=FALSE)
 					any.noncent <- any.noncent+1
 				}
 				Report(c(format(covars[i], width=28), cent, '\n'), outf) # name
-				for (j in 1:(dim(x$dyvCovars[[i]])[3]))
+				for (j in 1:(atts$vardims[3]))
 				{
 					Report(c("	period", format(j + periodFromStart,
 											   width=3),

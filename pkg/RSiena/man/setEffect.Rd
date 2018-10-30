@@ -95,7 +95,8 @@ will be set to the values requested.}
 \author{Ruth Ripley }
 \seealso{
   \code{\link{getEffects}}, \code{\link{includeEffects}},
-  \code{\link{includeInteraction}}.
+  \code{\link{includeInteraction}},
+  \code{\link{print.sienaEffects}}.
 }
 
 \examples{

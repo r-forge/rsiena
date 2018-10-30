@@ -14,6 +14,8 @@
  * Runs simulations.
  */
 
+// #include "siena07models.h"
+
 #include <stdexcept>
 #include <vector>
 #include <cstring>
@@ -385,31 +387,9 @@ SEXP forwardModel(SEXP DERIV, SEXP DATAPTR, SEXP SEEDS,
 					pEpochSimulation->rVariables();
 				for (unsigned i = 0; i < rVariables.size(); i++)
 				{
-					NetworkVariable * pNetworkVariable =
-						dynamic_cast<NetworkVariable *>(rVariables[i]);
-					BehaviorVariable * pBehaviorVariable =
-						dynamic_cast<BehaviorVariable *>(rVariables[i]);
-
-					if (pNetworkVariable)
-					{
-						const Network * pNetwork =
-							pNetworkVariable->pNetwork();
-						SEXP thisEdge = getEdgeList(*pNetwork);
-						SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(sims, group), i),
-								period, thisEdge);
-					}
-					else if (pBehaviorVariable)
-					{
-						SEXP theseValues =
-							getBehaviorValues(*pBehaviorVariable);
-						SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(sims,
-										group), i), period, theseValues);
-					}
-					else
-					{
-						throw domain_error(
-							"Unexpected class of dependent variable");
-					}
+					// Rprintf("attach var %d (2)\n", i);
+					SET_VECTOR_ELT(VECTOR_ELT(VECTOR_ELT(sims, group), i), period,
+							var_to_sexp(rVariables[i]));
 				}
 			}
 			if (returnChains)
@@ -640,44 +620,19 @@ SEXP mlPeriod(SEXP DERIV, SEXP DATAPTR, SEXP MODELPTR, SEXP EFFECTSLIST,
 	}
 
 	/* sims will be the returned chain */
-	SEXP sims;
-	PROTECT(sims = allocVector(VECSXP, 1));
+	SEXP sims = PROTECT(allocVector(VECSXP, 1));
 	/* theseDeps will be the returned dependent variables */
-	SEXP theseDeps;
-	PROTECT(theseDeps = allocVector(VECSXP, numberVariables));	
+	SEXP theseDeps = PROTECT(allocVector(VECSXP, numberVariables));
 	int nProtects = 5;
 
 	if (returnDeps)
 	{
 		// get simulated last state
 		pMLSimulation->gotoLastState();
-		const vector<DependentVariable *> lastVariables =
-				  pMLSimulation->rVariables();
-	
+		const vector<DependentVariable *> rVariables = pMLSimulation->rVariables();
 		for (unsigned i = 0; i < numberVariables; i++)
 		{
-			NetworkVariable * pNetworkVariable =
-				dynamic_cast<NetworkVariable *>(lastVariables[i]);
-			BehaviorVariable * pBehaviorVariable =
-				dynamic_cast<BehaviorVariable *>(lastVariables[i]);
-				if (pNetworkVariable)
-			{
-				const Network * pNetwork = pNetworkVariable->pNetwork();
-				SEXP thisEdge;
-				PROTECT(thisEdge = getEdgeList(*pNetwork));
-				SET_VECTOR_ELT(theseDeps, i, thisEdge);
-			}
-			else if (pBehaviorVariable)
-			{
-				SEXP theseValues;
-				PROTECT(theseValues = getBehaviorValues(*pBehaviorVariable));
-				SET_VECTOR_ELT(theseDeps, i, theseValues);
-			}
-			else
-			{
-				throw domain_error("Unexpected class of dependent variable");
-			}
-		nProtects++;
+			SET_VECTOR_ELT(theseDeps, i, var_to_sexp(rVariables[i]));
 		}
 	}
 

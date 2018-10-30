@@ -25,6 +25,13 @@ multigroup option and to \code{\link{sienaBayes}} for the hierarchical
 random effects multigroup option.
 Also used internally for convenience with a single Siena data object.
 
+Each covariate should either be centered in all groups, or non-centered
+in all groups.
+For centered actor covariates, the original values are used, and the overall
+mean of all non-missing observations is subtracted. Note that this implies
+that group-dependent variables that are constant for all actors in each
+group, can be used as centered actor covariates.
+
 For combining two-wave with more-wave groups in one group object,
 covariates that are changing covariates for the more-wave groups have to
 be specified as changing covariates also for the two-wave groups.
@@ -120,7 +127,7 @@ containing the input objects, with attributes:
 }
 \references{See the Section on Multi-group Siena analysis in the manual
    available from \url{http://www.stats.ox.ac.uk/~snijders/siena/ }.}
-\author{ Ruth Ripley }
+\author{ Ruth Ripley, Modification by Tom Snijders }
 \seealso{\code{\link{sienaDataCreate}} }
 \examples{
 Group1 <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))

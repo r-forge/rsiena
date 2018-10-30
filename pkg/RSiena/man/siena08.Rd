@@ -130,11 +130,11 @@ effects.1 <- getEffects(dataset.1)
 effects.3 <- getEffects(dataset.3)
 effects.4 <- getEffects(dataset.4)
 effects.1 <- includeEffects(effects.1, transTrip)
-effects.1 <- setEffect(effects.1, cycle3, fix=TRUE, test=TRUE)
+effects.1 <- setEffect(effects.1, transRecTrip, fix=TRUE, test=TRUE)
 effects.3 <- includeEffects(effects.3, transTrip)
-effects.3 <- setEffect(effects.3, cycle3, fix=TRUE, test=TRUE)
+effects.3 <- setEffect(effects.3, transRecTrip, fix=TRUE, test=TRUE)
 effects.4 <- includeEffects(effects.4, transTrip)
-effects.4 <- setEffect(effects.4, cycle3, fix=TRUE, test=TRUE)
+effects.4 <- setEffect(effects.4, transRecTrip, fix=TRUE, test=TRUE)
 ans.1 <- siena07(OneAlgorithm, data=dataset.1, effects=effects.1, batch=TRUE)
 ans.3 <- siena07(OneAlgorithm, data=dataset.3, effects=effects.3, batch=TRUE)
 ans.4 <- siena07(OneAlgorithm, data=dataset.4, effects=effects.4, batch=TRUE)
@@ -142,6 +142,7 @@ ans.1
 ans.3
 ans.4
 (meta <- siena08(ans.1, ans.3, ans.4))
+plot(meta, which=2:3, layout = c(2,1))
 # For specifically presenting the Fisher combinations:
 # First determine the components of meta with estimated effects:
 which.est <- sapply(meta, function(x){ifelse(is.list(x),!is.null(x$cjplus),FALSE)})

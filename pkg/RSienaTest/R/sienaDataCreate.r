@@ -338,7 +338,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 		if (!(inherits(nodeSets, "sienaNodeSet") || inherits(nodeSets[[1]], "sienaNodeSet")))
 		{
 			stop("nodeSets should be a sienaNodeSet object or a list of such objects")
-		}		
+		}
 	}
 	nodeSetNames <- sapply(nodeSets,function(x) attr(x,"nodeSetName"))
 	names(nodeSets) <- nodeSetNames
@@ -1274,7 +1274,6 @@ groupRangeAndSimilarityAndMean <- function(group)
 		cCovarMean[covar] <- attr(group[[i]]$cCovars[[covar]], "mean")
 		cCovarRange2[, covar] <- attr(group[[i]]$cCovars[[covar]], "range2")
    }
-
 	vCovarRange <- namedVector(NA, atts$vCovars)
 	vCovarSim <- namedVector(NA, atts$vCovars)
 	vCovarPoszvar <- namedVector(TRUE, atts$vCovars)
@@ -1288,19 +1287,26 @@ groupRangeAndSimilarityAndMean <- function(group)
 		for (i in 1:length(group))
 		{
 			j <- match(atts$vCovars[covar], names(group[[i]]$vCovars))
+			j1 <- match(atts$vCovars[covar], names(group[[1]]$vCovars))
 			if (is.na(j))
 			{
 				stop("inconsistent actor covariate names")
 			}
-			vartotal <- vartotal + attr(group[[i]]$vCovars[[j]], "vartotal")
-			nonMissingCount <- nonMissingCount +
-				attr(group[[i]]$vCovars[[j]], "nonMissingCount")
-			group[[i]]$vCovars[[j]] <- group[[i]]$vCovars[[j]] +
-				attr(group[[i]]$vCovars[[j]], "vartotal") /
+			if (attr(group[[i]]$vCovars[[j]],"centered") != attr(group[[1]]$vCovars[[j]],"centered"))
+			{
+				stop(paste("Inconsistent centering for covariate", names(group[[i]]$vCovars)[j]))
+			}
+			if (attr(group[[i]]$vCovars[[j]],"centered"))
+			{
+				vartotal <- vartotal + attr(group[[i]]$vCovars[[j]], "vartotal")
+				nonMissingCount <- nonMissingCount +
 					attr(group[[i]]$vCovars[[j]], "nonMissingCount")
+				group[[i]]$vCovars[[j]] <- group[[i]]$vCovars[[j]] +
+					attr(group[[i]]$vCovars[[j]], "vartotal") /
+						attr(group[[i]]$vCovars[[j]], "nonMissingCount")
+			}
 		}
 		varmean <- vartotal / nonMissingCount
-#browser() # Hier kijken hoe je moet centreren in de groep.
 		j <- match(atts$vCovars[covar], names(group[[1]]$vCovars))
 		if (attr(group[[1]]$vCovars[[j]],"centered"))
 		{
@@ -1756,6 +1762,7 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 			vars <- objlist[[i]]$vCovars
 			oldnames <- names(vars)
 			nVCovar <- length(vars)
+
 			for (j in seq(along=const))
 			{
 				newcovar <-
@@ -1779,6 +1786,8 @@ sienaGroupCreate <- function(objlist, singleOK=FALSE, getDocumentation=FALSE)
 			nVCovar <- length(vars)
 			for (j in seq(along=const))
 			{
+				oneCentered <- FALSE
+				oneNonCentered <- FALSE
 				dim3 <- objlist[[i]]$observations - 1
 				newcovar <-
 					varDyadCovar(array(const[[j]], dim=c(dim(const[[j]]),

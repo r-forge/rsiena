@@ -72,6 +72,7 @@ public:
 		int period) const;
 
 private:
+	void calculateStatisticsInitNetwork(NetworkLongitudinalData * pNetwork);
 	void calculateStatistics();
 	void calculateNetworkRateStatistics(
 		NetworkLongitudinalData * pNetworkData);

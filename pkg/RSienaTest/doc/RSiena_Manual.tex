@@ -55,6 +55,7 @@
 \newcommand{\informationy}{\mbox{${\cal E}$}}
 \newcommand{\var}{\mbox{var}}
 \newcommand{\cov}{\mbox{cov}}
+\newcommand{\Cov}{\mbox{Cov}}
 \newcommand{\mathbold}[1]{\mbox{\boldmath $\bf#1$}}
 \newcommand{\Reals}{\mbox{I} \! \mbox{R}}
 \newcommand{\+}{\, + \,}
@@ -185,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-10.
+This version was renewed for \RS version 1.2-13.
 \end{abstract}
 
 
@@ -220,7 +221,8 @@ networks according to the Stochastic Actor-oriented Model
 \citet{SnijdersEA07},  \citet{SnijdersEA10a}, \citet{SLT2013},
 and \citet{Greenan15}; also see \citet{SteglichEA10}.
 A tutorial for these models is in \citet{SnijdersEA10b}.
-Books are in preparation \citep{SNDE,AMAND}.
+A review article is \citet{Snijders2017}.
+Books are in preparation \citep{AMAND,SNDE}.
 
 A website for \SI is maintained at
 {\small\url{http://www.stats.ox.ac.uk/~snijders/siena/}~}.
@@ -234,7 +236,7 @@ The website further contains references to many published examples,
 example scripts illustrating various possibilities of the package,
 course announcements, etc.
 
-This is a manual for \rs, which also may be called \SI version 4.1.2;
+This is a manual for \rs, which also might be called \SI version 4.1.2;
 the manual is provisional in the sense
 that it is continually being updated, taking account of
 updates in the package.
@@ -266,7 +268,7 @@ information:
 in collaboration with Tom Snijders.
 Since May 2012 the maintainer is Tom Snijders.
 Further contributions were made by Josh Lospinoso, Charlotte Greenan,
-Felix Sch"{o}nenberger,
+Felix Sch\"{o}nenberger,
 Christian Steglich, Johan Koskinen, Mark Ortmann, Nynke Niezink,
 and Robert Hellpap.
 Currently, \RS is maintained by a research group
@@ -277,7 +279,7 @@ In addition to the `official' \R distribution of \rs, there is
 an additional distribution at R-Forge, which is
 a central platform for the development of \R packages
 offering facilities for source code management.
-It is quite usual that later versions of \RS are available at
+It is quite usual that recent versions of \RS are available at
 \url{http://r-forge.r-project.org/R/?group_id=461}
 before being incorporated into the R package that can be downloaded from CRAN.
 In addition, at R-Forge there is a package {\sf RSienaTest} which may include
@@ -817,7 +819,7 @@ and (alternatively) \sfn{sienacpr()}, using the following procedure:
 \subsubsection{Design issues for longitudinal network modeling}
 
 Issues concerning the design of longitudinal network models
-according to the \SAOM are discussed in 
+according to the \SAOM are discussed in
 \citet{StadfeldSnijdersSteglichVanDuijn2018}.
 
 \subsubsection{Further useful options in \RS}
@@ -887,24 +889,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-10}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-13}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-10.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-13.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-10.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-13.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-10.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-13.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-10.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-13.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-10.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-13.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-10.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-13.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1102,7 +1104,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-10) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-13) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1593,7 +1595,7 @@ interactions between covariates; see Section~\ref{S_int_eff}.
 \subsubsection{Centering}
 \label{S_center}
 
-Individual as well as dyadic covariates are centered
+Individual as well as dyadic covariates can be centered
 by the program in the following way.
 
 For individual covariates, the mean value is subtracted
@@ -1607,6 +1609,7 @@ of \sfn{print01Report()}.
 For the multi-group option (section \ref{S_multigroup}),
 the subtracted values are the global means across all groups.
 
+Centering is the default.
 Centering of covariates can be turned off by specifying
 \texttt{centered=FALSE} in the call of \sfn{coCovar()},
 \sfn{varCovar()}, \sfn{coDyadCovar()}, or \sfn{varDyadCovar()}, respectively.
@@ -1719,6 +1722,19 @@ going up and going down.
 These effects then are dropped automatically from the effects object.
 If this is not desired, this can be prevented
 by calling \sfn{sienaDependent} with \sfn{allowOnly=FALSE}.
+
+
+\subsubsection{Multivariate dependent variables with constraints}
+\label{S_constraints0}
+
+When analysing multiple dependent networks, it is possible that they
+are related in some deterministic way. For example, two networks
+might be mutually exclusive (this could be the case for negative and positive
+ties -- although there are many cases where positive
+and negative ties may coexist!), or networks could be ordered, i.e.,
+one network could be a sub-network of the other 
+(networks with ordinal tie values represented as a multivariate network).
+This is treated in Section~\ref{S_constraints}.
 
 
 \subsection{Further data specification options}
@@ -2115,11 +2131,16 @@ gets an opportunity for changing her score on the dependent
 variable.\\
 Advice: in most cases, start modeling with a constant rate function without
 additional rate function effects.
-(When there are important size or activity differences between
-actors, it is possible that different advice must be given,
-and it may be necessary to let the rate function
-depend on the individual covariate that indicates this size;
-or on the out-degree.)
+
+When there are important differences between
+actors in some measure of size or importance,
+it is possible that different advice must be given.
+This can be the case, e.g., when the network has a clear
+core-periphery structure; or when the outdegree distribution
+is very skewed.
+Then it may be necessary to let the rate function
+depend on the outdegrees or on an individual covariate indicating this size.
+
 \item {\em evaluation function }\\
 The evaluation function\footnote{The evaluation function was called
 \emph{objective function} in \citet{Snijders01}.}
@@ -2578,7 +2599,11 @@ The basic list of these and other effects is as follows.
       $h \rightarrow i$ and $h \not\rightarrow j$.
       This can, however, not be combined with the transitive triplets
       effect because it is a different mechanism leading to the
-      same structures.
+      same structures.\\
+      The betweenness effect has the property that it is defined using
+      configurations characterized by the \underline{absence} of certain ties,
+      not only by their presence.
+      This leads to difficulties in interpretation, and may be undesirable.
 
 \item[{\hspace*{-1ex}$\bigodot$}]
      The following eight degree-related effects may be important especially for networks
@@ -2634,6 +2659,21 @@ The basic list of these and other effects is as follows.
      reflects tendencies for actors with high out-degrees
      to preferably be tied to other actors with high out-degrees.
 \end{enumerate}
+
+\subsubsection{Rate function}
+
+In some cases the rate function needs special attention.
+This can be the case, e.g., when the network has a clear
+core-periphery structure; or when the outdegree distribution
+is very skewed.
+Then it may be necessary to let the rate function
+depend on the outdegrees, using one of the three effects \texttt{outRateLog},
+\texttt{outRateInv}, or \texttt{outRate};
+or on an individual covariate indicating this size.
+Experience shows that often a rate dependence on outdegrees gives
+best results, and that \texttt{outRateLog} often is preferable.
+See Section~\ref{S_r}.
+
 
 \subsection{Important structural effects for network dynamics: \protect\newline
             two-mode networks}
@@ -3656,6 +3696,11 @@ See \citet{HollandLeinhardt1973} for a discussion of
 fixed choice designs and \citet{Znidarsic2012}
 for references to more recent literature.
 
+The \textsf{MaxDegree} option does not work for likelihood-based
+estimation; therefore, neither ML estimation using \textsf{siena07}
+nor multilevel estimation using \textsf{sienaBayes} support
+this option.
+
 
 \subsection{Goodness of fit with auxiliary statistics}
 \label{S_gof}
@@ -4606,9 +4651,9 @@ Rate parameters:
 \end{verbatim}
 }
 
-The rate parameter is the
-\hyperlink{T_rho}{parameter called $\rho$}
-in section \ref{S_r} below. The value 6.0742 indicates
+The rate parameter is the parameter called $ \rho^{\rm net}_m$
+in Section~\ref{S_r} below (where $m=1$ because there is only one period).
+The value 6.0742 indicates
 that the estimated number of opportunities
 for change per actor (note that each actor
 corresponds to a row in the adjacency matrix)
@@ -5458,7 +5503,7 @@ this null value using the score-type test of Section~\ref{S_Scoretest}.
 See the script \texttt{RscriptSienaMultiple.R} on the \SI webpage
 for an example.
 
-\subsubsection*{Multi-parameter Wald tests}
+\subsubsection{Multi-parameter Wald tests}
 
 Now suppose that we wish to test another null hypothesis,
 which can be represented as a linear constraint on $\theta$:
@@ -7092,7 +7137,6 @@ The extra part of model specification for \sfn{sienaBayes},
 compared to \sfn{siena07},
 is that it is required to specify which parameters are
 randomly varying from group to group, and which are fixed across groups.
-The basic rate parameters always are randomly varying.
 The specification of fixed vs.\ randomly varying
 for the other parameters is done in the function
 \sfn{setEffect}, by its parameter \texttt{random}.
@@ -7108,6 +7152,12 @@ Requesting \texttt{includeRandoms=TRUE} will show the column indicating
 which effects are random; \texttt{dropRates= TRUE} omits the
 rows with rate effects, which can be a lot of superfluous information
 that perhaps you do not want to see.
+
+The exception to the rate parameters being always randomly varying
+is that they may be fixed --- in which case all of them need to be fixed,
+and input parameter \\
+\texttt{priorRatesFromData} needs to be set to --2.
+\medskip
 
 There currently is little advice about which effects to specify
 as randomly varying.
@@ -7200,9 +7250,6 @@ Do not use such a high value for \texttt{nbrNodes} that your computer gets too
 
 \subsubsection{Prior distributions}
 
-More research is needed for advice about prior distributions.
-Especially for small numbers of groups, the priors may have a strong influence.
-
 The prior mean and prior variance need to be given for the vector of parameters
 that are randomly varying between the groups.
 These are the rate parameters and the parameters specified with
@@ -7218,6 +7265,11 @@ print(myeff, includeRandoms=TRUE)
 This will also tell you the number of random effects, which are the
 dimensions for the parameters \texttt{priorMu} and  \texttt{priorSigma}
 used to specify the prior distribution.
+The rate parameters can be dropped from the \texttt{print} result
+by requesting
+\begin{verbatim}
+print(myeff, includeRandoms=TRUE, dropRates=TRUE)
+\end{verbatim}
 The list and order of only the randomly varying effects
 can be shown by requesting
 \begin{verbatim}
@@ -7225,7 +7277,63 @@ myeff[(myeff$randomEffects | (myeff$basicRate & (myeff$group==1) )) & myeff$incl
 \end{verbatim}
 \smallskip
 
+For the non-varying parameters an improper flat prior is used,
+and nothing needs to be specified by the user.
+\smallskip
 
+The population distribution of the randomly varying parameters
+is assumed to be multivariate normal $\mathcal{N}(\mu, \Sigma)$.
+The conjugate prior for the multivariate normal distribution is used
+to reflect the prior uncertainty in the parameters $\mu$ and $\Sigma$;
+cf.\ \citet[][Section 3.6]{BDA3} and \citet[][Chapter 14]{HaganForster2004}.
+This conjugate prior is the inverse Wishart distribution for $\Sigma$;
+and, conditional on $\Sigma$, for $\mu$ a multivariate normal distribution,
+specified as follows:
+\begin{subequations}
+\begin{align}
+  \Sigma \, & \sim \,
+    \mathrm{InvWishart}_{{p_1}}(\Lambda_0^{-1},\nu_0) \, ,
+    \text{ and conditionally on }  \Sigma \\
+   \mu \, & \mid \, \Sigma \sim \mathcal{N}_{p_1}(\mu_0, \Sigma/\kappa_0) \, .
+\end{align}
+\end{subequations}
+Thus, the parameters of the prior are $\nu_0$, $\Lambda_0$, $\mu_0$,
+and $\kappa_0$.
+These are specified for \sfn{sienaBayes} in \RS in the following way:
+\begin{itemize}
+  \item $\nu_0$ = \texttt{priorDf};
+  \item  $\Lambda_0 = \mathtt{priorDf} \times \mathtt{priorSigma}$;
+  \item  $\mu_0$ = \texttt{priorMu};
+  \item $\kappa_0$ = \texttt{priorKappa}.
+\end{itemize}
+This means the following for the prior parameters as
+specified for \sfn{sienaBayes}:
+\begin{itemize}
+  \item  \texttt{priorDf} can be regarded as the
+        effective sample size that has led to the prior information.
+        For mathematical reasons, this must be at least $p+2$, where
+        $p$ is the number of varying parameters.
+  \item  \texttt{priorSigma} is your prior guess for the population
+        covariance matrix of the varying parameters; in other words,
+        this reflects the differences that may exist between the groups.
+  \item  \texttt{priorMu} is your prior guess for the population mean $\mu$ of
+       the varying parameters.
+  \item \texttt{priorSigma / priorKappa} reflects your uncertainty
+       about your guess for $\mu$.
+\end{itemize}
+It is quite a restriction that the covariance matrix expressing the prior
+uncertainty about $\mu$ should be proportional to the population
+(i.e., `true between-group') covariance matrix of the varying parameters.
+This is a mathematical consequence of the use of the conjugate prior.
+Often, the prior uncertainty about $\mu$ will be greater than the
+assumed between-group differences, leading to a choice of \texttt{priorKappa}
+less than 1, e.g., 0.1; note that \texttt{priorKappa} is a ratio
+of variances, and the ratio of uncertainties will be better
+expressed by its square root.
+
+More research is needed for advice about prior distributions.
+Especially for small numbers of groups, the priors may have a strong influence.
+\medskip
 
 The prior mean of the varying parameters,
 \texttt{priorMu}, is a vector of length equal to the number of varying parameters.
@@ -7246,7 +7354,10 @@ equal to the length of \texttt{priorMu}.
 \smallskip
 
 \noindent
-Special attention must be given to the rate parameters.
+If rate parameters are fixed (an exceptional case), they are
+not included in the prior.
+
+In other cases, special attention must be given to the rate parameters.
 Sometimes, for small groups and complicated models, some of the
 rate parameters may be estimated in the multi-group option by very high
 numbers. This may be the case especially for groups with low Jaccard
@@ -7262,8 +7373,8 @@ based on the estimated rate parameters from the initialization phase.
 This mostly will be adequate.
 
 To have explicit control of the prior for the basic rate parameters,
-the data dependence can be turned off by using \\
-\texttt{priorRatesFromData = 0}.\\
+the data dependence can be turned off by using
+\texttt{priorRatesFromData = 0}.
 Then the choice for \texttt{priorMu} and \texttt{priorSigma}
 is going to matter.
 Consider the rate parameters as estimated in the multi-group analysis
@@ -7290,22 +7401,25 @@ in both cases with a standard deviation of 1.4, corresponding
 to a variance of about 2.
 Suppose further that for the parameters of the objective function
 the prior mean for the density parameter is specified as $-1$,
-all other prior means as $0$, and all prior variances as $0.16$,
-corresponding to prior standard deviations of $0.4$.
+all other prior means as $0$, and all prior between-group variances as $0.16$,
+corresponding to prior between-group standard deviations of $0.4$.
+Further assume that the prior uncertainty about $\mu$ is thought to be
+2~times larger, on the parameter scale, than the prior between-group differences,
+which means a ratio of 4 on the variance scale.
 One then could use the following piece of code.
 \begin{verbatim}
 m7 <- c(4, 5, -1, 0, 0, 0, 0)
 S7 <- matrix(0, 7, 7)
 diag(S7) <- c(2, 2, 0.16, 0.16, 0.16, 0.16, 0.16)
-ans <- sienaBayes(...., priorMu=m7, priorSigma=S7, priorDf=20,
+ans <- sienaBayes(...., priorMu=m7, priorSigma=S7, priorDf=22, priorKappa=0.25,
                   priorRatesFromData = 0, ....)
 \end{verbatim}
 \texttt{priorDf} is the prior degrees of freedom for the
 covariance matrix. It can be interpreted as the sample size on which,
 hypothetically, the prior knowledge about the covariance matrix of the
 parameters is based.
-By choosing it, as suggested here, equal to the number of groups,
-the prior will have a non-negligible but also not a very strong influence.
+The influence of the prior on the results is larger when \texttt{priorDf}
+is larger.
 \medskip
 
 \noindent
@@ -8091,14 +8205,14 @@ and
    with the outgoing tie variables from $i$ tucked far away in the formula.
    These effects are somewhat similar with respect to what they mean for the
    networks as \texttt{outPop} and \texttt{inPop}, respectively.\\
-   Like the gwesp effects, these are similar to the effects developed for 
+   Like the gwesp effects, these are similar to the effects developed for
    exponential random graph models (`ERGMs')
    by \citet{SPRH06}, in the parametrisation of \citet{Hunter2007}.
    They are motivated because they are natural companions to \texttt{gwespFF}
    and \texttt{gwespFB}, as the conditions for the transitive closure
-   expressed by the latter two effects.\\   
+   expressed by the latter two effects.\\
    These effects are implemented as regular effects, not as elementary effects.
-   
+
  \item {\em number of (unilateral) peripheral relations to dense triads},\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
  I\{ (x_{jh}\,  + x_{hj}\, + x_{jk}\, + x_{kj}\, + x_{hk}\, + x_{kh}\,)\geq c \} \,$,\\
@@ -9029,6 +9143,23 @@ $s^{\rm net}_{i\vit}(x ) = \sum_j  x^{\rm{simm}}_{ij}\,v_j $ .
 \end{minipage}
 
 
+ \item {\em same covariate $\times$ transitive reciprocated triplets}
+ \texttt{(sameXTransRecTrip)}, defined by the number of transitive
+ reciprocated triplets
+ $i \rightarrow h \rightarrow j \leftrightarrow i$
+ that have the same covariate value for $i$ and $j$,\\
+ $s^{\rm net}_{i\vit}(x) =
+ \sum_j x_{ij}\, x_{ji}\, x_{ih} \, x_{hj} \, I\{v_i = v_j\}$;
+
+ \item {\em different covariate $\times$ transitive reciprocated triplets}
+ \texttt{(diffXTransRecTrip)}, defined by the number of transitive
+ reciprocated triplets
+ $i \rightarrow h \rightarrow j \leftrightarrow i$
+ that have different covariate values for $i$ and $j$,\\
+ $s^{\rm net}_{i\vit}(x) =
+ \sum_j x_{ij}\, x_{ji}\, x_{ih} \, x_{hj} \, I\{v_i \neq v_j\}$;
+
+
 \iffalse
  \item {\em covariate-related similarity $\times$ popularity alter}, defined by
  the sum of centered similarity scores between $i$ and the
@@ -9267,8 +9398,8 @@ of $\breve v_j$ would be the same as the alter effect of $v_j$.
  \emph{original} covariate $v$, and $\widehat{{\rm sim}^v}$ is as above
  (see \texttt{simDist2}).\\
   Note that for ego ($i$) the own value is used and for alter ($j$) the alters' covariate-average
-  (these are alter's alters!), so that this effect is about a comparison between $i$
-   and the out-neighbourhoods of the $j$'s.
+  (these are alter's in-alters!), so that this effect is about a comparison between $i$
+   and the in-neighbourhoods of the $j$'s.
 
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
@@ -9360,6 +9491,11 @@ with short name \texttt{outInAss}.
 An introduction to the analysis of multiple (multivariate) networks,
 with a discussion of the basic effects, is given in \citet{SLT2013}.
 
+See Section~\ref{S_constraints} for the possibility that two networks
+have a deterministic constraint by being mutually exclusive,
+or by one being implied by the other, or (rarely used, if ever) 
+by the union of them being the complete graph.
+
 If there are multiple dependent networks, the definition of
 cross-network effects is such that always, one network has the
 role of the dependent variable, while the other network, or
@@ -9400,6 +9536,10 @@ from each other.
  \item {\em Effect of W on X} ($X$: $W$)  \texttt{(crprod)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ij}  $ ;\\
  $i \stackrel{W}{\rightarrow} j$ leads to  $i \stackrel{X}{\rightarrow} j$;
+ this is also called the dyadic entrainment effect;\\
+ if one of the contraints of Section~\ref{S_constraints} is in use,
+ this effect should not be included because its role is taken over by the 
+ constraint;
 
  \item {\em Effect of incoming W on X} ($X$: reciprocity with $W$)  \texttt{(crprodRecip)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ji}  $ ;\\
@@ -9408,11 +9548,11 @@ from each other.
 
  \item {\em Effect of mutual ties in W on X} ($X$: mutuality with $W$)  \texttt{(crprodMutual)},\\
  $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} \, w_{ij} \, w_{ji}  $ ;\\
- $j \stackrel{W}{\leftrightarrow} i$ leads to  $i \stackrel{X}{\rightarrow} j$;
+ $j \stackrel{W}{\leftrightarrow} i$ leads to  $i \stackrel{X}{\rightarrow} j$.
 \setcounter{savenumi}{\value{enumi}}
 \end{enumerate}
 \smallskip
-The following six are degree-related effects, where nodal degrees
+The following seven are degree-related effects, where nodal degrees
 in the $W$ network have effects on popularity or activity in the
 $X$  network. They use an internal effect parameter $p$, which
 mostly will be 1 or 2.
@@ -10991,8 +11131,13 @@ one therefore should use one or two, not all three, because this leads to collin
 
 \subsubsection{Network rate function} \label{S_r}
 
-The \hypertarget{T_rate}{network rate function} $\lambda^{\rm net}$
-(lambda) is defined for Model Type 1 (which is the default Model
+To define rate effects by the function \sfn{includeEffects} or \sfn{setEffect},
+note that in the call of these functions the specification
+\texttt{type='rate'} should be included.
+\medskip
+
+The network rate function $\lambda^{\rm net}$
+(lambda) is defined for Model Type~1 (which is the default Model
 Type) as a product \[ \lambda^{\rm net}_i(\rho, \alpha, x, m) =
 \lambda^{\rm net}_{i1} \lambda^{\rm net}_{i2} \lambda^{\rm net}_{i3}
 \] of factors depending, respectively, on period $m$, actor
@@ -11002,8 +11147,10 @@ corresponding factors in the rate function are the following:
  \item The dependence on the period \texttt{(Rate)}
  can be represented by a simple factor
  \[ \lambda^{\rm net}_{i1} = \rho^{\rm net}_m \]
- for $m = 1, ..., M-1$. If there are only $M = 2 $ observations,
- \hypertarget{T_rho}{the basic rate parameter} is called $ \rho^{\rm net}$.
+ for $m = 1, ..., M-1$.\\
+ This basic rate parameter is always period-dependent (i.e.,
+ it may and will be different for
+ different values of $m$); this is in contrast to all other parameters.
 
  \item The effect of actor covariates \texttt{(RateX)} with values
  $v_{hi}$ can be represented by the factor
@@ -11062,6 +11209,9 @@ reciprocated degrees.
  For the two latter effects, the addition of 1 to the outdegrees avoids
  problems (division by 0, logarithm of 0) that otherwise would occur
  when $ x_{i+} = 0$.
+
+ For making the rates dependent on the outdegree,
+ the \texttt{outRateLog} effect often gives the best fit.
 \end{enumerate}
 
 When rate effects are included, sometimes it can be helpful to specify
@@ -11133,7 +11283,7 @@ dependent network variable by $x$.
 Here the dependent variable is transformed
 to have an overall average value of 0;
 in other words, $z$ denotes the original input variable
-minus the overall mean\footnote{More precisely:
+minus the overall mean\footnote{More precisely: \label{meandef}
 this is the mean of the means per wave, and the
 means per wave are means of the non-missing observations
 for that wave.}, which is given in the
@@ -11472,7 +11622,25 @@ The list of these effects is the following.
  $s^{\rm beh}_{i\vit}(x, z) =  x_{+i} \, x_{i+}^{-1} \sum_j x_{ij} ({\rm sim}^z_{ij} - \widehat{{\rm sim}^z}) $;\\
  (and 0 if $x_{i+} = 0$) ;\\
  because of collinearity, under the Method of Moments this cannot be estimated together with the
-  average similarity $\times$ popularity alter effect.
+  average similarity $\times$ popularity alter effect;
+
+ \item {\em group average} \texttt{(avGroup)}, defined by ego's value multiplied by the
+ average of \underline{all} values $z_h$ for this period,  \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_{i} \,( \overline {z} - c_p) $;\\
+ here $\overline {z}$ is the mean of the values $z_h$ for all actors $h$
+ in the group, and $c_p$ is a centering constant depending on the internal effect parameter $p$.
+ Denote the overall mean used for centering the observed $Z$ values by
+ $m_Z$ (see the footnote on p.~\pageref{meandef}).
+ If $p \leq 0$, centering is no different than for the $z_i$ values generally,
+ so $c_p = 0$; if $p \geq 1$, centering is by $c_p = p - m_Z$.
+ For the original non-centered values of $Z$, this means that the mean
+ is centered around the value $p$.\\
+ This effect is useful especially for multigroup data sets, where the average value
+ varies between groups. For multigroup data sets, centering by the groupwise
+ mean may be less desirable, and it will be better to center by a value $p$
+ close to the median of $Z$.
+ (Note that the centering in a multi-group data set
+ will affect the linear shape parameter.)
 
 \end{followenum}
 \medskip
@@ -11820,6 +11988,7 @@ the latter of which is a choice among three, dependent on the
 For each dyadic covariate $W$ there are the following effects.
 Recall that the default is to center dyadic covariates; however, it often
 will be preferable here to use non-centered covariates.
+It is then important how to define the zero point of the covariate!
 
 \begin{enumerate}
 \setcounter{enumi}{\value{savenumi}}
@@ -13594,7 +13763,7 @@ For example, compare the construction of \texttt{sameXTransTrip} to that of
 		\item Build the package and install it.  Check from R that
               the new effect (which has only been created nominally)
               appears now in the effects object in RSiena.\\
-              If this is not the case, there may be furethr changes necessary
+              If this is not the case, there may be further changes necessary
               in the file \sfn{effects.r}; also see
               Section~\ref{S_notestwomode}.
 		\end{itemize}
@@ -13630,6 +13799,8 @@ For example, compare the construction of \texttt{sameXTransTrip} to that of
                   We recommend opening any effect file to see
                   how the syntax works, but creating a new effect will be hard
                    without knowing at least a bit of C++.
+            \item Add the name \textsf{NewEffect.cpp} to the file \textsf{sources.list}.
+                  This is a long file without any hard returns. It does not matter where
 
 		\end{itemize}
 
@@ -14470,6 +14641,86 @@ the R-Forge repository, which contains a more complete listing.
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
+\item 2018-10-30 R-Forge Revision 336, packages version 1.2-13.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item Correct error in \textsf{sienaGroupCreate} for centered actor covariates.
+   \item Correct error in \textsf{print01Report} that occurred for changing dyadic covariates
+     given as lists of sparse matrices.
+   \item Also get simulated dependent behavior variables for
+     \texttt{siena07(,,, returnDeps=TRUE, ...)} for ML estimation (see help page).
+   \item \textsf{siena.table} corrected for data sets with several dependent variables.
+   \item For \textsf{siena08}: new parameters \texttt{which} and \texttt{useBound} 
+   in \textsf{plot.sienaMeta};
+     new parameter \texttt{reportEstimates}, allowing to reduce
+     the output produced.
+   \item \textsf{updateSpecification}: also update \texttt{randomEffects} column.
+   \item More explanation of sparse matrix input in the help page for \textsf{sienaDependent}.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item \textsf{sienaBayes}: new parameters \texttt{proposalFromPrev}, which allows
+     taking proposal distributions from \texttt{prevBayes} object;\\
+     \texttt{incidentalBasicRates} resuscitated;\\
+     allow fixed rate parameters, with \texttt{priorRatesFromData=-1};\\
+     changed initial values of scale factors for proposal distributions;\\
+     new parameters target and \texttt{usePrevOnly};\\
+     in case \texttt{prevBayes} is used, parameters \texttt{nrunMHBatches, nSampVarying, nSampConst},
+     and \texttt{nSampRates} in the function call of \textsf{sienaBayes} supersede those
+     in the \texttt{prevBayes} object;\\
+     correct bug for three-effect interactions;\\
+     copy parameters \texttt{modelType, behModelType, MaxDegree, Offset, initML},
+     from parameter \texttt{algo} to the algorithms created within \textsf{sienaBayes};\\
+     more extensive checking of smallest eigenvalue of covariance matrix;\\
+     for \texttt{priorRatesFromData = 1} or 2, the resulting prior Covariance
+     matrix for \texttt{priorKappa != 1}
+     was incorrect; this was corrected;\\
+     reported timing changed to elapsed system time.
+\end{itemize}
+
+\item 2018-05-13 CRAN, RSiena version 1.2-12.
+
+\item 2018-05-06 R-Forge Revision 335, packages version 1.2-11.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item New effects \texttt{gwdspFF} and \texttt{gwdspFB}.
+   \item Effects \texttt{simEgoInDist2} and \texttt{simEgoInDist2W}
+   for two-mode networks were corrected.
+     Perhaps \texttt{simEgoDist2} and \texttt{simEgoDist2W} were broken
+     in a previous version; if so, that was now corrected.
+   \item Added \texttt{sqrt} version for \texttt{reciAct}, obtained for parameter = 2.
+   \item Allowed the value \texttt{parameter=NULL} for \textsf{setEffect} and
+   \textsf{includeInteraction},
+     meaning that no change is made for the internal effect parameter.
+     For \textsf{setEffect} this is the new default,
+     implying that when starting the
+     default values from \texttt{allEffects.csv} are used, just like in
+     \textsf{includeEffects}
+     (where no parameter can be given).
+   \item New auxiliary functions for \textsf{sienaGOF}:
+   \textsf{Triad Census} and \textsf{mixedTriadCensus}
+     (contribution by Christoph Stadtfeld).
+   \item triad census from \texttt{igraph} added to help page of
+   \textsf{sienaGOF-auxiliary}.
+   \item improved \textsf{sienatable} output for \texttt{type="html"}:
+   added \texttt{rules=none, frame = void} to
+     general options; changed minus to \texttt{\&ndash;}~;
+     added column for asterisks to have better alignment for estimates.
+   \item Stop cluster also for a user interrupt in  \textsf{siena07}.
+   \item Extension of help page for \textsf{siena07} by
+   mentioning functions for accessing simulated networks for ML.
+\end{itemize}
+
+Change in RSienaTest:
+\begin{itemize}
+   \item \textsf{extract.sienaBayes}:
+   error corrected that occurred if called with
+     \texttt{extracted="all"} but there are no varying,
+     or no non-varying parameters.
+\end{itemize}
 
 \item 2018-03-24 R-Forge Revision 334, packages version 1.2-10.
 

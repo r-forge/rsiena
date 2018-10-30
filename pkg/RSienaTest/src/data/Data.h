@@ -78,8 +78,10 @@ public:
 	NetworkLongitudinalData * createNetworkData(std::string name,
 		const ActorSet * pSenders,
 		const ActorSet * pReceivers);
-	OneModeNetworkLongitudinalData * createOneModeNetworkData(std::string name,
-		const ActorSet * pActors);
+	OneModeNetworkLongitudinalData * createOneModeNetworkData(
+			std::string name, const ActorSet * pActors);
+	OneModeNetworkLongitudinalData * createOneModeSimNetworkData(
+			std::string name, const ActorSet * pActors);
 	BehaviorLongitudinalData * createBehaviorData(std::string name,
 		const ActorSet * pActorSet);
 	ConstantCovariate * createConstantCovariate(std::string name,
@@ -95,8 +97,9 @@ public:
 
 	const ActorSet * pActorSet(std::string name) const;
 	NetworkLongitudinalData * pNetworkData(std::string name) const;
-	OneModeNetworkLongitudinalData * pOneModeNetworkData(std::string name)
-		const;
+	NetworkLongitudinalData * pSimNetworkData(std::string name) const;
+	OneModeNetworkLongitudinalData * pOneModeNetworkData(std::string name) const;
+	OneModeNetworkLongitudinalData * pOneModeSimNetworkData(std::string name) const;
 	BehaviorLongitudinalData * pBehaviorData(std::string name) const;
 	ConstantCovariate * pConstantCovariate(std::string name) const;
 	ChangingCovariate * pChangingCovariate(std::string name) const;
@@ -105,12 +108,11 @@ public:
 
 	const std::vector<const ActorSet *> & rActorSets() const;
 	const std::vector<LongitudinalData *> & rDependentVariableData() const;
+	const std::vector<LongitudinalData *> & rSimVariableData() const;
 	const std::vector<ConstantCovariate *> & rConstantCovariates() const;
 	const std::vector<ChangingCovariate *> & rChangingCovariates() const;
-	const std::vector<ConstantDyadicCovariate *> &
-		rConstantDyadicCovariates() const;
-	const std::vector<ChangingDyadicCovariate *> &
-		rChangingDyadicCovariates() const;
+	const std::vector<ConstantDyadicCovariate *> & rConstantDyadicCovariates() const;
+	const std::vector<ChangingDyadicCovariate *> & rChangingDyadicCovariates() const;
 
 	void active(const ActorSet * pActorSet,
 		int actor,
@@ -145,6 +147,7 @@ private:
 	// dependent variables
 
 	std::vector<LongitudinalData *> ldependentVariableData;
+	std::vector<LongitudinalData *> lsimVariableData;
 
 	// A collection of constant covariates
 	std::vector<ConstantCovariate *> lconstantCovariates;

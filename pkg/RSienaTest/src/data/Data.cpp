@@ -131,8 +131,7 @@ NetworkLongitudinalData * Data::createNetworkData(std::string name,
  * @param[in] pActors the set of actors of the network
  */
 OneModeNetworkLongitudinalData * Data::createOneModeNetworkData(
-	std::string name,
-	const ActorSet * pActors)
+	std::string name, const ActorSet * pActors)
 {
 	OneModeNetworkLongitudinalData * pNetworkData =
 		new OneModeNetworkLongitudinalData(this->ldependentVariableData.size(),
@@ -140,6 +139,16 @@ OneModeNetworkLongitudinalData * Data::createOneModeNetworkData(
 			pActors,
 			this->lobservationCount);
 	this->ldependentVariableData.push_back(pNetworkData);
+	return pNetworkData;
+}
+
+OneModeNetworkLongitudinalData * Data::createOneModeSimNetworkData(
+	std::string name, const ActorSet * pActors)
+{
+	OneModeNetworkLongitudinalData * pNetworkData =
+		new OneModeNetworkLongitudinalData(this->lsimVariableData.size(),
+			name, pActors, this->lobservationCount);
+	this->lsimVariableData.push_back(pNetworkData);
 	return pNetworkData;
 }
 
@@ -235,6 +244,10 @@ const std::vector<LongitudinalData *> & Data::rDependentVariableData() const
 	return this->ldependentVariableData;
 }
 
+const std::vector<LongitudinalData *> & Data::rSimVariableData() const
+{
+	return this->lsimVariableData;
+}
 
 /**
  * Returns the collection of constant covariates.
@@ -361,15 +374,25 @@ NetworkLongitudinalData * Data::pNetworkData(std::string name) const
 		findNamedObject(name, this->ldependentVariableData));
 }
 
+NetworkLongitudinalData * Data::pSimNetworkData(std::string name) const
+{
+	return dynamic_cast<NetworkLongitudinalData *>(
+		findNamedObject(name, this->lsimVariableData));
+}
 
 /**
  * Returns the longitudinal one-mode network data with the given name.
  */
-OneModeNetworkLongitudinalData * Data::pOneModeNetworkData(std::string name)
-	const
+OneModeNetworkLongitudinalData * Data::pOneModeNetworkData(std::string name) const
 {
 	return dynamic_cast<OneModeNetworkLongitudinalData *>(
 		findNamedObject(name, this->ldependentVariableData));
+}
+
+OneModeNetworkLongitudinalData * Data::pOneModeSimNetworkData(std::string name) const
+{
+	return dynamic_cast<OneModeNetworkLongitudinalData *>(
+		findNamedObject(name, this->lsimVariableData));
 }
 
 

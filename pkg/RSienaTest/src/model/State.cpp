@@ -8,6 +8,9 @@
 #include "model/EpochSimulation.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/variables/BehaviorVariable.h"
+#include "model/settings/Setting.h"
+#include "model/settings/PrimarySetting.h"
+#include "network/OneModeNetwork.h"
 
 using namespace std;
 
@@ -62,7 +65,22 @@ State::State(const Data * pData, int observation, bool ownedValues)
 		}
 		else
 		{
-			throw domain_error("Unexpected class of longitudinal data");
+			throw domain_error("unexpected class for longitudinal data: " + rVariables[i]->name());
+		}
+	}
+
+	// SimVariables!
+	const vector<LongitudinalData *> & rSimVariables = pData->rSimVariableData();
+	for (unsigned i = 0; i < rSimVariables.size(); i++) {
+		NetworkLongitudinalData * pNetworkData = dynamic_cast<NetworkLongitudinalData *>(rSimVariables[i]);
+		if (pNetworkData) {
+			const Network * pNetwork = pNetworkData->pNetwork(observation);
+			if (ownedValues) {
+				pNetwork = pNetwork->clone();
+			}
+			this->lnetworks[pNetworkData->name()] = pNetwork;
+		} else {
+			throw domain_error("unexpected class for simulated data: " + rSimVariables[i]->name());
 		}
 	}
 
@@ -72,9 +90,7 @@ State::State(const Data * pData, int observation, bool ownedValues)
 
 State::State(EpochSimulation * pSimulation)
 {
-	const vector<DependentVariable *> & rVariables =
-		pSimulation->rVariables();
-
+	const vector<DependentVariable *> & rVariables = pSimulation->rVariables();
 	for (unsigned i = 0; i < rVariables.size(); i++)
 	{
 		NetworkVariable * pNetworkVariable =
@@ -86,6 +102,16 @@ State::State(EpochSimulation * pSimulation)
 		{
 			this->lnetworks[pNetworkVariable->name()] =
 				pNetworkVariable->pNetwork();
+
+			const Setting * pSetting = pNetworkVariable->setting(1); // 0=universal, 1=primary
+			if (pSetting) {
+				const PrimarySetting * pPSetting = dynamic_cast<const PrimarySetting *>(pSetting);
+				if (pPSetting) {
+					if (pPSetting->pPrimaryNetwork() == 0) throw domain_error("no setting");
+					std::string pname = "primary(" + pNetworkVariable->name() + ")";
+					this->lnetworks[pname] = pPSetting->pPrimaryNetwork();
+				}
+			}
 		}
 		else if (pBehaviorVariable)
 		{
@@ -94,7 +120,7 @@ State::State(EpochSimulation * pSimulation)
 		}
 		else
 		{
-			throw domain_error("Unexpected class of dependent variable");
+			throw domain_error("unexpected class for dependent variable: " + rVariables[i]->name());
 		}
 	}
 

@@ -2679,4 +2679,9 @@ void NetworkVariable::initializeSetting() {
 	setting->initSetting(ego());
 }
 
+const Setting * NetworkVariable::setting(int i) const {
+	if (i >= numberSettings()) return 0;
+	return lsettings[i];
+}
+
 }

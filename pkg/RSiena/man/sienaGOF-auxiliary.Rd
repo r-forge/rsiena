@@ -175,13 +175,13 @@ Ph.D. Thesis. University of Oxford: U.K.
 \examples{
 ### For use out of the box:
 
-mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
-mybeh <- sienaDependent(s50a, type="behavior")
+mynet1 <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
+mybeh <- sienaDependent(s50a[,1:2], type="behavior")
 mydata <- sienaDataCreate(mynet1, mybeh)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTies, cycle3)
 # Shorter phases 2 and 3, just for example:
-myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=100, seed=1234)
+myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=50, seed=1234)
 (ans <- siena07(myalgorithm, data=mydata, effects=myeff, returnDeps=TRUE,
    batch=TRUE))
 
@@ -193,7 +193,7 @@ BehaviorDistribution(20, ans$f, ans$sims, period=1, groupName="Data1",
   varName="mybeh")
 sparseMatrixExtraction(50, ans$f, ans$sims, period=1, groupName="Data1",
   varName="mynet1")
-networkExtraction(100, ans$f, ans$sims, period=1, groupName="Data1",
+networkExtraction(40, ans$f, ans$sims, period=1, groupName="Data1",
   varName="mynet1")
 behaviorExtraction(50, ans$f, ans$sims, period=1, groupName="Data1",
   varName="mybeh")
@@ -221,6 +221,7 @@ plot(goftc, center=TRUE, scale=TRUE)
 descriptives.sienaGOF(goftc)
 round(descriptives.sienaGOF(goftc, center=TRUE, scale=TRUE), 0)
 
+\dontrun{
 ### The mixed triad census for co-evolution of one-mode and two-mode networks:
 actors <- sienaNodeSet(50, nodeSetName="actors")
 activities <- sienaNodeSet(20, nodeSetName="activities")
@@ -242,12 +243,13 @@ twoeff <- includeEffects(twoeff, to, name="twomodenet",
                             interaction1="onemodenet")
 twoeff
 # Shorter phases 2 and 3, just for example:
-twoalgorithm <- sienaAlgorithmCreate(projname="twomode", nsub=1, n3=100, seed=1234)
+twoalgorithm <- sienaAlgorithmCreate(projname="twomode", nsub=2, n3=200, seed=1234)
 (ans <- siena07(twoalgorithm, data=twodata, effects=twoeff, returnDeps=TRUE,
    batch=TRUE))
 (gof.two <- sienaGOF(ans, mixedTriadCensus,
                         varName=c("onemodenet", "twomodenet"), verbose=TRUE))
 plot(gof.two, center=TRUE, scale=TRUE)
+}
 
 \dontrun{
 ### Here come some useful functions for building your own auxiliary statistics:

@@ -190,12 +190,13 @@ public:
 	int rejections(int stepType) const;
 	int aborts(int stepType) const;
 
+	int numberSettings() const;
+
 protected:
 	inline EpochSimulation * pSimulation() const;
 	void simulatedDistance(int distance);
 	void invalidateRates();
 	void successfulChange(bool success);
-	int numberSettings() const;
 	int stepType() const;
 	void getStepType();
 	double settingRate() const;
