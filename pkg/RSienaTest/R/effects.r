@@ -405,33 +405,39 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 				objEffects$type == 'eval', 'include'] <- TRUE
 		}
 		rateEffects$basicRate[1:observations] <- TRUE
-		## The following adding of settings effects should perhaps have been
-		## placed earlier; but for the moment it is here.
-		## This uses the results of addSettings
-		## which adds the settings to the sienaDependent object.
-		if (!is.null(attr(depvar,"settings")))
-		{
-		## add settings effects
-			# nbrSettings <- ifelse(attr(depvar,"settings") == "", 0, length(attr(depvar,"settings")))
-			nbrSettings <- length(attr(depvar,"settings"))
-			dupl <- rateEffects[1:observations, ]
-		## make extra copies
-			newEffects <- dupl[rep(1:nrow(dupl), each=nbrSettings), ]
-			newEffects <- split(newEffects, list(newEffects$group, newEffects$period))
-			newEffects <- lapply(newEffects, function(dd) {
-					dd$setting <- attr(depvar,"settings")
-					i1 <- regexpr("rate", dd$effectName)
-					dd$effectName <-
-						  paste(substr(dd$effectName, 1, i1 - 2),
-								dd$setting, substring(dd$effectName, i1))
+
+		if (!is.null(attr(depvar,"settingsinfo"))) {
+			settingIds <- sapply(attr(depvar,"settingsinfo"), function(s) s$id)
+			nbrSettings <- length(settingIds)
+
+			if ("primary" %in% settingIds) {
+				# append effects with an interaction on the primary settings network of `varname`
+				objEffects <- rbind(objEffects, createEffects(
+					"nonSymmetricSymmetricObjective", paste0("primary(", varname, ")") , name=varname,
+					groupName=groupName, group=group, netType=netType))
+			}
+
+			# duplicate rate effects, split by periods
+			setRate <- rateEffects[1:observations, ]
+			setRate <- setRate[rep(1:nrow(setRate), each=nbrSettings), ]
+			setRateByPeriod <- split(setRate, list(setRate$group, setRate$period))
+
+			# for each period, set "setting" and modify "effectName"
+			setRateByPeriod <- lapply(setRateByPeriod, function(dd) {
+					dd$setting <- settingIds
+					# prepend "rate" with the settings name
+					i1 <- regexpr("rate", dd$effectName) # index of match
+					dd$effectName <- paste(substr(dd$effectName, 1, i1 - 2), dd$setting, substring(dd$effectName, i1))
 					dd
 				})
-			newEffects <- do.call(rbind, newEffects)
+
+			setRate <- do.call(rbind, setRateByPeriod)
+
 			## add the extra column also to the other effects
 			rateEffects$setting <- rep("", nrow(rateEffects))
 			objEffects$setting <- rep("", nrow(objEffects))
-			rateEffects <-
-				rbind(newEffects, rateEffects[!rateEffects$basicRate, ])
+
+			rateEffects <- rbind(setRate, rateEffects[!rateEffects$basicRate, ])
 		}
 		list(effects=rbind(rateEffects = rateEffects, objEffects = objEffects),
 			starts=starts)

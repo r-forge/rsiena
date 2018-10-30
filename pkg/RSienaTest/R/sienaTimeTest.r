@@ -1168,6 +1168,7 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
 								interaction1= c(effect$interaction1,
 									dname),
 								interaction2=effect$interaction2,
+								parameter=effect$parameter,
 								name=depvar, verbose=FALSE)
 					} else {
 						newEffects <-
@@ -1178,6 +1179,7 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
 								interaction1= c(effect$interaction1,
 									dname),
 								interaction2=effect$interaction2,
+								parameter=effect$parameter,
 								name=depvar, verbose=FALSE)
 					}
 					## find the row altered

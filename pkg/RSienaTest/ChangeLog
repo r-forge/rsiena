@@ -1,3 +1,56 @@
+2018-10-29 R-Forge Revision 336, packages version 1.2-13.
+Changes in RSiena and RSienaTest:
+   * Correct error in print01Report that occurred for changing dyadic covariates
+     given as lists of sparse matrices.
+   * Correct error in sienaGroupCreate for centered actor covariates.
+   * Drop dependence on utils (the packages did not depend on it).
+   * Also get simulated dependent behavior variables for
+     siena07(,,, returnDeps=TRUE, ...) for ML estimation.
+   * siena.table corrected for data sets with several dependent variables.
+   * For siena08: new parameters which and useBound in plot.sienaMeta;
+     new parameter reportEstimates in siena08, allowing to reduce
+     the output produced.
+   * updateSpecification: also update randomEffects column.
+   * Change help page for sienaDependent.
+   * Some changes in sienaprint.r depending on sienaBayes, to keep the two
+     packages the same when possible.
+Changes in RSienaTest:
+   * sienaBayes: new parameters proposalFromPrev, which allows
+     taking proposal distributions from prevBayes object;
+     incidentalBasicRates resuscitated;
+     allow fixed rate parameters, with priorRatesFromData=-1;
+     changed initial values of scale factors for proposal distributions;
+     new parameters target and usePrevOnly;
+     in case prevBayes is used, parameters nrunMHBatches, nSampVarying, nSampConst,
+     and nSampRates in the function call of sienaBayes supersede those
+     in the prevBayes object;
+     correct bug for three-effect interactions (projectEffects)
+     copy parameters modelType, behModelType, MaxDegree, Offset, initML,
+     from parameter algo to the algorithms created within sienaBayes;
+     more extensive checking of smallest eigenvalue of covariance matrix
+     (function correctMatrix);
+     For priorRatesFromData = 1 or 2, the resulting matrix for priorKappa != 1 
+     was incorrect; this was corrected.
+     reported timing changed to elapsed system time;
+     some reordering of parameters.
+     This also required some corresponding changes in sienaprint.r.
+   * DESCRIPTION: Added 'Encoding: UTF-8' because sienaGOF.r complained about
+     non-ASCII.
+   * Data.cpp: Add a new 'SimNetworkData' type: This is for variables that
+     behave like dependent variable for effects but are not changed by the
+     simulation.  Currently used for the primary setting network.
+   * PrimaryLayer: A network layer holding the full primary setting as network.
+
+2018-05-13 CRAN for RSiena, version 1.2-12.
+
+2018-05-07 R-Forge Revision 336, packages version 1.2-12.
+Changes in RSiena and RSienaTest:
+    * Change default parameter of reciAct to 1 (implies changes only in
+      output, not computationally).
+    * Internal effect parameter carried through in sienaTimeFix.
+Changes in RSiena:
+    * Shorter examples for sienaGOF and sienaGOF-auxiliary help pages.
+
 2018-05-06 R-Forge Revision 335, packages version 1.2-11.
 Changes in RSiena and RSienaTest:
    * New effects gwdspFF and gwdspFB.
@@ -5,21 +58,22 @@ Changes in RSiena and RSienaTest:
      Perhaps simEgoDist2 and simEgoDist2W were broken in a previous version;
      if so, that was now corrected.
    * Added sqrt version for reciAct, obtained for parameter = 2.
-   * Allowed the value parameter=NULL for setEffect and includeInteraction, 
-     meaning that no change is made for the internal effect parameter. 
-     For setEffect this is the new default, implying that when starting the 
-     default values from allEffects.csv are used, just like in includeEffects 
+   * Allowed the value parameter=NULL for setEffect and includeInteraction,
+     meaning that no change is made for the internal effect parameter.
+     For setEffect this is the new default, implying that when starting the
+     default values from allEffects.csv are used, just like in includeEffects
      (where no parameter can be given).
-   * New auxiliary functions for sienaGOF: Triad Census and mixedTriadCensus 
+   * New auxiliary functions for sienaGOF: Triad Census and mixedTriadCensus
      (contribution by Christoph Stadtfeld).
    * triad census from igraph added to help page of sienaGOF-auxiliary.
    * sienatable output for type="html": added rules=none, frame = void to
      general options; changed minus to &ndash; ;
      added column for asterisks to have better alignment for estimates.
    * Stop cluster also if (!z$OK || !z$Phase3Interrupt) (robmon.r).
-   * Extension of help page for siena07 by mentioning functions for testing.
+   * Extension of help page for siena07 by mentioning functions for accessing
+     simulated networks for ML.
 Changes in RSienaTest:
-   * extract.sienaBayes: error corrected that occurred if called with 
+   * extract.sienaBayes: error corrected that occurred if called with
      extracted="all" but there are no varying, or no non-varying parameters.
 
 2018-03-24 R-Forge Revision 334, packages version 1.2-10.

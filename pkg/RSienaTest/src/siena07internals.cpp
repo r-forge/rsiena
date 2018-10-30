@@ -37,6 +37,10 @@
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/ml/MLSimulation.h"
+#include "network/layers/PrimaryLayer.h"
+#include "network/TieIterator.h"
+#include "utils/Utils.h"
+
 
 using namespace std;
 using namespace siena;
@@ -387,15 +391,15 @@ void setupOneModeNetwork(SEXP ONEMODE,
  * Create all observations for a one mode Network
  *
  */
-void setupOneModeObservations(SEXP ONEMODES,
-			      OneModeNetworkLongitudinalData *
-                              pOneModeNetworkLongitudinalData)
-
+void setupOneModeObservations(const std::string& name, SEXP ONEMODES,
+		OneModeNetworkLongitudinalData * pOneModeNetworkLongitudinalData)
 {
 	int observations = length(ONEMODES);
 	if (observations != pOneModeNetworkLongitudinalData->observationCount())
 	{
-		error ("wrong number of observations in OneMode");
+		error(("wrong number of observations in: " + name + ": expected "
+				+ toString(pOneModeNetworkLongitudinalData->observationCount()) + " got "
+				+ toString(observations)).c_str());
 	}
 	SEXP uo;
 	PROTECT(uo = install("uponly"));
@@ -445,9 +449,9 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 
 		SEXP nm = PROTECT(install("name"));
 		SEXP name = getAttrib(ONEMODES, nm);
-		const ActorSet* myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
-		OneModeNetworkLongitudinalData *  pOneModeNetworkLongitudinalData =
-			pData->createOneModeNetworkData(CHAR(STRING_ELT(name, 0)), myActorSet);
+		const ActorSet* pActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet, 0)));
+		const char* cname = CHAR(STRING_ELT(name, 0));
+		OneModeNetworkLongitudinalData *  pNetData = pData->createOneModeNetworkData(cname, pActorSet);
 
 		// parse settings
 		SEXP settingsSymbol = PROTECT(install("settingsinfo"));
@@ -478,28 +482,53 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 			if (type.length() == 0) error("settings type should not be empty");
 			// add it
 			Rprintf("%s %s %s %s\n", id.c_str(), type.c_str(), covar.c_str(), only.c_str());
-			pOneModeNetworkLongitudinalData->addSettingName(id, type, covar, permType);
+			pNetData->addSettingName(id, type, covar, permType);
 		}
 
-		pOneModeNetworkLongitudinalData->symmetric(*(LOGICAL(symmetric)));
-		pOneModeNetworkLongitudinalData->balanceMean(*(REAL(balmean)));
-		pOneModeNetworkLongitudinalData->structuralMean(*(REAL(structmean)));
-		pOneModeNetworkLongitudinalData->
-			averageInDegree(*(REAL(averageInDegree)));
-		pOneModeNetworkLongitudinalData->
-			averageOutDegree(*(REAL(averageOutDegree)));
-		setupOneModeObservations(ONEMODES,
-				pOneModeNetworkLongitudinalData);
-		//	Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
-		//	averageInDegree(),  pOneModeNetworkLongitudinalData->
-		//	averageOutDegree());
+		// check first two setting types
+		if (pNetData->rSettingNames().size() == 1) {
+			error("if setting are present use universal and primary");
+		} else if (pNetData->rSettingNames().size() >= 2) {
+			if (pNetData->rSettingNames().at(0).getSettingType() != "universal")
+				error("first setting should be type=universal");
+			if (pNetData->rSettingNames().at(1).getSettingType() != "primary")
+				error("second setting should be type=primary");
+		}
 
-		// Once all network data has been stored, calculate some
-		// statistical properties of that data.
-		pOneModeNetworkLongitudinalData->calculateProperties();
-		//Rprintf("%f %f\n", pOneModeNetworkLongitudinalData->
-		//	averageInDegree(), pOneModeNetworkLongitudinalData->
-		//	averageOutDegree());
+		pNetData->symmetric(*(LOGICAL(symmetric)));
+		pNetData->balanceMean(*(REAL(balmean)));
+		pNetData->structuralMean(*(REAL(structmean)));
+		pNetData->averageInDegree(*(REAL(averageInDegree)));
+		pNetData->averageOutDegree(*(REAL(averageOutDegree)));
+		setupOneModeObservations(cname, ONEMODES, pNetData);
+		// Once all network data has been stored, calculate some statistical
+		// properties of that data.
+		pNetData->calculateProperties();
+
+		// add the primary setting for each observation
+		if (pNetData->rSettingNames().size() >= 1) {
+			std::string settingName = "primary(" + std::string(cname) + ")";
+			OneModeNetworkLongitudinalData* pSettingNetwork =
+				pData->createOneModeSimNetworkData(settingName.c_str(), pActorSet);
+
+			// Copy the primary layer to the data objects.  Cannot simply use
+			// `setupOneModeObservations` (with an object from R) because that
+			// expects a different format.
+			for (int obs = 0; obs < pNetData->observationCount(); obs++) {
+				const Network& net = *pNetData->pNetwork(obs);
+				PrimaryLayer l;
+				l.onInitializationEvent(net);
+				for (TieIterator tie = l.pLayer()->ties(); tie.valid(); tie.next()) {
+					pSettingNetwork->tieValue(tie.ego(), tie.alter(), obs, 1);
+					// TODO ignore missing and structural?
+					pSettingNetwork->missing(tie.ego(), tie.alter(), obs, 0);
+					pSettingNetwork->structural(tie.ego(), tie.alter(), obs, 0);
+				}
+				l.onNetworkDisposeEvent(net);
+			}
+			pSettingNetwork->calculateProperties();
+		}
+
 		UNPROTECT(15);
 	}
 }
@@ -726,10 +755,10 @@ void setupBehaviorGroup(SEXP BEHGROUP, Data *pData)
 		SEXP name = getAttrib(VECTOR_ELT(VECTOR_ELT(BEHGROUP, behavior), 0),
 				nm);
 
-		const ActorSet * myActorSet = pData->pActorSet(CHAR(STRING_ELT(
+		const ActorSet * pActorSet = pData->pActorSet(CHAR(STRING_ELT(
 						actorSet, 0)));
 		BehaviorLongitudinalData * pBehaviorData =
-			pData->createBehaviorData(CHAR(STRING_ELT(name, 0)), myActorSet);
+			pData->createBehaviorData(CHAR(STRING_ELT(name, 0)), pActorSet);
 		//	Rprintf("%x\n", pBehaviorData);
 		setupBehavior(VECTOR_ELT(BEHGROUP, behavior), pBehaviorData);
 		UNPROTECT(2);
@@ -818,18 +847,18 @@ void setupConstantCovariateGroup(SEXP COCOVARGROUP, Data *pData)
 		SEXP nm;
 		PROTECT(nm = install("name"));
 		SEXP name = getAttrib(VECTOR_ELT(COCOVARGROUP, constantCovariate), nm);
-		const ActorSet * myActorSet = pData->pActorSet(CHAR(STRING_ELT(
+		const ActorSet * pActorSet = pData->pActorSet(CHAR(STRING_ELT(
 						actorSet, 0)));
 		int nActors = length(VECTOR_ELT(COCOVARGROUP, constantCovariate));
 		//    Rprintf("nactors %d\n", nActors);
 
-		if (nActors != myActorSet->n())
+		if (nActors != pActorSet->n())
 		{
 			error ("wrong number of actors");
 		}
 		ConstantCovariate * pConstantCovariate =
 			pData->createConstantCovariate(CHAR(STRING_ELT(name, 0)),
-					myActorSet);
+					pActorSet);
 		setupConstantCovariate(VECTOR_ELT(COCOVARGROUP,	constantCovariate),
 				pConstantCovariate);
 		SEXP mn;
@@ -973,17 +1002,17 @@ void setupChangingCovariateGroup(SEXP VARCOVARGROUP, Data *pData)
 		PROTECT(nm = install("name"));
 		SEXP name = getAttrib(VECTOR_ELT(VARCOVARGROUP, changingCovariate),
 				nm);
-		const ActorSet * myActorSet = pData->pActorSet(CHAR(STRING_ELT(
+		const ActorSet * pActorSet = pData->pActorSet(CHAR(STRING_ELT(
 						actorSet, 0)));
 		int nActors = nrows(VECTOR_ELT(VARCOVARGROUP,changingCovariate));
 
-		if (nActors != myActorSet->n())
+		if (nActors != pActorSet->n())
 		{
 			error ("wrong number of actors");
 		}
 		ChangingCovariate * pChangingCovariate =
 			pData->createChangingCovariate(CHAR(STRING_ELT(name, 0)),
-					myActorSet);
+					pActorSet);
 		setupChangingCovariate(VECTOR_ELT(VARCOVARGROUP, changingCovariate),
 				pChangingCovariate);
 		SEXP mn;
@@ -1220,17 +1249,17 @@ void setupExogenousEventSet(SEXP EXOGEVENTSET, Data *pData)
 	//Rprintf("actor %d\n",*actor);
 	double * time = REAL(VECTOR_ELT(EVENTS, 3));
 	//Rprintf("time %5.4f\n",*time);
-	const ActorSet * myActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet,
+	const ActorSet * pActorSet = pData->pActorSet(CHAR(STRING_ELT(actorSet,
 					0)));
 	for (int event = 0; event < nEvents; event++)
 	{
 		if (*type == 1)
 		{
-			pData->addJoiningEvent(*period-1, myActorSet, *actor-1, *time);
+			pData->addJoiningEvent(*period-1, pActorSet, *actor-1, *time);
 		}
 		else
 		{
-			pData->addLeavingEvent(*period-1, myActorSet, *actor-1, *time);
+			pData->addLeavingEvent(*period-1, pActorSet, *actor-1, *time);
 		}
 		type++;
 		period++;
@@ -1248,13 +1277,13 @@ void setupExogenousEventSet(SEXP EXOGEVENTSET, Data *pData)
 
 	/* this is a matrix with column for each observation and row per actor*/
 
-	int nActors = myActorSet->n();
+	int nActors = pActorSet->n();
 	int *active = LOGICAL(ACTIVES);
 	for (int period = 0; period < pData->observationCount(); period++)
 	{
 		for (int actor = 0; actor < nActors; actor++)
 		{
-			pData->active(myActorSet, actor, period, *active);
+			pData->active(pActorSet, actor, period, *active);
 			active++;
 		}
 

@@ -1176,7 +1176,7 @@ mixedTriadCensus <- function (i, obsData, sims, period, groupName, varName) {
 ##@TriadCensus sienaGOF Calculates mixed triad census
 # Contributed by Christoph Stadtfeld.
 # 
-# Implementation of the Batagelj–Mrvar (Social Networks, 2001) algorithm
+# Implementation of the Batagelj-Mrvar (Social Networks, 2001) algorithm
 # based on the summary in the thesis of Sindhuja
 #
 TriadCensus <- function (i, obsData, sims, period, groupName, varName, levls = 1:16) {  

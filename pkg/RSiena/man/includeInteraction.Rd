@@ -9,7 +9,7 @@ Function to create user-specified interactions for a Siena model.
 \usage{
 includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
     type = "eval", interaction1 = rep("", 3), interaction2 = rep("", 3),
-    fix = FALSE, test = FALSE, parameter = 0, random = FALSE,
+    fix = FALSE, test = FALSE, parameter = NULL, random = FALSE,
     character = FALSE, verbose = TRUE)
 }
 \arguments{
@@ -42,7 +42,7 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   \item{test}{
     Boolean. Are the effects to be tested or not (requires \code{fix}).}
   \item{parameter}{
-    Value of internal effect parameter of this interaction effect. Default 0.
+    Value of internal effect parameter of this interaction effect.
 	If NULL, no change is made.}
   \item{random}{For specifying that the interaction effect will vary randomly;
     not relevant for \code{RSiena} at this moment.

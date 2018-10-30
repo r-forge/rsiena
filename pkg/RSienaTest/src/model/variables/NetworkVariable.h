@@ -78,6 +78,8 @@ public:
 	virtual bool missing(const MiniStep * pMiniStep) const;
 	virtual bool structural(const MiniStep * pMiniStep) const;
 
+	const Setting * setting(int i) const;
+
 private:
 	void preprocessEgo(int ego);
 	void preprocessEgo(const Function * pFunction, int ego);

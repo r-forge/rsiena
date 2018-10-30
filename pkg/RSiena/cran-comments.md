@@ -1,18 +1,11 @@
-# RSiena new version 1.2-3 (2017-9-08)
+# RSiena new version 1.2-12 (2018-05-12)
 
-## Issue for previous version (1.1-232) on gcc-UBSAN (runtime error) solved.
+## Passed checks on Windows, Mac, and Linux
+* No ERRORs, WARNINGs, or NOTEs on Windows and Mac. 
+* For Linux there were no ERRORs or WARNINGs;
+  there was a NOTE about the installed package size,
+  which is due to the use of a lot of compiled C++ code.
 
-## Warning for previous version (1.1-232) on windows-devel
-(cleanup: Non-Windows OSes require LF line endings) solved.
+## R CMD check --run-donttest on Windows OK.
 
-##Test environments
-* local Windows 7, R 3.4.1: OK
-* local Windows 7, R-devel (2017-8-24) through devtools: OK
-* local Windows 7, R-patched (2017-8-25) through devtools: OK
-* R-Hub Debian Linux, R-devel, GCC: OK
-* R-Hub macOS 10.9 Mavericks, R-oldrel (experimental): OK
-* R-Hub macOS 10.11 El Capitan, R-release (experimental): OK
-* R-Hub Ubuntu Linux 16.04 LTS, R-devel, GCC: OK
-
-## R CMD check results
-* All results were OK, no ERRORs, WARNINGs, or NOTEs.
+## Reverse dependency checked: btergm.

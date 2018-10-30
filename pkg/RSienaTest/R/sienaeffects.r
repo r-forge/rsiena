@@ -83,7 +83,7 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 includeInteraction <- function(myeff, ...,
 				include=TRUE, name=myeff$name[1],
 				type="eval", interaction1=rep("", 3), interaction2=rep("", 3),
-				fix=FALSE, test=FALSE, parameter=0, random=FALSE,
+				fix=FALSE, test=FALSE, parameter=NULL, random=FALSE,
 				character=FALSE, verbose=TRUE)
 {
 	if (character)

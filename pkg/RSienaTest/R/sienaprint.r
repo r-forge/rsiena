@@ -726,6 +726,11 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 				group, !z$generalParametersInGroup, drop=FALSE], 3, var, na.rm=TRUE)
 	}
 
+	if (is.null(z$priorRatesFromData))
+	{
+		z$priorRatesFromData <- 2
+	}
+# 2 is here the default; this is to achieve compatibility with earlier versions
 	if (groupOnly != 0)
 	{
 		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
@@ -734,6 +739,16 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 	}
 	else
 	{
+		if ((z$priorRatesFromData <0) | z$incidentalBasicRates)
+		{
+		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
+				z$ThinPosteriorMu[(nfirst):dim(z$ThinPosteriorMu)[1],
+					, drop=FALSE], na.rm=TRUE)
+		postVarMean[z$varyingObjectiveParameters] <- sapply(1:(dim(z$ThinPosteriorSigma)[2]),
+			function(i){mean(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i], na.rm=TRUE)})
+		}
+		else
+		{
 	thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
 				z$ThinPosteriorMu[(nfirst):dim(z$ThinPosteriorMu)[1],
 					z$objectiveInVarying, drop=FALSE], na.rm=TRUE)
@@ -741,16 +756,11 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 		function(i){mean(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i], na.rm=TRUE)}
 														)[z$objectiveInVarying]
 	}
-	if (any(z$set2))
-	{
+	}
 		thetaMean[z$set2] <-
 			colMeans(z$ThinPosteriorEta[nfirst:dim(z$ThinPosteriorEta)[1],, drop=FALSE],
 						na.rm=TRUE)
-	}
-	if (any(z$fix))
-	{
-		thetaMean[z$fix] <- z$thetaMat[1,z$fix]
-	}
+	thetaMean[z$fix & (!z$basicRate)] <- z$thetaMat[1,z$fix & (!z$basicRate)]
 	list(thetaMean, postVarMean)
 }
 
@@ -778,16 +788,20 @@ sdTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 	}
 	else
 	{
+		if ((z$priorRatesFromData <0) | z$incidentalBasicRates)
+		{
+		sdTheta[(z$set1)&(!z$basicRate)] <- apply(
+				z$ThinPosteriorMu[nfirst:ntot, , drop=FALSE], 2, sd)
+		}
+		else
+		{
 		sdTheta[(z$set1)&(!z$basicRate)] <- apply(
 				z$ThinPosteriorMu[nfirst:ntot,
 				z$objectiveInVarying, drop=FALSE], 2, sd)
 	}
-	if (any(z$set2))
-	{
-		sdTheta[z$set2] <-
-			apply(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE],
-			   2, sd)
 	}
+		sdTheta[z$set2] <-
+			apply(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE], 2, sd)
 	sdTheta
 }
 
@@ -813,6 +827,18 @@ credValues <- function(z, theProbs = c(0.025,0.975), tested = 0,
 	}
 	else
 	{
+		if ((z$priorRatesFromData <0) | z$incidentalBasicRates)
+		{
+			credVals[(z$set1)&(!z$basicRate), 1:3] <-
+				t(apply(z$ThinPosteriorMu[nfirst:ntott,
+					, drop=FALSE], 2, cvp, test0 = tested))
+			credVals[z$varyingObjectiveParameters, 4:5] <-
+				t(sapply(1:(dim(z$ThinPosteriorSigma)[2]),
+		function(i){cvp(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i],
+									10)[1:2]} ))
+		}
+		else
+		{
 		credVals[(z$set1)&(!z$basicRate), 1:3] <-
 			t(apply(z$ThinPosteriorMu[nfirst:ntott,
 				z$objectiveInVarying, drop=FALSE], 2, cvp, test0 = tested))
@@ -821,6 +847,7 @@ credValues <- function(z, theProbs = c(0.025,0.975), tested = 0,
 		function(i){cvp(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i],
 									10)[1:2]}
 		)[,z$objectiveInVarying])
+	}
 	}
 	for (group in 1:z$nGroup)
 	{
@@ -997,7 +1024,7 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 	mydf[nrates + (1:xp), 'text' ] <- theEffects$effectName
 	mydf[nrates + (1:xp), 'value' ] <- theta
 
-	if (fromBayes)
+	if (fromBayes) # then nrates=0
 	{
 		mydf[nrates + (1:xp), 'se' ] <- sdTheta.last(x, groupOnly, nfirst=nfirst)
 		mydf[nrates + (1:xp), 'random' ] <- NA
@@ -1185,6 +1212,13 @@ makeTemp <- function(x, groupOnly=0, nfirst, ...)
 			mymat[(x$fix|x$basicRate|x$set2), 'postSd']    <- "       "
 			mymat[(x$fix|x$basicRate|x$set2), 'cSdFrom']   <- "       "
 			mymat[(x$fix|x$basicRate|x$set2), 'cSdTo']     <- "       "
+		}
+		if (x$incidentalBasicRates)
+		{
+			mymat[x$basicRate, 'se']     <- "       "
+#			mymat[x$basicRate, 'postSd'] <- "       "
+			mymat[x$basicRate, 'cFrom']  <- "       "
+			mymat[x$basicRate, 'cTo']    <- "       "
 		}
 		mymat[, 'type'] <- format(mymat[, 'type'])
 		mymat[, 'text'] <- format(mymat[, 'text'])
@@ -1408,7 +1442,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 		{
 			cat(sprintf("%8.4f", x$priorSigma[i,]),"\n        ")
 		}
-		cat("\nDf       ",sprintf("%1d", x$priorDf),"\n")
+		cat("\nPrior Df ",sprintf("%1d", x$priorDf),"\n")
 		if (length(x$f$groupNames) >= 2)
 		{
 			cat("\nKappa  ",sprintf("%8.4f", x$priorKappa),"\n")
@@ -1473,7 +1507,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 			lines.thisgroup <- union(lines.thisgroup,
 							2 + which(x$varyingObjectiveParameters))
 			lines.thisgroup <- union(lines.thisgroup,
-							2 + which(x$fix))
+							2 + which(x$fix & (!x$basicRate)))
 			lines.thisgroup <- sort(union(lines.thisgroup, 2 + which(x$set2)))
 			for (i in lines.thisgroup)
 			{

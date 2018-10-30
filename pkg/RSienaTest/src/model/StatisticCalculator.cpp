@@ -262,42 +262,18 @@ int StatisticCalculator::settingDistance(LongitudinalData * pData,
 	}
 	else
 	{
-		throw invalid_argument(
-			"Unknown effect: The given setting rate is not part of the model.");
+		throw invalid_argument("Unknown setting: " + setting);
 	}
 
 	return value;
 }
 
-/**
- * Calculates the statistics for all effects of the given model. Note that
- * this->lperiod relates to the current period when simulating, but the
- * previous when calculating targets.
- */
-void StatisticCalculator::calculateStatistics()
-{
-	const vector<LongitudinalData *> & rVariables =
-		this->lpData->rDependentVariableData();
+void StatisticCalculator::calculateStatisticsInitNetwork(NetworkLongitudinalData * pNetworkData) {
+	const Network * pPredictor = pNetworkData->pNetworkLessMissing(this->lperiod);
+	this->lpPredictorState->pNetwork(pNetworkData->name(), pPredictor);
 
-	// set up the predictor and currentLessMissingsEtc states of these variables
-
-	for (unsigned i = 0; i < rVariables.size(); i++)
-	{
-		NetworkLongitudinalData * pNetworkData =
-			dynamic_cast<NetworkLongitudinalData *>(rVariables[i]);
-		BehaviorLongitudinalData * pBehaviorData =
-			dynamic_cast<BehaviorLongitudinalData *>(rVariables[i]);
-		string name = rVariables[i]->name();
-
-		if (pNetworkData)
-		{
-			const Network * pPredictor =
-				pNetworkData->pNetworkLessMissing(this->lperiod);
-			this->lpPredictorState->pNetwork(name, pPredictor);
-
-			// Duplicate the current network and remove those ties that are
-			// missing at either end of the period.
-
+	// Duplicate the current network and remove those ties that are missing at
+	// either end of the period.
 			Network * pNetwork = this->lpState->pNetwork(pNetworkData->name())->clone();
 
 			subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod));
@@ -318,22 +294,54 @@ void StatisticCalculator::calculateStatistics()
 				pNetworkData->pStructuralTieNetwork(this->lperiod));
 
 			// NOTE: pass delete responsibility to state
-			this->lpStateLessMissingsEtc->pNetwork(name, pNetwork);
+	this->lpStateLessMissingsEtc->pNetwork(pNetworkData->name(), pNetwork);
 			// delete pNetwork;
+}
 
+/**
+ * Calculates the statistics for all effects of the given model. Note that
+ * this->lperiod relates to the current period when simulating, but the
+ * previous when calculating targets.
+ */
+void StatisticCalculator::calculateStatistics()
+{
+	const vector<LongitudinalData *> & rVariables = this->lpData->rDependentVariableData();
+
+	// set up the predictor and currentLessMissingsEtc states of these variables
+	for (unsigned i = 0; i < rVariables.size(); i++)
+	{
+		NetworkLongitudinalData * pNetworkData = dynamic_cast<NetworkLongitudinalData *>(rVariables[i]);
+		BehaviorLongitudinalData * pBehaviorData = dynamic_cast<BehaviorLongitudinalData *>(rVariables[i]);
+
+		if (pNetworkData)
+		{
+			calculateStatisticsInitNetwork(pNetworkData);
 		}
 		else if (pBehaviorData)
 		{
-			// create a copy of the start of the period and zero any values
-			// missing at (either end?) start of period
-
-			const int * values =
-				pBehaviorData->valuesLessMissingStarts(this->lperiod);
-			this->lpPredictorState->behaviorValues(name, values);
+			// create a copy of the start of the period and zero any values missing
+			// at (either end?) start of period
+			const int * values = pBehaviorData->valuesLessMissingStarts(this->lperiod);
+			this->lpPredictorState->behaviorValues(pBehaviorData->name(), values);
 		}
 		else
 		{
 			throw domain_error("Unexpected class of dependent variable");
+		}
+	}
+
+	const vector<LongitudinalData *> & rSimVariables = this->lpData->rSimVariableData();
+	for (unsigned i = 0; i < rSimVariables.size(); i++)
+	{
+		NetworkLongitudinalData * pNetworkData = dynamic_cast<NetworkLongitudinalData *>(rSimVariables[i]);
+
+		if (pNetworkData)
+		{
+			calculateStatisticsInitNetwork(pNetworkData);
+		}
+		else
+		{
+			throw domain_error("Unexpected class of simulated variable");
 		}
 	}
 

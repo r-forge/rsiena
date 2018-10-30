@@ -69,19 +69,31 @@ mybeh <- sienaDependent(s50a, type="behavior")
 ## note that the following example works although the node sets do not yet exist!
 mynet3 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)),
        type="bipartite", nodeSet=c("senders", "receivers"))
-## sparse matrix input - create some RSiena edgelists first
+## sparse matrix input
+## To show this, we first go back from the adjacency matrices to edgelists.
+## The manual shows one way to do this.
+## Another way is to use the sparse matrix representation which internally
+## indeed is an edge list:
 library(Matrix)
 tmps501 <- as(Matrix(s501), "dgTMatrix")
 tmps502 <- as(Matrix(s502), "dgTMatrix")
 tmps503 <- as(Matrix(s503), "dgTMatrix")
+## If you are interested in the internal structure of these sparse matrices,
+## you can request
+str(tmps501)
+## Slot @i is the row, @j is the column, and @x the value;
+## here the values all are 1.
+## The edge lists now are created as matrices in the following way,
+## where the columns are sender, receiver, tie value, and wave:
 mymat1 <- cbind(tmps501@i + 1, tmps501@j + 1, 1, 1)
 mymat2 <- cbind(tmps502@i + 1, tmps502@j + 1, 1, 2)
 mymat3 <- cbind(tmps503@i + 1, tmps503@j + 1, 1, 3)
 mymat <- rbind(mymat1, mymat2, mymat3)
-library(Matrix)
-## mymat includes all 3 waves
-mymatlist <- by(mymat, mymat[, 4], function(x)
-    spMatrix(50, 50, x[, 1], x[, 2], x[, 3]))
+## mymat is an edge list and includes all 3 waves.
+## The edge lists do not contain information about the number of nodes,
+## so that has to be supplied additionally; here it is 50:
+mymatlist <- by( mymat, mymat[, 4], function(x)
+    spMatrix(50, 50, x[, 1], x[, 2], x[, 3]) )
 mynet4 <- sienaDependent(mymatlist)
 ## or alternatively
 mymat1 <- mymat[mymat[, 4] == 1, ]

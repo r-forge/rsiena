@@ -111,7 +111,7 @@ maxlikec <- function(z, x, data=NULL, effects=NULL,
 			ans[[11]] <- sapply(anss, "[[", 11)
 			if (z$returnDeps)
 			{
-				fff <- lapply(anss, function(x) x[[12]][[1]])
+				fff <- lapply(anss, function(x) x[[12]])
 				sims <- split(fff, callGrid[, 1 ]) ## split by group
 			}
 			else

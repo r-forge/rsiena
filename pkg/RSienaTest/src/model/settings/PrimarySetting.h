@@ -9,7 +9,9 @@
 #define PRIMARYSETTING_H_
 
 #include "GeneralSetting.h"
-#include "../../network/layers/DistanceTwoLayer.h"
+#include "network/layers/DistanceTwoLayer.h"
+#include "network/layers/PrimaryLayer.h"
+
 namespace siena {
 
 class Network;
@@ -20,15 +22,12 @@ public:
 
 	virtual ~PrimarySetting();
 
-	/**
-	 * @copydoc ASetting::initSetting(Network* const lpNetwork)
-	 */
+	/** @copydoc ASetting::initSetting(Network* const lpNetwork) */
 	virtual void initSetting(Network* const lpNetwork);
-
-	/**
-	 * @copydoc ASetting::terminateSetting(Network* const lpNetwork)
-	 */
+	/** @copydoc ASetting::terminateSetting(Network* const lpNetwork) */
 	virtual void terminateSetting(Network* const lpNetwork);
+
+	const Network * pPrimaryNetwork() const;
 
 	ITieIterator* getSteps();
 
@@ -36,18 +35,18 @@ public:
 
 
 protected:
-
-	void initSetting();
-
+	void initSetting(); // called on each initSetting(int ego)
 	void terminateSetting();
 
 private:
+	Network* lpNetwork; // the underlying dependent
 
-	DistanceTwoLayer rDistTwoLayer;
+	// old
+	// DistanceTwoLayer rDistTwoLayer;
+	// ITieIterator* lpiter;
 
-	Network* lpNetwork;
-
-	ITieIterator* lpiter;
+	// new
+	PrimaryLayer lPLayer; // the 2-path extension
 
 };
 

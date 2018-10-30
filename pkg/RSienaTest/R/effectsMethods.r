@@ -63,7 +63,7 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
 			included <- included & !x$basicRate
 		}
 		specs <- specs[included, ]
-		if (nrow(specs) > 0) 
+		if (nrow(specs) > 0)
 		{
 			row.names(specs) <- 1:nrow(specs)
 		}
@@ -129,9 +129,9 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
 	}
 	if (includeRandoms)
 	{
-		nreff <- sum(x$randomEffects & x$include)
-		nrate <- sum(x$basicRate & x$include & (x$group==2))
-		if (nrate > 0) # else there is only one group, and counting should be different.
+		nreff <- sum(x$randomEffects & x$include & (!x$fix))
+		nrate <- sum(x$basicRate & x$include & (x$group==2) & (!x$fix))
+		if (sum(x$group != 1) > 0) # else there is only one group, and counting should be different.
 		{
 			cat('Dimensions of priorMu and priorSigma for sienaBayes should be',
 				nreff, '+', nrate, '=', nreff+nrate,'.\n')
@@ -297,5 +297,6 @@ updateSpecification <- function(effects.to, effects.from, name.to=NULL, name.fro
 	effects.to$fix[use] <- prevEffects$fix[correspondence][use]
 	effects.to$test[use] <- prevEffects$test[correspondence][use]
 	effects.to$parameter[use] <- prevEffects$parameter[correspondence][use]
+	effects.to$randomEffects[use] <- prevEffects$randomEffects[correspondence][use]
 	effects.to
 }

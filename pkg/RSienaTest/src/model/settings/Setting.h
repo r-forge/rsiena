@@ -51,7 +51,7 @@ public:
 
 	void terminateSetting(int ego);
 
-	virtual void initDyadicSetting(const std::map<int, double>& row, int ego) {
+	virtual void initDyadicSetting(const std::map<int, double>& /*row*/, int /*ego*/) {
 	}
 
 	virtual void initPermittedSteps(const bool* const permitted) = 0;

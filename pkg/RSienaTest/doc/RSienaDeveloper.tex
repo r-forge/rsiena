@@ -573,7 +573,7 @@ is at \url{https://builder.r-hub.io}; in the `advanced' page
 there is a variety of platforms on which you can check.
 
 \subsection{Submitting to CRAN}
-Instruction for submitting to CRAN are linked from 
+Instructions for submitting to CRAN are linked from
 \url{ https://CRAN.R-project.org/banner.shtml#submitting}.
 
 RSiena contains a file \texttt{cran-comments.md} which contains,
@@ -581,6 +581,10 @@ for the last CRAN submission, the comments added for the
 submission, and noting the checks made.
 This is visible on R-Forge but excluded from the tarball
 by the file \texttt{.Rbuildignore}.
+
+It will be helpful to have checked that the packages that depend
+on RSiena (`reverse dependencies') have no problems with the
+new version, and mention this in these comments.
 
 
 \section{Personal/private keys}

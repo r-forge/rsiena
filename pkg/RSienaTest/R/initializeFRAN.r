@@ -313,7 +313,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 		{
 			if (x$maxlike)
 			{
-				stop("Conditional estimation is not possible with",
+				stop("Conditional estimation is not possible with ",
 					"maximum likelihood method")
 			}
 			##  if (nets == 1) not sure if this is necessary
@@ -1318,7 +1318,6 @@ unpackOneMode <- function(depvar, observations, compositionChange)
 	attr(edgeLists, "structmean") <- attr(depvar, "structmean")
 	attr(edgeLists, "averageInDegree") <- attr(depvar, "averageInDegree")
 	attr(edgeLists, "averageOutDegree") <- attr(depvar, "averageOutDegree")
-	attr(edgeLists, "settings") <- attr(depvar, "settings")
 	attr(edgeLists, "settingsinfo") <- attr(depvar, "settingsinfo")
 	return(edgeLists = edgeLists)
 }

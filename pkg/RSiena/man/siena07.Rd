@@ -178,7 +178,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 }
 \author{Ruth Ripley, Tom Snijders}
 
-\seealso{\code{\link{sienaAlgorithmCreate}},
+\seealso{\code{\link{siena}}, \code{\link{sienaAlgorithmCreate}},
+  \code{\link{sienaEffects}},
   \code{\link{Wald.RSiena}}, \code{\link{Multipar.RSiena}},
   \code{\link{score.Test}}.
 
@@ -200,7 +201,7 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 # or if a previous "on track" result ans was obtained --------------------------
 \dontrun{
-ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans, batch=TRUE)
+ans1 <- siena07(myalgorithm, data=mydata, effects=myeff, prevAns=ans)
          }
 
 # Running in multiple processors -----------------------------------------------
@@ -258,7 +259,7 @@ sdat <- sienaDataCreate(net)
 alg <- sienaAlgorithmCreate(maxlike=TRUE, nsub=3, n3=100, seed=1234)
 effs <- getEffects(sdat)
 \dontrun{
-(ans <- siena07(alg, data=sdat, effects=effs, returnDeps=TRUE, batch=TRUE))
+(ans <- siena07(alg, data=sdat, effects=effs, returnDeps=TRUE))
 # See manual Section 9.1 for information about the following functions
 edges.to.adj <- function(x,n){
 # create empty adjacency matrix
@@ -275,7 +276,7 @@ n <- 4
 ego <- rep.int(1:n,n)
 alter <- rep(1:n, each=n)
 ones <- sapply(1:n^2, function(i)
-    {mean(sapply(ans$sims, function(x){the.edge(x[[1]][[2]],n,ego[i],alter[i])}))})
+    {mean(sapply(ans$sims, function(x){the.edge(x[[1]][[2]][[1]],n,ego[i],alter[i])}))})
 cbind(ego,alter,ones)
 matrix(ones,n,n)
     }

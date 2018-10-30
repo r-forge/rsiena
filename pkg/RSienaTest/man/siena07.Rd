@@ -193,7 +193,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
 }
 \author{Ruth Ripley, Tom Snijders}
 
-\seealso{\code{\link{sienaAlgorithmCreate}},
+\seealso{\code{\link{siena}}, \code{\link{sienaAlgorithmCreate}},
+  \code{\link{sienaEffects}},
   \code{\link{Wald.RSiena}}, \code{\link{Multipar.RSiena}},
   \code{\link{score.Test}}, \code{\link{sienacpp}}.
 
@@ -289,7 +290,7 @@ n <- 4
 ego <- rep.int(1:n,n)
 alter <- rep(1:n, each=n)
 ones <- sapply(1:n^2, function(i)
-    {mean(sapply(ans$sims, function(x){the.edge(x[[1]][[2]],n,ego[i],alter[i])}))})
+    {mean(sapply(ans$sims, function(x){the.edge(x[[1]][[2]][[1]],n,ego[i],alter[i])}))})
 cbind(ego,alter,ones)
 matrix(ones,n,n)
     }

@@ -510,6 +510,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new SameCovariateTransitiveTripletsEffect(pEffectInfo, false);
 	}
+	else if (effectName == "sameXTransRecTrip")
+	{
+		pEffect = new SameCovariateTransitiveReciprocatedTripletsEffect(pEffectInfo, true);
+	}
+	else if (effectName == "diffXTransRecTrip")
+	{
+		pEffect = new SameCovariateTransitiveReciprocatedTripletsEffect(pEffectInfo, false);
+	}
 	else if (effectName == "inPopX")
 	{
 		string networkName = pEffectInfo->variableName();
@@ -1439,6 +1447,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "avAlt")
 	{
 		pEffect = new AverageAlterEffect(pEffectInfo, true, false);
+	}
+	else if (effectName == "avGroup")
+	{
+		pEffect = new AverageGroupEffect(pEffectInfo);
 	}
 	else if (effectName == "totAlt")
 	{

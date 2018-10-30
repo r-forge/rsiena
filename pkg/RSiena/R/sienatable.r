@@ -305,8 +305,9 @@ siena.table <- function(x, type='tex',
 					<TD>&nbsp;&nbsp;&nbsp;(s.e.)</TD>",start.tstat,"</TR>")))
 					midTable <- tableSection(c("",""))
 					indentTable <- tableSection("")
-		ruleTable <- tableSection("</TABLE>")
-		footnoteStart <- "<TABLE border=1  rules=none frame = below>"
+		ruleTable <- tableSection("<TR> <TD colspan='9'><HR/></TD> </TR>")
+
+		footnoteStart <- c("</TABLE>","<TABLE border=1  rules=none frame = below>")
 					footnote <- c(paste(" <TR> <TD colspan=9 align=left>
 							all convergence t ratios < ",
 							max.t,".</TD> </TR> <TR> </TR>",
