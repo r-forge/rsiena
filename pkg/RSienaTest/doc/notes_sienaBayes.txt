@@ -1,0 +1,108 @@
+pp: Number of parameters in multigroup object,
+		with duplication of rate parameters for each group,
+		including fixed parameters.
+TruNumPars: Number of estimated parameters in each group
+	(where basic rate parameters are not duplicated for each group),
+	excluding fixed parameters.
+
+TruTotalPars: Number of estimated parameters in each group
+	(where basic rate parameters are not duplicated for each group),
+	including the rate parameters, whether or not fixed.
+
+TruNumPars = p1 (varying) + p2 (non-varying) + # fixed
+priorMu, priorSigma, muTemp, and SigmaTemp have dimensions p1
+thetaMat has dimensions nGroup x pp (with duplication of rate parameters,
+	and NA for rate parameters for other groups)
+proposalCov has dimensions p1 x p1
+
+set1: set of varying parameters, including basic rates (in pp)
+set2: set of estimated non-varying parameters (eta) (in pp)
+
+
+if incidentalBasicRates or (priorRatesFromData < 0), the rate parameters are excluded from set1 (as well as set2).
+
+	z$nonRates <- !startupGlobal$requestedEffects$basicRate[startupGlobal$requestedEffects$group==1]
+
+	# now 1=rates group 1; 2=other rates; 3=randomly varying non-rates;
+	# 4 = estimated non-varying (eta); 5 = non-estimated, fixed.
+	# set1 = (1,2,3), #(1,3) = p1,  set2 = (4), #(4) = p2
+	# z$basicRate = 1,2
+   # fixed (5) not in set1 or set2
+	z$generalParametersInGroup <- vec1[vec1!= 2] %in% c(3,4,5)
+	z$varyingGeneralParametersInGroup <- vec1[vec1!= 2] == 3
+	z$varyingParametersInGroup <- vec1[vec1!= 2] %in% c(1,3)
+	z$objectiveInVarying <- vec1[vec1 %in% c(1,3)] == 3
+	z$estimatedParameters <- vec1 %in% c(3,4)
+	
+	
+	z$varyingNonRateInEstimated <- vec1[vec1 %in% c(1,3,4)] == 3
+	z$varyingInEstimated <- vec1[vec1 %in% c(1,3,4)] %in% c(1,3)
+	z$ratesInVarying <- !z$objectiveInVarying
+	z$varyingObjectiveParameters <- vec1 == 3
+
+	z$varyingParametersInNonRates <- vec1[(vec1 != 2) & (!z$basicRate)] == 3
+
+
+not used now:
+
+#	z$varyingObjectiveInEstimated <- vec1[vec1 %in% c(1,3,4)] == 3
+#	z$etaInGroup <- vec1[vec1!= 2] == 4
+#	z$varyingRateParameters <- vec1 %in% c(1,2)
+
+
+
+In a data set of Zsofi, there was an occurrence of any(is.na(proposals.accept))
+which was caused by divergence (one non-rate parameter 180) in one group.
+I added further comments and advice.
+Now parameters larger than 50 lead to stops.
+
+A way to get estimates from overdispersed starting points and not
+run the whole improveMH() over and over again is to use prevBayes,
+with an object in which $thetaMat is changed to new initial values.
+Then the proposal covariance matrices etc. will be retained,
+so the transition distribution of the MCMC process remains the same but
+only the starting vlaues are different.
+
+
+Dan McNeish:
+
+Hi James,
+
+To my knowledge, there are no studies that overlap Bayes, small samples, and sparse clusters at the same time. In general, for Bayesian methods to be useful with data with few clusters, the priors for the variance components need to be somewhat informative (Depaoli, 2014;  Depaoli & van de Schoot, 2016; van de Schoot et al., 2015). I showed in a recent paper in Structural Equation Modeling that Bayesian methods with "uninformative" priors for small sample clustered data (like those used in Mplus by default) tend to be no better than frequentist methods with small sample corrections (like Kenward-Roger). So, if you are planning on using Bayesian methods to get around the small sample issue, the priors need to reasonable informative.
+
+A study I did with Laura Stapleton compared 12 different methods for modeling data with 4-14 clusters with as few as 7 observations per cluster and we found that using an Inverse gamma prior on the variance components was slightly better than a half-Cauchy prior with smaller cluster sizes (although both were not much better than a Kenward-Roger correction). The two sparse cluster studies I am familiar with (Clarke, 2008; McNeish, 2014) both use frequentist methods and use 50 or more clusters. With 50 clusters, in the 2014 study I found that bias was essentially negligible with continuous outcomes and 3-6 observations per cluster.
+
+Hope that is somewhat helpful!
+Dan
+
+References
+
+Clarke, P. (2008). When can group level clustering be ignored? Multilevel models versus single level models with sparse data. Journal of Epidemiology
+and Community Health, 62, 752–758.
+
+Depaoli, S. (2014). The impact of inaccurate “informative” priors for growth parameters in Bayesian growth mixture modeling. Structural
+Equation Modeling, 21, 239–252.
+
+Depaoli, S., & van de Schoot, R. (2015). Improving transparency and replication in Bayesian statistics: The WAMBS-Checklist.
+Psychological Methods.  doi:10.1037/met0000065
+
+McNeish, D. (2016). On using Bayesian methods to address small sample problems. Structural Equation Modeling. DOI:10.1080/10705511.2016.1186549
+
+McNeish, D. (2014). Modeling sparsely clustered data: Design-based, model-based, and single-level methods. Psychological Methods, 19, 552-563
+
+McNeish, D., & Stapleton, L. M. (2016). Modeling clustered data with very few clusters. Multivariate Behavioral Research. doi:10.1080/00273171.2016.1167008
+
+van de Schoot, R., Broere, J. J., Perryck, K. H., Zondervan-Zwijnenburg, M., & van Loey, N. E. (2015). Analyzing small data sets using Bayesian estimation: The case of posttraumatic stress symptoms following mechanical ventilation in burn survivors. European Journal of Psychotraumatology, 6
+
+
+
+For MCMC diagnostics: see
+http://www2.math.su.se/matstat/reports/master/2011/rep2/report.pdf
+
+(also in \R\ergm)
+
+Zie ook BrowneSteeleGolalazadehGreen2009.pdf
+
+
+
+

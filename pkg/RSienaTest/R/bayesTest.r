@@ -283,8 +283,14 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 		stop('all elements of zlist must be sienaBayesFit objects')
 	}
 
-	#browser()
 	niter <- sapply(zlist,function(z){dim(z$ThinPosteriorMu)[1]})
+	if (length(niter) > 1)
+	{
+		if (var(niter) > 1e-6)
+		{
+			stop("Length of these sienaBayes objects is not constant")
+		}
+	}
 	nit <- niter[1] - nfirst + 1
 
 	if (extracted %in% c("all", "rates")){
@@ -307,7 +313,8 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 
 	if (extracted %in% c("all", "objective", "varying")){
 		# mu
-		nind <- sum(zlist[[1]]$varyingParametersInGroup)
+		varyings <- zlist[[1]]$varyingInEstimated
+		nind <- sum(varyings)
 		res2 <- array(dim = c(nit, length(zlist), (2*nind)))
 		if (nind <= 0)
 		{
@@ -316,10 +323,10 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 		}
 		else
 		{
-			EffName <- getNames(zlist[[1]])[zlist[[1]]$varyingParametersInGroup]
+			EffName <- getNames(zlist[[1]])[varyings]
 			for (h in 1:length(zlist)){
 				res2[,h,1:nind] <-
-					zlist[[h]]$ThinPosteriorMu[(niter[h]-nit+1):niter[h], ,drop=FALSE]
+					zlist[[h]]$ThinPosteriorMu[(niter[h]-nit+1):niter[h], , drop=FALSE]
 				postsig <- zlist[[h]]$ThinPosteriorSigma
 				postsigg <- matrix(NA,dim(postsig)[1],nind)
 				if (sdLog){

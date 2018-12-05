@@ -1,0 +1,19 @@
+Rate effects are currently of three types, 
+defined by the rateType column of allEffects.csv.
+The values are "structural", "diffusion", "covariate", or NA.
+
+Function DependentVariable::initializeRateFunction in Dependentvariable.cpp 
+initializes the rate function; here also the functions 
+model/effects/StructuralRateEffect.h and 
+model/effects/DiffusionRateEffect.h 
+are used. 
+
+Functions StatisticCalculator::calculateNetworkRateStatistics and 
+StatisticCalculator::calculateBehaviorRateStatistics in StatisticCalculator.cpp 
+calculate the rate functions.
+
+The RateX effect is defined in a funny way. 
+If you look for the string "RateX", it occurs nowhere in the cpp directory. 
+It is identified by being the only rate effect of type "covariate", 
+together with the dependent variable name and the explanatory variable, 
+given by the parameter "interaction1".

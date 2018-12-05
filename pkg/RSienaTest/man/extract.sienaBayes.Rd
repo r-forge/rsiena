@@ -46,11 +46,7 @@ extract.posteriorMeans(z, nfirst=z$nwarm+1)
  after the thinning in \code{sienaBayes} implied by its parameters
  \code{nrunMHBatches}, \code{nSampVarying}, \code{nSampConst} and
  \code{nSampRate}.\cr
- The number of iterations extracted is determined by the first chain and
- \code{nfirst}. The same number of iterations will be extracted
- from the other chains; for each, the last part of the chain
- will be used. If one of the chains is not long enough,
- this will lead to an error message.\cr
+ The number of iterations should be the same for all chains.\cr
  It is not checked that the specifications of the chains are identical.
  For the parameter names, the names in the first chain are used.
 

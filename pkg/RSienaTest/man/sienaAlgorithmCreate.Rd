@@ -144,7 +144,11 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
   \item{mult}{Multiplication factor for maximum likelihood and Bayes. Number of
     steps per iteration is set to this multiple of the total distance
     between the observations at start and finish of the wave.
-    Decreasing \code{mult} below a certain value has no further effect.}
+    Decreasing \code{mult} below a certain value has no further effect.\cr
+    This can be either a number (which needs to be positive) or a vector
+    of numbers, of length equal to the number of basic rate parameters in the
+    model, i.e., the number of periods times the number of dependent
+    variables.}
   \item{simOnly}{Logical: If TRUE, then the calculation of the covariance
     matrix and standard errors of the estimates at the end of
     Phase 3 of the estimation algorithm in function siena07 is skipped.

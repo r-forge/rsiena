@@ -74,17 +74,18 @@ dummy. Alternatively, use \code{\link{includeTimeDummy}}.
 }
 \item{group}{
   Number of group if basic rate.
+  Only relevant for \code{\link{sienaGroup}} data sets.
   }
-\item{character}{Boolean: is the short name a character string or not.}
+\item{character}{Boolean: whether the short name is a character string.}
 }
 \details{
 The arguments \code{shortName}, \code{name}, \code{type},
 \code{interaction1}, \code{interaction2}, \code{effect1}, \code{effect2},
-and \code{effect3} should identify the effects completely.
-The column elements of the output effects object for \code{parm},
-\code{fix}, \code{test}, \code{randomEffects},
-\code{initialValue}, and \code{timeDummy}
-will be set to the values requested.}
+\code{effect3}, and \code{group} should identify the effects completely.
+
+The column elements of the output effects object for \code{parameter},
+\code{fix}, \code{test}, \code{randomEffects}, \code{initialValue},
+and \code{timeDummy} will be set to the values requested.}
 \value{
   An object of class \code{\link{sienaEffects}} or
   \code{\link{sienaGroupEffects}}. This will be an updated version of the

@@ -1401,7 +1401,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 {
 	if (!inherits(x, "summary.sienaBayesFit"))
 	{
-        stop("not a legitimate summary of a Siena Bayes model fit")
+		stop("not a legitimate summary of a Siena Bayes model fit")
 	}
 	ntot <- sum(!is.na(x$ThinPosteriorMu[,1]))
 	if (is.null(nfirst))
@@ -1429,13 +1429,15 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 	}
 	else
 	{
+		ncr <- max(sapply(x$effectName, nchar)) + 1
+		codestring <- paste("%-", ncr, "s", sep="") # the minus signs leads to right padding
 		cat("Bayesian estimation.\n")
 		cat("Prior distribution:\n")
 		cat("\nMu      ")
 		for (i in seq(along=x$priorMu))
 		{
-			cat(x$effectName[x$varyingParametersInGroup][i],
-					sprintf("%8.4f", x$priorMu[i,1]),"\n        ")
+			cat(sprintf(codestring, x$effectName[x$varyingParametersInGroup][i]),
+				sprintf("%8.4f", x$priorMu[i,1]),"\n        ")
 		}
 		cat("\nSigma   ")
 		for (i in seq(along=x$priorMu))
@@ -1447,6 +1449,32 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 		{
 			cat("\nKappa  ",sprintf("%8.4f", x$priorKappa),"\n")
 		}
+		if (!is.null(x$anyPriorEta))
+		{
+			cat("\nEta   ")
+			if (x$anyPriorEta)
+			{
+				cat("\nFor the fixed parameters, prior variance:\n")
+				var.eta <- rep(NA, length(x$set2prior))
+				var.eta[x$set2prior] <- 1/(2*x$priorPrecEta)
+				for (i in seq(along=x$set2prior))
+				{
+					cat(sprintf(codestring, x$effectName[!x$varyingParametersInGroup][i]))
+					if (x$set2prior[i])
+					{
+						cat(sprintf("%8.4f", var.eta[i]),"\n        ")
+					}
+					else
+					{
+						cat(" (constant prior) \n")
+					}
+				}
+			}
+			else
+			{
+				cat("\nFor the fixed parameters, constant prior.\n")
+			}
+		}
 #		cat("\nFor the basic rate parameters, ")
 #		cat("the prior is on the square root scale.\n\n")
 	}
@@ -1454,14 +1482,19 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 	{
 		cat("\nBasic rates parameters are treated as incidental parameters.\n\n")
 	}
-	cat("\nAlgorithm specifications were nwarm =",x$nwarm,", nmain =", x$nmain,
+	cat("\nAlgorithm specifications were ")
+	if (!is.null(x$nprewarm))
+	{
+		cat(" nprewarm =",x$nprewarm,",")
+	}
+	cat(" nwarm =",x$nwarm,", nmain =", x$nmain,
 	    ", nrunMHBatches =", x$nrunMHBatches,
 	    ", nImproveMH =", x$nImproveMH,
 		",\n nSampVarying =", x$nSampVarying, ", nSampConst =", x$nSampConst,
 		", mult =", x$mult, ".\n")
 	if (!is.null(nfirst))
 	{
-		cat("For the results, nwarm is superseded by nfirst = ", nfirst, ".")
+		cat("For these results, nwarm is superseded by nfirst = ", nfirst, ".")
 	}
 	if (ntot < x$nwarm + x$nmain)
 	{
@@ -1488,7 +1521,7 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 		cat(sprintf("%4.2f",
 			colMeans(x$ThinBayesAcceptances[first:ntot,])/x$nrunMHBatches),
 			fill=TRUE,"\n")
-		cat("This should ideally be close to 0.25.\n")
+		cat("This should ideally be between 0.15 and 0.50.\n")
 	}
 	print.sienaBayesFit(x, nfirst)
 	if (ntot > first+2)

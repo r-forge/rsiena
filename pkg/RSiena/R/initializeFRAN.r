@@ -703,6 +703,13 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 			z$maxlikeTargets <- rowSums(ans)
 			z$maxlikeTargets2 <- ans
 			z$mult <- x$mult
+			length.nrunMH <- length(colSums(z$maxlikeTargets2[z$requestedEffects$basicRate,, drop=FALSE ]))
+			if ((length(z$mult) >= 2) &&
+				(length(z$mult) != length.nrunMH))
+			{
+				stop(paste('Length of parameter mult in the algorithm object is incorrect',
+				'(should be 1 or', length.nrunMH, ').'))
+			}
 			z$nrunMH <- floor(z$mult *
 				colSums(z$maxlikeTargets2[z$requestedEffects$basicRate,
 					, drop=FALSE ]))

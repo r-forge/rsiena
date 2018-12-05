@@ -11,12 +11,12 @@
 \usage{
 sienaBayes(data, effects, algo,  saveFreq=100,
     initgainGlobal=0.1, initgainGroupwise = 0.02, initfgain=0.2, gamma=0.05,
-    initML=FALSE,
+    initML=FALSE, priorSigEta=NULL,
     priorMu=NULL, priorSigma=NULL, priorDf=NULL, priorKappa=NULL,
     priorRatesFromData=2,
     frequentist=FALSE, incidentalBasicRates=FALSE,
     reductionFactor=0.5, delta=1e-04,
-    nwarm=50, nmain=250, nrunMHBatches=20,
+    nprewarm=50, nwarm=50, nmain=250, nrunMHBatches=20,
     nSampVarying=1, nSampConst=1, nSampRates=0,
     nImproveMH=100, targetMHProb=0.25,
     lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
@@ -60,14 +60,18 @@ glueBayes(z1, z2, nwarm2=0)
     see \code{initfgain}.}
   \item{initML}{Boolean, whether to use maximum likelihood estimation for the
      groupwise initial estimation.}
+  \item{priorSigEta}{Vector of length equal to the number of fixed parameters,
+     or \code{NULL}. If not \code{NULL}, values that are not \code{NA} are prior
+     variances of eta (fixed effects); these must all be positive.}
   \item{priorMu}{Vector of length equal to the number of randomly varying
-     parameters.
+     parameters, or \code{NULL}.
      Prior mean of mu (global population mean for varying parameters);
      default: 0.
      For the basic rate parameters the defaults are data-dependent,
      but if ((\code{priorRatesFromData = 0}) and \code{priorMu=NULL}),
-     then for these parameters the prior mean will be 2.}
-  \item{priorSigma}{Square matrix of dimension equal to length of priorMu.
+     for these parameters the prior mean will be 2.}
+  \item{priorSigma}{Square matrix of dimension equal to length of priorMu,
+     or \code{NULL}.
      Prior global population covariance matrix Sigma for the varying parameters;
      default: identity matrix.}
   \item{priorDf}{Prior degrees of freedom for Sigma (global population
@@ -104,6 +108,8 @@ glueBayes(z1, z2, nwarm2=0)
     non-positive definite (i.e., has one or more negative correlations)
     during iterations, it is changed so that
    all correlations are at least delta.}
+  \item{nprewarm}{Number of iterations in the pre-warm-up phase,
+    before improveMH.}
   \item{nwarm}{Number of iterations in the warm-up phase.
     Used only if \code{prevBayes} is \code{NULL}.
     Then it should be at least 5.}
@@ -196,9 +202,18 @@ glueBayes(z1, z2, nwarm2=0)
   where \eqn{Lambda = priorDf \times priorSigma}{Lambda = priorDf * priorSigma};
   and, conditional on Sigma, for the expected value a multivariate normal with
   mean \code{priorMu} and covariance matrix \code{Sigma/priorKappa}.\cr
-  The required dimensions of the prior parameters \code{priorMu} and
-  \code{priorSigma} depend on the number of groupwise varying parameters
-  and are given in the output for \code{\link{print.sienaEffects}}
+  For the fixed parameters, if \code{priorSigEta=NULL}, the improper constant
+  prior is used.
+  Else, for the components of eta for which \code{priorEta} is \code{NA},
+  the improper constant prior is used, and for other components,
+  independent normal priors with mean 0 and variances given by \code{priorEta}.
+  \cr
+  Recommendation: use the normal prior only for effects of group-level
+  variables. If a non-zero prior mean is desired, transform the
+  group-level variable.  \cr
+  The required dimensions of the prior parameters \code{priorSigEta},
+  \code{priorMu} and \code{priorSigma} depend on the number of groupwise varying
+  parameters and are given in the output for \code{\link{print.sienaEffects}}
   when using the keyword \code{includeRandoms} .\cr
   If \code{priorRatesFromData} is 1 or 2,
   the prior distribution for the basic rate parameters is determined
@@ -210,12 +225,17 @@ glueBayes(z1, z2, nwarm2=0)
   In the initialization phase, initial parameter values and the proposal
   covariance matrix for Metropolis-Hastings steps for groupwise parameters
   are obtained from, first, Method of Moments estimation of a parameter vector
-  assumed to be the same across the groups (in a multi-group estimation),
+  assumed to be the same across the groups (in a multi-group estimation);
+  replacing this estimate by a precision-weighted mean of this estimate
+  and the prior mean;
   followed by one subphase of the Robbins-Monro algorithm for Method of
-  Moments estimates for the groups separately, with step size \code{initgain}.\cr
+  Moments estimates for the groups separately, starting from the overall
+  estimate, with step size \code{initgain}.
+  This is skipped if \code{initgain=0}.\cr
   If the \code{prevBayes} object is supplied, this initialization phase is
   skipped, and if \code{newProposalFromPrev} the proposal covariance matrices are
   calculated from the simulated chains in this object.\cr
+  From this basis, \code{nprewarm} Metropolis Hastings steps are taken.
   The proposal covariance matrices then are scaled, in the
   function 'improveMH', to achieve a proportion of accepted MH proposals
   equal to \code{target}.\cr
@@ -309,19 +329,20 @@ glueBayes(z1, z2, nwarm2=0)
   FourEffects <- setEffect(FourEffects, density, random=TRUE)
   FourEffects <- setEffect(FourEffects, recip, random=TRUE)
   print(FourEffects, includeRandoms=TRUE)
-# Note this also shows the "randomEffects" column.
+# Note this also shows the "randomEffects" column
+# and the dimensions of the objects for specifying the priors.
   print(FourEffects, includeRandoms=TRUE, dropRates=TRUE)
 # Note this does not show the rate effects.
   FourAlgo <- sienaAlgorithmCreate(projname = "FourGroups", maxlike=TRUE,
                                    seed=123)
 \dontrun{
   bayes.model <- sienaBayes(FourAlgo, data = FourGroups,
-        effects = FourEffects, nwarm=10, nmain=25, nrunMHBatches=10)
+       effects = FourEffects, nprewarm=10, nwarm=10, nmain=25, nrunMHBatches=10)
   bayes.model
   summary(bayes.model)
   bayes.nextModel <- sienaBayes(FourAlgo, data = FourGroups,
-        effects = FourEffects, nmain=15, nrunMHBatches=10,
-        prevBayes = bayes.model)
+       effects = FourEffects, nmain=15, nrunMHBatches=10,
+       prevBayes = bayes.model)
   bayes.combinedModel <- glueBayes(bayes.model, bayes.nextModel)
   summary(bayes.combinedModel)
 }

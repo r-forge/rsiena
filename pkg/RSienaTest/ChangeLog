@@ -1,8 +1,24 @@
+2018-12-05 R-Forge Revision 337, packages version 1.2-14.
+Changes in RSiena and RSienaTest:
+   * Check for length of parameter mult for ML estimation (initializeFRAN), 
+     extend explanation of mult in help page for sienaAlgorithmCreate.
+Changes in RSienaTest:
+   * extract.sienaBayes corrected.
+   * sienaBayes: subphases for initial global parameter estimation decreased 
+     to 2;
+     prior variances for fixed parameters introduced;
+     after initialization by MoM estimation of multi-group data set,
+     a precision weighted mean (called "Kelley") of this estimate and the 
+     prior mean is used for initial parameter values;
+     prewarming phase introduced before improveMH;
+     in case prevBayes is used, also parameter nImproveMH in the function 
+     call of sienaBayes supersedes this parameter in the prevBayes object.
+
 2018-10-29 R-Forge Revision 336, packages version 1.2-13.
 Changes in RSiena and RSienaTest:
    * Correct error in print01Report that occurred for changing dyadic covariates
      given as lists of sparse matrices.
-   * Correct error in sienaGroupCreate for centered actor covariates.
+   * Correct error in sienaGroupCreate for non-centered actor covariates.
    * Drop dependence on utils (the packages did not depend on it).
    * Also get simulated dependent behavior variables for
      siena07(,,, returnDeps=TRUE, ...) for ML estimation.

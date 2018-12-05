@@ -15,12 +15,11 @@ includeEffects(myeff, ..., include = TRUE, name = myeff$name[1], type = "eval",
   \item{myeff}{a Siena effects object as created by \code{\link{getEffects}}
 }
   \item{\dots}{
-short names to identify the effects which should be included or excluded.
-}
+short names to identify the effects which should be included or excluded.}
   \item{include}{Boolean. default TRUE, but can be switched to FALSE to
-	turn off an effect.}
+    turn off an effect.}
   \item{name}{Name of network for which effects are being
-	included. Defaults to the first in the effects object.}
+    included. Defaults to the first in the effects object.}
   \item{type}{
   Type of effects to be included: "eval", "endow", "creation", "rate" or "gmm".}
   \item{interaction1}{
@@ -45,8 +44,15 @@ short names to identify the effects which should be included or excluded.
   other variables in the data set.
   The arguments should identify the effects completely.
 
+  The function \code{includeEffects} operates as an interface
+  setting the "include" column on selected rows of the effects object,
+  to the value requested (TRUE or FALSE).
+
   The value of \code{myeff$initialValue} can be set by function
   \code{\link{setEffect}}.
+  The function \code{\link{setEffect}} can operate on the effects object
+  in a more detailed way, e.g., setting the value of \code{myeff$initialValue},
+  but applies to one effect at the time.
 
   A list of all effects available in a given effects object (e.g.,
   \code{myeff}), including their names of dependent variables,
@@ -57,21 +63,17 @@ short names to identify the effects which should be included or excluded.
   If some of the effects are specified with \code{type='gmm'},
   the effects object can only be used for estimation by the
   Generalized Method of Moments using \code{\link{sienacpp}}.
-
-  The function \code{}includeEffects operates as an interface
-  setting the "include" column on selected rows of the effects object,
-  to the value requested (TRUE or FALSE).
 }
 \value{
-	An updated version of the input effects object, with the include, test, and fix
-	columns for one or more rows updated.
-	Details of the rows altered will be printed.
+    An updated version of the input effects object, with the include, test, and fix
+    columns for one or more rows updated.
+    Details of the rows altered will be printed.
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley }
 \seealso{
   \code{\link{getEffects}}, \code{\link{setEffect}},
-  \code{\link{includeInteraction}}, 
+  \code{\link{includeInteraction}},
   \code{\link{print.sienaEffects}}, \code{\link{effectsDocumentation}},
   \code{\link{sienacpp}}
 }

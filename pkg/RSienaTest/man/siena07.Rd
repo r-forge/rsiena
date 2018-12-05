@@ -272,8 +272,7 @@ net <- sienaDependent(mats, allowOnly=FALSE)
 sdat <- sienaDataCreate(net)
 alg <- sienaAlgorithmCreate(maxlike=TRUE, nsub=3, n3=100, seed=1234)
 effs <- getEffects(sdat)
-\dontrun{
-(ans <- siena07(alg, data=sdat, effects=effs, returnDeps=TRUE))
+(ans <- siena07(alg, data=sdat, effects=effs, returnDeps=TRUE, batch=TRUE))
 # See manual Section 9.1 for information about the following functions
 edges.to.adj <- function(x,n){
 # create empty adjacency matrix
@@ -293,6 +292,5 @@ ones <- sapply(1:n^2, function(i)
     {mean(sapply(ans$sims, function(x){the.edge(x[[1]][[2]][[1]],n,ego[i],alter[i])}))})
 cbind(ego,alter,ones)
 matrix(ones,n,n)
-    }
 }
 \keyword{models}
