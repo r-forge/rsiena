@@ -129,10 +129,13 @@ print.sienaEffects <- function(x, fileName=NULL, includeOnly=TRUE,
 	}
 	if (includeRandoms)
 	{
+		nfeff <- sum((!x$randomEffects) & x$include & (!x$fix) & (!x$basicRate))
 		nreff <- sum(x$randomEffects & x$include & (!x$fix))
 		nrate <- sum(x$basicRate & x$include & (x$group==2) & (!x$fix))
 		if (sum(x$group != 1) > 0) # else there is only one group, and counting should be different.
 		{
+			cat('Length of priorSigEta for sienaBayes, if used, should be',
+				nfeff, '.\n')
 			cat('Dimensions of priorMu and priorSigma for sienaBayes should be',
 				nreff, '+', nrate, '=', nreff+nrate,'.\n')
 		}

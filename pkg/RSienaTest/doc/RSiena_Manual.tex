@@ -62,7 +62,6 @@
 \newcommand{\half}{{\textstyle \frac{1}{2}}}
 \newcommand{\neqsum}[3]
 {\, \sum_{\stackrel{\scriptstyle #1 = 1}{\scriptstyle #2 \neq #3}}^n \,}
-\newcommand{\vit}{\theenumi}
 
 \newcommand{\firsttabitem}{\hspace{4mm} $\bullet$ \hspace{1mm}}
 \newcommand{\tabitem}{\\ \\ \hspace{4mm} $\bullet$ \hspace{1mm}}
@@ -106,6 +105,7 @@
 \newcommand{\separationb}{\\[0.5ex]\hline\rule{0pt}{2ex}}
 
 
+\newcommand{\vit}{\theenumi}
 \newcounter{savenumi}
 
 \newenvironment{startenum}
@@ -1480,7 +1480,15 @@ in a separate call of \sfn{varCovar}, using for input
 an $n \times (M-1)$ matrix where the columns correspond to the $M-1$ periods
 between observations.
 
-The mean is always subtracted from the covariates.
+By default, the mean is subtracted from the covariates.
+This can be turned off by constructing the covariate with the keyword
+\texttt{centered=FALSE}. Centering of covariates improves
+convergence of the estimation algorithm.
+Therefore the advice is to use the default (centering) unless there are reasons to
+use non-centered covariates, such as when they are used as weights in effects
+(e.g., for inPopX).
+It is possible to include a given actor variable as a covariate in the centered
+as well as the non-centered version in the Siena data set.
 See Section~\ref{S_center} on centering.
 
 When an actor covariate is constant within waves, i.e.,
@@ -1613,6 +1621,16 @@ Centering is the default.
 Centering of covariates can be turned off by specifying
 \texttt{centered=FALSE} in the call of \sfn{coCovar()},
 \sfn{varCovar()}, \sfn{coDyadCovar()}, or \sfn{varDyadCovar()}, respectively.
+Centering of covariates improves
+convergence of the estimation algorithm.
+Therefore the advice is to use the default (centering) unless there are reasons to
+use non-centered covariates, such as when they are used as weights in effects
+(as is the case, e.g., for effect \texttt{inPopX}).
+If some actor variable is to be used as a non-centered covariate,
+it is recommended to include it as a covariate in the centered
+as well as the non-centered version in the Siena data set,
+and use the non-centered version only when it is necessary
+to get the appropriate effect definition.
 
 For the dyadic covariates and the similarity variables derived
 from the individual covariates, the grand mean is calculated
@@ -1732,7 +1750,7 @@ are related in some deterministic way. For example, two networks
 might be mutually exclusive (this could be the case for negative and positive
 ties -- although there are many cases where positive
 and negative ties may coexist!), or networks could be ordered, i.e.,
-one network could be a sub-network of the other 
+one network could be a sub-network of the other
 (networks with ordinal tie values represented as a multivariate network).
 This is treated in Section~\ref{S_constraints}.
 
@@ -2495,7 +2513,15 @@ The basic list of these and other effects is as follows.
       Usually it will be sufficient to express the tendency to network
       closure by including one or two of these. They can be selected
       by theoretical considerations and/or by their empirical
-      statistical significance.
+      statistical significance and contribution to a good fit.
+      
+      In older publications, when the gwesp effect was not available, it was
+      sometimes advised to include the transitive triplets together with the transitive 
+      ties effect. Currently, the impression is that often the gwesp effect
+      is at least as good as a combination of transitive triplets and transitive
+      ties. For many data sets, a model containing either the transitive triplets 
+      effect or the gwesp effect (not both) is adequate to represent transitivity,
+      and the user may try out which of these yields the best fit.
       \begin{enumerate}
       \item[a.]
       \begin{minipage}[t]{.6\textwidth}
@@ -2533,7 +2559,13 @@ The basic list of these and other effects is as follows.
                 how many two-paths $i \rightarrow h \rightarrow j $ there are,
                 it is only considered whether there is at least one such indirect connection.
                 Thus, one indirect tie suffices for the network embeddedness.
-      \item[c.] The \emph{gwesp} effect (see later in this manual).
+      \item[c.] The \emph{gwesp} effect; see later in this manual.
+                Figure~\ref{F_gwesp2} shows that the contribution of the number of
+                two-paths for the gwesp effect is between that for the transitive
+                ties effect ($\alpha = 0$) and for the transitive
+                triplets effect ($\alpha = \infty$). The default for gwesp
+                is  $\alpha = 0.69$, corresponding to an internal effect
+                parameter of 69.
       \item[d.] There are various other effects that may express network closure,
                 such as the \emph{balance} effect, the
                 \emph{Jaccard similarity effects} for incoming and for outgoing ties,
@@ -8083,10 +8115,11 @@ nodes $h$ for which there is the two-path $i \rightarrow h \rightarrow j$.
 \includegraphics[scale=0.8]{gwesp.png}
 % from tikztry.tex
 \\
-\emph{Figure.} Geometrically weighted edgewise shared partners; \\
-left, transitive (`gwespFF'); right, cyclical (`gwespBB');
-for F=`forward', B=`backward'.
 \end{center}
+\caption{Geometrically weighted edgewise shared partners; 
+left, transitive (`gwespFF'); right, cyclical (`gwespBB');
+for F=`forward', B=`backward'.}
+\label{F_gwesp1}
 \end{figure}
 
 An equivalent way of writing this is
@@ -8104,10 +8137,10 @@ where the convention is used that $x_{jj} = 0$ for all $j$.
 \begin{figure}[htb]
 \begin{center}
 \includegraphics[scale=1]{gwespCurves.png}
-
-\emph{Figure.} GWESP weight for a tie closing $s$ two-paths for
-                    $\alpha = \infty, 1.2, 0.69, 0$.
 \end{center}
+\caption{ GWESP weight for a tie closing $s$ two-paths for
+                    $\alpha = \infty, 1.2, 0.69, 0$.}
+\label{F_gwesp2}
 \end{figure}
 
 The parameter $\alpha$ is a tuning parameter that may range from 0 to $\infty$.
@@ -8813,7 +8846,8 @@ by Maximum Likelihood and Bayesian estimation.
 
 \noindent
 For actor-dependent covariates $v_j$ (recall that these are
-centered internally by \si) as well as for dependent behavior
+centered internally by \si, unless they are constructed with
+\texttt{centered=FALSE}), as well as for dependent behavior
 variables (for notational simplicity here also denoted $v_j$;
 these variables also are centered),
 the following effects are available:
@@ -9229,8 +9263,8 @@ to whom $j$ is tied, and defined mathematically by
          0                                &  \text{ if } x_{j+} = 0  .
   \end{array}   \right.            \label{alt_av}
 \end{equation}
-(Since $v$ is centered, the value of 0 in case $x_{j+} = 0$ is also the mean value
-of the original variable.)\\
+(If $v$ is centered ---the default---, the value of 0 in case $x_{j+} = 0$
+is also the mean value of the original variable.)\\
 (It may be noted that this constructed variable $\breve v_j$
 will not itself have exactly a zero mean generally.)
 
@@ -9493,7 +9527,7 @@ with a discussion of the basic effects, is given in \citet{SLT2013}.
 
 See Section~\ref{S_constraints} for the possibility that two networks
 have a deterministic constraint by being mutually exclusive,
-or by one being implied by the other, or (rarely used, if ever) 
+or by one being implied by the other, or (rarely used, if ever)
 by the union of them being the complete graph.
 
 If there are multiple dependent networks, the definition of
@@ -9538,7 +9572,7 @@ from each other.
  $i \stackrel{W}{\rightarrow} j$ leads to  $i \stackrel{X}{\rightarrow} j$;
  this is also called the dyadic entrainment effect;\\
  if one of the contraints of Section~\ref{S_constraints} is in use,
- this effect should not be included because its role is taken over by the 
+ this effect should not be included because its role is taken over by the
  constraint;
 
  \item {\em Effect of incoming W on X} ($X$: reciprocity with $W$)  \texttt{(crprodRecip)},\\
@@ -12542,7 +12576,7 @@ network evaluation function of actor $i$ is given by
 \end{align}
 \fi
 
-It should be noted that all variables are internally centered by \si.
+It should be noted that by default all variables are internally centered by \si.
 The mean values used for the centering
 are given near the beginning of the file produced by
 \sfn{print01Report()} and are given by the \textsf{"mean"}
@@ -12719,7 +12753,7 @@ graphics.off()
 
 In this case, what was produced can be seen in Figure~\ref{F_sel_dk}.
 
-\begin{figure}[hb]
+\begin{figure}[htb]
   \centering
   \includegraphics[width=0.7\textwidth]{selectionTable_drinking.png}
   \caption{Plot of selection table  for friendship with respect to drinking.}
@@ -12773,7 +12807,7 @@ $ v_i \ \  \backslash  \ \ v_j $
 
 The corresponding figure is in Figure~\ref{F_sel_dg}.
 
-\begin{figure}[hb]
+\begin{figure}[htb]
   \centering
   \includegraphics[width=0.7\textwidth]{selectionTable_drugs.png}
   \caption{Plot of selection table  for friendship with respect to drug use.}
@@ -14645,13 +14679,13 @@ the R-Forge repository, which contains a more complete listing.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
-   \item Correct error in \textsf{sienaGroupCreate} for centered actor covariates.
+   \item Correct error in \textsf{sienaGroupCreate} for non-centered actor covariates.
    \item Correct error in \textsf{print01Report} that occurred for changing dyadic covariates
      given as lists of sparse matrices.
    \item Also get simulated dependent behavior variables for
      \texttt{siena07(,,, returnDeps=TRUE, ...)} for ML estimation (see help page).
    \item \textsf{siena.table} corrected for data sets with several dependent variables.
-   \item For \textsf{siena08}: new parameters \texttt{which} and \texttt{useBound} 
+   \item For \textsf{siena08}: new parameters \texttt{which} and \texttt{useBound}
    in \textsf{plot.sienaMeta};
      new parameter \texttt{reportEstimates}, allowing to reduce
      the output produced.

@@ -373,8 +373,8 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
 				objEffects$type == "eval",
 			c('include', "initialValue", "untrimmedValue")] <-
 				list(TRUE, starts$degree, starts$untrimmed)
-			objEffects[objEffects$shortName=='transTriads' &
-				objEffects$type=='eval','include'] <- TRUE
+#			objEffects[objEffects$shortName=='transTriads' &
+#					   objEffects$type=='eval','include'] <- TRUE
 		}
 		else
 		{

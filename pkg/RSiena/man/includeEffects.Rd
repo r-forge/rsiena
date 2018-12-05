@@ -15,8 +15,7 @@ includeEffects(myeff, ..., include = TRUE, name = myeff$name[1], type = "eval",
   \item{myeff}{a Siena effects object as created by \code{\link{getEffects}}
 }
   \item{\dots}{
-short names to identify the effects which should be included or excluded.
-}
+short names to identify the effects which should be included or excluded.}
   \item{include}{Boolean. default TRUE, but can be switched to FALSE to
 	turn off an effect.}
   \item{name}{Name of network for which effects are being
@@ -44,19 +43,22 @@ short names to identify the effects which should be included or excluded.
   to interactions between effects, but to dependence of effects on
   other variables in the data set.
   The arguments should identify the effects completely.
+  
+  The function \code{includeEffects} operates as an interface
+  setting the "include" column on selected rows of the effects object,
+  to the value requested (TRUE or FALSE).
 
   The value of \code{myeff$initialValue} can be set by function
   \code{\link{setEffect}}.
+  The function \code{\link{setEffect}} can operate on the effects object
+  in a more detailed way, e.g., setting the value of \code{myeff$initialValue},
+  but applies to one effect at the time.
 
   A list of all effects available in a given effects object (e.g.,
   \code{myeff}), including their names of dependent variables,
   effect names, short names,
   and values of interaction1 and interaction2 (if any),
   is obtained by executing \code{\link{effectsDocumentation}(myeff)}.
-
-  The function \code{}includeEffects operates as an interface
-  setting the "include" column on selected rows of the effects object,
-  to the value requested (TRUE or FALSE).
 }
 \value{
 	An updated version of the input effects object, with the include, test, and fix

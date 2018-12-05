@@ -1,8 +1,24 @@
+2018-12-05 R-Forge Revision 337, packages version 1.2-14.
+Changes in RSiena and RSienaTest:
+   * Check for length of parameter mult for ML estimation (initializeFRAN), 
+     extend explanation of mult in help page for sienaAlgorithmCreate.
+Changes in RSienaTest:
+   * extract.sienaBayes corrected.
+   * sienaBayes: subphases for initial global parameter estimation decreased 
+     to 2;
+     prior variances for fixed parameters introduced;
+     after initialization by MoM estimation of multi-group data set,
+     a precision weighted mean (called "Kelley") of this estimate and the 
+     prior mean is used for initial parameter values;
+     prewarming phase introduced before improveMH;
+     in case prevBayes is used, also parameter nImproveMH in the function 
+     call of sienaBayes supersedes this parameter in the prevBayes object.
+
 2018-10-29 R-Forge Revision 336, packages version 1.2-13.
 Changes in RSiena and RSienaTest:
    * Correct error in print01Report that occurred for changing dyadic covariates
      given as lists of sparse matrices.
-   * Correct error in sienaGroupCreate for centered actor covariates.
+   * Correct error in sienaGroupCreate for non-centered actor covariates.
    * Drop dependence on utils (the packages did not depend on it).
    * Also get simulated dependent behavior variables for
      siena07(,,, returnDeps=TRUE, ...) for ML estimation.
@@ -34,6 +50,12 @@ Changes in RSienaTest:
      reported timing changed to elapsed system time;
      some reordering of parameters.
      This also required some corresponding changes in sienaprint.r.
+   * DESCRIPTION: Added 'Encoding: UTF-8' because sienaGOF.r complained about
+     non-ASCII.
+   * Data.cpp: Add a new 'SimNetworkData' type: This is for variables that
+     behave like dependent variable for effects but are not changed by the
+     simulation.  Currently used for the primary setting network.
+   * PrimaryLayer: A network layer holding the full primary setting as network.
 
 2018-05-13 CRAN for RSiena, version 1.2-12.
 

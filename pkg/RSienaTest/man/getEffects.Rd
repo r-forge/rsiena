@@ -20,7 +20,11 @@ getEffects(x, nintn = 10, behNintn=4, getDocumentation=FALSE)
   functions, not for use by users.}
 }
 \details{
-Creates a data frame of effects for use in siena model fits.
+Creates a data frame of effects for use in siena model estimation.
+The regular way of changing this object is by the functions 
+\code{\link{includeEffects}}, \code{\link{setEffect}},
+and \code{\link{includeInteraction}}.
+
 Note that the class of the return object may be lost if the data.frame
 is edited using \command{fix}.
 See \code{\link{fix}} and \code{\link{edit.data.frame}}.
@@ -81,7 +85,7 @@ variable in the input object, with columns
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Ruth Ripley}
-\seealso{\code{\link{sienaDataCreate}}, \code{\link{sienaDataCreate}},
+\seealso{\code{\link{sienaDataCreate}}, \code{\link{sienaGroupCreate}},
         \code{\link{includeEffects}}, \code{\link{setEffect}},
         \code{\link{print.sienaEffects}}}
 \examples{
