@@ -37,17 +37,20 @@ Package \code{"RSiena"} is the official release.
   defines the settings (parameters) of the algorithm,
   and which can be created by \code{\link{sienaAlgorithmCreate}}.
 
-  Function \code{\link{siena07}} is used to fit a model.
+  Functions \code{\link{siena07}}, \code{\link{sienacpp}},
+  and \code{\link{sienaBayes}} can be used to fit a model.
+
+  Function \code{\link{sienaGOF}} can be used for studying goodness of fit.
 
   A general introduction to the method is available in the tutorial paper
   Snijders, van de Bunt, and Steglich (2010).
-  Next to the help pages, more detailed help is available in the manual (see below)
-  and a lot of information is at the website (also see below).
+  Next to the help pages, more detailed help is available in the manual
+  (see below) and a lot of information is at the website (also see below).
   \tabular{ll}{
     Package: \tab RSienaTest\cr
     Type: \tab Package\cr
-    Version: \tab 1.2-14\cr
-    Date: \tab 2018-12-05\cr
+    Version: \tab 1.2-15\cr
+    Date: \tab 2019-01-02\cr
     Depends: \tab R (>= 3.0.0)\cr
     Imports: \tab Matrix\cr
     Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -69,8 +72,8 @@ Package \code{"RSiena"} is the official release.
 }
 \references{
   \itemize{
-    \item Schweinberger, Michael, and Snijders,
-      Tom A.B. (2007). Markov models for digraph panel data:
+    \item Schweinberger, Michael, and Snijders, Tom A.B. (2007).
+      Markov models for digraph panel data:
       Monte Carlo-based derivative estimation.
       \emph{Computational Statistics and Data Analysis} 51, 4465-4483.
     \item Snijders, Tom A.B. (2001).

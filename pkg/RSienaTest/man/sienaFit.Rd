@@ -7,8 +7,8 @@
 \alias{siena.table}
 \alias{print.sienaFit}
 \alias{summary.sienaFit}
-\title{Methods for processing sienaFit objects, produced by \code{\link{siena07}}.
-}
+\title{Methods for processing sienaFit and sienaBayesFit objects,
+       produced by \code{\link{siena07}} or \code{\link{sienaBayes}}.}
 \usage{
 \method{print}{sienaFit}(x, tstat=TRUE, ...)
 
@@ -20,15 +20,16 @@
                 digits = NULL, display = NULL, ...)
 
 siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
-            vertLine=TRUE, tstatPrint=FALSE, sig=FALSE, d=3)
+            vertLine=TRUE, tstatPrint=FALSE, sig=FALSE, d=3, nfirst=NULL)
 }
 \arguments{
-  \item{object}{An object of class \code{sienaFit}, produced by
+  \item{object}{An object of class \code{\link{sienaFit}}, produced by
     \code{\link{siena07}}.}
-  \item{x}{An object of class \code{sienaFit}, or
-    \code{summary.sienaFit} as appropriate.}
-  \item{matrices}{Boolean: whether also to print in the summary the 
-   covariance matrix of the estimates, the derivative matrix of expected 
+  \item{x}{An object of class \code{\link{sienaFit}}, or
+    \code{\link{summary.sienaFit}} as appropriate; for \code{siena.table},
+    also an object of type \code{\link{sienaBayesFit}}.}
+  \item{matrices}{Boolean: whether also to print in the summary the
+   covariance matrix of the estimates, the derivative matrix of expected
    statistics X by parameters, and the covariance matrix of the statistics.}
   \item{tstat}{Boolean: if this is NULL, the t-statistics for convergence
      will not be added to the report.}
@@ -53,6 +54,11 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
     See documentation for \code{\link[xtable]{xtable}}.}
   \item{display}{
     See documentation for \code{\link[xtable]{xtable}}}
+  \item{nfirst}{For \code{\link{sienaBayes}} objects \code{x}:
+      the first element of the MCMC chain used for calculating
+      properties of the chain; i.e., the first element for which
+      it is assumed that convergence has occurred. If \code{NULL},
+      the value \code{x$nwarm+1} will be used.}
   \item{\dots}{
     Add extra parameters for  \code{\link[xtable]{print.xtable}}
     here. e.g.
@@ -78,7 +84,9 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
   passes an extra arguments to the \code{print.xtable}.
 
   The function \code{siena.table} outputs a latex or html table of
-  the estimates and standards errors of a \code{sienaFit} object.
+  the estimates and standards errors of a \code{\link{sienaFit}} object;
+  or of posterior means and posterior standard deviations of the
+  global parameteres of a \code{\link{sienaBayesFit}} object.
   The table will be written to a file in the current directory and
   has a footnote reporting the maximum of the convergence t-ratios.
 
@@ -86,7 +94,7 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
-\author{Ruth Ripley, Charlotte Greenan}
+\author{Ruth Ripley, Charlotte Greenan, Tom Snijders}
 
 \seealso{\code{\link[xtable]{xtable}}, \code{\link[xtable]{print.xtable}},
   \code{\link{siena07}}}

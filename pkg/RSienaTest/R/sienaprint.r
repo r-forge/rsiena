@@ -700,11 +700,10 @@ objectOrNull <- function(x)
 }
 
 ##@averageTheta.last Miscellaneous
-
 averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
-	ntott <- dim(z$ThinParameters)[1]
+	ntott <- sum(!is.na(z$ThinParameters[,1,1]))
 
 	if (nfirst > ntot)
 	{
@@ -719,11 +718,12 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 	for (group in 1:z$nGroup)
 	{
 		thetaMean[z$ratePositions[[group]]] <- colMeans(
-				z$ThinParameters[nfirst:ntott, group,
+					z$ThinParameters[nfirst:ntott, group,
 					!z$generalParametersInGroup, drop=FALSE], na.rm=TRUE)
 		postVarMean[z$ratePositions[[group]]] <- apply(
-				z$ThinParameters[nfirst:ntott,
-				group, !z$generalParametersInGroup, drop=FALSE], 3, var, na.rm=TRUE)
+					z$ThinParameters[nfirst:ntott,
+					group, !z$generalParametersInGroup, drop=FALSE], 3,
+					var, na.rm=TRUE)
 	}
 
 	if (is.null(z$priorRatesFromData))
@@ -734,32 +734,33 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 	if (groupOnly != 0)
 	{
 		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinParameters[(nfirst):ntott, groupOnly,
-					z$varyingGeneralParametersInGroup, drop=FALSE], na.rm=TRUE)
+				z$ThinParameters[nfirst:ntott, groupOnly,
+				z$varyingGeneralParametersInGroup, drop=FALSE], na.rm=TRUE)
 	}
 	else
 	{
 		if ((z$priorRatesFromData <0) | z$incidentalBasicRates)
 		{
-		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinPosteriorMu[(nfirst):dim(z$ThinPosteriorMu)[1],
-					, drop=FALSE], na.rm=TRUE)
-		postVarMean[z$varyingObjectiveParameters] <- sapply(1:(dim(z$ThinPosteriorSigma)[2]),
-			function(i){mean(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i], na.rm=TRUE)})
+			thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
+				z$ThinPosteriorMu[nfirst:ntot, , drop=FALSE], na.rm=TRUE)
+			postVarMean[z$varyingObjectiveParameters] <-
+				sapply(1:(dim(z$ThinPosteriorSigma)[2]),
+					function(i){mean(z$ThinPosteriorSigma[nfirst:ntot,i,i], na.rm=TRUE)})
 		}
+
 		else
 		{
-	thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinPosteriorMu[(nfirst):dim(z$ThinPosteriorMu)[1],
-					z$objectiveInVarying, drop=FALSE], na.rm=TRUE)
-	postVarMean[z$varyingObjectiveParameters] <- sapply(1:(dim(z$ThinPosteriorSigma)[2]),
-		function(i){mean(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i], na.rm=TRUE)}
+			thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
+				z$ThinPosteriorMu[nfirst:ntot,
+								z$objectiveInVarying, drop=FALSE], na.rm=TRUE)
+			postVarMean[z$varyingObjectiveParameters] <-
+			sapply(1:(dim(z$ThinPosteriorSigma)[2]),
+				function(i){mean(z$ThinPosteriorSigma[nfirst:ntot,i,i], na.rm=TRUE)}
 														)[z$objectiveInVarying]
+		}
 	}
-	}
-		thetaMean[z$set2] <-
-			colMeans(z$ThinPosteriorEta[nfirst:dim(z$ThinPosteriorEta)[1],, drop=FALSE],
-						na.rm=TRUE)
+	thetaMean[z$set2] <-
+			colMeans(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE], na.rm=TRUE)
 	thetaMean[z$fix & (!z$basicRate)] <- z$thetaMat[1,z$fix & (!z$basicRate)]
 	list(thetaMean, postVarMean)
 }
@@ -768,7 +769,7 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 sdTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
-	ntott <- dim(z$ThinParameters)[1]
+	ntott <- sum(!is.na(z$ThinParameters[,1,1]))
 	if (nfirst >= ntot-1)
 	{
 		stop('Sample did not come beyond warming')
@@ -1261,7 +1262,15 @@ print.sienaBayesFit <- function(x, nfirst=NULL, ...)
 	}
 	else
 	{
-		cat("Note: this summary does not contain a convergence check.\n\n")
+		cat("Note: this summary does not contain a convergence check.\n")
+		if (is.null(nfirst))
+		{
+			cat("Note: the print function for sienaBayesFit objects")
+			cat(" can also use a parameter nfirst,\n")
+			cat("      indicating the first run")
+			cat(" from which convergence is assumed.\n")
+		}
+		cat("\n")
 		if (length(x$f$groupNames) > 1)
 		{
 			cat("Groups:\n")
@@ -1561,5 +1570,34 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 		}
 	}
 	invisible(x)
+}
+
+##@shortBayesResult abbreviated sienaBayesFit results
+shortBayesResults <- function(x, nfirst=NULL){
+	if (!inherits(x, "sienaBayesFit"))
+	{
+		stop('x must be a sienaBayesFit object')
+	}
+	if (is.null(nfirst))
+	{
+		nfirst <- x$nwarm+1
+	}
+	df1 <- sienaFitThetaTable(x, fromBayes=TRUE, nfirst=nfirst)[[1]][,
+		c("text", "value", "se", "cFrom", "cTo", "postSd", "cSdFrom", "cSdTo" )]
+	df1$postSd[is.na(df1$cSdFrom)] <- NA
+	df1$postSd <- as.numeric(df1$postSd)
+	df1$cSdFrom <- as.numeric(df1$cSdFrom)
+	df1$cSdTo <- as.numeric(df1$cSdTo)
+	df2 <- as.data.frame(x$requestedEffects[,c("name","shortName", "interaction1", "interaction2",
+		"type", "randomEffects", "fix", "parm", "period", "effect1", "effect2", "effect3", "group")])
+	df2$period <- as.numeric(df2$period)
+	replace1 <- function(x){ifelse(x=="text", "effectName", x)}
+	replace2 <- function(x){ifelse(x=="value", "postMeanGlobal", x)}
+	replace3 <- function(x){ifelse(x=="se", "postSdGlobal", x)}
+	replace4 <- function(x){ifelse(x=="postSd", "postSdBetween", x)}
+	dfs <- cbind(df2, df1)
+	dfr <- dfs
+	names(dfr) <- replace1(replace2(replace3(replace4(names(dfs)))))
+	dfr
 }
 

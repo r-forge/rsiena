@@ -1,3 +1,17 @@
+2019-01-02 R-Forge Revision 338, packages version 1.2-15.
+Changes in RSiena and RSienaTest:
+   * New effects sameXReciAct and diffXReciAct.
+   * Increased length of MLSimulation::preburnin.
+   * Changes in sienaFitThetaTable, averageTheta.last, sdTheta.last in sienaprint.r
+     to enable change in extract.posteriorMeans (see below).
+   * siena.table adapted for sienaBayes results.
+Changes in RSienaTest:
+   * New functions shortBayesResults and plotPostMeansMDS.
+   * extract.posteriorMeans works also for an object saved as PartialBayesResult
+     (which has NA results for as yet unfinished runs) 
+     (this was achieved by changes in sienaprint.r, see above).
+   * Examples added to help page for print.sienaBayesFit (in dontrun...).
+
 2018-12-05 R-Forge Revision 337, packages version 1.2-14.
 Changes in RSiena and RSienaTest:
    * Check for length of parameter mult for ML estimation (initializeFRAN), 
@@ -12,7 +26,9 @@ Changes in RSienaTest:
      prior mean is used for initial parameter values;
      prewarming phase introduced before improveMH;
      in case prevBayes is used, also parameter nImproveMH in the function 
-     call of sienaBayes supersedes this parameter in the prevBayes object.
+     call of sienaBayes supersedes this parameter in the prevBayes object;
+     checks for dimensions of prior mean and covariance matrix
+     put earlier in the initialization phase.
 
 2018-10-29 R-Forge Revision 336, packages version 1.2-13.
 Changes in RSiena and RSienaTest:

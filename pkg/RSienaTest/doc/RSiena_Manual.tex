@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-13.
+This version was renewed for \RS version 1.2-14.
 \end{abstract}
 
 
@@ -889,24 +889,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-13}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-14}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-13.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-14.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-13.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-14.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-13.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-14.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-13.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-14.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-13.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-14.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-13.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-14.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1019,7 +1019,8 @@ of \rs.
       The \texttt{Distance} mentioned there
       is the Hamming distance between successively observed networks, i.e.,
       the number of tie variables that differ.
-      The \texttt{Jaccard} index is the Jaccard distance between the
+      The \texttt{Jaccard} index is the Jaccard similarity index between the
+  \index{Jaccard index}
       successive networks:
       \[
          \frac{N_{11}}{N_{01}+N_{10}+N_{11}} \ ,
@@ -1048,6 +1049,7 @@ of \rs.
       will mean that the first wave hardly plays a role in the results, and
       for non-conditional estimation it will be close to treating the second wave as
       a sample from the stationary distribution of the network dynamics.
+      \index{Jaccard index}
 
       If Jaccard indices are low because the network is mainly increasing
       (creation of new ties) or decreasing (termination of ties),
@@ -1104,7 +1106,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-13) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-14) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -2514,12 +2516,12 @@ The basic list of these and other effects is as follows.
       closure by including one or two of these. They can be selected
       by theoretical considerations and/or by their empirical
       statistical significance and contribution to a good fit.
-      
+
       In older publications, when the gwesp effect was not available, it was
-      sometimes advised to include the transitive triplets together with the transitive 
+      sometimes advised to include the transitive triplets together with the transitive
       ties effect. Currently, the impression is that often the gwesp effect
       is at least as good as a combination of transitive triplets and transitive
-      ties. For many data sets, a model containing either the transitive triplets 
+      ties. For many data sets, a model containing either the transitive triplets
       effect or the gwesp effect (not both) is adequate to represent transitivity,
       and the user may try out which of these yields the best fit.
       \begin{enumerate}
@@ -4277,7 +4279,8 @@ The advice is to use (1.) \underline{or} (2.), in both cases together with (3.).
     The baseline value (see the preceding section\footnote{The value given here
     is the default number of simulation runs in the 4'th subphase.})
     would be \\
-    $(p+7)\times (2.52)^4$, where $p$ is the
+    $(p+7)\times (2.52)^4$ \\
+    where $p$ is the
     number of estimated parameters (excluding the rate parameters
     estimated by conditioning, if conditional estimation is used).
     For a `high value', start with a value that is about twice as large,
@@ -4969,7 +4972,7 @@ as a multi-group data set (Section~\ref{S_multigroup}).
 \end{enumerate}
 
 For ML estimation, an important parameter for tuning the
-algorithm is the so-called \textsf{Multiplication factor},
+algorithm is the so-called \textsf{multiplication factor},
 given in \sfn{sienaAlgorithmCreate()} as the argument \texttt{mult}.
 This determines the number of Metropolis-Hastings steps taken
 for simulating each new network.
@@ -4982,10 +4985,11 @@ lead to high autocorrelation in the generated statistics.
 This leads to poor performance of the algorithm.
 These autocorrelations are given in the output file. When some
 autocorrelations are more than 0.4, it is good to increase the
-\textsf{Multiplication factor}.
-When the \textsf{Multiplication factor} is unnecessarily high,
+\textsf{multiplication factor}.
+When the \textsf{multiplication factor} is unnecessarily high,
 on the other hand, computing time will be unnecessarily high.
-The advice is to aim at values between 0.1 and 0.3 or 0.4.
+The advice is to aim at values for the autocorrelations
+between 0.1 and 0.4.
 
 A practical way to proceed is as follows.
 For initial tuning of the multiplication factor, use the model that
@@ -5004,6 +5008,12 @@ Then start with estimating the models of interest.
 For other models the autocorrelations may change again, therefore
 it still can be important later on to adapt the multiplication factor
 to keep the highest autocorrelation less than 0.4.
+
+Note that the multiplication factor can be given as one number,
+but also as a vector, with the number of elements equal to the number of
+basic rate parameters in the effects object; i.e., the number
+of periods times the number of waves. This permits to set a high
+value of the multiplication factor for only some period-wave combinations.
 
 Another parameter of the algorithm that sometimes needs tuning
 (but less often than the multiplication factor)
@@ -7147,6 +7157,7 @@ An example script to make such replacements is at
 A restriction (maybe to be lifted later) is that the networks must not be
 empty at any wave; and consecutive waves of networks must not be identical
 (in other words, all Jaccard indices should be strictly less than 1).
+\index{Jaccard index}
 
 Be prepared for long computation times. The reason is that likelihood-based
 computations are used (as distinct from the Method of Moments approach).
@@ -7211,6 +7222,13 @@ The basic issues are the following.
     (About this we have little general knowledge; it can be tried out
     by running estimations for different specifications of this
     part of the model.)
+\item[\emph{convergence:}] specifying effects as random will
+    influence convergence. Up to a point, randomly varying parameters
+    will have better convergence properties than fixed parameters;
+    but if their number is too large, given the number of groups,
+    convergence can deteriorate again.
+    This may then lead to outliers in the posterior means,
+    which can be diagnosed by function \sfn{plotPostMeansMDS}.
 \item[\emph{amount of information:}] which specification will
      use the information in the data most efficiently?\\
      (Here finally we do have a provisional answer. Assuming that an effect is fixed
@@ -7241,15 +7259,18 @@ give further examples and explanation for creating \sfn{sienaGroup} objects.
 If you have a large number of groups (more than 30), try first
 with a smaller number of groups (10-20). If you need or wish to
 make a selection of groups, select the one with few or no missing data and
-with Jaccard coefficients at least 0.30.
+with Jaccard coefficients at least 0.30.\index{Jaccard index}
 
 \subsubsection{How to choose the parameter settings for sienaBayes}
 \label{S_sienaBayesParameters}
 
 It may be good to have an initial try run with\\
 \texttt{nwarm=5, nmain=10, nrunMHBatches=5, nImproveMH=20}
-(for speed) and \texttt{silentstart = FALSE} (for information about the
-initialization phase), and then \sfn{print} the result.
+(for speed) \\
+and \\
+\texttt{silentstart = FALSE} (for information about the
+initialization phase),\\
+and then \sfn{print} the result.
 This will give information about the results of the initialization
 phase and about computing time. If some of the groups have some very
 high estimated rate parameters, you should either drop those groups
@@ -7304,9 +7325,11 @@ print(myeff, includeRandoms=TRUE, dropRates=TRUE)
 \end{verbatim}
 The list and order of only the randomly varying effects
 can be shown by requesting
+{\small
 \begin{verbatim}
 myeff[(myeff$randomEffects | (myeff$basicRate & (myeff$group==1) )) & myeff$include, ]
 \end{verbatim}
+}
 \smallskip
 
 For the non-varying parameters an improper flat prior is used,
@@ -7359,7 +7382,7 @@ uncertainty about $\mu$ should be proportional to the population
 This is a mathematical consequence of the use of the conjugate prior.
 Often, the prior uncertainty about $\mu$ will be greater than the
 assumed between-group differences, leading to a choice of \texttt{priorKappa}
-less than 1, e.g., 0.1; note that \texttt{priorKappa} is a ratio
+less than 1, e.g., 0.01; note that \texttt{priorKappa} is a ratio
 of variances, and the ratio of uncertainties will be better
 expressed by its square root.
 
@@ -7393,6 +7416,7 @@ In other cases, special attention must be given to the rate parameters.
 Sometimes, for small groups and complicated models, some of the
 rate parameters may be estimated in the multi-group option by very high
 numbers. This may be the case especially for groups with low Jaccard
+\index{Jaccard index}
 coefficients, or for groups that deviate strongly from the other groups.
 It may be advisable to take out the groups with extremely high
 rate parameters (e.g., larger than 50 or 80).
@@ -7427,25 +7451,29 @@ close to these $m$ and $s^2$.
 As an example, suppose there are $N=20$ groups, 3 waves and one dependent
 variable (a network), and 5 varying parameters in addition to the rate parameters.
 Then \texttt{p1} = 2+5 = 7.
-Suppose that plausible values for the first rate parameter would
-be centered about 4 and for the second about 5,
-in both cases with a standard deviation of 1.4, corresponding
-to a variance of about 2.
+Suppose that for the rate parameters the default
+data-dependent prior is used (\texttt{priorRatesFromData=2}).
+Then in the parameters \texttt{priorMu} and \texttt{priorSigma}
+it still is necessary to include the prior rate parameters,
+to have the correct dimensionality of this vector and matrix,
+but their values do not matter.
 Suppose further that for the parameters of the objective function
 the prior mean for the density parameter is specified as $-1$,
-all other prior means as $0$, and all prior between-group variances as $0.16$,
-corresponding to prior between-group standard deviations of $0.4$.
+for the reciprocity parameter as $+1$,
+all other prior means as $0$, and all prior between-group variances as $1$.
 Further assume that the prior uncertainty about $\mu$ is thought to be
-2~times larger, on the parameter scale, than the prior between-group differences,
-which means a ratio of 4 on the variance scale.
+10~times larger, on the variance scale, than the prior between-group differences.
 One then could use the following piece of code.
+{\small
 \begin{verbatim}
-m7 <- c(4, 5, -1, 0, 0, 0, 0)
+m7 <- c(5, 5, -1, 1, 0, 0, 0)
 S7 <- matrix(0, 7, 7)
-diag(S7) <- c(2, 2, 0.16, 0.16, 0.16, 0.16, 0.16)
-ans <- sienaBayes(...., priorMu=m7, priorSigma=S7, priorDf=22, priorKappa=0.25,
-                  priorRatesFromData = 0, ....)
+diag(S7) <- 0.01
+ans <- sienaBayes(...., priorMu=m7, priorSigma=S7, priorDf=22, priorKappa=0.01,
+                  priorRatesFromData = 2, ....)
 \end{verbatim}
+}
+\noindent
 \texttt{priorDf} is the prior degrees of freedom for the
 covariance matrix. It can be interpreted as the sample size on which,
 hypothetically, the prior knowledge about the covariance matrix of the
@@ -7470,19 +7498,22 @@ reciprocity parameter +1.5 or +2. For homophily parameters on important
 attributes expressed by the \texttt{simX} effect (which is standardized),
 as long as these are regarded as control effects, one might specify the
 prior mean conservatively as 0.3 or 0.5.
+\iffalse
 Since many \SI parameters are defined in such a way that they have values
 in the range between --1 and +1, a prior variance in the range from 0.02 to
 0.5 would often be reasonable; but it will be good to consider earlier
 studies to have a good grounding for this choice.
+\fi
 
 Continuing the example above, if the 5 varying non-rate parameters would
 start with an outdegree and a reciprocity parameter, the prior means
-and prior variances could be modified, e.g., to
+could be modified, e.g., to
 \begin{verbatim}
-m7 <- c(4, 5, -2, +1.5, 0, 0, 0)
-S7 <- matrix(0, 7, 7)
-diag(S7) <- c(2, 2, 1, 0.3, 0.2, 0.1, 0.1)
+m7 <- c(5, 5, -2, +1.5, 0, 0, 0)
 \end{verbatim}
+(if for the similarity parameters also the value of 0 is used...).
+% S7 <- matrix(0, 7, 7)
+% diag(S7) <- c(2, 2, 1, 0.3, 0.2, 0.1, 0.1)
 
 
 \subsubsection{Operation of sienaBayes()}
@@ -7602,6 +7633,17 @@ and one-sided posterior $p$-values
 for testing whether the parameter is positive or negative.
 These are the Bayesian versions of estimates, standard errors,
 confidence intervals, and $p$-values.
+These functions can be used with a parameter \texttt{nfirst}, indicating
+the first iterations from which convergence is assumed.
+The default value is the number of warming iterations~+~1,
+but this may be inadequate. From the trace plots obtained by
+functions in script  \texttt{BayesPlots.r} is may be possible
+to make an improved guess for this iteration number,
+and use this for \texttt{nfirst}.
+
+The function \sfn{siena.table} can be used also for making
+\texttt{html} or \LaTeX\ tables of the results for the global parameters;
+here again, the parameter \texttt{nfirst} may be used.
 
 The functions \sfn{simpleBayesTest()} and \sfn{multipleBayesTest()}
 are available for testing parameters; see the help page for these functions.
@@ -7611,13 +7653,32 @@ the components
 ThinPosteriorEta}, and \texttt{ThinPosteriorSigma} of the
 \sfn{sienaBayesFit} object, as mentioned in the help page, may be useful.
 
+The file \texttt{BayesPlots.r}, mentioned above, contains some plotting
+functions that are useful for making posterior density plots.
+
 The function \sfn{extract.posteriorMeans()} can be used to obtain
 posterior means and standard deviations of the groupwise estimated
 parameters. These are like the `\emph{empirical Bayes}' estimates
 known also from other statistical models.
+A multi-dimensional scaling (`MDS') plot of the posterior means
+can be obtained from the function \\
+\sfn{plotPostMeansMDS}.
+This is useful especially for detecting outliers.
+If strong outliers are found, this may have two different reasons:
+truly deviating groups; or instability of the estimation
+of the posterior means, related perhaps to having too many
+randomly varying parameters.
+In the latter case, it may be quite arbitrary which groups are
+indicated in the plot as being the outliers.
 
-The file \texttt{BayesPlots.r}, mentioned above, contains some plotting
-functions that are useful for making posterior density plots.
+It should be noted that due to the high correlations between parameters,
+the posterior means may be useful mainly for model specifications
+with a limited number of randomly varying parameters.
+If one is interested, for example, in assessing differences
+between groups with respect to reciprocation by comparing
+posterior means for the reciprocity parameter, it should be avoided
+to specify other parameters as randomly varying that are
+highly correlated with the reciprocity parameter.
 
 It should be noted that the \texttt{.out} files produced by \sfn{sienaBayes()}
 are produced somewhere in the initial phase of the project and not meant
@@ -8116,7 +8177,7 @@ nodes $h$ for which there is the two-path $i \rightarrow h \rightarrow j$.
 % from tikztry.tex
 \\
 \end{center}
-\caption{Geometrically weighted edgewise shared partners; 
+\caption{Geometrically weighted edgewise shared partners;
 left, transitive (`gwespFF'); right, cyclical (`gwespBB');
 for F=`forward', B=`backward'.}
 \label{F_gwesp1}
@@ -9096,6 +9157,21 @@ the following effects are available:
  $s^{\rm net}_{i\vit}(x) = \big(\sum_j x_{ij} \,v_j \big)^2 $;\\
  since the covariate here is used as a weight, this probably
  makes sense especially for non-centered covariates;
+
+
+ \item {\em reciprocal degree activity to same covariate}
+\texttt{(sameXReciAct)} defined by the outdegree of $i$,
+ multiplied by the number of $i$'s reciprocated ties
+ to others who have the same covariate value as $i$,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\,
+                \sum_h x_{ih}\,x_{hi}\, I\{v_i = v_h \} $;
+
+ \item {\em reciprocal degree activity to different covariate}
+\texttt{(diffXReciAct)} defined by the outdegree of $i$,
+ multiplied by the number of $i$'s reciprocated ties
+ to others who have a different covariate value than $i$,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\,
+                \sum_h x_{ih}\,x_{hi}\, I\{v_i \neq v_h \} $;
 
 
 \item only in RSienaTest:  \emph{Simmelian alter X effect}, (\texttt{simmelianAltX}), the effect of
@@ -14674,6 +14750,34 @@ the R-Forge repository, which contains a more complete listing.
 
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+
+\item 2018-12-05 R-Forge Revision 337, packages version 1.2-14.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item In the help page of \sfn{sienaAlgorithmCreate}, the possibility is
+   mentioned that the multiplication factor (parameter \texttt{mult}) can
+   be specified as a vector.
+   This allows the possibility for ML estimation to specify the
+   multiplication factor separately for periods $\times$ waves.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item \textsf{sienaBayes}:\\
+     the possibility now exists to specify prior variances for non-varying
+     parameters, which can be meaningful especially for effects of
+     group-level variables;\\
+     a new, hopefully better, initial value is used, defined as
+     a precision weighted mean of the multi-group MoM estimate and the
+     prior mean;\\
+     number of subphases for initial global parameter estimation by MoM decreased
+     to 2;\\
+     prewarming phase introduced before the first \textsf{improveMH};
+     checks for dimensions of prior mean and covariance matrix
+     put earlier in the initialization phase.
+   \item \textsf{extract.sienaBayes} corrected.
+\end{itemize}
 
 \item 2018-10-30 R-Forge Revision 336, packages version 1.2-13.
 

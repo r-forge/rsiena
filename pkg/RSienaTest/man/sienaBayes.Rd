@@ -339,6 +339,7 @@ glueBayes(z1, z2, nwarm2=0)
   bayes.model <- sienaBayes(FourAlgo, data = FourGroups,
        effects = FourEffects, nprewarm=10, nwarm=10, nmain=25, nrunMHBatches=10)
   bayes.model
+  print(bayes.model, nfirst=20)
   summary(bayes.model)
   bayes.nextModel <- sienaBayes(FourAlgo, data = FourGroups,
        effects = FourEffects, nmain=15, nrunMHBatches=10,

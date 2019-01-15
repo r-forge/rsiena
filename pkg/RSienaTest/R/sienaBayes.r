@@ -2860,11 +2860,10 @@ glueBayes <- function(z1,z2,nwarm2=0){
 }
 
 ##@protectedInverse inverse of p.s.d matrix
-protectedInverse <- function(x)
+protectedInverse <- function(x){
+	if (inherits(try(xinv <- chol2inv(chol(x)),
+		silent=TRUE), "try-error"))
 	{
-		if (inherits(try(xinv <- chol2inv(chol(x)),
-			silent=TRUE), "try-error"))
-		{
 	# Now make this x positive definite, if it is not.
 	# See above for a more extensive treatment of the same.
 	# Adapted from function make.positive.definite in package corpcor
@@ -2872,24 +2871,21 @@ protectedInverse <- function(x)
 	# but changed to make the matrix positive definite (psd)
 	# instead of nonnegative definite.
 	# The idea is to left-truncate all eigenvalues to delta0.
-	# The construction with tol, not used now,
-	# is to ensure positive definiteness given numerical inaccuracy.
-			es <- eigen(x)
-			esv <- es$values
-			delta0 <- 1e-6
-			cat("protectedInverse: Eigenvalues Sigma = ", sort(esv), "\n")
-			if (min(esv) < delta0)
-			{
-				delta <- delta0
-				tau <- pmax(delta, esv)
-		#		cat("Smallest eigenvalue of Sigma now is ",
-		#					min(esv),"; make posdef.\n")
-				xinv <- es$vectors %*%
-							diag(1/tau, dim(x)[1]) %*% t(es$vectors)
-			}
+		es <- eigen(x)
+		esv <- es$values
+		delta0 <- 1e-6
+		cat("protectedInverse: Eigenvalues Sigma = ", sort(esv), "\n")
+		if (min(esv) < delta0)
+		{
+			delta <- delta0
+			tau <- pmax(delta, esv)
+	#		cat("Smallest eigenvalue of Sigma now is ",
+	#					min(esv),"; make posdef.\n")
+			xinv <- es$vectors %*% diag(1/tau, dim(x)[1]) %*% t(es$vectors)
 		}
-		xinv
 	}
+	xinv
+}
 
 
 ##@trafo link function rates

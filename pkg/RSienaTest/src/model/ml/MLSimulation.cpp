@@ -232,7 +232,7 @@ void MLSimulation::preburnin()
 {
 	int rejectCount = 0;
 	bool accept;
-	while (rejectCount < 5)
+	while (rejectCount < 50)
 	{
 		accept = this->insertDiagonalMiniStep();
 		if (!accept)
@@ -241,7 +241,7 @@ void MLSimulation::preburnin()
 		}
 	}
 	rejectCount = 0;
-	while (rejectCount < 5)
+	while (rejectCount < 50)
 	{
 		accept = this->insertPermute(1);
 		if (!accept)
