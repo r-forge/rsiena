@@ -18,7 +18,8 @@ export(
 
 export(
 	sienaBayes, glueBayes, simpleBayesTest, multipleBayesTest,
-	extract.sienaBayes, extract.posteriorMeans, algorithms, profileLikelihoods,
+	extract.sienaBayes, extract.posteriorMeans, plotPostMeansMDS, 
+   shortBayesResults, algorithms, profileLikelihoods,
 	sienaRIDynamics
 )
 

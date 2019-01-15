@@ -228,8 +228,9 @@ stretch2 <- function(x){
 	x
 }
 
-plot.multipleBayesTest <- function(x, xlim=NULL, ylim=NULL,
-	main=NULL, ...){
+
+##@plot.multipleBayesTest methods
+plot.multipleBayesTest <- function(x, xlim=NULL, ylim=NULL,	main=NULL, ...){
 	if (!inherits(x, 'multipleBayesTest'))
 	{
 		stop("not a legitimate multipleBayesTest object")
@@ -430,7 +431,7 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1){
 		stop('z must be a sienaBayesFit object')
 	}
 
-	ntot <- dim(z$ThinPosteriorMu)[1]
+	ntot <- max(which(!is.na(z$ThinPosteriorMu[,1])))
 	nit <- ntot - nfirst + 1
 	nind <- sum(z$varyingParametersInGroup)
 	res <- matrix(NA, z$nGroup, 2*nind)
@@ -456,4 +457,45 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1){
 		dimnames(res) <- list(1:dim(res)[1], fName)
 	}
 	res
+}
+
+
+##@plotPostMeansMDS MDS plot of posterior means for sienaBayesFit object
+plotPostMeansMDS <- function(x, pmonly=0, nfirst=NULL, ...){
+# This function makes an MDS plot of the posterior means in z;
+# for the method: see MASS (book) p. 308.
+# if pmonly=0 posterior means and standard deviations,
+# if pmonly=1 only the posterior means,
+# if pmonly=2 only the posterior standard deviations.
+	if (!inherits(x, "sienaBayesFit"))
+	{
+		stop('x must be a sienaBayesFit object')
+	}
+	if (is.null(nfirst))
+	{
+		nfirst <- x$nwarm+1
+	}
+#	requireNamespace(MASS)
+	is.even <- function(k){k %% 2 == 0}
+	is.odd <- function(k){k %% 2 != 0}
+	cat('extracting posterior means ...\n')
+	pm <- extract.posteriorMeans(x, nfirst=nfirst)
+	if (pmonly <= 0)
+	{ 
+		vars <- (1:dim(pm)[2])
+	}
+	else if (pmonly == 1)
+	{ 
+		vars <- is.odd(1:dim(pm)[2])
+	}
+	else
+	{ 
+		vars <- is.even(1:dim(pm)[2])
+	}
+	cat('calculating MDS solution ...\n')
+	corpm <- cor(t(pm[,vars]))
+	mds <- isoMDS(1-corpm)
+	eqscplot(mds$points, type='n', ...)
+	text(mds$points, labels=as.character(1:dim(mds$points)[1]), ...)
+	invisible(mds$points)
 }
