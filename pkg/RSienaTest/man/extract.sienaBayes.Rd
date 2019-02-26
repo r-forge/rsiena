@@ -15,7 +15,7 @@
 \usage{
 extract.sienaBayes(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
                    sdLog=TRUE)
-extract.posteriorMeans(z, nfirst=z$nwarm+1)
+extract.posteriorMeans(z, nfirst=z$nwarm+1, verbose=TRUE)
 }
 \arguments{
   \item{zlist}{A list of \code{\link{sienaBayesFit}} objects,
@@ -37,6 +37,8 @@ extract.posteriorMeans(z, nfirst=z$nwarm+1)
      }
   \item{sdLog}{Logical: should the logarithms be taken of the posterior
       standard deviations (applies only to varying parameters).}
+  \item{verbose}{Logical: gives some console output to show ongoing activity
+       (may be reassuring for large number of groups).}
 }
 \details{
  \code{extract.sienaBayes} produces a 3-dimensional array, iterations by chains

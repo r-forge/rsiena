@@ -9,7 +9,8 @@
 }
 \usage{
 includeEffects(myeff, ..., include = TRUE, name = myeff$name[1], type = "eval",
- interaction1 = "", interaction2 = "", fix=FALSE, test=FALSE, character=FALSE)
+ interaction1 = "", interaction2 = "", fix=FALSE, test=FALSE, character=FALSE,
+ verbose = TRUE)
 }
 \arguments{
   \item{myeff}{a Siena effects object as created by \code{\link{getEffects}}
@@ -33,7 +34,8 @@ short names to identify the effects which should be included or excluded.}
   \code{myeff$initialValue} or not.}
   \item{test}{
   Boolean. Are the effects to be tested or not (requires \code{fix}).}
-\item{character}{Boolean: are the effect names character strings or not.}
+  \item{character}{Boolean: are the effect names character strings or not.}
+  \item{verbose}{Boolean: should the print of altered effects be produced.}
 }
 \details{The effects indicated by the arguments \ldots, \code{type},
   and (if necessary) \code{interaction1} and \code{interaction2}

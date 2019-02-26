@@ -1,3 +1,35 @@
+2019-02-26 R-Forge Revision 339, packages version 1.2-16.
+Changes in RSiena and RSienaTest:
+   * New effects maxAAlt, minXAlt (thanks to Per Block, Marion Hoffman,
+     Isabel Raabe, and Timon Elmer), outIsolate.
+   * Effect name of isolate effect (not shortName) changed to in-isolate.
+   * New parameter thetaValues in siena07, allowing simulations in Phase 3
+     with varying parameters according to matrix input.
+     Corresponding changes in print.sienaFit.
+   * sienaRI: earlier check for bipartite dependent variables; if so, stop.
+   * Argument "verbose" added to includeEffects and setEffect.
+     (It existed already for includeInteraction.)
+   * Wald.RSiena, Multipar.RSiena and score.Test also produce one-sided
+     test statistic if df=1.
+   * objects produced by Wald.RSiena, Multipar.RSiena and score.Test
+     have class "sienaTest".
+   * print method added for objects of class sienaTest.
+   * Changed/added some keywords and concepts in .Rd files.
+Changes in RSienaTest:
+   * Allow arbitrary number of interactions in sienaBayes (via getEffects).
+   * simpleBayesTest and multipleBayesTest corrected; they were wrong
+     for models with user-defined interactions.
+   * glueBayes extended (to allow good use for models with fixed parameters)
+     and check for prior rates relaxed (to allow priorRatesFromData=2
+     leading to different prior rates.)
+   * New default (prevBayes$nwarm >= 1) for newProposalFromPrev in sienaBayes.
+   * siena.table for sienaBayes results extended with between-groups s.d.
+   * Argument "verbose" added to extract.posteriorMeans.
+   * sienaBayes: check that prevAns is a sienaFit object; 
+     totally skip initial multigroup estimation if prevAns is given with 
+     prevAns$n3 >= 500 and (!usePrevOnly).
+
+
 2019-01-02 R-Forge Revision 338, packages version 1.2-15.
 Changes in RSiena and RSienaTest:
    * New effects sameXReciAct and diffXReciAct.

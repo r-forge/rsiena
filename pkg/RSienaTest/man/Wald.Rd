@@ -3,9 +3,8 @@
 \alias{Multipar.RSiena}
 \alias{score.Test}
 \alias{scoreTest}
-\title{
-  Wald and score tests for RSiena results
-}
+\alias{sienaTest}
+\title{  Wald and score tests for RSiena results }
 \description{
   These functions compute Wald-type and score-type tests for results
   estimated by siena07.
@@ -13,11 +12,10 @@
 \usage{
 Wald.RSiena(A, ans)
 
-Multipar.RSiena(ans, \ldots)
+Multipar.RSiena(ans, \dots)
 
 score.Test(ans, test=ans$test)
 }
-%- maybe also "usage" for other objects documented here.
 \arguments{
   \item{A}{A \code{k} * \code{p} matrix, where \code{p = ans$pp},
   the number of parameters in \code{ans} excluding the basic rate parameters
@@ -38,7 +36,7 @@ score.Test(ans, test=ans$test)
    the parameter estimated in the process leading to \code{ans}.
 
    The hypothesis tested by \code{Multipar.RSiena} is that all
-   parameters given in \eqn{\ldots} are 0. This is a special case of
+   parameters given in \eqn{\ldots} are 0.  This is a special case of
    the preceding.
 
    The tested effects for \code{score.Test} should have been specified
@@ -50,18 +48,21 @@ score.Test(ans, test=ans$test)
    These tests should be carried out only when convergence is adequate
    (overall maximum convergence ratio less than 0.25
    and all \emph{t}-ratios for convergence less than 0.1 in absolute value).
+   
+   These functions have their own print method, see \code{\link{print.sienaTest}}.
 }
-\value{A list of three elements:
+\value{An object of class \code{sienaTest}, which is a list with elements:
 \itemize{
   \item{chisquare: }{ The test statistic, assumed to have a chi-squared null
     distribution.}
   \item{df: }{ The degrees of freedom.}
   \item{pvalue: }{ The associated \emph{p}-value.}
+  \item{onesided: }{For \code{df}=1, the onesided test statistic.}
 }
 }
 \references{See the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}}
 \author{Tom Snijders}
-\seealso{ \code{\link{siena07}}}
+\seealso{ \code{\link{siena07}}, \code{\link{print.sienaTest}} }
 
 \examples{
 mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
@@ -76,20 +77,19 @@ myeff <- includeEffects(myeff, outAct, outPop, fix=TRUE, test=TRUE)
 A <- matrix(0, 2, 6)
 A[1, 3] <- 1
 A[2, 4] <- 1
-Wald.RSiena(A, ans)
+wa <- Wald.RSiena(A, ans)
+wa
 # A shortcut for the above is:
 Multipar.RSiena(ans, 3, 4)
 # The following two are equivalent:
-score.Test(ans, c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE))
-score.Test(ans,6)
+sct <- score.Test(ans, c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE))
+sct <- score.Test(ans,6)
+print(sct)
 # Getting all 1-df score tests separately:
 # (More identifying information for the effects may be added as necessary)
 for (i in which(ans$test)){
    sct <- score.Test(ans,i)
-   cat(ans$requestedEffects$effectName[i], '\n',
-   '    chisquared =', round(sct$chisquare,1),
-   '; p =', round(sct$pvalue,3), '\n')}
+   cat(ans$requestedEffects$effectName[i], '\n')
+   print(sct)}
 }
-% Add one or more standard keywords, see file "KEYWORDS" in the
-% R documentation directory.
 \keyword{ tests }

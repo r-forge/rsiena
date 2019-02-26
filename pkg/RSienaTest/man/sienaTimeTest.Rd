@@ -96,8 +96,8 @@ Actor Oriented Models. \emph{Advances in Data Analysis and Computation},
 5:147-176.
 
 M. Schweinberger (2012). Statistical modeling of network panel data:
-Goodness-of-fit.
-\emph{British Journal of Statistical and Mathematical Psychology}, 65:263-281.}
+Goodness-of-fit. \emph{British Journal of Statistical 
+and Mathematical Psychology} \bold{65}, 263--281.}
 
 \author{Josh Lospinoso, Tom Snijders}
 \seealso{\code{\link{siena07}}, \code{\link{plot.sienaTimeTest}},
@@ -193,4 +193,4 @@ myeff <- includeTimeDummy(myeff, RateX, type="rate", interaction1="myccov")
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 }
 }
-\keyword{models}
+\keyword{tests}

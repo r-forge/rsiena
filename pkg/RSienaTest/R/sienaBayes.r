@@ -29,7 +29,7 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 				nImproveMH=100, targetMHProb=0.25,
 				lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
 				storeAll = FALSE, prevAns=NULL, usePrevOnly=TRUE,
-				prevBayes = NULL, newProposalFromPrev=TRUE,
+				prevBayes = NULL, newProposalFromPrev=(prevBayes$nwarm >= 1),
 				silentstart=TRUE,
 				nbrNodes=1, clusterType=c("PSOCK", "FORK"),
 				getDocumentation=FALSE)
@@ -821,6 +821,7 @@ covtrob <- function(x){
 		}
 	cr + 0.05*diag(diag(cr), nrow = dim(x)[2])
 }
+
 	## ###################################### ##
 	## start of function sienaBayes() proper  ##
 	## ###################################### ##
@@ -850,6 +851,15 @@ covtrob <- function(x){
 	{
 		cat("Specification that some effects are tested is canceled.\n")
 		effects$test[effects$test] <- FALSE
+	}
+	
+	if ((!is.null(prevAns)) & (!inherits(prevAns,'sienaFit')))
+	{
+		if (inherits(prevAns, 'sienaBayesFit'))
+		{
+			cat('Did you mean to use prevBayes instead of prevAns?\n')
+		}
+		stop('What you used for prevAns is not a sienaFit object')
 	}
 
 	if (is.null(prevBayes))
@@ -956,6 +966,7 @@ covtrob <- function(x){
 			stop("Do not use this object for prevBayes.")
 		}
 		z <- prevBayes
+		z$newProposalFromPrev <- newProposalFromPrev
 
 		if ((nrunMHBatches != z$nrunMHBatches) & (nrunMHBatches >= 2))
 		{
@@ -993,7 +1004,7 @@ covtrob <- function(x){
 			if (min(dS) <= 0)
 			{
 				cat('Its diagonal elements are not all positive.\n')
-				stop('Incorrect priorSigma for prevBAyes object.')
+				stop('Incorrect priorSigma for prevBayes object.')
 			}
 			cat('Off-diagonal values are set to 0.\n')
 			pS <- matrix(0, dim(z$priorSigma)[1], dim(z$priorSigma)[1])
@@ -1161,7 +1172,8 @@ covtrob <- function(x){
 		# effects0 defined as in initializeBayes,
 		# used for determining which groupwise parameters are needed.
 		# This is the same for all groups, therefore group 1 is used.
-			effects0 <- getEffects(data[[1]])
+			effects0 <- getEffects(data[[1]],
+						nintn=numberIntn(effects), behNintn=numberBehIntn(effects))
 		# projectEffects copies the model specification,
 		# except for the basic rate effects for other groups,
 		# and it fixes non-random effects;
@@ -1630,6 +1642,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	else
 	{
 		nsub <- 2
+		startupSkip <- FALSE
 		if (!is.null(prevAns))
 		{
 			if ((usePrevOnly) &
@@ -1637,6 +1650,10 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 				!prevAns$x$cconditional)
 			{
 				nsub <- 0
+				if (prevAns$n3 >= 500)
+				{
+					startupSkip <- TRUE
+				}
 			}
 		}
 		startupModel <- sienaAlgorithmCreate(n3=500, nsub=nsub, cond=FALSE,
@@ -1655,10 +1672,17 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	}
 	else
 	{
-		startupGlobal <- siena07(startupModel, data=data, effects=effects,
-						batch=TRUE, silent=silentstart,
-						useCluster=(nbrNodes >= 2), nbrNodes=nbrNodes,
-						clusterType=clusterType, prevAns=prevAns)
+		if (startupSkip)
+		{
+			startupGlobal <- prevAns
+		}
+		else
+		{
+			startupGlobal <- siena07(startupModel, data=data, effects=effects,
+								batch=TRUE, silent=silentstart,
+								useCluster=(nbrNodes >= 2), nbrNodes=nbrNodes,
+								clusterType=clusterType, prevAns=prevAns)
+		}		
 	}
 	cat("Initial global estimates\n")
 	z$initialResults <- print(startupGlobal)
@@ -1993,7 +2017,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		}
 		else
 		{
-			effects0 <- getEffects(data[[i]])
+			effects0 <- getEffects(data[[i]],
+						nintn=numberIntn(effects), behNintn=numberBehIntn(effects))
 			# The following function copies the model specification,
 			# except for the basic rate effects for other groups,
 			# copies estimated values in startupGlobal to initial values in effects0,
@@ -2127,6 +2152,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	# Construction of indicator of parameters of the hierarchical model
 	# within the groupwise parameters:
 	# Question: Why does this use effects, and not requestedEffects?
+	# Answer: because effects is the argument of the function initializeBayes.
 
 	vec1 <- 4 - effects$randomEffects[effects$include]
 	vec1[effects$fix[effects$include]] <- 5
@@ -2626,6 +2652,8 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	d1 <- sum(!is.na(z1$ThinPosteriorMu[,1]))
 	d2 <- sum(!is.na(z2$ThinPosteriorMu[,1]))
 	if (nstart2 > d2){stop("Insufficient data in z2.")}
+	cat("Use iterations", 1, "to", d1, "from the first object,")
+	cat("and", nstart2, "to", d2, "from the second object.\n")
 	z$ThinPosteriorMu <-
 		rbind(z1$ThinPosteriorMu[1:d1,,drop=FALSE],
 				z2$ThinPosteriorMu[nstart2:d2,,drop=FALSE])
@@ -2652,6 +2680,8 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	z$nImproveMH  <- z1$nImproveMH
 	z$nwarm	 <- z1$nwarm
 	z$nmain	 <- z1$nmain + z2$nwarm+z2$nmain - nwarm2
+	cat("The new object has", z$nwarm, "warming iterations")
+	cat("and", z$nmain, "main iterations.\n")
 	what <- ''
 	if (all(z1$mult == z2$mult))
 	{
@@ -2756,16 +2786,21 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	{
 		stop(paste("The two objects do not have the same specification. Difference in:", what))
 	}
-	if (all(z1$priorMu == z2$priorMu))
+	consider <- rep(TRUE, z1$p1)
+	if (z1$priorRatesFromData == 2)
+	{
+		consider[z1$rates] <- FALSE
+	}
+	if (all(z1$priorMu[consider] == z2$priorMu[consider]))
 	{
 		z$priorMu <- z1$priorMu
 	}
 	else
 	{
 		dif <- TRUE
-		what <- paste(what, 'priorMu;')
+		what <- 'priorMu;'
 	}
-	if (all(z1$priorSigma == z2$priorSigma))
+	if (all(z1$priorSigma[consider,consider] == z2$priorSigma[consider,consider]))
 	{
 		z$priorSigma <- z1$priorSigma
 	}
@@ -2855,6 +2890,8 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	z$varyingGeneralParametersInGroup  <- z1$varyingGeneralParametersInGroup
 	z$varyingObjectiveParameters <- z1$varyingObjectiveParameters
 	z$incidentalBasicRates <- z1$incidentalBasicRates
+	z$thetaMat <- z2$thetaMat
+	z$theta <- (d1*z1$theta + (d2 - nstart2 + 1)*z2$theta)/(d1 + d2 - nstart2 + 1)
 	class(z) <- "sienaBayesFit"
 	z
 }
@@ -2887,6 +2924,19 @@ protectedInverse <- function(x){
 	xinv
 }
 
+##@ numberIntn used in sienaBayes, number of network interaction effects used for getEffects
+numberIntn <- function(myeff){
+	numnet <- length(unique(myeff$name[myeff$shortName=="density"]))
+	nintn <- sum(myeff$shortName == 'unspInt')/3 # 3 for eval - creation - endow
+	ifelse((numnet <= 0), 10, nintn/numnet) # 10 is the default in getEffects
+}
+
+##@ numberIntn used in sienaBayes, number of behavior interaction effects used for getEffects
+numberBehIntn <- function(myeff){
+	numbeh <- length(unique(myeff$name[myeff$shortName=="linear"]))
+	nbehIntn <- sum(myeff$shortName == 'behUnspInt')/3 # 3 for eval - creation - endow
+	ifelse((numbeh <= 0), 4, nbehIntn/numbeh) # 4 is the default in getEffects
+}
 
 ##@trafo link function rates
 # the log link is too strong!

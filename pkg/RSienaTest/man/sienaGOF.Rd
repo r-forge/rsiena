@@ -158,6 +158,8 @@ We recommend the following heuristic approach to model checking:
  \item \code{\link{IndegreeDistribution}}
  \item \code{\link{OutdegreeDistribution}}
  \item \code{\link{BehaviorDistribution}}
+ \item \code{\link{TriadCensus}}
+ \item \code{\link{mixedTriadCensus}}
 }
 
 }

@@ -11,7 +11,7 @@
 includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 						   type="eval", interaction1="", interaction2="",
 						   fix=FALSE, test=FALSE,
-						   character=FALSE)
+						   character=FALSE, verbose=TRUE)
 {
 	if (!inherits(myeff, 'sienaEffects'))
 	{
@@ -63,7 +63,11 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 	{
 #		print.data.frame(myeff[use, c("name", "shortName", "type",
 #			"interaction1", "interaction2", "include")])
-		print.sienaEffects(myeff[use,])
+		if (verbose)
+		{
+			print.sienaEffects(myeff[use,], includeRandoms = 
+					any(myeff$random & (myeff$shortName != 'density')))
+		}
 	}
 	if (hasArg('initialValue'))
 	{
@@ -233,7 +237,8 @@ includeInteraction <- function(myeff, ...,
 	}
 	if (verbose)
 	{
-		print.sienaEffects(myeff[intn,], includeRandoms = random)
+		print.sienaEffects(myeff[intn,], includeRandoms = 
+					any(myeff$random & (myeff$shortName != 'density')))
 	}
 	myeff
 }
@@ -246,7 +251,7 @@ setEffect <- function(myeff, shortName, parameter=NULL,
 					include=TRUE, name=myeff$name[1],
 					type="eval", interaction1="", interaction2="",
 					effect1=0, effect2=0, effect3=0,
-					period=1, group=1, character=FALSE)
+					period=1, group=1, character=FALSE, verbose=TRUE)
 {
 	if (!character)
 	{
@@ -298,6 +303,9 @@ setEffect <- function(myeff, shortName, parameter=NULL,
 	# print.data.frame(myeff[use, c("name", "shortName", "type", "interaction1",
 	# 		"interaction2", "include", "parm", "fix", "test",
 	# 		"initialValue", "timeDummy", "period", "group")])
-	print.sienaEffects(myeff[use,])
+	if (verbose)
+	{
+		print.sienaEffects(myeff[use,], includeRandoms = random)
+	}
 	myeff
 }

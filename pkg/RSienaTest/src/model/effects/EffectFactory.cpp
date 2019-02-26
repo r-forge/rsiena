@@ -1394,7 +1394,11 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "isolate")
 	{
-		pEffect = new IsolateEffect(pEffectInfo);
+		pEffect = new IsolateEffect(pEffectInfo, true);
+	}
+	else if (effectName == "outIsolate")
+	{
+		pEffect = new IsolateEffect(pEffectInfo, false);
 	}
 	else if (effectName == "isolateNet")
 	{
@@ -1624,6 +1628,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "AltsAvAlt")
 	{
 		throw domain_error("Effect AltsAvAlt renamed to avXAlt");
+	}
+	else if (effectName == "minXAlt")
+	{
+		pEffect = new AltersCovariateMinimumEffect(pEffectInfo);
+	}
+	else if (effectName == "maxXAlt")
+	{
+		pEffect = new AltersCovariateMaximumEffect(pEffectInfo);
 	}
 	else if (effectName == "avXAlt")
 	{

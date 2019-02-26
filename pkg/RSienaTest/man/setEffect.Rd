@@ -12,7 +12,7 @@ setEffect(myeff, shortName, parameter = NULL, fix = FALSE,
 test = FALSE, random=FALSE, initialValue = 0, timeDummy = ",", include = TRUE,
 name = myeff$name[1], type = "eval", interaction1 = "",
 interaction2 = "", effect1=0, effect2=0, effect3=0,
-period=1, group=1, character=FALSE)
+period=1, group=1, character=FALSE, verbose = TRUE)
 }
 %- maybe also "usage" for other objects documented here.
 \arguments{
@@ -77,6 +77,7 @@ dummy. Alternatively, use \code{\link{includeTimeDummy}}.
   Only relevant for \code{\link{sienaGroup}} data sets.
   }
 \item{character}{Boolean: whether the short name is a character string.}
+\item{verbose}{Boolean: should the print of altered effects be produced.}
 }
 \details{
 The arguments \code{shortName}, \code{name}, \code{type},

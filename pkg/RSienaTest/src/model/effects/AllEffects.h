@@ -16,6 +16,8 @@
 #include "AltersCovariateAvAltEffect.h"
 #include "AltersCovariateAverageEffect.h"
 #include "AltersCovariateAvSimEffect.h"
+#include "AltersCovariateMinimumEffect.h"
+#include "AltersCovariateMaximumEffect.h"
 #include "AltersCovariateTotSimEffect.h"
 #include "AltersDist2CovariateAverageEffect.h"
 #include "AltersInDist2CovariateAverageEffect.h"

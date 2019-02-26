@@ -60,4 +60,4 @@ myeff <- getEffects(mydata)
 myeff
 summary(myeff)
 }
-\keyword{methods}
+\keyword{print}

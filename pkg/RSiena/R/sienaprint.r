@@ -235,6 +235,7 @@ print.sienaDependent <- function(x, ...)
 ##@print.sienaFit Methods
 print.sienaFit <- function(x, tstat=TRUE, ...)
 {
+	objectName <- deparse(substitute(x))
 	if (!inherits(x, "sienaFit"))
 	{
         stop("not a legitimate Siena model fit")
@@ -249,9 +250,13 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 	}
 	else
 	{
+		if (is.null(x$thetaFromFile))
+		{
+			x$thetaFromFile <- FALSE
+		}
 		if(x$x$simOnly)
 		{
-		cat("Parameter values\n\n")
+		cat("Parameter values used for simulations\n\n")
 		}
 		else
 		{
@@ -274,15 +279,14 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 		mymat[, 'value'] <- format(round(mydf$value, digits=4))
 		if(x$x$simOnly)
 		{
-			mymat[, 'se'] <- ' '
 			mymat[, 'tstat'] <- ' '
 		}
 		else
 		{
-			mymat[, 'se'] <- format(round(mydf$se, digits=4))
 			mymat[, 'tstat'] <- paste(" ", format(round(mydf$tstat, digits=4)))
 			mymat[is.na(mydf$tstat), 'tstat'] <- ' '
 		}
+		mymat[, 'se'] <- format(round(mydf$se, digits=4))
 		mymat[, 'type'] <- format(mymat[, 'type'])
 		mymat[, 'text'] <- format(mymat[, 'text'])
 		mymat[mydf$row < 1, 'row'] <-
@@ -291,9 +295,18 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			paste(format(mydf[mydf$row >= 1, 'row']), '.', sep='')
 		if(x$x$simOnly)
 		{
-			mymat <- rbind(c(rep("", 4), "Parameter", "", "", "",
+			if (x$thetaFromFile)
+			{
+				mymat <- rbind(c(rep("", 4), "Mean", "", "Standard", "",
 						 ""),
-					   c(rep("", 4), "  value",rep("", 4)), mymat)
+					   c(rep("", 4), "  value", "", "Deviation", rep("", 2)), mymat)
+			}
+			else
+			{
+				mymat <- rbind(c(rep("", 4), "Parameter", "", "Standard", "",
+						 ""),
+					   c(rep("", 4), "  value", "", "Deviation", rep("", 2)), mymat)
+			}
 		}
 		else
 		{
@@ -323,14 +336,22 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 
 		if(x$x$simOnly)
 		{
-	cat('\nEstimated means and standard deviations, standard errors of the mean \n')
+			cat('\nSimulated means and standard deviations')
+			if (x$thetaFromFile)
+			{
+				cat('\n')
+			}
+			else
+			{
+				cat(', standard errors of the mean \n')
+			}
 			if (x$x$maxlike)
 			{
 				cat('Note: statistics for ML simulations are score functions.\n')
 			}
 			dmsf <- diag(x$msf)
 			mean.stats <- colMeans(x$sf) + x$targets
-#  cov.dev may be dropped - just for now (07-10-13) I keep it in
+#  cov.dev may be dropped
 #			cov.dev <- x$msf
 			sem <- sqrt(dmsf/dim(x$sf)[1])
 			if (x$x$dolby)
@@ -355,10 +376,29 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			mymess1 <- paste(format(1:x$qq,width=3), '. ',
 					format(x$requestedEffects$functionName[selection], width = 56),
 					format(round(mean.stats, 3), width=8, nsmall=3), ' ',
-					format(round(sqrt(dmsf), 3) ,width=8, nsmall=3), ' ',
+				format(round(sqrt(dmsf), 3) ,width=8, nsmall=3), ' ', sep='')
+			if (x$thetaFromFile)
+			{
+				mymess1 <- paste(mymess1, rep('\n',x$qq), sep='')
+			}
+			else
+			{
+				mymess1 <- paste(mymess1,
 					format(round(sem, 4) ,width=8, nsmall=4),
 					rep('\n',x$qq), sep='')
+			}
 			cat(as.matrix(mymess1),'\n', sep='')
+			cat("\nSimulated statistics are in ...$sf")
+#						paste(objectName,'$sf',sep=""))
+			if (x$returnDeps)
+			{
+				cat("\nand simulated dependent variables in ...$sims.\n")
+#					paste(objectName,'$sims',sep=""), ".\n")
+			}
+			else
+			{
+				cat(".\n")
+			}
 		}
 		else
 		{
@@ -380,39 +420,51 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 					cat(names(x$x$MaxDegree)[i],':',x$x$MaxDegree[i],'\n')}
 			cat('\n')
 		}
-		if (any(x$x$UniversalOffset > 0)) {
+		if (any(x$x$UniversalOffset > 0))
+		{
 	cat(' Offsets for symmetric networks, and for settings model (if any): \n')
-			for (i in 1:length(x$x$UniversalOffset)){
-					cat(names(x$x$UniversalOffset)[i],':',x$x$UniversalOffset[i],'\n')}
+			for (i in 1:length(x$x$UniversalOffset))
+			{
+				cat(names(x$x$UniversalOffset)[i],':',x$x$UniversalOffset[i],'\n')
+			}
 		}
-		if (any(x$x$modelType != 1)) {
+		if (any(x$x$modelType != 1))
+			{
 			cat('\n Model Type:\n')
-			for (i in 1:length(x$x$modelType)){
+				for (i in 1:length(x$x$modelType))
+				{
 					cat(names(x$x$modelType)[i],':',
-							ModelTypeStrings(x$x$modelType[i]),'\n')}
+							ModelTypeStrings(x$x$modelType[i]),'\n')
+				}
 			cat('\n')
 		}
-		if (any(x$x$behModelType != 1)) {
+		if (any(x$x$behModelType != 1))
+			{
 			cat('\n Behavioral Model Type:\n')
-			for (i in 1:length(x$x$behModelType)){
+				for (i in 1:length(x$x$behModelType))
+				{
 					cat(names(x$x$behModelType)[i],':',
-				BehaviorModelTypeStrings(x$x$behModelType[i]),'\n')}
+						BehaviorModelTypeStrings(x$x$behModelType[i]),'\n')
+				}
 			cat('\n')
 		}
 
 		try(if (x$errorMessage.cov > '')
 				{cat('\nWarning:', x$errorMessage.cov, '\n')}, silent=TRUE)
-			# "Try" for downward compatibility
+			# "Try" for compatibility with previous versions
 		cat("\nTotal of", x$n, "iteration steps.\n\n")
-		if ((x$x$dolby)&(x$x$simOnly))
+
+		if ((x$x$dolby) & (x$x$simOnly) & (!x$thetaFromFile))
 		{
-		cat('(Standard errors of the mean are less than s.d./', sqrt(x$n),' \n',
-				sep='')
+			cat('(Standard errors of the mean are less than s.d./',
+						sqrt(x$n),' \n', sep='')
 		cat('because of regression on scores (Dolby option).) \n')
 		}
 		if (x$termination == "UserInterrupt")
+		{
 			cat(" \n*** Warning ***",
 				"Estimation terminated early at user request.\n")
+	}
 	}
 	invisible(x)
 }
@@ -703,7 +755,7 @@ objectOrNull <- function(x)
 averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
-	ntott <- dim(z$ThinParameters)[1]
+	ntott <- sum(!is.na(z$ThinParameters[,1,1]))
 
 	if (nfirst > ntot)
 	{
@@ -722,7 +774,8 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 					!z$generalParametersInGroup, drop=FALSE], na.rm=TRUE)
 		postVarMean[z$ratePositions[[group]]] <- apply(
 				z$ThinParameters[nfirst:ntott,
-				group, !z$generalParametersInGroup, drop=FALSE], 3, var, na.rm=TRUE)
+					group, !z$generalParametersInGroup, drop=FALSE], 3,
+					var, na.rm=TRUE)
 	}
 
 	if (is.null(z$priorRatesFromData))
@@ -733,7 +786,7 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 	if (groupOnly != 0)
 	{
 		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinParameters[(nfirst):ntott, groupOnly,
+				z$ThinParameters[nfirst:ntott, groupOnly,
 				z$varyingGeneralParametersInGroup, drop=FALSE], na.rm=TRUE)
 	}
 	else
@@ -741,24 +794,24 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 		if ((z$priorRatesFromData <0) | z$incidentalBasicRates)
 		{
 		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinPosteriorMu[(nfirst):dim(z$ThinPosteriorMu)[1],
-					, drop=FALSE], na.rm=TRUE)
-		postVarMean[z$varyingObjectiveParameters] <- sapply(1:(dim(z$ThinPosteriorSigma)[2]),
-			function(i){mean(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i], na.rm=TRUE)})
+				z$ThinPosteriorMu[nfirst:ntot, , drop=FALSE], na.rm=TRUE)
+			postVarMean[z$varyingObjectiveParameters] <-
+				sapply(1:(dim(z$ThinPosteriorSigma)[2]),
+					function(i){mean(z$ThinPosteriorSigma[nfirst:ntot,i,i], na.rm=TRUE)})
 		}
 		else
 		{
 	thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
-				z$ThinPosteriorMu[(nfirst):dim(z$ThinPosteriorMu)[1],
+				z$ThinPosteriorMu[nfirst:ntot,
 				z$objectiveInVarying, drop=FALSE], na.rm=TRUE)
-	postVarMean[z$varyingObjectiveParameters] <- sapply(1:(dim(z$ThinPosteriorSigma)[2]),
-		function(i){mean(z$ThinPosteriorSigma[nfirst:dim(z$ThinPosteriorSigma)[1],i,i], na.rm=TRUE)}
+			postVarMean[z$varyingObjectiveParameters] <-
+			sapply(1:(dim(z$ThinPosteriorSigma)[2]),
+				function(i){mean(z$ThinPosteriorSigma[nfirst:ntot,i,i], na.rm=TRUE)}
 														)[z$objectiveInVarying]
 	}
 	}
 		thetaMean[z$set2] <-
-			colMeans(z$ThinPosteriorEta[nfirst:dim(z$ThinPosteriorEta)[1],, drop=FALSE],
-						na.rm=TRUE)
+			colMeans(z$ThinPosteriorEta[nfirst:ntot,, drop=FALSE], na.rm=TRUE)
 	thetaMean[z$fix & (!z$basicRate)] <- z$thetaMat[1,z$fix & (!z$basicRate)]
 	list(thetaMean, postVarMean)
 }
@@ -767,7 +820,7 @@ averageTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 sdTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 {
 	ntot <- sum(!is.na(z$ThinPosteriorMu[,1]))
-	ntott <- dim(z$ThinParameters)[1]
+	ntott <- sum(!is.na(z$ThinParameters[,1,1]))
 	if (nfirst >= ntot-1)
 	{
 		stop('Sample did not come beyond warming')
@@ -877,6 +930,10 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
     theEffects <-theEffects[which(theEffects$type!='gmm'),]
 	}
 	pp <- dim(theEffects)[1]
+	if (is.null(x$thetaFromFile))
+	{
+		x$thetaFromFile <- FALSE
+	}
     if (x$cconditional)
     {
         nrates <- length(x$rate)
@@ -947,16 +1004,36 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
             {
                 mydf[1, 'text'] <- 'Rate parameter of conditioning variable'
             }
+			if (x$x$simOnly)
+			{
+				mydf[1, 'se'] <- NA
+				mydf[1, 'value'] <- NA
+			}
+			else
+			{
             mydf[1, 'value'] <- x$rate[1]
             mydf[1, 'se'] <- x$vrate[1]
+        }
+            addtorow$command[addsub] <-
+                'Other parameters: '
+            addtorow$pos[[addsub]] <- 3
+            addsub <- addsub + 1
         }
         else ## observations > 2
         {
             nn <- length(x$rate)
             nnstr <- as.numeric(paste('0.', as.character(1:nn), sep=""))
             mydf[1:nn, 'row'] <- nnstr
+			if (x$x$simOnly)
+			{
+				mydf[1:nn, 'se'] <- rep(NA, nn)
+				mydf[1:nn, 'value'] <- rep(NA, nn)
+			}
+			else
+			{
             mydf[1:nn, 'value'] <- x$rate
             mydf[1:nn, 'se'] <- x$vrate
+			}
             if (length(x$f$types) == 1)
             {
                 mydf[1:nn, 'text'] <- paste('Rate parameter period', 1:nn)
@@ -1260,7 +1337,15 @@ print.sienaBayesFit <- function(x, nfirst=NULL, ...)
 	}
 	else
 	{
-		cat("Note: this summary does not contain a convergence check.\n\n")
+		cat("Note: this summary does not contain a convergence check.\n")
+		if (is.null(nfirst))
+		{
+			cat("Note: the print function for sienaBayesFit objects")
+			cat(" can also use a parameter nfirst,\n")
+			cat("      indicating the first run")
+			cat(" from which convergence is assumed.\n")
+		}
+		cat("\n")
 		if (length(x$f$groupNames) > 1)
 		{
 			cat("Groups:\n")
@@ -1561,3 +1646,31 @@ print.summary.sienaBayesFit <- function(x, nfirst=NULL, ...)
 	invisible(x)
 }
 
+##@shortBayesResult abbreviated sienaBayesFit results
+shortBayesResults <- function(x, nfirst=NULL){
+	if (!inherits(x, "sienaBayesFit"))
+	{
+		stop('x must be a sienaBayesFit object')
+	}
+	if (is.null(nfirst))
+	{
+		nfirst <- x$nwarm+1
+	}
+	df1 <- sienaFitThetaTable(x, fromBayes=TRUE, nfirst=nfirst)[[1]][,
+		c("text", "value", "se", "cFrom", "cTo", "postSd", "cSdFrom", "cSdTo" )]
+	df1$postSd[is.na(df1$cSdFrom)] <- NA
+	df1$postSd <- as.numeric(df1$postSd)
+	df1$cSdFrom <- as.numeric(df1$cSdFrom)
+	df1$cSdTo <- as.numeric(df1$cSdTo)
+	df2 <- as.data.frame(x$requestedEffects[,c("name","shortName", "interaction1", "interaction2",
+		"type", "randomEffects", "fix", "parm", "period", "effect1", "effect2", "effect3", "group")])
+	df2$period <- as.numeric(df2$period)
+	replace1 <- function(x){ifelse(x=="text", "effectName", x)}
+	replace2 <- function(x){ifelse(x=="value", "postMeanGlobal", x)}
+	replace3 <- function(x){ifelse(x=="se", "postSdGlobal", x)}
+	replace4 <- function(x){ifelse(x=="postSd", "postSdBetween", x)}
+	dfs <- cbind(df2, df1)
+	dfr <- dfs
+	names(dfr) <- replace1(replace2(replace3(replace4(names(dfs)))))
+	dfr
+}

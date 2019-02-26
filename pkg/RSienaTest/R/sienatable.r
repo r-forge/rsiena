@@ -18,15 +18,17 @@ siena.table <- function(x, type='tex',
 	vertLine=TRUE, tstatPrint=FALSE,
 	sig=FALSE, d=3, nfirst=NULL)
 {
+	objectName <- deparse(substitute(x))
 	fromBayes <- FALSE
 	xkind.string <- "sienaFit"
+	tstat <- tstatPrint
 	if (!inherits(x, "sienaFit"))
 	{
 		if (inherits(x, "sienaBayesFit"))
 		{
 			fromBayes <- TRUE
 			sig <- FALSE
-			tstatPrint <- FALSE
+			tstat <- TRUE # for sienaBayesFit, the place for t-stats is used for between-groups sd.
 			if (is.null(nfirst))
 			{
 				nfirst <- x$nwarm + 1
@@ -34,9 +36,9 @@ siena.table <- function(x, type='tex',
 				cat(" can also use a parameter nfirst,\n")
 				cat("      indicating the first run")
 				cat(" from which convergence is assumed.\n")
-				cat("      The default value used now is nfirst =", 
+				cat("      The default value used now is nfirst =",
 					x$nwarm + 1, ".\n")
-			}			
+			}
 			xkind.string <- "sienaBayesFit"
 		}
 		else
@@ -44,7 +46,6 @@ siena.table <- function(x, type='tex',
 			stop('x must be a sienaFit or sienaBayesFit object')
 		}
 	}
-	tstat <- tstatPrint
 	effects <- x$requestedEffects
 	p <- x$pp
 	condrates <- 0
@@ -54,13 +55,15 @@ siena.table <- function(x, type='tex',
 	{
 		condrates <- length(x$rate)
 	}
-	
+
 	if (fromBayes)
 	{
 		xx <- shortBayesResults(x, nfirst=nfirst)
 		theta <- xx$postMeanGlobal
 		ses <- xx$postSdGlobal
-		se.string <- 'psd.'
+		sd.between <- xx$postSdBetween
+		se.string <- '(psd)'
+		sdb.string <- 'psd-between'
 	}
 	else
 	{
@@ -81,7 +84,7 @@ siena.table <- function(x, type='tex',
 		{
 			maxlincomb.t <- maxlincomb.t + 10^{-dd} #needs to be rounded up
 		}
-		se.string <- 's.e.'
+		se.string <- '(s.e.)'
 	}
 	if (length(x$condvarno) == 0)
 	{
@@ -103,7 +106,7 @@ siena.table <- function(x, type='tex',
 
 	max.ses.width <- max.width(ses)
 	max.theta.width <- max.width(theta)
-	max.tstat.width <- max.width(theta/ses)
+	max.tstat.width <- ifelse(fromBayes, max.width(sd.between), max.width(theta/ses))
 
 	## signif converts t values into daggers and asterisks
 
@@ -185,7 +188,14 @@ siena.table <- function(x, type='tex',
 		}
 		else
 		{
-			tcsplit <- c("N","A.")
+			if (fromBayes)
+			{
+				tcsplit <- c("","")
+			}
+			else
+			{
+				tcsplit <- c("N","A.")
+			}
 		}
 
 		if (int.width>0)
@@ -251,7 +261,7 @@ siena.table <- function(x, type='tex',
 	{
 		if (type == "html")
 		{
-			if (tstat == TRUE)
+			if (tstat)
 			{
 				amp5 <- rep("</TD><TD align=\"right\">",pp)
 				amp6 <- rep(".",pp)
@@ -328,9 +338,16 @@ siena.table <- function(x, type='tex',
 
 	if (type == "html")
 	{
-		if (tstat == TRUE)
+		if (tstat)
 		{
-			start.tstat <- "<TD>t stat.</TD>"
+			if (fromBayes)
+			{
+				start.tstat <- "<TD>betw. sd.</TD>"
+			}
+			else
+			{
+				start.tstat <- "<TD>t stat.</TD>"
+			}
 		}
 		else
 		{
@@ -347,9 +364,12 @@ siena.table <- function(x, type='tex',
 		footnoteStart <- c("</TABLE>","<TABLE border=1  rules=none frame = below>")
 		if (fromBayes)
 		{
-			footnote <- "<TR> <TD colspan=9 align=left> par=posterior mean;
-						psd = posterior standard deviation.
-							</TD> </TR> <TR> </TR></TABLE>"
+			footnote <- c(paste("<TR> <TD colspan=9 align=left> par=posterior mean;
+							psd = posterior standard deviation;
+							</TD> </TR> "),
+						paste("<TR> <TD colspan=9 align=left>
+							betw. sd = posterior between-groups stand. deviation.
+							</TD> </TR> <TR> </TR>"), "</TABLE>")
 		}
 		else
 		{
@@ -374,16 +394,6 @@ siena.table <- function(x, type='tex',
 	}
 	else
 	{
-		if (tstat == TRUE)
-		{
-			start.tstat <- "r@{.}l"
-			start.tstat2 <- "&\\multicolumn{2}{c}{$t$ stat.}"
-		}
-		else
-		{
-			start.tstat <- ""
-			start.tstat2 <- ""
-		}
 		if (vertLine)
 		{
 			linesep="|"
@@ -391,6 +401,23 @@ siena.table <- function(x, type='tex',
 		else
 		{
 			linesep=""
+		}
+		if (tstat)
+		{
+			start.tstat <- "r@{.}l"
+			if (fromBayes)
+			{
+				start.tstat2 <- paste("&\\multicolumn{2}{c", linesep, "}{betw. sd}")
+			}
+			else
+			{
+				start.tstat2 <- paste("&\\multicolumn{2}{c", linesep, "}{$t$ stat.}")
+			}
+		}
+		else
+		{
+			start.tstat <- ""
+			start.tstat2 <- ""
 		}
 		startTable <- tableSection(c(paste("% Table based on", xkind.string, "object",
 					deparse(substitute(x)), ',', date()),
@@ -401,7 +428,6 @@ siena.table <- function(x, type='tex',
 				"\\hline",
 				"\\rule{0pt}{2ex}\\relax",
 				paste("Effect &\\multicolumn{2}{c}{par.}&\\multicolumn{2}{c",
-					linesep,
 					"}{",se.string,"}",
 					start.tstat2,"\\\\[0.5ex]"),
 				"\\hline"))
@@ -411,8 +437,10 @@ siena.table <- function(x, type='tex',
 		ruleTable <- tableSection("\\hline")
 		if (fromBayes)
 		{
-			footnote <- c(paste("\\multicolumn{5}{l}\n   ",
-				"{\\footnotesize{par = posterior mean; psd = posterior standard deviation.}}\\\\\n",
+			footnote <- c(paste("\\multicolumn{7}{l}\n   ",
+				"{\\footnotesize{par = posterior mean; psd = posterior standard deviation;}}\\\\\n",
+				"\\multicolumn{7}{l}\n   ",
+				"{\\footnotesize{betw. sd = posterior between-groups stand. deviation.}}\\\\\n",
 				sep="",collapse=""),
 			"\\end{tabular}")
 		}
@@ -432,7 +460,7 @@ siena.table <- function(x, type='tex',
 					$^\\ast$ $p$ $<$ 0.05; $^{\\ast\\ast}$ $p$ $<$ 0.01;
 					$^{\\ast\\ast\\ast}$ $p$ $<$ 0.001;}}\\\\" ,footnote)
 			}
-		}		
+		}
 	}
 
 	endTable <- tableSection(footnote)
@@ -495,24 +523,45 @@ siena.table <- function(x, type='tex',
 
 		remove <- unique(c(basicRates,fixed.2))
 
-		if (tstat == TRUE)
+		if (tstat)
 		{
-			mainTable$tstat1[-mid][-remove] <-
-				sapply(theta[rows]/ses[rows],mystr,max.tstat.width)[1,][-remove]
-			mainTable$tstat2[-mid][-remove] <-
-				sapply(theta[rows]/ses[rows],mystr)[2,][-remove]
-
-			if (min(remove)<nn+m+1)
+			if (fromBayes)
 			{
-				if (type=='tex')
+				remove <- is.na(sd.between)
+				mainTable$tstat1[-mid][-remove] <-
+					sapply(sd.between[rows],mystr,max.tstat.width)[1,][-remove]
+				mainTable$tstat2[-mid][-remove] <-
+					sapply(sd.between[rows],mystr)[2,][-remove]
+
+				if (any(remove))
 				{
-					mainTable$tstat1[-mid][remove] <- "\\omit"
-					mainTable$tstat2[-mid][remove] <- "-"
+					if (type=='tex')
+					{
+						mainTable$tstat1[-mid][remove] <- "\\omit"
+						mainTable$tstat2[-mid][remove] <- "-"
+					}
 				}
 			}
+			else
+			{
+				mainTable$tstat1[-mid][-remove] <-
+					sapply(theta[rows]/ses[rows],mystr,max.tstat.width)[1,][-remove]
+				mainTable$tstat2[-mid][-remove] <-
+					sapply(theta[rows]/ses[rows],mystr)[2,][-remove]
+
+				if (min(remove)<nn+m+1)
+				{
+					if (type=='tex')
+					{
+						mainTable$tstat1[-mid][remove] <- "\\omit"
+						mainTable$tstat2[-mid][remove] <- "-"
+					}
+				}
+			}
+
 		}
 
-		if (sig == TRUE)
+		if (sig)
 		{
 			mainTable$signif[-mid][-remove] <- sapply(theta[rows]/ses[rows],signif)[-remove]
 		}
@@ -528,7 +577,7 @@ siena.table <- function(x, type='tex',
 			rateTable$se1 <- sapply(x$vrate,mystr,max.vrate.width)[1,]
 			rateTable$se2 <- sapply(x$vrate,mystr)[2,]
 
-			if (tstat==TRUE)
+			if (tstat)
 			{
 				if (type=='tex')
 				{

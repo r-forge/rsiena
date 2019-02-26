@@ -78,7 +78,7 @@ plotPostMeansMDS(x, pmonly=0, nfirst=NULL, ...)
   \emph{Modern Applied Statistics with S.} Fourth edition. Springer.
 }
 \author{Tom Snijders}
-\keyword{methods}
+\keyword{print}
 \examples{
   Group1 <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))
   Group3 <- sienaDependent(array(c(N3403, HN3403), dim=c(37, 37, 2)))
