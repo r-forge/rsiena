@@ -120,4 +120,4 @@ meta <- siena08(ans.1, ans.3, ans.4, bound=0.4)
 plot(meta, which=c(2,3), layout=c(2,1))
 plot(meta, which=c(2,3), layout=c(2,1), useBound=FALSE)
 }}
-\keyword{ methods }
+\keyword{ print }

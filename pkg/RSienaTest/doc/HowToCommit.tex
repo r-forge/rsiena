@@ -92,16 +92,8 @@ an editor take away the hard returns). This is helpful for file comparisons.
 
 The correspondence between \RS and \RST should be kept intact:
 \begin{enumerate}
-\item Both packages should have the same version number, \texttt{ChangeLog}, and
-     manual; this means that if (e.g.) you commit a new version of \RST only,
-     you also need to change the version number and \texttt{ChangeLog} of \rs,
-     and see to it that the files \texttt{RSiena\_Manual.tex},\ \texttt{RSiena\_Manual.pdf},
-     and \texttt{RSiena.bib} in directory \texttt{$\bs$inst$\bs$doc} are identical
-     in both packages.
-\item Preferably, the number of the R-Forge revision (e.g., 276) should
-     be the same as the last number in the \RS version number (e.g., 1.1-276).
-     Evidently, this will lead to questions when moving to version 1.2-xxx etc.
-     We shall deal with those when the time comes.
+\item Both packages should have the same version number and \texttt{ChangeLog}; this means that if (e.g.) you commit a new version of \RST only,
+     you also need to change the version number and \texttt{ChangeLog} of \rs.
 \item The moment when things are moved from \RST to \RS is up to the programmers.
      Some things, certainly error corrections, should be changed in both simultaneously.
      When we are unsure about a change in the code, it may be better to first
@@ -119,12 +111,13 @@ The internal structure of both packages should remain intact:
       in so far as they are noticeable
       to users, to the top of appendix B in the manual.
 \item When new effects are added, these \underline{must} be added to
-      Chapter 12 of the manual.
+      Chapter 12 of the manual.\\
+      The manual is in \RST only.
 \item Also new other functionalities, if any, should be added to the manual,
       unless they are clear enough from the help pages.
 \item The manual states the version to which it applies. The best way to keep
       this up to date is to search in RSiena\_Manual.tex for the occurrence of the
-      last/current version number (e.g., 286) and replace appropriately.
+      last/current version number (e.g., 1.2-16) and replace appropriately.
 \end{enumerate}
 
 To keep things easy for users of different platforms, when you add a file to the system,
@@ -159,11 +152,19 @@ Preferably limit line lengths to a maximum of 80 characters.
   Do this also for the most recent patched version of R, because R-Forge will do this
   and often it leads to additional errors and notes, because R becomes progressively
   stringent.
+  
+
+There is a facility to check Windows packages on CRAN. See
+\url{http://win-builder.r-project.org/}; use the upload page!
+
+A facility to build and check packages on various platforms
+is at \url{https://builder.r-hub.io}; in the `advanced' page
+there is a variety of platforms on which you can check.
 
   Try to make the code so that notes and warnings from this Check are avoided as far as possible,
   and that you understand those that remain.
   There should of course be no errors at all.
-  For example, I always get a note that the package size is big
+  For example, I always get a note for \RST that the package size is big
   (because the manual is a very big file and the C++ code is big) and
   often about some superfluous pieces of code (because I want to use them later).
 

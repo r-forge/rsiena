@@ -3,6 +3,7 @@
 \alias{sienaBayesFit}
 \alias{bayes}
 \alias{glueBayes}
+\concept{estimation}
 \title{A function for fitting Bayesian models}
 \description{A function to fit hierarchical Bayesian models random effects
   to sienaGroup data objects. Uses the function \code{\link{maxlikec}} for the
@@ -21,7 +22,7 @@ sienaBayes(data, effects, algo,  saveFreq=100,
     nImproveMH=100, targetMHProb=0.25,
     lengthPhase1=round(nmain/5), lengthPhase3=round(nmain/5),
     storeAll=FALSE, prevAns=NULL, usePrevOnly=TRUE,
-    prevBayes=NULL, newProposalFromPrev=TRUE,
+    prevBayes=NULL, newProposalFromPrev=(prevBayes$nwarm >= 1),
     silentstart = TRUE,
     nbrNodes=1, clusterType=c("PSOCK", "FORK"),
     getDocumentation=FALSE)
@@ -144,12 +145,16 @@ glueBayes(z1, z2, nwarm2=0)
       the deviations) can be extracted along with the parameters estimates
       which will be used as the initial values, unless
       \code{algo} requests the use of standard initial values.\cr
-      If \code{prevAns=NULL}, then a multi-group estimation will be performed
-      as part of the initialization. If \code{prevAns} is an object as described,
-      estimated with unconditional estimation,
-      then if \code{usePrevOnly=TRUE} this multi-group estimation will be skipped
-      but if \code{usePrevOnly=FALSE} a multi-group estimation still will be
-      performed, but starting at the results provided by \code{prevAns}. }
+      If \code{prevAns=NULL}, then a multi-group estimation
+      using \code{\link{siena07}} will be performed as part of the
+      initialization. If \code{prevAns} is an object as described,
+      estimated with unconditional estimation, with 500 or more runs in Phase 3,
+      then if \code{usePrevOnly=TRUE} this multi-group estimation will be skipped;
+      if \code{usePrevOnly=FALSE} a multi-group estimation still will be
+      performed, but starting at the results provided by \code{prevAns};
+      if \code{usePrevOnly=TRUE} but with less than 500 runs in Phase 3,
+      then the multi-group estimation will be done only for Phase 3
+      (skipping Phases 1 and 2). }
   \item{usePrevOnly}{Boolean: see immediately above.}
   \item{prevBayes}{An object of class \code{sienaBayes} as returned by function
       \code{sienaBayes}, on which the current function will continue.
@@ -166,10 +171,11 @@ glueBayes(z1, z2, nwarm2=0)
       All further relevant parameters of the function call should be identical.
       This is not completely checked, so errors
       may occur if this is not the case.}
-  \item{newProposalFromPrev}{Boolean, has consequences only when \code{prevBayes}
-      is given: whether to use a robust estimate of the covariance matrix of
-      parameters in \code{prevBayes} to define the proposal distribution.
-      Else the proposal distribution is the same as in the \code{prevBayes} object.}
+  \item{newProposalFromPrev}{Boolean, has consequences only when
+      \code{prevBayes} is given: whether to use a robust estimate of the
+      covariance matrix of parameters in \code{prevBayes} to define a new
+      proposal distribution.  Else the proposal distribution is the same
+      as in the \code{prevBayes} object.}
   \item{silentstart}{Boolean: whether to suppress most information
       to the console during the calculation of initial values.}
   \item{nbrNodes}{Number of processes to be used. Cannot be more than
@@ -190,9 +196,9 @@ glueBayes(z1, z2, nwarm2=0)
   of multiple groups all having the same number of waves and the same
   model specification.
   It wraps Bayesian sampling of parameters around calls to
-  \code{\link{maxlikec}}. The RSiena manual has a lot of information. \cr
+  \code{\link{maxlikec}}.  The RSiena manual has a lot of information. \cr
   Effects can be randomly varying between groups, or global (i.e., constant
-  across groups). This is indicated by the keyword \code{random} in the
+  across groups).  This is indicated by the keyword \code{random} in the
   call of \code{\link{setEffect}}, and reported when using the
   keyword \code{includeRandoms} in \code{\link{print.sienaEffects}}.\cr
   For the groupwise parameters normal distributions are assumed with conjugate
@@ -209,7 +215,7 @@ glueBayes(z1, z2, nwarm2=0)
   independent normal priors with mean 0 and variances given by \code{priorEta}.
   \cr
   Recommendation: use the normal prior only for effects of group-level
-  variables. If a non-zero prior mean is desired, transform the
+  variables.  If a non-zero prior mean is desired, transform the
   group-level variable.  \cr
   The required dimensions of the prior parameters \code{priorSigEta},
   \code{priorMu} and \code{priorSigma} depend on the number of groupwise varying
@@ -217,7 +223,7 @@ glueBayes(z1, z2, nwarm2=0)
   when using the keyword \code{includeRandoms} .\cr
   If \code{priorRatesFromData} is 1 or 2,
   the prior distribution for the basic rate parameters is determined
-  in a data-dependent way. For the non-varying parameters,
+  in a data-dependent way.  For the non-varying parameters,
   a flat prior is assumed. \cr
   The frequentist option currently is not supported (probably broken).\cr
   The procedure consists of three parts: initialization, warming,
@@ -252,16 +258,23 @@ glueBayes(z1, z2, nwarm2=0)
   ('mu' and 'Sigma').
   In the warming as well as the final phase, the number of MH steps
   within each run is determined by parameter \code{mult}
-  ("multiplication factor") in the algorithm object \code{algo}.\cr
-  The function is time-consuming. When starting to use it, it is advisable
+  ("multiplication factor") in the algorithm object \code{algo}.
+
+  The function is time-consuming.  When starting to use it, it is advisable
   to start with low values of \code{nmain} to explore computing time.\cr
+  Initialisation is an important part, and will be shorter if \code{prevAns}
+  is given.  If an earlier \code{sienaBayes} object is available for
+  this data specification (which may differ in which effects are specified
+  as being random), then if the name of this object is \code{zz}
+  it will be possible to use \code{prevAns=zz$initialResults}.
+
   When the procedure seems to diverge, and for very small groups, it is
   advisable to use smaller values of the parameters \code{initgainGlobal}
   and \code{initgainGroupwise}.\cr
   \code{glueBayes(z1,z2)} combines two existing \code{sienaBayesFit} objects
   with the same data and model specifications (this is not entirely
-  checked) into one. This is intended to be used when \code{z2} was produced
-  by calling \code{sienaBayes} with \code{prevAns=z1}.\cr
+  checked) into one.  This is intended to be used when \code{z2} was produced
+  by calling \code{sienaBayes} with \code{prevBayes=z1}.\cr
   For the function \code{\link{print.sienaEffects}}, the options
   \code{includeRandoms=TRUE} and \code{dropRates=TRUE} are meant to be useful
   especially for effects objects used for \code{sienaBayes}.

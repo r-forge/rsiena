@@ -499,11 +499,11 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "sameXOutAct")
 	{
-		pEffect = new SameCovariateActivityEffect(pEffectInfo, true);
+		pEffect = new SameCovariateActivityEffect(pEffectInfo, true, false);
 	}
 	else if (effectName == "diffXOutAct")
 	{
-		pEffect = new SameCovariateActivityEffect(pEffectInfo, false);
+		pEffect = new SameCovariateActivityEffect(pEffectInfo, false, false);
 	}
 	else if (effectName == "homXOutAct")
 	{
@@ -512,6 +512,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "altXOutAct")
 	{
 		pEffect = new AlterCovariateActivityEffect(pEffectInfo);
+	}
+	else if (effectName == "sameXReciAct")
+	{
+		pEffect = new SameCovariateActivityEffect(pEffectInfo, true, true);
+	}
+	else if (effectName == "diffXReciAct")
+	{
+		pEffect = new SameCovariateActivityEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "homXTransTrip")
 	{
@@ -1304,7 +1312,11 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "isolate")
 	{
-		pEffect = new IsolateEffect(pEffectInfo);
+		pEffect = new IsolateEffect(pEffectInfo, true);
+	}
+	else if (effectName == "outIsolate")
+	{
+		pEffect = new IsolateEffect(pEffectInfo, false);
 	}
 	else if (effectName == "isolateNet")
 	{
@@ -1526,6 +1538,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	else if (effectName == "AltsAvAlt")
 	{
 		throw domain_error("Effect AltsAvAlt renamed to avXAlt");
+	}
+	else if (effectName == "minXAlt")
+	{
+		pEffect = new AltersCovariateMinimumEffect(pEffectInfo);
+	}
+	else if (effectName == "maxXAlt")
+	{
+		pEffect = new AltersCovariateMaximumEffect(pEffectInfo);
 	}
 	else if (effectName == "avXAlt")
 	{

@@ -57,7 +57,7 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
   \item{nfirst}{For \code{\link{sienaBayes}} objects \code{x}:
       the first element of the MCMC chain used for calculating
       properties of the chain; i.e., the first element for which
-      it is assumed that convergence has occurred. If \code{NULL},
+      it is assumed that convergence has occurred.  If \code{NULL},
       the value \code{x$nwarm+1} will be used.}
   \item{\dots}{
     Add extra parameters for  \code{\link[xtable]{print.xtable}}
@@ -86,7 +86,7 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
   The function \code{siena.table} outputs a latex or html table of
   the estimates and standards errors of a \code{\link{sienaFit}} object;
   or of posterior means and posterior standard deviations of the
-  global parameteres of a \code{\link{sienaBayesFit}} object.
+  global parameters of a \code{\link{sienaBayesFit}} object.
   The table will be written to a file in the current directory and
   has a footnote reporting the maximum of the convergence t-ratios.
 

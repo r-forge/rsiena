@@ -22,7 +22,7 @@ simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
 	{
 		stop('probs should be a vector of length 2')
 	}
-	theEffects <- z$effects
+	theEffects <- z$requestedEffects
 	efNames <- format(paste(ifelse(theEffects$type == "creation",
 				"creat", theEffects$type),
 			theEffects$effectName)[!z$basicRate])
@@ -51,7 +51,7 @@ simpleBayesTest <- function(z, nfirst=z$nwarm+1, tested0=0,
 
 ##@multipleBayesTest Tests parameters of sienaBayesFit objects
 multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits=4) {
-	theEffects <- z$effects
+	theEffects <- z$requestedEffects
 	#	efNames <- format(paste(ifelse(theEffects$type == "creation",
 	#									"creat", theEffects$type),
 	#							theEffects$effectName)[!z$basicRate])
@@ -69,7 +69,7 @@ multipleBayesTest <- function(z, testedPar, nfirst=z$nwarm+1, tested0=0, ndigits
 	vec1 <- 4 - theEffects$randomEffects[theEffects$include]
 	vec1[z$basicRate] <- 2
 	vec1[z$ratePositions[[1]]] <- 1
-	vec1[z$effects$fix[z$effects$include]] <- 5
+	vec1[theEffects$fix[theEffects$include]] <- 5
 	# now 1=rates group 1; 2=other rates; 3=randomly varying;
 	# 4 = estimated non-varying (eta); 5 = non-estimated, fixed.
 	# set1 = (1,2,3) set2 = (4)
@@ -410,7 +410,7 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 
 
 ##@extract.posteriorMeans extracts posterior means from sienaBayesFit object
-extract.posteriorMeans <- function(z, nfirst=z$nwarm+1){
+extract.posteriorMeans <- function(z, nfirst=z$nwarm+1, verbose=TRUE){
 # produces a matrix with the groups in the rows
 # and all effects in the columns, with for each effect
 # first the posterior mean ("p.m.") and then the posterior standard deviation ("psd.")
@@ -442,7 +442,20 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1){
 	else
 	{
 		EffName <- getNames(z)[z$varyingParametersInGroup]
+		if (verbose)
+		{
+			cat(z$nGroup, ' groups\n')
+		}
 		for (h in 1:z$nGroup){
+			if (verbose)
+			{
+				cat('.')
+				flush.console()
+				if ((h %% 50) == 0)
+				{
+				 cat(h, '\n')
+				}
+			}
 			df <- sienaFitThetaTable(z, fromBayes=TRUE, tstat=FALSE,
 									groupOnly=h, nfirst=nfirst)$mydf
 			seth <- union(z$ratePositions[[h]], which(z$varyingObjectiveParameters))

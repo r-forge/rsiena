@@ -589,6 +589,14 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 			}
 		}
 		## iteration proper
+
+		if (z$thetaFromFile)
+		{
+			if (nit <= dim(z$thetaValues)[1])
+			{
+				zsmall$theta <- z$thetaValues[nit,]
+			}
+		}
 		if (z$int == 1)
 		{
 			zz <- x$FRAN(zsmall, xsmall)
@@ -634,6 +642,10 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 			z$sims[[z$nit]] <- zz$sims
 			z$chain[[z$nit]] <- zz$chain
 			fra <- fra + z$targets
+			if (z$thetaFromFile)
+			{
+				z$thetaUsed[z$nit, ] <- zsmall$theta
+			}
 		}
 		else
 		{
@@ -651,6 +663,10 @@ doPhase1or3Iterations <- function(phase, z, x, zsmall, xsmall, nits, nits6=0,
 					z$sf2s <- z$sf2s + zz[[i]]$fra
 				}
 				z$sims[[z$nit + (i - 1)]] <- zz[[i]]$sims
+				if (z$thetaFromFile)
+				{
+					z$thetaUsed[z$nit + (i - 1), ] <- zsmall$theta
+				}
 			}
 			if (z$FinDiff.method)
 			{

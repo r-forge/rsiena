@@ -325,10 +325,21 @@ score.Test <- function(ans, test=ans$test)
 	if (any(test & (!ans$fix))) cat('Warning: some tested parameters were not fixed; do you know what you are doing??? \n')	
 	fra <- colMeans(ans$sf, na.rm=TRUE)
 	redundant <- (ans$fix & (!test))
-	teststat <- EvaluateTestStatistic(ans$maxlike, test, redundant, ans$dfra, ans$msf, fra)$cvalue
+	tests <- EvaluateTestStatistic(ans$maxlike, test, redundant, ans$dfra, ans$msf, fra)
+	teststat <- tests$cvalue
 	df <- sum(test)
+	if (df == 1)
+	{
+		onesided <- tests$oneSided
+	}
+	else
+	{
+		onesided <- NULL
+	}
 	pval <- 1 - pchisq(teststat, df)
-	list(chisquare = teststat, df = df, pvalue = pval)
+	t.ans <- list(chisquare=teststat, df=df, pvalue=pval, onesided=onesided)
+	class(t.ans) <- "sienaTest"
+	t.ans
 }
 
 ##@Wald.RSiena  Calculate Wald test statistics
@@ -351,9 +362,19 @@ Wald.RSiena <- function(A, ans)
 	th <- A %*% ans$theta
 	covmat <- A %*% sigma %*% t(A)
 	chisq <- drop(t(th) %*% solve(covmat) %*% th)
-	d.f. <- nrow(A)
-	pval <- 1 - pchisq(chisq, d.f.)
-	list(chisquare = chisq, df = d.f., pvalue = pval)
+	df <- nrow(A)
+	pval <- 1 - pchisq(chisq, df)
+	if (df == 1)
+	{
+		onesided <- sign(th) * sqrt(chisq)
+	}
+	else
+	{
+		onesided <- NULL
+	}
+	t.ans <- list(chisquare=chisq, df=df, pvalue=pval, onesided=onesided)
+	class(t.ans) <- "sienaTest"
+	t.ans
 }
 
 ##@Multipar.RSiena  Calculate Wald test statistic for hypothesis that subvector = 0.
@@ -364,4 +385,31 @@ Multipar.RSiena <- function(ans, ...)
 	A <- matrix(0, nrow=k, ncol=p)
 	A[cbind(1:k,c(...))] <- 1
 	Wald.RSiena(A, ans)
+}
+
+##@print.sienaTest Methods
+print.sienaTest <- function(x, ...)
+{
+	if (!inherits(x, "sienaTest"))
+	{
+		stop("not a legitimate sienaTest object")
+	}
+	cat(paste('chi-squared = ',
+		format(round(x$chisquare, digits=2), nsmall = 2),
+		', d.f. = ', x$df, '; ', sep=''))
+	if ((x$df == 1) & (!is.null(x$onesided)))
+	{
+		cat(paste('one-sided Z = ',
+			format(round(x$onesided, digits=2), nsmall = 2), '; ', sep=''))
+	}
+	if (x$pvalue < 0.001)
+	{
+		cat(' p < 0.001. \n')
+	}
+	else
+	{
+		cat(paste(' p = ',
+			format(round(x$pvalue, digits=3), nsmall = 2), '. \n', sep=''))
+	}
+	invisible(x)
 }

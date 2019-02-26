@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-14.
+This version was renewed for \RS version 1.2-16.
 \end{abstract}
 
 
@@ -355,6 +355,7 @@ A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
 and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
 For Generalized Method of Moments estimators,
 the reference is \citet*{ASS2015}.
+
 
 \newpage
 %\addtocontents{toc}{\vspace{-2ex}}  % hack to avoid a 3-page table of contents
@@ -771,7 +772,7 @@ different impact) of effects for the increase and the decrease of behavior.
 \label{S_estim}
 \noindent
 \SI estimates parameters by the function \sfn{siena07()}
-and (alternatively) \sfn{sienacpr()}, using the following procedure:
+and (alternatively) \sfn{sienacpp()}, using the following procedure:
 \begin{enumerate}
 \item  Certain statistics are used that reflect the parameter values;\\
   the finally obtained parameters should be such that the \emph{expected
@@ -810,7 +811,7 @@ and (alternatively) \sfn{sienacpr()}, using the following procedure:
 
   If the estimation has to be repeated, this can be done by employing the
   argument \texttt{prevAns} in the call of \sfn{siena07()}
-  (or \sfn{sienacpr()}).
+  (or \sfn{sienacpp()}).
   See the help page for  \sfn{siena07()}.
 \end{enumerate}
 \end{enumerate}
@@ -889,24 +890,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-14}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-16}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-14.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-16.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-14.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-16.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-14.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-16.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-14.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-16.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-14.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-16.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-14.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-16.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -970,7 +971,7 @@ of the software appear).
 	\item	Use functions \sfn{includeEffects()}, \sfn{setEffect()} and
             \sfn{includeInteraction()} to further specify the model
             (see Sections~\ref{S_imp_str1}~--~\ref{S_eff_beh}).
-	\item	Use \sfn{siena07()} or \sfn{sienacpr()}
+	\item	Use \sfn{siena07()} or \sfn{sienacpp()}
             to run the estimation procedure.\footnote{The
             use of multiple processes can speed up the estimation.
             For directions on how to utilize multiple processors,
@@ -1106,7 +1107,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-14) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-16) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1992,6 +1993,16 @@ provide information for period $m+1$.
 See
 \href{http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf}{\texttt{Siena\_algorithms.pdf}}
 for a further description.
+\medskip
+
+There is ongoing work by Robert Krause and others about using
+multiple imputation for \RS modeling;
+see \citet{KHS2018}.
+A script illustrating this for longitudinal network analysis
+is at the Siena scripts webpage,
+\url{http://www.stats.ox.ac.uk/~snijders/siena/multipleImputation_for_RSiena.R}
+Methods for co-evolution studies are in preparation.
+
 
 \subsubsection{Composition change: joiners and leavers}
 \label{S_comp}
@@ -2351,10 +2362,28 @@ If there are several dependent variables (networks and/or behavioral variables),
 the variable name (\sfn{name}) also is required to specify the effect.
 The \sfn{shortName}s are part of the effects object.
 For the practical use of \si, the \sfn{shortName}s are important.
-A list of effects with their \sfn{shortName}s can be displayed in a browser
+
+The distinction between evaluation, endowment, and creation effects is
+specified by the \sfn{type} of the effect; this can be
+\texttt{eval}, \texttt{endow}, or \texttt{creation}.
+The default is \texttt{eval}.
+Only for rate effects this distinction does not exist;
+their \sfn{type} is \texttt{rate}.
+The \sfn{type} can be set in the functions \sfn{includeEffects},
+\sfn{setEffect}, and \sfn{includeInteraction}.
+
+A list of all effects available in the current version of
+\SI with their \sfn{shortName}s can be displayed in a browser
 by using the function:
 
 \verb|effectsDocumentation()| \\
+
+A list of all effects available for the given effects object, e.g.,
+\texttt{myeff} -- which depends on the set of variables and the number of periods
+in the data object --  can be displayed in a browser
+by requesting
+
+\verb|effectsDocumentation(myeff)| \\
 
 For example, the command
 \begin{verbatim}
@@ -2365,8 +2394,12 @@ As another example,
 \begin{verbatim}
 cbind(myeff$effectName, myeff$type, myeff$shortName)[myeff$type=="eval",]
 \end{verbatim}
-lists all evaluation effects in \texttt{myeff}.
-
+lists all evaluation effects in \texttt{myeff},
+and
+\begin{verbatim}
+unique(myeff$shortName)
+\end{verbatim}
+gives the set of all \sfn{shortName}s.
 
 \subsubsection{Mathematical specification}
 \label{S_mathmod}
@@ -2429,9 +2462,9 @@ the objective function is equal to the evaluation function for the new state,
 \]
 Because of the properties of the exponential function one can just as
 well define the objective function as the gain in evaluation function,
-\[
-   u_i(x^0, x) \,=\, f_i(x) - f_i(x^0) \ .
-\]
+\begin{equation}
+   u_i(x^0, x) \,=\, f_i(x) - f_i(x^0) \ .    \label{gain}
+\end{equation}
 To define the general case, note that if $x^0$ and $x$ are not the same,
 then they differ in only one tie variable $x_{ij}$.
 Define  $\Delta^+(x^0, x) = 1$ if $x$ has one tie more than $x^0$,
@@ -2466,10 +2499,42 @@ To the objective function $ u_i(x^0, x)$ we then still have to add
 For behavior dynamics the definitions are analogous.
 Here a basic assumption is that, when there is an opportunity for change,
 the possible new values for the behavior variable are the current
-value, this value + 1, and this value --1, as long as these changes
+value, this value +1, and this value --1, as long as these changes
 do not take the value out of the permitted range.
 More elaborate explanations are in
 \citep*{SnijdersEA07, SnijdersEA10b, SteglichEA10, VeenstraEtAl2013}.
+
+The evaluation, creation, and endowment functions are constructed as a
+linear combination of the effects:
+\begin{equation}
+f_i(x) \, = \, \sum_k \beta_k \, s_{ik}(x)   
+\end{equation}
+where $\beta_k$ are parameters and $s_{ik}(x)$ are effects.
+For models with more than one dependent variable (networks, behaviors),
+this is specific to each dependent variable; e.g., in a network and behavior
+study with one network and one behavioral variable, there will be two evaluation
+functions. 
+Because of formula (\ref{gain}), what is essential for the effects for networks
+is the difference
+\begin{equation}
+   \Delta_{kij} (x) \,=\,  s_{ki}\big(x^{+ij}\big) \, - \,  s_{ki}\big(x^{-ij}\big)  \label{changestat0}
+\end{equation}
+where $x^{+ij}$ is network $x$ with the tie $i \rightarrow j$
+and $x^{-ij}$ is network $x$ without this tie.
+This is called the \emph{change statistic}.
+
+Elementary effects are defined by
+\[
+    s^{\rm el}_{ijk}(x) \, = \, x_{ij}\,s^{\rm el0}_{ijk}(x) \ ,
+\]
+for a statistic $s^{\rm el0}_{ijk}(x)$ which does not depend on $x_{ij}$. Therefore,
+the corresponding change statistic is
+\[
+    \Delta^{\rm el}_{kij} (x) \,=\, s^{\rm el0}_{ijk}(x) \ .
+\]
+
+
+
 
 \subsection{Important structural effects for network dynamics:
            \protect\newline one-mode networks}
@@ -3878,7 +3943,7 @@ algorithm.
 % provisionally placed here.
 
 The estimation process implemented in functions \textsf{siena07()}
-and \sfn{sienacpr()}
+and \sfn{sienacpp()}
 starts with initial values for the parameters,
 and returns a so-called \textsf{sienaFit} object, in this example called
 \texttt{results1}, which contains the estimates and their standard errors and
@@ -3889,21 +3954,21 @@ how the satisfactory convergence of the algorithm can be checked,
 and how to go on if this is not satisfactory.
 
 Much of what follows is about the use of \sfn{siena07()}
-but applies equally to \sfn{sienacpr()}.
+but applies equally to \sfn{sienacpp()}.
 The difference between these two functions is that
-estimation by \sfn{sienacpr()} stays entirely in the
+estimation by \sfn{sienacpp()} stays entirely in the
 `back end' \sfn{C++} part of \si, contrasting with \sfn{siena07()}
 which carries out the simulations in \sfn{C++} but the
 Robbins-Monro updates in the \sfn{R} `front end' part;
-this yields greater computational efficiency for \sfn{sienacpr()}.
+this yields greater computational efficiency for \sfn{sienacpp()}.
 Since the simulations take the largest amount of processing time
 for medium-sized and large networks, the time difference is
 notable, in a proportional sense, mainly for data sets
 where simulations run very quickly (i.e., number of actors
 and distance between first and last simulations are small).
-Further, results from \sfn{sienacpr()} cannot used for
+Further, results from \sfn{sienacpp()} cannot used for
 \sfn{sienaGOF()}.
-Note that \sfn{sienacpr()} is available only in \sfn{RSienaTest()}.
+Note that \sfn{sienacpp()} is available only in \sfn{RSienaTest()}.
 
 The estimation algorithm is determined by a call of functions
 such as
@@ -4837,7 +4902,7 @@ and Bayesian methods
 
 The Generalized Method of Moments is still in development.
 It is theoretically more efficient than the Method of Moments.
-It is somewhat more time-consuming; on the other hand, function \sfn{sienacpr()}
+It is somewhat more time-consuming; on the other hand, function \sfn{sienacpp()}
 is coded in a more efficient way than \sfn{siena07()}.
 
 In models for one network, without co-evolution,
@@ -4860,9 +4925,9 @@ For co-evolution, estimation by the Generalized Method of Moments
 will be made available in future versions.
 
 Estimation by the regular Method of Moments (MoM)
-is implemented in the functions \sfn{siena07()} and \sfn{sienacpr()}.
+is implemented in the functions \sfn{siena07()} and \sfn{sienacpp()}.
 Estimation by the Generalized Method of Moments (GMoM)
-is implemented in the function \sfn{sienacpr()}.
+is implemented in the function \sfn{sienacpp()}.
 
 ML estimation is done by the function \sfn{siena07()}, using a set of options
 created by \sfn{sienaAlgorithmCreate()} with \sfn{maxlike=TRUE}.
@@ -4876,10 +4941,10 @@ but is as yet implemented only for multilevel network modeling
 
 Estimation by the Generalized Method of Moments (GMoM)
 was proposed in \citet{ASS2015} and is implemented
-in the function \sfn{sienacpr()}, available in \sfn{RSienaTest()}.
+in the function \sfn{sienacpp()}, available in \sfn{RSienaTest()}.
 
 If the algorithm object created by \sfn{sienaAlgorithmCreate()}
-uses \texttt{maxlike=FALSE}, the estimation function \sfn{sienacpr()}
+uses \texttt{maxlike=FALSE}, the estimation function \sfn{sienacpp()}
 will use the MoM or the GMoM; the latter will be used as soon as
 at least one of the effects were specified in the effects object with
 \texttt{type='gmm'}.
@@ -5715,7 +5780,8 @@ a parameter without estimating it.
 
 This is done using the generalized Neyman-Rao score test
 that is implemented for the Method of Moments estimation method
-in \si, following the methods of \citet{Schweinberger12}.
+ in \si\ as a part of function \sfn{siena07}, following the methods
+of \citet{Schweinberger12}.
 For the ML estimation method,
 following the same steps produces the \citet{Rao47} efficient score test.
 Since the name of ``score test'' is associated with
@@ -5747,6 +5813,15 @@ of the estimation results (the \sfn{sienaFit} object obtained from
 The $t$-ratios for convergence can be disregarded for the parameters
 that are fixed and estimated by the score test, as convergence is not an issue
 for these parameters.
+
+Score tests can also be obtained by the function \sfn{score.Test}.
+This will provide score tests for any given subset of the parameters
+that were fixed and tested in the \sfn{sienaFit} object given to it.
+Note that while the  \sfn{summary} of this object and the results
+in the output file give the score tests for the set of \underline{all}
+fixed \& tested parameters, and for \underline{each} of these parameters
+separately, the function \sfn{score.Test} can give the combined test
+for \underline{any subvector}.
 
 It should be noted that using the \sfn{prevAns} option in \sfn{siena07}
 overrides the initial values in the effects object,
@@ -5856,7 +5931,8 @@ suggesting that this parameter is positive, which agrees with the one-sided test
 \subsubsection{Multi-parameter tests}
 
 In the case where $K > 1$ model parameters are restricted, \SI
-evaluates the test statistic with $K$ degrees of freedom. A low
+reports for the score test, in the \sfn{summary} and in the output file,
+the test statistic with $K$ degrees of freedom. A low
 $p$-value of the joint test would indicate that the
 goodness-of-fit of the model is intolerable. However, the joint
 test with $K$ degrees of freedom gives no clue as to what parameters
@@ -5926,6 +6002,10 @@ tests, it seems that the misfit is due to all three parameters.
 Thus, it is sensible to improve
 the goodness-of-fit of the baseline model by including all of these parameters,
 and estimate them.
+
+If a simultaneous score test is desired for a subset of
+the tested parameters with more than one element,
+the function \sfn{score.Test} can be used.
 
 \subsection{Alternative application: convergence problems}
 \label{alternative}
@@ -6271,97 +6351,31 @@ terminated with an error message, saying
 \emph{Unlikely to terminate this epoch}.
 In this case, you are advised to change to unconditional simulation.
 
-\iffalse
-\newpage
-\section[Options for model type, estimation and simulation]
-        {Options for model type, estimation and simulation}
-\label{S_options}
 
-\hypertarget{T_S_options}{}
-There are several options available in \si. The main options
-concern the model type and the estimation procedure used.
+\subsection{Simulating with variable parameter values}
 
+The procedures described until now in this chapter conduct the simulations
+in Phase~3 with a constant parameter vector.
+If \texttt{nsub=0} this parameter value is given in the effects object,
+and returned for the resulting \textsf{sienaFit} object \texttt{ans}
+as \texttt{ans\$theta}.
+It is also possible to use a different parameter vector in every
+run of Phase~3. This is done by specifying a matrix of parameter
+values (runs in the rows, parameters in the columns) as the
+argument \texttt{thetaValues} for \textsf{siena07}.
+This requires specifying \texttt{simOnly=TRUE}.
+The parameter values actually used are then returned
+in \texttt{ans\$thetaUsed}.
 
-\begin{enumerate}
-\item There is a choice between conditional (1) and unconditional (0)
-Method of Moments estimation. If there are dependent action variables, the default for
-conditional estimation is to condition on the observed distance
-for the network variable; but it then is possible also to condition
-on the distances observed for the dependent action variables.\\
-%In addition, there are options for maximum likelihood (2)
-%and Bayesian (3) estimation; these are beginning to be documented.
-%\item \hypertarget{T_modelcode}{The Model Code}.\\
-%   This defines the Model Type and an associated output option.\\
-%   In the longitudinal case, the meaning of this code is as follows.\\
-%   Model Codes 10 or more give extra output for evaluating the fit of
-%   the out-degree distribution and for the explained variation
-%   \citet{Snijders04};\\
-%   the integer Model Code in the unit position (i.e.,
-%   Model Code itself if it is less than 10, and Model Code - 10 if the code is more than 10)
-%   defines the Model Type defined in Section~\ref{S_modeltype}.\\[0.5ex]
-\item The number of subphases in phase 2 of the estimation algorithm.\\
-      This determines the precision of the estimate.
-      Advice: 3 for quick preliminary investigations,
-      4 or 5 for serious estimations.
-\item The number of runs in phase 3 of the estimation algorithm.\\
-      This determines the precision of the estimated standard errors
-      (and covariance matrix of the estimates),
-      and of the overall maximum convergence ratio
-      and the $t$-values reported as diagnostics of the convergence.
-      Advice: 200 for preliminary investigations when precise standard errors
-      and $t$-values are not important,
-      1000 for serious investigations,
-      2000 to 4000 for estimations of which results are to be reported
-      in publications.\\
-      (These numbers can be twice as low if, instead of the
-      new (from Version 2.3) default option of estimation by the
-      Score Function method, the older method of
-      Finite Differences is used. The latter method has runs
-      that take more time, but needs fewer runs.)
-%\item A constant used in other estimation procedures.\\
-%      In the ML case, this is the multiplication
-%      factor $r$ for the \hyperlink{T_runlength}{run length} used in the
-%      MCMC algorithm.
-\item The initial gain value, which is the step size in the starting
-      steps of the Robbins-Monro procedure, indicated in
-      \citet{Snijders01} by $a_1\,$.
-\item The choice between standard initial values (suitable
-estimates for the density and reciprocity parameters and zero
-values for all other parameters) or
-the current parameter values as initial values for estimating new
-parameter values.
-%\item The selection of the period for which a goodness-of-fit
-%       on period homogeneity is to be carried out.
-%\item The selection of the effect for which a goodness-of-fit
-%       on actor homogeneity is to be carried out
-%       (1 for the out-degree effect, 2 for the reciprocity effect);
-%       if this is selected, a list of actors also has to be supplied.
-\item A random number seed. If the value 0 is chosen, the program
-      will randomly select a seed. This is advised to obtain truly
-      random results. If results from an earlier run are to be
-      exactly replicated, the random number seed from this earlier
-      run can be used.
-\item The method to estimate derivatives;
-      0 is the older finite differences method
-      %(this is the method used in
-      %\SI versions 1 and 2, which has a bias);
-      1 is the more efficient and unbiased
-      method proposed by \citet{SchweinbergerSnijders07a};
-      this is the preferred method. See Section~\ref{S_se}.
-\end{enumerate}
+If parallel processes are used (\texttt{useCluster=TRUE})
+and the number of processes is \texttt{nbrNodes} $ > 1$,
+the parameters used will be constant in each set of \texttt{nbrNodes}
+consecutively stored simulations.
+If the number of rows of \texttt{thetaValues} is not large enough
+given the values of \texttt{n3} and \texttt{nbrNodes},
+the last row of \texttt{thetaValues} will continue to be used.
+All this will be reflected by the value of \texttt{ans\$thetaUsed}.
 
-\hypertarget{T_S_simoptions}
-There is one option for simulations that can be chosen here.
-\begin{enumerate}
-\setcounter{enumi}{\value{savenumi}}
-\item The number of runs in the straight simulations.\\
-      Advice: the default of 1000 will usually be adequate.
-\setcounter{savenumi}{\value{enumi}}
-\end{enumerate}
-Depending on the choice for conditional or unconditional
-estimation in the estimation options, also the simulations are run
-conditionally or unconditionally.\medskip
-\fi
 
 \newpage
 \section{Getting started}
@@ -8418,7 +8432,17 @@ and
  $ -1.2$ for \texttt{outTrunc} (internal effect parameter $c=1$) is interpreted
  as a positive tendency $+1.2$ toward outdegrees equal to 0; the standard
  error is unchanged. In the case of $c=1$, an alternative and more directly
- comprehensible name is \emph{outdegree at least 1} effect.
+ comprehensible name is \emph{outdegree at least 1} effect.\\
+ Compare what is written below about the in-isolate effects:
+     the isolation effects are difficult to interpret in words or pictures,
+     because they are not based on subgraph counts.
+ This holds for the \texttt{outTrunc}($c=1$) effect but, in modified form,
+ also for the \texttt{outTrunc} effect generally,
+ The interpretation can best be understood from the change statistics.
+ The \texttt{outTrunc} effect has a change statistic of +1 when actor $i$
+ creates a link, if the previous outdegree of $i$ is less than $c$.
+ For $c=1$, this means a change statistic of +1 for the creation of the
+ first outgoing tie of $i$, and of --1 for the termination of the last outgoing tie.
 
  \item {\em square root out-degree}, defined by  \\
  $s^{\rm net}_{i\vit}(x) = \sqrt{x_{i+}}$;\\
@@ -8533,7 +8557,15 @@ $s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1, x_{j+} = 0\} $;\\
       wishing to connect to others who otherwise would have
       no incoming ties, and wishing not to sever connections to
       others who thereby would lose their last incoming connection: \\
-$s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1 \} $;
+$s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1 \} $;\\
+     the isolation effects are difficult to interpret in words or pictures,
+     because they are not based on subgraph counts, and the in-isolation
+     effects are especially difficult.
+     The interpretation can best be understood from the change statistics.
+     The anti in-isolates effect has a change statistic of +1 when actor $i$
+     creates a link to some other actor who previously had indegree 0; and 
+     (by implication) a change statistic of --1 when the actor was the only one to link to some
+     other actor and now drops the link;
 
 \item \emph{anti in-near-isolates effect}
  = \emph{indegree at least 2 effect}, (\texttt{antiInIso2 = in2Plus}),
@@ -8541,7 +8573,11 @@ $s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1 \} $;
       wishing to make a new connection to others who currently have
       an indegree equal to 1, and wishing not to sever connections to
       others who currently have an indegree equal to 2:\\
-$s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 2 \} $;
+$s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 2 \} $;\\
+    the anti in-near-isolates effect has a contribution of +1 when actor $i$
+     creates a link to some actor who previously had indegree 1, and
+     (by implication) --1 when the actor drops a link to some
+     other actor who before this had indegree +2;
 
 \item \emph{indegree at least 3 effect}, (\texttt{in3Plus}),
       the effect of
@@ -11472,10 +11508,16 @@ The list of these effects is the following.
 % $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} \leq c\}$,\\
 % where again $I\{A\}$ denotes the indicator function of the condition $A$;
 
- \item {\em isolate effect} \texttt{(isolate)},
-  the differential attractiveness of the behavior for isolates, \\
- $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} = 0 \}$,\\
- where again $I\{A\}$ denotes the indicator function of the condition $A$;
+ \item {\em in-isolate effect} \texttt{(isolate)},
+  the differential attractiveness of the behavior for in-isolates, \\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i\, I\{x_{+i} = 0 \}$,\\
+ where again $I\{A\}$ denotes the indicator function of the condition $A$;\\
+ (before version 1.2-16 this was called the  {\em isolate effect};)
+
+ \item {\em out-isolate effect} \texttt{(outIsolate)},
+  the differential attractiveness of the behavior for out-isolates, \\
+ $s^{\rm beh}_{i\vit}(x, z) = z_i\, I\{x_{i+} = 0 \}$,\\
+ where $I\{A\}$ still denotes the indicator function of the condition $A$;
 
  \item
  {\em average similarity $\times$ reciprocity effect} \texttt{(avSimRecip)},
@@ -11855,6 +11897,20 @@ denoted $v_j$), there are the following effects.
        $s^{\rm beh}_{i\vit}(x, z) = z_i \, x_{i+}\, \breve v_i $.\\
       This is similar to the `total alter' effect; for
       $v_i = z_i$ it would reduce to the latter effect.
+
+
+ \item {\em maximum alter's covariate effect} \texttt{(maxXAlt)},
+ defined by  $i$'s
+ behavior multiplied by the maximum covariate value of his alters, \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \text{max}_j \, x_{ij}\, v_j \big) $\\
+ (and the mean covariate if $\sum_j x_{ij} = 0$) ;
+
+ \item {\em minimum alter's covariate effect} \texttt{(minXAlt)},
+ defined by  $i$'s
+ behavior multiplied by the minimum covariate value of his alters, \\
+ $s^{\rm beh}_{i\vit}(x, z) =  z_i \big( \text{min}_j \, x_{ij}\, v_j \big) $\\
+ (and the mean covariate if $\sum_j x_{ij} = 0$) ;
+
 
 
 \item {\em absolute contrast outdegree -- covariate}
@@ -14751,6 +14807,62 @@ the R-Forge repository, which contains a more complete listing.
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
+\item 2019-02-26 R-Forge Revision 339, package version 1.2-16.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item New effects \texttt{maxAAlt, minXAlt} (thanks to Per Block, Marion Hoffman,
+     Isabel Raabe, and Kieran Mepham), \texttt{outIsolate}.
+    \item Effect name of \texttt{isolate} effect (not its \texttt{shortName})
+      changed to \texttt{in-isolate}.
+   \item New parameter \texttt{thetaValues} in \sfn{siena07},
+     allowing simulations in Phase 3
+     with varying parameters according to matrix input.
+     Corresponding changes in \sfn{print.sienaFit}.
+   \item \sfn{sienaRI}: earlier check for bipartite dependent variables; if so, stop.
+   \item Argument \texttt{verbose} added to \sfn{includeEffects} and \sfn{setEffect}.
+     (It existed already for \sfn{includeInteraction}.)
+  \item \sfn{Wald.RSiena}, \sfn{Multipar.RSiena} and \sfn{score.Test} also produce one-sided
+     test statistic if \texttt{df=1}.
+   \item objects produced by \sfn{Wald.RSiena},\sfn{ Multipar.RSiena} and \sfn{score.Test}
+     have class \sfn{sienaTest}. These now also have a \sfn{print} method.
+
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item Allow arbitrary number of interactions in \sfn{sienaBayes}
+        (via \sfn{getEffects}).
+   \item \sfn{simpleBayesTest} and \sfn{multipleBayesTest} corrected; they were wrong
+     for models with user-defined interactions.
+   \item \sfn{glueBayes} extended (to allow good use for models with fixed parameters)
+     and check for prior rates relaxed (to allow \texttt{priorRatesFromData=2}
+     leading to different prior rates.)
+
+   \item New default \texttt{prevBayes\$nwarm >= 1} for
+        \texttt{newProposalFromPrev} in \sfn{sienaBayes}.
+   \item \sfn{siena.table} for \sfn{sienaBayes} results extended with between-groups s.d.
+   \item Argument \texttt{verbose} added to \sfn{extract.posteriorMeans}.
+   \item \sfn{sienaBayes}: check that \texttt{prevAns} is not a \sfn{sienaFit} object;
+     totally skip initial multigroup estimation if \texttt{prevAns} is given with
+     \texttt{((prevAns\$n3 >= 500) \& (!usePrevOnly))}.
+
+\end{itemize}
+
+
+\item 2019-01-15 R-Forge Revision 338, package version 1.2-15.
+
+Changes in RSienaTest:
+\begin{itemize}
+    \item New effects \texttt{sameXReciAct} and \texttt{diffXReciAct}.
+    \item Increased burn-in for ML simulations in \sfn{siena07}.
+    \item \sfn{siena.table} adapted for \textsf{sienaBayes} results.
+   \item  New functions \sfn{shortBayesResults} and \sfn{plotPostMeansMDS}.
+   \item  \sfn{extract.posteriorMeans} works also for an object saved as \texttt{PartialBayesResult}
+     (which has \texttt{NA} results for as yet unfinished runs).
+   \item  Examples added to help page for \texttt{print.sienaBayesFit} (in dontrun...).
+\end{itemize}
+
 \item 2018-12-05 R-Forge Revision 337, packages version 1.2-14.
 
 Changes in RSiena and RSienaTest:
@@ -15179,7 +15291,7 @@ Changes in RSiena and RSienaTest:
 
 Changes in RSienaTest:
 \begin{itemize}
-   \item \sfn{sienacpr()} added (programmed by Felix Sch\"{o}nenberger); this includes
+   \item \sfn{sienacpp()} added (programmed by Felix Sch\"{o}nenberger); this includes
      gmm estimation (Amati - Snijders).
    \item \sfn{sienaBayes()}: option \texttt{initML} added; check for zero distances;
      corrected function \texttt{improveMH()} in initialization.

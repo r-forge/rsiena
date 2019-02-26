@@ -1,7 +1,7 @@
 
-R version 3.5.1 (2018-07-02) -- "Feather Spray"
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
-Platform: i386-w64-mingw32/i386 (32-bit)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -79,6 +79,8 @@ Estimates, standard errors and convergence t-ratios
 
 Rate parameters: 
   0       Rate parameter       3.2640  ( 0.5554   )             
+
+Other parameters: 
   1. eval outdegree (density) -1.7460  ( 0.4314   )   0.1523    
   2. eval reciprocity          1.4356  ( 0.4395   )   0.2525    
   3. eval transitive triplets  0.3126  ( 0.1201   )   0.0971    
@@ -112,6 +114,36 @@ Overall maximum convergence ratio:    0.2334
 
 Total of 588 iteration steps.
 
+> (myeff <- includeEffects(myeff, outAct, fix=TRUE, test=TRUE))
+  effectName           include fix  test initialValue parm
+1 outdegree - activity TRUE    TRUE TRUE          0   0
+  effectName                  include fix   test  initialValue parm
+1 basic rate parameter mynet1 TRUE    FALSE FALSE    4.80941   0
+2 outdegree (density)         TRUE    FALSE FALSE   -0.56039   0
+3 reciprocity                 TRUE    FALSE FALSE    0.00000   0
+4 outdegree - activity        TRUE     TRUE  TRUE    0.00000   0
+> ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
++               parallelTesting=TRUE, silent=TRUE)
+> ans
+Estimates, standard errors and convergence t-ratios
+
+                                      Estimate   Standard   Convergence
+                                                   Error      t-ratio
+  1. rate basic rate parameter mynet1  3.0512  ( 0.5362   )    0.0177
+  2. eval outdegree (density)         -1.1688  ( 0.1862   )   -0.1783
+  3. eval reciprocity                  1.8243  ( 0.4225   )   -0.1683
+  4. eval outdegree - activity         0.0000  (     NA   )   -1.0807
+
+Overall maximum convergence ratio:    0.1935
+
+
+Score test for 1 parameter:
+chi-squared = 5.52, p = 0.0188.
+
+Total of 395 iteration steps.
+
+> score.Test(ans, 4)
+chi-squared = 5.52, d.f. = 1; one-sided Z = 2.35;  p = 0.019.
 > ##test6
 > mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
 > mydata <- sienaDataCreate(mynet1)
@@ -177,6 +209,8 @@ Estimates, standard errors and convergence t-ratios
 
 Rate parameters: 
   0       Rate parameter       3.0998  ( 0.5110   )             
+
+Other parameters: 
   1. eval outdegree (density) -1.1509  ( 0.2244   )   -0.1080   
   2. eval reciprocity          1.7982  ( 0.4363   )    0.0185   
 
@@ -375,6 +409,8 @@ Estimates, standard errors and convergence t-ratios
 
 Rate parameters: 
   0       Rate parameter          1.8747  ( 0.3077   )             
+
+Other parameters: 
   1. eval outdegree (density)    -1.8071  ( 0.1798   )    0.0536   
   2. eval myvar1 ego              0.3003  ( 0.1138   )   -0.0517   
   3. eval myvar1 in-alter dist 2 -0.0569  ( 0.1678   )   -0.0475   
@@ -436,6 +472,8 @@ Estimates, standard errors and convergence t-ratios
 
 Rate parameters: 
   0       Rate parameter       2.9009  ( 0.4890   )             
+
+Other parameters: 
   1. eval outdegree (density) -1.1160  ( 0.1866   )   0.6470    
   2. eval reciprocity          1.9615  ( 0.3929   )   1.1065    
 
@@ -524,4 +562,4 @@ Total of 266 iteration steps.
 > 
 > proc.time()
    user  system elapsed 
-  18.71    0.50   19.56 
+  15.56    0.70   16.39 

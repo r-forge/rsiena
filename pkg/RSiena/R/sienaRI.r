@@ -17,6 +17,11 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL,
 	{
 		stop("no a legitimate Siena data specification")
 	}
+	datatypes <- sapply(data$depvars, function(x){attr(x,"type")})
+	if (any(datatypes == "bipartite"))
+	{
+		stop("sienaRI works only for dependent variables of type 'oneMode' or 'behavior'")
+	}
 	if(!is.null(ans))
 	{
 		if (!inherits(ans, "sienaFit"))
@@ -25,7 +30,7 @@ sienaRI <- function(data, ans=NULL, theta=NULL, algorithm=NULL, effects=NULL,
 		}
 		if(!is.null(algorithm)||!is.null(theta)||!is.null(effects))
 		{
-			warning(paste("some information are multiply defined \n",
+			warning(paste("some informations are multiply defined \n",
 					"results will be based on 'theta', 'algorithm', and 'effects'\n",
 					"stored in 'ans' (as 'ans$theta', 'ans$x', 'ans$effects')\n", sep=""))
 		}

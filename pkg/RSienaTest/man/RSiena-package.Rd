@@ -49,8 +49,8 @@ Package \code{"RSiena"} is the official release.
   \tabular{ll}{
     Package: \tab RSienaTest\cr
     Type: \tab Package\cr
-    Version: \tab 1.2-15\cr
-    Date: \tab 2019-01-02\cr
+    Version: \tab 1.2-16\cr
+    Date: \tab 2019-02-26\cr
     Depends: \tab R (>= 3.0.0)\cr
     Imports: \tab Matrix\cr
     Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -66,7 +66,7 @@ Package \code{"RSiena"} is the official release.
   Ruth Ripley, Krists Boitmanis, Tom Snijders, Felix Schoenenberger.
   Contributions by Josh Lospinoso, Charlotte Greenan, Christian Steglich,
   Johan Koskinen, Mark Ortmann, Nynke Niezink, Natalie Indlekofer,
-  Christoph Stadtfeld, and Robert Hellpap.
+  Christoph Stadtfeld, Per Block, Marion Hoffman, and Robert Hellpap.
 
   Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>
 }
@@ -75,25 +75,26 @@ Package \code{"RSiena"} is the official release.
     \item Schweinberger, Michael, and Snijders, Tom A.B. (2007).
       Markov models for digraph panel data:
       Monte Carlo-based derivative estimation.
-      \emph{Computational Statistics and Data Analysis} 51, 4465-4483.
+      \emph{Computational Statistics and Data Analysis} \bold{51}, 4465--4483.
     \item Snijders, Tom A.B. (2001).
       The statistical evaluation of social network dynamics.
-      \emph{Sociological Methodology}, 31, 361-395.
+      \emph{Sociological Methodology} \bold{31}, 361-395.
     \item Snijders, Tom A.B. (2017). Stochastic Actor-Oriented Models for Network
-      Dynamics. \emph{Annual Review of Statistics and Its Application}, 4, 343-363.
+      Dynamics. 
+      \emph{Annual Review of Statistics and Its Application} \bold{4}, 343--363.
     \item  Snijders, Tom A.B., van de Bunt, Gerhard G., and
       Steglich, Christian E.G. (2010).
       Introduction to actor-based models for network dynamics.
-      \emph{Social Networks}, 32, 44-60.
+      \emph{Social Networks} \bold{32}, 44--60.
     \item Snijders, Tom A.B., Steglich, Christian E.G., and Schweinberger,
       Michael (2007). Modeling the co-evolution of networks and behavior.
-      Pp. 41-71 in \emph{Longitudinal models in the behavioral
+      Pp. 41--71 in \emph{Longitudinal models in the behavioral
         and related sciences},
       edited by Kees van Montfort, Han Oud and Albert Satorra; Lawrence Erlbaum.
     \item Steglich, Christian E.G., Snijders, Tom A.B., and
       Pearson, Michael A. (2010). Dynamic networks and behavior:
-      Separating selection from influence. \emph{Sociological Methodology},
-      40, 329-393.
+      Separating selection from influence. \emph{Sociological Methodology}
+      \bold{40}, 329--393.
     \item The manual: \url{http://www.stats.ox.ac.uk/~snijders/siena/RSiena_Manual.pdf}
     \item The website: \url{http://www.stats.ox.ac.uk/~snijders/siena/}.
   }

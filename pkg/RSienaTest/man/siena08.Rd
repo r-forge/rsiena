@@ -100,10 +100,10 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
   \item{ns}{Number of fits on which the score test analysis is based}
 }
 \references{
-  T. A. B. Snijders and Chris Baerveldt.
+  T. A. B. Snijders and Chris Baerveldt (2003).
   Multilevel network study of the effects
   of delinquent behavior on friendship
-  evolution. \emph{Journal of Mathematical Sociology}, 27: 123-151, 2003.
+  evolution. \emph{Journal of Mathematical Sociology} \bold{27}, 123--151.
 
   See also the manual (Section 11.2)
   and \url{http://www.stats.ox.ac.uk/~snijders/siena/ }
