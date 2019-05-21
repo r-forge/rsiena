@@ -92,14 +92,4 @@ double TruncatedOutdegreeEffect::egoStatistic(int ego,
 	}
 }
 
-/**
- * Returns the statistic corresponding to this effect as part of
- * the endowment function.
- */
-double TruncatedOutdegreeEffect::endowmentStatistic(Network * pLostTieNetwork)
-{
-	throw logic_error(
-		"TruncatedOutdegreeEffect: Endowment effect not supported.");
-}
-
 }

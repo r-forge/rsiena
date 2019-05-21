@@ -314,7 +314,7 @@ reformatSienaFit <- function(z) {
 
   if (length(z$sienafit) >= 2)
   {
-	cat('\nFor multigroup data sets, sienacpp probably is incorrect.\n')
+	message('\nFor multigroup data sets, sienacpp probably is incorrect.')
   }
 
 # TS: for computing tconv.max, in siena07

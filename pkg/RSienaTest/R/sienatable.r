@@ -32,12 +32,11 @@ siena.table <- function(x, type='tex',
 			if (is.null(nfirst))
 			{
 				nfirst <- x$nwarm + 1
-				cat("Note: the print function for sienaBayesFit objects")
-				cat(" can also use a parameter nfirst,\n")
-				cat("      indicating the first run")
-				cat(" from which convergence is assumed.\n")
-				cat("      The default value used now is nfirst =",
-					x$nwarm + 1, ".\n")
+				message
+("Note: the print function for sienaBayesFit objects can also use a parameter nfirst,")
+				message("    indicating the first run from which convergence is assumed.")
+				message("    The default value used now is nfirst =",
+					x$nwarm + 1, ".")
 			}
 			xkind.string <- "sienaBayesFit"
 		}

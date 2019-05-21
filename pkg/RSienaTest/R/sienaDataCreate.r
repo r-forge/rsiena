@@ -965,9 +965,9 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 	}
 	if (someOnly)
 	{
-cat('For some variables, in some periods, there are only increases, or only decreases.\n')
-cat('This will be respected in the simulations.\n')
-cat('If this is not desired, use allowOnly=FALSE when creating the dependent variables.\n')
+message('For some variables, in some periods, there are only increases, or only decreases.')
+message('This will be respected in the simulations.')
+message('If this is not desired, use allowOnly=FALSE when creating the dependent variables.')
 	}
 	## create the object
 	z <- NULL
@@ -1102,9 +1102,9 @@ checkConstraints <- function(z)
 			   paste(c("Network ", x[1], " is higher than network ", x[2],
 						".\n"), sep="")
 		  })
-		cat(report)
-		cat("This will be respected in the simulations.\n")
-cat("If this is not desired, change attribute 'higher'.\n")
+		message(report)
+		message("This will be respected in the simulations.")
+		message("If this is not desired, change attribute 'higher'.")
 	}
 	if (any(disjoint))
 	{
@@ -1114,9 +1114,9 @@ cat("If this is not desired, change attribute 'higher'.\n")
 			   paste(c("Network ", x[1], " is disjoint from network ",
 						x[2], ".\n"), sep="")
 		  })
-		cat(report)
-		cat("This will be respected in the simulations.\n")
-cat("If this is not desired, change attribute 'disjoint'.\n")
+		message(report)
+		message("This will be respected in the simulations.")
+		message("If this is not desired, change attribute 'disjoint'.")
 	}
 	if (any(atLeastOne))
 	{
@@ -1127,9 +1127,9 @@ cat("If this is not desired, change attribute 'disjoint'.\n")
 						x[1], " and", x[2],
 					   " always exists.\n"), sep="")
 		  })
-		cat(report)
-		cat("This will be respected in the simulations.\n")
-cat("If this is not desired, change attribute 'atLeastOne'.\n")
+		message(report)
+		message("This will be respected in the simulations.")
+		message("If this is not desired, change attribute 'atLeastOne'.")
 	}
 	z
 }

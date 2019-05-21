@@ -301,12 +301,11 @@ phase3.2 <- function(z, x, ...)
 			fromBayes <- 'fromBayes' %in% names(x)
 			if (!fromBayes)
 			{
-				cat('*** Warning: Covariance matrix not positive definite *** \n')
-				cat('*** Standard errors not reliable ***\n')
-				cat('The following is approximately a linear combination \n')
-				cat('for which the data carries no information:\n',
-					thetext,'\n')
-				cat('It is advisable to drop one or more of these effects.\n')
+				warning('*** Warning: Covariance matrix not positive definite *** \n')
+				message('*** Standard errors not reliable ***')
+				message('The following is approximately a linear combination ')
+				message('for which the data carries no information:\n', thetext)
+				message('It is advisable to drop one or more of these effects.')
 				if (any(z$fixed || any(z$newfixed)))
 				{
 					Report(c('(This may be unimportant, and related to the fact\n',
@@ -396,6 +395,16 @@ CalculateDerivative3<- function(z,x)
 	z$msf <- cov(z$sf)
 	z$dfra1 <- z$dfra
 	z$dfra <- dfra
+	if (x$simOnly)
+	{
+		dmsf <- diag(z$msf)
+		sem <- sqrt(dmsf/dim(z$sf)[1])
+		if ((x$dolby) & (!z$thetaFromFile))
+		{
+			sem <- sem*sqrt(1 - (z$regrCor)^2)
+		}
+		z$estMeans.sem <- sem
+	}
 	z
 }
 

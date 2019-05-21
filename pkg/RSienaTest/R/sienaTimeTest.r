@@ -283,13 +283,13 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 	extraExclusions <- rep(FALSE, nBaseEffects)
 	if (rankSigma < dim(sigma)[1])
 	{
-		cat("TimeTest constructed a null hypothesis with ")
-		cat(nRowsToTest - nDummies, "estimated parameters\n")
-		cat("and", nDummies,"dummy variables to be tested.\n")
-		cat("However, there are", dim(sigma)[1] - rankSigma)
-		cat(" linear dependencies between these.\n")
-		cat("This may be because some of the parameters are already\n")
-		cat("interactions with time dummies or other time variables.\n")
+		message("TimeTest constructed a null hypothesis with ")
+		message(nRowsToTest - nDummies, "estimated parameters\n")
+		message("and", nDummies,"dummy variables to be tested.\n")
+		message("However, there are", dim(sigma)[1] - rankSigma)
+		message(" linear dependencies between these.\n")
+		message("This may be because some of the parameters are already\n")
+		message("interactions with time dummies or other time variables.\n")
 
 		subset0 <- rep(FALSE, dim(sigma)[1])
 		subset0[1:nBaseEffects] <- TRUE
@@ -324,18 +324,18 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 			nDummies <- sum(toTest$toTest)
 			G <- G[,,useRows]
 			nRowsToTest <- dim(toTest)[1]
-			cat("Automatic discovery of dependencies yielded the exclusion of")
+			message("Automatic discovery of dependencies yielded the exclusion of")
 			excludedNumber <- sum(extraExclusions)
 			if (excludedNumber <= 1)
 			{
-				cat(" effect",":\n")
-				cat(paste(row(fitEffects)[baseInFit,][extraExclusions,][1],'.',
+				message(" effect",":\n")
+				message(paste(row(fitEffects)[baseInFit,][extraExclusions,][1],'.',
 						fitEffects$effectName[baseInFit][which(extraExclusions)],"\n "))
 			}
 			else
 			{
-				cat(" effects:\n")
-				cat(paste(row(fitEffects)[baseInFit,][extraExclusions,][,1],'.',
+				message(" effects:\n")
+				message(paste(row(fitEffects)[baseInFit,][extraExclusions,][,1],'.',
 						fitEffects$effectName[baseInFit][which(extraExclusions)],"\n "))
 			}
 			rankSigma <- qr(sigma)$rank
@@ -549,7 +549,7 @@ transformed.scoreTest <- function(dfra, msf, fra, A, nullHyp, maxlike)
 	# non-zero columns of A should not overlap with nullHyp
 {
 	test <- colSums(abs(A)) > 0
-	if (test && nullHyp)
+	if (any(test & nullHyp))
 	{
 		stop("Null hyp and test in transformed score test should not overlap")
 	}
@@ -573,7 +573,7 @@ partial.scoreTest <- function(dfra, msf, fra, test, nullHyp, maxlike)
 	# test gives vector of tested effects,
 	# nullHyp gives vector of estimated effects
 {
-	if (test && nullHyp)
+	if (any(test & nullHyp))
 	{
 		stop("Null hypothesis and test in partial score test should not overlap")
 	}
@@ -983,8 +983,8 @@ sienaTimeFix <- function(effects, data=NULL, getDocumentation=FALSE)
 				cdvind <- match(effect$interaction1, atts$cCovars)
 				vdvind <- match(effect$interaction1, atts$vCovars)
 				bdvind <- match(effect$interaction1, atts$netnames)
-				if (is.na(cdvind) && is.na(vdvind) &&
-					(is.na(bdvind))) #|| atts$types[bdvind] != "behavior"))
+				if (any((is.na(cdvind) & is.na(vdvind) &
+					(is.na(bdvind))))) #|| atts$types[bdvind] != "behavior"))
 				{
 					stop("Having trouble finding the covariate for your rate ",
 						"effect. Please contact the developers.")
@@ -1257,7 +1257,7 @@ includeTimeDummy <- function(myeff, ..., timeDummy="all", name=myeff$name[1],
 	}
 	else
 	{
-		cat("No effects could be found with this specification.\n")
+		warning("No effects could be found with this specification.")
 	}
 	myeff
 }

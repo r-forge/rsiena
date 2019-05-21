@@ -530,7 +530,7 @@ sienaDataConstraint <- function(x, net1, net2, type=c("higher",
 
     if (value == attr(x, type)[pairname])
     {
-        cat("No change in constraint\n")
+        message("No change in constraint")
     }
     else
     {

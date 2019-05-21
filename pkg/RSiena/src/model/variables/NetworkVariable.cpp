@@ -530,6 +530,7 @@ bool NetworkVariable::canMakeChange(int actor) const
  * Simulates a change of the network according to the choice of the given
  * actor. First, the actor chooses the alter based on the evaluation and
  * endowment functions, and then the tie to the selected alter is flipped.
+ * Used for MoM.
  */
 void NetworkVariable::makeChange(int actor)
 {
@@ -1149,6 +1150,9 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	else
 	{
 		Rprintf("total = %f\n", total);
+		Rprintf("this actor = %d\n", (this->lego + 1) );
+		Rprintf("this period = %d\n", (this->period() + 1) );
+		// counting starts at 0
 		error("total probability non-positive");
 	}
 }

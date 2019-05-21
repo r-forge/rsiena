@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-16.
+This version was renewed for \RS version 1.2-17.
 \end{abstract}
 
 
@@ -647,6 +647,7 @@ between structure and covariates are possible. Some examples for effects:
 
 \noindent
 \textbf{Dependent variables: network evaluation, creation and endowment functions}\\
+\label{S_endow}
 
 As we discussed earlier, \SI is capable of analyzing and modeling the
 evolution of networks and behavior, jointly or separately.
@@ -890,24 +891,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-16}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-17}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-16.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-17.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-16.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-17.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-16.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-17.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-16.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-17.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-16.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-17.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-16.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-17.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1107,7 +1108,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-16) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-17) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1995,6 +1996,10 @@ See
 for a further description.
 \medskip
 
+The default method in \SI for treating missing behavioral data in \SI was compared
+with several alternative methods in \citet{ZandbergHuisman2019}, and was found to
+perform quite well.
+
 There is ongoing work by Robert Krause and others about using
 multiple imputation for \RS modeling;
 see \citet{KHS2018}.
@@ -2507,13 +2512,13 @@ More elaborate explanations are in
 The evaluation, creation, and endowment functions are constructed as a
 linear combination of the effects:
 \begin{equation}
-f_i(x) \, = \, \sum_k \beta_k \, s_{ik}(x)   
+f_i(x) \, = \, \sum_k \beta_k \, s_{ik}(x)
 \end{equation}
 where $\beta_k$ are parameters and $s_{ik}(x)$ are effects.
 For models with more than one dependent variable (networks, behaviors),
 this is specific to each dependent variable; e.g., in a network and behavior
 study with one network and one behavioral variable, there will be two evaluation
-functions. 
+functions.
 Because of formula (\ref{gain}), what is essential for the effects for networks
 is the difference
 \begin{equation}
@@ -3938,17 +3943,19 @@ for the models that are to be reported in papers or presentations,
 to confirm that what you report is a stable result of the
 algorithm.
 
-\subsection{The estimation function \textsf{siena07}}
+\subsection{An overview of the estimation procedure}
 \hypertarget{T_S_options}{   }
 % provisionally placed here.
 
-The estimation process implemented in functions \textsf{siena07()}
-and \sfn{sienacpp()}
-starts with initial values for the parameters,
-and returns a so-called \textsf{sienaFit} object, in this example called
-\texttt{results1}, which contains the estimates and their standard errors and
+The estimation process is implemented in functions \sfn{siena07}
+and \sfn{sienacpp} (alternatives for each other),
+using an algorithm specification defined in function \sfn{sienaAlgorithmCreate}.
+Estimation starts with initial values for the parameters,
+and the functions \sfn{siena07} and \sfn{sienacpp} both return a 
+so-called \textsf{sienaFit} object containing the estimates and their standard errors and
 a lot of further information.
-Since the estimate is iterative (depending on the initial value) and stochastic,
+Since the estimation procedure is iterative (i.e., depending on the 
+initial value) and stochastic,
 the results are not always completely satisfactory. We shall see below
 how the satisfactory convergence of the algorithm can be checked,
 and how to go on if this is not satisfactory.
@@ -3973,7 +3980,7 @@ Note that \sfn{sienacpp()} is available only in \sfn{RSienaTest()}.
 The estimation algorithm is determined by a call of functions
 such as
 \begin{verbatim}
-algorithm1    <-  sienaAlgorithmCreate(projname = "trypro", useStdInits = FALSE)
+algorithm1    <-  sienaAlgorithmCreate(projname = "trypro")
 results1      <-  siena07(algorithm1, data = mydata, effects = myeff)
 \end{verbatim}
 The function \textsf{sienaAlgorithmCreate} defines an algorithm specification
@@ -3994,6 +4001,90 @@ results1  <-  siena07(algorithm1, data = mydata, effects = myeff,
                       verbose = TRUE)
 \end{verbatim}
 
+\subsection{Parameters of the algorithm}
+
+Function \sfn{sienaAlgorithmCreate} defines the algorithm.
+The algorithm is described more in detail in Section~\ref{S_algorithm}.
+This function has a lot of parameters that you will never need to touch,
+and which have been put there for the purpose of investigating
+the best settings of the algorithm.
+The following parameters are worth knowing about.
+\begin{enumerate}
+  \item \texttt{projname}: the `project name', the root name of the file
+       to which relevant intermediate and final information will be written.
+       This file will be put in the working directory of your R session,
+       and have the name \texttt{ppp.out}, if \texttt{projname~=~ppp}.
+  \item \texttt{n3}: the number of iterations in the third phase of the estimation
+       algorithm, determining the precision of the standard errors.
+  \item \texttt{seed}: the seed of the random number algorithm. This seed determines
+       the starting value of the random number algorithm, and thereby leads
+       to exactly reproducible results. Normally, if the estimation procedure
+       has converged as indicated by the convergence criterion (see the next section) and 
+       parameter \texttt{n3} is large enough, different random seeds will give 
+       results for converged models that are equivalent for practical purposes. 
+       (Well, this is a way to check
+       whether indeed your convergence criterion is strict enough, and whether
+       parameter \texttt{n3} is large enough.)
+\end{enumerate}
+Then there are some parameters that determine some aspects of the
+model, rather than the estimation algorithm. These are the following.
+\begin{enumerate}[resume]
+  \item \texttt{modelType}: the type of model for non-directed networks,
+        see Section~\ref{S_modeltype_nd}.
+  \item \texttt{behModelType}: the type of model defining the behavior
+        ministeps at the boundary (minimum and maximum) of the range,
+        see Section~\ref{S_modeltype_beh}.
+  \item \texttt{MaxDegree}: puts a maximum to the outdegree of all actors,
+        see Section~\ref{S_maxdegree}.
+  \item \texttt{Offset}: an offset is a constant added to the
+        constant term in a generalized linear model, it is used for 
+         \texttt{modelType~=~3}, see Section~\ref{S_modeltype_nd}.
+\end{enumerate}
+Some other parameters are sometimes important, in the case of convergence
+difficulties.  Their role is described in the following sections.
+\begin{enumerate}[resume]
+  \item \texttt{useStdInits}: whether the initial values in the effects
+    object will be ignored and default values used instead (default: \texttt{FALSE}).
+  \item \texttt{nsub}:  the number of subphases in the estimation algorithm
+    (default: 4).
+  \item \texttt{n2start}: the number of iterations in the first subphase.
+  \item \texttt{firstg}: the initial value of the multiplier for the size in the
+       stochastic approximation algorithm.
+\end{enumerate}
+The default estimation algorithm is the Method of Moments. But it is also possible
+to use the method of Maximum Likelihood; further explanations are in Section~\ref{S_ML}. 
+This is determined by the following parameters.
+\begin{enumerate}[resume]
+  \item \texttt{maxlike}: whether to use Maximum Likelihood (ML) estimation
+       (default: \texttt{FALSE}).
+  \item \texttt{mult}: the multiplication factor for the ML algorithm.
+\end{enumerate}
+As described in Section~\ref{S_cond}, there is a choice between conditional
+and non-conditional estimation. Conditioning means that for one of the
+dependent variables, the simulated number of differences is always equal to 
+the observed number of differences (note that the number of ministeps usually will 
+be somewhat larger than the number of differences, because some ministeps
+may cancel earlier ministeps, and ministeps can have the outcome of
+`no change'). The associated parameters are
+\begin{enumerate}[resume]
+  \item \texttt{cond}: whether to use conditional estimation;
+  \item \texttt{condvarno}: the number of the conditioning variable;
+  \item \texttt{condname}: the name of the conditioning variable (an alternative
+      to using \texttt{condvarno}).
+\end{enumerate}
+Finally, there are some parameters with special purposes that sometimes
+can be used.
+\begin{enumerate}[resume]
+  \item \texttt{simOnly}: to indicate that the interest is in simulation,
+       not estimation; see Chapter~\ref{S_sim}.
+  \item \texttt{lessMem}: using \texttt{lessMem~=~TRUE} reduces storage in
+      the \texttt{sienaFit} object produced by \sfn{siena07} by leaving out
+      some large arrays; but these are used by functions
+     \sfn{sienaTimeTest} and \sfn{sienaGOF}, so running those functions will be impossible
+     for \sfn{sienaFit} object obtained with \texttt{lessMem=TRUE}.
+\end{enumerate}
+
+\subsection{Results of the estimation}
 
 The estimation produces an output file in the current working directory,
 of which the name is defined by the \textsf{projname} option;
@@ -4002,7 +4093,8 @@ To look at the information, you may either look at this file
 (which can be opened by any text editor), or produce results on the \R console.
 
 A brief summary of the results is given in the \R console by
-typing the name of the  \textsf{sienaFit} object. For example,
+typing the name of the  \sfn{sienaFit} object. For example,
+if this name is \texttt{results1},
 \begin{verbatim}
 results1
 \end{verbatim}
@@ -4044,6 +4136,8 @@ are higher in absolute value than 0.1, convergence is not adequate.
 The value \texttt{Overall maximum convergence ratio} is another, stricter,
 indicator of convergence.
 For adequate convergence, this value should be less than 0.25.
+The overall maximum convergence ratio for \sfn{sienaFit} object \texttt{results1}
+is given by  \texttt{results1\$tconv.max}.
 
 In this example, convergence is good.
 If convergence is not adequate, the estimation must be repeated.
@@ -4157,6 +4251,8 @@ for any linear combination of the target values.
 A precise definition is given in \\
 \href{http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf}{\texttt{Siena\_algorithms.pdf}}
 which can be downloaded from the \SI website.
+The overall maximum convergence ratio for \sfn{sienaFit} object \texttt{results1}
+is given by  \texttt{results1\$tconv.max}.
 
 Convergence is excellent when the overall maximum convergence ratio
 is less than 0.2, and for all the individual parameters the $t$-ratios
@@ -4234,18 +4330,6 @@ For the technical background, see
 which can be downloaded from the \SI website.
 
 \begin{itemize}
-\item \texttt{doubleAveraging}\\
-      This replaces the Robbins-Monro updating step by a double averaging
-      step \citep{bather1989,SchwabeWalk96,KushnerYin03} which can be
-      more efficient. The default is \texttt{doubleAveraging=0}, which starts using
-      this step from subphase 2.1.
-\item \texttt{diagonalize}\\
-    This parameter may range from 0 to 1,
-    and determines the extent to which the matrix of derivatives of expected
-    values with respect to parameters is diagonalized.
-    The value 1 (total diagonalization) gives greatest stability;
-    smaller values give greater efficiency.
-    The default is 0.2.
 \item \texttt{n2start}\\
     This is the minimum length of phase 2.1, i.e., the first subphase of phase~2.
     The default value
@@ -4259,6 +4343,13 @@ which can be downloaded from the \SI website.
     are $(2.52)^{k-1} \times\,$\texttt{n2start} for subphase~$k$.\\
     This implies the total duration of the algorithm will be roughly proportional to
     \texttt{n2start}. One may try using a value higher than the default.
+\item \texttt{nsub}\\
+    This is the number of subphases in Phase~2 of the algorithm.
+    Usually, the default value of 4 is large enough. Below it is mentioned
+    that sometimes it can be good to use \texttt{nsub~=~1} in conjunction
+    with a large value of \texttt{n2start} to improve convergence
+    after having found a reasonably good, but not totally satisfactory,
+    estimate.
 \item \texttt{firstg}\\
     This determines the step sizes in the estimation algorithm. If the algorithm is unstable,
     use a smaller value (but greater than~0).
@@ -4266,6 +4357,18 @@ which can be downloaded from the \SI website.
     Sometimes for difficult data-model combinations, the algorithm
     diverges very quickly, and this may be countered by smaller values of
      \texttt{firstg}, e.g., 0.01 or 0.05.
+\item \texttt{diagonalize}\\
+    This parameter may range from 0 to 1,
+    and determines the extent to which the matrix of derivatives of expected
+    values with respect to parameters is diagonalized.
+    The value 1 (total diagonalization) gives greatest stability;
+    smaller values give greater efficiency.
+    The default is 0.2.
+\item \texttt{doubleAveraging}\\
+      This replaces the Robbins-Monro updating step by a double averaging
+      step \citep{bather1989,SchwabeWalk96,KushnerYin03} which can be
+      more efficient. The default is \texttt{doubleAveraging=0}, which starts using
+      this step from subphase 2.1.
 \end{itemize}
 
 
@@ -5342,6 +5445,7 @@ unconditional estimation.
   If multiple processors are available, then using
   multiple processes can speed up the estimation in \sfn{siena07},
   \sfn{sienacpp}, and \sfn{sienaGOF}.
+  The help pages for these functions show how to do this.
   You can find out the number of processes possible by
 \begin{verbatim}
 library(parallel)
@@ -5737,29 +5841,128 @@ The test of the preceding example is then produced by the command
 Multipar.RSiena(ans, 6, 7, 8)
 \end{verbatim}
 
-\subsubsection{Standard errors of linear combinations}
+
+
+\subsubsection{Tests of linear combinations}
 
 Sometimes there can be interest in a linear combination of parameters.
-Suppose this is for a \sfn{sienaFit} object called \texttt{ans}.
-The number of parameters is
-\texttt{ans\$pp} which is the same as \texttt{length(ans\$theta)}.
-This is the number of estimated parameters, excepting (if any) the rate
-parameters used for conditioning in conditional estimation.
-Let \texttt{a} be the vector with the coefficients of the linear combination.
-Then
+For example, this can arise when an evaluation and an endowment function
+are included in the model.
+This situation was explained in Section~\ref{S_endow} and
+further elaborated in Section~\ref{S_c}.
+Equations (\ref{fc_net}) and (\ref{fe_net}) imply that,
+if there is no creation function,
+the split between creation and maintenance can be made as follows:
+\begin{itemize}
+\item creation of ties:\  evaluation parameter;
+\item maintenance of ties:\ evaluation parameter + endowment parameter.
+\end{itemize}
+
+In an example using the Glasgow data (160 students, with joiners and leavers),
+we obtained the following results.
+
+\begin{center}
+% Table based on sienaFit object G160_net_Res_m2 , Mon Apr 08 15:35:49 2019
+\begin{tabular}{l | r@{.}l r@{.}l  | }
+\hline
+\rule{0pt}{2ex}\relax
+Effect &\multicolumn{2}{c}{par.}&\multicolumn{2}{c }{ (s.e.) }  \\[0.5ex]
+\hline
+\rule{0pt}{2ex}\relax
+constant friendship rate (period 1) &   13 & 801 & (1 & 459)\\
+constant friendship rate (period 2) &   10 & 938 & (1 & 192)\\
+\hline
+\rule{0pt}{2ex}\relax
+outdegree                  &  --3 & 507 & (0 & 223)\\
+reciprocity: evaluation             &    4 & 392 & (0 & 419)\\
+reciprocity: endowment              &  --1 & 640 & (0 & 703)\\
+gwespFF (transitivity)              &    1 & 810 & (0 & 077)\\
+indegree-popularity                 &  --0 & 053 & (0 & 019)\\
+outdegree-activity                  &    0 & 144 & (0 & 036)\\
+reciprocal degree-activity          &  --0 & 346 & (0 & 050)\\
+sex alter                           &  --0 & 137 & (0 & 084)\\
+sex ego                             &    0 & 038 & (0 & 095)\\
+same sex                            &    0 & 647 & (0 & 076)\\
+\hline
+\multicolumn{5}{l}
+   {\footnotesize{convergence $t$ ratios all $<$ 0.05.}}\\
+\multicolumn{5}{l}{\footnotesize{Overall maximum convergence ratio 0.09.}}
+\end{tabular}
+\end{center}
+
+\noindent
+The effect of reciprocation on creation of ties is 4.392,
+with s.e.~= 0.419.
+This can be tested by the ratio $t = 4.392/0.419 = 10.48$,
+extremely strongly significant.
+Suppose the \sfn{sienaFit} object is called \texttt{ans}.
+The Wald test can also be obtained by the following.
+Requesting the dimensionality \texttt{ans\$pp} is helpful to
+confirm the numbering of the parameters. In this case, the dimension
+is 12, and the tested parameter, reciprocity evaluation, is the fourth.
+In terms of the formulae earlier in this section,
+the tested parameter is $\theta_4$.
+\begin{verbatim}
+(p <- ans$pp)
+mat <- matrix(0,1,p)
+mat[1,4] <- 1
+Wald.RSiena(mat, ans)
+\end{verbatim}
+with the result that $p=12$, and
+\begin{verbatim}
+chi-squared = 110.03, d.f. = 1; one-sided Z = 10.49;  p < 0.001.
+\end{verbatim}
+The difference between the values 10.48 and 10.49 is due to rounding.
+
+The estimated effect of reciprocation on maintenance of ties is
+$\hat\theta_4 + \hat\theta_5 = 4.392 - 1.640 = 2.752$.
+Here the Wald test is obtained by
+\begin{verbatim}
+(p <- ans$pp)
+mat <- matrix(0,1,p)
+mat[1,4] <- 1
+mat[1,5] <- 1
+Wald.RSiena(mat, ans)
+\end{verbatim}
+with the result
+\begin{verbatim}
+chi-squared = 36.09, d.f. = 1; one-sided Z = 6.01;  p < 0.001.
+\end{verbatim}
+
+We can also get the standard error of the linear combination
+$\hat\theta_4 + \hat\theta_5$ in the following way.
+If $a$ is a vector with coefficients of the linear combination
+$a'\,\theta$, in which we are interested, then
 \begin{verbatim}
 sum(a*ans$theta)
 \end{verbatim}
- is the linear combination;
+ is the corresponding estimate,
 \begin{verbatim}
-t(a) %*% ans$covtheta %*% a
+a %*% ans$covtheta %*% t(a)
 \end{verbatim}
 is the variance, and
 \begin{verbatim}
-sqrt(t(a) %*% ans$covtheta %*% a)
+sqrt(a %*% ans$covtheta %*% t(a))
 \end{verbatim}
 is the standard error.
+In this case, $a$ is the matrix \texttt{mat}.
+Therefore the standard error is obtained as
+\begin{verbatim}
+sqrt(mat %*% ans$covtheta %*% t(mat))
+\end{verbatim}
+with the result 0.458.
+Indeed $2.752 / 0.458 = 6.01$.
 
+In this example, a further question is whether the effect of reciprocation
+on creation of ties is equal to its effect on maintenance of ties.
+This is simply tested by the parameter $\theta_5$, which ---as is implied
+by the above--- is just the difference between the effects of reciprocation
+on maintenance and on creation of ties. In this case, the difference is --1.640,
+with $t$-ratio $t = -1.640/0.703 = -2.33$, $p < 0.05$.
+We may conclude that, in this model, the effect of reciprocation on
+creation of ties is significantly (two-sided $p < 0.05$) larger than
+on maintenance of ties; but the latter, on itself,
+still is significant.
 
 
 \subsection{Score-type tests}
@@ -7870,13 +8073,10 @@ and for maintaining existing ties.
    defined by the number of transitive
  patterns in $i$'s relations (ordered pairs of actors
  $(j,h)$ to both of whom $i$ is tied, while also $j$ is tied to $h$),\\
- for directed networks,
   $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{ih}\, x_{hj}\,$;\\
- and for non-directed networks,
- $s^{\rm net}_{i\vit}(x) =  \sum_{j < h} x_{ij}\, x_{ih}\, x_{hj}\,$;\\
- there was an error here until version 3.313,
+ (there was an error here until version 3.313,
  which amounted to combining the transitive triplets and transitive
- mediated triplets effects;
+ mediated triplets effects;)
 \end{minipage}
 \hfill
 \begin{minipage}[t]{.13\textwidth}
@@ -8341,6 +8541,12 @@ and
  in \RS this effect has had a bug until version 1.1-219;\\
  in \RS the target statistic for this effect was multiplied by a factor $n$ until version 1.1-241;
 
+ \item {\em in-degree related popularity effect (centered)} \texttt{(inPop.c)},
+ defined by the sum of
+ the centered in-degrees of the others to whom $i$ is tied,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \big( x_{+j} - d \big)$,\\
+ where $d$ is the average in-degree across all waves;
+
  \item {\em in-degree related popularity (sqrt) effect} \texttt{(inPopSqrt)}
  (earlier called {\em popularity of alter (sqrt measure) effect}), defined by the sum of
  the square roots of the in-degrees of the others to whom $i$ is tied,\\
@@ -8359,6 +8565,11 @@ and
   \sum_j x_{ij} \sum_h x_{jh} $; \\
  until version 3.313, this effect was multiplied by a factor $1/n$;
 
+ \item {\em out-degree related popularity effect (centered)} \texttt{(outPop.c)},
+ defined by the sum of
+ the centered out-degrees of the others to whom $i$ is tied,\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij}\, \big( x_{j+} - d \big)$,\\
+ where $d$ is the average out-degree across all waves;
 
  \item {\em out-degree related popularity (sqrt) effect} \texttt{(outPopSqrt)}
  (earlier called {\em activity of alter (sqrt measure) effect}), defined by the sum of
@@ -8390,6 +8601,12 @@ and
  $s^{\rm net}_{i\vit}(x) = x_{i+}\, x_{+i}$;\\
  endowment effect only likelihood-based;
 
+ \item {\em in-degree related activity effect (centered)} \texttt{(inAct.c)},
+ defined by the sum of
+ the cross-product of the actor's out- and centered in-degrees,\\
+ $s^{\rm net}_{i\vit}(x) =  x_{i+}\,\big( x_{+i} - d \big)$,\\
+ where $d$ is the average in-degree across all waves;
+
  \item {\em in-degree related activity (sqrt) effect}, \texttt{(inActSqrt)}
  defined by  \\
  $s^{\rm net}_{i\vit}(x) = x_{i+}\,\sqrt{x_{+i}}$ ;
@@ -8404,6 +8621,11 @@ and
  	 defined as the squared out-degree of the actor,
  $s^{\rm net}_{i\vit}(x) = x^2_{i+}$;\\
  endowment effect only likelihood-based;
+
+ \item {\em out-degree related activity effect (centered)} \texttt{(outAct.c)},
+ defined by the out-degree times the centered out-degree of the actor,\\
+ $s^{\rm net}_{i\vit}(x) =  x_{i+}\,\big( x_{i+} - d \big)$,\\
+ where $d$ is the average out-degree across all waves;
 
  \item {\em out-degree related activity (sqrt) effect}  \texttt{(outActSqrt)}
  (earlier called {\em out-degree$\,\hat{\ }$(1.5)}), defined by  \\
@@ -8563,7 +8785,7 @@ $s^{\rm net}_{i\vit}(x) = \sum_j I\{x_{+j} \geq 1 \} $;\\
      effects are especially difficult.
      The interpretation can best be understood from the change statistics.
      The anti in-isolates effect has a change statistic of +1 when actor $i$
-     creates a link to some other actor who previously had indegree 0; and 
+     creates a link to some other actor who previously had indegree 0; and
      (by implication) a change statistic of --1 when the actor was the only one to link to some
      other actor and now drops the link;
 
@@ -9609,6 +9831,14 @@ assumed to have equal contributions.
 \[
  s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} (\sqrt{x_{j+}} + \sqrt{x_{i+}}) \ .
 \]
+\item A centered version of \texttt{degPlus}:\\
+      \emph{degree activity plus popularity effect (centered)} \texttt{(degPlus.c)};
+     This is defined as the sum of the centered in=outdegree popularity
+     and in=outdegree activity effects:
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} (x_{j+} + x_{i+} - 2 d) \ ,
+\]
+   where $d$ is the average degree across all waves.
 \item \emph{covariate effect} \texttt{(egoPlusAltX)}.
      This is defined as the sum of the covariate-ego and
      covariate-alter effects; equivalently, this effect
@@ -9624,12 +9854,20 @@ assumed to have equal contributions.
      covariate-squared alter effect
      under the assumption that the parameters for both are the same:
 \[
- s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} (v_i^2 + v_j^2) \ .
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij} (v_i^2 + v_j^2) \ ;
 \]
+  \item {\em transitive triads effect} \texttt{(transTriads)},
+   defined by the number of transitive patterns in $i$'s relations,
+   which for non-directed networks can be written as\\
+ $s^{\rm net}_{i\vit}(x) =  \sum_{j < h} x_{ij}\, x_{ih}\, x_{hj}\,$;\\
 \end{enumerate}
 For non-directed networks there is only one degree assortativity effect,
-the degree assortativity effect which is the outdegree-indegree version
-with short name \texttt{outInAss}.
+the degree assortativity effect which is the outdegree-indegree
+version\footnote{Of the four versions this has the correct change statistic,
+because the change in $x_{ij}$ is associated with a change
+in both the outdegree of $i$ and the indegree of $j$.}
+still with short name \texttt{outInAss}.
+There is also only one GWESP effect, called simply \texttt{gwesp}.
 
 \subsubsection{Multiple network effects}
 \label{S_MultiNet}
@@ -11362,9 +11600,11 @@ reciprocated degrees.
 
 When rate effects are included, sometimes it can be helpful to specify
 a smaller value for the initial gain parameter in \sfn{sienaAlgorithmCreate()};
-e.g., \texttt{initg=0.01} or even  \texttt{initg=0.001}.
+e.g., \texttt{firstg=0.01} or even  \texttt{firstg=0.001}.
 When the estimation algorithm diverges and any rate effects are in the model,
 this option should be considered.
+With a smaller \texttt{firstg} parameter convergence will be slower, but also
+there is a smaller probability that the parameter will diverge accidentally.
 
 \iffalse
 \subsubsection{Network rate function for Model Type 2}
@@ -11502,7 +11742,6 @@ The list of these effects is the following.
 
 \item {\em reciprocated degree effect} \texttt{(recipDeg)}, \\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\,x_{ji} $;
-
 
 % \item {\em indegree up to $c$ effect}, where $c$ is a constant between 1 and $n-1$,\\
 % $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} \leq c\}$,\\
@@ -11758,9 +11997,10 @@ The list of these effects is the following.
 
  \item {\em peripheral effect}, defined by  $i$'s
  behavior multiplied by the number of dense triads to which actor $i$ stands
- in a unilateral-peripheral relation,\\
- $s^{\rm beh}_{i\vit}(x, z) =  \\[0.4ex]
- \phantom{abcdef} z_i \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
+ in a unilateral-peripheral relation,
+
+ $s^{\rm beh}_{i\vit}(x, z) =  $\\[0.4ex]
+ $\phantom{abcdef} z_i \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
  I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$,\\[0.4ex]
  where $c$ is the same constant as in the {\it dense triads} effect;\\
  for symmetric networks, the unilateral condition is dropped, and the effect is\\
@@ -13475,7 +13715,7 @@ sink()
 \end{verbatim}
 
 
-\subsubsection*{After updating}
+\subsection{After updating}
 
 \noindent
 Updates of \RS and \textsf{RSienaTest} are not always completely backward
@@ -13485,10 +13725,22 @@ incomplete backward compatibility with respect to
 useability of scripts, this will be mentioned at the \emph{News page}
 of the \SI website.
 
+Creating a new effect object given that you have an earlier effect
+object \texttt{old.effects} for an older \RS version can become
+easier using the function \sfn{updateSpecification},
+with commands such as the following.
+\begin{verbatim}
+eff0 <- getEffects(data_object)
+new.effects <- updateSpecification(eff0, old.effects)
+\end{verbatim}
+See the help file for  \sfn{updateSpecification};
+the \RS version used to create \texttt{old.effects} does not matter.
+
 
 
 \subsection{During estimation}
 
+$\diamondsuit$
 \emph{Unlikely to terminate this epoch: more than 1000000 steps}.
 \medskip
 
@@ -13561,7 +13813,7 @@ This requires allowOnly=FALSE in startup1Model
 
 \fi
 
-\noindent
+\noindent $\diamondsuit$
 \emph{Error in solve.default(z\$dfra) : \\
 system is computationally singular: reciprocal condition number = 2.34809e--35
 }\\
@@ -13572,7 +13824,7 @@ system is computationally singular: reciprocal condition number = 2.34809e--35
 or
 \smallskip
 
-\noindent
+\noindent $\diamondsuit$
 \emph{Error for inversion of d11}
 \smallskip
 
@@ -13599,7 +13851,7 @@ be relevant here.)
 \end{indentation}
 \bigskip
 
-\noindent\emph{Error in initializeFRAN(z, x, initC = FALSE, ...) :\\
+\noindent $\diamondsuit$ \emph{Error in initializeFRAN(z, x, initC = FALSE, ...) :\\
   Unexpected effect name: someShortName}\\
 (where \emph{someShortName} is a short name you supplied in the
 model specification).
@@ -13607,7 +13859,7 @@ model specification).
 
 \begin{indentation}{0.04\textwidth}{0pt}
 \noindent
-Probably your effects object was made by an earlier version
+Probably your effects object was made by an earlier or newer version
 of {\rs} than the version you are using now.
 \smallskip
 
@@ -13625,7 +13877,7 @@ If this is all right, the recreate the effects object.
 \bigskip
 
 
-\noindent\emph{Endowment effect not supported}\\
+\noindent $\diamondsuit$ \emph{Endowment effect not supported}\\
 (for a specified endowment or creation effect).
 \smallskip
 
@@ -13649,9 +13901,54 @@ If this is all right, the recreate the effects object.
 
 
 
+\noindent $\diamondsuit$ \emph{total probability non-positive}\\
+\smallskip
+
+\begin{indentation}{0.04\textwidth}{0pt}
+\noindent
+The calculation of probabilities for the next ministep failed,
+probably because no change was allowed for this actor in this period,
+given the current state of the model.
+
+This may have to do with structurally determined values
+(see Section~\ref{S_struct})
+and/or with joiners and leavers (see Section~\ref{S_comp});
+or with a restriction that a variable (tie variable, behavioral variable)
+is monotonic (Section~\ref{S_monotone}), i.e., can only
+increase or only decrease.
+
+Perhaps the most likely possibility is that you are working with a
+multiple group data set (perhaps using \sfn{sienaBayes})
+for which some groups are only-increasing or only-decreasing,
+which then is taken by \RS to apply also to the simulations carried
+out for this group, as mentioned in Section~\ref{S_monotone}.
+\smallskip
+
+\noindent
+\emph{Solution.} \\
+Try to find out why it is possible in your data set
+that some actor has no options at all to choose from.
+
+If you are working with a multi-group data set, use
+\texttt{allowOnly = FALSE} in the call of \sfn{sienaDependent},
+as recommended in Section~\ref{S_monotone}; also see the help file for
+\sfn{sienaDependent}.
+
+Note that if you wish to forbid some actors from making any changes
+in some dependent variable, you can use a rate function dependent
+on a dummy actor covariate (effect \texttt{rateX}), with parameter fixed
+to a large negative value such as --100, which is sufficiently close to
+infinity (recall the exponentation in the calculation of the rate function)
+to effectively prevent this actor from taking any ministeps.
+\end{indentation}
+\bigskip
+
+
+
 
 \subsection{As the result of a score-type test (including time test)}
 
+$\diamondsuit$
 \emph{Error in solve.default(v9) :
    Lapack routine dgesv: system is exactly singular\\
 Error in if (cvalue $<$ 0) cvalue $<-$ 0 :
@@ -13685,7 +13982,7 @@ time heterogeneity tests by the \sfn{excludeEffects} parameter.
 
 \subsection{In sienaGOF}
 
-
+$\diamondsuit$
 \emph{Error in if (attr(obsData[[groupName]]\$depvars[[varName]], "sparse")) \{ :\\
   argument is of length zero }
 \smallskip
@@ -13704,6 +14001,7 @@ Use a correct \sfn{groupName} and \sfn{varName}.
 \bigskip
 
 \noindent
+$\diamondsuit$
 \emph{Error in if (isbipartite) \{ : argument is of length zero }
 \smallskip
 
@@ -14801,11 +15099,44 @@ This presents the main changes, especially those directly visible to the user,
 in reverse time order from the current version until
 version 1.0.6 of end October 2009.
 For more complete information about changes,
-consult the \sfn{ChangeLog} file in the source code on CRAN or in
+consult the CHANGELOG file in the source code on CRAN or in
 the R-Forge repository, which contains a more complete listing.
 
 \begin{small}
 \begin{itemize} % Also update version number in abstract
+
+\item 2019-05-20 R-Forge Revision 340, package version 1.2-17.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item New effects \texttt{outAct.c}, \texttt{inAct.c}, \texttt{outPop.c}, \texttt{inPop.c}, \texttt{degPlus.c}.
+       These are centered versions, which might have better convergence properties
+       than their namesakes without the \texttt{.c}.
+   \item Effects \texttt{antiInIso} and \texttt{antiInIso2} implemented also for non-directed networks.
+   \item Effects \texttt{outTrunc}, \texttt{outTrunc2}, \texttt{outSqInv}, \texttt{isolateNet}, and \texttt{degPlus} got
+     endowment effects.
+   \item For \texttt{inPopIntn}, \texttt{outPopIntn}, \texttt{inActIntn}, and \texttt{outActIntn}, added `centered'
+     to the statistic name.
+   \item \sfn{plot.sienaGOF} has a new parameter \texttt{fontsize}; the dots \texttt{...} will also accept parameters
+     \texttt{cex}, \texttt{cex.main}, \texttt{cex.lab}, \texttt{cex.axis}, as used more generally
+     for plotting in R.
+   \item In case of simulation as indicated by \texttt{x\$simOnly~=~TRUE},
+     the object produced by \sfn{siena07} now also contains the standard errors of the mean,
+     called \texttt{estMeans.sem} (see the help page for \sfn{siena07}).
+   \item On various places diagnostic output messages were relabeled to `message' or `warning', which implies
+   that they can be turned off by commands such as \texttt{suppressMessages}
+   or \texttt{suppressWarnings}.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item In \sfn{sienaBayes}: \\
+     \texttt{prevAns} now is allowed to have a different specification of
+     random effects than \texttt{effects};\\
+     it is not allowed to use \texttt{prevAns} and \texttt{prevBayes}
+      objects simultaneously;\\
+      some further small algorithm changes (see CHANGELOG).
+\end{itemize}
 
 \item 2019-02-26 R-Forge Revision 339, package version 1.2-16.
 

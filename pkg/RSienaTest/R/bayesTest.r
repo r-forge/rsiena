@@ -253,7 +253,7 @@ plot.multipleBayesTest <- function(x, xlim=NULL, ylim=NULL,	main=NULL, ...){
 	if (is.null(ylim)){ylim <- stretch2(range(d1$y))}
 	if (is.null(main)){main <- "posterior distances"}
 	if (x$chisquared > xlim[2]){
-		cat('note: observed chi-squared =',round(x$chisquared,1),
+		warning('note: observed chi-squared =',round(x$chisquared,1),
 			'outside plot window.\n')}
 	plot(d1, xlim=xlim, ylim=ylim, xlab='distance', ylab="density", col=4,
 		cex=4, cex.lab=2, cex.main=2, main=main, lwd=2, ...)
@@ -396,13 +396,13 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 					dim(res2)[3]+dim(res3)[3]))
 			fName <- c(fName2, fName3)
 		},
-		cat('wrong parameter given: extracted =',extracted,'\n')
+		warning('wrong parameter given: extracted =',extracted,'\n')
 	)
 	if (!is.null(res)){
 		dimnames(res) <- list(1:dim(res)[1], paste('chain', 1:length(zlist)),
 			fName)
 		if (any(is.na(res))){
-			cat('warning: the extracted array contains NA elements\n')
+			warning('warning: the extracted array contains NA elements\n')
 		}
 	}
 	res
@@ -491,21 +491,21 @@ plotPostMeansMDS <- function(x, pmonly=0, nfirst=NULL, ...){
 #	requireNamespace(MASS)
 	is.even <- function(k){k %% 2 == 0}
 	is.odd <- function(k){k %% 2 != 0}
-	cat('extracting posterior means ...\n')
+	message('extracting posterior means ...')
 	pm <- extract.posteriorMeans(x, nfirst=nfirst)
 	if (pmonly <= 0)
-	{ 
+	{
 		vars <- (1:dim(pm)[2])
 	}
 	else if (pmonly == 1)
-	{ 
+	{
 		vars <- is.odd(1:dim(pm)[2])
 	}
 	else
-	{ 
+	{
 		vars <- is.even(1:dim(pm)[2])
 	}
-	cat('calculating MDS solution ...\n')
+	message('calculating MDS solution ...')
 	corpm <- cor(t(pm[,vars]))
 	mds <- isoMDS(1-corpm)
 	eqscplot(mds$points, type='n', ...)

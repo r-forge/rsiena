@@ -1,6 +1,33 @@
+2019-05-20 R-Forge Revision 340, packages version 1.2-17.
+Changes in RSiena and RSienaTest:
+   * New effects outAct.c, inAct.c, outPop.c., inPop.c, degPlus.c.
+   * Effects antiInIso and antiInIso2 implemented for non-directed networks.
+   * Effects outTrunc, outTrunc2, outSqInv, isolateNet, and degPlus got
+     endowment effects.
+   * For inPopIntn, outPopIntn, inActIntn, and outActIntn, added "centered"
+     to the statistic name.
+   * In plot.sienaGOF new parameter fontsize; ... will also accept parameters
+     cex, cex.main, cex.lab, cex.axis.
+   * estMeans.sem added to object produced by siena07, if x$simOnly.
+   * Components regrCoef, regrCor, estMeans, and estMeans.sem mentioned in
+     help page for siena07.
+   * Hidden options in siena07 with x$targets (initializeFRAN.r).
+   * Extra identifying information for "total probability non-positive" error
+     (NetworkVariable.cpp).
+   * On various places replaced "cat" by "message" or "warning".
+   * Replaced && by any(.. & ..) 
+     to comply with R 3.6.0 new standard (sienaTimeTest).
+Changes in RSienaTest:
+   * sienaBayes: do not allow prevAns and prevBayes objects simultaneously;
+     omit partial averaging at the end of warming phase;
+     "prevAns" now is allowed to have a different specification of 
+     random effects than "effects";
+     warming up lowest level reduced to 3 iterations of MCMCCycle,
+     but applied also if newProposalFromPrev.
+
 2019-02-26 R-Forge Revision 339, packages version 1.2-16.
 Changes in RSiena and RSienaTest:
-   * New effects maxAAlt, minXAlt (thanks to Per Block, Marion Hoffman,
+   * New effects maxXAlt, minXAlt (thanks to Per Block, Marion Hoffman,
      Isabel Raabe, and Timon Elmer), outIsolate.
    * Effect name of isolate effect (not shortName) changed to in-isolate.
    * New parameter thetaValues in siena07, allowing simulations in Phase 3
@@ -34,8 +61,8 @@ Changes in RSienaTest:
 Changes in RSiena and RSienaTest:
    * New effects sameXReciAct and diffXReciAct.
    * Increased length of MLSimulation::preburnin.
-   * Changes in sienaFitThetaTable, averageTheta.last, sdTheta.last in sienaprint.r
-     to enable change in extract.posteriorMeans (see below).
+   * Changes in sienaFitThetaTable, averageTheta.last, sdTheta.last in 
+     sienaprint.r to enable change in extract.posteriorMeans (see below).
    * siena.table adapted for sienaBayes results.
 Changes in RSienaTest:
    * New functions shortBayesResults and plotPostMeansMDS.
@@ -85,15 +112,15 @@ Changes in RSienaTest:
      allow fixed rate parameters, with priorRatesFromData=-1;
      changed initial values of scale factors for proposal distributions;
      new parameters target and usePrevOnly;
-     in case prevBayes is used, parameters nrunMHBatches, nSampVarying, nSampConst,
-     and nSampRates in the function call of sienaBayes supersede those
-     in the prevBayes object;
+     in case prevBayes is used, parameters nrunMHBatches, nSampVarying, 
+     nSampConst, and nSampRates in the function call of sienaBayes supersede 
+     those in the prevBayes object;
      correct bug for three-effect interactions (projectEffects)
      copy parameters modelType, behModelType, MaxDegree, Offset, initML,
      from parameter algo to the algorithms created within sienaBayes;
      more extensive checking of smallest eigenvalue of covariance matrix
      (function correctMatrix);
-     For priorRatesFromData = 1 or 2, the resulting matrix for priorKappa != 1 
+     For priorRatesFromData = 1 or 2, the resulting matrix for priorKappa != 1
      was incorrect; this was corrected.
      reported timing changed to elapsed system time;
      some reordering of parameters.
@@ -165,7 +192,8 @@ Changes in RSiena and RSienaTest:
      returnDeps: new function gotoLastState() in MLSimulation, adaptation of
      mlPeriod() in siena07models.cpp, and some other small changes.
    * Added endowment and creation effects for maxAlt and minAlt.
-   * Error messages for non-character nodeSets in sienaDependent, coCovar, varCovar.
+   * Error messages for non-character nodeSets in sienaDependent, coCovar, 
+     varCovar.
    * Improved way of handling missings for distance-2 network effects.
    * Added components requestedEffects, theta, and se to siena08
      (theta and se are the ML estimates).
@@ -397,8 +425,8 @@ Changes in RSiena and RSienaTest:
    * outOutAss dropped for symmetric networks; only outInAss remains.
    * egoX effect has interactionType='ego' also for symmetric networks.
    * The exclusion in effects.r of effects if the variance of a covariate is 0,
-     or a covariate has only two values, is dropped (these effects have no meaning,
-     but their exclusion was a potential nuisance for meta-analyses).
+     or a covariate has only two values, is dropped (these effects have no 
+     meaning, but their exclusion was a potential nuisance for meta-analyses).
    * Description of gwespFB and gwespBF corrected (allEffects.csv and manual).
    * includeInteraction has an additional parameter random.
    * siena08 now also accepts a list for ...

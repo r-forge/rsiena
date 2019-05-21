@@ -1353,6 +1353,9 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	else
 	{
 		Rprintf("total = %f\n", total);
+		Rprintf("this actor = %d\n", (this->lego + 1) );
+		Rprintf("this period = %d\n", (this->period() + 1) );
+		// counting starts at 0
 		error("total probability non-positive");
 	}
 

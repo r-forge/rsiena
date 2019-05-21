@@ -172,8 +172,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 			}
 			if (any(is.na(actual)))
 			{
-				cat('is.na(actual) for ',which(is.na(actual)),"\n")
-cat("Please report to Tom; and hit a key to continue\n")
+				warning('is.na(actual) for ',which(is.na(actual)), noBreaks. = TRUE)
+				warning("Please report to Tom; and hit a key to continue", noBreaks. = TRUE)
 # if this never happens this check can be dropped
 browser()
 				actual[is.na(actual)] <- actual.previous
@@ -207,7 +207,7 @@ browser()
 					z$scaleFactorEta * multiplier[z$nGroup+2]
 			if (any(is.na(z$scaleFactors)))
 			{
-				cat('\nany(is.na(z$scaleFactors)) in improveMH\n')
+				warning('\nany(is.na(z$scaleFactors)) in improveMH', noBreaks. = TRUE)
 				browser()
 			}
 			cat('\n',iter, '.        ', sprintf("%6.1f", actual),
@@ -223,9 +223,9 @@ browser()
 			}
 			if (any(z$scaleFactors < tiny))
 			{
-				cat('tiny: ', which(z$scaleFactors < tiny),'\n')
-				cat('This is a problem: scaleFactors too small.\n')
-				cat('Try a model with fewer randomly varying effects.\n')
+				message('tiny: ', which(z$scaleFactors < tiny))
+				message('This is a problem: scaleFactors too small.')
+				message('Try a model with fewer randomly varying effects.')
 				stop('Tiny scaleFactors.')
 			}
 		}
@@ -291,12 +291,12 @@ browser()
 			if (inherits(try(z$SigmaTemp.inv <<- chol2inv(chol(z$SigmaTemp)),
 					silent=TRUE), "try-error"))
 			{ # practically impossible given correctMatrix
-				cat('Covariance matrix z$SigmaTemp is non-invertible;\n')
+				message('Covariance matrix z$SigmaTemp is non-invertible;')
 					if (nmain <= z$p1 + 2)
 				{
-					cat('this may be because nmain is too small;\n or')
+					message('this may be because nmain is too small;')
 				}
-				cat('perhaps the model is not identified; please check.\n')
+				message('or perhaps the model is not identified; please check.')
 				stop('Inversion error in Cholesky decomposition.')
 			}
 
@@ -494,10 +494,10 @@ browser()
 		if (any(is.na(logpNew))) # This was a bug, hopefully does not occur any more
 		{
 			save(z,file="ErrorPartialBayesResult.RData")
-			cat("Current object saved as ErrorPartialBayesResult.RData \n")
-			cat(print(z$thetaMat), "\n")
-			cat("(is.na(logpNew)) for ", which(is.na(logpNew)), "\n")
-			cat("thetaMat for NA coordinates\n")
+			message("Current object saved as ErrorPartialBayesResult.RData ")
+			message(print(z$thetaMat))
+			message("(is.na(logpNew)) for ", which(is.na(logpNew)))
+			message("thetaMat for NA coordinates")
 			for (i in which(is.na(logpNew))){byM(thetaMati(i))}
 		}
 		proposalProbability <- priorNew - priorOld + logpNew - logpOld
@@ -522,12 +522,14 @@ browser()
 		}
 		if (any(is.na(proposals.accept)))
 		{
-			cat("any(is.na(proposals.accept))\n")
-			cat("The group/s with NA proposals.accept is/are ", which(is.na(proposals.accept)),"\n")
+			warning("any(is.na(proposals.accept))", noBreaks. = TRUE)
+			warning("The group/s with NA proposals.accept is/are ", 
+						which(is.na(proposals.accept)), noBreaks. = TRUE)
 			if (initgainGroupwise > 0.0)
 			{
-				cat("\nPerhaps a case of divergence?\n")
-				cat("\nIf so: perhaps use a smaller value of initgainGroupwise.\n\n")
+				warning("\nPerhaps a case of divergence?", noBreaks. = TRUE)
+				warning("\nIf so: perhaps use a smaller value of initgainGroupwise.", 
+									noBreaks. = TRUE)
 			}
 			cat("Hit return to continue....")
 			browser()
@@ -657,7 +659,7 @@ browser()
 			if (bgain*maxdif > 0.3)
 			{
 				correct <- 0.3/(bgain*maxdif)
-				cat("Correction for jump in mu by ",correct,"\n")
+				message("Correction for jump in mu by ",correct)
 			}
 			# The update needs to be applied only to the unmasked part,
 			# because the masked part plays no role.
@@ -694,7 +696,7 @@ browser()
 				if (bgain*maxdif > 0.3)
 				{
 					correct <- 0.3/(bgain*maxdif)
-					cat("Correction for jump in eta by ",correct,"\n")
+					message("Correction for jump in eta by ",correct)
 				}
 				z$thetaMat[,z$set2] <<- z$thetaMat[,z$set2] +
 							bgain * correct * z$factorsEta*etaScores
@@ -716,7 +718,7 @@ browser()
 			if (bgain*maxdif > 0.2)
 			{
 				correct <- 0.2/(bgain*maxdif)
-				cat("Correction for jump in Sigma by ",correct,"\n")
+				message("Correction for jump in Sigma by ",correct)
 			}
 			z$SigmaTemp <<- correctMatrix(z$SigmaTemp -
 					bgain * correct * (z$SigmaTemp - matQ), z$delta)
@@ -745,14 +747,14 @@ browser()
 #			if (min(esv) <= .Machine$double.eps)
 		if (min(esv) < delt)
 			{
-				cat("correctMatrix: Eigenvalues Sigma = ", sort(esv), "\n")
+				message("correctMatrix: Eigenvalues Sigma = ", sort(esv))
 #				tol <- dd*max(abs(esv))*.Machine$double.eps
 #				delt <-	 2*tol # factor two is just to make sure the resulting
 				# matrix passes all numerical tests of positive definiteness
 				# TS: I replace this delta by a larger number
 				tau <- pmax(0, delt - esv)
-				cat("Smallest eigenvalue of Sigma now is ",
-								min(esv),"; make posdef.\n")
+				message("Smallest eigenvalue of Sigma now is ",
+								min(esv),"; make posdef.")
 				dm =  es$vectors %*%
 						diag(tau, nrow=length(tau)) %*% t(es$vectors)
 #		diag(standdev, nrow=length(tau)) %*% (corrMatrix + dm) %*% diag(standdev, nrow=length(tau))
@@ -849,15 +851,15 @@ covtrob <- function(x){
 	ctime <- proc.time()
 	if (any(effects$test))
 	{
-		cat("Specification that some effects are tested is canceled.\n")
+		warning("Specification that some effects are tested is canceled.", noBreaks. = TRUE)
 		effects$test[effects$test] <- FALSE
 	}
-	
+
 	if ((!is.null(prevAns)) & (!inherits(prevAns,'sienaFit')))
 	{
 		if (inherits(prevAns, 'sienaBayesFit'))
 		{
-			cat('Did you mean to use prevBayes instead of prevAns?\n')
+			warning('Did you mean to use prevBayes instead of prevAns?', noBreaks. = TRUE)
 		}
 		stop('What you used for prevAns is not a sienaFit object')
 	}
@@ -954,6 +956,10 @@ covtrob <- function(x){
 	}
 	else #	(!is.null(prevBayes))
 	{
+		if (!is.null(prevAns))
+		{
+			stop('Do not use a prevAns and a prevBayes object simultaneously.')
+		}
 		if (inherits(prevBayes, "sienaBayesFit"))
 		{
 				cat("Continuation from earlier sienaBayes result",
@@ -961,8 +967,8 @@ covtrob <- function(x){
 		}
 		else
 		{
-			cat(deparse(substitute(prevBayes)),
-						"is not a sienaBayesFit object.\n")
+			warning(deparse(substitute(prevBayes)),
+						"is not a sienaBayesFit object.")
 			stop("Do not use this object for prevBayes.")
 		}
 		z <- prevBayes
@@ -994,19 +1000,18 @@ covtrob <- function(x){
 			cat("nImproveMH changed to ", nImproveMH, ".\n")
 		}
 		flush.console()
-		correctMatrix
 
 		esv <- eigen(z$priorSigma)$values
 		if (min(esv) <= 0)
 		{
-			cat('The matrix priorSigma is not positive definite.\n')
+			message('The matrix priorSigma is not positive definite.')
 			dS <- diag(z$priorSigma)
 			if (min(dS) <= 0)
 			{
-				cat('Its diagonal elements are not all positive.\n')
+				message('Its diagonal elements are not all positive.')
 				stop('Incorrect priorSigma for prevBayes object.')
 			}
-			cat('Off-diagonal values are set to 0.\n')
+			message('Off-diagonal values are set to 0.')
 			pS <- matrix(0, dim(z$priorSigma)[1], dim(z$priorSigma)[1])
 			diag(pS) <- dS
 			z$priorSigma <- pS
@@ -1041,44 +1046,49 @@ covtrob <- function(x){
 		cat('warming took', round((ctime3-ctime2)[3]),'seconds elapsed for warming.\n')
 		flush.console()
 
-		# Improve parameter value by averaging
-	# Average the groupwise parameters over the last half of Phase 2
-#cat('aaa\n')
-#browser()
-		halfPhaseWarm <- floor(nwarm/2 + 1)
-		for (group in 1:z$nGroup)
+		if (frequentist)
 		{
-			if (priorRatesFromData >= 0)
+		# until 09/04/19, this was always done - without the frequentist condition -,
+		# and not properly moreover.
+			# Improve parameter value by averaging
+			# Average the groupwise parameters over the last portion of Phase 2
+			portion <- max(0.1, min(0.5, nwarm/50))
+			lastPhaseWarm <- floor((1-portion)*nwarm + 1)
+			for (group in 1:z$nGroup)
 			{
-			z$thetaMat[group, z$ratePositions[[group]]] <-
-				colMeans(z$ThinParameters[halfPhaseWarm:nwarm, group,
-				!z$generalParametersInGroup, drop=FALSE], dims=1)
+				if (priorRatesFromData >= 0)
+				{
+				z$thetaMat[group, z$ratePositions[[group]]] <-
+					colMeans(z$ThinParameters[lastPhaseWarm:nwarm, group,
+					!z$generalParametersInGroup, drop=FALSE], dims=1)
+				}
+				z$thetaMat[group, !z$basicRate] <- colMeans(
+					z$ThinParameters[lastPhaseWarm:nwarm, group,
+					z$generalParametersInGroup, drop=FALSE], dims=1)
 			}
-			z$thetaMat[group, !z$basicRate] <- colMeans(
-				z$ThinParameters[halfPhaseWarm:nwarm, group,
-				z$generalParametersInGroup, drop=FALSE], dims=1)
-		}
 		# Average the past groupwise parameters over runs and groups
 		# Average the covariance matrices over the runs
-		if (priorRatesFromData >= 0)
-		{
-			z$muTemp <-
-				colMeans(z$ThinParameters[halfPhaseWarm:nwarm, ,
+			if (priorRatesFromData >= 0)
+			{
+				z$muTemp <-
+					colMeans(z$ThinParameters[lastPhaseWarm:nwarm, ,
+							z$randomParametersInGroup, drop=FALSE], dims=2)
+				tmp <- lapply(lastPhaseWarm:nwarm, function(i, x)
+					{cov(x[i,,z$randomParametersInGroup])},
+										x=z$ThinParameters)
+			}
+			else
+			{# in the following, changed varyingGeneralParametersInGroup to randomParametersInGroup, 9/4/19
+				z$muTemp <-
+					colMeans(z$ThinParameters[lastPhaseWarm:nwarm, ,
 						z$randomParametersInGroup, drop=FALSE], dims=2)
-			tmp <- lapply(halfPhaseWarm:nwarm, function(i, x)
-				{cov(x[i,,z$randomParametersInGroup])},
+				tmp <- lapply(lastPhaseWarm:nwarm, function(i, x)
+					{cov(x[i,,z$randomParametersInGroup])},
 										x=z$ThinParameters)
+			}
+			z$SigmaTemp <- Reduce('+', tmp) / (nwarm - lastPhaseWarm + 1)
 		}
-		else
-		{# or should this also be randomParametersInGroup?
-		z$muTemp <-
-			colMeans(z$ThinParameters[halfPhaseWarm:nwarm, ,
-						z$varyingGeneralParametersInGroup, drop=FALSE], dims=2)
-		tmp <- lapply(halfPhaseWarm:nwarm, function(i, x)
-				{cov(x[i,,z$varyingGeneralParametersInGroup])},
-										x=z$ThinParameters)
-		}
-		z$SigmaTemp <- Reduce('+', tmp) / (nwarm - halfPhaseWarm + 1)
+
 		cat('Parameter values after warming up\n')
 		for (i in (1:z$nGroup))
 		{
@@ -1139,7 +1149,7 @@ covtrob <- function(x){
 		prevThetaMat <- z$thetaMat
 		z$FRAN <- getFromNamespace(algo$FRANname, pkgname)
 		z <- initializeFRAN(z, algo, data=data, effects=effects,
-				prevAns=prevAns, initC=FALSE, onlyLoglik=TRUE)
+				prevAns=NULL, initC=FALSE, onlyLoglik=TRUE)
 		cat('back in sienaBayes\n')
 		z$thetaMat <- prevThetaMat
 
@@ -1167,6 +1177,20 @@ covtrob <- function(x){
 								max=.Machine$integer.max)))
 		}
 
+		# Note: all parameter values are taken from prevBayes,
+		# but this does not contain the likelihood chains at the lowest level.
+		# Therefore some burn-in is offered to make the lowest level correspond
+		# to current parameter values.
+		# The number 3 seems a reasonable choice.
+		cat('warm up lowest level')
+		for (ii in 1:3)
+		{
+			MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
+						nSampCons=nSampConst, nSampRate=nSampRates,
+						bgain=0.0, change=FALSE)
+		}
+		cat('\nend of warming up lowest level\n')
+				
 		if (newProposalFromPrev)
 		{
 		# effects0 defined as in initializeBayes,
@@ -1219,21 +1243,6 @@ covtrob <- function(x){
 			ctime04<- proc.time()
 			cat('From prevBayes improveMH', round((ctime04-ctime01)[3]),'seconds elapsed.\n')
 			flush.console()
-		}
-		else
-		{
-		# Note: all parameter values are taken from prevBayes,
-		# but this does not contain the likelihood chains at the lowest level.
-		# Therefore some burn-in is offered to make the lowest level correspond
-		# to current parameter values.
-			print('warm up lowest level')
-			for (ii in 1:20)
-			{
-				MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
-							nSampCons=nSampConst, nSampRate=nSampRates,
-							bgain=0.0, change=FALSE)
-			}
-			print('end of warming up lowest level')
 		}
 	}
 
@@ -1418,8 +1427,8 @@ covtrob <- function(x){
 	z$FRAN <- NULL
 	if (z$correctSigma > 0)
 	{
-		cat('Warning: corrections of the covariance matrix to keep eigenvalues larger than ', delta,
-		 ' were necessary in ', z$correctSigma, 'cases.\n')
+		warning('corrections of the covariance matrix to keep eigenvalues larger than ', delta,
+		 ' were necessary in ', z$correctSigma, 'cases.')
 	}
 	class(z) <- "sienaBayesFit"
 
@@ -1471,32 +1480,32 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 
 	if (min(matDistances) <= 0)
 	{
-		cat('In some groups, there is no change for a dependent variable.\n')
-		cat('This is not allowed.\n')
+		message('In some groups, there is no change for a dependent variable.')
+		message('This is not allowed.')
 		dist.check <- 3
 		wh <- which((matDistances <= dist.check), arr.ind=TRUE, useNames=FALSE)
-		cat('The following shows the dependent variables and periods\n')
-		cat('for which there are less than',dist.check+1, 'changes: \n')
+		message('The following shows the dependent variables and periods')
+		message('for which there are less than',dist.check+1, 'changes: ')
 		prmatrix(cbind(wh[,1], colnames(matDistances)[wh[,2]], matDistances[wh]),
 						rowlab=rep('',dim(wh)[1]),
 						collab=c('group', 'depvar/period', '# changes'), quote=FALSE)
-		cat('In any case, there should be no groups with 0 changes.\n')
+		message('In any case, there should be no groups with 0 changes.')
 		stop('No change in some variable: Adapt the data set.')
 	}
 
 	imp.change <- lapply(data, checkImpossibleChanges)
 	if (sum(unlist(imp.change)) > 0)
 	{
-		cat('For some groups, there are impossible changes;\n')
-		cat('This occurs for groups\n', which(sapply(imp.change,
-						function(ic){(sum(ic) > 0)})),'\n')
-		cat('This is not permitted for likelihood-based estimation')
+		message('For some groups, there are impossible changes;')
+		message('This occurs for groups\n', which(sapply(imp.change,
+						function(ic){(sum(ic) > 0)})))
+		message('This is not permitted for likelihood-based estimation')
 		stop('Impossible changes in some variable: Adapt the data set.')
 	}
 
 	if (!is.null(algo$MaxDegree))
 	{
-		cat('The MaxDegree option is not implemented for likelihood-based estimation')
+		message('The MaxDegree option is not implemented for likelihood-based estimation')
 		stop('Do not use MaxDegree.')
 	}
 	numberFixed <- sum((!effects$randomEffects) & effects$include &
@@ -1507,15 +1516,15 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	{
 		if (any(priorSigEta[!is.na(priorSigEta)] == 0))
 		{
-			cat("priorSigEta is given as", priorSigEta,
+			message("priorSigEta is given as", priorSigEta,
 				"; this contains zeros, which is not allowed.\n")
 			stop("priorSigEta contains a zero.\n")
 		}
 		if (length(priorSigEta) != numberFixed)
 		{
-			cat("priorSigEta was specified with length", length(priorSigEta), ".\n")
-			cat("However, the model specification contains", numberFixed,
-				"fixed effects.\n")
+			message("priorSigEta was specified with length", length(priorSigEta))
+			message("However, the model specification contains", numberFixed,
+				"fixed effects.")
 			stop("priorSigEta is not of the correct length.")
 		}
 	}
@@ -1527,9 +1536,9 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		}
 		if (length(priorMu) != numberRandom)
 		{
-			cat("priorMu was specified with length ", length(priorMu), ".\n")
-			cat("However, the model specification contains", numberRandom,
-				"randomly varying effects.\n")
+			message("priorMu was specified with length ", length(priorMu))
+			message("However, the model specification contains", numberRandom,
+				"randomly varying effects.")
 			stop("priorMu is not of the correct length.")
 		}
 	}
@@ -1541,10 +1550,10 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		}
 		if (!all(dim(priorSigma) == c(numberRandom, numberRandom)))
 		{
-			cat("priorSigma was specified with dimensions ",
-			dim(priorSigma), ".\n")
-			cat("However, the model specification contains", numberRandom,
-				"randomly varying effects.\n")
+			message("priorSigma was specified with dimensions ",
+			dim(priorSigma))
+			message("However, the model specification contains", numberRandom,
+				"randomly varying effects.")
 			stop("priorSigma is not of the correct dimensions.")
 		}
 	}
@@ -1614,11 +1623,11 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 			if (diverse && any(sapply(1:ngroups,
 					function(i){attr(data[[i]]$depvars[[j]], "allowOnly")})))
 			{
-			cat("\nThere is heterogeneity between the groups with respect to")
-			cat("\ngoing up only, or down only, for dependent variable ",
-					attr(data[[1]]$depvars[[j]], "name"),".\n")
-			cat("Define this variable in sienaDependent() for all groups",
-				"with allowOnly=FALSE.\n")
+			message("\nThere is heterogeneity between the groups with respect to")
+			message("\ngoing up only, or down only, for dependent variable ",
+					attr(data[[1]]$depvars[[j]], "name"))
+			message("Define this variable in sienaDependent() for all groups",
+				"with allowOnly=FALSE.")
 			stop("allowOnly=FALSE should be set in sienaDependent().")
 			}
 		}
@@ -1675,6 +1684,9 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		if (startupSkip)
 		{
 			startupGlobal <- prevAns
+# to allow "prevAns" to have a different specification of random effects than "effects":
+			startupGlobal$requestedEffects[startupGlobal$requestedEffects$include,
+							'randomEffects'] <- effects[effects$include,'randomEffects']
 		}
 		else
 		{
@@ -1682,7 +1694,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 								batch=TRUE, silent=silentstart,
 								useCluster=(nbrNodes >= 2), nbrNodes=nbrNodes,
 								clusterType=clusterType, prevAns=prevAns)
-		}		
+		}
 	}
 	cat("Initial global estimates\n")
 	z$initialResults <- print(startupGlobal)
@@ -1695,16 +1707,16 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		max(abs(startupGlobal$theta), na.rm=TRUE), "\n")
 	if (max(abs(startupGlobal$theta), na.rm=TRUE) > 400)
 	{
-		cat("\nThe initial global estimates are\n")
+		message("\nThe initial global estimates are")
 		print(startupGlobal$theta)
-		cat("\nThe largest absolute value is ",
+		message("\nThe largest absolute value is ",
 				max(abs(startupGlobal$theta), na.rm=TRUE),
 				"\nwhich is too large for good operation of this function.\n",
 				"\nAdvice: use a smaller value of initgainGlobal;\n",
 				"or, if possible, first estimate a multi-group project using siena07\n",
-				"and use this as prevAns in sienaBayes with initgainGlobal=0.\n\n")
+				"and use this as prevAns in sienaBayes with initgainGlobal=0.\n")
 		save(startupGlobal, file="startupGlobal.RData")
-		cat("startupGlobal saved.\n")
+		message("startupGlobal saved.")
 		stop("Divergent initial estimate.")
 	}
 # some checks
@@ -1811,8 +1823,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		{
 			if (incidentalBasicRates)
 			{
-				cat('For the incidentalBasicRates option, \n',
-					'rate parameters should not be included in the prior.\n')
+				message('For the incidentalBasicRates option, \n',
+					'rate parameters should not be included in the prior.')
 			}
 			stop(paste("priorMu must have length ",z$p1))
 		}
@@ -1928,18 +1940,18 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	if (inherits(try(z$proposalC0 <- chol2inv(chol(prec)),
 					silent=TRUE), "try-error"))
 	{
-		cat("precision(startupGlobal + prior) non-invertible.\n")
-		cat("This probably means the model is not identifiable.\n")
-		cat("A ridge is added to this precision matrix.\n")
+		message("precision(startupGlobal + prior) non-invertible.")
+		message("This probably means the model is not identifiable.")
+		message("A ridge is added to this precision matrix.")
 #		stop("Non-invertible precision(startupGlobal).")
 		prec.amended <- prec + diag(0.5*diag(prec), nrow=dim(prec)[1])
 		prec.PA <- prec.amended
 		if (inherits(try(z$proposalC0 <- chol2inv(chol(prec.amended)),
 					silent=TRUE), "try-error"))
 		{
-			cat("Even the amended precision(startupGlobal + prior) is non-invertible.\n")
+			message("Even the amended precision(startupGlobal + prior) is non-invertible.")
 			print(prec.amended)
-			cat("\n Please report this to Tom.\n")
+			message("\n Please report this to Tom.")
 			stop("Non-invertible amended precision(startupGlobal).")
 		}
 	}
@@ -2085,12 +2097,12 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	{
 		cat("\nThe initial estimates are\n")
 		print(initialEstimates)
-		cat("\nThe largest absolute value is ",
+		message("\nThe largest absolute value is ",
 				max(abs(initialEstimates), na.rm=TRUE),
 				"\nwhich is too large for good operation of this function.\n",
-				"\nAdvice: use a smaller value of initgainGroupwise (perhaps 0).\n\n")
+				"\nAdvice: use a smaller value of initgainGroupwise (perhaps 0).\n")
 		save(startupGlobal, initialEstimates, file="startupGlobal.RData")
-		cat("startupGlobal and initialEstimates saved.\n")
+		message("startupGlobal and initialEstimates saved.")
 		stop("Divergent initial estimate.")
 	}
 
@@ -2183,8 +2195,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	{
 		if (z$nGroup <= 1)
 		{
-			cat("\nFrequentist option for sienaBayes is available only for ")
-			cat("more than one group.\n")
+			message("\nFrequentist option for sienaBayes is available only for ")
+			message("more than one group.")
 			stop('Frequentist option unavailable.')
 		}
 #		else
@@ -2231,7 +2243,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		}
 		if (try.error)
 		{
-			cat('Condition priorRatesFromData=2 impossible, changed to 1.\n')
+			warning('Condition priorRatesFromData=2 impossible, changed to 1.', 
+								noBreaks. = TRUE)
 			priorRatesFromData <- 1
 		}
 		else
@@ -2544,7 +2557,7 @@ dmvnorm <- function(x, mean , sigma)
 	evs <- eigen(sigma, symmetric=TRUE, only.values=TRUE)$values
 	if (min(evs)< 1e-8)
 	{
-		cat('singular covariance matrix in dmvnorm\n')
+		warning('singular covariance matrix in dmvnorm', noBreaks. = TRUE)
 		dmvn <- -Inf
 	}
 	else
@@ -2566,7 +2579,7 @@ dmvnorm2 <- function(x, mean , evs, sigma.inv)
 	}
 	if (min(evs)< 1e-8)
 	{
-		cat('singular covariance matrix in dmvnorm2\n')
+		warning('singular covariance matrix in dmvnorm2', noBreaks. = TRUE)
 		dmvn <- -Inf
 	}
 	else
@@ -2615,8 +2628,8 @@ getProbabilitiesFromC <- function(z, index=1, getScores=FALSE)
 #	ans[[1]] <- sum(sapply(anss, "[[", 1))
 	if (nrow(callGrid) != length(anss))
 	{
-		cat("Error: nrow(callGrid) = ", nrow(callGrid), "; length(anss) = ",
-			length(anss),"\n")
+		message("Error: nrow(callGrid) = ", nrow(callGrid), "; length(anss) = ",
+			length(anss))
 		stop("Error in getProbabilitiesFromC")
 	}
 	# Sum the log probabilities for the periods corresponding to each group
@@ -2680,7 +2693,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	z$nImproveMH  <- z1$nImproveMH
 	z$nwarm	 <- z1$nwarm
 	z$nmain	 <- z1$nmain + z2$nwarm+z2$nmain - nwarm2
-	cat("The new object has", z$nwarm, "warming iterations")
+	cat("The new object has", z$nwarm, "warming iterations ")
 	cat("and", z$nmain, "main iterations.\n")
 	what <- ''
 	if (all(z1$mult == z2$mult))
@@ -2911,12 +2924,12 @@ protectedInverse <- function(x){
 		es <- eigen(x)
 		esv <- es$values
 		delta0 <- 1e-6
-		cat("protectedInverse: Eigenvalues Sigma = ", sort(esv), "\n")
+		message("protectedInverse: Eigenvalues Sigma = ", sort(esv))
 		if (min(esv) < delta0)
 		{
 			delta <- delta0
 			tau <- pmax(delta, esv)
-	#		cat("Smallest eigenvalue of Sigma now is ",
+	#		message("Smallest eigenvalue of Sigma now is ",
 	#					min(esv),"; make posdef.\n")
 			xinv <- es$vectors %*% diag(1/tau, dim(x)[1]) %*% t(es$vectors)
 		}

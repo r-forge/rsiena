@@ -181,16 +181,15 @@ proc2subphase <- function(z, x, subphase, useAverage=TRUE, ...)
 		else
 		{
 			# regression is just an experimental option, probably not important
-			cat('\n')
-			cat('Regression\n')
+			message('\nRegression\n')
 			##  use regression
-			cat('mean = ', z$thav / z$thavn, '; \n') #(z$nit + 1)
+			message('mean = ', z$thav / z$thavn, '; ') #(z$nit + 1)
 			#		stop('Regression not implemented; revive z$thetaStore if you wish')
 			mylm <- lm(z$sf[1:z$nit, ] ~ z$thetaStore[1:z$nit, ])
 			coefs <- coef(mylm)[-1, ]
 			newvals <- solve(t(coefs), - mylm$coef[1, ])
 			z$theta <- newvals
-			cat('regression = ',z$theta, '\n')
+			message('regression = ',z$theta)
 			# may take a lot of memory; if this would be a serious option,
 			# only sufficient statistics should be stored
 		}
@@ -456,7 +455,7 @@ doIterations<- function(z, x, subphase,...)
 			}
 			else
 			{
-				cat('thetaStore?\n')
+				message('thetaStore?')
 				browser()
 			}
 		}

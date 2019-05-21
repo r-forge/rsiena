@@ -247,7 +247,7 @@ EvaluateTestStatistic<- function(maxlike, test, redundant, dfra, msf, fra)
 	z2 <- fra[test]
 	if (inherits(try(id11 <- solve(d11), silent=TRUE), "try-error"))
 	{
-		cat('Score test: Error for inversion of d11 \n')
+		warning('Score test: Error for inversion of d11 \n')
 		oneSided <- NA
 		v9 <- d22
 		v9[] <- NA
@@ -275,7 +275,7 @@ EvaluateTestStatistic<- function(maxlike, test, redundant, dfra, msf, fra)
 		if (inherits(try(vav <- solve(v9), silent=TRUE), "try-error"))
 			## vav is the inverse variance matrix of ov
 		{
-			cat('Score test: Error for inversion of v9\n')
+			warning('Score test: Error for inversion of v9\n')
 			vav <- v9
 			vav[] <- NA
 			cvalue <- NA
@@ -322,7 +322,7 @@ score.Test <- function(ans, test=ans$test)
 	if (sum(test) <= 0) stop(paste('Something should be tested, but the total requested is',
 			sum(test)))
 	if (length(test) != ans$pp) stop('Dimensions of must agree')
-	if (any(test & (!ans$fix))) cat('Warning: some tested parameters were not fixed; do you know what you are doing??? \n')	
+	if (any(test & (!ans$fix))) warning('Warning: some tested parameters were not fixed; do you know what you are doing??? \n')
 	fra <- colMeans(ans$sf, na.rm=TRUE)
 	redundant <- (ans$fix & (!test))
 	tests <- EvaluateTestStatistic(ans$maxlike, test, redundant, ans$dfra, ans$msf, fra)

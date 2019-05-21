@@ -184,7 +184,7 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05, maxit=20)
 # to components requestedEffects, theta and se
 	requestedEffects <- ex[[1]]$requestedEffects
 	if (dim(requestedEffects)[1] != length(unique(mydf$effects))){
-		cat('\nWarning: length requestedEffects incorrect.\n')
+		warning('\nWarning: length requestedEffects incorrect.\n')
 		print(requestedEffects)
 		print(mydf$effects)
 	}

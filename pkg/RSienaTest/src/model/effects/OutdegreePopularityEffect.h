@@ -14,6 +14,9 @@
 
 #include "NetworkEffect.h"
 
+#include <string>
+using namespace std;
+
 namespace siena
 {
 
@@ -40,8 +43,10 @@ class OutdegreePopularityEffect : public NetworkEffect
 {
 public:
 	OutdegreePopularityEffect(const EffectInfo * pEffectInfo,
-		bool root);
+		bool root, bool centered);
 
+	virtual void initialize(const Data * pData, State * pState,	int period,
+			Cache * pCache);
 	virtual double calculateContribution(int alter) const;
 
 protected:
@@ -50,9 +55,11 @@ protected:
 private:
 	// Indicates if the square root of outdegrees must be used
 	bool lroot;
-
 	// Lookup table for fast square root calculations
 	SqrtTable * lsqrtTable;
+	bool lcentered;
+	double lcentering;
+	string lvariableName;
 };
 
 }

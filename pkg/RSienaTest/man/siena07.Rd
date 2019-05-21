@@ -180,7 +180,14 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{scores}{Score functions, added over waves, for each
     simulation in phase 3. Only included
     if \code{x$lessMem=FALSE}.}
- \item{sims}{If \code{returnDeps=TRUE}:
+  \item{regrCoef}{If \code{x$dolby} and not \code{x$maxlike}:
+    regression coefficients of estimation statistics on score functions.}
+  \item{regrCor}{If \code{x$dolby} and not \code{x$maxlike}:
+    correlations between estimation statistics and score functions.}
+  \item{estMeans}{Estimated means of estimation statistics.}
+  \item{estMeans.sem}{If \code{x$simOnly}: Standard errors of the
+    estimated means of estimation statistics.}
+  \item{sims}{If \code{returnDeps=TRUE}:
     list of simulated dependent variables (networks, behaviour).
     Networks are given as a list of edgelists, one for each period.}
  \item{chain}{If \code{returnChains = TRUE}:
@@ -214,7 +221,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     edited by Kees van Montfort, Han Oud and Albert Satorra; Lawrence Erlbaum.
    \item Steglich, Christian E. G., Snijders, Tom A. B., and
     Pearson, Michael A. (2010). Dynamic networks and behavior:
-    Separating selection from influence. 
+    Separating selection from influence.
     \emph{Sociological Methodology} \bold{40}, 329--393.
    \item Information about the implementation of the algorithm is in
      \url{http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf}.
