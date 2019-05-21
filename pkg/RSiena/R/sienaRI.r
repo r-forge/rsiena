@@ -223,7 +223,7 @@ expectedRelativeImportance <- function(conts, effects, theta, thedata=NULL,
 			structurals <- (depNetwork >= 10)
 			if (networkTypes[eff] == "oneMode"){
 				if (attr(depNetwork, 'symmetric')){
-					cat('\nNote that for symmetric networks, effect sizes are for modelType 2 (forcing).\n')}}
+message('\nNote that for symmetric networks, effect sizes are for modelType 2 (forcing).')}}
 
 			#			currentDepObjEffsNames <- paste(effects$shortName[currentDepEffs],
 			#				effects$type[currentDepEffs],effects$interaction1[currentDepEffs],sep=".")
@@ -335,9 +335,9 @@ expectedRelativeImportance <- function(conts, effects, theta, thedata=NULL,
 	}
 	if(depNumber>1)
 	{
-		warning(paste("more than one dependent variable\n",
+		message(paste("more than one dependent variable\n",
 				"return value is therefore not of class 'sienaRI'\n",
-				"but a list of objects of class 'sienaRI'.\n"))
+				"but a list of objects of class 'sienaRI'."))
 	}
 	RI
 }

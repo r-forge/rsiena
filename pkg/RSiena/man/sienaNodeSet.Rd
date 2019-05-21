@@ -25,6 +25,7 @@ sienaNodeSet(n, nodeSetName="Actors", names=NULL)
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/ }}
 \author{Ruth Ripley }
+\seealso{\code{\link{sienaDependent}}, \code{\link{sienaDataCreate}}}
 \examples{
 students <- sienaNodeSet(50, "student")
 }

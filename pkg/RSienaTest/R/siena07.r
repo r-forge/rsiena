@@ -149,7 +149,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 			if (!capabilities("X11"))
 			{
 				batchUse <- TRUE
-				cat("No X11 device available, forcing use of batch mode")
+				message("No X11 device available, forcing use of batch mode")
 			}
 		}
 		if(nzchar(Sys.getenv("RSIENA_TESTING")))

@@ -322,8 +322,9 @@ glueBayes(z1, z2, nwarm2=0)
   \emph{Journal of Statistical Planning and Inference}, 13, 3930-3938.
 }
 \author{Ruth Ripley, Johan Koskinen, Tom Snijders }
-\seealso{\code{\link{siena07}}, \code{\link{sienaGroupCreate}}, \code{\link{bayesTest}},
-   \code{\link{extract.sienaBayes}}\cr
+\seealso{\code{\link{siena07}}, \code{\link{sienaGroupCreate}},
+   \code{\link{bayesTest}}, \code{\link{extract.sienaBayes}},
+   \code{\link{plotPostMeansMDS}}\cr
   There are print and summary methods for sienaBayesFit objects, see
   \code{\link{print.sienaBayesFit}}.}
 \examples{

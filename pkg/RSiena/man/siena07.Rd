@@ -165,6 +165,13 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   \item{scores}{Score functions, added over waves, for each
     simulation in phase 3. Only included
     if \code{x$lessMem=FALSE}.}
+  \item{regrCoef}{If \code{x$dolby} and not \code{x$maxlike}:
+    regression coefficients of estimation statistics on score functions.}
+  \item{regrCor}{If \code{x$dolby} and not \code{x$maxlike}:
+    correlations between estimation statistics and score functions.}
+  \item{estMeans}{Estimated means of estimation statistics.}
+  \item{estMeans.sem}{If \code{x$simOnly}: Standard errors of the
+    estimated means of estimation statistics.}
  \item{sims}{If \code{returnDeps=TRUE}:
     list of simulated dependent variables (networks, behaviour).
     Networks are given as a list of edgelists, one for each period.}

@@ -56,11 +56,11 @@ sienaGOF <- function(
 	{
 		if (groups <= 1)
 		{
-			cat("Detected", iterations, "iterations and", groups, "group.\n")
+			message("Detected", iterations, "iterations and", groups, "group.")
 		}
 		else
 		{
-			cat("Detected", iterations, "iterations and", groups, "groups.\n")
+			message("Detected", iterations, "iterations and", groups, "groups.")
 		}
 	}
 
@@ -98,11 +98,11 @@ sienaGOF <- function(
 	{
 		if (length(period) <= 1)
 		{
-			cat("Calculating auxiliary statistics for period", period, ".\n")
+			message("Calculating auxiliary statistics for period", period, ".")
 		}
 		else
 		{
-			cat("Calculating auxiliary statistics for periods", period, ".\n")
+			message("Calculating auxiliary statistics for periods", period, ".")
 		}
 	}
 	if (!is.null(cluster))
@@ -123,14 +123,14 @@ sienaGOF <- function(
 					function (j) {
 						if (verbose)
 						{
-							cat("  Period ", j, "\n")
+							message("  Period ", j, "\n")
 							flush.console()
 						}
 						simStatsByPeriod <- sapply(1:iterations, function (i)
 						{
 							if (verbose && (i %% 100 == 0) )
 								{
-								cat("  > Completed ", i,
+								message("  > Completed ", i,
 										" calculations\r")
 								flush.console()
 								}
@@ -138,7 +138,7 @@ sienaGOF <- function(
 										sienaFitObject$f,
 										sienaFitObject$sims, j, groupName, varName, ...)
 						})
-					cat("  > Completed ", iterations, " calculations\n")
+					message("  > Completed ", iterations, " calculations\n")
 					flush.console()
 					simStatsByPeriod <-
 							matrix(simStatsByPeriod, ncol=iterations)
@@ -292,7 +292,7 @@ sienaGOF <- function(
 		counterTestEffects <- 0
 		for(index in which(sienaFitObject$test)) {
 			if (verbose) {
-				cat("Estimating test statistic for model including ",
+				message("Estimating test statistic for model including ",
 						effectsObject$effectName[index], "\n")
 			}
 			counterTestEffects <- counterTestEffects + 1
@@ -529,7 +529,7 @@ summary.sienaGOF <- function(object, ...) {
 
 ##@plot.sienaGOF siena07 Plot method for sienaGOF
 plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
-		key=NULL, perc=.05, period=1, ...)
+		key=NULL, perc=.05, period=1, fontsize=12, ...)
 {
 	## require(lattice)
 	args <- list(...)
@@ -567,12 +567,12 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 				(diag(var(rbind(sims,obs)))!=0)
 
 	if (any((diag(var(rbind(sims,obs)))==0)))
-	{	cat("Note: some statistics are not plotted because their variance is 0.\n")
-		cat("This holds for the statistic")
-		if (sum(diag(var(rbind(sims,obs)))==0) > 1){cat("s")}
-		cat(": ")
-		cat(paste(attr(x,"key")[which(diag(var(rbind(sims,obs)))==0)], sep=", "))
-		cat(".\n")
+	{	message("Note: some statistics are not plotted because their variance is 0.")
+		message("This holds for the statistic", appendLF = FALSE)
+		if (sum(diag(var(rbind(sims,obs)))==0) > 1){message("s", appendLF = FALSE)}
+		message(": ", appendLF = FALSE)
+		message(paste(attr(x,"key")[which(diag(var(rbind(sims,obs)))==0)], sep=", "), appendLF = FALSE)
+		message(".")
 	}
 
 	sims <- sims[,screen, drop=FALSE]
@@ -641,6 +641,51 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 		xlabel = args$xlab
 	}
 
+	if (is.null(args$cex))
+	{
+		cexpar <- par("cex")
+	}
+	else
+	{
+		cexpar <- args$cex
+	}
+
+	if (is.null(args$cex.axis))
+	{
+		cexaxispar <- par("cex.axis")
+	}
+	else
+	{
+		cexaxispar <- args$cex.axis
+	}
+
+	if (is.null(args$cex.main))
+	{
+		cexmainpar <- par("cex.main")
+	}
+	else
+	{
+		cexmainpar <- args$cex.main
+	}
+
+	if (is.null(args$cex.lab))
+	{
+		cexlabpar <- par("cex.lab")
+	}
+	else
+	{
+		cexlabpar <- args$cex.lab
+	}
+
+	if (is.null(args$cex.sub))
+	{
+		cexsubpar <- par("cex.sub")
+	}
+	else
+	{
+		cexsubpar <- args$cex.sub
+	}
+
 	xAxis <- (1:sum(screen))
 
 	if (is.null(key))
@@ -672,8 +717,28 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 	plot.symbol <- trellis.par.get("plot.symbol")
 	plot.symbol$col <- "black"
 	plot.symbol$pch <- 4
-	plot.symbol$cex <- 1
+	plot.symbol$cex <- cexpar  # default 1
 	trellis.par.set("plot.symbol", plot.symbol)
+
+#	plot.axis <- trellis.par.get("axis.text")
+#	plot.axis$cex <- cexaxispar # default 1
+	trellis.par.set("axis.text", list(cex=cexaxispar))
+
+#	plot.xlab <- trellis.par.get("par.xlab.text")
+#	plot.xlab$cex <- cexlabpar # default 1
+	trellis.par.set("par.xlab.text", list(cex=cexlabpar))
+
+#	plot.ylab <- trellis.par.get("par.ylab.text")
+#	plot.ylab$cex <- cexlabpar # default 1
+	trellis.par.set("par.ylab.text", list(cex=cexlabpar))
+
+#	plot.main <- trellis.par.get("par.main.text")
+#	plot.main$cex <- cexmainpar # default 1.2
+	trellis.par.set("par.main.text", list(cex=cexmainpar))
+
+#	plot.font <- trellis.par.get("fontsize")
+#	plot.font$text <- fontsize
+	trellis.par.set("fontsize", list(text=fontsize))
 
 	panelFunction <- function(..., x=x, y=y, box.ratio){
 		ind.lower <- max( round(itns * perc/2), 1)

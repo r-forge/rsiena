@@ -272,19 +272,27 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "inPop")
 	{
-		pEffect = new IndegreePopularityEffect(pEffectInfo, false);
+		pEffect = new IndegreePopularityEffect(pEffectInfo, false, false);
+	}
+	else if (effectName == "inPop.c")
+	{
+		pEffect = new IndegreePopularityEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "inPopSqrt")
 	{
-		pEffect = new IndegreePopularityEffect(pEffectInfo, true);
+		pEffect = new IndegreePopularityEffect(pEffectInfo, true, false);
 	}
 	else if (effectName == "outPop")
 	{
-		pEffect = new OutdegreePopularityEffect(pEffectInfo, false);
+		pEffect = new OutdegreePopularityEffect(pEffectInfo, false, false);
+	}
+	else if (effectName == "outPop.c")
+	{
+		pEffect = new OutdegreePopularityEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "outPopSqrt")
 	{
-		pEffect = new OutdegreePopularityEffect(pEffectInfo, true);
+		pEffect = new OutdegreePopularityEffect(pEffectInfo, true, false);
 	}
 	else if (effectName == "reciPop")
 	{
@@ -296,15 +304,23 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "inAct")
 	{
-		pEffect = new IndegreeActivityEffect(pEffectInfo, false);
+		pEffect = new IndegreeActivityEffect(pEffectInfo, false, false);
+	}
+	else if (effectName == "inAct.c")
+	{
+		pEffect = new IndegreeActivityEffect(pEffectInfo, false, true);
 	}
 	else if (effectName == "inActSqrt")
 	{
-		pEffect = new IndegreeActivityEffect(pEffectInfo, true);
+		pEffect = new IndegreeActivityEffect(pEffectInfo, true, false);
 	}
 	else if (effectName == "outAct")
 	{
-		pEffect = new OutdegreeActivityEffect(pEffectInfo);
+		pEffect = new OutdegreeActivityEffect(pEffectInfo, false);
+	}
+	else if (effectName == "outAct.c")
+	{
+		pEffect = new OutdegreeActivityEffect(pEffectInfo, true);
 	}
 	else if (effectName == "outActSqrt")
 	{
@@ -316,7 +332,11 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "degPlus")
 	{
-		pEffect = new BothDegreesEffect(pEffectInfo);
+		pEffect = new BothDegreesEffect(pEffectInfo, false);
+	}
+	else if (effectName == "degPlus.c")
+	{
+		pEffect = new BothDegreesEffect(pEffectInfo, true);
 	}
 	else if (effectName == "outTrunc")
 	{
@@ -1588,11 +1608,6 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new MainCovariateEffect(pEffectInfo);
 	}
-	// else if (effectName == "inflIntX")
-	// {
-	// 	pEffect = new InteractionCovariateEffect(pEffectInfo, false, false,
-	// 		false);
-	//}
 	else if (effectName == "avSimEgoX")
 	{
 		pEffect = new InteractionCovariateEffect(pEffectInfo, true, false, false, false);

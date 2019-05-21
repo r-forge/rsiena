@@ -152,9 +152,9 @@ print.siena <- function(x, ...)
 			   paste(c("Network ", x[1], " is higher than network ", x[2],
 						".\n"), sep="")
 		  })
-		cat("\n", report)
-		cat("This will be respected in the simulations.\n")
-		cat("If this is not desired, change attribute 'higher'.\n")
+		message("\n", report)
+		message("This will be respected in the simulations.\n")
+		message("If this is not desired, change attribute 'higher'.\n")
 	}
 	if (any(disjoint))
 	{
@@ -164,9 +164,9 @@ print.siena <- function(x, ...)
 			   paste(c("Network ", x[1], " is disjoint from network ",
 						x[2], ".\n"), sep="")
 		  })
-		cat("\n", report)
-		cat("This will be respected in the simulations.\n")
-		cat("If this is not desired, change attribute 'disjoint'.\n")
+		message("\n", report)
+		message("This will be respected in the simulations.\n")
+		message("If this is not desired, change attribute 'disjoint'.\n")
 	}
 	if (any(atleastone))
 	{
@@ -177,9 +177,9 @@ print.siena <- function(x, ...)
 						x[1], " and", x[2],
 					   " always exists.\n"), sep="")
 		  })
-		cat("\n", report)
-		cat("This will be respected in the simulations.\n")
-		cat("If this is not desired, change attribute 'atLeastOne'.\n")
+		message("\n", report)
+		message("This will be respected in the simulations.\n")
+		message("If this is not desired, change attribute 'atLeastOne'.\n")
 	}
 	invisible(x)
 }
@@ -242,11 +242,11 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 	}
 	if (!x$OK)
 	{
-		cat("Error end of estimation algorithm\n")
+		message("Error end of estimation algorithm\n")
 	}
 	else if (x$termination == "UserInterrupt")
 	{
-		cat("User interrupted run, object possibly incomplete\n")
+		message("User interrupted run, object possibly incomplete\n")
 	}
 	else
 	{
@@ -354,13 +354,14 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 #  cov.dev may be dropped
 #			cov.dev <- x$msf
 			sem <- sqrt(dmsf/dim(x$sf)[1])
-			if (x$x$dolby)
+			if ((x$x$dolby) & (!x$thetaFromFile))
 			{
 				scores <- apply(x$ssc, c(1,3), sum)	 # x$nit by x$qq matrix
 				mean.scores <- colMeans(scores)
 				mean.stats <- mean.stats - (x$regrCoef * mean.scores)
 				sem <- sem*sqrt(1 - (x$regrCor)^2)
 			}
+# mean.stats is exactly the same as x$estMeans
 			if (!is.null(x$gmm))
 			{
 				if (x$gmm)
@@ -450,7 +451,7 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			}
 
 		try(if (x$errorMessage.cov > '')
-				{cat('\nWarning:', x$errorMessage.cov, '\n')}, silent=TRUE)
+				{warning('\nWarning:', x$errorMessage.cov, '\n')}, silent=TRUE)
 			# "Try" for compatibility with previous versions
 		cat("\nTotal of", x$n, "iteration steps.\n\n")
 
@@ -462,7 +463,7 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 		}
 		if (x$termination == "UserInterrupt")
 		{
-			cat(" \n*** Warning ***",
+			warning(" \n*** Warning ***",
 				"Estimation terminated early at user request.\n")
 		}
 	}
@@ -833,6 +834,11 @@ sdTheta.last <- function(z, groupOnly=0, nfirst=z$nwarm+1)
 					z$ThinParameters[nfirst:ntott,
 					group, !z$generalParametersInGroup, drop=FALSE], 3, sd)
 	}
+	if (is.null(z$priorRatesFromData))
+	{
+		z$priorRatesFromData <- 2
+	}
+# 2 is here the default; this is to achieve compatibility with earlier versions
 	if (groupOnly != 0)
 	{
 		sdTheta[(z$set1)&(!z$basicRate)] <- apply(
@@ -871,6 +877,11 @@ credValues <- function(z, theProbs = c(0.025,0.975), tested = 0,
 	credVals <- matrix(NA, length(z$set1), 5)
 	cvp <- function(x, test0){c(quantile(x, probs=theProbs, na.rm=TRUE),
 									1-(ecdf(x))(test0))}
+	if (is.null(z$priorRatesFromData))
+	{
+		z$priorRatesFromData <- 2
+	}
+# 2 is here the default; this is to achieve compatibility with earlier versions
 	if (groupOnly != 0)
 	{
 		credVals[(z$set1)&(!z$basicRate), 1:3] <- t(apply(

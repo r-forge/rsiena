@@ -694,6 +694,17 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 		{
 			z$targets <- rowSums(ans)
 			z$targets2 <- ans
+# For the moment, the following is an undocumented and hidden option.
+			if ((!is.null(x$targets[1])) & (nGroup == 1) & (groupPeriods[1] == 2))
+			{
+				if (length(z$targets) == length(x$targets))
+				{
+					z$targets <- x$targets
+					z$targets2 <- matrix(x$targets, length(x$targets), 1)
+					message('Note: targets taken from algorithm object.\n')
+					message(z$targets , '\n')
+				}
+			}
 		}
 		else
 		{
@@ -703,7 +714,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 			z$maxlikeTargets <- rowSums(ans)
 			z$maxlikeTargets2 <- ans
 			z$mult <- x$mult
-			length.nrunMH <- length(colSums(z$maxlikeTargets2[z$requestedEffects$basicRate,, drop=FALSE ]))
+			length.nrunMH <- length(colSums(z$maxlikeTargets2[z$requestedEffects$basicRate,
+					, drop=FALSE ]))
 			if ((length(z$mult) >= 2) &&
 				(length(z$mult) != length.nrunMH))
 			{
@@ -1325,7 +1337,6 @@ unpackOneMode <- function(depvar, observations, compositionChange)
 	attr(edgeLists, "structmean") <- attr(depvar, "structmean")
 	attr(edgeLists, "averageInDegree") <- attr(depvar, "averageInDegree")
 	attr(edgeLists, "averageOutDegree") <- attr(depvar, "averageOutDegree")
-	attr(edgeLists, "settings") <- attr(depvar, "settings")
 	attr(edgeLists, "settingsinfo") <- attr(depvar, "settingsinfo")
 	return(edgeLists = edgeLists)
 }
