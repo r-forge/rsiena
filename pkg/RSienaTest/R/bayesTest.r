@@ -260,6 +260,20 @@ plot.multipleBayesTest <- function(x, xlim=NULL, ylim=NULL,	main=NULL, ...){
 	lines(c(x$chisquared, x$chisquared), c(0, max(d1$y)),lwd=2)
 }
 
+getNames <- function(x){
+		# effect names without duplicated rate parameters
+		# and with "unspecified interaction" replaced by
+		# information about the effects in question
+		b <- x$basicRate
+		tpar<- rep(NA,length(b))
+		# True Parameters, i.e., all except rate parameters for groups 2 and up.
+		for (i in (2:length(b))){tpar[i] <- !b[i]|(b[i]&!b[i-1])}
+		tpar[1] <- TRUE
+		# Take away the ' (period 1)' in the first rate parameter
+		sub(' (period 1)','', x$requestedEffects$effectName[tpar], fixed=TRUE)
+}
+	
+	
 ##@extract.sienaBayes extracts samples from sienaBayesFit objects
 extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 	sdLog=TRUE){
@@ -410,7 +424,8 @@ extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 
 
 ##@extract.posteriorMeans extracts posterior means from sienaBayesFit object
-extract.posteriorMeans <- function(z, nfirst=z$nwarm+1, verbose=TRUE){
+extract.posteriorMeans <- function(z, nfirst=z$nwarm+1, pmonly=1,
+								excludeRates=FALSE, verbose=TRUE){
 # produces a matrix with the groups in the rows
 # and all effects in the columns, with for each effect
 # first the posterior mean ("p.m.") and then the posterior standard deviation ("psd.")
@@ -430,10 +445,16 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1, verbose=TRUE){
 	{
 		stop('z must be a sienaBayesFit object')
 	}
-
 	ntot <- max(which(!is.na(z$ThinPosteriorMu[,1])))
 	nit <- ntot - nfirst + 1
-	nind <- sum(z$varyingParametersInGroup)
+	if (excludeRates)
+	{
+		nind <- sum(z$objectiveInVarying)
+	}
+	else
+	{
+		nind <- sum(z$varyingParametersInGroup)
+	}
 	res <- matrix(NA, z$nGroup, 2*nind)
 	if (nind <= 0)
 	{
@@ -442,6 +463,10 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1, verbose=TRUE){
 	else
 	{
 		EffName <- getNames(z)[z$varyingParametersInGroup]
+		if (excludeRates)
+		{
+			EffName <- EffName[z$objectiveInVarying]
+		}
 		if (verbose)
 		{
 			cat(z$nGroup, ' groups\n')
@@ -458,23 +483,43 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1, verbose=TRUE){
 			}
 			df <- sienaFitThetaTable(z, fromBayes=TRUE, tstat=FALSE,
 									groupOnly=h, nfirst=nfirst)$mydf
-			seth <- union(z$ratePositions[[h]], which(z$varyingObjectiveParameters))
+			if (excludeRates)
+			{
+				seth <- which(z$varyingObjectiveParameters)
+			}
+			else
+			{
+				seth <- sort(union(z$ratePositions[[h]], 
+							which(z$varyingObjectiveParameters)))
+			}
 			posttheta <- df[seth,"value"]
 			postsd <- df[seth,"se"]
 			res[h,1:nind] <- posttheta
 			res[h,(nind+1):(2*nind)] <- postsd
 		}
 		fName <- rep('',2*nind)
-		fName[2*(1:nind)-1]  <- paste('p.m.',EffName)
-		fName[2*(1:nind)]  <- paste('psd.',EffName)
+		fName[1:nind]  <- paste('p.m.',EffName)
+		fName[nind + (1:nind)]  <- paste('psd.',EffName)
 		dimnames(res) <- list(1:dim(res)[1], fName)
+	}
+	if (pmonly == 1)
+	{
+		res <- res[,1:nind]
+	}
+	else if (pmonly >= 2)
+	{
+		res <- res[,nind + (1:nind)]
+	}
+	if (verbose)
+	{
+		cat('*\n')
 	}
 	res
 }
 
 
 ##@plotPostMeansMDS MDS plot of posterior means for sienaBayesFit object
-plotPostMeansMDS <- function(x, pmonly=0, nfirst=NULL, ...){
+plotPostMeansMDS <- function(x, pmonly=1, excludeRates=TRUE, nfirst=NULL, ...){
 # This function makes an MDS plot of the posterior means in z;
 # for the method: see MASS (book) p. 308.
 # if pmonly=0 posterior means and standard deviations,
@@ -492,7 +537,8 @@ plotPostMeansMDS <- function(x, pmonly=0, nfirst=NULL, ...){
 	is.even <- function(k){k %% 2 == 0}
 	is.odd <- function(k){k %% 2 != 0}
 	message('extracting posterior means ...')
-	pm <- extract.posteriorMeans(x, nfirst=nfirst)
+	pm <- extract.posteriorMeans(x, nfirst=nfirst, pmonly=pmonly, 
+									excludeRates=excludeRates)
 	if (pmonly <= 0)
 	{
 		vars <- (1:dim(pm)[2])

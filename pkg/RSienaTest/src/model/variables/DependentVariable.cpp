@@ -60,6 +60,7 @@ DependentVariable::DependentVariable(string name,
 	this->lpActorSet = pSimulation->pSimulationActorSet(pActorSet);
 	this->lpSimulation = pSimulation;
 	this->ltotalRate = 0;
+	this->lnonSettingsRate = 0;
 	this->lrate = new double[this->n()];
 	this->lcovariateRates = new double[this->n()];
 	this->lpEvaluationFunction = new Function();
@@ -623,6 +624,7 @@ void DependentVariable::calculateRates()
 	if (!this->constantRates() || !this->lvalidRates)
 	{
 		this->ltotalRate = 0;
+		this->lnonSettingsRate = 0;
 		int n = this->n();
 
 		for (int i = 0; i < n; i++)
@@ -633,6 +635,7 @@ void DependentVariable::calculateRates()
 			if (this->canMakeChange(i))
 			{
 				this->lrate[i] = this->calculateRate(i);
+				this->lnonSettingsRate += (this->lcovariateRates[i] * this->structuralRate(i));
 			}
 			else
 			{
@@ -645,7 +648,7 @@ void DependentVariable::calculateRates()
 
 		if (this->pSimulation()->pModel()->needScores())
 		{
-		    this->calculateScoreSumTerms();
+		    this->calculateScoreSumTerms(); // for the non-constant rate components
 		}
 		if(this->symmetric() && this->networkModelTypeB())
 		{
@@ -655,7 +658,6 @@ void DependentVariable::calculateRates()
 
 		this->lvalidRates = true;
 	}
-
 }
 
 
@@ -698,7 +700,7 @@ double DependentVariable::calculateRate(int i)
 	// The rate is the product of the basic rate parameter for the current
 	// period, exponentials of some covariate-based effects, and exponentials
 	// of some effects depending on the structure of certain networks. The
-	// later two components are precomputed for efficiency.
+	// latter two components are precomputed for efficiency.
 
 	return (this->basicRate() + this->settingRate()) *
 		this->lcovariateRates[i] *
@@ -706,7 +708,6 @@ double DependentVariable::calculateRate(int i)
 		this->structuralRate(i) *
 		this->diffusionRate(i);
 }
-
 
 /**
  * Returns the total rate of change over all actors.
@@ -716,6 +717,13 @@ double DependentVariable::totalRate() const
 	return this->ltotalRate;
 }
 
+/**
+ * Returns the total rate of change over all actors.
+ */
+double DependentVariable::nonSettingsRate() const
+{
+	return this->lnonSettingsRate;
+}
 
 /**
  * Returns the rate of change for the given actor. It is assumed that the
@@ -812,7 +820,7 @@ void DependentVariable::updateCovariateRates()
 
 
 /**
- * Returns the component of the rate function of actor <i>i</i> depending
+ * Returns the component of the rate function of actor i depending
  * on structural effects.
  */
 double DependentVariable::structuralRate(int i) const
@@ -844,7 +852,7 @@ double DependentVariable::diffusionRate(int i) const
 	return rate;
 }
 /**
- * Returns the component of the rate function of actor <i>i</i> depending
+ * Returns the component of the rate function of actor i depending
  * on behavior variables.
  */
 double DependentVariable::behaviorVariableRate(int i) const
@@ -922,7 +930,7 @@ void DependentVariable::accumulateRateScores(double tau,
 		this->lbasicRateScore -= this->totalRate() * tau / this->basicRate();
 	}
 
-	// TODO Current settings implementation is only for networks.
+	// Settings implementation is only for networks.
 	if (this->networkVariable())
 	{
 		// Update scores for setting rates
@@ -933,14 +941,13 @@ void DependentVariable::accumulateRateScores(double tau,
 
 		for (int i = 0; i < this->lnumberSettings; i++)
 		{
-			// TODO: Check if this correct
 			if (this == pSelectedVariable && this->lstepType == i)
 			{
-				this->lsettingRateScores[rSettingNames[i].getId()] += 1.0
-					/ this->lsettings[i]->getRate();
+				this->lsettingRateScores[rSettingNames[i].getId()] +=
+							1.0/this->lsettings[i]->getRate();
 			}
-			this->lsettingRateScores[rSettingNames[i].getId()] -= this->totalRate() * tau /
-				this->lsettings[i]->getRate();
+			this->lsettingRateScores[rSettingNames[i].getId()] -=
+						   tau * this->nonSettingsRate();
 		}
 	}
 
@@ -1585,9 +1592,9 @@ double DependentVariable::basicRateDerivative() const
 {
 	return this->lbasicRateDerivative;
 }
+
 double DependentVariable::settingRateScore(string setting) const
 {
-
 	map<string, double>::const_iterator iter =
 		this->lsettingRateScores.find(setting);
 	if (iter == this->lsettingRateScores.end())

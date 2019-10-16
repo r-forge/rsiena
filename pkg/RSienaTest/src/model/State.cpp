@@ -5,9 +5,11 @@
 #include "network/Network.h"
 #include "data/NetworkLongitudinalData.h"
 #include "data/BehaviorLongitudinalData.h"
+#include "data/ContinuousLongitudinalData.h"
 #include "model/EpochSimulation.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/variables/BehaviorVariable.h"
+#include "model/variables/ContinuousVariable.h"
 #include "model/settings/Setting.h"
 #include "model/settings/PrimarySetting.h"
 #include "network/OneModeNetwork.h"
@@ -33,6 +35,8 @@ State::State(const Data * pData, int observation, bool ownedValues)
 			dynamic_cast<NetworkLongitudinalData *>(rVariables[i]);
 		BehaviorLongitudinalData * pBehaviorData =
 			dynamic_cast<BehaviorLongitudinalData *>(rVariables[i]);
+		ContinuousLongitudinalData * pContinuousData =
+			dynamic_cast<ContinuousLongitudinalData *>(rVariables[i]);
 
 		if (pNetworkData)
 		{
@@ -62,6 +66,24 @@ State::State(const Data * pData, int observation, bool ownedValues)
 			}
 
 			this->lbehaviors[pBehaviorData->name()] = values;
+		}
+		else if (pContinuousData)
+		{
+			const double * values = pContinuousData->values(observation);
+			
+			if (ownedValues)
+			{
+				double * copies = new double[pContinuousData->n()];
+
+				for (int actor = 0; actor < pContinuousData->n(); actor++)
+				{
+					copies[actor] = values[actor];
+				}
+
+				values = copies;
+			}
+
+			this->lcontinuous[pContinuousData->name()] = values;
 		}
 		else
 		{
@@ -124,6 +146,15 @@ State::State(EpochSimulation * pSimulation)
 		}
 	}
 
+	const vector<ContinuousVariable *> & rContinuousVariables =
+		pSimulation->rContinuousVariables();
+
+	for (unsigned i = 0; i < rContinuousVariables.size(); i++)
+	{
+		this->lcontinuous[rContinuousVariables[i]->name()] =
+				rContinuousVariables[i]->values();
+	}
+
 	this->lownedValues = false;
 }
 
@@ -137,6 +168,15 @@ State::State()
 	this->lownedValues = false; // depends on the passed pointers
 }
 
+/**
+ * Default constructor creating an empty state. The current values of dependent
+ * variables can be stored later with the appropriate setters.
+ * Added by TS but I do not know where to use it; is superfluous, should be dropped.
+ */
+State::State(bool ownedValues)
+{
+	this->lownedValues = ownedValues;
+}
 
 /**
  * Deallocates this state.
@@ -204,6 +244,34 @@ void State::behaviorValues(string name, const int * values)
 
 
 /**
+ * Returns the values of the continuous behavior variable with the given
+ * name, or 0 if no such values are stored in this state.
+ */
+const double * State::continuousValues(string name) const
+{
+	const double * values = 0;
+	map<string, const double *>::const_iterator iter =
+		this->lcontinuous.find(name);
+
+	if (iter != this->lcontinuous.end())
+	{
+		values = iter->second;
+	}
+
+	return values;
+}
+
+
+/**
+ * Stores the values of a continuous behavior variable with the given name.
+ */
+void State::continuousValues(string name, const double * values)
+{
+	this->lcontinuous[name] = values;
+}
+
+
+/**
  * Deletes the values stored in this state (only called if lownedValues).
  */
 void State::deleteValues()
@@ -224,6 +292,13 @@ void State::deleteValues()
 	{
 		const int * values = this->lbehaviors.begin()->second;
 		this->lbehaviors.erase(this->lbehaviors.begin());
+		delete[] values;
+	}
+	
+	while (!this->lcontinuous.empty())
+	{
+		const double * values = this->lcontinuous.begin()->second;
+		this->lcontinuous.erase(this->lcontinuous.begin());
 		delete[] values;
 	}
 }

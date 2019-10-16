@@ -217,7 +217,7 @@ plot(gofb)
 plot(goftc, center=TRUE, scale=TRUE)
 # For this type of auxiliary statistics
 # it is advisable in the plot to center and scale.
-# note the keys at the x-axis.
+# note the keys at the x-axis (widen the plot if they are not clear).
 descriptives.sienaGOF(goftc)
 round(descriptives.sienaGOF(goftc, center=TRUE, scale=TRUE), 0)
 

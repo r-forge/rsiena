@@ -16,10 +16,10 @@ sienaTimeTest(sienaFit, effects=NULL, excludedEffects=NULL, condition=FALSE)
 \arguments{
   \item{sienaFit}{ A \code{sienaFit} object returned by \code{siena07}. }
   \item{effects}{Optional vector of effect numbers to test. Use the
-  number on the print of the sienaFit object.}
+  numbering on the print of the sienaFit object.}
   \item{excludedEffects}{Optional vector of effect numbers
   for which time heterogeneity is not to be tested. Use the
-  number on the print of the sienaFit object.}
+  numbering on the print of the sienaFit object.}
   \item{condition}{ Whether to orthogonalize effect-wise score-type tests
   and individual significance tests against estimated effects
   and un-estimated dummy terms, or just against estimated effects.}
@@ -65,7 +65,8 @@ sienaTimeTest(sienaFit, effects=NULL, excludedEffects=NULL, condition=FALSE)
  will be automatically excluded from the time heterogeneity testing.
 
  If \code{sienaTimeTest} gives errors that there are too
- many collinear effects, run it with a smaller \code{effects} parameter.
+ many collinear effects, run it with a smaller set of effects as specified
+ by the \code{effects} parameter.
  For example, if the model has 40 effects of which the
  first 8 are rate parameters and therefore uninteresting,
  and there is such an error message, try \code{effects=9:30};
@@ -73,6 +74,10 @@ sienaTimeTest(sienaFit, effects=NULL, excludedEffects=NULL, condition=FALSE)
  increase it, to find the largest possible set of effects for which
  heterogeneity assessment still is possible; then as a next step
  try the remaining effects in a similar way.
+
+ Also if the execution is time-consuming, e.g., for a multi-group
+ \code{sienaFit} object with many groups and many effects,
+ it can be helpful to carry out the function in smaller subsets of effects.
 }
 \value{
   \code{sienaTimeTest} returns a list containing many items,
@@ -96,7 +101,7 @@ Actor Oriented Models. \emph{Advances in Data Analysis and Computation},
 5:147-176.
 
 M. Schweinberger (2012). Statistical modeling of network panel data:
-Goodness-of-fit. \emph{British Journal of Statistical 
+Goodness-of-fit. \emph{British Journal of Statistical
 and Mathematical Psychology} \bold{65}, 263--281.}
 
 \author{Josh Lospinoso, Tom Snijders}

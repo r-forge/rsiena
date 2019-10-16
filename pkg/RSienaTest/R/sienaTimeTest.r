@@ -225,7 +225,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 				nEffects + nDummies))
 		DF[, , 1:nEffects, 1:nEffects] <- derivs
 		for (wave in 2:nWaves)
-		{
+		{			
 			thisWave <- toTest$period == wave & toTest$toTest
 			subs1 <- (1: (nEffects + nDummies))[thisWave]
 			subs2 <- toTest$baseRowInD[thisWave]

@@ -15,6 +15,7 @@
 #include "EffectFactory.h"
 #include "data/Data.h"
 #include "data/NetworkLongitudinalData.h"
+#include "data/ContinuousLongitudinalData.h"
 #include "model/EffectInfo.h"
 #include "model/effects/AllEffects.h"
 #include "model/effects/generic/GenericNetworkEffect.h"
@@ -138,6 +139,12 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	Effect * pEffect = 0;
 	string effectName = pEffectInfo->effectName();
 
+	// Defined so we can later on differentiate between effects for 
+	// continuous and discrete dependent behavior variables
+	string variableName = pEffectInfo->variableName();
+	ContinuousLongitudinalData * pContinuousData = 
+        dynamic_cast<ContinuousLongitudinalData *>(this->lpData->pContinuousData(variableName));
+	
 	// Handle the user-defined interaction effects first.
 
 	if (pEffectInfo->pEffectInfo1())
@@ -340,11 +347,15 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "outTrunc")
 	{
-		pEffect = new TruncatedOutdegreeEffect(pEffectInfo);
+		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, true);
 	}
 	else if (effectName == "outTrunc2")
 	{
-		pEffect = new TruncatedOutdegreeEffect2(pEffectInfo);
+		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, true);
+	}
+	else if (effectName == "outMore")
+	{
+		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, false);
 	}
 	else if (effectName == "outInv")
 	{
@@ -1406,11 +1417,39 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "indeg")
 	{
+		if (pContinuousData)
+		{
+			pEffect = new IndegreeContinuousEffect(pEffectInfo, false);
+		}
+		else
+		{
 		pEffect = new IndegreeEffect(pEffectInfo);
+	}
+	}
+	else if (effectName == "indegSqrt")
+	{
+		if (pContinuousData)
+		{
+			pEffect = new IndegreeContinuousEffect(pEffectInfo, true);
+		}
 	}
 	else if (effectName == "outdeg")
 	{
+		if (pContinuousData)
+		{
+			pEffect = new OutdegreeContinuousEffect(pEffectInfo, false);
+		}
+		else
+		{
 		pEffect = new OutdegreeEffect(pEffectInfo);
+	}
+	}
+	else if (effectName == "outdegSqrt")
+	{
+		if (pContinuousData)
+		{
+			pEffect = new OutdegreeContinuousEffect(pEffectInfo, true);
+		}
 	}
 	else if (effectName == "isolate")
 	{
@@ -1440,6 +1479,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new AntiIsolateEffect(pEffectInfo, false, 3);
 	}
+	else if (effectName == "isolateOut")
+	{
+		pEffect = new IsolateOutContinuousEffect(pEffectInfo);
+	}
 	else if (effectName == "isolatePop")
 	{
 		pEffect = new IsolatePopEffect(pEffectInfo, true);
@@ -1448,6 +1491,50 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new InIsolateDegreeEffect(pEffectInfo);
 	}
+	else if (effectName == "settingSizeAct")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, false, false, false, false, false);
+	}
+	else if (effectName == "settingSizeActSqrt")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, false, false, true, false, false);
+	}
+	else if (effectName == "settingSizeActLog")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, false, true, false, false, false);
+	}
+	else if (effectName == "settingOppAct")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, true, false, false, false, false);
+	}
+	else if (effectName == "settingOppActSqrt")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, true, false, true, false, false);
+	}
+	else if (effectName == "settingOppActLog")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, true, true, false, false, false);
+	}
+	else if (effectName == "settingLogCreationAct")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, true, true, false, true, false);
+	}
+	else if (effectName == "settingOppActD")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, true, false, false, false, true);
+	}
+	else if (effectName == "settingOppActSqrtD")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, true, false, true, false, true);
+	}
+	else if (effectName == "settingOppActLogD")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, true, true, false, false, true);
+	}
+	else if (effectName == "settingLogCreationActD")
+	{
+		pEffect = new SettingSizeEffect(pEffectInfo, true, true, false, true, true);
+	}	
 	else if (effectName == "avSimRecip")
 	{
 		pEffect = new ReciprocatedSimilarityEffect(pEffectInfo, true, false);
@@ -1478,7 +1565,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "avAlt")
 	{
+		if (pContinuousData)
+		{
+			pEffect = new AverageAlterContinuousEffect(pEffectInfo);
+		}
+		else
+		{	
 		pEffect = new AverageAlterEffect(pEffectInfo, true, false);
+	}
 	}
 	else if (effectName == "avGroup")
 	{
@@ -1514,11 +1608,25 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "maxAlt")
 	{
+		if (pContinuousData)
+		{
+			pEffect = new MaxAlterContinuousEffect(pEffectInfo, false);
+		}
+		else
+		{
 		pEffect = new MaxAlterEffect(pEffectInfo, false);
+	}
 	}
 	else if (effectName == "minAlt")
 	{
+		if (pContinuousData)
+		{
+			pEffect = new MaxAlterContinuousEffect(pEffectInfo, true);
+		}
+		else
+		{
 		pEffect = new MaxAlterEffect(pEffectInfo, true);
+	}
 	}
 	else if (effectName == "avInAlt")
 	{
@@ -1570,7 +1678,18 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "recipDeg")
 	{
+		if (pContinuousData)
+		{
+			pEffect = new ReciprocalDegreeContinuousEffect(pEffectInfo, true);
+		}
+		else
+		{
 		pEffect = new ReciprocalDegreeBehaviorEffect(pEffectInfo);
+	}
+	}
+	else if (effectName == "nonrecipDeg")
+	{
+		pEffect = new ReciprocalDegreeContinuousEffect(pEffectInfo, false);
 	}
 	else if (effectName == "FFDeg")
 	{
@@ -1606,7 +1725,14 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "effFrom")
 	{
+		if (pContinuousData)
+		{
+			pEffect = new MainCovariateContinuousEffect(pEffectInfo);
+		}
+		else
+		{
 		pEffect = new MainCovariateEffect(pEffectInfo);
+	}
 	}
 	else if (effectName == "avSimEgoX")
 	{
@@ -1921,6 +2047,19 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 				covariateName, true, false);
 		pEffect = new GenericNetworkEffect(pEffectInfo,
 			pChangeFunction, pStatisticFunction);
+	}
+	else if (effectName == "intercept")
+	{
+		pEffect = new InterceptEffect(pEffectInfo);
+
+	}
+	else if (effectName == "feedback")
+	{
+		pEffect = new FeedbackEffect(pEffectInfo);
+	}
+	else if (effectName == "wiener")
+	{
+		pEffect = new WienerEffect(pEffectInfo);
 	}
 	else
 	{

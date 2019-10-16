@@ -43,7 +43,7 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
     Boolean. Are the effects to be tested or not (requires \code{fix}).}
   \item{parameter}{
     Value of internal effect parameter of this interaction effect.
-	If NULL, no change is made.}
+    If NULL, no change is made.}
   \item{random}{For specifying that the interaction effect will vary randomly,
     which is taken into account only by \code{\link{sienaBayes}}.
     Boolean required. Default FALSE.}
@@ -60,6 +60,8 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   Effects in the manual for this. The \code{interactionType} is shown
   in the list of effects obtained from the function
   \code{\link{effectsDocumentation}}.\cr
+  The short names must not be set between quotes,
+  unless you use \code{character=TRUE}.\cr
   From the point of view of model building it is usually advisable, when
   including an interaction effect in a model, also to include the
   corresponding main effects. This is however not enforced
@@ -81,15 +83,18 @@ includeInteraction(myeff, ..., include = TRUE, name = myeff$name[1],
   other variables in the data set.
   They are used to completely identify the effects.
 
+  To set attributes of interaction effects in the effects object,
+  function \code{\link{setEffect}} can also be used with short name
+  \code{unspInt} or \code{behUnspInt}, and further using parameters
+  \code{effect1} and \code{effect2}, and possibly \code{effect3}.
+
+  Further information about Siena effects objects is given
+  in the help page for \code{\link{getEffects}}.
+
   A list of all effects in a given effects object (e.g., \code{myeff}),
   including their names of dependent variables, effect names, short names,
   and values of interaction1 and interaction2 (if any),
   is obtained by executing \code{\link{effectsDocumentation}(myeff)}.
-
-  To set attributes of interaction effects in the effects object,
-  function \code{\link{setEffect}} can also be used with short name 
-  \code{unspInt} or \code{behUnspInt}, and further using parameters
-  \code{effect1} and \code{effect2}, and possibly \code{effect3}.
   }
 \value{
   An updated version of the input effects object; if \code{include},

@@ -11,14 +11,14 @@
   but the first name indicates more precisely the purpose of this function.
 }
 \usage{
-sienaDependent(netarray, type=c("oneMode", "bipartite", "behavior"),
-nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
+sienaDependent(netarray, type=c("oneMode", "bipartite", "behavior", "continuous"),
+nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE, imputationValues=NULL)
 
-sienaNet(netarray, type=c("oneMode", "bipartite", "behavior"),
-nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
+sienaNet(netarray, type=c("oneMode", "bipartite", "behavior", "continuous"),
+nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE, imputationValues=NULL)
 }
 \arguments{
-  \item{netarray}{matrix (type="behavior" only)
+  \item{netarray}{matrix (type="behavior" or "continuous" only)
     or (for the other types) array of values or list of sparse matrices
     of type "dgTMatrix".}
   \item{type}{type of dependent variable, default "oneMode".}
@@ -44,6 +44,9 @@ nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
     TRUE is the appropriate option. When it is only the case for some of the
     periods, and for data sets that will be part of a multi-group object
     created by \code{\link{sienaGroupCreate}}, FALSE usually is preferable.}
+  \item{imputationValues}{for "behavior" or "continuous" dependent variables,
+    a matrix with imputation values can be included that will be used instead 
+    of the default imputation values.}
 }
 \details{
   Adds attributes so that the array or list of matrices can be used in a

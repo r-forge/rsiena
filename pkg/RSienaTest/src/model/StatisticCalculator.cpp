@@ -24,6 +24,7 @@
 #include "network/Network.h"
 #include "data/NetworkLongitudinalData.h"
 #include "data/BehaviorLongitudinalData.h"
+#include "data/ContinuousLongitudinalData.h"
 #include "network/OneModeNetwork.h"
 #include "network/TieIterator.h"
 #include "data/ConstantCovariate.h"
@@ -37,6 +38,7 @@
 #include "model/effects/EffectFactory.h"
 #include "model/effects/NetworkEffect.h"
 #include "model/effects/BehaviorEffect.h"
+#include "model/effects/ContinuousEffect.h"
 #include "model/EpochSimulation.h"
 #include "model/variables/NetworkVariable.h"
 #include "model/variables/BehaviorVariable.h"
@@ -73,7 +75,6 @@ StatisticCalculator::StatisticCalculator(const Data * pData,
 	this->lpStateLessMissingsEtc = new State();
 	this->lneedActorStatistics = 0;
 	this->lcountStaticChangeContributions = 0;
-
 	this->calculateStatistics();
 }
 
@@ -94,7 +95,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData,
 	this->lpState = pState;
 	this->lperiod = period;
 	this->lpPredictorState = new State();
-	this->lpStateLessMissingsEtc = new State();
+	this->lpStateLessMissingsEtc = new State();	
 	this->lneedActorStatistics = returnActorStatistics;
 	this->lcountStaticChangeContributions = 0;
 
@@ -155,6 +156,7 @@ static void for_each_map_value(map<K, T>& m, void (*fn)(T&))
 StatisticCalculator::~StatisticCalculator()
 {
 	clear_map_value_array_pointers(this->ldistances);
+	clear_map_value_array_pointers(this->lcontinuousDistances);
 
 	for_each_map_value(this->lsettingDistances, &clear_map_value_array_pointers);
 	this->lsettingDistances.clear();
@@ -244,6 +246,47 @@ int StatisticCalculator::distance(LongitudinalData * pData, int period)
 	return iter->second[period];
 }
 
+
+/**
+ * Returns the simulated distance for the given continuous behavior variable
+ * and period.
+ */
+double StatisticCalculator::distance(ContinuousLongitudinalData * pData, int period)
+	const
+{
+	map<ContinuousLongitudinalData *, double *>::const_iterator iter =
+		this->lcontinuousDistances.find(pData);
+
+	if (iter == this->lcontinuousDistances.end())
+	{
+		throw invalid_argument(
+			"Unknown effect: The given scale parameter is not part of the model.");
+	}
+
+	return iter->second[period];
+}
+
+
+/**
+ * Returns the total simulated distance of all continuous behavior variables
+ * for the given period.
+ */
+double StatisticCalculator::totalDistance(int period) const
+{
+	double total = 0;
+	
+	for (map<ContinuousLongitudinalData *, double *>::const_iterator iter = 
+			this->lcontinuousDistances.begin();
+		 iter != this->lcontinuousDistances.end();
+		 iter++)
+	{
+		total += iter->second[period];
+	}
+	
+	return total;
+}
+
+
 /**
  * Returns the simulated setting distance for the given network and period.
  */
@@ -268,34 +311,34 @@ int StatisticCalculator::settingDistance(LongitudinalData * pData,
 	return value;
 }
 
-void StatisticCalculator::calculateStatisticsInitNetwork(NetworkLongitudinalData * pNetworkData) {
+void StatisticCalculator::calculateStatisticsInitNetwork(NetworkLongitudinalData * pNetworkData) 
+{
 	const Network * pPredictor = pNetworkData->pNetworkLessMissing(this->lperiod);
 	this->lpPredictorState->pNetwork(pNetworkData->name(), pPredictor);
 
 	// Duplicate the current network and remove those ties that are missing at
 	// either end of the period.
-			Network * pNetwork = this->lpState->pNetwork(pNetworkData->name())->clone();
+	Network * pNetwork = this->lpState->pNetwork(pNetworkData->name())->clone();
+	subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod));
+	subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod + 1));
 
-			subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod));
-			subtractNetwork(pNetwork, pNetworkData->pMissingTieNetwork(this->lperiod + 1));
+	// for not-targets, overwrite the current network for values
+	// structurally fixed for the next period. (no effect for targets)
 
-			// for not-targets, overwrite the current network for values
-			// structurally fixed for the next period. (no effect for targets)
+	replaceNetwork(pNetwork,
+		pNetworkData->pNetwork(this->lperiod + 1),
+		pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
 
-			replaceNetwork(pNetwork,
-				pNetworkData->pNetwork(this->lperiod + 1),
-				pNetworkData->pStructuralTieNetwork(this->lperiod + 1));
+	// for targets look backwards and mimic the simulation by carrying
+	// forward structural values.
 
-			// for targets look backwards and mimic the simulation by carrying
-			// forward structural values.
-
-			replaceNetwork(pNetwork,
-				pNetworkData->pNetwork(this->lperiod),
-				pNetworkData->pStructuralTieNetwork(this->lperiod));
-
-			// NOTE: pass delete responsibility to state
+	replaceNetwork(pNetwork,
+		pNetworkData->pNetwork(this->lperiod),
+		pNetworkData->pStructuralTieNetwork(this->lperiod));
+				
+	// NOTE: pass delete responsibility to state
 	this->lpStateLessMissingsEtc->pNetwork(pNetworkData->name(), pNetwork);
-			// delete pNetwork;
+			// delete pNetwork; 
 }
 
 /**
@@ -312,6 +355,7 @@ void StatisticCalculator::calculateStatistics()
 	{
 		NetworkLongitudinalData * pNetworkData = dynamic_cast<NetworkLongitudinalData *>(rVariables[i]);
 		BehaviorLongitudinalData * pBehaviorData = dynamic_cast<BehaviorLongitudinalData *>(rVariables[i]);
+		ContinuousLongitudinalData * pContinuousData = dynamic_cast<ContinuousLongitudinalData *>(rVariables[i]);
 
 		if (pNetworkData)
 		{
@@ -323,6 +367,11 @@ void StatisticCalculator::calculateStatistics()
 			// at (either end?) start of period
 			const int * values = pBehaviorData->valuesLessMissingStarts(this->lperiod);
 			this->lpPredictorState->behaviorValues(pBehaviorData->name(), values);
+		}
+		else if (pContinuousData)
+		{
+			const double * values = pContinuousData->valuesLessMissingStarts(this->lperiod);
+			this->lpPredictorState->continuousValues(pContinuousData->name(), values);
 		}
 		else
 		{
@@ -351,6 +400,8 @@ void StatisticCalculator::calculateStatistics()
 			dynamic_cast<NetworkLongitudinalData *>(rVariables[i]);
 		BehaviorLongitudinalData * pBehaviorData =
 			dynamic_cast<BehaviorLongitudinalData *>(rVariables[i]);
+		ContinuousLongitudinalData * pContinuousData =
+			dynamic_cast<ContinuousLongitudinalData *>(rVariables[i]);
 
 		if (pNetworkData)
 		{
@@ -365,6 +416,11 @@ void StatisticCalculator::calculateStatistics()
 			this->calculateBehaviorRateStatistics(pBehaviorData);
 			this->calculateBehaviorStatistics(pBehaviorData);
 			this->calculateBehaviorGMMStatistics(pBehaviorData);
+		}
+		else if (pContinuousData)
+		{
+			this->calculateContinuousRateStatistics(pContinuousData);
+			this->calculateContinuousStatistics(pContinuousData);
 		}
 		else
 		{
@@ -1090,6 +1146,62 @@ void StatisticCalculator::calculateBehaviorStatistics(
 
 
 /**
+ * Calculates the statistics for effects of the given continuous behavior 
+ * variable.
+ */
+void StatisticCalculator::calculateContinuousStatistics(
+	ContinuousLongitudinalData * pContinuousData)
+{
+	// create a copy of the current state and zero any values missing
+	// at either end of period
+
+	const double * currentState =
+		this->lpState->continuousValues(pContinuousData->name());
+
+	double * currentValues  = new double[pContinuousData->n()];
+
+	for (int i = 0; i < pContinuousData->n(); i++)
+	{
+		currentValues[i] = currentState[i]; // - pContinuousData->overallMean();
+
+		if (pContinuousData->missing(this->lperiod, i) ||
+			pContinuousData->missing(this->lperiod + 1, i))
+		{
+			currentValues[i] = 0;
+		}
+	}
+
+	// Loop through the effects, calculate the statistics, and store them.
+	const vector<EffectInfo *> & rEffects =
+		this->lpModel->rEvaluationEffects(pContinuousData->name());
+
+ 	EffectFactory factory(this->lpData);
+ 	Cache cache;
+	
+	for (unsigned i = 0; i < rEffects.size(); i++)
+	{
+		EffectInfo * pInfo = rEffects[i];
+		ContinuousEffect * pEffect =
+			(ContinuousEffect *) factory.createEffect(pInfo);
+
+		// Initialize the effect to work with our data and state of variables.
+
+		pEffect->initialize(this->lpData,
+			this->lpPredictorState,
+			this->lperiod,
+			&cache);
+
+		this->lstatistics[pInfo] =
+			pEffect->evaluationStatistic(currentValues);
+
+		delete pEffect;
+	}
+
+	delete[] currentValues;
+}
+
+
+/**
  * Calculates the statistics for the rate effects of the given
  * network variable.
  */
@@ -1674,6 +1786,68 @@ void StatisticCalculator::calculateBehaviorRateStatistics(
 	delete[] difference;
 	delete[] currentValues;
 }
+
+/**
+ * Calculates the statistics for the scale effects of the given
+ * continuous behavior variable.
+ */
+void StatisticCalculator::calculateContinuousRateStatistics(
+	ContinuousLongitudinalData * pContinuousData)
+{
+	// create a copy of the current state and zero any values missing
+	// at either end of period
+	const double * currentState = this->lpState->
+		continuousValues(pContinuousData->name());
+
+	double * currentValues  = new double[pContinuousData->n()];
+
+	for (int i = 0; i < pContinuousData->n(); i++)
+	{
+		currentValues[i] = currentState[i];
+
+		if (pContinuousData->missing(this->lperiod, i) ||
+			pContinuousData->missing(this->lperiod + 1, i))
+		{
+			currentValues[i] = 0;
+		}
+	}
+	// Construct a vector of squared differences between current and 
+	// start of period. Differences for missing values are set to 0.
+	const double * start = pContinuousData->values(this->lperiod);
+
+	double * difference  = new double[pContinuousData->n()];
+
+	for (int i = 0; i < pContinuousData->n(); i++)
+	{
+		difference[i] = currentState[i] - start[i];
+		difference[i] *= difference[i];
+		if (pContinuousData->missing(this->lperiod, i) ||
+			pContinuousData->missing(this->lperiod + 1, i))
+		{
+			difference[i] = 0;
+		}
+	}
+	
+	// basic rate distance (used for estimating the SDE scale parameters)
+	if (!this->lcontinuousDistances[pContinuousData])
+	{
+		double * array =
+			new double[pContinuousData->observationCount() - 1];
+
+		this->lcontinuousDistances[pContinuousData] = array;
+	}
+
+	double distance = 0;
+	for (int i = 0; i < pContinuousData->n(); i++)
+	{
+		distance += difference[i];
+	}
+	this->lcontinuousDistances[pContinuousData][this->lperiod] = distance;
+
+	delete[] difference;
+	delete[] currentValues;
+}
+
 
 /**
  * Calculates the value of the diffusion rate effect for the given actor.
