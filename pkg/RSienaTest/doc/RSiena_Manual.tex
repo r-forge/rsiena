@@ -240,7 +240,7 @@ This is a manual for \rs, which also might be called \SI version 4.1.2;
 the manual is provisional in the sense
 that it is continually being updated, taking account of
 updates in the package.
-\RS is a contributed package for the \R statistical system
+\RS is a contributed package for the \R statistical system \citep{R}
 which can be downloaded from
 \url{http://cran.r-project.org}. For the operation of \Rn,
 the reader is referred to the corresponding literature and help pages.
@@ -355,6 +355,9 @@ A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
 and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
 For Generalized Method of Moments estimators,
 the reference is \citet*{ASS2015}.
+\smallskip
+
+A general reference for \R is \citet{R}.
 
 
 \newpage
@@ -1414,6 +1417,13 @@ the adjacency matrix. \verb|tmp| above is a sparse matrix which is in edge list
 format but includes information on the size of the adjacency matrix, and can be
 used in a similar way to the original matrix \verb|a| while saving memory space.
 
+For some insight into how this is done with \rs, you could request
+\begin{verbatim}
+RSiena:::sparseMatrixExtraction0
+\end{verbatim}
+to see how this function is defined, using either the data set (for \texttt{i == NULL})
+or the simulated data from \sfn{siena07} (for \texttt{i != NULL}).
+
 
 \subsubsection{Behavioral data}
 
@@ -1466,6 +1476,10 @@ independent variable.
 Changing variables can change between observation moments;
 then they are called `changing individual covariates',
 and have the role of independent variables.
+
+The internal operation of \RS is not scale-independent.
+It is advisable to scale the covariates so that they have
+standard deviations in the range between 0.1 and 10.
 
 Changing individual covariates are assumed to have constant values from one
 observation moment to the next. If observation moments for the
@@ -1534,6 +1548,10 @@ waves (i.e., observation moments) of network data,
 this covers $M-1$ periods, and accordingly,
 for specifying a single changing dyadic covariate,
 a $n \times n \times (M-1)$ array is needed.
+
+The internal operation of \RS is not scale-independent.
+It is advisable to scale the covariates so that they have
+standard deviations in the range between 0.1 and 10.
 
 Like is the case for monadic  covariates,
 changing dyadic covariates are assumed to have constant values from one
@@ -3806,7 +3824,7 @@ nor multilevel estimation using \textsf{sienaBayes} support
 this option.
 
 
-\subsection{Goodness of fit with auxiliary statistics}
+\subsection{Goodness of fit with auxiliary statistics: \sfn{sienaGOF}}
 \label{S_gof}
 
 There is available in RSienaTest a function \verb!sienaGOF!
@@ -3836,8 +3854,13 @@ additional packages such as \texttt{igraph} and \texttt{sna},
 are available by copying script from the examples in the same help page.
 (The reason for this construction is to reduce dependencies
 of the basic \sfn{RSiena} on other packages.)
-\medskip
 
+The examples in the help pages for \sfn{sienaGOF} and \sfn{sienaGOF-auxiliary}
+give ample help for how to use this function.
+Also see the script on the \SI website.
+
+
+\subsubsection{Plots}
 The results of \verb!sienaGOF! can be plotted which then produces
 \emph{violin plots} \citep{HintzeNelson1998}, which present
 the distribution of the statistic as a combination
@@ -3856,12 +3879,38 @@ it often is advisable to use the defaults \sfn{center = FALSE},
 is less important, e.g., triad counts, a clearer picture may be obtained by
 plotting with \sfn{center = TRUE}, \sfn{scale = TRUE}.
 
-The method of joiners and leavers for representing composition change
-(Section~\ref{S_comp}) does not combine properly with the \sfn{sienaGOF} function.
+\subsubsection{$p$-values}
+The $p$-values for \sfn{sienaGOF} compare, in the space of outcomes
+of the auxiliary statistic (which is a vector,
+with a dimension usually between 4 and 20),
+the position of the observed data to the cloud of
+points formed by the simulated data sets that correspond
+to the estimated model. This comparison is with respect to the
+``distance'' from the center of the cloud of points,
+where ``distance'' is between quotation marks because it is the
+Mahalanobis distance, which takes into account the correlations
+and different variances of the components of the auxiliary statistic.
 
-The examples in the help pages for \sfn{sienaGOF} and \sfn{sienaGOF-auxiliary}
-give ample help for how to use this function.
-Also see the script on the \SI website.
+This means that very small values of $p$ indicate poor fit.
+There is an important difference here between $p=0$ and $p>0$.
+Suppose that there are, e.g., 1,000 simulated data sets
+(this number is given by \texttt{n3}, the `length of Phase 3');
+then the smallest possible non-zero value of $p$ is 0.001.
+If $p=0$, the observed data are further away from the center of
+the simulated data than any of the simulated data points -- this
+could be very far away indeed. If $p=0.001$ or larger, then
+the observed data point must be at least somewhere close to or within the
+cloud of simulated points, because one or more of the simulated data
+points are further away from the center than the observed data.
+Concluding, if $p=0$, then with respect to the auxiliary statistic
+the fit is poor; it might be rather poor or extremely poor,
+and you do not know how extreme it is.
+
+The customary value of $p=0.05$ may be used as a threshold determining
+whether the fit is adequate, but this threshold is of even less
+importance here than it is in the case of regular hypothesis testing.
+
+
 
 For combining \sfn{sienaGOF} results for multiple groups, the resulting $p$-values
 as calculated for each single group can be combined.
@@ -3871,13 +3920,18 @@ This methods transforms each $p$-value to a standard normal variate, adds these
 and divides by $\sqrt{N}$ where $N$ is the number of combined studies,
 and tests the result in the standard normal distribution.
 %For the p-value of sienaGOF, consult the help page of sienaGOF.
-%For the transformation to standard normal,
-%you can use qnorm (check whether you need qnorm(p) or qnorm(1-p)).
-%For testing in the standard normal you can use pnorm.
+For the transformation to standard normal,
+you can use function \sfn{qnorm}
+(check whether you need \texttt{qnorm(p)} or \texttt{qnorm(1-p)}).
+For testing in the standard normal you can use \sfn{pnorm}.
 
 
+\subsubsection{Composition change, missing data, and structural values in \sfn{sienaGOF} }
 
-\subsubsection{Treatment of missing data and structural values in \sfn{sienaGOF} }
+
+The method of joiners and leavers for representing composition change
+(Section~\ref{S_comp}) does not combine properly with the \sfn{sienaGOF} function.
+
 
 Missing tie values and structurally determined tie values are treated
 in the estimation in such a way that they do not contribute directly
@@ -3951,10 +4005,10 @@ The estimation process is implemented in functions \sfn{siena07}
 and \sfn{sienacpp} (alternatives for each other),
 using an algorithm specification defined in function \sfn{sienaAlgorithmCreate}.
 Estimation starts with initial values for the parameters,
-and the functions \sfn{siena07} and \sfn{sienacpp} both return a 
+and the functions \sfn{siena07} and \sfn{sienacpp} both return a
 so-called \textsf{sienaFit} object containing the estimates and their standard errors and
 a lot of further information.
-Since the estimation procedure is iterative (i.e., depending on the 
+Since the estimation procedure is iterative (i.e., depending on the
 initial value) and stochastic,
 the results are not always completely satisfactory. We shall see below
 how the satisfactory convergence of the algorithm can be checked,
@@ -4019,9 +4073,9 @@ The following parameters are worth knowing about.
   \item \texttt{seed}: the seed of the random number algorithm. This seed determines
        the starting value of the random number algorithm, and thereby leads
        to exactly reproducible results. Normally, if the estimation procedure
-       has converged as indicated by the convergence criterion (see the next section) and 
-       parameter \texttt{n3} is large enough, different random seeds will give 
-       results for converged models that are equivalent for practical purposes. 
+       has converged as indicated by the convergence criterion (see the next section) and
+       parameter \texttt{n3} is large enough, different random seeds will give
+       results for converged models that are equivalent for practical purposes.
        (Well, this is a way to check
        whether indeed your convergence criterion is strict enough, and whether
        parameter \texttt{n3} is large enough.)
@@ -4037,7 +4091,7 @@ model, rather than the estimation algorithm. These are the following.
   \item \texttt{MaxDegree}: puts a maximum to the outdegree of all actors,
         see Section~\ref{S_maxdegree}.
   \item \texttt{Offset}: an offset is a constant added to the
-        constant term in a generalized linear model, it is used for 
+        constant term in a generalized linear model, it is used for
          \texttt{modelType~=~3}, see Section~\ref{S_modeltype_nd}.
 \end{enumerate}
 Some other parameters are sometimes important, in the case of convergence
@@ -4052,7 +4106,7 @@ difficulties.  Their role is described in the following sections.
        stochastic approximation algorithm.
 \end{enumerate}
 The default estimation algorithm is the Method of Moments. But it is also possible
-to use the method of Maximum Likelihood; further explanations are in Section~\ref{S_ML}. 
+to use the method of Maximum Likelihood; further explanations are in Section~\ref{S_ML}.
 This is determined by the following parameters.
 \begin{enumerate}[resume]
   \item \texttt{maxlike}: whether to use Maximum Likelihood (ML) estimation
@@ -4061,8 +4115,8 @@ This is determined by the following parameters.
 \end{enumerate}
 As described in Section~\ref{S_cond}, there is a choice between conditional
 and non-conditional estimation. Conditioning means that for one of the
-dependent variables, the simulated number of differences is always equal to 
-the observed number of differences (note that the number of ministeps usually will 
+dependent variables, the simulated number of differences is always equal to
+the observed number of differences (note that the number of ministeps usually will
 be somewhat larger than the number of differences, because some ministeps
 may cancel earlier ministeps, and ministeps can have the outcome of
 `no change'). The associated parameters are
@@ -4429,11 +4483,9 @@ to try and achieve convergence if one does not obtain the desired low level
 of \sfn{tconv.max} by successive estimation using the \sfn{prevAns}
 parameter sequentially.
 The advice is to use (1.) \underline{or} (2.), in both cases together with (3.).
+It is to be expected that (1.) will be computationally more efficient than (2.)
 
 \begin{enumerate}
-\item In the estimations where \sfn{prevAns} is used,
-    use more than 4 subphases: \sfn{nsub=5} or, if that is not sufficient,
-    \sfn{nsub=6}.
 \item First do an estimation with the default parameters
     for the algorithm.
     If that has returned a somewhat reasonable provisional estimate
@@ -4455,6 +4507,9 @@ The advice is to use (1.) \underline{or} (2.), in both cases together with (3.).
     Note that computation time in Phase~2 will be proportional to \sfn{n2start}.
     Continue estimation with these algorithmic parameters using \sfn{prevAns},
     further perhaps increasing \sfn{n2start} if necessary.
+\item As an alternative to (1.): in the estimations where \sfn{prevAns} is used,
+    use more than 4 subphases: \sfn{nsub=5} or, if that is not sufficient,
+    \sfn{nsub=6}.
 \item Use for \sfn{n3} a larger value than the default.
     E.g., \sfn{n3 = 3000} or \sfn{5000};
     if it was necessary to further increase \sfn{nsub} or \sfn{n2start}, it may also be
@@ -4629,7 +4684,10 @@ Further details are in the help file for \textsf{siena07}.
  \texttt{ans\$estMeans }     \> estimated expected values of the target statistics\\
                              \> (if the Dolby option was chosen, this is \\
                              \> not equal to the average of the simulations!)\\
- \texttt{ans\$effects }      \> the effects object with only the requested effects\\
+ \texttt{ans\$requestedEffects }  \\
+                            \> the effects object with only the requested effects\\
+ \texttt{ans\$effects }      \> the effects object including also the main effects\\
+                                \> for any requested interactions\\
  \texttt{ans\$x }            \> the algorithm object used\\
  \texttt{ans\$f }            \> everything needed for the calculations in C++;\\
                              \> in particular, the data set is hidden in here,
@@ -4641,7 +4699,8 @@ Further details are in the help file for \textsf{siena07}.
                              \> Programmers can consult function \texttt{initializeFRAN()}\\
                              \> for the creation and hence contents of this object.\\
  \texttt{ans\$version }      \> the \textsf{RSiena/Test} version\\
- \texttt{ans\$revision }     \> the \textsf{R-Forge} revision.\\
+ \texttt{ans\$revision }     \> the \textsf{R-Forge} revision (probably empty)\\
+ \texttt{ans\$startingDate}  \> date and time of the start of the estimation (since version 1.2-17).\\
 
 \end{tabbing}
 Like for any \R object, the internal structure of the \textsf{sienaFit} object
@@ -7804,7 +7863,7 @@ only the starting values are different.
 The advice of literature such as \citet{BDA3} is to use multiple
 sequences produced independently, preferably from overdispersed
 starting points, for assessing convergence.
-For example, one may use 4 or 5 such sequences.
+For example, one may use 3 to 5 such sequences.
 Function \sfn{extract.sienaBayes()} can be used to extract
 from these sequences the draws from the posterior distributions
 of the parameters of interest.
@@ -8665,6 +8724,13 @@ and
  creates a link, if the previous outdegree of $i$ is less than $c$.
  For $c=1$, this means a change statistic of +1 for the creation of the
  first outgoing tie of $i$, and of --1 for the termination of the last outgoing tie.
+
+
+ \item {\em out-degree more than $c$} (\texttt{outMore})
+ where $c$ is some constant
+ (internal effect parameter, see above), defined by \\
+ $s^{\rm net}_{i\vit}(x) = \text{max}(x_{i+}\,-\, c, \, 0)$;\\
+ this can be regarded as the mirror image of \texttt{outTrunc};
 
  \item {\em square root out-degree}, defined by  \\
  $s^{\rm net}_{i\vit}(x) = \sqrt{x_{i+}}$;\\
@@ -13872,7 +13938,7 @@ effectsDocumentation(myeff)
 \end{verbatim}
 (where of course you should substitute the name of your effects object
 for \texttt{myeff}).
-If this is all right, the recreate the effects object.
+If this is all right, then recreate the effects object.
 \end{indentation}
 \bigskip
 
@@ -14580,6 +14646,17 @@ the following effectGroup is defined:
 
 Further some of the complex effectGroups are the following:
 \begin{itemize}
+\item \sfn{nonSymmetricNonSymmetricObjective} is for combination of two
+    directed networks, one in the role of dependent network and the other
+    in the role of explanatory network;
+\item \sfn{nonSymmetricSymmetricObjective} is for the combination of a
+    directed network in the role of dependent network and a non-directed network
+    in the role of explanatory network;
+\item \sfn{nonSymmetricSymmetricSObjective} is for the combination of a
+    directed network in the role of dependent network and a non-directed network
+    in the role of explanatory network, where also the primary setting
+    can have the role of explanatory network (and is treated with cross-lagged
+    statistics as usual for co-evolution models);
 \item \sfn{tripleNetworkObjective} is for combinations
     of three networks where for the two in the role of explanatory networks,
     either both should be one-mode, or both should be bipartite with the same second node sets.

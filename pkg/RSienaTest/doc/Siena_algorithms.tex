@@ -3928,6 +3928,8 @@ The reason is that for the likelihood-based calculations,
 the `complete data' is the embedded chain (without the time increments),
 whereas in  \textsf{simstats0c}
 the complete chain, including the time increments (`tau'), is used.
+In \textsf{simstats0c} the contributions to the score function
+are calculated immediately after each ministep.
 Working with only the embedded chain is more efficient, because part
 of the variability is integrated out; the advantage for the
 likelihood-based calculations is that there are no complications springing
@@ -3935,12 +3937,6 @@ from changing dimensionality of the continuous part of the outcome space.
 For rate functions depending on the state $y$, working with the
 embedded chain entails the complications associated with the constant denoted $\kappa$
 and its consequence \textit{KappaFactor}.
-\vspace{\parskip}
-\\
-\hspace*{\parindent}
-I think there would be no harm, and probably a small efficiency gain,
-in changing \textsf{simstats0c} to using the same score functions
-for the rate parameters as those used in the likelihood calculations.
 \bigskip
 \\
 \hspace*{\parindent}
@@ -5612,20 +5608,20 @@ To calculate the scores in the second model type (`\texttt{ABSORB}'),
 for the boundary cases,
 we may note that this is based on a multinomial regression model
 with three options $\{-1, 0, 1\}$, of which the first two outcomes
-are combined. 
+are combined.
 Consider the case for the right boundary.
-The first two outcomes have the same value 
+The first two outcomes have the same value
 $\Delta_{ik}(-1,z) = \Delta_{ik}(0,z) = 0$; the value is 0
 because this option means no change.
 A score function is a function of the sufficient statistic,
 and for this 3-option statistical model the sufficient statistic corresponds
 to the partition of the outcome space into  $\big\{\{-1, 0\}, \{1\} \big\}$.
 Therefore the score function that we need is again (\ref{sc1}),
-for the original probabilities $p_i$. However, since 
+for the original probabilities $p_i$. However, since
 $\Delta_{ik}(-1,z) = \Delta_{ik}(0,z) = 0$ and $\pi_i(1) = p_i(1)$,
 it does not matter whether we calculate (\ref{sc1})
 for $p_i$ or for $\pi_i$.
- 
+
 
 
 \newpage

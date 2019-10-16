@@ -435,9 +435,11 @@ doIterations<- function(z, x, subphase,...)
 		fchange <- as.vector(z$gain * changestep)
 
 		## check positivity restriction
+		fchange[is.na(fchange)] <- 0
 		z$positivized[fchange > z$theta] <- z$positivized[fchange > z$theta] +1
 		z$positivized[!z$posj] <- 0
 		fchange <- ifelse(z$posj & (fchange > z$theta), z$theta * 0.5, fchange)
+		# make step
 		if (subphase > x$doubleAveraging)
 		{
 			zsmall$theta <- (z$thav/z$thavn) - fchange

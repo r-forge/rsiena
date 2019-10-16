@@ -1,3 +1,47 @@
+2019-10-16 R-Forge Revision 341, package version 1.2-18.
+In this R-forge revision, only RSienaTest is updated.
+Changes in RSiena and RSienaTest:
+   * Continuous dependent behavior variables implemented (Nynke Niezink).
+     This implies new effect types continuousFeedback, continuousIntercept,
+     continuousOneModeObjective, continuousRate, continuousWiener,
+     unspecifiedContinuousInteraction.
+   * imputationValues allowed in sienaDependent (Nynke Niezink)
+   * New effect outMore.
+   * component startingDate added to sienaFit object; this is reported in
+     siena.table(..., type='tex', ...).
+   * Speeded up calculation of IndegreeDistribution and OutdegreeDistribution
+     for sienaGOF if there are no missings or structurals.
+   * regrCoef and regrCor added to the sienaFit object also when !dolby.
+   * Some "warnings" changed back to "cat".
+   * EpochSimulation->totalRate renamed to grandTotalRate,
+     to avoid confusion with DependentVariable->totalRate.
+   * stop if useCluster and returnChains (in this case, no chains would 
+     be returned anyway).
+   * sienaDataCreate: more informative message in case of constraints.
+   * Further explanation in help page for setEffect, and small extensions of
+     help pages for getEffects, includeEffects, and includeInteraction.
+   * small clarification in help page for sienaDependent.
+   * small clarifications about node sets in help pages for coCovar,
+     varCovar, coDyadCovar, varDyadCovar, and sienaDataCreate.
+   * small addition to help page for sienaTimeTest.
+   * Object names are given in sienaFit.print if simOnly.
+   * Settings model: corrected scores for rate parameters;
+     stepType in NetworkCache; new class settingNetworkEffects;
+     effect group nonSymmetricSymmetricObjective split in this and
+     nonSymmetricSymmetricSObjective (also operating for primary setting effects);
+     new effects settingSizeAct, settingSizeActSqrt, settingSizeActLog,
+     settingOppAct, settingOppActSqrt, settingOppActLog,
+     settingLogCreationAct, settingOppActD, settingOppActSqrtD,
+     settingOppActLogD, settingLogCreationActD.
+     These new effects are not yet operational (target statistics not calculated).
+   * inPopIntn and outActIntn dropped from effect group 
+     nonSymmetricSymmetricObjective.
+Changes in RSienaTest:
+   * Corrected error in names of array returned by extract.posteriorMeans.
+   * New parameter excludeRates in extract.posteriorMeans, plotPostMeansMDS.
+   * Use parameter pmonly also in plotPostMeansMDS.
+
+
 2019-05-20 R-Forge Revision 340, packages version 1.2-17.
 Changes in RSiena and RSienaTest:
    * New effects outAct.c, inAct.c, outPop.c., inPop.c, degPlus.c.
@@ -169,7 +213,7 @@ Changes in RSienaTest:
 
 2018-03-24 R-Forge Revision 334, packages version 1.2-10.
 Changes in RSiena and RSienaTest:
-   * Example in help file siena07 for accessing generated networks for ML.
+   * Example in help page siena07 for accessing generated networks for ML.
 
 2018-03-21 R-Forge Revision 332, packages version 1.2-9.
 Changes in RSiena and RSienaTest:
@@ -236,7 +280,7 @@ Changes in RSienaTest:
    * multipleBayesTest corrected (there was an error for testing 2 or more
      linear combinations simultaneously) and adapted for cases with fixed
      parameters;
-     adapted help file text.
+     adapted help page text.
    * All remaining parts of rsiena01gui removed.
    * As a compensation of this, sienaDataCreateFromSession exported,
      with a more informative help page.
@@ -471,7 +515,7 @@ Changes in RSienaTest:
         if priorRatesFromData=2, change to different robust covariance matrix
           estimator when this is necessary (i.e., for small number of groups);
         in print.summary, also report nImproveMH;
-        a few lines added to help file.
+        a few lines added to help page.
    * test14 dropped from parallel.R (using clusters undesirable for basic testing)
      and replaced by a test using maxlike.
 
@@ -1282,9 +1326,9 @@ Changes in RSiena as well as RSienaTest:
    * In print method for sienaAlgorithm, report of conditional corrected
      in case !x$cconditional (sienaprint.r)
    * If there is a composition change object, MoM estimation is forced
-     to be non-conditional (initializeFRAN.r). This is reported in the help file
+     to be non-conditional (initializeFRAN.r). This is reported in the help page
      (sienaCompositionChange.Rd).
-   * Small changes in help files sienaAlgorithm.Rd, plot.sienaTimeTest.Rd,
+   * Small changes in help pages sienaAlgorithm.Rd, plot.sienaTimeTest.Rd,
 
 
 2013-05-10 R-forge revision 230
@@ -1897,7 +1941,7 @@ For RSiena and RSienaTest:
     returning of chains every iteration. Bug fixes for ML.
     * R/algorithms.r: added to RSienaTest (from examples directory).
     * man/profileLikelihoods.Rd, man/algorithms.Rd: (RSien aTest only)
-    help files for functions in algorithms.r.
+    help pages for functions in algorithms.r.
 
 2011-11-27 R-forge revision 185.
 
@@ -3080,7 +3124,7 @@ For RSiena and RSienaTest:
     to terminate the epoch.
     * tests/parallel.R, parallel.Rout.save: change in line number of effect
     * man/plot.sienaTimeTest.Rd, man/sienaTimeTest.Rd,
-    man/includeTimeDummy.Rd: split the help file into three.
+    man/includeTimeDummy.Rd: split the help page into three.
 
 2010-06-04 R-forge revision 92 (RSienaTest only)
 

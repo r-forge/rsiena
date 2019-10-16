@@ -200,10 +200,8 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 		z$thetaValues <- thetaValues
 		z$thetaFromFile <- TRUE
 	}
-
 	z <- robmon(z, x, useCluster, nbrNodes, initC, clusterString,
 		clusterIter, clusterType, cl, ...)
-
 	time1 <-  proc.time()['elapsed']
 	Report(c("Total computation time", round(time1 - time0, digits=2),
 			"seconds.\n"), outf)
@@ -268,6 +266,7 @@ InitReports <- function(z, seed, newseed)
 	}
 	z$revision <- revision
 	z$version <- version
+	z$startingDate <- date()
 	z
 }
 

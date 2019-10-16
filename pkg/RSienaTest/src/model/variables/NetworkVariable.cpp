@@ -612,7 +612,7 @@ void NetworkVariable::makeChange(int actor)
 				this->addAlterAgreementScores(accept);
 			}
 		}
-		
+
 		if (this->pSimulation()->pModel()->needScores())
 		{
 			this->accumulateScores(alter);
@@ -620,7 +620,7 @@ void NetworkVariable::makeChange(int actor)
 		if (this->pSimulation()->pModel()->needDerivatives())
 		{
 			this->accumulateDerivatives(); // ABC
-		}		
+		}
 	}
 //	 NB  the probabilities in the reported chain are probably wrong for !accept
 	if (this->pSimulation()->pModel()->needChain())
@@ -861,7 +861,6 @@ void NetworkVariable::calculateTieFlipContributions()
 	const vector<Effect *> & rCreationEffects =
 		this->pCreationFunction()->rEffects();
 	bool twoModeNetwork = !this->oneModeNetwork();
-	NetworkLongitudinalData * pData = (NetworkLongitudinalData *) this->pData();
 
 	int m = this->m();
 	int alter = 0;
@@ -894,7 +893,7 @@ void NetworkVariable::calculateTieFlipContributions()
 
 		if (this->lpermitted[alter] && (twoModeNetwork || alter != this->lego))
 		// The second condition seems superfluous,
-		// as (alter = this->lego) is dealt with later.
+		// as (alter == this->lego) is dealt with later.
 		// TODO: check if this can safely be dropped.
 		{
 			for (int i = 0; i < evaluationEffectCount; i++)
@@ -908,13 +907,6 @@ void NetworkVariable::calculateTieFlipContributions()
 				if (this->lpNetworkCache->outTieExists(alter))
 				{
 					contribution = -contribution;
-				}
-				else
-				{
-					if ((this->stepType() == 0) || (this->stepType() >= 2))
-					{
-						contribution += pData->universalOffset();
-					}
 				}
 				this->levaluationEffectContribution[alter][i] = contribution;
 			}
@@ -1037,11 +1029,13 @@ void NetworkVariable::calculateTieFlipContributions()
 
 
 /**
- * Calculates the probability of each actor of being chosen for the next
- * tie flip.
+ * If Settings model, chooses the setting; 
+ * calculates the probability of each actor
+ * for being chosen as alter for the next tie flip.
  */
 void NetworkVariable::calculateTieFlipProbabilities()
 {
+	NetworkLongitudinalData * pData = (NetworkLongitudinalData *) this->pData();
 	// If a settings model, decide what to do. Pre-store probabilities
 	this->getStepType();
 //	if (this->stepType() > 1)
@@ -1094,12 +1088,14 @@ void NetworkVariable::calculateTieFlipProbabilities()
 //	// TODO: correct this->lsetting for primary setting
 //	if (this->stepType() == 1)
 //	{
+//	{
 //		delete this->lsetting;
 //		this->lsetting = primarySetting(this->pNetwork(), this->lego);
 //	}
 	if (stepType() > -1)
 	{
-		initializeSetting();
+		initializeSetting(); 
+		this->lpNetworkCache->stepTypeSet(stepType());
 	}
 	this->preprocessEgo(this->lego);
 	this->calculatePermissibleChanges();
@@ -1115,7 +1111,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 		lsettings[stepType()]->initPermittedSteps(lpermitted);
 		// if there is only one permissable change (ego) return
 		if (!lsettings[stepType()]->validate(lpNetwork))
-	{
+		{
 			return;
 		}
 	}
@@ -1185,6 +1181,7 @@ void NetworkVariable::calculateTieFlipProbabilities()
 					// because there always is the no-change option
 	int m = this->m(); // not this->m()+1 for two-mode network;
 					// this is handled separately below
+	double primaryOffset = 0;
 
 	Setting* curSetting = 0;
 	ITieIterator* permIter = 0;
@@ -1193,6 +1190,20 @@ void NetworkVariable::calculateTieFlipProbabilities()
 		curSetting = lsettings[stepType()];
 		permIter = curSetting->getPermittedSteps();
 		m = curSetting->getPermittedSize();
+		if (this->stepType() == 1)
+		{
+			int egoOutDegree = 0;
+			egoOutDegree = this->lpNetwork->outDegree(this->lego);
+			if (egoOutDegree > m)
+			{
+				LOGS(logger::Priority::ERROR)<< "outdegree > primary setting size\n";
+					throw "outdegree > primary setting size";
+			}
+			else if (egoOutDegree < m)
+			{
+				primaryOffset = -std::log(m - egoOutDegree);
+			}
+		}
 	}
 
 	// calculate all contributions then subtract the largest to remove overflow
@@ -1255,6 +1266,15 @@ void NetworkVariable::calculateTieFlipProbabilities()
 						(* this->lpChangeContribution)[pEffect->pEffectInfo()].at(alter) =
 							this->lcreationEffectContribution[alter][i];
 					}
+				}
+//				for settings model:
+				if ((this->stepType() == 0) || (this->stepType() >= 2))
+				{
+					contribution += pData->universalOffset();
+				}
+				else if (this->stepType() == 1)
+				{
+					contribution += primaryOffset;
 				}
 			}
 
@@ -1363,7 +1383,6 @@ void NetworkVariable::calculateTieFlipProbabilities()
 	if (permIter != 0) {
 		delete permIter;
 	}
-
 }
 
 /**
@@ -1377,24 +1396,26 @@ void NetworkVariable::accumulateScores(int alter) const
 	Setting* curSetting = 0;
 	ITieIterator* permIter = 0;
 
-	if (this->stepType() != -1) {
+	if (this->stepType() != -1)
+	{
 		curSetting = lsettings[stepType()];
 		m = curSetting->getPermittedSize();
 		sumPermitted = m;
 		permIter = curSetting->getPermittedSteps();
-	} else {
+	} else
+	{
 		if (!this->oneModeNetwork()) {
-		m++;
-	}
+			m++;
+		}
 		if (alter >= m) {
 			Rprintf("this->n = %d this->m = %d m = %d alter = %d \n", this->n(),
 					this->m(), m, alter);
-		error("alter too large");
-	}
-		for (int h = 0; h < m; h++) {
-			if (this->lpermitted[h])
-				sumPermitted++;
-	}
+			error("alter too large");
+		}
+		for (int h = 0; h < m; h++)
+		{
+			if (this->lpermitted[h]) sumPermitted++;
+		}
 	}
 	if (sumPermitted <= 0)
 	{
@@ -1426,10 +1447,10 @@ void NetworkVariable::accumulateScores(int alter) const
 				if (permIter)
 				{
 					if (!permIter->valid())
-				{
+					{
 						LOGS(logger::Priority::ERROR)<< "iterator not valid\n";
 						throw "not valid";
-				}
+					}
 					j = permIter->actor();
 					permIter->next();
 				}

@@ -25,7 +25,7 @@ namespace siena
  * Constructor.
  */
 TruncatedOutdegreeEffect::TruncatedOutdegreeEffect(
-	const EffectInfo * pEffectInfo) : NetworkEffect(pEffectInfo)
+	const EffectInfo * pEffectInfo, bool right) : NetworkEffect(pEffectInfo)
 {
 	this->lc = int(pEffectInfo->internalEffectParameter() + 0.01);
 	// C++ always rounds downward
@@ -33,8 +33,9 @@ TruncatedOutdegreeEffect::TruncatedOutdegreeEffect(
 	if (this->lc < 1)
 	{
 		throw invalid_argument(
-			"TruncatedOutdegreeEffect: Parameter value must be at least 1");
+			"Truncated/More OutdegreeEffect: Parameter value must be at least 1");
 	}
+	this->lright = right;
 }
 
 
@@ -48,23 +49,46 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
 	// Current out-degree
 	int d =	this->pNetwork()->outDegree(this->ego());
 
-	if (this->outTieExists(alter))
+	if (lright) // outTrunc
 	{
+		if (this->outTieExists(alter))
+		{
 		// After a tie withdrawal, the new out-degree would be d-1, and
 		// the new effect value would have decreased by 1 if d <= this->lc
-
-		if (d <= this->lc)
-		{
-			change = 1;
+			if (d <= this->lc)
+			{
+				change = 1;
+			}
 		}
-	}
-	else
-	{
+		else
+		{
 		// When introducing a new tie, the new out-degree would be d+1, and
 		// the new effect value would have increased by 1 if d < this->lc
-		if (d < this->lc)
+			if (d < this->lc)
+			{
+				change = 1;
+			}
+		}
+	}
+	else // More
+	{
+		if (this->outTieExists(alter))
 		{
-			change = 1;
+		// After a tie withdrawal, the new out-degree would be d-1, and
+		// the new effect value would have decreased by 1 if d >= this->lc
+			if (d >= this->lc)
+			{
+				change = 1;
+			}
+		}
+		else
+		{
+		// When introducing a new tie, the new out-degree would be d+1, and
+		// the new effect value would have increased by 1 if d > this->lc
+			if (d > this->lc)
+			{
+				change = 1;
+			}
 		}
 	}
 
@@ -79,17 +103,27 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
 double TruncatedOutdegreeEffect::egoStatistic(int ego,
 	const Network * pNetwork)
 {
-	// Current out-degree
-	int d =	this->pNetwork()->outDegree(this->ego());
+	int statistic =	this->pNetwork()->outDegree(this->ego());
 
-	if (d <= this->lc)
+	if (this->lright)
 	{
-		return d;
+		if (statistic > this->lc)
+		{
+			statistic = this->lc;
+		}
 	}
 	else
 	{
-		return this->lc;
+		if (statistic > this->lc)
+		{
+			statistic = statistic - this->lc;
+		}
+		else
+		{
+			statistic = 0;
+		}
 	}
+	return statistic;
 }
 
 }

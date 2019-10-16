@@ -15,7 +15,8 @@
 \usage{
 extract.sienaBayes(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
                    sdLog=TRUE)
-extract.posteriorMeans(z, nfirst=z$nwarm+1, verbose=TRUE)
+extract.posteriorMeans(z, nfirst=z$nwarm+1, pmonly=1, excludeRates=FALSE,
+                   verbose=TRUE)
 }
 \arguments{
   \item{zlist}{A list of \code{\link{sienaBayesFit}} objects,
@@ -37,6 +38,10 @@ extract.posteriorMeans(z, nfirst=z$nwarm+1, verbose=TRUE)
      }
   \item{sdLog}{Logical: should the logarithms be taken of the posterior
       standard deviations (applies only to varying parameters).}
+  \item{pmonly}{if \code{pmonly=0} the posterior means and standard deviations
+       are extracted, if \code{pmonly=1} only the posterior means,
+      if \code{pmonly=2} only the posterior standard deviations.}
+  \item{excludeRates}{Logical: whether to exclude the rate parameters.}
   \item{verbose}{Logical: gives some console output to show ongoing activity
        (may be reassuring for large number of groups).}
 }
@@ -68,7 +73,7 @@ extract.posteriorMeans(z, nfirst=z$nwarm+1, verbose=TRUE)
 \references{See the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
 \author{Tom Snijders}
-\seealso{\code{\link{sienaBayes}}}
+\seealso{\code{\link{sienaBayes}, \link{plotPostMeansMDS}}}
 \examples{
   Group1 <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))
   Group3 <- sienaDependent(array(c(N3403, HN3403), dim=c(37, 37, 2)))

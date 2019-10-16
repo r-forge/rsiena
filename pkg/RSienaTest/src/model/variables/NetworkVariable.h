@@ -92,8 +92,8 @@ private:
 	void checkAlterAgreement(int alter);
 	void addAlterAgreementScores(bool accept);
 	void accumulateSymmetricModelScores(int alter, bool accept);
-	void accumulateRateScores(double tau, const DependentVariable *
-		pSelectedVariable, int selectedActor);
+// NU	void accumulateRateScores(double tau, const DependentVariable *
+//		pSelectedVariable, int selectedActor);
 	void calculateSymmetricTieFlipContributions(int alter, int sub);
 	void calculateSymmetricTieFlipProbabilities(int alter, int sub, bool aagree);
 	bool calculateModelTypeBProbabilities();

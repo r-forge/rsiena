@@ -23,6 +23,7 @@ extern "C"
 
 static const R_CallMethodDef CallEntries[] = {
 	CALLDEF(Behavior, 2),
+    CALLDEF(Continuous, 2),
 	CALLDEF(Bipartite, 2),
 	CALLDEF(ChangingCovariates, 2),
 	CALLDEF(ChangingDyadicCovariates, 2),

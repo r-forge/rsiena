@@ -28,6 +28,7 @@ class LongitudinalData;
 class NetworkLongitudinalData;
 class OneModeNetworkLongitudinalData;
 class BehaviorLongitudinalData;
+class ContinuousLongitudinalData;
 class ConstantCovariate;
 class ChangingCovariate;
 class ConstantDyadicCovariate;
@@ -84,6 +85,8 @@ public:
 			std::string name, const ActorSet * pActors);
 	BehaviorLongitudinalData * createBehaviorData(std::string name,
 		const ActorSet * pActorSet);
+	ContinuousLongitudinalData * createContinuousData(std::string name,
+		const ActorSet * pActorSet);
 	ConstantCovariate * createConstantCovariate(std::string name,
 		const ActorSet * pActorSet);
 	ChangingCovariate * createChangingCovariate(std::string name,
@@ -101,6 +104,7 @@ public:
 	OneModeNetworkLongitudinalData * pOneModeNetworkData(std::string name) const;
 	OneModeNetworkLongitudinalData * pOneModeSimNetworkData(std::string name) const;
 	BehaviorLongitudinalData * pBehaviorData(std::string name) const;
+	ContinuousLongitudinalData * pContinuousData(std::string name) const;
 	ConstantCovariate * pConstantCovariate(std::string name) const;
 	ChangingCovariate * pChangingCovariate(std::string name) const;
 	ConstantDyadicCovariate * pConstantDyadicCovariate(std::string name) const;
@@ -148,6 +152,10 @@ private:
 
 	std::vector<LongitudinalData *> ldependentVariableData;
 	std::vector<LongitudinalData *> lsimVariableData;
+
+	// A collection of longitudinal continuous dependent variables
+	// Necessary for computation of statistics based on all cont DVs
+	std::vector<ContinuousLongitudinalData *> lcontinuousDependentVariableData;
 
 	// A collection of constant covariates
 	std::vector<ConstantCovariate *> lconstantCovariates;

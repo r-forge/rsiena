@@ -77,6 +77,7 @@ print.siena <- function(x, ...)
 		cat("\n")
 	}
 
+	has.set <- hasSettings(x)
 	for (j in (1:length(x$depvars)))
 	{
 		xj <- x$depvars[[j]]
@@ -102,10 +103,10 @@ print.siena <- function(x, ...)
 			mymat[4,] <- c("Nodeset ", attr(xj, "nodeSet"))
 			nrows <- 4
 		}
-		if (attr(xj, "type") == "behavior")
+		if (attr(xj, "type") %in% c("behavior", "continuous"))
 		{
 			mymat[nrows+1,] <- c("Range",
-				paste(attr(xj, "range2"),  collapse=" - "))
+				paste(signif(attr(xj, "range2"), 4),  collapse=" - "))
 		}
 		else
 		{
@@ -114,6 +115,13 @@ print.siena <- function(x, ...)
 		}
 		mymat2 <- apply(mymat[0:nrows+1,], 2, format)
 		write.table(mymat2, row.names=FALSE, col.names=FALSE, quote=FALSE)
+		if (has.set[j]){
+			cat("\nSettings\n")
+			dts <- describeTheSetting(xj)
+			dts <- matrix(c(colnames(dts), t(dts)), 3, 4, byrow=TRUE)
+			mymat3 <- apply(dts[,1:3], 2, format)
+			write.table(mymat3, row.names=FALSE, col.names=FALSE, quote=FALSE)
+		}
 		cat("\n")
 	}
 
@@ -1062,8 +1070,9 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
         }
     }
     nBehavs <- sum(x$f$types == "behavior")
-    nNetworks <- length(x$f$types) - nBehavs
-    if (nBehavs > 0 && nNetworks > 0)
+	nConts <- sum(x$f$types == "continuous")
+    nNetworks <- length(x$f$types) - nBehavs - nConts
+    if ((nConts > 0 || nBehavs > 0) && nNetworks > 0)
     {
         addtorow$command[addsub] <-
             "Network Dynamics"
@@ -1105,6 +1114,21 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 		theEffects$effectName[theEffects$netType=='behavior'] <-
 			behEffects$effectName
 	}
+    if (nConts > 0)
+    {
+        contEffects <- theEffects[theEffects$netType == 'continuous',]
+        contNames <- unique(contEffects$name)
+    }
+    if (nConts > 1)
+    {
+        contEffects$effectName <- paste('<',
+            (1:nConts)[match(contEffects$name,
+                contNames)],
+            '> ', contEffects$effectName,
+            sep='')
+        theEffects$effectName[theEffects$netType=='continuous'] <-
+            contEffects$effectName
+    }
 
 	mydf[nrates + (1:xp), 'row'] <-  1:xp
 	mydf[nrates + (1:xp), 'type' ] <- ifelse(theEffects$type == "creation",
@@ -1144,12 +1168,22 @@ sienaFitThetaTable <- function(x, fromBayes=FALSE, tstat=FALSE, groupOnly=0, nfi
 
 	if (nBehavs > 0 && nNetworks > 0)
 	{
-		nNetworkEff <- nrow(theEffects) - nrow(behEffects)
+		nNetworkEff <- nrow(theEffects) - nrow(behEffects) -
+            sum(theEffects$netType %in% c('continuous', 'sde'))
 		addtorow$command[addsub] <-
 			'Behavior Dynamics'
 		addtorow$pos[[addsub]] <- nrates + 2 + nNetworkEff
 		addsub <- addsub + 1
 	}
+    if (nConts > 0 && nNetworks > 0)
+    {
+        nNetworkAndBehEff <- nrow(theEffects) -
+            sum(theEffects$netType %in% c('continuous', 'sde'))
+        addtorow$command[addsub] <-
+            'Continuous Behavior Dynamics'
+        addtorow$pos[[addsub]] <- nrates + 2 + nNetworkAndBehEff
+        addsub <- addsub + 1
+    }
 	return(list(mydf=mydf, addtorow=addtorow))
 } # end sienaFitThetaTable
 

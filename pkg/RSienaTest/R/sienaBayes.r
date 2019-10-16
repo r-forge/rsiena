@@ -397,6 +397,12 @@ browser()
 		# are less stable; and these steps are done much more
 		# frequently than those for the global parameters.
 				scores <- getProbabilitiesFromC(z, getScores=TRUE)[[2]]
+# this goes wrong for more than 1 period:
+# incompatible dimensions in the following statement.
+# see the definition of getProbabilitiesFromC down in this file,
+# which also has some uncertainty.
+# if incidentalBasicRates is going to be used for more than 1 period,
+# this should be repaired.
 				z$thetaMat[,z$basicRate] <<-
 					pmax(z$thetaMat[,z$basicRate] +
 					bgain*z$factorsBasicRate*t(scores[z$basicRate,]), 0.1)
@@ -523,12 +529,12 @@ browser()
 		if (any(is.na(proposals.accept)))
 		{
 			warning("any(is.na(proposals.accept))", noBreaks. = TRUE)
-			warning("The group/s with NA proposals.accept is/are ", 
+			warning("The group/s with NA proposals.accept is/are ",
 						which(is.na(proposals.accept)), noBreaks. = TRUE)
 			if (initgainGroupwise > 0.0)
 			{
 				warning("\nPerhaps a case of divergence?", noBreaks. = TRUE)
-				warning("\nIf so: perhaps use a smaller value of initgainGroupwise.", 
+				warning("\nIf so: perhaps use a smaller value of initgainGroupwise.",
 									noBreaks. = TRUE)
 			}
 			cat("Hit return to continue....")
@@ -1190,7 +1196,7 @@ covtrob <- function(x){
 						bgain=0.0, change=FALSE)
 		}
 		cat('\nend of warming up lowest level\n')
-				
+
 		if (newProposalFromPrev)
 		{
 		# effects0 defined as in initializeBayes,
@@ -1516,15 +1522,15 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	{
 		if (any(priorSigEta[!is.na(priorSigEta)] == 0))
 		{
-			message("priorSigEta is given as", priorSigEta,
+			message("priorSigEta is given as ", priorSigEta,
 				"; this contains zeros, which is not allowed.\n")
 			stop("priorSigEta contains a zero.\n")
 		}
 		if (length(priorSigEta) != numberFixed)
 		{
-			message("priorSigEta was specified with length", length(priorSigEta))
-			message("However, the model specification contains", numberFixed,
-				"fixed effects.")
+			message("priorSigEta was specified with length ", length(priorSigEta))
+			message("However, the model specification contains ", numberFixed,
+				" fixed effects.")
 			stop("priorSigEta is not of the correct length.")
 		}
 	}
@@ -1537,8 +1543,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		if (length(priorMu) != numberRandom)
 		{
 			message("priorMu was specified with length ", length(priorMu))
-			message("However, the model specification contains", numberRandom,
-				"randomly varying effects.")
+			message("However, the model specification contains ", numberRandom,
+				" randomly varying effects.")
 			stop("priorMu is not of the correct length.")
 		}
 	}
@@ -1814,6 +1820,12 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	}
 	# Note that z$p1 = sum(z$set1) + (z$nGroup-1)*(number of rate parameters per group)
 	# unless incidentalBasicRates
+
+	if ((data[[1]]$observations >= 3) & (incidentalBasicRates))
+	{
+		stop("There is an error in the use of incidentalBasicRates for 2 or more periods.")
+# the error occurs in sampleVaryingParameters
+	}
 
 	# Some further checks of input parameters, using p1:
 	# (could be put earlier, with some effort)
@@ -2243,7 +2255,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		}
 		if (try.error)
 		{
-			warning('Condition priorRatesFromData=2 impossible, changed to 1.', 
+			warning('Condition priorRatesFromData=2 impossible, changed to 1.',
 								noBreaks. = TRUE)
 			priorRatesFromData <- 1
 		}

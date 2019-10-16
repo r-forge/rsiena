@@ -22,6 +22,7 @@
 #include "data/NetworkLongitudinalData.h"
 #include "data/OneModeNetworkLongitudinalData.h"
 #include "data/BehaviorLongitudinalData.h"
+#include "data/ContinuousLongitudinalData.h"
 #include "data/ChangingDyadicCovariate.h"
 #include "data/ConstantDyadicCovariate.h"
 #include "data/ChangingCovariate.h"
@@ -33,6 +34,7 @@
 #include "model/StatisticCalculator.h"
 #include "data/ActorSet.h"
 #include "model/EpochSimulation.h"
+#include "model/SdeSimulation.h"
 #include "model/variables/DependentVariable.h"
 #include "model/variables/BehaviorVariable.h"
 #include "model/variables/NetworkVariable.h"
@@ -305,7 +307,21 @@ void updateParameters(SEXP EFFECTSLIST, SEXP THETA, vector<Data *> *
 				 	}
 				}
 			}
+			else if (strcmp(effectType, "rate") == 0 &&
+					 strcmp(effectName, "scale") == 0)		
+			{
+				int period = INTEGER(VECTOR_ELT(EFFECTS, periodCol))[eff] - 1;
+				if (strcmp(setting, "") == 0)
+				{
+					pModel->basicScaleParameter(period, currentValue);
+				}
 			else
+			{
+					error("setting found for behavior variable %s", 
+						networkName);
+				}
+			}
+			else // no rate or scale effect
 			{
 				EffectInfo * pEffectInfo =
 					(EffectInfo *) R_ExternalPtrAddr(
@@ -461,7 +477,7 @@ void setupOneModeGroup(SEXP ONEMODEGROUP, Data * pData)
 			SEXP settingInfo = VECTOR_ELT(settingsList, j);
 			SEXP infoNames = getAttrib(settingInfo, R_NamesSymbol);
 			std::string id, type, covar, only;
-			// Rprintf("setting %d\n", j);
+//			Rprintf("setting %d\n", j);
 			// parse key value list
 			for (int k = 0; k < length(settingInfo); k++) {
 				// Rprintf("key value %d\n", k);
@@ -765,6 +781,95 @@ void setupBehaviorGroup(SEXP BEHGROUP, Data *pData)
 	}
 }
 
+/**
+ * Create all observations for a continuous dependent variable
+ *
+ */
+void setupContinuous(SEXP CONTINUOUS, ContinuousLongitudinalData * 
+	pContinuousData)
+{
+    int observations = ncols(VECTOR_ELT(CONTINUOUS, 0));
+
+    if (observations != pContinuousData->observationCount())
+    {
+		error ("wrong number of observations in Continuous");
+    }
+    int nActors = nrows(VECTOR_ELT(CONTINUOUS, 0));
+
+    if (nActors != pContinuousData->n())
+    {
+        error ("wrong number of actors");
+    }
+    double * start = REAL(VECTOR_ELT(CONTINUOUS, 0));
+	int * missing = LOGICAL(VECTOR_ELT(CONTINUOUS, 1));
+
+    for (int period = 0; period < observations; period++)
+    {
+        for (int actor = 0; actor < nActors; actor++)
+        {
+			pContinuousData->value(period, actor, *start++);
+			pContinuousData->missing(period, actor, *missing++);
+        }
+    }
+    SEXP uo;
+    PROTECT(uo = install("uponly"));
+    SEXP uponly = getAttrib(VECTOR_ELT(CONTINUOUS, 0), uo);
+    SEXP dow;
+    PROTECT(dow = install("downonly"));
+    SEXP downonly = getAttrib(VECTOR_ELT(CONTINUOUS,0), dow);
+    for (int period = 0; period < (observations - 1); period++)
+    {
+        pContinuousData->upOnly(period, LOGICAL(uponly)[period]);
+        pContinuousData->downOnly(period, LOGICAL(downonly)[period]);
+    }
+    SEXP sim;
+    PROTECT(sim = install("simMean"));
+    SEXP simMean = getAttrib(VECTOR_ELT(CONTINUOUS,0), sim);
+	pContinuousData->similarityMean(REAL(simMean)[0]);
+	SEXP sims;
+	PROTECT(sims = install("simMeans"));
+	SEXP simMeans = getAttrib(VECTOR_ELT(CONTINUOUS, 0), sims);
+	SEXP simNames;
+	PROTECT(simNames = getAttrib(simMeans, R_NamesSymbol));
+	int numberNetworks = length(simMeans);
+	for (int net = 0; net < numberNetworks; net++)
+	{
+		pContinuousData->similarityMeans(REAL(simMeans)[net],
+			CHAR(STRING_ELT(simNames, net)));
+	}
+
+    // Now that the values are set, calculate some important statistics
+	pContinuousData->calculateProperties();
+	UNPROTECT(5);
+}
+/**
+ * Create one group of Continuous dependent variables
+ *
+ */
+void setupContinuousGroup(SEXP CONTGROUP, Data *pData)
+{
+    int nCont = length(CONTGROUP);
+
+    for (int continuous = 0; continuous < nCont; continuous++)
+    {
+		SEXP as;
+		PROTECT(as = install("nodeSet"));
+        SEXP actorSet = getAttrib(VECTOR_ELT(VECTOR_ELT(CONTGROUP, continuous), 0),
+								  as);
+
+        SEXP nm;
+        PROTECT(nm = install("name"));
+        SEXP name = getAttrib(VECTOR_ELT(VECTOR_ELT(CONTGROUP, continuous), 0),
+							  nm);
+
+        const ActorSet * myActorSet = pData->pActorSet(CHAR(STRING_ELT(
+                                                                actorSet, 0)));
+		ContinuousLongitudinalData * pContinuousData =
+			pData->createContinuousData(CHAR(STRING_ELT(name, 0)), myActorSet);
+		setupContinuous(VECTOR_ELT(CONTGROUP, continuous), pContinuousData);
+        UNPROTECT(2);
+    }
+}
 /**
  * Create a constant covariate
  *
@@ -1392,8 +1497,20 @@ SEXP createEffects(SEXP EFFECTS, Model *pModel, vector<Data *> * pGroupData,
 				}
 			}
 		}
-
+		else if (strcmp(effectType, "rate") == 0 &&
+				 strcmp(effectName, "scale") == 0)		
+		{
+			int period = INTEGER(VECTOR_ELT(EFFECTS, periodCol))[i] - 1;
+			if (strcmp(setting, "") == 0)
+			{
+				pModel->basicScaleParameter(period, initialValue);
+			}
 		else
+		{
+				error("setting found for variable %s", networkName);
+			}
+		}
+		else // no rate or scale effect
 		{
 			pEffectInfo = pModel->addEffect(networkName,
 					effectName,
@@ -1665,7 +1782,8 @@ void getStatistics(SEXP EFFECTSLIST,
 			//	Rprintf("%s %s \n", effectType, netType);
 			if (strcmp(effectType, "rate") == 0)
 			{
-				if (strcmp(effectName, "Rate") == 0)
+				if (strcmp(effectName, "Rate") == 0 ||
+					strcmp(effectName, "scale") == 0)
 				{
 					int groupno =
 						INTEGER(VECTOR_ELT(EFFECTS, groupCol))[i];
@@ -1686,6 +1804,20 @@ void getStatistics(SEXP EFFECTSLIST,
 								const DependentVariable * pVariable =
 									pEpochSimulation->pVariable(networkName);
 								score = pVariable->basicRateScore();
+							}
+							else
+							{
+								score = 0;
+							}
+						}
+						else if (strcmp(netType, "continuous") == 0)
+						{
+							statistic = pCalculator->totalDistance(period);
+
+							if (pEpochSimulation)
+							{
+								score = pEpochSimulation->pSdeSimulation()->basicScaleScore();
+								// Rprintf("The tau score gets update with %f\n", score); NYNKE
 							}
 							else
 							{

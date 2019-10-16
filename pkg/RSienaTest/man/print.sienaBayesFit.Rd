@@ -14,7 +14,7 @@
 
 shortBayesResults(x, nfirst=NULL)
 
-plotPostMeansMDS(x, pmonly=0, nfirst=NULL, ...)
+plotPostMeansMDS(x, pmonly=1, excludeRates=TRUE, nfirst=NULL, ...)
 }
 \description{
   \code{print} and \code{summary} methods for \code{\link{sienaBayesFit}} objects,
@@ -31,6 +31,8 @@ plotPostMeansMDS(x, pmonly=0, nfirst=NULL, ...)
   \item{pmonly}{if \code{pmonly=0} a plot is made for posterior means and standard deviations,
       if \code{pmonly=1} only for the posterior means,
       if \code{pmonly=2} only for the posterior standard deviations.}
+  \item{excludeRates}{Logical: whether to exclude the rate parameters
+      for determining the coordinates.}
   \item{\dots}{For extra arguments. At present used only for
      further specification of the plot made by \code{plotPostMeansMDS},
     allowing further arguments for \code{\link{plot}} and \code{\link{text}}.}
@@ -69,7 +71,8 @@ plotPostMeansMDS(x, pmonly=0, nfirst=NULL, ...)
   tables of posterior means and standard deviations of a
   \code{\link{sienaBayesFit}} object.
 }
-\seealso{\code{\link{siena.table}}, \code{\link{sienaBayes}}.}
+\seealso{\code{\link{siena.table}}, \code{\link{sienaBayes}},
+    \code{\link{extract.sienaBayes}}, \code{\link{extract.posteriorMeans}}.}
 \references{
   See also \url{http://www.stats.ox.ac.uk/~snijders/siena/}
   \cr

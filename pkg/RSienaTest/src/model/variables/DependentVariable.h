@@ -32,7 +32,7 @@ namespace siena
  */
 	enum NetworkModelType { NOTUSED, NORMAL, AFORCE, AAGREE, BFORCE, BAGREE, BJOINT };
 	enum BehaviorModelType { OUTOFUSE, RESTRICT, ABSORB };
-	
+
 // ----------------------------------------------------------------------------
 // Section: Forward declarations
 // ----------------------------------------------------------------------------
@@ -112,6 +112,7 @@ public:
 
 	void calculateRates();
 	double totalRate() const;
+	double nonSettingsRate() const;
 	double rate(int actor) const;
 	inline double basicRate() const;
 	void updateBasicRate(int period);
@@ -227,6 +228,9 @@ private:
 
 	// The total rate of change summed over all actors
 	double ltotalRate;
+
+	// The rate of change factor excepting settingsrate
+	double lnonSettingsRate;
 
 	// The rate of change for each actor
 	double * lrate;
