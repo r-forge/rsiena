@@ -18,9 +18,14 @@ sienaNet(netarray, type=c("oneMode", "bipartite", "behavior", "continuous"),
 nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE, imputationValues=NULL)
 }
 \arguments{
-  \item{netarray}{matrix (type="behavior" or "continuous" only)
-    or (for the other types) array of values or list of sparse matrices
-    of type "dgTMatrix".}
+  \item{netarray}{type="behavior" or "continuous": matrix 
+    (actors \eqn{\times} waves).\cr
+	type="oneMode" or "bipartite": array of values or list of sparse matrices
+    of type "dgTMatrix"; if an array is used, it should have
+	dimensions: for a one-network, \eqn{n \times n \times M},
+	and for a two-mode network \eqn{n \times m \times M}, 
+	where \code{n} is the number of actors, \code{m} is the number
+	of nodes in the second mode, and \code{M} is the number of waves.}
   \item{type}{type of dependent variable, default "oneMode".}
   \item{nodeSet}{character string naming the appropriate node set.
     For a bipartite network, a vector containing 2 character strings:

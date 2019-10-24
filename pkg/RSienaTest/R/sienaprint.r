@@ -397,12 +397,11 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 					rep('\n',x$qq), sep='')
 			}
 			cat(as.matrix(mymess1),'\n', sep='')
-			cat("\nSimulated statistics are in ...$sf")
-#						paste(objectName,'$sf',sep=""))
+			cat("\nSimulated statistics are in ", objectName,'$sf',sep="")
 			if (x$returnDeps)
 			{
-				cat("\nand simulated dependent variables in ...$sims.\n")
-#					paste(objectName,'$sims',sep=""), ".\n")
+				cat("\nand simulated dependent variables in ",
+								objectName,'$sims.\n',sep="")
 			}
 			else
 			{

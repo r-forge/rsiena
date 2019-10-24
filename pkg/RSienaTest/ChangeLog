@@ -1,3 +1,13 @@
+2019-10-24 R-Forge Revision 342, package version 1.2-19.
+In this R-forge revision, only RSienaTest is updated.
+Changes in RSiena and RSienaTest:
+   * New effect avGroupEgoX.
+   * CovariateDependentNetworkEffect:  + lSimulatedOffset taken out of
+     definition missings for ChangingCovariate (seems wrong).
+Changes in RSienaTest:
+   * In sienaBayes: more precise check that 
+     prevAns has same specification as effects.
+
 2019-10-16 R-Forge Revision 341, package version 1.2-18.
 In this R-forge revision, only RSienaTest is updated.
 Changes in RSiena and RSienaTest:

@@ -27,6 +27,7 @@
 #include "AverageAlterDist2Effect.h"
 #include "AverageAlterInDist2Effect.h"
 #include "AverageGroupEffect.h"
+#include "AverageGroupEgoEffect.h"
 #include "AverageInAlterEffect.h"
 #include "AverageReciprocatedAlterEffect.h"
 #include "AverageSimmelianAlterEffect.h"

@@ -94,10 +94,9 @@ dummy. Alternatively, use \code{\link{includeTimeDummy}}.
    The call of \link{setEffect} will set, for this effect,
    the column elements of the resulting effects object for \code{parameter},
    \code{fix}, \code{test}, \code{randomEffects}, \code{initialValue},
-    \code{timeDummy}, and \code{include} to the values requested.} 
-	
+    \code{timeDummy}, and \code{include} to the values requested.\cr	
 	The \code{shortName} must not be set between quotes,
-	unless you use \code{character=TRUE}.
+	unless you use \code{character=TRUE}.}
 \value{
   An object of class \code{\link{sienaEffects}} or
   \code{\link{sienaGroupEffects}}. This will be an updated version of the

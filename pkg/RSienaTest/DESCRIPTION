@@ -2,9 +2,10 @@ Encoding: UTF-8
 Package: RSienaTest
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.2-18
-Date: 2019-10-16
-Author: Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders, Felix Schoenenberger
+Version: 1.2-19
+Date: 2019-10-24
+Author: Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders, Felix Schoenenberger,
+   Nynke Niezink
 Depends: R (>= 2.15.0)
 Imports: Matrix, tcltk, lattice, parallel, MASS, RUnit, methods
 Suggests: xtable, network, tools, codetools
