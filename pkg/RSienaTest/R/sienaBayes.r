@@ -1664,11 +1664,34 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 				(dim(prevAns$requestedEffects)[1] == sum(effects$include)) &
 				!prevAns$x$cconditional)
 			{
-				nsub <- 0
-				if (prevAns$n3 >= 500)
+				e1 <- prevAns$requestedEffects[prevAns$requestedEffects$include,]
+				e2 <- effects[effects$include,]
+				if (all(e1$name == e2$name) & all(e1$shortName == e2$shortName) &
+					all(e1$type == e2$type) & all(e1$effect1 == e2$effect1) &
+					all(e1$effect2 == e2$effect2) &
+					all(e1$effect3 == e2$effect3) &
+					all(e1$interaction1 == e2$interaction1) &
+					all(e1$interaction2 == e2$interaction2) &
+					all(e1$parm == e2$parm))
 				{
-					startupSkip <- TRUE
+					nsub <- 0
+					if (prevAns$n3 >= 500)
+					{
+						startupSkip <- TRUE
+					}
+					else
+					{
+						message('prevAns is given with low value of n3.\n')
+					}
 				}
+				else
+				{
+					message('prevAns does not have same specification.\n')
+				}
+			}
+			else
+			{
+				message('prevAns does not have same number of effects.\n')
 			}
 		}
 		startupModel <- sienaAlgorithmCreate(n3=500, nsub=nsub, cond=FALSE,

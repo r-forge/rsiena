@@ -659,6 +659,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new SameCovariateFourCyclesEffect(pEffectInfo, true);
 	}
+	else if (effectName == "avGroupEgoX")
+	{
+		pEffect = new AverageGroupEgoEffect(pEffectInfo);
+	}
 	else if (effectName == "cycle4")
 	{
 		pEffect = new FourCyclesEffect(pEffectInfo, true);

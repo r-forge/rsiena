@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-17.
+This version was renewed for \RS version 1.2-18.
 \end{abstract}
 
 
@@ -350,7 +350,8 @@ and \citet{SchweinbergerSnijders07a} for the calculation of
 standard errors of the Method of Moments estimators.
 For assessing and
 correcting time heterogeneity, and goodness of fit assement and associated model
-selection considerations, refer to \citet*{Lospinoso2011} and \citet{Lospinoso2012}.
+selection considerations, refer to \citet*{Lospinoso2011} and
+\citet{LospinosoSnijders2019}.
 A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
 and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
 For Generalized Method of Moments estimators,
@@ -894,24 +895,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-17}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-18}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-17.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-18.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-17.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-18.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-17.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-18.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-17.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-18.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-17.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-18.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-17.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-18.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1111,7 +1112,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-17) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-18) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -3840,7 +3841,8 @@ whether the end result gives a good representation
 also of these other statistics.
 
 The \sfn{sienaGOF} function, proposed and elaborated by
-\citet{Lospinoso2012}, operates basically by comparing
+\citet{Lospinoso2012} and presented further
+in \citet{LospinosoSnijders2019}, operates basically by comparing
 the observed values, at the ends of the periods, with the
 simulated values for the ends of the periods.
 The differences are assessed by combining the auxiliary statistics
@@ -8405,7 +8407,10 @@ the {\em number of four-cycles} with shortName \texttt{(cycle4)} \\
  the number of actors to whom $i$
  is not directly tied, and tied through twopaths via at least two intermediaries,\\
  $s^{\rm net}_{i\vit}(x) =  \#\{j \mid x_{ij} = 0,\, \sum_h (x_{ih}\, x_{hj}) \geq 2 \}$;\\
- endowment effect only likelihood-based;
+ evidently, this is even more difficult to interpret than \texttt{(nbrDist2)};
+ both effects should be used if there are very specific
+ and convincing reasons to include them in the model;\\
+ endowment effect only likelihood-based;\\
 
 
  \item {\em number of dense triads} \texttt{(denseTriads)},
@@ -9650,6 +9655,18 @@ with shortName \texttt{(sameXCycle4)}, \\[0.3em]
 \end{minipage}
 
 \setcounter{savenumi}{\value{enumi}}
+
+ \item {\em group average} \texttt{(avGroupEgoX)}, defined by ego's value multiplied by the
+ average of the covariate for this period,  \\
+ $s^{\rm beh}_{i\vit}(x, z) =  \sum_j x_{ij} \, \overline {v}  $;\\
+ here $\overline {v}$ is the mean of the values $v_{ih}$ for all actors $h$
+ in the actor set: for changing covariate, the mean of the wave at the
+ start of the period; for behavioral dependent variables,
+ the current mean.
+ This effect is not meaningful for constant covariates.
+ It is useful especially for multigroup data sets, where the average value
+ varies between groups. 
+ Note that always, the average $\overline {v} $ is centered by the global mean.
 \end{enumerate}
 
 \noindent
@@ -12089,10 +12106,11 @@ The list of these effects is the following.
  in the group, and $c_p$ is a centering constant depending on the internal effect parameter $p$.
  Denote the overall mean used for centering the observed $Z$ values by
  $m_Z$ (see the footnote on p.~\pageref{meandef}).
- If $p \leq 0$, centering is no different than for the $z_i$ values generally,
- so $c_p = 0$; if $p \geq 1$, centering is by $c_p = p - m_Z$.
+ If $p \leq 0.5$, centering is no different than for the $z_i$ values generally,
+ so $c_p = 0$; if $p > 0.5$, centering is by $c_p = p - m_Z$.
  For the original non-centered values of $Z$, this means that the mean
- is centered around the value $p$.\\
+ is centered around the value $p$, the effect parameter itself.
+ Note that this can be any real value, not necessarily integer.\\
  This effect is useful especially for multigroup data sets, where the average value
  varies between groups. For multigroup data sets, centering by the groupwise
  mean may be less desirable, and it will be better to center by a value $p$
@@ -15182,6 +15200,37 @@ the R-Forge repository, which contains a more complete listing.
 \begin{small}
 \begin{itemize} % Also update version number in abstract
 
+
+\item 2019-10-17 R-Forge Revision 341, RSienaTest version 1.2-18.
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item Continuous dependent behavior variables implemented (Nynke Niezink).
+     This implies new effect types \texttt{continuousFeedback},
+     \texttt{ continuousIntercept}, \\
+     \texttt{continuousOneModeObjective},
+     \texttt{ continuousRate}, \texttt{ continuousWiener}, \\
+     \texttt{ unspecifiedContinuousInteraction}.
+   \item \texttt{imputationValues} allowed in \sfn{sienaDependent} (Nynke Niezink).
+   \item New effect \texttt{outMore}.
+   \item component \texttt{startingDate} added to \sfn{sienaFit} object;
+   this date is reported in  \sfn{siena.table(..., type='tex', ...)}.
+   \item Object names are given in \sfn{sienaFit.print} if \texttt{simOnly}.
+   \item Speeded up calculation of \sfn{IndegreeDistribution} and \sfn{OutdegreeDistribution}
+     for \sfn{sienaGOF} if there are no missings or structurals.
+   \item \texttt{regrCoef} and \texttt{regrCor} added to the \sfn{sienaFit} object
+   also when not \texttt{dolby}.
+   \item Immediate stop if \texttt{useCluster} and \texttt{returnChains}
+     both are used (in this case, no chains would be returned anyway).
+   \item \sfn{sienaDataCreate}: more informative message in case of constraints.
+   \item Small improvements in many help pages.
+   \item Corrected error in names of array returned by \sfn{extract.posteriorMeans}.
+   \item New parameter \texttt{excludeRates} in \sfn{extract.posteriorMeans},
+       \sfn{plotPostMeansMDS}.
+   \item Use parameter \texttt{pmonly} also in \sfn{plotPostMeansMDS}.
+\end{itemize}
+
+
 \item 2019-05-20 R-Forge Revision 340, package version 1.2-17.
 
 Changes in RSiena and RSienaTest:
@@ -15433,7 +15482,7 @@ Changes in RSiena and RSienaTest:
 Changes in RSienaTest:
 \begin{itemize}
    \item new function \sfn{extract.posteriorMeans} for \sfn{sienaBayes} results.
-   \item Restrict check of maximum
+   \item Restrict check in \sfn{sienaBayes} of maximum
      estimated parameter value after initialization to non-fixed effects.
    \item Correct construction of groupwise effects object in \sfn{sienaBayes}
     so that this
@@ -15444,7 +15493,8 @@ Changes in RSienaTest:
      In \sfn{print.sienaBayesFit}, include fixed parameters and
      give credibility intervals for rate parameters; include variance parameters;
      allow shorter \texttt{ThinParameters};
-     print objects returned through \texttt{partialBayesResult.RData}
+     print objects returned through \\
+     \texttt{partialBayesResult.RData}
      (by adding \texttt{na.rm=TRUE} to quantile).
    \item \sfn{multipleBayesTest} corrected (there was an error for testing
       2 or more linear combinations simultaneously)

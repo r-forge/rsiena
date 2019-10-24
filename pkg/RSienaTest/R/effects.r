@@ -184,7 +184,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 				tmp <- covarOneModeEff(names(xx$cCovars)[j],
 					attr(xx$cCovars[[j]], 'poszvar'),
 					attr(xx$cCovars[[j]], 'moreThan2'),
-					symmetric, name=varname)
+					symmetric, constant=TRUE, name=varname)
 				objEffects <-  rbind(objEffects, tmp$objEff)
 				rateEffects <- rbind(rateEffects, tmp$rateEff)
 			}
@@ -197,7 +197,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 				tmp <- covarOneModeEff(names(xx$depvars)[j],
 					poszvar=TRUE,
 					attr(xx$depvars[[j]], 'moreThan2'),
-					symmetric, name=varname)
+					symmetric, constant=FALSE, name=varname)
 				objEffects <- rbind(objEffects, tmp$objEff)
 				rateEffects <- rbind(rateEffects, tmp$rateEff)
 			}
@@ -209,7 +209,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 				tmp <- covarOneModeEff(names(xx$vCovars)[j],
 					attr(xx$vCovars[[j]], 'poszvar'),
 					attr(xx$vCovars[[j]], 'moreThan2'),
-					symmetric, name=varname)
+					symmetric, constant=FALSE, name=varname)
 				objEffects <- rbind(objEffects,tmp$objEff)
 				rateEffects<- rbind(rateEffects,tmp$rateEff)
 			}
@@ -767,7 +767,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 	##@continuousNet internal getEffects
     continuousNet <- function(depvars, varnames)
     {
-        nodeSet <- attr(depvars[[1]],'nodeSet')	## NN: nodeset should be the same for 
+        nodeSet <- attr(depvars[[1]],'nodeSet')	## NN: nodeset should be the same for
 						##     all continuous depvars
 
         rateEffects <- createEffects("continuousRate", name="sde",
@@ -785,33 +785,33 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
                                  rateEffects[-c(1, 2), ])
         }
 
-        objEffects <- fbicEffects <- wEffects <- NULL # general effects, feedback 
+        objEffects <- fbicEffects <- wEffects <- NULL # general effects, feedback
                                                       # and intercept, wiener
         for (j in seq(along=varnames)) # for all continuous variables
         {
 			for (k in seq(along=varnames))
             {
-				fbicEffects <- rbind(fbicEffects, createEffects("continuousFeedback", 
+				fbicEffects <- rbind(fbicEffects, createEffects("continuousFeedback",
                                 xName = varnames[j], yName = varnames[k],
 							    name=varnames[j], groupName=groupName, group=group,
                                 netType=netType))
-				if (j <= k) 
-				    wEffects <- rbind(wEffects, createEffects("continuousWiener", 
+				if (j <= k)
+				    wEffects <- rbind(wEffects, createEffects("continuousWiener",
                                 xName = varnames[k], yName = varnames[j],
 							    name=varnames[k], groupName=groupName, group=group,
                                 netType=netType))
 			}
-            fbicEffects <- rbind(fbicEffects, createEffects("continuousIntercept", 
-							xName = varnames[j], name = varnames[j], 
+            fbicEffects <- rbind(fbicEffects, createEffects("continuousIntercept",
+							xName = varnames[j], name = varnames[j],
 							groupName=groupName, group=group, netType=netType))
-            
+
             for (k in seq(along=depvars))
             {
                 if (types[k] == "oneMode" &&
                     attr(xx$depvars[[k]], "nodeSet") == nodeSet)
                 {
                     depvarname <- names(xx$depvars)[k]
-                    
+
                     tmpObjEffects <-
                             createEffects("continuousOneModeObjective",
                                           varnames[j], depvarname, name=varnames[j],
@@ -860,15 +860,15 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
                 }
             }
 			interaction <- createEffects("unspecifiedContinuousInteraction",
-                                     varnames[j], name=varnames[j], 
-									 groupName=groupName, group=group, 
+                                     varnames[j], name=varnames[j],
+									 groupName=groupName, group=group,
 									 netType=netType)
 
-			objEffects <- rbind(objEffects, interaction[rep(1, behNintn),])			
+			objEffects <- rbind(objEffects, interaction[rep(1, behNintn),])
 		}
-        
+
 		fbicEffects$include <- TRUE
-        
+
         if (onePeriodSde)
         {
             wEffects$include <- TRUE
@@ -879,21 +879,21 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
         {
             wEffects$fix[1] <- TRUE
             rateEffects$include[1:observations] <- TRUE
-            rateEffects$basicRate[1:observations] <- TRUE        
+            rateEffects$basicRate[1:observations] <- TRUE
         }
-        
+
 		if (nContinuous > 1)
 			wEffects$include <- TRUE
-	 
-        starts <- getContinuousStartingVals(depvars, onePeriodSde)	
+
+        starts <- getContinuousStartingVals(depvars, onePeriodSde)
         wEffects$initialValue <- starts$startWiener
 		rateEffects$initialValue[1:noPeriods] <- starts$startScale
 		fbicEffects$initialValue <- starts$startFbic
-                   
-        list(effects = rbind(rateEffects, wEffects, fbicEffects, objEffects), 
+
+        list(effects = rbind(rateEffects, wEffects, fbicEffects, objEffects),
              starts = starts)
     }
-	
+
 	##@bipartiteNet internal getEffects
 	bipartiteNet <- function(depvar, varname)
 	{
@@ -1138,7 +1138,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 	}
 
 	##@covarOneModeEff internal getEffects
-	covarOneModeEff<- function(covarname, poszvar, moreThan2, symmetric,
+	covarOneModeEff<- function(covarname, poszvar, moreThan2, symmetric, constant,
 		name)
 	{
 		if (symmetric)
@@ -1162,6 +1162,12 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 				name=name,
 				groupName=groupName, group=group,
 				netType=netType)
+		}
+
+		if (constant)
+		{
+			covObjEffects <-
+				covObjEffects[!(covObjEffects$shortName %in% c("avGroupEgoX")),]
 		}
 
 # these lines tentatively dropped version 1.2-5
@@ -1208,7 +1214,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 					"degAbsDiffX", "degPosDiffX", "degNegDiffX",
 					"altInDist2", "totInDist2",
 					"simEgoInDist2", "sameXInPop", "diffXInPop",
-					"sameXCycle4", "inPopX", "inActX"), ]
+					"sameXCycle4", "inPopX", "inActX", "avGroupEgoX"), ]
 			covRateEffects <- createEffects("covarBipartiteRate", covarname,
 				name=varname,
 				groupName=groupName, group=group,
@@ -1385,7 +1391,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 		}
 		objEffects
 	}
-	
+
 	##@covContEff internal getEffects
 	covContEff <- function(varname, covarname, nodeSet, same=FALSE,
                          ## same indicates that varname and covarname are
@@ -1403,7 +1409,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 		}
 		list(objEff=covObjEffects)
 	}
-	
+
 	###################################
 	## start of function getEffects
 	##################################
@@ -1453,12 +1459,12 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 	effects <- vector('list',n+1) 			# n+1 th place for all sde parameters
 	#nodeSetNames <- sapply(xx$nodeSets, function(x)attr(x, 'nodeSetName'))
 	names(effects) <- names(xx$depvars) 	# n+1 th place has no name
-	
+
 	if (onePeriodSde && xx$observations > 2)
-		stop('onePeriodSde only possible in case of 2 observations')	
+		stop('onePeriodSde only possible in case of 2 observations')
 
 	if (onePeriodSde && groupx)
-		stop('onePeriodSde not possible in combination with multi-group')	
+		stop('onePeriodSde not possible in combination with multi-group')
 
 	for (i in 1:(n-nContinuous))
 	{
@@ -1518,12 +1524,12 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
         	group <- 1
 	        noPeriods <- xx$observations - 1
 		netType <- "continuous"
-		contIndices <- (n-nContinuous+1):n ## indicates continuous depvars 
+		contIndices <- (n-nContinuous+1):n ## indicates continuous depvars
 		varnames <- names(xx$depvars)[contIndices]
-        	depvars <- xx$depvars[contIndices] 
+        	depvars <- xx$depvars[contIndices]
 		tmp <- continuousNet(depvars,varnames)
 		effects[[n+1]] <- tmp$effects
-		attr(effects[[n+1]], 'starts') <- tmp$starts 
+		attr(effects[[n+1]], 'starts') <- tmp$starts
 		for (i in contIndices)
 		{
 			# all the continuous variable specific effects are currently
@@ -1713,7 +1719,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 				depvars <- xx$depvars[contIndices]
 				starts <- getContinuousStartingVals(depvars, onePeriodSde = FALSE)
 				## At this point, onePeriodSde is always FALSE, as the combination
-				## of multi-group and onePeriodSde = TRUE is not feasible 
+				## of multi-group and onePeriodSde = TRUE is not feasible
 				for (i in 1:nContinuous) ## check whether all continous vars match
 				{
 					eff <- match(varnames[i], names(effects))
@@ -1731,7 +1737,7 @@ getEffects<- function(x, nintn = 10, behNintn=4, getDocumentation=FALSE, onePeri
 												  groupNames[group], group,
 												  1:noPeriods)
 			}
-			
+
 			period <-  period + xx$observations ##periods used so far
 		}
 	}
@@ -1830,26 +1836,26 @@ getContinuousStartingVals <- function(depvars, onePeriodSde)
 	nActors <- nrow(depvar)           # no. of actors
 	nPeriods <- ncol(depvar) - 1	  # no. of periods
 	nCont <- length(depvars)          # no. of continuous variables
-    
+
 	if(nCont > 1)
 		stop("getContinuousStartingVals not defined for more than one continuous variable")
 
 	# determine SDE parameters by regressing each observation on the
 	# preceding observation, using the Bergstrom formula
-	# note: wiener process parameter G is set to 1 for identifiability 
-	LL <- function(theta) 
+	# note: wiener process parameter G is set to 1 for identifiability
+	LL <- function(theta)
 	{
 		a <- theta[1]
 		b0 <- theta[2]
 		tau <- theta[3:(2+nPeriods)]
 		minlogliks <- rep(0, nPeriods)
-        
+
 		for(i in 1:nPeriods)
 		{	# actors present at time i and i+1
 			act <- which(!is.na(depvar[,i] + depvar[,i+1]))
-			R <- depvar[act,i+1] - exp(a * tau[i]) * depvar[act,i] - 
+			R <- depvar[act,i+1] - exp(a * tau[i]) * depvar[act,i] -
 				(exp(a*tau[i]) - 1) * b0 / a
-			R <- suppressWarnings(dnorm(R, 0, sqrt((exp(2 * a * tau[i]) - 1) / (2*a)), 
+			R <- suppressWarnings(dnorm(R, 0, sqrt((exp(2 * a * tau[i]) - 1) / (2*a)),
 				log = TRUE))
 			minlogliks[i] <- -sum(R)
 		}
@@ -1863,13 +1869,13 @@ getContinuousStartingVals <- function(depvars, onePeriodSde)
 		g <- theta[3]
 		# actors present at time 1 and 2
 		act <- which(!is.na(depvar[,1] + depvar[,2]))
-		R <- depvar[act,2] - exp(a) * depvar[act,1] - 
+		R <- depvar[act,2] - exp(a) * depvar[act,1] -
 			(exp(a) - 1) * b0 / a
-		R <- suppressWarnings(dnorm(R, 0, sqrt((exp(2 * a) - 1) * g^2 / (2*a)), 
+		R <- suppressWarnings(dnorm(R, 0, sqrt((exp(2 * a) - 1) * g^2 / (2*a)),
 			log = TRUE))
 		-sum(R)
 	}
-    
+
 	if (onePeriodSde)
 		fit <- optim(theta <- c(-0.5, 3, 1), LLonePeriodSde, hessian = TRUE)
 	else
@@ -1885,10 +1891,10 @@ getContinuousStartingVals <- function(depvars, onePeriodSde)
 	cat("SDE par stand errors:", sqrt(diag(solve(fit$hessian))), '\n')
 
 	if (onePeriodSde) # return: tau, g, a, b0
-		list(startScale = 1, startWiener = fit$par[3], startFbic = fit$par[1:2]) 
+		list(startScale = 1, startWiener = fit$par[3], startFbic = fit$par[1:2])
 	else
-		list(startScale = fit$par[3:(2+nPeriods)], startWiener = 1, 
-			 startFbic = fit$par[1:2]) 
+		list(startScale = fit$par[3:(2+nPeriods)], startWiener = 1,
+			 startFbic = fit$par[1:2])
 }
 ##@getNetworkStartingVals DataCreate
 getNetworkStartingVals <- function(depvar)

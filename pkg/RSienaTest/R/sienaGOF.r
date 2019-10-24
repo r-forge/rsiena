@@ -235,7 +235,6 @@ sienaGOF <- function(
 		attr(ret, "key") <- plotKey
 		ret
 	}
-
 	res <- lapply(1:length(simStats),
 					function (i) {
 				 applyTest(obsStats[[i]], simStats[[i]]) })
