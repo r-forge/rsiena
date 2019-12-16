@@ -1,4 +1,4 @@
-2019-12-16 R-Forge Revision 342, package version 1.2-19.
+2019-12-16 R-Forge Revision 344, package version 1.2-19.
 Changes in RSiena and RSienaTest:
    * SienaTimeTest: some corrections with consequences probably only if
      one effect is being tested; or is left after automatic exclusion
