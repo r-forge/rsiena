@@ -217,7 +217,7 @@ plot(gofb)
 plot(goftc, center=TRUE, scale=TRUE)
 # For this type of auxiliary statistics
 # it is advisable in the plot to center and scale.
-# note the keys at the x-axis.
+# note the keys at the x-axis (widen the plot if they are not clear).
 descriptives.sienaGOF(goftc)
 round(descriptives.sienaGOF(goftc, center=TRUE, scale=TRUE), 0)
 
@@ -243,7 +243,7 @@ twoeff <- includeEffects(twoeff, to, name="twomodenet",
                             interaction1="onemodenet")
 twoeff
 # Shorter phases 2 and 3, just for example:
-twoalgorithm <- sienaAlgorithmCreate(projname="twomode", nsub=2, n3=200, seed=1234)
+twoalgorithm <- sienaAlgorithmCreate(projname="twomode", nsub=1, n3=100, seed=1234)
 (ans <- siena07(twoalgorithm, data=twodata, effects=twoeff, returnDeps=TRUE,
    batch=TRUE))
 (gof.two <- sienaGOF(ans, mixedTriadCensus,

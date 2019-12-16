@@ -58,10 +58,14 @@ plotPostMeansMDS(x, pmonly=1, excludeRates=TRUE, nfirst=NULL, ...)
   \code{eta});
   variables  "postSdBetween", "cSdFrom", "cSdTo" are the posterior mean,
   and similar percentiles, for the global between-group standard deviations
-  (\code{sigma}) of the parameters that are randomly varying between groups.\cr
+  (\code{sigma}) of the parameters that are randomly varying between groups.
+
   The function \code{plotPostMeansMDS} makes an MDS plot of the posterior means.
   This can be useful for detection of outliers.
-  Its return value is the matrix of two-dimensional MDS coordinates.
+  Its return value is a list with two components:
+  \code{corpm}, the similarities between the groups (correlation matrix of the
+  transposed matrix of posterior means), used as input for the MDS;
+  \code{points}, the matrix of two-dimensional MDS coordinates.
 
   It is advisable to employ the \code{first} parameter; looking at trace plots
   will be helpful to estimate the number of runs from which convergence

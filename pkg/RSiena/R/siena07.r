@@ -261,6 +261,7 @@ InitReports <- function(z, seed, newseed)
 	}
 	z$revision <- revision
 	z$version <- version
+	z$startingDate <- date()
 	z
 }
 

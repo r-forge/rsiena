@@ -20,7 +20,6 @@ class State
 public:
 	State(const Data * pData, int observation, bool ownedValues = false);
 	State(EpochSimulation * pSimulation);
-	State(bool ownedValues);
 	State();
 	virtual ~State();
 
@@ -32,7 +31,7 @@ public:
 
 	const double * continuousValues(std::string name) const;
 	void continuousValues(std::string name, const double * values);
-	
+
 	void deleteValues();
 
 private:

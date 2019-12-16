@@ -61,7 +61,8 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 		z$ThinPosteriorSigma <<-
 					array( NA, dim=c(nwarm+nmain, z$p1, z$p1) )
 		z$ThinParameters <<- array(NA,
-						dim=c(nwarm+nmain, z$nGroup, z$TruNumParsPlus))
+						dim=c(nwarm+nmain, z$nGroup, z$TruNumParsPlus),
+						dimnames=list(NULL, NULL, getNames(z)))
 		z$ThinBayesAcceptances <<-
 						matrix(NA, nrow=nwarm+nmain, ncol=z$nGroup+2)
 		z$sumBasicRates <<- matrix(0, nrow=z$nGroup, ncol=sum(z$basicRate))
@@ -926,7 +927,7 @@ covtrob <- function(x){
 		{
 			stop("If incidentalBasicRates or priorRatesFromData < 0, nSampRates should be 0.")
 		}
-		z$nSampConst <- min(nSampConst, 1)
+		z$nSampConst <- max(nSampConst, 1)
 		if (nSampConst < 1)
 		{
 			cat("nSampConst increased to 1.\n")
@@ -1431,6 +1432,8 @@ covtrob <- function(x){
 	}
 	z$frequentist <- frequentist
 	z$FRAN <- NULL
+	rm(zsmall)
+	rm(zm)
 	if (z$correctSigma > 0)
 	{
 		warning('corrections of the covariance matrix to keep eigenvalues larger than ', delta,
@@ -1882,6 +1885,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	else
 	{
 		z$anyPriorEta <- TRUE
+		z$priorSigEta <- priorSigEta
 		z$set2prior <- !is.na(priorSigEta) # The set of eta for which a prior is specified
 		z$priorPrecEta <- 1/(2*priorSigEta[z$set2prior])
 	}
@@ -2290,7 +2294,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 			z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
 				reductionFactor * robustRates$cov
 			diag(z$priorSigma)[z$ratesInVarying] <-
-				(diag(z$priorSigma)[z$ratesInVarying] + 0.5)
+				(diag(z$priorSigma)[z$ratesInVarying] + 0.01)
 		}
 	}
 	if (priorRatesFromData == 1)
@@ -2303,7 +2307,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		z$priorSigma[z$ratesInVarying,z$ratesInVarying] <-
 			reductionFactor * cov(t(rateParameters))
 		diag(z$priorSigma)[z$ratesInVarying] <-
-			(diag(z$priorSigma)[z$ratesInVarying] + 0.5)
+			(diag(z$priorSigma)[z$ratesInVarying] + 0.01)
 	}
 	# Truncate initial parameter values for the rate parameters
 	# depending on the prior for the rates:
@@ -2696,6 +2700,7 @@ doGetProbabilitiesFromC <- function(x, thetaMat, index, getScores)
 glueBayes <- function(z1,z2,nwarm2=0){
 	z <- list()
 	dif <- FALSE
+	difs <- FALSE
 	nstart2 <- nwarm2+1
 	d1 <- sum(!is.na(z1$ThinPosteriorMu[,1]))
 	d2 <- sum(!is.na(z2$ThinPosteriorMu[,1]))
@@ -2746,7 +2751,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	}
 	else
 	{
-		dif <- TRUE
+		difs <- TRUE
 		what <- paste(what, 'nrunMHBatches;')
 	}
 	if (z1$nSampConst == z2$nSampConst)
@@ -2755,7 +2760,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	}
 	else
 	{
-		dif <- TRUE
+		difs <- TRUE
 		what <- paste(what, 'nSampConst;')
 	}
 	if (z1$nSampVarying == z2$nSampVarying)
@@ -2764,7 +2769,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	}
 	else
 	{
-		dif <- TRUE
+		difs <- TRUE
 		what <- paste(what, 'nSampVarying;')
 	}
 	if (z1$nSampRates == z2$nSampRates)
@@ -2773,7 +2778,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	}
 	else
 	{
-		dif <- TRUE
+		difs <- TRUE
 		what <- paste(what, 'nSampRates;')
 	}
 	if (all(z1$fix == z2$fix))
@@ -2833,6 +2838,10 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	if (dif)
 	{
 		stop(paste("The two objects do not have the same specification. Difference in:", what))
+	}
+	if (difs)
+	{
+		warning(paste("The two objects do not have the same specification. Difference in:", what))
 	}
 	consider <- rep(TRUE, z1$p1)
 	if (z1$priorRatesFromData == 2)
@@ -2937,7 +2946,10 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	z$randomParametersInGroup  <- z1$randomParametersInGroup
 	z$varyingGeneralParametersInGroup  <- z1$varyingGeneralParametersInGroup
 	z$varyingObjectiveParameters <- z1$varyingObjectiveParameters
+	z$varyingInEstimated <- z1$varyingInEstimated
 	z$incidentalBasicRates <- z1$incidentalBasicRates
+	z$varyingNonRateInEstimated <- z1$varyingNonRateInEstimated
+	z$ratesInVarying <- z1$ratesInVarying
 	z$thetaMat <- z2$thetaMat
 	z$theta <- (d1*z1$theta + (d2 - nstart2 + 1)*z2$theta)/(d1 + d2 - nstart2 + 1)
 	class(z) <- "sienaBayesFit"

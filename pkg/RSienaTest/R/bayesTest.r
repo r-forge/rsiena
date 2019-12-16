@@ -272,8 +272,8 @@ getNames <- function(x){
 		# Take away the ' (period 1)' in the first rate parameter
 		sub(' (period 1)','', x$requestedEffects$effectName[tpar], fixed=TRUE)
 }
-	
-	
+
+
 ##@extract.sienaBayes extracts samples from sienaBayesFit objects
 extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
 	sdLog=TRUE){
@@ -489,7 +489,7 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1, pmonly=1,
 			}
 			else
 			{
-				seth <- sort(union(z$ratePositions[[h]], 
+				seth <- sort(union(z$ratePositions[[h]],
 							which(z$varyingObjectiveParameters)))
 			}
 			posttheta <- df[seth,"value"]
@@ -529,6 +529,7 @@ plotPostMeansMDS <- function(x, pmonly=1, excludeRates=TRUE, nfirst=NULL, ...){
 	{
 		stop('x must be a sienaBayesFit object')
 	}
+	objectName <- deparse(substitute(x))
 	if (is.null(nfirst))
 	{
 		nfirst <- x$nwarm+1
@@ -537,7 +538,7 @@ plotPostMeansMDS <- function(x, pmonly=1, excludeRates=TRUE, nfirst=NULL, ...){
 	is.even <- function(k){k %% 2 == 0}
 	is.odd <- function(k){k %% 2 != 0}
 	message('extracting posterior means ...')
-	pm <- extract.posteriorMeans(x, nfirst=nfirst, pmonly=pmonly, 
+	pm <- extract.posteriorMeans(x, nfirst=nfirst, pmonly=pmonly,
 									excludeRates=excludeRates)
 	if (pmonly <= 0)
 	{
@@ -554,7 +555,8 @@ plotPostMeansMDS <- function(x, pmonly=1, excludeRates=TRUE, nfirst=NULL, ...){
 	message('calculating MDS solution ...')
 	corpm <- cor(t(pm[,vars]))
 	mds <- isoMDS(1-corpm)
-	eqscplot(mds$points, type='n', ...)
+	plot(mds$points, type='n', main=paste('MDS',objectName),
+											xlab='', ylab='', ...)
 	text(mds$points, labels=as.character(1:dim(mds$points)[1]), ...)
-	invisible(mds$points)
+	invisible(list(corpm=corpm, points=mds$points))
 }

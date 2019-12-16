@@ -118,8 +118,8 @@ print.siena <- function(x, ...)
 		if (has.set[j]){
 			cat("\nSettings\n")
 			dts <- describeTheSetting(xj)
-			dts <- matrix(c(colnames(dts), t(dts)), 3, 4, byrow=TRUE)
-			mymat3 <- apply(dts[,1:3], 2, format)
+			dts <- matrix(c(colnames(dts), t(dts)), 3, 5, byrow=TRUE)
+			mymat3 <- apply(dts[,1:5], 2, format)
 			write.table(mymat3, row.names=FALSE, col.names=FALSE, quote=FALSE)
 		}
 		cat("\n")
@@ -191,6 +191,7 @@ print.siena <- function(x, ...)
 	}
 	invisible(x)
 }
+
 ##@print.sienaGroup Methods
 print.sienaGroup <- function(x, ...)
 {

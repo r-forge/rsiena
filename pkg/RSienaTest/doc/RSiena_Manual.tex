@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-18.
+This version was renewed for \RS version 1.2-19.
 \end{abstract}
 
 
@@ -348,10 +348,9 @@ More technical references are
 \citet{Schweinberger12} for the score-type tests
 and \citet{SchweinbergerSnijders07a} for the calculation of
 standard errors of the Method of Moments estimators.
-For assessing and
-correcting time heterogeneity, and goodness of fit assement and associated model
-selection considerations, refer to \citet*{Lospinoso2011} and
-\citet{LospinosoSnijders2019}.
+For assessing and correcting time heterogeneity, refer to \citet*{Lospinoso2011}.
+For goodness of fit assement and associated model
+selection considerations, refer to \citet{LospinosoSnijders2019}.
 A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
 and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
 For Generalized Method of Moments estimators,
@@ -827,6 +826,29 @@ and (alternatively) \sfn{sienacpp()}, using the following procedure:
 Issues concerning the design of longitudinal network models
 according to the \SAOM are discussed in
 \citet{StadfeldSnijdersSteglichVanDuijn2018}.
+
+\subsubsection{Identifiability}
+
+Identifiability of a statistical model means that different
+parameter vectors imply different probability distributions.
+This is a basic requirement for any statistical model.
+
+The \SAOM is so complicated mathematically that it is hard to give
+proofs of any properties.
+For this type of model, which comes to terms with strongly dependent
+random variables, mathematical proofs of desirable properties
+are so hard that they should not be prerequisites for the use of the model.
+Identifiability depends, of course, on the model specification.
+The \SAOM is a combination of generalized linear models
+(one for the timing and another one for the choices of tie or behavior changes)
+with very much missing data (the ministeps);
+the basis in generalized linear models suggests
+that -- unless there are redundant effects, e.g.,
+effects of covariates that are constant across actors and across
+waves -- the model is identifiable indeed.
+The estimation algorithm is such that the fact that there is convergence
+(see Section~\ref{S_ccheck}) strongly suggests that there is identifiability.
+
 
 \subsubsection{Further useful options in \RS}
 \label{S_etc}
@@ -3769,7 +3791,8 @@ see Section~\ref{S_timetest2}.
 
 See \citet{Lospinoso2011} for a technical presentation
 and examples of how the test works,
-and \citet{Lospinoso2010b} for a walkthrough on model selection.
+and \citet{LospinosoSnijders2019} for relations with
+testing goodness of fit (further treated in Section~\ref{S_gof}).
 
 
 \subsection{Limiting the maximum outdegree}
@@ -4509,9 +4532,14 @@ It is to be expected that (1.) will be computationally more efficient than (2.)
     Note that computation time in Phase~2 will be proportional to \sfn{n2start}.
     Continue estimation with these algorithmic parameters using \sfn{prevAns},
     further perhaps increasing \sfn{n2start} if necessary.
-\item As an alternative to (1.): in the estimations where \sfn{prevAns} is used,
+\item As an alternative to (1.): in estimations where \sfn{prevAns} is
+    not\footnote{Until December 2, 2019, unfortunately, the `not'
+    was erroneously omitted here.} used,
     use more than 4 subphases: \sfn{nsub=5} or, if that is not sufficient,
-    \sfn{nsub=6}.
+    \sfn{nsub=6}.\\
+    Note that if \sfn{prevAns} is used, a larger value of \sfn{nsub}
+    makes no sense; if anything, \sfn{nsub} should be decreased
+    (and \sfn{n2start} increased).
 \item Use for \sfn{n3} a larger value than the default.
     E.g., \sfn{n3 = 3000} or \sfn{5000};
     if it was necessary to further increase \sfn{nsub} or \sfn{n2start}, it may also be
@@ -4657,12 +4685,14 @@ Further details are in the help file for \textsf{siena07}.
                                                        for conditioning;\\
                                       \> if time dummies were requested using
                                             \textsf{sienaTimeFix},\\
-                                      \> these are also in \texttt{theta}). \\
+                                      \> these are also in \texttt{theta}) \\
  \texttt{ans\$covtheta   }            \> covariance matrix of the estimates \\
  \texttt{ans\$se   }               \> standard errors of the estimates \\
  \texttt{ans\$pp}                     \> number of parameters  \\
  \texttt{ans\$targets }               \> targets (observed statistics)
                                          for Method of Moments estimation  \\
+ \texttt{ans\$nrunMH}               \> number of Metropolis-Hastings step per wave \\
+                                      \> for Maximum Likelihood estimation\\
  \texttt{ans\$tconv   }               \> $t$-ratios for convergence for  each of the parameters\\
  \texttt{ans\$tmax   }               \> maximum absolute value of these ratios for non-fixed parameters\\
  \texttt{ans\$tconv.max   }         \> maximum $t$-ratio for convergence for \\
@@ -5062,7 +5092,7 @@ Method of Moments \citep*[`MoM', the default; ][]{Snijders01, SnijdersEA07};
 the Generalized Method of Moments \citep*[`GMoM', see][]{ASS2015};
 the Maximum Likelihood method \citep*[`ML', see][]{SnijdersEA10a},
 and Bayesian methods
-\citep[see][]{Koskinen04,KoskinenSnijders07,SchweinbergerSnijders07c,KoskinenSnijders15}.
+\citep[see][]{Koskinen04,KoskinenSnijders07,SchweinbergerSnijders07c,KoskinenSnijders19}.
 
 The Generalized Method of Moments is still in development.
 It is theoretically more efficient than the Method of Moments.
@@ -5219,6 +5249,11 @@ When the \textsf{multiplication factor} is unnecessarily high,
 on the other hand, computing time will be unnecessarily high.
 The advice is to aim at values for the autocorrelations
 between 0.1 and 0.4.
+
+The number of Metropolis-Hastings steps (sampling frequency)
+is potentially different for each wave,
+and for the answer object \texttt{ans} these numbers are
+given by \texttt{ans\$nrunMH}.
 
 A practical way to proceed is as follows.
 For initial tuning of the multiplication factor, use the model that
@@ -8719,6 +8754,9 @@ and
  as a positive tendency $+1.2$ toward outdegrees equal to 0; the standard
  error is unchanged. In the case of $c=1$, an alternative and more directly
  comprehensible name is \emph{outdegree at least 1} effect.\\
+ Note that the \texttt{outIso} effect (see below) is equivalent
+ to \texttt{outTrunc} for $c=1$, but with the opposite sign.
+
  Compare what is written below about the in-isolate effects:
      the isolation effects are difficult to interpret in words or pictures,
      because they are not based on subgraph counts.
@@ -8729,6 +8767,11 @@ and
  creates a link, if the previous outdegree of $i$ is less than $c$.
  For $c=1$, this means a change statistic of +1 for the creation of the
  first outgoing tie of $i$, and of --1 for the termination of the last outgoing tie.
+
+ \item {\em out-isolate} (\texttt{outIso}), defined by \\
+ $s^{\rm net}_{i\vit}(x) = I\{x_{i+} \,=\,  0\}$;\\
+ this is equivalent to \texttt{outTrunc} for $c=1$,
+ but with a sign reversal for the parameter;
 
 
  \item {\em out-degree more than $c$} (\texttt{outMore})
@@ -9183,7 +9226,7 @@ by Maximum Likelihood and Bayesian estimation.
  only the contribution of the
  the number of weighted $X-W$ two-paths
  $i \stackrel{X}{\rightarrow} h \stackrel{W}{\rightarrow} j$.
- In other words, only the $i \rightarrow j$ tie in the figure
+ In other words, only the $i \rightarrow j$ tie in the figure above
  is the dependent variable here. The effect is defined as\\
  $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{hj}\,$;\\
  The covariate $W$ here always is used non-centered.
@@ -9198,6 +9241,7 @@ by Maximum Likelihood and Bayesian estimation.
  $i \stackrel{X}{\rightarrow} h $,
  $j \stackrel{W}{\rightarrow} h $.
  In other words, only the $i \rightarrow j$ tie in the figure here
+ to the right
  is the dependent variable. The effect is defined as\\
  $s^{\rm el}_{i\vit}(x) = x_{ij} \sum_{h; h \neq j}  x_{ih}\, w_{jh}\,$.\\
  The covariate $W$ here always is used non-centered.
@@ -9660,13 +9704,14 @@ with shortName \texttt{(sameXCycle4)}, \\[0.3em]
  average of the covariate for this period,  \\
  $s^{\rm beh}_{i\vit}(x, z) =  \sum_j x_{ij} \, \overline {v}  $;\\
  here $\overline {v}$ is the mean of the values $v_{ih}$ for all actors $h$
- in the actor set: for changing covariate, the mean of the wave at the
+ in the actor set: for changing covariates, the mean of the wave at the
  start of the period; for behavioral dependent variables,
  the current mean.
  This effect is not meaningful for constant covariates.
  It is useful especially for multigroup data sets, where the average value
- varies between groups. 
+ varies between groups.
  Note that always, the average $\overline {v} $ is centered by the global mean.
+ For multi-group data, global centering means centering over all groups.
 \end{enumerate}
 
 \noindent
@@ -12968,7 +13013,7 @@ use variables are given in Figure~\ref{F_DD}.
 \end{figure}
 
 For both actor variables, in the network part we use the
-four-parameter specification of \citet{SL2018}, which is
+four-parameter specification of \citet{SL2019}, which is
 a combination of the ego minus alter squared, alter squared,
 ego, and alter effects.
 
@@ -15201,7 +15246,52 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
-\item 2019-10-17 R-Forge Revision 341, RSienaTest version 1.2-18.
+\item 2019-12-15 R-Forge Revision 342, package version 1.2-19.
+
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+ \item New effects \texttt{avGroupEgoX}, \texttt{outIso}.
+ \item Starting date of estimation reported in
+     \texttt{siena.table(..., type='tex', ...)}.
+\item Handling of changing covariates corrected (?).
+\end{itemize}
+
+Changes in RSiena:
+\begin{itemize}
+ \item Changes of RSienaTest version 1.2-18 (see below)
+      ported to RSiena.
+      The main changes are the introduction of the option of
+      continuous dependent behavior variables
+      and allowing  \texttt{imputationValues} also in \sfn{sienaDependent}
+      (both by Nynke Niezink).
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+\item In \sfn{sienaBayes}: more precise check that
+     \texttt{prevAns} has same specification as \texttt{effects}.
+     \texttt{priorSigEta} added to \texttt{sienaBayesFit} object.
+	  \texttt{dimnames(ThinParameters)[[3]]} defined as effect names;
+     ridge for prior variance of rate parameters if \texttt{priorRatesFromData=1} 
+     or 2  decreased from 0.5 to 0.01.
+ \item \sfn{sienaBayes}: \texttt{zm} and \texttt{zsmall} are removed at the end.
+ \item \sfn{plotPostMeansMDS} also shows a title, and coordinates show the dimensions
+     of the MDS solution.
+ \item The value returned by \sfn{plotPostMeansMDS} contains not only the
+     plot coordinates, but also the similarities (correlations)
+     between the groups.
+ \item \sfn{glueBayes}: added \texttt{z\$varyingInEstimated, z\$varyingNonRateInEstimated,
+     z\$ratesInVarying} to the object produced.
+     (Else extract.sienaBayes is not going to work properly.)
+ \item \sfn{glueBayes}: if one of the sampling parameters is different,
+     give a warning instead of a stop.
+ \item Corrected error in names of array returned by \sfn{extract.posteriorMeans}.
+ \item New parameter \texttt{excludeRates} in \sfn{extract.posteriorMeans, plotPostMeansMDS}.
+ \item Use parameter \texttt{pmonly} also in \sfn{plotPostMeansMDS}.
+\end{itemize}
+
+\item 2019-10-16 R-Forge Revision 341, RSienaTest version 1.2-18.
 
 Changes in RSienaTest:
 \begin{itemize}

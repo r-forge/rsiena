@@ -89,7 +89,7 @@ dummy. Alternatively, use \code{\link{includeTimeDummy}}.
    The arguments \code{shortName}, \code{name}, \code{type},
    \code{interaction1}, \code{interaction2}, \code{effect1}, \code{effect2},
    \code{effect3}, \code{period}, and \code{group} should identify one
-   effect completely. (Not all fo them are needed;
+   effect completely. (Not all of them are needed;
    see \code{\link{getEffects}}.)\cr
    The call of \link{setEffect} will set, for this effect,
    the column elements of the resulting effects object for \code{parameter},

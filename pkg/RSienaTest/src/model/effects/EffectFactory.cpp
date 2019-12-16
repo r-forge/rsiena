@@ -347,15 +347,19 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	}
 	else if (effectName == "outTrunc")
 	{
-		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, true);
+		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, true, false);
 	}
 	else if (effectName == "outTrunc2")
 	{
-		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, true);
+		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, true, false);
 	}
 	else if (effectName == "outMore")
 	{
-		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, false);
+		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, false, false);
+	}
+	else if (effectName == "outIso")
+	{
+		pEffect = new TruncatedOutdegreeEffect(pEffectInfo, true, true);
 	}
 	else if (effectName == "outInv")
 	{
@@ -1689,7 +1693,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		else
 		{
 		pEffect = new ReciprocalDegreeBehaviorEffect(pEffectInfo);
-	}
+		}
 	}
 	else if (effectName == "nonrecipDeg")
 	{
@@ -1736,7 +1740,7 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 		else
 		{
 		pEffect = new MainCovariateEffect(pEffectInfo);
-	}
+		}
 	}
 	else if (effectName == "avSimEgoX")
 	{

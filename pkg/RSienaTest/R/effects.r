@@ -1975,7 +1975,8 @@ getNetworkStartingVals <- function(depvar)
 	if (length(attr(depvar,'settings')) >= 2) # also see above with 0.75
 	{
 		startR <- rep(startRate, length(attr(depvar,'settings')))
-		setR <- rep(sapply(attr(depvar,'settings'), function(x){x$id}), length(startRate))
+#		setR <- rep(sapply(attr(depvar,'settings'), function(x){x$id}), length(startRate))
+		setR <- rep(attr(depvar,'settings'), length(startRate))
 		startR[setR=='primary'] <- 0.75 * startR[setR=='primary']
 		startR[setR!='primary'] <- 0.5
 		startRateSett <- startR
@@ -1996,32 +1997,32 @@ getNetworkStartingVals <- function(depvar)
 		(matchange["matchangeFrom0To0", ] +
 			matchange["matchangeFrom0To1", ]), 0.5)
 	p10 <- ifelse (matchange["matchangeFrom1To0", ]
-		+ matchange["matchangeFrom1To1", ] >=1,
-		matchange["matchangeFrom1To0", ] /
-			(matchange["matchangeFrom1To0", ] +
-				matchange["matchangeFrom1To1", ]), 0.5)
+					+ matchange["matchangeFrom1To1", ] >=1,
+				matchange["matchangeFrom1To0", ] /
+					(matchange["matchangeFrom1To0", ] +
+						matchange["matchangeFrom1To1", ]), 0.5)
 	p01 <- pmax(0.02, p01)
 	p10 <- pmax(0.02, p10)
 	p01 <- pmin(0.98, p01)
 	p10 <- pmin(0.98, p10)
 	alpha <- 0.5 * log(p01 / p10)
 	p00 <- ifelse (matchange["matchangeFrom0To0", ] +
-		matchange["matchangeFrom0To1", ] >=1,
-	matchange["matchangeFrom0To0", ] /
-		(matchange["matchangeFrom0To0", ] +
-			matchange["matchangeFrom0To1", ]), 0.0)
+			matchange["matchangeFrom0To1", ] >=1,
+		matchange["matchangeFrom0To0", ] /
+			(matchange["matchangeFrom0To0", ] +
+				matchange["matchangeFrom0To1", ]), 0.0)
 	p11 <- ifelse (matchange["matchangeFrom1To0", ]
 		+ matchange["matchangeFrom1To1", ] >=1,
 		matchange["matchangeFrom1To1", ] /
 			(matchange["matchangeFrom1To0", ] +
 				matchange["matchangeFrom1To1", ]), 0.0)
-	p00 <- pmax(0.02, p00)
+	p00 <- pmax(0.02, p00)			
 	p11 <- pmax(0.02, p11)
 	p00 <- pmin(0.98, p00)
 	p11 <- pmin(0.98, p11)
 	prec <- ifelse(matchange["matchangeFrom0To1", ] *
 		matchange["matchangeFrom1To0", ] >= 1,
-	4 / ((p00 / matchange["matchangeFrom0To1", ]) +
+		4 / ((p00 / matchange["matchangeFrom0To1", ]) +
 		(p11 / matchange["matchangeFrom1To0", ])), 1e-6)
 	alphaf1 <- sum(alpha * prec / sum(prec))
 	untrimmed <- alphaf1

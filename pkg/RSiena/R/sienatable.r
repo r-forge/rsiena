@@ -418,8 +418,17 @@ siena.table <- function(x, type='tex',
 			start.tstat <- ""
 			start.tstat2 <- ""
 		}
+		if (is.null(x$startingDate))
+		{
+			startdate <- NULL
+		}
+		else		
+		{
+			startdate <- paste("%Estimation date",x$startingDate)
+		}
 		startTable <- tableSection(c(paste("% Table based on", xkind.string, "object",
 					deparse(substitute(x)), ',', date()),
+					startdate,
 				paste("\\begin{tabular}{l",
 					linesep,
 					"r@{.}l r@{.}l",start.tstat,

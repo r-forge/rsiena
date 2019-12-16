@@ -130,7 +130,7 @@ double CovariateDependentNetworkEffect::value(const int i) const
 		return this->lpConstantCovariate->value(i);
 	}
 	if (this->lpChangingCovariate) {
-		return this->lpChangingCovariate->value(i, this->period());
+		return this->lpChangingCovariate->value(i, this->period() + lSimulatedOffset);
 	}
   return this->lvalues[i] - this->lpBehaviorData->overallMean();
 }
@@ -145,7 +145,7 @@ bool CovariateDependentNetworkEffect::missing(int i) const
 		return this->lpConstantCovariate->missing(i);
 	}
 	if (this->lpChangingCovariate) {
-		return this->lpChangingCovariate->missing(i, this->period());
+		return this->lpChangingCovariate->missing(i, this->period() + lSimulatedOffset);
 	}
   return this->lpBehaviorData->missing(this->period() + lSimulatedOffset, i);
 // This means: if simulated state, period+1; else period.

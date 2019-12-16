@@ -191,6 +191,10 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 	dimnames(G) <- list(nameslist$Iteration, nameslist$Wave, toTest$dummyNames)
 	## Make the covariance matrix for the new moments
 	sigma <- cov(apply(G, c(1, 3), sum))
+	if (length(sigma) == 1)
+	{
+		sigma <- matrix(sigma,1,1)
+	}
 	if (!(sienaFit$maxlike || sienaFit$FinDiff.method))
 	{
 		scores <- sienaFit$ssc[ , , estimatedInFit, drop=FALSE]
@@ -225,7 +229,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 				nEffects + nDummies))
 		DF[, , 1:nEffects, 1:nEffects] <- derivs
 		for (wave in 2:nWaves)
-		{			
+		{
 			thisWave <- toTest$period == wave & toTest$toTest
 			subs1 <- (1: (nEffects + nDummies))[thisWave]
 			subs2 <- toTest$baseRowInD[thisWave]
@@ -266,7 +270,7 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 		useRows[1:nBaseEffects] <- TRUE
 		toTest <- toTest[useRows,]
 		D <- D[useRows, useRows]
-		sigma <- sigma[useRows, useRows]
+		sigma <- sigma[useRows, useRows, drop=FALSE]
 		nDummies <- sum(toTest$toTest)
 		G <- G[,,useRows]
 		nRowsToTest <- dim(toTest)[1]
@@ -283,13 +287,14 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 	extraExclusions <- rep(FALSE, nBaseEffects)
 	if (rankSigma < dim(sigma)[1])
 	{
-		message("TimeTest constructed a null hypothesis with ")
-		message(nRowsToTest - nDummies, "estimated parameters\n")
-		message("and", nDummies,"dummy variables to be tested.\n")
-		message("However, there are", dim(sigma)[1] - rankSigma)
-		message(" linear dependencies between these.\n")
-		message("This may be because some of the parameters are already\n")
-		message("interactions with time dummies or other time variables.\n")
+		es <- ifelse((nRowsToTest - nDummies == 1), '', 's')
+		message("TimeTest constructed a null hypothesis with ",
+							nRowsToTest - nDummies, " estimated parameter", es)
+		message("and ", nDummies," dummy variables to be tested.")
+		message("However, there are ", dim(sigma)[1] - rankSigma,
+							" linear dependencies between these.\n")
+		message("This may be because some of the parameters are already")
+		message("interactions with time dummies or other time variables.")
 
 		subset0 <- rep(FALSE, dim(sigma)[1])
 		subset0[1:nBaseEffects] <- TRUE
@@ -318,25 +323,24 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 				}
 				useRows[1:nBaseEffects] <- TRUE
 			}
-			toTest <- toTest[useRows,]
-			D <- D[useRows, useRows]
-			sigma <- sigma[useRows, useRows]
+			toTest <- toTest[useRows,, drop=FALSE]
+			D <- D[useRows, useRows, drop=FALSE]
+			sigma <- sigma[useRows, useRows, drop=FALSE]
 			nDummies <- sum(toTest$toTest)
-			G <- G[,,useRows]
+			G <- G[,,useRows, drop=FALSE]
 			nRowsToTest <- dim(toTest)[1]
-			message("Automatic discovery of dependencies yielded the exclusion of")
 			excludedNumber <- sum(extraExclusions)
+			es <- ifelse((excludedNumber == 1), '', 's')
+			message("Automatic discovery of dependencies yielded the exclusion of effect", es)
 			if (excludedNumber <= 1)
 			{
-				message(" effect",":\n")
-				message(paste(row(fitEffects)[baseInFit,][extraExclusions,][1],'.',
-						fitEffects$effectName[baseInFit][which(extraExclusions)],"\n "))
+				message(paste(row(fitEffects)[baseInFit,drop=FALSE][extraExclusions,drop=FALSE][1],'.',
+						fitEffects$effectName[baseInFit,drop=FALSE][which(extraExclusions)],"\n "))
 			}
 			else
 			{
-				message(" effects:\n")
-				message(paste(row(fitEffects)[baseInFit,][extraExclusions,][,1],'.',
-						fitEffects$effectName[baseInFit][which(extraExclusions)],"\n "))
+				message(paste(row(fitEffects)[baseInFit,drop=FALSE][extraExclusions,drop=FALSE][,1],'.',
+						fitEffects$effectName[baseInFit,drop=FALSE][which(extraExclusions)],"\n "))
 			}
 			rankSigma <- qr(sigma)$rank
 			if (rankSigma < dim(sigma)[1])
@@ -383,13 +387,12 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 		rownames(jointTestP) <- "Joint Significant Test"
 		colnames(jointTestP) <- "p-Val"
 	}
-	thetaOneStep <- c(sienaFit$theta[estimatedInFit], rep(0, nDummies)) +
+	thetaOneStep <- c(sienaFit$theta[estimatedInFit, drop=FALSE], rep(0, nDummies)) +
 		jointTest$oneStep
 	## Define the null hypothesis for the later tests (effect-wise and group-wise)
 	## as the null hypothesis tested in the overall test:
 	nullHyp <- 	!toTest$toTest
-	effectTest <-
-		as.vector(by(toTest, toTest$baseEffect, function (x)
+	effectTest <- as.vector(by(toTest, toTest$baseEffect, function (x)
 				{
 					doTests <- rep(FALSE, nEffects + nDummies)
 					if (any(x$toTest))
@@ -494,21 +497,30 @@ sienaTimeTest <- function (sienaFit, effects=NULL, excludedEffects=NULL,
 	# Therefore matrix A is created as the design matrix for this test.
 	remainingEffects <- unique(toTest$baseEffect[toTest$toTest])
 	nRemainingEffects <- length(remainingEffects)
-	A <- matrix(0, nRemainingEffects, nRowsToTest)
-	for (i in seq_along(remainingEffects))
+	if (nRemainingEffects >= 1)
 	{
-		A[i, which(toTest$baseEffect==remainingEffects[i])[2:nWaves]] <- 1
+		A <- matrix(0, nRemainingEffects, nRowsToTest)
+		for (i in seq_along(remainingEffects))
+		{
+			A[i, which(toTest$baseEffect==remainingEffects[i])[2:nWaves]] <- 1
+		}
+		groupTest[1] <- transformed.scoreTest(D, sigma, fra, A,
+							nullHyp, maxlike=sienaFit$maxlike)
+		dim(groupTest) <- c(nGroups, 1)
+		groupTestP <- matrix(NA, nGroups, 3)
+		groupTestP[,1] <- round(groupTest[,1], 2)
+		groupTestP[,2] <- tapply(toTest$toTest, toTest$whichGroup, sum)
+		groupTestP[1,2] <- nRemainingEffects
+		groupTestP[,3] <- round(1 - pchisq(groupTestP[,1], groupTestP[,2]), 3)
+		rownames(groupTestP) <- paste(groupsKind, 1:nGroups)
+		colnames(groupTestP) <- c("chi-sq.", "df", "p-value")
 	}
-	groupTest[1] <- transformed.scoreTest(D, sigma, fra, A,
-		nullHyp, maxlike=sienaFit$maxlike)
-	dim(groupTest) <- c(nGroups, 1)
-	groupTestP <- matrix(NA, nGroups, 3)
-	groupTestP[,1] <- round(groupTest[,1], 2)
-	groupTestP[,2] <- tapply(toTest$toTest, toTest$whichGroup, sum)
-	groupTestP[1,2] <- nRemainingEffects
-	groupTestP[,3] <- round(1 - pchisq(groupTestP[,1], groupTestP[,2]), 3)
-	rownames(groupTestP) <- paste(groupsKind, 1:nGroups)
-	colnames(groupTestP) <- c("chi-sq.", "df", "p-value")
+	else
+	{
+		groupTest[1] <- NA
+		groupTestP <- NA
+		cat('Nothing remains...\n')
+	}
 	returnObj <- list(
 		sienaFitName=deparse(substitute(sienaFit)),
 		JointTest=jointTestP,

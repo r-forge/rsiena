@@ -100,7 +100,7 @@ glueBayes(z1, z2, nwarm2=0)
    If \code{priorRatesFromData} = 1 or 2, the prior distribution for the rate
    parameters is the estimated covariance matrix of the estimated rate parameters
    in the initialization phase multiplied by \code{reductionFactor},
-   plus a contribution of 0.5 for the variances.
+   plus a contribution of 0.01 for the variances.
    For many data sets the default will be OK. If the rate parameters diverge,
    as evidenced by the traceplots of the posterior values,
    then a smaller value is advisable, such as 0.01.

@@ -1503,8 +1503,8 @@ createSettings <- function(x, varName=1)
 		stop('varName should refer to a dependent network variable in x')
 	}
 	attr(x$depvars[[varName]], 'settingsinfo') <- list(
-		list(id="universal", type="universal", only="up"),
-		list(id="primary", type="primary", only="both"))
+		list(id="universal", type="universal", only="up", covariate=""),
+		list(id="primary", type="primary", only="both", covariate=""))
 	x
 }
 

@@ -250,7 +250,6 @@ mydata <- sienaDataCreate(mynet1, mynet2, mybeh)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip)
 myeff <- includeEffects(myeff, recip, name="mynet2")
-myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=50)
 # Shorter phases 2 and 3, just for example.
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, returnDeps=TRUE)
 gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,

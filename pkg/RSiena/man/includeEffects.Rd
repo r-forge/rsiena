@@ -44,7 +44,9 @@ short names to identify the effects which should be included or excluded.}
   The names \code{interaction1} and \code{interaction2} do not refer
   to interactions between effects, but to dependence of effects on
   other variables in the data set.
-  The arguments should identify the effects completely.
+  The arguments should identify the effects completely.\cr
+  The short names must not be set between quotes,
+  unless you use \code{character=TRUE}.
   
   The function \code{includeEffects} operates as an interface
   setting the "include" column on selected rows of the effects object,
@@ -53,8 +55,12 @@ short names to identify the effects which should be included or excluded.}
   The value of \code{myeff$initialValue} can be set by function
   \code{\link{setEffect}}.
   The function \code{\link{setEffect}} can operate on the effects object
-  in a more detailed way, e.g., setting the value of \code{myeff$initialValue},
+  in a more detailed way,
+  e.g., setting the value of \code{myeff$initialValue},
   but applies to one effect at the time.
+
+  Further information about Siena effects objects is given
+  in the help page for \code{\link{getEffects}}.
 
   A list of all effects available in a given effects object (e.g.,
   \code{myeff}), including their names of dependent variables,

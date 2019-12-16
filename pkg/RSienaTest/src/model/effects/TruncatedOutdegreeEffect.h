@@ -27,7 +27,8 @@ namespace siena
 class TruncatedOutdegreeEffect : public NetworkEffect
 {
 public:
-	TruncatedOutdegreeEffect(const EffectInfo * pEffectInfo, bool right);
+	TruncatedOutdegreeEffect(const EffectInfo * pEffectInfo, 
+									bool right, bool outIso);
 
 	virtual double calculateContribution(int alter) const;
 
@@ -38,6 +39,7 @@ protected:
 private:
 	int lc;
 	bool lright;
+	bool lOutIso;
 };
 
 }

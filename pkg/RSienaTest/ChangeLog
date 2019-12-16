@@ -1,15 +1,35 @@
-2019-10-24 R-Forge Revision 342, package version 1.2-19.
-In this R-forge revision, only RSienaTest is updated.
+2019-12-15 R-Forge Revision 342, package version 1.2-19.
 Changes in RSiena and RSienaTest:
-   * New effect avGroupEgoX.
+   * SienaTimeTest: some corrections with consequences probably only if
+     one effect is being tested; or is left after automatic exclusion
+     of tested effects.
+   * Setting-related effects corrected.
+   * Some further changes in Settings model.
+   * New effects avGroupEgoX, outIso.
    * CovariateDependentNetworkEffect:  + lSimulatedOffset taken out of
      definition missings for ChangingCovariate (seems wrong).
+   * Alphabetically ordered sources.list.
 Changes in RSienaTest:
    * In sienaBayes: more precise check that 
-     prevAns has same specification as effects.
+     prevAns has same specification as effects;
+     priorSigEta added to sienaBayesFit object.
+	  dimnames(ThinParameters)[[3]] defined as effect names;
+     ridge for prior variance of rate parameters if priorRatesFromData=1 or 2
+     decreased from 0.5 to 0.01.
+   * sienaBayes: zm and zsmall are removed at the end.
+   * plotPostMeansMDS also shows a title, and coordinates show the dimensions
+     of the MDS solution.
+   * The value returned by plotPostMeansMDS contains not only the 
+     plot coordinates, but also the similarities (correlations) 
+     between the groups.
+   * glueBayes: added z$varyingInEstimated, z$varyingNonRateInEstimated, 
+     z$ratesInVarying to the object produced. 
+     (Else extract.sienaBayes is not going to work properly.)
+   * glueBayes: if one of the sampling parameters is different,
+     give a warning instead of a stop.
 
 2019-10-16 R-Forge Revision 341, package version 1.2-18.
-In this R-forge revision, only RSienaTest is updated.
+In this R-forge revision, only RSienaTest was updated.
 Changes in RSiena and RSienaTest:
    * Continuous dependent behavior variables implemented (Nynke Niezink).
      This implies new effect types continuousFeedback, continuousIntercept,
