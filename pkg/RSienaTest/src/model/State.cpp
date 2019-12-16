@@ -70,7 +70,7 @@ State::State(const Data * pData, int observation, bool ownedValues)
 		else if (pContinuousData)
 		{
 			const double * values = pContinuousData->values(observation);
-			
+
 			if (ownedValues)
 			{
 				double * copies = new double[pContinuousData->n()];
@@ -166,16 +166,6 @@ State::State(EpochSimulation * pSimulation)
 State::State()
 {
 	this->lownedValues = false; // depends on the passed pointers
-}
-
-/**
- * Default constructor creating an empty state. The current values of dependent
- * variables can be stored later with the appropriate setters.
- * Added by TS but I do not know where to use it; is superfluous, should be dropped.
- */
-State::State(bool ownedValues)
-{
-	this->lownedValues = ownedValues;
 }
 
 /**
@@ -294,7 +284,7 @@ void State::deleteValues()
 		this->lbehaviors.erase(this->lbehaviors.begin());
 		delete[] values;
 	}
-	
+
 	while (!this->lcontinuous.empty())
 	{
 		const double * values = this->lcontinuous.begin()->second;

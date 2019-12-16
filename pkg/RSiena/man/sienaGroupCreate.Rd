@@ -45,7 +45,12 @@ For later use in \code{\link{siena07}},
 it will often (but not always...) be helpful when creating the
 Siena data objects in \code{objlist}
 to use \code{allowOnly=FALSE} in the call of
-\code{\link{sienaDependent}}; see the help page for this function.}
+\code{\link{sienaDependent}}; see the help page for this function.
+
+If there are multiple dependent networks, it may be necessary to run
+\code{\link{sienaDataConstraint}} before \code{sienaGroupCreate}
+to ensure that these constraints are equal for all groups.
+}
 
 \value{
 An object of class "sienaGroup"; this is a list
@@ -127,7 +132,7 @@ containing the input objects, with attributes:
 \references{See the Section on Multi-group Siena analysis in the manual
    available from \url{http://www.stats.ox.ac.uk/~snijders/siena/ }.}
 \author{ Ruth Ripley, Modification by Tom Snijders }
-\seealso{\code{\link{sienaDataCreate}} }
+\seealso{\code{\link{sienaDataCreate}}, \code{\link{sienaDataConstraint}} }
 \examples{
 Group1 <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))
 Group3 <- sienaDependent(array(c(N3403, HN3403), dim=c(37, 37, 2)))

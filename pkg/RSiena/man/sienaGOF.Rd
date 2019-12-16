@@ -233,7 +233,7 @@ myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip)
 myeff <- setEffect(myeff, cycle3, fix=TRUE, test=TRUE)
 myeff <- setEffect(myeff, transTies, fix=TRUE, test=TRUE)
-myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=20, seed=1234)
+myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=50)
 # Shorter phases 2 and 3, just for example.
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, returnDeps=TRUE)
 gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
@@ -283,11 +283,9 @@ library(parallel)
 myalgorithm.c <- sienaAlgorithmCreate(nsub=4, n3=1000, seed=12345)
 (ans.c <- siena07(myalgorithm.c, data=mydata, effects=myeff, batch=TRUE,
     returnDeps=TRUE, useCluster=TRUE, nbrNodes=n.clus))
-gofi.1 <- sienaGOF(ans.c, IndegreeDistribution, verbose=TRUE,
-  varName="mynet1")
+gofi.1 <- sienaGOF(ans.c, TriadCensus, verbose=TRUE, varName="mynet1")
 cl <- makeCluster(n.clus)
-gofi.cl <- sienaGOF(ans.c, IndegreeDistribution, varName="mynet1",
-  cluster=cl)
+gofi.cl <- sienaGOF(ans.c, TriadCensus, varName="mynet1", cluster=cl)
 # compare simulation times
 attr(gofi.1,"simTime")
 attr(gofi.cl,"simTime")

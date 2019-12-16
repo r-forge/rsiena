@@ -25,9 +25,20 @@ namespace siena
  * Constructor.
  */
 TruncatedOutdegreeEffect::TruncatedOutdegreeEffect(
-	const EffectInfo * pEffectInfo, bool right) : NetworkEffect(pEffectInfo)
+	const EffectInfo * pEffectInfo, bool right, bool outIso) : NetworkEffect(pEffectInfo)
 {
-	this->lc = int(pEffectInfo->internalEffectParameter() + 0.01);
+	this->lOutIso = outIso;
+	this->lc = 1;
+	this->lright = right;
+
+	if (this->lOutIso)
+	{
+		this->lc = 1;
+	}
+	else
+	{
+		this->lc = int(pEffectInfo->internalEffectParameter() + 0.01);
+	}
 	// C++ always rounds downward
 
 	if (this->lc < 1)
@@ -35,7 +46,6 @@ TruncatedOutdegreeEffect::TruncatedOutdegreeEffect(
 		throw invalid_argument(
 			"Truncated/More OutdegreeEffect: Parameter value must be at least 1");
 	}
-	this->lright = right;
 }
 
 
@@ -49,7 +59,7 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
 	// Current out-degree
 	int d =	this->pNetwork()->outDegree(this->ego());
 
-	if (lright) // outTrunc
+	if (lright) // outTrunc or outIso
 	{
 		if (this->outTieExists(alter))
 		{
@@ -57,7 +67,14 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
 		// the new effect value would have decreased by 1 if d <= this->lc
 			if (d <= this->lc)
 			{
-				change = 1;
+				if (this->lOutIso)
+				{
+					change = -1;
+				}
+				else
+				{
+					change = 1;
+				}
 			}
 		}
 		else
@@ -66,7 +83,14 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
 		// the new effect value would have increased by 1 if d < this->lc
 			if (d < this->lc)
 			{
-				change = 1;
+				if (this->lOutIso)
+				{
+					change = -1;
+				}
+				else
+				{
+					change = 1;
+				}
 			}
 		}
 	}
@@ -99,28 +123,43 @@ double TruncatedOutdegreeEffect::calculateContribution(int alter) const
  * Calculates the statistic corresponding to the given ego. The parameter
  * pNetwork is always the current network as there are no endowment effects
  * of this kind.
+ * TS: well, the endowment effect is implemented. I'm not sure about this.
  */
 double TruncatedOutdegreeEffect::egoStatistic(int ego,
 	const Network * pNetwork)
 {
 	int statistic =	this->pNetwork()->outDegree(this->ego());
 
-	if (this->lright)
+	if (this->lOutIso)
 	{
-		if (statistic > this->lc)
+		if (statistic <= 0)
 		{
-			statistic = this->lc;
-		}
-	}
-	else
-	{
-		if (statistic > this->lc)
-		{
-			statistic = statistic - this->lc;
+			statistic = 1;
 		}
 		else
 		{
 			statistic = 0;
+		}
+	}
+	else
+	{
+		if (this->lright)
+		{
+			if (statistic > this->lc)
+			{
+				statistic = this->lc;
+			}
+		}
+		else
+		{
+			if (statistic > this->lc)
+			{
+				statistic = statistic - this->lc;
+			}
+			else
+			{
+				statistic = 0;
+			}
 		}
 	}
 	return statistic;

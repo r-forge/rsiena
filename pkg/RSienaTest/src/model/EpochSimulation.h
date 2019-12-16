@@ -153,9 +153,6 @@ private:
 	// The current increment of time of the simulation
 	double ltau;
 
-	// The expected value of the current increment of time of the simulation
-	double lexpTau;
-
 	// A sorted set of exogenous events of composition change
 	const EventSet * lpEvents;
 

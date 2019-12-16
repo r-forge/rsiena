@@ -306,6 +306,15 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 				x$condvarno <- 1
 			}
 		}
+
+		if (any(hasSettings(data)))
+		{
+			if (x$cconditional)
+			{
+				stop("Estimation for a settings model requires ",
+						"conditional estimation")
+			}
+		}
 		types <- sapply(data[[1]]$depvars, function(x) attr(x, "type"))
 		## now check if conditional estimation is OK and copy to z if so
 		z$cconditional <- FALSE
@@ -493,7 +502,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 	ans <- .Call(C_Behavior, PACKAGE=pkgname,
 		pData, lapply(f, function(x)x$behavs))
 	ans <- .Call(C_Continuous, PACKAGE=pkgname,
-		pData, lapply(f, function(x)x$contbehavs))				 
+		pData, lapply(f, function(x)x$contbehavs))
 	ans <-.Call(C_ConstantCovariates, PACKAGE=pkgname,
 		pData, lapply(f, function(x)x$cCovars))
 	ans <-.Call(C_ChangingCovariates, PACKAGE=pkgname,
@@ -525,11 +534,11 @@ higher <- attr(f, "allHigher")
 		storage.mode(effects$group) <- "integer"
 		storage.mode(effects$period) <- "integer"
 		effects$effectPtr <- rep(NA, nrow(effects))
-        
+
 		if (any(attr(f,"types") == "continuous"))
 		{
 			splitFactor <- factor(effects$name, levels=c(attr(f, "netnames"), "sde"))
-		} 
+		}
 		else
 		{
 		splitFactor <- factor(effects$name, levels=attr(f, "netnames"))
@@ -582,7 +591,7 @@ higher <- attr(f, "allHigher")
 		types <- ff$types
 	}
 
-	
+
 	ans <- .Call(C_effects, PACKAGE=pkgname, pData, basicEffects)
 	pModel <- ans[[1]][[1]]
 	for (i in seq(along=(ans[[2]]))) ## ans[[2]] is a list of lists of
@@ -705,6 +714,8 @@ higher <- attr(f, "allHigher")
 			z$targets <- rowSums(ans)
 			z$targets2 <- ans
 # For the moment, the following is an undocumented and hidden option.
+# This replaces the targets calculated from the data
+# by user-defined targets.
 			if ((!is.null(x$targets[1])) & (nGroup == 1) & (groupPeriods[1] == 2))
 			{
 				if (length(z$targets) == length(x$targets))
@@ -1705,7 +1716,7 @@ unpackBehavior<- function(depvar, observations)
     {
         beh[behmiss] <- attr(depvar, "imputationValues")[behmiss]
     }
-    else 
+    else
     {
     beh[allna, ] <- rep(modes, each=sum(allna))
     for (i in 2:observations)
@@ -1897,7 +1908,7 @@ unpackData <- function(data, x)
     f$behavs <-  lapply(Behaviors, function(x, n) unpackBehavior(x, n),
                         n = observations)
     names(f$behavs) <- names(Behaviors)
-    f$contbehavs <- lapply(continuousBehaviors, function(x, n) 
+    f$contbehavs <- lapply(continuousBehaviors, function(x, n)
 			unpackBehavior(x, n), n = observations)
     names(f$contbehavs) <- names(continuousBehaviors)
     f$observations <- observations

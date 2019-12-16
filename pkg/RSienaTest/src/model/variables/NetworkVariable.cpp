@@ -1272,10 +1272,10 @@ void NetworkVariable::calculateTieFlipProbabilities()
 				{
 					contribution += pData->universalOffset();
 				}
-				else if (this->stepType() == 1)
-				{
-					contribution += primaryOffset;
-				}
+//				else if (this->stepType() == 1)
+//				{
+//					contribution += primaryOffset;
+//				}
 			}
 
 			// The selection probability is the exponential of the total

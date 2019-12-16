@@ -1,4 +1,5 @@
 #/******************************************************************************
+#/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
 # * Web: http://www.stats.ox.ac.uk/~snijders/siena
@@ -51,13 +52,13 @@ includeEffects <- function(myeff, ..., include=TRUE, name=myeff$name[1],
 	myeff[use, "fix"] <- fix
 	if (sum(use) <= 0)
 	{
-		warning(paste("There is no effect with short name "))
-		warning(paste(effectNames,", \n", sep=""))
-		warning(paste("and with interaction1 = <",interaction1,">, ", sep=""))
-		warning(paste("interaction2 = <",interaction2,">, ", sep=""))
-		warning(paste("and type = <",type,">, \n", sep=""))
-		warning(paste("for dependent variable",name,".\n"))
-		warning("See effectsDocumentation() for this effects object.\n")
+		cat(paste("There is no effect with short name "))
+		cat(paste(effectNames,", \n", sep=""))
+		cat(paste("and with interaction1 = <",interaction1,">, ", sep=""))
+		cat(paste("interaction2 = <",interaction2,">, ", sep=""))
+		cat(paste("and type = <",type,">, \n", sep=""))
+		cat(paste("for dependent variable",name,".\n"))
+		cat("See effectsDocumentation() for this effects object.\n")
 	}
 	else
 	{

@@ -95,7 +95,7 @@ StatisticCalculator::StatisticCalculator(const Data * pData,
 	this->lpState = pState;
 	this->lperiod = period;
 	this->lpPredictorState = new State();
-	this->lpStateLessMissingsEtc = new State();	
+	this->lpStateLessMissingsEtc = new State();
 	this->lneedActorStatistics = returnActorStatistics;
 	this->lcountStaticChangeContributions = 0;
 
@@ -387,6 +387,8 @@ void StatisticCalculator::calculateStatistics()
 		if (pNetworkData)
 		{
 			calculateStatisticsInitNetwork(pNetworkData);
+//			Network * pNetwork = this->lpState->pNetwork(pNetworkData->name())->clone();
+//			this->lpPredictorState->pNetwork(pNetworkData->name(), pNetwork);
 		}
 		else
 		{
@@ -427,7 +429,6 @@ void StatisticCalculator::calculateStatistics()
 			throw domain_error("Unexpected class of dependent variable");
 		}
 	}
-
 	// clean up created data not owned by states
 	for (unsigned i = 0; i < rVariables.size(); i++)
 	{

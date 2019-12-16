@@ -73,6 +73,10 @@ robmon <- function(z, x, useCluster, nbrNodes, initC, clusterString,
        # {
        #     stop("Multiple processors only for simstats0c at present")
        # }
+		if (z$returnChains)
+		{
+			stop("returnChains and useCluster are incompatible")
+		}
         if (!clusterIter && nbrNodes >= z$observations)
         {
             stop("Not enough observations to use the nodes")

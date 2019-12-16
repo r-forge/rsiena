@@ -163,3 +163,5 @@ myalg1 <- sienaAlgorithmCreate(seed=1234, cond=FALSE, Offset = c(Friends=1), nsu
 RSienaTest:::hasSettings(dataset.1)
 RSienaTest:::describeTheSetting(dataset.1$depvars[[1]])
 (ans0 <- siena07(myalg1, data=dataset.1, effects=myeff, batch=TRUE))
+(myeff <- setEffect(myeff, settingSizeAct, initialValue=-0.02, fix=TRUE))
+(ans <- siena07(myalg1, data=dataset.1, effects=myeff, batch=TRUE))

@@ -1,11 +1,17 @@
-# RSiena new version 1.2-12 (2018-05-12)
+# RSiena new version 1.2-19 (2019-12-16)
 
-## Passed checks on Windows, Mac, and Linux
-* No ERRORs, WARNINGs, or NOTEs on Windows and Mac. 
-* For Linux there were no ERRORs or WARNINGs;
-  there was a NOTE about the installed package size,
+## Kurt Hornik sent me a message that it was necessary to replace the use of
+   (class(..) == ... ) by (inherits(...)). This was done.
+
+## Passed checks on Windows, Mac, and Linux for R-release and R-devel.
+* No ERRORs or WARNINGs.
+* On some systems there is a NOTE about the installed package size,
   which is due to the use of a lot of compiled C++ code.
 
-## R CMD check --run-donttest on Windows OK.
+## There are quite some parts in the .Rd files with donttest.
+   This is because executing them is too time-consuming.
+* R CMD check --run-donttest on Windows OK.
 
-## Reverse dependency checked: btergm.
+## Reverse dependencies checked: btergm.
+
+## Reverse suggests checked: netdiffuse.

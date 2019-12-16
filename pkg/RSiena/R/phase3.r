@@ -358,8 +358,6 @@ CalculateDerivative3<- function(z,x)
 			Report(c("Warning: diagonal element(s)", sub,
 					" of derivative matrix < 0\n"), cf)
 		}
-		if (x$dolby)
-		{
 			if (z$sf2.byIteration)
 			{
 				scores <- apply(z$ssc, c(1,3), sum)  # z$nit by z$pp matrix
@@ -381,6 +379,8 @@ CalculateDerivative3<- function(z,x)
 				if (is.na(z$regrCoef[i])){z$regrCoef[i] <- 0}
 				options(warn = oldwarn)
 			}
+		if (x$dolby)
+		{
 			estMeans <- estMeans - (z$regrCoef * colMeans(scores))
 		}
 		Report('Correlations between scores and statistics:\n', cf)

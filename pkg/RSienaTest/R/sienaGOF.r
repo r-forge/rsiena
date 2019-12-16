@@ -167,15 +167,15 @@ sienaGOF <- function(
 
 	applyTest <-  function (observed, simulated)
 	{
-		if (class(simulated) != "matrix")
+		if (!inherits(simulated,"matrix"))
 		{
 			stop("Invalid input.")
 		}
-		if (class(observed) != "matrix")
+		if (!inherits(simulated,"matrix"))
 		{
 			observed <- matrix(observed,nrow=1)
 		}
-		if (class(observed) != "matrix")
+		if (!inherits(simulated,"matrix"))
 		{
 			stop("Observation must be a matrix.")
 		}
@@ -564,14 +564,13 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 	screen <- sapply(1:ncol(obs),function(i){
 						(sum(is.nan(rbind(sims,obs)[,i])) == 0) }) &
 				(diag(var(rbind(sims,obs)))!=0)
-
 	if (any((diag(var(rbind(sims,obs)))==0)))
-	{	message("Note: some statistics are not plotted because their variance is 0.")
-		message("This holds for the statistic", appendLF = FALSE)
-		if (sum(diag(var(rbind(sims,obs)))==0) > 1){message("s", appendLF = FALSE)}
-		message(": ", appendLF = FALSE)
-		message(paste(attr(x,"key")[which(diag(var(rbind(sims,obs)))==0)], sep=", "), appendLF = FALSE)
-		message(".")
+	{	cat("Note: some statistics are not plotted because their variance is 0.\n")
+		cat("This holds for the statistic")
+		if (sum(diag(var(rbind(sims,obs)))==0) > 1){cat("s")}
+		cat(": ")
+		cat(paste(attr(x,"key")[which(diag(var(rbind(sims,obs)))==0)], sep=", "))
+		cat(".\n")
 	}
 
 	sims <- sims[,screen, drop=FALSE]

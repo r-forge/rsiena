@@ -98,16 +98,16 @@ sienaGOF <- function(
 	{
 		if (length(period) <= 1)
 		{
-			message("Calculating auxiliary statistics for period", period, ".")
+			cat("Calculating auxiliary statistics for period ", period, ".\n")
 		}
 		else
 		{
-			message("Calculating auxiliary statistics for periods", period, ".")
+			cat("Calculating auxiliary statistics for periods ", period, ".\n")
 		}
 	}
 	if (!is.null(cluster))
 	{
-		ttcSimulation <- system.time(simStatsByPeriod <- 
+		ttcSimulation <- system.time(simStatsByPeriod <-
 			lapply(period, function (j) {
 				simStatsByPeriod <- parSapply(cluster, 1:iterations,
 					function (i){auxiliaryFunction(i, sienaFitObject$f,
@@ -130,7 +130,7 @@ sienaGOF <- function(
 						{
 							if (verbose && (i %% 100 == 0) )
 								{
-								message("  > Completed ", i,
+								cat("  > Completed ", i,
 										" calculations\r")
 								flush.console()
 								}
@@ -138,7 +138,7 @@ sienaGOF <- function(
 										sienaFitObject$f,
 										sienaFitObject$sims, j, groupName, varName, ...)
 						})
-					message("  > Completed ", iterations, " calculations\n")
+					cat("  > Completed ", iterations, " calculations\n")
 					flush.console()
 					simStatsByPeriod <-
 							matrix(simStatsByPeriod, ncol=iterations)
@@ -167,15 +167,15 @@ sienaGOF <- function(
 
 	applyTest <-  function (observed, simulated)
 	{
-		if (class(simulated) != "matrix")
+		if (!inherits(simulated,"matrix"))
 		{
 			stop("Invalid input.")
 		}
-		if (class(observed) != "matrix")
+		if (!inherits(simulated,"matrix"))
 		{
 			observed <- matrix(observed,nrow=1)
 		}
-		if (class(observed) != "matrix")
+		if (!inherits(simulated,"matrix"))
 		{
 			stop("Observation must be a matrix.")
 		}
@@ -567,12 +567,12 @@ plot.sienaGOF <- function (x, center=FALSE, scale=FALSE, violin=TRUE,
 				(diag(var(rbind(sims,obs)))!=0)
 
 	if (any((diag(var(rbind(sims,obs)))==0)))
-	{	message("Note: some statistics are not plotted because their variance is 0.")
-		message("This holds for the statistic", appendLF = FALSE)
-		if (sum(diag(var(rbind(sims,obs)))==0) > 1){message("s", appendLF = FALSE)}
-		message(": ", appendLF = FALSE)
-		message(paste(attr(x,"key")[which(diag(var(rbind(sims,obs)))==0)], sep=", "), appendLF = FALSE)
-		message(".")
+	{	cat("Note: some statistics are not plotted because their variance is 0.\n")
+		cat("This holds for the statistic")
+		if (sum(diag(var(rbind(sims,obs)))==0) > 1){cat("s")}
+		cat(": ")
+		cat(paste(attr(x,"key")[which(diag(var(rbind(sims,obs)))==0)], sep=", "))
+		cat(".\n")
 	}
 
 	sims <- sims[,screen, drop=FALSE]
@@ -889,8 +889,8 @@ changeToStructural <- function(X, S) {
 	if (any(S >= 10, na.rm=TRUE))
 		{
 			S[is.na(S)] <- 0
-			S0 <- Matrix(S==10)
-			S1 <- Matrix(S==11)
+			S0 <- (S==10)
+			S1 <- (S==11)
 # the 1* turns the logical into numeric
 			X <- 1*((X - S0 + S1)>=1)
 		}
@@ -904,12 +904,13 @@ changeToStructural <- function(X, S) {
 # X must have values 0, 1.
 # NA values in X or SBefore or SAfter will be 0 in the result.
 changeToNewStructural <- function(X, SBefore, SAfter) {
-		SB <- Matrix(SBefore>=10)
-		SA <- Matrix(SAfter>=10)
-		if (any(SA>SB, na.rm=TRUE))
+		SB <- (SBefore>=10)
+		SA <- (SAfter>=10)
+		difAB <- (SA > SB)
+		if (any(difAB, na.rm=TRUE))
 		{
-			S0 <- (SA>SB)*Matrix(SAfter==10)
-			S1 <- (SA>SB)*Matrix(SAfter==11)
+			S0 <- (difAB)*(SAfter==10)
+			S1 <- (difAB)*(SAfter==11)
 # the 1* turns the logical into numeric
 			X <- 1*((X - S0 + S1)>=1)
 		}
@@ -954,6 +955,8 @@ sparseMatrixExtraction <-
 	# require(Matrix)
 	isBipartite <- "bipartite" == attr(obsData[[groupName]]$depvars[[varName]], "type")
 	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
+	if (attr(obsData[[groupName]]$depvars[[varName]], "missing"))
+	{
 	if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
 	{
 		missings <-
@@ -966,6 +969,7 @@ sparseMatrixExtraction <-
 			(is.na(obsData[[groupName]]$depvars[[varName]][,,period]) |
 			is.na(obsData[[groupName]]$depvars[[varName]][,,period+1]))*1)
 	}
+	}
 	if (is.null(i))
 	{
 		# sienaGOF wants the observation;
@@ -975,47 +979,96 @@ sparseMatrixExtraction <-
 		# use these to replace the observations at period+1.
 		if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
 		{
-			returnValue <- drop0(Matrix(
+			extractedMatrix <- drop0(Matrix(
 				obsData[[groupName]]$depvars[[varName]][[period+1]] %% 10))
-			returnValue[is.na(returnValue)] <- 0
-			returnValue <- changeToStructural(returnValue,
+			extractedMatrix[is.na(extractedMatrix)] <- 0
+			if (attr(obsData[[groupName]]$depvars[[varName]], "structural"))
+			{
+				extractedMatrix <- changeToStructural(extractedMatrix,
 				Matrix(obsData[[groupName]]$depvars[[varName]][[period]]))
+		}
 		}
 		else # not sparse
 		{
-			returnValue <-
+			extractedMatrix <-
 			 Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1] %% 10)
-			returnValue[is.na(returnValue)] <- 0
-			returnValue <- changeToStructural(returnValue,
+			extractedMatrix[is.na(extractedMatrix)] <- 0
+			if (attr(obsData[[groupName]]$depvars[[varName]], "structural"))
+			{
+				extractedMatrix <- changeToStructural(extractedMatrix,
 				Matrix(obsData[[groupName]]$depvars[[varName]][,,period]))
 		}
-		if(!isBipartite) diag(returnValue) <- 0 # not guaranteed by data input
+		}
+		if(!isBipartite){ diag(extractedMatrix) <- 0} # not guaranteed by data input
 	}
 	else
 	{
 		# sienaGOF wants the i-th simulation:
-		returnValue <- sparseMatrix(
+		extractedMatrix <- sparseMatrix(
 				sims[[i]][[groupName]][[varName]][[period]][,1],
 				sims[[i]][[groupName]][[varName]][[period]][,2],
 				x=sims[[i]][[groupName]][[varName]][[period]][,3],
 				dims=dimsOfDepVar[1:2] )
+		if (attr(obsData[[groupName]]$depvars[[varName]], "structural"))
+		{
 		# If observation at end of period contains structural values
 		# use these to replace the simulations.
 		if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
 		{
-			returnValue <- changeToNewStructural(returnValue,
+				extractedMatrix <- changeToNewStructural(extractedMatrix,
 				Matrix(obsData[[groupName]]$depvars[[varName]][[period]]),
 				Matrix(obsData[[groupName]]$depvars[[varName]][[period+1]]))
 		}
 		else # not sparse
 		{
-			returnValue <- changeToNewStructural(returnValue,
+				extractedMatrix <- changeToNewStructural(extractedMatrix,
 				Matrix(obsData[[groupName]]$depvars[[varName]][,,period]),
 				Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1]))
 		}
 	}
+	}
 	## Zero missings (the 1* turns the logical into numeric):
-	1*drop0((returnValue - missings) > 0)
+	if (attr(obsData[[groupName]]$depvars[[varName]], "missing"))
+	{
+		extractedMatrix <- 1*drop0((extractedMatrix - missings) > 0)
+	}
+	extractedMatrix
+}
+
+##@sparseMatrixExtraction0 sienaGOF Extracts simulated networks
+## simplified version of sparseMatrixExtraction if there are no missings or structurals
+sparseMatrixExtraction0 <-
+	function(i, obsData, sims, period, groupName, varName){
+	# require(Matrix)
+	isBipartite <- "bipartite" == attr(obsData[[groupName]]$depvars[[varName]], "type")
+	dimsOfDepVar<- attr(obsData[[groupName]]$depvars[[varName]], "netdims")
+	if (is.null(i))
+	{
+		# sienaGOF wants the observation:
+		if (attr(obsData[[groupName]]$depvars[[varName]], "sparse"))
+		{
+			extractedValue <- Matrix(
+				obsData[[groupName]]$depvars[[varName]][[period+1]])
+			extractedValue[is.na(extractedValue)] <- 0
+		}
+		else # not sparse
+		{
+			extractedValue <-
+			 Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1])
+			extractedValue[is.na(extractedValue)] <- 0
+		}
+		diag(extractedValue) <- 0 # not guaranteed by data input
+	}
+	else
+	{
+		# sienaGOF wants the i-th simulation:
+		extractedValue <- sparseMatrix(
+				sims[[i]][[groupName]][[varName]][[period]][,1],
+				sims[[i]][[groupName]][[varName]][[period]][,2],
+				x=1,
+				dims=dimsOfDepVar[1:2] )
+	}
+	extractedValue
 }
 
 ##@networkExtraction sienaGOF Extracts simulated networks
@@ -1063,16 +1116,16 @@ networkExtraction <- function (i, obsData, sims, period, groupName, varName){
 # But it is good to be explicit.
 	if (sum(matrixNetwork) <= 0) # else network.edgelist() below will not work
 	{
-		returnValue <- emptyNetwork
+		extractedValue <- emptyNetwork
 	}
 	else
 	{
-		returnValue <- network::network.edgelist(
+		extractedValue <- network::network.edgelist(
 					cbind(sparseMatrixNetwork@i + 1,
 					sparseMatrixNetwork@j + bipartiteOffset, 1),
 					emptyNetwork)
 	}
-	returnValue
+	extractedValue
 }
 
 ##@behaviorExtraction sienaGOF Extracts simulated behavioral variables.
@@ -1089,21 +1142,30 @@ behaviorExtraction <- function (i, obsData, sims, period, groupName, varName) {
 		# sienaGOF wants the observation:
 		original <- obsData[[groupName]]$depvars[[varName]][,,period+1]
 		original[missings] <- NA
-		returnValue <- original
+		extractedValue <- original
 	}
 	else
 	{
 		#sienaGOF wants the i-th simulation:
-		returnValue <- sims[[i]][[groupName]][[varName]][[period]]
-		returnValue[missings] <- NA
+		extractedValue <- sims[[i]][[groupName]][[varName]][[period]]
+		extractedValue[missings] <- NA
 	}
-	returnValue
+	extractedValue
 }
 
 ##@OutdegreeDistribution sienaGOF Calculates Outdegree distribution
 OutdegreeDistribution <- function(i, obsData, sims, period, groupName, varName,
 						levls=0:8, cumulative=TRUE) {
+	if (!(attr(obsData[[groupName]]$depvars[[varName]],'missing') |
+	      attr(obsData[[groupName]]$depvars[[varName]],'structural')))
+	{
+		x <- sparseMatrixExtraction0(i, obsData, sims, period, groupName, varName)
+	}
+	else
+	{
 	x <- sparseMatrixExtraction(i, obsData, sims, period, groupName, varName)
+	}
+
 	a <- apply(x, 1, sum)
 	if (cumulative)
 	{
@@ -1120,7 +1182,15 @@ OutdegreeDistribution <- function(i, obsData, sims, period, groupName, varName,
 ##@IndegreeDistribution sienaGOF Calculates Indegree distribution
 IndegreeDistribution <- function (i, obsData, sims, period, groupName, varName,
 						levls=0:8, cumulative=TRUE){
+	if (!(attr(obsData[[groupName]]$depvars[[varName]],'missing') |
+	      attr(obsData[[groupName]]$depvars[[varName]],'structural')))
+	{
+		x <- sparseMatrixExtraction0(i, obsData, sims, period, groupName, varName)
+	}
+	else
+	{
   x <- sparseMatrixExtraction(i, obsData, sims, period, groupName, varName)
+	}
   a <- apply(x, 2, sum)
   if (cumulative)
   {
@@ -1240,15 +1310,15 @@ mixedTriadCensus <- function (i, obsData, sims, period, groupName, varName) {
 
 ##@TriadCensus sienaGOF Calculates mixed triad census
 # Contributed by Christoph Stadtfeld.
-# 
+#
 # Implementation of the Batagelj-Mrvar (Social Networks, 2001) algorithm
 # based on the summary in the thesis of Sindhuja
 #
-TriadCensus <- function (i, obsData, sims, period, groupName, varName, levls = 1:16) {  
+TriadCensus <- function (i, obsData, sims, period, groupName, varName, levls = 1:16) {
   # get matrix and prepare data
   mat <- as.matrix(sparseMatrixExtraction(i, obsData, sims, period, groupName, varName = varName))
   N <- nrow(mat)
-  # matrix with reciprocal ties 
+  # matrix with reciprocal ties
   matReciprocal <- mat + t(mat)
   # matrix with direction information for triad
   matDirected <- mat - t(mat)
@@ -1262,7 +1332,7 @@ TriadCensus <- function (i, obsData, sims, period, groupName, varName, levls = 1
   neighbors<- apply(matReciprocal, 1, function(x) which(x > 0))
   # neighbors with lower ids
   neighborsHigher <- apply(matHigher, 1, function(x) which(x > 0))
-  
+
   # lookup table for 64 triad types
   # i->j, j->k, i->k
   # 1: empty, 2: forward, 3: backward, 4: reciprocal
@@ -1284,7 +1354,7 @@ TriadCensus <- function (i, obsData, sims, period, groupName, varName, levls = 1
   lookup[2,2,4] <- lookup[3,3,4] <- lookup[2,4,3] <- lookup[3,4,2] <- lookup[4,2,3] <- lookup[4,3,2]<- 14
   lookup[2,4,4] <- lookup[4,2,4] <- lookup[4,4,2] <- lookup[3,4,4] <- lookup[4,3,4] <- lookup[4,4,3] <- 15
   lookup[4,4,4] <- 16
-  
+
   # initialize triad census
   tc <- c("003"  = 0,
           "012"  = 0,
@@ -1302,7 +1372,7 @@ TriadCensus <- function (i, obsData, sims, period, groupName, varName, levls = 1
           "120C" = 0,
           "210"  = 0,
           "300"  = 0)
-  
+
   # iterate through all non-empty dyads (from lower to higher ID)
   for(i in 1:N){
     for(j in neighborsHigher[[i]]){

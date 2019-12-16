@@ -11,16 +11,21 @@
   but the first name indicates more precisely the purpose of this function.
 }
 \usage{
-sienaDependent(netarray, type=c("oneMode", "bipartite", "behavior"),
-nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
+sienaDependent(netarray, type=c("oneMode", "bipartite", "behavior", "continuous"),
+nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE, imputationValues=NULL)
 
-sienaNet(netarray, type=c("oneMode", "bipartite", "behavior"),
-nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
+sienaNet(netarray, type=c("oneMode", "bipartite", "behavior", "continuous"),
+nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE, imputationValues=NULL)
 }
 \arguments{
-  \item{netarray}{matrix (type="behavior" only)
-    or (for the other types) array of values or list of sparse matrices
-    of type "dgTMatrix".}
+  \item{netarray}{type="behavior" or "continuous": matrix 
+    (actors \eqn{\times} waves).\cr
+	type="oneMode" or "bipartite": array of values or list of sparse matrices
+    of type "dgTMatrix"; if an array is used, it should have
+	dimensions: for a one-network, \eqn{n \times n \times M},
+	and for a two-mode network \eqn{n \times m \times M}, 
+	where \code{n} is the number of actors, \code{m} is the number
+	of nodes in the second mode, and \code{M} is the number of waves.}
   \item{type}{type of dependent variable, default "oneMode".}
   \item{nodeSet}{character string naming the appropriate node set.
     For a bipartite network, a vector containing 2 character strings:
@@ -44,6 +49,9 @@ nodeSet="Actors", sparse=is.list(netarray), allowOnly=TRUE)
     TRUE is the appropriate option. When it is only the case for some of the
     periods, and for data sets that will be part of a multi-group object
     created by \code{\link{sienaGroupCreate}}, FALSE usually is preferable.}
+  \item{imputationValues}{for "behavior" or "continuous" dependent variables,
+    a matrix with imputation values can be included that will be used instead 
+    of the default imputation values.}
 }
 \details{
   Adds attributes so that the array or list of matrices can be used in a

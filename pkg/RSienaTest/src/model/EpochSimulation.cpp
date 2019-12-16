@@ -484,7 +484,6 @@ void EpochSimulation::drawTimeIncrement() {
 #endif
 
 	this->ltau = tau;
-	this->lexpTau = 1 / this->lgrandTotalRate;
 }
 
 /**
