@@ -138,7 +138,7 @@ sienaGOF <- function(
 										sienaFitObject$f,
 										sienaFitObject$sims, j, groupName, varName, ...)
 						})
-					cat("  > Completed ", iterations, " calculations\n")
+					cat("  > Completed ", iterations, " calculations\n\n")
 					flush.console()
 					simStatsByPeriod <-
 							matrix(simStatsByPeriod, ncol=iterations)

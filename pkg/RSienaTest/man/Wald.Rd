@@ -58,6 +58,8 @@ score.Test(ans, test=ans$test)
   \item{df: }{ The degrees of freedom.}
   \item{pvalue: }{ The associated \emph{p}-value.}
   \item{onesided: }{For \code{df}=1, the onesided test statistic.}
+  \item{efnames: }{For \code{Multipar.RSiena} and \code{score.Test}, the names
+              of the tested effects.}
 }
 }
 \references{See the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}}

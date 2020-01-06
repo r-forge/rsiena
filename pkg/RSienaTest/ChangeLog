@@ -1,3 +1,23 @@
+2020-01-04 R-Forge Revision 345, package version 1.2-22.
+Changes in RSiena and RSienaTest:
+   * Tested effects reported in print of Multipar.RSiena and score.Test.
+   * Reordered effects object so that reciAct comes after instead of 
+     before inAct and inAct.c.
+   * Operation of siena07 in Test 14 silenced (message Brian Ripley about 
+     apparently minor changes depending on the platform).
+
+2019-12-18 packages version 1.2-21.
+Changes in RSiena and RSienaTest:
+   * Tests ended with deleting file Siena.out by unlink instead of file.remove.
+
+2019-12-16 packages version 1.2-20.
+Changes in RSiena:
+   * dumpChain (Chain) and getChainProbabilities (siena07models) dropped; 
+     kept in RSienaTest.
+   * Configure line 2274 changed to RBIN="${R_HOME}/bin"
+Changes in RSiena and RSienaTest:
+   * Tests ended with deleting file Siena.out.
+
 2019-12-16 R-Forge Revision 344, package version 1.2-19.
 Changes in RSiena and RSienaTest:
    * SienaTimeTest: some corrections with consequences probably only if

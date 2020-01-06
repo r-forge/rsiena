@@ -1432,8 +1432,8 @@ covtrob <- function(x){
 	}
 	z$frequentist <- frequentist
 	z$FRAN <- NULL
-	rm(zsmall)
-	rm(zm)
+	rm(zsmall, envir=globalenv())
+	rm(zm, envir=globalenv())
 	if (z$correctSigma > 0)
 	{
 		warning('corrections of the covariance matrix to keep eigenvalues larger than ', delta,
