@@ -22,7 +22,7 @@ Type 'q()' to quit R.
 > mynet1 <- sienaDependent(array(c(tmp3, tmp4),dim=c(32, 32, 2)))
 > mydata <- sienaDataCreate(mynet1)
 > myeff<- getEffects(mydata)
-> mymodel<- model.create(findiff=TRUE, fn = simstats0c, projname='test3',
+> mymodel<- model.create(findiff=TRUE, fn = simstats0c,
 +                        cond=FALSE, nsub=2, n3=50, seed=3)
 > print('test3')
 [1] "test3"
@@ -63,7 +63,6 @@ Total of 407 iteration steps.
 3 reciprocity                 TRUE    FALSE FALSE    0.00000   0   
 4 transitive triplets         TRUE    FALSE FALSE    0.00000   0   
 > ##test4
-> mymodel$projname <- 'test4'
 > mymodel$cconditional <- TRUE
 > mymodel$condvarno<- 1
 > print('test4')
@@ -94,7 +93,7 @@ Total of 231 iteration steps.
 > mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
 > mydata <- sienaDataCreate(mynet1)
 > myeff<- getEffects(mydata)
-> mymodel<- model.create(fn = simstats0c, projname='test5', nsub=2, n3=50,
+> mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
 +                        cond=FALSE, seed=5)
 > print('test5')
 [1] "test5"
@@ -143,12 +142,14 @@ chi-squared = 5.52, p = 0.0188.
 Total of 395 iteration steps.
 
 > score.Test(ans, 4)
+Tested effects:
+ mynet1: outdegree-activity eval 
 chi-squared = 5.52, d.f. = 1; one-sided Z = 2.35;  p = 0.019.
 > ##test6
 > mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
 > mydata <- sienaDataCreate(mynet1)
 > myeff<- getEffects(mydata)
-> mymodel<- model.create(fn = simstats0c, projname='test6', nsub=2, n3=50,
+> mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
 +                        cond=FALSE, doubleAveraging=0,seed=5)
 > print('test6')
 [1] "test6"
@@ -172,7 +173,7 @@ Total of 588 iteration steps.
 > mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
 > mydata <- sienaDataCreate(mynet1)
 > myeff<- getEffects(mydata)
-> mymodel<- model.create(fn = simstats0c, projname='test7', nsub=2, n3=50,
+> mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
 +                        cond=FALSE,  diagonalize=0.5, seed=5)
 > print('test7')
 [1] "test7"
@@ -194,7 +195,7 @@ Overall maximum convergence ratio:    0.3630
 Total of 545 iteration steps.
 
 > ##test8
-> mymodel<- model.create(fn = simstats0c, projname='test8', nsub=1, n3=50,
+> mymodel<- model.create(fn = simstats0c,  nsub=1, n3=50,
 +                        cond=TRUE, condvarno=1, seed=5)
 > print('test8')
 [1] "test8"
@@ -235,7 +236,6 @@ Total of 240 iteration steps.
 > ##test10
 > print('test10')
 [1] "test10"
-> mymodel$projname <- 'test10'
 > mymodel$cconditional <- TRUE
 > mymodel$condvarno<- 1
 > ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
@@ -271,7 +271,7 @@ Total of 335 iteration steps.
 > ##test11
 > print('test11')
 [1] "test11"
-> mymodel<- model.create(fn = simstats0c, projname='test11', nsub=1, n3=50,
+> mymodel<- model.create(fn = simstats0c,  nsub=1, n3=50,
 +                        behModelType=c(mynet2=2), seed=6)
 > (ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
 +                parallelTesting=TRUE, silent=TRUE))
@@ -319,8 +319,7 @@ Total of 340 iteration steps.
 > myeff <- setEffect(myeff, altInDist2, interaction1="myvar1", parameter=1)
   effectName             include fix   test  initialValue parm
 1 myvar1 in-alter dist 2 TRUE    FALSE FALSE          0   1   
-> ans <- siena07(sienaModelCreate(n3=50, nsub=2,
-+                seed=1, projname="test12"),
+> ans <- siena07(sienaModelCreate(n3=50, nsub=2, seed=1),
 +                data=mydata, effects=myeff, batch=TRUE, silent=TRUE)
 > ans
 Estimates, standard errors and convergence t-ratios
@@ -399,8 +398,7 @@ Type "?sienaTimeTest" for more information on this output.
 > myeff <- setEffect(myeff, egoX, interaction1="myvar1")
   effectName include fix   test  initialValue parm
 1 myvar1 ego TRUE    FALSE FALSE          0   0   
-> (ans <- siena07(sienaModelCreate(n3=50, nsub=2,
-+                seed=1, projname="test13"),
+> (ans <- siena07(sienaModelCreate(n3=50, nsub=2, seed=1),
 +                data=mydata, effects=myeff, batch=TRUE, silent=TRUE))
 Estimates, standard errors and convergence t-ratios
 
@@ -430,59 +428,7 @@ Total of 588 iteration steps.
   effectName            include fix   test  initialValue parm
 1 indegree - popularity TRUE    FALSE FALSE          0   0   
 > algo <- sienaAlgorithmCreate(nsub=1, n3=20, maxlike=TRUE, seed=15, mult=1)
-> (ans <- siena07(algo, data=dataset, effects=myeff, batch=TRUE))
-
-Start phase 0 
-theta:  4.81 -0.56  0.00  0.00 
-
-Start phase 1 
-Phase 1 Iteration 1 Progress: 0%
-Phase 1 Iteration 2 Progress: 1%
-Phase 1 Iteration 3 Progress: 1%
-Phase 1 Iteration 4 Progress: 1%
-Phase 1 Iteration 5 Progress: 1%
-Phase 1 Iteration 6 Progress: 2%
-Phase 1 Iteration 7 Progress: 2%
-Phase 1 Iteration 8 Progress: 2%
-Phase 1 Iteration 9 Progress: 3%
-Phase 1 Iteration 10 Progress: 3%
-Phase 1 Iteration 11 Progress: 3%
-Phase 1 Iteration 12 Progress: 4%
-Phase 1 Iteration 13 Progress: 4%
-Phase 1 Iteration 14 Progress: 4%
-Phase 1 Iteration 15 Progress: 4%
-Phase 1 Iteration 16 Progress: 5%
-Phase 1 Iteration 17 Progress: 5%
-Phase 1 Iteration 18 Progress: 5%
-Phase 1 Iteration 19 Progress: 6%
-theta:  4.78357 -0.62565  0.12958  0.00709 
-
-Start phase 2.1
-Phase 2 Subphase 1 Iteration 1 Progress: 28%
-Phase 2 Subphase 1 Iteration 2 Progress: 28%
-theta  4.7601 -0.7322  0.3177  0.0171 
-ac 0.410 0.905 1.163 0.981 
-Phase 2 Subphase 1 Iteration 3 Progress: 29%
-Phase 2 Subphase 1 Iteration 4 Progress: 29%
-theta  4.5553 -1.0509  0.8932  0.0487 
-ac 0.567 0.951 1.204 1.027 
-Phase 2 Subphase 1 Iteration 5 Progress: 29%
-Phase 2 Subphase 1 Iteration 6 Progress: 30%
-theta  4.4930 -1.2943  1.3546  0.0727 
-ac 0.285 0.883 1.216 0.982 
-Phase 2 Subphase 1 Iteration 7 Progress: 30%
-Phase 2 Subphase 1 Iteration 8 Progress: 30%
-theta  4.3276 -1.3769  1.5587  0.0837 
-ac 0.416 0.896 1.211 0.984 
-Phase 2 Subphase 1 Iteration 9 Progress: 30%
-Phase 2 Subphase 1 Iteration 10 Progress: 31%
-theta  4.1928 -1.3873  1.6731  0.0851 
-ac 0.547 0.886 1.210 0.974 
-theta  3.750 -1.622  1.805  0.125 
-ac 0.468 0.625 0.966 0.654 
-theta:  3.750 -1.622  1.805  0.125 
-
-Start phase 3 
+> (ans <- siena07(algo, data=dataset, effects=myeff, batch=TRUE, silent=TRUE))
 Estimated by Maximum Likelihood
 
 Estimates, standard errors and convergence t-ratios
@@ -537,7 +483,7 @@ SDE par stand errors: 0.04669358 0.1223113 0.08791327
 5 behavior wiener (behavior.behavior)  TRUE    FALSE FALSE    0.85769   0
 6 behavior feedback from behavior      TRUE    FALSE FALSE   -0.11172   0
 7 behavior intercept                   TRUE    FALSE FALSE   -0.86402   0
-> algorithmMoM <- sienaAlgorithmCreate(nsub=1, n3=20, seed=321, projname='test16')
+> algorithmMoM <- sienaAlgorithmCreate(nsub=1, n3=20, seed=321)
 > (ans <- siena07(algorithmMoM, data = mydata, effects = myeff, batch=TRUE))
 SDE init parameters:  -0.1519645 -1.175127 0.7355777
 SDE par stand errors: 0.06428706 0.2889378 0.1507865
@@ -608,7 +554,9 @@ Overall maximum convergence ratio:    0.9060
 
 Total of 305 iteration steps.
 
+> ## delete output file
+> if (file.exists('Siena.out')){unlink('Siena.out')}
 > 
 > proc.time()
    user  system elapsed 
-  16.70    0.62   17.34 
+  16.35    0.70   17.09 

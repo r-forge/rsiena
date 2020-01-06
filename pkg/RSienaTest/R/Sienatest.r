@@ -321,7 +321,7 @@ score.Test <- function(ans, test=ans$test)
 	}
 	if (sum(test) <= 0) stop(paste('Something should be tested, but the total requested is',
 			sum(test)))
-	if (length(test) != ans$pp) stop('Dimensions of must agree')
+	if (length(test) != ans$pp) stop('Dimensions of test must agree')
 	if (any(test & (!ans$fix))) warning('Warning: some tested parameters were not fixed; do you know what you are doing??? \n')
 	fra <- colMeans(ans$sf, na.rm=TRUE)
 	redundant <- (ans$fix & (!test))
@@ -337,7 +337,12 @@ score.Test <- function(ans, test=ans$test)
 		onesided <- NULL
 	}
 	pval <- 1 - pchisq(teststat, df)
-	t.ans <- list(chisquare=teststat, df=df, pvalue=pval, onesided=onesided)
+	efnames <- paste(ans$effects$name[test], ans$effects$effectName[test], sep=': ')
+	if (any(ans$effects$type != "eval"))
+	{
+		efnames <- paste(efnames, ans$effects$type[test], sep=' ')
+	}
+	t.ans <- list(chisquare=teststat, df=df, pvalue=pval, onesided=onesided, efnames=efnames)
 	class(t.ans) <- "sienaTest"
 	t.ans
 }
@@ -381,10 +386,18 @@ Wald.RSiena <- function(A, ans)
 Multipar.RSiena <- function(ans, ...)
 {
 	p <- length(ans$theta)
-	k <- length(c(...))
+	tested <- c(...)
+	efnames <- paste(ans$effects$name[tested], ans$effects$effectName[tested], sep=': ')
+	if (any(ans$effects$type != "eval"))
+	{
+		efnames <- paste(efnames, ans$effects$type[tested], sep=' ')
+	}
+	k <- length(tested)
 	A <- matrix(0, nrow=k, ncol=p)
-	A[cbind(1:k,c(...))] <- 1
-	Wald.RSiena(A, ans)
+	A[cbind(1:k,tested)] <- 1
+	t.ans <- Wald.RSiena(A, ans)
+	t.ans$efnames <- efnames
+	t.ans
 }
 
 ##@print.sienaTest Methods
@@ -393,6 +406,11 @@ print.sienaTest <- function(x, ...)
 	if (!inherits(x, "sienaTest"))
 	{
 		stop("not a legitimate sienaTest object")
+	}
+	if (!is.null(x$efnames))
+	{
+		cat('Tested effects:\n ')
+		cat(paste(x$efnames,'\n'))
 	}
 	cat(paste('chi-squared = ',
 		format(round(x$chisquare, digits=2), nsmall = 2),

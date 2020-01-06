@@ -11,7 +11,7 @@
 
 ##@sienaModelCreate DataCreate
 sienaModelCreate <- function(fn,
-	projname="Siena", MaxDegree=NULL,  Offset=NULL,
+	projname="Siena", MaxDegree=NULL, Offset=NULL,
 	useStdInits=FALSE,
 	n3=1000, nsub=4, n2start = NULL, dolby=TRUE,
 	maxlike=FALSE, diagonalize=0.2*!maxlike,

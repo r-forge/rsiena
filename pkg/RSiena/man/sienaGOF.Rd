@@ -233,7 +233,7 @@ myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip)
 myeff <- setEffect(myeff, cycle3, fix=TRUE, test=TRUE)
 myeff <- setEffect(myeff, transTies, fix=TRUE, test=TRUE)
-myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=50)
+myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=25)
 # Shorter phases 2 and 3, just for example.
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, returnDeps=TRUE)
 gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
@@ -250,7 +250,6 @@ mydata <- sienaDataCreate(mynet1, mynet2, mybeh)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip)
 myeff <- includeEffects(myeff, recip, name="mynet2")
-# Shorter phases 2 and 3, just for example.
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, returnDeps=TRUE)
 gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
   varName="mynet1")

@@ -5,7 +5,7 @@ library(RSienaTest)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4),dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff<- getEffects(mydata)
-mymodel<- model.create(findiff=TRUE, fn = simstats0c, projname='test3',
+mymodel<- model.create(findiff=TRUE, fn = simstats0c,
                        cond=FALSE, nsub=2, n3=50, seed=3)
 print('test3')
 ans<- siena07(mymodel, data=mydata, effects=myeff,
@@ -15,7 +15,6 @@ ans
 (myeff <- includeEffects(myeff, transTrip, cycle4))
 (myeff <- includeEffects(myeff, cycle4, include=FALSE))
 ##test4
-mymodel$projname <- 'test4'
 mymodel$cconditional <- TRUE
 mymodel$condvarno<- 1
 print('test4')
@@ -27,7 +26,7 @@ ans
 mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
 mydata <- sienaDataCreate(mynet1)
 myeff<- getEffects(mydata)
-mymodel<- model.create(fn = simstats0c, projname='test5', nsub=2, n3=50,
+mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
                        cond=FALSE, seed=5)
 print('test5')
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -42,7 +41,7 @@ score.Test(ans, 4)
 mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
 mydata <- sienaDataCreate(mynet1)
 myeff<- getEffects(mydata)
-mymodel<- model.create(fn = simstats0c, projname='test6', nsub=2, n3=50,
+mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
                        cond=FALSE, doubleAveraging=0,seed=5)
 print('test6')
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -52,7 +51,7 @@ ans
 mynet1 <- sienaDependent(array(c(tmp3,tmp4),dim=c(32,32,2)))
 mydata <- sienaDataCreate(mynet1)
 myeff<- getEffects(mydata)
-mymodel<- model.create(fn = simstats0c, projname='test7', nsub=2, n3=50,
+mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
                        cond=FALSE,  diagonalize=0.5, seed=5)
 print('test7')
 ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -60,7 +59,7 @@ ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
 ##, verbose=TRUE)#,dll='../siena/src/RSiena.dll')
 ans
 ##test8
-mymodel<- model.create(fn = simstats0c, projname='test8', nsub=1, n3=50,
+mymodel<- model.create(fn = simstats0c,  nsub=1, n3=50,
                        cond=TRUE, condvarno=1, seed=5)
 print('test8')
 ans <- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -78,7 +77,6 @@ myeff <- setEffect(myeff, avAlt, name="mynet2", interaction1="mynet1")
 ##myeff$initialValue[98] <- 0.34699930338 ## siena3 starting values differ
 ##test10
 print('test10')
-mymodel$projname <- 'test10'
 mymodel$cconditional <- TRUE
 mymodel$condvarno<- 1
 ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
@@ -87,7 +85,7 @@ ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
 ans
 ##test11
 print('test11')
-mymodel<- model.create(fn = simstats0c, projname='test11', nsub=1, n3=50,
+mymodel<- model.create(fn = simstats0c,  nsub=1, n3=50,
                        behModelType=c(mynet2=2), seed=6)
 (ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
                parallelTesting=TRUE, silent=TRUE))
@@ -104,8 +102,7 @@ mydata <- sienaDataCreate(mynet1, myvar1, nodeSets=list(senders, receivers))
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, inPop)
 myeff <- setEffect(myeff, altInDist2, interaction1="myvar1", parameter=1)
-ans <- siena07(sienaModelCreate(n3=50, nsub=2,
-               seed=1, projname="test12"),
+ans <- siena07(sienaModelCreate(n3=50, nsub=2, seed=1),
                data=mydata, effects=myeff, batch=TRUE, silent=TRUE)
 ans
 tt <- sienaTimeTest(ans)
@@ -123,8 +120,7 @@ mydata <- sienaDataCreate(mynet1, myvar1, nodeSets=list(senders, receivers))
 myeff <- getEffects(mydata)
 myeff <- setEffect(myeff, altInDist2, interaction1="myvar1", parameter=1)
 myeff <- setEffect(myeff, egoX, interaction1="myvar1")
-(ans <- siena07(sienaModelCreate(n3=50, nsub=2,
-               seed=1, projname="test13"),
+(ans <- siena07(sienaModelCreate(n3=50, nsub=2, seed=1),
                data=mydata, effects=myeff, batch=TRUE, silent=TRUE))
 ##test14
 print('test14')
@@ -142,7 +138,7 @@ print('test15')
 myeff <- getEffects(dataset)
 myeff <- includeEffects(myeff, inPop)
 algo <- sienaAlgorithmCreate(nsub=1, n3=20, maxlike=TRUE, seed=15, mult=1)
-(ans <- siena07(algo, data=dataset, effects=myeff, batch=TRUE))
+(ans <- siena07(algo, data=dataset, effects=myeff, batch=TRUE, silent=TRUE))
 ##test16
 print('test16')
 set.seed(123) # simulate behavior data according to dZ(t) = [-0.1 Z + 1] dt + 1 dW(t)
@@ -152,7 +148,7 @@ friend <- sienaDependent(array(c(s501, s502), dim = c(50,50,2)))
 behavior <- sienaDependent(matrix(c(y1,y2), 50,2), type = "continuous")
 (mydata <- sienaDataCreate(friend, behavior))
 (myeff <- getEffects(mydata, onePeriodSde = TRUE))
-algorithmMoM <- sienaAlgorithmCreate(nsub=1, n3=20, seed=321, projname='test16')
+algorithmMoM <- sienaAlgorithmCreate(nsub=1, n3=20, seed=321)
 (ans <- siena07(algorithmMoM, data = mydata, effects = myeff, batch=TRUE))
 ##test17
 print('test17')
@@ -165,3 +161,5 @@ RSienaTest:::describeTheSetting(dataset.1$depvars[[1]])
 (ans0 <- siena07(myalg1, data=dataset.1, effects=myeff, batch=TRUE))
 (myeff <- setEffect(myeff, settingSizeAct, initialValue=-0.02, fix=TRUE))
 (ans <- siena07(myalg1, data=dataset.1, effects=myeff, batch=TRUE))
+## delete output file
+if (file.exists('Siena.out')){unlink('Siena.out')}
