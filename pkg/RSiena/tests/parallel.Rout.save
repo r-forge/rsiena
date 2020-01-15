@@ -24,6 +24,9 @@ Type 'q()' to quit R.
 > myeff<- getEffects(mydata)
 > mymodel<- model.create(findiff=TRUE, fn = simstats0c,
 +                        cond=FALSE, nsub=2, n3=50, seed=3)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > print('test3')
 [1] "test3"
 > ans<- siena07(mymodel, data=mydata, effects=myeff,
@@ -95,6 +98,9 @@ Total of 231 iteration steps.
 > myeff<- getEffects(mydata)
 > mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
 +                        cond=FALSE, seed=5)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > print('test5')
 [1] "test5"
 > ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -151,6 +157,9 @@ chi-squared = 5.52, d.f. = 1; one-sided Z = 2.35;  p = 0.019.
 > myeff<- getEffects(mydata)
 > mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
 +                        cond=FALSE, doubleAveraging=0,seed=5)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > print('test6')
 [1] "test6"
 > ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -175,6 +184,9 @@ Total of 588 iteration steps.
 > myeff<- getEffects(mydata)
 > mymodel<- model.create(fn = simstats0c,  nsub=2, n3=50,
 +                        cond=FALSE,  diagonalize=0.5, seed=5)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > print('test7')
 [1] "test7"
 > ans<- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -197,6 +209,9 @@ Total of 545 iteration steps.
 > ##test8
 > mymodel<- model.create(fn = simstats0c,  nsub=1, n3=50,
 +                        cond=TRUE, condvarno=1, seed=5)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > print('test8')
 [1] "test8"
 > ans <- siena07(mymodel, data=mydata, effects=myeff,  batch=TRUE,
@@ -273,6 +288,9 @@ Total of 335 iteration steps.
 [1] "test11"
 > mymodel<- model.create(fn = simstats0c,  nsub=1, n3=50,
 +                        behModelType=c(mynet2=2), seed=6)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > (ans <- siena07(mymodel, data=mydata, effects=myeff, batch=TRUE,
 +                parallelTesting=TRUE, silent=TRUE))
 Estimates, standard errors and convergence t-ratios
@@ -321,6 +339,9 @@ Total of 340 iteration steps.
 1 myvar1 in-alter dist 2 TRUE    FALSE FALSE          0   1   
 > ans <- siena07(sienaModelCreate(n3=50, nsub=2, seed=1),
 +                data=mydata, effects=myeff, batch=TRUE, silent=TRUE)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > ans
 Estimates, standard errors and convergence t-ratios
 
@@ -400,6 +421,9 @@ Type "?sienaTimeTest" for more information on this output.
 1 myvar1 ego TRUE    FALSE FALSE          0   0   
 > (ans <- siena07(sienaModelCreate(n3=50, nsub=2, seed=1),
 +                data=mydata, effects=myeff, batch=TRUE, silent=TRUE))
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 Estimates, standard errors and convergence t-ratios
 
                                  Estimate   Standard   Convergence 
@@ -428,6 +452,9 @@ Total of 588 iteration steps.
   effectName            include fix   test  initialValue parm
 1 indegree - popularity TRUE    FALSE FALSE          0   0   
 > algo <- sienaAlgorithmCreate(nsub=1, n3=20, maxlike=TRUE, seed=15, mult=1)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > (ans <- siena07(algo, data=dataset, effects=myeff, batch=TRUE, silent=TRUE))
 Estimated by Maximum Likelihood
 
@@ -484,6 +511,9 @@ SDE par stand errors: 0.04669358 0.1223113 0.08791327
 6 behavior feedback from behavior      TRUE    FALSE FALSE   -0.11172   0
 7 behavior intercept                   TRUE    FALSE FALSE   -0.86402   0
 > algorithmMoM <- sienaAlgorithmCreate(nsub=1, n3=20, seed=321)
+## IGNORE_RDIFF_BEGIN
+siena07 will create an output file Siena.txt .
+## IGNORE_RDIFF_END
 > (ans <- siena07(algorithmMoM, data = mydata, effects = myeff, batch=TRUE))
 SDE init parameters:  -0.1519645 -1.175127 0.7355777
 SDE par stand errors: 0.06428706 0.2889378 0.1507865
@@ -555,7 +585,7 @@ Overall maximum convergence ratio:    0.9060
 Total of 305 iteration steps.
 
 > ## delete output file
-> if (file.exists('Siena.out')){unlink('Siena.out')}
+> if (file.exists('Siena.txt')){unlink('Siena.txt')}
 > 
 > proc.time()
    user  system elapsed 

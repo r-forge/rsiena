@@ -1,3 +1,16 @@
+2020-01-15 R-Forge Revision 346, version 1.2-23 same as CRAN version
+(except that one error in dontrun part of sienaGOF-auxiliary.Rd was corrected).
+
+2020-01-12 Package version 1.2-23 submitted to CRAN.
+   * Changes in RSiena and RSienaTest:
+     Option projname=NULL in sienaAlgorithmCreate.
+     This option is used for all examples in RSiena where siena07 is called,
+     to restrict file writing for examples to the temporary directory. 
+
+2020-01-10 Package version 1.2-22.
+   * Changes in RSiena and RSienaTest:
+     Changed extension names of output files from .out to .txt. 
+
 2020-01-04 R-Forge Revision 345, package version 1.2-22.
 Changes in RSiena and RSienaTest:
    * Tested effects reported in print of Multipar.RSiena and score.Test.

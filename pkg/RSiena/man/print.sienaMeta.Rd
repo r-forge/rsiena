@@ -24,7 +24,7 @@
   \item{x}{An object of class \code{sienaMeta}, or
     \code{summary.sienaMeta} as appropriate.}
   \item{file}{Boolean: if TRUE, sends output to file named
-    \code{x$projname.out}. If FALSE, output is to the terminal.}
+    \code{x$projname.txt}. If FALSE, output is to the terminal.}
   \item{reportEstimates}{Boolean: whether to report all estimates and standard errors.}
   \item{extra}{Boolean: if TRUE, prints more information.}
   \item{which}{Set of effects contained in the plot (given by sequence numbers).}
@@ -47,7 +47,7 @@
 
  Output from either can be directed to a file by using the argument
  \code{file}. It will be appended to any existing file of the same
- name: \code{projname.out}  where \code{projname} is the value of the
+ name: \code{projname.txt}  where \code{projname} is the value of the
  argument to \code{siena08}.
 
  The function \code{plot.sienaMeta} plots estimates against standard

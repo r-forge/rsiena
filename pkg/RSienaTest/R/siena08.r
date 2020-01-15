@@ -498,9 +498,9 @@ print.summary.sienaMeta <- function(x, file=FALSE, extra=TRUE, ...)
 				0
 			}
 		Report(c(rep(" ", nBlanks), rep("*", astlen), "\n"), sep="", outf)
-		Report(c(rep(" ", nBlanks2), projname, ".out\n"), sep="", outf)
+		Report(c(rep(" ", nBlanks2), projname, ".txt\n"), sep="", outf)
 		Report(c(rep(" ", nBlanks), rep("*", astlen), "\n"), sep="", outf)
-		Report(c("Filename is ", projname, ".out.\n\n"), sep="", outf)
+		Report(c("Filename is ", projname, ".txt.\n\n"), sep="", outf)
 		Report(c("This file contains primary output for SIENA project <<",
 				projname, ">>.\n\n"), sep="", outf)
 		Report(c("Date and time:", format(Sys.time(),

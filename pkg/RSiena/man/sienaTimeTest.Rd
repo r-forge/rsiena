@@ -109,7 +109,7 @@ and Mathematical Psychology} \bold{65}, 263--281.}
   \code{\link{includeTimeDummy}}}
 \examples{
 ## Estimate a restricted model
-myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=50)
+myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=50, projname=NULL)
 # Short estimation not for practice, just for having a quick demonstration
 mynet1 <- sienaDependent(array(c(s501, s502, s503), dim=c(50, 50, 3)))
 mydata <- sienaDataCreate(mynet1)
@@ -135,7 +135,7 @@ ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 ## (Of course pasting these identical sets of three waves after each other
 ##  in a sequence of six is not really meaningful. It's just a demonstration.)
 
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50, seed=1234)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50, seed=654, projname=NULL)
 mynet1 <- sienaDependent(array(c(s501, s502, s503, s501, s503, s502),
                                dim=c(50, 50, 6)))
 mydata <- sienaDataCreate(mynet1)

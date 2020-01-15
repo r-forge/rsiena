@@ -8,7 +8,7 @@
 ## * Description: This file contains the code to create and use global objects
 ## *
 ## ****************************************************************************/
-##@outf Objects/File project .out file
+##@outf Objects/File project .txt file
 outf <- NULL
 ##@lf Objects/File suppressed or to console
 lf <- NULL
@@ -36,11 +36,11 @@ Reportfun<- function(x, verbose = FALSE, silent=FALSE)
 			noReportFile <<- FALSE
             if (type =='w')
             {
-                x$outf <<- file(paste(projname, ".out", sep=""), open="w")
+                x$outf <<- file(paste(projname, ".txt", sep=""), open="w")
             }
             else if (type =="a")
             {
-                x$outf <<- file(paste(projname, ".out", sep=""), open="a")
+                x$outf <<- file(paste(projname, ".txt", sep=""), open="a")
             }
             else if (type == "n")
             {

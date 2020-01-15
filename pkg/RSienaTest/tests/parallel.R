@@ -162,4 +162,4 @@ RSienaTest:::describeTheSetting(dataset.1$depvars[[1]])
 (myeff <- setEffect(myeff, settingSizeAct, initialValue=-0.02, fix=TRUE))
 (ans <- siena07(myalg1, data=dataset.1, effects=myeff, batch=TRUE))
 ## delete output file
-if (file.exists('Siena.out')){unlink('Siena.out')}
+if (file.exists('Siena.txt')){unlink('Siena.txt')}

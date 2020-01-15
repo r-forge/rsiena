@@ -31,7 +31,7 @@
 mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 mydata <- sienaDataCreate(mynet)
 myeff <- getEffects(mydata)
-myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=40, seed=123)
+myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=40, seed=123, projname=NULL)
 # nsub=1 and n3=40 is used here for having a brief computation,
 # not for practice.
 myeff <- includeEffects(myeff, transTrip, transTies)
