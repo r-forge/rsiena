@@ -48,7 +48,7 @@ siena08(..., projname = "sienaMeta", bound = 5, alpha = 0.05, maxit=20)
   This object contains at least the following.
   \item{thetadf}{Data frame containing the coefficients, standard errors
     and score test results}
-  \item{projname}{Name for any output file to be produced by the print method}
+  \item{projname}{Root name for any output file to be produced by the print method}
   \item{bound}{Estimates with standard error above this value were
     excluded from the calculations}
   \item{scores}{Object of class \code{by} indicating, for each effect in
@@ -125,7 +125,7 @@ Group4 <- sienaDependent(array(c(N3404, HN3404), dim=c(33, 33, 2)))
 dataset.1 <- sienaDataCreate(Friends = Group1)
 dataset.3 <- sienaDataCreate(Friends = Group3)
 dataset.4 <- sienaDataCreate(Friends = Group4)
-OneAlgorithm <- sienaAlgorithmCreate(projname = "SingleGroups", seed=1234)
+OneAlgorithm <- sienaAlgorithmCreate(projname = "SingleGroups", seed=128)
 effects.1 <- getEffects(dataset.1)
 effects.3 <- getEffects(dataset.3)
 effects.4 <- getEffects(dataset.4)

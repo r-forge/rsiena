@@ -135,7 +135,7 @@ ans2 <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 ## (Of course pasting these identical sets of three waves after each other
 ##  in a sequence of six is not really meaningful. It's just a demonstration.)
 
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50, seed=1234)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=50, seed=654)
 mynet1 <- sienaDependent(array(c(s501, s502, s503, s501, s503, s502),
                                dim=c(50, 50, 6)))
 mydata <- sienaDataCreate(mynet1)

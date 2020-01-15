@@ -44,8 +44,8 @@ Package \code{"RSiena"} is the official release.
   \tabular{ll}{
     Package: \tab RSiena\cr
     Type: \tab Package\cr
-    Version: \tab 1.2-22\cr
-    Date: \tab 2020-01-02\cr
+    Version: \tab 1.2-23\cr
+    Date: \tab 2020-01-12\cr
     Depends: \tab R (>= 3.0.0)\cr
     Imports: \tab Matrix\cr
     Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
@@ -103,7 +103,7 @@ mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTrip)
 myeff
-myalgorithm <- sienaAlgorithmCreate(nsub=3, n3=200)
+myalgorithm <- sienaAlgorithmCreate(nsub=3, n3=200, projname=NULL)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 summary(ans)
 }

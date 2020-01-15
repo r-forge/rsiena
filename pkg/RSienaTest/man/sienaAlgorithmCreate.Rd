@@ -43,7 +43,9 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
   \item{fn}{Function to do one simulation in the Robbins-Monro
     algorithm. Not to be touched.}
   \item{projname}{Character string name of project; the output file will be
-    called projname.out. No embedded spaces!!!}
+    called projname.txt. No embedded spaces!!!\cr
+	If \code{projname=NULL}, output will be written to a file in the temporary
+	session directory, created as \code{\link{tempfile}(Siena)}.}
   \item{MaxDegree}{Named vector of maximum degree values for
     corresponding networks. Allows to restrict the model to networks
     with degrees not higher than this maximum.
@@ -179,7 +181,7 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
   Robbins-Monro algorithm. Those not
   available as arguments can be changed manually where desired.\cr
   Further information about the implementation of the algorithm is in \cr
-  http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf.
+  http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf.\cr
 }
 \value{Returns an object of class \code{sienaAlgorithm} containing
   values implied by the parameters.}

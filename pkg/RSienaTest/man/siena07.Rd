@@ -198,7 +198,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
    \item{Phase3nits}{Number of iterations actually performed in phase 3.}
    \item{thetaUsed}{If \code{thetaValues} is not \code{NULL}, the matrix
    of parameter values actually used in the simulations of Phase 3.}
-  Writes text output to the file named "projname.out", where projname is defined
+  Writes text output to the file named "projname.txt", where projname is defined
   in the \code{\link{sienaAlgorithm}} object \code{x}.
 }
 \references{\itemize{
@@ -238,7 +238,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
   There are print, summary and xtable methods for \code{\link{sienaFit}}
   objects: \code{\link{xtable}}, \code{\link{print.sienaFit}}.}
 \examples{
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=123)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=1293)
 # nsub=2 and n3=100 is used here for having a brief computation, not for practice.
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
@@ -247,7 +247,7 @@ ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 
 # or for non-conditional estimation --------------------------------------------
 \dontrun{
-model <- sienaModelCreate(nsub=2, n3=100, cond=FALSE, seed=123)
+model <- sienaAlgorithmCreate(nsub=2, n3=100, cond=FALSE, seed=1283)
 ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
         }
 
@@ -308,7 +308,7 @@ mat3 <- matrix(c(0,1,0,1,
 mats <- array(c(mat1,mat2,mat3), dim=c(4,4,3))
 net <- sienaDependent(mats, allowOnly=FALSE)
 sdat <- sienaDataCreate(net)
-alg <- sienaAlgorithmCreate(maxlike=TRUE, nsub=3, n3=100, seed=1234)
+alg <- sienaAlgorithmCreate(maxlike=TRUE, nsub=3, n3=100, seed=12534)
 effs <- getEffects(sdat)
 (ans <- siena07(alg, data=sdat, effects=effs, returnDeps=TRUE, batch=TRUE))
 # See manual Section 9.1 for information about the following functions

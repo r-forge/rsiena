@@ -92,7 +92,7 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
 \seealso{\code{\link[xtable]{xtable}}, \code{\link[xtable]{print.xtable}},
   \code{\link{siena07}}}
 \examples{
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, projname=NULL)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)

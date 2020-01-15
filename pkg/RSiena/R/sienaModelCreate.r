@@ -25,7 +25,26 @@ sienaModelCreate <- function(fn,
 	lessMem=FALSE)
 {
 	model <- NULL
-	model$projname <- projname
+	if (is.null(projname))
+	{
+		model$projname <- tempfile("Siena")
+		cat('siena07 will create an output file', 
+				paste(model$projname,'.txt',sep=''),'.\n')
+		cat('This is a temporary file for this R session.\n')
+	}
+	else
+	{
+		if (is.character(projname))
+		{
+			model$projname <- projname
+			cat('siena07 will create an output file', 
+				paste(model$projname,'.txt',sep=''),'.\n')
+		}
+		else
+		{
+			stop('projname should be a character string.')
+		}
+	}
 	model$useStdInits <- useStdInits
 	model$checktime <- TRUE
 	model$n3 <- n3

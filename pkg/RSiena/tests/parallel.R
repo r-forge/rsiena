@@ -142,4 +142,4 @@ behavior <- sienaDependent(matrix(c(y1,y2), 50,2), type = "continuous")
 algorithmMoM <- sienaAlgorithmCreate(nsub=1, n3=20, seed=321)
 (ans <- siena07(algorithmMoM, data = mydata, effects = myeff, batch=TRUE))
 ## delete output file
-if (file.exists('Siena.out')){unlink('Siena.out')}
+if (file.exists('Siena.txt')){unlink('Siena.txt')}

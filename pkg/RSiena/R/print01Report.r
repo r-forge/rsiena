@@ -894,10 +894,10 @@ print01Report <- function(data, modelname="Siena", getDocumentation=FALSE)
 	}
 	Report(openfiles=TRUE, type="w", projname=modelname)
 	Report("							************************\n", outf)
-	Report(c("									 ", modelname, ".out\n"),
+	Report(c("									 ", modelname, ".txt\n"),
 		sep='', outf)
 	Report("							************************\n\n", outf)
-	Report(c("Filename is ", modelname, ".out.\n\n"), sep="", outf)
+	Report(c("Filename is ", modelname, ".txt.\n\n"), sep="", outf)
 	Report(c("This file contains primary output for SIENA project <<",
 		modelname, ">>.\n\n"), sep="", outf)
 	Report(c("Date and time:", format(Sys.time(), "%d/%m/%Y %X"), "\n\n"), outf)
