@@ -1,3 +1,8 @@
+# Note: this file is not part of the .tar.gz file,
+# but just an internal note for the maintainer.
+# See R-package-devel Digest, Vol 57, Issue 18.
+# See .Rbuildignore
+
 # RSiena new version 1.2-23 (2020-01-12)
 
 ## Passed checks on Windows, Mac, and Linux for R-release and R-devel.

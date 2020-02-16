@@ -981,7 +981,7 @@ sparseMatrixExtraction <-
 				obsData[[groupName]]$depvars[[varName]][[period+1]] %% 10))
 			extractedMatrix[is.na(extractedMatrix)] <- 0
 			if (attr(obsData[[groupName]]$depvars[[varName]], "structural"))
-			{	
+			{
 				extractedMatrix <- changeToStructural(extractedMatrix,
 					Matrix(obsData[[groupName]]$depvars[[varName]][[period]]))
 			}
@@ -992,7 +992,7 @@ sparseMatrixExtraction <-
 			Matrix(obsData[[groupName]]$depvars[[varName]][,,period+1] %% 10)
 			extractedMatrix[is.na(extractedMatrix)] <- 0
 			if (attr(obsData[[groupName]]$depvars[[varName]], "structural"))
-			{	
+			{
 				extractedMatrix <- changeToStructural(extractedMatrix,
 					Matrix(obsData[[groupName]]$depvars[[varName]][,,period]))
 			}
@@ -1397,3 +1397,33 @@ TriadCensus <- function (i, obsData, sims, period, groupName, varName, levls = 1
   tc[levls]
 }
 
+
+##@dyadicCov sienaGOF Auxiliary variable for dyadic covariate
+#
+# An auxiliary function calculating the proportion of ties
+# for subsets of ordered pairs corresponding to
+# certain values of the categorical dyadic covariate dc.
+# dc should be a matrix of the same dimensions as
+# the dependent variable.
+dyadicCov <-  function (i, obsData, sims, period, groupName,
+                           varName, dc, dc.table=NULL){
+	m <- sparseMatrixExtraction(i, obsData, sims, period, groupName, varName)
+	tmdyv <- table((m*dc)@x) # note that m*dc is a sparse matrix, too
+	if (is.null(dc.table))
+	{
+		tdyv <- table(dc)
+	}
+	else
+	{
+		tdyv <- dc.table
+	}
+	# Now we want to construct the proportions of m*dyv in dyv;
+	# and categories in dyv not represented in m*dyv should get a 0.
+	# First make a vector of the correct length with 0s in place.
+	ttmdyv <- 0*tdyv
+	dims <- dimnames(tmdyv)[[1]]
+	ttmdyv[dims] <- tmdyv
+	z <- ttmdyv/tdyv
+#	names(z) <- dims
+	z
+}

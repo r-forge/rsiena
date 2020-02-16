@@ -11,7 +11,7 @@ export(
 	includeTimeDummy, sienaGOF, descriptives.sienaGOF, sienaRI,
 	sparseMatrixExtraction, networkExtraction, behaviorExtraction,
 	OutdegreeDistribution, IndegreeDistribution, BehaviorDistribution,
-	TriadCensus, mixedTriadCensus,
+	TriadCensus, mixedTriadCensus, dyadicCov,
 	siena.table, xtable, score.Test, Wald.RSiena, Multipar.RSiena
 )
 
