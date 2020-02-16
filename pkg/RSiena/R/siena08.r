@@ -206,6 +206,7 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05, maxit=20)
 	meta$requestedEffects <- requestedEffects
 	meta$theta <- meta.theta
 	meta$se <- meta.se
+	meta$startingDate <- date()
     meta
 }
 

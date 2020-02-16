@@ -140,7 +140,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 		# Check that the following attributes have correct names
 		checkNames(x$MaxDegree, c('oneMode','bipartite'))
 		checkNames(x$UniversalOffset, c('oneMode','bipartite'))
-		checkNames(x$modelType, 'oneMode')
+		checkNames(x$modelType, c('oneMode','bipartite'))
 		checkNames(x$behModelType, 'behavior')
 		# The following error will occur if ML estimation is requested
 		# and there are any impossible changes from structural values

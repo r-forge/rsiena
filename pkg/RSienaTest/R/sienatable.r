@@ -7,7 +7,7 @@
 ##  *
 ##  * Description: This file contains the code to save a latex or html table of
 ##  * estimates for a sienaFit or sienaBayesFit object
-##  * Written by Charlotte Greenan; small modifications by Tom Snijders.
+##  * Written by Charlotte Greenan; modifications by Tom Snijders.
 ##  *
 ##  ***************************************************************************/
 
@@ -32,10 +32,9 @@ siena.table <- function(x, type='tex',
 			if (is.null(nfirst))
 			{
 				nfirst <- x$nwarm + 1
-				message
-("Note: the print function for sienaBayesFit objects can also use a parameter nfirst,")
+				message("Note: the print function for sienaBayesFit objects can also use a parameter nfirst,")
 				message("    indicating the first run from which convergence is assumed.")
-				message("    The default value used now is nfirst =",
+				message("    The default value used now is nfirst = ",
 					x$nwarm + 1, ".")
 			}
 			xkind.string <- "sienaBayesFit"
@@ -48,8 +47,14 @@ siena.table <- function(x, type='tex',
 	effects <- x$requestedEffects
 	p <- x$pp
 	condrates <- 0
-	nwaves <- dim(x$targets2)[2]
-
+	if (fromBayes)
+	{
+		nwaves <- attr(x$initialResults$f,'observations')
+	}
+	else
+	{
+		nwaves <- dim(x$targets2)[2]
+	}
 	if (x$cconditional)
 	{
 		condrates <- length(x$rate)
@@ -424,7 +429,7 @@ siena.table <- function(x, type='tex',
 		}
 		else		
 		{
-			startdate <- paste("%Estimation date",x$startingDate)
+			startdate <- paste("% Estimation date",x$startingDate)
 		}
 		startTable <- tableSection(c(paste("% Table based on", xkind.string, "object",
 					deparse(substitute(x)), ',', date()),

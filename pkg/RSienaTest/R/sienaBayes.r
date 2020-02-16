@@ -2437,6 +2437,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	}
 	## z$returnDataFrame <- TRUE # chains come back as data frames not lists
 	z$returnChains <- FALSE
+	z$startingDate <- date()
 	z
 } # end initializeBayes
 

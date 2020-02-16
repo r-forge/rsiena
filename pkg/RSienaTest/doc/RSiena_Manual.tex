@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-22.
+This version was renewed for \RS version 1.2-24.
 \end{abstract}
 
 
@@ -920,24 +920,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-22}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-24}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-22.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-24.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-22.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-24.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-22.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-24.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-22.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-24.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-22.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-24.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-22.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-24.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1137,7 +1137,7 @@ For technical problems running \rs, follow the following points.
   of \rs. Details of the latest version available can
   be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
   The version is
-  identified by a version number (e.g.\ 1.2-22) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-24) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -6931,6 +6931,7 @@ The four options are:
       This is explained in Section~\ref{S_struct}.\\
       The special effort to be made here is the construction
       of the data files for the large (combined) network.
+      This is superfluous; it is better to use option~2.
 \item Combining different sub-projects
       into one \emph{multi-group} project,
       and analyzing this by \sfn{siena07}.
@@ -6944,12 +6945,13 @@ The four options are:
       variables that indicate the different networks)
       whereas the multi-group option yields rate parameters
       that are distinct across different networks.\\
-      In this option, the assumption is made that all parameters
-      are the same for the various networks, except for the basic rate
-      parameters; and except for explicitly specified interaction
+      In this option (like in option~1), the assumption is made that all 
+      parameters are the same for the various networks, 
+      except for the basic rate parameters; 
+      and except for explicitly specified interaction
       effects between variables depending on the sub-project, and other effects.
-
-      Usually, option (2) is preferable to option (1).
+      This is a very strong assumption, and undesirable unless 
+      options 3-4 are impossible.
 \item Analyzing the different networks separately, without any assumption
       that parameters are the same but using the same model specification,
       and post-processing the output files by a meta-analysis
@@ -6976,8 +6978,10 @@ Therefore the second option seems preferable to the first.
 
 The third option makes much less assumptions because parameters are not
 constrained at all across the different networks.
+This is preferable to the assumption of homogeneous parameters
+made in options 1 and~2.
 The fourth option is a middle ground between the first two and the third.
-Therefore the arguments usual in statistical modeling apply:
+The arguments usual in statistical modeling apply:
 as far as assumptions is concerned, options (3) and (4) are safer;
 but if the assumptions are satisfied (or if they are a good approximation),
 then options (1) and (2) have higher power and are simpler.
@@ -6985,6 +6989,15 @@ Option (3) requires that each of the different network data sets
 is informative enough to lead to well-converged estimates;
 this will not always be the case for small data sets,
 and then option (4) may be preferable.
+
+One difference between option 3 and the others is the centering of covariates;
+if this is used (which is the default!).
+For actor covariates, the multi-group data sets will center actor covariates
+by subtracting the grand mean; in the individual data sets analyzed in option~3,
+groupwise means are subtracted, This will affect the results.
+In some cases, for a multi-group analysis by option 2 or 4, it will be desirable
+not to center and/or to also use the groupwise means of covariates
+as an additional covariate.
 
 When the data sets for the different networks are not too small
 individually,
@@ -15249,14 +15262,44 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
-\item 2020-01-06 R-Forge Revision 345, package version 1.2-22.
+\item 2020-02-16 R-Forge Revision 346, package version 1.2-24.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
-\item Tested effects reported in print of \sfn{Multipar.RSiena} and 
+\item New auxiliary function \sfn{dyadicCov} for \sfn{sienaGOF}.
+\item Correction of error in \texttt{modelType} when one-mode as well as two-mode
+     networks are used.
+\item Added \texttt{startingDate} in \sfn{siena08} to the object produced.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item Corrected \sfn{siena.table} for \sfn{sienaBayesFit} objects;
+     added \texttt{startingDate} in \sfn{sienaBayes} to the object produced.
+\end{itemize}
+
+
+\item 2020-01-12 CRAN Siena version 1.2-23.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+\item Changed extension names of output files from \texttt{.out} to
+    \texttt{.txt}.
+\item Option \texttt{projname=NULL} in \sfn{sienaAlgorithmCreate}.
+     This option is used for all examples in \sfn{RSiena} where \sfn{siena07} is called,
+     to restrict file writing for examples to the temporary directory.
+\end{itemize}
+
+
+
+\item 2020-01-16 R-Forge Revision 345, package version 1.2-22.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+\item Tested effects reported in print of \sfn{Multipar.RSiena} and
         \sfn{score.Test}.
 \item Reordered effects object so that \texttt{reciAct} comes after instead of
-     before \texttt{inAct} and \texttt{inAct.c}.   
+     before \texttt{inAct} and \texttt{inAct.c}.
 \end{itemize}
 
 
@@ -15267,7 +15310,7 @@ Changes in RSiena and RSienaTest:
  \item New effects \texttt{avGroupEgoX}, \texttt{outIso}.
  \item Starting date of estimation reported in
      \texttt{siena.table(..., type='tex', ...)}.
-\item Handling of mssings in changing covariates corrected (?).
+\item Handling of missings in changing covariates corrected (?).
 \end{itemize}
 
 Changes in RSiena:

@@ -214,12 +214,9 @@ We recommend the following heuristic approach to model checking:
 \itemize{
 \item See \url{http://www.stats.ox.ac.uk/~snijders/siena/}
   for general information on RSiena.
-\item Lospinoso, J.A. and Snijders, T.A.B., \dQuote{Goodness of fit for
-  Stochastic Actor Oriented Models.} Presentation given at Sunbelt XXXI,
-  St. Petes Beach, Fl. 2011.
-\item Lospinoso, J.A. (2012).
-  \dQuote{Statistical Models for Social Network Dynamics.}
-  Ph.D. Thesis. University of Oxford: U.K.
+\item Lospinoso, J.A. and Snijders, T.A.B. (2019).
+  Goodness of fit for stochastic actor-orientedmodels.
+  \emph{Methodological Innovations}, 12:2059799119884282.
 }
 }
 \author{Josh Lospinoso, modifications by Ruth Ripley and Tom Snijders}

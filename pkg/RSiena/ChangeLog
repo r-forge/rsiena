@@ -1,3 +1,12 @@
+2020-02-16 R-Forge Revision 347, package version 1.2-24.
+   * Changes in RSiena and RSienaTest:
+   * New auxiliary function dyadicCov.
+   * Correction of error in modelType when one-mode as well as two-mode
+     networks are used (initializeFRAN.r).
+Changes in RSienaTest:
+   * Corrected siena.table for sienaBayesFit objects;
+     added startingDate in sienaBayes and siena08 to the object produced. 
+
 2020-01-15 R-Forge Revision 346, version 1.2-23 same as CRAN version
 (except that one error in dontrun part of sienaGOF-auxiliary.Rd was corrected).
 

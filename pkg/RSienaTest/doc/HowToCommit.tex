@@ -152,7 +152,7 @@ Preferably limit line lengths to a maximum of 80 characters.
   Do this also for the most recent patched version of R, because R-Forge will do this
   and often it leads to additional errors and notes, because R becomes progressively
   stringent.
-  
+
 
 There is a facility to check Windows packages on CRAN. See
 \url{http://win-builder.r-project.org/}; use the upload page!
@@ -160,6 +160,11 @@ There is a facility to check Windows packages on CRAN. See
 A facility to build and check packages on various platforms
 is at \url{https://builder.r-hub.io}; in the `advanced' page
 there is a variety of platforms on which you can check.
+
+In case R-hub throws unexplainable problems, you might consult
+the R-hub issue tracker:
+\url{https://github.com/r-hub/rhub/issues}
+
 
   Try to make the code so that notes and warnings from this Check are avoided as far as possible,
   and that you understand those that remain.
@@ -174,5 +179,20 @@ there is a variety of platforms on which you can check.
   Sometimes the file \texttt{$\bs$tests$\bs$parallel.Rout.save} must be updated.
 
   It may be useful to add other scripts for checking (but they should not consume much time).
+
+\section{Committing}
+
+Essential reading is \emph{Writing R extensions},\\
+\url{https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Checking-packages}
+(exists also in an \textit{r-devel} version!).
+
+CRAN policies are not constant; see, e.g., Hornik, Ligges and Zeileis. 
+``Changes on CRAN: 2017-12-01 to 2018-06-30'', 
+R Journal 10(1), July 2018. \url{https://journal.r-project.org/archive/2018-1/cran.pdf}
+\medskip
+
+The queue at CRAN is shown in the ``CRAN incoming dashboard'', 
+          \url{https://cransays.itsalocke.com/articles/dashboard.html}
+
 
 \end{document}
