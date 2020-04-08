@@ -2391,7 +2391,7 @@ covarDist2 <- function(z)
 	for (i in seq(along=z$cCovars))
 	{
 		nodeSet <- attr(z$cCovars[[i]], "nodeSet")
-		use <- (netTypes != "behavior" & netActorSet == nodeSet)
+		use <- (!(netTypes %in% c("behavior", "continuous")) & (netActorSet == nodeSet))
 		simMeans <- namedVector(NA, netNames[use])
 		for (j in which(use))
 		{
@@ -2404,7 +2404,7 @@ covarDist2 <- function(z)
 	for (i in seq(along=z$vCovars))
 	{
 		nodeSet <- attr(z$vCovars[[i]], "nodeSet")
-		use <- (netTypes != "behavior" & netActorSet == nodeSet)
+		use <- (!(netTypes %in% c("behavior", "continuous")) & (netActorSet == nodeSet))
 		simMeans <- namedVector(NA, netNames[use])
 		for (j in which(use))
 		{

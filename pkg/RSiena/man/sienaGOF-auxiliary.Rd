@@ -43,8 +43,7 @@ TriadCensus(i, obsData, sims, period, groupName, varName, levls=1:16)
 
 mixedTriadCensus(i, obsData, sims, period, groupName, varName)
 
-dyadicCov(i, obsData, sims, period, groupName, varName,
-          dc, dc.table=NULL)
+dyadicCov(i, obsData, sims, period, groupName, varName, dc)
 
 sparseMatrixExtraction(i, obsData, sims, period, groupName, varName)
 
@@ -74,9 +73,6 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
     cumulative (<=) distributions?}
   \item{dc}{Dyadic covariate: matrix with the same dimensions as
     adjacency matrix for dependent network variable.}
-  \item{dc.table}{Used as denominator for counts of dc. Can be given as
-    table for dc, calculated in advance, to circumvent calculating
-    \code{table(dc)} a large number of times.}
 }
 \details{
  The statistics should be chosen to represent features of the network
@@ -113,9 +109,10 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
  the \code{sna} procedure may be faster.
 
  \code{dyadicCov} assumes that \code{dc} is a categorical dyadic variable,
- and the frequencies of the values for realized ties are returned divided by
- the elements of \code{dc.table}, which normally is the table of
- overall frequencies of values of \code{dc}.
+ and returns the frequencies of the non-zero values for realized ties.
+ Since zero values of dc are not counted, it may be advisable
+ to code dc so that all non-diagonal values are non-zero,
+ and all diagonal values are zero.
  }
 
 \value{
@@ -133,6 +130,9 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
 
  \code{mixedTriadCensus} returns a named vector, the distribution of the
   mixed triad census of Hollway, Lomi, Pallotti,and Stadtfeld (2017).
+
+ \code{dyadicCov} returns a named vector, the frequencies of the non-missing
+  non-zero values dc(ego,alter) of the observed or simulated (ego,alter) ties.
 
  \code{sparseMatrixExtraction} returns the simulated network as a
   \code{dgCMatrix};
@@ -189,8 +189,8 @@ behaviorExtraction(i, obsData, sims, period, groupName, varName)
 
 mynet1 <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 mybeh <- sienaDependent(s50a[,1:2], type="behavior")
-mydycov <- matrix(rep(1:5, 500), 50, 50) # artificial, just for trying
-mydy.table <- table(mydycov)
+mycov <- c(rep(1:3,16),1,2) # artificial, just for trying
+mydycov <- matrix(rep(1:5, 500), 50, 50) # also artificial, just for trying
 mydata <- sienaDataCreate(mynet1, mybeh)
 myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, transTies, cycle3)
@@ -203,7 +203,7 @@ myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=50, seed=122, projname=NULL)
 OutdegreeDistribution(NULL, ans$f, ans$sims, period=1, groupName="Data1",
   levls=0:7, varName="mynet1")
 dyadicCov(NULL, ans$f, ans$sims, period=1, groupName="Data1",
-  dc=mydycov, dc.table=mydy.table, varName="mynet1")
+  dc=mydycov, varName="mynet1")
 # An arbitrary selection for simulation run i:
 IndegreeDistribution(5, ans$f, ans$sims, period=1, groupName="Data1",
   varName="mynet1")
@@ -227,8 +227,26 @@ plot(gofi)
 plot(gofo)
 
 (gofdc <- sienaGOF(ans, dyadicCov, verbose=TRUE, join=TRUE,
-    dc=mydycov, dc.table=mydy.table, varName="mynet1"))
+    dc=mydycov, varName="mynet1"))
 plot(gofdc)
+
+# How to use dyadicCov for ego-alter combinations of a monadic variable:
+mycov.egoalter <- outer(10*mycov, mycov ,'+')
+diag(mycov.egoalter) <- 0
+dim(mycov.egoalter) # 50 * 50 matrix
+# This is a dyadic variable indicating ego-alter combinations of mycov.
+# This construction works since mycov has integer values 
+# not outside the interval from 1 to 9.
+# All cells of this matrix contain a two-digit number,
+# left digit is row (ego) value, right digit is column (alter) value.
+# See the top left part of the matrix:
+mycov.egoalter[1:10,1:12]
+# The number of values is the square of the number of values of mycov;
+# therefore, unwise to do this for a monadic covariate with more than 5 values.
+gof.mycov <- sienaGOF(ans, dyadicCov, verbose=TRUE, varName="mynet1", 
+    dc=mycov.egoalter)  
+plot(gof.mycov)
+descriptives.sienaGOF(gof.mycov, showAll=TRUE)
 
 (gofb <- sienaGOF(ans, BehaviorDistribution, varName = "mybeh",
     verbose=TRUE, join=TRUE, cumulative=FALSE))

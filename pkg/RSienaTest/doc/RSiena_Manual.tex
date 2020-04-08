@@ -1747,11 +1747,53 @@ formula, having been calculated according to a
 \hyperlink{T_meanbal}{formula given in Chapter}~\ref{S_math}.
 It is also reported in the
  output file produced by \sfn{print01Report()} and available -- e.g., for the first
-dependent variable -- as \texttt{attr(mydata\$depvars[[1]], "balmean")}.
+dependent variable -- as
+\begin{verbatim}
+\texttt{attr(mydata\$depvars[[1]], "balmean")}
+\end{verbatim}
 Instead of \texttt{[[1]]} you can request a different number or
 the name of the variable.
 
-%The dependent behavior variable is not centered.
+
+\subsubsection{Centering of behavioral variables}
+
+Dependent behavior variables are not centered by \sfn{sienaDataCreate},
+but internally during the simulations.
+Therefore their mean is not stored in the Siena data set.
+However, the values and their frequencies are stored in
+(using \texttt{mydat} and \texttt{smoke} as example names)
+\begin{verbatim}
+attr(mydata$depvars$smoke, "vals")
+\end{verbatim}
+From this, the mean can be calculated by using the functions
+\begin{verbatim}
+theMean <- function(x){
+# Mean of a named vector of frequencies, where the names are the values
+    sum(as.integer(names(x)) * x, na.rm=TRUE)/sum(x, na.rm=TRUE)
+}
+meanByWave <- function(x, vari, w){
+    theMean(attr(x$depvars[[vari]], "vals")[[w]])
+}
+grandMean <- function(x, vari){
+    xxx <- attr(x$depvars[[vari]], "vals")
+    mean(sapply(xxx, theMean))
+}
+\end{verbatim}
+For comprehensibility, these three functions are given separately here.
+The first is a general utility function, the second and third specific for \rs.
+They can be applied, e.g., as
+\begin{verbatim}
+grandMean(mydata, "smoke")
+sapply(1:mydata$observations, meanByWave, x=mydata, vari="smoke")
+\end{verbatim}
+and for multi-group data as
+\begin{verbatim}
+sapply(myGroupData, grandMean, vari="smoke")
+\end{verbatim}
+
+
+
+
 
 \subsubsection{Monotonic dependent variables}
 \label{S_monotone}
@@ -3180,7 +3222,7 @@ These constraints will continue to be respected during the simulations.
 The constraints for the simulations can be changed by function
 \sfn{sienaDataConstraint}.
 
-This does not work for multigroup projects! By implication,
+This does not work for multi-group projects! By implication,
 it does not work for \sfn{sienaBayes}.
 
 
@@ -6530,7 +6572,7 @@ containing all simulated networks
 as edge lists to the \texttt{sim\_ans} object.
 This uses rather a lot of memory.
 Since here the default \texttt{n3 = 1000} was used, \texttt{sim\_ans} will be
-a list of 1000 elements; e.g., the 568'th network generated
+a list of 1000 elements; e.g., if there are three waves, the 568'th network generated
 for wave 2 is given by
 \begin{verbatim}
 sim_ans$sims[[568]][[1]][[1]][[1]]
@@ -6540,12 +6582,19 @@ arbitrarily, 568); then the number of the group as defined in
 Section~\ref{S_multigroup} (1 in the usual case of single-group data structures);
 then the number of the dependent variable (here 1, because it is supposed
 that there only is a dependent network);
-then the number of the wave minus 1 (here 1 because there are supposed to be
-2 waves).
+then the period number (i.e., wave number minus 1).
 This type of information can be found out by requesting
 \begin{verbatim}
 str(sim_ans$sims[[568]])
 \end{verbatim}
+\bigskip
+
+In the case of maximum likelihood estimation,
+if there is only one group and two waves, the list structure is simpler.
+Then the two superfluous list levels, group and wave/period, are omitted.
+The list then has three levels: dependent variable within group
+within simulation run.
+\bigskip
 
 The help page for \textsf{siena07} contains an example for how to access the
 generated networks in the case of ML estimation. Note that this is meaningful only in view
@@ -6583,6 +6632,8 @@ make.edgelist.sna <- function(x, n)
                          attr(x, "n") <- n
                          x
                      }
+# Note: if there is only one group and two waves,
+# x[[1]][[1]][[1]] should be replaced by x[[1]]
 # Apply this function to the list of simulated networks
 simusnas <- lapply(sim_ans$sims, make.edgelist.sna, 50)
 # Define a function that calculates the largest k-core number in the graph
@@ -6945,12 +6996,12 @@ The four options are:
       variables that indicate the different networks)
       whereas the multi-group option yields rate parameters
       that are distinct across different networks.\\
-      In this option (like in option~1), the assumption is made that all 
-      parameters are the same for the various networks, 
-      except for the basic rate parameters; 
+      In this option (like in option~1), the assumption is made that all
+      parameters are the same for the various networks,
+      except for the basic rate parameters;
       and except for explicitly specified interaction
       effects between variables depending on the sub-project, and other effects.
-      This is a very strong assumption, and undesirable unless 
+      This is a very strong assumption, and undesirable unless
       options 3-4 are impossible.
 \item Analyzing the different networks separately, without any assumption
       that parameters are the same but using the same model specification,
@@ -9724,7 +9775,7 @@ with shortName \texttt{(sameXCycle4)}, \\[0.3em]
  start of the period; for behavioral dependent variables,
  the current mean.
  This effect is not meaningful for constant covariates.
- It is useful especially for multigroup data sets, where the average value
+ It is useful especially for multi-group data sets, where the average value
  varies between groups.
  Note that always, the average $\overline {v} $ is centered by the global mean.
  For multi-group data, global centering means centering over all groups.
@@ -12172,8 +12223,8 @@ The list of these effects is the following.
  For the original non-centered values of $Z$, this means that the mean
  is centered around the value $p$, the effect parameter itself.
  Note that this can be any real value, not necessarily integer.\\
- This effect is useful especially for multigroup data sets, where the average value
- varies between groups. For multigroup data sets, centering by the groupwise
+ This effect is useful especially for multi-group data sets, where the average value
+ varies between groups. For multi-group data sets, centering by the groupwise
  mean may be less desirable, and it will be better to center by a value $p$
  close to the median of $Z$.
  (Note that the centering in a multi-group data set
@@ -15446,8 +15497,10 @@ Changes in RSienaTest:
         \texttt{newProposalFromPrev} in \sfn{sienaBayes}.
    \item \sfn{siena.table} for \sfn{sienaBayes} results extended with between-groups s.d.
    \item Argument \texttt{verbose} added to \sfn{extract.posteriorMeans}.
-   \item \sfn{sienaBayes}: check that \texttt{prevAns} is not a \sfn{sienaFit} object;
-     totally skip initial multigroup estimation if \texttt{prevAns} is given with
+   \item \sfn{sienaBayes}: check that \texttt{prevAns} is a \sfn{sienaFit} object,
+     and not \sfn{sienaBayes};\\
+     totally skip initial multi-group estimation if \texttt{prevAns} is given \\
+     with
      \texttt{((prevAns\$n3 >= 500) \& (!usePrevOnly))}.
 
 \end{itemize}
@@ -15463,7 +15516,8 @@ Changes in RSienaTest:
    \item  New functions \sfn{shortBayesResults} and \sfn{plotPostMeansMDS}.
    \item  \sfn{extract.posteriorMeans} works also for an object saved as \texttt{PartialBayesResult}
      (which has \texttt{NA} results for as yet unfinished runs).
-   \item  Examples added to help page for \texttt{print.sienaBayesFit} (in dontrun...).
+   \item  Examples added to help page for \texttt{print.sienaBayesFit}
+   (in \texttt{dontrun}...).
 \end{itemize}
 
 \item 2018-12-05 R-Forge Revision 337, packages version 1.2-14.

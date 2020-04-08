@@ -1,5 +1,22 @@
+2020-04-08 R-Forge Revision 348, package version 1.2-25.
+Changes in RSiena and RSienaTest:
+   * Correction of sienaDataCreate for actor covariates (gave a warning).
+   * Auxiliary function dyadicCov now can handle missings,
+     does not return a named value for frequency of zeros,
+     and returns the frequencies without any division.
+   * descriptives.sienaGOF also shows the exceedance probabilities
+     of the observed statistics.
+   * modelType and behModelType, if NULL, get their defaults already in
+     initializeFRAN (checkNames) rather than in C++.
+   * Some extra information in help page for siena07.
+Changes in RSienaTest:
+   * getNames corrected for data with multiple periods
+     (used in sienaBayes, extract.sienaBayes, and extract.posteriorMeans)
+check bayesTest.getNames, voor extract.sienaBayes en extract.posteriorMeans !!!
+   
+
 2020-02-16 R-Forge Revision 347, package version 1.2-24.
-   * Changes in RSiena and RSienaTest:
+Changes in RSiena and RSienaTest:
    * New auxiliary function dyadicCov.
    * Correction of error in modelType when one-mode as well as two-mode
      networks are used (initializeFRAN.r).

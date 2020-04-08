@@ -76,6 +76,8 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     of ministeps should be returned; this may produce a very big file.}
 }
 \details{
+  This is the main function and workhorse of RSienaTest.
+
   For use of \code{siena07}, it is necessary to specify parameters \code{data}
   (RSiena data set) and \code{effects} (effects object), which are
   required parameters in function \code{\link{simstats0c}}.
@@ -93,7 +95,7 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  simulation to estimate standard errors and check convergence of the model. The
  simulation function is called once for each iteration in these phases
  and also once to initialise the model fitting and once to complete it.
- Unless in batch mode, displays a tcl/tk screen to allow interruption
+ Unless in batch mode, a tcl/tk screen is displayed to allow interruption
  and to show progress.
 
  If  \code{x$maxlike=TRUE}, estimation is done by Maximum Likelihood
@@ -109,6 +111,12 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
  the parameter \code{prevAns} as illustrated in the example below.
  (This parameter is inserted through '\dots' into the function
  \code{\link{initializeFRAN}}.)
+
+ For good estimation of standard errors, it is necessary that \code{x$n3} is
+ large enough. More about this is in the manual. The default value \code{x$n3}
+ set in \code{\link{sienaAlgorithmCreate}} is adequate for most explorative use,
+ but for presentation in publications larger values are necessary, depending
+ on the data set and model; e.g., \code{x$n3=3000} or larger.
 
  Parameters can be tested against zero by dividing the estimate by its
  standard error and using an approximate standard normal null distribution.
@@ -189,7 +197,11 @@ siena07(x, batch=FALSE, verbose=FALSE, silent=FALSE,
     estimated means of estimation statistics.}
   \item{sims}{If \code{returnDeps=TRUE}:
     list of simulated dependent variables (networks, behaviour).
-    Networks are given as a list of edgelists, one for each period.}
+    Networks are given as a list of edgelists, one for each period.\cr
+    The structure of sims is a nested list:
+    \code{sims[[run]][[group]][[dependent variable]][[period]]}.
+    If \code{x$maxlike=TRUE} and there is only one group and one period,
+    the structure is \code{[[run]][[dependent variable]]}.}
  \item{chain}{If \code{returnChains = TRUE}:
     list, or data frame, of simulated chains of ministeps.
     The chain has the structure
@@ -326,9 +338,13 @@ the.edge <- function(x,n,h,k){
 n <- 4
 ego <- rep.int(1:n,n)
 alter <- rep(1:n, each=n)
+# Get the average simulated adjacency matrices for wave 3 (period 2):
 ones <- sapply(1:n^2, function(i)
     {mean(sapply(ans$sims,
            function(x){the.edge(x[[1]][[2]][[1]],n,ego[i],alter[i])}))})
+# Note that for maximum likelihood estimation,
+# if there is one group and one period,
+# the nesting levels for group and period are dropped from ans$sims.
 cbind(ego,alter,ones)
 matrix(ones,n,n)
 }
