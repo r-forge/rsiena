@@ -400,12 +400,12 @@ print.sienaFit <- function(x, tstat=TRUE, ...)
 			cat("\nSimulated statistics are in ", objectName,'$sf',sep="")
 			if (x$returnDeps)
 			{
-				cat("\nand simulated dependent variables in ",
-								objectName,'$sims.\n',sep="")
+				cat("\nand simulated dependent variables in ", objectName,
+					'$sims, where ', objectName,' is the created object.\n',sep="")
 			}
 			else
 			{
-				cat(".\n")
+				cat(", where", objectName, "is the created object.\n")
 			}
 		}
 		else

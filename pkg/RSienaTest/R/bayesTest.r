@@ -265,30 +265,26 @@ getNames <- function(x){
 		# and with "unspecified interaction" replaced by
 		# information about the effects in question
 		b <- x$basicRate
-		tpar<- rep(NA,length(b))
 		# True Parameters, i.e., all except rate parameters for groups 2 and up.
-		for (i in (2:length(b))){tpar[i] <- !b[i]|(b[i]&!b[i-1])}
-		tpar[1] <- TRUE
+# earlier, can be deleted when checked:
+#		tpar<- rep(NA,length(b))
+#		for (i in (2:length(b))){tpar[i] <- !b[i]|(b[i]&!b[i-1])}
+#		tpar[1] <- TRUE
+		tpar <- !x$basicRate
+		tpar[unlist(x$rateParameterPosition[[1]])] <- TRUE
+		theNames <- x$requestedEffects$effectName[tpar]
+		if (length(unlist(x$rateParameterPosition[[1]]) <= 1))
+		{
 		# Take away the ' (period 1)' in the first rate parameter
-		sub(' (period 1)','', x$requestedEffects$effectName[tpar], fixed=TRUE)
+			theNames <- sub(' (period 1)','', theNames, fixed=TRUE)
+		}
+		theNames
 }
-
 
 ##@extract.sienaBayes extracts samples from sienaBayesFit objects
 extract.sienaBayes <- function(zlist, nfirst=zlist[[1]]$nwarm+1, extracted,
-	sdLog=TRUE){
-	getNames <- function(x){
-		# effect names without duplicated rate parameters
-		# and with "unspecified interaction" replaced by
-		# information about the effects in question
-		b <- x$basicRate
-		tpar<- rep(NA,length(b))
-		# True Parameters, i.e., all except rate parameters for groups 2 and up.
-		for (i in (2:length(b))){tpar[i] <- !b[i]|(b[i]&!b[i-1])}
-		tpar[1] <- TRUE
-		# Take away the ' (period 1)' in the first rate parameter
-		sub(' (period 1)','', x$requestedEffects$effectName[tpar], fixed=TRUE)
-	}
+	sdLog=TRUE)
+{
 	if (!(is.list(zlist)))
 	{
 		stop('zlist must be a list of sienaBayesFit objects')
@@ -429,18 +425,6 @@ extract.posteriorMeans <- function(z, nfirst=z$nwarm+1, pmonly=1,
 # produces a matrix with the groups in the rows
 # and all effects in the columns, with for each effect
 # first the posterior mean ("p.m.") and then the posterior standard deviation ("psd.")
-	getNames <- function(x){
-		# effect names without duplicated rate parameters
-		# and with "unspecified interaction" replaced by
-		# information about the effects in question
-		b <- x$basicRate
-		tpar<- rep(NA,length(b))
-		# True Parameters, i.e., all except rate parameters for groups 2 and up.
-		for (i in (2:length(b))){tpar[i] <- !b[i]|(b[i]&!b[i-1])}
-		tpar[1] <- TRUE
-		# Take away the ' (period 1)' in the first rate parameter
-		sub(' (period 1)','', x$requestedEffects$effectName[tpar], fixed=TRUE)
-	}
 	if (!inherits(z, "sienaBayesFit"))
 	{
 		stop('z must be a sienaBayesFit object')

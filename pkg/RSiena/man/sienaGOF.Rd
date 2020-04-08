@@ -203,8 +203,10 @@ We recommend the following heuristic approach to model checking:
     \code{descriptives.sienaGOF} returns a matrix giving numerical
     information about what is plotted in the \code{plot} method:
     maximum, upper percentile, mean, median, lower percentile, minimum,
-    of the simulated distributions of the auxiliary statistics, and the
-    observed values. If \code{center=TRUE} the median is subtracted
+    of the simulated distributions of the auxiliary statistics, the
+    observed values, and the proportions of simulated values greater
+    and greater-or-equal than the observed values. 
+    If \code{center=TRUE} the median is subtracted
     from mean, median, and percentiles; if \code{scale=TRUE}
     these numbers are divided by (maximum - minimum). \cr
     If \code{showAll=FALSE}, statistics with variance 0 will be dropped.

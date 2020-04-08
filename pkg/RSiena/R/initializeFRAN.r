@@ -19,6 +19,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 	##@checkNames used in initializeFRAN for siena07
 	checkNames <- function(xx, types) {
 		# checks whether names of named vectors are in names of dependent variables.
+		# returns xx; if is.null(xx), returns named vector
+		# with variable names and all values 1.
 		if (('oneMode' %in% types) || ('bipartite' %in% types))
 		{
 			thetype <- 'network'
@@ -49,6 +51,8 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 		if (is.null(xx))
 		{
 			wrongName <- FALSE
+			xx <- rep(1, sum(theVars))
+			names(xx) <- theVarNames
 		}
 		else
 		{
@@ -73,7 +77,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 				stop('Invalid algorithm-data combination.')
 			}
 		}
-		invisible(!wrongName)
+		xx
 	}
 
 	# start of initializeFRAN proper
@@ -138,10 +142,12 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 		}
 
 		# Check that the following attributes have correct names
+		# and change NULL to default values for x$modelType and x$behModelType
+		# For symmetric networks, default is changed below from 1 to 2.
 		checkNames(x$MaxDegree, c('oneMode','bipartite'))
 		checkNames(x$UniversalOffset, c('oneMode','bipartite'))
-		checkNames(x$modelType, c('oneMode','bipartite'))
-		checkNames(x$behModelType, 'behavior')
+		x$modelType <- checkNames(x$modelType, c('oneMode','bipartite'))
+		x$behModelType <- checkNames(x$behModelType, 'behavior')
 		# The following error will occur if ML estimation is requested
 		# and there are any impossible changes from structural values
 		# to different observed values.
@@ -657,7 +663,7 @@ initializeFRAN <- function(z, x, data, effects, prevAns=NULL, initC,
 		UNIVERSALOFFSET <- x$UniversalOffset
 		storage.mode(UNIVERSALOFFSET) <- "double"
 	}
-	if ((length(x$modelType) == 0)||(x$modelType == 0) || is.null(x$modelType))
+	if ((length(x$modelType) == 0)||all(x$modelType == 0) || is.null(x$modelType))
 	{
 		MODELTYPE <-  NULL
 	}
