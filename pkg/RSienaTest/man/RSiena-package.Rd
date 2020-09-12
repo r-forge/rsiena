@@ -49,14 +49,13 @@ Package \code{"RSiena"} is the official release.
   \tabular{ll}{
     Package: \tab RSienaTest\cr
     Type: \tab Package\cr
-    Version: \tab 1.2-25\cr
-    Date: \tab 2020-04-08\cr
-    Depends: \tab R (>= 3.0.0)\cr
-    Imports: \tab Matrix\cr
-    Suggests: \tab tcltk, network, codetools, lattice, MASS, parallel,
-    xtable, tools, utils\cr
-    SystemRequirements: \tab GNU make, tcl/tk 8.5, Tktable\cr
-    License: \tab GPL-2 \cr
+    Version: \tab 1.2-26\cr
+    Date: \tab 2020-09-12\cr
+    Depends: \tab R (>= 2.15.0)\cr
+    Imports: \tab Matrix, lattice, parallel, MASS, methods\cr
+    Suggests: \tab xtable, network, tools, codetools, utils, tcltk\cr
+    SystemRequirements: \tab GNU make \cr
+    License: \tab GPL-3 \cr
     LazyData: \tab yes\cr
     NeedsCompilation: \tab yes\cr
     BuildResaveData: \tab no\cr
@@ -67,7 +66,7 @@ Package \code{"RSiena"} is the official release.
   Nynke Niezink.
   Contributions by Josh Lospinoso, Charlotte Greenan, Christian Steglich,
   Johan Koskinen, Mark Ortmann, Natalie Indlekofer,
-  Christoph Stadtfeld, Per Block, Marion Hoffman, and Robert Hellpap.
+  Christoph Stadtfeld, Per Block, Marion Hoffman, Michael Schweinberger, and Robert Hellpap.
 
   Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>
 }

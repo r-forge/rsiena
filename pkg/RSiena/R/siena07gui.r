@@ -1,7 +1,7 @@
 #/******************************************************************************
 # * SIENA: Simulation Investigation for Empirical Network Analysis
 # *
-# * Web: http://www.stats.ox.ac.uk/~snidjers/siena
+# * Web: http://www.stats.ox.ac.uk/~snijders/siena
 # *
 # * File: siena07Gui.r
 # *
@@ -9,6 +9,7 @@
 # *
 # *****************************************************************************/
 ##@siena07Gui siena07 Create program screen for siena07
+## This is called only if !batch.
 siena07Gui <- function(tt, getDocumentation=FALSE)
 {
     ##@myInterrupt internal siena07Gui

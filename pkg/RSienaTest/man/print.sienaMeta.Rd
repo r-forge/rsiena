@@ -1,6 +1,5 @@
 \name{print.sienaMeta}
 \alias{print.sienaMeta}
-\alias{sienaMeta}
 \alias{summary.sienaMeta}
 \alias{plot.sienaMeta}
 \alias{print.summary.sienaMeta}
@@ -17,11 +16,11 @@
 }
 \description{
   \code{print}, \code{summary}, and \code{plot} methods for
-   \code{sienaMeta} objects.
+   \code{\link{sienaMeta}} objects.
 }
 \arguments{
-  \item{object}{An object of class \code{sienaMeta}.}
-  \item{x}{An object of class \code{sienaMeta}, or
+  \item{object}{An object of class \code{\link{sienaMeta}}.}
+  \item{x}{An object of class \code{\link{sienaMeta}}, or
     \code{summary.sienaMeta} as appropriate.}
   \item{file}{Boolean: if TRUE, sends output to file named
     \code{x$projname.txt}. If FALSE, output is to the terminal.}
@@ -29,7 +28,7 @@
   \item{extra}{Boolean: if TRUE, prints more information.}
   \item{which}{Set of effects contained in the plot (given by sequence numbers).}
   \item{useBound}{Boolean: whether to restict plotted symbols to the bound
-    used in the call of \code{sienaMeta}.}
+    used in the call of \code{\link{siena08}}.}
   \item{layout}{Vector giving number of rows and columns
     in the arrangement of the several panels in a
     rectangular array, possibly spanning multiple pages.}

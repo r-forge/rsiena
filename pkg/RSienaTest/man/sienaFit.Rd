@@ -36,7 +36,7 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
   \item{type}{Type of output to produce; must be either \code{"tex"} or
     \code{"html"}.}
   \item{file}{Name of the file; defaults to the name of the \code{sienaFit}
-    object.}
+    object. "" indicates output to the console.}
   \item{vertLine}{Boolean: add vertical lines separating the columns in
     \code{siena.table}.}
   \item{tstatPrint}{Boolean: add a column of significance t values (parameter
@@ -99,7 +99,7 @@ siena.table(x, type="tex", file=paste(deparse(substitute(x)), ".", type,sep=""),
 \seealso{\code{\link[xtable]{xtable}}, \code{\link[xtable]{print.xtable}},
   \code{\link{siena07}}}
 \examples{
-myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100)
+myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, projname=NULL)
 mynet1 <- sienaDependent(array(c(tmp3, tmp4), dim=c(32, 32, 2)))
 mydata <- sienaDataCreate(mynet1)
 myeff <- getEffects(mydata)

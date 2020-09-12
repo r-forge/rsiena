@@ -195,6 +195,20 @@ siena08 <- function(..., projname="sienaMeta", bound=5, alpha=0.05, maxit=20)
 					function(x){ifelse(is.null(x$mu.ml.se),NA,x$mu.ml.se)})
 	names(meta.theta) <- rep('', length(meta.theta))
 	names(meta.se) <- rep('', length(meta.se))
+# Put the IWLS estimates easily accessible on the meta object
+	neff <- length(unique((mydf$effects))) # number of effects
+	muhat <- rep(NA, neff)	
+	se.muhat <- rep(NA, neff)	
+	for (i in 1:neff)
+	{
+	if (!is.null(meta[[i]]$regsummary))
+		{
+			muhat[i] <- meta[[i]]$regsummary$coefficients[1, 1]
+			se.muhat[i] <- meta[[i]]$regsummary$coefficients[1, 2]
+		}
+	}
+	meta$muhat <- muhat
+	meta$se.muhat <- se.muhat	
 # add everything to the meta object created
     meta$thetadf <- mydf
     class(meta) <- "sienaMeta"

@@ -52,8 +52,6 @@ short names to identify the effects which should be included or excluded.}
   setting the "include" column on selected rows of the effects object,
   to the value requested (TRUE or FALSE).
 
-  The value of \code{myeff$initialValue} can be set by function
-  \code{\link{setEffect}}.
   The function \code{\link{setEffect}} can operate on the effects object
   in a more detailed way,
   e.g., setting the value of \code{myeff$initialValue},
@@ -78,6 +76,7 @@ short names to identify the effects which should be included or excluded.}
 \seealso{
   \code{\link{getEffects}}, \code{\link{setEffect}},
   \code{\link{includeInteraction}}, 
+  \code{\link{updateSpecification}},
   \code{\link{print.sienaEffects}}, \code{\link{effectsDocumentation}}
 }
 

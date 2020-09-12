@@ -23,7 +23,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	{
 		if (!is.batch())
 		{
-			tkdestroy(tkvars$tt)
+		  tcltk::tkdestroy(tkvars$tt)
 		}
 		## close the report file
 		Report(closefiles=TRUE)
@@ -137,6 +137,13 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	batchUse <- batch
 	if (!batch)
 	{
+		if (!requireNamespace("tcltk", quietly = TRUE))
+		{
+				batchUse <- TRUE
+				message("Package tcltk not available, forcing use of batch mode")		
+		}
+		else
+		{
 		if (.Platform$OS.type != "windows")
 		{
 			if (!capabilities("X11"))
@@ -144,6 +151,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 				batchUse <- TRUE
 				message("No X11 device available, forcing use of batch mode")
 			}
+		}
 		}
 		if(nzchar(Sys.getenv("RSIENA_TESTING")))
 		{

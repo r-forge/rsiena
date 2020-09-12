@@ -150,7 +150,19 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 			tt <- getInternals()
 			return(tt)
 		}
-		desired <- trunc(target*totruns)
+		if (totruns <= 0)
+		{
+			break
+		}
+		if (length(target) == 1)
+		{
+			desired <- target*totruns
+		}
+		else
+		{
+			desired <- c(rep(trunc(target[1]*totruns), z$nGroup), 
+						rep(trunc(target[2]*totruns), 2))
+		}		
 		iter <- 0
 		nearGoal <- rep(FALSE, z$nGroup+2)
 		farFromGoal <- rep(TRUE, z$nGroup+2)
@@ -231,8 +243,6 @@ browser()
 			}
 		}
 		cat('fine tuning took ', iter, ' iterations.\n')
-#drop		cat('scaleFactors:', z$scaleFactors, z$scaleFactor0,
-#										z$scaleFactorEta, '\n')
 		flush.console()
 	} # end improveMH
 
@@ -978,6 +988,8 @@ covtrob <- function(x){
 						"is not a sienaBayesFit object.")
 			stop("Do not use this object for prevBayes.")
 		}
+		zm <- list()
+		zsmall <- list()
 		z <- prevBayes
 		z$newProposalFromPrev <- newProposalFromPrev
 
@@ -1232,12 +1244,17 @@ covtrob <- function(x){
 # this dimension is retained because of the drop=FALSE,
 # and this is necessary because the third coordinate might have just one value
 # (which will hardly occur in practice...)
-			scf <- 2.38/sqrt(z$TruNumPars)
+			scf <- (2.38^2)/z$TruNumPars
 # theoretically optimal value according to Roberts & Rosenthal, 2001
+# Also see page 99 (in chapter by Rosenthal) of the Chapman & Hall
+# Handbook of Markov Chain Monte Carlo, 2011. 
+# Until RSienaTest version 1.2-25, the scale factors were initialized
+# at 2.38/sqrt(z$TruNumPars); but this should be (2.38^2)/z$TruNumPars,
+# because they are applied to the variance.
 			z$scaleFactors <- rep(scf, z$nGroup)
 			if (z$p2 > 0)
 			{
-				z$scaleFactorEta <- 2.38/sqrt(z$p2)
+				z$scaleFactorEta <- (2.38^2)/z$p2
 			}
 			else
 			{
@@ -1303,10 +1320,6 @@ covtrob <- function(x){
 #	print(round(z$thetaMat,2))
 	ctime5<- proc.time()
 	if (frequentist) {cat('For phase 1 ', round((ctime5-ctime4)[3]),' seconds elapsed.\n')}
-	flush.console()
-
-#	cat('Third ')
-#	improveMH()
 	flush.console()
 
 	# Phase 2
@@ -1432,8 +1445,9 @@ covtrob <- function(x){
 	}
 	z$frequentist <- frequentist
 	z$FRAN <- NULL
-	rm(zsmall, envir=globalenv())
-	rm(zm, envir=globalenv())
+	rm(zsmall)
+#		rm(zsmall, envir=globalenv())
+	rm(zm)
 	if (z$correctSigma > 0)
 	{
 		warning('corrections of the covariance matrix to keep eigenvalues larger than ', delta,
@@ -1506,8 +1520,8 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	if (sum(unlist(imp.change)) > 0)
 	{
 		message('For some groups, there are impossible changes;')
-		message('This occurs for groups\n', which(sapply(imp.change,
-						function(ic){(sum(ic) > 0)})))
+		message('This occurs for groups\n', paste(which(sapply(imp.change,
+						function(ic){(sum(ic) > 0)})), ' '))
 		message('This is not permitted for likelihood-based estimation')
 		stop('Impossible changes in some variable: Adapt the data set.')
 	}
@@ -1869,7 +1883,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	}
 	if (!is.null(priorSigma))
 	{
-	if (!((class(priorSigma)=="matrix") & all(dim(priorSigma)==c(z$p1,z$p1))))
+	if (!((inherits(priorSigma,"matrix")) & all(dim(priorSigma)==c(z$p1,z$p1))))
 		{
 			stop(paste("priorSigma is not a matrix of dimensions",z$p1))
 		}
@@ -1917,7 +1931,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	z$priorSigma <- diag(z$p1)
 	if (!is.null(priorSigma))
 	{
-		if ((class(priorSigma)=="matrix") &
+		if ((inherits(priorSigma,"matrix")) &
 			all(dim(priorSigma)==c(z$p1,z$p1)))
 		{
 		z$priorSigma <- priorSigma
@@ -1949,8 +1963,9 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	startupPrec <- prec[objective, objective]
 	priorPrec <- matrix(0, sum(objective), sum(objective))
 	diag(priorPrec) <- 0.01 # a prior variance of 100 if nothing else is said
+# In the following line, up to version 1.2-25, the ginv was missing!!!	
 	priorPrec[randomInObjective, randomInObjective] <-
-				z$priorSigma[objectiveInRandom, objectiveInRandom]
+				ginv(z$priorSigma[objectiveInRandom, objectiveInRandom])
 	for (i in seq(along=z$set2prior))
 	{
 		if (z$set2prior[i])
@@ -2187,12 +2202,13 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	{
 		z$TruNumPars <- sum(!z$basicRate )
 	}
-	scf <- 2.38/sqrt(z$TruNumPars)
-# theoretically optimal value according to Roberts & Rosenthal, 2001
+	scf <- (2.38^2)/z$TruNumPars
+# theoretically optimal value according to Roberts & Rosenthal, 2001; 
+# also see earlier occurrence of 2.38.
 	z$scaleFactors <- rep(scf, z$nGroup)
 	if (z$p2 > 0)
 	{
-		z$scaleFactorEta <- 2.38/sqrt(z$p2)
+		z$scaleFactorEta <- (2.38^2)/z$p2
 	}
 	else
 	{

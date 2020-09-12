@@ -1,1 +1,1 @@
-inst/.*\.(tex|png|jpg|bib)
+inst/.*\.(tex|txt|png|jpg|bib|log|bbl|blg|aux|toc|bak)
