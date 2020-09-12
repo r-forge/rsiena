@@ -33,7 +33,7 @@
             urlcolor=VioletRed
             ]{hyperref}
 
-\setlength{\bibsep}{0.01in}
+\setlength{\bibsep}{0.02in} % smaller separation between bibliography items
 
 %\setlength{\oddsidemargin}{15mm}
 
@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-24.
+This version was renewed for \RS version 1.2-26.
 \end{abstract}
 
 
@@ -354,7 +354,7 @@ selection considerations, refer to \citet{LospinosoSnijders2019}.
 A basic reference for the Bayesian estimation is \citet{KoskinenSnijders07}
 and for the maximum likelihood estimation \citet*{SnijdersEA10a}.
 For Generalized Method of Moments estimators,
-the reference is \citet*{ASS2015}.
+the reference is \citet*{ASS2015,ASS2019}.
 \smallskip
 
 A general reference for \R is \citet{R}.
@@ -758,10 +758,11 @@ Separating the contribution of an effect into two functions requires
 more of the data, and if a given effect is similarly strong for the
 creation and maintenance of ties the statistical power will
 decrease by this split.
- For these reasons, most  \SI studies limit their
- attention to evaluation effects. However, if there is enough data,
- the distinction between creation and maintenance of ties can
- produce powerful insights \citep[e.g.,][]{Cheadle_etal2013}.\\
+For these reasons, most  \
+SI studies limit their
+attention to evaluation effects. However, if there is enough data,
+the distinction between creation and maintenance of ties can
+produce powerful insights \citep[e.g.,][]{Cheadle_etal2013}.\\
 
 \noindent
 \textbf{Dependent variables: behavior evaluation, creation and endowment functions}\\
@@ -794,9 +795,9 @@ and (alternatively) \sfn{sienacpp()}, using the following procedure:
   is applied.
   This works as follows:
 \begin{enumerate}
-\item In Phase 1, the sensitivity of the statistics to the parameters is roughly
+\item In Phase~1, the sensitivity of the statistics to the parameters is roughly
   determined.
-\item In Phase 2, provisional parameter values are updated iteratively:\\
+\item In Phase~2, provisional parameter values are updated iteratively:\\
   this is done by simulating a network according to the provisional parameter
   values, calculating the statistics and the deviations between these simulated
   statistics and the \emph{target values}, and making a little change (the
@@ -806,7 +807,7 @@ and (alternatively) \sfn{sienacpp()}, using the following procedure:
   (Only a `hopefully' good update is possible, because the simulated network is
   only a random draw from the distribution of networks, and not the expected
   value itself.)
-\item In Phase 3, the final result of Phase 2 is used, and it is checked if the
+\item In Phase~3, the final result of Phase~2 is used, and it is checked if the
   average statistics of many simulated networks are indeed close to the target
   values. This is reflected in the so-called
   \texttt{overall maximum convergence ratio} and the \texttt{t statistics for deviations
@@ -920,24 +921,24 @@ of the software appear).
             \end{itemize}
 
             Installation from a downloaded file can be done as follows, assuming
-            the root name of the file is \texttt{RSienaTest\_1.2-24}, and filling in the correct path name.
+            the root name of the file is \texttt{RSienaTest\_1.2-26}, and filling in the correct path name.
             It will be convenient to first navigate to the directory
             containing the \RS binary or source file so that this is the current directory.
             Then the pathname consists only of the filename.
             \begin{itemize}
             \item In \R from binary:\\
             for Windows:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-24.zip", repos = NULL, type="binary")}\\
+             \texttt{install.packages("pathname to RSienaTest\_1.2-26.zip", repos = NULL, type="binary")}\\
             for Mac:\\
-             \texttt{install.packages("pathname to RSienaTest\_1.2-24.tgz", repos = NULL, type="binary")}
+             \texttt{install.packages("pathname to RSienaTest\_1.2-26.tgz", repos = NULL, type="binary")}
              \item In \R from source:\\
-            \texttt{install.packages("RSienaTest\_1.2-24.tar.gz", repos = NULL, type="source")}
+            \texttt{install.packages("RSienaTest\_1.2-26.tar.gz", repos = NULL, type="source")}
             \item In \text{command.com} or in batch mode (Windows) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-24.zip}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-26.zip}
             \item In the terminal (Mac) from binary:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-24.tgz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-26.tgz}
             \item In \text{command.com} or in batch mode (Windows) or in the terminal (Mac) from source:\\
-            \texttt{R CMD INSTALL RSienaTest\_1.2-24.tar.gz}
+            \texttt{R CMD INSTALL RSienaTest\_1.2-26.tar.gz}
             \item In drop-down menu in \Rn:\\
             for Windows:  go to Packages  $\rightarrow$ Install package(s) from local zip file\\
             for Mac:  go to Packages \& Data $\rightarrow$ Package Installer
@@ -1135,9 +1136,9 @@ For technical problems running \rs, follow the following points.
 \item[Check your version of \RS]
   The `News' page of the \SI website gives information about new versions
   of \rs. Details of the latest version available can
-  be found at \small{\url{http://r-forge.r-project.org/R/?group_id=461}}.
+  be found at {\small{\url{http://r-forge.r-project.org/R/?group_id=461}}}.
   The version is
-  identified by a version number (e.g.\ 1.2-24) and an R-Forge revision
+  identified by a version number (e.g.\ 1.2-26) and an R-Forge revision
   number. You can find both numbers of your current installed version by
   opening \R, and typing \\
   \verb|packageDescription("RSiena")|. The version is
@@ -1183,7 +1184,7 @@ The operation of the \SI program is comprised of five main parts:
         (see Section~\ref{S_Est});
     the main output of the estimation procedure
     is written to a text file named
-    \textsf{\textsl{pname}.out}, where \textsf{\textsl{pname}} is the name
+    \textsf{\textsl{pname}.txt}, where \textsf{\textsl{pname}} is the name
     specified in the call of \textsf{sienaAlgorithmCreate()};
  \item testing parameters and assessing goodness of fit
         (see Sections~\ref{S_se} and \ref{S_test});
@@ -1472,7 +1473,17 @@ constant between observations.
 Dependent behavioral variables must have nonnegative integer values;
 e.g., 0 and 1, or a range of integers like 0,1,2 or 1,2,3,4,5.
 The number of different values should not be too high: ten values
-is on the high side.
+is on the high side, but can still be totally adequate.
+If the original variable is continuous or has many values,
+it should be categorized. It is often advisable to take
+approximately equal intervals on the original scale, and to achieve
+a rather smooth distribution of values, which might resemble a
+discretized normal or skew distribution, as the case may be.
+Using a small number of values may amount to a loss of information.
+If the original variable is continuous then 8 to 10 categories may be
+a good number. This is studied in \citet[][Chapter 6]{Niezink2018a}.
+
+
 Each dependent action variable must be given in one
 matrix, containing $M$ columns, corresponding to the $M$
 observation moments.
@@ -1544,7 +1555,7 @@ ties between such components are not allowed), then only the ego effect
 of the actor covariate is made available.
 This is because the other effects then are meaningless.
 This may cause problems for combining several data sets
-in a multi-group project (see Section~\ref{S_multigroup}).
+in a multi-group data set (see Section~\ref{S_multigroup}).
 If at least one case is missing (i.e., has the missing value data code),
 then the other covariate effects are made available.
 When analysing multiple data sets in parallel,
@@ -1688,16 +1699,16 @@ are subtracted during the program calculations. (Thus,
 dyadic covariates are treated internally by the program differently than
 individual covariates in the sense that the mean is subtracted at
 a different moment, but the effect is the same; except for multi-group
-projects, see below.)
+data sets, see below.)
 Unlike the `covariate similarity' effect,
 the `same covariate' effect is not centered but keeps its 0-1 values.
 
 For the multi-group option (section \ref{S_multigroup}),
 dyadic covariates are treated \underline{differently} from
 individual covariates:
-for dyadic covariates in multi-group projects, centering is done by the
+for dyadic covariates in multi-group data sets, centering is done by the
 within-group mean;
-actor covariates in multi-group projects
+actor covariates in multi-group data sets
 are centered by the overall mean.
 
 For dependent behavioral variables, the effects are defined
@@ -3222,7 +3233,7 @@ These constraints will continue to be respected during the simulations.
 The constraints for the simulations can be changed by function
 \sfn{sienaDataConstraint}.
 
-This does not work for multi-group projects! By implication,
+This does not work for multi-group data sets! By implication,
 it does not work for \sfn{sienaBayes}.
 
 
@@ -3588,8 +3599,8 @@ an explanation of the background of this
 is given in section ``Statistics for MoM'' of
 \href{http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf}{\texttt{Siena\_algorithms.pdf}}.
 
-For network effects, the interaction type is "ego", "dyadic", or "" (blank);
-for behaviour effects, it is "OK" or "".
+For network effects, the interaction type is \texttt{"ego"}, \texttt{"dyadic"}, or \texttt{""} (blank);
+for behaviour effects, it is \texttt{"OK"} or \texttt{""}.
 
 The information necessary for working with interaction effects
 -- the interaction types, short names, and sequence numbers
@@ -3678,8 +3689,8 @@ There are some restrictions on what is permitted
 as interactions between behavior effects.
 Of course,  they should refer to the same dependent behavior variable.
 What is permitted depends on the so-called \texttt{interactionType} of the
-effects, which for behavior effects can be \texttt{OK}\footnote{The value
-is \texttt{OK} for the effects of which the
+effects, which for behavior effects can be \texttt{"OK"}\footnote{The value
+is \texttt{"OK"} for the effects of which the
 formula as defined in Section~\ref{S_f_b}
 is given by $z_i$ multiplied by something not dependent on $z_i$.}
 or blank.
@@ -3691,17 +3702,17 @@ is shown in the list of effects displayed in a browser by using the function:
 \verb|effectsDocumentation()|
 \bigskip
 
-The behavioral effects with non-\texttt{OK} (i.e., blank)
+The behavioral effects with non-\texttt{"OK"} (i.e., blank)
 \texttt{interactionType} include,
 in particular, all effects of which the name
-includes the word ``similarity",
-or alternatively, the short name includes the string ``sim".
+includes the word \texttt{"similarity"},
+or alternatively, the short name includes the string \texttt{"sim"}.
 
 The requirement for behavior interactions is that,
 of the interacting effects, all or all but one have
-the value \texttt{OK}. Thus, for an interaction between two effects,
-one or both should be \texttt{OK}; for a three-effect interaction,
-two or all three should be \texttt{OK}.
+the value \texttt{"OK"}. Thus, for an interaction between two effects,
+one or both should be \texttt{"OK"}; for a three-effect interaction,
+two or all three should be \texttt{"OK"}.
 
 The number of behavior interaction effects that can be created is defined by the
 parameter \texttt{behNintn} in function \sfn{getEffects()}. If you need more
@@ -3964,7 +3975,7 @@ and different variances of the components of the auxiliary statistic.
 This means that very small values of $p$ indicate poor fit.
 There is an important difference here between $p=0$ and $p>0$.
 Suppose that there are, e.g., 1,000 simulated data sets
-(this number is given by \texttt{n3}, the `length of Phase 3');
+(this number is given by \texttt{n3}, the `length of Phase~3');
 then the smallest possible non-zero value of $p$ is 0.001.
 If $p=0$, the observed data are further away from the center of
 the simulated data than any of the simulated data points -- this
@@ -4035,7 +4046,7 @@ during the model specification part, using an iterative stochastic
 approximation algorithm.
 Four estimation procedures are implemented:
 the Method of Moments \citep*[`MoM';][]{Snijders01, SnijdersEA07};
-the Generalized Method of Moments \citep*[`GMoM';][]{ASS2015};
+the Generalized Method of Moments \citep*[`GMoM';][]{ASS2015,ASS2019};
  the Method of Maximum Likelihood \citep[`ML';][]{SnijdersEA10a};
  and a Bayesian method
  \citep{Koskinen04, KoskinenSnijders07,SchweinbergerSnijders07c}.
@@ -4049,9 +4060,8 @@ the Generalized Method of Moments \citep*[`GMoM';][]{ASS2015};
  and relatively complicated models
  (networks and behavior; creation or endowment effects).
 
-In the following, the number of
-parameters is denoted by $p$. The algorithm %s are
-is based on repeated
+In this chapter, the number of
+parameters is denoted by $p$. The algorithm is based on repeated
 (and repeated, and repeated...) simulation of the evolution
 process of the network. These repetitions are called `runs' in the
 following. The MoM estimation algorithm is based on comparing the
@@ -4064,8 +4074,9 @@ For well-fitting combinations of data set and model, the
 estimation results obtained in different trials will be very
 similar. It is good to repeat the estimation process at least once
 for the models that are to be reported in papers or presentations,
-to confirm that what you report is a stable result of the
-algorithm.
+to confirm that what you report is a stable result of the algorithm.
+If you wish to have identical results over different estimations,
+you can set the seed; see Section~\ref{S_param}.
 
 \subsection{An overview of the estimation procedure}
 \hypertarget{T_S_options}{   }
@@ -4126,6 +4137,7 @@ results1  <-  siena07(algorithm1, data = mydata, effects = myeff,
 \end{verbatim}
 
 \subsection{Parameters of the algorithm}
+\label{S_param}
 
 Function \sfn{sienaAlgorithmCreate} defines the algorithm.
 The algorithm is described more in detail in Section~\ref{S_algorithm}.
@@ -4137,7 +4149,8 @@ The following parameters are worth knowing about.
   \item \texttt{projname}: the `project name', the root name of the file
        to which relevant intermediate and final information will be written.
        This file will be put in the working directory of your R session,
-       and have the name \texttt{ppp.out}, if \texttt{projname~=~ppp}.
+       and have the name \texttt{ppp.txt}, if \texttt{projname~=~ppp}.
+       (In \RS versions before 1.2-23, this file was called \texttt{ppp.out}).
   \item \texttt{n3}: the number of iterations in the third phase of the estimation
        algorithm, determining the precision of the standard errors.
   \item \texttt{seed}: the seed of the random number algorithm. This seed determines
@@ -4212,7 +4225,7 @@ can be used.
 
 The estimation produces an output file in the current working directory,
 of which the name is defined by the \textsf{projname} option;
-in this example, the name is \texttt{trypro.out}.
+in this example, the name is \texttt{trypro.txt}.
 To look at the information, you may either look at this file
 (which can be opened by any text editor), or produce results on the \R console.
 
@@ -4330,14 +4343,14 @@ results1 <- siena07(algorithm1, data = mydata, effects = myeff,
       \texttt{results0}.\\
       If the specification of the effects object used to obtain
       \texttt{results0} was the same as \texttt{myeff}, then not only the initial
-      values are copied, but also Phase 1 of the algorithm is skipped,
+      values are copied, but also Phase~1 of the algorithm is skipped,
       because information for the sensitivity of the statistics with
-      respect to the parameters is taken from the results of Phase 3
+      respect to the parameters is taken from the results of Phase~3
       of \texttt{results0}.\\
       If the specification of the effects object used to obtain
       \texttt{results0} was not the same as \texttt{myeff}, then for those
       parameters that do match, the initial values are copied
-      from \texttt{results0} and Phase 1 is carried out as usual.
+      from \texttt{results0} and Phase~1 is carried out as usual.
 \item If \texttt{useStdInits = TRUE} is used in the call of
       \textsf{sienaAlgorithmCreate}, standard initial values are used.\\
       These consist of some reasonable values for the rate parameters and the
@@ -4455,7 +4468,7 @@ which can be downloaded from the \SI website.
 
 \begin{itemize}
 \item \texttt{n2start}\\
-    This is the minimum length of phase 2.1, i.e., the first subphase of phase~2.
+    This is the minimum length of Phase~2.1, i.e., the first subphase of phase~2.
     The default value
      is $2.52\times (p+7)$, where $p$ is the number of estimated parameters.
     The minimum lengths of the subsequent subphases\footnote{These values are
@@ -4562,9 +4575,10 @@ It is to be expected that (1.) will be computationally more efficient than (2.)
     (among other requirements, with a value of \sfn{tconv.max} that is
     not very high; and \emph{not} with one or more parameter estimates
     being very high in absolute value), continue the estimation, using \sfn{prevAns},
-    with \sfn{nsub=1}; a high value for \sfn{n2start};
-    and \sfn{firstg} clearly less than the default 0.2; e.g., 0.01.
-    What is `a high value' depends on the data set - model combination,
+    with \sfn{nsub=1}; a high value for \sfn{n3}, e.g., 3000 or 5000;
+    and a high value for \sfn{n2start}.
+    What is `a high value for \sfn{n2start}' depends on the data set
+    - model combination,
     the number of parameters in the first place.
     The baseline value (see the preceding section\footnote{The value given here
     is the default number of simulation runs in the 4'th subphase.})
@@ -4577,6 +4591,10 @@ It is to be expected that (1.) will be computationally more efficient than (2.)
     Note that computation time in Phase~2 will be proportional to \sfn{n2start}.
     Continue estimation with these algorithmic parameters using \sfn{prevAns},
     further perhaps increasing \sfn{n2start} if necessary.
+
+    If estimation further was unstable, a possibility here is to
+    use a value for \sfn{firstg} clearly less than the default 0.2; e.g., 0.01.
+    But often the default works just fine here.
 \item As an alternative to (1.): in estimations where \sfn{prevAns} is
     not\footnote{Until December 2, 2019, unfortunately, the `not'
     was erroneously omitted here.} used,
@@ -4725,7 +4743,7 @@ are the following.
 Further details are in the help file for \textsf{siena07}.
 
 \begin{tabbing}
- \texttt{ans\$theta  }\hspace{3em}    \=  estimates  \\
+ \texttt{ans\$theta  }\hspace{3em}    \=  parameter estimates  \\
                                       \> (but not for the rate parameter used
                                                        for conditioning;\\
                                       \> if time dummies were requested using
@@ -4743,14 +4761,14 @@ Further details are in the help file for \textsf{siena07}.
  \texttt{ans\$tconv.max   }         \> maximum $t$-ratio for convergence for \\
                                  \> any linear combination of the parameters,\\
                              \> called the overall maximum convergence ratio \\
- \texttt{ans\$sf    }        \>  generated statistics in Phase 3 (targets subtracted)\\
+ \texttt{ans\$sf    }        \>  generated statistics in Phase~3 (targets subtracted)\\
  \texttt{ans\$msf   }        \>  covariance matrix of
                                            \texttt{ans\$sf    } \\
  \texttt{ans\$dfra  }        \> estimated derivative of expected
                                             statistics w.r.t.\ parameters,  \\
- \texttt{ans\$ac  }        \> autocorrelations of generated statistics in Phase 3  \\
+ \texttt{ans\$ac  }        \> autocorrelations of generated statistics in Phase~3  \\
  \texttt{ans\$sims }         \> simulated values of dependent variables
-                                      in Phase 3 of the algorithm     \\
+                                      in Phase~3 of the algorithm     \\
                              \>  if \textsf{returnDeps = TRUE}
                                         in the call of \textsf{siena07}; \\
                              \> in case of Maximum Likelihood estimation (see Section~\ref{S_sims}), note that \\
@@ -4835,11 +4853,11 @@ which can be downloaded from the \SI website.
 It has %for both the MoM and ML method
 three phases:
 \begin{enumerate}
-\item In phase 1, the parameter vector is held constant at its
+\item In Phase~1, the parameter vector is held constant at its
 initial value.
       This phase is for
       having a first rough estimate of the matrix of derivatives.
-\item Phase 2 consists of several subphases.
+\item Phase~2 consists of several subphases.
       More subphases means a greater precision. The default
       number of subphases is 4.
       The parameter values change from run to run, reflecting
@@ -4869,17 +4887,17 @@ initial value.
       the multiplication factor may be too small.
       But in this case, the auto\-correlations given in the output file
       are more important information than those given on the screen.
-\item In phase 3, the parameter vector is held constant again,
+\item In Phase~3, the parameter vector is held constant again,
       now at its final value.
       This phase is for estimating the covariance matrix and the
       matrix of derivatives used for the computation of standard errors.\\
-      The default number of runs in phase 3 is 1000. This requires a lot
-      of computing time, but when the number of phase 3 runs is too low,
+      The default number of runs in Phase~3 is 1000. This requires a lot
+      of computing time, but when the number of Phase~3 runs is too low,
       the standard errors computed are rather unreliable.
 \end{enumerate}
 
-The number of subphases in phase 2, and the number of runs in
-phase 3, are determined by parameters \textsf{nsub} and \textsf{n3}
+The number of subphases in Phase~2, and the number of runs in
+Phase~3, are determined by parameters \textsf{nsub} and \textsf{n3}
 in the call of \textsf{sienaAlgorithmCreate}.
 
 During the estimation process, if the graphical user interface
@@ -4889,8 +4907,8 @@ the user can break in and modify the estimation process in two
 ways:
 \begin{enumerate}
 \item it is possible to terminate the estimation;
-\item in phase 2, it is possible to terminate phase 2
-      and continue with phase 3.
+\item in Phase~2, it is possible to terminate Phase~2
+      and continue with Phase~3.
 \end{enumerate}
 
 % For the ML estimation option and for the non-longitudinal case,
@@ -4951,7 +4969,7 @@ Output can be obtained in several ways.
   \item The function \textsf{siena07}
         writes an output file which is an ASCII (`text') file that can be
         read by any text editor.
-        It is called \textsf{\textsl{pname}.out},
+        It is called \textsf{\textsl{pname}.txt},
         where \textsf{\textsl{pname}} is the name
         specified in the call of \textsf{sienaAlgorithmCreate()}.
 
@@ -5134,12 +5152,12 @@ and can be dropped for that reason.
 \SI can estimate models by four estimation methods:
 the (unconditional or conditional)
 Method of Moments \citep*[`MoM', the default; ][]{Snijders01, SnijdersEA07};
-the Generalized Method of Moments \citep*[`GMoM', see][]{ASS2015};
+the Generalized Method of Moments \citep*[`GMoM', see][]{ASS2015,ASS2019};
 the Maximum Likelihood method \citep*[`ML', see][]{SnijdersEA10a},
 and Bayesian methods
-\citep[see][]{Koskinen04,KoskinenSnijders07,SchweinbergerSnijders07c,KoskinenSnijders19}.
+\citep[see][]{Koskinen04,KoskinenSnijders07,SchweinbergerSnijders07c,KoskinenSnijders20}.
 
-The Generalized Method of Moments is still in development.
+The application of the Generalized Method of Moments is still in development.
 It is theoretically more efficient than the Method of Moments.
 It is somewhat more time-consuming; on the other hand, function \sfn{sienacpp()}
 is coded in a more efficient way than \sfn{siena07()}.
@@ -5179,7 +5197,7 @@ but is as yet implemented only for multilevel network modeling
 \label{S_GMoM}
 
 Estimation by the Generalized Method of Moments (GMoM)
-was proposed in \citet{ASS2015} and is implemented
+was proposed in \citet{ASS2015,ASS2019} and part of this is implemented
 in the function \sfn{sienacpp()}, available in \sfn{RSienaTest()}.
 
 If the algorithm object created by \sfn{sienaAlgorithmCreate()}
@@ -5449,6 +5467,7 @@ network evolution in each time period (and the co-evolution of the
 behavioral dimensions, if any are included) carry on until the
 predetermined time length (chosen as 1.0
 for each time period between consecutive observation moments) has elapsed.
+This is expained in \citet[][Section 4.2]{Snijders01}.
 
 In conditional estimation, in each period
 the simulations run on until a stopping
@@ -5532,7 +5551,7 @@ problems, sometimes it tries to solve them automatically by fixing
 one (or more) of the parameters. This will be noticeable because a
 parameter is reported in the output as being fixed without your
 having requested this. This automatic fixing procedure is used,
-when in phase 1 one of the generated statistics seems to be
+when in Phase~1 one of the generated statistics seems to be
 insensitive to changes in the corresponding parameter.
 
 This is a sign that there is little information in the data about
@@ -5598,12 +5617,12 @@ detectCores()
 
   There are some examples in the help page for \sfn{siena07}.
 \item For estimation by Method of Moments (MoM), in Phases 1 and 3
-  the simulations are performed in parallel. In Phase 2,
+  the simulations are performed in parallel. In Phase~2,
   multiple (viz., \texttt{nbrNodes} which is a parameter
   given in the call of \sfn{siena07()}) simulations are done with the same parameters,
   and the resulting statistics are averaged for the updating step in the
   Robbins Monro algorithm. The gain parameter is increased and the
-  number of iterations in phase 2 reduced to take advantage of
+  number of iterations in Phase~2 reduced to take advantage of
   the increased accuracy of the update.\\
   When using the MoM, decrease in computation time will be somewhat less
   than proportional to the number of processes used, if this number is less than
@@ -5611,7 +5630,7 @@ detectCores()
   returns.
 
 \item For estimation by Maximum Likelihood (ML) and by \sfn{sienaBayes()},
-  parallelization goes by period; for multi-group projects, period $\times$
+  parallelization goes by period; for multi-group data sets, period $\times$
   group. Therefore, for this type of estimation, the maximum meaningful number
   of parallel processes is \\ (number of waves -- 1) $\times$ (number of groups).
 
@@ -5666,15 +5685,30 @@ the score function method was developed in \citet{SchweinbergerSnijders07a}
 (where also the finite difference method is explained).
 The score function method is preferable, because it is unbiased
 and demands less computation time than finite differences,
-although it requires more iterations in phase 3 of the estimation algorithm
+although it requires more iterations in Phase~3 of the estimation algorithm
 (see Section~\ref{S_algorithm}).
 It is recommended to use the score function method with
-at least 1000 iterations (default) in phase 3.  For
-published results, it is recommended to have 2000 or 4000 iterations in phase 3.
+at least 1000 iterations (default) in Phase~3.  For
+published results, it is recommended to have at least\footnote{Earlier
+recommendations in this manual were lower, `2000 to 4000'.
+This is adequate in many cases; the increase to 5000 has the purpose
+to be on the safe side.} 5000 iterations in Phase~3.
+
+In some cases, with high correlations between parameters,
+the estimation of standard errors is unstable and even 5000 may be not enough.
+This can be checked this by running \textsf{siena07} several times, with different
+random number seeds (or the default \texttt{seed=NULL} which also gives different
+seeds every run).
+
+To calculate the standard errors for a
+given set of estimates, when these estimates are good and do not need to be changed,
+algorithm settings can be used with \texttt{nsub=0}
+in \sfn{sienaAlgorithmCreate}, so phases 1 and 2 are
+skipped and the whole operation of \sfn{siena07} takes considerably less time.
 
 The method for estimating derivatives is set
-by the \sfn{findiff} parameter and the number of iterations in phase 3
-by the \sfn{n3} parameter, both in function \sfn{sienaAlgorithmCreate()}
+by the \sfn{findiff} parameter and the number of iterations in Phase~3
+by the \sfn{n3} parameter, both in function \sfn{sienaAlgorithmCreate}
 that creates the object with specifications for the algorithm.
 
 \subsection{Multicollinearity}
@@ -5732,6 +5766,7 @@ If the standard errors are stable, then parameter correlations above
 for parameters that are significantly different from 0 and of which
 estimates as well as standard errors are stable across repeated runs of
 the estimation algorithm.
+Also see the preceding section about the stability of standard errors.
 
 \subsection{Precision of the finite differences method}
 
@@ -5750,8 +5785,19 @@ are not very reliable if they are of the order of 0.02 or less.
 \section{Tests}
 \label{S_test}
 
-%Three
-Two types of tests are available in \si.
+Estimated parameters in \SI can be of three kinds:
+basic rate parameters, indicated by the letter $\rho$ (rho), and specific for a
+dependent variable -- period combination; other parameters for the rate function
+(which may be absent from the model), indicated by the letter $\alpha$ (alpha);
+and parameters that are weights for the objective function, indicated by $\beta$ (beta).
+The basic rate parameters are necessarily positive,
+so testing the null hypothesis that they are equal to~0 makes no sense.
+For a combined notation, we denote the combination of $\alpha$ and $\beta$ parameters
+by the letter $\theta$ (theta); for non-conditional estimation,
+$\theta$ will also include the basic rate parameters $\rho$.
+
+For these parameters, two types of test are available in \si.
+
 \begin{enumerate}
 \item $t$-type tests of single parameters can be carried out by
 dividing the parameter estimate by its standard error.
@@ -5770,14 +5816,14 @@ In the maximum  likelihood estimation method
 it is possible to request likelihood ratio tests.
 The log likelihood ratio is computed
 by bridge sampling \citep{GelmanMeng98, HandcockHunter06}.
-This can be requested (a bit deviously) by the number of runs in phase 3
+This can be requested (a bit deviously) by the number of runs in Phase~3
 (defined in the  \hyperlink{T_S_options}{specification options}):
 \begin{enumerate}
-\item If the number of phase 3 runs is a multiple of 100 plus 1
+\item If the number of Phase~3 runs is a multiple of 100 plus 1
       (e.g., 101, 501, etc.), then
       the log likelihood ratio is calculated comparing
       the estimates obtained with the standard initial values.
-\item If the number of phase 3 runs is a multiple of 100 plus 2
+\item If the number of Phase~3 runs is a multiple of 100 plus 2
       (e.g., 102, 502, etc.), then
       the log likelihood ratio is calculated comparing
       the estimates obtained with the initial values
@@ -5885,42 +5931,31 @@ Then the function \sfn{Wald.RSiena()}
 can be used to produce
 the Wald-type test: the chi-squared value of the
 test statistic, the number of degrees of freedom, and the $p$-value.
-\iffalse
-\begin{verbatim}
-Wald.RSiena <- function(A, ans)
-{
-    if (is.vector(A))
-    {
-        A  <- matrix(A, nrow=1)
-    }
-    th     <- A %*% ans$theta
-    covmat <- A %*% ans$covtheta %*% t(A)
-    chisq  <- drop(t(th) %*% solve(covmat) %*% th)
-    d.f.   <- nrow(A)
-    pval   <- 1 - pchisq(chisq, d.f.)
-    print(c(chisquare = chisq, df = d.f., pvalue = pval), digits=3)
-}
-\end{verbatim}
-This is available as function \sfn{Wald.RSiena()}.
-\fi
 
-As an example, for the first two waves of the \textsf{klas12b} data
+As an example, for the \textsf{klas12b} data
 the following results were obtained,
 collected in the \textsf{sienaFit} object \texttt{ans}.
+% script s50_script\Wald.R
 \begin{small}
 \begin{verbatim}
-                              Estimate   Standard   t statistic
-                                           Error
+                                       Estimate   Standard   Convergence
+                                                    Error      t-ratio
 Rate parameters:
-  0       Rate parameter      10.4625  ( 1.8917   )
-  1. eval outdegree (density) -1.8760  ( 0.1883   )  0.0173
-  2. eval reciprocity          1.1405  ( 0.3397   ) -0.0430
-  3. eval transitive triplets  0.3703  ( 0.0639   ) -0.0425
-  4. eval 3-cycles            -0.3373  ( 0.1238   )  0.0020
-  5. eval primary              0.6718  ( 0.2125   ) -0.0619
-  6. eval sex alter            0.1390  ( 0.2011   ) -0.0545
-  7. eval sex ego              0.3165  ( 0.1938   ) -0.0055
-  8. eval sex similarity       0.8197  ( 0.2126   ) -0.0298
+  0.1      Rate parameter period 1      8.7995  ( 1.7061   )
+  0.2      Rate parameter period 2      7.6486  ( 1.2754   )
+  0.3      Rate parameter period 3      8.2209  ( 1.3090   )
+
+Other parameters:
+  1.  eval outdegree (density)         -1.9823  ( 0.1374   )   -0.0200
+  2.  eval reciprocity                  1.6659  ( 0.2548   )    0.0153
+  3.  eval transitive triplets          0.3948  ( 0.0504   )   -0.0225
+  4.  eval transitive recipr. triplets -0.4540  ( 0.0962   )   -0.0276
+  5.  eval primary                      0.6062  ( 0.1372   )   -0.0646
+  6.  eval sex alter                    0.0732  ( 0.1331   )    0.0069
+  7.  eval sex ego                      0.3323  ( 0.1347   )   -0.0526
+  8.  eval sex similarity               0.8828  ( 0.1348   )    0.0525
+
+Overall maximum convergence ratio:    0.1366
 \end{verbatim}
 \end{small}
 The output of \texttt{summary(ans)} also contains the
@@ -5928,17 +5963,19 @@ covariance matrix of the estimates:
 \begin{footnotesize}
 \begin{verbatim}
 Covariance matrix of estimates (correlations below diagonal)
-    0.035    -0.030    -0.009     0.011    -0.009     0.004    -0.003    -0.018
-   -0.470     0.115     0.009    -0.031    -0.003    -0.009     0.002    -0.006
-   -0.767     0.432     0.004    -0.006     0.003     0.001     0.000     0.005
-    0.475    -0.731    -0.761     0.015    -0.005    -0.001     0.001    -0.005
-   -0.218    -0.044     0.246    -0.180     0.045     0.004    -0.003     0.011
-    0.096    -0.132     0.067    -0.058     0.090     0.040    -0.017     0.002
-   -0.092     0.029    -0.017     0.037    -0.079    -0.437     0.038     0.009
-   -0.442    -0.076     0.369    -0.172     0.234     0.054     0.208     0.045
+   0.019 -0.023 -0.006  0.008 -0.002  0.001 -0.001 -0.004
+  -0.666  0.065  0.009 -0.020 -0.001 -0.001  0.002 -0.003
+  -0.817  0.664  0.003 -0.004  0.000  0.001  0.000  0.000
+   0.620 -0.795 -0.861  0.009 -0.001 -0.001  0.000  0.000
+  -0.083 -0.023  0.063 -0.104  0.019  0.000  0.000  0.002
+   0.045 -0.019  0.107 -0.097  0.020  0.018 -0.009 -0.001
+  -0.035  0.059 -0.073  0.012 -0.021 -0.481  0.018  0.005
+  -0.220 -0.099  0.054 -0.012  0.101 -0.049  0.255  0.018
 \end{verbatim}
 \end{footnotesize}
-To test the null hypothesis that the three sex effects
+You probably do not need this as a user, but this covariance matrix
+is used by \RS to carry out the tests.
+To test the null hypothesis, e.g., that the three sex effects
 (ego, alter, similarity) are zero,
 the matrix $A$ is constructed as follows, and the Wald test then is requested.
 \begin{small}
@@ -5953,8 +5990,7 @@ Wald.RSiena(A, ans)
 The result is
 \begin{small}
 \begin{verbatim}
-chisquare        df    pvalue
-   16.556     3.000     0.000872
+chi-squared = 45.66, d.f. = 3;  p < 0.001.
 \end{verbatim}
 \end{small}
 The value $p < 0.001$ expresses strong evidence
@@ -5965,23 +6001,32 @@ The Wald test is frequently applied to test the null
 hypothesis that several parameters are 0.
 The extra work to define the matrix $A$ above can be automated
 by using the following function \sfn{Multipar.RSiena()}.
-\iffalse
-\begin{verbatim}
-Multipar.RSiena <- function(ans, ...)
-   {
-    p <- length(ans$theta)
-    k <- length(c(...))
-    A <- matrix(0, nrow=k, ncol=p)
-    A[cbind(1:k,c(...))] <- 1
-    Wald.RSiena(A, ans)
-    }
-\end{verbatim}
-\fi
 The test of the preceding example is then produced by the command
 \begin{verbatim}
 Multipar.RSiena(ans, 6, 7, 8)
 \end{verbatim}
-
+The output gives slightly more information:
+\begin{verbatim}
+Tested effects:
+ friends: sex alter
+ friends: sex ego
+ friends: sex similarity
+chi-squared = 45.66, d.f. = 3;  p < 0.001.
+\end{verbatim}
+If only one parameter is tested by this function, also the
+one-sided statistic is given. For example, the effect
+of knowing each other from primary school can be tested by
+\begin{verbatim}
+Multipar.RSiena(ans, 5)
+\end{verbatim}
+with the result
+\begin{verbatim}
+Tested effects:
+ friends: primary
+chi-squared = 19.52, d.f. = 1; one-sided Z = 4.42;  p < 0.001.
+\end{verbatim}
+The $Z$-value is just the square root of the chi-squared,
+but with the sign of the parameter attached.
 
 
 \subsubsection{Tests of linear combinations}
@@ -6000,11 +6045,14 @@ the split between creation and maintenance can be made as follows:
 \end{itemize}
 
 In an example using the Glasgow data (160 students, with joiners and leavers),
-we obtained the following results.
+we obtained the following results (the LaTeX table was made by the function
+\textsf{siena.table}).
+
+% Use of \@startpbox doesn't match its definition.%
 
 \begin{center}
 % Table based on sienaFit object G160_net_Res_m2 , Mon Apr 08 15:35:49 2019
-\begin{tabular}{l | r@{.}l r@{.}l  | }
+\begin{tabular}{l | r@{.}l r@{.}l | }
 \hline
 \rule{0pt}{2ex}\relax
 Effect &\multicolumn{2}{c}{par.}&\multicolumn{2}{c }{ (s.e.) }  \\[0.5ex]
@@ -6191,7 +6239,7 @@ summary(myans1)
 \end{verbatim}
 
 
-The one-step estimates are given in the file \texttt{pname.out},
+The one-step estimates are given in the file \texttt{pname.txt},
 mentioned in Section~\ref{S_output}.
 These are `quick and easy' estimates that are not totally
 reliable, but that can be used as approximations of the unrestricted estimates
@@ -6208,7 +6256,7 @@ to the resulting estimate).
 
 Suppose that it is desired to test the goodness-of-fit of the model
 restricted by the null hypothesis that the reciprocity parameter is zero.
-The following output may be obtained in the file \texttt{pname.out},
+The following output may be obtained in the file \texttt{pname.txt},
 mentioned in Section~\ref{S_output}:
 
 
@@ -6400,6 +6448,11 @@ This is allowed because the analysis of period~2 conditions on wave~2.
 \subsection{Testing time heterogeneity in parameters}
 \label{S_timetest2}
 
+The model assumes that the parameter values $\beta_k$
+of the objective function are constant over the periods from 1 to $M-1$.
+This can be tested by the \sfn{sienaTimeTest} function,
+as explained in this section.
+
 We initially assume that $\beta$ does not vary over time, yielding a
 \emph{restricted model}. Our data contains $|\mathcal{M}|$ observations, and we
 estimate the restricted model the method of moments. We wish to test whether the
@@ -6457,13 +6510,34 @@ and conduct the timetest through
 tt2 <- sienaTimeTest(ans2)
 plot(tt2, effects=1:2)
 \end{verbatim}
-If as a consequence of this analysis you wish to add time dummy terms,
-this may be done via
+
+When time heterogeneity is found, there are several options for how to continue.
+One option is to break apart the set of periods, and do the analysis separately
+for smaller subsets of waves. The extreme of this is to do a wave-by-wave analysis,
+i.e., an analysis for each pair of consecutive waves.
+Then there is no issue of heterogeneity, and the results
+will show in some cases that the heterogeneity affects only one or a few parameters.
+Depending on the non-constant pattern that is shown by some of the parameters,
+a new time-varying actor variable, or several, can be defined to
+capture this heterogeneity,
+and the analysis may be done for the set of all periods, for a model including
+interactions of this time varying covariate with the effects for
+which heterogeneity was found. This is the second option.
+The time-varying actor variable could be a linear function of time, a time dummy,
+or whatever.
+The summary of \sfn{sienaTimeTest} gives information that can
+be used to see which waves, and which effects, are mainly responsible for
+the time heterogeneity. A wave-by-wave analysis may give this information
+more clearly, but is more work.
+
+One possibility for time-varying covariates is a time dummy variable.
+This is available in an automated way in the
+function \sfn{includeTimeDummy}. An example is
 \begin{verbatim}
 myeff <- includeTimeDummy(myeff, recip, balance, timeDummy="2")
 ans3  <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE)
 \end{verbatim}
-and testing again,
+after which you can test the new model again,
 \begin{verbatim}
 tt3 <- sienaTimeTest(ans3)
 \end{verbatim}
@@ -6483,7 +6557,7 @@ exploration of the model, for goodness of fit assessment,
 and for studying the sensitivity of the model to parameters.
 Simulations are produced by the \textsf{siena07} function
 also used for parameter estimation, but by calling it in
-such a way that only Phase 3 is carried out
+such a way that only Phase~3 is carried out
 (see section~\ref{S_algorithm}).
 This is done by requesting \texttt{nsub = 0} in
 the model specification in function \textsf{sienaAlgorithmCreate}.
@@ -6971,7 +7045,7 @@ These methods can be applied for two or more networks.
 \medskip
 
 In the following discussion,
-the terms `networks' and `sub-projects' are used interchangeably.
+the terms `networks' and `groups' are used interchangeably.
 
 \noindent
 The four options are:
@@ -6983,10 +7057,10 @@ The four options are:
       The special effort to be made here is the construction
       of the data files for the large (combined) network.
       This is superfluous; it is better to use option~2.
-\item Combining different sub-projects
-      into one \emph{multi-group} project,
+\item Combining different groups
+      into one \emph{multi-group} data set,
       and analyzing this by \sfn{siena07}.
-      The `sub-projects' are the same as the `different networks'
+      The `groups' are the same as the `different networks'
       mentioned here.
       This is explained in Section~\ref{S_multigroup}.\\
       A difference between options 1 and 2 is that the use
@@ -7000,7 +7074,7 @@ The four options are:
       parameters are the same for the various networks,
       except for the basic rate parameters;
       and except for explicitly specified interaction
-      effects between variables depending on the sub-project, and other effects.
+      effects between variables depending on the group, and other effects.
       This is a very strong assumption, and undesirable unless
       options 3-4 are impossible.
 \item Analyzing the different networks separately, without any assumption
@@ -7008,13 +7082,13 @@ The four options are:
       and post-processing the output files by a meta-analysis
       using \textsf{siena08}.
       This is explained in Section~\ref{S_Siena08}.
-\item Combining different sub-projects into one \emph{multi-group} project
+\item Combining different groups into one \emph{multi-group} data set
       as in option (2), but analyzing this by \sfn{sienaBayes}.
       This is explained in Section~\ref{S_sienaBayes}.\\
       Here the assumption for the parameters is that all basic rate parameters
-      may differ arbitrarily between the sub-projects;
+      may differ arbitrarily between the groups;
       for the other parameters, some are identical and others vary randomly across
-      sub-projects according to a multivariate normal distribution.
+      groups according to a multivariate normal distribution.
       The distinction between ``some'' and ``others'' here is made by
       the parameter \texttt{random} in function \sfn{setEffect()}.
 \end{enumerate}
@@ -7055,7 +7129,7 @@ individually,
 then a middle ground might be found in the following way.
 Start with option (3). This will show for which parameters there are
 important differences between the networks.
-Next follow option (2), with interactions between the sub-project dummies
+Next follow option (2), with interactions between the group dummies
 and those parameters for which there were important between-network
 differences; or option (4), where the randomness of the effects
 is determined by these differences.
@@ -7063,7 +7137,7 @@ is determined by these differences.
 When the data sets for the different networks are quite small,
 then one might start by option (2), and use \sfn{sienaTimeTest} to test
 for which of the effects especially there is a large variation in
-parameter values across the sub-projects;
+parameter values across the groups;
 next one could follow approach (4), determining the randomness of the effects
 by the results about this variability.
 
@@ -7080,50 +7154,57 @@ to use \texttt{allowOnly = FALSE} in the call of \sfn{sienaDependent}.
 \subsection{Multi-group Siena analysis}
 \label{S_multigroup}
 
-The multi-group option `glues' several projects
-(further referred to as \emph{sub-projects}) after each other
-into one larger multi-group project.
-These sub-projects
-must have the same sets of variables of all kinds:
+The multi-group option `glues' several Siena data sets
+(further referred to as \emph{groups}) one after the other
+into one larger multi-group data set.
+These groups must have the same sets of variables of all kinds:
 that is, the list of dependent networks, dependent behavioral variables,
 actor covariates, and dyadic covariates must be the same
-for the various sub-projects.
+for the various groups.
 Also their names must be the same.
-The number of actors
-and the number of waves can be different, however.
-These sub-projects then are combined into one project
+The number of actors and the number of waves can be different, however.
+
+Gluing the groups together means that the observations (waves) of the groups
+are arranged after each other, so the total number of observations
+in the multi-group data set is the sum over all groups of the
+number of observations per group. In this way
+the groups then are combined into one Siena data set
 where the number of actors is the largest of the number of
-actors of the sub-projects, and the number of observations
-is the sum of the observations of the sub-projects.
+actors of the groups, and the number of observations
+is the sum of the observations of the groups.
+Constant covariates (whether monadic or dyadic) are transformed
+to changing covariates, because the groups now are regarded
+as multiple observations.
+
 This is done by the function \textsf{sienaGroupCreate} which creates
 a so-called \texttt{sienaGroupEffects} object, which is a list of
 \texttt{sienaEffect} objects with some additional information.
 
-As an example, suppose that three projects with names {\tt sub1}, {\tt sub2},
+As an example, suppose that three Siena data sets with names {\tt sub1}, {\tt sub2},
 and {\tt sub3} are combined. Suppose {\tt sub1} has 21 actors and
 2 observations, {\tt sub2} has 35 actors and 4 observations,
 and {\tt sub3} has 24 actors with 5 observations.
-Then the combined multi-group project has 35 actors and 11 observations.
-The step from observation 2 to 3 switches from sub-project {\tt sub1}
-to sub-project {\tt sub2}, while
-the step from observation 6 to 7 switches from sub-project {\tt sub2}
+Then the combined multi-group group has 35 actors and 11 observations.
+The step from observation 2 to 3 switches from group {\tt sub1}
+to group {\tt sub2}, while
+the step from observation 6 to 7 switches from group {\tt sub2}
 to {\tt sub3}. These switching steps do not correspond to simulations
 of the actor-based model, because that would not be meaningful.
 
-The different sub-projects are considered to be unrelated
+The different groups are considered to be unrelated
 except that they have the same model specification,
 the same variable names, and the same parameter values.
 It is important to check that this is a reasonable assumption.
 One aspect of this is by looking at the descriptives for change
 produced by \textsf{print01Report}, and checking that the
 tendencies in the dependent variable or variables, upward/stable/downward,
-are not too different between the sub-projects.
+are not too different between the groups.
 The \textsf{sienaTimetest} function can be used for
 formally testing this assumption.
 Moderate violations ($p$-values larger than 0.01) will probably
 be acceptable in the sense that the combined results
 still are a meaningful aggregate, strong violations are not acceptable
-and should be remedied by dropping some of the sub-projects or by
+and should be remedied by dropping some of the groups or by
 including an interaction term.
 
 Given the potentially large number of periods that can be implied
@@ -7131,7 +7212,7 @@ by the multi-group option, it probably is advisable,
 when using Method of Moments estimation, to use
 the conditional estimation option.
 
-In multi-group projects, individual covariates are centered by subtracting
+In multi-group groups, individual covariates are centered by subtracting
 the overall mean (across all groups), but dyadic covariates are centered
 by subtracting the within-group means.
 
@@ -7464,6 +7545,11 @@ will be significant.
   Specifying it for too many effects may, however, lead to unstable estimation.
 
   The analysis is done by a Bayesian estimation method.
+  This contrasts with the other functions in \rs, which are based on the
+  frequentist approach to statistical inference.
+  For introductions to Bayesian inference see, e.g.,
+  \citet{KaplanDepaoli2013}.
+
   For the groupwise parameters normal distributions are assumed with conjugate
   priors. The prior distribution for the basic rate parameters is determined
   in a data-dependent way. For the non-varying parameters,
@@ -7800,8 +7886,8 @@ numbers. This may be the case especially for groups with low Jaccard
 coefficients, or for groups that deviate strongly from the other groups.
 It may be advisable to take out the groups with extremely high
 rate parameters (e.g., larger than 50 or 80).
-To try and include some groups with high estimated rate parameters, the prior
-distribution for these parameters may be employed.
+To make it feasible to try and include some groups with high estimated rate
+parameters, a stronger prior distribution for these parameters may be employed.
 
 By default, the prior for the basic rate parameters is data-dependent,
 with a mean and covariance matrix that are robust estimates
@@ -7844,6 +7930,7 @@ all other prior means as $0$, and all prior between-group variances as $1$.
 Further assume that the prior uncertainty about $\mu$ is thought to be
 10~times larger, on the variance scale, than the prior between-group differences.
 One then could use the following piece of code.
+
 {\small
 \begin{verbatim}
 m7 <- c(5, 5, -1, 1, 0, 0, 0)
@@ -7980,11 +8067,12 @@ Currently there is no good way in \sfn{sienaBayes()} to use
 overdispersed starting points. (The difficulty is to get overdispersion
 while still retaining a reasonable convergence for each sequence.)
 The best option currently is to use independent restarts of the whole
-algorithm; or to use one starting point and several continuations
-using \texttt{prevBayes}. In the latter option one uses a long chain
-instead of parallel chains, which is too bad, but this is the best
-we have currently on offer; and using \sfn{monitor()} on such parts of
-a long chain still will give an acceptable impression of convergence.
+algorithm; or to use one MoM estimation run as the basic starting
+point, and use that as \texttt{prevAns} parameter in several independent
+restarts, and perhaps continuations after this using \texttt{prevBayes}.
+Note that `independence' is obtained by using different random
+number seeds in the \texttt{sienaAlgorithm}; and that this is implied
+by its default value \texttt{NULL}.
 
 Function \sfn{monitor()} gives information about the potential
 scale reduction $\hat R$ of the posterior distribution if simulations
@@ -8048,7 +8136,9 @@ If strong outliers are found, this may have two different reasons:
 truly deviating groups; or instability of the estimation
 of the posterior means, related perhaps to having too many
 randomly varying parameters.
-In the latter case, it may be quite arbitrary which groups are
+In the latter case, it may be quite arbitrary (in the sense of
+`depending on the whim of the random numbers during the
+operation of \sfn{sienaBayes}') which groups are
 indicated in the plot as being the outliers.
 
 It should be noted that due to the high correlations between parameters,
@@ -8060,7 +8150,7 @@ posterior means for the reciprocity parameter, it should be avoided
 to specify other parameters as randomly varying that are
 highly correlated with the reciprocity parameter.
 
-It should be noted that the \texttt{.out} files produced by \sfn{sienaBayes()}
+It should be noted that the \texttt{.txt} files produced by \sfn{sienaBayes()}
 are produced somewhere in the initial phase of the project and not meant
 to be informative for final results. They contain the results of the
 initial estimate by the multiple groups method and may be disregarded.
@@ -8130,7 +8220,7 @@ the four-cycle effect.
 
 \hypertarget{T_effpar}{
 Some of the effects contain a number which is denoted in this section
-by $c$, and called in this manual an \emph{internal effect parameter}.
+by $p$, and called in this manual an \emph{internal effect parameter}.
 }
 (These are totally different from the statistical parameters which are
 the weights of the effects in the objective function.)
@@ -8188,7 +8278,7 @@ where $s^{\rm el0}_{ijk}(x)$ does not depend on $x_{ij}$.
 The potential effects in the \hypertarget{T_objective}{network
 evaluation function}
 are the following. Note that in all
-effects where a constants $c$ occurs, this constant can be chosen
+effects where a constants $p$ occurs, this constant can be chosen
 and changed by the user;
 this is the internal effect parameter mentioned above,
 which can be modified by the function \texttt{setEffect(..., parameter=..., ...)}.
@@ -8306,17 +8396,43 @@ and for maintaining existing ties.
 \end{minipage}\\
 
 
+ \begin{minipage}[t]{.75\textwidth}
  \item {\em transitive mediated triplets effect} \texttt{(transMedTrip)},
  defined by the number of transitive patterns in $i$'s
  relations where $i$ has the mediating position
  (ordered pairs of actors
- $(j,h)$ for which $j$ is tied to $i$ and $i$ to $h$, while also $j$ is tied
- to $h$),  which is different from the transitive triplets effect
+ $(j,h)$ for which $h$ is tied to $i$ and $i$ to $j$, while also $h$ is tied
+ to $j$),  which is different from the transitive triplets effect
  only for directed networks,\\
-  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ji}\, x_{ih}\, x_{jh}\,$;\\
+  $s^{\rm net}_{i\vit}(x) =  \sum_{j, h} x_{ij}\, x_{hi}\, x_{hj}\,$;\\
  this cannot be used together with the transitive triplets effect in
  Method of Moments estimation, because of perfect collinearity
- of the fit statistics;
+ of the fit statistics;\\
+ in the saying `friends of my friends are my friends', the actor $i$
+ here is the second `friend';
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.13\textwidth}
+\linethickness{0.3pt}
+\vfill
+\begin{center}
+\beginpicture
+\setcoordinatesystem units <0.8cm,0.8cm> point at 4 3
+\setplotarea x from 2 to 4, y from 0 to 3
+\put{\large$\bullet$} at  2 1
+\put{\large$\bullet$} at  4 1
+\put{\large$\bullet$} at  3 2.732
+\put{$i$} at 2 0.4
+\put{$j$} at 4 0.4
+\put{$h$} at 3 3.4
+\arrow <2mm> [.2,.6]  from 2.2 1 to 3.8 1
+\arrow <2mm> [.2,.6]  from 2.9 2.559 to 2.1 1.1732
+\arrow <2mm> [.2,.6]  from 3.1 2.559 to 3.9 1.1732
+\endpicture
+\end{center}
+\vfill
+\end{minipage}\\
+
 
 
  \item
@@ -8516,20 +8632,24 @@ the {\em number of four-cycles} with shortName \texttt{(cycle4)} \\
 
 
  \item {\em number of dense triads} \texttt{(denseTriads)},
- defined as triads containing at least $c$ ties,\\
+ defined as triads containing at least $p$ ties,\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h} x_{ij} \, I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
- + x_{jh}\, + x_{hj}\,)\geq c \}\,$,\\
+ + x_{jh}\, + x_{hj}\,)\geq p \}\,$,\\
  where the `indicator function' $I\{A\}$ is 1 if the condition
- $A$ is fulfilled and 0 otherwise, and where $c$ is either 5 or 6;\\
+ $A$ is fulfilled and 0 otherwise, and where $p$ is either 5 or 6;\\
   (this effect is superfluous and undefined for symmetric networks);
 
  \item five variations of the \emph{GWESP (geometrically weighted edgewise
   shared partners)} effects: \texttt{gwespFF, gwespBB, gwespFB, gwespBF, gwespRR},
   and for non-directed $W$ networks the sixth version \texttt{gwesp}. \\
   \emph{Note that there is a difference since version 1.1-251; see at the end
-  of this item.}\\
+  of this item.}
+
   These are effects like those developed for exponential random graph models (`ERGMs')
   by \citet{SPRH06}, in the parametrisation of \citet{Hunter2007}.
+  The five versions relate to the various directionalities of the ties,
+  just like the proposals for directed networks in \citet{RPW2009}.
+
   The \texttt{gwespFF} effect is an alternative expression for transitivity.
   This concept here is specified in an actor-based way,
   by counting configurations in the local neighbourhood of
@@ -8689,11 +8809,11 @@ and
 
  \item {\em number of (unilateral) peripheral relations to dense triads},\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
- I\{ (x_{jh}\,  + x_{hj}\, + x_{jk}\, + x_{kj}\, + x_{hk}\, + x_{kh}\,)\geq c \} \,$,\\
- where $c$ is the same constant as in the {\it dense triads} effect;\\
+ I\{ (x_{jh}\,  + x_{hj}\, + x_{jk}\, + x_{kj}\, + x_{hk}\, + x_{kh}\,)\geq p \} \,$,\\
+ where $p$ is the same constant as in the {\it dense triads} effect;\\
  for symmetric networks, the `unilateral' condition is dropped, and the definition is\\
  $s^{\rm net}_{i\vit}(x) =  \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
- I\{ (x_{jh}\,  + x_{hj}\, + x_{jk}\, + x_{kj}\, + x_{hk}\, + x_{kh}\,)\geq c \} \,$;
+ I\{ (x_{jh}\,  + x_{hj}\, + x_{jk}\, + x_{kj}\, + x_{hk}\, + x_{kh}\,)\geq p \} \,$;
 
 
 
@@ -8802,103 +8922,103 @@ and
  defined by the degree of $i$ multiplied by $i$'s reciprocal degree,\\
  $s^{\rm net}_{i\vit}(x) =   x_{i+}\, x^{(r)}_{i} $; \\
  where the reciprocal degree is defined as above;\\
- for internal effect parameter $c=2$, it is defined by\\
+ for internal effect parameter $p=2$, it is defined by\\
  $s^{\rm net}_{i\vit}(x) =   x_{i+}\, \sqrt{x^{(r)}_{i}} $; \\
 
- \item {\em out-degree up to $c$} (\emph{truncated out-degree}),
- where $c$ is some constant
+ \item {\em out-degree up to $p$} (\emph{truncated out-degree}),
+ where $p$ is some constant
  (internal effect parameter, see above),  there are two implementations here:
  \texttt{outTrunc} and \texttt{outTrunc2}, to allow the simultaneous use of this
  effect with 2 different internal effect parameters; the effect is
  defined by  \\
- $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, c)$;\\
- note that for $c=1$ this represents --inversely-- the tendency to be an isolate
+ $s^{\rm net}_{i\vit}(x) = \text{min}(x_{i+}\,,\, p)$;\\
+ note that for $p=1$ this represents --inversely-- the tendency to be an isolate
  with respect to outgoing ties, i.e., have out-degree equal to 0:
  $ \text{min}(x_{i+}\,,\, 1) = 0$ if $x_{i+} = 0$, and
  $ \text{min}(x_{i+}\,,\, 1) = 1$ if $x_{i+} \geq 1$.\\
  Since the representation is inverse, a result like a negative coefficient
- $ -1.2$ for \texttt{outTrunc} (internal effect parameter $c=1$) is interpreted
+ $ -1.2$ for \texttt{outTrunc} (internal effect parameter $p=1$) is interpreted
  as a positive tendency $+1.2$ toward outdegrees equal to 0; the standard
- error is unchanged. In the case of $c=1$, an alternative and more directly
+ error is unchanged. In the case of $p=1$, an alternative and more directly
  comprehensible name is \emph{outdegree at least 1} effect.\\
  Note that the \texttt{outIso} effect (see below) is equivalent
- to \texttt{outTrunc} for $c=1$, but with the opposite sign.
+ to \texttt{outTrunc} for $p=1$, but with the opposite sign.
 
  Compare what is written below about the in-isolate effects:
      the isolation effects are difficult to interpret in words or pictures,
      because they are not based on subgraph counts.
- This holds for the \texttt{outTrunc}($c=1$) effect but, in modified form,
+ This holds for the \texttt{outTrunc}($p=1$) effect but, in modified form,
  also for the \texttt{outTrunc} effect generally,
  The interpretation can best be understood from the change statistics.
  The \texttt{outTrunc} effect has a change statistic of +1 when actor $i$
- creates a link, if the previous outdegree of $i$ is less than $c$.
- For $c=1$, this means a change statistic of +1 for the creation of the
+ creates a link, if the previous outdegree of $i$ is less than $p$.
+ For $p=1$, this means a change statistic of +1 for the creation of the
  first outgoing tie of $i$, and of --1 for the termination of the last outgoing tie.
 
  \item {\em out-isolate} (\texttt{outIso}), defined by \\
  $s^{\rm net}_{i\vit}(x) = I\{x_{i+} \,=\,  0\}$;\\
- this is equivalent to \texttt{outTrunc} for $c=1$,
+ this is equivalent to \texttt{outTrunc} for $p=1$,
  but with a sign reversal for the parameter;
 
 
- \item {\em out-degree more than $c$} (\texttt{outMore})
- where $c$ is some constant
+ \item {\em out-degree more than $p$} (\texttt{outMore})
+ where $p$ is some constant
  (internal effect parameter, see above), defined by \\
- $s^{\rm net}_{i\vit}(x) = \text{max}(x_{i+}\,-\, c, \, 0)$;\\
+ $s^{\rm net}_{i\vit}(x) = \text{max}(x_{i+}\,-\, p, \, 0)$;\\
  this can be regarded as the mirror image of \texttt{outTrunc};
 
  \item {\em square root out-degree}, defined by  \\
  $s^{\rm net}_{i\vit}(x) = \sqrt{x_{i+}}$;\\
  this is left out in later versions of \si;
 
- \item {\em squared (out-degree -- $c$)}, where $c$ is some constant,
+ \item {\em squared (out-degree -- $p$)}, where $p$ is some constant,
  defined by  \\
- $s^{\rm net}_{i\vit}(x) = (x_{i+} - c)^2$,\\
- where $c$ is chosen to diminish the collinearity between this
+ $s^{\rm net}_{i\vit}(x) = (x_{i+} - p)^2$,\\
+ where $p$ is chosen to diminish the collinearity between this
  and the density effect;\\
  this is left out in later versions of \si;
 
- \item {\em sum of (1/(out-degree + $c$)} \texttt{(outInv)},
- where $c$ is some constant,  defined by  \\
- $s^{\rm net}_{i\vit}(x) = 1/(x_{i+} + c)$;\\
+ \item {\em sum of (1/(out-degree + $p$)} \texttt{(outInv)},
+ where $p$ is some constant,  defined by  \\
+ $s^{\rm net}_{i\vit}(x) = 1/(x_{i+} + p)$;\\
  endowment effect only likelihood-based;
 
- \item {\em sum of (1/(out-degree + $c$)(out-degree + $c+1$))} \texttt{(outSqInv)},
- where $c$ is some constant, defined by  \\
- $s^{\rm net}_{i\vit}(x) = 1/(x_{i+} + c)(x_{i+} + c + 1)$;\\
+ \item {\em sum of (1/(out-degree + $p$)(out-degree + $p+1$))} \texttt{(outSqInv)},
+ where $p$ is some constant, defined by  \\
+ $s^{\rm net}_{i\vit}(x) = 1/(x_{i+} + p)(x_{i+} + p + 1)$;\\
  endowment effect only likelihood-based.
 
 
  \item[{\hspace*{-1ex}$\bigodot$}] the following assortativity effects are,
- for $c=1$, various orientations of three-paths (plus a bit of two-paths):\\
+ for $p=1$, various orientations of three-paths (plus a bit of two-paths):\\
 
- \item {\em out-out degree$\,\hat{\ }$(1/c) assortativity}
+ \item {\em out-out degree$\,\hat{\ }$(1/p) assortativity}
  \texttt{(outOutAss)},
  which represents the differential tendency for actors with high out-degrees
  to be tied to other actors who likewise have high out-degrees,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{i+}^{1/c}} {x_{j+}^{1/c}} $;\\
- $c$ can be 1 or 2 (the latter value is the default);
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{i+}^{1/p}} {x_{j+}^{1/p}} $;\\
+ $p$ can be 1 or 2 (the latter value is the default);
 
- \item {\em out-in degree$\,\hat{\ }$(1/c) assortativity}
+ \item {\em out-in degree$\,\hat{\ }$(1/p) assortativity}
  \texttt{(outInAss)},
  which represents the differential tendency for actors with high out-degrees
  to be tied to other actors who have high in-degrees,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{i+}^{1/c}} {x_{+j}^{1/c}} $;\\
- $c$ can be 1 or 2 (the latter value is the default);
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{i+}^{1/p}} {x_{+j}^{1/p}} $;\\
+ $p$ can be 1 or 2 (the latter value is the default);
 
- \item {\em in-out degree$\,\hat{\ }$(1/c) assortativity}
+ \item {\em in-out degree$\,\hat{\ }$(1/p) assortativity}
  \texttt{(inOutAss)},
  which represents the differential tendency for actors with high in-degrees
  to be tied to other actors who have high out-degrees,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{+i}^{1/c}} {x_{j+}^{1/c}} $;\\
- $c$ can be 1 or 2 (the latter value is the default);
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{+i}^{1/p}} {x_{j+}^{1/p}} $;\\
+ $p$ can be 1 or 2 (the latter value is the default);
 
- \item {\em in-in degree$\,\hat{\ }$(1/c) assortativity}
+ \item {\em in-in degree$\,\hat{\ }$(1/p) assortativity}
  \texttt{(inInAss)},
  which represents the differential tendency for actors with high in-degrees
  to be tied to other actors who likewise have high in-degrees,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{+i}^{1/c}} {x_{+j}^{1/c}} $;\\
- $c$ can be 1 or 2 (the latter value is the default);
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, {x_{+i}^{1/p}} {x_{+j}^{1/p}} $;\\
+ $p$ can be 1 or 2 (the latter value is the default);
 
 \item \emph{network-isolate effect}, (\texttt{isolateNet}), the effect of ego having
       in-degree as well as out-degree zero, i.e., being a total isolate,\\
@@ -9369,8 +9489,8 @@ the following effects are available:
  \texttt{(altRThresholdX)},
  defined by the number of actors to whom $i$ has a tie
  and whose covariate value
- is greater than (to the right of)  or equal to a threshold $c$,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, I\{v_j \geq c\} $;\\
+ is greater than (to the right of)  or equal to a threshold $p$,\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, I\{v_j \geq p\} $;\\
  for an actor covariate this (and the following effect)
  can also be obtained as \texttt{altX} for a transformed
  covariate, but this would be impossible for a behavioral dependent variable $V$;\\
@@ -9380,8 +9500,8 @@ the following effects are available:
  \texttt{(altLThresholdX)},
  defined by the number of actors to whom $i$ has a tie
  and whose covariate value
- is smaller than (to the left of)  or equal to a threshold $c$,\\
- $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, I\{v_j \geq c\} $;\\
+ is smaller than (to the left of)  or equal to a threshold $p$,\\
+ $s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\, I\{v_j \geq p\} $;\\
  note that behavioral dependent variables always are centered;
  i.e., the overall mean is subtracted!
 
@@ -9398,8 +9518,8 @@ the following effects are available:
  \item {\em right threshold covariate ego}
  \texttt{(egoRThresholdX)},
  defined by $i$'s out-degree when $i$'s covariate value
- is greater than (to the right of)  or equal to a threshold $c$,\\
- $s^{\rm net}_{i\vit}(x) = I\{v_i \geq c\} \, x_{i+} $;\\
+ is greater than (to the right of)  or equal to a threshold $p$,\\
+ $s^{\rm net}_{i\vit}(x) = I\{v_i \geq p\} \, x_{i+} $;\\
  for an actor covariate this (and the following effect)
  can also be obtained by transforming
  the covariate, but this would be impossible for a behavioral dependent
@@ -9409,8 +9529,8 @@ the following effects are available:
  \item {\em left threshold covariate ego}
  \texttt{(egoLThresholdX)},
  defined by $i$'s out-degree when $i$'s covariate value
- is less than (to the right of) or equal to a threshold $c$,\\
- $s^{\rm net}_{i\vit}(x) = I\{v_i \leq c\} \, x_{i+} $;\\
+ is less than (to the right of) or equal to a threshold $p$,\\
+ $s^{\rm net}_{i\vit}(x) = I\{v_i \leq p\} \, x_{i+} $;\\
  note that behavioral dependent variables always are centered!
 
  \item {\em absolute difference outdegree -- covariate}
@@ -9629,6 +9749,20 @@ the following effects are available:
       third actor to whom both have a mutual tie.
       The Simmelian alter $V$ effect  is  \\
 $s^{\rm net}_{i\vit}(x ) = \sum_j  x^{\rm{simm}}_{ij}\,v_j $ .
+
+
+ \item {\em covariate $\times$ transitive triplets}
+ \texttt{(transTripX)}, defined by the sum of transitive triplets
+ $i \rightarrow h \rightarrow j \leftarrow i$
+ weighted by the covariate value for the intermediate actor $h$,\\
+ $s^{\rm net}_{i\vit}(x) =
+ \sum_j v_h \, x_{ij}\, x_{ih} \, x_{hj} $;\\
+ this is meaningful especially if covariate $V$ is non-centered;
+ else some weights would be negative, and the term `weight'
+ would not be appropriate.
+ Note that weighting by the covariate values for $i$ and/or $j$
+ can be obtained by `user-defined' interactions of \texttt{transTrip}
+ with \texttt{egoX} and/or \texttt{altX}.
 
 
  \item {\em same covariate $\times$ transitive triplets}
@@ -9991,7 +10125,7 @@ the generality already now.
  if two interacting effects are defined by
  $s^{\rm net}_{ia}(x) = \sum_j s^a_{ij}(x)$ and
  $s^{\rm net}_{ib}(x) = \sum_j s^b_{ij}(x)$
- (where $a$ and $b$ are calculated from the internal effect parameter $c$),
+ (where $a$ and $b$ are calculated from the internal effect parameter $p$),
  then the interaction is defined by\\
  $s^{\rm net}_{i\vit}(x) = \sum_j s^a_{ij}(x) s^b_{ij}(x)$ .
 \fi
@@ -10095,7 +10229,7 @@ These conditions are hopefully clear from logical considerations,
 and drawing a little diagram of the involved nodes and arrows
 will be helpful in cases of doubt.
 
-In the \SI output for projects with multiple networks,
+In the \SI output for groups with multiple networks,
 the dependent network in each given effect is indicated by
 the first part of the effect name.
 In the list below, a more or less normally formulated name is given first,
@@ -10677,7 +10811,7 @@ by Maximum Likelihood and Bayesian estimation.
  the Jaccard similarity with respect to outgoing $W$-ties,\\
  $s^{\rm net}_{i\vit}(x) =  \sum_j x_{ij} \, J_{W,\, \text{out}}(i,j)$, where
  \[
- J_{W,\, \text{out}}(i,j) \,=\, \frac{\sum_h w_{ih}\,x_{jh}}
+ J_{W,\, \text{out}}(i,j) \,=\, \frac{\sum_h w_{ih}\,w_{jh}}
                      {w_{i+} + w_{j+} - \sum_h w_{ih}\,w_{jh}}
  \]
  (where 0/0 is taken as 0).
@@ -11626,6 +11760,11 @@ the dependent network is $X$, the two explanatory networks are $W$ and $Z$.
  s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\,
         \Big( \sum_{h} w_{ih}\,w_{jh} \, \sqrt{ z_{+h}} \Big) \ .
 \]
+     For internal effect parameter $p=-1$, the effect is
+\[
+ s^{\rm net}_{i\vit}(x) = \sum_j x_{ij}\,
+        \Big( \sum_{h} \, \frac{ w_{ih}\,w_{jh} }{( z_{+h}+1) } \Big) \ .
+\]
     $W$ is given as \texttt{interaction1}, $Z$ as \texttt{interaction2}.
 
     This effect also is available if all or some of $X$, $W$, and $Z$ are the same.
@@ -11938,8 +12077,8 @@ The list of these effects is the following.
 \item {\em reciprocated degree effect} \texttt{(recipDeg)}, \\
  $s^{\rm beh}_{i\vit}(x, z) = z_i \sum_j x_{ij}\,x_{ji} $;
 
-% \item {\em indegree up to $c$ effect}, where $c$ is a constant between 1 and $n-1$,\\
-% $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} \leq c\}$,\\
+% \item {\em indegree up to $p$ effect}, where $p$ is a constant between 1 and $n-1$,\\
+% $s^{\rm beh}_{i\vit}(x, z) = z_i I\{x_{+i} \leq p\}$,\\
 % where again $I\{A\}$ denotes the indicator function of the condition $A$;
 
  \item {\em in-isolate effect} \texttt{(isolate)},
@@ -12187,8 +12326,8 @@ The list of these effects is the following.
  in the dense triads in which actor $i$ is located, \\
  $s^{\rm beh}_{i\vit}(x, z) =  \sum_{j,h} ({\rm sim}(v_i, v_j) + {\rm sim}(v_i, v_h))\,
   I\{ x_{ij}\, + x_{ji}\, + x_{ih}\, + x_{hi}\,
- + x_{jh}\, + x_{hj}\,\geq c \}\,$,\\
- where $c$ is either 5 or 6; \\
+ + x_{jh}\, + x_{hj}\,\geq p \}\,$,\\
+ where $p$ is either 5 or 6; \\
 
  \item {\em peripheral effect}, defined by  $i$'s
  behavior multiplied by the number of dense triads to which actor $i$ stands
@@ -12196,11 +12335,11 @@ The list of these effects is the following.
 
  $s^{\rm beh}_{i\vit}(x, z) =  $\\[0.4ex]
  $\phantom{abcdef} z_i \sum_{j,h,k} x_{ij} (1-x_{ji})(1-x_{hi})(1-x_{ki})
- I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$,\\[0.4ex]
- where $c$ is the same constant as in the {\it dense triads} effect;\\
+ I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq p \} \,$,\\[0.4ex]
+ where $p$ is the same constant as in the {\it dense triads} effect;\\
  for symmetric networks, the unilateral condition is dropped, and the effect is\\
  $s^{\rm beh}_{i\vit}(x, z) =  z_i \sum_{j,h,k} x_{ij} (1-x_{hi})(1-x_{ki})
- I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq c \} \,$;\\
+ I\{ x_{ij}\,  + x_{ji}\, + x_{ih}\, + x_{hi}\, + x_{jh}\, + x_{hj}\,)\geq p \} \,$;\\
 
  \item {\em average similarity $\times$ popularity ego effect}
  \texttt{(avSimPopEgo)}, defined by the
@@ -12944,7 +13083,7 @@ f^{\rm beh}_i(x, z) \, = \, \sum_k \beta^{\rm beh}_k s^{\rm beh}_{ik}(x, z) \ ,
 \]
 see (\ref{f_beh}).
 In many cases\footnote{For effects satisfying this condition,
-the \texttt{interactionType} is defined as \texttt{OK}.}
+the \texttt{interactionType} is defined as \texttt{"OK"}.}
 the effect has the form of a product
 \begin{equation}
 s^{\rm beh}_{ik}(x, z) \,=\, z_i \,s^{0}_{ik}(x, z) \ ,  \label{beh_generic}
@@ -13178,6 +13317,7 @@ and average alter.
 The results obtained are as follows.\\
 
 {\small
+% g129_manual.r
 % Table based on sienaFit object ans5 , Sat Feb 03 18:03:20 2018
 \begin{center}
 \begin{tabular}{l | r@{.}l r@{.}l   }
@@ -13421,6 +13561,7 @@ behavior evaluation function are as follows.
 \medskip
 
 {\small
+% g129_manual.r
 % Table based on sienaFit object ans5 , Sat Feb 03 18:03:20 2018
 \begin{center}
 \begin{tabular}{l | r@{.}l r@{.}l   }
@@ -13625,6 +13766,7 @@ results are as follows.
 
 {\small
 \begin{center}
+% g129_manual.r
 % Table based on sienaFit object ans.s , Sun Feb 04 20:09:27 2018
 \begin{tabular}{l | r@{.}l r@{.}l  | }
 \hline
@@ -14489,16 +14631,16 @@ As an example, we show how the truncated out-degree effect
 (short name \texttt{outTrunc}) was added. It is
  defined by
  \begin{equation}
-  s^{\rm net}_{i}(x) = \text{min}(x_{i+}\,,\, c)   \label{outTrunc}
+  s^{\rm net}_{i}(x) = \text{min}(x_{i+}\,,\, p)   \label{outTrunc}
  \end{equation}
-where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
+where $p$ is an \hyperlink{T_effpar}{internal effect parameter}.
 
 \begin{enumerate}
 \item The change statistic (\ref{changestat}) is
       \begin{equation}
        \Delta_{ij}(x) \,=\, \left\{ \begin{array}{ll}
-                   1 & \text{  if } \{x_{i+} < c,  x_{ij} = 0 \}
-                     \text{ or } \{x_{i+} \leq c,  x_{ij} = 1 \} \\
+                   1 & \text{  if } \{x_{i+} < p,  x_{ij} = 0 \}
+                     \text{ or } \{x_{i+} \leq p,  x_{ij} = 1 \} \\
                    0 & \text{  else. }
                    \end{array}         \right.  \label{outTrunc_cs}
       \end{equation}
@@ -14547,7 +14689,7 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
       effects defined in Chapter~\ref{S_math} that depend only on the
       outdegree. Consider the effects Outdegree activity - sqrt
       (short name \texttt{outActSqrt})
-      and sum of (1/(out-degree + $c$) (short name \texttt{outInv})
+      and sum of (1/(out-degree + $p$) (short name \texttt{outInv})
       as possible examples.
       A look in  \textsf{EffectFactory.cpp} shows that these are implemented
       using the functions
@@ -14579,7 +14721,7 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
       \textsf{InverseOutdegreeEffect.cpp} as templates.
       This has a second advantage: the  \texttt{outInv} effect has an
       \hyperlink{T_effpar}{effect parameter}, which we also need
-      to represent the parameter $c$ in  (\ref{outTrunc}).
+      to represent the parameter $p$ in  (\ref{outTrunc}).
 
       As a first step,   the files \textsf{InverseOutdegreeEffect.h} and
       \textsf{InverseOutdegreeEffect.cpp} were saved under the new names
@@ -14611,7 +14753,7 @@ where $c$ is an \hyperlink{T_effpar}{internal effect parameter}.
       formulae by $i$) in the current network -- in other words,
       $x_{i+}$.\\
       The variable \texttt{this->lc} refers to the
-      internal effect parameter, denoted in our formulae by $c$.
+      internal effect parameter, denoted in our formulae by $p$.
       The \sfn{return} statement defines the function value that is returned
       when the function is called.
       \\
@@ -15164,7 +15306,7 @@ getDocumentation=FALSE) & print01Report(MyData) & Prints a
 report of a Siena data object and its default effects. We need to supply a
 Siena data object (``data'') a siena effects object (``myeff'') and a model
 name (``modelname'') that defaults to ``Siena''. It creates and saves a file
-named ``modelname.out'' (Siena.out) that contains preliminary information
+named ``modelname.txt'' (Siena.txt) that contains preliminary information
 on the data.\\
 \hline
 
@@ -15313,7 +15455,75 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
-\item 2020-02-16 R-Forge Revision 346, package version 1.2-24.
+\item 2020-08-12 R-Forge Revision 349, package version 1.2-26.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+   \item \texttt{tcltk} no longer a requirement; if not available,
+        batch mode is followed for \sfn{siena07}.
+   \item New effect \texttt{transTripX}.
+   \item For effect \texttt{from.w.ind}, option \texttt{parameter=-1} added.
+   \item The \texttt{to} effect is an ego effect.
+   \item For \sfn{siena.table}, some of the \texttt{effectNames} changed to nice strings,
+     so that \LaTeX\ can run without errors if \texttt{type='tex'}.
+   \item The \sfn{sienaMeta} object produced by \sfn{siena08} now has IWLS estimates more easily
+     accessible, as \texttt{object\$muhat} and \texttt{object\$se.muhat}.
+   \item Error message in \sfn{sienaTimeTest} for \sfn{sienaFit} objects produced with
+     \texttt{lessMem=TRUE}.
+   \item More extensive error message for error in named vectors in algorithm object
+     (\texttt{checkNames} in \sfn{initializeFRAN}).
+   \item For \sfn{sienaDataCreate}: more extensive error message, and \texttt{class(...)} replaced
+     by \texttt{class(...)[1]}.
+   \item multiplication factor added to \sfn{print.sienaAlgorithm} if \texttt{maxlike}.
+   \item \sfn{SienaAlgorithmCreate}: requirements for \texttt{mult} corrected in help page.
+\end{itemize}
+
+Changes in RSiena:
+\begin{itemize}
+\item Vignette \texttt{basicRSiena} added (was earlier available as a script);
+     thanks to James Hollway.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+   \item Improved initialisation in \sfn{sienaBayes}: initial scale factors (squared)
+     and initial parameter estimate (`Kelley').
+   \item Allow parameter \texttt{targetMHProb} of \sfn{sienaBayes} to have length 2,
+        applying separately to the random parameters and the fixed parameters.
+   \item Test on \texttt{class()==} replaced by \texttt{inherits()} in \sfn{sienaBayes}.
+   \item Another attempt to discard the objects \texttt{zn} and \texttt{zsmall} remaining after operation
+     of \sfn{sienaBayes}.
+\end{itemize}
+
+
+
+
+\item 2020-04-08 R-Forge Revision 348, package version 1.2-25.
+
+Changes in RSiena and RSienaTest:
+\begin{itemize}
+ \item Correction of \sfn{sienaDataCreate} for actor covariates (gave a warning).
+ \item Auxiliary function \sfn{dyadicCov} for \sfn{sienaGOF} now can handle missings,
+     does not return a named value for frequency of zeros,
+     and returns the frequencies without any division.
+     The help page indicates how this function can be used to check fit
+     for ego-alter combinations of monadic variables.
+ \item \sfn{descriptives.sienaGOF} also shows the exceedance probabilities
+     of the observed statistics.
+ \item The \texttt{NULL} default values for \texttt{modelType}
+     and \texttt{behModelType} are implemented already at the \texttt{R}
+     side instead of waiting until the information comes to \texttt{C++}.
+ \item Some extra information in help page for \sfn{siena07}.
+\end{itemize}
+
+Changes in RSienaTest:
+\begin{itemize}
+ \item Error corrected that occurred in \sfn{sienaBayes}, \sfn{extract.sienaBayes},
+ and \sfn{extract.posteriorMeans} for data with multiple periods.
+\end{itemize}
+
+
+\item 2020-02-16 R-Forge Revision 347, package version 1.2-24.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
@@ -15936,7 +16146,7 @@ Changes in RSiena and RSienaTest:
 	 \texttt{gwespFFMix}, \texttt{gwespBBMix}, \texttt{gwespBFMix},
      \texttt{gwespFBMix}, \texttt{gwespRRMix}, \texttt{gwespMix}.
    \item Corrected the omission of the check for positive derivative matrix
-      at the end of phase 1 for effects with fixed parameters.
+      at the end of Phase~1 for effects with fixed parameters.
    \item Added parameters \texttt{fix}, \texttt{test}, \texttt{parameter} to
    \sfn{includeInteraction()}.
    \item More helpful error message for incorrect nodesets in
@@ -15974,8 +16184,8 @@ Changes in RSiena and RSienaTest:
    \item \texttt{inOutAss} is dyadic.
    \item Corrected \texttt{effectName} and \texttt{functionName} of \texttt{inPopIntn, outPopIntn,
      inActIntn}, and \texttt{outActIntn} (`\texttt{in}' and `\texttt{out}' were missing).
-  \item Check for positive derivative matrix at the end of phase 1 (non-positive
-     estimated derivatives lead to repeating a prolonged phase 1)
+  \item Check for positive derivative matrix at the end of Phase~1 (non-positive
+     estimated derivatives lead to repeating a prolonged Phase~1)
      omitted for effects with fixed parameters.
 \end{itemize}
 

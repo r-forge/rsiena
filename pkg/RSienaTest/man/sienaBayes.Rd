@@ -125,8 +125,12 @@ glueBayes(z1, z2, nwarm2=0)
         for each chain sample.}
   \item{nSampRates}{Number of extra samples of basic rate parameters
         for each chain sample.}
-  \item{nImproveMH}{Number of iterations per improveMH step.}
-  \item{targetMHProb}{Desired proportion of acceptances in MH steps.}
+  \item{nImproveMH}{Number of iterations per improveMH step.
+        If \code{nImproveMH=0}, no improveMH steps at all.}
+  \item{targetMHProb}{Desired proportion of acceptances in MH steps. 
+       This can be one number, or a vector of two numbers. In the latter case,
+       the first number applies to the MH steps per group (for each group), 
+       the second to the MH steps for the constant parameters ("eta").}
   \item{lengthPhase1}{Only used for frequentist estimation or
       \code{incidentalBasicRates}:
       length of the first phase of the Robbins Monro algorithm.
@@ -244,7 +248,7 @@ glueBayes(z1, z2, nwarm2=0)
   From this basis, \code{nprewarm} Metropolis Hastings steps are taken.
   The proposal covariance matrices then are scaled, in the
   function 'improveMH', to achieve a proportion of accepted MH proposals
-  equal to \code{target}.\cr
+  approximately equal to \code{target}.\cr
   After initialization and scaling of the proposal covariance matrices,
   a warming phase is done of \code{nwarm} Bayesian proposals
   each with a number of MH steps, followed again by the function 'improveMH'.
@@ -289,6 +293,17 @@ glueBayes(z1, z2, nwarm2=0)
   \item{priorKappa}{proportionality constant between prior covariance matrix
                 and covariance matrix of prior distribution for the mean}
   \item{priorDf}{prior degrees of freedom for covariance matrix}
+  \item{nmain}{Number of iterations used in the main phase, as given
+     in the call of \code{sienaBayes}}
+  \item{nwarm}{Number of iterations used in the warm-up phase, as given
+     in the call of \code{sienaBayes}; 0 if \code{prevBayes} was used.
+     The value of \code{nwarm} is used in other
+     functions such as \code{\link{print.sienaBayesFit}},
+     and when the object is used for \code{sienaBayes} as a
+     \code{prevBayes} parameter with \code{newProposalFromPrev=TRUE}.
+     If it was deemed that converge begins later (or earlier) than
+     the value of \code{nwarm}, this value can be changed for further
+     use of the object produced by \code{sienaBayes}.}
   \item{effectName}{array of names of effects included in the model}
   \item{f$groupNames}{array of names of groups included in the model}
   \item{initialResults}{sienaFit object: result of initial MoM estimation

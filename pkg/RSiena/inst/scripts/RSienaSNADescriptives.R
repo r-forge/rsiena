@@ -2,7 +2,7 @@
 ###
 ### ---- RscriptSNADescriptives.R: a script for the introduction to RSiena -------
 ###
-###                               version: May 8, 2014
+###                               version: September 8, 2020
 ##################################################################################
 #
 # Rscript01DataFormat.R is followed by
@@ -33,7 +33,16 @@
 # For this script, you will need the data read and modified in the script
 # Rscript01DataFormat.R. If you have already ran that script, you may
 # load the required workspace:
-load("WorkspaceRscript01.RData")
+# load("WorkspaceRscript01.RData")
+
+# If not, to make this script self-contained, you may run the commands:
+
+    library(RSiena)
+    friend.data.w1 <- s501
+    friend.data.w2 <- s502
+    friend.data.w3 <- s503
+    drink <- s50a
+    smoke <- s50s
 
         net1 <- as.network( friend.data.w1 )
         net2 <- as.network( friend.data.w2 )
@@ -143,12 +152,28 @@ load("WorkspaceRscript01.RData")
    	   dist$gd
 # matrix of geodesic distances
 	      dist$counts
-# matrix containing the number of paths at each geodesic between each pair of vertices
-        dist
+    table(dist$counts)
+# reachability matrix:
+    ?reachability
         reach <- reachability( net1 )  # calculate the reachability matrix
         reach
+
+
+# ---- Network autocorrelation  ------------------------------------------------
+
+# Moran's autocorrelation for outgoing ties:
+
+nacf(net1, drink[, 1], type="moran", neighborhood.type='out')[2]
+nacf(net2, drink[, 2], type="moran", neighborhood.type='out')[2]
+nacf(net3, drink[, 3], type="moran", neighborhood.type='out')[2]
+
+# Moran's autocorrelation for outgoing and incoming ties:
+nacf(net1, drink[, 1], type="moran", neighborhood.type='total')[2]
+nacf(net2, drink[, 2], type="moran", neighborhood.type='total')[2]
+nacf(net3, drink[, 3], type="moran", neighborhood.type='total')[2]
+
 ################################################################################
 ###
-### ---- PROCEED TO Rscript02SienaVariableFormat.R FOR PREPARING DATA FOR RSIENA -
+### -- PROCEED TO Rscript02SienaVariableFormat.R FOR PREPARING DATA FOR RSIENA -
 ###
 ################################################################################

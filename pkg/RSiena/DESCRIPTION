@@ -2,15 +2,37 @@ Encoding: UTF-8
 Package: RSiena
 Type: Package
 Title: Siena - Simulation Investigation for Empirical Network Analysis
-Version: 1.2-25
-Date: 2020-04-08
-Author: Ruth Ripley, Krists Boitmanis, Tom A.B. Snijders, Felix Schoenenberger,
-   Nynke Niezink
-Depends: R (>= 2.15.0)
-Imports: Matrix, tcltk, lattice, parallel, MASS, methods
-Suggests: xtable, network, tools, codetools
-SystemRequirements: GNU make, tcl/tk 8.5, Tktable
+Version: 1.2-26
+Date: 2020-09-12
+Authors@R: c(person("Tom A.B.", "Snijders", role = c("cre", "aut"), email = "tom.snijders@nuffield.ox.ac.uk", comment = c(ORCID = "0000-0003-3157-4157")),
+              person("Christian", "Steglich", role = c("aut","ctb"), comment = c(ORCID = "0000-0002-9097-0873")),
+              person("Johan", "Koskinen", role = c("aut","ctb"), comment = c(ORCID = "0000-0002-6860-325X")),
+              person("Nynke", "Niezink", role = c("aut","ctb")),
+              person("Viviana", "Amati", role = c("aut","ctb")),
+              person("Christoph", "Stadtfeld", role = "ctb", comment = c(ORCID = "0000-0002-2704-2134")),
+              person("James", "Hollway", role = "ctb", comment = c("IHEID", ORCID = "0000-0002-8361-9647")),
+              person("Per", "Block", role = "ctb"),
+              person("Robert", "Krause", role = "ctb"),
+              person("Charlotte", "Greenan", role = "ctb"),
+              person("Josh", "Lospinoso", role = "ctb"),
+              person("Michael", "Schweinberger", role = "ctb"),
+              person("Mark", "Huisman", role = "ctb"),
+              person("Krists", "Boitmanis", role = "ctr"),
+              person("Felix", "Schoenenberger", role = "ctb"),
+              person("Mark", "Ortmann", role = "ctb"),
+              person("Marion", "Hoffman", role = "ctb"),
+              person("Robert", "Hellpap", role = "ctb"),
+              person("Ruth", "Ripley", role = "aut"))
 Maintainer: Tom A.B. Snijders <tom.snijders@nuffield.ox.ac.uk>
+Depends: R (>= 2.15.0)
+Imports:
+    Matrix,
+    lattice,
+    parallel,
+    MASS,
+    methods
+Suggests: xtable, network, tools, codetools, tcltk, knitr, rmarkdown
+SystemRequirements: GNU make
 Description: The main purpose of this package is to perform simulation-based 
    estimation of stochastic actor-oriented models for longitudinal network 
    data collected as panel data. Dependent variables can be single or 
@@ -22,10 +44,11 @@ Description: The main purpose of this package is to perform simulation-based
    Its Application, 4, 343-363 <doi: 10.1146/annurev-statistics-060116-054035>.
    An extensive manual, scripts, and much further information is at the Siena 
    website <http://www.stats.ox.ac.uk/~snijders/siena>.
-License: GPL (>= 3)
-LazyLoad: yes
+License: GPL-3 
 LazyData: yes
 Biarch: yes
 NeedsCompilation: yes
 BuildResaveData: no
+BuildVignettes: yes
+VignetteBuilder: knitr, rmarkdown
 URL: http://www.stats.ox.ac.uk/~snijders/siena

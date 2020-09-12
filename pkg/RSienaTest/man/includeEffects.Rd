@@ -79,7 +79,8 @@ short names to identify the effects which should be included or excluded.}
 \author{Ruth Ripley }
 \seealso{
   \code{\link{getEffects}}, \code{\link{setEffect}},
-  \code{\link{includeInteraction}},
+  \code{\link{includeInteraction}}, 
+  \code{\link{updateSpecification}},
   \code{\link{print.sienaEffects}}, \code{\link{effectsDocumentation}},
   \code{\link{sienacpp}}
 }

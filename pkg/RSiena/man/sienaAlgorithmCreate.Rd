@@ -145,12 +145,13 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
     Default \code{NULL} implies values 1.}
   \item{mult}{Multiplication factor for maximum likelihood and Bayes. Number of
     steps per iteration is set to this multiple of the total distance
-    between the observations at start and finish of the wave.
+    between the observations at start and finish of the wave (and rounded).
     Decreasing \code{mult} below a certain value has no further effect.\cr
-    This can be either a number (which needs to be positive) or a vector
-    of numbers, of length equal to the number of basic rate parameters in the
-    model, i.e., the number of periods times the number of dependent
-    variables.}
+     \code{mult} can be either a number (which needs to be positive) or a vector
+    of numbers, of length equal to the total number of periods. Note that for 
+    multi-group data, the total number of periods is equal to the number
+    of groups times the number of periods per group 
+    (if the latter is constant).}
   \item{simOnly}{Logical: If TRUE, then the calculation of the covariance
     matrix and standard errors of the estimates at the end of
     Phase 3 of the estimation algorithm in function siena07 is skipped.
@@ -180,8 +181,6 @@ sienaModelCreate(fn, projname = "Siena", MaxDegree = NULL, Offset = NULL,
   available as arguments can be changed manually where desired.\cr
   Further information about the implementation of the algorithm is in \cr
   http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf.\cr
-  Some of the examples use \code{projname=NULL}; this is just for the sake of
-  checking the examples, not necessarily intended for normal use.
 }
 \value{Returns an object of class \code{sienaAlgorithm} containing
   values implied by the parameters.}

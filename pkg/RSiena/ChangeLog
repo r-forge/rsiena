@@ -1,3 +1,35 @@
+2020-09-12 R-Forge Revision 348, package version 1.2-26.
+Changes in RSiena and RSienaTest:
+   * Changed requirement for tcltk to "Suggests", 
+     and further modified / cleaned up DESCRIPTION.
+   * In siena07: if (!requireNamespace("tcltk")) set batch to TRUE.
+   * New effect transTripX.
+   * For effect from.w.ind, option parameter=-1 added.
+   * The to effect is an ego effect.
+   * For siena.table, some of the effectNames changed to nice strings,
+     so that LaTeX can run without errors if type='tex'.
+   * The object produced by siena08 now has IWLS estimates more easily 
+     accessible, as object$muhat and object$se.muhat.
+   * Error message in sienaTimeTest for sienaFit objects produced with
+     lessMem=TRUE.
+   * More extensive error message for error in named vectors in algorithm object
+     (checkNames in initializeFRAN).
+   * For sienaDataCreate: more extensive error message, and class(...) replaced
+     by class(...)[1]. 
+   * multiplication factor added to print.sienaAlgorithm if maxlike.
+   * SienaAlgorithmCreate: requirements for mult corrected in help page.
+Changes in RSiena:
+   * Vignette basicRSiena added (was earlier available as a script);
+     thanks to James Hollway.
+Changes in RSienaTest:
+   * Improved initialisation in sienaBayes: initial scale factors (squared)
+     and initial parameter estimate ('Kelley').
+   * Allow parameter targetMHProb of sienaBayes to have length 2.
+   * Test on class()== replaced by inherits() in sienaBayes.
+   * Another attempt to discard the objects zn and zsmall remaining after operation
+     of sienaBayes.
+
+
 2020-04-08 R-Forge Revision 348, package version 1.2-25.
 Changes in RSiena and RSienaTest:
    * Correction of sienaDataCreate for actor covariates (gave a warning).
@@ -12,7 +44,6 @@ Changes in RSiena and RSienaTest:
 Changes in RSienaTest:
    * getNames corrected for data with multiple periods
      (used in sienaBayes, extract.sienaBayes, and extract.posteriorMeans)
-check bayesTest.getNames, voor extract.sienaBayes en extract.posteriorMeans !!!
    
 
 2020-02-16 R-Forge Revision 347, package version 1.2-24.

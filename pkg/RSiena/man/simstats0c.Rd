@@ -38,7 +38,7 @@ terminateFRAN(z, x)
     derivatives by wave (uses a great deal of memory). Only necessary
     for \code{\link{sienaTimeTest}}}
   \item{byGroup}{Boolean. For internal use: allows different thetas for each
-    group to be used in \code{sienaBayes}.}
+    group to be used in sienaBayes.}
   \item{returnDataFrame}{Boolean. Whether to return the chains as
     lists or data frames.}
   \item{returnLoglik}{Boolean. Whether to return the log likelihood of

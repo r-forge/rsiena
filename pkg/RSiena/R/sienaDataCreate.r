@@ -273,7 +273,7 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 	compositionChange <- vector('list',narg)
 	v1 <- 0; v2 <- 0; v3 <- 0; v4 <- 0; v5 <- 0; v6 <- 0
 	for (i in seq(along = dots))
-		switch(class(dots[[i]]),
+		switch(class(dots[[i]])[1],
 			   sienaDependent = {
 				   if (attr(dots[[i]],'sparse'))
 				   {
@@ -321,8 +321,9 @@ sienaDataCreate<- function(..., nodeSets=NULL, getDocumentation=FALSE)
 				   compositionChange[[v6]] <- dots[[i]]
 				   names(compositionChange)[v6] <- nm[i]
 			   },
-			   stop(paste("invalid object in sienaDataCreate",
-						  class(dots[[i]])), call.=FALSE)
+			   stop(paste("invalid object in sienaDataCreate: argument number",
+					i, "is of class ", class(dots[[i]]),
+					", which is not a valid ... argument."), call.=FALSE)
 			   )
 	if (v1 == 0)
 	{

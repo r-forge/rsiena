@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 suppressPackageStartupMessages(library(RSienaTest))
-suppressPackageStartupMessages(library(tcltk))
 RSienaTest:::DONE(FALSE)
 while(!RSienaTest:::DONE()) {Sys.sleep(0.1)}
 

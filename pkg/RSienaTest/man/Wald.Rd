@@ -48,7 +48,7 @@ score.Test(ans, test=ans$test)
    These tests should be carried out only when convergence is adequate
    (overall maximum convergence ratio less than 0.25
    and all \emph{t}-ratios for convergence less than 0.1 in absolute value).
-   
+
    These functions have their own print method, see \code{\link{print.sienaTest}}.
 }
 \value{An object of class \code{sienaTest}, which is a list with elements:
@@ -70,7 +70,7 @@ score.Test(ans, test=ans$test)
 mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 mydata <- sienaDataCreate(mynet)
 myeff <- getEffects(mydata)
-myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=40, seed=1777)
+myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=40, seed=1777, projname=NULL)
 # nsub=1 and n3=40 is used here for having a brief computation,
 # not for practice.
 myeff <- includeEffects(myeff, transTrip, transTies)
@@ -93,5 +93,13 @@ for (i in which(ans$test)){
    sct <- score.Test(ans,i)
    cat(ans$requestedEffects$effectName[i], '\n')
    print(sct)}
+# Testing that endowment and creation effects are identical:
+myeff1 <- getEffects(mydata)
+myeff1 <- includeEffects(myeff1, recip, include=FALSE)
+myeff1 <- includeEffects(myeff1, recip, type='creation')
+(myeff1 <- includeEffects(myeff1, recip, type='endow'))
+(ans1 <- siena07(myalgorithm, data=mydata, effects=myeff1, batch=TRUE))
+A <- matrix(c(0,1,-1), 1, 3)
+(Wald.RSiena(A, ans1))
 }
 \keyword{ tests }
