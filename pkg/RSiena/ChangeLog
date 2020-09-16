@@ -1,4 +1,4 @@
-2020-09-12 R-Forge Revision 348, package version 1.2-26.
+2020-09-16 R-Forge Revision 350, package version 1.2-27.
 Changes in RSiena and RSienaTest:
    * Changed requirement for tcltk to "Suggests", 
      and further modified / cleaned up DESCRIPTION.
@@ -18,6 +18,8 @@ Changes in RSiena and RSienaTest:
      by class(...)[1]. 
    * multiplication factor added to print.sienaAlgorithm if maxlike.
    * SienaAlgorithmCreate: requirements for mult corrected in help page.
+   * In sienaAlgorithmCreate, use the definitions for projname=NULL
+     also if any environment variable _R_CHECK* is set.
 Changes in RSiena:
    * Vignette basicRSiena added (was earlier available as a script);
      thanks to James Hollway.
