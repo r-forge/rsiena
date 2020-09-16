@@ -186,7 +186,7 @@ It also contains contributions written
 by Mark Huisman, Michael Schweinberger, and Christian Steglich.
 
 This manual is frequently updated, mostly only in a minor way.
-This version was renewed for \RS version 1.2-26.
+This version was renewed for \RS version 1.2-27.
 \end{abstract}
 
 
@@ -15455,17 +15455,19 @@ the R-Forge repository, which contains a more complete listing.
 \begin{itemize} % Also update version number in abstract
 
 
-\item 2020-08-12 R-Forge Revision 349, package version 1.2-26.
+\item 2020-09-16 R-Forge Revision 350, package version 1.2-27.
 
 Changes in RSiena and RSienaTest:
 \begin{itemize}
    \item \texttt{tcltk} no longer a requirement; if not available,
-        batch mode is followed for \sfn{siena07}.
+        batch mode is followed for \sfn{siena07} (with help
+        by James Hollway).
    \item New effect \texttt{transTripX}.
    \item For effect \texttt{from.w.ind}, option \texttt{parameter=-1} added.
    \item The \texttt{to} effect is an ego effect.
    \item For \sfn{siena.table}, some of the \texttt{effectNames} changed to nice strings,
-     so that \LaTeX\ can run without errors if \texttt{type='tex'}.
+     so that \LaTeX\ can run without errors 
+     on the table produced if \texttt{type='tex'}.
    \item The \sfn{sienaMeta} object produced by \sfn{siena08} now has IWLS estimates more easily
      accessible, as \texttt{object\$muhat} and \texttt{object\$se.muhat}.
    \item Error message in \sfn{sienaTimeTest} for \sfn{sienaFit} objects produced with
@@ -15474,8 +15476,9 @@ Changes in RSiena and RSienaTest:
      (\texttt{checkNames} in \sfn{initializeFRAN}).
    \item For \sfn{sienaDataCreate}: more extensive error message, and \texttt{class(...)} replaced
      by \texttt{class(...)[1]}.
-   \item multiplication factor added to \sfn{print.sienaAlgorithm} if \texttt{maxlike}.
-   \item \sfn{SienaAlgorithmCreate}: requirements for \texttt{mult} corrected in help page.
+   \item multiplication factor \texttt{mult}
+     added to \sfn{print.sienaAlgorithm} if \texttt{maxlike}.
+   \item \sfn{sienaAlgorithmCreate}: requirements for \texttt{mult} corrected in help page.
 \end{itemize}
 
 Changes in RSiena:

@@ -25,7 +25,7 @@ export(
 
 export(sienacpp)
 
-import(Matrix, tcltk, lattice, parallel, MASS)
+import(Matrix, lattice, parallel, MASS)
 importFrom("grDevices", "rgb", "xy.coords")
 importFrom("graphics", "axis", "barplot", "contour", "layout", "lines",
            "mtext", "pairs", "panel.smooth", "par", "pie", "plot",

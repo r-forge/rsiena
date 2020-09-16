@@ -30,7 +30,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	{
 		if (!is.batch())
 		{
-			tkdestroy(tkvars$tt)
+		  tcltk::tkdestroy(tkvars$tt)
 		}
 		## close the report file
 		Report(closefiles=TRUE)
@@ -144,6 +144,13 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 	batchUse <- batch
 	if (!batch)
 	{
+		if (!requireNamespace("tcltk", quietly = TRUE))
+		{
+				batchUse <- TRUE
+				message("Package tcltk not available, forcing use of batch mode")		
+		}
+		else
+		{
 		if (.Platform$OS.type != "windows")
 		{
 			if (!capabilities("X11"))
@@ -151,6 +158,7 @@ siena07 <- function(x, batch = FALSE, verbose = FALSE, silent=FALSE,
 				batchUse <- TRUE
 				message("No X11 device available, forcing use of batch mode")
 			}
+		}
 		}
 		if(nzchar(Sys.getenv("RSIENA_TESTING")))
 		{
@@ -276,11 +284,11 @@ AnnouncePhase <- function(z, x, subphase=NULL)
 	## require(tcltk)
 	if (!is.batch())
 	{
-		tkdelete(z$tkvars$phase, 0, "end")
-		tkinsert(z$tkvars$phase, 0, paste(" ", z$Phase))
-		tkdelete(z$tkvars$subphase, 0, "end")
-		tkdelete(z$tkvars$iteration, 0, "end")
-		tkinsert(z$tkvars$iteration, 0, format(0, width=6))
+		tcltk::tkdelete(z$tkvars$phase, 0, "end")
+		tcltk::tkinsert(z$tkvars$phase, 0, paste(" ", z$Phase))
+		tcltk::tkdelete(z$tkvars$subphase, 0, "end")
+		tcltk::tkdelete(z$tkvars$iteration, 0, "end")
+		tcltk::tkinsert(z$tkvars$iteration, 0, format(0, width=6))
 	}
 	if (missing(subphase))
 	{
@@ -294,7 +302,7 @@ AnnouncePhase <- function(z, x, subphase=NULL)
 	{
 		if (!is.batch())
 		{
-			tkinsert(z$tkvars$subphase, 0, paste(" ", subphase))
+			tcltk::tkinsert(z$tkvars$subphase, 0, paste(" ", subphase))
 		}
 		else
 		{
@@ -307,9 +315,9 @@ AnnouncePhase <- function(z, x, subphase=NULL)
 	{
 		if (!is.batch())
 		{
-			tkconfigure(z$tkvars$current, height=min(z$pp, 30))
-			tkconfigure(z$tkvars$deviation, height=min(z$pp, 30))
-			tkconfigure(z$tkvars$quasi, height=min(z$pp, 30))
+			tcltk::tkconfigure(z$tkvars$current, height=min(z$pp, 30))
+			tcltk::tkconfigure(z$tkvars$deviation, height=min(z$pp, 30))
+			tcltk::tkconfigure(z$tkvars$quasi, height=min(z$pp, 30))
 		}
 		n1pos <- z$n1 * (z$pp + 1)
 		z$n2min0 <- 7 + z$pp
@@ -394,8 +402,8 @@ DisplayThetaAutocor <- function(z)
 	if (!is.batch())
 	{
 		DisplayTheta(z)
-		tkdelete(z$tkvars$quasi, "1.0", "end")
-		tkinsert(z$tkvars$quasi, "1.0", FormatString(z$pp, z$ac))
+		tcltk::tkdelete(z$tkvars$quasi, "1.0", "end")
+		tcltk::tkinsert(z$tkvars$quasi, "1.0", FormatString(z$pp, z$ac))
 	}
 	else
 	{
@@ -421,8 +429,8 @@ DisplayTheta <- function(z)
 {
 	if (!is.batch())
 	{
-		tkdelete(z$tkvars$current, "1.0", "end")
-		tkinsert(z$tkvars$current, "1.0", FormatString(z$pp, z$theta))
+		tcltk::tkdelete(z$tkvars$current, "1.0", "end")
+		tcltk::tkinsert(z$tkvars$current, "1.0", FormatString(z$pp, z$theta))
 	}
 
 }
@@ -441,8 +449,8 @@ DisplayDeviations <- function(z, fra)
 {
 	if (!is.batch())
 	{
-		tkdelete(z$tkvars$deviations, "1.0", "end")
-		tkinsert(z$tkvars$deviations, "1.0", FormatString(z$pp, fra))
+		tcltk::tkdelete(z$tkvars$deviations, "1.0", "end")
+		tcltk::tkinsert(z$tkvars$deviations, "1.0", FormatString(z$pp, fra))
 	}
 }
 ##@DisplayIteration siena07 Progress reporting
@@ -450,9 +458,9 @@ DisplayIteration <- function(z)
 {
 	if (!is.batch())
 	{
-		tkdelete(z$tkvars$iteration, 0, "end")
-		tkinsert(z$tkvars$iteration, 0, format(z$nit, width=6))
-		tcl("update")
+		tcltk::tkdelete(z$tkvars$iteration, 0, "end")
+		tcltk::tkinsert(z$tkvars$iteration, 0, format(z$nit, width=6))
+		tcltk::tcl("update")
 	}
 }
 ##@Root siena07 Safe square root for compatibility with siena3. Probably not necessary in R.
@@ -467,7 +475,7 @@ getProgressBar <- function(pb)
 	if (is.batch())
 		val <- pb$pbval
 	else
-		val <- as.numeric(tclvalue(tkcget(pb$pb, "-value")))
+		val <- as.numeric(tcltk::tclvalue(tcltk::tkcget(pb$pb, "-value")))
 	val
 }
 
@@ -480,8 +488,8 @@ setProgressBar <- function(pb, val)
 	}
 	else
 	{
-		tkconfigure(pb$pb, value=val)
-		tcl("update")
+		tcltk::tkconfigure(pb$pb, value=val)
+		tcltk::tcl("update")
 	}
 	pb
 }
@@ -491,13 +499,13 @@ createProgressBar <- function(pb, maxvalue)
 	if (is.batch())
 		pb$pbmax <- maxvalue
 	else
-		tkconfigure(pb$pb, maximum=maxvalue)
+		tcltk::tkconfigure(pb$pb, maximum=maxvalue)
 	pb
 }
 ##@tkErrorMessage Miscellaneous Not used
 tkErrorMessage <- function()
 {
-	tkmessageBox(geterrmessage(), icon="error")
+	tcltk::tkmessageBox(geterrmessage(), icon="error")
 }
 
 ##@errorHandler Miscellaneous Not used
