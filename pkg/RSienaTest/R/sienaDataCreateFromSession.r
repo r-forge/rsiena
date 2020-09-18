@@ -16,10 +16,9 @@ trim.blanks <- function(x)
 }
 
 ##@sessionFromFile siena01/DataCreate
-sessionFromFile <- function(loadfilename, tk=FALSE)
+sessionFromFile <- function(loadfilename)
 {
 	## browser()
-	## require(tcltk)
 	dots <- max(c(0, gregexpr(".", loadfilename, fixed=TRUE)[[1]]))
 	if (dots > 1)
 	{
@@ -60,18 +59,8 @@ sessionFromFile <- function(loadfilename, tk=FALSE)
 	}
 	else
 	{
-		if (tk)
-		{
-			tkmessageBox(message="Can only read csv, txt",
-				"(tab delimited) or prn (space delimiited) files",
-				icon="error")
-			return()
-		}
-		else
-		{
-			stop("Can only read csv, txt (tab delimited)",
+		stop("Can only read csv, txt (tab delimited)",
 				"or prn (space delimiited) files")
-		}
 	}
 	session
 }
@@ -79,7 +68,6 @@ sessionFromFile <- function(loadfilename, tk=FALSE)
 ##@readInFiles siena01/DataCreate
 readInFiles <- function(session, edited, files=NULL)
 {
-	## require(tcltk)
 	noFiles <- nrow(session)
 	if (!any(edited))
 	{
@@ -137,7 +125,6 @@ sienaDataCreateFromSession <- function (filename=NULL,
 	files=NULL, getDocumentation=FALSE)
 {
 	session <- NULL
-	## require(tcltk)
 	##@turnoffwarn internal sienaDataCreateFromSession
 	turnoffwarn <- function()
 	{
@@ -697,13 +684,7 @@ sienaDataCreateFromSession <- function (filename=NULL,
 		obj <- unlist(lapply(objnames, strsplit, split=" "))
 		if (any(duplicated(obj)))
 		{
-			if (is.null(filename))
-			{
-				tkmessageBox(message = paste('Duplicate names',
-						obj[duplicated(obj)]))
-			}
-			else
-				stop(paste('Duplicate names',
+			stop(paste('Duplicate names',
 						obj[duplicated(obj)]))
 		}
 		objlist <- mget(obj, as.environment(-1))

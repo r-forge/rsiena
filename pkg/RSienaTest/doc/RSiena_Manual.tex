@@ -880,22 +880,27 @@ of the software appear).
             For Mac, you will also need \sfn{X11}, because this is
             required for \sfn{tcltk}. See the FAQ list for R on Mac,
 	\item	Install the package \RS or \sfn{RSienaTest}, with dependencies.
-            The other packages used are \sfn{tcltk}, \sfn{parallel}
+            The other packages used are  \sfn{parallel}
             and \sfn{tools} (all included in the basic \R distribution);
             \sfn{Matrix}, \sfn{MASS}, \sfn{lattice}, \sfn{codetools}
             (`recommended' packages included in most R distributions);
             \sfn{network} and \sfn{xtable}; and, for \sfn{RSienaTest},
-            \sfn{RUnit}.
+            \sfn{RUnit}. \sfn{tcltk} is optional.
             For goodness of fit testing it will be useful also to
-            install \sfn{sna} and \sfn{igraph}.\\
+            install \sfn{sna} and \sfn{igraph}.
+            For constructing the vignette in \RS the
+            packages \sfn{knitr} and \sfn{rmarkdown} are used.
+            
             You can just install \RS and the other packages
             in the regular way from CRAN.
             If you want to have detailed information about
             what is available at CRAN, go to\\
 \url{http://cran.r-project.org/web/packages/RSiena/} .\\
             However, it is advisable to have the latest version of \RS
-            or \sfn{RSienaTest} from R-Forge or the \SI website.
+            or \sfn{RSienaTest} from GitHub, R-Forge or the \SI website.
             You can go to\\
+            \url{https://github.com/snlab-nl/rsiena/releases}\\
+            or to\\
                \url{http://r-forge.r-project.org/R/?group_id=461} \\
                or to\\
               \url{http://www.stats.ox.ac.uk/~snijders/siena/siena_downloads.htm}\\
@@ -905,9 +910,34 @@ of the software appear).
             in \Rn,
             via the drop-down menu in the \R console, or in command mode which for Mac is
             the `terminal'.
-            If a binary file is available (\texttt{.zip} for Windows, \texttt{.tgz} for Mac),
+            If you downloaded a binary file (\texttt{.zip} for Windows, 
+            \texttt{.tgz} for Mac),
             then using the binary is recommended.
             Installation from binary is much faster than installation from source.
+
+            Installation from the GitHub can be done as follows.
+        Download  the latest release from 
+        \url{https://github.com/snlab-nl/rsiena/releases/}.
+Once the file has been downloaded, unzip it, and install the binary 
+as appropriate for your Operating System.
+In the following, perhaps the name of the Downloads folder and 
+the version number have to be amended:
+
+For Windows:
+
+\texttt{install.packages("\url{~/Downloads/rsiena\_AllOS/winOS/RSiena\_1.2.26.zip}", \\
+repos = NULL)}
+
+For Mac:
+
+\texttt{install.packages("\url{~/Downloads/rsiena\_AllOS/macOS/RSiena\_1.2.26.tgz}", \\
+repos = NULL)}
+
+For Unix:
+
+\texttt{install.packages(\\
+"\url{~/Downloads/rsiena\_AllOS/linuxOS/RSiena\_1.2-26\_R\_x86\_64-pc-linux-gnu.tar.gz}",
+ repos = NULL)}
 
             Installation from the R-Forge repository can be done as follows.
             In these commands, \texttt{RSienaTest} can be replaced by \texttt{RSiena}.
