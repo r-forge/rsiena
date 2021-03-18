@@ -127,9 +127,9 @@ glueBayes(z1, z2, nwarm2=0)
         for each chain sample.}
   \item{nImproveMH}{Number of iterations per improveMH step.
         If \code{nImproveMH=0}, no improveMH steps at all.}
-  \item{targetMHProb}{Desired proportion of acceptances in MH steps. 
+  \item{targetMHProb}{Desired proportion of acceptances in MH steps.
        This can be one number, or a vector of two numbers. In the latter case,
-       the first number applies to the MH steps per group (for each group), 
+       the first number applies to the MH steps per group (for each group),
        the second to the MH steps for the constant parameters ("eta").}
   \item{lengthPhase1}{Only used for frequentist estimation or
       \code{incidentalBasicRates}:
@@ -274,11 +274,14 @@ glueBayes(z1, z2, nwarm2=0)
 
   When the procedure seems to diverge, and for very small groups, it is
   advisable to use smaller values of the parameters \code{initgainGlobal}
-  and \code{initgainGroupwise}.\cr
+  and \code{initgainGroupwise}.
+
   \code{glueBayes(z1,z2)} combines two existing \code{sienaBayesFit} objects
   with the same data and model specifications (this is not entirely
-  checked) into one.  This is intended to be used when \code{z2} was produced
-  by calling \code{sienaBayes} with \code{prevBayes=z1}.\cr
+  checked) into one by putting \code{z2} after \code{z1}.
+  This is intended to be used when \code{z2} was produced
+  by calling \code{sienaBayes} with \code{prevBayes=z1}.
+
   For the function \code{\link{print.sienaEffects}}, the options
   \code{includeRandoms=TRUE} and \code{dropRates=TRUE} are meant to be useful
   especially for effects objects used for \code{sienaBayes}.

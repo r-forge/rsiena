@@ -553,6 +553,10 @@ Effect * EffectFactory::createEffect(const EffectInfo * pEffectInfo) const
 	{
 		pEffect = new SameCovariateTransitiveReciprocatedTripletsEffect(pEffectInfo, false);
 	}
+	else if (effectName == "homXTransRecTrip")
+	{
+		pEffect = new HomCovariateTransitiveTripletsEffect(pEffectInfo, true);
+	}
 	else if (effectName == "inPopX")
 	{
 		string networkName = pEffectInfo->variableName();

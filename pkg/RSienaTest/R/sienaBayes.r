@@ -1595,6 +1595,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	z$int2 <- nbrNodes
 	z$mult <- algo$mult
 	algo$cconditional <-  FALSE
+	startupSkip <- FALSE
 	if (!is.null(algo$randomSeed))
 	{
 		set.seed(algo$randomSeed)
@@ -1674,7 +1675,6 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	else
 	{
 		nsub <- 2
-		startupSkip <- FALSE
 		if (!is.null(prevAns))
 		{
 			if ((usePrevOnly) &
@@ -2957,6 +2957,7 @@ glueBayes <- function(z1,z2,nwarm2=0){
 	z$requestedEffects <- z1$requestedEffects
 	z$basicRate	 <- z1$basicRate
 	z$ratePositions	 <- z1$ratePositions
+	z$rateParameterPosition	 <- z1$rateParameterPosition
 	z$objectiveInVarying  <- z1$objectiveInVarying
 	z$generalParametersInGroup <- z1$generalParametersInGroup
 	z$varyingParametersInGroup	<- z1$varyingParametersInGroup
