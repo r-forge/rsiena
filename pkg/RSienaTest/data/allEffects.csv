@@ -302,6 +302,7 @@ covarNonSymmetricObjective,transitive triplets same xxxxxx,Number of transitive 
 covarNonSymmetricObjective,transitive triplets diff. xxxxxx,Number of transitive triplets diff. on xxxxxx,diffXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarNonSymmetricObjective,transitive triplets homog. xxxxxx,Number of transitive triplets homogeneous on xxxxxx,homXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarNonSymmetricObjective,transitive triplets jumping xxxxxx,Number of transitive triplets jumping xxxxxx,jumpXTransTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
+covarNonSymmetricObjective,trans. rec. triads hom. xxxxxx,Number of transit. recipr. triads hom. on xxxxxx,homXTransRecTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarNonSymmetricObjective,trans. rec. triads same xxxxxx,Number of transit. recipr. triads same on xxxxxx,sameXTransRecTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarNonSymmetricObjective,trans. rec. triads diff. xxxxxx,Number of transit. recipr. triads diff. on xxxxxx,diffXTransRecTrip,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,,FALSE
 covarNonSymmetricObjective,xxxxxx ego x xxxxxx alter,Sum xxxxxx ego x xxxxxx alter,egoXaltX,TRUE,xxxxxx,,eval,FALSE,FALSE,FALSE,FALSE,FALSE,",",0,0,objective,NA,NA,0,0,0,0,dyadic,FALSE

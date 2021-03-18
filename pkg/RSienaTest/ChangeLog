@@ -1,3 +1,8 @@
+2021-03-18 R-Forge Revision 352, package version 1.2-28.
+   * New effect homXTransRecTrip
+   * Added rateParameterPosition	to glueBayes, which results
+     in correct effect names for extract.posteriorMeans.
+
 2020-09-16 R-Forge Revision 350, package version 1.2-27.
 Changes in RSiena and RSienaTest:
    * Changed requirement for tcltk to "Suggests", 

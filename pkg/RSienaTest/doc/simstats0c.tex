@@ -57,7 +57,7 @@
 
 \title{Simstats0c/FRAN}
 \author{Ruth Ripley}
-\date{}
+\date{2013}
 \maketitle
 
 \centerline{\emph{\today}}
@@ -76,10 +76,13 @@ C++ functions for most of its work.
 \section{Outstanding work}
 \begin{enumerate}
 \item When setting up the effects for behaviour variables, it is
-  assumed that the one-mode network is non-symmetric. Should not!
+  assumed that the one-mode network is non-symmetric. Should not!\\
+Note by Tom (February 2021): I'm not sure that this still is the case.
+It should be checked.
 \item Allow data values indicating structurally fixed values to be a parameter.
 \item Validate things
 \end{enumerate}
+
 
 \section{Model specification}
 
@@ -229,10 +232,10 @@ selected rate effects multiplied by relevant theta value
 \IF{bipartite}
 \STATE add \{0\} to  alters
 \ENDIF
-\FOR[calculate deltas and effects]{$j \in \text{alters}$ }
-\IF{out-degree of actor >= \nm{maxdegree}} (changed from = to >=, ts, 6-5-13)
-\STATE change is only permissible if there is a link to this alter, to
-change its value
+\FOR[calculate deltas and effects;
+this condition changed from = to >=, ts, 6-5-13]{$j \in \text{alters}$ }
+\IF{out-degree of actor $>=$ \nm{maxdegree}}
+\STATE change is only permissible if there is a link to this alter, to change its value
 \ELSIF{link from actor to $j$ is structurally determined}
 \STATE $\nnm{delta} = \{\}$
 \ELSE[changes are permissible]
