@@ -49,8 +49,8 @@ Package \code{"RSiena"} is the official release.
   \tabular{ll}{
     Package: \tab RSienaTest\cr
     Type: \tab Package\cr
-    Version: \tab 1.2-28\cr
-    Date: \tab 2021-03-18\cr
+    Version: \tab 1.2-29\cr
+    Date: \tab 2021-04-14\cr
     Depends: \tab R (>= 2.15.0)\cr
     Imports: \tab Matrix, lattice, parallel, MASS, methods\cr
     Suggests: \tab xtable, network, tools, codetools, utils, tcltk\cr
@@ -80,7 +80,7 @@ Package \code{"RSiena"} is the official release.
       The statistical evaluation of social network dynamics.
       \emph{Sociological Methodology} \bold{31}, 361-395.
     \item Snijders, Tom A.B. (2017). Stochastic Actor-Oriented Models for Network
-      Dynamics. 
+      Dynamics.
       \emph{Annual Review of Statistics and Its Application} \bold{4}, 343--363.
     \item  Snijders, Tom A.B., van de Bunt, Gerhard G., and
       Steglich, Christian E.G. (2010).

@@ -916,6 +916,11 @@ covtrob <- function(x){
 		zsmall <- list()
 
 		z$nImproveMH <- nImproveMH
+		if  (nrunMHBatches%%2 == 1) # meaning that it is odd
+		{
+			cat("nrunMHBatches should be even. 1 is added to it.\n")
+			nrunMHBatches <- nrunMHBatches + 1
+		}
 		if (nrunMHBatches >= 2)
 		{
 			z$nrunMHBatches <- nrunMHBatches
@@ -950,14 +955,21 @@ covtrob <- function(x){
 
 		# Pre-warming phase
 		bgain <- initfgain
+		accepts.earlier <- 10
 		for (ii in 1:nprewarm)
 		{
 			MCMCcycle(nrunMH=nrunMHBatches, nSampVar=nSampVarying,
 								nSampCons=nSampConst, nSampRate=nSampRates,
 								bgain=bgain)
 			cat('Pre-warming step',ii,'(',nprewarm,')\n')
-			cat("Accepts ",sum(zm$BayesAcceptances),"/",
+			accepts <- sum(zm$BayesAcceptances)
+			cat("Accepts ",sum(accepts),"/",
 				z$nGroup*nrunMHBatches,"\n")
+			if (max(accepts, accepts.earlier) <= 0)
+			{
+				break
+			}
+			accepts.earlier <- accepts
 			flush.console()
 		}
 		print('end of pre-warming')

@@ -149,7 +149,7 @@ behavior <- sienaDependent(matrix(c(y1,y2), 50,2), type = "continuous")
 (mydata <- sienaDataCreate(friend, behavior))
 (myeff <- getEffects(mydata, onePeriodSde = TRUE))
 algorithmMoM <- sienaAlgorithmCreate(nsub=1, n3=20, seed=321)
-(ans <- siena07(algorithmMoM, data = mydata, effects = myeff, batch=TRUE))
+#(ans <- siena07(algorithmMoM, data = mydata, effects = myeff, batch=TRUE))
 ##test17
 print('test17')
 Group1 <- sienaDependent(array(c(N3401, HN3401), dim=c(45, 45, 2)))
