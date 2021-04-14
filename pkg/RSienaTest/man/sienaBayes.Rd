@@ -43,7 +43,7 @@ glueBayes(z1, z2, nwarm2=0)
     are saved after each multiple of saveFreq iterations in the main phase,
     in a file with name PartialBayesResult.RData (if a file with this name
     exists, it will be overwritten).
-    This file contains an object z of class "sienaBayesFit",
+    This file contains an object \code{z} of class \code{\link{sienaBayesFit}},
     with the provisional results.
     This is to guard against crashes or power failure.
     It can be used as value for \code{prevBayes} as indicated below.}
@@ -63,22 +63,22 @@ glueBayes(z1, z2, nwarm2=0)
      groupwise initial estimation.}
   \item{priorSigEta}{Vector of length equal to the number of fixed parameters,
      or \code{NULL}. If not \code{NULL}, values that are not \code{NA} are prior
-     variances of eta (fixed effects); these must all be positive.}
+     variances of \code{eta} (fixed effects); these must all be positive.}
   \item{priorMu}{Vector of length equal to the number of randomly varying
      parameters, or \code{NULL}.
-     Prior mean of mu (global population mean for varying parameters);
+     Prior mean of \code{mu} (global population mean for varying parameters);
      default: 0.
      For the basic rate parameters the defaults are data-dependent,
      but if ((\code{priorRatesFromData = 0}) and \code{priorMu=NULL}),
      for these parameters the prior mean will be 2.}
-  \item{priorSigma}{Square matrix of dimension equal to length of priorMu,
+  \item{priorSigma}{Square matrix of dimension equal to length of \code{priorMu},
      or \code{NULL}.
-     Prior global population covariance matrix Sigma for the varying parameters;
+     Prior global population covariance matrix \code{Sigma} for the varying parameters;
      default: identity matrix.}
-  \item{priorDf}{Prior degrees of freedom for Sigma (global population
+  \item{priorDf}{Prior degrees of freedom for \code{Sigma} (global population
     covariance matrix); default: number of randomly varying parameters + 2.}
   \item{priorKappa}{Proportionality constant between prior covariance matrix
-    and covariance matrix of prior distribution for mu; default: 1.}
+    and covariance matrix of prior distribution for \code{mu}; default: 1.}
   \item{priorRatesFromData}{-1, 0, 1, or 2. Determines the prior distribution
      for the rate parameters.\cr
      -1: all basic rate parameters are fixed; this must correspond to
@@ -88,13 +88,13 @@ glueBayes(z1, z2, nwarm2=0)
         from initialization phase;\cr
      2: prior is defined by robust estimates for location and multivariate scale
         of estimated rate parameters from initialization phase.}
-  \item{frequentist}{Currently only frequentist=FALSE works.
+  \item{frequentist}{Currently only \code{frequentist=FALSE} works.
     Boolean: chooses between frequentist or Bayesian
     estimation of the global parameters.
     Frequentist estimation is possible only for at least 2 groups.}
-  \item{incidentalBasicRates}{Boolean. If this is TRUE, the basic rate
+  \item{incidentalBasicRates}{Boolean. If this is \code{TRUE}, the basic rate
     parameters are defined specifically for each group, and estimated
-    using a Robbins Monro algorithm; if FALSE, they have a
+    using a Robbins Monro algorithm; if \code{FALSE}, they have a
     common prior for all groups.}
   \item{reductionFactor}{Positive number.
    If \code{priorRatesFromData} = 1 or 2, the prior distribution for the rate
@@ -110,35 +110,38 @@ glueBayes(z1, z2, nwarm2=0)
     during iterations, it is changed so that
    all correlations are at least delta.}
   \item{nprewarm}{Number of iterations in the pre-warm-up phase,
-    before improveMH.}
+    before \code{improveMH}.}
   \item{nwarm}{Number of iterations in the warm-up phase.
     Used only if \code{prevBayes} is \code{NULL}.
     Then it should be at least 5.}
   \item{nmain}{Number of iterations in the main phase.
      Should be at least 10.}
-  \item{nrunMHBatches}{Thinning ratio in MCMC process;
-     but thinning is further determined by parameter \code{mult} in \code{algo},
-     see \code{\link{sienaAlgorithmCreate}}.}
+  \item{nrunMHBatches}{Integer: thinning ratio in MCMC process;
+     but thinning at the lowest level is further determined by parameter
+     \code{mult} in \code{algo},
+     see \code{\link{sienaAlgorithmCreate}}. Should be even.}
   \item{nSampVarying}{Number of samples of varying parameters
         for each chain sample.}
-  \item{nSampConst}{Number of samples of constant parameters ("eta")
+  \item{nSampConst}{Number of samples of constant parameters ("\code{eta}")
         for each chain sample.}
   \item{nSampRates}{Number of extra samples of basic rate parameters
         for each chain sample.}
-  \item{nImproveMH}{Number of iterations per improveMH step.
-        If \code{nImproveMH=0}, no improveMH steps at all.}
+  \item{nImproveMH}{Number of iterations per \code{improveMH} step.
+        If \code{nImproveMH=0}, no \code{improveMH} steps at all.}
   \item{targetMHProb}{Desired proportion of acceptances in MH steps.
        This can be one number, or a vector of two numbers. In the latter case,
        the first number applies to the MH steps per group (for each group),
-       the second to the MH steps for the constant parameters ("eta").}
+       the second to the MH steps for the constant parameters ("\code{eta}").}
   \item{lengthPhase1}{Only used for frequentist estimation or
       \code{incidentalBasicRates}:
       length of the first phase of the Robbins Monro algorithm.
-      lengthPhase1 + lengthPhase3 should be strictly less than nmain.}
+      \code{lengthPhase1 + lengthPhase3} should be strictly 
+	  less than \code{nmain}.}
    \item{lengthPhase3}{Only used for frequentist estimation or
       \code{incidentalBasicRates}:
       length of the third phase of the Robbins Monro algorithm.
-      lengthPhase1 + lengthPhase3 should be strictly less than nmain.}
+      \code{lengthPhase1 + lengthPhase3} should be strictly 
+	  less than \code{nmain}.}
   \item{storeAll}{Boolean: whether to store parameters for all MCMC iterations,
       i.e., before thinning. \code{storeAll=TRUE} may lead to producing
       very large objects and is not recommended for usual operation.}
@@ -162,7 +165,7 @@ glueBayes(z1, z2, nwarm2=0)
   \item{usePrevOnly}{Boolean: see immediately above.}
   \item{prevBayes}{An object of class \code{sienaBayes} as returned by function
       \code{sienaBayes}, on which the current function will continue.
-      For example, the object z contained in the intermediate saved result
+      For example, the object \code{z} contained in the intermediate saved result
       \code{PartialBayesResult.RData} as mentioned above.
       Initialization and warming phases are skipped. \cr
       If these are given, the values of \code{nrunMHBatches},
@@ -208,13 +211,14 @@ glueBayes(z1, z2, nwarm2=0)
   For the groupwise parameters normal distributions are assumed with conjugate
   priors.
   The conjugate prior is an inverse Wishart distribution for the covariance
-  matrix Sigma, with parameters \code{Lambda^{-1}} and \code{priorDf},
-  where \eqn{Lambda = priorDf \times priorSigma}{Lambda = priorDf * priorSigma};
-  and, conditional on Sigma, for the expected value a multivariate normal with
+  matrix \code{Sigma}, with parameters \code{Lambda^{-1}} and \code{priorDf},
+  where \code{Lambda = priorDf*priorSigma};
+  and, conditional on \code{Sigma}, for the expected value a multivariate normal with
   mean \code{priorMu} and covariance matrix \code{Sigma/priorKappa}.\cr
   For the fixed parameters, if \code{priorSigEta=NULL}, the improper constant
   prior is used.
-  Else, for the components of eta for which \code{priorEta} is \code{NA},
+  Else, for the components of \code{eta} (fixed effects parameter) for which
+  \code{priorEta} is \code{NA},
   the improper constant prior is used, and for other components,
   independent normal priors with mean 0 and variances given by \code{priorEta}.
   \cr
@@ -243,23 +247,25 @@ glueBayes(z1, z2, nwarm2=0)
   estimate, with step size \code{initgain}.
   This is skipped if \code{initgain=0}.\cr
   If the \code{prevBayes} object is supplied, this initialization phase is
-  skipped, and if \code{newProposalFromPrev} the proposal covariance matrices are
-  calculated from the simulated chains in this object.\cr
-  From this basis, \code{nprewarm} Metropolis Hastings steps are taken.
+  skipped, and if \code{newProposalFromPrev} the proposal covariance matrices
+  are calculated from the simulated chains in this object.\cr
+  From this basis, \code{nprewarm} Metropolis Hastings steps are taken;
+  however, if no acceptances occur in two consecutive steps, the prewarming
+  phase is ended.
   The proposal covariance matrices then are scaled, in the
-  function 'improveMH', to achieve a proportion of accepted MH proposals
+  function '\code{improveMH}', to achieve a proportion of accepted MH proposals
   approximately equal to \code{target}.\cr
   After initialization and scaling of the proposal covariance matrices,
   a warming phase is done of \code{nwarm} Bayesian proposals
-  each with a number of MH steps, followed again by the function 'improveMH'.
+  each with a number of MH steps, followed again by the function '\code{improveMH}'.
   If the \code{prevBayes} object is supplied, the warming phase is skipped.
   \cr
-  Finally \code{nmain} repeats (of \code{nrunMHBatches} are performed of a
+  Finally \code{nmain} repeats of \code{nrunMHBatches} are performed of a
   number of MH steps sampling chains, plus \code{nSampVarying} MH steps
-  sampling the varying parameters ('theta_j') plus \code{nSampConst} MH steps
-  sampling the non-varying parameters ('eta') plus one Gibbs
+  sampling the varying parameters ('\code{theta_j}') plus \code{nSampConst}
+  MH steps sampling the non-varying parameters ('\code{eta}') plus one Gibbs
   step sampling the global mean and covariance matrix of the varying parameters
-  ('mu' and 'Sigma').
+  ('\code{mu}' and '\code{Sigma}').
   In the warming as well as the final phase, the number of MH steps
   within each run is determined by parameter \code{mult}
   ("multiplication factor") in the algorithm object \code{algo}.
@@ -312,30 +318,36 @@ glueBayes(z1, z2, nwarm2=0)
   \item{initialResults}{sienaFit object: result of initial MoM estimation
   under the assumption of same parameters across groups}
   \item{ThinParameters}{array of dimensions (\code{nwarm+nmain} iterations
-  by parameters by groups): sampled groupwise parameters}
+    by parameters by groups): sampled groupwise parameters}
   \item{ThinPosteriorMu}{array of dimensions (\code{nwarm+nmain} iterations
-  by parameters): sampled global means of varying parameters}
+    by parameters): sampled global means of varying parameters}
   \item{ThinPosteriorEta}{array of dimensions (\code{nwarm+nmain} iterations
-  by fixed parameters): sampled fixed parameters}
+    by fixed parameters): sampled fixed parameters}
   \item{ThinPosteriorSigma}{array of dimensions (\code{nwarm+nmain} iterations
-  by parameters by parameters): sampled global covariance matrix
-  of varying parameters}
-  \item{nrunMH}{vector (by groups * waves) of number of MH steps in the innermost loop
-  of the likelihood simulations of the SAOM; this is a data-dependent
-   multiple of the value of \code{mult} set in \code{\link{sienaAlgorithmCreate}}.}
+    by parameters by parameters): sampled global covariance matrix
+    of varying parameters}
+  \item{nrunMH}{vector (by groups * waves) of number of MH steps in the
+   innermost loop of the likelihood simulations of the SAOM;
+   this is a data-dependent multiple of the value of \code{mult}
+   set in \code{\link{sienaAlgorithmCreate}}}
+  \item{ThinBayesAcceptances}{matrix of number of acceptances
+   in the \code{nrunMHBatches} MH steps in each iteration,
+   and summed over dependent variables,
+   for each group and (duplicated) for the vector of fixed effects}
   \item{acceptances}{if \code{storeAll=TRUE}: matrix of booleans:
-   whether the corresponding change to the parameters was accepted, by group}
+   whether the corresponding change to the parameters was accepted
+   in each step, by group}
   \item{MHacceptances}{if \code{storeAll=TRUE}:
    array of acceptances of the MH steps, by step type and group
    but summed over dependent variables}
   \item{MHrejections}{if \code{storeAll=TRUE}:
-   array of rejections of the ML steps}
+   array of rejections of the MH steps}
   \item{MHproportions}{if \code{storeAll=TRUE}:
    array of proportions of the MH steps accepted}
 }
 \references{See \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 
-  Koskinen, J. H. and T. A. B. Snijders (2007).
+  Koskinen, J.H. and T.A.B. Snijders (2007).
   Bayesian inference for dynamic social network data.
   \emph{Journal of Statistical Planning and Inference}, 13, 3930-3938.
 }
