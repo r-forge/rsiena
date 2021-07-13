@@ -1,3 +1,8 @@
+2021-07-13 R-Forge Revision 354, package version 1.2-30.
+Changes in RSienaTest:
+   * sienaBayes: adaptation of nwarm and nmain 
+     at the end of initializeBayes dropped.
+
 2021-04-14 R-Forge Revision 353, package version 1.2-29.
 Changes in RSienaTest:
    * sienaBayes: break out of prewarming if in 2 consecutive steps
