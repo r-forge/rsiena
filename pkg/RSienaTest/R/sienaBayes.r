@@ -160,9 +160,9 @@ sienaBayes <- function(data, effects, algo, saveFreq=100,
 		}
 		else
 		{
-			desired <- c(rep(trunc(target[1]*totruns), z$nGroup), 
+			desired <- c(rep(trunc(target[1]*totruns), z$nGroup),
 						rep(trunc(target[2]*totruns), 2))
-		}		
+		}
 		iter <- 0
 		nearGoal <- rep(FALSE, z$nGroup+2)
 		farFromGoal <- rep(TRUE, z$nGroup+2)
@@ -782,7 +782,7 @@ browser()
 		}
 
 	##@averageTheta internal sienaBayes; algorithm to average past theta values
-	averageTheta <- function()
+	averageTheta <- function(z)
 	{
 		thetaMean <- rep(NA, z$pp)
 		for (group in 1:z$nGroup)
@@ -791,7 +791,7 @@ browser()
 				z$ThinParameters[, group, !z$generalParametersInGroup,
 						drop=FALSE], na.rm=TRUE)
 		}
-		if ((priorRatesFromData <0) | incidentalBasicRates)
+		if ((z$priorRatesFromData <0) | z$incidentalBasicRates)
 		{
 		# then (z$set1)&(!z$basicRate) == (z$set1); just for clarity we write:
 		thetaMean[(z$set1)&(!z$basicRate)] <- colMeans(
@@ -826,7 +826,7 @@ browser()
 		}
 		else
 		{
-			z$theta <<- averageTheta()
+			z$theta <<- averageTheta(z)
 		}
 		save(z,file="PartialBayesResult.RData")
 		z$theta <<- saveTheta
@@ -1259,7 +1259,7 @@ covtrob <- function(x){
 			scf <- (2.38^2)/z$TruNumPars
 # theoretically optimal value according to Roberts & Rosenthal, 2001
 # Also see page 99 (in chapter by Rosenthal) of the Chapman & Hall
-# Handbook of Markov Chain Monte Carlo, 2011. 
+# Handbook of Markov Chain Monte Carlo, 2011.
 # Until RSienaTest version 1.2-25, the scale factors were initialized
 # at 2.38/sqrt(z$TruNumPars); but this should be (2.38^2)/z$TruNumPars,
 # because they are applied to the variance.
@@ -1453,7 +1453,7 @@ covtrob <- function(x){
 	}
 	else
 	{
-		z$theta <- averageTheta()
+		z$theta <- averageTheta(z)
 	}
 	z$frequentist <- frequentist
 	z$FRAN <- NULL
@@ -1975,7 +1975,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 	startupPrec <- prec[objective, objective]
 	priorPrec <- matrix(0, sum(objective), sum(objective))
 	diag(priorPrec) <- 0.01 # a prior variance of 100 if nothing else is said
-# In the following line, up to version 1.2-25, the ginv was missing!!!	
+# In the following line, up to version 1.2-25, the ginv was missing!!!
 	priorPrec[randomInObjective, randomInObjective] <-
 				ginv(z$priorSigma[objectiveInRandom, objectiveInRandom])
 	for (i in seq(along=z$set2prior))
@@ -2215,7 +2215,7 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		z$TruNumPars <- sum(!z$basicRate )
 	}
 	scf <- (2.38^2)/z$TruNumPars
-# theoretically optimal value according to Roberts & Rosenthal, 2001; 
+# theoretically optimal value according to Roberts & Rosenthal, 2001;
 # also see earlier occurrence of 2.38.
 	z$scaleFactors <- rep(scf, z$nGroup)
 	if (z$p2 > 0)
@@ -2369,28 +2369,29 @@ initializeBayes <- function(data, effects, algo, nbrNodes,
 		lengthPhase1 <- round(nmain/5)
 		lengthPhase3 <- round(nmain/5)
 	}
-	if ((nwarm + lengthPhase1 + 5 + lengthPhase3) > nmain)
-	{
-		nwarm <- max(5,
-			round(nwarm*nmain/(nwarm + 2*lengthPhase1+lengthPhase3)))
-		oldLengthPhase1 <- lengthPhase1
-		lengthPhase1 <- max(5,
-			round(lengthPhase1*nmain/(nwarm + 2*lengthPhase1+lengthPhase3)))
-		lengthPhase3 <- max(5,
-			round(lengthPhase3*nmain/(nwarm + 2*oldLengthPhase1+lengthPhase3)))
-		nmain <<- nwarm + 2*lengthPhase1 + lengthPhase3
-		cat("Iteration numbers adapted:\n")
-		cat("nwarm = ", nwarm, "; nmain = ", nmain)
-		if (frequentist)
-		{
-			cat(", lengthPhase1 = ", lengthPhase1,
-				"; lengthPhase3 = ", lengthPhase3, ".\n")
-		}
-		else
-		{
-			cat(".\n")
-		}
-	}
+# adaptation of nwarn and nmain skipped version
+#	if ((nwarm + lengthPhase1 + 5 + lengthPhase3) > nmain)
+#	{
+#		nwarm <- max(5,
+#			round(nwarm*nmain/(nwarm + 2*lengthPhase1+lengthPhase3)))
+#		oldLengthPhase1 <- lengthPhase1
+#		lengthPhase1 <- max(5,
+#			round(lengthPhase1*nmain/(nwarm + 2*lengthPhase1+lengthPhase3)))
+#		lengthPhase3 <- max(5,
+#			round(lengthPhase3*nmain/(nwarm + 2*oldLengthPhase1+lengthPhase3)))
+#		nmain <<- nwarm + 2*lengthPhase1 + lengthPhase3
+#		cat("Iteration numbers adapted:\n")
+#		cat("nwarm = ", nwarm, "; nmain = ", nmain)
+#		if (frequentist)
+#		{
+#			cat(", lengthPhase1 = ", lengthPhase1,
+#				"; lengthPhase3 = ", lengthPhase3, ".\n")
+#		}
+#		else
+#		{
+#			cat(".\n")
+#		}
+#	}
 	z$nwarm <- nwarm
 	z$nprewarm <- nprewarm
 	z$nmain <- nmain

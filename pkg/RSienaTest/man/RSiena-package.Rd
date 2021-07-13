@@ -14,10 +14,11 @@ Not only one-mode networks but also two-mode networks
 and multivariate networks are allowed.
 The models are stochastic actor-oriented models.
 
-Package \code{"RSienaTest"} is the development version, and
-is distributed through R-Forge, see
+Package \code{"RSienaTest"} has the extra functionality of function 
+\code{\link{sienaBayes}}, and is distributed through R-Forge, see
 \url{http://r-forge.r-project.org/R/?group_id=461}.
 Package \code{"RSiena"} is the official release.
+The 
 }
 \details{
   The main flow of operations of this package is as follows.
@@ -49,8 +50,8 @@ Package \code{"RSiena"} is the official release.
   \tabular{ll}{
     Package: \tab RSienaTest\cr
     Type: \tab Package\cr
-    Version: \tab 1.2-29\cr
-    Date: \tab 2021-04-14\cr
+    Version: \tab 1.2-30\cr
+    Date: \tab 2021-07-13\cr
     Depends: \tab R (>= 2.15.0)\cr
     Imports: \tab Matrix, lattice, parallel, MASS, methods\cr
     Suggests: \tab xtable, network, tools, codetools, utils, tcltk\cr

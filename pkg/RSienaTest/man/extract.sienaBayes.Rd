@@ -44,7 +44,7 @@ extract.posteriorMeans(z, nfirst=z$nwarm+1, pmonly=1, excludeRates=FALSE,
   \item{excludeRates}{Logical: whether to exclude the rate parameters.}
   \item{verbose}{Logical: gives some console output to show ongoing activity
        (may be reassuring for large number of groups).}
-}
+} 
 \details{
  \code{extract.sienaBayes} produces a 3-dimensional array, iterations by chains
  by parameters, suitable for use, e.g., in function \code{monitor()}
@@ -55,7 +55,7 @@ extract.posteriorMeans(z, nfirst=z$nwarm+1, pmonly=1, excludeRates=FALSE,
  \code{nSampRate}.\cr
  The number of iterations should be the same for all chains.\cr
  It is not checked that the specifications of the chains are identical.
- For the parameter names, the names in the first chain are used.
+ For the parameter names, the shortNames in the first chain are used.
 
  \code{extract.posteriorMeans} produces the posterior means of the
  groupwise varying parameters. The resulting matrix has the groups
@@ -68,7 +68,10 @@ extract.posteriorMeans(z, nfirst=z$nwarm+1, pmonly=1, excludeRates=FALSE,
   For \code{extract.posteriorMeans} a matrix with the groups in the rows
   and all effects in the columns, with for each effect two columns:
   first the posterior mean (effect name preceded by "p.m.") and then the
-  posterior standard deviation (effect name preceded by "psd.").
+  posterior standard deviation (effect name preceded by "psd.").\cr
+  If some names are duplicated (e.g., because of the presence of
+  evaluation and creation effects), these can be changed by the user
+  after creation of the array.
   }
 \references{See the manual and \url{http://www.stats.ox.ac.uk/~snijders/siena/}
 }
